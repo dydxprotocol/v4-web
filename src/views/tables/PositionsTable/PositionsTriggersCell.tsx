@@ -1,8 +1,9 @@
+import { PositionUniqueId, SubaccountOrder } from '@/abacus-ts/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { Nullable, type SubaccountOrder } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -26,11 +27,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { isStopLossOrder } from '@/lib/orders';
+import { isStopLossOrderNew } from '@/lib/orders';
 
 type ElementProps = {
   marketId: string;
   assetId: string;
+  positionUniqueId: PositionUniqueId;
   tickSizeDecimals: number;
   liquidationPrice: Nullable<BigNumber>;
   stopLossOrders: SubaccountOrder[];
@@ -44,6 +46,7 @@ type ElementProps = {
 export const PositionsTriggersCell = ({
   marketId,
   assetId,
+  positionUniqueId,
   tickSizeDecimals,
   liquidationPrice,
   stopLossOrders,
@@ -62,14 +65,14 @@ export const PositionsTriggersCell = ({
   const onViewOrders = () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
-    if (!isStopLossOrder(order, isSlTpLimitOrdersEnabled) || !liquidationPrice) {
+    if (!isStopLossOrderNew(order, isSlTpLimitOrdersEnabled) || !liquidationPrice) {
       return false;
     }
     return (
       (positionSide === IndexerPositionSide.SHORT &&
-        (order.triggerPrice ?? order.price) > liquidationPrice.toNumber()) ||
+        (order.triggerPrice ?? order.price).gt(liquidationPrice)) ||
       (positionSide === IndexerPositionSide.LONG &&
-        (order.triggerPrice ?? order.price) < liquidationPrice.toNumber())
+        (order.triggerPrice ?? order.price).lt(liquidationPrice))
     );
   };
 
@@ -82,8 +85,7 @@ export const PositionsTriggersCell = ({
         DialogTypes.Triggers({
           marketId,
           assetId,
-          stopLossOrders,
-          takeProfitOrders,
+          positionUniqueId,
           navigateToMarketOrders: onViewOrders,
         })
       )
@@ -138,14 +140,14 @@ export const PositionsTriggersCell = ({
       const order = orders[0]!;
       const { size, triggerPrice } = order;
 
-      const isPartialPosition = !!(positionSize && Math.abs(size) < positionSize.abs().toNumber());
+      const isPartialPosition = !!(positionSize && size.abs().lt(positionSize.abs()));
       const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
 
       const output = (
         <$Output
           withSubscript
           type={OutputType.Fiat}
-          value={triggerPrice ?? null}
+          value={triggerPrice?.toNumber() ?? null}
           fractionDigits={tickSizeDecimals}
           $withLiquidationWarning={!!liquidationWarningSide}
         />
@@ -182,7 +184,7 @@ export const PositionsTriggersCell = ({
               align="end"
               side="top"
               hovercard={
-                isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+                isStopLossOrderNew(order, isSlTpLimitOrdersEnabled)
                   ? 'partial-close-stop-loss'
                   : 'partial-close-take-profit'
               }
@@ -194,7 +196,7 @@ export const PositionsTriggersCell = ({
                   disabled={isDisabled}
                 >
                   {stringGetter({
-                    key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+                    key: isStopLossOrderNew(order, isSlTpLimitOrdersEnabled)
                       ? STRING_KEYS.EDIT_STOP_LOSS
                       : STRING_KEYS.EDIT_TAKE_PROFIT,
                   })}

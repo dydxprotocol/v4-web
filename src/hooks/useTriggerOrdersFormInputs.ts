@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
+import { SubaccountOrder } from '@/abacus-ts/types/summaryTypes';
 import { shallowEqual, useDispatch } from 'react-redux';
 
-import { AbacusOrderType, SubaccountOrder, TriggerOrdersInputField } from '@/constants/abacus';
+import { AbacusOrderType, TriggerOrdersInputField } from '@/constants/abacus';
 
 import { useAppSelector } from '@/state/appTypes';
 import { setTriggerFormInputs } from '@/state/inputs';
@@ -11,7 +12,7 @@ import { getTriggerOrdersInputErrors } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { isLimitOrderType } from '@/lib/orders';
+import { isLimitOrderTypeNew } from '@/lib/orders';
 
 export const useTriggerOrdersFormInputs = ({
   marketId,
@@ -50,22 +51,23 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.stopLossOrderSize,
-          value: stopLossOrder.size,
+          value: stopLossOrder.size.toNumber(),
           hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.stopLossOrderType,
-          value: stopLossOrder.type.rawValue,
+          // DANGER - only safe because they happen to match, manually verified
+          value: stopLossOrder.type,
           hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.stopLossPrice,
-          value: stopLossOrder.triggerPrice,
+          value: stopLossOrder.triggerPrice?.toNumber(),
           hasFormInput: true,
         },
-        isLimitOrderType(stopLossOrder.type) && {
+        isLimitOrderTypeNew(stopLossOrder.type) && {
           field: TriggerOrdersInputField.stopLossLimitPrice,
-          value: stopLossOrder.price,
+          value: stopLossOrder.price.toNumber(),
           hasFormInput: true,
         },
       ]
@@ -97,22 +99,23 @@ export const useTriggerOrdersFormInputs = ({
         },
         {
           field: TriggerOrdersInputField.takeProfitOrderSize,
-          value: takeProfitOrder.size,
+          value: takeProfitOrder.size.toNumber(),
           hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.takeProfitOrderType,
-          value: takeProfitOrder.type.rawValue,
+          // DANGER - only safe because they happen to match, manually verified
+          value: takeProfitOrder.type,
           hasFormInput: false,
         },
         {
           field: TriggerOrdersInputField.takeProfitPrice,
-          value: takeProfitOrder.triggerPrice,
+          value: takeProfitOrder.triggerPrice?.toNumber(),
           hasFormInput: true,
         },
-        isLimitOrderType(takeProfitOrder.type) && {
+        isLimitOrderTypeNew(takeProfitOrder.type) && {
           field: TriggerOrdersInputField.takeProfitLimitPrice,
-          value: takeProfitOrder.price,
+          value: takeProfitOrder.price.toNumber(),
           hasFormInput: true,
         },
       ]
@@ -136,15 +139,15 @@ export const useTriggerOrdersFormInputs = ({
 
     if (stopLossOrder?.size && takeProfitOrder?.size) {
       if (stopLossOrder.size === takeProfitOrder.size) {
-        setSize(stopLossOrder.size);
+        setSize(stopLossOrder.size.toNumber());
       } else {
         setSize(null);
         setDifferingOrderSizes(true);
       }
     } else if (stopLossOrder?.size) {
-      setSize(stopLossOrder.size);
+      setSize(stopLossOrder.size.toNumber());
     } else if (takeProfitOrder?.size) {
-      setSize(takeProfitOrder.size);
+      setSize(takeProfitOrder.size.toNumber());
     } else {
       // Default to full position size for initial order creation
       setSize(positionSize);
@@ -172,7 +175,7 @@ export const useTriggerOrdersFormInputs = ({
     inputSize,
     // Boolean to signify whether the limit box should be checked on initial render of the triggers order form
     existsLimitOrder:
-      !!(stopLossOrder && isLimitOrderType(stopLossOrder.type)) ||
-      !!(takeProfitOrder && isLimitOrderType(takeProfitOrder.type)),
+      !!(stopLossOrder && isLimitOrderTypeNew(stopLossOrder.type)) ||
+      !!(takeProfitOrder && isLimitOrderTypeNew(takeProfitOrder.type)),
   };
 };

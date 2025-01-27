@@ -1,23 +1,23 @@
 import { BonsaiCore } from '@/bonsai/ontology';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
-import { groupBy, sum } from 'lodash';
+import { groupBy, keyBy, mapValues, sum } from 'lodash';
 
 import {
   AbacusMarginMode,
-  AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
   HistoricalTradingRewardsPeriod,
   ORDER_SIDES,
   type AbacusOrderStatuses,
   type SubaccountFill,
-  type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
@@ -27,16 +27,14 @@ import {
   getHydratedOrder,
   isOrderStatusClearable,
   isOrderStatusOpen,
-  isStopLossOrder,
-  isTakeProfitOrder,
+  isStopLossOrderNew,
+  isTakeProfitOrderNew,
 } from '@/lib/orders';
-import { getHydratedPositionData } from '@/lib/positions';
 
 import { type RootState } from './_store';
 import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
-import { getAssets } from './assetsSelectors';
 import {
   getCurrentMarketId,
   getCurrentMarketOrderbook,
@@ -99,22 +97,6 @@ export const getNonZeroPendingPositions = createAppSelector(
   [(state: RootState) => state.account.subaccount?.pendingPositions],
   (pending) => pending?.toArray().filter((p) => (p.equity?.current ?? 0) > 0)
 );
-
-/**
- * @param marketId
- * @returns user's position details with the given marketId
- */
-
-export const getPositionDetails = () =>
-  createAppSelector(
-    [getExistingOpenPositions, getAssets, getPerpetualMarkets, (s, marketId: string) => marketId],
-    (positions, assets, perpetualMarkets, marketId) => {
-      const matchingPosition = positions?.find((position) => position.id === marketId);
-      return matchingPosition
-        ? getHydratedPositionData({ data: matchingPosition, assets, perpetualMarkets })
-        : undefined;
-    }
-  );
 
 export const getOpenPositionFromId = (marketId: string) =>
   createAppSelector([getOpenPositions], (allOpenPositions) =>
@@ -266,65 +248,53 @@ export const getFillByClientId = () =>
 
 /**
  * @param state
- * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
- */
-export const getMarketSubaccountOpenOrders = createAppSelector(
-  [getSubaccountOpenOrders],
-  (
-    orders
-  ): {
-    [marketId: string]: SubaccountOrder[];
-  } => {
-    return (orders ?? []).reduce(
-      (marketOrders, order) => {
-        marketOrders[order.marketId] ??= [];
-        marketOrders[order.marketId]!.push(order);
-        return marketOrders;
-      },
-      {} as { [marketId: string]: SubaccountOrder[] }
-    );
-  }
-);
-
-/**
- * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
 export const getSubaccountConditionalOrders = () =>
   createAppSelector(
     [
-      getMarketSubaccountOpenOrders,
-      getOpenPositions,
+      BonsaiCore.account.openOrders.data,
+      BonsaiCore.account.parentSubaccountPositions.data,
       (s, isSlTpLimitOrdersEnabled: boolean) => isSlTpLimitOrdersEnabled,
     ],
-    (openOrdersByMarketId, positions, isSlTpLimitOrdersEnabled) => {
-      const stopLossOrders: SubaccountOrder[] = [];
-      const takeProfitOrders: SubaccountOrder[] = [];
+    (orders, positions, isSlTpLimitOrdersEnabled) => {
+      const openOrdersByPositionUniqueId = groupBy(orders, (o) => o.positionUniqueId);
 
-      positions?.forEach((position) => {
-        const orderSideForConditionalOrder =
-          position.side.current === AbacusPositionSide.LONG
-            ? AbacusOrderSide.Sell
-            : AbacusOrderSide.Buy;
+      return mapValues(
+        keyBy(positions, (p) => p.uniqueId),
+        (position) => {
+          const orderSideForConditionalOrder =
+            position.side === IndexerPositionSide.LONG
+              ? IndexerOrderSide.SELL
+              : IndexerOrderSide.BUY;
 
-        const conditionalOrders = openOrdersByMarketId[position.id];
+          const conditionalOrders = openOrdersByPositionUniqueId[position.uniqueId];
 
-        conditionalOrders?.forEach((order: SubaccountOrder) => {
-          if (
-            order.side === orderSideForConditionalOrder &&
-            isStopLossOrder(order, isSlTpLimitOrdersEnabled)
-          ) {
-            stopLossOrders.push(order);
-          } else if (
-            order.side === orderSideForConditionalOrder &&
-            isTakeProfitOrder(order, isSlTpLimitOrdersEnabled)
-          ) {
-            takeProfitOrders.push(order);
-          }
-        });
-      });
+          return {
+            stopLossOrders: conditionalOrders?.filter(
+              (order) =>
+                order.side === orderSideForConditionalOrder &&
+                isStopLossOrderNew(order, isSlTpLimitOrdersEnabled)
+            ),
+            takeProfitOrders: conditionalOrders?.filter(
+              (order) =>
+                order.side === orderSideForConditionalOrder &&
+                isTakeProfitOrderNew(order, isSlTpLimitOrdersEnabled)
+            ),
+          };
+        }
+      );
+    }
+  );
 
-      return { stopLossOrders, takeProfitOrders };
+export const getSubaccountPositionByUniqueId = () =>
+  createAppSelector(
+    [
+      BonsaiCore.account.parentSubaccountPositions.data,
+      (s, uniqueId: PositionUniqueId) => uniqueId,
+    ],
+    (positions, uniqueId) => {
+      return positions?.find((p) => p.uniqueId === uniqueId);
     }
   );
 
@@ -462,40 +432,6 @@ export const getSubaccountTransfers = (state: RootState) => state.account.transf
 
 /**
  * @param state
- * @returns list of funding payments for the currently connected subaccount
- */
-export const getSubaccountFundingPayments = (state: RootState) => state.account.fundingPayments;
-
-/**
- * @param state
- * @returns Record of SubaccountFundingPayments indexed by marketId
- */
-export const getMarketFundingPayments = createAppSelector(
-  [getSubaccountFundingPayments],
-  (fundingPayments): { [marketId: string]: SubaccountFundingPayment[] } => {
-    return (fundingPayments ?? []).reduce(
-      (marketFundingPayments, fundingPayment) => {
-        marketFundingPayments[fundingPayment.marketId] ??= [];
-        marketFundingPayments[fundingPayment.marketId]!.push(fundingPayment);
-        return marketFundingPayments;
-      },
-      {} as { [marketId: string]: SubaccountFundingPayment[] }
-    );
-  }
-);
-
-/**
- * @param state
- * @returns SubaccountFundingPayments of the current market
- */
-export const getCurrentMarketFundingPayments = createAppSelector(
-  [getCurrentMarketId, getMarketFundingPayments],
-  (currentMarketId, marketFundingPayments): SubaccountFundingPayment[] =>
-    !currentMarketId ? [] : marketFundingPayments[currentMarketId] ?? []
-);
-
-/**
- * @param state
  * @returns boolean on whether an order status is considered open
  */
 const isOpenOrderStatus = (status: AbacusOrderStatuses) => !isOrderStatusClearable(status);
@@ -536,17 +472,11 @@ const getAllUnseenFillsCount = createAppSelector(
  * @returns Total numbers of the subaccount's open positions, open orders and unseen fills
  */
 export const getTradeInfoNumbers = createAppSelector(
-  [
-    getExistingOpenPositions,
-    getSubaccountOrders,
-    getAllUnseenFillsCount,
-    getSubaccountFundingPayments,
-  ],
-  (positions, orders, unseenFillsCount, fundingPayments) => ({
+  [getExistingOpenPositions, getSubaccountOrders, getAllUnseenFillsCount],
+  (positions, orders, unseenFillsCount) => ({
     numTotalPositions: positions?.length,
     numTotalOpenOrders: orders?.filter((order) => isOpenOrderStatus(order.status)).length,
     numTotalUnseenFills: unseenFillsCount,
-    numTotalFundingPayments: fundingPayments?.length,
   })
 );
 
@@ -555,12 +485,11 @@ export const getTradeInfoNumbers = createAppSelector(
  * @returns Numbers of the subaccount's open orders and unseen fills of the current market
  */
 export const getCurrentMarketTradeInfoNumbers = createAppSelector(
-  [getCurrentMarketOrders, getUnseenFillsCountForMarket, getCurrentMarketFundingPayments],
-  (marketOrders, marketUnseenFillsCount, marketFundingPayments) => {
+  [getCurrentMarketOrders, getUnseenFillsCountForMarket],
+  (marketOrders, marketUnseenFillsCount) => {
     return {
       numOpenOrders: marketOrders.filter((order) => isOpenOrderStatus(order.status)).length,
       numUnseenFills: marketUnseenFillsCount,
-      numFundingPayments: marketFundingPayments.length,
     };
   }
 );

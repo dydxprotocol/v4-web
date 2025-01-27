@@ -12,10 +12,9 @@ import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 
 export const TriggersDialog = ({
+  positionUniqueId,
   marketId,
   assetId,
-  stopLossOrders,
-  takeProfitOrders,
   navigateToMarketOrders,
   setIsOpen,
 }: DialogProps<TriggersDialogProps>) => {
@@ -31,9 +30,8 @@ export const TriggersDialog = ({
       slotIcon={<AssetIcon logoUrl={logoUrl} symbol={assetId} />}
     >
       <TriggersForm
+        positionUniqueId={positionUniqueId}
         marketId={marketId}
-        stopLossOrders={stopLossOrders}
-        takeProfitOrders={takeProfitOrders}
         onViewOrdersClick={() => {
           dispatch(closeDialog());
           navigateToMarketOrders(marketId);

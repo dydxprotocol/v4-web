@@ -33,6 +33,7 @@ import {
   SubaccountSummaryCore,
   SubaccountSummaryDerived,
 } from '../types/summaryTypes';
+import { getPositionUniqueId } from './helpers';
 import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
@@ -216,7 +217,7 @@ function calculateDerivedPositionCore(
   const value = signedSize.times(oracle);
 
   return {
-    uniqueId: `${position.market}-${position.subaccountNumber}`,
+    uniqueId: getPositionUniqueId(position.market, position.subaccountNumber),
     assetId: getAssetFromMarketId(position.market),
     marginMode,
     unsignedSize,

@@ -15,8 +15,8 @@ export type MarketsData = { [marketId: string]: IndexerWsBaseMarketObject };
 export type OrdersData = { [orderId: string]: IndexerCompositeOrderObject };
 
 export type OrderbookData = {
-  bids: { [price: string]: string };
-  asks: { [price: string]: string };
+  bids: { [price: string]: { size: string; offset: number } };
+  asks: { [price: string]: { size: string; offset: number } };
 };
 
 export interface ParentSubaccountData {

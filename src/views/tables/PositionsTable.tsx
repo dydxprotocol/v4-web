@@ -1,14 +1,16 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { PerpetualMarketSummary, SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import {
+  PerpetualMarketSummary,
+  SubaccountOrder,
+  SubaccountPosition,
+} from '@/bonsai/types/summaryTypes';
 import { Separator } from '@radix-ui/react-separator';
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { type SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -17,6 +19,7 @@ import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -362,10 +365,12 @@ const getPositionsTableColumnDef = ({
           signedSize,
           stopLossOrders,
           takeProfitOrders,
+          uniqueId,
         }) => {
           return (
             <PositionsTriggersCell
               marketId={market}
+              positionUniqueId={uniqueId}
               assetId={assetId}
               tickSizeDecimals={tickSizeDecimals}
               liquidationPrice={liquidationPrice}
@@ -467,34 +472,23 @@ export const PositionsTable = forwardRef(
       });
     }, [currentMarket, marketTypeFilter, openPositions]);
 
-    const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
-    // todo calculate this too
-    const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
-      useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
-        equalityFn: (oldVal, newVal) => {
-          return (
-            shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
-            shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
-          );
-        },
-      });
+    const tpslOrdersByPositionUniqueId = useParameterizedSelector(
+      getSubaccountConditionalOrders,
+      isSlTpLimitOrdersEnabled
+    );
 
     const positionsData = useMemo(
       () =>
         positions.map((position: SubaccountPosition): PositionTableRow => {
           const marketSummary = marketSummaries[position.market];
-          const orderIsInThisMarket = (order: SubaccountOrder) => {
-            return (
-              order.marketId === position.market &&
-              order.subaccountNumber === position.subaccountNumber
-            );
-          };
           return safeAssign(
             {},
             {
               marketSummary,
-              stopLossOrders: allStopLossOrders.filter(orderIsInThisMarket),
-              takeProfitOrders: allTakeProfitOrders.filter(orderIsInThisMarket),
+              stopLossOrders:
+                tpslOrdersByPositionUniqueId[position.uniqueId]?.stopLossOrders ?? EMPTY_ARR,
+              takeProfitOrders:
+                tpslOrdersByPositionUniqueId[position.uniqueId]?.takeProfitOrders ?? EMPTY_ARR,
               stepSizeDecimals: marketSummary?.stepSizeDecimals ?? TOKEN_DECIMALS,
               tickSizeDecimals: marketSummary?.tickSizeDecimals ?? USD_DECIMALS,
               oraclePrice: MaybeNumber(marketSummary?.oraclePrice) ?? undefined,
@@ -502,7 +496,7 @@ export const PositionsTable = forwardRef(
             position
           );
         }),
-      [positions, allStopLossOrders, allTakeProfitOrders, marketSummaries]
+      [positions, tpslOrdersByPositionUniqueId, marketSummaries]
     );
 
     return (
