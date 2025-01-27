@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { SubaccountOrder } from '@/abacus-ts/types/summaryTypes';
+import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { shallowEqual, useDispatch } from 'react-redux';
 
 import { AbacusOrderType, TriggerOrdersInputField } from '@/constants/abacus';
