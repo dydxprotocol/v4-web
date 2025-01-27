@@ -124,7 +124,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               tw="w-[50%] overflow-scroll"
               style={{
                 height: formState === 'form' ? 0 : '100%',
-                maxHeight: isMobile ? '50vh' : '25rem',
+                maxHeight: isMobile ? '50vh' : '30rem',
               }}
             >
               <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />

@@ -25,3 +25,13 @@ export const VIEM_PUBLIC_CLIENTS = {
     transport: http(getAlchemyRPCUrlForChainId(ChainId.POLYGON_MAINNET)),
   }),
 } as const;
+
+export const CHAIN_ID_TO_INFO = {
+  [mainnet.id]: mainnet,
+  [base.id]: base,
+  [arbitrum.id]: arbitrum,
+  [optimism.id]: optimism,
+  [polygon.id]: polygon,
+};
+
+export type EvmDepositChainId = keyof typeof VIEM_PUBLIC_CLIENTS;

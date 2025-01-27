@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 
 import { formatUnits, parseUnits } from 'viem';
 import { useWalletClient } from 'wagmi';
@@ -22,6 +22,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { AmountInput } from './AmountInput';
+import { DepositSteps } from './DepositSteps';
 import { RouteOptions } from './RouteOptions';
 import { useBalance, useDepositRoutes } from './queries';
 import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
@@ -85,8 +86,10 @@ export const DepositForm = ({
         </div>
       );
 
+    if (!walletClient) return <div>Connect wallet</div>;
+
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [error, hasSufficientBalance, stringGetter, token.denom]);
+  }, [error, hasSufficientBalance, stringGetter, token.denom, walletClient]);
 
   const { data: steps } = useDepositSteps({
     sourceAccount,
@@ -96,12 +99,49 @@ export const DepositForm = ({
   });
 
   const [depositSteps, setDepositSteps] = useState<DepositStep[]>();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showRetryCurrentStep, setShowRetryCurrentStep] = useState(false);
   const [awaitingWalletAction, setAwaitingWalletAction] = useState(false);
+
+  // Helpers for fetching updated values within the useEffect for autoPromptStep
+  const skipClientRef = useRef(skipClient);
+  useEffect(() => {
+    skipClientRef.current = skipClient;
+  }, [skipClient]);
+  const walletClientRef = useRef(walletClient);
+  useEffect(() => {
+    if (!walletClient) return;
+    walletClientRef.current = walletClient;
+  }, [walletClient]);
+
+  useEffect(() => {
+    async function autoPromptStep() {
+      if (!depositSteps || !depositSteps.length || !walletClientRef.current) {
+        return;
+      }
+
+      const success = await depositSteps[currentStep]?.executeStep(
+        walletClientRef.current,
+        skipClientRef.current
+      );
+      if (success && currentStep < depositSteps.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+      }
+      if (!success) {
+        setShowRetryCurrentStep(true);
+      }
+    }
+
+    autoPromptStep();
+  }, [depositSteps, currentStep]);
 
   useEffect(() => {
     // reset current deposit steps if the input has changed
     setDepositSteps(undefined);
-  }, [token, debouncedAmount]);
+    setCurrentStep(0);
+    setAwaitingWalletAction(false);
+    setShowRetryCurrentStep(false);
+  }, [token, debouncedAmount, selectedRoute]);
 
   const onDepositClick = async () => {
     if (depositDisabled || !steps || !walletClient) return;
@@ -115,8 +155,24 @@ export const DepositForm = ({
     }
   };
 
+  const retryCurrentStep = async () => {
+    const step = depositSteps?.[currentStep];
+    if (!step || !walletClient) return;
+
+    setShowRetryCurrentStep(false);
+
+    const success = await step.executeStep(walletClient, skipClient);
+    if (success) {
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      setShowRetryCurrentStep(true);
+    }
+  };
+
+  const coinbaseOptionDisabled = Boolean(depositSteps?.length ?? awaitingWalletAction);
+
   return (
-    <div tw="flex min-h-10 flex-col gap-2 p-1.25">
+    <div tw="flex min-h-10 flex-col p-1.25">
       <div tw="flex flex-col gap-0.5">
         <AmountInput
           tokenBalance={tokenBalance}
@@ -133,7 +189,7 @@ export const DepositForm = ({
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
         />
-        <div tw="flex flex-col gap-0.5">
+        <div tw="flex flex-col gap-0.5" style={{ opacity: coinbaseOptionDisabled ? '0.5' : '1' }}>
           <div tw="flex items-center gap-1">
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
             {/* TODO(deposit2): localization */}
@@ -145,6 +201,7 @@ export const DepositForm = ({
               dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
               onClose();
             }}
+            disabled={coinbaseOptionDisabled}
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
@@ -159,9 +216,9 @@ export const DepositForm = ({
         </div>
       </div>
       <div tw="flex flex-col gap-0.5">
-        {!depositSteps && (
+        {!depositSteps?.length && (
           <Button
-            tw="w-full"
+            tw="mt-2 w-full"
             onClick={onDepositClick}
             state={{
               isDisabled: depositDisabled,
@@ -175,21 +232,14 @@ export const DepositForm = ({
           </Button>
         )}
         {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
-        {/* TODO(deposit2.0): implement real UI for iterating through steps! */}
-        {depositSteps?.length && walletClient && (
-          <div>
-            <div>[Placeholder UI] Steps to deposit:</div>
-            {depositSteps.map((step, i) => (
-              <div key={step.type}>
-                <div>
-                  {i + 1}. {step.type}
-                </div>
-                {/* TODO(deposit2.0): handle solana and cosmos signer here too */}
-                <button type="button" onClick={() => step.executeStep(walletClient, skipClient)}>
-                  Do step
-                </button>
-              </div>
-            ))}
+        {depositSteps?.length && (
+          <div tw="mt-1">
+            <DepositSteps
+              steps={depositSteps}
+              currentStep={currentStep}
+              showRetry={showRetryCurrentStep}
+              onRetry={retryCurrentStep}
+            />
           </div>
         )}
         {/* TODO(deposit2.0): Show difference between current and new balance here */}
