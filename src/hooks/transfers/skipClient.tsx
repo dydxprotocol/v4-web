@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 
 import {
   MsgWithdrawFromSubaccount,
@@ -39,7 +39,13 @@ const useSkipClientContext = () => {
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { sourceAccount } = useAccounts();
+
   const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  useEffect(() => {
+    if (!walletClient) return;
+    walletClientRef.current = walletClient;
+  }, [walletClient]);
 
   const { skipClient, skipInstanceId } = useMemo(
     () => ({
@@ -57,7 +63,7 @@ const useSkipClientContext = () => {
             throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
           },
         },
-        getEVMSigner: async () => getEVMSigner(walletClient, sourceAccount),
+        getEVMSigner: async () => getEVMSigner(walletClientRef.current, sourceAccount),
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
       skipInstanceId: crypto.randomUUID(),
@@ -71,7 +77,6 @@ const useSkipClientContext = () => {
       solanaRpcUrl,
       sourceAccount,
       validators,
-      walletClient,
     ]
   );
   return { skipClient, skipInstanceId };
