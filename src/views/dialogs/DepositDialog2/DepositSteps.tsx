@@ -16,6 +16,7 @@ type DepositStepsProps = {
 
 const STEP_TYPE_TO_INFO: { [type: string]: { title: string; icon: ReactNode } } = {
   network: {
+    // TODO(deposit2.0): localization
     title: 'Switch networks',
     icon: <Icon size="1.25rem" iconName={IconName.Switch} />,
   },
