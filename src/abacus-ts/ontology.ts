@@ -192,7 +192,7 @@ interface BonsaiHelpersShape {
   markets: {
     createSelectMarketSummaryById: ParameterizedSelector<
       PerpetualMarketSummary | undefined,
-      [string]
+      [string | undefined]
     >;
   };
   forms: {
