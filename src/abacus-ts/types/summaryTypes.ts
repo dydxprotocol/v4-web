@@ -261,3 +261,20 @@ export type ConfigTiers = {
   feeTiers: FeeTiers | undefined;
   equityTiers: EquityTiers | undefined;
 };
+
+export type OrderbookLine = {
+  price: number;
+  size: number;
+  depth: number;
+  sizeCost: number;
+  depthCost: number;
+  offset: number;
+};
+
+export type OrderbookProcessedData = {
+  asks: OrderbookLine[];
+  bids: OrderbookLine[];
+  midPrice: number | undefined;
+  spread: number | undefined;
+  spreadPercent: number | undefined;
+};

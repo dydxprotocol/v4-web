@@ -10,6 +10,7 @@ import {
   IndexerIsoString,
   IndexerLiquidity,
   IndexerMarketType,
+  IndexerOrderbookResponseObject,
   IndexerOrderResponseObject,
   IndexerOrderSide,
   IndexerOrderType,
@@ -97,6 +98,25 @@ export type IndexerWsBaseMarketObject = Omit<
 
 export interface IndexerWsPerpetualMarketResponse {
   markets: { [key: string]: IndexerWsBaseMarketObject };
+}
+
+export interface IndexerWsOrderbookSubscribedMessage {
+  channel: 'v4_orderbook';
+  connection_id: string;
+  contents: IndexerOrderbookResponseObject;
+  id: string;
+  message_id: number;
+  type: 'subscribed';
+}
+
+export interface IndexerWsOrderbookChannelBatchDataMessage {
+  channel: 'v4_orderbook';
+  connection_id: string;
+  contents: IndexerWsOrderbookUpdateResponse[];
+  id: string;
+  message_id: number;
+  type: 'channel_batch_data';
+  version: string;
 }
 
 export interface IndexerWsOrderbookUpdateResponse {

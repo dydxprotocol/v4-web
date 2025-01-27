@@ -10,6 +10,7 @@ export const selectRawAssetsData = (state: RootState) => state.raw.markets.asset
 export const selectRawAssets = (state: RootState) => state.raw.markets.assets;
 export const selectRawSparklines = (state: RootState) => state.raw.markets.sparklines;
 export const selectRawSparklinesData = (state: RootState) => state.raw.markets.sparklines.data;
+export const selectRawOrderbooks = (state: RootState) => state.raw.markets.orderbooks;
 
 export const selectRawParentSubaccount = (state: RootState) => state.raw.account.parentSubaccount;
 export const selectRawParentSubaccountData = (state: RootState) =>

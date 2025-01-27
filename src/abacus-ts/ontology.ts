@@ -43,6 +43,10 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import {
+  selectCurrentMarketOrderbookData,
+  selectCurrentMarketOrderbookLoading,
+} from './selectors/markets';
+import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketInfo,
@@ -200,6 +204,10 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
     stableMarketInfo: selectCurrentMarketInfoStable,
+    orderbook: {
+      data: selectCurrentMarketOrderbookData,
+      loading: selectCurrentMarketOrderbookLoading,
+    },
     account: {
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,

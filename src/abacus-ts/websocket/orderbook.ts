@@ -1,7 +1,12 @@
 import { keyBy, mapValues, throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
-import { isWsOrderbookResponse, isWsOrderbookUpdateResponses } from '@/types/indexer/indexerChecks';
+import {
+  isWsOrderbookChannelBatchDataMessage,
+  isWsOrderbookResponse,
+  isWsOrderbookSubscribedMessage,
+  isWsOrderbookUpdateResponses,
+} from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -28,20 +33,25 @@ function orderbookWebsocketValueCreator(
     {
       channel: 'v4_orderbook',
       id: marketId,
-      handleBaseData: (baseMessage) => {
+      handleBaseData: (baseMessage, _, fullMessage) => {
+        const wsMessage = isWsOrderbookSubscribedMessage(fullMessage);
         const message = isWsOrderbookResponse(baseMessage);
         return loadableLoaded({
           asks: mapValues(
             keyBy(message.asks, (a) => a.price),
-            (a) => a.size
+            (a) => ({
+              size: a.size,
+              offset: wsMessage.message_id,
+            })
           ),
           bids: mapValues(
             keyBy(message.bids, (a) => a.price),
-            (a) => a.size
+            (a) => ({ size: a.size, offset: wsMessage.message_id })
           ),
         });
       },
-      handleUpdates: (baseUpdates, value) => {
+      handleUpdates: (baseUpdates, value, fullMessage) => {
+        const wsMessage = isWsOrderbookChannelBatchDataMessage(fullMessage);
         const updates = isWsOrderbookUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
@@ -53,10 +63,16 @@ function orderbookWebsocketValueCreator(
         startingValue = { asks: { ...startingValue.asks }, bids: { ...startingValue.bids } };
         updates.forEach((update) => {
           if (update.asks) {
-            update.asks.forEach(([price, size]) => (startingValue.asks[price] = size));
+            update.asks.forEach(
+              ([price, size]) =>
+                (startingValue.asks[price] = { size, offset: wsMessage.message_id })
+            );
           }
           if (update.bids) {
-            update.bids.forEach(([price, size]) => (startingValue.bids[price] = size));
+            update.bids.forEach(
+              ([price, size]) =>
+                (startingValue.bids[price] = { size, offset: wsMessage.message_id })
+            );
           }
         });
         return loadableLoaded(startingValue);
