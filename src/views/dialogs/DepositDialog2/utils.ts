@@ -16,7 +16,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { CHAIN_ID_TO_INFO, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
+import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
 
 // Because our deposit flow only supports ETH and USDC
 export function getTokenSymbol(denom: string) {
@@ -148,9 +148,7 @@ export function useDepositSteps({
 
       if (approvalMaybeNeeded) {
         const viemClient =
-          VIEM_PUBLIC_CLIENTS[
-            Number(approvalMaybeNeeded.chainId) as keyof typeof VIEM_PUBLIC_CLIENTS
-          ];
+          VIEM_PUBLIC_CLIENTS[Number(approvalMaybeNeeded.chainId) as EvmDepositChainId];
         const allowance = (await viemClient.readContract({
           abi: ERC20ABI,
           address: approvalMaybeNeeded.tokenContract as Address,
@@ -169,10 +167,7 @@ export function useDepositSteps({
                   abi: ERC20ABI,
                   functionName: 'approve',
                   args: [approvalMaybeNeeded.spender as Address, maxUint256],
-                  chain:
-                    CHAIN_ID_TO_INFO[
-                      Number(approvalMaybeNeeded.chainId) as keyof typeof CHAIN_ID_TO_INFO
-                    ],
+                  chain: CHAIN_ID_TO_INFO[Number(approvalMaybeNeeded.chainId) as EvmDepositChainId],
                 });
                 const receipt = await viemClient.waitForTransactionReceipt({ hash: txHash });
                 // TODO future improvement: also check to see if approval amount is sufficient here

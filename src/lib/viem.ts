@@ -33,3 +33,5 @@ export const CHAIN_ID_TO_INFO = {
   [optimism.id]: optimism,
   [polygon.id]: polygon,
 };
+
+export type EvmDepositChainId = keyof typeof VIEM_PUBLIC_CLIENTS;
