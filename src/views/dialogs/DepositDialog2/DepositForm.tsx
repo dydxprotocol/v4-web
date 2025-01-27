@@ -169,6 +169,8 @@ export const DepositForm = ({
     }
   };
 
+  const coinbaseOptionDisabled = Boolean(depositSteps?.length ?? awaitingWalletAction);
+
   return (
     <div tw="flex min-h-10 flex-col p-1.25">
       <div tw="flex flex-col gap-0.5">
@@ -187,10 +189,7 @@ export const DepositForm = ({
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
         />
-        <div
-          tw="flex flex-col gap-0.5"
-          style={{ opacity: depositSteps ?? awaitingWalletAction ? '0.5' : '1' }}
-        >
+        <div tw="flex flex-col gap-0.5" style={{ opacity: coinbaseOptionDisabled ? '0.5' : '1' }}>
           <div tw="flex items-center gap-1">
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
             {/* TODO(deposit2): localization */}
@@ -202,7 +201,7 @@ export const DepositForm = ({
               dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
               onClose();
             }}
-            disabled={!!depositSteps || awaitingWalletAction}
+            disabled={coinbaseOptionDisabled}
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
