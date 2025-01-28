@@ -120,7 +120,7 @@ interface BonsaiCoreShape {
       data: BasicSelector<HeightResponse | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
-    apiState: BasicSelector<ApiState>;
+    apiState: BasicSelector<ApiState | undefined>;
   };
 }
 

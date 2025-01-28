@@ -3,7 +3,6 @@ import { kollections } from '@dydxprotocol/v4-abacus';
 import { fromPairs, throttle } from 'lodash';
 
 import type {
-  AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
@@ -37,7 +36,6 @@ import {
   setUnbondingDelegations,
   setWallet,
 } from '@/state/account';
-import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
@@ -246,9 +244,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     console.error('parse errors', arr);
   }
 
-  apiStateChanged(apiState: AbacusApiState) {
-    this.store?.dispatch(setApiState(apiState));
-  }
+  apiStateChanged() {}
 
   setStore = (store: RootStore) => {
     this.store = store;

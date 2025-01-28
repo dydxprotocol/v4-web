@@ -149,7 +149,7 @@ export const useAnalytics = () => {
 
       track(
         AnalyticsEvents.NetworkStatus({
-          status: status.name,
+          status,
           lastSuccessfulIndexerRpcQuery,
           elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
           blockHeight: height ?? undefined,
