@@ -520,19 +520,6 @@ export const getOnboardingGuards = (state: RootState) => state.account.onboardin
 export const getHasUnseenOrderUpdates = (state: RootState) => state.account.hasUnseenOrderUpdates;
 
 /**
- * @returns Fee tier id of the current user
- */
-export const getUserFeeTier = (state: RootState) => state.account.wallet?.user?.feeTierId;
-
-/**
- * @returns user stats of the current user
- */
-export const getUserStats = (state: RootState) => ({
-  makerVolume30D: state.account.wallet?.user?.makerVolume30D,
-  takerVolume30D: state.account.wallet?.user?.takerVolume30D,
-});
-
-/**
  * @returns user wallet balances
  */
 export const getBalances = (state: RootState) => state.account.balances;

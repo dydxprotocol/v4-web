@@ -1,8 +1,8 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { EquityTierSummary } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { EquityTier } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -18,11 +18,10 @@ import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getStatefulOrderEquityTiers } from '@/state/configsSelectors';
 
 export const EquityTiers = () => {
   const stringGetter = useStringGetter();
-  const equityTiers = useAppSelector(getStatefulOrderEquityTiers, shallowEqual);
+  const equityTiers = useAppSelector(BonsaiCore.configs.equityTiers)?.statefulOrderEquityTiers;
   const { isNotTablet } = useBreakpoints();
   const { equityTiersLearnMore } = useURLConfigs();
 
@@ -47,7 +46,7 @@ export const EquityTiers = () => {
         <$Table
           label={stringGetter({ key: STRING_KEYS.EQUITY_TIERS })}
           data={equityTiers ?? []}
-          getRowKey={(row: EquityTier) => row.requiredTotalNetCollateralUSD}
+          getRowKey={(row: EquityTierSummary) => row.requiredTotalNetCollateralUSD}
           columns={
             [
               {
@@ -94,7 +93,7 @@ export const EquityTiers = () => {
                   <$HighlightOutput type={OutputType.Number} value={maxOrders} />
                 ),
               },
-            ] satisfies ColumnDef<EquityTier>[]
+            ] satisfies ColumnDef<EquityTierSummary>[]
           }
           selectionBehavior="replace"
           paginationBehavior="showAll"

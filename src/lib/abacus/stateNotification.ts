@@ -3,7 +3,6 @@ import { kollections } from '@dydxprotocol/v4-abacus';
 import { fromPairs, throttle } from 'lodash';
 
 import type {
-  AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
@@ -37,13 +36,11 @@ import {
   setUnbondingDelegations,
   setWallet,
 } from '@/state/account';
-import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
-import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+import { setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 import { isTruthy } from '../isTruthy';
@@ -122,10 +119,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (updatedState.account?.tradingRewards) {
           dispatch(setTradingRewards(updatedState.account.tradingRewards));
         }
-      }
-
-      if (changes.has(Changes.configs)) {
-        dispatch(setConfigs(updatedState.configs));
       }
 
       if (changes.has(Changes.input)) {
@@ -230,22 +223,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             this.throttledOrderbookUpdateByMarketId[market](orderbook);
           }
         }
-
-        if (changes.has(Changes.trades)) {
-          const trades = updatedState.marketTrades(market)?.toArray() ?? [];
-          dispatch(setLiveTrades({ trades, marketId: market }));
-        }
-
-        if (changes.has(Changes.historicalFundings)) {
-          const historicalFundings = updatedState.historicalFunding(market)?.toArray() ?? [];
-
-          dispatch(
-            setHistoricalFundings({
-              marketId: market,
-              historicalFundings,
-            })
-          );
-        }
       });
     }
   }
@@ -262,9 +239,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     console.error('parse errors', arr);
   }
 
-  apiStateChanged(apiState: AbacusApiState) {
-    this.store?.dispatch(setApiState(apiState));
-  }
+  apiStateChanged() {}
 
   setStore = (store: RootStore) => {
     this.store = store;
