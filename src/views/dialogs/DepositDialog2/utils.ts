@@ -265,6 +265,7 @@ function userAddressHelper(route: RouteResponse, userAddresses: UserAddress[]) {
 }
 
 // TODO(deposit2.0): localization
+// TODO(deposit2.0): Add final copy for each error message
 function parseError(e: Error, fallbackMessage: string) {
   if ('code' in e && e.code === UserRejectedRequestError.code) {
     return 'User rejected request.';
