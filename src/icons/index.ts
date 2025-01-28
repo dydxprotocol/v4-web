@@ -78,6 +78,7 @@ export { default as SocialXIcon } from './social-x.svg';
 export { default as SpeechBubbleIcon } from './speech-bubble.svg';
 export { default as StarIcon } from './star.svg';
 export { default as SunIcon } from './sun.svg';
+export { default as SwitchIcon } from './switch.svg';
 export { default as TerminalIcon } from './terminal.svg';
 export { default as TogglesMenuIcon } from './toggles-menu.svg';
 export { default as TokenIcon } from './token.svg';
