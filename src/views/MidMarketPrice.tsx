@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
+
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -11,12 +13,9 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const getMidMarketPriceColor = ({
   midMarketPrice,
@@ -36,8 +35,19 @@ const getMidMarketPriceColor = ({
 };
 
 export const MidMarketPrice = () => {
-  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
+
+  const midMarketPriceLoading = ['pending', 'idle'].includes(
+    useAppSelector(BonsaiHelpers.currentMarket.orderbook.loading)
+  );
+
+  const midMarketPrice = useParameterizedSelector(
+    BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData,
+    undefined
+  )?.midPrice;
+
   const lastMidMarketPrice = useRef(midMarketPrice);
 
   const midMarketColor = getMidMarketPriceColor({
@@ -49,7 +59,11 @@ export const MidMarketPrice = () => {
     lastMidMarketPrice.current = midMarketPrice;
   }, [midMarketPrice]);
 
-  return midMarketPrice !== undefined ? (
+  if (midMarketPriceLoading) {
+    return <LoadingDots size={5} />;
+  }
+
+  return (
     <$Output
       withSubscript
       type={OutputType.Fiat}
@@ -57,10 +71,9 @@ export const MidMarketPrice = () => {
       color={midMarketColor}
       fractionDigits={tickSizeDecimals}
     />
-  ) : (
-    <LoadingDots size={5} />
   );
 };
+
 const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 

@@ -180,7 +180,10 @@ interface BonsaiHelpersShape {
       fills: BasicSelector<SubaccountFill[]>;
     };
     orderbook: {
-      createSelectGroupedData: ParameterizedSelector<OrderbookProcessedData | undefined, [number]>;
+      createSelectGroupedData: ParameterizedSelector<
+        OrderbookProcessedData | undefined,
+        [number | undefined]
+      >;
       loading: BasicSelector<LoadableStatus>;
     };
   };
