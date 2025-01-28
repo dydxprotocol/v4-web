@@ -6,11 +6,16 @@ import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
+import { calculateOrderbook, groupOrderbook } from '../calculators/orderbook';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
 import { selectRawAssets, selectRawMarkets } from './base';
-import { selectAllMarketsInfo, selectSparkLinesData } from './markets';
+import {
+  selectAllMarketsInfo,
+  selectCurrentMarketOrderbook,
+  selectSparkLinesData,
+} from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
   [selectRawMarkets, selectRawAssets],
@@ -76,5 +81,22 @@ export const createSelectMarketSummaryById = () =>
         return undefined;
       }
       return allSummaries?.[marketId];
+    }
+  );
+
+export const createSelectCurrentMarketGroupedOrderbook = () =>
+  createAppSelector(
+    [
+      selectCurrentMarketOrderbook,
+      selectCurrentMarketInfoStable,
+      (_s, groupingMultiplier?: number) => groupingMultiplier ?? 1,
+    ],
+    (currentMarketOrderbook, currentMarketStableInfo, groupingMultiplier) => {
+      if (currentMarketOrderbook == null || currentMarketStableInfo == null) {
+        return undefined;
+      }
+      const { tickSize } = currentMarketStableInfo;
+      const orderbook = calculateOrderbook(currentMarketOrderbook.data);
+      return groupOrderbook(orderbook, groupingMultiplier, tickSize);
     }
   );
