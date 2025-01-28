@@ -1,7 +1,7 @@
 import { mapValues } from 'lodash';
 
 import { Nullable } from '@/constants/abacus';
-import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
+import { EMPTY_OBJ } from '@/constants/objects';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -96,20 +96,6 @@ export const getMarketConfig = (state: RootState, marketId: string) =>
   getMarketData(state, marketId)?.configs;
 
 /**
- * @returns Record of list of MarketTrades indexed by marketId
- */
-export const getLiveTrades = (state: RootState) => state.perpetuals.liveTrades;
-
-/**
- * @returns List of MarketTrades of the market the user is currently viewing
- */
-export const getCurrentMarketLiveTrades = (state: RootState) => {
-  const liveTrades = getLiveTrades(state);
-  const currentMarketId = getCurrentMarketId(state);
-  return currentMarketId ? liveTrades?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR;
-};
-
-/**
  * @returns Record of subscribed or previously subscribed Orderbook data, indexed by marketId.
  */
 export const getOrderbooks = (state: RootState) => state.perpetuals.orderbooks;
@@ -131,20 +117,6 @@ export const getCurrentMarketOrderbookMap = (state: RootState) => {
   const currentMarketId = getCurrentMarketId(state);
   return orderbookMap?.[currentMarketId ?? ''];
 };
-
-/**
- * @returns Record of historical funding indexed by marketId.
- */
-export const getHistoricalFundings = (state: RootState) => state.perpetuals.historicalFundings;
-
-/**
- * @returns Historical funding data for the market the user is currently viewing
- */
-export const getCurrentMarketHistoricalFundings = createAppSelector(
-  [getHistoricalFundings, getCurrentMarketId],
-  (historicalFundings, currentMarketId) =>
-    currentMarketId ? historicalFundings[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR
-);
 
 /**
  * @returns oracle price of the market the user is currently viewing

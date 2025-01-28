@@ -1,6 +1,6 @@
+import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import styled, { css } from 'styled-components';
 
-import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -49,7 +49,7 @@ export const FooterDesktop = () => {
         exchangeStatus: undefined,
         label: stringGetter({ key: STRING_KEYS.CONNECTING }),
       }
-    : status === AbacusApiStatus.NORMAL
+    : status === ApiStatus.NORMAL
       ? {
           exchangeStatus: ExchangeStatus.Operational,
           label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),

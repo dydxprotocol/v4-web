@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
+import { FeeTierSummary } from '@/bonsai/types/summaryTypes';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { DoubleArrowUpIcon } from '@radix-ui/react-icons';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { FeeTier } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { FEE_DECIMALS } from '@/constants/numbers';
 
@@ -26,9 +26,7 @@ import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import { Tag, TagSize } from '@/components/Tag';
 
-import { getUserFeeTier, getUserStats } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getFeeTiers } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
@@ -44,9 +42,8 @@ const EQUALITY_SYMBOL_MAP = {
 export const Fees = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const userFeeTier = useAppSelector(getUserFeeTier, shallowEqual);
-  const userStats = useAppSelector(getUserStats, shallowEqual);
-  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
+  const userStats = useAppSelector(BonsaiCore.account.stats.data);
+  const feeTiers = useAppSelector(BonsaiCore.configs.feeTiers);
   const { referredBy } = useSubaccount();
   const { affiliateProgramFaq } = useURLConfigs();
 
@@ -56,6 +53,8 @@ export const Fees = () => {
     }
     return null;
   }, [userStats]);
+
+  const userFeeTier = userStats.feeTierId;
 
   const hasReceivedFeeTierBonus =
     userFeeTier === '3' &&
@@ -162,8 +161,8 @@ export const Fees = () => {
         <$FeeTable
           label={stringGetter({ key: STRING_KEYS.FEE_TIERS })}
           data={feeTiers ?? []}
-          getRowKey={(row: FeeTier) => row.tier}
-          getRowAttributes={(row: FeeTier) => ({
+          getRowKey={(row: FeeTierSummary) => row.tier}
+          getRowAttributes={(row: FeeTierSummary) => ({
             'data-yours': row.tier === userFeeTier,
           })}
           columns={(
@@ -236,7 +235,7 @@ export const Fees = () => {
                   />
                 ),
               },
-            ] satisfies Array<false | ColumnDef<FeeTier>>
+            ] satisfies Array<false | ColumnDef<FeeTierSummary>>
           ).filter(isTruthy)}
           selectionBehavior="replace"
           paginationBehavior="showAll"

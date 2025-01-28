@@ -1,13 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import merge from 'lodash/merge';
 
-import type {
-  MarketHistoricalFunding,
-  MarketOrderbook,
-  MarketTrade,
-  Nullable,
-  PerpetualMarket,
-} from '@/constants/abacus';
+import type { MarketOrderbook, Nullable, PerpetualMarket } from '@/constants/abacus';
 import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
@@ -19,7 +13,9 @@ export interface PerpetualsState {
   currentMarketId?: string;
   // if user is viewing is a live, tradeable market: its id; otherwise: undefined
   currentMarketIdIfTradeable?: string;
-  liveTrades?: Record<string, MarketTrade[]>;
+  marketFilter: MarketFilters;
+  launchMarketIds: string[];
+
   markets?: Record<string, PerpetualMarket>;
   orderbooks?: Record<string, MarketOrderbook>;
   orderbooksMap?: Record<
@@ -29,24 +25,17 @@ export interface PerpetualsState {
       bids: Record<string, number>;
     }
   >;
-  historicalFundings: Record<string, MarketHistoricalFunding[]>;
-  marketFilter: MarketFilters;
-  launchMarketIds: string[];
 }
 
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
   currentMarketIdIfTradeable: undefined,
-  liveTrades: {},
   markets: undefined,
   orderbooks: undefined,
   orderbooksMap: undefined,
-  historicalFundings: {},
   marketFilter: MarketFilters.ALL,
   launchMarketIds: [],
 };
-
-const MAX_NUM_LIVE_TRADES = 100;
 
 export const perpetualsSlice = createSlice({
   name: 'Perpetuals',
@@ -64,15 +53,6 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
     },
-    setLiveTrades: (
-      state: PerpetualsState,
-      action: PayloadAction<{ trades: MarketTrade[]; marketId: string }>
-    ) => ({
-      ...state,
-      liveTrades: merge({}, state.liveTrades, {
-        [action.payload.marketId]: action.payload.trades.slice(0, MAX_NUM_LIVE_TRADES),
-      }),
-    }),
     setMarkets: (
       state: PerpetualsState,
       action: PayloadAction<{ markets: Record<string, PerpetualMarket>; update?: boolean }>
@@ -103,12 +83,6 @@ export const perpetualsSlice = createSlice({
         },
       };
     },
-    setHistoricalFundings: (
-      state: PerpetualsState,
-      action: PayloadAction<{ historicalFundings: MarketHistoricalFunding[]; marketId: string }>
-    ) => {
-      state.historicalFundings[action.payload.marketId] = action.payload.historicalFundings;
-    },
     resetPerpetualsState: () =>
       ({
         ...initialState,
@@ -132,10 +106,8 @@ export const perpetualsSlice = createSlice({
 export const {
   setCurrentMarketId,
   setCurrentMarketIdIfTradeable,
-  setLiveTrades,
   setMarkets,
   setOrderbook,
-  setHistoricalFundings,
   resetPerpetualsState,
   setMarketFilter,
   setLaunchMarketIds,

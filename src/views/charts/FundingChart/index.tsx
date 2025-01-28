@@ -130,6 +130,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       )}
       onTooltipContext={(ttContext) => setTooltipContext(ttContext)}
       minZoomDomain={FUNDING_RATE_TIME_RESOLUTION * 4}
+      defaultZoomDomain={timeUnits.day * 14}
       numGridLines={1}
       slotEmpty={
         isLoading ? (
