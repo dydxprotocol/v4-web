@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { curveNatural } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
@@ -21,6 +23,11 @@ const theme = buildChartTheme({
 
 export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datum>) => {
   const { data, positive, xAccessor, yAccessor } = props;
+
+  const flat = useMemo(
+    () => data.every((d) => yAccessor(d) === yAccessor(data[0])),
+    [data, yAccessor]
+  );
 
   return (
     <$ParentSize>
@@ -66,7 +73,11 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
               yAccessor={yAccessor}
               curve={curveNatural}
               stroke={
-                positive ? 'url(#sparkline-gradient-positive)' : 'url(#sparkline-gradient-negative)'
+                flat
+                  ? 'var(--color-positive)'
+                  : positive
+                    ? 'url(#sparkline-gradient-positive)'
+                    : 'url(#sparkline-gradient-negative)'
               }
             />
           </XYChart>
