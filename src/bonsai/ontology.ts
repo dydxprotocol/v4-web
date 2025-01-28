@@ -38,6 +38,7 @@ import {
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
 } from './selectors/assets';
+import { selectAccountBalances } from './selectors/balances';
 import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
@@ -57,6 +58,7 @@ import {
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
 import {
+  AccountBalances,
   AllAssetData,
   ApiState,
   AssetData,
@@ -106,6 +108,9 @@ interface BonsaiCoreShape {
     };
     stats: {
       data: BasicSelector<UserStats>;
+    };
+    balances: {
+      data: BasicSelector<AccountBalances>;
     };
   };
   markets: {
@@ -160,6 +165,9 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     stats: {
       data: selectUserStats,
+    },
+    balances: {
+      data: selectAccountBalances,
     },
   },
   markets: {

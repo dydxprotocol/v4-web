@@ -295,6 +295,11 @@ export interface UserStats {
   takerVolume30D?: number;
 }
 
+export type AccountBalances = {
+  usdcAmount?: string;
+  chainTokenAmount?: string;
+};
+
 export type OrderbookLine = {
   price: number;
   size: number;

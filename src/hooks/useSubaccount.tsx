@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
@@ -11,7 +12,6 @@ import { shallowEqual } from 'react-redux';
 import { formatUnits, parseUnits } from 'viem';
 
 import type {
-  AccountBalance,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
@@ -27,7 +27,7 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { clearSubaccountState } from '@/state/account';
-import { getBalances, getSubaccountOrders } from '@/state/accountSelectors';
+import { getSubaccountOrders } from '@/state/accountSelectors';
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -281,9 +281,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   // ------ Deposit/Withdraw Methods ------ //
   const rebalanceWalletFunds = useCallback(
-    async (balance: AccountBalance) => {
+    async (balance: string) => {
       if (!subaccountClient) return;
-      const balanceAmount = parseFloat(balance.amount);
+      const balanceAmount = parseFloat(balance);
       const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
       const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
       if (shouldDeposit) {
@@ -301,8 +301,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, depositToSubaccount, withdrawFromSubaccount]
   );
 
-  const balances = useAppSelector(getBalances, shallowEqual);
-  const usdcCoinBalance = balances?.[usdcDenom];
+  const balances = useAppSelector(BonsaiCore.account.balances.data);
+  const usdcCoinBalance = balances.usdcAmount;
 
   useEffect(() => {
     if (usdcCoinBalance && !isKeplr) {
@@ -315,7 +315,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   useEffect(() => {
     if (isKeplr && usdcCoinBalance) {
       if (showDepositDialog) {
-        const balanceAmount = parseFloat(usdcCoinBalance.amount);
+        const balanceAmount = parseFloat(usdcCoinBalance);
         const usdcBalance = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC;
         const shouldDeposit = usdcBalance > 0 && usdcBalance.toFixed(2) !== '0.00';
         if (shouldDeposit) {
@@ -330,7 +330,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       }
       setShowDepositDialog(false);
     }
-  }, [isKeplr, usdcCoinBalance, showDepositDialog]);
+  }, [isKeplr, usdcCoinBalance, showDepositDialog, dispatch]);
 
   const deposit = useCallback(
     async (amount: number) => {
@@ -953,7 +953,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       latestReferrer &&
       dydxAddress &&
       usdcCoinBalance &&
-      parseFloat(usdcCoinBalance.amount) > AMOUNT_USDC_BEFORE_REBALANCE &&
+      parseFloat(usdcCoinBalance) > AMOUNT_USDC_BEFORE_REBALANCE &&
       isReferredByFetched &&
       !referredBy?.affiliateAddress &&
       !isRegisterAffiliatePending

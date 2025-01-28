@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { StargateClient } from '@cosmjs/stargate';
 import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
@@ -19,7 +20,7 @@ import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { useSolanaConnection } from '@/hooks/useSolanaConnection';
 
-import { getBalances, getStakingBalances } from '@/state/accountSelectors';
+import { getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
@@ -56,8 +57,8 @@ export const useAccountBalance = ({
 } => {
   const { sourceAccount, dydxAccountGraz, dydxAddress } = useAccounts();
 
-  const balances = useAppSelector(getBalances, shallowEqual);
-  const { chainTokenDenom, usdcDenom, usdcDecimals } = useTokenConfigs();
+  const balances = useAppSelector(BonsaiCore.account.balances.data);
+  const { chainTokenDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -243,11 +244,11 @@ export const useAccountBalance = ({
 
   const balance = isCosmosChain ? cosmosBalance : isSolanaChain ? solBalance : evmBalance;
 
-  const nativeTokenCoinBalance = balances?.[chainTokenDenom];
-  const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
+  const nativeTokenCoinBalance = balances.chainTokenAmount;
+  const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance);
 
-  const usdcCoinBalance = balances?.[usdcDenom];
-  const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).toNumber();
+  const usdcCoinBalance = balances.usdcAmount;
+  const usdcBalance = MustBigNumber(usdcCoinBalance).toNumber();
 
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount).toNumber();
