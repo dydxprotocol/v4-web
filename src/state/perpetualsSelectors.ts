@@ -1,5 +1,3 @@
-import { mapValues } from 'lodash';
-
 import { Nullable } from '@/constants/abacus';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
@@ -31,14 +29,6 @@ export const getCurrentMarketIdIfTradeable = (state: RootState) =>
 export const getCurrentMarketDisplayId = (state: RootState) => {
   const currentMarketId = getCurrentMarketId(state) ?? '';
   return state.perpetuals.markets?.[currentMarketId]?.displayId;
-};
-
-/**
- * @returns assetId of the currentMarket
- */
-export const getCurrentMarketAssetId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals.markets?.[currentMarketId]?.assetId;
 };
 
 /**
@@ -178,14 +168,6 @@ export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSe
 export const getCurrentMarketNextFundingRate = createAppSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
-);
-
-export const getMarketIdToAssetMetadataMap = createAppSelector(
-  [(state: RootState) => state.perpetuals.markets, (state: RootState) => state.assets.assets],
-  (markets, assets) => {
-    const mapping = mapValues(markets ?? {}, (v) => assets?.[v.assetId]);
-    return mapping;
-  }
 );
 
 /**

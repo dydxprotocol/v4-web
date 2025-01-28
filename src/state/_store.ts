@@ -14,7 +14,6 @@ import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { appUiConfigsSlice } from './appUiConfigs';
-import { assetsSlice } from './assets';
 import { configsSlice } from './configs';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
@@ -38,7 +37,6 @@ const reducers = {
   app: appSlice.reducer,
   appUiConfigs: appUiConfigsSlice.reducer,
   accountUiMemory: accountUiMemorySlice.reducer,
-  assets: assetsSlice.reducer,
   configs: configsSlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,

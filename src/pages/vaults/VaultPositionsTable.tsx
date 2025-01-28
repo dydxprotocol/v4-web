@@ -25,7 +25,8 @@ import { TableCell } from '@/components/Table/TableCell';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
+import { getMarketIdToAssetMetadataMap } from '@/state/assetSelectors';
+import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
@@ -66,8 +67,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
             renderCell: ({ marketId, currentLeverageMultiple }) => {
               const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
 
-              const logoUrl =
-                marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
+              const logoUrl = marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.logo;
 
               return (
                 // eslint-disable-next-line jsx-a11y/interactive-supports-focus
@@ -85,7 +85,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     slotLeft={
                       <AssetIcon
                         logoUrl={logoUrl}
-                        symbol={marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.id}
+                        symbol={marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.assetId}
                         tw="[--asset-icon-size:2.5em]"
                       />
                     }

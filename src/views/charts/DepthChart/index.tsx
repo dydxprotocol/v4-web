@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { curveStepAfter } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
@@ -37,7 +38,6 @@ import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -68,7 +68,7 @@ export const DepthChart = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   // Chart data
-  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId) ?? '';
   const { stepSizeDecimals, tickSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 

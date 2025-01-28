@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import { shallowEqual } from 'react-redux';
 
 import type { Nullable } from '@/constants/abacus';
 import {
@@ -21,7 +21,6 @@ import { Output, OutputType } from '@/components/Output';
 import { TooltipContent } from '@/components/visx/TooltipContent';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -43,7 +42,7 @@ export const DepthChartTooltipContent = ({
   const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
   const { spread, spreadPercent, midMarketPrice } = useOrderbookValuesForDepthChart();
-  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId) ?? '';
 
   const priceImpact = useMemo(() => {
     if (nearestDatum && midMarketPrice) {

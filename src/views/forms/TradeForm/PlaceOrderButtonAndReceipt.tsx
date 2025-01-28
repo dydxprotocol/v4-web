@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -38,7 +39,6 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
@@ -95,7 +95,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
 
-  const { id } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
   const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf, side } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)

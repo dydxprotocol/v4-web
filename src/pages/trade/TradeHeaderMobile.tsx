@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -14,18 +15,16 @@ import { Output, OutputType } from '@/components/Output';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?: string }) => {
-  const { name, id, resources } = orEmptyObj(
-    useAppSelector(getCurrentMarketAssetData, shallowEqual)
-  );
-  const { imageUrl } = orEmptyObj(resources);
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+  const name = useAppSelector(BonsaiHelpers.currentMarket.assetName);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+
   const navigate = useNavigate();
 
   const { displayId, priceChange24H, priceChange24HPercent } =

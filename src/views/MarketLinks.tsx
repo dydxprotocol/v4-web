@@ -1,4 +1,4 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
@@ -9,13 +9,19 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
-  const { resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { coinMarketCapsLink, websiteLink, whitepaperLink } = orEmptyObj(resources);
+  const { urls: marketUrls } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
+  const {
+    cmc: coinMarketCapsLink,
+    website: websiteLink,
+    technicalDoc: whitepaperLink,
+  } = orEmptyObj(marketUrls);
+
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
   const { urls } = orEmptyObj(launchableAsset);
 
