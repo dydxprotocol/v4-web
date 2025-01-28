@@ -1,7 +1,13 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { ERC20Approval, RouteResponse, SkipClient, UserAddress } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import { Address, maxUint256, WalletClient } from 'viem';
+import {
+  Address,
+  ChainMismatchError,
+  maxUint256,
+  UserRejectedRequestError,
+  WalletClient,
+} from 'viem';
 import { useChainId } from 'wagmi';
 
 import ERC20ABI from '@/abi/erc20.json';
@@ -65,10 +71,14 @@ export function getUserAddressesForRoute(
   });
 }
 
+type StepResult =
+  | { success: true; errorMessage: undefined }
+  | { success: false; errorMessage: string };
+
 export type DepositStep =
   | {
       type: 'network' | 'approve';
-      executeStep: (signer: WalletClient) => Promise<boolean>;
+      executeStep: (signer: WalletClient) => Promise<StepResult>;
     }
   | {
       type: 'deposit';
@@ -76,7 +86,7 @@ export type DepositStep =
       executeStep: (
         signer: WalletClient | OfflineSigner,
         skipClient: SkipClient
-      ) => Promise<boolean>;
+      ) => Promise<StepResult>;
     };
 
 // Prepares all the steps the user needs to take in their wallet to complete their deposit
@@ -111,9 +121,12 @@ export function useDepositSteps({
         executeStep: async (signer: WalletClient) => {
           try {
             await signer.switchChain({ id: Number(depositToken.chainId) });
-            return true;
+            return { success: true };
           } catch (e) {
-            return false;
+            return {
+              success: false,
+              errorMessage: parseError(e, 'There was an error changing wallet networks.'),
+            };
           }
         },
       });
@@ -171,9 +184,19 @@ export function useDepositSteps({
                 });
                 const receipt = await viemClient.waitForTransactionReceipt({ hash: txHash });
                 // TODO future improvement: also check to see if approval amount is sufficient here
-                return receipt.status === 'success';
+                // TODO(deposit2.0): localization
+                const isOnChainSuccess = receipt.status === 'success';
+                return {
+                  success: isOnChainSuccess,
+                  errorMessage: isOnChainSuccess
+                    ? undefined
+                    : 'Your approval has failed. Please try again.',
+                } as StepResult;
               } catch (e) {
-                return false;
+                return {
+                  success: false,
+                  errorMessage: parseError(e, 'There was an error with your approval.'),
+                };
               }
             },
           });
@@ -196,9 +219,12 @@ export function useDepositSteps({
               onDeposit({ txHash, chainId: chainID });
             },
           });
-          return true;
+          return { success: true };
         } catch (e) {
-          return false;
+          return {
+            success: false,
+            errorMessage: parseError(e, 'Your deposit has failed. Please try again.'),
+          };
         }
       },
     });
@@ -213,6 +239,7 @@ export function useDepositSteps({
       depositRoute?.amountIn,
       depositRoute?.sourceAssetChainID,
       depositRoute?.sourceAssetDenom,
+      walletChainId,
     ],
     queryFn: getStepsQuery,
   });
@@ -235,4 +262,17 @@ function userAddressHelper(route: RouteResponse, userAddresses: UserAddress[]) {
     addressList = userAddresses.map((x) => x.address);
   }
   return addressList;
+}
+
+// TODO(deposit2.0): localization
+function parseError(e: Error, fallbackMessage: string) {
+  if ('code' in e && e.code === UserRejectedRequestError.code) {
+    return 'User rejected request.';
+  }
+
+  if ('name' in e && e.name === ChainMismatchError.name) {
+    return 'Please change your wallet network and try again.';
+  }
+
+  return fallbackMessage;
 }
