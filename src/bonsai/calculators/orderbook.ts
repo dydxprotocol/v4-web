@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 import { GroupingMultiplier } from '@/constants/orderbook';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -92,18 +93,24 @@ export const formatOrderbook = weakMapMemoize(
 
     // If groupingMultiplier is ONE, return the orderbook as is.
     if (groupingMultiplier === GroupingMultiplier.ONE) {
+      const tickSizeDecimals = MustBigNumber(tickSize).dp() ?? SMALL_USD_DECIMALS;
+
       return {
-        asks: orderBy(currentMarketOrderbook.asks.map(mapOrderbookLineToNumber), 'price', 'desc'),
+        asks: orderBy(
+          currentMarketOrderbook.asks.map(mapOrderbookLineToNumber),
+          (ask) => ask.price,
+          'desc'
+        ),
         bids: currentMarketOrderbook.bids.map(mapOrderbookLineToNumber),
         asksMap: Object.fromEntries(
           currentMarketOrderbook.asks.map((line) => [
-            line.price.toString(),
+            line.price.toFixed(tickSizeDecimals),
             mapOrderbookLineToNumber(line),
           ])
         ),
         bidsMap: Object.fromEntries(
           currentMarketOrderbook.bids.map((line) => [
-            line.price.toString(),
+            line.price.toFixed(tickSizeDecimals),
             mapOrderbookLineToNumber(line),
           ])
         ),
@@ -121,12 +128,12 @@ export const formatOrderbook = weakMapMemoize(
     // Convert groupedAsks and groupedBids to list and sort by price. Asks will now be descending and bids will be remain descending
     const asksList = orderBy(
       Object.values(groupedAsks).map(mapOrderbookLineToNumber),
-      'price',
+      (ask) => ask.price,
       'desc'
     );
     const bidsList = orderBy(
       Object.values(groupedBids).map(mapOrderbookLineToNumber),
-      'price',
+      (bid) => bid.price,
       'desc'
     );
 
@@ -260,40 +267,38 @@ const getGroupingTickSize = (tickSize: string, multiplier: GroupingMultiplier) =
  * @param shouldFloor we want to round asks up and bids down so they don't have an overlapping group in the middle
  * @returns Grouped OrderbookLines in a dictionary using price as key
  */
-const group = weakMapMemoize(
-  (orderbook: OrderbookLineBN[], groupingTickSize: number, shouldFloor?: boolean) => {
-    if (orderbook.length === 0) {
-      return null;
-    }
+const group = (orderbook: OrderbookLineBN[], groupingTickSize: number, shouldFloor?: boolean) => {
+  if (orderbook.length === 0) {
+    return null;
+  }
 
-    const mapResult: Record<string, OrderbookLineBN> = {};
+  const mapResult: Record<string, OrderbookLineBN> = {};
 
-    orderbook.forEach((line) => {
-      const price = roundToNearestFactor({
-        number: line.price,
-        factor: groupingTickSize,
-        roundingMode: shouldFloor ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP,
-      });
-
-      const key = price.toString();
-      const existingLine = mapResult[key];
-
-      if (existingLine) {
-        existingLine.size = existingLine.size.plus(line.size);
-        existingLine.sizeCost = existingLine.sizeCost.plus(line.sizeCost);
-        existingLine.depth = line.depth;
-        existingLine.depthCost = line.depthCost;
-      } else {
-        mapResult[key] = {
-          ...line,
-          price,
-        };
-      }
+  orderbook.forEach((line) => {
+    const price = roundToNearestFactor({
+      number: line.price,
+      factor: groupingTickSize,
+      roundingMode: shouldFloor ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP,
     });
 
-    return mapResult;
-  }
-);
+    const key = price.toString();
+    const existingLine = mapResult[key];
+
+    if (existingLine) {
+      existingLine.size = existingLine.size.plus(line.size);
+      existingLine.sizeCost = existingLine.sizeCost.plus(line.sizeCost);
+      existingLine.depth = line.depth;
+      existingLine.depthCost = line.depthCost;
+    } else {
+      mapResult[key] = {
+        ...line,
+        price,
+      };
+    }
+  });
+
+  return mapResult;
+};
 
 function roundMidPrice(
   lowestAsk: OrderbookLine | undefined,
