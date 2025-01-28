@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
-import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
 import {
   ORDERBOOK_ANIMATION_DURATION,
@@ -32,11 +31,12 @@ import { generateFadedColorVariant } from '@/lib/styles';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
+import { OrderbookLineWithMine } from './useOrderbookValues';
 
 type ElementProps = {
-  data: Array<PerpetualMarketOrderbookLevel | undefined>;
+  data: Array<OrderbookLineWithMine | undefined>;
   histogramRange: number;
-  side: PerpetualMarketOrderbookLevel['side'];
+  side: OrderbookLineWithMine['side'];
   displayUnit: DisplayUnit;
 };
 
@@ -323,7 +323,7 @@ export const useDrawOrderbook = ({
     }: {
       ctx: CanvasRenderingContext2D;
       idx: number;
-      rowToRender?: PerpetualMarketOrderbookLevel;
+      rowToRender?: OrderbookLineWithMine;
       animationType?: OrderbookRowAnimationType;
     }) => {
       if (!rowToRender) return;
@@ -356,7 +356,7 @@ export const useDrawOrderbook = ({
       drawText({
         animationType,
         ctx,
-        depth: depth ?? undefined,
+        depth,
         depthCost,
         sizeCost,
         price,

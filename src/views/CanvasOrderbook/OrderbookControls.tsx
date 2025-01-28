@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 
-import { clamp } from 'lodash';
-import { shallowEqual, useDispatch } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { GroupingMultiplier } from '@/constants/orderbook';
 import { DisplayUnit } from '@/constants/trade';
 
 import { Button } from '@/components/Button';
@@ -17,33 +17,32 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type OrderbookControlsProps = {
   className?: string;
   assetId?: string;
-  grouping: Nullable<MarketOrderbookGrouping>;
+  grouping: GroupingMultiplier;
+  modifyGrouping: (increase: boolean) => void;
 };
 
-export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
+export const OrderbookControls = ({
+  className,
+  assetId,
+  grouping,
+  modifyGrouping,
+}: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
-
-  const modifyScale = useCallback(
-    (direction: number) => {
-      const start = grouping?.multiplier.ordinal ?? 0;
-      const end = clamp(start + direction, 0, 3);
-      abacusStateManager.modifyOrderbookLevel(
-        OrderbookGrouping.values().find((v) => v.ordinal === end)!
-      );
-    },
-    [grouping?.multiplier.ordinal]
+  const { tickSize, tickSizeDecimals = USD_DECIMALS } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-  const tickSizeDecimals = currentMarketConfig?.tickSizeDecimals ?? USD_DECIMALS;
+
+  const displayTickSize = tickSize && MustBigNumber(tickSize).times(grouping).toNumber();
+
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
       if (!assetId) return;
@@ -57,6 +56,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     },
     [dispatch, assetId]
   );
+
   return (
     <$OrderbookControlsContainer className={className}>
       <div tw="flex justify-between gap-0.5">
@@ -67,7 +67,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
                 buttonStyle={ButtonStyle.WithoutBackground}
-                onClick={() => modifyScale(-1)}
+                onClick={() => modifyGrouping(false)}
               >
                 -
               </Button>
@@ -75,7 +75,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
                 buttonStyle={ButtonStyle.WithoutBackground}
-                onClick={() => modifyScale(1)}
+                onClick={() => modifyGrouping(true)}
               >
                 +
               </Button>
@@ -83,7 +83,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
           </$ButtonGroup>
           <Output
             withSubscript
-            value={grouping?.tickSize}
+            value={displayTickSize}
             type={OutputType.Fiat}
             fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
           />
