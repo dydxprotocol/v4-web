@@ -50,9 +50,10 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';

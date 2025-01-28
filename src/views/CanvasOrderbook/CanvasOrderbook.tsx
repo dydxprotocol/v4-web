@@ -22,13 +22,10 @@ import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketData,
-  getCurrentMarketId,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 

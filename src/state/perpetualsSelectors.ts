@@ -6,22 +6,12 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
+import { getCurrentMarketId } from './currentMarketSelectors';
 
 /**
  * @returns current market filter applied inside the markets page
  */
 export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
-
-/**
- * @returns marketId of the market the user is currently viewing (Internal)
- */
-export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
-
-/**
- * @returns marketId of the market the user is currently viewing if it is tradeable (Internal)
- */
-export const getCurrentMarketIdIfTradeable = (state: RootState) =>
-  state.perpetuals.currentMarketIdIfTradeable;
 
 /**
  * @returns displayId of the currentMarket the user is viewing (Render)

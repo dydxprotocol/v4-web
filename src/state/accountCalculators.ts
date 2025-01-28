@@ -11,7 +11,7 @@ import { createAppSelector } from '@/state/appTypes';
 
 import { isOrderStatusOpen } from '@/lib/orders';
 
-import { getCurrentMarketId } from './perpetualsSelectors';
+import { getCurrentMarketId } from './currentMarketSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],

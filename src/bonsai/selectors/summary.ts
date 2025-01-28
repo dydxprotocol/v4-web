@@ -3,7 +3,7 @@ import { shallowEqual } from 'react-redux';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
