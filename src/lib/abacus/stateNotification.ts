@@ -43,7 +43,7 @@ import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+import { setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 import { isTruthy } from '../isTruthy';
@@ -229,22 +229,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           if (orderbook) {
             this.throttledOrderbookUpdateByMarketId[market](orderbook);
           }
-        }
-
-        if (changes.has(Changes.trades)) {
-          const trades = updatedState.marketTrades(market)?.toArray() ?? [];
-          dispatch(setLiveTrades({ trades, marketId: market }));
-        }
-
-        if (changes.has(Changes.historicalFundings)) {
-          const historicalFundings = updatedState.historicalFunding(market)?.toArray() ?? [];
-
-          dispatch(
-            setHistoricalFundings({
-              marketId: market,
-              historicalFundings,
-            })
-          );
         }
       });
     }
