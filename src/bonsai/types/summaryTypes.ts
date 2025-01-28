@@ -265,6 +265,36 @@ export type ConfigTiers = {
   equityTiers: EquityTiers | undefined;
 };
 
+export interface FeeTierSummary {
+  id: string;
+  tier: string;
+  symbol: string;
+  volume: number;
+  totalShare?: number;
+  makerShare?: number;
+  maker?: number;
+  taker?: number;
+}
+
+export interface EquityTierSummary {
+  requiredTotalNetCollateralUSD: number;
+  nextLevelRequiredTotalNetCollateralUSD?: number;
+  maxOrders: number;
+}
+
+export interface EquityTiersSummary {
+  shortTermOrderEquityTiers: EquityTierSummary[];
+  statefulOrderEquityTiers: EquityTierSummary[];
+}
+
+export interface UserStats {
+  feeTierId?: string;
+  makerFeeRate?: number;
+  takerFeeRate?: number;
+  makerVolume30D?: number;
+  takerVolume30D?: number;
+}
+
 export type OrderbookLine = {
   price: number;
   size: number;

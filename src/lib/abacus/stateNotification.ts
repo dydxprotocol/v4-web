@@ -37,7 +37,6 @@ import {
   setWallet,
 } from '@/state/account';
 import { setAssets } from '@/state/assets';
-import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -120,10 +119,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (updatedState.account?.tradingRewards) {
           dispatch(setTradingRewards(updatedState.account.tradingRewards));
         }
-      }
-
-      if (changes.has(Changes.configs)) {
-        dispatch(setConfigs(updatedState.configs));
       }
 
       if (changes.has(Changes.input)) {
