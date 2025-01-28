@@ -1,12 +1,14 @@
 import { omit } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
+import { GroupingMultiplier } from '@/constants/orderbook';
+
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
-import { calculateOrderbook, groupOrderbook } from '../calculators/orderbook';
+import { calculateOrderbook, formatOrderbook } from '../calculators/orderbook';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
@@ -89,7 +91,7 @@ export const createSelectCurrentMarketGroupedOrderbook = () =>
     [
       selectCurrentMarketOrderbook,
       selectCurrentMarketInfoStable,
-      (_s, groupingMultiplier?: number) => groupingMultiplier ?? 1,
+      (_s, groupingMultiplier?: GroupingMultiplier) => groupingMultiplier ?? GroupingMultiplier.ONE,
     ],
     (currentMarketOrderbook, currentMarketStableInfo, groupingMultiplier) => {
       if (currentMarketOrderbook == null || currentMarketStableInfo == null) {
@@ -97,6 +99,6 @@ export const createSelectCurrentMarketGroupedOrderbook = () =>
       }
       const { tickSize } = currentMarketStableInfo;
       const orderbook = calculateOrderbook(currentMarketOrderbook.data);
-      return groupOrderbook(orderbook, groupingMultiplier, tickSize);
+      return formatOrderbook(orderbook, groupingMultiplier, tickSize);
     }
   );
