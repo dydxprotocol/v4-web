@@ -1,10 +1,10 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { ApiState, ApiStatus } from '@/bonsai/types/summaryTypes';
 
-import type { AbacusApiState, Nullable } from '@/constants/abacus';
-import { AbacusApiStatus } from '@/constants/abacus';
+import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { getApiState, getInitializationError } from '@/state/appSelectors';
+import { getInitializationError } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { useStringGetter } from './useStringGetter';
@@ -29,7 +29,7 @@ const getConnectionError = ({
   apiState,
   initializationError,
 }: {
-  apiState: Nullable<AbacusApiState>;
+  apiState: Nullable<ApiState>;
   initializationError?: string;
 }) => {
   const { status } = apiState ?? {};
@@ -39,17 +39,17 @@ const getConnectionError = ({
   }
 
   switch (status) {
-    case AbacusApiStatus.INDEXER_TRAILING: {
+    case ApiStatus.INDEXER_TRAILING: {
       return ConnectionErrorType.INDEXER_TRAILING;
     }
-    case AbacusApiStatus.INDEXER_DOWN:
-    case AbacusApiStatus.INDEXER_HALTED:
-    case AbacusApiStatus.VALIDATOR_DOWN:
-    case AbacusApiStatus.VALIDATOR_HALTED:
-    case AbacusApiStatus.UNKNOWN: {
+    case ApiStatus.INDEXER_DOWN:
+    case ApiStatus.INDEXER_HALTED:
+    case ApiStatus.VALIDATOR_DOWN:
+    case ApiStatus.VALIDATOR_HALTED:
+    case ApiStatus.UNKNOWN: {
       return ConnectionErrorType.CHAIN_DISRUPTION;
     }
-    case AbacusApiStatus.NORMAL:
+    case ApiStatus.NORMAL:
     default: {
       return undefined;
     }
@@ -72,37 +72,20 @@ const getStatusErrorMessage = ({
   return null;
 };
 
-const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
-  const { haltedBlock, trailingBlocks, status, height } = apiState ?? {};
-
-  switch (status) {
-    case AbacusApiStatus.INDEXER_HALTED: {
-      return haltedBlock;
-    }
-    case AbacusApiStatus.INDEXER_TRAILING: {
-      return height != null && trailingBlocks != null ? height - trailingBlocks : null;
-    }
-    default: {
-      return height;
-    }
-  }
-};
-
 export const useApiState = () => {
   const stringGetter = useStringGetter();
-  const apiState = useAppSelector(getApiState, shallowEqual);
+  const apiState = useAppSelector(BonsaiCore.network.apiState);
   const initializationError = useAppSelector(getInitializationError);
-  const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
+  const { haltedBlock, validatorHeight, indexerHeight, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({
     apiState,
     initializationError,
   });
   const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
-  const indexerHeight = getIndexerHeight(apiState);
 
   return {
     haltedBlock,
-    height,
+    height: validatorHeight,
     indexerHeight,
     status,
     connectionError,

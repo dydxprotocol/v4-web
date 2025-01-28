@@ -1,15 +1,14 @@
 import { useEffect, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { isMainnet } from '@/constants/networks';
 
-import { getApiState } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -17,6 +16,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { wrapAndLogError } from '@/lib/asyncUtils';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
@@ -31,8 +31,8 @@ export const useWithdrawalInfo = ({
 }) => {
   const { getWithdrawalAndTransferGatingStatus, getWithdrawalCapacityByDenom } = useDydxClient();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
-  const apiState = useAppSelector(getApiState, shallowEqual);
-  const { height } = apiState ?? {};
+  const apiState = useAppSelector(BonsaiCore.network.apiState);
+  const { validatorHeight: height } = orEmptyObj(apiState);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const dispatch = useAppDispatch();
   const { withdrawalSafetyEnabled } = useEnvFeatures();

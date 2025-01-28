@@ -133,7 +133,10 @@ export function getLatestHeight(heightState: HeightState): HeightResponse | unde
 export function computeApiState(heights: {
   indexerHeight: HeightState;
   validatorHeight: HeightState;
-}): ApiState {
+}): ApiState | undefined {
+  if (loadingWithNoData(heights.indexerHeight) || loadingWithNoData(heights.validatorHeight)) {
+    return undefined;
+  }
   const indexerState = computeNetworkState(heights.indexerHeight);
   const validatorState = computeNetworkState(heights.validatorHeight);
 
@@ -154,4 +157,11 @@ export function computeApiState(heights: {
     indexerHeight: indexerHeight?.height,
     validatorHeight: validatorHeight?.height,
   };
+}
+
+function loadingWithNoData(height: HeightState) {
+  return (
+    height.latest.data == null &&
+    (height.latest.status === 'pending' || height.latest.status === 'idle')
+  );
 }

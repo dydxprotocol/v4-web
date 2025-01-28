@@ -1,5 +1,5 @@
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useQuery } from '@tanstack/react-query';
-import { shallowEqual } from 'react-redux';
 
 import {
   DEFAULT_MAX_AFFILIATE_SHARE,
@@ -10,7 +10,6 @@ import {
 import { timeUnits } from '@/constants/time';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getFeeTiers } from '@/state/configsSelectors';
 
 import { safeFetch } from '@/lib/safeFetch';
 import { log } from '@/lib/telemetry';
@@ -109,7 +108,7 @@ const useAffiliatesStatus = (dydxAddress?: string) => {
 
 const useAffiliateMaxEarning = () => {
   const { compositeClient, getAllAffiliateTiers } = useDydxClient();
-  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
+  const feeTiers = useAppSelector(BonsaiCore.configs.feeTiers);
 
   const fetchAffiliateMaxEarning = async () => {
     const allAffiliateTiers = await getAllAffiliateTiers();
