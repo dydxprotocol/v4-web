@@ -33,6 +33,8 @@ const STEP_TYPE_TO_INFO: { [type: string]: { title: string; icon: ReactNode } } 
   },
 };
 
+const SHAKE_DURATION = 1000;
+
 export const DepositSteps = ({
   steps,
   currentStep,
@@ -47,7 +49,7 @@ export const DepositSteps = ({
     }
 
     setIsShaking(true);
-    setTimeout(() => setIsShaking(false), 1000);
+    setTimeout(() => setIsShaking(false), SHAKE_DURATION);
   }, [currentStepError]);
 
   return (
@@ -65,9 +67,7 @@ export const DepositSteps = ({
                   strokeWidth="2"
                   stroke=""
                   tw="absolute left-0 top-0 flex h-full w-full items-center justify-center text-color-accent"
-                  style={{
-                    visibility: i === currentStep && !currentStepError ? undefined : 'hidden',
-                  }}
+                  css={(i !== currentStep || currentStepError) && tw`invisible`}
                 />
                 <div
                   css={i === currentStep && tw`text-color-text-2`}
@@ -82,8 +82,8 @@ export const DepositSteps = ({
               <div tw="flex flex-1 items-center justify-between gap-0.5">
                 <div tw="flex flex-col gap-0.125">
                   <div
-                    tw="opacity-50 transition-all duration-300"
-                    style={{ opacity: i === currentStep ? '100%' : undefined }}
+                    tw="transition-all duration-300"
+                    css={[i === currentStep ? tw`opacity-100` : tw`opacity-50`]}
                   >
                     {stepInfo.title}
                   </div>
@@ -92,7 +92,7 @@ export const DepositSteps = ({
                 {error && (
                   <button
                     css={isShaking && tw`animate-shake`}
-                    tw="flex items-center gap-0.375 rounded-0.5 border border-solid border-color-accent p-0.375 text-color-accent"
+                    tw="flex items-center gap-0.375 rounded-0.5 border border-solid border-color-accent p-0.375 text-color-accent hover:bg-color-layer-4"
                     type="button"
                     onClick={onRetry}
                   >
