@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
+import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
-import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogProps, DialogTypes, ExchangeOfflineDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
@@ -32,7 +32,7 @@ export const ExchangeOfflineDialog = ({
     if (
       activeDialog != null &&
       DialogTypes.is.ExchangeOffline(activeDialog) &&
-      status === AbacusApiStatus.NORMAL
+      status === ApiStatus.NORMAL
     ) {
       dispatch(closeDialog());
     }

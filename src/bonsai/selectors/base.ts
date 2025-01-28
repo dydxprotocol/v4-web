@@ -50,3 +50,9 @@ export const selectRawBlockTradingRewardsRest = (state: RootState) =>
 
 export const selectRawIndexerHeight = (state: RootState) => state.raw.heights.indexerHeight;
 export const selectRawValidatorHeight = (state: RootState) => state.raw.heights.validatorHeight;
+
+export const selectRawConfigFeeTiers = (state: RootState) => state.raw.configs.data?.feeTiers;
+export const selectRawConfigEquityTiers = (state: RootState) => state.raw.configs.data?.equityTiers;
+
+export const selectRawAccountFeeTierData = (state: RootState) => state.raw.account.feeTier.data;
+export const selectRawAccountStatsData = (state: RootState) => state.raw.account.stats.data;

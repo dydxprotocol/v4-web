@@ -43,6 +43,7 @@ import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
+import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
 import {
   selectCurrentMarketOrderbookData,
   selectCurrentMarketOrderbookLoading,
@@ -58,10 +59,13 @@ import {
   selectCurrentMarketInfoStable,
   StablePerpetualMarketSummary,
 } from './selectors/summary';
+import { selectUserStats } from './selectors/userStats';
 import {
   AllAssetData,
   ApiState,
   AssetData,
+  EquityTiersSummary,
+  FeeTierSummary,
   GroupedSubaccountSummary,
   OrderbookProcessedData,
   PendingIsolatedPosition,
@@ -70,6 +74,7 @@ import {
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
+  UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
@@ -103,6 +108,9 @@ interface BonsaiCoreShape {
       data: BasicSelector<SubaccountFill[]>;
       loading: BasicSelector<LoadableStatus>;
     };
+    stats: {
+      data: BasicSelector<UserStats>;
+    };
   };
   markets: {
     currentMarketId: BasicSelector<string | undefined>;
@@ -124,7 +132,11 @@ interface BonsaiCoreShape {
       data: BasicSelector<HeightResponse | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
-    apiState: BasicSelector<ApiState>;
+    apiState: BasicSelector<ApiState | undefined>;
+  };
+  configs: {
+    feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
+    equityTiers: BasicSelector<EquityTiersSummary | undefined>;
   };
 }
 
@@ -150,6 +162,9 @@ export const BonsaiCore: BonsaiCoreShape = {
       data: selectAccountFills,
       loading: selectAccountFillsLoading,
     },
+    stats: {
+      data: selectUserStats,
+    },
   },
   markets: {
     currentMarketId: getCurrentMarketId,
@@ -172,6 +187,10 @@ export const BonsaiCore: BonsaiCoreShape = {
       loading: selectRawValidatorHeightDataLoading,
     },
     apiState: selectApiState,
+  },
+  configs: {
+    equityTiers: selectEquityTiers,
+    feeTiers: selectFeeTiers,
   },
 };
 
