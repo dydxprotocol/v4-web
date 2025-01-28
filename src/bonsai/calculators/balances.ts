@@ -13,7 +13,7 @@ function convertAmount(amount: string | undefined, decimals: number): string | u
     return undefined;
   }
   return MustBigNumber(amount)
-    .div(BIG_NUMBERS.ONE.pow(decimals))
+    .times(BIG_NUMBERS.TEN.pow(-1 * decimals))
     .toFixed(10, BigNumber.ROUND_FLOOR);
 }
 
