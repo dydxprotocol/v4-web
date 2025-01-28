@@ -284,18 +284,10 @@ const group = weakMapMemoize(
         existingLine.depth = line.depth;
         existingLine.depthCost = line.depthCost;
       } else {
-        // Asks are ascending and bids are descending, so we need to unshift asks and push bids
-        if (shouldFloor) {
-          mapResult[key] = {
-            ...line,
-            price,
-          };
-        } else {
-          mapResult[key] = {
-            ...line,
-            price,
-          };
-        }
+        mapResult[key] = {
+          ...line,
+          price,
+        };
       }
     });
 
