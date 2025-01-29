@@ -8,6 +8,7 @@ export type LocaleSeparators = { group?: string; decimal?: string };
 export const BIG_NUMBERS = {
   ZERO: new BigNumber(0),
   ONE: new BigNumber(1),
+  TEN: new BigNumber(10),
 };
 
 // defaults to zero if null or empty

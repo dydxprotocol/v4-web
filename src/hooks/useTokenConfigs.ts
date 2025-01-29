@@ -1,24 +1,24 @@
-import { TOKEN_CONFIG_MAP } from '@/constants/networks';
+import { DydxChainId, TOKEN_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { createAppSelector, useAppSelector } from '@/state/appTypes';
 
-export const useTokenConfigs = (): {
-  tokensConfigs: {
-    [DydxChainAsset.USDC]: {
-      denom: string;
-      name: string;
-      decimals: number;
-      gasDenom?: string;
-    };
-    [DydxChainAsset.CHAINTOKEN]: {
-      denom: string;
-      name: string;
-      decimals: number;
-      gasDenom?: string;
-    };
-  };
+type TokenConfig = {
+  denom: string;
+  name: string;
+  decimals: number;
+  gasDenom?: string;
+  image?: string;
+};
+
+type TokenConfigs = {
+  [DydxChainAsset.USDC]: TokenConfig;
+  [DydxChainAsset.CHAINTOKEN]: TokenConfig;
+};
+
+export type TokenConfigsResult = {
+  tokensConfigs: TokenConfigs;
   usdcDenom: string;
   usdcDecimals: number;
   usdcGasDenom: string;
@@ -28,8 +28,9 @@ export const useTokenConfigs = (): {
   chainTokenDecimals: number;
   chainTokenImage: string;
   chainTokenLabel: string;
-} => {
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+};
+
+const getTokenConfigsData = (selectedDydxChainId: DydxChainId): TokenConfigsResult => {
   const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
 
   return {
@@ -44,4 +45,13 @@ export const useTokenConfigs = (): {
     chainTokenImage: tokensConfigs[DydxChainAsset.CHAINTOKEN].image,
     chainTokenLabel: tokensConfigs[DydxChainAsset.CHAINTOKEN].name,
   };
+};
+
+export const selectTokenConfigs = createAppSelector(
+  [getSelectedDydxChainId],
+  (selectedDydxChainId): TokenConfigsResult => getTokenConfigsData(selectedDydxChainId)
+);
+
+export const useTokenConfigs = (): TokenConfigsResult => {
+  return useAppSelector(selectTokenConfigs);
 };

@@ -517,11 +517,6 @@ export const getOnboardingGuards = (state: RootState) => state.account.onboardin
 export const getHasUnseenOrderUpdates = (state: RootState) => state.account.hasUnseenOrderUpdates;
 
 /**
- * @returns user wallet balances
- */
-export const getBalances = (state: RootState) => state.account.balances;
-
-/**
  *  @returns user wallet staking balances
  * */
 export const getStakingBalances = (state: RootState) => state.account.stakingBalances;
@@ -604,7 +599,7 @@ export const getComplianceUpdatedAt = (state: RootState) => state.account.compli
  */
 export const getGeo = (state: RootState) => state.account.compliance?.geo;
 
-export const getUserWalletAddress = (state: RootState) => state.account.wallet?.walletAddress;
+export const getUserWalletAddress = (state: RootState) => state.wallet.localWallet?.address;
 
 export const getUserSubaccountNumber = (state: RootState) =>
   state.account.subaccount?.subaccountNumber;
