@@ -6,7 +6,7 @@ import { timeUnits } from '@/constants/time';
 import { IndexerHistoricalFundingResponse } from '@/types/indexer/indexerApiGen';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';

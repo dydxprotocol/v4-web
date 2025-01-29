@@ -35,11 +35,8 @@ import { type RootState } from './_store';
 import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
-import {
-  getCurrentMarketId,
-  getCurrentMarketOrderbook,
-  getPerpetualMarkets,
-} from './perpetualsSelectors';
+import { getCurrentMarketId } from './currentMarketSelectors';
+import { getCurrentMarketOrderbook, getPerpetualMarkets } from './perpetualsSelectors';
 
 /**
  * @param state

@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { AdjustIsolatedMarginDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -12,7 +14,6 @@ import { Dialog } from '@/components/Dialog';
 
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 
 import { AdjustIsolatedMarginForm } from '../forms/AdjustIsolatedMarginForm';
 
@@ -22,7 +23,11 @@ export const AdjustIsolatedMarginDialog = ({
 }: DialogProps<AdjustIsolatedMarginDialogProps>) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(positionId), shallowEqual);
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, subaccountPosition?.assetId));
+  const logoUrl = useParameterizedSelector(
+    BonsaiHelpers.assets.createSelectAssetLogo,
+    subaccountPosition?.assetId
+  );
+
   const onIsolatedMarginAdjustment = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (

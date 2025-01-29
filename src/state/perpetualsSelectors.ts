@@ -1,5 +1,3 @@
-import { mapValues } from 'lodash';
-
 import { Nullable } from '@/constants/abacus';
 import { EMPTY_OBJ } from '@/constants/objects';
 
@@ -8,6 +6,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
+import { getCurrentMarketId } from './currentMarketSelectors';
 
 /**
  * @returns current market filter applied inside the markets page
@@ -15,30 +14,11 @@ import { createAppSelector } from './appTypes';
 export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
 
 /**
- * @returns marketId of the market the user is currently viewing (Internal)
- */
-export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
-
-/**
- * @returns marketId of the market the user is currently viewing if it is tradeable (Internal)
- */
-export const getCurrentMarketIdIfTradeable = (state: RootState) =>
-  state.perpetuals.currentMarketIdIfTradeable;
-
-/**
  * @returns displayId of the currentMarket the user is viewing (Render)
  */
 export const getCurrentMarketDisplayId = (state: RootState) => {
   const currentMarketId = getCurrentMarketId(state) ?? '';
   return state.perpetuals.markets?.[currentMarketId]?.displayId;
-};
-
-/**
- * @returns assetId of the currentMarket
- */
-export const getCurrentMarketAssetId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals.markets?.[currentMarketId]?.assetId;
 };
 
 /**
@@ -150,14 +130,6 @@ export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSe
 export const getCurrentMarketNextFundingRate = createAppSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
-);
-
-export const getMarketIdToAssetMetadataMap = createAppSelector(
-  [(state: RootState) => state.perpetuals.markets, (state: RootState) => state.assets.assets],
-  (markets, assets) => {
-    const mapping = mapValues(markets ?? {}, (v) => assets?.[v.assetId]);
-    return mapping;
-  }
 );
 
 /**

@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
@@ -15,7 +16,6 @@ import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getOrderById } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { getTradeType } from '@/lib/orders';
@@ -36,7 +36,7 @@ export const OrderCancelNotification = ({
   const order = useParameterizedSelector(getOrderById, localCancel.orderId)!;
   const marketData = useAppSelector((s) => getMarketData(s, order.marketId), shallowEqual);
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
   const indexedOrderStatus = order.status.rawValue;

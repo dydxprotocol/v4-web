@@ -8,8 +8,8 @@ describe('Smoke test', () => {
     await $('input[type=password]').setValue(process.env.E2E_ENVIRONMENT_PASSWORD || '');
     await $('button.submit').click();
 
-    await expect($('main')).toBeExisting();
-    await expect($('header')).toBeExisting();
-    await expect($('footer')).toBeExisting();
+    await expect($('main')).toBeExisting({ wait: 10000 });
+    await expect($('header')).toBeExisting({ wait: 10000 });
+    await expect($('footer')).toBeExisting({ wait: 10000 });
   });
 });

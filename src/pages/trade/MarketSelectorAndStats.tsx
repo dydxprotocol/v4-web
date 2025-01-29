@@ -1,4 +1,4 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -9,11 +9,9 @@ import { MarketStatsDetails } from '@/views/MarketStatsDetails';
 import { MarketsDropdown } from '@/views/MarketsDropdown';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
 import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketSelectorAndStats = ({
   className,
@@ -22,8 +20,7 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const { resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
-  const { imageUrl } = orEmptyObj(resources);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   const displayableId = launchableMarketId

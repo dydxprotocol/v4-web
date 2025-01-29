@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { debounce } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -32,7 +33,6 @@ import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getInputTradeOptions,
@@ -55,7 +55,7 @@ export const TradeSizeInputs = () => {
   const stringGetter = useStringGetter();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);

@@ -19,8 +19,8 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 export const FooterMobile = () => {
   const dispatch = useAppDispatch();
