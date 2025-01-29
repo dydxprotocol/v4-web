@@ -13,7 +13,6 @@ import { PositionTile } from '@/views/PositionTile';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -24,14 +23,15 @@ type ElementProps = {
 export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { id, resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
-  );
+  const {
+    stepSizeDecimals,
+    tickSizeDecimals,
+    assetId: id,
+    logo: imageUrl,
+  } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
   const { size: positionSize, notionalTotal } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
-  const { imageUrl } = orEmptyObj(resources);
 
   return (
     <$PositionPreviewContainer>

@@ -35,6 +35,7 @@ import {
 } from './selectors/apiStatus';
 import {
   createSelectAssetInfo,
+  createSelectAssetLogo,
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
 } from './selectors/assets';
@@ -49,6 +50,9 @@ import {
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
+  selectCurrentMarketAssetId,
+  selectCurrentMarketAssetLogoUrl,
+  selectCurrentMarketAssetName,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
   StablePerpetualMarketSummary,
@@ -193,6 +197,12 @@ interface BonsaiHelpersShape {
     marketInfo: BasicSelector<PerpetualMarketSummary | undefined>;
     // marketInfo but with only the properties that rarely change, for fewer rerenders
     stableMarketInfo: BasicSelector<StablePerpetualMarketSummary | undefined>;
+
+    // direct helpers
+    assetId: BasicSelector<string | undefined>;
+    assetLogo: BasicSelector<string | undefined>;
+    assetName: BasicSelector<string | undefined>;
+
     account: {
       openOrders: BasicSelector<SubaccountOrder[]>;
       orderHistory: BasicSelector<SubaccountOrder[]>;
@@ -204,7 +214,8 @@ interface BonsaiHelpersShape {
     };
   };
   assets: {
-    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string]>;
+    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string | undefined]>;
+    createSelectAssetLogo: ParameterizedSelector<string | undefined, [string | undefined]>;
   };
   markets: {
     createSelectMarketSummaryById: ParameterizedSelector<
@@ -233,6 +244,9 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
     stableMarketInfo: selectCurrentMarketInfoStable,
+    assetId: selectCurrentMarketAssetId,
+    assetLogo: selectCurrentMarketAssetLogoUrl,
+    assetName: selectCurrentMarketAssetName,
     orderbook: {
       createSelectGroupedData: createSelectCurrentMarketGroupedOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
@@ -244,7 +258,9 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     },
   },
   assets: {
+    // only use this for launchable assets, otherwise use market info
     createSelectAssetInfo,
+    createSelectAssetLogo,
   },
   markets: {
     createSelectMarketSummaryById,

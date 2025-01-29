@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -23,16 +24,15 @@ import { MidMarketPrice } from '@/views/MidMarketPrice';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDialogProps>) => {
-  const { id, resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
-  const { imageUrl } = orEmptyObj(resources);
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 

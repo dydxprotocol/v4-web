@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -15,14 +16,13 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeMarginMode, useTradeFormData } from '@/state/inputsSelectors';
-import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const MarginModeSelector = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
 
-  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
+  const currentAssetId = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const marginMode =

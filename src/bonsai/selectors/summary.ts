@@ -75,6 +75,26 @@ export const selectCurrentMarketAssetInfo = createAppSelector(
   }
 );
 
+export const selectCurrentMarketAssetId = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.assetId;
+  }
+);
+
+export const selectCurrentMarketAssetName = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.name;
+  }
+);
+export const selectCurrentMarketAssetLogoUrl = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.logo;
+  }
+);
+
 export const createSelectMarketSummaryById = () =>
   createAppSelector(
     [selectAllMarketSummaries, (_s, marketId: string | undefined) => marketId],

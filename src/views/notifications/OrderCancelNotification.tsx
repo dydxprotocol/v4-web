@@ -31,10 +31,9 @@ export const OrderCancelNotification = ({
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
   const order = useParameterizedSelector(getOrderById, localCancel.orderId)!;
-  const marketData = orEmptyObj(
+  const { assetId, logo: logoUrl } = orEmptyObj(
     useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, order.marketId)
   );
-  const { assetId, logo: logoUrl } = marketData;
 
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;

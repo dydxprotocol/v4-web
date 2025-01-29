@@ -20,9 +20,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
-
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { FillDetails } from './FillDetails';
@@ -52,7 +49,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
     MARKET
   );
   const { assetId } = orEmptyObj(marketData);
-  const assetImgUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const assetImgUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
   const tradeType = TRADE_TYPES[orderType] ?? undefined;
   const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;

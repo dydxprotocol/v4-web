@@ -50,7 +50,6 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
@@ -102,7 +101,8 @@ export const ClosePositionForm = ({
   const { closePosition } = useSubaccount();
 
   const market = useAppSelector(getCurrentMarketId);
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+
   const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );

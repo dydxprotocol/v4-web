@@ -23,7 +23,6 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
@@ -65,16 +64,17 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const { isTablet } = useBreakpoints();
   const dispatch = useAppDispatch();
 
-  const currentMarketAssetData = useAppSelector(getCurrentMarketAssetData, shallowEqual);
-  const currentMarketConfigs = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo);
+  const {
+    stepSizeDecimals,
+    tickSizeDecimals,
+    assetId: id,
+    logo: imageUrl,
+  } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo));
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
-  const { id, resources } = orEmptyObj(currentMarketAssetData);
   const symbol = getDisplayableAssetFromBaseAsset(id);
-  const { imageUrl } = orEmptyObj(resources);
 
   const {
     adjustedImf,

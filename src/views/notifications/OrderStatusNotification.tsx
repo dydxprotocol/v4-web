@@ -30,8 +30,6 @@ import {
   getFillByClientId,
   getOrderByClientId,
 } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -61,7 +59,7 @@ export const OrderStatusNotification = ({
   );
 
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
   const { equityTiersLearnMore } = useURLConfigs();
   // force allow the ?. just in case it's not in the map
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
