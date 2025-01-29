@@ -14,3 +14,20 @@ export const ORDERBOOK_WIDTH = 300;
 export const ORDERBOOK_ROW_HEIGHT = 21;
 export const ORDERBOOK_ROW_PADDING_RIGHT = 8;
 export const ORDERBOOK_HEADER_HEIGHT = 70;
+
+/**
+ * @description Orderbook grouping constants
+ */
+export enum GroupingMultiplier {
+  ONE = 1,
+  TEN = 10,
+  HUNDRED = 100,
+  THOUSAND = 1_000,
+}
+
+export const GROUPING_MULTIPLIER_LIST = [
+  GroupingMultiplier.ONE,
+  GroupingMultiplier.TEN,
+  GroupingMultiplier.HUNDRED,
+  GroupingMultiplier.THOUSAND,
+];

@@ -43,11 +43,9 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
+import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
-  selectCurrentMarketOrderbookData,
-  selectCurrentMarketOrderbookLoading,
-} from './selectors/markets';
-import {
+  createSelectCurrentMarketGroupedOrderbook,
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
@@ -201,7 +199,7 @@ interface BonsaiHelpersShape {
       fills: BasicSelector<SubaccountFill[]>;
     };
     orderbook: {
-      data: BasicSelector<OrderbookProcessedData | undefined>;
+      createSelectGroupedData: ParameterizedSelector<OrderbookProcessedData | undefined, [number]>;
       loading: BasicSelector<LoadableStatus>;
     };
   };
@@ -236,7 +234,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     marketInfo: selectCurrentMarketInfo,
     stableMarketInfo: selectCurrentMarketInfoStable,
     orderbook: {
-      data: selectCurrentMarketOrderbookData,
+      createSelectGroupedData: createSelectCurrentMarketGroupedOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
     },
     account: {

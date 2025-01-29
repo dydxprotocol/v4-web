@@ -2,7 +2,6 @@ import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { calculateAllMarkets, formatSparklineData } from '../calculators/markets';
-import { calculateOrderbook } from '../calculators/orderbook';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import {
   selectRawMarketsData,
@@ -39,21 +38,4 @@ export const selectCurrentMarketOrderbookLoading = createAppSelector(
   [selectCurrentMarketOrderbook],
   (currentMarketOrderbook) =>
     currentMarketOrderbook ? mergeLoadableStatus(currentMarketOrderbook) : 'idle'
-);
-
-export const selectCurrentMarketOrderbookData = createAppSelector(
-  [selectCurrentMarketOrderbook],
-  (currentMarketOrderbook) => calculateOrderbook(currentMarketOrderbook?.data)
-);
-
-export const createSelectCurrentMarketOrderbook = createAppSelector(
-  [selectCurrentMarketOrderbook, (_s, groupingMultiplier?: number) => groupingMultiplier],
-  (currentMarketOrderbook, _groupingMultiplier) => {
-    if (currentMarketOrderbook?.data == null) {
-      return undefined;
-    }
-
-    // TODO: groupMultiplier calculations on the orderbook
-    return calculateOrderbook(currentMarketOrderbook.data);
-  }
 );
