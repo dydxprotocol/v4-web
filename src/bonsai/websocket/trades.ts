@@ -43,7 +43,7 @@ function tradesWebsocketValueCreator(
           });
           return value;
         }
-        const allNewTrades = updates.flatMap((u) => u.trades).toReversed();
+        const allNewTrades = updates.flatMap((u) => u.trades).reverse();
         const merged = mergeById(allNewTrades, startingValue.trades, (t) => t.id);
         const sortedMerged = orderBy(merged, [(t) => t.createdAt], ['desc']);
         return loadableLoaded({ trades: sortedMerged.slice(0, POST_LIMIT) });

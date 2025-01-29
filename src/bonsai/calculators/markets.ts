@@ -119,7 +119,7 @@ export function formatSparklineData(sparklines?: {
   if (sparklines == null) return sparklines;
   return mapValues(sparklines, (map) => {
     return mapValues(map, (sparkline) => {
-      return sparkline.map((point) => MustBigNumber(point).toNumber()).toReversed();
+      return sparkline.map((point) => MustBigNumber(point).toNumber()).reverse();
     });
   });
 }
