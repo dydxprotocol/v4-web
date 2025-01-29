@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -20,11 +21,11 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { LeverageSlider } from './LeverageSlider';
 
@@ -39,8 +40,9 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { initialMarginFraction, effectiveInitialMarginFraction } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
   const { leverage, size: currentPositionSize } =
     useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
   const { side } = useAppSelector(getInputTradeData, shallowEqual) ?? {};

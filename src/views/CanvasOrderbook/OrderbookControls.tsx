@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { clamp } from 'lodash';
-import { shallowEqual, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
@@ -17,7 +18,6 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
@@ -42,8 +42,10 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     },
     [grouping?.multiplier.ordinal]
   );
-  const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-  const tickSizeDecimals = currentMarketConfig?.tickSizeDecimals ?? USD_DECIMALS;
+
+  const tickSizeDecimals =
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)?.tickSizeDecimals ?? USD_DECIMALS;
+
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
       if (!assetId) return;
@@ -57,6 +59,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
     },
     [dispatch, assetId]
   );
+
   return (
     <$OrderbookControlsContainer className={className}>
       <div tw="flex justify-between gap-0.5">

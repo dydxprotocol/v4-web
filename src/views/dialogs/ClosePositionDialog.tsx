@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ClosePositionDialogProps, DialogProps } from '@/constants/dialogs';
@@ -24,10 +23,10 @@ import { MidMarketPrice } from '@/views/MidMarketPrice';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDialogProps>) => {
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
@@ -99,8 +98,9 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
 
 const CloseOrderHeader = () => {
   const stringGetter = useStringGetter();
-  const { priceChange24H, priceChange24HPercent } =
-    useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { priceChange24H, percentChange24h } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
+  );
 
   return (
     <div tw="spacedRow">
@@ -110,7 +110,7 @@ const CloseOrderHeader = () => {
           <MidMarketPrice />
           <$PriceChange
             type={OutputType.Percent}
-            value={MustBigNumber(priceChange24HPercent).abs()}
+            value={MustBigNumber(percentChange24h).abs()}
             isNegative={MustBigNumber(priceChange24H).isNegative()}
           />
         </$MarketDetails>
