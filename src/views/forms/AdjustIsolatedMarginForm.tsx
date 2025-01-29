@@ -45,6 +45,7 @@ import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -66,9 +67,8 @@ export const AdjustIsolatedMarginForm = ({
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
   const { childSubaccountNumber, marginUsage, freeCollateral } = subaccountPosition ?? {};
-  const marketConfig = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
-    marketId
+  const { tickSizeDecimals } = orEmptyObj(
+    useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, marketId)
   );
   const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
@@ -78,8 +78,6 @@ export const AdjustIsolatedMarginForm = ({
     amountPercent,
     summary,
   } = adjustIsolatedMarginInputs ?? {};
-
-  const { tickSizeDecimals } = marketConfig ?? {};
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({
