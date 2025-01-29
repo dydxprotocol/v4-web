@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -10,6 +11,7 @@ import { DialogProps, SharePNLAnalyticsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LogoIcon } from '@/icons/logo';
@@ -23,8 +25,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
 import { Tag, TagSign } from '@/components/Tag';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
+import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
@@ -54,7 +55,8 @@ export const SharePNLAnalyticsDialog = ({
 }: DialogProps<SharePNLAnalyticsDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
+
   const symbol = getDisplayableAssetFromBaseAsset(assetId);
 
   const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -49,10 +50,10 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -101,7 +102,8 @@ export const ClosePositionForm = ({
   const { closePosition } = useSubaccount();
 
   const market = useAppSelector(getCurrentMarketId);
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+
   const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
     useAppSelector(getCurrentMarketConfig, shallowEqual)
   );

@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -15,10 +16,8 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketTypeFilter, PanelView } from './types';
 
@@ -38,10 +37,8 @@ export const TradeTableSettings = ({
   onOpenChange,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { id: currentMarketAssetId, resources } = orEmptyObj(
-    useAppSelector(getCurrentMarketAssetData)
-  );
-  const { imageUrl } = orEmptyObj(resources);
+  const currentMarketAssetId = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
   const symbol = getDisplayableAssetFromBaseAsset(currentMarketAssetId);
 
   return (

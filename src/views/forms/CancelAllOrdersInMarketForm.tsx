@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { zipObject } from 'lodash';
-import { shallowEqual } from 'react-redux';
 
 import { ButtonAction } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -17,15 +18,9 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import {
-  getNonZeroPendingPositions,
-  getPendingIsolatedOrders,
-  getSubaccount,
-} from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssets } from '@/state/assetsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 type CancelAllOrdersInMarketFormProps = {
   marketId: string;
@@ -42,14 +37,17 @@ export const CancelAllOrdersInMarketForm = ({
   onCancelComplete,
 }: CancelAllOrdersInMarketFormProps) => {
   const stringGetter = useStringGetter();
-  const pendingPositions = useAppSelector(getNonZeroPendingPositions, shallowEqual);
-  const thisPendingPosition = useMemo(
-    () => pendingPositions?.find((f) => f.marketId === marketId),
-    [marketId, pendingPositions]
+  const marketSummaryForThisMarket = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    marketId
   );
-  const allPending = useAppSelector(getPendingIsolatedOrders, shallowEqual);
-  const pendingPositionOrders = allPending[marketId] ?? EMPTY_ARR;
-  const assetsData = useAppSelector(getAssets, shallowEqual);
+
+  const allPending = useAppSelector(BonsaiHelpers.unopenedIsolatedPositions);
+  const pendingPositionThisMarket = useMemo(
+    () => allPending?.find((p) => p.marketId === marketId),
+    [marketId, allPending]
+  );
+  const pendingPositionOrders = pendingPositionThisMarket?.orders ?? EMPTY_ARR;
 
   const [cancellingStatus, setCancellingStatus] = useState<Record<string, OrderCancelStatus>>({});
   const isCancelling = useMemo(
@@ -57,7 +55,8 @@ export const CancelAllOrdersInMarketForm = ({
     [cancellingStatus]
   );
   const { cancelOrder } = useSubaccount();
-  const { freeCollateral: crossFreeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral: crossFreeCollateral } =
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data) ?? {};
 
   const onCancel = useCallback(() => {
     if (isCancelling) {
@@ -117,10 +116,10 @@ export const CancelAllOrdersInMarketForm = ({
         value: (
           <DiffOutput
             type={OutputType.Fiat}
-            value={thisPendingPosition?.freeCollateral?.current ?? 0}
+            value={pendingPositionThisMarket?.equity ?? 0}
             newValue={0}
             sign={NumberSign.Negative}
-            withDiff={(thisPendingPosition?.freeCollateral?.current ?? 0) > 0}
+            withDiff={(pendingPositionThisMarket?.equity ?? BIG_NUMBERS.ZERO).gt(0)}
           />
         ),
       },
@@ -130,12 +129,12 @@ export const CancelAllOrdersInMarketForm = ({
         value: (
           <DiffOutput
             type={OutputType.Fiat}
-            value={crossFreeCollateral?.current}
-            newValue={MustBigNumber(crossFreeCollateral?.current).plus(
-              MustBigNumber(thisPendingPosition?.freeCollateral?.current ?? 0)
+            value={crossFreeCollateral}
+            newValue={MustBigNumber(crossFreeCollateral).plus(
+              pendingPositionThisMarket?.equity ?? 0
             )}
             sign={NumberSign.Positive}
-            withDiff={(thisPendingPosition?.freeCollateral?.current ?? 0) > 0}
+            withDiff={(pendingPositionThisMarket?.equity ?? BIG_NUMBERS.ZERO).gt(0)}
           />
         ),
       },
@@ -143,8 +142,8 @@ export const CancelAllOrdersInMarketForm = ({
   }, [
     crossFreeCollateral,
     pendingPositionOrders.length,
+    pendingPositionThisMarket?.equity,
     stringGetter,
-    thisPendingPosition?.freeCollateral,
   ]);
 
   const submitButtonWithReceipt = (
@@ -179,7 +178,7 @@ export const CancelAllOrdersInMarketForm = ({
                     key: STRING_KEYS.N_OPEN_ORDERS,
                     params: { COUNT: pendingPositionOrders.length },
                   }),
-            ASSET: assetsData?.[pendingPositionOrders[0]?.assetId ?? '']?.name ?? marketId,
+            ASSET: marketSummaryForThisMarket?.name ?? marketId,
             MARKET: marketId,
           },
         })}

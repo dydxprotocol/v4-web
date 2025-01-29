@@ -20,8 +20,9 @@ import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 

@@ -34,7 +34,6 @@ import {
   setTransfers,
   setUnbondingDelegations,
 } from '@/state/account';
-import { setAssets } from '@/state/assets';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -71,24 +70,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
-      if (changes.has(Changes.assets)) {
-        dispatch(
-          setAssets(
-            Object.fromEntries(
-              (updatedState.assetIds()?.toArray() ?? [])
-                .map((assetId: string) => {
-                  const assetData = updatedState.asset(assetId);
-                  if (assetData == null) {
-                    return undefined;
-                  }
-                  return [assetId, assetData];
-                })
-                .filter(isTruthy)
-            )
-          )
-        );
-      }
-
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.stakingBalances) {
           const stakingBalances: Record<string, AccountBalance> = fromPairs(

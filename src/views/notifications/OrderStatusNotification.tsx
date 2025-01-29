@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import {
@@ -31,7 +32,6 @@ import {
   getOrderByClientId,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
@@ -59,7 +59,7 @@ export const OrderStatusNotification = ({
   );
 
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
   const { equityTiersLearnMore } = useURLConfigs();
   // force allow the ?. just in case it's not in the map
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

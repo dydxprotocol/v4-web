@@ -5,7 +5,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { calculateFills } from '../calculators/fills';
 import {

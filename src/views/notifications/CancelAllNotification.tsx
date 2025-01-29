@@ -1,9 +1,11 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY, LocalCancelAllData } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -13,7 +15,6 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -38,7 +39,7 @@ export const CancelAllNotification = ({
   const numFailed = localCancelAll.failedOrderIds?.length ?? 0;
 
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, assetId));
+  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
 
   // Check if all orders have been confirmed canceled or failed
   const isCancellationConfirmed = numCanceled + numFailed >= numOrders;

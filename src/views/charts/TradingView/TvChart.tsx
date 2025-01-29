@@ -11,7 +11,7 @@ import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useTradingViewToggles } from '@/hooks/tradingView/useTradingViewToggles';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { BaseTvChart } from './BaseTvChart';
 

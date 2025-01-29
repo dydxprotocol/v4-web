@@ -3,7 +3,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { UsdcDepositArgs, UsdcWithdrawArgs } from './calculators/accountActions';
 import { HistoricalFundingObject } from './calculators/funding';
@@ -35,6 +35,7 @@ import {
 } from './selectors/apiStatus';
 import {
   createSelectAssetInfo,
+  createSelectAssetLogo,
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
 } from './selectors/assets';
@@ -44,14 +45,15 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
+import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
-  selectCurrentMarketOrderbookData,
-  selectCurrentMarketOrderbookLoading,
-} from './selectors/markets';
-import {
+  createSelectCurrentMarketGroupedOrderbook,
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
+  selectCurrentMarketAssetId,
+  selectCurrentMarketAssetLogoUrl,
+  selectCurrentMarketAssetName,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
   StablePerpetualMarketSummary,
@@ -203,18 +205,25 @@ interface BonsaiHelpersShape {
     marketInfo: BasicSelector<PerpetualMarketSummary | undefined>;
     // marketInfo but with only the properties that rarely change, for fewer rerenders
     stableMarketInfo: BasicSelector<StablePerpetualMarketSummary | undefined>;
+
+    // direct helpers
+    assetId: BasicSelector<string | undefined>;
+    assetLogo: BasicSelector<string | undefined>;
+    assetName: BasicSelector<string | undefined>;
+
     account: {
       openOrders: BasicSelector<SubaccountOrder[]>;
       orderHistory: BasicSelector<SubaccountOrder[]>;
       fills: BasicSelector<SubaccountFill[]>;
     };
     orderbook: {
-      data: BasicSelector<OrderbookProcessedData | undefined>;
+      createSelectGroupedData: ParameterizedSelector<OrderbookProcessedData | undefined, [number]>;
       loading: BasicSelector<LoadableStatus>;
     };
   };
   assets: {
-    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string]>;
+    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string | undefined]>;
+    createSelectAssetLogo: ParameterizedSelector<string | undefined, [string | undefined]>;
   };
   markets: {
     createSelectMarketSummaryById: ParameterizedSelector<
@@ -243,8 +252,11 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   currentMarket: {
     marketInfo: selectCurrentMarketInfo,
     stableMarketInfo: selectCurrentMarketInfoStable,
+    assetId: selectCurrentMarketAssetId,
+    assetLogo: selectCurrentMarketAssetLogoUrl,
+    assetName: selectCurrentMarketAssetName,
     orderbook: {
-      data: selectCurrentMarketOrderbookData,
+      createSelectGroupedData: createSelectCurrentMarketGroupedOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
     },
     account: {
@@ -254,7 +266,9 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     },
   },
   assets: {
+    // only use this for launchable assets, otherwise use market info
     createSelectAssetInfo,
+    createSelectAssetLogo,
   },
   markets: {
     createSelectMarketSummaryById,

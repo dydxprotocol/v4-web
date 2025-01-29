@@ -40,17 +40,14 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import {
   getCurrentInput,
   getInputTradeData,
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketId,
-  getCurrentMarketOraclePrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';

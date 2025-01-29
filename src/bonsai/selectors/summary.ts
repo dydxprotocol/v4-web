@@ -1,16 +1,23 @@
 import { omit } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
+import { GroupingMultiplier } from '@/constants/orderbook';
+
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
+import { calculateOrderbook, formatOrderbook } from '../calculators/orderbook';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
 import { selectRawAssets, selectRawMarkets } from './base';
-import { selectAllMarketsInfo, selectSparkLinesData } from './markets';
+import {
+  selectAllMarketsInfo,
+  selectCurrentMarketOrderbook,
+  selectSparkLinesData,
+} from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
   [selectRawMarkets, selectRawAssets],
@@ -68,6 +75,26 @@ export const selectCurrentMarketAssetInfo = createAppSelector(
   }
 );
 
+export const selectCurrentMarketAssetId = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.assetId;
+  }
+);
+
+export const selectCurrentMarketAssetName = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.name;
+  }
+);
+export const selectCurrentMarketAssetLogoUrl = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.logo;
+  }
+);
+
 export const createSelectMarketSummaryById = () =>
   createAppSelector(
     [selectAllMarketSummaries, (_s, marketId: string | undefined) => marketId],
@@ -76,5 +103,22 @@ export const createSelectMarketSummaryById = () =>
         return undefined;
       }
       return allSummaries?.[marketId];
+    }
+  );
+
+export const createSelectCurrentMarketGroupedOrderbook = () =>
+  createAppSelector(
+    [
+      selectCurrentMarketOrderbook,
+      selectCurrentMarketInfoStable,
+      (_s, groupingMultiplier?: GroupingMultiplier) => groupingMultiplier ?? GroupingMultiplier.ONE,
+    ],
+    (currentMarketOrderbook, currentMarketStableInfo, groupingMultiplier) => {
+      if (currentMarketOrderbook == null || currentMarketStableInfo == null) {
+        return undefined;
+      }
+      const { tickSize } = currentMarketStableInfo;
+      const orderbook = calculateOrderbook(currentMarketOrderbook.data);
+      return formatOrderbook(orderbook, groupingMultiplier, tickSize);
     }
   );

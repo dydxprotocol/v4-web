@@ -8,10 +8,10 @@ import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
   getCurrentMarketConfig,
-  getCurrentMarketId,
   getCurrentMarketMidMarketPriceWithOraclePriceFallback,
 } from '@/state/perpetualsSelectors';
 
