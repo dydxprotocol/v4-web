@@ -57,7 +57,10 @@ export const useAccountBalance = ({
 } => {
   const { sourceAccount, dydxAccountGraz, dydxAddress } = useAccounts();
 
-  const balances = useAppSelector(BonsaiCore.account.balances.data);
+  const { chainTokenAmount: nativeTokenCoinBalance, usdcAmount: usdcCoinBalance } = useAppSelector(
+    BonsaiCore.account.balances.data
+  );
+
   const { chainTokenDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
@@ -244,10 +247,7 @@ export const useAccountBalance = ({
 
   const balance = isCosmosChain ? cosmosBalance : isSolanaChain ? solBalance : evmBalance;
 
-  const nativeTokenCoinBalance = balances.chainTokenAmount;
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance);
-
-  const usdcCoinBalance = balances.usdcAmount;
   const usdcBalance = MustBigNumber(usdcCoinBalance).toNumber();
 
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];

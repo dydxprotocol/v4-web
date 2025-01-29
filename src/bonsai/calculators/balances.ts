@@ -1,10 +1,8 @@
 import { Coin } from '@cosmjs/proto-signing';
-import BigNumber from 'bignumber.js';
 import { keyBy } from 'lodash';
+import { formatUnits } from 'viem';
 
 import { TokenConfigsResult } from '@/hooks/useTokenConfigs';
-
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { AccountBalances } from '../types/summaryTypes';
 
@@ -12,9 +10,7 @@ function convertAmount(amount: string | undefined, decimals: number): string | u
   if (amount == null) {
     return undefined;
   }
-  return MustBigNumber(amount)
-    .times(BIG_NUMBERS.TEN.pow(-1 * decimals))
-    .toFixed(10, BigNumber.ROUND_FLOOR);
+  return formatUnits(BigInt(amount), decimals);
 }
 
 export function calculateBalances(
