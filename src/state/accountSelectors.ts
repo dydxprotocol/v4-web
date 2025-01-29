@@ -35,11 +35,8 @@ import { type RootState } from './_store';
 import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
-import {
-  getCurrentMarketId,
-  getCurrentMarketOrderbook,
-  getPerpetualMarkets,
-} from './perpetualsSelectors';
+import { getCurrentMarketId } from './currentMarketSelectors';
+import { getCurrentMarketOrderbook } from './perpetualsSelectors';
 
 /**
  * @param state
@@ -194,7 +191,7 @@ export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], 
 );
 
 export const getOpenIsolatedOrders = createAppSelector(
-  [getSubaccountOrders, getPerpetualMarkets],
+  [getSubaccountOrders, BonsaiCore.markets.markets.data],
   (allOrders, allMarkets) =>
     (allOrders ?? [])
       .filter((o) => isOrderStatusOpen(o.status) && o.marginMode === AbacusMarginMode.Isolated)

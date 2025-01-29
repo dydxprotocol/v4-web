@@ -9,7 +9,6 @@ import type {
   MarketOrderbook,
   Nullable,
   ParsingErrors,
-  PerpetualMarket,
   PerpetualState,
   PerpetualStateChanges,
   SubaccountOrder,
@@ -40,7 +39,7 @@ import { setAssets } from '@/state/assets';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setMarkets, setOrderbook } from '@/state/perpetuals';
+import { setOrderbook } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 import { isTruthy } from '../isTruthy';
@@ -127,25 +126,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.wallet)) {
         dispatch(setWallet(updatedState.wallet));
-      }
-
-      if (changes.has(Changes.markets)) {
-        dispatch(
-          setMarkets({
-            markets: Object.fromEntries(
-              (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
-                .map((marketId: string): undefined | [string, PerpetualMarket] => {
-                  const marketData = updatedState.market(marketId);
-                  if (marketData == null) {
-                    return undefined;
-                  }
-                  return [marketId, marketData];
-                })
-                .filter(isTruthy)
-            ),
-            update: !!marketIds,
-          })
-        );
       }
 
       if (changes.has(Changes.restriction)) {

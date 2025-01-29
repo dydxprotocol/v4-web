@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -25,7 +26,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
@@ -66,7 +66,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const dispatch = useAppDispatch();
 
   const currentMarketAssetData = useAppSelector(getCurrentMarketAssetData, shallowEqual);
-  const currentMarketConfigs = useAppSelector(getCurrentMarketConfig, shallowEqual);
+  const currentMarketConfigs = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo);
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);

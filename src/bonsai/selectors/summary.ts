@@ -5,7 +5,7 @@ import { GroupingMultiplier } from '@/constants/orderbook';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { calculateOrderbook, formatOrderbook } from '../calculators/orderbook';

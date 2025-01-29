@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import merge from 'lodash/merge';
 
-import type { MarketOrderbook, Nullable, PerpetualMarket } from '@/constants/abacus';
+import type { MarketOrderbook, Nullable } from '@/constants/abacus';
 import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
@@ -16,7 +16,6 @@ export interface PerpetualsState {
   marketFilter: MarketFilters;
   launchMarketIds: string[];
 
-  markets?: Record<string, PerpetualMarket>;
   orderbooks?: Record<string, MarketOrderbook>;
   orderbooksMap?: Record<
     string,
@@ -30,7 +29,6 @@ export interface PerpetualsState {
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
   currentMarketIdIfTradeable: undefined,
-  markets: undefined,
   orderbooks: undefined,
   orderbooksMap: undefined,
   marketFilter: MarketFilters.ALL,
@@ -53,15 +51,6 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
     },
-    setMarkets: (
-      state: PerpetualsState,
-      action: PayloadAction<{ markets: Record<string, PerpetualMarket>; update?: boolean }>
-    ) => ({
-      ...state,
-      markets: action.payload.update
-        ? merge({}, state.markets, action.payload.markets)
-        : action.payload.markets,
-    }),
     setOrderbook: (
       state: PerpetualsState,
       action: PayloadAction<{ orderbook?: Nullable<MarketOrderbook>; marketId: string }>
@@ -106,7 +95,6 @@ export const perpetualsSlice = createSlice({
 export const {
   setCurrentMarketId,
   setCurrentMarketIdIfTradeable,
-  setMarkets,
   setOrderbook,
   resetPerpetualsState,
   setMarketFilter,

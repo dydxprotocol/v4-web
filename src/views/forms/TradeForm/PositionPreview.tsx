@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import { PositionTile } from '@/views/PositionTile';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -25,11 +25,12 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const { id, resources } = orEmptyObj(useAppSelector(getCurrentMarketAssetData, shallowEqual));
-  const { configs } = orEmptyObj(useAppSelector(getCurrentMarketData, shallowEqual));
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
+  );
   const { size: positionSize, notionalTotal } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(configs);
   const { imageUrl } = orEmptyObj(resources);
 
   return (

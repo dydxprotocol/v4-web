@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useDispatch } from 'react-redux';
 
@@ -9,10 +10,7 @@ import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { useAppSelector } from '@/state/appTypes';
 import { setClosePositionFormInputs } from '@/state/inputs';
 import { getClosePositionFormInputs, getInputClosePositionData } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -34,7 +32,7 @@ export const useClosePositionFormInputs = () => {
   const { limitPrice } = price ?? {};
 
   const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig, shallowEqual)
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);

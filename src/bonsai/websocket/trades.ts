@@ -6,7 +6,7 @@ import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/i
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { mergeById } from '@/lib/mergeById';
 

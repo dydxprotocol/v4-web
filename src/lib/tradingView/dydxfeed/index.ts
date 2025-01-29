@@ -1,3 +1,4 @@
+import { BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
 import { subscribeOnStream, unsubscribeFromStream } from '@/bonsai/websocket/candlesForTradingView';
 import { groupBy } from 'lodash';
@@ -29,9 +30,9 @@ import { Themes } from '@/styles/themes';
 import { type RootStore } from '@/state/_store';
 import { getMarketFills } from '@/state/accountSelectors';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
-import { getMarketConfig, getMarketData } from '@/state/perpetualsSelectors';
 
 import { objectKeys } from '@/lib/objectHelpers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { log } from '../../telemetry';
 import { getSymbol, mapCandle } from '../utils';
@@ -84,7 +85,9 @@ export const getDydxDatafeed = (
 
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
-    const { tickSizeDecimals } = getMarketConfig(store.getState(), symbolItem.symbol) ?? {};
+    const { tickSizeDecimals } = orEmptyObj(
+      BonsaiHelpers.markets.createSelectMarketSummaryById()(store.getState(), symbolItem.symbol)
+    );
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
@@ -123,7 +126,10 @@ export const getDydxDatafeed = (
     const colorMode = getAppColorMode(store.getState());
 
     const [fromMs, toMs] = [fromSeconds * 1000, toSeconds * 1000];
-    const market = getMarketData(store.getState(), symbolInfo.ticker!);
+    const market = BonsaiHelpers.markets.createSelectMarketSummaryById()(
+      store.getState(),
+      symbolInfo.ticker!
+    );
     if (!market) return;
 
     const fills = getMarketFills(store.getState())[symbolInfo.ticker!] ?? [];

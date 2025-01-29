@@ -1,4 +1,4 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import {
   AbacusOrderStatus,
@@ -32,7 +32,6 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAssetImageUrl } from '@/state/assetsSelectors';
-import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -52,7 +51,10 @@ export const OrderStatusNotification = ({
   const stringGetter = useStringGetter();
   const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
   const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
-  const marketData = useAppSelector((s) => getMarketData(s, localOrder.marketId), shallowEqual);
+  const marketData = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    localOrder.marketId
+  );
   const averageFillPrice = useParameterizedSelector(
     getAverageFillPriceForOrder,
     localOrder.orderId
@@ -93,7 +95,7 @@ export const OrderStatusNotification = ({
               filledAmount={order.totalFilled}
               assetId={assetId}
               averagePrice={averageFillPrice ?? order.price}
-              tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
+              tickSizeDecimals={marketData?.tickSizeDecimals ?? USD_DECIMALS}
             />
           );
         } else if (

@@ -10,7 +10,7 @@ import {
 
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketIdIfTradeable } from '@/state/perpetualsSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { setOrderbookRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';

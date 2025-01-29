@@ -3,7 +3,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { UsdcDepositArgs, UsdcWithdrawArgs } from './calculators/accountActions';
 import { HistoricalFundingObject } from './calculators/funding';
