@@ -79,6 +79,7 @@ export { default as ShowIcon } from './show.svg';
 export { default as SocialXIcon } from './social-x.svg';
 export { default as SpeechBubbleIcon } from './speech-bubble.svg';
 export { default as StarIcon } from './star.svg';
+export { default as SuccessCircleIcon } from './success-circle.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as SwitchIcon } from './switch.svg';
 export { default as TerminalIcon } from './terminal.svg';

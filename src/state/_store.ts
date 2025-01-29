@@ -27,6 +27,7 @@ import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
 import { tradingViewSlice } from './tradingView';
+import { transfersSlice } from './transfers';
 import { vaultsSlice } from './vaults';
 import { walletSlice } from './wallet';
 
@@ -46,6 +47,7 @@ const reducers = {
   notifications: notificationsSlice.reducer,
   perpetuals: perpetualsSlice.reducer,
   tradingView: tradingViewSlice.reducer,
+  transfers: transfersSlice.reducer,
   vaults: vaultsSlice.reducer,
   wallet: walletSlice.reducer,
   raw: rawSlice.reducer,
@@ -55,12 +57,13 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 4,
+  version: 5,
   storage,
   whitelist: [
     'affiliates',
     'dismissable',
     'tradingView',
+    'transfers',
     'wallet',
     'appUiConfigs',
     'accountUiMemory',

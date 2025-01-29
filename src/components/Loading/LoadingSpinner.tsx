@@ -9,7 +9,6 @@ type LoadingSpinnerProps = {
   className?: string;
   disabled?: boolean;
   size?: string;
-  stroke?: string;
   strokeWidth?: string;
 } & ComponentProps<'div'>;
 
@@ -20,12 +19,11 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   className,
   disabled = false,
   size = '38',
-  stroke = 'var(--color-layer-1)',
   strokeWidth = '5',
   ...rest
 }: LoadingSpinnerProps) => {
   return (
-    <div className={className} tw="leading-[0] text-color-text-0 [--spinner-width:auto]" {...rest}>
+    <div className={className} tw="leading-[0] [--spinner-width:auto]" {...rest}>
       <$LoadingSpinnerSvg
         id={id}
         width={size}
@@ -38,14 +36,15 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           cx="19"
           cy="19"
           r="16"
-          stroke={stroke}
+          stroke="var(--color-accent)"
+          strokeOpacity="0.3"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
         {!disabled && (
           <path
             d="M35 19.248C35 22.1935 34.1611 25.08 32.5786 27.5797C30.9961 30.0794 28.7334 32.0923 26.0474 33.3897C23.3614 34.6871 20.3597 35.217 17.3831 34.9194C14.4066 34.6217 11.5744 33.5084 9.20825 31.7058C6.84207 29.9032 5.03667 27.4835 3.99704 24.7216C2.95741 21.9596 2.7252 18.966 3.32678 16.0807C3.92836 13.1953 5.33963 10.5338 7.40035 8.39841C9.46107 6.26299 12.0887 4.73918 14.9848 4"
-            stroke="currentColor"
+            stroke="var(--color-accent)"
             strokeWidth={strokeWidth}
             strokeLinecap="round"
           />

@@ -57,6 +57,7 @@ import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
@@ -85,6 +86,7 @@ const Content = () => {
   useAnalytics();
   useCommandMenu();
   usePrefetchedQueries();
+  useUpdateTransfers();
   useReferralCode();
   useUnlimitedLaunchDialog();
   useUiRefreshMigrations();

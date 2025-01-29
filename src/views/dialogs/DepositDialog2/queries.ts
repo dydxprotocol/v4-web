@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { BalanceRequest, RouteRequest, SkipClient } from '@skip-go/client';
+import { BalanceRequest, RouteRequest, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';
 import { optimism } from 'viem/chains';
@@ -124,7 +124,7 @@ async function getSkipDepositRoutes(
     destAssetChainID: DYDX_DEPOSIT_CHAIN,
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
-    // allow quotes even if they have large price impact, as the user would see the difference in fees anyway
+    // TODO(deposit2.0): Manually calculate price impact by comparing USD values and warn user if difference > a certain %
     allowUnsafe: true,
     smartSwapOptions: { evmSwaps: true },
   };
@@ -134,9 +134,7 @@ async function getSkipDepositRoutes(
     skipClient.route({ ...routeOptions, goFast: true }),
   ]);
 
-  // @ts-ignore SDK doesn't know about .goFastTransfer
-  const isFastRouteAvailable = Boolean(fast.operations.find((op) => op.goFastTransfer));
-  return { slow, fast: isFastRouteAvailable ? fast : undefined };
+  return { slow, fast: isInstantDeposit(fast) ? fast : undefined };
 }
 
 export function useDepositRoutes(token: TokenForTransfer, amount: string) {
@@ -151,6 +149,11 @@ export function useDepositRoutes(token: TokenForTransfer, amount: string) {
     placeholderData: (prev) => prev,
     retry: false,
   });
+}
+
+export function isInstantDeposit(route: RouteResponse) {
+  // @ts-ignore SDK doesn't know about .goFastTransfer
+  return Boolean(route.operations.find((op) => op.goFastTransfer));
 }
 
 export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {

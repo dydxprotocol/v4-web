@@ -65,7 +65,6 @@ export const DepositSteps = ({
                   id={`deposit-step-${step.type}`}
                   size="100%"
                   strokeWidth="2"
-                  stroke=""
                   tw="absolute left-0 top-0 flex h-full w-full items-center justify-center text-color-accent"
                   css={(i !== currentStep || currentStepError) && tw`invisible`}
                 />
