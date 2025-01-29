@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import { shallowEqual } from 'react-redux';
@@ -13,7 +14,6 @@ import {
 } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
@@ -24,6 +24,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type DepthChartTooltipProps = {
   chartPointAtPointer: DepthChartPoint;
@@ -42,20 +43,22 @@ export const DepthChartTooltipContent = ({
 }: DepthChartTooltipProps) => {
   const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
-  const { spread, spreadPercent, midMarketPrice } = useOrderbookValuesForDepthChart();
   const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { spread, spreadPercent, midPrice } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.depthChart.data)
+  );
 
   const priceImpact = useMemo(() => {
-    if (nearestDatum && midMarketPrice) {
+    if (nearestDatum && midPrice) {
       const depthChartSeries = nearestDatum.key as DepthChartSeries;
 
       return {
-        [DepthChartSeries.Bids]: MustBigNumber(midMarketPrice)
+        [DepthChartSeries.Bids]: MustBigNumber(midPrice)
           .minus(nearestDatum.datum.price)
-          .div(midMarketPrice),
+          .div(midPrice),
         [DepthChartSeries.Asks]: MustBigNumber(nearestDatum.datum.price)
-          .minus(midMarketPrice)
-          .div(midMarketPrice),
+          .minus(midPrice)
+          .div(midPrice),
         [DepthChartSeries.MidMarket]: undefined,
       }[depthChartSeries];
     }
@@ -137,11 +140,9 @@ export const DepthChartTooltipContent = ({
             : nearestDatum?.key === DepthChartSeries.MidMarket
               ? [
                   {
-                    key: 'midMarketPrice',
+                    key: 'midPrice',
                     label: stringGetter({ key: STRING_KEYS.PRICE }),
-                    value: (
-                      <Output type={OutputType.Fiat} value={midMarketPrice} useGrouping={false} />
-                    ),
+                    value: <Output type={OutputType.Fiat} value={midPrice} useGrouping={false} />,
                   },
                   {
                     key: 'spread',

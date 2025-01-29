@@ -295,19 +295,11 @@ export interface UserStats {
   takerVolume30D?: number;
 }
 
-export type OrderbookLine = {
-  price: number;
-  size: number;
-  depth: number;
-  sizeCost: number;
-  depthCost: number;
-  offset: number;
-};
-
-export type OrderbookProcessedData = {
-  asks: OrderbookLine[];
-  bids: OrderbookLine[];
-  midPrice: number | undefined;
-  spread: number | undefined;
-  spreadPercent: number | undefined;
-};
+export interface SubaccountOpenOrderPriceMap {
+  [IndexerOrderSide.BUY]: {
+    [price: string]: BigNumber;
+  };
+  [IndexerOrderSide.SELL]: {
+    [price: string]: BigNumber;
+  };
+}

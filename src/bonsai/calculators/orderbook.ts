@@ -4,14 +4,16 @@ import { weakMapMemoize } from 'reselect';
 
 import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 import { GroupingMultiplier } from '@/constants/orderbook';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MustBigNumber, roundToNearestFactor } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
+import { OrderbookLine } from '../types/orderbookTypes';
 import { OrderbookData } from '../types/rawTypes';
-import { OrderbookLine } from '../types/summaryTypes';
+import { SubaccountOpenOrderPriceMap, SubaccountOrder } from '../types/summaryTypes';
 
 type OrderbookLineBN = {
   price: BigNumber;
@@ -23,6 +25,12 @@ type OrderbookLineBN = {
 };
 
 type RawOrderbookLineBN = Omit<OrderbookLineBN, 'depth' | 'depthCost'>;
+
+export type OrderbookProcessingOptions = {
+  groupingMultiplier?: GroupingMultiplier;
+  asksSortOrder?: 'asc' | 'desc';
+  bidsSortOrder?: 'asc' | 'desc';
+};
 
 export const calculateOrderbook = weakMapMemoize((orderbook: OrderbookData | undefined) => {
   if (orderbook == null) {
@@ -66,11 +74,11 @@ export const calculateOrderbook = weakMapMemoize((orderbook: OrderbookData | und
   const highestBid = processedBids.at(0);
   const midPriceBN = lowestAsk && highestBid && lowestAsk.price.plus(highestBid.price).div(2);
   const spreadBN = lowestAsk && highestBid && lowestAsk.price.minus(highestBid.price);
-  const spreadPercentBN = spreadBN && midPriceBN && spreadBN.div(midPriceBN).times(100);
+  const spreadPercentBN = spreadBN && midPriceBN && spreadBN.div(midPriceBN);
 
   return {
-    bids: processedBids,
-    asks: processedAsks,
+    bids: processedBids, // descending bids
+    asks: processedAsks, // ascending asks
     midPrice: midPriceBN,
     spread: spreadBN,
     spreadPercent: spreadPercentBN,
@@ -84,57 +92,68 @@ export const calculateOrderbook = weakMapMemoize((orderbook: OrderbookData | und
 export const formatOrderbook = weakMapMemoize(
   (
     currentMarketOrderbook: ReturnType<typeof calculateOrderbook>,
-    groupingMultiplier: GroupingMultiplier,
-    tickSize: string
+    tickSize: string,
+    options?: OrderbookProcessingOptions
   ) => {
     if (currentMarketOrderbook == null) {
       return undefined;
     }
 
+    const {
+      groupingMultiplier = GroupingMultiplier.ONE,
+      asksSortOrder = 'desc',
+      bidsSortOrder = 'desc',
+    } = options ?? {
+      groupingMultiplier: GroupingMultiplier.ONE,
+      asksSortOrder: 'desc',
+      bidsSortOrder: 'desc',
+    };
+
     // If groupingMultiplier is ONE, return the orderbook as is.
     if (groupingMultiplier === GroupingMultiplier.ONE) {
-      const tickSizeDecimals = MustBigNumber(tickSize).dp() ?? SMALL_USD_DECIMALS;
+      const asks = (
+        asksSortOrder === 'desc'
+          ? currentMarketOrderbook.asks.toReversed()
+          : currentMarketOrderbook.asks
+      ).map(mapOrderbookLineToNumber);
+
+      const bids = (
+        bidsSortOrder === 'desc'
+          ? currentMarketOrderbook.bids
+          : currentMarketOrderbook.bids.toReversed()
+      ).map(mapOrderbookLineToNumber);
 
       return {
-        asks: orderBy(
-          currentMarketOrderbook.asks.map(mapOrderbookLineToNumber),
-          (ask) => ask.price,
-          'desc'
-        ),
-        bids: currentMarketOrderbook.bids.map(mapOrderbookLineToNumber),
-        asksMap: Object.fromEntries(
-          currentMarketOrderbook.asks.map((line) => [
-            line.price.toFixed(tickSizeDecimals),
-            mapOrderbookLineToNumber(line),
-          ])
-        ),
-        bidsMap: Object.fromEntries(
-          currentMarketOrderbook.bids.map((line) => [
-            line.price.toFixed(tickSizeDecimals),
-            mapOrderbookLineToNumber(line),
-          ])
-        ),
+        asks,
+        bids,
         spread: currentMarketOrderbook.spread?.toNumber(),
         spreadPercent: currentMarketOrderbook.spreadPercent?.toNumber(),
         midPrice: currentMarketOrderbook.midPrice?.toNumber(),
       };
     }
 
-    const groupingTickSize = getGroupingTickSize(tickSize, groupingMultiplier);
+    const { groupingTickSize, groupingTickSizeDecimals } = getGroupingTickSize(
+      tickSize,
+      groupingMultiplier
+    );
+
     const { asks, bids } = currentMarketOrderbook;
-    const groupedAsks = orEmptyRecord(group(asks, groupingTickSize));
-    const groupedBids = orEmptyRecord(group(bids, groupingTickSize, true));
+
+    const groupedAsks = orEmptyRecord(group(asks, groupingTickSize, groupingTickSizeDecimals));
+    const groupedBids = orEmptyRecord(
+      group(bids, groupingTickSize, groupingTickSizeDecimals, true)
+    );
 
     // Convert groupedAsks and groupedBids to list and sort by price. Asks will now be descending and bids will be remain descending
     const asksList = orderBy(
       Object.values(groupedAsks).map(mapOrderbookLineToNumber),
-      (ask) => ask.price,
-      'desc'
+      [(ask) => ask.price],
+      [asksSortOrder]
     );
     const bidsList = orderBy(
       Object.values(groupedBids).map(mapOrderbookLineToNumber),
       (bid) => bid.price,
-      'desc'
+      [bidsSortOrder]
     );
 
     const lowestAsk = asksList.at(-1);
@@ -142,9 +161,7 @@ export const formatOrderbook = weakMapMemoize(
 
     return {
       asks: asksList,
-      asksMap: groupedAsks,
       bids: bidsList,
-      bidsMap: groupedBids,
       spread: currentMarketOrderbook.spread?.toNumber(),
       spreadPercent: currentMarketOrderbook.spreadPercent?.toNumber(),
       midPrice: roundMidPrice(lowestAsk, highestBid, groupingTickSize)?.toNumber(),
@@ -153,6 +170,7 @@ export const formatOrderbook = weakMapMemoize(
 );
 
 /** ------ .map Helper Functions ------ */
+
 function mapRawOrderbookLineToBN(
   rawOrderbookLineEntry: [string, { size: string; offset: number }]
 ) {
@@ -256,9 +274,14 @@ function calculateDepthAndDepthCost(
 
 /** ------ Grouping Helpers ------ */
 
-const getGroupingTickSize = (tickSize: string, multiplier: GroupingMultiplier) => {
-  return MustBigNumber(tickSize).times(multiplier).toNumber();
-};
+export function getGroupingTickSize(tickSize: string, multiplier: GroupingMultiplier) {
+  const groupingTickSize = MustBigNumber(tickSize).times(multiplier).toNumber();
+
+  return {
+    groupingTickSize,
+    groupingTickSizeDecimals: MustBigNumber(groupingTickSize).dp() ?? SMALL_USD_DECIMALS,
+  };
+}
 
 /**
  *
@@ -267,7 +290,12 @@ const getGroupingTickSize = (tickSize: string, multiplier: GroupingMultiplier) =
  * @param shouldFloor we want to round asks up and bids down so they don't have an overlapping group in the middle
  * @returns Grouped OrderbookLines in a dictionary using price as key
  */
-const group = (orderbook: OrderbookLineBN[], groupingTickSize: number, shouldFloor?: boolean) => {
+const group = (
+  orderbook: OrderbookLineBN[],
+  groupingTickSize: number,
+  groupingTickSizeDecimals: number,
+  shouldFloor?: boolean
+) => {
   if (orderbook.length === 0) {
     return null;
   }
@@ -281,7 +309,7 @@ const group = (orderbook: OrderbookLineBN[], groupingTickSize: number, shouldFlo
       roundingMode: shouldFloor ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP,
     });
 
-    const key = price.toString();
+    const key = price.toFixed(groupingTickSizeDecimals);
     const existingLine = mapResult[key];
 
     if (existingLine) {
@@ -323,4 +351,57 @@ function roundMidPrice(
         roundingMode: BigNumber.ROUND_HALF_UP,
       })
     : roundedMidPrice;
+}
+
+/** ------ Orderbook + Open Order Helpers ------ */
+
+export function getSubaccountOpenOrdersPriceMap(
+  subaccountOpenOrders: SubaccountOrder[],
+  groupingTickSize: number,
+  groupingTickSizeDecimals: number
+) {
+  return subaccountOpenOrders.reduce(
+    (acc, order) => {
+      const side = order.side;
+
+      const key = roundToNearestFactor({
+        number: MustBigNumber(order.price),
+        factor: groupingTickSize,
+        roundingMode: side === IndexerOrderSide.BUY ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL,
+      }).toFixed(groupingTickSizeDecimals);
+
+      if (acc[side][key]) {
+        acc[side][key] = acc[side][key].plus(order.size);
+      } else {
+        acc[side][key] = order.size;
+      }
+      return acc;
+    },
+    {
+      [IndexerOrderSide.BUY]: {},
+      [IndexerOrderSide.SELL]: {},
+    } as SubaccountOpenOrderPriceMap
+  );
+}
+
+export function findMine({
+  orderMap,
+  side,
+  price,
+  groupingTickSize,
+  groupingTickSizeDecimals,
+}: {
+  orderMap: SubaccountOpenOrderPriceMap;
+  side: IndexerOrderSide;
+  price: number;
+  groupingTickSize: number;
+  groupingTickSizeDecimals: number;
+}): number | undefined {
+  const key = roundToNearestFactor({
+    number: MustBigNumber(price),
+    factor: groupingTickSize,
+    roundingMode: side === IndexerOrderSide.BUY ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL,
+  }).toFixed(groupingTickSizeDecimals);
+
+  return orderMap[side][key]?.toNumber();
 }

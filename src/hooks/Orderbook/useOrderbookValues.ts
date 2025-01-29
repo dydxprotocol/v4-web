@@ -1,36 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderbookLine } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 
-import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
 import { GROUPING_MULTIPLIER_LIST, GroupingMultiplier } from '@/constants/orderbook';
 
-import { getSubaccountOrderSizeBySideAndOrderbookLevel } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
-
-import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
-import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { useParameterizedSelector } from '../useParameterizedSelector';
-
-export type OrderbookLineWithMine = OrderbookLine & {
-  mine?: number;
-  key: string;
-  side: 'ask' | 'bid';
-};
 
 export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number }) => {
   // const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
   const [groupingMultiplier, setGroupingMultiplier] = useState(GroupingMultiplier.ONE);
-
-  const subaccountOrderSizeBySideAndPrice = orEmptyRecord(
-    useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual)
-  );
 
   const orderbook = useParameterizedSelector(
     BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData,
@@ -56,33 +36,27 @@ export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number
   }, []);
 
   return useMemo(() => {
-    const asks: Array<OrderbookLineWithMine | undefined> = (orderbook?.asks ?? [])
-      .map(
-        (row: OrderbookLine, idx: number): OrderbookLineWithMine =>
-          safeAssign(
-            {},
-            {
-              key: `ask-${idx}`,
-              side: 'ask' as const,
-              mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-            },
-            row
-          )
+    const asks = (orderbook?.asks ?? [])
+      .map((row, idx: number) =>
+        safeAssign(
+          {},
+          {
+            key: `ask-${idx}`,
+          },
+          row
+        )
       )
-      .slice(-1 * rowsPerSide);
+      .slice(0, rowsPerSide);
 
-    const bids: Array<OrderbookLineWithMine | undefined> = (orderbook?.bids ?? [])
-      .map(
-        (row: OrderbookLine, idx: number): OrderbookLineWithMine =>
-          safeAssign(
-            {},
-            {
-              key: `bid-${idx}`,
-              side: 'bid' as const,
-              mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
-            },
-            row
-          )
+    const bids = (orderbook?.bids ?? [])
+      .map((row, idx: number) =>
+        safeAssign(
+          {},
+          {
+            key: `bid-${idx}`,
+          },
+          row
+        )
       )
       .slice(0, rowsPerSide);
 
@@ -107,47 +81,5 @@ export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number
       groupingMultiplier,
       modifyGroupingMultiplier,
     };
-  }, [
-    rowsPerSide,
-    orderbook,
-    subaccountOrderSizeBySideAndPrice,
-    groupingMultiplier,
-    modifyGroupingMultiplier,
-  ]);
-};
-
-export const useOrderbookValuesForDepthChart = () => {
-  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
-
-  return useMemo(() => {
-    const bids = (orderbook?.bids?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Bids }));
-
-    const asks = (orderbook?.asks?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Asks }));
-
-    const lowestBid = bids[bids.length - 1];
-    const highestBid = bids[0];
-    const lowestAsk = asks[0];
-    const highestAsk = asks[asks.length - 1];
-
-    const midMarketPrice = orderbook?.midPrice;
-    const spread = MustBigNumber(lowestAsk?.price ?? 0).minus(highestBid?.price ?? 0);
-    const spreadPercent = orderbook?.spreadPercent;
-
-    return {
-      bids,
-      asks,
-      lowestBid,
-      highestBid,
-      lowestAsk,
-      highestAsk,
-      midMarketPrice,
-      spread,
-      spreadPercent,
-      orderbook,
-    };
-  }, [orderbook]);
+  }, [rowsPerSide, orderbook, groupingMultiplier, modifyGroupingMultiplier]);
 };

@@ -1,11 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
-
-import { Nullable } from '@/constants/abacus';
-
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -14,23 +11,24 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const getMidMarketPriceColor = ({
   midMarketPrice,
   lastMidMarketPrice,
 }: {
-  midMarketPrice: Nullable<number>;
-  lastMidMarketPrice: Nullable<number>;
+  midMarketPrice?: BigNumber;
+  lastMidMarketPrice?: BigNumber;
 }) => {
-  if (MustBigNumber(midMarketPrice).lt(MustBigNumber(lastMidMarketPrice))) {
+  if (lastMidMarketPrice == null || midMarketPrice == null) {
+    return 'var(--color-text-2)';
+  }
+  if (midMarketPrice.lt(lastMidMarketPrice)) {
     return 'var(--color-negative)';
   }
-  if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
+  if (midMarketPrice.gt(lastMidMarketPrice)) {
     return 'var(--color-positive)';
   }
-
   return 'var(--color-text-2)';
 };
 
@@ -40,13 +38,10 @@ export const MidMarketPrice = () => {
   );
 
   const midMarketPriceLoading = ['pending', 'idle'].includes(
-    useAppSelector(BonsaiHelpers.currentMarket.orderbook.loading)
+    useAppSelector(BonsaiHelpers.currentMarket.midPrice.loading)
   );
 
-  const midMarketPrice = useParameterizedSelector(
-    BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData,
-    undefined
-  )?.midPrice;
+  const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
 
   const lastMidMarketPrice = useRef(midMarketPrice);
 

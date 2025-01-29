@@ -85,7 +85,7 @@ export const CanvasOrderbook = forwardRef(
           ? new Array<undefined>(rowsPerSide - asks.length).fill(undefined)
           : [];
 
-      const newAsksSlice: Array<OrderbookLineWithMine | undefined> = [...emptyAskRows, ...asks];
+      const newAsksSlice: Array<OrderbookLineWithMine | undefined> = [...asks, ...emptyAskRows];
 
       const emptyBidRows =
         bids.length < rowsPerSide
@@ -94,7 +94,7 @@ export const CanvasOrderbook = forwardRef(
       const newBidsSlice: Array<OrderbookLineWithMine | undefined> = [...bids, ...emptyBidRows];
 
       return {
-        asksSlice: layout === 'horizontal' ? newAsksSlice : newAsksSlice.reverse(),
+        asksSlice: layout === 'horizontal' ? newAsksSlice.reverse() : newAsksSlice,
         bidsSlice: newBidsSlice,
       };
     }, [asks, bids, layout, rowsPerSide]);

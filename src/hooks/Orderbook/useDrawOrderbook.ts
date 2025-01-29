@@ -432,5 +432,9 @@ export const useDrawOrderbook = ({
     drawOrderbookRow,
   ]);
 
+  // if (side === 'ask') {
+  //   console.log(data);
+  // }
+
   return { canvasRef };
 };
