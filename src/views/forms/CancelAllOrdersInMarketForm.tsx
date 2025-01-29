@@ -131,7 +131,7 @@ export const CancelAllOrdersInMarketForm = ({
             type={OutputType.Fiat}
             value={crossFreeCollateral}
             newValue={MustBigNumber(crossFreeCollateral).plus(
-              MustBigNumber(pendingPositionThisMarket?.equity ?? 0)
+              pendingPositionThisMarket?.equity ?? 0
             )}
             sign={NumberSign.Positive}
             withDiff={(pendingPositionThisMarket?.equity ?? BIG_NUMBERS.ZERO).gt(0)}
