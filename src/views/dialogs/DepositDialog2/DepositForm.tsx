@@ -68,7 +68,7 @@ export const DepositForm = ({
 
   // Difference between selectedRoute and depositRoute:
   // selectedRoute may be the cached route from the previous query response,
-  // whereas depositRoute is undefined while the current route request is still loading
+  // whereas depositRoute is undefined while the current route query is still loading
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
 
