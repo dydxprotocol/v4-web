@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { ArrowRightIcon } from '@radix-ui/react-icons';
 
 import { ButtonAction } from '@/constants/buttons';
 
@@ -64,15 +65,21 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
         </div>
       </div>
       <div tw="flex items-center justify-between self-stretch">
-        <div tw="text-color-text-0">Your deposit</div>
-        {/* TODO(deposit2.0): Show actual deposit amount here */}
-        <div>
-          <Output
-            tw="inline"
-            value={deposit.estimatedAmountUsd}
-            type={OutputType.Fiat}
-            slotLeft="~"
-          />
+        <div tw="text-color-text-0">{depositSuccess ? 'Available balance' : 'Your deposit'}</div>
+        <div tw="flex items-center gap-0.125">
+          {depositSuccess ? (
+            <>
+              <ArrowRightIcon tw="text-green" />
+              <Output tw="inline" value={freeCollateral} type={OutputType.Fiat} />
+            </>
+          ) : (
+            <Output
+              tw="inline"
+              value={deposit.estimatedAmountUsd}
+              type={OutputType.Fiat}
+              slotLeft="~"
+            />
+          )}
         </div>
       </div>
       <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
