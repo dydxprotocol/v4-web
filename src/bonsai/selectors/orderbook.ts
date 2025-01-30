@@ -14,6 +14,7 @@ import {
   getGroupingTickSize,
   getSubaccountOpenOrdersPriceMap,
 } from '../calculators/orderbook';
+import { CanvasOrderbookLine } from '../types/orderbookTypes';
 import { selectCurrentMarketOpenOrders } from './account';
 import { selectCurrentMarketOrderbook } from './markets';
 import { selectCurrentMarketInfoStable } from './summary';
@@ -59,7 +60,7 @@ export const createSelectCurrentMarketOrderbook = () =>
         asksSortOrder: 'asc',
       });
 
-      const bids =
+      const bids: CanvasOrderbookLine[] =
         formattedOrderbook?.bids.map((line) => ({
           ...line,
           side: 'bid',
@@ -72,7 +73,7 @@ export const createSelectCurrentMarketOrderbook = () =>
           }),
         })) ?? EMPTY_ARR;
 
-      const asks =
+      const asks: CanvasOrderbookLine[] =
         formattedOrderbook?.asks.map((line) => ({
           ...line,
           side: 'ask',
@@ -93,6 +94,8 @@ export const createSelectCurrentMarketOrderbook = () =>
         midPrice,
         spread,
         spreadPercent,
+        groupingTickSize,
+        groupingTickSizeDecimals,
       };
     }
   );

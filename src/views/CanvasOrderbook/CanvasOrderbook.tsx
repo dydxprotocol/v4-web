@@ -59,7 +59,8 @@ export const CanvasOrderbook = forwardRef(
       midMarketPrice,
       hasOrderbook,
       histogramRange,
-      groupingMultiplier,
+      groupingTickSize,
+      groupingTickSizeDecimals,
       modifyGroupingMultiplier,
     } = useCalculateOrderbookData({
       rowsPerSide,
@@ -206,7 +207,8 @@ export const CanvasOrderbook = forwardRef(
           {!hideHeader && (
             <OrderbookControls
               assetId={id}
-              grouping={groupingMultiplier}
+              groupingTickSize={groupingTickSize}
+              groupingTickSizeDecimals={groupingTickSizeDecimals}
               modifyGrouping={modifyGroupingMultiplier}
             />
           )}

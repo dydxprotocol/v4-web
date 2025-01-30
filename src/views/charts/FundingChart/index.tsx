@@ -6,9 +6,12 @@ import type { TooltipContextType } from '@visx/xychart';
 import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
-import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
+import {
+  FundingDirection,
+  FundingRateResolution,
+  type FundingChartDatum,
+} from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
-import { FundingDirection } from '@/constants/markets';
 import { FUNDING_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';

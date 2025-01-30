@@ -1,12 +1,10 @@
 import { useCallback } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { GroupingMultiplier } from '@/constants/orderbook';
 import { DisplayUnit } from '@/constants/trade';
 
 import { Button } from '@/components/Button';
@@ -19,29 +17,26 @@ import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 type OrderbookControlsProps = {
   className?: string;
   assetId?: string;
-  grouping: GroupingMultiplier;
+  groupingTickSize?: number;
+  groupingTickSizeDecimals?: number;
   modifyGrouping: (increase: boolean) => void;
 };
 
 export const OrderbookControls = ({
   className,
   assetId,
-  grouping,
+  groupingTickSize,
+  groupingTickSizeDecimals,
   modifyGrouping,
 }: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
-  const { tickSize, tickSizeDecimals = USD_DECIMALS } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
-
-  const displayTickSize = tickSize && MustBigNumber(tickSize).times(grouping).toNumber();
+  const fractionDigits =
+    (groupingTickSizeDecimals ?? 0) <= 1 ? USD_DECIMALS : groupingTickSizeDecimals;
 
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
@@ -83,9 +78,9 @@ export const OrderbookControls = ({
           </$ButtonGroup>
           <Output
             withSubscript
-            value={displayTickSize}
+            value={groupingTickSize}
             type={OutputType.Fiat}
-            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
+            fractionDigits={fractionDigits}
           />
         </div>
         {assetId && (

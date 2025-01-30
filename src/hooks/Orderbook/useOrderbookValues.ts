@@ -9,7 +9,6 @@ import { safeAssign } from '@/lib/objectHelpers';
 import { useParameterizedSelector } from '../useParameterizedSelector';
 
 export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number }) => {
-  // const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
   const [groupingMultiplier, setGroupingMultiplier] = useState(GroupingMultiplier.ONE);
 
   const orderbook = useParameterizedSelector(
@@ -79,6 +78,8 @@ export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number
 
       // Orderbook grouping
       groupingMultiplier,
+      groupingTickSize: orderbook?.groupingTickSize,
+      groupingTickSizeDecimals: orderbook?.groupingTickSizeDecimals,
       modifyGroupingMultiplier,
     };
   }, [rowsPerSide, orderbook, groupingMultiplier, modifyGroupingMultiplier]);

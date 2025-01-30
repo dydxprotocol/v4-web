@@ -1,4 +1,16 @@
+import BigNumber from 'bignumber.js';
+
 import { DepthChartSeries } from '@/constants/charts';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+
+export interface SubaccountOpenOrderPriceMap {
+  [IndexerOrderSide.BUY]: {
+    [price: string]: BigNumber;
+  };
+  [IndexerOrderSide.SELL]: {
+    [price: string]: BigNumber;
+  };
+}
 
 export type OrderbookLine = {
   price: number;
@@ -9,17 +21,19 @@ export type OrderbookLine = {
   offset: number;
 };
 
-export type OrderbookProcessedData = {
-  asks: OrderbookLine[] | CanvasOrderbookLine[];
-  bids: OrderbookLine[] | CanvasOrderbookLine[];
-  midPrice: number | undefined;
-  spread: number | undefined;
-  spreadPercent: number | undefined;
-};
-
 export type CanvasOrderbookLine = OrderbookLine & {
   mine: number | undefined;
   side: 'ask' | 'bid';
+};
+
+export type OrderbookProcessedData = {
+  asks: CanvasOrderbookLine[];
+  bids: CanvasOrderbookLine[];
+  midPrice: number | undefined;
+  spread: number | undefined;
+  spreadPercent: number | undefined;
+  groupingTickSize: number;
+  groupingTickSizeDecimals: number;
 };
 
 type DepthChartDatum = OrderbookLine & {

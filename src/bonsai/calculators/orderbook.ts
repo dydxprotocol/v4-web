@@ -11,9 +11,9 @@ import { BIG_NUMBERS, MustBigNumber, roundToNearestFactor } from '@/lib/numbers'
 import { objectEntries } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
-import { OrderbookLine } from '../types/orderbookTypes';
+import { OrderbookLine, SubaccountOpenOrderPriceMap } from '../types/orderbookTypes';
 import { OrderbookData } from '../types/rawTypes';
-import { SubaccountOpenOrderPriceMap, SubaccountOrder } from '../types/summaryTypes';
+import { SubaccountOrder } from '../types/summaryTypes';
 
 type OrderbookLineBN = {
   price: BigNumber;

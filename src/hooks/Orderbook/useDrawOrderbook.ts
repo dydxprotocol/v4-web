@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
 import { shallowEqual } from 'react-redux';
 
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
@@ -33,12 +34,11 @@ import { generateFadedColorVariant } from '@/lib/styles';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
-import { OrderbookLineWithMine } from './useOrderbookValues';
 
 type ElementProps = {
-  data: Array<OrderbookLineWithMine | undefined>;
+  data: Array<CanvasOrderbookLine | undefined>;
   histogramRange: number;
-  side: OrderbookLineWithMine['side'];
+  side: CanvasOrderbookLine['side'];
   displayUnit: DisplayUnit;
 };
 
@@ -325,7 +325,7 @@ export const useDrawOrderbook = ({
     }: {
       ctx: CanvasRenderingContext2D;
       idx: number;
-      rowToRender?: OrderbookLineWithMine;
+      rowToRender?: CanvasOrderbookLine;
       animationType?: OrderbookRowAnimationType;
     }) => {
       if (!rowToRender) return;
@@ -433,10 +433,6 @@ export const useDrawOrderbook = ({
     canvas,
     drawOrderbookRow,
   ]);
-
-  // if (side === 'ask') {
-  //   console.log(data);
-  // }
 
   return { canvasRef };
 };

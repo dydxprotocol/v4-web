@@ -295,14 +295,6 @@ export interface UserStats {
   takerVolume30D?: number;
 }
 
-export interface SubaccountOpenOrderPriceMap {
-  [IndexerOrderSide.BUY]: {
-    [price: string]: BigNumber;
-  };
-  [IndexerOrderSide.SELL]: {
-    [price: string]: BigNumber;
-  };
-}
 export type AccountBalances = {
   usdcAmount?: string;
   chainTokenAmount?: string;
