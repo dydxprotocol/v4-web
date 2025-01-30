@@ -20,6 +20,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { Deposit } from '@/state/transfers';
 
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
@@ -40,13 +41,12 @@ export const DepositForm = ({
   setAmount: Dispatch<SetStateAction<string>>;
   token: TokenForTransfer;
   onClose: () => void;
-  onDeposit: ({ txHash, chainId }: { txHash: string; chainId: string }) => void;
+  onDeposit: (deposit: Deposit) => void;
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
-
   const { data: walletClient } = useWalletClient();
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
@@ -238,7 +238,7 @@ export const DepositForm = ({
         )}
         {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
         {depositSteps?.length && (
-          <div tw="mt-1">
+          <div tw="my-1">
             <DepositSteps
               steps={depositSteps}
               currentStep={currentStep}

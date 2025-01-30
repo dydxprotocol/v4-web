@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
@@ -10,16 +10,18 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
-import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { addDeposit, Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
 import { DepositForm } from './DepositForm';
+import { DepositStatus } from './DepositStatus';
 import { TokenSelect } from './TokenSelect';
 
 function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
@@ -50,12 +52,12 @@ function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
 }
 
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const { sourceAccount } = useAccounts();
+  const dispatch = useAppDispatch();
+  const { sourceAccount, dydxAddress } = useAccounts();
 
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState<TokenForTransfer>(getDefaultToken(sourceAccount));
-  const [broadcastedTx, setBroadcastedTx] = useState<{ txHash: string; chainId: string }>();
-  const [txConfirmed, setTxConfirmed] = useState(false);
+  const [currentDeposit, setCurrentDeposit] = useState<{ txHash: string; chainId: string }>();
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -72,22 +74,12 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     tokenSelectRef.current?.scroll({ top: 0 });
   };
 
-  const { skipClient } = useSkipClient();
+  const onDeposit = (deposit: Deposit) => {
+    if (!dydxAddress) return;
 
-  // TODO(deposit2.0): Move transaction status tracking to global scope so user can exit the modal
-  useEffect(() => {
-    async function waitForConfirmation() {
-      if (!broadcastedTx) return;
-
-      await skipClient.waitForTransaction({
-        chainID: broadcastedTx.chainId,
-        txHash: broadcastedTx.txHash,
-      });
-      setTxConfirmed(true);
-    }
-
-    waitForConfirmation();
-  }, [broadcastedTx, skipClient]);
+    setCurrentDeposit({ txHash: deposit.txHash, chainId: deposit.chainId });
+    dispatch(addDeposit({ deposit, dydxAddress }));
+  };
 
   return (
     <$Dialog
@@ -100,10 +92,14 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      {/* TODO(deposit2.0): Implement real progress UI here */}
-      {broadcastedTx && !txConfirmed && <div tw="flex h-10">Your deposit is pending...</div>}
-      {broadcastedTx && txConfirmed && <div tw="flex h-10">DONE!!</div>}
-      {!broadcastedTx && (
+      {currentDeposit && (
+        <DepositStatus
+          onClose={() => setIsOpen(false)}
+          txHash={currentDeposit.txHash}
+          chainId={currentDeposit.chainId}
+        />
+      )}
+      {!currentDeposit && (
         <div tw="w-[100%] overflow-hidden">
           <div tw="flex w-[200%]">
             <div
@@ -111,7 +107,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
             >
               <DepositForm
-                onDeposit={setBroadcastedTx}
+                onDeposit={onDeposit}
                 onClose={() => setIsOpen(false)}
                 amount={amount}
                 setAmount={setAmount}
