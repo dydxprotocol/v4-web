@@ -11,7 +11,7 @@ import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { mergeById } from '@/lib/mergeById';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
@@ -38,7 +38,7 @@ function tradesWebsocketValueCreator(
         const updates = isWsTradesUpdateResponses(baseUpdates);
         const startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('TradesTracker', 'found unexpectedly null base data in update', {
+          logBonsaiError('TradesTracker', 'found unexpectedly null base data in update', {
             marketId,
           });
           return value;

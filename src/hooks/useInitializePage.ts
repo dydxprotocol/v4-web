@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
-import { logAbacusTsInfo } from '@/bonsai/logs';
+import { logBonsaiInfo } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
 import { IndexerWebsocketManager } from '@/bonsai/websocket/lib/indexerWebsocketManager';
 
@@ -52,7 +52,7 @@ export const useInitializePage = () => {
             // reconnect abacus (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             abacusStateManager.restart({ network: localStorageNetwork });
             IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
-            logAbacusTsInfo('useInitializePage', 'restarting because visibility change');
+            logBonsaiInfo('useInitializePage', 'restarting because visibility change');
           }
           hiddenTimeRef.current = null;
         }
@@ -69,7 +69,7 @@ export const useInitializePage = () => {
     const handleOnline = () => {
       abacusStateManager.restart({ network: localStorageNetwork });
       IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
-      logAbacusTsInfo('useInitializePage', 'restarting because network status change');
+      logBonsaiInfo('useInitializePage', 'restarting because network status change');
     };
     window.addEventListener('online', handleOnline);
     return () => {

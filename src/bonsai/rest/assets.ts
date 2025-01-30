@@ -12,7 +12,7 @@ import metadataClient from '@/clients/metadataService';
 
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpAssetsQuery(store: RootStore) {
@@ -46,7 +46,7 @@ export function setUpAssetsQuery(store: RootStore) {
         )
       );
     } catch (e) {
-      logAbacusTsError('setUpAssetsQuery', 'Error handling result from react query', e, result);
+      logBonsaiError('setUpAssetsQuery', 'Error handling result from react query', e, result);
     }
   });
   return () => {

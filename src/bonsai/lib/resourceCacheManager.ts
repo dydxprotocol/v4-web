@@ -1,4 +1,4 @@
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 
 type CacheEntry<T> = {
   resource: T;
@@ -45,11 +45,11 @@ export class ResourceCacheManager<T, U> {
     const serializedKey = this.options.keySerializer(key);
     const entry = this.cache[serializedKey];
     if (!entry) {
-      logAbacusTsError('ResourceCacheManager', 'tried to mark done unknown key', key);
+      logBonsaiError('ResourceCacheManager', 'tried to mark done unknown key', key);
       return;
     }
     if (entry.count <= 0) {
-      logAbacusTsError('ResourceCacheManager', 'tried to mark done key with no subscribers', key);
+      logBonsaiError('ResourceCacheManager', 'tried to mark done key with no subscribers', key);
       entry.count = 1;
     }
 
@@ -65,7 +65,7 @@ export class ResourceCacheManager<T, U> {
       entry.destroyTimeout = setTimeout(() => {
         const latestVal = this.cache[serializedKey];
         if (!latestVal) {
-          logAbacusTsError('ResourceCacheManager', 'could not find resource to destroy', key);
+          logBonsaiError('ResourceCacheManager', 'could not find resource to destroy', key);
           return;
         }
 

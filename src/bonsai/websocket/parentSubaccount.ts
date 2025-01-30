@@ -27,7 +27,7 @@ import {
   freshChildSubaccount,
   isValidSubaccount,
 } from '../lib/subaccountUtils';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
 import { ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -86,11 +86,10 @@ function accountWebsocketValueCreator(
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
         if (value.data == null) {
-          logAbacusTsError(
-            'ParentSubaccountTracker',
-            'found unexpectedly null base data in update',
-            { address, subaccountNumber }
-          );
+          logBonsaiError('ParentSubaccountTracker', 'found unexpectedly null base data in update', {
+            address,
+            subaccountNumber,
+          });
           return value;
         }
         if (updates.length === 0 || subaccountNumber == null) {

@@ -1,4 +1,4 @@
-import { logAbacusTsError } from '@/bonsai/logs';
+import { logBonsaiError } from '@/bonsai/logs';
 import { selectCompositeClientReady, selectIndexerReady } from '@/bonsai/socketSelectors';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
@@ -87,7 +87,7 @@ export function createIndexerQueryStoreEffect<T, R>(
       try {
         config.onResult(result);
       } catch (e) {
-        logAbacusTsError(
+        logBonsaiError(
           'IndexerQueryStoreEffect',
           'Error handling result from react query store effect',
           e,
@@ -148,7 +148,7 @@ export function createValidatorQueryStoreEffect<T, R>(
       try {
         config.onResult(result);
       } catch (e) {
-        logAbacusTsError(
+        logBonsaiError(
           'ValidatorQueryStoreEffect',
           'Error handling result from react query store effect',
           e,
