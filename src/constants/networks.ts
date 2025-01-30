@@ -17,6 +17,7 @@ export const ENVIRONMENT_CONFIG_MAP = environments.environments;
 export const TOKEN_CONFIG_MAP = environments.tokens;
 export const LINKS_CONFIG_MAP = environments.links;
 export const WALLETS_CONFIG_MAP = environments.wallets;
+export const WEB_CONFIG_MAP = environments.apps.web;
 export type DydxNetwork = keyof typeof ENVIRONMENT_CONFIG_MAP;
 export type DydxChainId = keyof typeof TOKEN_CONFIG_MAP;
 export const DEFAULT_APP_ENVIRONMENT = AVAILABLE_ENVIRONMENTS.default as DydxNetwork;

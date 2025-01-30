@@ -12,7 +12,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
 import { config as grazConfig } from '@/constants/graz';
-import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -51,6 +51,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useDefaultLandingPath } from './hooks/useDefaultLandingPath';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
@@ -107,6 +108,8 @@ const Content = () => {
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
+  const defaultPath = useDefaultLandingPath();
+
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   return (
@@ -152,10 +155,7 @@ const Content = () => {
               </Route>
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
-              <Route
-                path="*"
-                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
-              />
+              <Route path="*" element={<Navigate to={pathFromHash || defaultPath} replace />} />
             </Routes>
           </Suspense>
         </$Main>
