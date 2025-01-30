@@ -22,7 +22,7 @@ export function calculateFills(
     getFillsById(restFills ?? EMPTY_ARR),
     (first, second) => maxBy([first, second], (f) => MustBigNumber(f.createdAtHeight).toNumber())!
   );
-  return orderBy(Object.values(merged).map(calculateFill), [(f) => f.createdAtHeight], ['desc']);
+  return orderBy(Object.values(merged).map(calculateFill), [(f) => f.createdAt], ['desc']);
 }
 
 const calculateFill = weakMapMemoize(
