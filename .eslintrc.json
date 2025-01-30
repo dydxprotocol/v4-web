@@ -52,7 +52,13 @@
     "no-restricted-imports": [
       "error",
       {
-        "patterns": ["@/bonsai/*/*", "!@/bonsai/ontology", "!@/bonsai/lib/*", "!@/bonsai/types/*"]
+        "patterns": [
+          "@/bonsai/*/*",
+          "!@/bonsai/ontology",
+          "!@/bonsai/lib/*",
+          "!@/bonsai/types/summaryTypes",
+          "!@/bonsai/types/orderbookTypes"
+        ]
       }
     ],
     "no-return-assign": "off",

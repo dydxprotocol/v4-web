@@ -1,13 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import merge from 'lodash/merge';
 
-import type { MarketOrderbook, Nullable, PerpetualMarket } from '@/constants/abacus';
+import type { PerpetualMarket } from '@/constants/abacus';
 import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 export interface PerpetualsState {
   currentMarketId?: string;
@@ -17,22 +16,12 @@ export interface PerpetualsState {
   launchMarketIds: string[];
 
   markets?: Record<string, PerpetualMarket>;
-  orderbooks?: Record<string, MarketOrderbook>;
-  orderbooksMap?: Record<
-    string,
-    {
-      asks: Record<string, number>;
-      bids: Record<string, number>;
-    }
-  >;
 }
 
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
   currentMarketIdIfTradeable: undefined,
   markets: undefined,
-  orderbooks: undefined,
-  orderbooksMap: undefined,
   marketFilter: MarketFilters.ALL,
   launchMarketIds: [],
 };
@@ -62,27 +51,6 @@ export const perpetualsSlice = createSlice({
         ? merge({}, state.markets, action.payload.markets)
         : action.payload.markets,
     }),
-    setOrderbook: (
-      state: PerpetualsState,
-      action: PayloadAction<{ orderbook?: Nullable<MarketOrderbook>; marketId: string }>
-    ) => {
-      state.orderbooks = merge({}, state.orderbooks, {
-        [action.payload.marketId]: action.payload.orderbook,
-      });
-
-      const { newAsks, newBids } = processOrderbookToCreateMap({
-        orderbookMap: state.orderbooksMap?.[action.payload.marketId],
-        newOrderbook: action.payload.orderbook,
-      });
-
-      state.orderbooksMap = {
-        ...(state.orderbooksMap ?? {}),
-        [action.payload.marketId]: {
-          asks: newAsks,
-          bids: newBids,
-        },
-      };
-    },
     resetPerpetualsState: () =>
       ({
         ...initialState,
@@ -107,7 +75,6 @@ export const {
   setCurrentMarketId,
   setCurrentMarketIdIfTradeable,
   setMarkets,
-  setOrderbook,
   resetPerpetualsState,
   setMarketFilter,
   setLaunchMarketIds,

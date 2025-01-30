@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { fromPairs, throttle } from 'lodash';
+import { fromPairs } from 'lodash';
 
 import type {
   AbacusNotification,
@@ -17,7 +17,6 @@ import type {
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import {
@@ -37,7 +36,7 @@ import {
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setMarkets, setOrderbook } from '@/state/perpetuals';
+import { setMarkets } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 import { isTruthy } from '../isTruthy';
@@ -177,20 +176,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
         if (isChildSubaccount) {
           dispatch(setChildSubaccount(childSubaccountUpdate));
-        }
-      });
-
-      marketIds?.forEach((market: string) => {
-        if (changes.has(Changes.orderbook)) {
-          this.throttledOrderbookUpdateByMarketId[market] ??= throttle(
-            (orderbook) => this.store?.dispatch(setOrderbook({ orderbook, marketId: market })),
-            timeUnits.second / 3
-          );
-
-          const orderbook = updatedState.marketOrderbook(market);
-          if (orderbook) {
-            this.throttledOrderbookUpdateByMarketId[market](orderbook);
-          }
         }
       });
     }

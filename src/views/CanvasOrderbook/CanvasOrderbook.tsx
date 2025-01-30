@@ -155,7 +155,7 @@ export const CanvasOrderbook = forwardRef(
     const asksOrderbook = (
       <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
-          {asksSlice.map((row, idx) =>
+          {asksSlice.toReversed().map((row, idx) =>
             row ? (
               <$Row
                 // eslint-disable-next-line react/no-array-index-key
