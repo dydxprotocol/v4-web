@@ -156,7 +156,7 @@ export function isInstantDeposit(route: RouteResponse) {
   return Boolean(route.operations.find((op) => op.goFastTransfer));
 }
 
-export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {
+export function useDepositDeltas({ depositAmount }: { depositAmount?: string }) {
   const depositInput = useMemo(
     () => ({
       subaccountNumber: 0,
