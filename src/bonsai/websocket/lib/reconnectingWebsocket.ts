@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logAbacusTsError, logAbacusTsInfo } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
 interface ReconnectingWebSocketConfig {
   url: string;
@@ -111,7 +111,7 @@ export class ReconnectingWebSocket {
 
   public send(data: any): void {
     if (!this.isActive()) {
-      logAbacusTsError(
+      logBonsaiError(
         'ReconnectingWebsocket',
         'Someone attempted to send data on socket in invalid state',
         this.url
@@ -164,7 +164,7 @@ class WebSocketConnection {
       this.ws = new WebSocket(url);
       this.setupEventHandlers();
     } catch (error) {
-      logAbacusTsError('WebSocketConnection', 'error connecting', { error });
+      logBonsaiError('WebSocketConnection', 'error connecting', { error });
       this.close();
       // we don't rethrow because we instead call the handleClose method
     }
@@ -179,7 +179,7 @@ class WebSocketConnection {
         const data = JSON.parse(event.data);
         this.handleMessage(this.id, data);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handler', { error: e, data: event.data });
+        logBonsaiError('WebSocketConnection', 'error in handler', { error: e, data: event.data });
         this.close();
       }
     };
@@ -191,7 +191,7 @@ class WebSocketConnection {
       try {
         this.handleConnected(this.id);
       } catch (e) {
-        logAbacusTsError('WebSocketConnection', 'error in handleConnected', { error: e });
+        logBonsaiError('WebSocketConnection', 'error in handleConnected', { error: e });
         this.close();
       }
     };
@@ -212,13 +212,13 @@ class WebSocketConnection {
         1006,
       ]);
       if (!allowedCodes.has(close.code)) {
-        logAbacusTsError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
+        logBonsaiError('WebSocketConnection', `socket ${this.id} closed abnormally`, {
           code: close.code,
           reason: close.reason,
           clean: close.wasClean,
         });
       } else {
-        logAbacusTsInfo('WebSocketConnection', `socket ${this.id} closed`, {
+        logBonsaiInfo('WebSocketConnection', `socket ${this.id} closed`, {
           code: close.code,
           reason: close.reason,
           clean: close.wasClean,
@@ -236,7 +236,7 @@ class WebSocketConnection {
       this.ws?.close();
       this.ws = null;
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error closing socket', { error: e });
+      logBonsaiError('WebSocketConnection', 'error closing socket', { error: e });
     }
   }
 
@@ -246,7 +246,7 @@ class WebSocketConnection {
 
   public send(data: any): void {
     if (!this.isActive()) {
-      logAbacusTsError(
+      logBonsaiError(
         'WebSocketConnection',
         `Socket ${this.id} attempted to send data in invalid state`,
         { closed: this.isClosed, nullWs: this.ws == null, readyState: this.ws?.readyState }
@@ -257,7 +257,7 @@ class WebSocketConnection {
       const message = typeof data === 'string' ? data : JSON.stringify(data);
       this.ws!.send(message);
     } catch (e) {
-      logAbacusTsError('WebSocketConnection', 'error sending data', { error: e, data });
+      logBonsaiError('WebSocketConnection', 'error sending data', { error: e, data });
     }
   }
 }

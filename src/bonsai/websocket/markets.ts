@@ -11,7 +11,7 @@ import { setAllMarketsRaw } from '@/state/raw';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { MarketsData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -32,7 +32,7 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
         const updates = isWsMarketUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('MarketsTracker', 'found unexpectedly null base data in update');
+          logBonsaiError('MarketsTracker', 'found unexpectedly null base data in update');
           return value;
         }
         startingValue = { ...startingValue };

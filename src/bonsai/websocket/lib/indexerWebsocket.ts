@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logAbacusTsError, logAbacusTsInfo } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';
@@ -152,14 +152,14 @@ export class IndexerWebsocket {
 
     // fails if already exists
     if (!wasSuccessful) {
-      logAbacusTsError('IndexerWebsocket', 'this subscription already exists', {
+      logBonsaiError('IndexerWebsocket', 'this subscription already exists', {
         id: `${channel}/${id}`,
         wsId: this.indexerWsId,
       });
       return;
     }
 
-    logAbacusTsInfo('IndexerWebsocket', 'adding subscription', {
+    logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
       channel,
       id,
       socketNonNull: this.socket != null,
@@ -188,11 +188,11 @@ export class IndexerWebsocket {
 
     // only if doesn't exist
     if (!wasSuccessful || sub == null) {
-      logAbacusTsError(
-        'IndexerWebsocket',
-        'unsubbing from nonexistent or already unsubbed channel',
-        { channel, id, wsId: this.indexerWsId }
-      );
+      logBonsaiError('IndexerWebsocket', 'unsubbing from nonexistent or already unsubbed channel', {
+        channel,
+        id,
+        wsId: this.indexerWsId,
+      });
       return;
     }
 
@@ -200,7 +200,7 @@ export class IndexerWebsocket {
       return;
     }
 
-    logAbacusTsInfo('IndexerWebsocket', 'removing subscription', {
+    logBonsaiInfo('IndexerWebsocket', 'removing subscription', {
       channel,
       id,
       socketNonNull: this.socket != null,
@@ -241,7 +241,7 @@ export class IndexerWebsocket {
         if (!hasBaseData && Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
           sub.lastRetryBecauseErrorMs = Date.now();
           this._refreshSub(maybeChannel, maybeId);
-          logAbacusTsInfo('IndexerWebsocket', 'error fetching subscription, refetching', {
+          logBonsaiInfo('IndexerWebsocket', 'error fetching subscription, refetching', {
             maybeChannel,
             maybeId,
             socketNonNull: this.socket != null,
@@ -250,7 +250,7 @@ export class IndexerWebsocket {
           });
           return true;
         }
-        logAbacusTsError('IndexerWebsocket', 'error fetching subscription, not retrying:', {
+        logBonsaiError('IndexerWebsocket', 'error fetching subscription, not retrying:', {
           maybeChannel,
           maybeId,
           hasBaseData,
@@ -285,7 +285,7 @@ export class IndexerWebsocket {
         if (!hasBaseData && Date.now() - lastRefresh > CHANNEL_RETRY_COOLDOWN_MS) {
           sub.lastRetryBecauseDuplicateMs = Date.now();
           this._refreshSub(maybeChannel, maybeId);
-          logAbacusTsInfo('IndexerWebsocket', 'error: subscription already exists, refetching', {
+          logBonsaiInfo('IndexerWebsocket', 'error: subscription already exists, refetching', {
             maybeChannel,
             maybeId,
             socketNonNull: this.socket != null,
@@ -294,7 +294,7 @@ export class IndexerWebsocket {
           });
           return true;
         }
-        logAbacusTsError('IndexerWebsocket', 'error: subscription already exists, not retrying', {
+        logBonsaiError('IndexerWebsocket', 'error: subscription already exists, not retrying', {
           maybeChannel,
           maybeId,
           hasBaseData,
@@ -316,7 +316,7 @@ export class IndexerWebsocket {
     if (handled) {
       return;
     }
-    logAbacusTsError('IndexerWebsocket', 'encountered server side error:', {
+    logBonsaiError('IndexerWebsocket', 'encountered server side error:', {
       message,
       wsId: this.indexerWsId,
     });
@@ -328,7 +328,7 @@ export class IndexerWebsocket {
       if (this.missingMessageDetector != null) {
         this.missingMessageDetector.insert(message.message_id);
       } else {
-        logAbacusTsError(
+        logBonsaiError(
           'IndexerWebsocket',
           'message received before missing message detector initialized'
         );
@@ -338,7 +338,7 @@ export class IndexerWebsocket {
       } else if (message.type === 'connected') {
         // do nothing
       } else if (message.type === 'unsubscribed') {
-        logAbacusTsInfo('IndexerWebsocket', `unsubscribe confirmed`, {
+        logBonsaiInfo('IndexerWebsocket', `unsubscribe confirmed`, {
           channel: message.channel,
           id: message.id,
           wsId: this.indexerWsId,
@@ -356,7 +356,7 @@ export class IndexerWebsocket {
         if (!this.subscriptions.hasSubscription(channel, id) || sub == null) {
           // hide error for channel we expect to see it on
           if (channel !== 'v4_orderbook') {
-            logAbacusTsInfo('IndexerWebsocket', 'encountered message with unknown target', {
+            logBonsaiInfo('IndexerWebsocket', 'encountered message with unknown target', {
               channel,
               id,
               type: message.type,
@@ -366,7 +366,7 @@ export class IndexerWebsocket {
           return;
         }
         if (message.type === 'subscribed') {
-          logAbacusTsInfo('IndexerWebsocket', `subscription confirmed`, {
+          logBonsaiInfo('IndexerWebsocket', `subscription confirmed`, {
             channel,
             id,
             wsId: this.indexerWsId,
@@ -375,7 +375,7 @@ export class IndexerWebsocket {
           sub.handleBaseData(message.contents, message);
         } else if (message.type === 'channel_data') {
           if (!sub.receivedBaseData) {
-            logAbacusTsError(
+            logBonsaiError(
               'IndexerWebsocket',
               'message received before subscription confirmed, hiding',
               {
@@ -390,7 +390,7 @@ export class IndexerWebsocket {
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (message.type === 'channel_batch_data') {
           if (!sub.receivedBaseData) {
-            logAbacusTsError(
+            logBonsaiError(
               'IndexerWebsocket',
               'message received before subscription confirmed, hiding',
               {
@@ -409,7 +409,7 @@ export class IndexerWebsocket {
         assertNever(message);
       }
     } catch (e) {
-      logAbacusTsError('IndexerWebsocket', 'Error handling websocket message', {
+      logBonsaiError('IndexerWebsocket', 'Error handling websocket message', {
         messagePre,
         wsId: this.indexerWsId,
         error: e,
@@ -418,7 +418,7 @@ export class IndexerWebsocket {
   };
 
   private _handleMissingMessageDetected = () => {
-    logAbacusTsError('IndexerWebsocket', 'missed message detected, restarting');
+    logBonsaiError('IndexerWebsocket', 'missed message detected, restarting');
     this.missingMessageDetector?.cleanup();
     this.missingMessageDetector = null;
     this.restart();
@@ -429,7 +429,7 @@ export class IndexerWebsocket {
     this.missingMessageDetector?.cleanup();
     this.missingMessageDetector = new MissingMessageDetector(this._handleMissingMessageDetected);
 
-    logAbacusTsInfo('IndexerWebsocket', 'freshly connected', {
+    logBonsaiInfo('IndexerWebsocket', 'freshly connected', {
       socketUrl: this.socket?.url,
       wsId: this.indexerWsId,
       socketNonNull: this.socket != null,
@@ -443,7 +443,7 @@ export class IndexerWebsocket {
         this._addSub(sub);
       });
     } else {
-      logAbacusTsError(
+      logBonsaiError(
         'IndexerWebsocket',
         "handle fresh connect called when websocket isn't ready.",
         { wsId: this.indexerWsId }
