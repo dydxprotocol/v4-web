@@ -47,7 +47,6 @@ export const DepositForm = ({
   const stringGetter = useStringGetter();
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
-
   const { data: walletClient } = useWalletClient();
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');

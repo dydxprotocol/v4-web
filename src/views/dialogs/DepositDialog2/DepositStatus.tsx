@@ -1,4 +1,4 @@
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
@@ -52,11 +52,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           />
         </div>
       </div>
-      <Button
-        onClick={onClose}
-        type={ButtonType.Submit}
-        action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}
-      >
+      <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
         {depositSuccess ? 'Start trading' : 'Close'}
       </Button>
     </div>

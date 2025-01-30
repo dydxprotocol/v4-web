@@ -126,6 +126,7 @@ export function useDepositSteps({
             await signer.switchChain({ id: Number(depositToken.chainId) });
             return { success: true };
           } catch (e) {
+            console.log('error!', e);
             return {
               success: false,
               errorMessage: parseError(e, 'There was an error changing wallet networks.'),

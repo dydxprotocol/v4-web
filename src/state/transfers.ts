@@ -17,7 +17,15 @@ export type Withdraw = {
   // TODO: add withdraw details here
 };
 
-type Transfer = Deposit | Withdraw;
+export type Transfer = Deposit | Withdraw;
+
+export function isDeposit(transfer: Transfer): transfer is Deposit {
+  return transfer.type === 'deposit';
+}
+
+export function isWithdraw(transfer: Transfer): transfer is Withdraw {
+  return transfer.type === 'withdraw';
+}
 
 export interface TransferState {
   transfersByDydxAddress: { [account: DydxAddress]: Transfer[] };
@@ -52,7 +60,7 @@ export const transfersSlice = createSlice({
 
       state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
         if (
-          transfer.type === 'deposit' &&
+          isDeposit(transfer) &&
           transfer.txHash === deposit.txHash &&
           transfer.chainId === deposit.chainId
         ) {

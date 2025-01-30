@@ -2,7 +2,7 @@ import { DydxAddress } from '@/constants/wallets';
 
 import { RootState } from './_store';
 import { createAppSelector } from './appTypes';
-import { Deposit } from './transfers';
+import { Deposit, isDeposit } from './transfers';
 
 const getTransfersByAddress = (state: RootState) => state.transfers.transfersByDydxAddress;
 
@@ -13,14 +13,13 @@ export const selectPendingDeposits = () =>
       if (!dydxAddress || !transfersByAddress[dydxAddress]) return [];
 
       return transfersByAddress[dydxAddress].filter(
-        (transfer) => transfer.type === 'deposit' && transfer.status === 'pending'
+        (transfer) => isDeposit(transfer) && transfer.status === 'pending'
       ) as Deposit[];
     }
   );
 
-const selectAllTransfers = createAppSelector(
-  [(state: RootState) => state.transfers.transfersByDydxAddress],
-  (transfersByDydxAddress) => Object.values(transfersByDydxAddress).flat()
+const selectAllTransfers = createAppSelector([getTransfersByAddress], (transfersByDydxAddress) =>
+  Object.values(transfersByDydxAddress).flat()
 );
 
 export const selectDeposit = () =>
@@ -33,7 +32,7 @@ export const selectDeposit = () =>
     (allTransfers, txHash, chainId) => {
       return allTransfers.find(
         (transfer) =>
-          transfer.type === 'deposit' && transfer.txHash === txHash && transfer.chainId === chainId
+          isDeposit(transfer) && transfer.txHash === txHash && transfer.chainId === chainId
       ) as Deposit | undefined;
     }
   );
