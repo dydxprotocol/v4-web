@@ -20,9 +20,12 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 
+import { Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
+
+import { isInstantDeposit } from './queries';
 
 // Because our deposit flow only supports ETH and USDC
 export function getTokenSymbol(denom: string) {
@@ -99,7 +102,7 @@ export function useDepositSteps({
   sourceAccount: SourceAccount;
   depositToken: TokenForTransfer;
   depositRoute?: RouteResponse;
-  onDeposit: ({ txHash, chainId }: { txHash: string; chainId: string }) => void;
+  onDeposit: (deposit: Deposit) => void;
 }) {
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
@@ -216,7 +219,14 @@ export function useDepositSteps({
             userAddresses,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
-              onDeposit({ txHash, chainId: chainID });
+              onDeposit({
+                type: 'deposit',
+                txHash,
+                chainId: chainID,
+                status: 'pending',
+                estimatedAmountUsd: depositRoute.usdAmountOut ?? '',
+                isInstantDeposit: isInstantDeposit(depositRoute),
+              });
             },
           });
           return { success: true };
