@@ -1,12 +1,13 @@
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getDeposit } from '@/state/transfersSelectors';
+import { selectDeposit } from '@/state/transfersSelectors';
 
 type DepositStatusProps = {
   txHash: string;
@@ -16,7 +17,7 @@ type DepositStatusProps = {
 
 // TODO(deposit2.0): localization for this whole component
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
-  const deposit = useAppSelector((store) => getDeposit(store, txHash, chainId));
+  const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
 
   if (!deposit) return null;
 

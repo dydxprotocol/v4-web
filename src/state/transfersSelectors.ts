@@ -1,27 +1,39 @@
 import { DydxAddress } from '@/constants/wallets';
 
 import { RootState } from './_store';
+import { createAppSelector } from './appTypes';
 import { Deposit } from './transfers';
 
-/**
- * @returns saved chartConfig for TradingView
- */
-export const getPendingDeposits = (state: RootState, dydxAddress?: DydxAddress): Deposit[] => {
-  if (!dydxAddress || !state.transfers.accountToTransfers[dydxAddress]) return [];
+const getTransfersByAddress = (state: RootState) => state.transfers.transfersByDydxAddress;
 
-  return state.transfers.accountToTransfers[dydxAddress].filter(
-    (transfer) => transfer.type === 'deposit' && transfer.status === 'pending'
-  ) as Deposit[];
-};
+export const selectPendingDeposits = () =>
+  createAppSelector(
+    [getTransfersByAddress, (s, dydxAddress?: DydxAddress) => dydxAddress],
+    (transfersByAddress, dydxAddress): Deposit[] => {
+      if (!dydxAddress || !transfersByAddress[dydxAddress]) return [];
 
-export const getDeposit = (
-  state: RootState,
-  txHash: string,
-  chainId: string
-): Deposit | undefined => {
-  const allTransfers = Object.values(state.transfers.accountToTransfers).flat();
-  return allTransfers.find(
-    (transfer) =>
-      transfer.type === 'deposit' && transfer.txHash === txHash && transfer.chainId === chainId
-  ) as Deposit;
-};
+      return transfersByAddress[dydxAddress].filter(
+        (transfer) => transfer.type === 'deposit' && transfer.status === 'pending'
+      ) as Deposit[];
+    }
+  );
+
+const selectAllTransfers = createAppSelector(
+  [(state: RootState) => state.transfers.transfersByDydxAddress],
+  (transfersByDydxAddress) => Object.values(transfersByDydxAddress).flat()
+);
+
+export const selectDeposit = () =>
+  createAppSelector(
+    [
+      selectAllTransfers,
+      (s, txHash: string) => txHash,
+      (s, txHash: string, chainId: string) => chainId,
+    ],
+    (allTransfers, txHash, chainId) => {
+      return allTransfers.find(
+        (transfer) =>
+          transfer.type === 'deposit' && transfer.txHash === txHash && transfer.chainId === chainId
+      ) as Deposit | undefined;
+    }
+  );

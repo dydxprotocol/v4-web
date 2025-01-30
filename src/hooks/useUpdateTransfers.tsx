@@ -2,12 +2,13 @@ import { useEffect, useRef } from 'react';
 
 import { StatusState } from '@skip-go/client';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { updateDeposit } from '@/state/transfers';
-import { getPendingDeposits } from '@/state/transfersSelectors';
+import { selectPendingDeposits } from '@/state/transfersSelectors';
 
 import { useSkipClient } from './transfers/skipClient';
 import { useAccounts } from './useAccounts';
+import { useParameterizedSelector } from './useParameterizedSelector';
 
 export function useUpdateTransfers() {
   const { dydxAddress } = useAccounts();
@@ -15,7 +16,7 @@ export function useUpdateTransfers() {
   const { skipClient } = useSkipClient();
 
   // TODO: generalize this to withdrawals too
-  const pendingDeposits = useAppSelector((store) => getPendingDeposits(store, dydxAddress));
+  const pendingDeposits = useParameterizedSelector(selectPendingDeposits, dydxAddress);
 
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});

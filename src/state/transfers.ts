@@ -20,11 +20,11 @@ export type Withdraw = {
 type Transfer = Deposit | Withdraw;
 
 export interface TransferState {
-  accountToTransfers: { [account: DydxAddress]: Transfer[] };
+  transfersByDydxAddress: { [account: DydxAddress]: Transfer[] };
 }
 
 const initialState: TransferState = {
-  accountToTransfers: {},
+  transfersByDydxAddress: {},
 };
 
 export const transfersSlice = createSlice({
@@ -33,11 +33,11 @@ export const transfersSlice = createSlice({
   reducers: {
     addDeposit: (state, action: PayloadAction<{ dydxAddress: DydxAddress; deposit: Deposit }>) => {
       const { dydxAddress, deposit } = action.payload;
-      if (!state.accountToTransfers[dydxAddress]) {
-        state.accountToTransfers[dydxAddress] = [];
+      if (!state.transfersByDydxAddress[dydxAddress]) {
+        state.transfersByDydxAddress[dydxAddress] = [];
       }
 
-      state.accountToTransfers[dydxAddress].push(deposit);
+      state.transfersByDydxAddress[dydxAddress].push(deposit);
     },
     updateDeposit: (
       state,
@@ -47,10 +47,10 @@ export const transfersSlice = createSlice({
       }>
     ) => {
       const { dydxAddress, deposit } = action.payload;
-      const accountTransfers = state.accountToTransfers[dydxAddress];
+      const accountTransfers = state.transfersByDydxAddress[dydxAddress];
       if (!accountTransfers?.length) return;
 
-      state.accountToTransfers[dydxAddress] = accountTransfers.map((transfer) => {
+      state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
         if (
           transfer.type === 'deposit' &&
           transfer.txHash === deposit.txHash &&
