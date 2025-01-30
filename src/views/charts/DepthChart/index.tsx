@@ -304,8 +304,8 @@ export const DepthChart = ({
                 },
               ]}
               strokeWidth={0.25}
-              xAccessor={(datum) => datum?.price}
-              yAccessor={(datum) => datum?.depth}
+              xAccessor={(datum: { price: number; depth: number } | undefined) => datum?.price ?? 0}
+              yAccessor={(datum: { price: number; depth: number } | undefined) => datum?.depth ?? 0}
             />
 
             <Tooltip<DepthChartDatum>
