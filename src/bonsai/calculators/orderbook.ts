@@ -144,7 +144,7 @@ export const formatOrderbook = weakMapMemoize(
       group(bids, groupingTickSize, groupingTickSizeDecimals, true)
     );
 
-    // Convert groupedAsks and groupedBids to list and sort by price. Asks will now be descending and bids will be remain descending
+    // Convert groupedAsks and groupedBids to list and sort by price depending on options. Default is descending.
     const asksList = orderBy(
       Object.values(groupedAsks).map(mapOrderbookLineToNumber),
       [(ask) => ask.price],
