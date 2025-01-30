@@ -229,7 +229,7 @@ export const DepositForm = ({
             <div>
               Deposit with <span tw="sr-only">Coinbase</span>
             </div>
-            <div tw="flex">
+            <div tw="flex text-color-text-1">
               <CoinbaseBrandIcon />
             </div>
           </Button>
