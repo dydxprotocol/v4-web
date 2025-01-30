@@ -1,3 +1,7 @@
+import { useEffect, useRef } from 'react';
+
+import { BonsaiCore } from '@/bonsai/ontology';
+
 import { ButtonAction } from '@/constants/buttons';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -7,7 +11,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
+import { appQueryClient } from '@/state/appQueryClient';
+import { useAppSelector } from '@/state/appTypes';
 import { selectDeposit } from '@/state/transfersSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type DepositStatusProps = {
   txHash: string;
@@ -18,11 +26,26 @@ type DepositStatusProps = {
 // TODO(deposit2.0): localization for this whole component
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
   const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
+  const { freeCollateral } = orEmptyObj(
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
+  );
+  const initialFreeCollateral = useRef(freeCollateral);
+
+  useEffect(() => {
+    if (!deposit || deposit.status !== 'success') return;
+
+    // Tell Bonsai to refetch wallet balances now so that the subaccount sweep can happen
+    appQueryClient.invalidateQueries({ queryKey: ['validator', 'accountBalances'], exact: false });
+  }, [deposit]);
 
   if (!deposit) return null;
 
-  // TODO(deposit2.0): Also wait for account free collateral value to update to show success state
-  const depositSuccess = deposit.status === 'success';
+  // Use difference in free collateral value to determine that the subaccount sweep has finished
+  const depositSuccess =
+    deposit.status === 'success' &&
+    freeCollateral &&
+    !initialFreeCollateral.current?.eq(freeCollateral);
+
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
       <div tw="flex flex-col gap-0.5">
@@ -42,7 +65,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
       </div>
       <div tw="flex items-center justify-between self-stretch">
         <div tw="text-color-text-0">Your deposit</div>
-        {/* TODO(deposit2.0): Show actual account free collateral diff here */}
+        {/* TODO(deposit2.0): Show actual deposit amount here */}
         <div>
           <Output
             tw="inline"

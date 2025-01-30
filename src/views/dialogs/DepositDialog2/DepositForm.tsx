@@ -1,12 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 
-import { formatUnits, parseUnits } from 'viem';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { parseUnits } from 'viem';
 import { useWalletClient } from 'wagmi';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
+import { TokenForTransfer } from '@/constants/tokens';
 
 import { SkipRouteSpeed, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -16,16 +17,19 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { CoinbaseBrandIcon, WarningIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
+import { DiffArrow } from '@/components/DiffArrow';
 import { Output, OutputType } from '@/components/Output';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { Deposit } from '@/state/transfers';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
 import { RouteOptions } from './RouteOptions';
-import { useBalance, useDepositRoutes } from './queries';
+import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
 
 export const DepositForm = ({
@@ -62,8 +66,19 @@ export const DepositForm = ({
     if (debouncedAmount && !isFetching && routes && !routes.fast) setSelectedSpeed('slow');
   }, [isFetching, routes, debouncedAmount]);
 
+  // Difference between selectedRoute and depositRoute:
+  // selectedRoute may be the cached route from the previous query response,
+  // whereas depositRoute is undefined while the current route request is still loading
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
+
+  const { freeCollateral } = orEmptyObj(
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
+  );
+
+  const { freeCollateral: updatedFreeCollateral } = orEmptyObj(
+    useDepositDeltas({ depositAmount: selectedRoute?.usdAmountOut })
+  );
 
   const { sourceAccount } = useAccounts();
 
@@ -220,7 +235,7 @@ export const DepositForm = ({
           </Button>
         </div>
       </div>
-      <div tw="flex flex-col gap-0.5">
+      <div tw="flex flex-col gap-0.75">
         {!depositSteps?.length && (
           <Button
             tw="mt-2 w-full"
@@ -251,13 +266,20 @@ export const DepositForm = ({
         <div tw="flex justify-between text-small">
           {/* TODO(deposit2.0): localization */}
           <div tw="text-color-text-0">Available balance</div>
-          <div style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}>
-            +
-            <Output
-              tw="inline"
-              type={OutputType.Fiat}
-              value={formatUnits(BigInt(depositRoute?.amountOut ?? 0), USDC_DECIMALS)}
-            />
+          <div
+            tw="flex items-center gap-0.375"
+            style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}
+          >
+            <Output tw="inline text-color-text-0" type={OutputType.Fiat} value={freeCollateral} />
+            {selectedRoute && <DiffArrow tw="text-green" />}
+            {selectedRoute && (
+              <Output
+                slotLeft="~"
+                tw="inline"
+                type={OutputType.Fiat}
+                value={updatedFreeCollateral}
+              />
+            )}
           </div>
         </div>
       </div>
