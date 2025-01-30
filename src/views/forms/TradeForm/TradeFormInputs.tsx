@@ -1,5 +1,6 @@
 import { Ref, useEffect, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -22,10 +23,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -51,7 +49,9 @@ export const TradeFormInputs = () => {
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
   const { marketId, type } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
-  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
 
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
   const [hasSetMidMarketLimit, setHasSetMidMarketLimit] = useState(false);

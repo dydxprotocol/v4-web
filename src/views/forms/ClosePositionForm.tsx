@@ -53,7 +53,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -105,7 +104,7 @@ export const ClosePositionForm = ({
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
 
   const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig, shallowEqual)
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   const {

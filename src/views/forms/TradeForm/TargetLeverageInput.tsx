@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -20,11 +20,10 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { MustBigNumber } from '@/lib/numbers';
+import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const TargetLeverageInput = () => {
@@ -32,7 +31,7 @@ export const TargetLeverageInput = () => {
 
   const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
   const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig, shallowEqual)
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
@@ -42,7 +41,10 @@ export const TargetLeverageInput = () => {
   }, [targetLeverage]);
 
   const maxLeverage = useMemo(() => {
-    return calculateMarketMaxLeverage({ initialMarginFraction, effectiveInitialMarginFraction });
+    return calculateMarketMaxLeverage({
+      initialMarginFraction: MaybeBigNumber(initialMarginFraction)?.toNumber(),
+      effectiveInitialMarginFraction,
+    });
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   const onSliderDrag = ([newLeverage]: number[]) => {

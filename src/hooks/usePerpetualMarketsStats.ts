@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiCore } from '@/bonsai/ontology';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 const FEE_ESTIMATION_MULTIPLIER = 0.0002 * 0.4; // 40% of 2bps because of vault and affiliate revshare
 
 export const usePerpetualMarketsStats = () => {
-  const perpetualMarkets = orEmptyRecord(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const perpetualMarkets = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
   const markets = useMemo(
     () => Object.values(perpetualMarkets).filter(isPresent),
@@ -18,20 +18,21 @@ export const usePerpetualMarketsStats = () => {
   );
 
   const stats = useMemo(() => {
-    let volume24HUSDC = 0;
-    let openInterestUSDC = 0;
+    let volume24HUSDC = BIG_NUMBERS.ZERO;
+    let openInterestUSDC = BIG_NUMBERS.ZERO;
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const { oraclePrice, perpetual } of markets) {
-      const { volume24H, openInterest = 0 } = perpetual ?? {};
-      volume24HUSDC += volume24H ?? 0;
-      if (oraclePrice) openInterestUSDC += openInterest * oraclePrice;
+    for (const { oraclePrice, volume24H, openInterest } of markets) {
+      volume24HUSDC = volume24HUSDC.plus(volume24H);
+      if (oraclePrice) {
+        openInterestUSDC = openInterestUSDC.plus(MustBigNumber(openInterest).times(oraclePrice));
+      }
     }
 
     return {
-      volume24HUSDC,
-      openInterestUSDC,
-      feesEarned: volume24HUSDC * FEE_ESTIMATION_MULTIPLIER,
+      volume24HUSDC: volume24HUSDC.toNumber(),
+      openInterestUSDC: openInterestUSDC.toNumber(),
+      feesEarned: volume24HUSDC.times(FEE_ESTIMATION_MULTIPLIER).toNumber(),
     };
   }, [markets]);
 

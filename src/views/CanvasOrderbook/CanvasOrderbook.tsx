@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -25,9 +25,9 @@ import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';
@@ -62,10 +62,9 @@ export const CanvasOrderbook = forwardRef(
 
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
-    const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-    const { assetId: id } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
-
-    const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
+    const { assetId: id, tickSizeDecimals = USD_DECIMALS } = orEmptyObj(
+      useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+    );
 
     /**
      * Slice asks and bids to rowsPerSide using empty rows

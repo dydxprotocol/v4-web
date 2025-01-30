@@ -1,6 +1,5 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 
 import {
   AbacusOrderStatus,
@@ -20,9 +19,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -48,7 +44,10 @@ export type TradeNotificationProps = NotificationProps & ElementProps;
 export const TradeNotification = ({ isToast, data, notification }: TradeNotificationProps) => {
   const stringGetter = useStringGetter();
   const { AVERAGE_PRICE, FILLED_AMOUNT, MARKET, ORDER_TYPE, ORDER_STATUS, SIDE } = data;
-  const marketData = useAppSelector((s) => getMarketData(s, MARKET), shallowEqual);
+  const marketData = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    MARKET
+  );
   const { assetId } = orEmptyObj(marketData);
   const assetImgUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
@@ -74,7 +73,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
           filledAmount={FILLED_AMOUNT}
           assetId={marketData?.assetId}
           averagePrice={AVERAGE_PRICE}
-          tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
+          tickSizeDecimals={marketData?.tickSizeDecimals ?? USD_DECIMALS}
         />
       }
     />

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type FormEvent } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -47,11 +48,12 @@ import {
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
+import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -91,8 +93,9 @@ export const TradeForm = ({
   const { price, size, summary, tradeErrors } = useTradeFormData();
 
   const currentInput = useAppSelector(getCurrentInput);
-  const { tickSizeDecimals, stepSizeDecimals } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
 
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const currentMarketId = useAppSelector(getCurrentMarketId);

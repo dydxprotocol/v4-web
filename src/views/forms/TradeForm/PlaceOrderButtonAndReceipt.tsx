@@ -41,7 +41,6 @@ import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSe
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
@@ -96,7 +95,9 @@ export const PlaceOrderButtonAndReceipt = ({
   const currentInput = useAppSelector(getCurrentInput);
 
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
-  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
   const { liquidationPrice, equity, leverage, notionalTotal, adjustedImf, side } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );

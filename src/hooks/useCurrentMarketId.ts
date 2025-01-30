@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
@@ -19,15 +20,12 @@ import { closeDialogInTradeBox, openDialog } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelectors';
 import { setCurrentMarketId, setCurrentMarketIdIfTradeable } from '@/state/perpetuals';
-import {
-  getLaunchedMarketIds,
-  getMarketIds,
-  getMarketOraclePrice,
-} from '@/state/perpetualsSelectors';
+import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 import { useMarketsData } from './useMarketsData';
+import { useParameterizedSelector } from './useParameterizedSelector';
 
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
@@ -38,7 +36,10 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const currentMarketOraclePrice = useAppSelector((s) => getMarketOraclePrice(s, marketId ?? ''));
+  const currentMarketOraclePrice = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    marketId
+  )?.oraclePrice;
   const hasMarketOraclePrice = currentMarketOraclePrice != null;
   const launchableMarkets = useLaunchableMarkets();
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);

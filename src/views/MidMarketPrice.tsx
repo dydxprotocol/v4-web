@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
@@ -11,12 +11,10 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
-import {
-  getCurrentMarketConfig,
-  getCurrentMarketMidMarketPrice,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const getMidMarketPriceColor = ({
   midMarketPrice,
@@ -36,7 +34,9 @@ const getMidMarketPriceColor = ({
 };
 
 export const MidMarketPrice = () => {
-  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
   const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
 

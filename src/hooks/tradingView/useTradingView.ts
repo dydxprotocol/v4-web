@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
@@ -22,7 +23,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
@@ -88,7 +88,7 @@ export const useTradingView = ({
     [marketId: string]: number | undefined;
   }>({});
   const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig)
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
   const tickSizeDecimals =
     (marketId
