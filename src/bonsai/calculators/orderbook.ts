@@ -156,8 +156,8 @@ export const formatOrderbook = weakMapMemoize(
       [bidsSortOrder]
     );
 
-    const lowestAsk = asksList.at(-1);
-    const highestBid = bidsList.at(0);
+    const lowestAsk = asksList.at(asksSortOrder === 'desc' ? -1 : 0);
+    const highestBid = bidsList.at(bidsSortOrder === 'desc' ? 0 : -1);
 
     return {
       asks: asksList,
