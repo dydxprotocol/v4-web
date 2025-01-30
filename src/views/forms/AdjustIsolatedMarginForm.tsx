@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -39,11 +40,12 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
-import { getMarketConfig, getMarketMaxLeverage } from '@/state/perpetualsSelectors';
+import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -65,7 +67,9 @@ export const AdjustIsolatedMarginForm = ({
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
   const { childSubaccountNumber, marginUsage, freeCollateral } = subaccountPosition ?? {};
-  const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
+  const { tickSizeDecimals } = orEmptyObj(
+    useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, marketId)
+  );
   const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
   const {
@@ -74,8 +78,6 @@ export const AdjustIsolatedMarginForm = ({
     amountPercent,
     summary,
   } = adjustIsolatedMarginInputs ?? {};
-
-  const { tickSizeDecimals } = marketConfig ?? {};
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({

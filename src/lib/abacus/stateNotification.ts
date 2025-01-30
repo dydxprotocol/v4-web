@@ -21,7 +21,6 @@ import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import {
-  setBalances,
   setChildSubaccount,
   setCompliance,
   setFills,
@@ -34,9 +33,7 @@ import {
   setTradingRewards,
   setTransfers,
   setUnbondingDelegations,
-  setWallet,
 } from '@/state/account';
-import { setAssets } from '@/state/assets';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -73,31 +70,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
-      if (changes.has(Changes.assets)) {
-        dispatch(
-          setAssets(
-            Object.fromEntries(
-              (updatedState.assetIds()?.toArray() ?? [])
-                .map((assetId: string) => {
-                  const assetData = updatedState.asset(assetId);
-                  if (assetData == null) {
-                    return undefined;
-                  }
-                  return [assetId, assetData];
-                })
-                .filter(isTruthy)
-            )
-          )
-        );
-      }
-
       if (changes.has(Changes.accountBalances)) {
-        if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = fromPairs(
-            updatedState.account.balances.toArray().map(({ k, v }) => [k, v])
-          );
-          dispatch(setBalances(balances));
-        }
         if (updatedState.account?.stakingBalances) {
           const stakingBalances: Record<string, AccountBalance> = fromPairs(
             updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
@@ -123,10 +96,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
-      }
-
-      if (changes.has(Changes.wallet)) {
-        dispatch(setWallet(updatedState.wallet));
       }
 
       if (changes.has(Changes.markets)) {

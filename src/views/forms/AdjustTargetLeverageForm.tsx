@@ -1,7 +1,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -27,12 +27,11 @@ import { WithLabel } from '@/components/WithLabel';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getLeverageOptionsForMaxLeverage } from '@/lib/leverage';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { MustBigNumber } from '@/lib/numbers';
+import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AdjustTargetLeverageForm = ({
@@ -44,7 +43,7 @@ export const AdjustTargetLeverageForm = ({
   const { adjustTargetLeverageLearnMore } = useURLConfigs();
 
   const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
-    useAppSelector(getCurrentMarketConfig, shallowEqual)
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
@@ -52,7 +51,10 @@ export const AdjustTargetLeverageForm = ({
   const leverageBN = MustBigNumber(leverage);
 
   const maxLeverage = useMemo(() => {
-    return calculateMarketMaxLeverage({ initialMarginFraction, effectiveInitialMarginFraction });
+    return calculateMarketMaxLeverage({
+      initialMarginFraction: MaybeBigNumber(initialMarginFraction)?.toNumber(),
+      effectiveInitialMarginFraction,
+    });
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   return (

@@ -18,7 +18,7 @@ import {
   calculateHasCancelableOrdersInOtherMarkets,
 } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 export const CancelAllOrdersConfirmationDialog = ({
   setIsOpen,

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -25,9 +26,8 @@ import { TableCell } from '@/components/Table/TableCell';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getMarketIdToAssetMetadataMap, getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getNumberSign } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
@@ -49,8 +49,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
     () => vaultsDataRaw?.positions?.toArray() ?? EMPTY_ARR,
     [vaultsDataRaw?.positions]
   );
-  const marketIdToAssetMetadataMap = useAppSelector(getMarketIdToAssetMetadataMap);
-  const marketsData = orEmptyRecord(useAppSelector(getPerpetualMarkets));
+  const marketsData = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
   const { isTablet } = useBreakpoints();
 
@@ -64,10 +63,8 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
               row.marketId === USDC_MARKET_HARDCODED ? usdcLabel : row.marketId,
             label: stringGetter({ key: STRING_KEYS.MARKET }),
             renderCell: ({ marketId, currentLeverageMultiple }) => {
-              const asset = marketId != null ? marketIdToAssetMetadataMap[marketId] : undefined;
-
-              const logoUrl =
-                marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.resources?.imageUrl;
+              const asset = marketId != null ? marketsData[marketId] : undefined;
+              const logoUrl = marketId === USDC_MARKET_HARDCODED ? usdcImage : asset?.logo;
 
               return (
                 // eslint-disable-next-line jsx-a11y/interactive-supports-focus
@@ -85,7 +82,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     slotLeft={
                       <AssetIcon
                         logoUrl={logoUrl}
-                        symbol={marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.id}
+                        symbol={marketId === USDC_MARKET_HARDCODED ? usdcLabel : asset?.assetId}
                         tw="[--asset-icon-size:2.5em]"
                       />
                     }
@@ -131,10 +128,12 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                     <$Label>
                       {marketId === USDC_MARKET_HARDCODED
                         ? usdcLabel
-                        : getDisplayableAssetFromBaseAsset(marketsData[marketId ?? '']?.assetId)}
+                        : marketsData[marketId ?? '']?.assetId != null
+                          ? marketsData[marketId ?? '']?.displayableAsset
+                          : getDisplayableAssetFromTicker(marketId ?? '')}
                     </$Label>
                   }
-                  fractionDigits={marketsData[marketId ?? '']?.configs?.stepSizeDecimals}
+                  fractionDigits={marketsData[marketId ?? '']?.stepSizeDecimals}
                 />
               </TableCell>
             ),
@@ -197,15 +196,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
           },
         ] satisfies Array<ColumnDef<VaultTableRow> | false>
       ).filter(isTruthy),
-    [
-      isTablet,
-      marketIdToAssetMetadataMap,
-      marketsData,
-      navigate,
-      stringGetter,
-      usdcImage,
-      usdcLabel,
-    ]
+    [isTablet, marketsData, navigate, stringGetter, usdcImage, usdcLabel]
   );
 
   return (

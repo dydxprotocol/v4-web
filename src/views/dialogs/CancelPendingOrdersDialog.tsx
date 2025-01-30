@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { CancelPendingOrdersDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -12,7 +14,6 @@ import { Dialog } from '@/components/Dialog';
 
 import { getNonZeroPendingPositions } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAssetImageUrl } from '@/state/assetsSelectors';
 
 import { CancelAllOrdersInMarketForm } from '../forms/CancelAllOrdersInMarketForm';
 
@@ -27,7 +28,11 @@ export const CancelPendingOrdersDialog = ({
     [allPending, marketId]
   );
 
-  const logoUrl = useAppSelector((s) => getAssetImageUrl(s, pendingPosition?.assetId));
+  const logoUrl = useParameterizedSelector(
+    BonsaiHelpers.assets.createSelectAssetLogo,
+    pendingPosition?.assetId
+  );
+
   const onSuccessfulCancel = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (

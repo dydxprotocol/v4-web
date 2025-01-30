@@ -20,6 +20,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { Deposit } from '@/state/transfers';
 
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
@@ -40,13 +41,12 @@ export const DepositForm = ({
   setAmount: Dispatch<SetStateAction<string>>;
   token: TokenForTransfer;
   onClose: () => void;
-  onDeposit: ({ txHash, chainId }: { txHash: string; chainId: string }) => void;
+  onDeposit: (deposit: Deposit) => void;
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
-
   const { data: walletClient } = useWalletClient();
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
@@ -100,7 +100,7 @@ export const DepositForm = ({
 
   const [depositSteps, setDepositSteps] = useState<DepositStep[]>();
   const [currentStep, setCurrentStep] = useState(0);
-  const [showRetryCurrentStep, setShowRetryCurrentStep] = useState(false);
+  const [currentStepError, setCurrentStepError] = useState<string>();
   const [awaitingWalletAction, setAwaitingWalletAction] = useState(false);
 
   // Helpers for fetching updated values within the useEffect for autoPromptStep
@@ -116,11 +116,16 @@ export const DepositForm = ({
 
   useEffect(() => {
     async function autoPromptStep() {
-      if (!depositSteps || !depositSteps.length || !walletClientRef.current) {
+      if (
+        !depositSteps ||
+        !depositSteps.length ||
+        !walletClientRef.current ||
+        !depositSteps[currentStep]
+      ) {
         return;
       }
 
-      const success = await depositSteps[currentStep]?.executeStep(
+      const { success, errorMessage } = await depositSteps[currentStep].executeStep(
         walletClientRef.current,
         skipClientRef.current
       );
@@ -128,7 +133,7 @@ export const DepositForm = ({
         setCurrentStep((prev) => prev + 1);
       }
       if (!success) {
-        setShowRetryCurrentStep(true);
+        setCurrentStepError(errorMessage);
       }
     }
 
@@ -140,7 +145,7 @@ export const DepositForm = ({
     setDepositSteps(undefined);
     setCurrentStep(0);
     setAwaitingWalletAction(false);
-    setShowRetryCurrentStep(false);
+    setCurrentStepError(undefined);
   }, [token, debouncedAmount, selectedRoute]);
 
   const onDepositClick = async () => {
@@ -148,7 +153,7 @@ export const DepositForm = ({
 
     setAwaitingWalletAction(true);
     if (steps.length === 1) {
-      const success = await steps[0]?.executeStep(walletClient, skipClient);
+      const { success } = await steps[0]!.executeStep(walletClient, skipClient);
       if (!success) setAwaitingWalletAction(false);
     } else {
       setDepositSteps(steps);
@@ -159,13 +164,13 @@ export const DepositForm = ({
     const step = depositSteps?.[currentStep];
     if (!step || !walletClient) return;
 
-    setShowRetryCurrentStep(false);
+    setCurrentStepError(undefined);
 
-    const success = await step.executeStep(walletClient, skipClient);
+    const { success, errorMessage } = await step.executeStep(walletClient, skipClient);
     if (success) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      setShowRetryCurrentStep(true);
+      setCurrentStepError(errorMessage);
     }
   };
 
@@ -233,11 +238,11 @@ export const DepositForm = ({
         )}
         {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
         {depositSteps?.length && (
-          <div tw="mt-1">
+          <div tw="my-1">
             <DepositSteps
               steps={depositSteps}
               currentStep={currentStep}
-              showRetry={showRetryCurrentStep}
+              currentStepError={currentStepError}
               onRetry={retryCurrentStep}
             />
           </div>

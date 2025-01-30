@@ -1,13 +1,15 @@
-import { mapValues } from 'lodash';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { mapValues, pickBy } from 'lodash';
 
-import { Nullable } from '@/constants/abacus';
 import { EMPTY_OBJ } from '@/constants/objects';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { MaybeBigNumber } from '@/lib/numbers';
+import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
+import { getCurrentMarketId } from './currentMarketSelectors';
 
 /**
  * @returns current market filter applied inside the markets page
@@ -15,85 +17,40 @@ import { createAppSelector } from './appTypes';
 export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
 
 /**
- * @returns marketId of the market the user is currently viewing (Internal)
- */
-export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
-
-/**
- * @returns marketId of the market the user is currently viewing if it is tradeable (Internal)
- */
-export const getCurrentMarketIdIfTradeable = (state: RootState) =>
-  state.perpetuals.currentMarketIdIfTradeable;
-
-/**
  * @returns displayId of the currentMarket the user is viewing (Render)
  */
-export const getCurrentMarketDisplayId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals.markets?.[currentMarketId]?.displayId;
-};
+export const getCurrentMarketDisplayId = createAppSelector(
+  [BonsaiHelpers.currentMarket.stableMarketInfo],
+  (m) => m?.displayableTicker
+);
 
 /**
  * @returns assetId of the currentMarket
  */
-export const getCurrentMarketAssetId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) ?? '';
-  return state.perpetuals.markets?.[currentMarketId]?.assetId;
-};
-
-/**
- * @returns Record of PerpetualMarket indexed by MarketId
- */
-export const getPerpetualMarkets = (state: RootState) => state.perpetuals.markets;
-
-/**
- * @param marketId
- * @returns PerpetualMarket data of the specified marketId
- */
-export const getMarketData = (state: RootState, marketId: string) =>
-  getPerpetualMarkets(state)?.[marketId];
+export const getCurrentMarketAssetId = createAppSelector(
+  [BonsaiHelpers.currentMarket.stableMarketInfo],
+  (m) => m?.assetId
+);
 
 /**
  * @returns marketIds of all markets
  */
-export const getMarketIds = (state: RootState) =>
-  Object.keys(getPerpetualMarkets(state) ?? EMPTY_OBJ);
+export const getMarketIds = createAppSelector([BonsaiCore.markets.markets.data], (markets) =>
+  Object.keys(markets ?? EMPTY_OBJ)
+);
 
 /**
  * @returns clobPairIds of all markets, mapped by marketId.
  */
-export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
-  return Object.entries(markets ?? {}).reduce(
-    (acc, [marketId, market]) => {
-      const clobPairId: Nullable<string> = market.configs?.clobPairId;
-      if (clobPairId !== undefined) {
-        acc[marketId] = Number(clobPairId);
-      }
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-});
-
-/**
- * @returns PerpetualMarket data of the market the user is currently viewing
- */
-export const getCurrentMarketData = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state);
-  return currentMarketId ? getPerpetualMarkets(state)?.[currentMarketId] : undefined;
-};
-
-/**
- * @returns MarketConfig data of the market the user is currently viewing
- */
-export const getCurrentMarketConfig = (state: RootState) => getCurrentMarketData(state)?.configs;
-
-/**
- * @param marketId
- * @returns config for specified market
- */
-export const getMarketConfig = (state: RootState, marketId: string) =>
-  getMarketData(state, marketId)?.configs;
+export const getPerpetualMarketsClobIds = createAppSelector(
+  [BonsaiCore.markets.markets.data],
+  (markets) => {
+    return pickBy(
+      mapValues(markets, (m) => MaybeBigNumber(m.clobPairId)?.toNumber()),
+      isPresent
+    );
+  }
+);
 
 /**
  * @returns Record of subscribed or previously subscribed Orderbook data, indexed by marketId.
@@ -121,15 +78,10 @@ export const getCurrentMarketOrderbookMap = (state: RootState) => {
 /**
  * @returns oracle price of the market the user is currently viewing
  */
-export const getCurrentMarketOraclePrice = (state: RootState) =>
-  getCurrentMarketData(state)?.oraclePrice;
-
-/**
- * @param marketId
- * @returns oraclePrice of specified marketId
- */
-export const getMarketOraclePrice = (state: RootState, marketId: string) =>
-  getMarketData(state, marketId)?.oraclePrice;
+export const getCurrentMarketOraclePrice = createAppSelector(
+  [BonsaiHelpers.currentMarket.marketInfo],
+  (m) => m?.oraclePrice
+);
 
 /**
  * @returns Mid market price for the market the user is currently viewing
@@ -148,33 +100,20 @@ export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSe
  * @returns Current market's next funding rate
  */
 export const getCurrentMarketNextFundingRate = createAppSelector(
-  [getCurrentMarketData],
-  (marketData) => marketData?.perpetual?.nextFundingRate
-);
-
-export const getMarketIdToAssetMetadataMap = createAppSelector(
-  [(state: RootState) => state.perpetuals.markets, (state: RootState) => state.assets.assets],
-  (markets, assets) => {
-    const mapping = mapValues(markets ?? {}, (v) => assets?.[v.assetId]);
-    return mapping;
-  }
+  [BonsaiHelpers.currentMarket.marketInfo],
+  (marketData) => marketData?.nextFundingRate
 );
 
 /**
  * @returns Specified market's max leverage
  */
 export const getMarketMaxLeverage = () =>
-  createAppSelector(
-    [
-      (state: RootState, marketId?: string) =>
-        marketId != null ? getMarketConfig(state, marketId) : undefined,
-    ],
-    (marketConfig) => {
-      const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
-
-      return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
-    }
-  );
+  createAppSelector([BonsaiHelpers.markets.createSelectMarketSummaryById()], (marketConfig) => {
+    const { effectiveInitialMarginFraction, initialMarginFraction: initialMarginFractionStr } =
+      orEmptyObj(marketConfig);
+    const initialMarginFraction = MaybeBigNumber(initialMarginFractionStr)?.toNumber();
+    return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
+  });
 
 // Returns list of markets that user has launched to handle loading/navigation state
 export const getLaunchedMarketIds = (state: RootState) => {

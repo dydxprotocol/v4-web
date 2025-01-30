@@ -33,8 +33,8 @@ import {
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';

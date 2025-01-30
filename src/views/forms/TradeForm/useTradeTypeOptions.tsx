@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS, StringKey } from '@/constants/localization';
@@ -12,22 +13,19 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedTradeType } from '@/lib/tradeData';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: boolean }) => {
   const { showAll, showAssetIcon } = opts ?? {};
   const stringGetter = useStringGetter();
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
-  const { id: currentAssetId, resources } = orEmptyObj(
-    useAppSelector(getCurrentMarketAssetData, shallowEqual)
-  );
-  const { imageUrl } = orEmptyObj(resources);
+  const currentAssetId = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+
   const { type: tradeType } = currentTradeData ?? {};
 
   const selectedTradeType = getSelectedTradeType(tradeType);

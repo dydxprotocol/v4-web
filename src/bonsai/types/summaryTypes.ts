@@ -303,3 +303,7 @@ export interface SubaccountOpenOrderPriceMap {
     [price: string]: BigNumber;
   };
 }
+export type AccountBalances = {
+  usdcAmount?: string;
+  chainTokenAmount?: string;
+};

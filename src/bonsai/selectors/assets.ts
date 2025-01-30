@@ -14,6 +14,14 @@ export const selectAllAssetsInfoLoading = createAppSelector(
 
 export const createSelectAssetInfo = () =>
   createAppSelector(
-    [selectAllAssetsInfo, (_s, assetId: string) => assetId],
-    (assets, assetId) => assets?.[assetId]
+    [selectAllAssetsInfo, (_s, assetId: string | undefined) => assetId],
+    (assets, assetId) => {
+      if (assetId == null) {
+        return undefined;
+      }
+      return assets?.[assetId];
+    }
   );
+
+export const createSelectAssetLogo = () =>
+  createAppSelector([createSelectAssetInfo()], (asset) => asset?.logo);

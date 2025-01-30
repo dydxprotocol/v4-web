@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
@@ -16,6 +17,7 @@ import { timeUnits } from '@/constants/time';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useNow } from '@/hooks/useNow';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -38,7 +40,6 @@ import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLaunchMarketIds } from '@/state/perpetuals';
-import { getMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromTicker, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
@@ -69,7 +70,10 @@ export const NewMarketPreviewStep = ({
   const { createPermissionlessMarket } = useSubaccount();
   const { usdcImage } = useTokenConfigs();
   const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);
-  const marketOraclePrice = useAppSelector((s) => getMarketOraclePrice(s, ticker));
+  const marketOraclePrice = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    ticker
+  )?.oraclePrice;
   const [txHash, setTxHash] = useState<string>();
   const [eta, setEta] = useState<number>(0);
   const now = useNow();

@@ -12,10 +12,7 @@ import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/o
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
 import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
 import { useOrderbookMiddleRowScrollListener } from '@/hooks/Orderbook/useOrderbookMiddleRowScrollListener';
-import {
-  OrderbookLineWithMine,
-  useCalculateOrderbookData,
-} from '@/hooks/Orderbook/useOrderbookValues';
+import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
@@ -85,13 +82,13 @@ export const CanvasOrderbook = forwardRef(
           ? new Array<undefined>(rowsPerSide - asks.length).fill(undefined)
           : [];
 
-      const newAsksSlice: Array<OrderbookLineWithMine | undefined> = [...asks, ...emptyAskRows];
+      const newAsksSlice = [...asks, ...emptyAskRows];
 
       const emptyBidRows =
         bids.length < rowsPerSide
           ? new Array<undefined>(rowsPerSide - bids.length).fill(undefined)
           : [];
-      const newBidsSlice: Array<OrderbookLineWithMine | undefined> = [...bids, ...emptyBidRows];
+      const newBidsSlice = [...bids, ...emptyBidRows];
 
       return {
         asksSlice: layout === 'horizontal' ? newAsksSlice.reverse() : newAsksSlice,
@@ -157,7 +154,7 @@ export const CanvasOrderbook = forwardRef(
     const asksOrderbook = (
       <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
-          {asksSlice.map((row: OrderbookLineWithMine | undefined, idx) =>
+          {asksSlice.map((row, idx) =>
             row ? (
               <$Row
                 // eslint-disable-next-line react/no-array-index-key
@@ -179,7 +176,7 @@ export const CanvasOrderbook = forwardRef(
     const bidsOrderbook = (
       <$OrderbookSideContainer $side="bids" $rows={rowsPerSide}>
         <$HoverRows>
-          {bidsSlice.map((row: OrderbookLineWithMine | undefined, idx) =>
+          {bidsSlice.map((row, idx) =>
             row ? (
               <$Row
                 // eslint-disable-next-line react/no-array-index-key

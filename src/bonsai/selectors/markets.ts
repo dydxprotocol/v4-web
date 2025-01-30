@@ -1,5 +1,5 @@
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { calculateAllMarkets, formatSparklineData } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';

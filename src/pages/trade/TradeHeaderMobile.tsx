@@ -1,4 +1,4 @@
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -14,22 +14,21 @@ import { Output, OutputType } from '@/components/Output';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?: string }) => {
-  const { name, id, resources } = orEmptyObj(
-    useAppSelector(getCurrentMarketAssetData, shallowEqual)
-  );
-  const { imageUrl } = orEmptyObj(resources);
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
+  const name = useAppSelector(BonsaiHelpers.currentMarket.assetName);
+  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+
   const navigate = useNavigate();
 
-  const { displayId, priceChange24H, priceChange24HPercent } =
-    useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { displayableTicker, priceChange24H, percentChange24h } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
+  );
 
   const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
 
@@ -50,7 +49,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
       <AssetIcon logoUrl={imageUrl} symbol={id} tw="text-[2.5rem]" />
       <$Name>
         <h3>{name}</h3>
-        <span>{displayId}</span>
+        <span>{displayableTicker}</span>
       </$Name>
     </div>
   );
@@ -65,7 +64,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
         <MidMarketPrice />
         <$PriceChange
           type={OutputType.Percent}
-          value={MustBigNumber(priceChange24HPercent).abs()}
+          value={MustBigNumber(percentChange24h).abs()}
           isNegative={MustBigNumber(priceChange24H).isNegative()}
         />
       </$Right>

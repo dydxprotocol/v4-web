@@ -17,9 +17,9 @@ import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { debounce } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -32,7 +33,6 @@ import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getInputTradeOptions,
@@ -40,11 +40,11 @@ import {
   getTradeFormInputs,
 } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
 import { TargetLeverageInput } from './TargetLeverageInput';
@@ -55,13 +55,15 @@ export const TradeSizeInputs = () => {
   const stringGetter = useStringGetter();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
-  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const { stepSizeDecimals, tickSizeDecimals } =
-    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
+
   const {
     size,
     usdcSize,

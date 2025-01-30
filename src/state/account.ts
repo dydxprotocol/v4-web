@@ -17,7 +17,6 @@ import {
   type TradingRewards,
   type UnbondingDelegation,
   type UsageRestriction,
-  type Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -26,13 +25,11 @@ import { getLocalStorage } from '@/lib/localStorage';
 import { isOrderStatusClearable } from '@/lib/orders';
 
 export type AccountState = {
-  balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
   stakingDelegations?: StakingDelegation[];
   unbondingDelegations?: UnbondingDelegation[];
   stakingRewards?: StakingRewards;
   tradingRewards?: TradingRewards;
-  wallet?: Nullable<Wallet>;
 
   subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
@@ -64,10 +61,6 @@ export type AccountState = {
 };
 
 const initialState: AccountState = {
-  // Wallet
-  balances: undefined,
-  wallet: undefined,
-
   // Subaccount
   subaccount: undefined,
   childSubaccounts: {},
@@ -206,10 +199,6 @@ export const accountSlice = createSlice({
 
       state.childSubaccounts = childSubaccountsCopy;
     },
-    setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
-      ...state,
-      wallet: action.payload,
-    }),
     viewedFills: (state, action: PayloadAction<string | undefined>) => {
       if (!action.payload) {
         // viewed fills for all markets
@@ -222,9 +211,6 @@ export const accountSlice = createSlice({
     },
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
-    },
-    setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
-      state.balances = action.payload;
     },
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;
@@ -263,10 +249,8 @@ export const {
   setCompliance,
   setSubaccount,
   setChildSubaccount,
-  setWallet,
   viewedFills,
   viewedOrders,
-  setBalances,
   setStakingBalances,
   setStakingDelegations,
   setTradingRewards,

@@ -3,7 +3,7 @@ import { shallowEqual } from 'react-redux';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -65,6 +65,26 @@ export const selectCurrentMarketAssetInfo = createAppSelector(
     }
 
     return assets[currentMarketInfo.assetId];
+  }
+);
+
+export const selectCurrentMarketAssetId = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.assetId;
+  }
+);
+
+export const selectCurrentMarketAssetName = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.name;
+  }
+);
+export const selectCurrentMarketAssetLogoUrl = createAppSelector(
+  [selectCurrentMarketInfo],
+  (currentMarketInfo) => {
+    return currentMarketInfo?.logo;
   }
 );
 

@@ -5,7 +5,7 @@ import { TvWidget } from '@/constants/tvchart';
 
 import { getIsAccountConnected, getMarketFills } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { useAppThemeAndColorModeContext } from '../useAppThemeAndColorMode';
 

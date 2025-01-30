@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
@@ -18,9 +19,10 @@ import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
+import { getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
+import { MaybeBigNumber } from '@/lib/numbers';
 import {
   getHistogramXValues,
   getRektFromIdx,
@@ -66,10 +68,10 @@ export const useDrawOrderbook = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const marketConfig = orEmptyObj(useAppSelector(getCurrentMarketConfig));
+  const marketConfig = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo));
   const stepSizeDecimals = marketConfig.stepSizeDecimals ?? TOKEN_DECIMALS;
   const tickSizeDecimals = marketConfig.tickSizeDecimals ?? SMALL_USD_DECIMALS;
-  const stepSize = marketConfig.stepSize ?? 10 ** (-1 * TOKEN_DECIMALS);
+  const stepSize = MaybeBigNumber(marketConfig.stepSize)?.toNumber() ?? 10 ** (-1 * TOKEN_DECIMALS);
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 

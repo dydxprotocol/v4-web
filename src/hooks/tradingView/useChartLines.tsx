@@ -21,6 +21,7 @@ import {
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import {
   cancelOrderFailed,
   cancelOrderSubmitted,
@@ -28,7 +29,6 @@ import {
   placeOrderSubmitted,
   setLatestOrder,
 } from '@/state/localOrders';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';

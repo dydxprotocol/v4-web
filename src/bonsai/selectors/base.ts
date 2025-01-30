@@ -56,3 +56,5 @@ export const selectRawConfigEquityTiers = (state: RootState) => state.raw.config
 
 export const selectRawAccountFeeTierData = (state: RootState) => state.raw.account.feeTier.data;
 export const selectRawAccountStatsData = (state: RootState) => state.raw.account.stats.data;
+
+export const selectRawAccountBalancesData = (state: RootState) => state.raw.account.balances.data;

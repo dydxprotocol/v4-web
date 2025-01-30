@@ -16,7 +16,6 @@ import {
   darkTheme,
   type EventHandlerParams,
 } from '@visx/xychart';
-import { shallowEqual } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 
 import {
@@ -37,7 +36,6 @@ import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -68,10 +66,11 @@ export const DepthChart = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   // Chart data
-  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
+  const {
+    stepSizeDecimals,
+    tickSizeDecimals,
+    assetId: id,
+  } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo));
 
   const { bids, asks, lowestBid, highestBid, lowestAsk, highestAsk, midPrice } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.depthChart.data)
