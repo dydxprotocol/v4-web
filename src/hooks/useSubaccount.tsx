@@ -272,7 +272,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, subaccountNumber]
   );
 
-  const dydxAddress = localDydxWallet?.address as DydxAddress | undefined;
+  const dydxAddress = localDydxWallet?.address as DydxAddress;
 
   useEffect(() => {
     dispatch(clearSubaccountState());
