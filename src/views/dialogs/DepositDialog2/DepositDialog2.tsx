@@ -119,11 +119,17 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               ref={tokenSelectRef}
               tw="w-[50%] overflow-scroll"
               style={{
+                pointerEvents: formState === 'form' ? 'none' : undefined,
                 height: formState === 'form' ? 0 : '100%',
                 maxHeight: isMobile ? '50vh' : '30rem',
               }}
             >
-              <TokenSelect token={token} setToken={setToken} onBack={onShowForm} />
+              <TokenSelect
+                disabled={formState === 'form'}
+                token={token}
+                setToken={setToken}
+                onBack={onShowForm}
+              />
             </div>
           </div>
         </div>

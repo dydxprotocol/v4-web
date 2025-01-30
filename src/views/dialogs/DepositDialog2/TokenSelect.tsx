@@ -16,10 +16,13 @@ import { useBalances } from './queries';
 import { getTokenSymbol } from './utils';
 
 export const TokenSelect = ({
+  disabled,
   onBack,
   token,
   setToken,
 }: {
+  // disable buttons to prevent tab events while TokenSelect has 0 height
+  disabled?: boolean;
   onBack: () => void;
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
@@ -71,6 +74,7 @@ export const TokenSelect = ({
         {withBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
+              disabled={disabled}
               onClick={onTokenClick({
                 chainId: balance.chainId,
                 denom: balance.denom,
@@ -123,6 +127,7 @@ export const TokenSelect = ({
         {noBalances.map((balance, i) => (
           <Fragment key={balance.denom}>
             <button
+              disabled={disabled}
               onClick={onTokenClick({
                 chainId: balance.chainId,
                 denom: balance.denom,
