@@ -79,7 +79,7 @@ function addUsdcAssetPosition(
 
 export type UsdcDepositArgs = {
   subaccountNumber: number;
-  depositAmount: string;
+  depositAmount?: string;
 };
 
 export function createUsdcDepositOperations(
@@ -88,7 +88,7 @@ export function createUsdcDepositOperations(
 ): SubaccountBatchedOperations {
   const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
     side: IndexerPositionSide.LONG,
-    size: depositAmount,
+    size: depositAmount ?? '0',
     subaccountNumber,
   });
 
