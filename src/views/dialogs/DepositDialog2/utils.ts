@@ -125,11 +125,21 @@ export function useDepositSteps({
           try {
             await signer.switchChain({ id: Number(depositToken.chainId) });
             return { success: true };
-          } catch (e) {
-            return {
-              success: false,
-              errorMessage: parseError(e, 'There was an error changing wallet networks.'),
-            };
+          } catch (_) {
+            try {
+              await signer.addChain({
+                chain: CHAIN_ID_TO_INFO[Number(depositToken.chainId) as EvmDepositChainId],
+              });
+              return { success: true };
+            } catch (e) {
+              return {
+                success: false,
+                errorMessage: parseError(
+                  e,
+                  'Please change networks within your wallet and try again.'
+                ),
+              };
+            }
           }
         },
       });
@@ -171,6 +181,7 @@ export function useDepositSteps({
           functionName: 'allowance',
           args: [sourceAccount.address, approvalMaybeNeeded.spender],
         })) as bigint;
+        console.log("allowance", allowance.toString(), 'spender:', approvalMaybeNeeded.spender)
 
         if (BigInt(allowance) < BigInt(approvalMaybeNeeded.amount)) {
           steps.push({

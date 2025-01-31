@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import {
   MsgWithdrawFromSubaccount,
   TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
 } from '@dydxprotocol/v4-client-js';
 import { SkipClient } from '@skip-go/client';
+import { getWalletClient } from '@wagmi/core';
 import { WalletClient } from 'viem';
-import { useWalletClient } from 'wagmi';
+import { useConfig } from 'wagmi';
 
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import { getSolanaChainId } from '@/constants/solana';
@@ -14,7 +15,6 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { SourceAccount } from '@/state/wallet';
 
 import { RPCUrlsByChainId } from '@/lib/wagmi';
 
@@ -39,13 +39,7 @@ const useSkipClientContext = () => {
   const { compositeClient } = useDydxClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { sourceAccount } = useAccounts();
-
-  const { data: walletClient } = useWalletClient();
-  const walletClientRef = useRef(walletClient);
-  useEffect(() => {
-    if (!walletClient) return;
-    walletClientRef.current = walletClient;
-  }, [walletClient]);
+  const wagmiConfig = useConfig();
 
   const { skipClient, skipInstanceId } = useMemo(
     () => ({
@@ -63,7 +57,18 @@ const useSkipClientContext = () => {
             throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
           },
         },
-        getEVMSigner: async () => getEVMSigner(walletClientRef.current, sourceAccount),
+        getEVMSigner: async (chainId: string) => {
+          if (sourceAccount.chain !== WalletNetworkType.Evm) {
+            throw new Error('no EVM wallet connected');
+          }
+
+          // @ts-ignore
+          const evmWalletClient = (await getWalletClient(wagmiConfig, {
+            chainId: Number(chainId),
+          })) as WalletClient;
+
+          return evmWalletClient;
+        },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
       skipInstanceId: crypto.randomUUID(),
@@ -77,22 +82,8 @@ const useSkipClientContext = () => {
       solanaRpcUrl,
       sourceAccount,
       validators,
+      wagmiConfig,
     ]
   );
   return { skipClient, skipInstanceId };
-};
-
-const getEVMSigner = async (
-  walletClient: WalletClient | undefined,
-  sourceAccount: SourceAccount
-) => {
-  if (!sourceAccount.walletInfo || sourceAccount.chain !== WalletNetworkType.Evm) {
-    throw new Error('Wallet is not evm');
-  }
-
-  if (!walletClient) {
-    throw new Error('wallet not connected');
-  }
-
-  return Promise.resolve(walletClient);
 };
