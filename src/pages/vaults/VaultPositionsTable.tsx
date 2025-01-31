@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-import { VaultPosition } from '@/bonsai/calculators/vault';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { VaultPosition } from '@/bonsai/public-calculators/vault';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -30,7 +29,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { getNumberSign } from '@/lib/numbers';
+import { getNumberSign, MustNumber } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = VaultPosition;
@@ -47,7 +46,13 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
 
   const vaultsDataRaw = useLoadedVaultPositions();
   const vaultsData = useMemo(
-    () => vaultsDataRaw?.positions ?? EMPTY_ARR,
+    () =>
+      vaultsDataRaw?.positions?.filter(
+        (p) =>
+          MustNumber(p.marginUsdc) > 0 ||
+          MustNumber(p.equityUsdc) > 0 ||
+          MustNumber(p.currentPosition?.asset) > 0
+      ) ?? EMPTY_ARR,
     [vaultsDataRaw?.positions]
   );
   const marketsData = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));

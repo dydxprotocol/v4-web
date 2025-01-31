@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-import { VaultShareUnlock } from '@/bonsai/calculators/vaultAccount';
+import { VaultShareUnlock } from '@/bonsai/public-calculators/vaultAccount';
 import { sum } from 'lodash';
 import styled from 'styled-components';
 

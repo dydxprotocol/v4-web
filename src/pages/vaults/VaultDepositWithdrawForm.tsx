@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-import { ErrorType } from '@/bonsai/calculators/vaultFormValidation';
+import { ErrorType } from '@/bonsai/public-calculators/vaultFormValidation';
 import { IndexedTx } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
 import { NumberFormatValues } from 'react-number-format';

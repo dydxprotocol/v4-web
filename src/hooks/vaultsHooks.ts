@@ -1,14 +1,15 @@
-/* eslint-disable no-restricted-imports */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { calculateVaultPositions, calculateVaultSummary } from '@/bonsai/calculators/vault';
-import { calculateUserVaultInfo } from '@/bonsai/calculators/vaultAccount';
+import { calculateVaultPositions, calculateVaultSummary } from '@/bonsai/public-calculators/vault';
+import { calculateUserVaultInfo } from '@/bonsai/public-calculators/vaultAccount';
 import {
   calculateSharesToWithdraw,
   validateVaultForm,
   VaultFormAction,
   VaultFormData,
-} from '@/bonsai/calculators/vaultFormValidation';
+} from '@/bonsai/public-calculators/vaultFormValidation';
+// we need this because vaults table sometimes has rows which we can't render but do have balance
+// eslint-disable-next-line no-restricted-imports
 import { selectAllMarketsInfo } from '@/bonsai/selectors/markets';
 import { MarketsInfo } from '@/bonsai/types/summaryTypes';
 import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';

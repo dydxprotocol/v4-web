@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-restricted-imports
-import { VaultFormAccountData } from '@/bonsai/calculators/vaultFormValidation';
+import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 

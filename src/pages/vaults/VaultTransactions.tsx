@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-import { VaultTransfer, VaultTransferType } from '@/bonsai/calculators/vaultAccount';
+import { VaultTransfer, VaultTransferType } from '@/bonsai/public-calculators/vaultAccount';
 import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
