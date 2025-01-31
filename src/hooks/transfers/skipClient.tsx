@@ -62,7 +62,6 @@ const useSkipClientContext = () => {
             throw new Error('no EVM wallet connected');
           }
 
-          // @ts-ignore
           const evmWalletClient = (await getWalletClient(wagmiConfig, {
             chainId: Number(chainId),
           })) as WalletClient;
