@@ -11,9 +11,7 @@ import {
   type Subaccount,
   type SubaccountFill,
   type SubaccountFills,
-  type SubaccountFundingPayments,
   type SubaccountOrder,
-  type SubaccountTransfers,
   type TradingRewards,
   type UnbondingDelegation,
   type UsageRestriction,
@@ -33,21 +31,7 @@ export type AccountState = {
 
   subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
-  transfers?: SubaccountTransfers;
   historicalPnl?: SubAccountHistoricalPNLs;
-
-  childSubaccounts: {
-    [subaccountNumber: number]: Nullable<
-      Partial<
-        Subaccount & {
-          fills: SubaccountFills;
-          fundingPayments: SubaccountFundingPayments;
-          transfers: SubaccountTransfers;
-          historicalPnl: SubAccountHistoricalPNLs;
-        }
-      >
-    >;
-  };
 
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
@@ -63,9 +47,7 @@ export type AccountState = {
 const initialState: AccountState = {
   // Subaccount
   subaccount: undefined,
-  childSubaccounts: {},
   fills: undefined,
-  transfers: undefined,
   historicalPnl: undefined,
 
   // Onboarding
@@ -119,9 +101,6 @@ export const accountSlice = createSlice({
         fills: action.payload,
         unseenFillsCountPerMarket: newUnseenFillsCountPerMarket,
       };
-    },
-    setTransfers: (state, action: PayloadAction<any>) => {
-      state.transfers = action.payload;
     },
     clearOrder: (state, action: PayloadAction<string>) => ({
       ...state,
@@ -184,21 +163,6 @@ export const accountSlice = createSlice({
         subaccount: action.payload,
       };
     },
-    setChildSubaccount: (
-      state,
-      action: PayloadAction<Partial<AccountState['childSubaccounts']>>
-    ) => {
-      const childSubaccountsCopy = { ...state.childSubaccounts };
-
-      Object.keys(action.payload).forEach((subaccountNumber) => {
-        childSubaccountsCopy[Number(subaccountNumber)] = {
-          ...childSubaccountsCopy[Number(subaccountNumber)],
-          ...action.payload[Number(subaccountNumber)],
-        };
-      });
-
-      state.childSubaccounts = childSubaccountsCopy;
-    },
     viewedFills: (state, action: PayloadAction<string | undefined>) => {
       if (!action.payload) {
         // viewed fills for all markets
@@ -230,7 +194,6 @@ export const accountSlice = createSlice({
     clearSubaccountState: (state) => {
       state.subaccount = undefined;
       state.fills = undefined;
-      state.transfers = undefined;
       state.historicalPnl = undefined;
     },
   },
@@ -238,7 +201,6 @@ export const accountSlice = createSlice({
 
 export const {
   setFills,
-  setTransfers,
 
   clearOrder,
   clearAllOrders,
@@ -248,7 +210,6 @@ export const {
   setRestrictionType,
   setCompliance,
   setSubaccount,
-  setChildSubaccount,
   viewedFills,
   viewedOrders,
   setStakingBalances,

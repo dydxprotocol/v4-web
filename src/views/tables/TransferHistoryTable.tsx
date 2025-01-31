@@ -1,8 +1,9 @@
+import { BonsaiCore } from '@/bonsai/ontology';
+import { SubaccountTransfer } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { type SubaccountTransfer } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
@@ -23,12 +24,14 @@ import { PageSize } from '@/components/Table/TablePaginationRow';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { MustNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
+
+import { getTransferTypeStringKey } from './enumToStringKeyHelpers';
 
 export enum TransferHistoryTableColumnKey {
   Time = 'Time',
@@ -54,39 +57,39 @@ const getTransferHistoryTableColumnDef = ({
     {
       [TransferHistoryTableColumnKey.Time]: {
         columnKey: TransferHistoryTableColumnKey.Time,
-        getCellValue: (row) => row.updatedAtMilliseconds,
+        getCellValue: (row) => row.createdAt,
         label: stringGetter({ key: STRING_KEYS.TIME }),
-        renderCell: ({ updatedAtMilliseconds }) => (
+        renderCell: ({ createdAt }) => (
           <Output
             type={OutputType.RelativeTime}
             relativeTimeOptions={{ format: 'singleCharacter' }}
-            value={updatedAtMilliseconds}
+            value={createdAt}
             tw="text-color-text-0"
           />
         ),
       },
       [TransferHistoryTableColumnKey.Action]: {
         columnKey: TransferHistoryTableColumnKey.Action,
-        getCellValue: (row) => row.resources.typeStringKey,
+        getCellValue: (row) => row.type,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
-        renderCell: ({ resources }) =>
-          resources.typeStringKey && stringGetter({ key: resources.typeStringKey }),
+        renderCell: ({ type }) => stringGetter({ key: getTransferTypeStringKey(type) }),
       },
       [TransferHistoryTableColumnKey.SenderRecipient]: {
         columnKey: TransferHistoryTableColumnKey.SenderRecipient,
-        getCellValue: (row) => `${row.fromAddress}-${row.toAddress}`,
+        getCellValue: ({ sender: { address: fromAddress }, recipient: { address: toAddress } }) =>
+          `${fromAddress}-${toAddress}`,
         label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TRANSFER_SENDER })}</span>
             <span>{stringGetter({ key: STRING_KEYS.TRANSFER_RECIPIENT })}</span>
           </TableColumnHeader>
         ),
-        renderCell: ({ fromAddress, toAddress }) => (
+        renderCell: ({ sender: { address: fromAddress }, recipient: { address: toAddress } }) => (
           <TableCell stacked>
-            <CopyButton buttonType="text" value={fromAddress ?? undefined}>
+            <CopyButton buttonType="text" value={fromAddress}>
               {fromAddress ? truncateAddress(fromAddress) : '-'}
             </CopyButton>{' '}
-            <CopyButton buttonType="text" value={toAddress ?? undefined}>
+            <CopyButton buttonType="text" value={toAddress}>
               {toAddress ? truncateAddress(toAddress) : '-'}
             </CopyButton>
           </TableCell>
@@ -94,9 +97,9 @@ const getTransferHistoryTableColumnDef = ({
       },
       [TransferHistoryTableColumnKey.Amount]: {
         columnKey: TransferHistoryTableColumnKey.Amount,
-        getCellValue: (row) => row.amount,
+        getCellValue: (row) => MustNumber(row.size),
         label: stringGetter({ key: STRING_KEYS.AMOUNT }),
-        renderCell: ({ amount }) => <Output type={OutputType.Fiat} value={amount} />,
+        renderCell: ({ size }) => <Output type={OutputType.Fiat} value={size} />,
       },
       [TransferHistoryTableColumnKey.TxHash]: {
         columnKey: TransferHistoryTableColumnKey.TxHash,
@@ -143,7 +146,7 @@ export const TransferHistoryTable = ({
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const transfers = useAppSelector(getSubaccountTransfers, shallowEqual) ?? [];
+  const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
   return (
     <$Table

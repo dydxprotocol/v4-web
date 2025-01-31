@@ -6,6 +6,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
+  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
@@ -316,3 +317,5 @@ export type OrderbookProcessedData = {
   spread: number | undefined;
   spreadPercent: number | undefined;
 };
+
+export type SubaccountTransfer = IndexerTransferResponseObject;

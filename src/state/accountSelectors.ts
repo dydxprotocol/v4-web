@@ -423,12 +423,6 @@ export const getAverageFillPriceForOrder = () =>
 
 /**
  * @param state
- * @returns list of transfers for the currently connected subaccount
- */
-export const getSubaccountTransfers = (state: RootState) => state.account.transfers;
-
-/**
- * @param state
  * @returns boolean on whether an order status is considered open
  */
 const isOpenOrderStatus = (status: AbacusOrderStatuses) => !isOrderStatusClearable(status);

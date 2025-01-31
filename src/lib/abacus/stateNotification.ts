@@ -21,7 +21,6 @@ import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import {
-  setChildSubaccount,
   setCompliance,
   setFills,
   setHistoricalPnl,
@@ -31,7 +30,6 @@ import {
   setStakingRewards,
   setSubaccount,
   setTradingRewards,
-  setTransfers,
   setUnbondingDelegations,
 } from '@/state/account';
 import { setInputs } from '@/state/inputs';
@@ -127,13 +125,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       subaccountNumbers?.forEach((subaccountId: number) => {
         const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
-        const childSubaccountUpdate: Parameters<typeof setChildSubaccount>[0] = {};
 
         if (changes.has(Changes.subaccount)) {
           const subaccountData = updatedState.subaccount(subaccountId);
-          if (isChildSubaccount) {
-            childSubaccountUpdate[subaccountId] = subaccountData;
-          } else {
+          if (!isChildSubaccount) {
             dispatch(setSubaccount(subaccountData));
             dispatch(updateOrders(subaccountData?.orders?.toArray() ?? []));
           }
@@ -142,23 +137,8 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (changes.has(Changes.fills)) {
           const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
           if (isChildSubaccount) {
-            childSubaccountUpdate[subaccountId] = { ...childSubaccountUpdate[subaccountId], fills };
-          } else {
             dispatch(setFills(fills));
             dispatch(updateFilledOrders(fills));
-          }
-        }
-
-        if (changes.has(Changes.transfers)) {
-          const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
-
-          if (isChildSubaccount) {
-            childSubaccountUpdate[subaccountId] = {
-              ...childSubaccountUpdate[subaccountId],
-              transfers,
-            };
-          } else {
-            dispatch(setTransfers(transfers));
           }
         }
 
@@ -166,17 +146,8 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           const historicalPnl = updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
 
           if (isChildSubaccount) {
-            childSubaccountUpdate[subaccountId] = {
-              ...childSubaccountUpdate[subaccountId],
-              historicalPnl,
-            };
-          } else {
             dispatch(setHistoricalPnl(historicalPnl));
           }
-        }
-
-        if (isChildSubaccount) {
-          dispatch(setChildSubaccount(childSubaccountUpdate));
         }
       });
 

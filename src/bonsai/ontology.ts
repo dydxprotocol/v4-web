@@ -14,6 +14,8 @@ import {
   selectAccountFills,
   selectAccountFillsLoading,
   selectAccountOrdersLoading,
+  selectAccountTransfers,
+  selectAccountTransfersLoading,
   selectCurrentMarketOpenOrders,
   selectCurrentMarketOrderHistory,
   selectOpenOrders,
@@ -74,6 +76,7 @@ import {
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
+  SubaccountTransfer,
   UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -106,6 +109,10 @@ interface BonsaiCoreShape {
     };
     fills: {
       data: BasicSelector<SubaccountFill[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    transfers: {
+      data: BasicSelector<SubaccountTransfer[]>;
       loading: BasicSelector<LoadableStatus>;
     };
     stats: {
@@ -164,6 +171,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     fills: {
       data: selectAccountFills,
       loading: selectAccountFillsLoading,
+    },
+    transfers: {
+      data: selectAccountTransfers,
+      loading: selectAccountTransfersLoading,
     },
     stats: {
       data: selectUserStats,
