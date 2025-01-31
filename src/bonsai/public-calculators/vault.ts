@@ -83,7 +83,6 @@ export function calculateVaultSummary(
   if (!latestEntry) return undefined;
 
   const latestTime = latestEntry.date;
-  if (!latestTime) return undefined;
 
   const thirtyDaysAgoTime = latestTime - 30 * timeUnits.day;
 
