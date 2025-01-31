@@ -61,9 +61,7 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
                 };
               } else {
                 const fullObj = isWsBasePerpetualMarketObject(updateObj);
-                startingValue[marketId] = {
-                  ...fullObj,
-                };
+                startingValue[marketId] = fullObj;
               }
             });
           }
