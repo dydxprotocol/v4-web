@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 
+// eslint-disable-next-line no-restricted-imports
+import { VaultShareUnlock } from '@/bonsai/calculators/vaultAccount';
 import { sum } from 'lodash';
 import styled from 'styled-components';
 
-import { VaultShareUnlock } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
@@ -25,7 +26,7 @@ export const VaultLockedSharesCard = ({ className }: { className?: string }) => 
   const [showShares, setShowShares] = useState(false);
   const vaultAccount = useLoadedVaultAccount().data;
   const rawLockedShares = vaultAccount?.vaultShareUnlocks;
-  const lockedShares = useMemo(() => rawLockedShares?.toArray(), [rawLockedShares]);
+  const lockedShares = useMemo(() => rawLockedShares, [rawLockedShares]);
   const lockedSharesTotalValue = useMemo(
     () => sum(lockedShares?.map((s) => s.amountUsdc)),
     [lockedShares]

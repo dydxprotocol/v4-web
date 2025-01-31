@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-restricted-imports
+import { VaultFormAccountData } from '@/bonsai/calculators/vaultFormValidation';
+
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 
 import {
@@ -143,9 +146,9 @@ export const selectSubaccountStateForVaults = createAppSelector(
     (state) => state.account.subaccount?.freeCollateral?.current,
     calculateCanViewAccount,
   ],
-  (marginUsage, freeCollateral, canViewAccount) => ({
-    marginUsage,
-    freeCollateral,
+  (marginUsage, freeCollateral, canViewAccount): VaultFormAccountData => ({
+    marginUsage: marginUsage ?? undefined,
+    freeCollateral: freeCollateral ?? undefined,
     canViewAccount,
   })
 );

@@ -1,5 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
+// eslint-disable-next-line no-restricted-imports
+import { ErrorType } from '@/bonsai/calculators/vaultFormValidation';
 import { IndexedTx } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
 import { NumberFormatValues } from 'react-number-format';
@@ -134,7 +136,7 @@ export const VaultDepositWithdrawForm = ({
 
   const errors = useMemo(
     () =>
-      validationResponse.errors.toArray().map((error) => {
+      validationResponse.errors.map((error) => {
         const errorStrings: { long?: string | JSX.Element; short?: string } = runFn(() => {
           const longKey = error.resources.text?.stringKey;
           const shortKey = error.resources.title?.stringKey;
@@ -196,7 +198,7 @@ export const VaultDepositWithdrawForm = ({
         slippage: validationResponse.summaryData.estimatedSlippage,
         requiredSlippageAck: validationResponse.summaryData.needSlippageAck,
         showedSlippageWarning:
-          validationResponse.errors.toArray().find((e) => e.code === 'SLIPPAGE_TOO_HIGH') != null,
+          validationResponse.errors.find((e) => e.code === 'SLIPPAGE_TOO_HIGH') != null,
       })
     );
     setIsSubmitting(true);
@@ -525,16 +527,16 @@ export const VaultDepositWithdrawForm = ({
           },
         };
 
-  const errorsPreventingSubmit = errors.filter((e) => e.type.name === 'error');
+  const errorsPreventingSubmit = errors.filter((e) => e.type === ErrorType.error);
   const hasInputErrors = errorsPreventingSubmit.length > 0;
 
   const renderedErrors = errors
     .filter((e) => e.long != null)
-    .filter((e) => !isSubmitting || e.type.name !== 'error') // hide errors if submitting
+    .filter((e) => !isSubmitting || e.type !== ErrorType.error) // hide errors if submitting
     .map((alertMessage) => (
       <AlertMessage
         key={alertMessage.code}
-        type={alertMessage.type.name === 'error' ? AlertType.Error : AlertType.Warning}
+        type={alertMessage.type === ErrorType.error ? AlertType.Error : AlertType.Warning}
       >
         {alertMessage.long}
       </AlertMessage>
