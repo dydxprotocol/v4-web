@@ -40,7 +40,6 @@ export const transfersSlice = createSlice({
   initialState,
   reducers: {
     addDeposit: (state, action: PayloadAction<{ dydxAddress: DydxAddress; deposit: Deposit }>) => {
-     console.log("adding deposit", action.payload.deposit);
       const { dydxAddress, deposit } = action.payload;
       if (!state.transfersByDydxAddress[dydxAddress]) {
         state.transfersByDydxAddress[dydxAddress] = [];
@@ -56,7 +55,6 @@ export const transfersSlice = createSlice({
       }>
     ) => {
       const { dydxAddress, deposit } = action.payload;
-      console.log("updateDeposit called for: ", dydxAddress, deposit);
       const accountTransfers = state.transfersByDydxAddress[dydxAddress];
       if (!accountTransfers?.length) return;
 
