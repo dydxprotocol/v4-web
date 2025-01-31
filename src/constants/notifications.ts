@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+
 import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
@@ -151,7 +152,7 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
-  title: ReactNode; // Title for Toast, Notification, and Push Notification
+  title: string; // Title for Toast, Notification, and Push Notification
   body?: ReactNode; // Description body for Toast, Notification, and Push Notification
   searchableContent?: string; // never rendered, but searchable
 
