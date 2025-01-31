@@ -9,8 +9,8 @@ import {
   VaultFormAction,
   VaultFormData,
 } from '@/bonsai/calculators/vaultFormValidation';
-import { BonsaiCore } from '@/bonsai/ontology';
-import { PerpetualMarketSummaries } from '@/bonsai/types/summaryTypes';
+import { selectAllMarketsInfo } from '@/bonsai/selectors/markets';
+import { MarketsInfo } from '@/bonsai/types/summaryTypes';
 import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { throttle } from 'lodash';
@@ -99,7 +99,7 @@ export const useVaultPnlHistory = () => {
 
 const MAX_UPDATE_SPEED_MS = timeUnits.minute;
 
-function isValidMarkets(markets: PerpetualMarketSummaries | undefined) {
+function isValidMarkets(markets: MarketsInfo | undefined) {
   return Object.keys(markets ?? {}).length > 0;
 }
 // A reference to raw abacus markets map that updates only when the data goes from empty to full and once per minute
@@ -107,13 +107,15 @@ function isValidMarkets(markets: PerpetualMarketSummaries | undefined) {
 // I don't know how else to ensure we catch the 0->1 aka empty to filled update
 const useDebouncedMarketsData = () => {
   // ignore this value except as the source of our ref
-  const marketsForUpdates = useAppSelector(BonsaiCore.markets.markets.data);
+  // We have to use the markets INFO selector which is hidden from bonsai ontology because we need accurate oracle prices for
+  // hidden markets
+  const marketsForUpdates = useAppSelector(selectAllMarketsInfo);
   const latestMarkets = useRef(marketsForUpdates);
   latestMarkets.current = marketsForUpdates;
 
   // wrap in object because the stupud value isn't a new reference when data is new for some reason
   const [marketsToReturn, setMarketsToReturn] = useState<{
-    data: PerpetualMarketSummaries | undefined;
+    data: MarketsInfo | undefined;
   }>({
     data: isValidMarkets(latestMarkets.current) ? latestMarkets.current : undefined,
   });

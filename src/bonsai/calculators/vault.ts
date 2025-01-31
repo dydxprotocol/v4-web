@@ -12,7 +12,7 @@ import {
 import { MaybeBigNumber, MaybeNumber, MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { PerpetualMarketSummaries, PerpetualMarketSummary } from '../types/summaryTypes';
+import { MarketInfo, MarketsInfo } from '../types/summaryTypes';
 import { calculateParentSubaccountSummary } from './subaccount';
 
 export interface VaultDetails {
@@ -110,7 +110,7 @@ export function calculateVaultSummary(
 export function calculateVaultPositions(
   positions?: IndexerMegavaultPositionResponse,
   histories?: IndexerVaultsHistoricalPnlResponse,
-  markets?: PerpetualMarketSummaries,
+  markets?: MarketsInfo,
   vaultTvl?: number
 ): VaultPositions | undefined {
   if (positions?.positions == null) {
@@ -160,7 +160,7 @@ function maybeAddUsdcRow(positions: VaultPosition[], vaultTvl?: number): VaultPo
 function calculateVaultPosition(
   position: IndexerVaultPosition,
   history?: IndexerVaultHistoricalPnl,
-  market?: PerpetualMarketSummary
+  market?: MarketInfo
 ): VaultPosition | undefined {
   const thirtyDayPnl = calculateThirtyDayPnl(history);
 
