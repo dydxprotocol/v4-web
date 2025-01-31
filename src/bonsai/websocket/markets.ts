@@ -2,6 +2,7 @@ import { throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 import {
+  isWsBasePerpetualMarketObject,
   isWsMarketUpdateResponses,
   isWsPerpetualMarketResponse,
 } from '@/types/indexer/indexerChecks';
@@ -50,11 +51,17 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
           if (update.trading != null) {
             Object.entries(update.trading).forEach(([marketId, updateObj]) => {
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              if (startingValue[marketId] != null && updateObj != null) {
+              if (updateObj == null) {
+                return;
+              }
+              if (startingValue[marketId] != null) {
                 startingValue[marketId] = {
                   ...startingValue[marketId],
                   ...updateObj,
                 };
+              } else {
+                const fullObj = isWsBasePerpetualMarketObject(updateObj);
+                startingValue[marketId] = fullObj;
               }
             });
           }
