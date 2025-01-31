@@ -181,7 +181,6 @@ export function useDepositSteps({
           functionName: 'allowance',
           args: [sourceAccount.address, approvalMaybeNeeded.spender],
         })) as bigint;
-        console.log("allowance", allowance.toString(), 'spender:', approvalMaybeNeeded.spender)
 
         if (BigInt(allowance) < BigInt(approvalMaybeNeeded.amount)) {
           steps.push({
