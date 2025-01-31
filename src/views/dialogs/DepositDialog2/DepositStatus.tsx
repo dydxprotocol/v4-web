@@ -29,7 +29,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
     appQueryClient.invalidateQueries({ queryKey: ['validator', 'accountBalances'], exact: false });
   }, [deposit]);
 
-  const depositSuccess = deposit?.status === 'success' && deposit.subaccountSweepCompleted;
+  const depositSuccess = deposit?.status === 'success';
 
   const statusDescription = useMemo(() => {
     if (depositSuccess) return 'Your funds are now available for trading.';

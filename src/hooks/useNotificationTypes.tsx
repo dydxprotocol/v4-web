@@ -279,7 +279,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           if (transfer.type === 'withdraw') return;
 
           const id = `${transfer.chainId}-${transfer.txHash}`;
-          const isSuccess = transfer.status === 'success' && transfer.subaccountSweepCompleted;
+          const isSuccess = transfer.status === 'success';
           const title = stringGetter({
             key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
           });

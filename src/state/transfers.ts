@@ -10,7 +10,6 @@ export type Deposit = {
   estimatedAmountUsd: string;
   actualAmountUsd?: string;
   isInstantDeposit: boolean;
-  subaccountSweepCompleted?: boolean;
 };
 
 export type Withdraw = {
@@ -41,6 +40,7 @@ export const transfersSlice = createSlice({
   initialState,
   reducers: {
     addDeposit: (state, action: PayloadAction<{ dydxAddress: DydxAddress; deposit: Deposit }>) => {
+     console.log("adding deposit", action.payload.deposit);
       const { dydxAddress, deposit } = action.payload;
       if (!state.transfersByDydxAddress[dydxAddress]) {
         state.transfersByDydxAddress[dydxAddress] = [];
@@ -56,6 +56,7 @@ export const transfersSlice = createSlice({
       }>
     ) => {
       const { dydxAddress, deposit } = action.payload;
+      console.log("updateDeposit called for: ", dydxAddress, deposit);
       const accountTransfers = state.transfersByDydxAddress[dydxAddress];
       if (!accountTransfers?.length) return;
 
@@ -71,21 +72,7 @@ export const transfersSlice = createSlice({
         return transfer;
       });
     },
-    // Mark all deposits that have successfully completed from Skip as also successfully completed the subaccount sweep
-    depositsSweptIntoSubaccount: (state, action: PayloadAction<{ dydxAddress: DydxAddress }>) => {
-      const { dydxAddress } = action.payload;
-      const accountTransfers = state.transfersByDydxAddress[dydxAddress];
-      if (!accountTransfers?.length) return;
-
-      state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
-        if (isDeposit(transfer) && transfer.status === 'success') {
-          return { ...transfer, subaccountSweepCompleted: true };
-        }
-
-        return transfer;
-      });
-    },
   },
 });
 
-export const { addDeposit, updateDeposit, depositsSweptIntoSubaccount } = transfersSlice.actions;
+export const { addDeposit, updateDeposit } = transfersSlice.actions;

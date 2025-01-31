@@ -106,7 +106,7 @@ export const AmountInput = ({
         <input
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          type="number"
+          type="text"
           placeholder="0.00"
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
           style={{ color: error ? 'var(--color-error)' : undefined }}
