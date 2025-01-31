@@ -188,7 +188,6 @@ export const selectAccountFillsLoading = createAppSelector(
 export const selectAccountTransfers = createAppSelector(
   [selectRawTransfersRestData, selectRawTransfersLiveData],
   (rest, live): SubaccountTransfer[] => {
-    console.log(rest, live, Object.values(calculateTransfers(rest?.transfers, live)));
     return orderBy(
       Object.values(calculateTransfers(rest?.transfers, live)).map((o) => ({
         ...o,
