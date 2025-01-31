@@ -42,6 +42,8 @@ import {
   placeOrderFailed,
   placeOrderSubmitted,
 } from '@/state/localOrders';
+import { depositsSweptIntoSubaccount } from '@/state/transfers';
+import { selectPendingDeposits } from '@/state/transfersSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
@@ -53,6 +55,7 @@ import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
+import { useParameterizedSelector } from './useParameterizedSelector';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -291,6 +294,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
           subaccountClient,
         });
+        dispatch(depositsSweptIntoSubaccount({ dydxAddress }));
       } else if (shouldWithdraw) {
         await withdrawFromSubaccount({
           amount: AMOUNT_RESERVED_FOR_GAS_USDC - balanceAmount,
@@ -298,17 +302,19 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         });
       }
     },
-    [subaccountClient, depositToSubaccount, withdrawFromSubaccount]
+    [subaccountClient, depositToSubaccount, dispatch, dydxAddress, withdrawFromSubaccount]
   );
 
   const balances = useAppSelector(BonsaiCore.account.balances.data);
   const usdcCoinBalance = balances.usdcAmount;
 
+  const pendingDeposits = useParameterizedSelector(selectPendingDeposits, dydxAddress);
+
   useEffect(() => {
-    if (usdcCoinBalance && !isKeplr) {
+    if (usdcCoinBalance && !isKeplr && !pendingDeposits.length) {
       rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance, rebalanceWalletFunds, isKeplr]);
+  }, [usdcCoinBalance, rebalanceWalletFunds, isKeplr, pendingDeposits]);
 
   const [showDepositDialog, setShowDepositDialog] = useState(true);
 

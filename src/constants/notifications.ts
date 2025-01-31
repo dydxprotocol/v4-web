@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
@@ -7,6 +8,7 @@ export enum NotificationType {
   // So the notifications don't get retriggered
   // It's pretty scary getting a bunch of unexpected withdrawal notifications
   SkipTransfer = 'SquidTransfer',
+  SkipTransfer2 = 'SkipTransfer2',
   FunkitDeposit = 'FunkitDeposit',
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
@@ -34,6 +36,7 @@ export const NotificationTypeCategory: {
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
   [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
@@ -148,8 +151,8 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
-  title: string; // Title for Toast, Notification, and Push Notification
-  body?: string; // Description body for Toast, Notification, and Push Notification
+  title: ReactNode; // Title for Toast, Notification, and Push Notification
+  body?: ReactNode; // Description body for Toast, Notification, and Push Notification
   searchableContent?: string; // never rendered, but searchable
 
   slotTitleLeft?: React.ReactNode;

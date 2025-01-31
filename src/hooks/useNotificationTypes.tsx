@@ -68,6 +68,7 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
+import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -75,6 +76,7 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
+import { useParameterizedSelector } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -261,6 +263,53 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [funkitDeposits, stringGetter, trigger, openAccountModal]);
+    },
+  },
+  {
+    type: NotificationType.SkipTransfer2,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { dydxAddress } = useAccounts();
+      const userTransfers = useParameterizedSelector(selectTransfersByAddress, dydxAddress);
+
+      useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const transfer of userTransfers) {
+          // TODO: handle withdraw notifications too
+          if (transfer.type === 'withdraw') return;
+
+          const id = `${transfer.chainId}-${transfer.txHash}`;
+          const isSuccess = transfer.status === 'success' && transfer.subaccountSweepCompleted;
+          const title = stringGetter({
+            key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+          });
+
+          // TODO(deposit2.0): localization
+          trigger(
+            id,
+            {
+              title,
+              icon: <Icon iconName={isSuccess ? IconName.Transfer : IconName.Clock} />,
+              body: isSuccess ? (
+                <div>
+                  Your deposit of{' '}
+                  <Output tw="inline" value={transfer.estimatedAmountUsd} type={OutputType.Fiat} />{' '}
+                  is now available.
+                </div>
+              ) : (
+                <div>
+                  Your deposit of{' '}
+                  <Output tw="inline" value={transfer.estimatedAmountUsd} type={OutputType.Fiat} />{' '}
+                  is pending.
+                </div>
+              ),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.SkipTransfer,
+            },
+            [isSuccess]
+          );
+        }
+      }, [stringGetter, userTransfers]);
     },
   },
   {
