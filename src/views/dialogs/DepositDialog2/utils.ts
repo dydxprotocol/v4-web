@@ -46,7 +46,8 @@ export function getUserAddressesForRoute(
   route: RouteResponse,
   sourceAccount: SourceAccount,
   nobleAddress?: string,
-  dydxAddress?: string
+  dydxAddress?: string,
+  osmosisAddress?: string
 ): UserAddress[] {
   const chains = route.requiredChainAddresses;
 
@@ -56,8 +57,8 @@ export function getUserAddressesForRoute(
         if (!nobleAddress) throw new Error('nobleAddress undefined');
         return { chainID: chainId, address: nobleAddress };
       case CosmosChainId.Osmosis:
-        // TODO(deposit2.0): handle osmosis case!
-        return { chainID: chainId, address: 'osmo1c2jm54xlan3jjfdxeggv7rm3905sscxjr2gtn5' };
+        if (!osmosisAddress) throw new Error('osmosisAddress undefined');
+        return { chainID: chainId, address: osmosisAddress };
       case DYDX_DEPOSIT_CHAIN:
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainID: chainId, address: dydxAddress };
@@ -106,7 +107,7 @@ export function useDepositSteps({
 }) {
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { nobleAddress, dydxAddress } = useAccounts();
+  const { nobleAddress, dydxAddress, osmosisAddress } = useAccounts();
 
   async function getStepsQuery() {
     if (!depositRoute || !sourceAccount.address) return [];
@@ -141,7 +142,8 @@ export function useDepositSteps({
       depositRoute,
       sourceAccount,
       nobleAddress,
-      dydxAddress
+      dydxAddress,
+      osmosisAddress
     );
 
     if (isEvmDepositChainId(depositToken.chainId)) {
