@@ -29,7 +29,6 @@ export const TokenSelect = ({
 }) => {
   const { isLoading, data } = useBalances();
 
-  console.log('data', data);
   const [withBalances, noBalances] = useMemo(() => {
     if (!data) return [[], []];
 
