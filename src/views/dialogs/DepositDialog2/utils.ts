@@ -234,6 +234,8 @@ export function useDepositSteps({
                 txHash,
                 chainId: chainID,
                 status: 'pending',
+                token: depositToken,
+                tokenAmount: depositRoute.amountIn,
                 estimatedAmountUsd: depositRoute.usdAmountOut ?? '',
                 isInstantDeposit: isInstantDeposit(depositRoute),
               });

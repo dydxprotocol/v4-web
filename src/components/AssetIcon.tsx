@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 import { ASSET_ICON_MAP } from '@/constants/assets';
+import { CHAIN_INFO } from '@/constants/chains';
 
 export type AssetSymbol = keyof typeof ASSET_ICON_MAP;
 
@@ -20,10 +21,12 @@ export const AssetIcon = ({
   logoUrl,
   symbol,
   className,
+  chainId,
 }: {
   logoUrl?: Nullable<string>;
   symbol?: Nullable<string>;
   className?: string;
+  chainId?: string;
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -47,7 +50,16 @@ export const AssetIcon = ({
       }}
     />
   ) : isAssetSymbol(symbol) ? (
-    <$AssetIcon src={ASSET_ICON_MAP[symbol]} className={className} alt={symbol} />
+    <div tw="relative flex items-center justify-center">
+      <$AssetIcon src={ASSET_ICON_MAP[symbol]} className={className} alt={symbol} />
+      {chainId && (
+        <img
+          tw="absolute bottom-[-2px] right-[-2px] h-[50%] w-[50%] rounded-9 border border-solid border-color-layer-4"
+          src={CHAIN_INFO[chainId]?.icon}
+          alt={CHAIN_INFO[chainId]?.name}
+        />
+      )}
+    </div>
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
