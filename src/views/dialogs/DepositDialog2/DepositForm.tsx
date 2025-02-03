@@ -184,10 +184,14 @@ export const DepositForm = ({
   const onDepositClick = async () => {
     if (depositDisabled || !steps || !signer) return;
 
+    setCurrentStepError(undefined);
     setAwaitingWalletAction(true);
     if (steps.length === 1) {
-      const { success } = await steps[0]!.executeStep(signer, skipClient);
-      if (!success) setAwaitingWalletAction(false);
+      const { success, errorMessage } = await steps[0]!.executeStep(signer, skipClient);
+      if (!success) {
+        setAwaitingWalletAction(false);
+        setCurrentStepError(errorMessage);
+      }
     } else {
       setDepositSteps(steps);
     }
@@ -254,21 +258,28 @@ export const DepositForm = ({
         </div>
       </div>
       <div tw="flex flex-col gap-0.75">
-        {!depositSteps?.length && (
-          <Button
-            tw="mt-2 w-full"
-            onClick={onDepositClick}
-            state={{
-              isDisabled: depositDisabled,
-              isLoading: isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
-            }}
-            disabled={depositDisabled}
-            action={ButtonAction.Primary}
-            type={ButtonType.Submit}
-          >
-            {depositButtonInner}
-          </Button>
-        )}
+        <div tw="mt-2 flex flex-col gap-0.375">
+          {!depositSteps?.length && currentStepError && (
+            <div tw="text-center text-small text-color-error">{currentStepError}</div>
+          )}
+          {!depositSteps?.length && (
+            <Button
+              tw="w-full"
+              onClick={onDepositClick}
+              state={{
+                isDisabled: depositDisabled,
+                isLoading:
+                  isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
+              }}
+              disabled={depositDisabled}
+              action={ButtonAction.Primary}
+              type={ButtonType.Submit}
+            >
+              {depositButtonInner}
+            </Button>
+          )}
+        </div>
+
         {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
         {depositSteps?.length && (
           <div tw="my-1">

@@ -216,6 +216,7 @@ export function useDepositSteps({
       // passing in updatedSkipClient is hack until that is available
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
         try {
+          console.log('calling executeRoute');
           await updatedSkipClient.executeRoute({
             route: depositRoute,
             userAddresses,
@@ -233,6 +234,7 @@ export function useDepositSteps({
           });
           return { success: true };
         } catch (e) {
+          console.log('error!', e);
           return {
             success: false,
             errorMessage: parseError(e, 'Your deposit has failed. Please try again.'),
@@ -285,6 +287,10 @@ function parseError(e: Error, fallbackMessage: string) {
 
   if ('name' in e && e.name === ChainMismatchError.name) {
     return 'Please change your wallet network and try again.';
+  }
+
+  if ('message' in e && e.message.includes('Insufficient balance for gas')) {
+    return 'Insufficient gas balance. Please add gas funds and try again.';
   }
 
   return fallbackMessage;
