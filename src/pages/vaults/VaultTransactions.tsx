@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 
+import { VaultTransfer, VaultTransferType } from '@/bonsai/public-calculators/vaultAccount';
 import styled from 'styled-components';
 
-import { VaultTransfer } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -101,14 +101,14 @@ export const VaultTransactionsTable = ({
           },
           {
             columnKey: 'action',
-            getCellValue: (row) => row.type?.name,
+            getCellValue: (row) => row.type,
             label: stringGetter({ key: STRING_KEYS.ACTION }),
             renderCell: ({ type }) => (
               <Output
                 value={
-                  type?.name === 'DEPOSIT'
+                  type === VaultTransferType.DEPOSIT
                     ? stringGetter({ key: STRING_KEYS.ADD_FUNDS })
-                    : type?.name === 'WITHDRAWAL'
+                    : type === VaultTransferType.WITHDRAWAL
                       ? stringGetter({ key: STRING_KEYS.REMOVE_FUNDS })
                       : undefined
                 }

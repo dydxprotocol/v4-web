@@ -6,6 +6,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
+  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
@@ -299,3 +300,5 @@ export type AccountBalances = {
   usdcAmount?: string;
   chainTokenAmount?: string;
 };
+
+export type SubaccountTransfer = IndexerTransferResponseObject;
