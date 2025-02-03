@@ -140,7 +140,7 @@ export const VaultDescription = ({ className }: { className?: string }) => {
 };
 export const VaultPositionsSection = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const numPositions = useLoadedVaultPositions()?.positions?.size;
+  const numPositions = useLoadedVaultPositions()?.positions?.length;
   const { vaultMetrics } = useURLConfigs();
 
   return (
