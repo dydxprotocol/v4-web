@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
+import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
 
-import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
 import {
   ORDERBOOK_ANIMATION_DURATION,
@@ -20,7 +19,6 @@ import { OutputType, formatNumberOutput } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
 import { MaybeBigNumber } from '@/lib/numbers';
@@ -36,9 +34,9 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { useLocaleSeparators } from '../useLocaleSeparators';
 
 type ElementProps = {
-  data: Array<PerpetualMarketOrderbookLevel | undefined>;
+  data: Array<CanvasOrderbookLine | undefined>;
   histogramRange: number;
-  side: PerpetualMarketOrderbookLevel['side'];
+  side: CanvasOrderbookLine['side'];
   displayUnit: DisplayUnit;
 };
 
@@ -64,7 +62,14 @@ export const useDrawOrderbook = ({
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
-  const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
+  const priceSizeMap = data.reduce(
+    (acc, row) => {
+      if (!row) return acc;
+      acc[row.price.toString()] = row.size;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
@@ -325,7 +330,7 @@ export const useDrawOrderbook = ({
     }: {
       ctx: CanvasRenderingContext2D;
       idx: number;
-      rowToRender?: PerpetualMarketOrderbookLevel;
+      rowToRender?: CanvasOrderbookLine;
       animationType?: OrderbookRowAnimationType;
     }) => {
       if (!rowToRender) return;
@@ -358,7 +363,7 @@ export const useDrawOrderbook = ({
       drawText({
         animationType,
         ctx,
-        depth: depth ?? undefined,
+        depth,
         depthCost,
         sizeCost,
         price,
@@ -397,14 +402,12 @@ export const useDrawOrderbook = ({
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     // Animate row removal (do not animate update)
-    const mapOfOrderbookPriceLevels =
-      side && currentOrderbookMap?.[side === 'ask' ? 'asks' : 'bids'];
 
     prevData.current.forEach((row, idx) => {
       if (!row) return;
 
       const animationType =
-        mapOfOrderbookPriceLevels?.[row.price] === 0
+        priceSizeMap[row.price] == null
           ? OrderbookRowAnimationType.REMOVE
           : OrderbookRowAnimationType.NONE;
 
@@ -428,7 +431,7 @@ export const useDrawOrderbook = ({
     histogramSide,
     side,
     theme,
-    currentOrderbookMap,
+    priceSizeMap,
     displayUnit,
     canvas,
     drawOrderbookRow,

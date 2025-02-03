@@ -4,9 +4,9 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { AbacusInputTypes, Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import { AbacusInputTypes, Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
@@ -22,7 +22,6 @@ import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
@@ -54,17 +53,26 @@ export const CanvasOrderbook = forwardRef(
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange, currentGrouping } = useCalculateOrderbookData(
-      {
-        rowsPerSide,
-      }
-    );
+    const {
+      asks,
+      bids,
+      midMarketPrice,
+      hasOrderbook,
+      histogramRange,
+      groupingTickSize,
+      groupingTickSizeDecimals,
+      modifyGroupingMultiplier,
+    } = useCalculateOrderbookData({
+      rowsPerSide,
+    });
+
+    const {
+      assetId: id,
+      ticker,
+      tickSizeDecimals = USD_DECIMALS,
+    } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo));
 
     const stringGetter = useStringGetter();
-    const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
-    const { assetId: id, tickSizeDecimals = USD_DECIMALS } = orEmptyObj(
-      useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-    );
 
     /**
      * Slice asks and bids to rowsPerSide using empty rows
@@ -75,30 +83,25 @@ export const CanvasOrderbook = forwardRef(
           ? new Array<undefined>(rowsPerSide - asks.length).fill(undefined)
           : [];
 
-      const newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
-        ...emptyAskRows,
-        ...asks.reverse(),
-      ];
+      const newAsksSlice = [...asks, ...emptyAskRows];
 
       const emptyBidRows =
         bids.length < rowsPerSide
           ? new Array<undefined>(rowsPerSide - bids.length).fill(undefined)
           : [];
-      const newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [
-        ...bids,
-        ...emptyBidRows,
-      ];
+      const newBidsSlice = [...bids, ...emptyBidRows];
 
       return {
-        asksSlice: layout === 'horizontal' ? newAsksSlice : newAsksSlice.reverse(),
+        asksSlice: layout === 'horizontal' ? newAsksSlice.reverse() : newAsksSlice,
         bidsSlice: newBidsSlice,
       };
     }, [asks, bids, layout, rowsPerSide]);
 
     const orderbookRef = useRef<HTMLDivElement>(null);
+
     useCenterOrderbook({
       orderbookRef,
-      marketId: currentMarket,
+      marketId: ticker ?? '',
       disabled: layout === 'horizontal',
     });
 
@@ -123,7 +126,7 @@ export const CanvasOrderbook = forwardRef(
           // avoid scientific notation for when converting small number to string
           dispatch(
             setTradeFormInputs({
-              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals),
             })
           );
         }
@@ -152,7 +155,7 @@ export const CanvasOrderbook = forwardRef(
     const asksOrderbook = (
       <$OrderbookSideContainer $side="asks" $rows={rowsPerSide}>
         <$HoverRows $bottom={layout !== 'horizontal'}>
-          {[...asksSlice].reverse().map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+          {[...asksSlice].reverse().map((row, idx) =>
             row ? (
               <$Row
                 // eslint-disable-next-line react/no-array-index-key
@@ -174,7 +177,7 @@ export const CanvasOrderbook = forwardRef(
     const bidsOrderbook = (
       <$OrderbookSideContainer $side="bids" $rows={rowsPerSide}>
         <$HoverRows>
-          {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+          {bidsSlice.map((row, idx) =>
             row ? (
               <$Row
                 // eslint-disable-next-line react/no-array-index-key
@@ -201,7 +204,14 @@ export const CanvasOrderbook = forwardRef(
     return (
       <div className={className} ref={ref} tw="flex flex-1 flex-col overflow-hidden">
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          {!hideHeader && <OrderbookControls assetId={id} grouping={currentGrouping} />}
+          {!hideHeader && (
+            <OrderbookControls
+              assetId={id}
+              groupingTickSize={groupingTickSize}
+              groupingTickSizeDecimals={groupingTickSizeDecimals}
+              modifyGrouping={modifyGroupingMultiplier}
+            />
+          )}
           {!hideHeader && (
             <$OrderbookRow tw="h-1.75 text-color-text-0">
               <span>
@@ -221,6 +231,7 @@ export const CanvasOrderbook = forwardRef(
           {(displaySide === 'top' || layout === 'horizontal') && (
             <$OrderbookMiddleRow
               side="top"
+              midMarketPrice={midMarketPrice}
               tickSizeDecimals={tickSizeDecimals}
               isHeader={layout === 'horizontal'}
             />
@@ -230,13 +241,18 @@ export const CanvasOrderbook = forwardRef(
               <div ref={orderbookRef} tw="flex flex-1 flex-col justify-center overflow-y-auto">
                 {asksOrderbook}
                 <OrderbookMiddleRow
+                  midMarketPrice={midMarketPrice}
                   tickSizeDecimals={tickSizeDecimals}
                   ref={orderbookMiddleRowRef}
                 />
                 {bidsOrderbook}
               </div>
               {displaySide === 'bottom' && (
-                <$OrderbookMiddleRow side="bottom" tickSizeDecimals={tickSizeDecimals} />
+                <$OrderbookMiddleRow
+                  side="bottom"
+                  midMarketPrice={midMarketPrice}
+                  tickSizeDecimals={tickSizeDecimals}
+                />
               )}
             </>
           ) : (

@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
-
-import { Nullable } from '@/constants/abacus';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -11,25 +10,25 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const getMidMarketPriceColor = ({
   midMarketPrice,
   lastMidMarketPrice,
 }: {
-  midMarketPrice: Nullable<number>;
-  lastMidMarketPrice: Nullable<number>;
+  midMarketPrice?: BigNumber;
+  lastMidMarketPrice?: BigNumber;
 }) => {
-  if (MustBigNumber(midMarketPrice).lt(MustBigNumber(lastMidMarketPrice))) {
+  if (lastMidMarketPrice == null || midMarketPrice == null) {
+    return 'var(--color-text-2)';
+  }
+  if (midMarketPrice.lt(lastMidMarketPrice)) {
     return 'var(--color-negative)';
   }
-  if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
+  if (midMarketPrice.gt(lastMidMarketPrice)) {
     return 'var(--color-positive)';
   }
-
   return 'var(--color-text-2)';
 };
 
@@ -37,7 +36,13 @@ export const MidMarketPrice = () => {
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
+
+  const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
+  const midMarketPriceLoading = useAppSelector(BonsaiHelpers.currentMarket.midPrice.loading);
+  const isLoading =
+    midMarketPriceLoading === 'idle' ||
+    (midMarketPriceLoading === 'pending' && midMarketPrice == null);
+
   const lastMidMarketPrice = useRef(midMarketPrice);
 
   const midMarketColor = getMidMarketPriceColor({
@@ -49,7 +54,11 @@ export const MidMarketPrice = () => {
     lastMidMarketPrice.current = midMarketPrice;
   }, [midMarketPrice]);
 
-  return midMarketPrice !== undefined ? (
+  if (isLoading) {
+    return <LoadingDots size={5} />;
+  }
+
+  return (
     <$Output
       withSubscript
       type={OutputType.Fiat}
@@ -57,10 +66,9 @@ export const MidMarketPrice = () => {
       color={midMarketColor}
       fractionDigits={tickSizeDecimals}
     />
-  ) : (
-    <LoadingDots size={5} />
   );
 };
+
 const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 

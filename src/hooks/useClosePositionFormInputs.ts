@@ -10,7 +10,6 @@ import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { useAppSelector } from '@/state/appTypes';
 import { setClosePositionFormInputs } from '@/state/inputs';
 import { getClosePositionFormInputs, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -35,7 +34,10 @@ export const useClosePositionFormInputs = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const midMarketPrice = useAppSelector(
+    BonsaiHelpers.currentMarket.midPrice.data,
+    shallowEqual
+  )?.toNumber();
 
   // when useLimit is toggled to true, set limit price input to use the mid price set in abacus
   useEffect(() => {

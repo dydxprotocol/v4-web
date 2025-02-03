@@ -1,13 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import merge from 'lodash/merge';
 
-import type { MarketOrderbook, Nullable } from '@/constants/abacus';
 import { LaunchMarketStatus } from '@/constants/launchableMarkets';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
-import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 export interface PerpetualsState {
   currentMarketId?: string;
@@ -15,22 +12,11 @@ export interface PerpetualsState {
   currentMarketIdIfTradeable?: string;
   marketFilter: MarketFilters;
   launchMarketIds: string[];
-
-  orderbooks?: Record<string, MarketOrderbook>;
-  orderbooksMap?: Record<
-    string,
-    {
-      asks: Record<string, number>;
-      bids: Record<string, number>;
-    }
-  >;
 }
 
 const initialState: PerpetualsState = {
   currentMarketId: undefined,
   currentMarketIdIfTradeable: undefined,
-  orderbooks: undefined,
-  orderbooksMap: undefined,
   marketFilter: MarketFilters.ALL,
   launchMarketIds: [],
 };
@@ -50,27 +36,6 @@ export const perpetualsSlice = createSlice({
       action: PayloadAction<string | undefined>
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
-    },
-    setOrderbook: (
-      state: PerpetualsState,
-      action: PayloadAction<{ orderbook?: Nullable<MarketOrderbook>; marketId: string }>
-    ) => {
-      state.orderbooks = merge({}, state.orderbooks, {
-        [action.payload.marketId]: action.payload.orderbook,
-      });
-
-      const { newAsks, newBids } = processOrderbookToCreateMap({
-        orderbookMap: state.orderbooksMap?.[action.payload.marketId],
-        newOrderbook: action.payload.orderbook,
-      });
-
-      state.orderbooksMap = {
-        ...(state.orderbooksMap ?? {}),
-        [action.payload.marketId]: {
-          asks: newAsks,
-          bids: newBids,
-        },
-      };
     },
     resetPerpetualsState: () =>
       ({
@@ -95,7 +60,6 @@ export const perpetualsSlice = createSlice({
 export const {
   setCurrentMarketId,
   setCurrentMarketIdIfTradeable,
-  setOrderbook,
   resetPerpetualsState,
   setMarketFilter,
   setLaunchMarketIds,

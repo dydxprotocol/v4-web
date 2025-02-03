@@ -1,8 +1,6 @@
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { FundingDirection } from './markets';
-
 export const TOGGLE_ACTIVE_CLASS_NAME = 'toggle-active';
 
 // ------ Depth Chart ------ //
@@ -32,6 +30,12 @@ export const SERIES_KEY_FOR_ORDER_SIDE = {
 };
 
 // ------ Funding Chart ------ //
+export enum FundingDirection {
+  ToShort = 'ToShort',
+  ToLong = 'ToLong',
+  None = 'None',
+}
+
 export enum FundingRateResolution {
   OneHour = 'OneHour',
   EightHour = 'EightHour',
