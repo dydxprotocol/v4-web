@@ -84,9 +84,9 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   return (
     <$Dialog
       isOpen
+      preventCloseOnOverlayClick
       withAnimation
       hasHeaderBorder
-      preventClose
       setIsOpen={setIsOpen}
       slotIcon={formState === 'form' && <div />} // Empty icon to help with center alignment of title
       onBack={formState !== 'form' ? onShowForm : undefined}
