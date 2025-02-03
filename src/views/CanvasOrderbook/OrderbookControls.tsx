@@ -1,11 +1,8 @@
 import { useCallback } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
-import { clamp } from 'lodash';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit } from '@/constants/trade';
@@ -19,32 +16,27 @@ import { useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 
 type OrderbookControlsProps = {
   className?: string;
   assetId?: string;
-  grouping: Nullable<MarketOrderbookGrouping>;
+  groupingTickSize?: number;
+  groupingTickSizeDecimals?: number;
+  modifyGrouping: (increase: boolean) => void;
 };
 
-export const OrderbookControls = ({ className, assetId, grouping }: OrderbookControlsProps) => {
+export const OrderbookControls = ({
+  className,
+  assetId,
+  groupingTickSize,
+  groupingTickSizeDecimals,
+  modifyGrouping,
+}: OrderbookControlsProps) => {
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
-
-  const modifyScale = useCallback(
-    (direction: number) => {
-      const start = grouping?.multiplier.ordinal ?? 0;
-      const end = clamp(start + direction, 0, 3);
-      abacusStateManager.modifyOrderbookLevel(
-        OrderbookGrouping.values().find((v) => v.ordinal === end)!
-      );
-    },
-    [grouping?.multiplier.ordinal]
-  );
-
-  const tickSizeDecimals =
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)?.tickSizeDecimals ?? USD_DECIMALS;
+  const fractionDigits =
+    (groupingTickSizeDecimals ?? 0) === 1 ? USD_DECIMALS : groupingTickSizeDecimals;
 
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
@@ -70,7 +62,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
                 buttonStyle={ButtonStyle.WithoutBackground}
-                onClick={() => modifyScale(-1)}
+                onClick={() => modifyGrouping(false)}
               >
                 -
               </Button>
@@ -78,7 +70,7 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
                 size={ButtonSize.XSmall}
                 shape={ButtonShape.Square}
                 buttonStyle={ButtonStyle.WithoutBackground}
-                onClick={() => modifyScale(1)}
+                onClick={() => modifyGrouping(true)}
               >
                 +
               </Button>
@@ -86,9 +78,9 @@ export const OrderbookControls = ({ className, assetId, grouping }: OrderbookCon
           </$ButtonGroup>
           <Output
             withSubscript
-            value={grouping?.tickSize}
+            value={groupingTickSize}
             type={OutputType.Fiat}
-            fractionDigits={tickSizeDecimals === 1 ? 2 : tickSizeDecimals}
+            fractionDigits={fractionDigits}
           />
         </div>
         {assetId && (

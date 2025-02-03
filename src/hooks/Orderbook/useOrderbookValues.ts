@@ -1,58 +1,61 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 
-import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
-import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
+import { GROUPING_MULTIPLIER_LIST, GroupingMultiplier } from '@/constants/orderbook';
 
-import { getSubaccountOrderSizeBySideAndOrderbookLevel } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
-
-import { MustBigNumber } from '@/lib/numbers';
 import { safeAssign } from '@/lib/objectHelpers';
-import { orEmptyRecord } from '@/lib/typeUtils';
+
+import { useParameterizedSelector } from '../useParameterizedSelector';
 
 export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number }) => {
-  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
+  const [groupingMultiplier, setGroupingMultiplier] = useState(GroupingMultiplier.ONE);
 
-  const subaccountOrderSizeBySideAndPrice = orEmptyRecord(
-    useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual)
+  const orderbook = useParameterizedSelector(
+    BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData,
+    groupingMultiplier
   );
 
+  const modifyGroupingMultiplier = useCallback((shouldIncrease: boolean) => {
+    setGroupingMultiplier((prev) => {
+      const currIdx = GROUPING_MULTIPLIER_LIST.indexOf(prev);
+      if (currIdx === -1) return prev;
+      const canIncrease = prev !== GroupingMultiplier.THOUSAND;
+      const canDecrease = prev !== GroupingMultiplier.ONE;
+      if (shouldIncrease && canIncrease) {
+        return GROUPING_MULTIPLIER_LIST[currIdx + 1]!;
+      }
+
+      if (!shouldIncrease && canDecrease) {
+        return GROUPING_MULTIPLIER_LIST[currIdx - 1]!;
+      }
+
+      return prev;
+    });
+  }, []);
+
   return useMemo(() => {
-    const asks: Array<PerpetualMarketOrderbookLevel | undefined> = (
-      orderbook?.asks?.toArray() ?? []
-    )
-      .map(
-        (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
-          safeAssign(
-            {},
-            {
-              key: `ask-${idx}`,
-              side: 'ask' as const,
-              mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-            },
-            row
-          )
+    const asks = (orderbook?.asks ?? [])
+      .map((row, idx: number) =>
+        safeAssign(
+          {},
+          {
+            key: `ask-${idx}`,
+          },
+          row
+        )
       )
       .slice(0, rowsPerSide);
 
-    const bids: Array<PerpetualMarketOrderbookLevel | undefined> = (
-      orderbook?.bids?.toArray() ?? []
-    )
-      .map(
-        (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
-          safeAssign(
-            {},
-            {
-              key: `bid-${idx}`,
-              side: 'bid' as const,
-              mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
-            },
-            row
-          )
+    const bids = (orderbook?.bids ?? [])
+      .map((row, idx: number) =>
+        safeAssign(
+          {},
+          {
+            key: `bid-${idx}`,
+          },
+          row
+        )
       )
       .slice(0, rowsPerSide);
 
@@ -67,47 +70,17 @@ export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number
     return {
       asks,
       bids,
+      midMarketPrice: orderbook?.midPrice,
       spread,
       spreadPercent,
       histogramRange,
       hasOrderbook: !!orderbook,
-      currentGrouping: orderbook?.grouping,
+
+      // Orderbook grouping
+      groupingMultiplier,
+      groupingTickSize: orderbook?.groupingTickSize,
+      groupingTickSizeDecimals: orderbook?.groupingTickSizeDecimals,
+      modifyGroupingMultiplier,
     };
-  }, [rowsPerSide, orderbook, subaccountOrderSizeBySideAndPrice]);
-};
-
-export const useOrderbookValuesForDepthChart = () => {
-  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
-
-  return useMemo(() => {
-    const bids = (orderbook?.bids?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Bids }));
-
-    const asks = (orderbook?.asks?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Asks }));
-
-    const lowestBid = bids[bids.length - 1];
-    const highestBid = bids[0];
-    const lowestAsk = asks[0];
-    const highestAsk = asks[asks.length - 1];
-
-    const midMarketPrice = orderbook?.midPrice;
-    const spread = MustBigNumber(lowestAsk?.price ?? 0).minus(highestBid?.price ?? 0);
-    const spreadPercent = orderbook?.spreadPercent;
-
-    return {
-      bids,
-      asks,
-      lowestBid,
-      highestBid,
-      lowestAsk,
-      highestAsk,
-      midMarketPrice,
-      spread,
-      spreadPercent,
-      orderbook,
-    };
-  }, [orderbook]);
+  }, [rowsPerSide, orderbook, groupingMultiplier, modifyGroupingMultiplier]);
 };

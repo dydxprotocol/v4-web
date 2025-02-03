@@ -23,7 +23,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
-import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -53,7 +52,7 @@ export const TradeFormInputs = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice, shallowEqual);
+  const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data)?.toNumber();
   const [hasSetMidMarketLimit, setHasSetMidMarketLimit] = useState(false);
 
   useEffect(() => {

@@ -9,7 +9,6 @@ import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
-import { getCurrentMarketId } from './currentMarketSelectors';
 
 /**
  * @returns current market filter applied inside the markets page
@@ -53,29 +52,6 @@ export const getPerpetualMarketsClobIds = createAppSelector(
 );
 
 /**
- * @returns Record of subscribed or previously subscribed Orderbook data, indexed by marketId.
- */
-export const getOrderbooks = (state: RootState) => state.perpetuals.orderbooks;
-
-/**
- * @returns Orderbook data for the market the user is currently viewing
- */
-export const getCurrentMarketOrderbook = (state: RootState) => {
-  const orderbookData = getOrderbooks(state);
-  const currentMarketId = getCurrentMarketId(state);
-  return orderbookData?.[currentMarketId ?? ''];
-};
-
-/**
- * @returns Orderbook data as a Map of price and size for the current market
- */
-export const getCurrentMarketOrderbookMap = (state: RootState) => {
-  const orderbookMap = state.perpetuals.orderbooksMap;
-  const currentMarketId = getCurrentMarketId(state);
-  return orderbookMap?.[currentMarketId ?? ''];
-};
-
-/**
  * @returns oracle price of the market the user is currently viewing
  */
 export const getCurrentMarketOraclePrice = createAppSelector(
@@ -83,17 +59,9 @@ export const getCurrentMarketOraclePrice = createAppSelector(
   (m) => m?.oraclePrice
 );
 
-/**
- * @returns Mid market price for the market the user is currently viewing
- */
-export const getCurrentMarketMidMarketPrice = (state: RootState) => {
-  const currentMarketOrderbook = getCurrentMarketOrderbook(state);
-  return currentMarketOrderbook?.midPrice;
-};
-
 export const getCurrentMarketMidMarketPriceWithOraclePriceFallback = createAppSelector(
-  [getCurrentMarketMidMarketPrice, getCurrentMarketOraclePrice],
-  (midMarketPrice, oraclePrice) => midMarketPrice ?? oraclePrice
+  [BonsaiHelpers.currentMarket.midPrice.data, getCurrentMarketOraclePrice],
+  (midMarketPrice, oraclePrice) => midMarketPrice?.toNumber() ?? oraclePrice
 );
 
 /**
