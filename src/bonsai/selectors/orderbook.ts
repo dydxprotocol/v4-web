@@ -1,3 +1,5 @@
+import { weakMapMemoize } from 'reselect';
+
 import { DepthChartSeries } from '@/constants/charts';
 import { EMPTY_ARR } from '@/constants/objects';
 import { GroupingMultiplier } from '@/constants/orderbook';
@@ -18,6 +20,17 @@ import { CanvasOrderbookLine } from '../types/orderbookTypes';
 import { selectCurrentMarketOpenOrders } from './account';
 import { selectCurrentMarketOrderbook } from './markets';
 import { selectCurrentMarketInfoStable } from './summary';
+
+const DEPTH_CHART_OPTIONS = {
+  groupingMultiplier: GroupingMultiplier.ONE,
+  asksSortOrder: 'asc',
+  bidsSortOrder: 'asc',
+} as const;
+
+const getCanvasOrderbookOptions = weakMapMemoize((groupingMultiplier?: GroupingMultiplier) => ({
+  groupingMultiplier: groupingMultiplier ?? GroupingMultiplier.ONE,
+  asksSortOrder: 'asc' as const,
+}));
 
 export const selectCurrentMarketMidPrice = createAppSelector(
   [selectCurrentMarketOrderbook],
@@ -55,10 +68,11 @@ export const createSelectCurrentMarketOrderbook = () =>
         groupingTickSizeDecimals
       );
 
-      const formattedOrderbook = formatOrderbook(orderbookBN, stableInfo.tickSize, {
-        groupingMultiplier,
-        asksSortOrder: 'asc',
-      });
+      const formattedOrderbook = formatOrderbook(
+        orderbookBN,
+        stableInfo.tickSize,
+        getCanvasOrderbookOptions(groupingMultiplier)
+      );
 
       const bids: CanvasOrderbookLine[] =
         formattedOrderbook?.bids.map((line) => ({
@@ -108,11 +122,7 @@ export const selectCurrentMarketDepthChart = createAppSelector(
     }
     const { tickSize } = stableInfo;
     const calculatedOrderbook = calculateOrderbook(orderbook.data);
-    const formattedOrderbook = formatOrderbook(calculatedOrderbook, tickSize, {
-      groupingMultiplier: GroupingMultiplier.ONE,
-      asksSortOrder: 'asc',
-      bidsSortOrder: 'asc',
-    });
+    const formattedOrderbook = formatOrderbook(calculatedOrderbook, tickSize, DEPTH_CHART_OPTIONS);
 
     const asks =
       formattedOrderbook?.asks.map((datum) => ({

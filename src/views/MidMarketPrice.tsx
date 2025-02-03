@@ -37,11 +37,11 @@ export const MidMarketPrice = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const midMarketPriceLoading = ['pending', 'idle'].includes(
-    useAppSelector(BonsaiHelpers.currentMarket.midPrice.loading)
-  );
-
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
+  const midMarketPriceLoading = useAppSelector(BonsaiHelpers.currentMarket.midPrice.loading);
+  const isLoading =
+    midMarketPriceLoading === 'idle' ||
+    (midMarketPriceLoading === 'pending' && midMarketPrice == null);
 
   const lastMidMarketPrice = useRef(midMarketPrice);
 
@@ -54,7 +54,7 @@ export const MidMarketPrice = () => {
     lastMidMarketPrice.current = midMarketPrice;
   }, [midMarketPrice]);
 
-  if (midMarketPriceLoading) {
+  if (isLoading) {
     return <LoadingDots size={5} />;
   }
 

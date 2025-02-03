@@ -9,7 +9,7 @@ import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MustBigNumber, roundToNearestFactor } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderbookLine, SubaccountOpenOrderPriceMap } from '../types/orderbookTypes';
 import { OrderbookData } from '../types/rawTypes';
@@ -103,24 +103,20 @@ export const formatOrderbook = weakMapMemoize(
       groupingMultiplier = GroupingMultiplier.ONE,
       asksSortOrder = 'desc',
       bidsSortOrder = 'desc',
-    } = options ?? {
-      groupingMultiplier: GroupingMultiplier.ONE,
-      asksSortOrder: 'desc',
-      bidsSortOrder: 'desc',
-    };
+    } = orEmptyObj(options);
 
     // If groupingMultiplier is ONE, return the orderbook as is.
     if (groupingMultiplier === GroupingMultiplier.ONE) {
       const asks = (
         asksSortOrder === 'desc'
-          ? currentMarketOrderbook.asks.toReversed()
+          ? [...currentMarketOrderbook.asks].reverse()
           : currentMarketOrderbook.asks
       ).map(mapOrderbookLineToNumber);
 
       const bids = (
         bidsSortOrder === 'desc'
           ? currentMarketOrderbook.bids
-          : currentMarketOrderbook.bids.toReversed()
+          : [...currentMarketOrderbook.bids].reverse()
       ).map(mapOrderbookLineToNumber);
 
       return {

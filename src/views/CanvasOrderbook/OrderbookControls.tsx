@@ -36,7 +36,7 @@ export const OrderbookControls = ({
   const dispatch = useDispatch();
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const fractionDigits =
-    (groupingTickSizeDecimals ?? 0) <= 1 ? USD_DECIMALS : groupingTickSizeDecimals;
+    (groupingTickSizeDecimals ?? 0) === 1 ? USD_DECIMALS : groupingTickSizeDecimals;
 
   const onToggleDisplayUnit = useCallback(
     (newValue: DisplayUnit) => {
