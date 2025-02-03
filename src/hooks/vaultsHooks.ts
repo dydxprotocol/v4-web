@@ -1,20 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { kollections } from '@dydxprotocol/v4-abacus';
-import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
-import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import { throttle } from 'lodash';
-
+import { calculateVaultPositions, calculateVaultSummary } from '@/bonsai/public-calculators/vault';
+import { calculateUserVaultInfo } from '@/bonsai/public-calculators/vaultAccount';
 import {
-  Nullable,
-  PerpetualMarket,
-  VaultAccountCalculator,
-  VaultCalculator,
-  VaultDepositWithdrawFormValidator,
-  VaultFormAccountData,
+  calculateSharesToWithdraw,
+  validateVaultForm,
   VaultFormAction,
   VaultFormData,
-} from '@/constants/abacus';
+} from '@/bonsai/public-calculators/vaultFormValidation';
+// we need this because vaults table sometimes has rows which we can't render but do have balance
+// eslint-disable-next-line no-restricted-imports
+import { selectAllMarketsInfo } from '@/bonsai/selectors/markets';
+import { MarketsInfo } from '@/bonsai/types/summaryTypes';
+import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { throttle } from 'lodash';
+
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
@@ -22,12 +23,11 @@ import { timeUnits } from '@/constants/time';
 import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
 import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
+import { mapIfPresent } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { safeStringifyForAbacusParsing } from '@/lib/stringifyHelpers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { appQueryClient } from '../state/appQueryClient';
@@ -40,7 +40,7 @@ import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 
 // it's illegal to return undefined from use query so we just wrap results in a data object
-function wrapNullable<T>(data: T | undefined | null): { data: T | null | undefined } {
+function wrapNullable<T>(data: T | undefined): { data: T | undefined } {
   return { data };
 }
 
@@ -65,9 +65,6 @@ export function useForceRefreshVaultDetails() {
   );
 }
 
-const toProcessedHistoricalPnlResponse = (res: any) =>
-  VaultCalculator.getVaultHistoricalPnlResponse(safeStringifyForAbacusParsing(res));
-
 export const useLoadedVaultDetails = () => {
   const { getMegavaultHistoricalPnl } = useDydxClient();
   const megavaultHistoryStartDateMs = useEnvConfig('megavaultHistoryStartDateMs');
@@ -76,11 +73,11 @@ export const useLoadedVaultDetails = () => {
     queryKey: ['vaultDetails'],
     queryFn: async () => {
       const [dailyResult, hourlyResult] = await Promise.all([
-        getMegavaultHistoricalPnl(PnlTickInterval.day).then(toProcessedHistoricalPnlResponse),
-        getMegavaultHistoricalPnl(PnlTickInterval.HOUR).then(toProcessedHistoricalPnlResponse),
+        getMegavaultHistoricalPnl(PnlTickInterval.day),
+        getMegavaultHistoricalPnl(PnlTickInterval.HOUR),
       ]);
       return wrapNullable(
-        VaultCalculator.calculateVaultSummary(
+        calculateVaultSummary(
           [dailyResult, hourlyResult].filter(isPresent),
           isTruthy(megavaultHistoryStartDateMs)
             ? MustBigNumber(megavaultHistoryStartDateMs).toNumber()
@@ -95,34 +92,40 @@ export const useLoadedVaultDetails = () => {
 
 export const useVaultPnlHistory = () => {
   const details = useLoadedVaultDetails();
-  return useMemo(() => details.data?.history?.toArray().reverse(), [details.data?.history]);
+  return useMemo(
+    () => mapIfPresent(details.data?.history, (h) => [...h].reverse()),
+    [details.data?.history]
+  );
 };
 
 const MAX_UPDATE_SPEED_MS = timeUnits.minute;
 
-// A reference to raw abacus markets map that updates only when the data goes from empty to full and once per minute
+function isValidMarkets(markets: MarketsInfo | undefined) {
+  return Object.keys(markets ?? {}).length > 0;
+}
+// A reference to raw markets data that updates only when the data goes from empty to full and once per minute
 // Note that this will cause the component to re-render a lot since we have to subscribe to redux markets which changes often
 // I don't know how else to ensure we catch the 0->1 aka empty to filled update
 const useDebouncedMarketsData = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
-  const _marketsOnlyHereToTriggerRerenders = useAppSelector((state) => state.perpetuals.markets);
+  // ignore this value except as the source of our ref
+  // We have to use the markets INFO selector which is hidden from bonsai ontology because we need accurate oracle prices for
+  // hidden markets
+  const marketsForUpdates = useAppSelector(selectAllMarketsInfo);
+  const latestMarkets = useRef(marketsForUpdates);
+  latestMarkets.current = marketsForUpdates;
 
-  const markets = abacusStateManager.stateManager.state?.marketsSummary?.markets;
-  const latestMarkets = useRef(markets);
-  latestMarkets.current = markets;
-
-  // wrap in object because the stupud abacus value isn't a new reference when data is new for some reason
+  // wrap in object because the value isn't a new reference when data is new for some reason
   const [marketsToReturn, setMarketsToReturn] = useState<{
-    data: Nullable<kollections.Map<string, PerpetualMarket>>;
+    data: MarketsInfo | undefined;
   }>({
-    data: latestMarkets.current?.size ? latestMarkets.current : undefined,
+    data: isValidMarkets(latestMarkets.current) ? latestMarkets.current : undefined,
   });
 
   const throttledSync = useMemo(
     () =>
       throttle(() => {
         setMarketsToReturn({
-          data: latestMarkets.current?.size ? latestMarkets.current : undefined,
+          data: isValidMarkets(latestMarkets.current) ? latestMarkets.current : undefined,
         });
       }, MAX_UPDATE_SPEED_MS),
     []
@@ -132,14 +135,14 @@ const useDebouncedMarketsData = () => {
   // this useEffect is meant to run basically every render
   useEffect(() => {
     throttledSync();
-  }, [_marketsOnlyHereToTriggerRerenders, throttledSync]);
+  }, [marketsForUpdates, throttledSync]);
 
   // if markets is null and we have non-null, force update it
-  if (!marketsToReturn.data?.size) {
-    if (latestMarkets.current?.size) {
+  if (!isValidMarkets(marketsToReturn.data)) {
+    if (isValidMarkets(latestMarkets.current)) {
       setMarketsToReturn((prev) => {
         // if it got set by someone else, don't bother
-        if (!prev.data?.size) {
+        if (!isValidMarkets(prev.data)) {
           return { data: latestMarkets.current };
         }
         return prev;
@@ -157,11 +160,7 @@ export const useLoadedVaultPositions = () => {
   const { data: subvaultHistories } = useQuery({
     queryKey: ['subvaultHistories'],
     queryFn: async () => {
-      return wrapNullable(
-        VaultCalculator.getSubvaultHistoricalPnlResponse(
-          safeStringifyForAbacusParsing(await getVaultsHistoricalPnl())
-        )
-      );
+      return wrapNullable(await getVaultsHistoricalPnl());
     },
     ...vaultQueryOptions,
   });
@@ -169,11 +168,7 @@ export const useLoadedVaultPositions = () => {
   const { data: vaultPositions } = useQuery({
     queryKey: ['vaultPositions'],
     queryFn: async () => {
-      return wrapNullable(
-        VaultCalculator.getVaultPositionsResponse(
-          safeStringifyForAbacusParsing(await getMegavaultPositions())
-        )
-      );
+      return wrapNullable(await getMegavaultPositions());
     },
     ...vaultQueryOptions,
   });
@@ -181,10 +176,14 @@ export const useLoadedVaultPositions = () => {
   const vaultTvl = useLoadedVaultDetails().data?.totalValue;
 
   const calculatedPositions = useMemo(() => {
-    if (vaultPositions?.data == null || marketsMap.data == null || marketsMap.data.size === 0) {
+    if (
+      vaultPositions?.data == null ||
+      marketsMap.data == null ||
+      !isValidMarkets(marketsMap.data)
+    ) {
       return undefined;
     }
-    return VaultCalculator.calculateVaultPositions(
+    return calculateVaultPositions(
       vaultPositions.data,
       subvaultHistories?.data,
       marketsMap.data,
@@ -216,7 +215,7 @@ export const useLoadedVaultAccount = () => {
       if (dydxAddress == null || compositeClient == null) {
         return wrapNullable(undefined);
       }
-      const [acc, transfers] = await Promise.all([
+      const [account, transfers] = await Promise.all([
         getVaultAccountInfo().then(
           (a) => a,
           // error is an expected result of this call when user has no balance
@@ -225,19 +224,10 @@ export const useLoadedVaultAccount = () => {
         getAllAccountTransfersBetween(dydxAddress, '0', MEGAVAULT_MODULE_ADDRESS, '0'),
       ]);
 
-      const parsedAccount = VaultAccountCalculator.getAccountVaultResponse(
-        safeStringifyForAbacusParsing(acc)
-      );
-      const parsedTransfers = VaultAccountCalculator.getTransfersBetweenResponse(
-        safeStringifyForAbacusParsing(transfers)
-      );
-
-      if (parsedTransfers == null) {
+      if (transfers == null) {
         return wrapNullable(undefined);
       }
-      return wrapNullable(
-        VaultAccountCalculator.calculateUserVaultInfo(parsedAccount, parsedTransfers)
-      );
+      return wrapNullable(calculateUserVaultInfo(account, transfers));
     },
     ...vaultQueryOptions,
   });
@@ -246,7 +236,7 @@ export const useLoadedVaultAccount = () => {
 
 export const useLoadedVaultAccountTransfers = () => {
   const account = useLoadedVaultAccount();
-  return useMemo(() => account.data?.vaultTransfers?.toArray(), [account.data?.vaultTransfers]);
+  return useMemo(() => account.data?.vaultTransfers, [account.data?.vaultTransfers]);
 };
 
 const VAULT_FORM_AMOUNT_DEBOUNCE_MS = 500;
@@ -290,18 +280,13 @@ export const useVaultFormSlippage = () => {
       if (operation === 'DEPOSIT' || amount.trim() === '') {
         return wrapNullable(undefined);
       }
-      const sharesToWithdraw = VaultDepositWithdrawFormValidator.calculateSharesToWithdraw(
+      const sharesToWithdraw = calculateSharesToWithdraw(
         vaultBalance,
         MustBigNumber(amount).toNumber()
       );
       const slippage = await getVaultWithdrawInfo(sharesToWithdraw);
 
-      const parsedSlippage =
-        VaultDepositWithdrawFormValidator.getVaultDepositWithdrawSlippageResponse(
-          safeStringifyForAbacusParsing(slippage)
-        );
-
-      return wrapNullable(parsedSlippage);
+      return wrapNullable(slippage);
     },
     ...vaultQueryOptions,
   });
@@ -313,29 +298,19 @@ export const useVaultCalculationForLaunchingMarket = ({ amount }: { amount: numb
   const vaultAccount = useLoadedVaultAccount().data;
 
   const vaultFormInfo = useMemo(
-    () => new VaultFormData(operationStringToVaultFormAction('DEPOSIT'), amount, true, true, true),
+    (): VaultFormData => ({
+      action: VaultFormAction.DEPOSIT,
+      amount,
+      acknowledgedSlippage: true,
+      acknowledgedTerms: true,
+      inConfirmationStep: true,
+    }),
     [amount]
   );
 
-  const vaultFormAccountInfo = useMemo(
-    () =>
-      new VaultFormAccountData(
-        accountInfo.marginUsage,
-        accountInfo.freeCollateral,
-        accountInfo.canViewAccount
-      ),
-    [accountInfo.marginUsage, accountInfo.freeCollateral, accountInfo.canViewAccount]
-  );
-
   const validationResponse = useMemo(
-    () =>
-      VaultDepositWithdrawFormValidator.validateVaultForm(
-        vaultFormInfo,
-        vaultFormAccountInfo,
-        vaultAccount,
-        null
-      ),
-    [vaultAccount, vaultFormInfo, vaultFormAccountInfo]
+    () => validateVaultForm(vaultFormInfo, accountInfo, vaultAccount, undefined),
+    [vaultAccount, vaultFormInfo, accountInfo]
   );
 
   return validationResponse;
@@ -351,34 +326,19 @@ export const useVaultFormValidationResponse = () => {
   const vaultAccount = useLoadedVaultAccount().data;
 
   const vaultFormInfo = useMemo(
-    () =>
-      new VaultFormData(
-        operationStringToVaultFormAction(operation),
-        amount != null && amount.trim().length > 0 ? MustBigNumber(amount).toNumber() : undefined,
-        slippageAck,
-        termsAck,
-        confirmationStep
-      ),
+    (): VaultFormData => ({
+      action: operationStringToVaultFormAction(operation),
+      amount: amount.trim().length > 0 ? MustBigNumber(amount).toNumber() : undefined,
+      acknowledgedSlippage: slippageAck,
+      acknowledgedTerms: termsAck,
+      inConfirmationStep: confirmationStep,
+    }),
     [operation, amount, slippageAck, termsAck, confirmationStep]
   );
-  const vaultFormAccountInfo = useMemo(
-    () =>
-      new VaultFormAccountData(
-        accountInfo.marginUsage,
-        accountInfo.freeCollateral,
-        accountInfo.canViewAccount
-      ),
-    [accountInfo.marginUsage, accountInfo.freeCollateral, accountInfo.canViewAccount]
-  );
+
   const validationResponse = useMemo(
-    () =>
-      VaultDepositWithdrawFormValidator.validateVaultForm(
-        vaultFormInfo,
-        vaultFormAccountInfo,
-        vaultAccount,
-        slippageResponse
-      ),
-    [vaultFormInfo, vaultFormAccountInfo, vaultAccount, slippageResponse]
+    () => validateVaultForm(vaultFormInfo, accountInfo, vaultAccount, slippageResponse),
+    [vaultFormInfo, accountInfo, vaultAccount, slippageResponse]
   );
 
   return validationResponse;
@@ -397,7 +357,7 @@ function getErrorToRenderFromErrorMessage(
 }
 
 export const useVaultFormErrorState = () => {
-  const { amount, confirmationStep, operation } = useAppSelector(getVaultForm) ?? {};
+  const { amount, confirmationStep, operation } = useAppSelector(getVaultForm);
   const stringGetter = useStringGetter();
   const [savedErrorMessage, setSavedErrorMessage] = useState<string | undefined>(undefined);
   const currentTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -431,7 +391,8 @@ export const useVaultFormErrorState = () => {
 function operationStringToVaultFormAction(operation: 'DEPOSIT' | 'WITHDRAW') {
   return operation === 'DEPOSIT'
     ? VaultFormAction.DEPOSIT
-    : operation === 'WITHDRAW'
+    : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      operation === 'WITHDRAW'
       ? VaultFormAction.WITHDRAW
       : assertNever(operation);
 }
