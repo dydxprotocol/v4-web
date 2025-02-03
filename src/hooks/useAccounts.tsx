@@ -5,7 +5,13 @@ import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import { getNobleChainId } from '@/constants/graz';
+import {
+  getNeutronChainId,
+  getNobleChainId,
+  getOsmosisChainId,
+  NEUTRON_BECH32_PREFIX,
+  OSMO_BECH32_PREFIX,
+} from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   ConnectorType,
@@ -103,7 +109,6 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const nobleChainId = getNobleChainId();
   const { indexerClient, getWalletFromSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
@@ -126,6 +131,9 @@ const useAccountsContext = () => {
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
+  const [localOsmosisWallet, setLocalOsmosisWallet] = useState<LocalWallet>();
+  const [localNeutronWallet, setLocalNeutronWallet] = useState<LocalWallet>();
+
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
@@ -139,9 +147,9 @@ const useAccountsContext = () => {
     dispatch(setLocalWallet({ address: dydxAddress }));
   }, [dispatch, dydxAddress]);
 
-  const nobleAddress = useMemo(() => {
-    return localNobleWallet?.address;
-  }, [localNobleWallet]);
+  const nobleAddress = localNobleWallet?.address;
+  const osmosisAddress = localOsmosisWallet?.address;
+  const neutronAddress = localNeutronWallet?.address;
 
   const setWalletFromSignature = useCallback(
     async (signature: string) => {
@@ -241,24 +249,42 @@ const useAccountsContext = () => {
   }, [localDydxWallet, hdKey, dydxAddress, sourceAccount.walletInfo]);
 
   useEffect(() => {
-    const setNobleWallet = async () => {
+    const setCosmosWallets = async () => {
       let nobleWallet: LocalWallet | undefined;
+      let osmosisWallet: LocalWallet | undefined;
+      let neutronWallet: LocalWallet | undefined;
       if (hdKey?.mnemonic) {
         nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        osmosisWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
+        neutronWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
       }
 
-      const nobleOfflineSigner = await getCosmosOfflineSigner(nobleChainId);
+      const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
       if (nobleOfflineSigner !== undefined) {
         nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+      }
+      const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
+      if (osmosisOfflineSigner !== undefined) {
+        osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
+      }
+      const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
+      if (neutronOfflineSigner !== undefined) {
+        neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
       }
 
       if (nobleWallet !== undefined) {
         abacusStateManager.setNobleWallet(nobleWallet);
         setLocalNobleWallet(nobleWallet);
       }
+      if (osmosisWallet !== undefined) {
+        setLocalOsmosisWallet(osmosisWallet);
+      }
+      if (neutronWallet !== undefined) {
+        setLocalNeutronWallet(neutronWallet);
+      }
     };
-    setNobleWallet();
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner, nobleChainId]);
+    setCosmosWallets();
+  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -336,6 +362,8 @@ const useAccountsContext = () => {
     dydxAddress,
 
     nobleAddress,
+    osmosisAddress,
+    neutronAddress,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

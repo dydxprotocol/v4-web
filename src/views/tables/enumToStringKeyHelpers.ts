@@ -7,6 +7,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPositionSide,
+  IndexerTransferType,
 } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
@@ -116,5 +117,21 @@ export function getOrderTimeInForceStringKey(time: IndexerAPITimeInForce): strin
     default:
       assertNever(time);
       return STRING_KEYS.GOOD_TIL_TIME;
+  }
+}
+
+export function getTransferTypeStringKey(type: IndexerTransferType): string {
+  switch (type) {
+    case IndexerTransferType.DEPOSIT:
+      return STRING_KEYS.DEPOSIT;
+    case IndexerTransferType.WITHDRAWAL:
+      return STRING_KEYS.WITHDRAW;
+    case IndexerTransferType.TRANSFERIN:
+      return STRING_KEYS.TRANSFER_IN;
+    case IndexerTransferType.TRANSFEROUT:
+      return STRING_KEYS.TRANSFER_OUT;
+    default:
+      assertNever(type);
+      return STRING_KEYS.DEPOSIT;
   }
 }
