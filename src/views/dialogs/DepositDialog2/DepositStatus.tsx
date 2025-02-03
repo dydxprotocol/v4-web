@@ -4,6 +4,7 @@ import { ButtonAction } from '@/constants/buttons';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
@@ -11,6 +12,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { appQueryClient } from '@/state/appQueryClient';
 import { selectDeposit } from '@/state/transfersSelectors';
+
+import { getTokenSymbol } from './utils';
 
 type DepositStatusProps = {
   txHash: string;
@@ -64,6 +67,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
             type={OutputType.Fiat}
             slotLeft="~"
           />
+          <AssetIcon symbol={getTokenSymbol(deposit.token.denom)} chainId={deposit.token.chainId} />
         </div>
       </div>
       <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
