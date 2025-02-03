@@ -25,7 +25,7 @@ import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -56,7 +56,7 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
-  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccountForPostOrder, shallowEqual));
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
   const isLoadingData =

@@ -42,7 +42,7 @@ export const CancelPendingOrdersDialog = ({
       slotIcon={pendingPosition && <AssetIcon logoUrl={logoUrl} symbol={pendingPosition.assetId} />}
       title={stringGetter({
         key:
-          (pendingPosition?.orderCount ?? 0) !== 1
+          (pendingPosition?.orders.length ?? 0) !== 1
             ? STRING_KEYS.CANCEL_ORDERS
             : STRING_KEYS.CANCEL_ORDER,
       })}

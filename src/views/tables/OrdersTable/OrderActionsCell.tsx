@@ -16,9 +16,6 @@ import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { clearOrder } from '@/state/account';
-import { useAppDispatch } from '@/state/appTypes';
-
 import { isNewOrderStatusClearable } from '@/lib/orders';
 
 type ElementProps = {
@@ -29,7 +26,6 @@ type ElementProps = {
 };
 
 export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const [isCanceling, setIsCanceling] = useState(false);
@@ -67,7 +63,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
           shape={ButtonShape.Square}
           buttonStyle={ButtonStyle.WithoutBackground}
           {...(isNewOrderStatusClearable(status)
-            ? { onClick: () => dispatch(clearOrder(orderId)) }
+            ? {}
             : {
                 onClick: onCancel,
                 state: {

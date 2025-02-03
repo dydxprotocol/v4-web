@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
@@ -21,7 +22,7 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { getGeo, getHasSubaccount } from '@/state/accountSelectors';
+import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
@@ -66,7 +67,7 @@ const useAccountsContext = () => {
     dydxAccountGraz,
   } = useWalletConnection();
 
-  const hasSubAccount = useAppSelector(getHasSubaccount);
+  const hasSubAccount = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data) != null;
   const sourceAccount = useAppSelector(getSourceAccount);
 
   const { ready, authenticated } = usePrivy();

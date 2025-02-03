@@ -30,10 +30,9 @@ import {
   getOrderTimeInForceStringKey,
 } from '@/views/tables/enumToStringKeyHelpers';
 
-import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOrderDetails } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
@@ -43,7 +42,6 @@ export const OrderDetailsDialog = ({
   setIsOpen,
 }: DialogProps<OrderDetailsDialogProps>) => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const { cancelOrder } = useSubaccount();
@@ -206,11 +204,6 @@ export const OrderDetailsDialog = ({
     cancelOrder({ orderId });
   };
 
-  const onClearClick = () => {
-    dispatch(clearOrder(orderId));
-    setIsOpen(false);
-  };
-
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
   // we update short term orders to pending status when they are best effort canceled in Abacus
   const isBestEffortCanceled =
@@ -225,9 +218,7 @@ export const OrderDetailsDialog = ({
       }
       title={type != null && stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
       slotFooter={
-        isAccountViewOnly ? null : status != null && isNewOrderStatusClearable(status) ? (
-          <Button onClick={onClearClick}>{stringGetter({ key: STRING_KEYS.CLEAR })}</Button>
-        ) : (
+        isAccountViewOnly || (status != null && isNewOrderStatusClearable(status)) ? null : (
           <Button
             action={ButtonAction.Destroy}
             state={{

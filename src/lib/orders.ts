@@ -19,7 +19,6 @@ import {
   Nullable,
   OrderStatus,
   SubaccountFill,
-  SubaccountFills,
   TRADE_TYPES,
   type Asset,
   type PerpetualMarket,
@@ -283,12 +282,12 @@ export const getHydratedFill = ({
 export const getTradeType = (orderType: string) =>
   TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];
 
-export const getAverageFillPrice = (fills: SubaccountFills) => {
+export const getAverageFillPrice = (fills: SubaccountFillNew[]) => {
   let total = BigNumber(0);
   let totalSize = BigNumber(0);
   fills.forEach((fill) => {
-    total = total.plus(BigNumber(fill.price).times(fill.size));
-    totalSize = totalSize.plus(fill.size);
+    total = total.plus(BigNumber(fill.price ?? 0).times(fill.size ?? 0));
+    totalSize = totalSize.plus(fill.size ?? 0);
   });
   return totalSize.gt(0) ? total.div(totalSize) : null;
 };

@@ -22,13 +22,12 @@ import { timeUnits } from '@/constants/time';
 import { type RootStore } from '@/state/_store';
 import {
   setCompliance,
-  setFills,
   setHistoricalPnl,
   setRestrictionType,
   setStakingBalances,
   setStakingDelegations,
   setStakingRewards,
-  setSubaccount,
+  setSubaccountForPostOrders,
   setTradingRewards,
   setUnbondingDelegations,
 } from '@/state/account';
@@ -129,7 +128,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (changes.has(Changes.subaccount)) {
           const subaccountData = updatedState.subaccount(subaccountId);
           if (!isChildSubaccount) {
-            dispatch(setSubaccount(subaccountData));
+            dispatch(setSubaccountForPostOrders(subaccountData));
             dispatch(updateOrders(subaccountData?.orders?.toArray() ?? []));
           }
         }
@@ -137,7 +136,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (changes.has(Changes.fills)) {
           const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
           if (isChildSubaccount) {
-            dispatch(setFills(fills));
             dispatch(updateFilledOrders(fills));
           }
         }
