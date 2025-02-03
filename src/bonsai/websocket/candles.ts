@@ -4,7 +4,7 @@ import { isWsCandlesResponse, isWsCandlesUpdateResponse } from '@/types/indexer/
 import { IndexerWsCandleResponse } from '@/types/indexer/indexerManual';
 
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { makeWsValueManager } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
@@ -28,7 +28,7 @@ function candlesWebsocketValueCreator(
         const updates = isWsCandlesUpdateResponse(baseUpdates);
         const startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('CandlesTracker', 'found unexpectedly null base data in update');
+          logBonsaiError('CandlesTracker', 'found unexpectedly null base data in update');
           return value;
         }
         if (startingValue.candles.length === 0) {

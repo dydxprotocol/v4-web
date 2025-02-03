@@ -20,15 +20,17 @@ import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { SourceAccount } from '@/state/wallet';
 
 export function useBalances() {
-  const { sourceAccount } = useAccounts();
+  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   return useQuery({
-    queryKey: ['balances', sourceAccount.address],
+    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],
     queryFn: async () => {
-      return skipClient.balances(networkTypeToBalances(sourceAccount));
+      return skipClient.balances(
+        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress, neutronAddress)
+      );
     },
-    enabled: Boolean(sourceAccount.address),
+    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress && neutronAddress),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
   });
@@ -60,7 +62,12 @@ function getNativeEvmTokenDenom(chain: Chain) {
   return `${chain.name.toLowerCase()}-native`;
 }
 
-function networkTypeToBalances(sourceAccount: SourceAccount): BalanceRequest {
+function networkTypeToBalances(
+  sourceAccount: SourceAccount,
+  nobleAddress?: string,
+  osmosisAddress?: string,
+  neutronAddress?: string
+): BalanceRequest {
   if (!sourceAccount.address) {
     throw new Error('fetching balances for undefined address');
   }
@@ -91,18 +98,22 @@ function networkTypeToBalances(sourceAccount: SourceAccount): BalanceRequest {
   }
 
   if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+    if (!neutronAddress || !osmosisAddress || !nobleAddress) {
+      throw new Error('cosmos addresses not defined');
+    }
+
     return {
       chains: {
         [CosmosChainId.Neutron]: {
-          address: sourceAccount.address!,
+          address: neutronAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Neutron]],
         },
         [CosmosChainId.Osmosis]: {
-          address: sourceAccount.address!,
+          address: osmosisAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],
         },
         [CosmosChainId.Noble]: {
-          address: sourceAccount.address!,
+          address: nobleAddress,
           denoms: [USDC_ADDRESSES[CosmosChainId.Noble]],
         },
       },
@@ -156,7 +167,7 @@ export function isInstantDeposit(route: RouteResponse) {
   return Boolean(route.operations.find((op) => op.goFastTransfer));
 }
 
-export function useDepositDeltas({ depositAmount }: { depositAmount: string }) {
+export function useDepositDeltas({ depositAmount }: { depositAmount?: string }) {
   const depositInput = useMemo(
     () => ({
       subaccountNumber: 0,

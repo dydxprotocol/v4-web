@@ -27,7 +27,7 @@ import {
   freshChildSubaccount,
   isValidSubaccount,
 } from '../lib/subaccountUtils';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectParentSubaccountInfo, selectWebsocketUrl } from '../socketSelectors';
 import { ParentSubaccountData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -50,10 +50,10 @@ function accountWebsocketValueCreator(
       id: `${address}/${parentSubaccountNumber}`,
       handleBaseData: (baseMessage): Loadable<ParentSubaccountData> => {
         accountRefreshSignal.notify();
+        const parentSubaccountNumberParsed = MustBigNumber(parentSubaccountNumber).toNumber();
 
         // empty message means account has had no transfers yet, but it's still valid
         if (baseMessage == null || isEmpty(baseMessage)) {
-          const parentSubaccountNumberParsed = MustBigNumber(parentSubaccountNumber).toNumber();
           return loadableLoaded({
             address,
             parentSubaccount: parentSubaccountNumberParsed,
@@ -68,7 +68,7 @@ function accountWebsocketValueCreator(
         }
 
         const message = isWsParentSubaccountSubscribed(baseMessage);
-        return loadableLoaded({
+        const result = {
           address: message.subaccount.address,
           parentSubaccount: message.subaccount.parentSubaccountNumber,
           childSubaccounts: keyBy(
@@ -80,17 +80,23 @@ function accountWebsocketValueCreator(
           live: {
             orders: keyBy(message.orders, (o) => o.id),
           },
-        });
+        };
+        if (result.childSubaccounts[parentSubaccountNumber] == null) {
+          result.childSubaccounts[parentSubaccountNumber] = freshChildSubaccount({
+            address,
+            subaccountNumber: parentSubaccountNumberParsed,
+          });
+        }
+        return loadableLoaded(result);
       },
       handleUpdates: (baseUpdates, value, fullMessage) => {
         const updates = isWsParentSubaccountUpdates(baseUpdates);
         const subaccountNumber = fullMessage?.subaccountNumber as number | undefined;
         if (value.data == null) {
-          logAbacusTsError(
-            'ParentSubaccountTracker',
-            'found unexpectedly null base data in update',
-            { address, subaccountNumber }
-          );
+          logBonsaiError('ParentSubaccountTracker', 'found unexpectedly null base data in update', {
+            address,
+            subaccountNumber,
+          });
           return value;
         }
         if (updates.length === 0 || subaccountNumber == null) {

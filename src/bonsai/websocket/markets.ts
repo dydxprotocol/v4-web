@@ -2,6 +2,7 @@ import { throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 import {
+  isWsBasePerpetualMarketObject,
   isWsMarketUpdateResponses,
   isWsPerpetualMarketResponse,
 } from '@/types/indexer/indexerChecks';
@@ -11,7 +12,7 @@ import { setAllMarketsRaw } from '@/state/raw';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { MarketsData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -32,7 +33,7 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
         const updates = isWsMarketUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('MarketsTracker', 'found unexpectedly null base data in update');
+          logBonsaiError('MarketsTracker', 'found unexpectedly null base data in update');
           return value;
         }
         startingValue = { ...startingValue };
@@ -50,11 +51,17 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
           if (update.trading != null) {
             Object.entries(update.trading).forEach(([marketId, updateObj]) => {
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              if (startingValue[marketId] != null && updateObj != null) {
+              if (updateObj == null) {
+                return;
+              }
+              if (startingValue[marketId] != null) {
                 startingValue[marketId] = {
                   ...startingValue[marketId],
                   ...updateObj,
                 };
+              } else {
+                const fullObj = isWsBasePerpetualMarketObject(updateObj);
+                startingValue[marketId] = fullObj;
               }
             });
           }

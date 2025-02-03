@@ -42,7 +42,14 @@ export const useWalletConnection = () => {
 
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
   const publicClientWagmi = usePublicClientWagmi();
-  const { data: signerWagmi } = useWalletClientWagmi();
+  const { data: signerWagmi, refetch } = useWalletClientWagmi();
+
+  useEffect(() => {
+    if (isConnectedWagmi && !signerWagmi) {
+      refetch();
+    }
+  }, [isConnectedWagmi, signerWagmi, refetch]);
+
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 

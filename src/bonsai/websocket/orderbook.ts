@@ -17,7 +17,7 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logAbacusTsError } from '../logs';
+import { logBonsaiError } from '../logs';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { OrderbookData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -55,7 +55,7 @@ function orderbookWebsocketValueCreator(
         const updates = isWsOrderbookUpdateResponses(baseUpdates);
         let startingValue = value.data;
         if (startingValue == null) {
-          logAbacusTsError('OrderbookTracker', 'found unexpectedly null base data in update', {
+          logBonsaiError('OrderbookTracker', 'found unexpectedly null base data in update', {
             marketId,
           });
           return value;
