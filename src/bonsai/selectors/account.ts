@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
@@ -22,6 +22,7 @@ import {
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
+import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawFillsLiveData,
@@ -186,8 +187,15 @@ export const selectAccountFillsLoading = createAppSelector(
 
 export const selectAccountTransfers = createAppSelector(
   [selectRawTransfersRestData, selectRawTransfersLiveData],
-  (rest, live) => {
-    return calculateTransfers(rest?.transfers, live);
+  (rest, live): SubaccountTransfer[] => {
+    return orderBy(
+      Object.values(calculateTransfers(rest?.transfers, live)).map((o) => ({
+        ...o,
+        id: o.transactionHash,
+      })),
+      (o) => o.createdAt,
+      'desc'
+    );
   }
 );
 

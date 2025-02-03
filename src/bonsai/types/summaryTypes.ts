@@ -6,6 +6,7 @@ import {
   IndexerOrderSide,
   IndexerOrderType,
   IndexerPerpetualPositionResponseObject,
+  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
   IndexerCompositeFillObject,
@@ -300,19 +301,4 @@ export type AccountBalances = {
   chainTokenAmount?: string;
 };
 
-export type OrderbookLine = {
-  price: number;
-  size: number;
-  depth: number;
-  sizeCost: number;
-  depthCost: number;
-  offset: number;
-};
-
-export type OrderbookProcessedData = {
-  asks: OrderbookLine[];
-  bids: OrderbookLine[];
-  midPrice: number | undefined;
-  spread: number | undefined;
-  spreadPercent: number | undefined;
-};
+export type SubaccountTransfer = IndexerTransferResponseObject;

@@ -55,8 +55,10 @@
         "patterns": [
           "@/bonsai/*/*",
           "!@/bonsai/ontology",
+          "!@/bonsai/public-calculators/*",
           "!@/bonsai/lib/*",
-          "!@/bonsai/types/summaryTypes"
+          "!@/bonsai/types/summaryTypes",
+          "!@/bonsai/types/orderbookTypes"
         ]
       }
     ],

@@ -1,15 +1,11 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-import BigNumber from 'bignumber.js';
 import { groupBy, keyBy, mapValues, sum } from 'lodash';
 
 import {
   AbacusMarginMode,
-  AbacusOrderStatus,
   AbacusPositionSide,
   HistoricalTradingRewardsPeriod,
-  ORDER_SIDES,
   type AbacusOrderStatuses,
   type SubaccountFill,
   type SubaccountOrder,
@@ -20,7 +16,6 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { mapIfPresent } from '@/lib/do';
-import { MustBigNumber } from '@/lib/numbers';
 import {
   getAverageFillPrice,
   getHydratedFill,
@@ -36,7 +31,6 @@ import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketId } from './currentMarketSelectors';
-import { getCurrentMarketOrderbook } from './perpetualsSelectors';
 
 /**
  * @param state
@@ -296,46 +290,6 @@ export const getSubaccountPositionByUniqueId = () =>
   );
 
 /**
- * @param state
- * @returns list of orders that are in the open status
- */
-export const getSubaccountOpenOrdersForCurrentMarket = createAppSelector(
-  [getSubaccountOrders, getCurrentMarketId],
-  (orders, marketId) =>
-    orders?.filter(
-      (order) =>
-        order.status === AbacusOrderStatus.Open && marketId != null && order.marketId === marketId
-    )
-);
-
-export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
-  [getSubaccountOpenOrdersForCurrentMarket, getCurrentMarketOrderbook],
-  (openOrders = [], book = undefined) => {
-    const tickSize = MustBigNumber(book?.grouping?.tickSize);
-    const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
-    openOrders.forEach((order: SubaccountOrder) => {
-      const side = ORDER_SIDES[order.side.name];
-      const byPrice = (orderSizeBySideAndPrice[side] ??= {});
-
-      const priceOrderbookLevel = (() => {
-        if (tickSize.isEqualTo(0)) {
-          return order.price;
-        }
-        const tickLevelUnrounded = MustBigNumber(order.price).div(tickSize);
-        const tickLevel =
-          side === OrderSide.BUY
-            ? tickLevelUnrounded.decimalPlaces(0, BigNumber.ROUND_FLOOR)
-            : tickLevelUnrounded.decimalPlaces(0, BigNumber.ROUND_CEIL);
-
-        return tickLevel.times(tickSize).toNumber();
-      })();
-      byPrice[priceOrderbookLevel] = (byPrice[priceOrderbookLevel] ?? 0) + order.size;
-    });
-    return orderSizeBySideAndPrice;
-  }
-);
-
-/**
  * @param orderId
  * @returns order details with the given orderId
  */
@@ -420,12 +374,6 @@ const getFillsForOrderId = createAppSelector(
  */
 export const getAverageFillPriceForOrder = () =>
   createAppSelector([(s, orderId) => getFillsForOrderId(s, orderId)], getAverageFillPrice);
-
-/**
- * @param state
- * @returns list of transfers for the currently connected subaccount
- */
-export const getSubaccountTransfers = (state: RootState) => state.account.transfers;
 
 /**
  * @param state
