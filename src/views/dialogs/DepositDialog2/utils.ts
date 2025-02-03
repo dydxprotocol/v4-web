@@ -23,6 +23,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
+import { sleep } from '@/lib/timeUtils';
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
 
 import { isInstantDeposit } from './queries';
@@ -130,6 +131,8 @@ export function useDepositSteps({
               await signer.addChain({
                 chain: CHAIN_ID_TO_INFO[Number(depositToken.chainId) as EvmDepositChainId],
               });
+              // Wait for external wallet to update chains
+              await sleep(2000);
               return { success: true };
             } catch (e) {
               return {
@@ -227,6 +230,8 @@ export function useDepositSteps({
           await updatedSkipClient.executeRoute({
             route: depositRoute,
             userAddresses,
+            // Bypass because we manually handle allowance checks above
+            bypassApprovalCheck: true,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
               onDeposit({
