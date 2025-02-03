@@ -103,7 +103,7 @@ const MAX_UPDATE_SPEED_MS = timeUnits.minute;
 function isValidMarkets(markets: MarketsInfo | undefined) {
   return Object.keys(markets ?? {}).length > 0;
 }
-// A reference to raw abacus markets map that updates only when the data goes from empty to full and once per minute
+// A reference to raw markets data that updates only when the data goes from empty to full and once per minute
 // Note that this will cause the component to re-render a lot since we have to subscribe to redux markets which changes often
 // I don't know how else to ensure we catch the 0->1 aka empty to filled update
 const useDebouncedMarketsData = () => {
@@ -114,7 +114,7 @@ const useDebouncedMarketsData = () => {
   const latestMarkets = useRef(marketsForUpdates);
   latestMarkets.current = marketsForUpdates;
 
-  // wrap in object because the stupud value isn't a new reference when data is new for some reason
+  // wrap in object because the value isn't a new reference when data is new for some reason
   const [marketsToReturn, setMarketsToReturn] = useState<{
     data: MarketsInfo | undefined;
   }>({
