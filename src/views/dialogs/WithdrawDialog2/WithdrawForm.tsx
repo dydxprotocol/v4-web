@@ -4,7 +4,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
 
@@ -26,6 +26,7 @@ import { RouteOptions } from '../DepositDialog2/RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
+import { useWithdrawSteps } from './utils';
 
 export const WithdrawForm = ({
   amount,
@@ -70,6 +71,11 @@ export const WithdrawForm = ({
   }, [isFetching, routes, debouncedAmount]);
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
+
+  const { executeWithdraw } = useWithdrawSteps({
+    withdrawRoute: selectedRoute,
+    onWithdraw: () => {},
+  });
 
   const routeInformation = selectedRoute && (
     <Details
@@ -126,6 +132,10 @@ export const WithdrawForm = ({
     />
   );
 
+  const onWithdrawClick = async () => {
+    executeWithdraw();
+  };
+
   return (
     <div tw="flex min-h-10 flex-col gap-1 p-1.25">
       <AddressInput
@@ -135,24 +145,21 @@ export const WithdrawForm = ({
         onDestinationClicked={onChainSelect}
       />
       <AmountInput value={amount} onChange={setAmount} />
-      {routes && (
-        <RouteOptions
-          routes={routes}
-          isLoading={isFetching}
-          disabled={
-            !amount || !selectedToken || parseUnits(amount, selectedToken.decimals) === BigInt(0)
-          }
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={setSelectedSpeed}
-        />
-      )}
+      <RouteOptions
+        routes={routes}
+        isLoading={isFetching}
+        disabled={
+          !amount || !selectedToken || parseUnits(amount, selectedToken.decimals) === BigInt(0)
+        }
+        selectedSpeed={selectedSpeed}
+        onSelectSpeed={setSelectedSpeed}
+      />
       {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
       <Button
-        tw="w-full"
-        state={{ isLoading: isFetching }}
-        disabled
+        tw="mt-2 w-full"
+        state={{ isLoading: isFetching, isDisabled: !selectedRoute || destinationAddress === '' }}
+        onClick={onWithdrawClick}
         action={ButtonAction.Primary}
-        type={ButtonType.Submit}
       >
         {stringGetter({ key: STRING_KEYS.WITHDRAW })}
       </Button>

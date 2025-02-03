@@ -28,6 +28,11 @@ export type TokenForTransfer = {
 };
 
 export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
+  {
+    chainId: CosmosChainId.Noble,
+    denom: USDC_ADDRESSES[CosmosChainId.Noble],
+    decimals: USDC_DECIMALS,
+  },
   { chainId: mainnet.id.toString(), denom: USDC_ADDRESSES[mainnet.id], decimals: USDC_DECIMALS },
   { chainId: arbitrum.id.toString(), denom: USDC_ADDRESSES[arbitrum.id], decimals: USDC_DECIMALS },
   { chainId: base.id.toString(), denom: USDC_ADDRESSES[base.id], decimals: USDC_DECIMALS },
@@ -37,11 +42,6 @@ export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   {
     chainId: CosmosChainId.Neutron,
     denom: USDC_ADDRESSES[CosmosChainId.Neutron],
-    decimals: USDC_DECIMALS,
-  },
-  {
-    chainId: CosmosChainId.Noble,
-    denom: USDC_ADDRESSES[CosmosChainId.Noble],
     decimals: USDC_DECIMALS,
   },
   {
