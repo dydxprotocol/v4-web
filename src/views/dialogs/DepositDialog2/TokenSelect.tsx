@@ -88,7 +88,11 @@ export const TokenSelect = ({
               key={balance.denom}
             >
               <div tw="flex items-center gap-0.75">
-                <AssetIcon tw="h-[2rem] w-[2rem]" symbol={getTokenSymbol(balance.denom)} />
+                <AssetIcon
+                  tw="h-[2rem] w-[2rem]"
+                  symbol={getTokenSymbol(balance.denom)}
+                  chainId={balance.chainId}
+                />
                 <div tw="flex flex-col items-start gap-0.125">
                   <div tw="text-medium font-medium">{getTokenSymbol(balance.denom)}</div>
                   <div>{CHAIN_INFO[balance.chainId]?.name}</div>
@@ -138,7 +142,11 @@ export const TokenSelect = ({
               key={balance.denom}
             >
               <div tw="flex items-center gap-0.75">
-                <AssetIcon tw="h-[2rem] w-[2rem]" symbol={getTokenSymbol(balance.denom)} />
+                <AssetIcon
+                  tw="h-[2rem] w-[2rem]"
+                  symbol={getTokenSymbol(balance.denom)}
+                  chainId={balance.chainId}
+                />
                 <div tw="flex flex-col items-start gap-0.125">
                   <div tw="text-medium font-medium">{getTokenSymbol(balance.denom)}</div>
                   <div>{CHAIN_INFO[balance.chainId]?.name}</div>

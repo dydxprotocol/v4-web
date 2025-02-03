@@ -125,11 +125,21 @@ export function useDepositSteps({
           try {
             await signer.switchChain({ id: Number(depositToken.chainId) });
             return { success: true };
-          } catch (e) {
-            return {
-              success: false,
-              errorMessage: parseError(e, 'There was an error changing wallet networks.'),
-            };
+          } catch (_) {
+            try {
+              await signer.addChain({
+                chain: CHAIN_ID_TO_INFO[Number(depositToken.chainId) as EvmDepositChainId],
+              });
+              return { success: true };
+            } catch (e) {
+              return {
+                success: false,
+                errorMessage: parseError(
+                  e,
+                  'Please change networks within your wallet and try again.'
+                ),
+              };
+            }
           }
         },
       });
@@ -224,6 +234,8 @@ export function useDepositSteps({
                 txHash,
                 chainId: chainID,
                 status: 'pending',
+                token: depositToken,
+                tokenAmount: depositRoute.amountIn,
                 estimatedAmountUsd: depositRoute.usdAmountOut ?? '',
                 isInstantDeposit: isInstantDeposit(depositRoute),
               });
