@@ -87,7 +87,7 @@ export type DepositStep =
     }
   | {
       type: 'deposit';
-      // TODO(deposit2.0): add solana signer type support too;
+      // TODO: also explicitly type support the Phantom Solana signer here
       executeStep: (
         signer: WalletClient | OfflineSigner,
         skipClient: SkipClient
@@ -302,6 +302,10 @@ function parseError(e: Error, fallbackMessage: string) {
 
   if ('name' in e && e.name === ChainMismatchError.name) {
     return 'Please change your wallet network and try again.';
+  }
+
+  if ('message' in e && e.message.includes('Insufficient balance for gas')) {
+    return 'Insufficient gas balance. Please add gas funds and try again.';
   }
 
   return fallbackMessage;
