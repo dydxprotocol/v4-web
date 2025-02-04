@@ -84,6 +84,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   return (
     <$Dialog
       isOpen
+      preventCloseOnOverlayClick
       withAnimation
       hasHeaderBorder
       setIsOpen={setIsOpen}

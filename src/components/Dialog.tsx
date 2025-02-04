@@ -38,6 +38,7 @@ type ElementProps = {
   description?: React.ReactNode;
   onBack?: () => void;
   preventClose?: boolean;
+  preventCloseOnOverlayClick?: boolean;
   slotTrigger?: React.ReactNode;
   slotHeaderAbove?: React.ReactNode;
   slotHeader?: React.ReactNode;
@@ -83,6 +84,7 @@ export const Dialog = ({
   description,
   onBack,
   preventClose,
+  preventCloseOnOverlayClick,
   slotTrigger,
   slotHeaderAbove,
   slotHeader,
@@ -120,7 +122,7 @@ export const Dialog = ({
             closeButtonRef.current?.focus();
           }}
           onInteractOutside={(e: Event) => {
-            if (!withOverlay || preventClose) {
+            if (!withOverlay || !!preventClose || !!preventCloseOnOverlayClick) {
               e.preventDefault();
             }
           }}
