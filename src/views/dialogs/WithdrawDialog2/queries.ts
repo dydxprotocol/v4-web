@@ -18,13 +18,15 @@ async function getSkipWithdrawalRoutes(
   amount: string
 ) {
   const routeOptions: RouteRequest = {
+    allowMultiTx: true,
+    allowSwaps: true,
     sourceAssetDenom: DYDX_CHAIN_USDC_DENOM,
     sourceAssetChainID: DYDX_DEPOSIT_CHAIN,
     destAssetDenom: token.denom,
     destAssetChainID: token.chainId,
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
-    smartSwapOptions: { evmSwaps: true },
+    smartSwapOptions: { evmSwaps: true, splitRoutes: true },
   };
 
   const [slow, fast] = await Promise.all([
@@ -32,9 +34,7 @@ async function getSkipWithdrawalRoutes(
     skipClient.route({ ...routeOptions, goFast: true }),
   ]);
 
-  // @ts-ignore SDK doesn't know about .goFastTransfer
-  const isFastRouteAvailable = Boolean(fast.operations.find((op) => op.goFastTransfer));
-  return { slow, fast: isFastRouteAvailable ? fast : undefined };
+  return { slow, fast };
 }
 
 export function useWithdrawalRoutes({

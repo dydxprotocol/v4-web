@@ -17,7 +17,12 @@ export type Deposit = {
 
 export type Withdraw = {
   type: 'withdraw';
-  // TODO: add withdraw details here
+  txHash: string;
+  chainId: string;
+  status: 'pending' | 'success' | 'error';
+  estimatedAmountUsd: string;
+  actualAmountUsd?: string;
+  isInstantWithdraw: boolean;
 };
 
 export type Transfer = Deposit | Withdraw;

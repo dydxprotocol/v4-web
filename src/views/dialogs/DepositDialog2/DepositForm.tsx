@@ -29,7 +29,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
-import { RouteOptions } from './RouteOptions';
+import { DepositRouteOptions } from './RouteOptions';
 import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
 
@@ -223,7 +223,7 @@ export const DepositForm = ({
           onTokenClick={onTokenSelect}
           error={error}
         />
-        <RouteOptions
+        <DepositRouteOptions
           routes={routes}
           isLoading={isFetching}
           disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
