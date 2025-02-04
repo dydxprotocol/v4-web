@@ -66,12 +66,18 @@ export const RouteOptions = ({
           tw="inline"
           type={OutputType.Fiat}
           fractionDigits={USD_DECIMALS}
-          value={routes.slow.estimatedFees[0]?.usdAmount}
+          value={routes.slow.estimatedFees[0]?.usdAmount ?? '0'}
         />{' '}
         fee, no limit
       </span>
     );
   }, [routes, disabled]);
+
+  const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
+  // TODO(deposit2.0): localization
+  // "slow" route could be fast when going from solana or cosmos
+  const slowRouteTitle =
+    slowRouteSpeed && slowRouteSpeed <= 60 ? `~${slowRouteSpeed} seconds` : '~20 mins';
 
   return (
     <div tw="flex gap-0.5">
@@ -111,8 +117,7 @@ export const RouteOptions = ({
         selected={selectedSpeed === 'slow'}
         disabled={disabled || isLoading || !routes?.slow}
         onClick={() => onSelectSpeed('slow')}
-        // TODO(deposit2.0): localization
-        title="~20 mins"
+        title={slowRouteTitle}
         description={slowRouteDescription}
       />
     </div>
@@ -149,7 +154,7 @@ const RouteOption = ({
       }}
     >
       {icon}
-      <div tw="flex flex-col items-start gap-0.125">
+      <div tw="flex flex-col items-start gap-0.125 text-left">
         <div
           tw="text-medium"
           style={{
