@@ -22,7 +22,6 @@ import { getDisplayableTickerFromMarket } from '../assetUtils';
 const MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES = 1;
 
 const getOhlcValues = ({
-  orderbookCandlesToggleOn,
   trades,
   tradeOpen,
   tradeClose,
@@ -31,7 +30,6 @@ const getOhlcValues = ({
   orderbookOpen,
   orderbookClose,
 }: {
-  orderbookCandlesToggleOn: boolean;
   trades: number;
   tradeOpen: number;
   tradeClose: number;
@@ -41,7 +39,6 @@ const getOhlcValues = ({
   orderbookClose?: number;
 }) => {
   const showOrderbookCandles =
-    orderbookCandlesToggleOn &&
     trades <= MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES &&
     orderbookOpen !== undefined &&
     orderbookClose !== undefined;
@@ -67,65 +64,55 @@ export const mapMetadataServiceCandles = (
   };
 };
 
-export const mapCandle =
-  (orderbookCandlesToggleOn: boolean) =>
-  ({
-    startedAt,
-    open,
-    close,
-    high,
-    low,
-    baseTokenVolume,
-    usdVolume,
-    trades,
-    orderbookMidPriceOpen,
-    orderbookMidPriceClose,
-  }: Candle): TradingViewChartBar => {
-    const tradeOpen = parseFloat(open);
-    const tradeClose = parseFloat(close);
-    const tradeLow = parseFloat(low);
-    const tradeHigh = parseFloat(high);
-    const orderbookOpen = orderbookMidPriceOpen ? parseFloat(orderbookMidPriceOpen) : undefined;
-    const orderbookClose = orderbookMidPriceClose ? parseFloat(orderbookMidPriceClose) : undefined;
-    const tokenVolume = Math.ceil(Number(baseTokenVolume)); // default
-    return {
-      ...getOhlcValues({
-        orderbookCandlesToggleOn,
-        trades,
-        tradeOpen,
-        tradeClose,
-        tradeLow,
-        tradeHigh,
-        orderbookOpen,
-        orderbookClose,
-      }),
-      time: new Date(startedAt).getTime(),
-      volume: Math.ceil(Number(usdVolume)),
-      assetVolume: tokenVolume,
-      usdVolume: Math.ceil(Number(usdVolume)),
+export const mapCandle = ({
+  startedAt,
+  open,
+  close,
+  high,
+  low,
+  baseTokenVolume,
+  usdVolume,
+  trades,
+  orderbookMidPriceOpen,
+  orderbookMidPriceClose,
+}: Candle): TradingViewChartBar => {
+  const tradeOpen = parseFloat(open);
+  const tradeClose = parseFloat(close);
+  const tradeLow = parseFloat(low);
+  const tradeHigh = parseFloat(high);
+  const orderbookOpen = orderbookMidPriceOpen ? parseFloat(orderbookMidPriceOpen) : undefined;
+  const orderbookClose = orderbookMidPriceClose ? parseFloat(orderbookMidPriceClose) : undefined;
+  const tokenVolume = Math.ceil(Number(baseTokenVolume)); // default
+  return {
+    ...getOhlcValues({
+      trades,
       tradeOpen,
       tradeClose,
-      orderbookOpen,
-      orderbookClose,
       tradeLow,
       tradeHigh,
-      trades,
-    };
+      orderbookOpen,
+      orderbookClose,
+    }),
+    time: new Date(startedAt).getTime(),
+    volume: Math.ceil(Number(usdVolume)),
+    assetVolume: tokenVolume,
+    usdVolume: Math.ceil(Number(usdVolume)),
+    tradeOpen,
+    tradeClose,
+    orderbookOpen,
+    orderbookClose,
+    tradeLow,
+    tradeHigh,
+    trades,
   };
+};
 
-const mapTradingViewChartBar = ({
-  orderbookCandlesToggleOn,
-  bar,
-}: {
-  orderbookCandlesToggleOn: boolean;
-  bar: TradingViewChartBar;
-}): TradingViewChartBar => {
+const mapTradingViewChartBar = ({ bar }: { bar: TradingViewChartBar }): TradingViewChartBar => {
   const { trades, orderbookOpen, orderbookClose, tradeOpen, tradeClose, tradeLow, tradeHigh } = bar;
 
   return {
     ...bar,
     ...getOhlcValues({
-      orderbookCandlesToggleOn,
       trades,
       tradeOpen,
       tradeClose,
@@ -150,21 +137,17 @@ export const getHistorySlice = ({
   fromMs,
   toMs,
   firstDataRequest,
-  orderbookCandlesToggleOn,
 }: {
   bars?: TradingViewChartBar[];
   fromMs: number;
   toMs: number;
   firstDataRequest: boolean;
-  orderbookCandlesToggleOn: boolean;
 }): TradingViewChartBar[] => {
   if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0]!.time)) {
     return [];
   }
 
-  return bars
-    .map((bar) => mapTradingViewChartBar({ orderbookCandlesToggleOn, bar }))
-    .filter(({ time }) => time >= fromMs);
+  return bars.map((bar) => mapTradingViewChartBar({ bar })).filter(({ time }) => time >= fromMs);
 };
 
 export const getChartLineColors = ({

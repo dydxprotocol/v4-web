@@ -61,7 +61,6 @@ export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
   initialPriceScale: number | null,
-  orderbookCandlesToggleOn: boolean,
   localeSeparators: {
     group?: string;
     decimal?: string;
@@ -176,7 +175,7 @@ export const getDydxDatafeed = (
         toMs,
       });
 
-      const bars = fetchedCandles.map(mapCandle(orderbookCandlesToggleOn)).reverse();
+      const bars = fetchedCandles.map(mapCandle).reverse();
 
       if (bars.length === 0) {
         onHistoryCallback([], {
@@ -202,7 +201,6 @@ export const getDydxDatafeed = (
   ) => {
     subscribeOnStream({
       store,
-      orderbookCandlesToggleOn,
       symbolInfo,
       resolution,
       onRealtimeCallback: onTick,

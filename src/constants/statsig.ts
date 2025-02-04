@@ -12,7 +12,6 @@ export enum StatsigFlags {
   ffEnableLimitClose = 'ff_enable_limit_close',
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
   ffEnableFunkit = 'ff_enable_funkit',
-  ffEnableOhlc = 'ff_enable_ohlc',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
