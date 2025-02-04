@@ -106,7 +106,7 @@ export const AmountInput = ({
         <input
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          type="number"
+          type="text"
           placeholder="0.00"
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
           style={{ color: error ? 'var(--color-error)' : undefined }}
@@ -121,8 +121,11 @@ export const AmountInput = ({
         onClick={onTokenClick}
       >
         <div tw="flex items-center gap-0.5">
-          {/* TODO(deposit2.0): Also include chain logo */}
-          <AssetIcon tw="h-[2rem] w-[2rem]" symbol={getTokenSymbol(token.denom)} />
+          <AssetIcon
+            tw="h-[2rem] w-[2rem]"
+            symbol={getTokenSymbol(token.denom)}
+            chainId={token.chainId}
+          />
           <div>{getTokenSymbol(token.denom)}</div>
         </div>
         {sourceAccount.chain !== WalletNetworkType.Solana && (
