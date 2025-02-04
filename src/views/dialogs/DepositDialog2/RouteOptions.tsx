@@ -1,6 +1,7 @@
 import { ReactNode, useMemo } from 'react';
 
 import { RouteResponse } from '@skip-go/client';
+import tw from 'twin.macro';
 import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -80,12 +81,11 @@ export const DepositRouteOptions = ({
       <RouteOption
         icon={
           <span
-            style={{
-              color:
-                selectedSpeed === 'fast' && !isLoading
-                  ? 'var(--color-favorite)'
-                  : 'var(--color-text-0)',
-            }}
+            css={[
+              selectedSpeed === 'fast' && !isLoading
+                ? tw`text-color-favorite`
+                : `text-color-text-0`,
+            ]}
           >
             <LightningIcon />
           </span>
@@ -157,12 +157,11 @@ export const WithdrawRouteOptions = ({
       <RouteOption
         icon={
           <span
-            style={{
-              color:
-                selectedSpeed === 'fast' && !isLoading
-                  ? 'var(--color-favorite)'
-                  : 'var(--color-text-0)',
-            }}
+            css={[
+              selectedSpeed === 'fast' && !isLoading
+                ? tw`text-color-favorite`
+                : `text-color-text-0`,
+            ]}
           >
             <LightningIcon />
           </span>

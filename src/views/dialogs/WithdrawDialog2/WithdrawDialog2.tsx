@@ -11,6 +11,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import usePrevious from '@/hooks/usePrevious';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -31,7 +32,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         : CosmosChainId.Noble
   );
 
-  const destinationChainRef = useRef(CHAIN_INFO[destinationChain]?.walletNetworkType);
+  const previousChainRef = usePrevious(CHAIN_INFO[destinationChain]?.walletNetworkType);
 
   const [amount, setAmount] = useState('');
 
@@ -57,13 +58,11 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     // Cosmos uses different Bech32Prefixes for different chains, so it is excluded from this check
     if (
       currentDestinationChainType === WalletNetworkType.Evm &&
-      destinationChainRef.current === currentDestinationChainType
+      previousChainRef === currentDestinationChainType
     )
       return;
 
     setDestinationAddress(() => {
-      destinationChainRef.current = currentDestinationChainType;
-
       if (dydxAddress) {
         if (destinationChain === CosmosChainId.Neutron) {
           return convertBech32Address({

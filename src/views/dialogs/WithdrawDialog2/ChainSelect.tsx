@@ -1,11 +1,7 @@
-import { Dispatch, Fragment, SetStateAction, useMemo } from 'react';
+import { Dispatch, Fragment, SetStateAction } from 'react';
 
 import { CHAIN_INFO } from '@/constants/chains';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WITHDRAWABLE_ASSETS } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
-
-import { useAccounts } from '@/hooks/useAccounts';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
@@ -20,28 +16,15 @@ export const ChainSelect = ({
   selectedChain: string;
   setSelectedChain: Dispatch<SetStateAction<string>>;
 }) => {
-  const { sourceAccount } = useAccounts();
-  const { chain } = sourceAccount;
-
   const onChainClick = (newChainId: string) => () => {
     setSelectedChain(newChainId);
     onBack();
   };
 
-  const assets = useMemo(() => {
-    return WITHDRAWABLE_ASSETS.filter((asset) => {
-      if (asset.chainId === SOLANA_MAINNET_ID) {
-        return chain === WalletNetworkType.Solana;
-      }
-
-      return true;
-    });
-  }, [chain]);
-
   return (
     <div tw="flex flex-col gap-0.5 py-1">
       <div tw="flex flex-col">
-        {Object.values(assets).map(({ chainId }) => (
+        {Object.values(WITHDRAWABLE_ASSETS).map(({ chainId }) => (
           <Fragment key={chainId}>
             <button
               disabled={disabled}

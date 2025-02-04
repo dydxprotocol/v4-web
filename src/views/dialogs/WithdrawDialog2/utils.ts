@@ -4,6 +4,7 @@ import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-j
 import { RouteResponse, UserAddress } from '@skip-go/client';
 
 import { CosmosChainId } from '@/constants/graz';
+import { USDC_ASSET_ID } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -76,7 +77,7 @@ export function useWithdrawSteps({
               number: 0,
             },
             recipient: dydxAddress,
-            assetId: 0,
+            assetId: USDC_ASSET_ID,
             quantums: withdrawRoute.amountIn,
           }),
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,

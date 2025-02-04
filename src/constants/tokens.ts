@@ -3,6 +3,9 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 import { CosmosChainId } from './graz';
 import { SOLANA_MAINNET_ID } from './solana';
 
+// USDC has a assetId of 0 on the dYdX Chain
+export const USDC_ASSET_ID = 0;
+
 export const USDC_ADDRESSES = {
   [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
@@ -39,4 +42,14 @@ export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   { chainId: optimism.id.toString(), denom: USDC_ADDRESSES[optimism.id], decimals: USDC_DECIMALS },
   { chainId: polygon.id.toString(), denom: USDC_ADDRESSES[polygon.id], decimals: USDC_DECIMALS },
   { chainId: SOLANA_MAINNET_ID, denom: USDC_ADDRESSES[SOLANA_MAINNET_ID], decimals: USDC_DECIMALS },
+  {
+    chainId: CosmosChainId.Neutron,
+    denom: USDC_ADDRESSES[CosmosChainId.Neutron],
+    decimals: USDC_DECIMALS,
+  },
+  {
+    chainId: CosmosChainId.Osmosis,
+    denom: USDC_ADDRESSES[CosmosChainId.Osmosis],
+    decimals: USDC_DECIMALS,
+  },
 ];
