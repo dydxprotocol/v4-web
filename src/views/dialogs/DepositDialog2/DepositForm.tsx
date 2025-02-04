@@ -288,7 +288,6 @@ export const DepositForm = ({
             />
           </div>
         )}
-        {/* TODO(deposit2.0): Show difference between current and new balance here */}
         <div tw="flex justify-between text-small">
           {/* TODO(deposit2.0): localization */}
           <div tw="text-color-text-0">Available balance</div>
