@@ -231,7 +231,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
                   dateStyle: 'short',
                   timeStyle: 'short',
                 }),
-          action: transfer.type?.name ?? '',
+          action: transfer.type ?? '',
           amount,
           id: transfer.id,
         };

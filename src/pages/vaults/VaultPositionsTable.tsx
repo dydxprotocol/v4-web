@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { VaultPosition } from '@/bonsai/public-calculators/vault';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { VaultPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -29,13 +29,13 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { getNumberSign } from '@/lib/numbers';
+import { getNumberSign, MustNumber } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = VaultPosition;
 
 const VAULT_PAGE_SIZE = 20 as const;
-// abacus adds a special line for unallocated usdc just for vaults, this isn't really done anywhere else so
+// bonsai adds a special line for unallocated usdc just for vaults, this isn't really done anywhere else so
 // happy to special case it just here
 const USDC_MARKET_HARDCODED = 'UNALLOCATEDUSDC-USD';
 
@@ -46,7 +46,13 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
 
   const vaultsDataRaw = useLoadedVaultPositions();
   const vaultsData = useMemo(
-    () => vaultsDataRaw?.positions?.toArray() ?? EMPTY_ARR,
+    () =>
+      vaultsDataRaw?.positions?.filter(
+        (p) =>
+          MustNumber(p.marginUsdc) > 0 ||
+          MustNumber(p.equityUsdc) > 0 ||
+          MustNumber(p.currentPosition?.asset) > 0
+      ) ?? EMPTY_ARR,
     [vaultsDataRaw?.positions]
   );
   const marketsData = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
@@ -148,7 +154,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
                 <div style={{ width: 50, height: 50 }} tw="ml-0.5">
                   {thirtyDayPnl?.sparklinePoints != null && (
                     <SparklineChart
-                      data={thirtyDayPnl.sparklinePoints.toArray().map((elem, index) => ({
+                      data={thirtyDayPnl.sparklinePoints.map((elem, index) => ({
                         x: index + 1,
                         y: elem,
                       }))}

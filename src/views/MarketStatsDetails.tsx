@@ -1,5 +1,3 @@
-import { useEffect, useRef } from 'react';
-
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
@@ -25,7 +23,6 @@ import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
 
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -68,13 +65,6 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
     trades24H,
     volume24H,
   } = orEmptyObj(marketData);
-
-  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
-  const lastMidMarketPrice = useRef(midMarketPrice);
-
-  useEffect(() => {
-    lastMidMarketPrice.current = midMarketPrice;
-  }, [midMarketPrice]);
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
 

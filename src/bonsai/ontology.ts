@@ -1,5 +1,7 @@
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
+import BigNumber from 'bignumber.js';
 
+import { GroupingMultiplier } from '@/constants/orderbook';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
@@ -49,7 +51,11 @@ import {
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
-  createSelectCurrentMarketGroupedOrderbook,
+  createSelectCurrentMarketOrderbook,
+  selectCurrentMarketDepthChart,
+  selectCurrentMarketMidPrice,
+} from './selectors/orderbook';
+import {
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
@@ -61,6 +67,7 @@ import {
   StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
+import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
 import {
   AccountBalances,
   AllAssetData,
@@ -69,7 +76,6 @@ import {
   EquityTiersSummary,
   FeeTierSummary,
   GroupedSubaccountSummary,
-  OrderbookProcessedData,
   PendingIsolatedPosition,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
@@ -228,7 +234,18 @@ interface BonsaiHelpersShape {
       fills: BasicSelector<SubaccountFill[]>;
     };
     orderbook: {
-      createSelectGroupedData: ParameterizedSelector<OrderbookProcessedData | undefined, [number]>;
+      createSelectGroupedData: ParameterizedSelector<
+        OrderbookProcessedData | undefined,
+        [GroupingMultiplier | undefined]
+      >;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    midPrice: {
+      data: BasicSelector<BigNumber | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    depthChart: {
+      data: BasicSelector<DepthChartData | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
   };
@@ -267,7 +284,15 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     assetLogo: selectCurrentMarketAssetLogoUrl,
     assetName: selectCurrentMarketAssetName,
     orderbook: {
-      createSelectGroupedData: createSelectCurrentMarketGroupedOrderbook,
+      createSelectGroupedData: createSelectCurrentMarketOrderbook,
+      loading: selectCurrentMarketOrderbookLoading,
+    },
+    midPrice: {
+      data: selectCurrentMarketMidPrice,
+      loading: selectCurrentMarketOrderbookLoading,
+    },
+    depthChart: {
+      data: selectCurrentMarketDepthChart,
       loading: selectCurrentMarketOrderbookLoading,
     },
     account: {

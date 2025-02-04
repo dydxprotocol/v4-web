@@ -17,7 +17,6 @@ export function useUpdateTransfers() {
 
   // TODO: generalize this to withdrawals too
   const pendingDeposits = useParameterizedSelector(selectPendingDeposits, dydxAddress);
-
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});
 
@@ -27,7 +26,7 @@ export function useUpdateTransfers() {
     for (let i = 0; i < pendingDeposits.length; i += 1) {
       const deposit = pendingDeposits[i]!;
       const depositKey = `${deposit.chainId}-${deposit.txHash}`;
-      if (transactionToCallback.current[depositKey]) return;
+      if (transactionToCallback.current[depositKey]) continue;
 
       transactionToCallback.current[depositKey] = true;
       skipClient

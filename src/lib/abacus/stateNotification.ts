@@ -1,15 +1,13 @@
 // eslint-disable-next-line max-classes-per-file
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { fromPairs, throttle } from 'lodash';
+import { fromPairs } from 'lodash';
 
 import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
-  MarketOrderbook,
   Nullable,
   ParsingErrors,
-  PerpetualMarket,
   PerpetualState,
   PerpetualStateChanges,
   SubaccountOrder,
@@ -17,7 +15,6 @@ import type {
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
 import {
@@ -35,10 +32,8 @@ import {
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
-import { isTruthy } from '../isTruthy';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -46,10 +41,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   constructor() {
     this.store = undefined;
   }
-
-  private throttledOrderbookUpdateByMarketId: {
-    [marketId: string]: (orderbook: MarketOrderbook) => void;
-  } = {};
 
   environmentsChanged(): void {}
 
@@ -64,7 +55,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     if (!this.store) return;
     const { dispatch } = this.store;
     const changes = new Set(incomingChanges?.changes.toArray() ?? []);
-    const marketIds = incomingChanges?.markets?.toArray();
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
@@ -94,25 +84,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
-      }
-
-      if (changes.has(Changes.markets)) {
-        dispatch(
-          setMarkets({
-            markets: Object.fromEntries(
-              (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
-                .map((marketId: string): undefined | [string, PerpetualMarket] => {
-                  const marketData = updatedState.market(marketId);
-                  if (marketData == null) {
-                    return undefined;
-                  }
-                  return [marketId, marketData];
-                })
-                .filter(isTruthy)
-            ),
-            update: !!marketIds,
-          })
-        );
       }
 
       if (changes.has(Changes.restriction)) {
@@ -147,20 +118,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
           if (isChildSubaccount) {
             dispatch(setHistoricalPnl(historicalPnl));
-          }
-        }
-      });
-
-      marketIds?.forEach((market: string) => {
-        if (changes.has(Changes.orderbook)) {
-          this.throttledOrderbookUpdateByMarketId[market] ??= throttle(
-            (orderbook) => this.store?.dispatch(setOrderbook({ orderbook, marketId: market })),
-            timeUnits.second / 3
-          );
-
-          const orderbook = updatedState.marketOrderbook(market);
-          if (orderbook) {
-            this.throttledOrderbookUpdateByMarketId[market](orderbook);
           }
         }
       });

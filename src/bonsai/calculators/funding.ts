@@ -1,4 +1,4 @@
-import { FundingDirection } from '@/constants/markets';
+import { FundingDirection } from '@/constants/charts';
 import { IndexerHistoricalFundingResponseObject } from '@/types/indexer/indexerApiGen';
 
 import { MustBigNumber } from '@/lib/numbers';
