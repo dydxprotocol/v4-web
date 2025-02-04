@@ -14,6 +14,7 @@ import { SkipRouteSpeed, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { CoinbaseBrandIcon, WarningIcon } from '@/icons';
 
@@ -118,7 +119,7 @@ export const DepositForm = ({
         </div>
       );
 
-    if (!signer) return <div>Connect wallet</div>;
+    if (!signer) return <div>Reconnect wallet</div>;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
   }, [error, hasSufficientBalance, stringGetter, token.denom, signer]);
@@ -134,6 +135,18 @@ export const DepositForm = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [currentStepError, setCurrentStepError] = useState<string>();
   const [awaitingWalletAction, setAwaitingWalletAction] = useState(false);
+
+  const { connectWallet, selectedWallet } = useWalletConnection();
+
+  const connectWagmi = async () => {
+    try {
+      setAwaitingWalletAction(true);
+      await connectWallet({ wallet: selectedWallet, forceConnect: true });
+      setAwaitingWalletAction(false);
+    } catch (e) {
+      setAwaitingWalletAction(false);
+    }
+  };
 
   // Helpers for fetching updated values within the useEffect for autoPromptStep
   const skipClientRef = useRef(skipClient);
@@ -181,7 +194,12 @@ export const DepositForm = ({
   }, [token, debouncedAmount, selectedRoute]);
 
   const onDepositClick = async () => {
-    if (depositDisabled || !steps || !signer) return;
+    if (depositDisabled || !steps) return;
+
+    if (!signer) {
+      connectWagmi();
+      return;
+    }
 
     setCurrentStepError(undefined);
     setAwaitingWalletAction(true);
