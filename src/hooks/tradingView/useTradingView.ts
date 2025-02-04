@@ -13,8 +13,6 @@ import {
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { STRING_KEYS, SUPPORTED_LOCALE_MAP } from '@/constants/localization';
-import { isDev } from '@/constants/networks';
-import { StatsigFlags } from '@/constants/statsig';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
@@ -33,7 +31,6 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { useDydxClient } from '../useDydxClient';
 import { useLocaleSeparators } from '../useLocaleSeparators';
-import { useStatsigGateValue } from '../useStatsig';
 import { useStringGetter } from '../useStringGetter';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
@@ -74,10 +71,10 @@ export const useTradingView = ({
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
-  const ffEnableOrderbookCandles = useStatsigGateValue(StatsigFlags.ffEnableOhlc) || isDev;
+
   useEffect(() => {
-    abacusStateManager.toggleOrderbookCandles(ffEnableOrderbookCandles);
-  }, [ffEnableOrderbookCandles]);
+    abacusStateManager.toggleOrderbookCandles(true);
+  }, []);
 
   const savedResolution = useMemo(
     () => getSavedResolution({ savedConfig: savedTvChartConfig }),
@@ -152,7 +149,6 @@ export const useTradingView = ({
           store,
           getCandlesForDatafeed,
           initialPriceScale,
-          ffEnableOrderbookCandles,
           { decimal, group },
           selectedLocale,
           stringGetter

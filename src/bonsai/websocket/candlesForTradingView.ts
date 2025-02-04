@@ -25,7 +25,6 @@ export const subscriptionsByGuid: {
 
 export const subscribeOnStream = ({
   store,
-  orderbookCandlesToggleOn,
   symbolInfo,
   resolution,
   onRealtimeCallback,
@@ -33,7 +32,6 @@ export const subscribeOnStream = ({
   onResetCacheNeededCallback,
 }: {
   store: RootStore;
-  orderbookCandlesToggleOn: boolean;
   symbolInfo: LibrarySymbolInfo;
   resolution: ResolutionString;
   onRealtimeCallback: SubscribeBarsCallback;
@@ -72,7 +70,7 @@ export const subscribeOnStream = ({
         data.candles.forEach((candle) => {
           if (candle.startedAt >= mostRecentFirstPointStartedAt!) {
             onRealtimeCallback(
-              mapCandle(orderbookCandlesToggleOn)({
+              mapCandle({
                 ...candle,
                 resolution: candle.resolution as unknown as CandleResolution,
                 orderbookMidPriceClose: candle.orderbookMidPriceClose ?? undefined,
