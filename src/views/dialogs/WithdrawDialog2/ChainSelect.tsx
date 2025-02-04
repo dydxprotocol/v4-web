@@ -6,10 +6,12 @@ import { WITHDRAWABLE_ASSETS } from '@/constants/tokens';
 import { AssetIcon } from '@/components/AssetIcon';
 
 export const ChainSelect = ({
+  disabled,
   onBack,
   selectedChain,
   setSelectedChain,
 }: {
+  disabled?: boolean;
   onBack: () => void;
   selectedChain: string;
   setSelectedChain: Dispatch<SetStateAction<string>>;
@@ -25,6 +27,7 @@ export const ChainSelect = ({
         {Object.values(WITHDRAWABLE_ASSETS).map(({ chainId }) => (
           <Fragment key={chainId}>
             <button
+              disabled={disabled}
               onClick={onChainClick(chainId)}
               type="button"
               style={{

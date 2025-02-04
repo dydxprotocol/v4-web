@@ -3,6 +3,9 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 import { CosmosChainId } from './graz';
 import { SOLANA_MAINNET_ID } from './solana';
 
+// USDC has a assetId of 0 on the dYdX Chain
+export const USDC_ASSET_ID = 0;
+
 export const USDC_ADDRESSES = {
   [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
@@ -28,6 +31,11 @@ export type TokenForTransfer = {
 };
 
 export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
+  {
+    chainId: CosmosChainId.Noble,
+    denom: USDC_ADDRESSES[CosmosChainId.Noble],
+    decimals: USDC_DECIMALS,
+  },
   { chainId: mainnet.id.toString(), denom: USDC_ADDRESSES[mainnet.id], decimals: USDC_DECIMALS },
   { chainId: arbitrum.id.toString(), denom: USDC_ADDRESSES[arbitrum.id], decimals: USDC_DECIMALS },
   { chainId: base.id.toString(), denom: USDC_ADDRESSES[base.id], decimals: USDC_DECIMALS },
@@ -37,11 +45,6 @@ export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   {
     chainId: CosmosChainId.Neutron,
     denom: USDC_ADDRESSES[CosmosChainId.Neutron],
-    decimals: USDC_DECIMALS,
-  },
-  {
-    chainId: CosmosChainId.Noble,
-    denom: USDC_ADDRESSES[CosmosChainId.Noble],
     decimals: USDC_DECIMALS,
   },
   {
