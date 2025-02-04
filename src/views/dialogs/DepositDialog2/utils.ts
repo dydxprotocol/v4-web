@@ -229,7 +229,6 @@ export function useDepositSteps({
       // passing in updatedSkipClient is hack until that is available
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
         try {
-          console.log('calling executeRoute');
           await updatedSkipClient.executeRoute({
             route: depositRoute,
             userAddresses,
@@ -251,7 +250,6 @@ export function useDepositSteps({
           });
           return { success: true };
         } catch (e) {
-          console.log('error!', e);
           return {
             success: false,
             errorMessage: parseError(e, 'Your deposit has failed. Please try again.'),
