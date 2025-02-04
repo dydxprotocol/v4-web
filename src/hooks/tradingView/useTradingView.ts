@@ -24,7 +24,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -71,10 +70,6 @@ export const useTradingView = ({
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
-
-  useEffect(() => {
-    abacusStateManager.toggleOrderbookCandles(true);
-  }, []);
 
   const savedResolution = useMemo(
     () => getSavedResolution({ savedConfig: savedTvChartConfig }),
