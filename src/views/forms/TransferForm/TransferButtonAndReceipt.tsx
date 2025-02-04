@@ -18,13 +18,13 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { isValidKey } from '@/lib/typeUtils';
+import { isValidKey, orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   selectedAsset: string;
@@ -44,13 +44,15 @@ export const TransferButtonAndReceipt = ({
   const { size } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { tokensConfigs } = useTokenConfigs();
 
-  const { equity: equityInfo, leverage: leverageInfo } =
-    useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { equity, leverage } = orEmptyObj(useAppSelector(getSubaccount));
+  const { equity: equityInfo, leverage: leverageInfo } = orEmptyObj(
+    useAppSelector(getSubaccountForPostOrder)
+  );
 
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { current: equity, postOrder: newEquity } = equityInfo ?? {};
-  const { current: leverage, postOrder: newLeverage } = leverageInfo ?? {};
+  const { postOrder: newEquity } = equityInfo ?? {};
+  const { postOrder: newLeverage } = leverageInfo ?? {};
 
   const isUSDCSelected = selectedAsset === DydxChainAsset.USDC;
 

@@ -1,6 +1,7 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { OrderStatus } from '@/bonsai/types/summaryTypes';
 
-import { AbacusOrderStatus } from '@/constants/abacus';
+import { AbacusOrderStatus, TRADE_TYPES_NEW } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
@@ -15,7 +16,6 @@ import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getOrderById } from '@/state/accountSelectors';
 
-import { getTradeType } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
@@ -35,9 +35,9 @@ export const OrderCancelNotification = ({
     useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, order.marketId)
   );
 
-  const tradeType = getTradeType(order.type.rawValue) ?? undefined;
+  const tradeType = TRADE_TYPES_NEW[order.type] ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
-  const indexedOrderStatus = order.status.rawValue;
+  const indexedOrderStatus = order.status;
   const cancelStatus = localCancel.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.CANCELING;
@@ -46,9 +46,8 @@ export const OrderCancelNotification = ({
 
   // show Canceled if either canceled confirmation happens (node / indexer)
   // note: indexer status is further processed by abacus, but PartiallyCanceled = CANCELED
-  const isPartiallyCanceled = indexedOrderStatus === AbacusOrderStatus.PartiallyCanceled.rawValue;
-  const isCancelFinalized =
-    indexedOrderStatus === AbacusOrderStatus.Canceled.rawValue || isPartiallyCanceled;
+  const isPartiallyCanceled = indexedOrderStatus === OrderStatus.PartiallyCanceled;
+  const isCancelFinalized = indexedOrderStatus === OrderStatus.Canceled || isPartiallyCanceled;
 
   if (cancelStatus === CancelOrderStatuses.Canceled || isCancelFinalized) {
     orderStatusStringKey = isPartiallyCanceled

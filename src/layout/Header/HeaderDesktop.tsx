@@ -39,7 +39,6 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
@@ -192,7 +191,7 @@ export const HeaderDesktop = () => {
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={
-                !availableBalance || MustBigNumber(availableBalance.current).gt(0)
+                !availableBalance || availableBalance.gt(0)
                   ? ButtonAction.Secondary
                   : ButtonAction.Primary
               }

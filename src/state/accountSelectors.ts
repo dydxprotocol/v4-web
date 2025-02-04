@@ -53,9 +53,16 @@ export const getNonZeroPendingPositions = createAppSelector(
   (pending) => pending?.filter((p) => p.equity.toNumber() > 0)
 );
 
-export const getOpenPositionFromId = (marketId: string) =>
-  createAppSelector([getOpenPositions], (allOpenPositions) =>
-    allOpenPositions?.find(({ market }) => market === marketId)
+export const getOpenPositionFromId = () =>
+  createAppSelector(
+    [getOpenPositions, (s, marketId: string) => marketId],
+    (allOpenPositions, marketId) => allOpenPositions?.find(({ market }) => market === marketId)
+  );
+
+export const getOpenPositionFromIdForPostOrder = () =>
+  createAppSelector(
+    [(s) => s.account.subaccountForPostOrders?.openPositions, (s, marketId: string) => marketId],
+    (allOpenPositions, marketId) => allOpenPositions?.toArray().find(({ id }) => id === marketId)
   );
 
 /**
@@ -105,6 +112,14 @@ export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
     !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
+);
+
+export const getCurrentMarketOrdersForPostOrder = createAppSelector(
+  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.orders],
+  (currentMarketId, marketOrders) =>
+    !currentMarketId
+      ? EMPTY_ARR
+      : marketOrders?.toArray().filter((o) => o.marketId === currentMarketId) ?? EMPTY_ARR
 );
 
 /**

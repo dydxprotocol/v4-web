@@ -1,6 +1,8 @@
 import Abacus, { kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
+
 import { STRING_KEYS } from './localization';
 import { TradeTypes } from './trade';
 
@@ -371,6 +373,16 @@ export const TRADE_TYPES: Record<
 
   [AbacusOrderType.FinalSettlement.name]: null,
   [AbacusOrderType.FinalSettlement.rawValue]: null,
+};
+
+export const TRADE_TYPES_NEW: Record<IndexerOrderType, Nullable<TradeTypes>> = {
+  [IndexerOrderType.LIMIT]: TradeTypes.LIMIT,
+  [IndexerOrderType.MARKET]: TradeTypes.MARKET,
+  [IndexerOrderType.STOPLIMIT]: TradeTypes.STOP_LIMIT,
+  [IndexerOrderType.STOPMARKET]: TradeTypes.STOP_MARKET,
+  [IndexerOrderType.TAKEPROFITMARKET]: TradeTypes.TAKE_PROFIT_MARKET,
+  [IndexerOrderType.TRAILINGSTOP]: null,
+  [IndexerOrderType.TAKEPROFIT]: TradeTypes.TAKE_PROFIT,
 };
 
 export const MARGIN_MODE_STRINGS: Record<string, string> = {

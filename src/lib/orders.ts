@@ -26,7 +26,7 @@ import {
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
+import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { IconName } from '@/components/Icon';
 
@@ -216,6 +216,10 @@ export const isTakeProfitOrderNew = (
 
 export const isSellOrder = (order: SubaccountOrder) => {
   return order.side.ordinal === AbacusOrderSide.Sell.ordinal;
+};
+
+export const isSellOrderNew = (order: NewSubaccountOrder) => {
+  return order.side === IndexerOrderSide.SELL;
 };
 
 type AddedProps = {
