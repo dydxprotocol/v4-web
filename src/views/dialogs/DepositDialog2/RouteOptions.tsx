@@ -66,7 +66,7 @@ export const RouteOptions = ({
           tw="inline"
           type={OutputType.Fiat}
           fractionDigits={USD_DECIMALS}
-          value={routes.slow.estimatedFees[0]?.usdAmount}
+          value={routes.slow.estimatedFees[0]?.usdAmount ?? '0'}
         />{' '}
         fee, no limit
       </span>

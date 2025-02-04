@@ -64,6 +64,24 @@ const useSkipClientContext = () => {
           },
         },
         getEVMSigner: async () => getEVMSigner(walletClientRef.current, sourceAccount),
+        getSVMSigner: async () => {
+          if (sourceAccount.chain !== WalletNetworkType.Solana || !window.phantom?.solana) {
+            throw new Error('no solana wallet connected');
+          }
+
+          await window.phantom.solana.connect();
+          return (window as any).phantom.solana;
+        },
+        getCosmosSigner: async (chainId: string) => {
+          if (sourceAccount.chain !== WalletNetworkType.Cosmos) {
+            throw new Error('no cosmos wallet connected');
+          }
+          if (!window.keplr) {
+            throw new Error('keplr wallet not connected');
+          }
+
+          return window.keplr.getOfflineSigner(chainId);
+        },
         registryTypes: [[TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT, MsgWithdrawFromSubaccount]],
       }),
       skipInstanceId: crypto.randomUUID(),

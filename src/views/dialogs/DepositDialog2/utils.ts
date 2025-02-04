@@ -86,7 +86,7 @@ export type DepositStep =
     }
   | {
       type: 'deposit';
-      // TODO(deposit2.0): add solana signer type support too;
+      // TODO: also explicitly type support the Phantom Solana signer here
       executeStep: (
         signer: WalletClient | OfflineSigner,
         skipClient: SkipClient
