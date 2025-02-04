@@ -154,7 +154,7 @@ const RouteOption = ({
       }}
     >
       {icon}
-      <div tw="flex flex-col items-start gap-0.125">
+      <div tw="flex flex-col items-start gap-0.125 text-left">
         <div
           tw="text-medium"
           style={{
