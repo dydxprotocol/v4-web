@@ -26,7 +26,7 @@ import { WithdrawRouteOptions } from '../DepositDialog2/RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
-import { useWithdrawSteps } from './utils';
+import { useWithdrawStep } from './utils';
 
 export const WithdrawForm = ({
   amount,
@@ -72,7 +72,7 @@ export const WithdrawForm = ({
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
 
-  const { executeWithdraw } = useWithdrawSteps({
+  const { executeWithdraw, isLoading } = useWithdrawStep({
     withdrawRoute: selectedRoute,
     onWithdraw: () => {},
   });
@@ -158,7 +158,10 @@ export const WithdrawForm = ({
       {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
       <Button
         tw="mt-2 w-full"
-        state={{ isLoading: isFetching, isDisabled: !selectedRoute || destinationAddress === '' }}
+        state={{
+          isLoading: isFetching || isLoading,
+          isDisabled: !selectedRoute || destinationAddress === '',
+        }}
         onClick={onWithdrawClick}
         action={ButtonAction.Primary}
       >

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
@@ -18,12 +18,18 @@ export function isInstantWithdraw(route: RouteResponse) {
   return Boolean(route.operations.find((op) => op.goFastTransfer));
 }
 
-export function useWithdrawSteps({
-  // withdrawToken,
+const parseWithdrawError = (e: Error, fallbackMessage: string) => {
+  if (e.message.includes('NewlyUndercollateralized')) {
+    return 'Your withdrawal would leave your account undercollateralized. Please try a a smaller amount.';
+  }
+
+  return fallbackMessage;
+};
+
+export function useWithdrawStep({
   withdrawRoute,
   onWithdraw,
 }: {
-  // withdrawToken?: TokenForTransfer;
   withdrawRoute?: RouteResponse;
   onWithdraw: (withdraw: Withdraw) => void;
 }) {
@@ -36,6 +42,7 @@ export function useWithdrawSteps({
     osmosisAddress,
     sourceAccount,
   } = useAccounts();
+  const [isLoading, setIsLoading] = useState(false);
 
   const userAddresses: UserAddress[] | undefined = useMemo(() => {
     if (
@@ -74,6 +81,7 @@ export function useWithdrawSteps({
 
   const executeWithdraw = useCallback(async () => {
     try {
+      setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
       if (!userAddresses) throw new Error('No user addresses found');
       if (!localDydxWallet && !localNobleWallet) throw new Error('No local wallets found');
@@ -105,9 +113,16 @@ export function useWithdrawSteps({
           });
         },
       });
+      return {
+        success: true,
+      };
     } catch (error) {
-      // eslint-disable-next-line prettier/prettier, no-console
-      console.error(error);
+      return {
+        success: false,
+        errorMessage: parseWithdrawError(error, 'Your withdrawal has failed. Please try again.'),
+      };
+    } finally {
+      setIsLoading(false);
     }
   }, [
     dydxAddress,
@@ -122,5 +137,6 @@ export function useWithdrawSteps({
 
   return {
     executeWithdraw,
+    isLoading,
   };
 }
