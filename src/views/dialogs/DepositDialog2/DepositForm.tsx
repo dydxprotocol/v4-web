@@ -118,11 +118,10 @@ export const DepositForm = ({
         </div>
       );
 
-    if (sourceAccount.chain === WalletNetworkType.Evm && !walletClient)
-      return <div>Connect wallet</div>;
+    if (!signer) return <div>Connect wallet</div>;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [error, hasSufficientBalance, sourceAccount.chain, stringGetter, token.denom, walletClient]);
+  }, [error, hasSufficientBalance, stringGetter, token.denom, signer]);
 
   const { data: steps } = useDepositSteps({
     sourceAccount,
@@ -258,11 +257,11 @@ export const DepositForm = ({
         </div>
       </div>
       <div tw="flex flex-col gap-0.75">
-        <div tw="mt-2 flex flex-col gap-0.375">
-          {!depositSteps?.length && currentStepError && (
-            <div tw="text-center text-small text-color-error">{currentStepError}</div>
-          )}
-          {!depositSteps?.length && (
+        {!depositSteps?.length && (
+          <div tw="mt-2 flex flex-col gap-0.375">
+            {currentStepError && (
+              <div tw="text-center text-small text-color-error">{currentStepError}</div>
+            )}
             <Button
               tw="w-full"
               onClick={onDepositClick}
@@ -277,10 +276,8 @@ export const DepositForm = ({
             >
               {depositButtonInner}
             </Button>
-          )}
-        </div>
-
-        {/* TODO(deposit2.0): handle the case where the wallet has lost connection (no walletClient defined) */}
+          </div>
+        )}
         {depositSteps?.length && (
           <div tw="my-1">
             <DepositSteps

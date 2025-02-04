@@ -73,6 +73,12 @@ export const RouteOptions = ({
     );
   }, [routes, disabled]);
 
+  const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
+  // TODO(deposit2.0): localization
+  // "slow" route could be fast when going from solana or cosmos
+  const slowRouteTitle =
+    slowRouteSpeed && slowRouteSpeed <= 60 ? `~${slowRouteSpeed} seconds` : '~20 mins';
+
   return (
     <div tw="flex gap-0.5">
       <RouteOption
@@ -111,8 +117,7 @@ export const RouteOptions = ({
         selected={selectedSpeed === 'slow'}
         disabled={disabled || isLoading || !routes?.slow}
         onClick={() => onSelectSpeed('slow')}
-        // TODO(deposit2.0): localization
-        title="~20 mins"
+        title={slowRouteTitle}
         description={slowRouteDescription}
       />
     </div>
