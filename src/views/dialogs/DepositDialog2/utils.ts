@@ -126,6 +126,8 @@ export function useDepositSteps({
         executeStep: async (signer: WalletClient) => {
           try {
             await signer.switchChain({ id: Number(depositToken.chainId) });
+            // Wait for external wallet to update chains
+            await sleep(2000);
             return { success: true };
           } catch (_) {
             try {
