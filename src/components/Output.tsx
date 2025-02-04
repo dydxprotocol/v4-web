@@ -346,7 +346,7 @@ export const Output = ({
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   if (!!isLoading || !!isDetailsLoading) {
-    return <LoadingOutput />;
+    return <LoadingOutput className={className} />;
   }
 
   switch (type) {

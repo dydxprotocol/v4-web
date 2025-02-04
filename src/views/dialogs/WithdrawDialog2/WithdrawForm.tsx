@@ -22,7 +22,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { RouteOptions } from '../DepositDialog2/RouteOptions';
+import { WithdrawRouteOptions } from '../DepositDialog2/RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
@@ -88,6 +88,7 @@ export const WithdrawForm = ({
             <Output
               tw="inline"
               type={OutputType.Fiat}
+              isLoading={isFetching}
               value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
             />
           ),
@@ -97,7 +98,7 @@ export const WithdrawForm = ({
           label: stringGetter({ key: STRING_KEYS.FREE_COLLATERAL }),
           value: (
             <DiffOutput
-              withDiff={!freeCollateral?.eq(updatedFreeCollateral ?? 0)}
+              withDiff={!freeCollateral?.eq(updatedFreeCollateral ?? 0) && !isFetching}
               type={OutputType.Fiat}
               value={freeCollateral}
               newValue={updatedFreeCollateral}
@@ -109,7 +110,7 @@ export const WithdrawForm = ({
           label: stringGetter({ key: STRING_KEYS.MARGIN_USAGE }),
           value: (
             <DiffOutput
-              withDiff={!marginUsage?.eq(updatedMarginUsage ?? 0)}
+              withDiff={!marginUsage?.eq(updatedMarginUsage ?? 0) && !isFetching}
               type={OutputType.Percent}
               value={marginUsage}
               newValue={updatedMarginUsage}
@@ -121,7 +122,7 @@ export const WithdrawForm = ({
           label: stringGetter({ key: STRING_KEYS.EQUITY }),
           value: (
             <DiffOutput
-              withDiff={!equity?.eq(updatedEquity ?? 0)}
+              withDiff={!equity?.eq(updatedEquity ?? 0) && !isFetching}
               type={OutputType.Fiat}
               value={equity}
               newValue={updatedEquity}
@@ -145,7 +146,7 @@ export const WithdrawForm = ({
         onDestinationClicked={onChainSelect}
       />
       <AmountInput value={amount} onChange={setAmount} />
-      <RouteOptions
+      <WithdrawRouteOptions
         routes={routes}
         isLoading={isFetching}
         disabled={

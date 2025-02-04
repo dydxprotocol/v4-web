@@ -3,9 +3,11 @@ import { ReactNode, useMemo } from 'react';
 import { RouteResponse } from '@skip-go/client';
 import { formatUnits } from 'viem';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LightningIcon, ShieldIcon } from '@/icons';
 
@@ -19,7 +21,7 @@ type Props = {
   onSelectSpeed: (route: SkipRouteSpeed) => void;
 };
 
-export const RouteOptions = ({
+export const DepositRouteOptions = ({
   routes,
   isLoading,
   selectedSpeed,
@@ -114,6 +116,62 @@ export const RouteOptions = ({
         // TODO(deposit2.0): localization
         title="~20 mins"
         description={slowRouteDescription}
+      />
+    </div>
+  );
+};
+
+export const WithdrawRouteOptions = ({
+  routes,
+  isLoading,
+  selectedSpeed,
+  onSelectSpeed,
+  disabled,
+}: Props) => {
+  const stringGetter = useStringGetter();
+  const fastRouteDescription = useMemo(() => {
+    const fastOperationFee = routes?.fast?.estimatedFees[0]?.usdAmount;
+
+    if (!routes || disabled) return '-';
+    if (!routes.fast) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
+
+    return (
+      <span tw="inline-block">
+        {fastOperationFee ? (
+          <Output
+            tw="inline-block"
+            type={OutputType.Fiat}
+            fractionDigits={USD_DECIMALS}
+            value={fastOperationFee}
+            isLoading={isLoading}
+          />
+        ) : (
+          <span tw="text-color-positive">{stringGetter({ key: STRING_KEYS.FREE })}</span>
+        )}
+      </span>
+    );
+  }, [routes, disabled, stringGetter, isLoading]);
+
+  return (
+    <div tw="flex gap-0.5">
+      <RouteOption
+        icon={
+          <span
+            style={{
+              color:
+                selectedSpeed === 'fast' && !isLoading
+                  ? 'var(--color-favorite)'
+                  : 'var(--color-text-0)',
+            }}
+          >
+            <LightningIcon />
+          </span>
+        }
+        selected={selectedSpeed === 'fast'}
+        disabled={disabled || !routes?.fast || isLoading}
+        onClick={() => onSelectSpeed('fast')}
+        title={stringGetter({ key: STRING_KEYS.INSTANT })}
+        description={fastRouteDescription}
       />
     </div>
   );
