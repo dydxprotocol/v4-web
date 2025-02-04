@@ -145,7 +145,7 @@ const useAccountsContext = () => {
   );
 
   useEffect(() => {
-    dispatch(setLocalWallet({ address: dydxAddress }));
+    dispatch(setLocalWallet({ address: dydxAddress, subaccountNumber: 0 }));
   }, [dispatch, dydxAddress]);
 
   const nobleAddress = localNobleWallet?.address;

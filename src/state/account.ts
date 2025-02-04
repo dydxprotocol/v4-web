@@ -89,10 +89,7 @@ export const accountSlice = createSlice({
       state.compliance = action.payload;
     },
     setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
-      return {
-        ...state,
-        subaccount: action.payload,
-      };
+      state.subaccountForPostOrders = action.payload;
     },
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;

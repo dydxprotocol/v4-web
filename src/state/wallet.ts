@@ -66,7 +66,10 @@ export const walletSlice = createSlice({
     clearSavedEncryptedSignature: (state) => {
       state.sourceAccount.encryptedSignature = undefined;
     },
-    setLocalWallet: (state, { payload }: PayloadAction<{ address?: string }>) => {
+    setLocalWallet: (
+      state,
+      { payload }: PayloadAction<{ address?: string; subaccountNumber?: number }>
+    ) => {
       state.localWallet = payload;
     },
     clearSourceAccount: (state) => {
