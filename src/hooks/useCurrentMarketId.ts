@@ -35,6 +35,7 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
+  const abacusHasMarketIds = useAppSelector((s) => s.perpetuals.abacusHasMarkets);
   const currentMarketOraclePrice = useParameterizedSelector(
     BonsaiHelpers.markets.createSelectMarketSummaryById,
     marketId
@@ -141,29 +142,38 @@ export const useCurrentMarketId = () => {
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (isViewingUnlaunchedMarket) {
-      abacusStateManager.setMarket(DEFAULT_MARKETID);
-      dispatch(setCurrentMarketIdIfTradeable(undefined));
+    if (abacusHasMarketIds) {
+      if (isViewingUnlaunchedMarket) {
+        abacusStateManager.setMarket(DEFAULT_MARKETID);
+      } else {
+        if (marketId) {
+          const isMarketReadyForSubscription = hasMarketOraclePrice;
+          if (isMarketReadyForSubscription) {
+            abacusStateManager.setMarket(marketId);
+          }
+        } else {
+          abacusStateManager.setMarket(DEFAULT_MARKETID);
+        }
+      }
       abacusStateManager.setTradeValue({ value: null, field: null });
-    } else if (hasMarketIds) {
+    }
+
+    if (isViewingUnlaunchedMarket) {
+      dispatch(setCurrentMarketIdIfTradeable(undefined));
+    } else {
       if (marketId) {
         const isMarketReadyForSubscription = hasMarketOraclePrice;
-
         if (isMarketReadyForSubscription) {
-          abacusStateManager.setMarket(marketId);
           dispatch(setCurrentMarketIdIfTradeable(marketId));
         }
       } else {
-        abacusStateManager.setMarket(DEFAULT_MARKETID);
         dispatch(setCurrentMarketIdIfTradeable(undefined));
       }
-
-      abacusStateManager.setTradeValue({ value: null, field: null });
     }
   }, [
     isViewingUnlaunchedMarket,
     selectedNetwork,
-    hasMarketIds,
+    abacusHasMarketIds,
     hasMarketOraclePrice,
     marketId,
     dispatch,

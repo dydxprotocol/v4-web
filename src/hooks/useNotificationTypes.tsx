@@ -13,8 +13,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import {
-  STRING_KEYS,
   STRING_KEY_VALUES,
+  STRING_KEYS,
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
@@ -42,7 +42,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification } from '@/components/Notification';
-import { Output, OutputType } from '@/components/Output';
+import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
@@ -65,8 +65,10 @@ import {
   getLocalCloseAllPositions,
   getLocalPlaceOrders,
 } from '@/state/localOrdersSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
+import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -74,6 +76,8 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
+import { useLocaleSeparators } from './useLocaleSeparators';
+import { useParameterizedSelector } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -260,6 +264,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [funkitDeposits, stringGetter, trigger, openAccountModal]);
+    },
+  },
+  {
+    type: NotificationType.SkipTransfer2,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { dydxAddress } = useAccounts();
+      const userTransfers = useParameterizedSelector(selectTransfersByAddress, dydxAddress);
+      const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+      const selectedLocale = useAppSelector(getSelectedLocale);
+
+      useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const transfer of userTransfers) {
+          // TODO: handle withdraw notifications too
+          if (transfer.type === 'withdraw') return;
+
+          const id = `${transfer.chainId}-${transfer.txHash}`;
+          const isSuccess = transfer.status === 'success';
+          const title = stringGetter({
+            key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+          });
+
+          // TODO(deposit2.0): localization
+          trigger(
+            id,
+            {
+              title,
+              icon: <Icon iconName={isSuccess ? IconName.Transfer : IconName.Clock} />,
+              body: `Your deposit of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`,
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.SkipTransfer,
+            },
+            [isSuccess]
+          );
+        }
+      }, [decimalSeparator, groupSeparator, selectedLocale, stringGetter, userTransfers]);
     },
   },
   {

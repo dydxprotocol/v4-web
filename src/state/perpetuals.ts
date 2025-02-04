@@ -12,6 +12,7 @@ export interface PerpetualsState {
   currentMarketIdIfTradeable?: string;
   marketFilter: MarketFilters;
   launchMarketIds: string[];
+  abacusHasMarkets: boolean;
 }
 
 const initialState: PerpetualsState = {
@@ -19,6 +20,7 @@ const initialState: PerpetualsState = {
   currentMarketIdIfTradeable: undefined,
   marketFilter: MarketFilters.ALL,
   launchMarketIds: [],
+  abacusHasMarkets: false,
 };
 
 export const perpetualsSlice = createSlice({
@@ -36,6 +38,9 @@ export const perpetualsSlice = createSlice({
       action: PayloadAction<string | undefined>
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
+    },
+    setAbacusHasMarkets: (state: PerpetualsState, action: PayloadAction<boolean>) => {
+      state.abacusHasMarkets = action.payload;
     },
     resetPerpetualsState: () =>
       ({
@@ -63,4 +68,5 @@ export const {
   resetPerpetualsState,
   setMarketFilter,
   setLaunchMarketIds,
+  setAbacusHasMarkets,
 } = perpetualsSlice.actions;

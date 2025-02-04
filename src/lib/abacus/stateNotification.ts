@@ -31,6 +31,7 @@ import {
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
+import { setAbacusHasMarkets } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 
@@ -91,6 +92,14 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.compliance) && updatedState.compliance) {
         dispatch(setCompliance(updatedState.compliance));
+      }
+
+      if (changes.has(Changes.markets)) {
+        dispatch(
+          setAbacusHasMarkets(
+            updatedState.marketIds() != null && updatedState.marketIds()!.size > 0
+          )
+        );
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {

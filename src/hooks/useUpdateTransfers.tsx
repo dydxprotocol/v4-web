@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 import { StatusState } from '@skip-go/client';
+import { formatUnits } from 'viem';
+
+import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { updateDeposit } from '@/state/transfers';
@@ -17,7 +20,6 @@ export function useUpdateTransfers() {
 
   // TODO: generalize this to withdrawals too
   const pendingDeposits = useParameterizedSelector(selectPendingDeposits, dydxAddress);
-
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});
 
@@ -27,17 +29,22 @@ export function useUpdateTransfers() {
     for (let i = 0; i < pendingDeposits.length; i += 1) {
       const deposit = pendingDeposits[i]!;
       const depositKey = `${deposit.chainId}-${deposit.txHash}`;
-      if (transactionToCallback.current[depositKey]) return;
+      if (transactionToCallback.current[depositKey]) continue;
 
       transactionToCallback.current[depositKey] = true;
       skipClient
         .waitForTransaction({ chainID: deposit.chainId, txHash: deposit.txHash })
         .then((response) => {
+          // Assume the final asset transfer is always USDC
+          const finalAmount = response.transferAssetRelease?.amount
+            ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
+            : undefined;
           dispatch(
             updateDeposit({
               dydxAddress,
               deposit: {
                 ...deposit,
+                finalAmountUsd: finalAmount,
                 status: handleResponseStatus(response.status),
               },
             })

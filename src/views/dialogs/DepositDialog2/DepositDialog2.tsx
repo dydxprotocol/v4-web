@@ -1,14 +1,14 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
-import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
+import { DepositDialog2Props, DialogProps, DialogTypes } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
+import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -17,6 +17,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 
 import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { addDeposit, Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
@@ -81,9 +82,17 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     dispatch(addDeposit({ deposit, dydxAddress }));
   };
 
+  useLayoutEffect(() => {
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
+      setIsOpen(false);
+      dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
+    }
+  }, [sourceAccount, dispatch, setIsOpen]);
+
   return (
     <$Dialog
       isOpen
+      preventCloseOnOverlayClick
       withAnimation
       hasHeaderBorder
       setIsOpen={setIsOpen}

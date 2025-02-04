@@ -3,24 +3,26 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
-import { CHAIN_INFO } from '@/constants/chains';
+import { CHAIN_INFO, isEvmDepositChainId } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
-import { CosmosChainId } from '@/constants/graz';
+import { CosmosChainId, NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
+import usePrevious from '@/hooks/usePrevious';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
+
+import { convertBech32Address } from '@/lib/addressUtils';
 
 import { ChainSelect } from './ChainSelect';
 import { WithdrawForm } from './WithdrawForm';
 
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const { sourceAccount } = useAccounts();
+  const { dydxAddress, sourceAccount, nobleAddress } = useAccounts();
   const [destinationAddress, setDestinationAddress] = useState(sourceAccount.address ?? '');
   const [destinationChain, setDestinationChain] = useState(
     sourceAccount.chain === WalletNetworkType.Evm
@@ -30,9 +32,10 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         : CosmosChainId.Noble
   );
 
+  const previousChainRef = usePrevious(CHAIN_INFO[destinationChain]?.walletNetworkType);
+
   const [amount, setAmount] = useState('');
 
-  const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
 
   const [formState, setFormState] = useState<'form' | 'chain-select'>('form');
@@ -49,10 +52,54 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
   };
 
   useEffect(() => {
-    if (CHAIN_INFO[destinationChain]?.walletNetworkType !== sourceAccount.chain) {
-      setDestinationAddress('');
-    }
-  }, [sourceAccount, destinationChain]);
+    const currentDestinationChainType = CHAIN_INFO[destinationChain]?.walletNetworkType;
+
+    // Do not update destination address if chainType goes from EVM -> EVM
+    // Cosmos uses different Bech32Prefixes for different chains, so it is excluded from this check
+    if (
+      currentDestinationChainType === WalletNetworkType.Evm &&
+      previousChainRef === currentDestinationChainType
+    )
+      return;
+
+    setDestinationAddress(() => {
+      if (dydxAddress) {
+        if (destinationChain === CosmosChainId.Neutron) {
+          return convertBech32Address({
+            address: dydxAddress,
+            bech32Prefix: NEUTRON_BECH32_PREFIX,
+          });
+        }
+
+        if (destinationChain === CosmosChainId.Osmosis) {
+          return convertBech32Address({ address: dydxAddress, bech32Prefix: OSMO_BECH32_PREFIX });
+        }
+      }
+
+      if (destinationChain === CosmosChainId.Noble && nobleAddress) {
+        return nobleAddress;
+      }
+
+      if (sourceAccount.address != null) {
+        const { address: sourceWalletAddress } = sourceAccount;
+        if (
+          destinationChain === SOLANA_MAINNET_ID &&
+          sourceAccount.chain === WalletNetworkType.Solana
+        ) {
+          return sourceWalletAddress;
+        }
+
+        if (
+          isEvmDepositChainId(destinationChain) &&
+          sourceAccount.chain === WalletNetworkType.Evm
+        ) {
+          return sourceWalletAddress;
+        }
+      }
+
+      return '';
+    });
+  }, [destinationChain, dydxAddress, nobleAddress, sourceAccount]);
 
   return (
     <$Dialog
@@ -65,33 +112,36 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      <div tw="flex w-[200%] overflow-hidden">
-        <div
-          tw="w-[50%]"
-          style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
-        >
-          <WithdrawForm
-            amount={amount}
-            setAmount={setAmount}
-            destinationAddress={destinationAddress}
-            setDestinationAddress={setDestinationAddress}
-            destinationChain={destinationChain}
-            onChainSelect={() => setFormState('chain-select')}
-          />
-        </div>
-        <div
-          ref={chainSelectRef}
-          tw="w-[50%] overflow-scroll"
-          style={{
-            height: formState === 'form' ? 0 : '100%',
-            maxHeight: isMobile ? '50vh' : '25rem',
-          }}
-        >
-          <ChainSelect
-            selectedChain={destinationChain}
-            setSelectedChain={setDestinationChain}
-            onBack={onShowForm}
-          />
+      <div tw="w-[100%] overflow-hidden">
+        <div tw="flex w-[200%]">
+          <div
+            tw="w-[50%]"
+            style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+          >
+            <WithdrawForm
+              amount={amount}
+              setAmount={setAmount}
+              destinationAddress={destinationAddress}
+              setDestinationAddress={setDestinationAddress}
+              destinationChain={destinationChain}
+              onChainSelect={() => setFormState('chain-select')}
+            />
+          </div>
+          <div
+            ref={chainSelectRef}
+            tw="w-[50%] overflow-scroll"
+            style={{
+              pointerEvents: formState === 'form' ? 'none' : undefined,
+              height: formState === 'form' ? 0 : '100%',
+            }}
+          >
+            <ChainSelect
+              disabled={formState === 'form'}
+              selectedChain={destinationChain}
+              setSelectedChain={setDestinationChain}
+              onBack={onShowForm}
+            />
+          </div>
         </div>
       </div>
     </$Dialog>

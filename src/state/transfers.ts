@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { TokenForTransfer } from '@/constants/tokens';
 import { DydxAddress } from '@/constants/wallets';
 
 export type Deposit = {
@@ -7,14 +8,21 @@ export type Deposit = {
   txHash: string;
   chainId: string;
   status: 'pending' | 'success' | 'error';
+  token: TokenForTransfer;
+  tokenAmount: string; // raw and unformatted amount
   estimatedAmountUsd: string;
-  actualAmountUsd?: string;
+  finalAmountUsd?: string;
   isInstantDeposit: boolean;
 };
 
 export type Withdraw = {
   type: 'withdraw';
-  // TODO: add withdraw details here
+  txHash: string;
+  chainId: string;
+  status: 'pending' | 'success' | 'error';
+  estimatedAmountUsd: string;
+  actualAmountUsd?: string;
+  isInstantWithdraw: boolean;
 };
 
 export type Transfer = Deposit | Withdraw;
