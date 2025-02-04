@@ -37,6 +37,7 @@ export function useUpdateTransfers() {
               dydxAddress,
               deposit: {
                 ...deposit,
+                finalAmountUsd: response.transferAssetRelease?.amount,
                 status: handleResponseStatus(response.status),
               },
             })
