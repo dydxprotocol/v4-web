@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef } from 'react';
-
-import { BonsaiCore } from '@/bonsai/ontology';
-import { ArrowRightIcon } from '@radix-ui/react-icons';
+import { useEffect, useMemo } from 'react';
 
 import { ButtonAction } from '@/constants/buttons';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { appQueryClient } from '@/state/appQueryClient';
-import { useAppSelector } from '@/state/appTypes';
 import { selectDeposit } from '@/state/transfersSelectors';
 
-import { orEmptyObj } from '@/lib/typeUtils';
+import { getTokenSymbol } from './utils';
 
 type DepositStatusProps = {
   txHash: string;
@@ -27,10 +24,6 @@ type DepositStatusProps = {
 // TODO(deposit2.0): localization for this whole component
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
   const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
-  const { freeCollateral } = orEmptyObj(
-    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
-  );
-  const initialFreeCollateral = useRef(freeCollateral);
 
   useEffect(() => {
     if (!deposit || deposit.status !== 'success') return;
@@ -39,11 +32,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
     appQueryClient.invalidateQueries({ queryKey: ['validator', 'accountBalances'], exact: false });
   }, [deposit]);
 
-  // Use difference in free collateral value to determine that the subaccount sweep has finished
-  const depositSuccess =
-    deposit?.status === 'success' &&
-    freeCollateral &&
-    !initialFreeCollateral.current?.eq(freeCollateral);
+  const depositSuccess = deposit?.status === 'success';
 
   const statusDescription = useMemo(() => {
     if (depositSuccess) return 'Your funds are now available for trading.';
@@ -70,21 +59,15 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
         </div>
       </div>
       <div tw="flex items-center justify-between self-stretch">
-        <div tw="text-color-text-0">{depositSuccess ? 'Available balance' : 'Your deposit'}</div>
+        <div tw="text-color-text-0">Your deposit</div>
         <div tw="flex items-center gap-0.125">
-          {depositSuccess ? (
-            <>
-              <ArrowRightIcon tw="text-green" />
-              <Output tw="inline" value={freeCollateral} type={OutputType.Fiat} />
-            </>
-          ) : (
-            <Output
-              tw="inline"
-              value={deposit.estimatedAmountUsd}
-              type={OutputType.Fiat}
-              slotLeft="~"
-            />
-          )}
+          <Output
+            tw="inline"
+            value={deposit.estimatedAmountUsd}
+            type={OutputType.Fiat}
+            slotLeft="~"
+          />
+          <AssetIcon symbol={getTokenSymbol(deposit.token.denom)} chainId={deposit.token.chainId} />
         </div>
       </div>
       <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
