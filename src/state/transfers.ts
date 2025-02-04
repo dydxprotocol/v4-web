@@ -11,7 +11,7 @@ export type Deposit = {
   token: TokenForTransfer;
   tokenAmount: string; // raw and unformatted amount
   estimatedAmountUsd: string;
-  actualAmountUsd?: string;
+  finalAmountUsd?: string;
   isInstantDeposit: boolean;
 };
 

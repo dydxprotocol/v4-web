@@ -294,8 +294,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             {
               title,
               icon: <Icon iconName={isSuccess ? IconName.Transfer : IconName.Clock} />,
-              // TODO(deposit2.0): Use final deposited or withdrawal amount here
-              body: `Your deposit of ${formatNumberOutput(transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`,
+              body: `Your deposit of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.SkipTransfer,
             },

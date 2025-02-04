@@ -63,9 +63,9 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
         <div tw="flex items-center gap-0.125">
           <Output
             tw="inline"
-            value={deposit.estimatedAmountUsd}
+            value={deposit.finalAmountUsd ?? deposit.estimatedAmountUsd}
             type={OutputType.Fiat}
-            slotLeft="~"
+            slotLeft={deposit.finalAmountUsd ? undefined : '~'}
           />
           <AssetIcon symbol={getTokenSymbol(deposit.token.denom)} chainId={deposit.token.chainId} />
         </div>

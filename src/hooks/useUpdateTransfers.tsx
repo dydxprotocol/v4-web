@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 import { StatusState } from '@skip-go/client';
+import { formatUnits } from 'viem';
+
+import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { updateDeposit } from '@/state/transfers';
@@ -32,11 +35,16 @@ export function useUpdateTransfers() {
       skipClient
         .waitForTransaction({ chainID: deposit.chainId, txHash: deposit.txHash })
         .then((response) => {
+          // Assume the final asset transfer is always USDC
+          const finalAmount = response.transferAssetRelease?.amount
+            ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
+            : undefined;
           dispatch(
             updateDeposit({
               dydxAddress,
               deposit: {
                 ...deposit,
+                finalAmountUsd: finalAmount,
                 status: handleResponseStatus(response.status),
               },
             })
