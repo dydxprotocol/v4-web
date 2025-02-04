@@ -28,8 +28,14 @@ export function useWithdrawSteps({
   onWithdraw: (withdraw: Withdraw) => void;
 }) {
   const { skipClient } = useSkipClient();
-  const { dydxAddress, localDydxWallet, localNobleWallet, nobleAddress, sourceAccount } =
-    useAccounts();
+  const {
+    dydxAddress,
+    localDydxWallet,
+    localNobleWallet,
+    nobleAddress,
+    osmosisAddress,
+    sourceAccount,
+  } = useAccounts();
 
   const userAddresses: UserAddress[] | undefined = useMemo(() => {
     if (
@@ -40,8 +46,14 @@ export function useWithdrawSteps({
       return undefined;
     }
 
-    return getUserAddressesForRoute(withdrawRoute, sourceAccount, nobleAddress, dydxAddress);
-  }, [dydxAddress, nobleAddress, sourceAccount, withdrawRoute]);
+    return getUserAddressesForRoute(
+      withdrawRoute,
+      sourceAccount,
+      nobleAddress,
+      dydxAddress,
+      osmosisAddress
+    );
+  }, [dydxAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute]);
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
