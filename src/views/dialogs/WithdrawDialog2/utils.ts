@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
-import { PublicKey } from '@solana/web3.js';
 import { isAddress } from 'viem';
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 
@@ -15,7 +14,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 import { Withdraw } from '@/state/transfers';
 
-import { validateCosmosAddress } from '@/lib/addressUtils';
+import { isValidSolanaAddress, validateCosmosAddress } from '@/lib/addressUtils';
 
 import { getUserAddressesForRoute } from '../DepositDialog2/utils';
 
@@ -41,14 +40,7 @@ export function isValidWithdrawalAddress(address: string, chainId: string): bool
     case CosmosChainId.Neutron:
       return validateCosmosAddress(address, 'neutron');
     case SOLANA_MAINNET_ID: {
-      try {
-        // Generating a publickey will demonstrate if an address is valid
-        // eslint-disable-next-line no-new
-        new PublicKey(address);
-        return true;
-      } catch (_e) {
-        return false;
-      }
+      return isValidSolanaAddress(address);
     }
     case mainnet.id.toString():
     case arbitrum.id.toString():
