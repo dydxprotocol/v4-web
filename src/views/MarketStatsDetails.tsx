@@ -49,7 +49,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const { isTablet } = useBreakpoints();
 
   const marketData = useAppSelector(BonsaiHelpers.currentMarket.marketInfo);
-  const isLoading = useAppSelector(BonsaiCore.markets.markets.loading) === 'pending';
+  const loadingState = useAppSelector(BonsaiCore.markets.markets.loading);
+  const isLoading = marketData == null && loadingState === 'pending';
 
   const {
     displayableAsset,
@@ -264,7 +265,7 @@ const DetailsItem = ({
           <$Output
             type={OutputType.Percent}
             value={value}
-            color={color}
+            color={!isLoading ? color : undefined}
             fractionDigits={FUNDING_DECIMALS}
           />
         </WithTooltip>
