@@ -35,6 +35,7 @@ export const CancelPendingOrdersDialog = ({
 
   const onSuccessfulCancel = useCallback(() => setIsOpen(false), [setIsOpen]);
 
+  console.log(logoUrl, pendingPosition?.assetId);
   return (
     <Dialog
       isOpen

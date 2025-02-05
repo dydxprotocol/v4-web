@@ -51,8 +51,8 @@ export const TransferButtonAndReceipt = ({
 
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { postOrder: newEquity } = equityInfo ?? {};
-  const { postOrder: newLeverage } = leverageInfo ?? {};
+  const { postOrder: newEquity } = orEmptyObj(equityInfo);
+  const { postOrder: newLeverage } = orEmptyObj(leverageInfo);
 
   const isUSDCSelected = selectedAsset === DydxChainAsset.USDC;
 
