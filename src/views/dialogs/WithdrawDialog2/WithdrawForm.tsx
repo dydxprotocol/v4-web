@@ -19,6 +19,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
+import { Withdraw } from '@/state/transfers';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -35,6 +36,7 @@ export const WithdrawForm = ({
   setDestinationAddress,
   destinationChain,
   onChainSelect,
+  onWithdraw,
 }: {
   amount: string;
   setAmount: Dispatch<SetStateAction<string>>;
@@ -42,6 +44,7 @@ export const WithdrawForm = ({
   setDestinationAddress: Dispatch<SetStateAction<string>>;
   destinationChain: string;
   onChainSelect: () => void;
+  onWithdraw: (withdraw: Withdraw) => void;
 }) => {
   const stringGetter = useStringGetter();
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
@@ -58,6 +61,7 @@ export const WithdrawForm = ({
   } = useWithdrawalRoutes({
     token: selectedToken,
     amount: debouncedAmount,
+    destinationAddress,
   });
 
   const {
@@ -66,15 +70,18 @@ export const WithdrawForm = ({
     equity: updatedEquity,
   } = orEmptyObj(useWithdrawalDeltas({ withdrawAmount: debouncedAmount }));
 
+  // @ts-expect-error SDK doesn't know about .goFastTransfer
+  const hasGoFastRoute = routes?.fast.operations.find((op) => op.goFastTransfer);
+
   useEffect(() => {
-    if (debouncedAmount && !isFetching && !routes?.fast) setSelectedSpeed('slow');
-  }, [isFetching, routes, debouncedAmount]);
+    if (debouncedAmount && !isFetching && !hasGoFastRoute) setSelectedSpeed('slow');
+  }, [isFetching, hasGoFastRoute, debouncedAmount]);
 
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
 
   const { executeWithdraw, isLoading } = useWithdrawStep({
     withdrawRoute: selectedRoute,
-    onWithdraw: () => {},
+    onWithdraw,
   });
 
   const routeInformation = selectedRoute && (

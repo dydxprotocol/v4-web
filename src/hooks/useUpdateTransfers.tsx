@@ -6,8 +6,8 @@ import { formatUnits } from 'viem';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { updateDeposit } from '@/state/transfers';
-import { selectPendingDeposits } from '@/state/transfersSelectors';
+import { isDeposit, isWithdraw, updateDeposit, updateWithdraw } from '@/state/transfers';
+import { selectPendingTransfers } from '@/state/transfersSelectors';
 
 import { useSkipClient } from './transfers/skipClient';
 import { useAccounts } from './useAccounts';
@@ -18,40 +18,55 @@ export function useUpdateTransfers() {
   const dispatch = useAppDispatch();
   const { skipClient } = useSkipClient();
 
-  // TODO: generalize this to withdrawals too
-  const pendingDeposits = useParameterizedSelector(selectPendingDeposits, dydxAddress);
+  const pendingTransfers = useParameterizedSelector(selectPendingTransfers, dydxAddress);
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    if (!dydxAddress || !pendingDeposits.length) return;
+    if (!dydxAddress || !pendingTransfers.length) return;
 
-    for (let i = 0; i < pendingDeposits.length; i += 1) {
-      const deposit = pendingDeposits[i]!;
-      const depositKey = `${deposit.chainId}-${deposit.txHash}`;
-      if (transactionToCallback.current[depositKey]) continue;
+    for (let i = 0; i < pendingTransfers.length; i += 1) {
+      const transfer = pendingTransfers[i]!;
+      const { chainId, txHash } = transfer;
+      const transferKey = `${chainId}-${txHash}`;
+      if (transactionToCallback.current[transferKey]) continue;
 
-      transactionToCallback.current[depositKey] = true;
-      skipClient
-        .waitForTransaction({ chainID: deposit.chainId, txHash: deposit.txHash })
-        .then((response) => {
-          // Assume the final asset transfer is always USDC
-          const finalAmount = response.transferAssetRelease?.amount
-            ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
-            : undefined;
+      transactionToCallback.current[transferKey] = true;
+
+      skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
+        // Assume the final asset transfer is always USDC
+        const finalAmount = response.transferAssetRelease?.amount
+          ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
+          : undefined;
+
+        if (isDeposit(transfer)) {
           dispatch(
             updateDeposit({
               dydxAddress,
               deposit: {
-                ...deposit,
+                ...transfer,
                 finalAmountUsd: finalAmount,
                 status: handleResponseStatus(response.status),
               },
             })
           );
-        });
+        }
+
+        if (isWithdraw(transfer)) {
+          dispatch(
+            updateWithdraw({
+              dydxAddress,
+              withdraw: {
+                ...transfer,
+                finalAmountUsd: finalAmount,
+                status: handleResponseStatus(response.status),
+              },
+            })
+          );
+        }
+      });
     }
-  }, [dydxAddress, pendingDeposits, skipClient, dispatch]);
+  }, [dydxAddress, pendingTransfers, skipClient, dispatch]);
 }
 
 function handleResponseStatus(status: StatusState) {

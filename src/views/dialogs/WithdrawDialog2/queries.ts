@@ -12,6 +12,8 @@ import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
+import { isValidWithdrawalAddress } from './utils';
+
 async function getSkipWithdrawalRoutes(
   skipClient: SkipClient,
   token: TokenForTransfer,
@@ -40,20 +42,27 @@ async function getSkipWithdrawalRoutes(
 export function useWithdrawalRoutes({
   token,
   amount,
+  destinationAddress,
 }: {
   token?: TokenForTransfer;
   amount: string;
+  destinationAddress: string;
 }) {
   const { skipClient } = useSkipClient();
   const rawAmount = amount && token && parseUnits(amount, token.decimals);
 
+  const hasValidAddress = Boolean(
+    destinationAddress &&
+      token?.chainId &&
+      isValidWithdrawalAddress(destinationAddress, token.chainId)
+  );
+
   return useQuery({
     queryKey: ['routes', token?.chainId, token?.denom, amount],
     queryFn: () => getSkipWithdrawalRoutes(skipClient, token!, amount),
-    enabled: Boolean(token) && Boolean(rawAmount && rawAmount > 0),
+    enabled: hasValidAddress && Boolean(rawAmount && rawAmount > 0),
     staleTime: 1 * timeUnits.minute,
     refetchOnMount: 'always',
-    placeholderData: (prev) => prev,
     retry: false,
   });
 }

@@ -21,7 +21,7 @@ export type Withdraw = {
   chainId: string;
   status: 'pending' | 'success' | 'error';
   estimatedAmountUsd: string;
-  actualAmountUsd?: string;
+  finalAmountUsd?: string;
   isInstantWithdraw: boolean;
 };
 
@@ -78,7 +78,41 @@ export const transfersSlice = createSlice({
         return transfer;
       });
     },
+    addWithdraw: (
+      state,
+      action: PayloadAction<{ dydxAddress: DydxAddress; withdraw: Withdraw }>
+    ) => {
+      const { dydxAddress, withdraw } = action.payload;
+      if (!state.transfersByDydxAddress[dydxAddress]) {
+        state.transfersByDydxAddress[dydxAddress] = [];
+      }
+
+      state.transfersByDydxAddress[dydxAddress].push(withdraw);
+    },
+    updateWithdraw: (
+      state,
+      action: PayloadAction<{
+        dydxAddress: DydxAddress;
+        withdraw: Partial<Withdraw> & { txHash: string; chainId: string };
+      }>
+    ) => {
+      const { dydxAddress, withdraw } = action.payload;
+      const accountTransfers = state.transfersByDydxAddress[dydxAddress];
+      if (!accountTransfers?.length) return;
+
+      state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
+        if (
+          isWithdraw(transfer) &&
+          transfer.txHash === withdraw.txHash &&
+          transfer.chainId === withdraw.chainId
+        ) {
+          return { ...transfer, ...withdraw };
+        }
+
+        return transfer;
+      });
+    },
   },
 });
 
-export const { addDeposit, updateDeposit } = transfersSlice.actions;
+export const { addDeposit, addWithdraw, updateDeposit, updateWithdraw } = transfersSlice.actions;
