@@ -115,7 +115,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
         if (changes.has(Changes.fills)) {
           const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
-          if (isChildSubaccount) {
+          if (!isChildSubaccount) {
             dispatch(updateFilledOrders(fills));
           }
         }
@@ -123,7 +123,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         if (changes.has(Changes.historicalPnl)) {
           const historicalPnl = updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
 
-          if (isChildSubaccount) {
+          if (!isChildSubaccount) {
             dispatch(setHistoricalPnl(historicalPnl));
           }
         }
