@@ -30,10 +30,19 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
   const statusDescription = useMemo(() => {
     if (transferSuccess) return 'Your funds have been withdrawn.';
 
-    return 'Your funds will be withdrawn shortly, and you may safely close this window.';
+    return 'Your funds will be withdrawn shortly, you may safely close this window.';
   }, [transferSuccess]);
 
   if (!withdraw) return null;
+
+  const WithdrawalOutput = (
+    <Output
+      tw="inline"
+      value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
+      type={OutputType.Fiat}
+      slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
+    />
+  );
 
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
@@ -47,7 +56,10 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
           <div tw="text-large">
             {!transferSuccess
               ? stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })
-              : stringGetter({ key: STRING_KEYS.WITHDRAW_COMPLETE })}
+              : stringGetter({
+                  key: STRING_KEYS.WITHDRAW_COMPLETE,
+                  params: { AMOUNT_USD: WithdrawalOutput },
+                })}
           </div>
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
@@ -55,12 +67,7 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
       <div tw="flex items-center justify-between self-stretch">
         <div tw="text-color-text-0">Your withdraw</div>
         <div tw="flex items-center gap-0.125">
-          <Output
-            tw="inline"
-            value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
-            type={OutputType.Fiat}
-            slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
-          />
+          {WithdrawalOutput}
           <AssetIcon symbol="USDC" chainId={withdraw.chainId} />
         </div>
       </div>
