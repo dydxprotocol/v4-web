@@ -279,14 +279,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of userTransfers) {
-          // TODO: handle withdraw notifications too
-          if (transfer.type === 'withdraw') return;
-
+          const { type, status } = transfer;
           const id = `${transfer.chainId}-${transfer.txHash}`;
-          const isSuccess = transfer.status === 'success';
-          const title = stringGetter({
-            key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-          });
+          const isSuccess = status === 'success';
+          let body: string = '';
+          let title: string = '';
+
+          if (type === 'withdraw') {
+            title = stringGetter({
+              key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+            });
+            body = `Your withdrawal of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} ${isSuccess ? 'has completed' : 'is pending'}.`;
+          } else {
+            // Deposit
+            title = stringGetter({
+              key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+            });
+            body = `Your deposit of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`;
+          }
 
           // TODO(deposit2.0): localization
           trigger(
@@ -294,7 +304,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             {
               title,
               icon: <Icon iconName={isSuccess ? IconName.Transfer : IconName.Clock} />,
-              body: `Your deposit of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`,
+              body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.SkipTransfer,
             },
