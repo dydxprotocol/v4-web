@@ -4,7 +4,6 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
-import { SubaccountPosition } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
@@ -130,7 +129,7 @@ export const useCurrentMarketId = () => {
         if (
           activeTradeBoxDialog != null &&
           TradeBoxDialogTypes.is.ClosePosition(activeTradeBoxDialog) &&
-          openPositions?.find((position: SubaccountPosition) => position.id === marketId)
+          openPositions?.find((position) => position.market === marketId)
         ) {
           // Keep the close positions dialog open between market changes as long as there exists an open position
           return;

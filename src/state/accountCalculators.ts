@@ -1,3 +1,4 @@
+import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
@@ -11,7 +12,7 @@ import {
 } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
-import { isOrderStatusOpen } from '@/lib/orders';
+import { isNewOrderStatusOpen } from '@/lib/orders';
 
 import { getCurrentMarketId } from './currentMarketSelectors';
 
@@ -123,10 +124,11 @@ export const calculateHasCancelableOrders = () =>
     [getSubaccountOpenOrders, (s, marketId?: string) => marketId],
     (openOrders, marketId) => {
       // the extra isOrderStatusOpen check filter the order to also not be canceling / best effort canceled
-      return (
-        openOrders?.some(
-          (order) => (!marketId || order.marketId === marketId) && isOrderStatusOpen(order.status)
-        ) ?? false
+      return openOrders.some(
+        (order) =>
+          (!marketId || order.marketId === marketId) &&
+          order.status != null &&
+          isNewOrderStatusOpen(order.status)
       );
     }
   );
@@ -135,16 +137,22 @@ export const calculateHasCancelableOrdersInOtherMarkets = createAppSelector(
   [getSubaccountOpenOrders, getCurrentMarketId],
   (openOrders, marketId) =>
     marketId !== undefined &&
-    (openOrders?.some((order) => order.marketId !== marketId && isOrderStatusOpen(order.status)) ??
-      false)
+    openOrders.some(
+      (order) =>
+        order.marketId !== marketId && order.status != null && isNewOrderStatusOpen(order.status)
+    )
 );
 
+const selectCurrentMarginUsage = createAppSelector(
+  [BonsaiCore.account.parentSubaccountSummary.data],
+  (d) => d?.marginUsage?.toNumber()
+);
+const selectCurrentFreeCollateral = createAppSelector(
+  [BonsaiCore.account.parentSubaccountSummary.data],
+  (d) => d?.freeCollateral.toNumber()
+);
 export const selectSubaccountStateForVaults = createAppSelector(
-  [
-    (state) => state.account.subaccount?.marginUsage?.current,
-    (state) => state.account.subaccount?.freeCollateral?.current,
-    calculateCanViewAccount,
-  ],
+  [selectCurrentMarginUsage, selectCurrentFreeCollateral, calculateCanViewAccount],
   (marginUsage, freeCollateral, canViewAccount): VaultFormAccountData => ({
     marginUsage: marginUsage ?? undefined,
     freeCollateral: freeCollateral ?? undefined,

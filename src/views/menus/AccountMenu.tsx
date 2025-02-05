@@ -227,7 +227,7 @@ export const AccountMenu = () => {
                   </$label>
                   <$BalanceOutput
                     type={OutputType.Asset}
-                    value={freeCollateral?.current ?? 0}
+                    value={freeCollateral ?? 0}
                     fractionDigits={USD_DECIMALS}
                   />
                 </div>
@@ -235,7 +235,7 @@ export const AccountMenu = () => {
                   asset={DydxChainAsset.USDC}
                   complianceState={complianceState}
                   dispatch={dispatch}
-                  hasBalance={MustBigNumber(freeCollateral?.current).gt(0)}
+                  hasBalance={MustBigNumber(freeCollateral).gt(0)}
                   stringGetter={stringGetter}
                   withOnboarding
                 />

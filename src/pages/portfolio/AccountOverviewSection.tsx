@@ -66,7 +66,7 @@ export const AccountOverviewSection = () => {
 
   const { equity, freeCollateral } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { balanceUsdc: vaultBalance } = orEmptyObj(useLoadedVaultAccount().data);
-  const totalValue = mapIfPresent(equity?.current, (e) => e + (vaultBalance ?? 0));
+  const totalValue = mapIfPresent(equity?.toNumber(), (e) => e + (vaultBalance ?? 0));
 
   const handleViewVault = useCallback(() => {
     track(AnalyticsEvents.ClickViewVaultFromOverview());
@@ -81,13 +81,13 @@ export const AccountOverviewSection = () => {
     {
       id: 'free-collateral',
       label: stringGetter({ key: STRING_KEYS.FREE_COLLATERAL }),
-      amount: mapIfPresent(freeCollateral?.current, (fc) => Math.max(fc, 0.0)),
+      amount: mapIfPresent(freeCollateral?.toNumber(), (fc) => Math.max(fc, 0.0)),
       color: ColorToken.GrayPurple2,
     },
     {
       id: 'open-positions',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-      amount: mapIfPresent(equity?.current, freeCollateral?.current, (e, f) =>
+      amount: mapIfPresent(equity?.toNumber(), freeCollateral?.toNumber(), (e, f) =>
         Math.max(e - Math.max(f, 0), 0)
       ),
       color: ColorToken.Yellow1,

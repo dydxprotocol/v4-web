@@ -126,9 +126,8 @@ export const ClosePositionForm = ({
 
   const closePositionInputErrors = useAppSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
-  const { size: currentPositionSize } = currentPositionData ?? {};
-  const { current: currentSize } = currentPositionSize ?? {};
-  const currentSizeBN = MustBigNumber(currentSize).abs();
+  const { signedSize: currentPositionSize } = currentPositionData ?? {};
+  const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
   const hasInputErrors = closePositionInputErrors?.some(
     (error: ValidationError) => error.type !== ErrorType.warning
@@ -280,7 +279,7 @@ export const ClosePositionForm = ({
         onInput={onAmountInput}
         type={InputType.Number}
         value={amountInput}
-        max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
+        max={currentPositionSize != null ? currentSizeBN.toNumber() : undefined}
         tw="w-full"
       />
 

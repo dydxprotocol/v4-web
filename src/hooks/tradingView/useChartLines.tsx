@@ -1,21 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
-import { HumanReadablePlaceOrderPayload, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
+import { HumanReadablePlaceOrderPayload } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDER_TYPE_STRINGS, TradeTypes, type OrderType } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { Icon, IconName } from '@/components/Icon';
 
 import {
   getCurrentMarketOrders,
+  getCurrentMarketOrdersForPostOrder,
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
@@ -39,7 +43,7 @@ import {
   createPlaceOrderPayloadFromExistingOrder,
   getOrderModificationError,
 } from '@/lib/orderModification';
-import { isOrderStatusOpen } from '@/lib/orders';
+import { isNewOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
 import { useCustomNotification } from '../useCustomNotification';
@@ -77,6 +81,10 @@ export const useChartLines = ({
   const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useAppSelector(
     getCurrentMarketOrders,
+    shallowEqual
+  );
+  const currentMarketOrdersAbacus = useAppSelector(
+    getCurrentMarketOrdersForPostOrder,
     shallowEqual
   );
 
@@ -189,9 +197,9 @@ export const useChartLines = ({
       return;
     }
 
-    const entryPrice = currentMarketPositionData.entryPrice.current;
-    const liquidationPrice = currentMarketPositionData.liquidationPrice.current;
-    const size = currentMarketPositionData.size.current;
+    const entryPrice = currentMarketPositionData.entryPrice.toNumber();
+    const liquidationPrice = currentMarketPositionData.liquidationPrice?.toNumber();
+    const size = currentMarketPositionData.signedSize.toNumber();
 
     maybeDrawPositionLine({
       key: entryLineKey,
@@ -236,7 +244,7 @@ export const useChartLines = ({
     async (order: SubaccountOrder, orderLine?: IOrderLineAdapter) => {
       if (!orderLine || !canModifyOrderTypeFromChart(order)) return;
 
-      const oldPrice = order.triggerPrice ?? order.price;
+      const oldPrice = (order.triggerPrice ?? order.price).toNumber();
       const newPrice = orderLine.getPrice();
 
       const priceError = getOrderModificationError(order, newPrice);
@@ -320,16 +328,24 @@ export const useChartLines = ({
     }
 
     currentMarketOrders.forEach((order) => {
-      const { id, type, status, side, cancelReason, size, triggerPrice, price, trailingPercent } =
-        order;
+      const {
+        id,
+        type,
+        status,
+        side,
+        removalReason: cancelReason,
+        size,
+        triggerPrice,
+        price,
+      } = order;
       const key = id;
       const quantity = size.toString();
 
-      const orderType = type.rawValue as OrderType;
+      const orderType = type;
       const orderLabel = stringGetter({
         key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
       });
-      const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
+      const orderString = orderLabel;
 
       const pendingReplacementOrder = Object.values(pendingOrderAdjustments).find(
         (adjustment) => adjustment.oldOrderId === id
@@ -341,7 +357,7 @@ export const useChartLines = ({
       // For orders that are modified on the chart, keep showing the canceled order (with the new price) until the new order is successfully placed
       const shouldShow =
         (!!pendingReplacementOrder && !replacementOrderPlaced) ||
-        (!cancelReason && isOrderStatusOpen(status));
+        (!cancelReason && status != null && isNewOrderStatusOpen(status));
 
       const maybeOrderLine = chartLinesRef.current[key]?.line;
 
@@ -375,7 +391,7 @@ export const useChartLines = ({
           if (orderLine) {
             const chartLine: ChartLine = {
               line: orderLine,
-              chartLineType: ORDER_SIDES[side.name],
+              chartLineType: side === IndexerOrderSide.BUY ? OrderSide.BUY : OrderSide.SELL,
             };
             setLineColorsAndFont({ chartLine });
             chartLinesRef.current[key] = chartLine;
@@ -391,13 +407,14 @@ export const useChartLines = ({
               AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
             );
             removePendingOrderAdjustment(order.clientId);
-            dispatch(setLatestOrder(order));
+            dispatch(setLatestOrder(currentMarketOrdersAbacus.find((o) => o.id === order.id)));
           }
         }
       }
     });
   }, [
     currentMarketOrders,
+    currentMarketOrdersAbacus,
     stringGetter,
     tvWidget,
     setLineColorsAndFont,

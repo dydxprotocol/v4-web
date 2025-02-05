@@ -26,8 +26,8 @@ export const funkitConfig = () =>
       },
       confirmationScreen: {
         showTokenAmount: false,
-        customRecipientConfig: {
-          destinationIcon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
+        destinationConfig: {
+          icon: <LogoShortIcon id="funkit-dydx-logo" width={15} height={15} />,
         },
         showPaymentAmountUsd: true,
       },
