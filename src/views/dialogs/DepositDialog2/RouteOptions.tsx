@@ -32,6 +32,8 @@ export const DepositRouteOptions = ({
   onSelectSpeed,
   disabled,
 }: Props) => {
+  const stringGetter = useStringGetter();
+
   const fastRouteDescription = useMemo(() => {
     const fastOperationFee = // @ts-ignore
       routes?.fast?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
@@ -80,10 +82,15 @@ export const DepositRouteOptions = ({
   }, [routes, disabled]);
 
   const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
-  // TODO(deposit2.0): localization
-  // "slow" route could be fast when going from solana or cosmos
-  const slowRouteTitle =
-    slowRouteSpeed && slowRouteSpeed <= 60 ? `~${slowRouteSpeed} seconds` : '~20 mins';
+  const slowRouteDuration = Date.now() + (slowRouteSpeed ?? 0) * 1000;
+  const { timeString, unitStringKey } = getStringsForDateTimeDiff(
+    DateTime.fromMillis(slowRouteDuration)
+  );
+  const slowRouteTitle = slowRouteSpeed
+    ? slowRouteSpeed <= 60
+      ? stringGetter({ key: STRING_KEYS.INSTANT })
+      : `${timeString}${stringGetter({ key: unitStringKey })}`
+    : stringGetter({ key: STRING_KEYS.DEFAULT });
 
   return (
     <div tw="flex gap-0.5">
@@ -211,7 +218,9 @@ export const WithdrawRouteOptions = ({
     DateTime.fromMillis(slowRouteDuration)
   );
   const slowRouteTitle = slowRouteSpeed
-    ? `${timeString}${stringGetter({ key: unitStringKey })}`
+    ? slowRouteSpeed <= 60
+      ? stringGetter({ key: STRING_KEYS.INSTANT })
+      : `${timeString}${stringGetter({ key: unitStringKey })}`
     : stringGetter({ key: STRING_KEYS.DEFAULT });
 
   return (
