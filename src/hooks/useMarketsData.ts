@@ -74,6 +74,7 @@ const sortByMarketCap = (a: AssetData, b: AssetData) => {
   return (b.marketCap ?? 0) - (a.marketCap ?? 0);
 };
 
+const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT']);
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
@@ -123,6 +124,7 @@ export const useMarketsData = ({
       !!forceShowUnlaunchedMarkets || !shouldHideLaunchableMarkets
         ? Object.values(assets)
             .filter(isTruthy)
+            .filter((a) => !ASSETS_TO_REMOVE.has(a.assetId))
             .sort(sortByMarketCap)
             .map((asset) => {
               // Remove assets that are already in the list of markets from Indexer a long with assets that have no price or a negative price
