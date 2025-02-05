@@ -53,7 +53,6 @@ import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { usePrefetchedQueries } from './hooks/usePrefetchedQueries';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
@@ -85,7 +84,6 @@ const Content = () => {
   useInitializePage();
   useAnalytics();
   useCommandMenu();
-  usePrefetchedQueries();
   useUpdateTransfers();
   useReferralCode();
   useUnlimitedLaunchDialog();

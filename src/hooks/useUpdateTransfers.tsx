@@ -5,6 +5,7 @@ import { formatUnits } from 'viem';
 
 import { USDC_DECIMALS } from '@/constants/tokens';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch } from '@/state/appTypes';
 import { isDeposit, isWithdraw, updateDeposit, updateWithdraw } from '@/state/transfers';
 import { selectPendingTransfers } from '@/state/transfersSelectors';
@@ -39,6 +40,7 @@ export function useUpdateTransfers() {
           ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
           : undefined;
 
+        const status = handleResponseStatus(response.status);
         if (isDeposit(transfer)) {
           dispatch(
             updateDeposit({
@@ -46,7 +48,7 @@ export function useUpdateTransfers() {
               deposit: {
                 ...transfer,
                 finalAmountUsd: finalAmount,
-                status: handleResponseStatus(response.status),
+                status,
               },
             })
           );
@@ -59,10 +61,17 @@ export function useUpdateTransfers() {
               withdraw: {
                 ...transfer,
                 finalAmountUsd: finalAmount,
-                status: handleResponseStatus(response.status),
+                status,
               },
             })
           );
+        }
+
+        if (status === 'success') {
+          appQueryClient.invalidateQueries({
+            queryKey: ['validator', 'accountBalances'],
+            exact: false,
+          });
         }
       });
     }

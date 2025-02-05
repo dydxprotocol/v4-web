@@ -454,56 +454,60 @@ const AssetActions = memo(
     withOnboarding?: boolean;
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
-  }) => (
-    <div tw="inlineRow">
-      {[
-        withOnboarding &&
-          complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: testFlags.showNewDepositFlow
-              ? DialogTypes.Deposit2({})
-              : DialogTypes.Deposit({}),
-            iconName: IconName.Deposit,
-            tooltipStringKey: STRING_KEYS.DEPOSIT,
-          },
-        withOnboarding &&
-          hasBalance && {
-            dialog: testFlags.showNewWithdrawFlow
-              ? DialogTypes.Withdraw2({})
-              : DialogTypes.Withdraw({}),
-            iconName: IconName.Withdraw,
-            tooltipStringKey: STRING_KEYS.WITHDRAW,
-          },
-        hasBalance &&
-          complianceState === ComplianceStates.FULL_ACCESS && {
-            dialog: DialogTypes.Transfer({ selectedAsset: asset }),
-            iconName: IconName.Send,
-            tooltipStringKey: STRING_KEYS.TRANSFER,
-          },
-      ]
-        .filter(isTruthy)
-        .map(({ iconName, tooltipStringKey, dialog }) => (
-          <Item key={tooltipStringKey}>
-            {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
+  }) => {
+    const showNewDepositFlow =
+      useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
+
+    return (
+      <div tw="inlineRow">
+        {[
+          withOnboarding &&
+            complianceState === ComplianceStates.FULL_ACCESS && {
+              dialog: showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}),
+              iconName: IconName.Deposit,
+              tooltipStringKey: STRING_KEYS.DEPOSIT,
+            },
+          withOnboarding &&
+            hasBalance && {
+              dialog: testFlags.showNewWithdrawFlow
+                ? DialogTypes.Withdraw2({})
+                : DialogTypes.Withdraw({}),
+              iconName: IconName.Withdraw,
+              tooltipStringKey: STRING_KEYS.WITHDRAW,
+            },
+          hasBalance &&
+            complianceState === ComplianceStates.FULL_ACCESS && {
+              dialog: DialogTypes.Transfer({ selectedAsset: asset }),
+              iconName: IconName.Send,
+              tooltipStringKey: STRING_KEYS.TRANSFER,
+            },
+        ]
+          .filter(isTruthy)
+          .map(({ iconName, tooltipStringKey, dialog }) => (
+            <Item key={tooltipStringKey}>
+              {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
           In general, any CTA in a dropdown should be wrapped in an Item tag
        */}
-            <WithTooltip
-              key={tooltipStringKey}
-              tooltipString={stringGetter({ key: tooltipStringKey })}
-              tw="[--tooltip-backgroundColor:--color-layer-5]"
-            >
-              <$IconButton
-                key={dialog.type}
-                action={ButtonAction.Base}
-                shape={ButtonShape.Square}
-                iconName={iconName}
-                onClick={() => dispatch(openDialog(dialog))}
-              />
-            </WithTooltip>
-          </Item>
-        ))}
-    </div>
-  )
+              <WithTooltip
+                key={tooltipStringKey}
+                tooltipString={stringGetter({ key: tooltipStringKey })}
+                tw="[--tooltip-backgroundColor:--color-layer-5]"
+              >
+                <$IconButton
+                  key={dialog.type}
+                  action={ButtonAction.Base}
+                  shape={ButtonShape.Square}
+                  iconName={iconName}
+                  onClick={() => dispatch(openDialog(dialog))}
+                />
+              </WithTooltip>
+            </Item>
+          ))}
+      </div>
+    );
+  }
 );
+
 const $Column = styled.div`
   ${layoutMixins.column}
 `;
