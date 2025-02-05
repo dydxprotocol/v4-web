@@ -4,6 +4,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { parseUnits } from 'viem';
 import { useWalletClient } from 'wagmi';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -26,6 +27,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { Deposit } from '@/state/transfers';
 
+import { track } from '@/lib/analytics/analytics';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AmountInput } from './AmountInput';
@@ -178,6 +180,7 @@ export const DepositForm = ({
         setCurrentStep((prev) => prev + 1);
       }
       if (!success) {
+        track(AnalyticsEvents.DepositError({ error: errorMessage }));
         setCurrentStepError(errorMessage);
       }
     }
@@ -203,6 +206,20 @@ export const DepositForm = ({
 
     setCurrentStepError(undefined);
     setAwaitingWalletAction(true);
+
+    track(
+      AnalyticsEvents.DepositInitiated({
+        sourceAssetDenom: depositRoute.sourceAssetDenom,
+        sourceAssetChainID: depositRoute.sourceAssetChainID,
+        amountIn: depositRoute.amountIn,
+        amountOut: depositRoute.amountOut,
+        usdAmountOut: depositRoute.usdAmountOut,
+        estimatedAmountOut: depositRoute.estimatedAmountOut,
+        swapPriceImpactPercent: depositRoute.swapPriceImpactPercent,
+        estimatedRouteDurationSeconds: depositRoute.estimatedRouteDurationSeconds,
+      })
+    );
+
     if (steps.length === 1) {
       const { success, errorMessage } = await steps[0]!.executeStep(signer, skipClient);
       if (!success) {
@@ -224,6 +241,7 @@ export const DepositForm = ({
     if (success) {
       setCurrentStep((prev) => prev + 1);
     } else {
+      track(AnalyticsEvents.DepositError({ error: errorMessage }));
       setCurrentStepError(errorMessage);
     }
   };

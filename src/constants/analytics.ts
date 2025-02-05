@@ -1,8 +1,11 @@
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
+import { RouteResponse } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
+
+import type { Deposit } from '@/state/transfers';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
@@ -395,6 +398,29 @@ export const AnalyticsEvents = unionize(
     LaunchMarketPageChangePriceChartTimeframe: ofType<{ timeframe: string; asset: string }>(),
     LaunchMarketTransaction: ofType<{ marketId: string }>(),
     LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
+
+    // Deposit
+    DepositInitiated:
+      ofType<
+        Pick<
+          RouteResponse,
+          | 'sourceAssetDenom'
+          | 'sourceAssetChainID'
+          | 'amountIn'
+          | 'amountOut'
+          | 'usdAmountOut'
+          | 'estimatedAmountOut'
+          | 'swapPriceImpactPercent'
+          | 'estimatedRouteDurationSeconds'
+        >
+      >(),
+    DepositSubmitted: ofType<
+      Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
+    >(),
+    DepositFinalized: ofType<
+      Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
+    >(),
+    DepositError: ofType<{ error: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
