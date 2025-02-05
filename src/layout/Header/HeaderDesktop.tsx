@@ -54,6 +54,8 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -199,9 +201,7 @@ export const HeaderDesktop = () => {
               onClick={() => {
                 dispatch(
                   openDialog(
-                    testFlags.showNewDepositFlow
-                      ? DialogTypes.Deposit2({})
-                      : DialogTypes.Deposit({})
+                    showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
                   )
                 );
               }}

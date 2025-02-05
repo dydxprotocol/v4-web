@@ -9,8 +9,10 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -78,13 +80,13 @@ export const StakeRewardButtonAndReceipt = ({
   const { usdcBalance, nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const [errorToDisplay, setErrorToDisplay] = useState(alert);
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const depositFunds = useCallback(
     () =>
       dispatch(
-        forceOpenDialog(
-          testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-        )
+        forceOpenDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
       ),
     [dispatch]
   );
