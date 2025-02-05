@@ -1,4 +1,4 @@
-import { EventHandler } from 'react';
+import { EventHandler, useState } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
@@ -13,6 +13,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { truncateAddress } from '@/lib/wallet';
 
@@ -33,6 +34,7 @@ export const AddressInput = ({
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
+  const [invalidAddress, setInvalidAddress] = useState(false);
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
     onChange(e.target.value);
@@ -40,11 +42,30 @@ export const AddressInput = ({
 
   const hasValidAddress = isValidWithdrawalAddress(value, destinationChain);
 
+  const onBlur = () => {
+    if (value.length > 0 && !hasValidAddress) {
+      setInvalidAddress(true);
+    }
+  };
+
+  const onFocus = () => {
+    setInvalidAddress(false);
+  };
+
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
       <div tw="flex flex-1 flex-col gap-0.5 text-small">
-        <div>{stringGetter({ key: STRING_KEYS.ADDRESS })}</div>
+        <div>
+          {stringGetter({ key: STRING_KEYS.ADDRESS })}{' '}
+          {invalidAddress && (
+            <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.INVALID_ADDRESS_TITLE })}>
+              <Icon tw="text-color-error" size="0.75rem" iconName={IconName.Warning} />
+            </WithTooltip>
+          )}
+        </div>
         <input
+          onBlur={onBlur}
+          onFocus={onFocus}
           placeholder={sourceAccount.address}
           tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
           value={value}
