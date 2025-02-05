@@ -11,7 +11,12 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
+
+import { truncateAddress } from '@/lib/wallet';
+
+import { isValidWithdrawalAddress } from './utils';
 
 type AddressInputProps = {
   value: string;
@@ -33,6 +38,8 @@ export const AddressInput = ({
     onChange(e.target.value);
   };
 
+  const hasValidAddress = isValidWithdrawalAddress(value, destinationChain);
+
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
       <div tw="flex flex-1 flex-col gap-0.5 text-small">
@@ -43,6 +50,12 @@ export const AddressInput = ({
           value={value}
           onChange={onValueChange}
         />
+        {hasValidAddress && (
+          <span tw="row gap-0.25 text-small" title={value}>
+            <span>{truncateAddress(value, '')}</span>
+            <CopyButton buttonType="text" value={value} />
+          </span>
+        )}
       </div>
       <button
         tw="flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375"

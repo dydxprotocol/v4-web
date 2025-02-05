@@ -41,6 +41,7 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
       value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
       type={OutputType.Fiat}
       slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
+      slotRight="USDC"
     />
   );
 
