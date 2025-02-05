@@ -15,6 +15,7 @@ import {
   getCurrentMarketAccountFills,
   selectAccountFills,
   selectAccountFillsLoading,
+  selectAccountOrders,
   selectAccountOrdersLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
@@ -113,6 +114,10 @@ interface BonsaiCoreShape {
       data: BasicSelector<SubaccountOrder[]>;
       loading: BasicSelector<LoadableStatus>;
     };
+    allOrders: {
+      data: BasicSelector<SubaccountOrder[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
     fills: {
       data: BasicSelector<SubaccountFill[]>;
       loading: BasicSelector<LoadableStatus>;
@@ -165,6 +170,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     parentSubaccountPositions: {
       data: selectParentSubaccountOpenPositions,
       loading: selectParentSubaccountOpenPositionsLoading,
+    },
+    allOrders: {
+      data: selectAccountOrders,
+      loading: selectAccountOrdersLoading,
     },
     openOrders: {
       data: selectOpenOrders,

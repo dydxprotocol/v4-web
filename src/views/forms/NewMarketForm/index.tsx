@@ -58,7 +58,7 @@ export const NewMarketForm = ({
 
   const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const { freeCollateral, marginUsage } = subAccount;
-  const currentFreeCollateral = freeCollateral?.current ?? 0;
+  const currentFreeCollateral = freeCollateral?.toNumber() ?? 0;
 
   useEffect(() => {
     if (defaultLaunchableMarketId) {
@@ -110,9 +110,9 @@ export const NewMarketForm = ({
       label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
       value: (
         <DiffOutput
-          withDiff={!!freeCollateral?.current}
+          withDiff={!!freeCollateral?.toNumber()}
           type={OutputType.Fiat}
-          value={freeCollateral?.current}
+          value={freeCollateral?.toNumber()}
           newValue={freeCollateralUpdated}
           sign={NumberSign.Negative}
           hasInvalidNewValue={(freeCollateralUpdated ?? 0) < 0}
@@ -143,9 +143,9 @@ export const NewMarketForm = ({
         label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
         value: (
           <DiffOutput
-            withDiff={!!marginUsage?.current && marginUsageUpdated != null}
+            withDiff={!!marginUsage?.toNumber() && marginUsageUpdated != null}
             type={OutputType.Percent}
-            value={marginUsage?.current}
+            value={marginUsage?.toNumber()}
             newValue={marginUsageUpdated}
             sign={NumberSign.Negative}
             hasInvalidNewValue={(marginUsageUpdated ?? 0) < 0 || (marginUsageUpdated ?? 0) > 1}

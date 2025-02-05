@@ -1,5 +1,5 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import { AbacusPositionSide, type Nullable } from '@/constants/abacus';
@@ -21,7 +21,10 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
-import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import {
+  getCurrentMarketPositionData,
+  getCurrentMarketPositionDataForPostTrade,
+} from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
@@ -54,9 +57,9 @@ type PositionInfoItems = {
   withSubscript?: boolean;
 
   // Values
-  value: Nullable<number> | string;
-  newValue?: Nullable<number> | string;
-  percentValue?: Nullable<number> | string;
+  value: Nullable<number | BigNumber> | string;
+  newValue?: Nullable<number | BigNumber> | string;
+  percentValue?: Nullable<number | BigNumber> | string;
 };
 
 export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: boolean }) => {
@@ -71,25 +74,26 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     logo: imageUrl,
   } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo));
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
-  const currentMarketPosition = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const currentMarketPosition = orEmptyObj(useAppSelector(getCurrentMarketPositionData));
+  const currentMarketPositionPostTrade = orEmptyObj(
+    useAppSelector(getCurrentMarketPositionDataForPostTrade)
+  );
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
   const symbol = getDisplayableAssetFromBaseAsset(id);
 
   const {
-    adjustedImf,
     entryPrice,
     exitPrice,
     leverage,
     liquidationPrice,
     netFunding,
-    notionalTotal,
     realizedPnl,
-    size,
-    unrealizedPnl,
-    unrealizedPnlPercent,
-    side,
-  } = currentMarketPosition ?? {};
+    notional: notionalTotal,
+    signedSize: size,
+    updatedUnrealizedPnl: unrealizedPnl,
+    updatedUnrealizedPnlPercent: unrealizedPnlPercent,
+  } = currentMarketPosition;
 
   const netFundingBN = MustBigNumber(netFunding);
 
@@ -99,7 +103,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       type: OutputType.Fiat,
       label: STRING_KEYS.AVERAGE_OPEN,
       fractionDigits: tickSizeDecimals,
-      value: entryPrice?.current,
+      value: entryPrice,
       withSubscript: true,
     },
     {
@@ -123,30 +127,35 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     },
   ];
 
-  const { current: currentSize, postOrder: postOrderSize } = size ?? {};
-  const leverageBN = MustBigNumber(leverage?.current);
-  const newLeverageBN = MustBigNumber(leverage?.postOrder);
-  const maxLeverage = BIG_NUMBERS.ONE.div(MustBigNumber(adjustedImf?.postOrder));
+  const currentSize = size;
+  const postOrderSize = currentMarketPositionPostTrade.size?.postOrder;
+  const leverageBN = MustBigNumber(leverage);
+  const newLeverageBN = MustBigNumber(currentMarketPositionPostTrade.leverage?.postOrder);
+  const maxLeverage = BIG_NUMBERS.ONE.div(
+    MustBigNumber(currentMarketPositionPostTrade.adjustedImf?.postOrder)
+  );
   const newPositionIsClosed = MustBigNumber(postOrderSize).isZero();
   const hasNoPositionInMarket = MustBigNumber(currentSize).isZero();
 
   const newLeverageIsInvalid =
-    !!leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
+    !!currentMarketPositionPostTrade.leverage?.postOrder &&
+    (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
-    !leverage?.current || (leverage.postOrder && newLeverageBN.gt(leverageBN));
+    !leverage ||
+    (currentMarketPositionPostTrade.leverage?.postOrder && newLeverageBN.gt(leverageBN));
 
   let liquidationArrowSign = NumberSign.Neutral;
-  const newLiquidationPriceIsLarger = MustBigNumber(liquidationPrice?.postOrder).gt(
-    MustBigNumber(liquidationPrice?.current)
-  );
+  const newLiquidationPriceIsLarger = MustBigNumber(
+    currentMarketPositionPostTrade.liquidationPrice?.postOrder
+  ).gt(MustBigNumber(liquidationPrice));
 
   const positionSideHasChanged = hasPositionSideChanged({
-    currentSize,
+    currentSize: currentSize?.toNumber(),
     postOrderSize,
   }).positionSideHasChanged;
 
-  if (leverage?.postOrder) {
+  if (currentMarketPositionPostTrade.leverage?.postOrder) {
     if (newLeverageIsInvalid) {
       liquidationArrowSign = NumberSign.Negative;
     } else if (newPositionIsClosed) {
@@ -154,13 +163,13 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     } else if (positionSideHasChanged) {
       liquidationArrowSign = NumberSign.Neutral;
     } else if (
-      liquidationPrice?.current && MustBigNumber(currentSize).gt(0)
+      liquidationPrice && MustBigNumber(currentSize).gt(0)
         ? !newLiquidationPriceIsLarger
         : newLiquidationPriceIsLarger
     ) {
       liquidationArrowSign = NumberSign.Positive;
     } else if (
-      !liquidationPrice?.current ||
+      !liquidationPrice ||
       (!newPositionIsClosed && MustBigNumber(currentSize).gt(0)
         ? newLiquidationPriceIsLarger
         : !newLiquidationPriceIsLarger)
@@ -184,8 +193,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
             : NumberSign.Neutral,
       useDiffOutput: true,
       showSign: ShowSign.None,
-      value: leverage?.current,
-      newValue: leverage?.postOrder,
+      value: leverage,
+      newValue: currentMarketPositionPostTrade.leverage?.postOrder,
       withBaseFont: true,
     },
     {
@@ -193,7 +202,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       type: OutputType.Fiat,
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip:
-        side?.postOrder === AbacusPositionSide.SHORT
+        currentMarketPositionPostTrade.side?.postOrder === AbacusPositionSide.SHORT
           ? 'liquidation-price-short'
           : 'liquidation-price-long',
       tooltipParams: {
@@ -203,8 +212,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
       sign: liquidationArrowSign,
       useDiffOutput: true,
-      value: liquidationPrice?.current,
-      newValue: liquidationPrice?.postOrder,
+      value: liquidationPrice,
+      newValue: currentMarketPositionPostTrade.liquidationPrice?.postOrder,
       withBaseFont: true,
     },
     {
@@ -212,13 +221,13 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       type: OutputType.Fiat,
       label: STRING_KEYS.UNREALIZED_PNL,
       tooltip: 'unrealized-pnl',
-      sign: MustBigNumber(unrealizedPnl?.current).gt(0)
+      sign: MustBigNumber(unrealizedPnl).gt(0)
         ? NumberSign.Positive
-        : MustBigNumber(unrealizedPnl?.current).lt(0)
+        : MustBigNumber(unrealizedPnl).lt(0)
           ? NumberSign.Negative
           : NumberSign.Neutral,
-      value: unrealizedPnl?.current,
-      percentValue: unrealizedPnlPercent?.current,
+      value: unrealizedPnl,
+      percentValue: unrealizedPnlPercent,
       withBaseFont: true,
     },
     {
@@ -226,12 +235,12 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       type: OutputType.Fiat,
       label: STRING_KEYS.REALIZED_PNL,
       tooltip: 'realized-pnl',
-      sign: MustBigNumber(realizedPnl?.current).gt(0)
+      sign: MustBigNumber(realizedPnl).gt(0)
         ? NumberSign.Positive
-        : MustBigNumber(realizedPnl?.current).lt(0)
+        : MustBigNumber(realizedPnl).lt(0)
           ? NumberSign.Negative
           : NumberSign.Neutral,
-      value: realizedPnl?.current ?? undefined,
+      value: realizedPnl ?? undefined,
       withBaseFont: true,
     },
   ] as const satisfies readonly PositionInfoItems[];
@@ -332,9 +341,9 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         <$DetachedSection>
           <PositionTile
             assetImgUrl={imageUrl}
-            currentSize={size?.current}
-            notionalTotal={notionalTotal?.current}
-            postOrderSize={size?.postOrder}
+            currentSize={size?.toNumber()}
+            notionalTotal={notionalTotal?.toNumber()}
+            postOrderSize={currentMarketPositionPostTrade.size?.postOrder}
             stepSizeDecimals={stepSizeDecimals}
             symbol={id ?? undefined}
             tickSizeDecimals={tickSizeDecimals}
@@ -377,9 +386,9 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       <div>
         <PositionTile
           assetImgUrl={imageUrl}
-          currentSize={size?.current}
-          notionalTotal={notionalTotal?.current}
-          postOrderSize={size?.postOrder}
+          currentSize={size?.toNumber()}
+          notionalTotal={notionalTotal?.toNumber()}
+          postOrderSize={currentMarketPositionPostTrade.size?.postOrder}
           stepSizeDecimals={stepSizeDecimals}
           symbol={id ?? undefined}
           tickSizeDecimals={tickSizeDecimals}

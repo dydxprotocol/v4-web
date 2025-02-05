@@ -37,7 +37,7 @@ import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getOpenPositionFromId } from '@/state/accountSelectors';
+import { getOpenPositionFromId, getOpenPositionFromIdForPostOrder } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
 import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
@@ -65,8 +65,12 @@ export const AdjustIsolatedMarginForm = ({
   onIsolatedMarginAdjustment,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber, marginUsage, freeCollateral } = subaccountPosition ?? {};
+  const { subaccountNumber: childSubaccountNumber, marginValueInitial: freeCollateral } =
+    orEmptyObj(useParameterizedSelector(getOpenPositionFromId, marketId));
+  const { marginUsage } = orEmptyObj(
+    useParameterizedSelector(getOpenPositionFromIdForPostOrder, marketId)
+  );
+
   const { tickSizeDecimals } = orEmptyObj(
     useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, marketId)
   );
@@ -203,7 +207,7 @@ export const AdjustIsolatedMarginForm = ({
         };
       }
     } else if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
-      if (MustBigNumber(amount).gte(MustBigNumber(freeCollateral?.current))) {
+      if (MustBigNumber(amount).gte(MustBigNumber(freeCollateral))) {
         return {
           message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
           type: AlertType.Error,

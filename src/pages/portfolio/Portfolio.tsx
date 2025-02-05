@@ -32,7 +32,7 @@ import { WithSidebar } from '@/components/WithSidebar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
-import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -68,7 +68,7 @@ const PortfolioPage = () => {
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { numTotalOpenOrders } = useAppSelector(getTradeInfoNumbers, shallowEqual);
+  const numTotalOpenOrders = useAppSelector(BonsaiCore.account.openOrders.data).length;
   const numTotalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
   ).length;
@@ -76,7 +76,7 @@ const PortfolioPage = () => {
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
-  const usdcBalance = freeCollateral?.current ?? 0;
+  const usdcBalance = freeCollateral?.toNumber() ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 

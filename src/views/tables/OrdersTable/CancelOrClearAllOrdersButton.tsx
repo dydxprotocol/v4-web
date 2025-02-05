@@ -12,7 +12,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 
-import { clearAllOrders } from '@/state/account';
 import { calculateHasCancelableOrders } from '@/state/accountCalculators';
 import { openDialog } from '@/state/dialogs';
 
@@ -28,8 +27,6 @@ export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
   const onClearOrCancelAll = useCallback(() => {
     if (hasCancelableOrders) {
       dispatch(openDialog(DialogTypes.CancelAllOrdersConfirmation({ marketId })));
-    } else {
-      dispatch(clearAllOrders(marketId));
     }
   }, [dispatch, hasCancelableOrders, marketId]);
 

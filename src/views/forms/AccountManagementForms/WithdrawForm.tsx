@@ -55,7 +55,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -68,6 +68,7 @@ import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -82,7 +83,16 @@ export const WithdrawForm = () => {
 
   const { dydxAddress, sourceAccount } = useAccounts();
   const { sendSkipWithdraw } = useSubaccount();
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral: freeCollateralBNBase } =
+    useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const freeCollateralBN = useMemo(
+    () => MustBigNumber(freeCollateralBNBase),
+    [freeCollateralBNBase]
+  );
+  const { freeCollateral: freeCollateralPost } = orEmptyObj(
+    useAppSelector(getSubaccountForPostOrder)
+  );
+  const freeCollateralPostOrder = freeCollateralPost?.postOrder;
 
   const {
     requestPayload,
@@ -130,10 +140,6 @@ export const WithdrawForm = () => {
 
   // Async Data
   const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
-  const freeCollateralBN = useMemo(
-    () => MustBigNumber(freeCollateral?.current),
-    [freeCollateral?.current]
-  );
 
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
@@ -415,8 +421,8 @@ export const WithdrawForm = () => {
       value: (
         <DiffOutput
           type={OutputType.Fiat}
-          value={freeCollateral?.current}
-          newValue={freeCollateral?.postOrder}
+          value={freeCollateralBN}
+          newValue={freeCollateralPostOrder}
           sign={NumberSign.Negative}
           hasInvalidNewValue={MustBigNumber(withdrawAmount).minus(freeCollateralBN).isNegative()}
           withDiff={

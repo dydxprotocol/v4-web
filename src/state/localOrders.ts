@@ -1,3 +1,4 @@
+import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import _ from 'lodash';
@@ -232,7 +233,7 @@ export const localOrdersSlice = createSlice({
     cancelAllOrderFailed: (
       state,
       action: PayloadAction<{
-        order: SubaccountOrder;
+        order: SubaccountOrderNew;
         errorParams?: ErrorParams;
       }>
     ) => {

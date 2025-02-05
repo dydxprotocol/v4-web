@@ -133,7 +133,9 @@ export const getDydxDatafeed = (
 
     const fills = getMarketFills(store.getState())[symbolInfo.ticker!] ?? [];
     const inRangeFills = fills.filter(
-      (fill) => fill.createdAtMilliseconds >= fromMs && fill.createdAtMilliseconds <= toMs
+      (fill) =>
+        new Date(fill.createdAt ?? 0).getTime() >= fromMs &&
+        new Date(fill.createdAt ?? 0).getTime() <= toMs
     );
     const fillsByOrderId = groupBy(inRangeFills, 'orderId');
     const marks = Object.entries(fillsByOrderId).map(([orderId, orderFills]) =>

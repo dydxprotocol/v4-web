@@ -369,7 +369,7 @@ export const VaultDepositWithdrawForm = ({
 
   const onClickMax = () => {
     if (operation === 'DEPOSIT') {
-      setAmountState(`${Math.floor(freeCollateral?.current ?? 0)}`);
+      setAmountState(`${Math.floor(freeCollateral?.toNumber() ?? 0)}`);
     } else {
       setAmountState(`${Math.floor(100 * (userAvailableBalance ?? 0)) / 100}`);
     }
@@ -379,19 +379,19 @@ export const VaultDepositWithdrawForm = ({
     <DiffOutput
       type={OutputType.Fiat}
       roundingMode={BigNumber.ROUND_FLOOR}
-      value={freeCollateral?.current}
+      value={freeCollateral?.toNumber()}
       newValue={freeCollateralUpdated}
       sign={getNumberSign(
         mapIfPresent(
           freeCollateralUpdated,
-          freeCollateral?.current,
+          freeCollateral?.toNumber(),
           (updated, cur) => updated - cur
         )
       )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         freeCollateralUpdated != null &&
-        freeCollateral?.current !== freeCollateralUpdated
+        freeCollateral?.toNumber() !== freeCollateralUpdated
       }
     />
   );
@@ -434,15 +434,15 @@ export const VaultDepositWithdrawForm = ({
   const marginUsageDiff = (
     <DiffOutput
       type={OutputType.Percent}
-      value={marginUsage?.current}
+      value={marginUsage?.toNumber()}
       newValue={marginUsageUpdated}
       sign={getNumberSign(
-        mapIfPresent(marginUsage?.current, marginUsageUpdated, (updated, cur) => updated - cur)
+        mapIfPresent(marginUsage?.toNumber(), marginUsageUpdated, (updated, cur) => updated - cur)
       )}
       withDiff={
         MustBigNumber(amount).gt(0) &&
         marginUsageUpdated != null &&
-        marginUsage?.current !== marginUsageUpdated
+        marginUsage?.toNumber() !== marginUsageUpdated
       }
     />
   );

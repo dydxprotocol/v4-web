@@ -77,7 +77,7 @@ export const PnlChart = ({
   slotEmpty,
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
-  const { equity } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { equity: equityBn } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
@@ -103,16 +103,17 @@ export const PnlChart = ({
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
+  const equity = equityBn?.toNumber();
   const data = useMemo(
     () =>
       lastPnlTick
         ? [
             ...pnlData,
-            equity?.current && {
+            equity && {
               createdAtMilliseconds: now,
               netTransfers: lastPnlTick.netTransfers ?? 0,
-              equity: equity.current,
-              totalPnl: equity.current - (lastPnlTick.equity ?? 0) + (lastPnlTick.totalPnl ?? 0),
+              equity,
+              totalPnl: equity - (lastPnlTick.equity ?? 0) + (lastPnlTick.totalPnl ?? 0),
             },
           ]
             .filter(isTruthy)
@@ -132,7 +133,7 @@ export const PnlChart = ({
               })
             )
         : [],
-    [pnlData, equity?.current, now, lastPnlTick, subaccountId]
+    [pnlData, equity, now, lastPnlTick, subaccountId]
   );
 
   const msForPeriod = useCallback(
