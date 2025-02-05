@@ -56,7 +56,7 @@ function addUsdcAssetPosition(
           if (signedSizeBN.lte(0)) {
             // New size flips the Asset Position Side
             childSubaccount.assetPositions.USDC.side =
-              side === IndexerPositionSide.LONG
+              childSubaccount.assetPositions.USDC.side === IndexerPositionSide.LONG
                 ? IndexerPositionSide.SHORT
                 : IndexerPositionSide.LONG;
             childSubaccount.assetPositions.USDC.size = signedSizeBN.abs().toString();
