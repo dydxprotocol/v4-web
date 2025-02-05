@@ -48,7 +48,8 @@ export function getUserAddressesForRoute(
   sourceAccount: SourceAccount,
   nobleAddress?: string,
   dydxAddress?: string,
-  osmosisAddress?: string
+  osmosisAddress?: string,
+  neutronAddress?: string
 ): UserAddress[] {
   const chains = route.requiredChainAddresses;
 
@@ -60,6 +61,9 @@ export function getUserAddressesForRoute(
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
         return { chainID: chainId, address: osmosisAddress };
+      case CosmosChainId.Neutron:
+        if (!neutronAddress) throw new Error('neutronAddress undefined');
+        return { chainID: chainId, address: neutronAddress };
       case DYDX_DEPOSIT_CHAIN:
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainID: chainId, address: dydxAddress };

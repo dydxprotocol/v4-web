@@ -2,14 +2,20 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
+import { PublicKey } from '@solana/web3.js';
+import { isAddress } from 'viem';
+import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from '@/constants/graz';
+import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { USDC_ASSET_ID } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { Withdraw } from '@/state/transfers';
+
+import { validateCosmosAddress } from '@/lib/addressUtils';
 
 import { getUserAddressesForRoute } from '../DepositDialog2/utils';
 
@@ -26,6 +32,37 @@ const parseWithdrawError = (e: Error, fallbackMessage: string) => {
   return fallbackMessage;
 };
 
+export function isValidWithdrawalAddress(address: string, chainId: string): boolean {
+  switch (chainId) {
+    case CosmosChainId.Noble:
+      return validateCosmosAddress(address, 'noble');
+    case CosmosChainId.Osmosis:
+      return validateCosmosAddress(address, 'osmo');
+    case CosmosChainId.Neutron:
+      return validateCosmosAddress(address, 'neutron');
+    case SOLANA_MAINNET_ID: {
+      try {
+        // Generating a publickey will demonstrate if an address is valid
+        // eslint-disable-next-line no-new
+        new PublicKey(address);
+        return true;
+      } catch (_e) {
+        return false;
+      }
+    }
+    case mainnet.id.toString():
+    case arbitrum.id.toString():
+    case base.id.toString():
+    case optimism.id.toString():
+    case polygon.id.toString(): {
+      return isAddress(address, { strict: true });
+    }
+    default: {
+      return false;
+    }
+  }
+}
+
 export function useWithdrawStep({
   withdrawRoute,
   onWithdraw,
@@ -40,6 +77,7 @@ export function useWithdrawStep({
     localNobleWallet,
     nobleAddress,
     osmosisAddress,
+    neutronAddress,
     sourceAccount,
   } = useAccounts();
   const [isLoading, setIsLoading] = useState(false);
@@ -58,9 +96,10 @@ export function useWithdrawStep({
       sourceAccount,
       nobleAddress,
       dydxAddress,
-      osmosisAddress
+      osmosisAddress,
+      neutronAddress
     );
-  }, [dydxAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute]);
+  }, [dydxAddress, neutronAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute]);
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
