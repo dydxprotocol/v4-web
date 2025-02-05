@@ -12,11 +12,13 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -57,6 +59,8 @@ const PortfolioPage = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const initialPageSize = 20;
 
@@ -253,9 +257,7 @@ const PortfolioPage = () => {
                     onClick={() =>
                       dispatch(
                         openDialog(
-                          testFlags.showNewDepositFlow
-                            ? DialogTypes.Deposit2({})
-                            : DialogTypes.Deposit({})
+                          showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
                         )
                       )
                     }

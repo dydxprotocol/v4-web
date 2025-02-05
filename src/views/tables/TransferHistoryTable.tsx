@@ -7,7 +7,9 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -145,6 +147,8 @@ export const TransferHistoryTable = ({
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
@@ -170,9 +174,7 @@ export const TransferHistoryTable = ({
               onClick={() =>
                 dispatch(
                   openDialog(
-                    testFlags.showNewDepositFlow
-                      ? DialogTypes.Deposit2({})
-                      : DialogTypes.Deposit({})
+                    showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
                   )
                 )
               }

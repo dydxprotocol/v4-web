@@ -79,7 +79,7 @@ export const DepositForm = ({
   );
 
   const { freeCollateral: updatedFreeCollateral } = orEmptyObj(
-    useDepositDeltas({ depositAmount: selectedRoute?.usdAmountOut })
+    useDepositDeltas({ depositAmount: depositRoute?.usdAmountOut })
   );
 
   const { sourceAccount, localDydxWallet } = useAccounts();
@@ -314,8 +314,8 @@ export const DepositForm = ({
             style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}
           >
             <Output tw="inline text-color-text-0" type={OutputType.Fiat} value={freeCollateral} />
-            {selectedRoute && <DiffArrow tw="text-green" />}
-            {selectedRoute && (
+            {depositRoute && <DiffArrow tw="text-green" />}
+            {depositRoute && (
               <Output
                 slotLeft="~"
                 tw="inline"

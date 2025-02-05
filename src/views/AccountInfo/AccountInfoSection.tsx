@@ -8,10 +8,12 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -62,6 +64,8 @@ export const AccountInfoSection = () => {
   const isLoadingData =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
   const isLoading = !!isLoadingGuards || isLoadingData;
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const {
@@ -98,9 +102,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() =>
         dispatch(
-          openDialog(
-            testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-          )
+          openDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
         )
       }
       shape={ButtonShape.Rectangle}
