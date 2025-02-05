@@ -1,6 +1,7 @@
 import { ReactNode, useMemo } from 'react';
 
 import { RouteResponse } from '@skip-go/client';
+import { DateTime } from 'luxon';
 import tw from 'twin.macro';
 import { formatUnits } from 'viem';
 
@@ -13,6 +14,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { LightningIcon, ShieldIcon } from '@/icons';
 
 import { Output, OutputType } from '@/components/Output';
+
+import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type Props = {
   routes?: { slow?: RouteResponse; fast?: RouteResponse };
@@ -134,11 +137,33 @@ export const WithdrawRouteOptions = ({
   disabled,
 }: Props) => {
   const stringGetter = useStringGetter();
-  const fastRouteDescription = useMemo(() => {
-    const fastOperationFee = routes?.fast?.estimatedFees[0]?.usdAmount;
 
+  const goFastOperation = useMemo(() => {
+    if (!routes?.fast) return undefined;
+
+    return routes.fast.operations.find((op) =>
+      // @ts-ignore
+      Boolean(op.goFastTransfer)
+    );
+  }, [routes?.fast]);
+
+  const fastRouteDescription = useMemo(() => {
     if (!routes || disabled) return '-';
     if (!routes.fast) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
+
+    if (!goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
+
+    // @ts-ignore
+    const fastOperationFee = goFastOperation.goFastTransfer?.fee;
+
+    const totalFastFee = fastOperationFee
+      ? formatUnits(
+          BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
+            BigInt(fastOperationFee.destinationChainFeeAmount ?? 0) +
+            BigInt(fastOperationFee.sourceChainFeeAmount ?? 0),
+          6
+        )
+      : undefined;
 
     return (
       <span tw="inline-block">
@@ -147,7 +172,30 @@ export const WithdrawRouteOptions = ({
             tw="inline-block"
             type={OutputType.Fiat}
             fractionDigits={USD_DECIMALS}
-            value={fastOperationFee}
+            value={totalFastFee}
+            isLoading={isLoading}
+          />
+        ) : (
+          <span tw="text-color-positive">{stringGetter({ key: STRING_KEYS.FREE })}</span>
+        )}
+      </span>
+    );
+  }, [goFastOperation, routes, disabled, stringGetter, isLoading]);
+
+  const slowRouteDescription = useMemo(() => {
+    const slowOperationFee = routes?.fast?.estimatedFees[0]?.usdAmount;
+
+    if (!routes || disabled) return '-';
+    if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
+
+    return (
+      <span tw="inline-block">
+        {slowOperationFee ? (
+          <Output
+            tw="inline-block"
+            type={OutputType.Fiat}
+            fractionDigits={USD_DECIMALS}
+            value={slowOperationFee}
             isLoading={isLoading}
           />
         ) : (
@@ -156,6 +204,15 @@ export const WithdrawRouteOptions = ({
       </span>
     );
   }, [routes, disabled, stringGetter, isLoading]);
+
+  const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
+  const slowRouteDuration = Date.now() + (slowRouteSpeed ?? 0) * 1000;
+  const { timeString, unitStringKey } = getStringsForDateTimeDiff(
+    DateTime.fromMillis(slowRouteDuration)
+  );
+  const slowRouteTitle = slowRouteSpeed
+    ? `${timeString}${stringGetter({ key: unitStringKey })}`
+    : stringGetter({ key: STRING_KEYS.DEFAULT });
 
   return (
     <div tw="flex gap-0.5">
@@ -172,10 +229,26 @@ export const WithdrawRouteOptions = ({
           </span>
         }
         selected={selectedSpeed === 'fast'}
-        disabled={disabled || !routes?.fast || isLoading}
+        disabled={disabled || !goFastOperation || isLoading}
         onClick={() => onSelectSpeed('fast')}
         title={stringGetter({ key: STRING_KEYS.INSTANT })}
         description={fastRouteDescription}
+      />
+      <RouteOption
+        icon={
+          <span
+            css={[
+              selectedSpeed === 'slow' && !isLoading ? tw`text-color-accent` : `text-color-text-0`,
+            ]}
+          >
+            <ShieldIcon />
+          </span>
+        }
+        selected={selectedSpeed === 'slow'}
+        disabled={disabled || !routes?.slow || isLoading}
+        onClick={() => onSelectSpeed('slow')}
+        title={slowRouteTitle}
+        description={slowRouteDescription}
       />
     </div>
   );
