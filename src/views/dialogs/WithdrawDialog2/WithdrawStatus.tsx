@@ -28,13 +28,10 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
   const transferSuccess = withdraw?.status === 'success';
 
   const statusDescription = useMemo(() => {
-    if (transferSuccess) return 'Your funds are now available for trading.';
+    if (transferSuccess) return 'Your funds have been withdrawn.';
 
-    if (withdraw?.isInstantWithdraw)
-      return 'Your funds will be available soon, and you may safely close this window.';
-
-    return 'You may safely close this window.';
-  }, [withdraw, transferSuccess]);
+    return 'Your funds will be withdrawn shortly, and you may safely close this window.';
+  }, [transferSuccess]);
 
   if (!withdraw) return null;
 
@@ -47,7 +44,11 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
           <Icon tw="self-center" iconName={IconName.SuccessCircle} size="64px" />
         )}
         <div tw="flex flex-col items-center gap-0.375 px-3 py-1 text-center">
-          <div tw="text-large">{!transferSuccess ? 'Deposit in progress' : 'Deposit complete'}</div>
+          <div tw="text-large">
+            {!transferSuccess
+              ? stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })
+              : stringGetter({ key: STRING_KEYS.WITHDRAW_COMPLETE })}
+          </div>
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
       </div>
