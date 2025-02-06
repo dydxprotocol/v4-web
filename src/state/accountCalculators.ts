@@ -6,7 +6,6 @@ import { OnboardingState, OnboardingSteps } from '@/constants/account';
 import {
   getOnboardingGuards,
   getOnboardingState,
-  getSubaccountId,
   getSubaccountOpenOrders,
   getUnbondingDelegations,
 } from '@/state/accountSelectors';
@@ -14,6 +13,7 @@ import { createAppSelector } from '@/state/appTypes';
 
 import { isNewOrderStatusOpen } from '@/lib/orders';
 
+import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
 
 export const calculateOnboardingStep = createAppSelector(

@@ -11,6 +11,7 @@ import { UsdcDepositArgs, UsdcWithdrawArgs } from './calculators/accountActions'
 import { HistoricalFundingObject } from './calculators/funding';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
+import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
 import {
   getCurrentMarketAccountFills,
   selectAccountFills,
@@ -332,9 +333,11 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
 interface BonsaiHooksShape {
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
+  useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
+  useParentSubaccountHistoricalPnls,
 };
