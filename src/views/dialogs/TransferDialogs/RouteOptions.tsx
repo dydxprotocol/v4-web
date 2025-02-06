@@ -3,7 +3,6 @@ import { ReactNode, useMemo } from 'react';
 import { RouteResponse } from '@skip-go/client';
 import { DateTime } from 'luxon';
 import tw from 'twin.macro';
-import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
@@ -15,6 +14,7 @@ import { LightningIcon, ShieldIcon } from '@/icons';
 
 import { Output, OutputType } from '@/components/Output';
 
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type Props = {
@@ -23,118 +23,16 @@ type Props = {
   disabled: boolean;
   selectedSpeed: SkipRouteSpeed;
   onSelectSpeed: (route: SkipRouteSpeed) => void;
+  type: 'deposit' | 'withdraw';
 };
 
-export const DepositRouteOptions = ({
+export const TransferRouteOptions = ({
   routes,
   isLoading,
   selectedSpeed,
   onSelectSpeed,
   disabled,
-}: Props) => {
-  const fastRouteDescription = useMemo(() => {
-    const fastOperationFee = // @ts-ignore
-      routes?.fast?.operations.find((op) => Boolean(op.goFastTransfer))?.goFastTransfer?.fee;
-    const totalFastFee = fastOperationFee
-      ? formatUnits(
-          BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
-            BigInt(fastOperationFee.destinationChainFeeAmount ?? 0) +
-            BigInt(fastOperationFee.sourceChainFeeAmount ?? 0),
-          6
-        )
-      : '-';
-
-    // TODO(deposit2.0): localization
-    if (!routes || disabled) return '$$ fee, $10k limit';
-    if (!routes.fast) return 'Unavailable';
-
-    return (
-      <span>
-        <Output
-          tw="inline"
-          type={OutputType.Fiat}
-          fractionDigits={USD_DECIMALS}
-          value={totalFastFee}
-        />{' '}
-        fee, $10k limit
-      </span>
-    );
-  }, [routes, disabled]);
-
-  const slowRouteDescription = useMemo(() => {
-    // TODO(deposit2.0): localization
-    if (!routes || disabled) return '$ fee, no limit';
-    if (!routes.slow) return 'Unavailable';
-
-    return (
-      <span>
-        <Output
-          tw="inline"
-          type={OutputType.Fiat}
-          fractionDigits={USD_DECIMALS}
-          value={routes.slow.estimatedFees[0]?.usdAmount ?? '0'}
-        />{' '}
-        fee, no limit
-      </span>
-    );
-  }, [routes, disabled]);
-
-  const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
-  // TODO(deposit2.0): localization
-  // "slow" route could be fast when going from solana or cosmos
-  const slowRouteTitle =
-    slowRouteSpeed && slowRouteSpeed <= 60 ? `~${slowRouteSpeed} seconds` : '~20 mins';
-
-  return (
-    <div tw="flex gap-0.5">
-      <RouteOption
-        icon={
-          <span
-            css={[
-              selectedSpeed === 'fast' && !isLoading
-                ? tw`text-color-favorite`
-                : `text-color-text-0`,
-            ]}
-          >
-            <LightningIcon />
-          </span>
-        }
-        selected={selectedSpeed === 'fast'}
-        disabled={disabled || !routes?.fast || isLoading}
-        onClick={() => onSelectSpeed('fast')}
-        // TODO(deposit2.0): localization
-        title="Instant"
-        description={fastRouteDescription}
-      />
-      <RouteOption
-        icon={
-          <span
-            style={{
-              color:
-                selectedSpeed === 'slow' && !isLoading
-                  ? 'var(--color-accent)'
-                  : 'var(--color-text-0)',
-            }}
-          >
-            <ShieldIcon />
-          </span>
-        }
-        selected={selectedSpeed === 'slow'}
-        disabled={disabled || isLoading || !routes?.slow}
-        onClick={() => onSelectSpeed('slow')}
-        title={slowRouteTitle}
-        description={slowRouteDescription}
-      />
-    </div>
-  );
-};
-
-export const WithdrawRouteOptions = ({
-  routes,
-  isLoading,
-  selectedSpeed,
-  onSelectSpeed,
-  disabled,
+  type,
 }: Props) => {
   const stringGetter = useStringGetter();
 
@@ -148,31 +46,22 @@ export const WithdrawRouteOptions = ({
   }, [routes?.fast]);
 
   const fastRouteDescription = useMemo(() => {
-    if (!routes || disabled) return '-';
-    if (!routes.fast) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
+    if (!routes || disabled) return type === 'deposit' ? '$$ fee, $10k limit' : '-';
+    if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
-    if (!goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
-
-    // @ts-ignore
-    const fastOperationFee = goFastOperation.goFastTransfer?.fee;
-
-    const totalFastFee = fastOperationFee
-      ? formatUnits(
-          BigInt(fastOperationFee.bpsFeeAmount ?? 0) +
-            BigInt(fastOperationFee.destinationChainFeeAmount ?? 0) +
-            BigInt(fastOperationFee.sourceChainFeeAmount ?? 0),
-          6
-        )
-      : undefined;
+    const fastOperationFee = routes.fast.estimatedFees.reduce(
+      (acc, fee) => acc.plus(fee.usdAmount),
+      BIG_NUMBERS.ZERO
+    );
 
     return (
       <span tw="inline-block">
-        {fastOperationFee ? (
+        {fastOperationFee.gt(0) ? (
           <Output
             tw="inline-block"
             type={OutputType.Fiat}
             fractionDigits={USD_DECIMALS}
-            value={totalFastFee}
+            value={fastOperationFee}
             isLoading={isLoading}
           />
         ) : (
@@ -180,17 +69,20 @@ export const WithdrawRouteOptions = ({
         )}
       </span>
     );
-  }, [goFastOperation, routes, disabled, stringGetter, isLoading]);
+  }, [goFastOperation, routes, disabled, stringGetter, isLoading, type]);
 
   const slowRouteDescription = useMemo(() => {
-    const slowOperationFee = routes?.fast?.estimatedFees[0]?.usdAmount;
+    const slowOperationFee = routes?.slow?.estimatedFees.reduce(
+      (acc, fee) => acc.plus(fee.usdAmount),
+      BIG_NUMBERS.ZERO
+    );
 
-    if (!routes || disabled) return '-';
+    if (!routes || disabled) return type === 'deposit' ? '$ fee, no limit' : '-';
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     return (
       <span tw="inline-block">
-        {slowOperationFee ? (
+        {slowOperationFee?.gt(0) ? (
           <Output
             tw="inline-block"
             type={OutputType.Fiat}
@@ -203,7 +95,7 @@ export const WithdrawRouteOptions = ({
         )}
       </span>
     );
-  }, [routes, disabled, stringGetter, isLoading]);
+  }, [routes, disabled, stringGetter, isLoading, type]);
 
   const slowRouteSpeed = routes?.slow?.estimatedRouteDurationSeconds;
   const slowRouteDuration = Date.now() + (slowRouteSpeed ?? 0) * 1000;
@@ -211,7 +103,9 @@ export const WithdrawRouteOptions = ({
     DateTime.fromMillis(slowRouteDuration)
   );
   const slowRouteTitle = slowRouteSpeed
-    ? `${timeString}${stringGetter({ key: unitStringKey })}`
+    ? slowRouteSpeed <= 60
+      ? stringGetter({ key: STRING_KEYS.INSTANT })
+      : `${timeString}${stringGetter({ key: unitStringKey })}`
     : stringGetter({ key: STRING_KEYS.DEFAULT });
 
   return (

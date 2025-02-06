@@ -45,6 +45,17 @@ type MultiChainAddress =
   | { address?: string | null; network: 'evm' }
   | { address?: string | null; network: 'solana' };
 
+export function isValidSolanaAddress(address: string) {
+  try {
+    // Generating a publickey will demonstrate if an address is valid
+    // eslint-disable-next-line no-new
+    new PublicKey(address);
+    return true;
+  } catch (_e) {
+    return false;
+  }
+}
+
 // TODO: Add unit test once `isAddress` works with vitest
 export function isValidAddress(input: MultiChainAddress): boolean {
   if (!input.address) return false;
@@ -54,14 +65,7 @@ export function isValidAddress(input: MultiChainAddress): boolean {
   }
 
   if (input.network === 'solana') {
-    try {
-      // Generating a publickey will demonstrate if an address is valid
-      // eslint-disable-next-line no-new
-      new PublicKey(input.address);
-      return true;
-    } catch (_e) {
-      return false;
-    }
+    return isValidSolanaAddress(input.address);
   }
 
   return validateCosmosAddress(input.address, input.prefix);

@@ -1,20 +1,12 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { ERC20Approval, RouteResponse, SkipClient, UserAddress } from '@skip-go/client';
+import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Address,
-  ChainMismatchError,
-  maxUint256,
-  UserRejectedRequestError,
-  WalletClient,
-} from 'viem';
+import { Address, WalletClient, maxUint256 } from 'viem';
 import { useChainId } from 'wagmi';
 
 import ERC20ABI from '@/abi/erc20.json';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
-import { CosmosChainId } from '@/constants/graz';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
+import { isEvmDepositChainId } from '@/constants/chains';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -28,59 +20,8 @@ import { track } from '@/lib/analytics/analytics';
 import { sleep } from '@/lib/timeUtils';
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
 
+import { getUserAddressesForRoute, parseError, userAddressHelper } from '../utils';
 import { isInstantDeposit } from './queries';
-
-// Because our deposit flow only supports ETH and USDC
-export function getTokenSymbol(denom: string) {
-  if (denom === 'polygon-native') {
-    return 'POL';
-  }
-
-  if (isNativeTokenDenom(denom)) return 'ETH';
-
-  return 'USDC';
-}
-
-export function isNativeTokenDenom(denom: string) {
-  return denom.endsWith('native');
-}
-
-export function getUserAddressesForRoute(
-  route: RouteResponse,
-  sourceAccount: SourceAccount,
-  nobleAddress?: string,
-  dydxAddress?: string,
-  osmosisAddress?: string,
-  neutronAddress?: string
-): UserAddress[] {
-  const chains = route.requiredChainAddresses;
-
-  return chains.map((chainId) => {
-    switch (chainId) {
-      case CosmosChainId.Noble:
-        if (!nobleAddress) throw new Error('nobleAddress undefined');
-        return { chainID: chainId, address: nobleAddress };
-      case CosmosChainId.Osmosis:
-        if (!osmosisAddress) throw new Error('osmosisAddress undefined');
-        return { chainID: chainId, address: osmosisAddress };
-      case CosmosChainId.Neutron:
-        if (!neutronAddress) throw new Error('neutronAddress undefined');
-        return { chainID: chainId, address: neutronAddress };
-      case DYDX_DEPOSIT_CHAIN:
-        if (!dydxAddress) throw new Error('dydxAddress undefined');
-        return { chainID: chainId, address: dydxAddress };
-      default:
-        if (
-          (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) ||
-          (chainId === SOLANA_MAINNET_ID && sourceAccount.chain === SOLANA_MAINNET_ID)
-        ) {
-          return { chainID: chainId, address: sourceAccount.address as string };
-        }
-
-        throw new Error(`unhandled chainId ${chainId} for user address ${sourceAccount.address}`);
-    }
-  });
-}
 
 type StepResult =
   | { success: true; errorMessage: undefined }
@@ -287,41 +228,4 @@ export function useDepositSteps({
     ],
     queryFn: getStepsQuery,
   });
-}
-
-// Copied from Skip https://github.com/skip-mev/skip-go/blob/147937416c81a69a447f4825b8c86806c5688194/packages/client/src/client.ts#L319
-function userAddressHelper(route: RouteResponse, userAddresses: UserAddress[]) {
-  let addressList: string[] = [];
-  let i = 0;
-  for (let j = 0; j < userAddresses.length; j += 1) {
-    if (route.requiredChainAddresses[i] !== userAddresses[j]?.chainID) {
-      i = j;
-      continue;
-    }
-    addressList.push(userAddresses[j]!.address!);
-    i += 1;
-  }
-
-  if (addressList.length !== route.requiredChainAddresses.length) {
-    addressList = userAddresses.map((x) => x.address);
-  }
-  return addressList;
-}
-
-// TODO(deposit2.0): localization
-// TODO(deposit2.0): Add final copy for each error message
-function parseError(e: Error, fallbackMessage: string) {
-  if ('code' in e && e.code === UserRejectedRequestError.code) {
-    return 'User rejected request.';
-  }
-
-  if ('name' in e && e.name === ChainMismatchError.name) {
-    return 'Please change your wallet network and try again.';
-  }
-
-  if ('message' in e && e.message.includes('Insufficient balance for gas')) {
-    return 'Insufficient gas balance. Please add gas funds and try again.';
-  }
-
-  return fallbackMessage;
 }

@@ -8,7 +8,7 @@ import ConnectingLine from '@/icons/connecting-line.svg';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { DepositStep } from './utils';
+import { DepositStep } from './depositHooks';
 
 type DepositStepsProps = {
   steps: DepositStep[];

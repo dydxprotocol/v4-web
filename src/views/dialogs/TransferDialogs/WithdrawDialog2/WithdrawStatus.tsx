@@ -30,7 +30,7 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
   const statusDescription = useMemo(() => {
     if (transferSuccess) return 'Your funds have been withdrawn.';
 
-    return 'Your funds will be withdrawn shortly, you may safely close this window.';
+    return 'Your funds will be withdrawn shortly. You may safely close this window.';
   }, [transferSuccess]);
 
   if (!withdraw) return null;
@@ -41,6 +41,7 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
       value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
       type={OutputType.Fiat}
       slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
+      slotRight="USDC"
     />
   );
 
