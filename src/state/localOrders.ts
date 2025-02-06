@@ -148,7 +148,7 @@ export const localOrdersSlice = createSlice({
     },
     setLatestOrder: (
       state,
-      action: PayloadAction<Nullable<{ clientId?: string | null; id?: string | null }>>
+      action: PayloadAction<Nullable<{ clientId?: string | null; id: string }>>
     ) => {
       const { clientId, id } = action.payload ?? {};
       state.latestOrder = action.payload;
@@ -158,7 +158,7 @@ export const localOrdersSlice = createSlice({
           order.clientId === clientId && order.submissionStatus < PlaceOrderStatuses.Placed
             ? {
                 ...order,
-                orderId: id ?? undefined,
+                orderId: id,
                 submissionStatus: PlaceOrderStatuses.Placed,
               }
             : order
