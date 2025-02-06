@@ -2,13 +2,23 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
+import BigNumber from 'bignumber.js';
 
 import { CosmosChainId } from '@/constants/graz';
+import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { USDC_ASSET_ID } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
+import { formatNumberOutput, OutputType } from '@/components/Output';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { Withdraw } from '@/state/transfers';
 
 import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
@@ -128,4 +138,45 @@ export function useWithdrawStep({
     executeWithdraw,
     isLoading,
   };
+}
+
+export function useProtocolWithdrawalValidation({
+  freeCollateral,
+  withdrawAmount,
+  selectedRoute,
+}: {
+  freeCollateral?: BigNumber;
+  withdrawAmount: string;
+  selectedRoute?: RouteResponse;
+}): string | undefined {
+  const stringGetter = useStringGetter();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
+
+  if (withdrawAmount === '' || !selectedRoute) {
+    return undefined;
+  }
+
+  // WithdrawalGating
+  const withdrawAmountBN = new BigNumber(withdrawAmount);
+  if (withdrawAmountBN.gt(0) && withdrawAmountBN.gt(usdcWithdrawalCapacity)) {
+    return stringGetter({
+      key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
+      params: {
+        USDC_LIMIT: formatNumberOutput(usdcWithdrawalCapacity, OutputType.Number, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: TOKEN_DECIMALS,
+        }),
+      },
+    });
+  }
+
+  if (freeCollateral && withdrawAmountBN.gt(freeCollateral)) {
+    return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+  }
+
+  return undefined;
 }
