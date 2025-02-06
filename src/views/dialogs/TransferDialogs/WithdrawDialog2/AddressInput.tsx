@@ -17,7 +17,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { truncateAddress } from '@/lib/wallet';
 
-import { isValidWithdrawalAddress } from './utils';
+import { isValidWithdrawalAddress } from '../utils';
 
 type AddressInputProps = {
   value: string;

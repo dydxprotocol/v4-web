@@ -30,9 +30,9 @@ import { Deposit } from '@/state/transfers';
 import { track } from '@/lib/analytics/analytics';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { TransferRouteOptions } from '../RouteOptions';
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
-import { DepositRouteOptions } from './RouteOptions';
 import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
 
@@ -259,12 +259,13 @@ export const DepositForm = ({
           onTokenClick={onTokenSelect}
           error={error}
         />
-        <DepositRouteOptions
+        <TransferRouteOptions
           routes={routes}
           isLoading={isFetching}
           disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
+          type="deposit"
         />
         <div tw="flex flex-col gap-0.5" style={{ opacity: coinbaseOptionDisabled ? '0.5' : '1' }}>
           <div tw="flex items-center gap-1">

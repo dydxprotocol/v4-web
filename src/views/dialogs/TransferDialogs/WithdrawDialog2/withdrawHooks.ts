@@ -2,11 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
-import { isAddress } from 'viem';
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from '@/constants/graz';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { USDC_ASSET_ID } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
@@ -14,46 +11,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 
 import { Withdraw } from '@/state/transfers';
 
-import { isValidSolanaAddress, validateCosmosAddress } from '@/lib/addressUtils';
-
-import { getUserAddressesForRoute } from '../DepositDialog2/utils';
-
-export function isInstantWithdraw(route: RouteResponse) {
-  // @ts-ignore SDK doesn't know about .goFastTransfer
-  return Boolean(route.operations.find((op) => op.goFastTransfer));
-}
-
-const parseWithdrawError = (e: Error, fallbackMessage: string) => {
-  if (e.message.includes('NewlyUndercollateralized')) {
-    return 'Your withdrawal would leave your account undercollateralized. Please try a a smaller amount.';
-  }
-
-  return fallbackMessage;
-};
-
-export function isValidWithdrawalAddress(address: string, chainId: string): boolean {
-  switch (chainId) {
-    case CosmosChainId.Noble:
-      return validateCosmosAddress(address, 'noble');
-    case CosmosChainId.Osmosis:
-      return validateCosmosAddress(address, 'osmo');
-    case CosmosChainId.Neutron:
-      return validateCosmosAddress(address, 'neutron');
-    case SOLANA_MAINNET_ID: {
-      return isValidSolanaAddress(address);
-    }
-    case mainnet.id.toString():
-    case arbitrum.id.toString():
-    case base.id.toString():
-    case optimism.id.toString():
-    case polygon.id.toString(): {
-      return isAddress(address, { strict: true });
-    }
-    default: {
-      return false;
-    }
-  }
-}
+import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
 
 export function useWithdrawStep({
   withdrawRoute,
@@ -140,7 +98,7 @@ export function useWithdrawStep({
             chainId: chainID,
             status: 'pending',
             estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
-            isInstantWithdraw: isInstantWithdraw(withdrawRoute),
+            isInstantWithdraw: isInstantTransfer(withdrawRoute),
           });
         },
       });
