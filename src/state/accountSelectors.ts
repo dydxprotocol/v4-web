@@ -17,6 +17,7 @@ import {
 } from '@/lib/orders';
 
 import { type RootState } from './_store';
+import { getUserWalletAddress } from './accountInfoSelectors';
 import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
@@ -29,14 +30,6 @@ import { getCurrentMarketId } from './currentMarketSelectors';
 export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
 export const getSubaccountForPostOrder = (s: RootState) => s.account.subaccountForPostOrders;
-
-/**
- * @param state
- * @returns identifier of the current subaccount
- */
-export const getSubaccountId = (state: RootState) => state.wallet.localWallet?.subaccountNumber;
-
-export const getSubaccountHistoricalPnl = (state: RootState) => state.account.historicalPnl;
 
 /**
  * @param state
@@ -378,8 +371,6 @@ export const getComplianceUpdatedAt = (state: RootState) => state.account.compli
  * @returns compliance geo of the current session
  */
 export const getGeo = (state: RootState) => state.account.compliance?.geo;
-
-export const getUserWalletAddress = (state: RootState) => state.wallet.localWallet?.address;
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(

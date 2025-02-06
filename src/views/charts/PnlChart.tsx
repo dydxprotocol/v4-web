@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
 import { debounce, get } from 'lodash';
@@ -22,11 +23,8 @@ import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
-import {
-  getSubaccount,
-  getSubaccountHistoricalPnl,
-  getSubaccountId,
-} from '@/state/accountSelectors';
+import { getSubaccountId } from '@/state/accountInfoSelectors';
+import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
@@ -47,7 +45,6 @@ export type PnlDatum = {
   subaccountId: number;
   equity: number;
   totalPnl: number;
-  netTransfers: number;
   createdAt: number;
 };
 
@@ -83,7 +80,7 @@ export const PnlChart = ({
   const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   // Chart data
-  const pnlData = useAppSelector(getSubaccountHistoricalPnl, shallowEqual);
+  const { data: pnlData } = BonsaiHooks.useParentSubaccountHistoricalPnls();
   const subaccountId = useAppSelector(getSubaccountId, shallowEqual);
 
   const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriods[]>([
@@ -111,7 +108,6 @@ export const PnlChart = ({
             ...pnlData,
             equity && {
               createdAtMilliseconds: now,
-              netTransfers: lastPnlTick.netTransfers ?? 0,
               equity,
               totalPnl: equity - (lastPnlTick.equity ?? 0) + (lastPnlTick.totalPnl ?? 0),
             },
@@ -123,7 +119,6 @@ export const PnlChart = ({
                 subaccountId: subaccountId ?? 0,
                 equity: Number(datum.equity),
                 totalPnl: Number(datum.totalPnl),
-                netTransfers: Number(datum.netTransfers),
                 createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
                 side: {
                   [-1]: PnlSide.Loss,

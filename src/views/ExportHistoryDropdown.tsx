@@ -20,7 +20,8 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
 import { OutputType, formatNumberOutput } from '@/components/Output';
 
-import { getIsAccountConnected, getSubaccountId } from '@/state/accountSelectors';
+import { getSubaccountId } from '@/state/accountInfoSelectors';
+import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 

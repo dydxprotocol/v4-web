@@ -4,11 +4,9 @@ import {
   Subaccount,
   type AccountBalance,
   type Compliance,
-  type HistoricalPnlPeriods,
   type Nullable,
   type StakingDelegation,
   type StakingRewards,
-  type SubAccountHistoricalPNLs,
   type TradingRewards,
   type UnbondingDelegation,
   type UsageRestriction,
@@ -27,9 +25,6 @@ export type AccountState = {
 
   subaccountForPostOrders?: Nullable<Subaccount>;
 
-  historicalPnl?: SubAccountHistoricalPNLs;
-  historicalPnlPeriod?: HistoricalPnlPeriods;
-
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
 
@@ -38,8 +33,6 @@ export type AccountState = {
 };
 
 const initialState: AccountState = {
-  historicalPnl: undefined,
-
   // Onboarding
   onboardingGuards: {
     [OnboardingGuard.hasAcknowledgedTerms]: Boolean(
@@ -51,8 +44,6 @@ const initialState: AccountState = {
     [OnboardingGuard.hasPreviousTransactions]: undefined,
   },
   onboardingState: OnboardingState.Disconnected,
-
-  historicalPnlPeriod: undefined,
 
   // Restriction
   restriction: undefined,
@@ -77,11 +68,6 @@ export const accountSlice = createSlice({
       ...state,
       onboardingState: action.payload,
     }),
-    setHistoricalPnl: (state, action: PayloadAction<Nullable<SubAccountHistoricalPNLs>>) => {
-      if (action.payload) {
-        state.historicalPnl = action.payload;
-      }
-    },
     setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
       state.restriction = action.payload;
     },
@@ -107,7 +93,7 @@ export const accountSlice = createSlice({
       state.tradingRewards = action.payload;
     },
     clearSubaccountState: (state) => {
-      state.historicalPnl = undefined;
+      state.subaccountForPostOrders = undefined;
     },
   },
 });
@@ -115,7 +101,6 @@ export const accountSlice = createSlice({
 export const {
   setOnboardingGuard,
   setOnboardingState,
-  setHistoricalPnl,
   setRestrictionType,
   setCompliance,
   setSubaccountForPostOrders,
@@ -124,6 +109,5 @@ export const {
   setTradingRewards,
   setUnbondingDelegations,
   setStakingRewards,
-
   clearSubaccountState,
 } = accountSlice.actions;

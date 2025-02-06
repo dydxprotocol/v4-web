@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
-import { getUserWalletAddress } from '@/state/accountSelectors';
+import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { setSeenFills, setSeenOpenOrders, setSeenOrderHistory } from '@/state/accountUiMemory';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
