@@ -11,6 +11,7 @@ import {
 import { useChainId } from 'wagmi';
 
 import ERC20ABI from '@/abi/erc20.json';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
@@ -23,6 +24,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
+import { track } from '@/lib/analytics/analytics';
 import { sleep } from '@/lib/timeUtils';
 import { CHAIN_ID_TO_INFO, EvmDepositChainId, VIEM_PUBLIC_CLIENTS } from '@/lib/viem';
 
@@ -242,16 +244,23 @@ export function useDepositSteps({
             bypassApprovalCheck: true,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
-              onDeposit({
-                type: 'deposit',
+              const baseDeposit = {
+                type: 'deposit' as const,
                 txHash,
                 chainId: chainID,
-                status: 'pending',
-                token: depositToken,
+                status: 'pending' as const,
                 tokenAmount: depositRoute.amountIn,
                 estimatedAmountUsd: depositRoute.usdAmountOut ?? '',
                 isInstantDeposit: isInstantDeposit(depositRoute),
-              });
+              };
+              track(
+                AnalyticsEvents.DepositSubmitted({
+                  ...baseDeposit,
+                  tokenInChainId: depositToken.chainId,
+                  tokenInDenom: depositToken.denom,
+                })
+              );
+              onDeposit({ ...baseDeposit, token: depositToken });
             },
           });
           return { success: true };
