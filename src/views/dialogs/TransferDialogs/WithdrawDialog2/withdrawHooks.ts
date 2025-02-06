@@ -21,6 +21,8 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { Withdraw } from '@/state/transfers';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
 
 export function useWithdrawStep({
@@ -153,14 +155,18 @@ export function useProtocolWithdrawalValidation({
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
+  const withdrawAmountBN = MustBigNumber(withdrawAmount);
 
-  if (withdrawAmount === '' || !selectedRoute) {
+  if (withdrawAmount === '' || withdrawAmountBN.lte(0) || !selectedRoute) {
     return undefined;
   }
 
+  if (freeCollateral && withdrawAmountBN.gt(freeCollateral)) {
+    return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+  }
+
   // WithdrawalGating
-  const withdrawAmountBN = new BigNumber(withdrawAmount);
-  if (withdrawAmountBN.gt(0) && withdrawAmountBN.gt(usdcWithdrawalCapacity)) {
+  if (usdcWithdrawalCapacity.gt(0) && withdrawAmountBN.gt(usdcWithdrawalCapacity)) {
     return stringGetter({
       key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
       params: {
@@ -172,10 +178,6 @@ export function useProtocolWithdrawalValidation({
         }),
       },
     });
-  }
-
-  if (freeCollateral && withdrawAmountBN.gt(freeCollateral)) {
-    return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
   }
 
   return undefined;
