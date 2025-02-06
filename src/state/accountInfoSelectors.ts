@@ -1,4 +1,4 @@
-import { RootState } from './_store';
+import { type RootState } from './_store';
 
 /**
  * @param state
