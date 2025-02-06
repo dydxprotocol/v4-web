@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
-import { AbacusOrderType, ComplianceStatus } from '@/constants/abacus';
+import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
@@ -30,7 +31,6 @@ import {
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
-import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -51,7 +51,6 @@ import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNo
 import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
-import { PredictionMarketEndNotification } from '@/views/notifications/PredictionMarketEndNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -652,7 +651,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const localCancelAlls = useAppSelector(getLocalCancelAlls, shallowEqual);
       const localCloseAllPositions = useAppSelector(getLocalCloseAllPositions, shallowEqual);
 
-      const allOrders = useAppSelector(getSubaccountOrders, shallowEqual);
+      const allOrders = useAppSelector(BonsaiCore.account.allOrders.data);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
@@ -686,7 +685,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         // eslint-disable-next-line no-restricted-syntax
         for (const localCancel of localCancelOrders) {
           // ensure order exists
-          const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
+          const existingOrder = allOrders.find((order) => order.id === localCancel.orderId);
           if (!existingOrder) return;
 
           // skip if this is from a cancel all operation and isn't an error
@@ -771,7 +770,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const orders = useAppSelector(BonsaiCore.account.allOrders.data);
 
       return (orderClientId: string) => {
         const order = orders.find((o) => o.clientId?.toString() === orderClientId);
@@ -819,65 +818,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
       };
-    },
-  },
-  {
-    type: NotificationType.PredictionMarketConcluded,
-    useTrigger: ({ trigger }) => {
-      const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
-      const stringGetter = useStringGetter();
-
-      // TRUMPWIN-USD
-      const trumpWinResultDate = new Date('2024-11-06T23:59:59.000Z');
-      const trumpWinFills = allFills.filter((fill) => fill.marketId === PREDICTION_MARKET.TRUMPWIN);
-      const trumpWinDeleveraged = trumpWinFills.filter(
-        (fill) => fill.type === AbacusOrderType.Deleveraged
-      );
-      const trumpWinOffset = trumpWinFills.filter(
-        (fill) => fill.type === AbacusOrderType.Offsetting
-      );
-
-      useEffect(() => {
-        if (trumpWinDeleveraged.length > 0 || trumpWinOffset.length > 0) {
-          const latestTrumpFill = [...trumpWinDeleveraged, ...trumpWinOffset].sort(
-            (a, b) => b.createdAtMilliseconds - a.createdAtMilliseconds
-          )[0];
-
-          if (!latestTrumpFill) return;
-
-          const hadCorrectOutcome = latestTrumpFill.type === AbacusOrderType.Offsetting;
-
-          if (latestTrumpFill.createdAtMilliseconds > trumpWinResultDate.getTime()) {
-            trigger(
-              PREDICTION_MARKET.TRUMPWIN,
-              {
-                icon: null,
-                title: stringGetter({
-                  key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED,
-                  params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
-                }),
-                body: stringGetter({
-                  key: STRING_KEYS.PREDICTION_MARKET_CONCLUDED_DESC,
-                  params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
-                }),
-                toastSensitivity: 'background',
-                groupKey: PREDICTION_MARKET.TRUMPWIN,
-                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                renderCustomBody: ({ isToast, notification }) => (
-                  <PredictionMarketEndNotification
-                    isToast={isToast}
-                    marketId={PREDICTION_MARKET.TRUMPWIN}
-                    hadCorrectOutcome={hadCorrectOutcome}
-                    notification={notification}
-                  />
-                ),
-              },
-              [],
-              true
-            );
-          }
-        }
-      }, [trumpWinDeleveraged, trumpWinOffset]);
     },
   },
   {

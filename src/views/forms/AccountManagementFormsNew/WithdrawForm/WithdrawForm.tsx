@@ -1,6 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
@@ -37,7 +38,6 @@ import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton'
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 
-import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -45,8 +45,9 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { isValidAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 import { dd } from '@/lib/analytics/datadog';
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { NetworkSelectMenu } from './NetworkSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawButtonAndReceipt';
@@ -61,7 +62,9 @@ export const WithdrawForm = () => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { dydxAddress, sourceAccount, localDydxWallet, localNobleWallet } = useAccounts();
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral } = orEmptyObj(
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
+  );
 
   // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-867/coinbase-withdrawals
   const { exchange } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
@@ -108,8 +111,6 @@ export const WithdrawForm = () => {
   }, [exchange, toAddress, toChainId]);
 
   const { addOrUpdateTransferNotification } = useLocalNotifications();
-
-  const freeCollateralBN = useMemo(() => MustBigNumber(freeCollateral?.current), [freeCollateral]);
 
   // TODO [onboarding-rewrite]: https://linear.app/dydx/issue/OTE-869/optimize-usetransfers
   // Stop doing this. This is pretty slow and requires multiple render cycles to set initial state
@@ -351,7 +352,7 @@ export const WithdrawForm = () => {
   };
 
   const onClickMax = () => {
-    setAmount(freeCollateralBN.toString());
+    setAmount(freeCollateral?.toString() ?? '');
   };
 
   useEffect(() => {
@@ -384,7 +385,7 @@ export const WithdrawForm = () => {
     onSubmitErrorMessage,
     toChainId,
     toToken,
-    freeCollateralBN,
+    freeCollateralBN: freeCollateral ?? BIG_NUMBERS.ZERO,
   });
 
   const isDisabled =
@@ -468,7 +469,7 @@ export const WithdrawForm = () => {
           <div tw="flex">
             <div>{stringGetter({ key: STRING_KEYS.AMOUNT })}</div>
             <div tw="ml-0.25 mr-0.25"> • </div>
-            <div>{freeCollateral?.current?.toFixed(2)} USDC Held</div>
+            <div>{(freeCollateral ?? BIG_NUMBERS.ZERO).toFixed(2)} USDC Held</div>
           </div>
         }
         slotRight={

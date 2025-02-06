@@ -8,7 +8,6 @@ import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
-import { shallowEqual } from 'react-redux';
 import { formatUnits, parseUnits } from 'viem';
 
 import type {
@@ -27,7 +26,6 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { clearSubaccountState } from '@/state/account';
-import { getSubaccountOrders } from '@/state/accountSelectors';
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -568,7 +566,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [dispatch]
   );
 
-  const orders = useAppSelector(getSubaccountOrders, shallowEqual);
+  const openOrders = useAppSelector(BonsaiCore.account.openOrders.data);
 
   // when marketId is provided, only cancel orders for that market, otherwise cancel globally
   const cancelAllOrders = useCallback(
@@ -579,7 +577,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableCancelOrderPayload>
       ) => {
-        const matchedOrder = orders?.find((order) => order.id === data?.orderId);
+        const matchedOrder = openOrders.find((order) => order.id === data?.orderId);
         // ##OrderOnlyConfirmedCancelViaIndexer: success here does not necessarily mean orders are successfully canceled,
         // we use indexer response as source of truth on whether the order is actually canceled
         if (!success) {
@@ -599,7 +597,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       dispatch(cancelAllSubmitted({ marketId, orderIds }));
       abacusStateManager.cancelAllOrders(marketId, callback);
     },
-    [dispatch, orders]
+    [dispatch, openOrders]
   );
 
   const closeAllPositions = useCallback(() => {

@@ -1,17 +1,9 @@
-import { BonsaiCore } from '@/bonsai/ontology';
-import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
-import { groupBy, keyBy, mapValues, sum } from 'lodash';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { PositionUniqueId, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import { groupBy, keyBy, mapValues } from 'lodash';
 
-import {
-  AbacusMarginMode,
-  AbacusPositionSide,
-  HistoricalTradingRewardsPeriod,
-  type AbacusOrderStatuses,
-  type SubaccountFill,
-  type SubaccountOrder,
-} from '@/constants/abacus';
-import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
-import { LEVERAGE_DECIMALS } from '@/constants/numbers';
+import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
+import { OnboardingState } from '@/constants/account';
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
@@ -20,8 +12,6 @@ import {
   getAverageFillPrice,
   getHydratedFill,
   getHydratedOrder,
-  isOrderStatusClearable,
-  isOrderStatusOpen,
   isStopLossOrderNew,
   isTakeProfitOrderNew,
 } from '@/lib/orders';
@@ -36,91 +26,64 @@ import { getCurrentMarketId } from './currentMarketSelectors';
  * @param state
  * @returns Abacus' subaccount object
  */
-export const getSubaccount = (state: RootState) => state.account.subaccount;
+export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
-/**
- * @param state
- * @returns Whether or not Abacus' subaccount object exists
- */
-export const getHasSubaccount = (state: RootState) => Boolean(state.account.subaccount);
+export const getSubaccountForPostOrder = (s: RootState) => s.account.subaccountForPostOrders;
 
 /**
  * @param state
  * @returns identifier of the current subaccount
  */
-export const getSubaccountId = (state: RootState) => state.account.subaccount?.subaccountNumber;
-
-/**
- * @param state
- * @returns buyingPower object of current subaccount
- */
-export const getSubaccountBuyingPower = (state: RootState) => state.account.subaccount?.buyingPower;
-
-/**
- * @param state
- * @returns equity object of current subaccount
- */
-export const getSubaccountEquity = (state: RootState) => state.account.subaccount?.equity;
+export const getSubaccountId = (state: RootState) => state.wallet.localWallet?.subaccountNumber;
 
 export const getSubaccountHistoricalPnl = (state: RootState) => state.account.historicalPnl;
+
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
  */
-export const getOpenPositions = createAppSelector(
-  [(state: RootState) => state.account.subaccount?.openPositions],
-  (t) => t?.toArray()
-);
-
-/**
- * @param state
- * @returns list of a subaccount's open positions, excluding the ones in draft, i.e. with NONE position side.
- */
-export const getExistingOpenPositions = createAppSelector([getOpenPositions], (allOpenPositions) =>
-  allOpenPositions?.filter((position) => position.side.current !== AbacusPositionSide.NONE)
-);
+export const getOpenPositions = BonsaiCore.account.parentSubaccountPositions.data;
 
 /**
  *
  * @returns All SubaccountOrders that have a margin mode of Isolated and no existing position for the market.
  */
 export const getNonZeroPendingPositions = createAppSelector(
-  [(state: RootState) => state.account.subaccount?.pendingPositions],
-  (pending) => pending?.toArray().filter((p) => (p.equity?.current ?? 0) > 0)
+  [BonsaiHelpers.unopenedIsolatedPositions],
+  (pending) => pending?.filter((p) => p.equity.toNumber() > 0)
 );
 
-export const getOpenPositionFromId = (marketId: string) =>
-  createAppSelector([getOpenPositions], (allOpenPositions) =>
-    allOpenPositions?.find(({ id }) => id === marketId)
+export const getOpenPositionFromId = () =>
+  createAppSelector(
+    [getOpenPositions, (s, marketId: string) => marketId],
+    (allOpenPositions, marketId) => allOpenPositions?.find(({ market }) => market === marketId)
+  );
+
+export const getOpenPositionFromIdForPostOrder = () =>
+  createAppSelector(
+    [(s) => s.account.subaccountForPostOrders?.openPositions, (s, marketId: string) => marketId],
+    (allOpenPositions, marketId) => allOpenPositions?.toArray().find(({ id }) => id === marketId)
   );
 
 /**
  * @param state
  * @returns AccountPositions of the current market
  */
-export const getCurrentMarketPositionData = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state);
-
-  return Object.fromEntries(
-    (getOpenPositions(state) ?? []).map((positionData) => [positionData.id, positionData])
-  )[currentMarketId!];
-};
+export const getCurrentMarketPositionData = createAppSelector(
+  [getCurrentMarketId, getOpenPositions],
+  (marketId, positions) => {
+    return positions?.find((p) => p.market === marketId);
+  }
+);
 
 /**
- * @returns the current leverage of the isolated position. Selector will return null if position is not isolated or does not exist.
+ * @param state
+ * @returns AccountPositions of the current market
  */
-export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
-  [getCurrentMarketPositionData],
-  (position) => {
-    if (
-      position?.childSubaccountNumber &&
-      position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
-      position.leverage.current
-    ) {
-      return Math.abs(Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS)));
-    }
-
-    return 0;
+export const getCurrentMarketPositionDataForPostTrade = createAppSelector(
+  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.openPositions],
+  (marketId, positions) => {
+    return positions?.toArray().find((p) => p.id === marketId);
   }
 );
 
@@ -128,41 +91,16 @@ export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
  * @param state
  * @returns list of orders for the currently connected subaccount
  */
-export const getSubaccountOrders = createAppSelector(
-  [(state: RootState) => state.account.subaccount?.orders],
-  (t) => t?.toArray()
-);
-
-/**
- * @param state
- * @returns list of order ids that user has cleared and should be hidden
- */
-export const getSubaccountClearedOrderIds = (state: RootState) => state.account.clearedOrderIds;
-
-/**
- * @param state
- * @returns list of orders that user has not cleared and should be displayed
- */
-export const getSubaccountUnclearedOrders = createAppSelector(
-  [getSubaccountOrders, getSubaccountClearedOrderIds],
-  (orders, clearedOrderIds) => orders?.filter((order) => !clearedOrderIds?.includes(order.id))
-);
+export const getSubaccountOrders = BonsaiCore.account.allOrders.data;
 
 /**
  * @param state
  * @returns Record of SubaccountOrders indexed by marketId
  */
 export const getMarketOrders = createAppSelector(
-  [getSubaccountUnclearedOrders],
+  [BonsaiCore.account.openOrders.data],
   (orders): { [marketId: string]: SubaccountOrder[] } => {
-    return (orders ?? []).reduce(
-      (marketOrders, order) => {
-        marketOrders[order.marketId] ??= [];
-        marketOrders[order.marketId]!.push(order);
-        return marketOrders;
-      },
-      {} as { [marketId: string]: SubaccountOrder[] }
-    );
+    return groupBy(orders, (o) => o.marketId);
   }
 );
 
@@ -176,38 +114,19 @@ export const getCurrentMarketOrders = createAppSelector(
     !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
 );
 
+export const getCurrentMarketOrdersForPostOrder = createAppSelector(
+  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.orders],
+  (currentMarketId, marketOrders) =>
+    !currentMarketId
+      ? EMPTY_ARR
+      : marketOrders?.toArray().filter((o) => o.marketId === currentMarketId) ?? EMPTY_ARR
+);
+
 /**
  * @param state
  * @returns list of orders that have not been filled or cancelled
  */
-export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter((order) => isOpenOrderStatus(order.status))
-);
-
-export const getOpenIsolatedOrders = createAppSelector(
-  [getSubaccountOrders, BonsaiCore.markets.markets.data],
-  (allOrders, allMarkets) =>
-    (allOrders ?? [])
-      .filter((o) => isOrderStatusOpen(o.status) && o.marginMode === AbacusMarginMode.Isolated)
-      // eslint-disable-next-line prefer-object-spread
-      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }))
-);
-
-export const getPendingIsolatedOrders = createAppSelector(
-  [getOpenIsolatedOrders, getExistingOpenPositions],
-  (isolatedOrders, allOpenPositions) => {
-    const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
-    return groupBy(
-      isolatedOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
-      (o) => o.marketId
-    );
-  }
-);
-
-export const getCurrentMarketHasOpenIsolatedOrders = createAppSelector(
-  [getOpenIsolatedOrders, getCurrentMarketId],
-  (openOrders, marketId) => openOrders.some((o) => o.marketId === marketId)
-);
+export const getSubaccountOpenOrders = BonsaiCore.account.openOrders.data;
 
 /**
  * @param state
@@ -215,7 +134,7 @@ export const getCurrentMarketHasOpenIsolatedOrders = createAppSelector(
  */
 export const getOrderById = () =>
   createAppSelector([getSubaccountOrders, (s, orderId: string) => orderId], (orders, orderId) =>
-    orders?.find((order) => order.id === orderId)
+    orders.find((order) => order.id === orderId)
   );
 
 /**
@@ -225,7 +144,7 @@ export const getOrderById = () =>
 export const getOrderByClientId = () =>
   createAppSelector(
     [getSubaccountOrders, (s, orderClientId: string) => orderClientId],
-    (orders, orderClientId) => orders?.find((order) => order.clientId === orderClientId)
+    (orders, orderClientId) => orders.find((order) => order.clientId === orderClientId)
   );
 
 /**
@@ -234,7 +153,7 @@ export const getOrderByClientId = () =>
  */
 export const getFillByClientId = () =>
   createAppSelector([getSubaccountFills, getOrderByClientId()], (fills, order) =>
-    fills?.find((fill) => fill.orderId === order?.id)
+    fills.find((fill) => fill.orderId === order?.id)
   );
 
 /**
@@ -316,7 +235,7 @@ export const getOrderDetails = () =>
  * @param state
  * @returns list of fills for the currently connected subaccount
  */
-export const getSubaccountFills = (state: RootState) => state.account.fills;
+export const getSubaccountFills = BonsaiCore.account.fills.data;
 
 /**
  * @param state
@@ -325,14 +244,7 @@ export const getSubaccountFills = (state: RootState) => state.account.fills;
 export const getMarketFills = createAppSelector(
   [getSubaccountFills],
   (fills): { [marketId: string]: SubaccountFill[] } => {
-    return (fills ?? []).reduce(
-      (marketFills, fill) => {
-        marketFills[fill.marketId] ??= [];
-        marketFills[fill.marketId]!.push(fill);
-        return marketFills;
-      },
-      {} as { [marketId: string]: SubaccountFill[] }
-    );
+    return groupBy(fills, (f) => f.market);
   }
 );
 
@@ -354,90 +266,16 @@ export const getFillDetails = () =>
     }
   );
 
-/**
- * @param state
- * @returns SubaccountFills of the current market
- */
-export const getCurrentMarketFills = createAppSelector(
-  [getCurrentMarketId, getMarketFills],
-  (currentMarketId, marketFills): SubaccountFill[] =>
-    !currentMarketId ? [] : marketFills[currentMarketId] ?? []
-);
-
-const getFillsForOrderId = createAppSelector(
-  [(s, orderId) => orderId, getSubaccountFills],
-  (orderId, fills) => (orderId ? groupBy(fills, 'orderId')[orderId] ?? [] : [])
-);
+const getFillsForOrderId = () =>
+  createAppSelector([(s, orderId) => orderId, getSubaccountFills], (orderId, fills) =>
+    orderId ? groupBy(fills, 'orderId')[orderId] ?? [] : []
+  );
 
 /**
  * @returns the average price the order is filled at
  */
 export const getAverageFillPriceForOrder = () =>
-  createAppSelector([(s, orderId) => getFillsForOrderId(s, orderId)], getAverageFillPrice);
-
-/**
- * @param state
- * @returns boolean on whether an order status is considered open
- */
-const isOpenOrderStatus = (status: AbacusOrderStatuses) => !isOrderStatusClearable(status);
-
-/**
- * @param state
- * @returns Whether there are unseen fill updates
- */
-export const getHasUnseenFillUpdates = (state: RootState) =>
-  Object.keys(state.account.unseenFillsCountPerMarket).length > 0;
-
-/**
- * @param state
- * @returns get unseen fills count per market
- */
-const getUnseenFillsCountPerMarket = (state: RootState) => state.account.unseenFillsCountPerMarket;
-
-/**
- * @param state
- * @returns get unseen fills count for current market
- */
-const getUnseenFillsCountForMarket = createAppSelector(
-  [getUnseenFillsCountPerMarket, getCurrentMarketId],
-  (unseenFillsCountPerMarket, marketId) => (marketId ? unseenFillsCountPerMarket[marketId] ?? 0 : 0)
-);
-
-/**
- * @param state
- * @returns get unseen fills count for current market
- */
-const getAllUnseenFillsCount = createAppSelector(
-  [getUnseenFillsCountPerMarket],
-  (unseenFillsCountPerMarket) => sum(Object.values(unseenFillsCountPerMarket))
-);
-
-/**
- * @param state
- * @returns Total numbers of the subaccount's open positions, open orders and unseen fills
- */
-export const getTradeInfoNumbers = createAppSelector(
-  [getExistingOpenPositions, getSubaccountOrders, getAllUnseenFillsCount],
-  (positions, orders, unseenFillsCount) => ({
-    numTotalPositions: positions?.length,
-    numTotalOpenOrders: orders?.filter((order) => isOpenOrderStatus(order.status)).length,
-    numTotalUnseenFills: unseenFillsCount,
-  })
-);
-
-/**
- * @param state
- * @returns Numbers of the subaccount's open orders and unseen fills of the current market
- */
-export const getCurrentMarketTradeInfoNumbers = createAppSelector(
-  [getCurrentMarketOrders, getUnseenFillsCountForMarket],
-  (marketOrders, marketUnseenFillsCount) => {
-    return {
-      numOpenOrders: marketOrders.filter((order) => isOpenOrderStatus(order.status)).length,
-      numUnseenFills: marketUnseenFillsCount,
-    };
-  }
-);
+  createAppSelector([getFillsForOrderId()], getAverageFillPrice);
 
 /**
  * @param state
@@ -457,12 +295,6 @@ export const getIsAccountConnected = (state: RootState) =>
  * @returns OnboardingGuards (Record of boolean items) to aid in determining what Onboarding Step the user is on.
  */
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
-
-/**
- * @param state
- * @returns Whether there are unseen order updates
- */
-export const getHasUnseenOrderUpdates = (state: RootState) => state.account.hasUnseenOrderUpdates;
 
 /**
  *  @returns user wallet staking balances
@@ -548,9 +380,6 @@ export const getComplianceUpdatedAt = (state: RootState) => state.account.compli
 export const getGeo = (state: RootState) => state.account.compliance?.geo;
 
 export const getUserWalletAddress = (state: RootState) => state.wallet.localWallet?.address;
-
-export const getUserSubaccountNumber = (state: RootState) =>
-  state.account.subaccount?.subaccountNumber;
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(

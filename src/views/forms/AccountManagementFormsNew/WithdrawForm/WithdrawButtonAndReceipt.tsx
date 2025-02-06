@@ -23,11 +23,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { RouteWarningMessage } from '../RouteWarningMessage';
 
@@ -49,6 +50,8 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { leverage: leveragePost } = orEmptyObj(useAppSelector(getSubaccountForPostOrder));
+  const leveragePostOrder = leveragePost?.postOrder;
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcDecimals } = useTokenConfigs();
@@ -134,11 +137,11 @@ export const WithdrawButtonAndReceipt = ({
       value: (
         <DiffOutput
           type={OutputType.Multiple}
-          value={leverage?.current}
-          newValue={leverage?.postOrder}
+          value={leverage}
+          newValue={leveragePostOrder}
           sign={NumberSign.Negative}
           withDiff={Boolean(
-            leverage?.current && leverage.postOrder && leverage.current !== leverage.postOrder
+            leverage && leveragePostOrder && leverage.toNumber() !== leveragePostOrder
           )}
           tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />

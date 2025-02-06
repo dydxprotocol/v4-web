@@ -1,33 +1,40 @@
+import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
 import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
 import {
+  AbacusOrderSide,
   AbacusOrderType,
   HumanReadableCancelOrderPayload,
   ParsingError,
   PlaceOrderMarketInfo,
-  SubaccountOrder,
 } from '@/constants/abacus';
+import {
+  IndexerAPITimeInForce,
+  IndexerOrderSide,
+  IndexerOrderType,
+} from '@/types/indexer/indexerApiGen';
 
 import abacusStateManager from './abacus';
+import { assertNever } from './assertNever';
 import {
-  isLimitOrderType,
-  isMarketOrderType,
-  isSellOrder,
-  isStopLossOrder,
-  isTakeProfitOrder,
+  isLimitOrderTypeNew,
+  isMarketOrderTypeNew,
+  isSellOrderNew,
+  isStopLossOrderNew,
+  isTakeProfitOrderNew,
 } from './orders';
 
 const ORDER_TYPES_MODIFICATION_ENABLED = [
-  AbacusOrderType.StopMarket.ordinal,
-  AbacusOrderType.TakeProfitMarket.ordinal,
-  AbacusOrderType.Limit.ordinal,
-] as number[];
+  IndexerOrderType.STOPMARKET,
+  IndexerOrderType.TAKEPROFITMARKET,
+  IndexerOrderType.LIMIT,
+] as IndexerOrderType[];
 
-export const canModifyOrderTypeFromChart = (order: SubaccountOrder) => {
-  return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type.ordinal);
+export const canModifyOrderTypeFromChart = (order: SubaccountOrderNew) => {
+  return ORDER_TYPES_MODIFICATION_ENABLED.includes(order.type);
 };
 
 // Inverse of calculateGoodTilBlockTime in v4-client
@@ -55,7 +62,7 @@ const getMarketInfo = (marketId: string) => {
 
 /* Copies an existing order into a PlaceOrder object */
 export const createPlaceOrderPayloadFromExistingOrder = (
-  order: SubaccountOrder,
+  order: SubaccountOrderNew,
   newPrice: number
 ) => {
   const {
@@ -78,30 +85,84 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     return undefined;
   }
 
-  const [orderPrice, orderTriggerPrice] = isLimitOrderType(order.type)
-    ? [newPrice, triggerPrice]
-    : [price, newPrice];
+  const [orderPrice, orderTriggerPrice] = isLimitOrderTypeNew(order.type)
+    ? [newPrice, triggerPrice?.toNumber()]
+    : [price.toNumber(), newPrice];
 
   return new Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload(
     subaccountNumber,
     marketId,
     generateRandomClientId().toString(),
-    type.rawValue,
-    side.rawValue,
+    indexerToAbacusOrderType(type).rawValue,
+    indexerToAbacusOrderSide(side).rawValue,
     orderPrice,
     orderTriggerPrice,
-    size,
+    size.toNumber(),
     null,
     reduceOnly,
     postOnly,
-    timeInForce?.rawValue,
+    timeInForce != null ? indexerToAbacusTimeInForce(timeInForce).rawValue : undefined,
     // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
-    isMarketOrderType(type) ? OrderExecution.IOC : null,
+    isMarketOrderTypeNew(type) ? OrderExecution.IOC : null,
     goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime),
     goodTilBlock,
     getMarketInfo(marketId)
   );
 };
+
+export function indexerToAbacusOrderType(
+  orderType: IndexerOrderType
+): Abacus.exchange.dydx.abacus.output.input.OrderType {
+  switch (orderType) {
+    case IndexerOrderType.MARKET:
+      return AbacusOrderType.Market;
+    case IndexerOrderType.LIMIT:
+      return AbacusOrderType.Limit;
+    case IndexerOrderType.STOPMARKET:
+      return AbacusOrderType.StopMarket;
+    case IndexerOrderType.STOPLIMIT:
+      return AbacusOrderType.StopLimit;
+    case IndexerOrderType.TRAILINGSTOP:
+      return AbacusOrderType.TrailingStop;
+    case IndexerOrderType.TAKEPROFIT:
+      return AbacusOrderType.TakeProfitLimit;
+    case IndexerOrderType.TAKEPROFITMARKET:
+      return AbacusOrderType.TakeProfitMarket;
+    default:
+      assertNever(orderType);
+      return AbacusOrderType.Market;
+  }
+}
+
+export function indexerToAbacusOrderSide(
+  side: IndexerOrderSide
+): Abacus.exchange.dydx.abacus.output.input.OrderSide {
+  switch (side) {
+    case IndexerOrderSide.BUY:
+      return AbacusOrderSide.Buy;
+    case IndexerOrderSide.SELL:
+      return AbacusOrderSide.Sell;
+    default:
+      assertNever(side);
+      return AbacusOrderSide.Sell;
+  }
+}
+
+export function indexerToAbacusTimeInForce(
+  timeInForce: IndexerAPITimeInForce
+): Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce {
+  switch (timeInForce) {
+    case IndexerAPITimeInForce.GTT:
+      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.GTT;
+    case IndexerAPITimeInForce.IOC:
+      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
+    case IndexerAPITimeInForce.FOK:
+      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
+    default:
+      assertNever(timeInForce);
+      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
+  }
+}
 
 export const cancelOrderAsync = (
   orderId: string
@@ -123,7 +184,7 @@ export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPri
 };
 
 export const getOrderModificationError = (
-  order: SubaccountOrder,
+  order: SubaccountOrderNew,
   newPrice: number
 ): { title: string; body?: string } | null => {
   const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
@@ -132,24 +193,24 @@ export const getOrderModificationError = (
   if (!bookPrice) return null;
 
   const oldPrice = order.triggerPrice ?? order.price;
-  if (isNewOrderPriceValid(bookPrice, oldPrice, newPrice)) return null;
+  if (isNewOrderPriceValid(bookPrice, oldPrice.toNumber(), newPrice)) return null;
 
-  if (order.type.ordinal === AbacusOrderType.Limit.ordinal) {
+  if (order.type === IndexerOrderType.LIMIT) {
     return {
       title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_LIMIT_PRICE_CROSS,
       body: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_USE_TRADE_FORM,
     };
   }
 
-  const isSell = isSellOrder(order);
+  const isSell = isSellOrderNew(order);
 
-  if (isStopLossOrder(order, false)) {
+  if (isStopLossOrderNew(order, false)) {
     return isSell
       ? { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_LOWER }
       : { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_SL_PRICE_HIGHER };
   }
 
-  if (isTakeProfitOrder(order, false)) {
+  if (isTakeProfitOrderNew(order, false)) {
     return isSell
       ? { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_HIGHER }
       : { title: ERRORS_STRING_KEYS.ORDER_MODIFICATION_ERROR_TP_PRICE_LOWER };

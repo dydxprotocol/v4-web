@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { ButtonAction } from '@/constants/buttons';
 
@@ -10,7 +10,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
-import { appQueryClient } from '@/state/appQueryClient';
 import { selectDeposit } from '@/state/transfersSelectors';
 
 import { getTokenSymbol } from './utils';
@@ -24,13 +23,6 @@ type DepositStatusProps = {
 // TODO(deposit2.0): localization for this whole component
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
   const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
-
-  useEffect(() => {
-    if (!deposit || deposit.status !== 'success') return;
-
-    // Tell Bonsai to refetch wallet balances now so that the subaccount sweep can happen
-    appQueryClient.invalidateQueries({ queryKey: ['validator', 'accountBalances'], exact: false });
-  }, [deposit]);
 
   const depositSuccess = deposit?.status === 'success';
 

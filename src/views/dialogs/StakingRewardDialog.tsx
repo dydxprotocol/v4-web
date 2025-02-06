@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits } from 'viem';
@@ -26,7 +26,6 @@ import {
   type StakeButtonAlert,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
-import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
@@ -34,6 +33,7 @@ import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const StakingRewardDialog = ({
   usdcRewards,
@@ -46,7 +46,7 @@ export const StakingRewardDialog = ({
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
-  const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
+  const { equity } = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);

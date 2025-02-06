@@ -8,10 +8,12 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -25,7 +27,7 @@ import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -56,12 +58,14 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
-  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccountForPostOrder, shallowEqual));
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
   const isLoadingData =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
   const isLoading = !!isLoadingGuards || isLoadingData;
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const {
@@ -98,9 +102,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() =>
         dispatch(
-          openDialog(
-            testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-          )
+          openDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
         )
       }
       shape={ButtonShape.Rectangle}

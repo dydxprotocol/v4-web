@@ -40,7 +40,7 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferButtonAndReceipt';
 
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -64,6 +64,8 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
 
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral: freeCollateralPost } =
+    useAppSelector(getSubaccountForPostOrder, shallowEqual) ?? {};
   const { dydxAddress, sourceAccount } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
@@ -97,11 +99,11 @@ export const TransferForm = ({
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
   const showMemoField = isChainTokenSelected;
 
-  const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
+  const balance = isUSDCSelected ? freeCollateral : nativeTokenBalance;
 
   // BN
   const newBalanceBN = isUSDCSelected
-    ? MustBigNumber(freeCollateral?.postOrder)
+    ? MustBigNumber(freeCollateralPost?.postOrder)
     : nativeTokenBalance.minus(size?.size ?? 0);
 
   const amountBN = MustBigNumber(amount);

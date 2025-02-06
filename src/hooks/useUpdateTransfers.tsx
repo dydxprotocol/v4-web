@@ -3,11 +3,15 @@ import { useEffect, useRef } from 'react';
 import { StatusState } from '@skip-go/client';
 import { formatUnits } from 'viem';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch } from '@/state/appTypes';
 import { isDeposit, isWithdraw, updateDeposit, updateWithdraw } from '@/state/transfers';
 import { selectPendingTransfers } from '@/state/transfersSelectors';
+
+import { track } from '@/lib/analytics/analytics';
 
 import { useSkipClient } from './transfers/skipClient';
 import { useAccounts } from './useAccounts';
@@ -39,14 +43,25 @@ export function useUpdateTransfers() {
           ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
           : undefined;
 
+        const status = handleResponseStatus(response.status);
         if (isDeposit(transfer)) {
+          const { token, ...rest } = transfer;
+          track(
+            AnalyticsEvents.DepositFinalized({
+              ...rest,
+              tokenInChainId: token.chainId,
+              tokenInDenom: token.denom,
+              status,
+              finalAmountUsd: finalAmount,
+            })
+          );
           dispatch(
             updateDeposit({
               dydxAddress,
               deposit: {
                 ...transfer,
                 finalAmountUsd: finalAmount,
-                status: handleResponseStatus(response.status),
+                status,
               },
             })
           );
@@ -59,10 +74,17 @@ export function useUpdateTransfers() {
               withdraw: {
                 ...transfer,
                 finalAmountUsd: finalAmount,
-                status: handleResponseStatus(response.status),
+                status,
               },
             })
           );
+        }
+
+        if (status === 'success') {
+          appQueryClient.invalidateQueries({
+            queryKey: ['validator', 'accountBalances'],
+            exact: false,
+          });
         }
       });
     }

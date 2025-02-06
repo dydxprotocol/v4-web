@@ -8,10 +8,12 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -48,6 +50,8 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const { isMobile } = useBreakpoints();
   const { walletLearnMore } = useURLConfigs();
   const { selectWallet, sourceAccount } = useAccounts();
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
@@ -56,12 +60,10 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     if (currentOnboardingStep === OnboardingSteps.DepositFunds) {
       setIsOpen(false);
       dispatch(
-        forceOpenDialog(
-          testFlags.showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-        )
+        forceOpenDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
       );
     }
-  }, [currentOnboardingStep, setIsOpen, dispatch]);
+  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
 
   const setIsOpenFromDialog = (open: boolean) => {
     setIsOpen(open);

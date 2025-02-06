@@ -39,7 +39,6 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
@@ -54,6 +53,8 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -192,16 +193,14 @@ export const HeaderDesktop = () => {
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={
-                !availableBalance || MustBigNumber(availableBalance.current).gt(0)
+                !availableBalance || availableBalance.gt(0)
                   ? ButtonAction.Secondary
                   : ButtonAction.Primary
               }
               onClick={() => {
                 dispatch(
                   openDialog(
-                    testFlags.showNewDepositFlow
-                      ? DialogTypes.Deposit2({})
-                      : DialogTypes.Deposit({})
+                    showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
                   )
                 );
               }}

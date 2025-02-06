@@ -182,3 +182,7 @@ export const getPositionMargin = ({ position }: { position: SubaccountPosition }
 export const getTradeStateWithDoubleValuesHasDiff = (tradeState: Nullable<TradeState<number>>) => {
   return !!tradeState && tradeState.current !== tradeState.postOrder;
 };
+
+export const getDoubleValuesHasDiff = (current: Nullable<number>, post: Nullable<number>) => {
+  return post != null && current !== post;
+};
