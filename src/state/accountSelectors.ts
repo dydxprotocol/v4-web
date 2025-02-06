@@ -31,8 +31,6 @@ export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
 export const getSubaccountForPostOrder = (s: RootState) => s.account.subaccountForPostOrders;
 
-export const getSubaccountHistoricalPnl = (state: RootState) => state.account.historicalPnl;
-
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
