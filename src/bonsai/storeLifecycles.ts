@@ -1,3 +1,4 @@
+import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
 import { setUpConfigTiersQuery } from './rest/configTiers';
@@ -33,4 +34,6 @@ export const storeLifecycles = [
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpConfigTiersQuery,
+  setUpLocalOrdersFillsSync,
+  setUpLocalOrdersOrdersSync,
 ] as const;

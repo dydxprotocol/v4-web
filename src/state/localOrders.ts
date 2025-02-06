@@ -1,9 +1,15 @@
-import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
+import {
+  OrderStatus,
+  SubaccountFill,
+  SubaccountOrder,
+  SubaccountOrder as SubaccountOrderNew,
+} from '@/bonsai/types/summaryTypes';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import { WritableDraft } from 'immer';
 import _ from 'lodash';
 
-import { AbacusOrderStatus, Nullable, SubaccountFill, SubaccountOrder } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
   CANCEL_ALL_ORDERS_KEY,
@@ -17,14 +23,14 @@ import {
 } from '@/constants/trade';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { isOrderStatusCanceled } from '@/lib/orders';
+import { isNewOrderStatusCanceled } from '@/lib/orders';
 
 export interface LocalOrdersState {
   localPlaceOrders: LocalPlaceOrderData[];
   localCancelOrders: LocalCancelOrderData[];
   localCancelAlls: Record<string, LocalCancelAllData>;
   localCloseAllPositions?: LocalCloseAllPositionsData;
-  latestOrder?: Nullable<SubaccountOrder>;
+  latestOrder?: Nullable<{ clientId?: string | null; id?: string | null }>;
 }
 
 const initialState: LocalOrdersState = {
@@ -45,9 +51,11 @@ export const localOrdersSlice = createSlice({
     updateOrders: (state, action: PayloadAction<SubaccountOrder[]>) => {
       const { payload: orders } = action;
       let { localCloseAllPositions } = state;
-      const canceledOrders = orders.filter((order) => isOrderStatusCanceled(order.status));
+      const canceledOrders = orders.filter(
+        (order) => order.status != null && isNewOrderStatusCanceled(order.status)
+      );
       const filledOrderClientIds = orders
-        .filter((order) => order.status === AbacusOrderStatus.Filled)
+        .filter((order) => order.status === OrderStatus.Filled)
         .map((order) => order.clientId)
         .filter(isTruthy);
 
@@ -110,7 +118,7 @@ export const localOrdersSlice = createSlice({
     },
     updateFilledOrders: (state, action: PayloadAction<SubaccountFill[]>) => {
       const filledOrderIds = action.payload.map((fill) => fill.orderId).filter(isTruthy);
-      if (!filledOrderIds) return state;
+      if (filledOrderIds.length === 0) return state;
 
       const getFailedToCancelOrderIds = (batch: LocalCancelAllData) => {
         const newFailedCancelOrderIds = _.intersection(batch.orderIds, filledOrderIds);
@@ -138,7 +146,10 @@ export const localOrdersSlice = createSlice({
         })),
       };
     },
-    setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
+    setLatestOrder: (
+      state,
+      action: PayloadAction<Nullable<{ clientId?: string | null; id: string }>>
+    ) => {
       const { clientId, id } = action.payload ?? {};
       state.latestOrder = action.payload;
 
@@ -274,7 +285,7 @@ export const {
 
 // helper functions
 const updateCancelAllOrderIds = (
-  state: LocalOrdersState,
+  state: WritableDraft<LocalOrdersState>,
   orderId: string,
   key: 'canceledOrderIds' | 'failedOrderIds',
   cancelAllKey: string

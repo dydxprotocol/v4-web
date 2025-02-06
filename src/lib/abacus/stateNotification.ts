@@ -28,7 +28,7 @@ import {
   setUnbondingDelegations,
 } from '@/state/account';
 import { setInputs } from '@/state/inputs';
-import { setLatestOrder, updateFilledOrders, updateOrders } from '@/state/localOrders';
+import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
 import { setAbacusHasMarkets } from '@/state/perpetuals';
 
@@ -93,6 +93,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setCompliance(updatedState.compliance));
       }
 
+      // this can be migrated when the trade/close position forms are migrated
       if (changes.has(Changes.markets)) {
         dispatch(
           setAbacusHasMarkets(
@@ -101,29 +102,22 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         );
       }
 
+      // this can be migrated when all forms are migrated
       subaccountNumbers?.forEach((subaccountId: number) => {
-        const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
-
         if (changes.has(Changes.subaccount)) {
           const subaccountData = updatedState.subaccount(subaccountId);
+          const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
           if (!isChildSubaccount) {
             dispatch(setSubaccountForPostOrders(subaccountData));
-            dispatch(updateOrders(subaccountData?.orders?.toArray() ?? []));
-          }
-        }
-
-        if (changes.has(Changes.fills)) {
-          const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
-          if (!isChildSubaccount) {
-            dispatch(updateFilledOrders(fills));
           }
         }
       });
     }
   }
 
+  // this can be migrated when the trade/close position forms are migrated
   lastOrderChanged(order: SubaccountOrder) {
-    this.store?.dispatch(setLatestOrder(order));
+    this.store?.dispatch(setLatestOrder({ clientId: order.clientId, id: order.id }));
   }
 
   errorsEmitted(errors: ParsingErrors) {

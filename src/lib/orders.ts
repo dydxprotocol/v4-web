@@ -152,6 +152,8 @@ export const isOrderStatusCanceled = (status: OrderStatus) =>
   [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
     (orderStatus) => status === orderStatus
   );
+export const isNewOrderStatusCanceled = (status: OrderStatusNew) =>
+  getSimpleOrderStatus(status) === OrderStatusNew.Canceled;
 
 export const isMarketOrderType = (type?: AbacusOrderTypes) =>
   type &&
