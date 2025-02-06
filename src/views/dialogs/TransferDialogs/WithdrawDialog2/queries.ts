@@ -12,7 +12,7 @@ import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
-import { isValidWithdrawalAddress } from './utils';
+import { isValidWithdrawalAddress } from '../utils';
 
 async function getSkipWithdrawalRoutes(
   skipClient: SkipClient,

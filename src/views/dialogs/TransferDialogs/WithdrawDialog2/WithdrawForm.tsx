@@ -23,11 +23,11 @@ import { Withdraw } from '@/state/transfers';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { WithdrawRouteOptions } from '../DepositDialog2/RouteOptions';
+import { TransferRouteOptions } from '../RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
-import { useWithdrawStep } from './utils';
+import { useWithdrawStep } from './withdrawHooks';
 
 export const WithdrawForm = ({
   amount,
@@ -153,7 +153,7 @@ export const WithdrawForm = ({
         onDestinationClicked={onChainSelect}
       />
       <AmountInput value={amount} onChange={setAmount} />
-      <WithdrawRouteOptions
+      <TransferRouteOptions
         routes={routes}
         isLoading={isFetching}
         disabled={
@@ -161,6 +161,7 @@ export const WithdrawForm = ({
         }
         selectedSpeed={selectedSpeed}
         onSelectSpeed={setSelectedSpeed}
+        type="withdraw"
       />
       {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
       <Button

@@ -12,7 +12,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { selectDeposit } from '@/state/transfersSelectors';
 
-import { getTokenSymbol } from './utils';
+import { getTokenSymbol } from '../utils';
 
 type DepositStatusProps = {
   txHash: string;

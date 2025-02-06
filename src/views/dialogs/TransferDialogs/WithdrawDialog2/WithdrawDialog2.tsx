@@ -35,8 +35,10 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         ? SOLANA_MAINNET_ID
         : CosmosChainId.Noble
   );
-
+  // prev values
+  const prevDestinationAddress = usePrevious(destinationAddress);
   const previousChainRef = usePrevious(CHAIN_INFO[destinationChain]?.walletNetworkType);
+
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const [amount, setAmount] = useState('');
@@ -61,7 +63,8 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     // Cosmos uses different Bech32Prefixes for different chains, so it is excluded from this check
     if (
       currentDestinationChainType === WalletNetworkType.Evm &&
-      previousChainRef === currentDestinationChainType
+      previousChainRef === currentDestinationChainType &&
+      prevDestinationAddress !== ''
     )
       return;
 
