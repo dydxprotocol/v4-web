@@ -93,6 +93,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setCompliance(updatedState.compliance));
       }
 
+      // this can be migrated when the trade/close position forms are migrated
       if (changes.has(Changes.markets)) {
         dispatch(
           setAbacusHasMarkets(
@@ -101,6 +102,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         );
       }
 
+      // this can be migrated when all forms are migrated
       subaccountNumbers?.forEach((subaccountId: number) => {
         if (changes.has(Changes.subaccount)) {
           const subaccountData = updatedState.subaccount(subaccountId);
@@ -113,6 +115,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     }
   }
 
+  // this can be migrated when the trade/close position forms are migrated
   lastOrderChanged(order: SubaccountOrder) {
     this.store?.dispatch(setLatestOrder({ clientId: order.clientId, id: order.id }));
   }
