@@ -107,7 +107,10 @@ export const DepositForm = ({
     ? tokenBalance.raw && BigInt(depositRoute.amountIn) <= BigInt(tokenBalance.raw)
     : true;
 
-  const depositDisabled = isFetching || !hasSufficientBalance || !depositRoute;
+  const isDebouncedAmountSame = debouncedAmount === amount;
+
+  const depositDisabled =
+    isFetching || !hasSufficientBalance || !depositRoute || !isDebouncedAmountSame;
 
   const depositButtonInner = useMemo(() => {
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;

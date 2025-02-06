@@ -99,8 +99,14 @@ export const WithdrawForm = ({
     selectedRoute,
   });
 
+  const isDebouncedAmountSame = debouncedAmount === amount;
+
   const withdrawDisabled =
-    !selectedRoute || destinationAddress === '' || amount === '' || !!validationError;
+    !selectedRoute ||
+    destinationAddress === '' ||
+    amount === '' ||
+    !!validationError ||
+    !isDebouncedAmountSame;
 
   const buttonInner = error ? (
     <WithTooltip tooltipString={error.message}>
