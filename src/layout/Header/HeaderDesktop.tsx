@@ -4,12 +4,14 @@ import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -48,6 +50,7 @@ export const HeaderDesktop = () => {
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
+  const { complianceState } = useComplianceState();
 
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const { freeCollateral: availableBalance } = subAccount ?? {};
@@ -186,31 +189,32 @@ export const HeaderDesktop = () => {
       <div role="separator" />
 
       <$NavAfter>
-        {onboardingState === OnboardingState.AccountConnected && (
-          <>
-            <Button
-              tw="mr-[0.5em]"
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              action={
-                !availableBalance || availableBalance.gt(0)
-                  ? ButtonAction.Secondary
-                  : ButtonAction.Primary
-              }
-              onClick={() => {
-                dispatch(
-                  openDialog(
-                    showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-                  )
-                );
-              }}
-              state={{ isDisabled: !dydxAccounts }}
-            >
-              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-            </Button>
-            <VerticalSeparator />
-          </>
-        )}
+        {onboardingState === OnboardingState.AccountConnected &&
+          complianceState === ComplianceStates.FULL_ACCESS && (
+            <>
+              <Button
+                tw="mr-[0.5em]"
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+                action={
+                  !availableBalance || availableBalance.gt(0)
+                    ? ButtonAction.Secondary
+                    : ButtonAction.Primary
+                }
+                onClick={() => {
+                  dispatch(
+                    openDialog(
+                      showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
+                    )
+                  );
+                }}
+                state={{ isDisabled: !dydxAccounts }}
+              >
+                {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+              </Button>
+              <VerticalSeparator />
+            </>
+          )}
 
         <MobileDownloadLinks />
 
