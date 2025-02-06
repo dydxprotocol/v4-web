@@ -39,10 +39,10 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getSubaccountId } from '@/state/accountInfoSelectors';
 import {
   getCurrentMarketPositionData,
   getCurrentMarketPositionDataForPostTrade,
-  getSubaccountId,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
