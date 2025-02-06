@@ -19,7 +19,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { type RootStore } from '@/state/_store';
 import {
   setCompliance,
-  setHistoricalPnl,
   setRestrictionType,
   setStakingBalances,
   setStakingDelegations,
@@ -117,14 +116,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
           if (!isChildSubaccount) {
             dispatch(updateFilledOrders(fills));
-          }
-        }
-
-        if (changes.has(Changes.historicalPnl)) {
-          const historicalPnl = updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
-
-          if (!isChildSubaccount) {
-            dispatch(setHistoricalPnl(historicalPnl));
           }
         }
       });
