@@ -31,10 +31,11 @@ import { track } from '@/lib/analytics/analytics';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
+import { getTokenSymbol } from '../utils';
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
+import { DepositStep, useDepositSteps } from './depositHooks';
 import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
-import { DepositStep, getTokenSymbol, useDepositSteps } from './utils';
 
 export const DepositForm = ({
   onTokenSelect,

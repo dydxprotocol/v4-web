@@ -12,8 +12,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
+import { getTokenSymbol } from '../utils';
 import { useBalances } from './queries';
-import { getTokenSymbol } from './utils';
 
 export const TokenSelect = ({
   disabled,
