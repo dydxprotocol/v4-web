@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.16.3
     version: 1.16.3
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.259
-    version: 1.1.259
+    specifier: ^1.1.260
+    version: 1.1.260
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1980,8 +1980,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.259:
-    resolution: {integrity: sha512-hmMJnsvCpCkxoXhqb56Ru3G1OBAFvInIoAVRCSKyZ9ejaSOaPx+vtBBO7eBoWx4CiHMPNjR57fN7kL7Wpp1jBA==}
+  /@dydxprotocol/v4-localization@1.1.260:
+    resolution: {integrity: sha512-J3SnTuu0nTCaRsAOhEZkFLi6OuSlt3v2BtFmce4ApLUQO1zJujTF8fMhY3RTXkQFrWGVMZ4oB5oZkRX5iArTkw==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -23287,6 +23287,7 @@ packages:
   /ws@8.13.0:
     resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
     engines: {node: '>=10.0.0'}
+    requiresBuild: true
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: '>=5.0.2'
