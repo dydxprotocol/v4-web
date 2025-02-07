@@ -13,10 +13,20 @@ import { EMPTY_ARR } from '@/constants/objects';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
+
+export const refreshStakingData = () => {
+  appQueryClient.invalidateQueries({
+    queryKey: ['validator', 'staking'],
+  });
+  appQueryClient.invalidateQueries({
+    queryKey: ['validator', 'accountBalances'],
+  });
+};
 
 export const useSortedUnbondingDelegations = () => {
   const unbondingDelegations = BonsaiHooks.useUnbondingDelegations().data;

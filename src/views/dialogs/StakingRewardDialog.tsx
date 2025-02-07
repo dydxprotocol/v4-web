@@ -12,6 +12,7 @@ import { DialogProps, StakingRewardDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
+import { refreshStakingData } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -26,7 +27,6 @@ import {
   type StakeButtonAlert,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
-import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
@@ -121,10 +121,7 @@ export const StakingRewardDialog = ({
       const tx = await withdrawReward(validators);
       const txHash = hashFromTx(tx.hash);
 
-      appQueryClient.invalidateQueries({
-        queryKey: ['staking'],
-        exact: false,
-      });
+      refreshStakingData();
 
       track(
         AnalyticsEvents.ClaimTransaction({

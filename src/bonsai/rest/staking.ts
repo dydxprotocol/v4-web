@@ -39,7 +39,7 @@ export const useStakingDelegations = () => {
   const client = useCompositeClient();
 
   return useQuery({
-    queryKey: ['staking', 'delegations', address, client.key],
+    queryKey: ['validator', 'staking', 'delegations', address, client.key],
     enabled: isPresent(address) && isPresent(client),
     queryFn: async (): Promise<StakingDelegationsResult> => {
       if (!address || !client.compositeClient) {
@@ -110,7 +110,7 @@ export const useUnbondingDelegations = () => {
   const client = useCompositeClient();
 
   return useQuery({
-    queryKey: ['staking', 'unbonding-delegations', address, client.key],
+    queryKey: ['validator', 'staking', 'unbonding-delegations', address, client.key],
     enabled: isPresent(address) && isPresent(client),
     queryFn: async (): Promise<UnbondingDelegation[]> => {
       if (!address || !client.compositeClient) {
@@ -158,7 +158,7 @@ export const useStakingRewards = () => {
   const client = useCompositeClient();
 
   return useQuery({
-    queryKey: ['staking', 'staking-rewards', address, client.key],
+    queryKey: ['validator', 'staking', 'staking-rewards', address, client.key],
     enabled: isPresent(address) && isPresent(client),
     queryFn: async (): Promise<StakingRewards> => {
       if (!address || !client.compositeClient) {
