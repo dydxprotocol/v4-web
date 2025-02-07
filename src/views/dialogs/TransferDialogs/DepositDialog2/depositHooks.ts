@@ -7,11 +7,13 @@ import { useChainId } from 'wagmi';
 import ERC20ABI from '@/abi/erc20.json';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { isEvmDepositChainId } from '@/constants/chains';
+import { STRING_KEYS } from '@/constants/localization';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
@@ -53,6 +55,7 @@ export function useDepositSteps({
   depositRoute?: RouteResponse;
   onDeposit: (deposit: Deposit) => void;
 }) {
+  const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
   const { nobleAddress, dydxAddress, osmosisAddress } = useAccounts();
@@ -87,10 +90,7 @@ export function useDepositSteps({
             } catch (e) {
               return {
                 success: false,
-                errorMessage: parseError(
-                  e,
-                  'Please change networks within your wallet and try again.'
-                ),
+                errorMessage: parseError(e, stringGetter({ key: STRING_KEYS.CHAIN_MISMATCH })),
               };
             }
           }
@@ -151,18 +151,20 @@ export function useDepositSteps({
                 });
                 const receipt = await viemClient.waitForTransactionReceipt({ hash: txHash });
                 // TODO future improvement: also check to see if approval amount is sufficient here
-                // TODO(deposit2.0): localization
                 const isOnChainSuccess = receipt.status === 'success';
                 return {
                   success: isOnChainSuccess,
                   errorMessage: isOnChainSuccess
                     ? undefined
-                    : 'Your approval has failed. Please try again.',
+                    : stringGetter({ key: STRING_KEYS.YOUR_APPROVAL_FAILED }),
                 } as StepResult;
               } catch (e) {
                 return {
                   success: false,
-                  errorMessage: parseError(e, 'There was an error with your approval.'),
+                  errorMessage: parseError(
+                    e,
+                    stringGetter({ key: STRING_KEYS.ERROR_WITH_APPROVAL })
+                  ),
                 };
               }
             },
@@ -208,7 +210,7 @@ export function useDepositSteps({
         } catch (e) {
           return {
             success: false,
-            errorMessage: parseError(e, 'Your deposit has failed. Please try again.'),
+            errorMessage: parseError(e, stringGetter({ key: STRING_KEYS.YOUR_DEPOSIT_FAILED })),
           };
         }
       },

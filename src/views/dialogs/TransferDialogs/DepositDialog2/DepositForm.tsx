@@ -120,12 +120,17 @@ export const DepositForm = ({
           <div tw="flex items-center text-color-error">
             <WarningIcon />
           </div>
-          {/* TODO(deposit2.0): localization */}
-          <div>Min deposit is $10</div>
+          {/* MINIMUM_DEPOSIT {MIN_DEPOSIT_USDC} */}
+          <div>
+            {stringGetter({
+              key: STRING_KEYS.MINIMUM_DEPOSIT,
+              params: { MIN_DEPOSIT_USDC: '$10' },
+            })}
+          </div>
         </div>
       );
 
-    if (!signer) return <div>Reconnect wallet</div>;
+    if (!signer) return <div>{stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}</div>;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
   }, [error, hasSufficientBalance, stringGetter, token.denom, signer]);
@@ -274,8 +279,7 @@ export const DepositForm = ({
         <div tw="flex flex-col gap-0.5" style={{ opacity: coinbaseOptionDisabled ? '0.5' : '1' }}>
           <div tw="flex items-center gap-1">
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
-            {/* TODO(deposit2): localization */}
-            <div tw="text-color-text-0">or</div>
+            <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.OR })}</div>
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
           </div>
           <Button
@@ -287,7 +291,7 @@ export const DepositForm = ({
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
-            {/* TODO(deposit2): localization */}
+            {/* DEPOSIT_WITH */}
             <div>
               Deposit with <span tw="sr-only">Coinbase</span>
             </div>
@@ -330,8 +334,7 @@ export const DepositForm = ({
           </div>
         )}
         <div tw="flex justify-between text-small">
-          {/* TODO(deposit2.0): localization */}
-          <div tw="text-color-text-0">Available balance</div>
+          <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}</div>
           <div
             tw="flex items-center gap-0.375"
             style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}

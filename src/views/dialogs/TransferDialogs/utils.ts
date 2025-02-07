@@ -88,19 +88,17 @@ export function userAddressHelper(route: RouteResponse, userAddresses: UserAddre
   return addressList;
 }
 
-// TODO(deposit2.0): localization
-// TODO(deposit2.0): Add final copy for each error message
 export function parseError(e: Error, fallbackMessage: string) {
   if ('code' in e && e.code === UserRejectedRequestError.code) {
-    return 'User rejected request.';
+    return 'User rejected request.'; // USER_REJECTED
   }
 
   if ('name' in e && e.name === ChainMismatchError.name) {
-    return 'Please change your wallet network and try again.';
+    return 'Please change your wallet network and try again.'; // CHAIN_MISMATCH
   }
 
   if ('message' in e && e.message.includes('Insufficient balance for gas')) {
-    return 'Insufficient gas balance. Please add gas funds and try again.';
+    return 'Insufficient gas balance. Please add gas funds and try again.'; // INSUFFICIENT_GAS_BALANCE
   }
 
   return fallbackMessage;
@@ -108,7 +106,7 @@ export function parseError(e: Error, fallbackMessage: string) {
 
 export const parseWithdrawError = (e: Error, fallbackMessage: string) => {
   if (e.message.includes('NewlyUndercollateralized')) {
-    return 'Your withdrawal would leave your account undercollateralized. Please try a a smaller amount.';
+    return 'Your withdrawal would leave your account undercollateralized. Please try a smaller amount.'; // WITHDRAWAL_UNDERCOLLATERALIZED
   }
 
   return fallbackMessage;
