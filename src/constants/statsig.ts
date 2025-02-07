@@ -13,6 +13,7 @@ export enum StatsigFlags {
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
   ffEnableFunkit = 'ff_enable_funkit',
   ffDepositRewrite = 'ff_deposit_rewrite',
+  ffWithdrawRewrite = 'ff_withdraw_rewrite',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

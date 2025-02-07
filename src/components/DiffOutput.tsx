@@ -50,7 +50,7 @@ const $DiffValue = styled.div<{ hasInvalidNewValue?: boolean }>`
   ${({ hasInvalidNewValue }) =>
     hasInvalidNewValue &&
     css`
-      color: var(--color-error);
+      color: var(--color-error) !important;
     `}
 `;
 

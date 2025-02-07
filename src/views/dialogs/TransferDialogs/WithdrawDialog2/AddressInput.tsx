@@ -67,7 +67,7 @@ export const AddressInput = ({
           onBlur={onBlur}
           onFocus={onFocus}
           placeholder={sourceAccount.address}
-          tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
+          tw="flex-1 text-ellipsis bg-color-layer-4 text-large font-medium outline-none"
           value={value}
           onChange={onValueChange}
         />

@@ -33,14 +33,17 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
       isOpen
       hasHeaderBorder
       setIsOpen={setIsOpen}
-      // TODO(deposit2.0): localization
-      title={<div tw="text-center">Deposit via Coinbase</div>}
+      title={<div tw="text-center">{stringGetter({ key: STRING_KEYS.DEPOSIT_VIA_COINBASE })}</div>}
     >
       <div tw="flex flex-col gap-0.5 px-0.5 pt-1.25">
         <div tw="text-center text-color-text-0">
-          {/* TODO(deposit2.0): localization */}
-          To deposit from Coinbase, send <span tw="text-color-text-1">USDC</span> on{' '}
-          <span tw="text-color-text-1">Noble Network</span> to the address shown below.
+          {stringGetter({
+            key: STRING_KEYS.TO_DEPOSIT_FROM_COINBASE,
+            params: {
+              ASSET: <span tw="text-color-text-1">USDC</span>,
+              NETWORK: <span tw="text-color-text-1">Noble Network</span>,
+            },
+          })}
         </div>
         <div tw="self-center" style={{ height: 200, width: 200 }}>
           <QrCode tw="text-center" hasLogo size={200} value={nobleAddress ?? ''} />
@@ -52,10 +55,8 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
             {showCopyLogo ? <CopyIcon /> : <GreenCheckCircle />}
           </button>
         </div>
-        {/* TODO(deposit2.0): localization */}
         <div tw="rounded-0.5 border border-solid border-color-border p-0.5 text-small">
-          This address is only for Noble USDC transfers to the Noble Chain. Sending any funds from
-          other blockchains will result in a loss of those funds.
+          {stringGetter({ key: STRING_KEYS.NOBLE_CHAIN_ONLY })}
         </div>
         <Button
           tw="bg-color-layer-4"

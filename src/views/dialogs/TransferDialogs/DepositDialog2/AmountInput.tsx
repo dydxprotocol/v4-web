@@ -81,7 +81,7 @@ export const AmountInput = ({
               <Output
                 tw="inline font-medium text-color-text-0"
                 fractionDigits={TOKEN_DECIMALS}
-                slotRight=" held" // TODO(deposit2.0): localization here
+                slotRight={` ${stringGetter({ key: STRING_KEYS.HELD })}`}
                 value={tokenBalance.formatted}
                 type={OutputType.Number}
               />

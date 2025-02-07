@@ -8,11 +8,15 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { LightningIcon, ShieldIcon } from '@/icons';
 
-import { Output, OutputType } from '@/components/Output';
+import { formatNumberOutput, Output, OutputType } from '@/components/Output';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
@@ -35,6 +39,13 @@ export const TransferRouteOptions = ({
   type,
 }: Props) => {
   const stringGetter = useStringGetter();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { decimal, group } = useLocaleSeparators();
+  const limitAmount = formatNumberOutput(10_000, OutputType.CompactNumber, {
+    selectedLocale,
+    decimalSeparator: decimal,
+    groupSeparator: group,
+  });
 
   const goFastOperation = useMemo(() => {
     if (!routes?.fast) return undefined;
@@ -46,7 +57,13 @@ export const TransferRouteOptions = ({
   }, [routes?.fast]);
 
   const fastRouteDescription = useMemo(() => {
-    if (!routes || disabled) return type === 'deposit' ? '$$ fee, $10k limit' : '-';
+    if (!routes || disabled)
+      return type === 'deposit'
+        ? stringGetter({
+            key: STRING_KEYS.SKIP_FAST_ROUTE_DESC,
+            params: { LIMIT_AMOUNT: limitAmount },
+          })
+        : '-';
     if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     const fastOperationFee = routes.fast.estimatedFees.reduce(
@@ -69,7 +86,7 @@ export const TransferRouteOptions = ({
         )}
       </span>
     );
-  }, [goFastOperation, routes, disabled, stringGetter, isLoading, type]);
+  }, [goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
 
   const slowRouteDescription = useMemo(() => {
     const slowOperationFee = routes?.slow?.estimatedFees.reduce(
@@ -77,7 +94,8 @@ export const TransferRouteOptions = ({
       BIG_NUMBERS.ZERO
     );
 
-    if (!routes || disabled) return type === 'deposit' ? '$ fee, no limit' : '-';
+    if (!routes || disabled)
+      return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC }) : '-';
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     return (
