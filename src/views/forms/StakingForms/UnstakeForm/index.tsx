@@ -57,7 +57,7 @@ export const UnstakeForm = ({
   const stringGetter = useStringGetter();
   const { undelegate, getUndelegateFee } = useSubaccount();
   const { nativeTokenBalance } = useAccountBalance();
-  const { currentDelegations } = useStakingValidator() ?? {};
+  const { currentDelegations } = useStakingValidator();
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
@@ -70,10 +70,8 @@ export const UnstakeForm = ({
     return (
       Object.keys(amounts).length > 0 &&
       Object.keys(amounts).every((validator) => {
-        const balance = parseFloat(
-          currentDelegations?.find((delegation) => delegation.validator === validator)?.amount ??
-            '0'
-        );
+        const balance =
+          currentDelegations.find((delegation) => delegation.validator === validator)?.amount ?? 0;
         const validatorAmount = amounts[validator];
         if (!validatorAmount) return true;
         return validatorAmount && validatorAmount > 0 && balance && validatorAmount <= balance;
@@ -177,7 +175,7 @@ export const UnstakeForm = ({
           hasInvalidNewValue={MustBigNumber(newStakedBalance).isNegative()}
           withDiff={
             newStakedBalance !== undefined &&
-            !MustBigNumber(nativeTokenBalance).eq(newStakedBalance ?? 0)
+            !MustBigNumber(nativeTokenBalance).eq(newStakedBalance)
           }
         />
       ),

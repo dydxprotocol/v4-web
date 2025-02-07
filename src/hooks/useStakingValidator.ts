@@ -1,32 +1,43 @@
 import { useState } from 'react';
 
+import { BonsaiHooks } from '@/bonsai/ontology';
 import {
   BondStatus,
   Validator,
 } from '@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash';
-import { shallowEqual } from 'react-redux';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
-import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
-import { getStakingDelegations } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
 
+export const useSortedUnbondingDelegations = () => {
+  const unbondingDelegations = BonsaiHooks.useUnbondingDelegations().data;
+  if (unbondingDelegations?.length) {
+    const sortedUnbondingDelegations = [...unbondingDelegations];
+    sortedUnbondingDelegations.sort(
+      (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
+    );
+    return sortedUnbondingDelegations;
+  }
+  return unbondingDelegations;
+};
+
 export const useStakingValidator = () => {
   const { getValidators, isCompositeClientConnected } = useDydxClient();
   const selectedNetwork = useAppSelector(getSelectedNetwork);
-  const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
-  const currentDelegations = useAppSelector(getStakingDelegations, shallowEqual)?.map(
+  const unbondingDelegations = useSortedUnbondingDelegations();
+  const currentDelegations = BonsaiHooks.useStakingDelegations().data?.delegations.map(
     (delegation) => {
       return {
-        validator: delegation.validator.toLowerCase(),
+        validator: delegation.validatorAddress.toLowerCase(),
         amount: delegation.amount,
       };
     }
@@ -95,7 +106,7 @@ export const useStakingValidator = () => {
       validatorOptions.includes(validator.operatorAddress.toLowerCase())
     );
 
-    const validatorWithFewestTokens = (whitelistedValidators ?? availableValidators ?? []).reduce(
+    const validatorWithFewestTokens = (whitelistedValidators ?? availableValidators).reduce(
       (prev, curr) => {
         return BigInt(curr.tokens) < BigInt(prev.tokens) ? curr : prev;
       }
@@ -108,7 +119,9 @@ export const useStakingValidator = () => {
 
     const unbondingValidators =
       response?.validators.filter((validator) =>
-        unbondingDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
+        unbondingDelegations?.some(
+          (d) => d.validatorAddress.toLowerCase() === validator.operatorAddress.toLowerCase()
+        )
       ) ?? [];
 
     return {
@@ -134,6 +147,6 @@ export const useStakingValidator = () => {
     availableValidators: data?.availableValidators,
     stakingValidators: data?.stakingValidators,
     unbondingValidators: data?.unbondingValidators,
-    currentDelegations,
+    currentDelegations: currentDelegations ?? EMPTY_ARR,
   };
 };

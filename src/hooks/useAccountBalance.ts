@@ -1,11 +1,10 @@
 import { useCallback, useMemo } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { StargateClient } from '@cosmjs/stargate';
 import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
@@ -20,7 +19,6 @@ import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { useSolanaConnection } from '@/hooks/useSolanaConnection';
 
-import { getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
@@ -63,7 +61,7 @@ export const useAccountBalance = ({
 
   const { chainTokenDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
-  const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
+  const stakingBalances = BonsaiHooks.useStakingDelegations().data?.balances;
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
