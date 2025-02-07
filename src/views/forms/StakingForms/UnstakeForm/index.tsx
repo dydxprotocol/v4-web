@@ -30,6 +30,8 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
+import { appQueryClient } from '@/state/appQueryClient';
+
 import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -137,6 +139,11 @@ export const UnstakeForm = ({
       setIsLoading(true);
       const tx = await undelegate(amounts);
       const txHash = hashFromTx(tx.hash);
+
+      appQueryClient.invalidateQueries({
+        queryKey: ['staking'],
+        exact: false,
+      });
 
       track(
         AnalyticsEvents.UnstakeTransaction({

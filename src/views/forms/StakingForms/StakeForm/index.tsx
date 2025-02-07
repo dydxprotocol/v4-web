@@ -27,6 +27,8 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { StakeButtonAlert } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
+import { appQueryClient } from '@/state/appQueryClient';
+
 import { track } from '@/lib/analytics/analytics';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -127,6 +129,11 @@ export const StakeForm = ({
       setIsLoading(true);
       const tx = await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
       const txHash = hashFromTx(tx.hash);
+
+      appQueryClient.invalidateQueries({
+        queryKey: ['staking'],
+        exact: false,
+      });
 
       track(
         AnalyticsEvents.StakeTransaction({

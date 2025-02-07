@@ -26,6 +26,7 @@ import {
   type StakeButtonAlert,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
@@ -119,6 +120,11 @@ export const StakingRewardDialog = ({
       setError(undefined);
       const tx = await withdrawReward(validators);
       const txHash = hashFromTx(tx.hash);
+
+      appQueryClient.invalidateQueries({
+        queryKey: ['staking'],
+        exact: false,
+      });
 
       track(
         AnalyticsEvents.ClaimTransaction({
