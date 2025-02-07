@@ -121,10 +121,9 @@ export function useWithdrawStep({
     } catch (error) {
       return {
         success: false,
-        errorMessage: parseWithdrawError(
-          error,
-          stringGetter({ key: STRING_KEYS.WITHDRAWAL_FAILED_TRY_AGAIN })
-        ),
+        errorMessage: stringGetter({
+          key: parseWithdrawError(error, STRING_KEYS.WITHDRAWAL_FAILED_TRY_AGAIN),
+        }),
       };
     } finally {
       setIsLoading(false);

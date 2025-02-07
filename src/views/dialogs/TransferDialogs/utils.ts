@@ -107,7 +107,7 @@ export function parseError(e: Error, fallbackMessage: string) {
 
 export const parseWithdrawError = (e: Error, fallbackMessage: string) => {
   if (e.message.includes('NewlyUndercollateralized')) {
-    return 'Your withdrawal would leave your account undercollateralized. Please try a smaller amount.'; // WITHDRAWAL_UNDERCOLLATERALIZED
+    return STRING_KEYS.WITHDRAWAL_UNDERCOLLATERALIZED;
   }
 
   return fallbackMessage;
