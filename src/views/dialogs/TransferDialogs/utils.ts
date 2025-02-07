@@ -4,6 +4,7 @@ import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
+import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -90,15 +91,15 @@ export function userAddressHelper(route: RouteResponse, userAddresses: UserAddre
 
 export function parseError(e: Error, fallbackMessage: string) {
   if ('code' in e && e.code === UserRejectedRequestError.code) {
-    return 'User rejected request.'; // USER_REJECTED
+    return STRING_KEYS.USER_REJECTED;
   }
 
   if ('name' in e && e.name === ChainMismatchError.name) {
-    return 'Please change your wallet network and try again.'; // CHAIN_MISMATCH
+    return STRING_KEYS.CHAIN_MISMATCH;
   }
 
   if ('message' in e && e.message.includes('Insufficient balance for gas')) {
-    return 'Insufficient gas balance. Please add gas funds and try again.'; // INSUFFICIENT_GAS_BALANCE
+    return STRING_KEYS.INSUFFICIENT_GAS_BALANCE;
   }
 
   return fallbackMessage;

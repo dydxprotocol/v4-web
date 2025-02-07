@@ -120,7 +120,6 @@ export const DepositForm = ({
           <div tw="flex items-center text-color-error">
             <WarningIcon />
           </div>
-          {/* MINIMUM_DEPOSIT {MIN_DEPOSIT_USDC} */}
           <div>
             {stringGetter({
               key: STRING_KEYS.MINIMUM_DEPOSIT,
@@ -291,9 +290,8 @@ export const DepositForm = ({
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
-            {/* DEPOSIT_WITH */}
             <div>
-              Deposit with <span tw="sr-only">Coinbase</span>
+              {stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })} <span tw="sr-only">Coinbase</span>
             </div>
             <div tw="flex text-color-text-1">
               <CoinbaseBrandIcon />

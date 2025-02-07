@@ -90,7 +90,7 @@ export function useDepositSteps({
             } catch (e) {
               return {
                 success: false,
-                errorMessage: parseError(e, stringGetter({ key: STRING_KEYS.CHAIN_MISMATCH })),
+                errorMessage: stringGetter({ key: parseError(e, STRING_KEYS.CHAIN_MISMATCH) }),
               };
             }
           }
@@ -210,7 +210,7 @@ export function useDepositSteps({
         } catch (e) {
           return {
             success: false,
-            errorMessage: parseError(e, stringGetter({ key: STRING_KEYS.YOUR_DEPOSIT_FAILED })),
+            errorMessage: stringGetter({ key: parseError(e, STRING_KEYS.YOUR_DEPOSIT_FAILED) }),
           };
         }
       },
