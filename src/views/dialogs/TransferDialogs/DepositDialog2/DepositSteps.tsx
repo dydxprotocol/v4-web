@@ -2,6 +2,10 @@ import { ReactNode, useEffect, useState } from 'react';
 
 import tw from 'twin.macro';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { ErrorExclamationIcon } from '@/icons';
 import ConnectingLine from '@/icons/connecting-line.svg';
 
@@ -17,18 +21,19 @@ type DepositStepsProps = {
   onRetry: () => void;
 };
 
-const STEP_TYPE_TO_INFO: { [type: string]: { title: string; icon: ReactNode } } = {
+const STEP_TYPE_TO_INFO: {
+  [type: string]: { titleKey: string; icon: ReactNode };
+} = {
   network: {
-    // TODO(deposit2.0): localization
-    title: 'Switch networks',
+    titleKey: STRING_KEYS.SWITCH_NETWORKS,
     icon: <Icon size="1.5rem" iconName={IconName.Switch} />,
   },
   approve: {
-    title: 'Approve USDC',
+    titleKey: STRING_KEYS.APPROVE_USDC,
     icon: <Icon size="1.5rem" iconName={IconName.Usdc} />,
   },
   deposit: {
-    title: 'Confirm deposit',
+    titleKey: STRING_KEYS.CONFIRM_DEPOSIT,
     icon: <Icon size="1.5rem" iconName={IconName.Deposit} />,
   },
 };
@@ -41,6 +46,7 @@ export const DepositSteps = ({
   currentStepError,
   onRetry,
 }: DepositStepsProps) => {
+  const stringGetter = useStringGetter();
   const [isShaking, setIsShaking] = useState(false);
   useEffect(() => {
     if (!currentStepError) {
@@ -84,7 +90,7 @@ export const DepositSteps = ({
                     tw="transition-all duration-300"
                     css={[i === currentStep ? tw`opacity-100` : tw`opacity-50`]}
                   >
-                    {stepInfo.title}
+                    {stringGetter({ key: stepInfo.titleKey })}
                   </div>
                   {error && <div tw="text-small text-color-error">{error}</div>}
                 </div>
@@ -96,8 +102,7 @@ export const DepositSteps = ({
                     onClick={onRetry}
                   >
                     <Icon iconName={IconName.Refresh} />
-                    {/* TODO(deposit2.0): localization */}
-                    <div>Retry</div>
+                    <div>{stringGetter({ key: STRING_KEYS.RETRY })}</div>
                   </button>
                 )}
               </div>

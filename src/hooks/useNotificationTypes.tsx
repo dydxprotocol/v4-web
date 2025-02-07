@@ -281,6 +281,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
         for (const transfer of userTransfers) {
           const { type, status } = transfer;
           const id = `${transfer.chainId}-${transfer.txHash}`;
+          const finalAmount = formatNumberOutput(
+            transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
+            OutputType.Fiat,
+            { decimalSeparator, groupSeparator, selectedLocale }
+          );
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
@@ -289,16 +294,28 @@ export const notificationTypes: NotificationTypeConfig[] = [
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });
-            body = `Your withdrawal of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} ${isSuccess ? 'has completed' : 'is pending'}.`;
+            body = isSuccess
+              ? stringGetter({
+                  key: STRING_KEYS.WITHDRAW_COMPLETE,
+                  params: { AMOUNT_USD: finalAmount },
+                })
+              : stringGetter({ key: STRING_KEYS.PENDING, params: { AMOUNT_USD: finalAmount } });
           } else {
             // Deposit
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
             });
-            body = `Your deposit of ${formatNumberOutput(transfer.finalAmountUsd ?? transfer.estimatedAmountUsd, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })} is ${isSuccess ? 'now available' : 'pending'}.`;
+            body = isSuccess
+              ? stringGetter({
+                  key: STRING_KEYS.DEPOSIT_AVAILABLE,
+                  params: { AMOUNT_USD: finalAmount },
+                })
+              : stringGetter({
+                  key: STRING_KEYS.DEPOSIT_PENDING,
+                  params: { AMOUNT_USD: finalAmount },
+                });
           }
 
-          // TODO(deposit2.0): localization
           trigger(
             id,
             {

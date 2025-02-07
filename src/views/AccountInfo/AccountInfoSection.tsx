@@ -66,6 +66,8 @@ export const AccountInfoSection = () => {
   const isLoading = !!isLoadingGuards || isLoadingData;
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
+  const showNewWithdrawFlow =
+    useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const {
@@ -83,9 +85,7 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() =>
         dispatch(
-          openDialog(
-            testFlags.showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw()
-          )
+          openDialog(showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw())
         )
       }
       shape={ButtonShape.Rectangle}
@@ -117,8 +117,8 @@ export const AccountInfoSection = () => {
   const depositWithdrawRow = (
     <div tw="inlineRow gap-0.5 self-stretch">
       <$WithSeparators layout="row" withSeparators>
-        {depositButton}
-        {complianceState === ComplianceStates.FULL_ACCESS && withdrawButton}
+        {complianceState === ComplianceStates.FULL_ACCESS && depositButton}
+        {withdrawButton}
       </$WithSeparators>
     </div>
   );
