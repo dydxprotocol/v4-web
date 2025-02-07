@@ -61,6 +61,8 @@ const PortfolioPage = () => {
   const { complianceState } = useComplianceState();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
+  const showNewWithdrawFlow =
+    useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const initialPageSize = 20;
 
@@ -271,9 +273,7 @@ const PortfolioPage = () => {
                     onClick={() =>
                       dispatch(
                         openDialog(
-                          testFlags.showNewWithdrawFlow
-                            ? DialogTypes.Withdraw2({})
-                            : DialogTypes.Withdraw()
+                          showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw()
                         )
                       )
                     }

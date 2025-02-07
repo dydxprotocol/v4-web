@@ -457,6 +457,8 @@ const AssetActions = memo(
   }) => {
     const showNewDepositFlow =
       useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
+    const showNewWithdrawFlow =
+      useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
     return (
       <div tw="inlineRow">
@@ -469,9 +471,7 @@ const AssetActions = memo(
             },
           withOnboarding &&
             hasBalance && {
-              dialog: testFlags.showNewWithdrawFlow
-                ? DialogTypes.Withdraw2({})
-                : DialogTypes.Withdraw({}),
+              dialog: showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw({}),
               iconName: IconName.Withdraw,
               tooltipStringKey: STRING_KEYS.WITHDRAW,
             },

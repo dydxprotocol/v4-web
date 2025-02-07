@@ -20,7 +20,6 @@ type WithdrawStatusProps = {
   onClose: () => void;
 };
 
-// TODO(deposit2.0): localization for this whole component
 export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps) => {
   const stringGetter = useStringGetter();
   const withdraw = useParameterizedSelector(selectWithdraw, txHash, chainId);
@@ -28,10 +27,10 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
   const transferSuccess = withdraw?.status === 'success';
 
   const statusDescription = useMemo(() => {
-    if (transferSuccess) return 'Your funds have been withdrawn.';
+    if (transferSuccess) return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN });
 
-    return 'Your funds will be withdrawn shortly. You may safely close this window.';
-  }, [transferSuccess]);
+    return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN_SHORTLY });
+  }, [stringGetter, transferSuccess]);
 
   if (!withdraw) return null;
 
@@ -66,7 +65,7 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
         </div>
       </div>
       <div tw="flex items-center justify-between self-stretch">
-        <div tw="text-color-text-0">Your withdraw</div>
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_WITHDRAWAL })}</div>
         <div tw="flex items-center gap-0.125">
           {WithdrawalOutput}
           <AssetIcon symbol="USDC" chainId={withdraw.chainId} />

@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
 import { ButtonAction } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -20,20 +22,20 @@ type DepositStatusProps = {
   onClose: () => void;
 };
 
-// TODO(deposit2.0): localization for this whole component
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
+  const stringGetter = useStringGetter();
   const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
 
   const depositSuccess = deposit?.status === 'success';
 
   const statusDescription = useMemo(() => {
-    if (depositSuccess) return 'Your funds are now available for trading.';
+    if (depositSuccess) return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_FOR_TRADING });
 
     if (deposit?.isInstantDeposit)
-      return 'Your funds will be available soon, and you may safely close this window.';
+      return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_SOON });
 
-    return 'You may safely close this window.';
-  }, [deposit, depositSuccess]);
+    return stringGetter({ key: STRING_KEYS.YOU_MAY_CLOSE_WINDOW });
+  }, [deposit, depositSuccess, stringGetter]);
 
   if (!deposit) return null;
 
@@ -46,12 +48,16 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           <Icon tw="self-center" iconName={IconName.SuccessCircle} size="64px" />
         )}
         <div tw="flex flex-col items-center gap-0.375 px-3 py-1 text-center">
-          <div tw="text-large">{!depositSuccess ? 'Deposit in progress' : 'Deposit complete'}</div>
+          <div tw="text-large">
+            {!depositSuccess
+              ? stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })
+              : stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })}
+          </div>
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
       </div>
       <div tw="flex items-center justify-between self-stretch">
-        <div tw="text-color-text-0">Your deposit</div>
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_DEPOSIT })}</div>
         <div tw="flex items-center gap-0.125">
           <Output
             tw="inline"
@@ -63,7 +69,9 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
         </div>
       </div>
       <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
-        {depositSuccess ? 'Start trading' : 'Close'}
+        {depositSuccess
+          ? stringGetter({ key: STRING_KEYS.START_TRADING })
+          : stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
     </div>
   );

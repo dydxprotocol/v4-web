@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
-import { AlertType } from '@/constants/alerts';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
@@ -12,22 +11,25 @@ import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { AlertMessage } from '@/components/AlertMessage';
+import { WarningIcon } from '@/icons';
+
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
 import { Withdraw } from '@/state/transfers';
 
+import { log } from '@/lib/telemetry';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
-import { useWithdrawStep } from './withdrawHooks';
+import { useProtocolWithdrawalValidation, useWithdrawStep } from './withdrawHooks';
 
 export const WithdrawForm = ({
   amount,
@@ -84,7 +86,47 @@ export const WithdrawForm = ({
     onWithdraw,
   });
 
-  const routeInformation = selectedRoute && (
+  // ------ Errors + Validation ------ //
+  useEffect(() => {
+    if (error) {
+      log('DepositForm/useWithdrawalRoutes', error);
+    }
+  }, [error]);
+
+  const validationError = useProtocolWithdrawalValidation({
+    freeCollateral,
+    withdrawAmount: debouncedAmount,
+    selectedRoute,
+  });
+
+  const isDebouncedAmountSame = debouncedAmount === amount;
+
+  const withdrawDisabled =
+    !selectedRoute ||
+    destinationAddress === '' ||
+    amount === '' ||
+    !!validationError ||
+    !isDebouncedAmountSame;
+
+  const buttonInner = error ? (
+    <div tw="row gap-0.5">
+      <WithTooltip tooltipString={error.message}>
+        <WarningIcon tw="text-color-error" />
+      </WithTooltip>
+      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+    </div>
+  ) : validationError ? (
+    <div tw="row gap-0.5">
+      <WithTooltip tooltipString={validationError}>
+        <WarningIcon tw="text-color-error" />
+      </WithTooltip>
+      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+    </div>
+  ) : (
+    stringGetter({ key: STRING_KEYS.WITHDRAW })
+  );
+
+  const receipt = selectedRoute && (
     <Details
       tw="font-small-book"
       items={[
@@ -106,6 +148,7 @@ export const WithdrawForm = ({
           value: (
             <DiffOutput
               withDiff={!freeCollateral?.eq(updatedFreeCollateral ?? 0) && !isFetching}
+              hasInvalidNewValue={updatedFreeCollateral?.lt(0)}
               type={OutputType.Fiat}
               value={freeCollateral}
               newValue={updatedFreeCollateral}
@@ -130,6 +173,7 @@ export const WithdrawForm = ({
           value: (
             <DiffOutput
               withDiff={!equity?.eq(updatedEquity ?? 0) && !isFetching}
+              hasInvalidNewValue={updatedEquity?.lt(0)}
               type={OutputType.Fiat}
               value={equity}
               newValue={updatedEquity}
@@ -163,19 +207,18 @@ export const WithdrawForm = ({
         onSelectSpeed={setSelectedSpeed}
         type="withdraw"
       />
-      {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
       <Button
         tw="mt-2 w-full"
         state={{
           isLoading: isFetching || isLoading,
-          isDisabled: !selectedRoute || destinationAddress === '',
+          isDisabled: withdrawDisabled,
         }}
         onClick={onWithdrawClick}
         action={ButtonAction.Primary}
       >
-        {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+        {buttonInner}
       </Button>
-      {routeInformation}
+      {receipt}
     </div>
   );
 };
