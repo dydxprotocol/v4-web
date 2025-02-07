@@ -109,13 +109,19 @@ export const WithdrawForm = ({
     !isDebouncedAmountSame;
 
   const buttonInner = error ? (
-    <WithTooltip tooltipString={error.message}>
-      <WarningIcon tw="text-color-error" />
-    </WithTooltip>
+    <div tw="row gap-0.5">
+      <WithTooltip tooltipString={error.message}>
+        <WarningIcon tw="text-color-error" />
+      </WithTooltip>
+      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+    </div>
   ) : validationError ? (
-    <WithTooltip tooltipString={validationError}>
-      <WarningIcon tw="text-color-error" />
-    </WithTooltip>
+    <div tw="row gap-0.5">
+      <WithTooltip tooltipString={validationError}>
+        <WarningIcon tw="text-color-error" />
+      </WithTooltip>
+      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+    </div>
   ) : (
     stringGetter({ key: STRING_KEYS.WITHDRAW })
   );

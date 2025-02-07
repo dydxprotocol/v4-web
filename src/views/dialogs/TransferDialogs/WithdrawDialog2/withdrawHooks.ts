@@ -32,6 +32,7 @@ export function useWithdrawStep({
   withdrawRoute?: RouteResponse;
   onWithdraw: (withdraw: Withdraw) => void;
 }) {
+  const stringGetter = useStringGetter();
   const { skipClient } = useSkipClient();
   const {
     dydxAddress,
@@ -120,7 +121,9 @@ export function useWithdrawStep({
     } catch (error) {
       return {
         success: false,
-        errorMessage: parseWithdrawError(error, 'Your withdrawal has failed. Please try again.'),
+        errorMessage: stringGetter({
+          key: parseWithdrawError(error, STRING_KEYS.WITHDRAWAL_FAILED_TRY_AGAIN),
+        }),
       };
     } finally {
       setIsLoading(false);
@@ -134,6 +137,7 @@ export function useWithdrawStep({
     getCosmosSigner,
     localDydxWallet,
     localNobleWallet,
+    stringGetter,
   ]);
 
   return {
