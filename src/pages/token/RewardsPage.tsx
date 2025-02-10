@@ -32,6 +32,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { GovernancePanel } from './GovernancePanel';
@@ -55,8 +56,7 @@ const RewardsPage = () => {
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
 
-  const stakingRewards = BonsaiHooks.useStakingRewards().data;
-  const { totalRewards } = stakingRewards ?? {};
+  const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
   const totalUsdcRewards = sumBy(
     (totalRewards ?? EMPTY_ARR).filter((reward) => reward.denom === usdcDenom && reward.amount),

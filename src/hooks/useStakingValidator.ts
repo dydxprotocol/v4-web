@@ -30,14 +30,12 @@ export const refreshStakingData = () => {
 
 export const useSortedUnbondingDelegations = () => {
   const unbondingDelegations = BonsaiHooks.useUnbondingDelegations().data;
-  if (unbondingDelegations?.length) {
-    const sortedUnbondingDelegations = [...unbondingDelegations];
-    sortedUnbondingDelegations.sort(
-      (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
-    );
-    return sortedUnbondingDelegations;
+  if (unbondingDelegations == null) {
+    return unbondingDelegations;
   }
-  return unbondingDelegations;
+  return [...unbondingDelegations].sort(
+    (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
+  );
 };
 
 export const useStakingValidator = () => {
