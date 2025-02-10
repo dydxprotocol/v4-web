@@ -289,26 +289,6 @@ export const getIsAccountConnected = (state: RootState) =>
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
 
 /**
- *  @returns user wallet staking balances
- * */
-export const getStakingBalances = (state: RootState) => state.account.stakingBalances;
-
-/**
- *  @returns user wallet staking delegations
- * */
-export const getStakingDelegations = (state: RootState) => state.account.stakingDelegations;
-
-/**
- *  @returns user unbonding delegations
- * */
-export const getUnbondingDelegations = (state: RootState) => state.account.unbondingDelegations;
-
-/**
- *  @returns user staking rewards
- * */
-export const getStakingRewards = (state: RootState) => state.account.stakingRewards;
-
-/**
  * @returns account all time trading rewards
  */
 export const getTotalTradingRewards = createAppSelector(

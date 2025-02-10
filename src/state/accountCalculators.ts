@@ -7,7 +7,6 @@ import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountOpenOrders,
-  getUnbondingDelegations,
 } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 
@@ -101,23 +100,6 @@ export const calculateShouldRenderActionsInPositionsTable = () =>
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );
-
-/**
- * @description calculate sorted unbonding delegations (from soonest to complete unbonding -> latest)
- */
-export const calculateSortedUnbondingDelegations = createAppSelector(
-  [getUnbondingDelegations],
-  (unbondingDelegations) => {
-    if (unbondingDelegations?.length) {
-      const sortedUnbondingDelegations = [...unbondingDelegations];
-      sortedUnbondingDelegations.sort(
-        (a, b) => new Date(a.completionTime).getTime() - new Date(b.completionTime).getTime()
-      );
-      return sortedUnbondingDelegations;
-    }
-    return unbondingDelegations;
-  }
-);
 
 export const calculateHasCancelableOrders = () =>
   createAppSelector(

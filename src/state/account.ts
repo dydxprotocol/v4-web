@@ -2,13 +2,9 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import {
   Subaccount,
-  type AccountBalance,
   type Compliance,
   type Nullable,
-  type StakingDelegation,
-  type StakingRewards,
   type TradingRewards,
-  type UnbondingDelegation,
   type UsageRestriction,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -17,10 +13,6 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { getLocalStorage } from '@/lib/localStorage';
 
 export type AccountState = {
-  stakingBalances?: Record<string, AccountBalance>;
-  stakingDelegations?: StakingDelegation[];
-  unbondingDelegations?: UnbondingDelegation[];
-  stakingRewards?: StakingRewards;
   tradingRewards?: TradingRewards;
 
   subaccountForPostOrders?: Nullable<Subaccount>;
@@ -77,18 +69,6 @@ export const accountSlice = createSlice({
     setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       state.subaccountForPostOrders = action.payload;
     },
-    setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
-      state.stakingBalances = action.payload;
-    },
-    setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
-      state.stakingDelegations = action.payload;
-    },
-    setUnbondingDelegations: (state, action: PayloadAction<UnbondingDelegation[]>) => {
-      state.unbondingDelegations = action.payload;
-    },
-    setStakingRewards: (state, action: PayloadAction<StakingRewards>) => {
-      state.stakingRewards = action.payload;
-    },
     clearSubaccountState: (state) => {
       state.subaccountForPostOrders = undefined;
     },
@@ -101,9 +81,5 @@ export const {
   setRestrictionType,
   setCompliance,
   setSubaccountForPostOrders,
-  setStakingBalances,
-  setStakingDelegations,
-  setUnbondingDelegations,
-  setStakingRewards,
   clearSubaccountState,
 } = accountSlice.actions;
