@@ -24,7 +24,6 @@ import {
   setStakingDelegations,
   setStakingRewards,
   setSubaccountForPostOrders,
-  setTradingRewards,
   setUnbondingDelegations,
 } from '@/state/account';
 import { setInputs } from '@/state/inputs';
@@ -72,12 +71,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         }
         if (updatedState.account?.stakingRewards) {
           dispatch(setStakingRewards(updatedState.account.stakingRewards));
-        }
-      }
-
-      if (changes.has(Changes.tradingRewards)) {
-        if (updatedState.account?.tradingRewards) {
-          dispatch(setTradingRewards(updatedState.account.tradingRewards));
         }
       }
 

@@ -7,11 +7,6 @@ import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import {
-  HistoricalTradingReward,
-  HistoricalTradingRewardsPeriod,
-  Nullable,
-} from '@/constants/abacus';
-import {
   TradingRewardsPeriod,
   tradingRewardsPeriods,
   type TradingRewardsDatum,
@@ -24,7 +19,6 @@ import { timeUnits } from '@/constants/time';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useNow } from '@/hooks/useNow';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -36,10 +30,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import {
-  getHistoricalTradingRewardsForPeriod,
-  getTotalTradingRewards,
-} from '@/state/accountSelectors';
+import { getTotalTradingRewards } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -55,7 +46,6 @@ type StyleProps = {
 };
 
 const TRADING_REWARDS_TIME_RESOLUTION = 1 * timeUnits.hour;
-const SELECTED_PERIOD = HistoricalTradingRewardsPeriod.DAILY;
 
 const CHART_STYLES = {
   margin: { left: 32, right: 48, top: 12, bottom: 32 },
@@ -90,14 +80,7 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.data);
-
-  const old: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
-    getHistoricalTradingRewardsForPeriod,
-    SELECTED_PERIOD.name
-  );
-
-  console.log(old);
+  const periodTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.chart);
 
   const rewardsData = useMemo(() => {
     if (canViewAccount) {

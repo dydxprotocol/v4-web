@@ -16,6 +16,7 @@ import {
   getCurrentMarketAccountFills,
   selectAccountFills,
   selectAccountFillsLoading,
+  selectAccountHistoricalTradingRewardsData,
   selectAccountOrders,
   selectAccountOrdersLoading,
   selectAccountTradingRewardsData,
@@ -138,6 +139,7 @@ interface BonsaiCoreShape {
     };
     tradingRewards: {
       data: BasicSelector<BlockTradingReward[]>;
+      chart: BasicSelector<BlockTradingReward[]>;
       loading: BasicSelector<LoadableStatus>;
     };
   };
@@ -207,6 +209,7 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     tradingRewards: {
       data: selectAccountTradingRewardsData,
+      chart: selectAccountHistoricalTradingRewardsData,
       loading: selectAccountTradingRewardsLoading,
     },
   },

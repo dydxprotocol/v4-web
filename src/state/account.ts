@@ -89,9 +89,6 @@ export const accountSlice = createSlice({
     setStakingRewards: (state, action: PayloadAction<StakingRewards>) => {
       state.stakingRewards = action.payload;
     },
-    setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
-      state.tradingRewards = action.payload;
-    },
     clearSubaccountState: (state) => {
       state.subaccountForPostOrders = undefined;
     },
@@ -106,7 +103,6 @@ export const {
   setSubaccountForPostOrders,
   setStakingBalances,
   setStakingDelegations,
-  setTradingRewards,
   setUnbondingDelegations,
   setStakingRewards,
   clearSubaccountState,

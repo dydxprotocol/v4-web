@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+
+import { BonsaiCore } from '@/bonsai/ontology';
 import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -9,6 +12,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
+import { timeUnits } from '@/constants/time';
 import { ConnectorType, EvmAddress, WalletNetworkType, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -30,14 +34,12 @@ import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 
-import {
-  getHistoricalTradingRewardsForCurrentWeek,
-  getOnboardingState,
-} from '@/state/accountSelectors';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
@@ -78,7 +80,18 @@ const Profile = () => {
     chainId: ENS_CHAIN_ID,
   });
 
-  const currentWeekTradingReward = useAppSelector(getHistoricalTradingRewardsForCurrentWeek);
+  const historicalTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.chart);
+
+  const currentWeekTradingReward = useMemo(() => {
+    const startMs = Date.now() - timeUnits.week;
+    const rewards = historicalTradingRewards.filter(
+      (reward) => reward.startedAtInMilliseconds >= startMs
+    );
+
+    return rewards.reduce((acc, reward) => {
+      return acc.plus(reward.amount);
+    }, BIG_NUMBERS.ZERO);
+  }, [historicalTradingRewards]);
 
   const actions: Action[] = [
     {
@@ -228,7 +241,7 @@ const Profile = () => {
                     <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} tw="ml-[0.5ch]" />
                   }
                   type={OutputType.Asset}
-                  value={currentWeekTradingReward?.amount}
+                  value={currentWeekTradingReward}
                 />
               ),
             },

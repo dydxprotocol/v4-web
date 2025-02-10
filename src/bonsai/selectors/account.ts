@@ -225,3 +225,16 @@ export const selectAccountTradingRewardsData = createAppSelector(
     return calculateBlockRewards(sortedTradingRewards);
   }
 );
+
+export const selectAccountHistoricalTradingRewardsData = createAppSelector(
+  [selectRawBlockTradingRewardsRestData, selectRawBlockTradingRewardsLiveData],
+  (rest, live): BlockTradingReward[] => {
+    const sortedTradingRewards = orderBy(
+      [...(rest?.rewards ?? EMPTY_ARR), ...(live ?? EMPTY_ARR)],
+      (o) => o.createdAt,
+      'desc'
+    );
+
+    return calculateBlockRewards(sortedTradingRewards, true);
+  }
+);
