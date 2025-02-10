@@ -1,11 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { fromPairs } from 'lodash';
 
 import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
-  AccountBalance,
   Nullable,
   ParsingErrors,
   PerpetualState,
@@ -20,12 +18,8 @@ import { type RootStore } from '@/state/_store';
 import {
   setCompliance,
   setRestrictionType,
-  setStakingBalances,
-  setStakingDelegations,
-  setStakingRewards,
   setSubaccountForPostOrders,
   setTradingRewards,
-  setUnbondingDelegations,
 } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
@@ -57,24 +51,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
-      if (changes.has(Changes.accountBalances)) {
-        if (updatedState.account?.stakingBalances) {
-          const stakingBalances: Record<string, AccountBalance> = fromPairs(
-            updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
-          );
-          dispatch(setStakingBalances(stakingBalances));
-        }
-        if (updatedState.account?.stakingDelegations) {
-          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
-        }
-        if (updatedState.account?.unbondingDelegation) {
-          dispatch(setUnbondingDelegations(updatedState.account.unbondingDelegation.toArray()));
-        }
-        if (updatedState.account?.stakingRewards) {
-          dispatch(setStakingRewards(updatedState.account.stakingRewards));
-        }
-      }
-
       if (changes.has(Changes.tradingRewards)) {
         if (updatedState.account?.tradingRewards) {
           dispatch(setTradingRewards(updatedState.account.tradingRewards));

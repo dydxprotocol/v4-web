@@ -12,6 +12,7 @@ import { DialogProps, StakingRewardDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
+import { refreshStakingData } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -119,6 +120,8 @@ export const StakingRewardDialog = ({
       setError(undefined);
       const tx = await withdrawReward(validators);
       const txHash = hashFromTx(tx.hash);
+
+      refreshStakingData();
 
       track(
         AnalyticsEvents.ClaimTransaction({

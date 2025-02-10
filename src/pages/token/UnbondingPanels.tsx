@@ -1,11 +1,10 @@
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 
-import { useStakingValidator } from '@/hooks/useStakingValidator';
+import { useSortedUnbondingDelegations, useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -16,13 +15,10 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ValidatorFaviconIcon } from '@/components/ValidatorFaviconIcon';
 
-import { calculateSortedUnbondingDelegations } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
-
 export const UnbondingPanels = () => {
   const stringGetter = useStringGetter();
-  const unbondingDelegations = useAppSelector(calculateSortedUnbondingDelegations, shallowEqual);
-  const { unbondingValidators } = useStakingValidator() ?? {};
+  const unbondingDelegations = useSortedUnbondingDelegations();
+  const { unbondingValidators } = useStakingValidator();
   const { chainTokenDecimals, chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
   if (!unbondingDelegations?.length) {
@@ -72,11 +68,11 @@ export const UnbondingPanels = () => {
                   },
                 });
 
-        const unbondingValidator = unbondingValidators?.[delegation.validator]?.[0];
+        const unbondingValidator = unbondingValidators?.[delegation.validatorAddress]?.[0];
 
         return (
           <Panel
-            key={`${delegation.validator}-${delegation.completionTime}`}
+            key={`${delegation.validatorAddress}-${delegation.completionTime}`}
             slotHeader={
               <$Header>
                 <$Title>

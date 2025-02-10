@@ -738,7 +738,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         subaccountClient,
         subaccountClient.wallet.address,
         validator,
-        parseUnits(amount.toString(), chainTokenDecimals).toString()
+        parseUnits(amount.toString(), chainTokenDecimals).toString(),
+        Method.BroadcastTxCommit
       );
 
       return response;
@@ -800,7 +801,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         localDydxWallet,
         () => Promise.resolve(msgs),
         false,
-        compositeClient.validatorClient.post.defaultDydxGasPrice
+        compositeClient.validatorClient.post.defaultDydxGasPrice,
+        undefined,
+        Method.BroadcastTxCommit
       );
 
       return tx;
@@ -864,7 +867,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         localDydxWallet,
         () => Promise.resolve(msgs),
         false,
-        compositeClient.validatorClient.post.defaultGasPrice
+        compositeClient.validatorClient.post.defaultGasPrice,
+        undefined,
+        Method.BroadcastTxCommit
       );
 
       return tx;

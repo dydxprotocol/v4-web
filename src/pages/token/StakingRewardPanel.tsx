@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiHooks } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -19,7 +19,6 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -36,15 +35,13 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const chartDotsBackground = useAppSelector(getChartDotBackground);
-  const { validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
+  const { validators } = BonsaiHooks.useStakingRewards().data ?? {};
   const { usdcImage } = useTokenConfigs();
 
   const openStakingRewardDialog = useCallback(
     () =>
       dispatch(
-        openDialog(
-          DialogTypes.StakingReward({ validators: validators?.toArray() ?? [], usdcRewards })
-        )
+        openDialog(DialogTypes.StakingReward({ validators: validators ?? [], usdcRewards }))
       ),
     [dispatch, validators, usdcRewards]
   );

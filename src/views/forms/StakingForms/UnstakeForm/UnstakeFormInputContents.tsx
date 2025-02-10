@@ -82,20 +82,20 @@ export const UnstakeFormInputContents = ({
   );
 
   const setAllUnstakeAmountsToMax = useCallback(() => {
-    currentDelegations?.forEach((delegation) => {
+    currentDelegations.forEach((delegation) => {
       onChangeAmount(delegation.validator, MustBigNumber(delegation.amount).toNumber());
     });
   }, [currentDelegations, onChangeAmount]);
 
   const clearAllUnstakeAmounts = useCallback(() => {
-    currentDelegations?.forEach((delegation) => {
+    currentDelegations.forEach((delegation) => {
       onChangeAmount(delegation.validator, undefined);
     });
   }, [currentDelegations, onChangeAmount]);
 
   return (
     <>
-      {currentDelegations?.length === 1 ? (
+      {currentDelegations.length === 1 ? (
         <WithDetailsReceipt
           side="bottom"
           detailItems={[
@@ -110,19 +110,17 @@ export const UnstakeFormInputContents = ({
               value: (
                 <DiffOutput
                   type={OutputType.Asset}
-                  value={parseFloat(currentDelegations[0]!.amount)}
+                  value={currentDelegations[0]!.amount}
                   sign={NumberSign.Negative}
                   newValue={
-                    parseFloat(currentDelegations[0]!.amount) -
-                    (amounts[currentDelegations[0]!.validator] ?? 0)
+                    currentDelegations[0]!.amount - (amounts[currentDelegations[0]!.validator] ?? 0)
                   }
                   hasInvalidNewValue={
-                    (amounts[currentDelegations[0]!.validator] ?? 0) >
-                    parseFloat(currentDelegations[0]!.amount)
+                    (amounts[currentDelegations[0]!.validator] ?? 0) > currentDelegations[0]!.amount
                   }
                   withDiff={Boolean(
                     (amounts[currentDelegations[0]!.validator] ?? 0) &&
-                      parseFloat(currentDelegations[0]!.amount)
+                      currentDelegations[0]!.amount
                   )}
                 />
               ),
@@ -146,7 +144,7 @@ export const UnstakeFormInputContents = ({
                   isPressed
                     ? onChangeAmount(
                         currentDelegations[0]!.validator,
-                        parseFloat(currentDelegations[0]!.amount)
+                        currentDelegations[0]!.amount
                       )
                     : onChangeAmount(currentDelegations[0]!.validator, undefined)
                 }
@@ -154,7 +152,7 @@ export const UnstakeFormInputContents = ({
             }
           />
         </WithDetailsReceipt>
-      ) : (currentDelegations?.length ?? 0) > 1 ? (
+      ) : currentDelegations.length > 1 ? (
         <div tw="grid grid-cols-[1fr_1fr] gap-1">
           <div>
             {stringGetter({
@@ -176,7 +174,7 @@ export const UnstakeFormInputContents = ({
             )}
           </div>
           {stakingValidators &&
-            currentDelegations?.map((delegation) => {
+            currentDelegations.map((delegation) => {
               const balance = MustBigNumber(delegation.amount).toNumber();
               return (
                 <React.Fragment key={delegation.validator}>
