@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
@@ -89,16 +90,20 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
+  const periodTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.data);
+
+  const old: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
     getHistoricalTradingRewardsForPeriod,
     SELECTED_PERIOD.name
   );
 
+  console.log(old);
+
   const rewardsData = useMemo(() => {
-    if (periodTradingRewards && canViewAccount) {
+    if (canViewAccount) {
       const res = periodTradingRewards.map(
         (datum): TradingRewardsDatum => ({
-          date: new Date(datum.endedAtInMilliseconds).valueOf(),
+          date: datum.endedAtInMilliseconds,
           cumulativeAmount: datum.cumulativeAmount,
         })
       );

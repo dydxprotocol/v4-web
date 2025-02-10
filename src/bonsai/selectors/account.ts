@@ -7,6 +7,7 @@ import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
+import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
 import {
   calculateAllOrders,
@@ -22,9 +23,12 @@ import {
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
-import { SubaccountTransfer } from '../types/summaryTypes';
+import { BlockTradingReward, SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
+  selectRawBlockTradingRewardsLiveData,
+  selectRawBlockTradingRewardsRest,
+  selectRawBlockTradingRewardsRestData,
   selectRawFillsLiveData,
   selectRawFillsRest,
   selectRawFillsRestData,
@@ -202,4 +206,22 @@ export const selectAccountTransfers = createAppSelector(
 export const selectAccountTransfersLoading = createAppSelector(
   [selectRawTransfersRest, selectRawParentSubaccount],
   mergeLoadableStatus
+);
+
+export const selectAccountTradingRewardsLoading = createAppSelector(
+  [selectRawBlockTradingRewardsRest],
+  mergeLoadableStatus
+);
+
+export const selectAccountTradingRewardsData = createAppSelector(
+  [selectRawBlockTradingRewardsRestData, selectRawBlockTradingRewardsLiveData],
+  (rest, live): BlockTradingReward[] => {
+    const sortedTradingRewards = orderBy(
+      [...(rest?.rewards ?? EMPTY_ARR), ...(live ?? EMPTY_ARR)],
+      (o) => o.createdAt,
+      'desc'
+    );
+
+    return calculateBlockRewards(sortedTradingRewards);
+  }
 );

@@ -18,6 +18,8 @@ import {
   selectAccountFillsLoading,
   selectAccountOrders,
   selectAccountOrdersLoading,
+  selectAccountTradingRewardsData,
+  selectAccountTradingRewardsLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectCurrentMarketOpenOrders,
@@ -75,6 +77,7 @@ import {
   AllAssetData,
   ApiState,
   AssetData,
+  BlockTradingReward,
   EquityTiersSummary,
   FeeTierSummary,
   GroupedSubaccountSummary,
@@ -132,6 +135,10 @@ interface BonsaiCoreShape {
     };
     balances: {
       data: BasicSelector<AccountBalances>;
+    };
+    tradingRewards: {
+      data: BasicSelector<BlockTradingReward[]>;
+      loading: BasicSelector<LoadableStatus>;
     };
   };
   markets: {
@@ -197,6 +204,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     balances: {
       data: selectAccountBalances,
+    },
+    tradingRewards: {
+      data: selectAccountTradingRewardsData,
+      loading: selectAccountTradingRewardsLoading,
     },
   },
   markets: {

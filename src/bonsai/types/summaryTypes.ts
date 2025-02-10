@@ -302,3 +302,10 @@ export type AccountBalances = {
 };
 
 export type SubaccountTransfer = IndexerTransferResponseObject;
+
+export type BlockTradingReward = {
+  amount: number;
+  cumulativeAmount: number;
+  startedAtInMilliseconds: number;
+  endedAtInMilliseconds: number;
+};

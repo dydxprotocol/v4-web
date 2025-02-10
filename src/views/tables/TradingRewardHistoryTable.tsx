@@ -1,17 +1,13 @@
 import { useCallback, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
+import { BlockTradingReward } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
-import {
-  HistoricalTradingReward,
-  HistoricalTradingRewardsPeriods,
-  Nullable,
-} from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -25,7 +21,6 @@ import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getTradingRewardsEventsForPeriod } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
@@ -43,7 +38,7 @@ const getTradingRewardHistoryTableColumnDef = ({
   chainTokenImage: string;
   chainTokenLabel: string;
   stringGetter: StringGetterFunction;
-}): ColumnDef<HistoricalTradingReward> => ({
+}): ColumnDef<BlockTradingReward> => ({
   ...(
     {
       [TradingRewardHistoryTableColumnKey.Event]: {
@@ -92,13 +87,12 @@ const getTradingRewardHistoryTableColumnDef = ({
           />
         ),
       },
-    } satisfies Record<TradingRewardHistoryTableColumnKey, ColumnDef<HistoricalTradingReward>>
+    } satisfies Record<TradingRewardHistoryTableColumnKey, ColumnDef<BlockTradingReward>>
   )[key],
 });
 
 type ElementProps = {
   columnKeys?: TradingRewardHistoryTableColumnKey[];
-  period: HistoricalTradingRewardsPeriods;
 };
 
 type StyleProps = {
@@ -106,7 +100,6 @@ type StyleProps = {
 };
 
 export const TradingRewardHistoryTable = ({
-  period,
   columnKeys = Object.values(TradingRewardHistoryTableColumnKey),
   className,
 }: ElementProps & StyleProps) => {
@@ -115,14 +108,11 @@ export const TradingRewardHistoryTable = ({
   const { isNotTablet } = useBreakpoints();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards: Nullable<Array<HistoricalTradingReward>> = useParameterizedSelector(
-    getTradingRewardsEventsForPeriod,
-    period.name
-  );
+  const tradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.data);
 
   const rewardsData = useMemo(() => {
-    return periodTradingRewards && canViewAccount ? periodTradingRewards : EMPTY_ARR;
-  }, [periodTradingRewards, canViewAccount]);
+    return canViewAccount ? tradingRewards : EMPTY_ARR;
+  }, [tradingRewards, canViewAccount]);
 
   const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
     getTradingRewardHistoryTableColumnDef({
@@ -133,7 +123,7 @@ export const TradingRewardHistoryTable = ({
     })
   );
 
-  const getRowKey = useCallback((row: HistoricalTradingReward) => row.startedAtInMilliseconds, []);
+  const getRowKey = useCallback((row: BlockTradingReward) => row.startedAtInMilliseconds, []);
 
   return (
     <$Table
