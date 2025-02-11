@@ -41,7 +41,6 @@ const usePreferenceMenu = () => {
   const geoRestricted = Boolean(
     geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
   );
-  console.log(geo, geoRestricted);
 
   const notificationSection = useMemo(
     (): MenuGroup<string, string> => ({
