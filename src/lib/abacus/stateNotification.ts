@@ -93,10 +93,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
   // this can be migrated when the trade/close position forms are migrated
   lastOrderChanged(order: SubaccountOrder | null | undefined) {
-    if (order == null) {
-      return;
-    }
-    this.store?.dispatch(setLatestOrder({ clientId: order.clientId, id: order.id }));
+    this.store?.dispatch(
+      setLatestOrder(order == null ? order : { clientId: order.clientId, id: order.id })
+    );
   }
 
   errorsEmitted(errors: ParsingErrors) {
