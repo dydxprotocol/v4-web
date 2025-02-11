@@ -294,6 +294,7 @@ const CriteriaTable = ({
       affiliateTierIdx={userTier === 'vip' ? 4 : userTier}
       withInnerBorders
       withOuterBorder
+      tableId="criteria"
       getRowKey={(row) => row.tier}
       columns={columns}
       data={tiers}

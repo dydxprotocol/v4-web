@@ -113,6 +113,7 @@ const ValidatorsDropdownContent = ({
         key="validators"
         label="Validators"
         data={filteredValidators}
+        tableId="validators"
         getRowKey={(row: ValidatorData) => row.operatorAddress}
         onRowAction={onRowAction}
         columns={columns}

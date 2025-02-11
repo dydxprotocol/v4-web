@@ -504,6 +504,7 @@ export const PositionsTable = forwardRef(
         key={currentMarket ?? 'positions'}
         label={stringGetter({ key: STRING_KEYS.POSITIONS })}
         data={positionsData}
+        tableId="positions"
         columns={columnKeys.map((key: PositionsTableColumnKey) =>
           getPositionsTableColumnDef({
             key,
