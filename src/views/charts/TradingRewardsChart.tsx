@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
@@ -14,6 +14,7 @@ import {
 import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
@@ -30,7 +31,6 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getTotalTradingRewards } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -79,21 +79,14 @@ export const TradingRewardsChart = ({
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
-  const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.chart);
+  const totalTradingRewards = BonsaiHooks.useTotalTradingRewards().data;
+  const periodTradingRewards = BonsaiHooks.useHistoricalTradingRewardsFilled().data;
 
   const rewardsData = useMemo(() => {
     if (canViewAccount) {
-      const res = periodTradingRewards.map(
-        (datum): TradingRewardsDatum => ({
-          date: datum.endedAtInMilliseconds,
-          cumulativeAmount: datum.cumulativeAmount,
-        })
-      );
-      res.sort((datumA, datumB) => datumA.date - datumB.date);
-      return res;
+      return periodTradingRewards;
     }
-    return [];
+    return EMPTY_ARR;
   }, [periodTradingRewards, canViewAccount]);
 
   const oldestDataPointDate = rewardsData[0]?.date;

@@ -2,6 +2,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
+import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
@@ -12,6 +13,11 @@ import { HistoricalFundingObject } from './calculators/funding';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
+import {
+  useHistoricalTradingRewards,
+  useHistoricalTradingRewardsFilled,
+  useTotalTradingRewards,
+} from './rest/historicalTradingRewards';
 import {
   StakingDelegationsResult,
   StakingRewards,
@@ -24,11 +30,8 @@ import {
   getCurrentMarketAccountFills,
   selectAccountFills,
   selectAccountFillsLoading,
-  selectAccountHistoricalTradingRewardsData,
   selectAccountOrders,
   selectAccountOrdersLoading,
-  selectAccountTradingRewardsData,
-  selectAccountTradingRewardsLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectCurrentMarketOpenOrders,
@@ -83,10 +86,10 @@ import { selectUserStats } from './selectors/userStats';
 import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
 import {
   AccountBalances,
+  AggregatedTradingReward,
   AllAssetData,
   ApiState,
   AssetData,
-  BlockTradingReward,
   EquityTiersSummary,
   FeeTierSummary,
   GroupedSubaccountSummary,
@@ -144,11 +147,6 @@ interface BonsaiCoreShape {
     };
     balances: {
       data: BasicSelector<AccountBalances>;
-    };
-    tradingRewards: {
-      data: BasicSelector<BlockTradingReward[]>;
-      chart: BasicSelector<BlockTradingReward[]>;
-      loading: BasicSelector<LoadableStatus>;
     };
   };
   markets: {
@@ -214,11 +212,6 @@ export const BonsaiCore: BonsaiCoreShape = {
     },
     balances: {
       data: selectAccountBalances,
-    },
-    tradingRewards: {
-      data: selectAccountTradingRewardsData,
-      chart: selectAccountHistoricalTradingRewardsData,
-      loading: selectAccountTradingRewardsLoading,
     },
   },
   markets: {
@@ -355,6 +348,12 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
 interface BonsaiHooksShape {
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
+  useHistoricalTradingRewards: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
+  useHistoricalTradingRewardsFilled: () => {
+    data: AggregatedTradingReward[];
+    loading: LoadableStatus;
+  };
+  useTotalTradingRewards: () => { data: BigNumber | undefined; loading: LoadableStatus };
   useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
   useStakingRewards: () => Loadable<StakingRewards>;
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
@@ -364,8 +363,11 @@ interface BonsaiHooksShape {
 export const BonsaiHooks: BonsaiHooksShape = {
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
+  useHistoricalTradingRewards,
+  useHistoricalTradingRewardsFilled,
   useParentSubaccountHistoricalPnls,
   useStakingRewards,
+  useTotalTradingRewards,
   useUnbondingDelegations,
   useStakingDelegations,
 };

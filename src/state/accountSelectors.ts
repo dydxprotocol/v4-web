@@ -289,14 +289,6 @@ export const getIsAccountConnected = (state: RootState) =>
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
 
 /**
- * @returns account all time trading rewards
- */
-export const getTotalTradingRewards = createAppSelector(
-  [BonsaiCore.account.tradingRewards.data],
-  (tradingRewards) => tradingRewards.at(0)?.cumulativeAmount
-);
-
-/**
  * @returns UsageRestriction of the current session
  */
 export const getUsageRestriction = (state: RootState) => state.account.restriction;
