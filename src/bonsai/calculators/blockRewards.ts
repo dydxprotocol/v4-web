@@ -9,6 +9,18 @@ import { objectEntries } from '@/lib/objectHelpers';
 
 import { BlockTradingReward } from '../types/summaryTypes';
 
+const NO_CREATED_AT_HEIGHT_SPECIAL_STRING = '______UNUSED_CREATED_AT_HEIGHT______';
+
+function createZeroBlockTradingReward(timestamp: number): IndexerHistoricalBlockTradingReward[] {
+  return [
+    {
+      createdAtHeight: NO_CREATED_AT_HEIGHT_SPECIAL_STRING,
+      createdAt: DateTime.fromMillis(timestamp).toISO()!,
+      tradingReward: '0',
+    },
+  ];
+}
+
 export function calculateBlockRewards(
   tradingRewards: IndexerHistoricalBlockTradingReward[] | undefined,
   shimAllDates?: boolean
@@ -33,13 +45,7 @@ export function calculateBlockRewards(
         const key = DateTime.fromMillis(toSet).toFormat('yyyy-MM-dd');
         if (!rewardsKeyedByDay[key]) {
           // Add a dummy entry if date has no trading reward events
-          rewardsKeyedByDay[key] = [
-            {
-              createdAtHeight: '___UNUSED_FIELD___', // Will be ignored
-              createdAt: DateTime.fromMillis(toSet).toISO()!,
-              tradingReward: '0',
-            },
-          ];
+          rewardsKeyedByDay[key] = createZeroBlockTradingReward(toSet);
         }
 
         toSet += timeUnits.day;
