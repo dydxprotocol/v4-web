@@ -23,10 +23,8 @@ async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
 
     const payload = await response.json();
 
-    // Access nested property safely using optional chaining
     const country = payload?.geo?.country;
 
-    // Return country if it's a string, null otherwise
     return { data: typeof country === 'string' ? country : undefined };
   } catch (error) {
     logBonsaiError('Geo', 'Error fetching geo data:', { error });
