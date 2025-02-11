@@ -300,7 +300,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   const balances = useAppSelector(BonsaiCore.account.balances.data);
-  console.log(balances);
   const usdcCoinBalance = balances.usdcAmount;
 
   useEffect(() => {
