@@ -210,6 +210,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
       withInnerBorders
       withOuterBorder
       data={vaultsData}
+      tableId="vault-positions"
       getRowKey={(row) => row.marketId ?? ''}
       label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       defaultSortDescriptor={{

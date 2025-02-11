@@ -423,6 +423,7 @@ export const OrdersTable = forwardRef(
       <$Table
         key={currentMarket ?? 'all-orders'}
         label="Orders"
+        tableId={tableType === 'OPEN' ? 'open-orders' : 'order-history'}
         data={ordersData}
         getRowKey={(row: OrderTableRow) => row.id}
         onRowAction={(key: Key) =>

@@ -161,6 +161,7 @@ export const Fees = () => {
         <$FeeTable
           label={stringGetter({ key: STRING_KEYS.FEE_TIERS })}
           data={feeTiers ?? []}
+          tableId="fees"
           getRowKey={(row: FeeTierSummary) => row.tier}
           getRowAttributes={(row: FeeTierSummary) => ({
             'data-yours': row.tier === userFeeTier,
