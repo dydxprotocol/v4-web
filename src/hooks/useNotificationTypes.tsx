@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
-import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';

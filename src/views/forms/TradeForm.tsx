@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState, type FormEvent } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
   AbacusInputTypes,
-  ComplianceStatus,
   ErrorType,
   TradeInputErrorAction,
   TradeInputField,
