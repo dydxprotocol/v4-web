@@ -35,9 +35,9 @@ export const useTablePagination = ({
   initialPageSize: PageSize;
   totalRows: number;
   shouldResetOnTotalRowsChange?: boolean;
-  tableId?: string;
+  tableId: string;
 }) => {
-  const savedPageSize = useParameterizedSelector(getSavedTablePageSize, tableId ?? '');
+  const savedPageSize = useParameterizedSelector(getSavedTablePageSize, tableId);
   const [pageSize, setPageSizeState] = useState(
     validPageSizeOrUndefined(savedPageSize) ?? initialPageSize
   );
