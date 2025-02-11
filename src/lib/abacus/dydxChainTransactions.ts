@@ -662,9 +662,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           break;
         }
         case TransactionType.SignCompliancePayload: {
-          // we can't remove this yet since abacus still handles the result of clicking the button in the compliance dialog
-          const result = await this.signCompliancePayload(params);
-          callback(result);
+          // this is now handled in bonsai, so the abacus call is a no-op
           break;
         }
         default: {

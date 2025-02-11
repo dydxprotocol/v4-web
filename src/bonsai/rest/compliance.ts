@@ -1,10 +1,11 @@
 import { ComplianceV2Response } from '@dydxprotocol/v4-client-js';
 
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DydxChainId, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { timeUnits } from '@/constants/time';
 
-import { type RootStore } from '@/state/_store';
+import { type AppDispatch, type RootState, type RootStore } from '@/state/_store';
 import { getUserSourceWalletAddress, getUserWalletAddress } from '@/state/accountInfoSelectors';
+import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import {
@@ -16,8 +17,11 @@ import {
 import abacusStateManager from '@/lib/abacus';
 import { mapIfPresent } from '@/lib/do';
 
-import { loadableIdle } from '../lib/loadable';
+import { loadableIdle, loadableLoaded } from '../lib/loadable';
+import { logBonsaiError } from '../logs';
+import { selectRawLocalAddressScreenV2 } from '../selectors/base';
 import { ComplianceResponse, ComplianceStatus } from '../types/summaryTypes';
+import { IndexerWebsocketManager } from '../websocket/lib/indexerWebsocketManager';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
@@ -68,18 +72,93 @@ function removeTrailingSlash(str: string) {
   return str.endsWith('/') ? str.slice(0, -1) : str;
 }
 
+export enum ComplianceAction {
+  CONNECT = 'CONNECT',
+  VALID_SURVEY = 'VALID_SURVEY',
+  INVALID_SURVEY = 'INVALID_SURVEY',
+}
+
+async function updateCompliance({
+  chainId,
+  address,
+  network,
+  status,
+  action,
+}: {
+  chainId: DydxChainId;
+  address: string;
+  network: DydxNetwork;
+  status: ComplianceStatus;
+  action: ComplianceAction;
+}) {
+  const networkConfig = ENVIRONMENT_CONFIG_MAP[network];
+  const indexerUrl = mapIfPresent(
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    networkConfig?.endpoints.indexers[0]?.api,
+    removeTrailingSlash
+  );
+  const payload = {
+    message: 'Verify account ownership',
+    action,
+    status,
+    chainId,
+  };
+
+  const signingResponse = await abacusStateManager.chainTransactions.signCompliancePayload(payload);
+  if (!signingResponse) {
+    return { status: ComplianceStatus.UNKNOWN };
+  }
+
+  const parsedSigningResponse = JSON.parse(signingResponse);
+  if (parsedSigningResponse.error != null) {
+    return { status: ComplianceStatus.UNKNOWN };
+  }
+
+  const { signedMessage, publicKey, timestamp, isKeplr } = parsedSigningResponse;
+
+  const urlAddition = isKeplr ? '/v4/compliance/geoblock-keplr' : '/v4/compliance/geoblock';
+  const isUrlAndKeysPresent = signedMessage !== null && publicKey !== null;
+  const isKeplrOrHasTimestamp = timestamp !== null || isKeplr === true;
+
+  if (!isUrlAndKeysPresent || !isKeplrOrHasTimestamp || !indexerUrl) {
+    return { status: ComplianceStatus.UNKNOWN };
+  }
+
+  const body = isKeplr
+    ? {
+        address,
+        message: payload.message,
+        action: payload.action,
+        signedMessage,
+        pubkey: publicKey,
+      }
+    : {
+        address,
+        message: payload.message,
+        currentStatus: payload.status,
+        action: payload.action,
+        signedMessage,
+        pubkey: publicKey,
+        timestamp,
+      };
+
+  const options: RequestInit = {
+    method: 'POST',
+    headers: new globalThis.Headers([['Content-Type', 'application/json']]),
+    body: JSON.stringify(body),
+  };
+
+  const response = await fetch(`${indexerUrl}${urlAddition}`, options);
+  const data = await response.json();
+  return data as ComplianceV2Response & ComplianceErrors;
+}
+
 export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectChainIdAndLocalAddress,
     getQueryKey: ({ address, chainId }) => ['screen-local-wallet-v2', chainId, address],
     getQueryFn: (indexerClient, { chainId, address, network }) => {
-      const networkConfig = ENVIRONMENT_CONFIG_MAP[network];
-      const indexerUrl = mapIfPresent(
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        networkConfig?.endpoints.indexers[0]?.api,
-        removeTrailingSlash
-      );
-      if (address == null || indexerUrl == null) {
+      if (address == null) {
         return null;
       }
       return async (): Promise<ComplianceResponse> => {
@@ -92,68 +171,18 @@ export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
           return { status: ComplianceStatus.UNKNOWN };
         }
 
-        const payload = {
-          message: 'Verify account ownership',
-          action: 'CONNECT',
-          status: firstScreenResult.status,
+        const updateResult = updateCompliance({
+          address,
           chainId,
-        };
-
-        const signingResponse =
-          await abacusStateManager.chainTransactions.signCompliancePayload(payload);
-        if (!signingResponse) {
-          return { status: ComplianceStatus.UNKNOWN };
-        }
-
-        const parsedSigningResponse = JSON.parse(signingResponse);
-        if (parsedSigningResponse.error != null) {
-          return { status: ComplianceStatus.UNKNOWN };
-        }
-
-        const { signedMessage, publicKey, timestamp, isKeplr } = parsedSigningResponse;
-
-        const urlAddition = isKeplr ? '/v4/compliance/geoblock-keplr' : '/v4/compliance/geoblock';
-        const isUrlAndKeysPresent = signedMessage !== null && publicKey !== null;
-        const isKeplrOrHasTimestamp = timestamp !== null || isKeplr === true;
-
-        if (!isUrlAndKeysPresent || !isKeplrOrHasTimestamp) {
-          return { status: ComplianceStatus.UNKNOWN };
-        }
-
-        const body = isKeplr
-          ? {
-              address,
-              message: payload.message,
-              action: payload.action,
-              signedMessage,
-              pubkey: publicKey,
-            }
-          : {
-              address,
-              message: payload.message,
-              currentStatus: payload.status,
-              action: payload.action,
-              signedMessage,
-              pubkey: publicKey,
-              timestamp,
-            };
-
-        const options: RequestInit = {
-          method: 'POST',
-          headers: new globalThis.Headers([['Content-Type', 'application/json']]),
-          body: JSON.stringify(body),
-        };
-
-        const response = await fetch(`${indexerUrl}${urlAddition}`, options);
-        const data = await response.json();
-
-        // TODO - retrieve the subaccounts if it does not exist yet. It is possible that the initial
-        // subaccount retrieval failed due to 403 before updating the compliance status.
+          network,
+          status: firstScreenResult.status,
+          action: ComplianceAction.CONNECT,
+        });
 
         return {
           ...firstScreenResult,
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          ...((data ?? {}) as ComplianceV2Response & ComplianceErrors),
+          ...(updateResult ?? {}),
         };
       };
     },
@@ -168,3 +197,40 @@ export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
     store.dispatch(setLocalAddressScreenV2Raw(loadableIdle()));
   };
 }
+
+export const triggerCompliance = (action: ComplianceAction) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    try {
+      const state = getState();
+      const currentLocalScreenStatus = selectRawLocalAddressScreenV2(state).data?.status;
+      const chainId = getSelectedDydxChainId(state);
+      const address = getUserWalletAddress(state);
+      const network = getSelectedNetwork(state);
+
+      if (!address || !currentLocalScreenStatus) {
+        throw new Error('TriggerCompliance: No account connected or screen status not loaded');
+      }
+
+      const result = await updateCompliance({
+        chainId,
+        address,
+        network,
+        status: currentLocalScreenStatus,
+        action,
+      });
+
+      dispatch(setLocalAddressScreenV2Raw(loadableLoaded(result)));
+
+      // force refresh all account information from indexer
+      IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+      appQueryClient.invalidateQueries({
+        queryKey: ['indexer', 'account'],
+      });
+
+      return true;
+    } catch (e) {
+      logBonsaiError('TriggerCompliance', 'failed to update compliance', { error: e });
+      return false;
+    }
+  };
+};
