@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
-import { BlockTradingReward } from '@/bonsai/types/summaryTypes';
+import { BonsaiHooks } from '@/bonsai/ontology';
+import { DateTime } from 'luxon';
 import styled from 'styled-components';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
+import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -16,6 +17,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
@@ -28,6 +30,9 @@ export enum TradingRewardHistoryTableColumnKey {
   Earned = 'Earned',
 }
 
+// Trading rewards should not be smaller than 0.00001
+const TRADING_REWARD_FRACTION_DIGITS = 5;
+
 const getTradingRewardHistoryTableColumnDef = ({
   key,
   chainTokenImage,
@@ -38,14 +43,14 @@ const getTradingRewardHistoryTableColumnDef = ({
   chainTokenImage: string;
   chainTokenLabel: string;
   stringGetter: StringGetterFunction;
-}): ColumnDef<BlockTradingReward> => ({
+}): ColumnDef<IndexerHistoricalTradingRewardAggregation> => ({
   ...(
     {
       [TradingRewardHistoryTableColumnKey.Event]: {
         columnKey: TradingRewardHistoryTableColumnKey.Event,
-        getCellValue: (row) => row.startedAtInMilliseconds,
+        getCellValue: (row) => row.startedAt,
         label: stringGetter({ key: STRING_KEYS.EVENT }),
-        renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
+        renderCell: ({ startedAt, endedAt }) => (
           <TableCell stacked>
             <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.REWARDED })}</span>
             <$TimePeriod>
@@ -56,13 +61,13 @@ const getTradingRewardHistoryTableColumnDef = ({
                     <>
                       <Output
                         type={OutputType.Date}
-                        value={startedAtInMilliseconds}
+                        value={DateTime.fromISO(startedAt).toMillis()}
                         timeOptions={{ useUTC: true }}
                       />
                       →
                       <Output
                         type={OutputType.Date}
-                        value={endedAtInMilliseconds}
+                        value={endedAt && DateTime.fromISO(endedAt).toMillis()}
                         timeOptions={{ useUTC: true }}
                       />
                     </>
@@ -75,19 +80,23 @@ const getTradingRewardHistoryTableColumnDef = ({
       },
       [TradingRewardHistoryTableColumnKey.Earned]: {
         columnKey: TradingRewardHistoryTableColumnKey.Earned,
-        getCellValue: (row) => row.amount,
+        getCellValue: (row) => row.tradingReward,
         label: stringGetter({ key: STRING_KEYS.EARNED }),
-        renderCell: ({ amount }) => (
+        renderCell: ({ tradingReward }) => (
           <Output
             type={OutputType.Asset}
-            value={amount}
+            fractionDigits={TRADING_REWARD_FRACTION_DIGITS}
+            value={tradingReward}
             showSign={ShowSign.Both}
             slotRight={<AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />}
             tw="gap-[0.5ch] [--output-sign-color:--color-positive]"
           />
         ),
       },
-    } satisfies Record<TradingRewardHistoryTableColumnKey, ColumnDef<BlockTradingReward>>
+    } satisfies Record<
+      TradingRewardHistoryTableColumnKey,
+      ColumnDef<IndexerHistoricalTradingRewardAggregation>
+    >
   )[key],
 });
 
@@ -107,11 +116,11 @@ export const TradingRewardHistoryTable = ({
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const { isNotTablet } = useBreakpoints();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
-
-  const tradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.data);
+  const { data: tradingRewards, status } = BonsaiHooks.useHistoricalTradingRewards();
+  const isLoading = status === 'pending';
 
   const rewardsData = useMemo(() => {
-    return canViewAccount ? tradingRewards : EMPTY_ARR;
+    return canViewAccount && tradingRewards != null ? tradingRewards : EMPTY_ARR;
   }, [tradingRewards, canViewAccount]);
 
   const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
@@ -123,7 +132,10 @@ export const TradingRewardHistoryTable = ({
     })
   );
 
-  const getRowKey = useCallback((row: BlockTradingReward) => row.startedAtInMilliseconds, []);
+  const getRowKey = useCallback(
+    (row: IndexerHistoricalTradingRewardAggregation) => row.startedAt,
+    []
+  );
 
   return (
     <$Table
@@ -133,10 +145,14 @@ export const TradingRewardHistoryTable = ({
       getRowKey={getRowKey}
       columns={columns}
       slotEmpty={
-        <div tw="flex flex-col items-center gap-1">
-          <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-          {stringGetter({ key: STRING_KEYS.TRADING_REWARD_TABLE_EMPTY_STATE })}
-        </div>
+        isLoading ? (
+          <LoadingSpace id="trading-rewards-history" />
+        ) : (
+          <div tw="flex flex-col items-center gap-1">
+            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+            {stringGetter({ key: STRING_KEYS.TRADING_REWARD_TABLE_EMPTY_STATE })}
+          </div>
+        )
       }
       selectionBehavior="replace"
       withOuterBorder={isNotTablet || rewardsData.length === 0}

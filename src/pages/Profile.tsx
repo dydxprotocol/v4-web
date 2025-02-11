@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -12,7 +12,6 @@ import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { timeUnits } from '@/constants/time';
 import { ConnectorType, EvmAddress, WalletNetworkType, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -71,6 +70,7 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
+  const historicalTradingRewardsFilled = BonsaiHooks.useHistoricalTradingRewardsFilled().data;
 
   const { data: ensName } = useEnsName({
     address:
@@ -80,18 +80,10 @@ const Profile = () => {
     chainId: ENS_CHAIN_ID,
   });
 
-  const historicalTradingRewards = useAppSelector(BonsaiCore.account.tradingRewards.chart);
-
   const currentWeekTradingReward = useMemo(() => {
-    const startMs = Date.now() - timeUnits.week;
-    const rewards = historicalTradingRewards.filter(
-      (reward) => reward.startedAtInMilliseconds >= startMs
-    );
-
-    return rewards.reduce((acc, reward) => {
-      return acc.plus(reward.amount);
-    }, BIG_NUMBERS.ZERO);
-  }, [historicalTradingRewards]);
+    const sevenDaySlice = historicalTradingRewardsFilled.slice(-7);
+    return sevenDaySlice.reduce((acc, { amount }) => acc.plus(amount), BIG_NUMBERS.ZERO).toNumber();
+  }, [historicalTradingRewardsFilled]);
 
   const actions: Action[] = [
     {
