@@ -37,7 +37,7 @@ export function useParentSubaccountHistoricalPnls() {
 
   return useQuery({
     enabled: isPresent(address) && isPresent(subaccount) && isPresent(indexerClient),
-    queryKey: ['indexer', 'account', 'HistoricalPnl', address, subaccount, indexerKey],
+    queryKey: ['indexer', 'account', 'historicalPnl', address, subaccount, indexerKey],
     queryFn: async () => {
       if (address == null || subaccount == null || indexerClient == null) {
         throw new Error('Invalid historical pnl query state');

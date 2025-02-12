@@ -34,7 +34,7 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isBlockedGeo } from '@/lib/compliance';
+import { hdKeyManager, isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -163,7 +163,9 @@ const useAccountsContext = () => {
         signature,
       });
       setLocalDydxWallet(wallet);
-      setHdKey({ mnemonic, privateKey, publicKey });
+      const key = { mnemonic, privateKey, publicKey };
+      setHdKey(key);
+      hdKeyManager.setHdkey(wallet.address, key);
     },
     [getWalletFromSignature]
   );
@@ -339,6 +341,7 @@ const useAccountsContext = () => {
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
+    hdKeyManager.clearHdkey();
   };
 
   const disconnect = async () => {

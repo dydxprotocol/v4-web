@@ -308,7 +308,6 @@ class AbacusStateManager {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
-      if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.walletConnectionType = AbacusWalletConnectionType.Cosmos;
       } else if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {

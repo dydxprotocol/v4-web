@@ -14,7 +14,7 @@ import {
   setSourceAddressScreenV2Raw,
 } from '@/state/raw';
 
-import abacusStateManager from '@/lib/abacus';
+import { signCompliancePayload } from '@/lib/compliance';
 import { mapIfPresent } from '@/lib/do';
 
 import { loadableIdle, loadableLoaded } from '../lib/loadable';
@@ -40,7 +40,7 @@ const pollingOptions = {
 export function setUpIndexerSourceAddressScreenV2Query(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: getUserSourceWalletAddress,
-    getQueryKey: (address) => ['screen-source-wallet-v2', address],
+    getQueryKey: (address) => ['screenSourceWalletV2', address],
     getQueryFn: (indexerClient, address) => {
       if (address == null) {
         return null;
@@ -78,6 +78,8 @@ export enum ComplianceAction {
   INVALID_SURVEY = 'INVALID_SURVEY',
 }
 
+const COMPLIANCE_PAYLOAD_MESSAGE = 'Verify account ownership';
+
 async function updateCompliance({
   chainId,
   address,
@@ -98,13 +100,13 @@ async function updateCompliance({
     removeTrailingSlash
   );
   const payload = {
-    message: 'Verify account ownership',
+    message: COMPLIANCE_PAYLOAD_MESSAGE,
     action,
     status,
     chainId,
   };
 
-  const signingResponse = await abacusStateManager.chainTransactions.signCompliancePayload(payload);
+  const signingResponse = await signCompliancePayload(address, payload);
   if (!signingResponse) {
     return { status: ComplianceStatus.UNKNOWN };
   }
@@ -117,10 +119,10 @@ async function updateCompliance({
   const { signedMessage, publicKey, timestamp, isKeplr } = parsedSigningResponse;
 
   const urlAddition = isKeplr ? '/v4/compliance/geoblock-keplr' : '/v4/compliance/geoblock';
-  const isUrlAndKeysPresent = signedMessage !== null && publicKey !== null;
+  const hasMessageAndKey = signedMessage !== null && publicKey !== null;
   const isKeplrOrHasTimestamp = timestamp !== null || isKeplr === true;
 
-  if (!isUrlAndKeysPresent || !isKeplrOrHasTimestamp || !indexerUrl) {
+  if (!hasMessageAndKey || !isKeplrOrHasTimestamp || !indexerUrl) {
     return { status: ComplianceStatus.UNKNOWN };
   }
 
@@ -156,7 +158,12 @@ async function updateCompliance({
 export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
     selector: selectChainIdAndLocalAddress,
-    getQueryKey: ({ address, chainId }) => ['screen-local-wallet-v2', chainId, address],
+    getQueryKey: ({ address, chainId, network }) => [
+      'screenLocalWalletV2',
+      chainId,
+      address,
+      network,
+    ],
     getQueryFn: (indexerClient, { chainId, address, network }) => {
       if (address == null) {
         return null;
