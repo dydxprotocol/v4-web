@@ -8,16 +8,19 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { SkipRouteSpeed, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useFunkitBuyNobleUsdc } from '@/hooks/useFunkitBuyNobleUsdc';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
-import { CoinbaseBrandIcon, WarningIcon } from '@/icons';
+import { CoinbaseBrandIcon, FunkitIcon, WarningIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
 import { DiffArrow } from '@/components/DiffArrow';
@@ -28,6 +31,7 @@ import { openDialog } from '@/state/dialogs';
 import { Deposit } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
@@ -102,6 +106,13 @@ export const DepositForm = ({
 
     throw new Error('wallet type not handled');
   }, [localDydxWallet, sourceAccount.chain, walletClient]);
+
+  const ffEnableFunkit =
+    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) || testFlags.showInstantDepositToggle) &&
+    import.meta.env.VITE_FUNKIT_API_KEY &&
+    sourceAccount.chain === WalletNetworkType.Evm;
+
+  const startCheckout = useFunkitBuyNobleUsdc();
 
   const hasSufficientBalance = depositRoute
     ? tokenBalance.raw && BigInt(depositRoute.amountIn) <= BigInt(tokenBalance.raw)
@@ -298,6 +309,28 @@ export const DepositForm = ({
             </div>
           </Button>
         </div>
+        {ffEnableFunkit && (
+          <div tw="flex flex-col gap-0.5">
+            <div tw="flex items-center gap-1">
+              <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
+              <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.OR })}</div>
+              <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
+            </div>
+            <Button
+              onClick={() => {
+                startCheckout();
+                onClose();
+              }}
+              type={ButtonType.Button}
+              tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
+            >
+              <div>{stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })}</div>
+              <div tw="flex text-color-text-1">
+                <FunkitIcon />
+              </div>
+            </Button>
+          </div>
+        )}
       </div>
       <div tw="flex flex-col gap-0.75">
         {!depositSteps?.length && (

@@ -3,12 +3,10 @@ import { useCallback, useMemo } from 'react';
 import { useFunkitCheckout } from '@funkit/connect';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { EvmAddress } from '@/constants/wallets';
 
 import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
 import { updateFunkitDeposit } from '@/state/funkitDeposits';
 
 import { track } from '@/lib/analytics/analytics';
@@ -36,9 +34,6 @@ export function useFunkitBuyNobleUsdc() {
         // TODO: Supply remaining transfer event data once Funkit provides it
         track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
         dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
-      },
-      onDydxSwitch: () => {
-        dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
       },
     }),
     [dispatch]
