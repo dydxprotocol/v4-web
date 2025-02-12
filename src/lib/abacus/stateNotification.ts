@@ -15,12 +15,7 @@ import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 
 import { type RootStore } from '@/state/_store';
-import {
-  setCompliance,
-  setRestrictionType,
-  setSubaccountForPostOrders,
-  setTradingRewards,
-} from '@/state/account';
+import { setSubaccountForPostOrders, setTradingRewards } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -59,14 +54,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
-      }
-
-      if (changes.has(Changes.restriction)) {
-        dispatch(setRestrictionType(updatedState.restriction));
-      }
-
-      if (changes.has(Changes.compliance) && updatedState.compliance) {
-        dispatch(setCompliance(updatedState.compliance));
       }
 
       // this can be migrated when the trade/close position forms are migrated

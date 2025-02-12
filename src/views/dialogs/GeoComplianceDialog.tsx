@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
+// eslint-disable-next-line no-restricted-imports
+import { ComplianceAction, triggerCompliance } from '@/bonsai/rest/compliance';
 import styled from 'styled-components';
 
-import { ComplianceAction, Nullable, ParsingError } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, GeoComplianceDialogProps } from '@/constants/dialogs';
 import { COUNTRIES_MAP } from '@/constants/geo';
@@ -19,9 +20,9 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { WithReceipt } from '@/components/WithReceipt';
 
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch } from '@/state/appTypes';
+
 import { isBlockedGeo } from '@/lib/compliance';
-import { log } from '@/lib/telemetry';
 
 const CountrySelector = ({
   label,
@@ -61,6 +62,7 @@ const CountrySelector = ({
 
 export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDialogProps>) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
   const [residence, setResidence] = useState('');
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
@@ -74,14 +76,10 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
         ? ComplianceAction.INVALID_SURVEY
         : ComplianceAction.VALID_SURVEY;
 
-    const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
-      if (success) {
-        setIsOpen(false);
-      } else {
-        log('useWithdrawalInfo/getWithdrawalCapacityByDenom', new Error(parsingError?.message));
-      }
-    };
-    abacusStateManager.triggerCompliance(action, callback);
+    const success = await dispatch(triggerCompliance(action));
+    if (success) {
+      setIsOpen(false);
+    }
   };
 
   return (

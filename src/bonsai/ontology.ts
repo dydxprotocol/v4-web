@@ -58,6 +58,7 @@ import {
   selectRawIndexerHeightDataLoading,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
+import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
@@ -83,6 +84,7 @@ import {
   AllAssetData,
   ApiState,
   AssetData,
+  Compliance,
   EquityTiersSummary,
   FeeTierSummary,
   GroupedSubaccountSummary,
@@ -168,6 +170,7 @@ interface BonsaiCoreShape {
     feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
   };
+  compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -233,6 +236,7 @@ export const BonsaiCore: BonsaiCoreShape = {
     equityTiers: selectEquityTiers,
     feeTiers: selectFeeTiers,
   },
+  compliance: { data: selectCompliance, loading: selectComplianceLoading },
 };
 
 interface BonsaiHelpersShape {
