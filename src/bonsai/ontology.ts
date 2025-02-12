@@ -349,11 +349,8 @@ interface BonsaiHooksShape {
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
   useHistoricalTradingRewards: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
-  useHistoricalTradingRewardsFilled: () => {
-    data: AggregatedTradingReward[];
-    loading: LoadableStatus;
-  };
-  useTotalTradingRewards: () => { data: BigNumber | undefined; loading: LoadableStatus };
+  useHistoricalTradingRewardsFilled: () => Loadable<AggregatedTradingReward[]>;
+  useTotalTradingRewards: () => Loadable<BigNumber>;
   useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
   useStakingRewards: () => Loadable<StakingRewards>;
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
