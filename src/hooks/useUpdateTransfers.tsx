@@ -68,6 +68,15 @@ export function useUpdateTransfers() {
         }
 
         if (isWithdraw(transfer)) {
+          track(
+            AnalyticsEvents.WithdrawFinalized({
+              ...transfer,
+              finalAmountUsd: finalAmount,
+              status,
+              transferAssetRelease: response.transferAssetRelease,
+            })
+          );
+
           dispatch(
             updateWithdraw({
               dydxAddress,
@@ -75,6 +84,7 @@ export function useUpdateTransfers() {
                 ...transfer,
                 finalAmountUsd: finalAmount,
                 status,
+                transferAssetRelease: response.transferAssetRelease,
               },
             })
           );

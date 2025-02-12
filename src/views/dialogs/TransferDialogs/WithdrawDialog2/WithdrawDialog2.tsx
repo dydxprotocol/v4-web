@@ -42,6 +42,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const [amount, setAmount] = useState('');
+  const [withdrawSubmitted, setWithdrawSubmitted] = useState(false);
   const [currentWithdraw, setCurrentWithdraw] = useState<{ txHash: string; chainId: string }>();
   const [formState, setFormState] = useState<'form' | 'chain-select'>('form');
   const chainSelectRef = useRef<HTMLDivElement | null>(null);
@@ -107,6 +108,10 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     });
   }, [destinationChain, dydxAddress, nobleAddress, sourceAccount]);
 
+  const onWithdrawSigned = () => {
+    setWithdrawSubmitted(true);
+  };
+
   const onWithdraw = (withdraw: Withdraw) => {
     if (!dydxAddress) return;
 
@@ -125,14 +130,14 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
       title={<div tw="text-center">{dialogTitle}</div>}
       placement={DialogPlacement.Default}
     >
-      {currentWithdraw && (
+      {withdrawSubmitted && (
         <WithdrawStatus
-          txHash={currentWithdraw.txHash}
-          chainId={currentWithdraw.chainId}
+          txHash={currentWithdraw?.txHash}
+          chainId={currentWithdraw?.chainId}
           onClose={() => setIsOpen(false)}
         />
       )}
-      {!currentWithdraw && (
+      {!withdrawSubmitted && (
         <div tw="w-[100%] overflow-hidden">
           <div tw="flex w-[200%]">
             <div
@@ -147,6 +152,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
                 destinationChain={destinationChain}
                 onChainSelect={() => setFormState('chain-select')}
                 onWithdraw={onWithdraw}
+                onWithdrawSigned={onWithdrawSigned}
               />
             </div>
             <div

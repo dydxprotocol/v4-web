@@ -5,7 +5,7 @@ import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 
-import type { Deposit } from '@/state/transfers';
+import type { Deposit, Withdraw } from '@/state/transfers';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
@@ -421,6 +421,25 @@ export const AnalyticsEvents = unionize(
       Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
     >(),
     DepositError: ofType<{ error: string }>(),
+
+    // Withdraw
+    WithdrawInitiated:
+      ofType<
+        Pick<
+          RouteResponse,
+          | 'sourceAssetDenom'
+          | 'sourceAssetChainID'
+          | 'amountIn'
+          | 'amountOut'
+          | 'usdAmountOut'
+          | 'estimatedAmountOut'
+          | 'swapPriceImpactPercent'
+          | 'estimatedRouteDurationSeconds'
+        >
+      >(),
+    WithdrawSubmitted: ofType<Withdraw>(),
+    WithdrawFinalized: ofType<Withdraw>(),
+    WithdrawError: ofType<{ error: string }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );

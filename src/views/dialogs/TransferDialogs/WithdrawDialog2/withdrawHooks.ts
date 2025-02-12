@@ -4,6 +4,7 @@ import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-j
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -21,6 +22,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { Withdraw } from '@/state/transfers';
 
+import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
@@ -28,9 +30,11 @@ import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from 
 export function useWithdrawStep({
   withdrawRoute,
   onWithdraw,
+  onWithdrawSigned,
 }: {
   withdrawRoute?: RouteResponse;
   onWithdraw: (withdraw: Withdraw) => void;
+  onWithdrawSigned: () => void;
 }) {
   const stringGetter = useStringGetter();
   const { skipClient } = useSkipClient();
@@ -81,7 +85,7 @@ export function useWithdrawStep({
     [localDydxWallet, localNobleWallet]
   );
 
-  const executeWithdraw = useCallback(async () => {
+  const executeWithdraw = async () => {
     try {
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
@@ -104,21 +108,31 @@ export function useWithdrawStep({
           }),
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
+        onTransactionSigned: async () => {
+          onWithdrawSigned();
+        },
         onTransactionBroadcast: async ({ txHash, chainID }) => {
-          onWithdraw({
-            type: 'withdraw',
+          const baseWithdraw = {
+            type: 'withdraw' as const,
             txHash,
             chainId: chainID,
-            status: 'pending',
+            destinationChainId: withdrawRoute.destAssetChainID,
+            status: 'pending' as const,
             estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
             isInstantWithdraw: isInstantTransfer(withdrawRoute),
-          });
+            transferAssetRelease: null,
+          };
+
+          track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
+          onWithdraw(baseWithdraw);
         },
       });
       return {
         success: true,
       };
     } catch (error) {
+      track(AnalyticsEvents.WithdrawError({ error: error.message }));
+
       return {
         success: false,
         errorMessage: stringGetter({
@@ -128,17 +142,7 @@ export function useWithdrawStep({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    dydxAddress,
-    withdrawRoute,
-    skipClient,
-    userAddresses,
-    onWithdraw,
-    getCosmosSigner,
-    localDydxWallet,
-    localNobleWallet,
-    stringGetter,
-  ]);
+  };
 
   return {
     executeWithdraw,
