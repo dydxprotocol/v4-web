@@ -324,7 +324,9 @@ export const DepositForm = ({
               type={ButtonType.Button}
               tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
             >
-              <div>{stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })}</div>
+              <div>
+                {stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })} <span tw="sr-only">FunKit</span>
+              </div>
               <div tw="flex text-color-text-1">
                 <FunkitIcon />
               </div>
