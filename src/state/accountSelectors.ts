@@ -2,7 +2,6 @@ import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { PositionUniqueId, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { groupBy, keyBy, mapValues } from 'lodash';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
@@ -288,44 +287,6 @@ export const getIsAccountConnected = (state: RootState) =>
  * @returns OnboardingGuards (Record of boolean items) to aid in determining what Onboarding Step the user is on.
  */
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
-
-/**
- * @returns account all time trading rewards
- */
-export const getTotalTradingRewards = (state: RootState) => state.account.tradingRewards?.total;
-
-/**
- * @returns account trading rewards aggregated by period
- */
-export const getHistoricalTradingRewards = (state: RootState) =>
-  state.account.tradingRewards?.filledHistory;
-
-/**
- * @returns account historical trading rewards for the specified perid
- */
-export const getTradingRewardsEventsForPeriod = () =>
-  createAppSelector(
-    [(state: RootState) => state.account.tradingRewards?.rawHistory, (s, period: string) => period],
-    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
-  );
-
-/**
- * @returns account historical trading rewards for the specified perid
- */
-export const getHistoricalTradingRewardsForPeriod = () =>
-  createAppSelector(
-    [getHistoricalTradingRewards, (s, period: string) => period],
-    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
-  );
-
-const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPeriod();
-/**
- * @returns account historical trading rewards for the current week
- */
-export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
-  [(s) => historicalRewardsForCurrentWeekSelector(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
-  (historicalTradingRewards) => historicalTradingRewards?.[0]
-);
 
 /**
  * @returns compliance status of the current session

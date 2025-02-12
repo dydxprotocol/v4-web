@@ -1,3 +1,4 @@
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -30,10 +31,7 @@ import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 
-import {
-  getHistoricalTradingRewardsForCurrentWeek,
-  getOnboardingState,
-} from '@/state/accountSelectors';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -69,6 +67,7 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
+  const currentWeekTradingReward = BonsaiHooks.useHistoricalTradingRewardsWeekly().data;
 
   const { data: ensName } = useEnsName({
     address:
@@ -77,8 +76,6 @@ const Profile = () => {
         : undefined,
     chainId: ENS_CHAIN_ID,
   });
-
-  const currentWeekTradingReward = useAppSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   const actions: Action[] = [
     {
@@ -228,7 +225,7 @@ const Profile = () => {
                     <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} tw="ml-[0.5ch]" />
                   }
                   type={OutputType.Asset}
-                  value={currentWeekTradingReward?.amount}
+                  value={currentWeekTradingReward}
                 />
               ),
             },

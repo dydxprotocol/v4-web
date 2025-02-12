@@ -15,7 +15,7 @@ import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 
 import { type RootStore } from '@/state/_store';
-import { setSubaccountForPostOrders, setTradingRewards } from '@/state/account';
+import { setSubaccountForPostOrders } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -46,12 +46,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
-      if (changes.has(Changes.tradingRewards)) {
-        if (updatedState.account?.tradingRewards) {
-          dispatch(setTradingRewards(updatedState.account.tradingRewards));
-        }
-      }
-
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
       }

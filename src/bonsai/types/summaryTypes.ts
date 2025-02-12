@@ -303,6 +303,12 @@ export type AccountBalances = {
 
 export type SubaccountTransfer = IndexerTransferResponseObject;
 
+export type AggregatedTradingReward = {
+  amount: number;
+  cumulativeAmount: number;
+  date: number;
+};
+
 export enum ComplianceStatus {
   COMPLIANT = 'COMPLIANT',
   FIRST_STRIKE_CLOSE_ONLY = 'FIRST_STRIKE_CLOSE_ONLY',

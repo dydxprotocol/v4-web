@@ -51,9 +51,6 @@ export const accountSlice = createSlice({
     setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       state.subaccountForPostOrders = action.payload;
     },
-    setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
-      state.tradingRewards = action.payload;
-    },
     clearSubaccountState: (state) => {
       state.subaccountForPostOrders = undefined;
     },
@@ -64,6 +61,5 @@ export const {
   setOnboardingGuard,
   setOnboardingState,
   setSubaccountForPostOrders,
-  setTradingRewards,
   clearSubaccountState,
 } = accountSlice.actions;

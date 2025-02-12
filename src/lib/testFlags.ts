@@ -52,10 +52,6 @@ class TestFlags {
     return this.queryParams.ref;
   }
 
-  get onboardingRewrite() {
-    return !!this.queryParams.onboarding_rewrite;
-  }
-
   get showInstantDepositToggle() {
     return !!this.queryParams.funkit_toggle;
   }

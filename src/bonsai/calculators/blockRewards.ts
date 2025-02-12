@@ -9,14 +9,14 @@ import { mapLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 
 export function calculateBlockRewards(
-  liveTransfers: Loadable<IndexerHistoricalBlockTradingReward[]>,
-  restTransfers: Loadable<IndexerHistoricalBlockTradingReward[]>
+  liveBlockRewards: Loadable<IndexerHistoricalBlockTradingReward[]>,
+  restBlockRewards: Loadable<IndexerHistoricalBlockTradingReward[]>
 ) {
   const getRewardsById = (data: Loadable<IndexerHistoricalBlockTradingReward[]>) =>
     mapLoadableData(data, (d) => keyBy(d, (reward) => reward.createdAtHeight));
   return mergeObjects(
-    getRewardsById(liveTransfers).data ?? {},
-    getRewardsById(restTransfers).data ?? {},
+    getRewardsById(liveBlockRewards).data ?? {},
+    getRewardsById(restBlockRewards).data ?? {},
     (first, second) => maxBy([first, second], (f) => MustBigNumber(f.createdAtHeight).toNumber())!
   );
 }
