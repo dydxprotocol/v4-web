@@ -13,12 +13,12 @@ import {
   SubaccountBatchedOperations,
   SubaccountOperations,
 } from '../types/operationTypes';
-import { ParentSubaccountData } from '../types/rawTypes';
+import { ParentSubaccountDataBase } from '../types/rawTypes';
 
 function addUsdcAssetPosition(
-  parentSubaccount: ParentSubaccountData,
+  parentSubaccount: ParentSubaccountDataBase,
   payload: Pick<IndexerAssetPositionResponseObject, 'side' | 'size' | 'subaccountNumber'>
-): ParentSubaccountData {
+): ParentSubaccountDataBase {
   const { side, size, subaccountNumber } = payload;
   return produce(parentSubaccount, (draftParentSubaccountData) => {
     let childSubaccount = draftParentSubaccountData.childSubaccounts[subaccountNumber];
@@ -83,7 +83,7 @@ export type UsdcDepositArgs = {
 };
 
 export function createUsdcDepositOperations(
-  parentSubaccount: ParentSubaccountData,
+  parentSubaccount: ParentSubaccountDataBase,
   { subaccountNumber, depositAmount }: UsdcDepositArgs
 ): SubaccountBatchedOperations {
   const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
@@ -111,7 +111,7 @@ export type UsdcWithdrawArgs = {
   withdrawAmount: string;
 };
 export function createUsdcWithdrawalOperations(
-  parentSubaccount: ParentSubaccountData,
+  parentSubaccount: ParentSubaccountDataBase,
   { subaccountNumber, withdrawAmount }: UsdcWithdrawArgs
 ): SubaccountBatchedOperations {
   const updatedParentSubaccountData = addUsdcAssetPosition(parentSubaccount, {
@@ -135,9 +135,9 @@ export function createUsdcWithdrawalOperations(
 }
 
 function modifyUsdcAssetPosition(
-  parentSubaccountData: ParentSubaccountData,
+  parentSubaccountData: ParentSubaccountDataBase,
   payload: ModifyUsdcAssetPositionProps
-): ParentSubaccountData {
+): ParentSubaccountDataBase {
   const { subaccountNumber, changes } = payload;
 
   return produce(parentSubaccountData, (draftParentSubaccountData) => {
@@ -148,10 +148,10 @@ function modifyUsdcAssetPosition(
 }
 
 export function applyOperationsToSubaccount(
-  parentSubaccount: ParentSubaccountData,
+  parentSubaccount: ParentSubaccountDataBase,
   batchedOperations: SubaccountBatchedOperations
-): ParentSubaccountData {
-  let parentSubaccountData: ParentSubaccountData = parentSubaccount;
+): ParentSubaccountDataBase {
+  let parentSubaccountData: ParentSubaccountDataBase = parentSubaccount;
 
   batchedOperations.operations.forEach((op) => {
     SubaccountOperations.match(op, {
