@@ -5,6 +5,7 @@ import { useFunkitCheckout } from '@funkit/connect';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { EvmAddress } from '@/constants/wallets';
 
 import { useAppDispatch } from '@/state/appTypes';
@@ -12,9 +13,11 @@ import { openDialog } from '@/state/dialogs';
 import { updateFunkitDeposit } from '@/state/funkitDeposits';
 
 import { track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 
 import { useAccounts } from './useAccounts';
 import { useFlushFunkitTheme } from './useFlushFunkitTheme';
+import { useStatsigGateValue } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 
 const TOKEN_SYMBOL = 'USDC';
@@ -30,19 +33,35 @@ export function useFunkitBuyNobleUsdc() {
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
 
-  const config = useMemo(
-    () => ({
-      onConfirmation: (checkoutId: string) => {
-        // TODO: Supply remaining transfer event data once Funkit provides it
-        track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
-        dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
-      },
-      onDydxSwitch: () => {
-        dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
-      },
-    }),
-    [dispatch]
-  );
+  const showNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
+
+  const enableFunWithNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffEnableFunkitNew) &&
+    showNewDepositFlow &&
+    testFlags.showInstantDepositToggle;
+
+  const config = useMemo(() => {
+    return enableFunWithNewDepositFlow
+      ? {
+          onConfirmation: (checkoutId: string) => {
+            // TODO: Supply remaining transfer event data once Funkit provides it
+            track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
+            dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
+          },
+        }
+      : {
+          onConfirmation: (checkoutId: string) => {
+            // TODO: Supply remaining transfer event data once Funkit provides it
+            track(AnalyticsEvents.TransferDeposit({ isFunkit: true }));
+            dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
+          },
+          onDydxSwitch: () => {
+            dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
+          },
+        };
+  }, [dispatch, enableFunWithNewDepositFlow]);
+
   const { beginCheckout } = useFunkitCheckout(config);
   const startCheckout = useCallback(async () => {
     flushTheme();

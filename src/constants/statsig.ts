@@ -12,6 +12,7 @@ export enum StatsigFlags {
   ffEnableLimitClose = 'ff_enable_limit_close',
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',
   ffEnableFunkit = 'ff_enable_funkit',
+  ffEnableFunkitNew = 'ff_enable_funkit_new',
   ffDepositRewrite = 'ff_deposit_rewrite',
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
 }
