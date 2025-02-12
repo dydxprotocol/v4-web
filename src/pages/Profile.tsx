@@ -9,7 +9,6 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { ConnectorType, EvmAddress, WalletNetworkType, wallets } from '@/constants/wallets';
 
@@ -68,8 +67,7 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
-  const historicalTradingRewardsWeekly =
-    BonsaiHooks.useHistoricalTradingRewardsWeekly().data ?? EMPTY_ARR;
+  const currentWeekTradingReward = BonsaiHooks.useHistoricalTradingRewardsWeekly().data;
 
   const { data: ensName } = useEnsName({
     address:
@@ -78,8 +76,6 @@ const Profile = () => {
         : undefined,
     chainId: ENS_CHAIN_ID,
   });
-
-  const currentWeekTradingReward = historicalTradingRewardsWeekly[0]?.tradingReward;
 
   const actions: Action[] = [
     {

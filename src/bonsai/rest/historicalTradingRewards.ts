@@ -65,30 +65,23 @@ export function useHistoricalTradingRewards() {
 }
 
 export function useHistoricalTradingRewardsWeekly() {
-  const address = useAppSelector(getUserWalletAddress);
-  const { indexerClient, key: indexerKey } = useIndexerClient();
+  const historicalTradingRewardsQuery = useHistoricalTradingRewards();
+  const tradingRewards = historicalTradingRewardsQuery.data ?? EMPTY_ARR;
 
-  return useQuery({
-    enabled: isPresent(address) && isPresent(indexerClient),
-    queryKey: ['indexer', 'account', 'weeklyHistoricTradingRewards', address, indexerKey],
-    queryFn: async () => {
-      if (address == null || indexerClient == null) {
-        throw new Error('Invalid historical trading rewards query state');
+  const weeklyReward = useMemo(() => {
+    return tradingRewards.reduce((acc, { tradingReward, startedAt }) => {
+      if (new Date(startedAt).getTime() > Date.now() - timeUnits.week) {
+        return acc.plus(tradingReward);
       }
-      const thisResult = await indexerClient.account.getHistoricalTradingRewardsAggregations(
-        address,
-        TradingRewardAggregationPeriod.WEEKLY,
-        undefined,
-        undefined
-      );
 
-      const typedResult = isIndexerHistoricalTradingRewardAggregationResponse(thisResult);
-      const resultArr = typedResult.rewards;
-      return resultArr;
-    },
-    refetchInterval: timeUnits.hour,
-    staleTime: timeUnits.hour,
-  });
+      return acc;
+    }, BIG_NUMBERS.ZERO);
+  }, [tradingRewards]);
+
+  return {
+    ...historicalTradingRewardsQuery,
+    data: weeklyReward,
+  };
 }
 
 /**

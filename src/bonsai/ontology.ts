@@ -355,7 +355,7 @@ interface BonsaiHooksShape {
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
   useDailyCumulativeTradingRewards: () => Loadable<AggregatedTradingReward[]>;
   useHistoricalTradingRewards: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
-  useHistoricalTradingRewardsWeekly: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
+  useHistoricalTradingRewardsWeekly: () => Loadable<BigNumber>;
   useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
   useTotalTradingRewards: () => Loadable<BigNumber>;
   useStakingRewards: () => Loadable<StakingRewards>;
