@@ -20,7 +20,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { ChildSubaccountData, MarketsData, ParentSubaccountData } from '../types/rawTypes';
+import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 import {
   GroupedSubaccountSummary,
   PendingIsolatedPosition,
@@ -37,7 +37,7 @@ import { getPositionUniqueId } from './helpers';
 import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
-  parent: Omit<ParentSubaccountData, 'live'>,
+  parent: ParentSubaccountDataBase,
   markets: MarketsData
 ): SubaccountPosition[] {
   return Object.values(parent.childSubaccounts)
@@ -56,7 +56,7 @@ export function calculateParentSubaccountPositions(
 }
 
 export function calculateParentSubaccountSummary(
-  parent: Omit<ParentSubaccountData, 'live'>,
+  parent: ParentSubaccountDataBase,
   markets: MarketsData
 ): GroupedSubaccountSummary {
   const summaries = mapValues(parent.childSubaccounts, (subaccount) =>
@@ -77,7 +77,7 @@ export function calculateParentSubaccountSummary(
   };
 }
 
-export function calculateMarketsNeededForSubaccount(parent: Omit<ParentSubaccountData, 'live'>) {
+export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountDataBase) {
   return Object.values(parent.childSubaccounts).flatMap((o) =>
     Object.values(o?.openPerpetualPositions ?? {}).map((p) => p.market)
   );
@@ -298,7 +298,7 @@ function calculatePositionDerivedExtra(
 }
 
 export function calculateChildSubaccountSummaries(
-  parent: Omit<ParentSubaccountData, 'live'>,
+  parent: ParentSubaccountDataBase,
   markets: MarketsData
 ): Record<string, SubaccountSummary> {
   return pickBy(
