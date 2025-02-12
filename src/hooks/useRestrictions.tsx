@@ -1,14 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
-
-import { RestrictionType } from '@/constants/abacus';
-
-import { getRestrictionType } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-
 const useRestrictionContext = () => {
-  const restrictionType = useAppSelector(getRestrictionType, shallowEqual);
   const [sanctionedAddresses, setSanctionedAddresses] = useState<string[]>([]);
 
   const updateSanctionedAddresses = useCallback(
@@ -25,8 +17,6 @@ const useRestrictionContext = () => {
   );
 
   return {
-    isBadActor: restrictionType === RestrictionType.USER_RESTRICTED,
-    isGeoRestricted: restrictionType === RestrictionType.GEO_RESTRICTED,
     updateSanctionedAddresses,
     sanctionedAddresses: useMemo(() => new Set(sanctionedAddresses), [sanctionedAddresses]),
   };

@@ -1,8 +1,13 @@
 import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
+import {
+  setUpIndexerLocalAddressScreenV2Query,
+  setUpIndexerSourceAddressScreenV2Query,
+} from './rest/compliance';
 import { setUpConfigTiersQuery } from './rest/configTiers';
 import { setUpFillsQuery } from './rest/fills';
+import { setUpGeoQuery } from './rest/geo';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpOrdersQuery } from './rest/orders';
@@ -36,4 +41,7 @@ export const storeLifecycles = [
   setUpConfigTiersQuery,
   setUpLocalOrdersFillsSync,
   setUpLocalOrdersOrdersSync,
+  setUpGeoQuery,
+  setUpIndexerSourceAddressScreenV2Query,
+  setUpIndexerLocalAddressScreenV2Query,
 ] as const;

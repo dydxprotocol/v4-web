@@ -328,29 +328,28 @@ export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
 );
 
 /**
- * @returns UsageRestriction of the current session
+ * @returns compliance status of the current session
  */
-export const getUsageRestriction = (state: RootState) => state.account.restriction;
-
-/**
- * @returns RestrictionType from the current session
- */
-export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;
+export const getComplianceStatus = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.status
+);
 
 /**
  * @returns compliance status of the current session
  */
-export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
-
-/**
- * @returns compliance status of the current session
- */
-export const getComplianceUpdatedAt = (state: RootState) => state.account.compliance?.updatedAt;
+export const getComplianceUpdatedAt = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.updatedAt
+);
 
 /**
  * @returns compliance geo of the current session
  */
-export const getGeo = (state: RootState) => state.account.compliance?.geo;
+export const getGeo = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.geo
+);
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(
