@@ -2,14 +2,10 @@ import { useMemo } from 'react';
 
 import { TradingRewardAggregationPeriod } from '@dydxprotocol/v4-client-js';
 import { useQuery } from '@tanstack/react-query';
-import { groupBy, orderBy } from 'lodash';
-import { DateTime } from 'luxon';
 
+import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
-import {
-  IndexerHistoricalTradingRewardAggregation,
-  IndexerTradingRewardAggregationPeriod,
-} from '@/types/indexer/indexerApiGen';
+import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
 import { isIndexerHistoricalTradingRewardAggregationResponse } from '@/types/indexer/indexerChecks';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
@@ -17,9 +13,9 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { mapIfPresent } from '@/lib/do';
 import { BIG_NUMBERS } from '@/lib/numbers';
-import { objectEntries } from '@/lib/objectHelpers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { calculateDailyCumulativeTradingRewards } from '../calculators/historicalTradingRewards';
 import { useIndexerClient } from './lib/useIndexer';
 
 const MAX_REQUESTS = 15;
@@ -31,7 +27,7 @@ export function useHistoricalTradingRewards() {
 
   return useQuery({
     enabled: isPresent(address) && isPresent(indexerClient),
-    queryKey: ['indexer', 'accountHistoricalTradingRewards', address, indexerKey],
+    queryKey: ['indexer', 'account', 'historicalTradingRewards', address, indexerKey],
     queryFn: async () => {
       if (address == null || indexerClient == null) {
         throw new Error('Invalid historical trading rewards query state');
@@ -77,117 +73,39 @@ export function useHistoricalTradingRewards() {
   });
 }
 
+/**
+ * @returns total cumulative trading rewards
+ */
 export function useTotalTradingRewards() {
-  const { data: tradingRewards, status } = useHistoricalTradingRewards();
+  const historicalTradingRewardsQuery = useHistoricalTradingRewards();
+  const tradingRewards = historicalTradingRewardsQuery.data ?? EMPTY_ARR;
 
   const lifetimeTradingRewards = useMemo(() => {
-    if (tradingRewards == null) {
-      return undefined;
-    }
-
     return tradingRewards.reduce((acc, { tradingReward }) => {
       return acc.plus(tradingReward);
     }, BIG_NUMBERS.ZERO);
   }, [tradingRewards]);
 
   return {
+    ...historicalTradingRewardsQuery,
     data: lifetimeTradingRewards,
-    loading: status,
   };
 }
 
-const NO_CREATED_AT_HEIGHT_SPECIAL_STRING = '______UNUSED_CREATED_AT_HEIGHT______';
-
+/**
+ * @returns chartData for daily cumulative trading rewards (includes dummy entries for days that have no trading rewards)
+ */
 export function useHistoricalTradingRewardsFilled() {
-  const { data: tradingRewards, status } = useHistoricalTradingRewards();
+  const { data: tradingRewards, status, error } = useHistoricalTradingRewards();
 
-  const getFormattedDate = (date: string | number) => {
-    if (typeof date === 'number') {
-      return DateTime.fromMillis(date).toFormat('yyyy-MM-dd');
-    }
-
-    return DateTime.fromISO(date).toFormat('yyyy-MM-dd');
-  };
-
-  function createDummyAggregatedTradingReward(
-    timestamp: number
-  ): IndexerHistoricalTradingRewardAggregation[] {
-    return [
-      {
-        startedAt: DateTime.fromMillis(timestamp).toISO()!,
-        startedAtHeight: NO_CREATED_AT_HEIGHT_SPECIAL_STRING,
-        endedAt: DateTime.fromMillis(timestamp + timeUnits.day - 1).toISO()!,
-        endedAtHeight: NO_CREATED_AT_HEIGHT_SPECIAL_STRING,
-        tradingReward: '0',
-        period: IndexerTradingRewardAggregationPeriod.DAILY,
-      },
-    ];
-  }
-
-  const chartData = useMemo(() => {
-    if (tradingRewards == null) {
-      return [];
-    }
-
-    // Create map of rewards keyed by day
-    const rewardsKeyedByDay = groupBy(tradingRewards, ({ startedAt }) =>
-      getFormattedDate(startedAt)
-    );
-
-    // Shim all dates from the first to the last date
-    const earliestEvent = tradingRewards.at(-1)?.startedAt;
-    const latestEvent = tradingRewards.at(0)?.startedAt;
-    if (earliestEvent && latestEvent) {
-      const startMs = new Date(earliestEvent).getTime();
-      const endMs = new Date(latestEvent).getTime();
-      let toSet = startMs + timeUnits.day;
-
-      while (toSet > startMs && toSet < endMs) {
-        const key = getFormattedDate(toSet);
-        if (!rewardsKeyedByDay[key]) {
-          // Add a dummy entry if date has no trading reward events
-          rewardsKeyedByDay[key] = createDummyAggregatedTradingReward(toSet);
-        }
-
-        toSet += timeUnits.day;
-      }
-    }
-
-    // sort objectEntries from earliest -> latest
-    const sortedRewards = orderBy(
-      objectEntries(rewardsKeyedByDay),
-      [([startedAt]) => new Date(startedAt).getTime()],
-      ['asc']
-    );
-
-    // Calculate cumulative amount
-    let cumulativeAmountBN = BIG_NUMBERS.ZERO;
-
-    const processedChartData: {
-      date: number;
-      amount: number;
-      cumulativeAmount: number;
-    }[] = [];
-
-    sortedRewards.forEach(([date, rewards]) => {
-      const totalForDate = rewards.reduce((acc, { tradingReward }) => {
-        return acc.plus(tradingReward);
-      }, BIG_NUMBERS.ZERO);
-
-      cumulativeAmountBN = cumulativeAmountBN.plus(totalForDate);
-
-      processedChartData.push({
-        date: new Date(date).getTime(),
-        amount: totalForDate.toNumber(),
-        cumulativeAmount: cumulativeAmountBN.toNumber(),
-      });
-    });
-
-    return processedChartData;
-  }, [tradingRewards]);
+  const chartData = useMemo(
+    () => calculateDailyCumulativeTradingRewards(tradingRewards),
+    [tradingRewards]
+  );
 
   return {
+    error,
     data: chartData,
-    loading: status,
+    status,
   };
 }

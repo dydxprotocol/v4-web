@@ -26,6 +26,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType, formatNumberOutput } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
@@ -80,7 +81,9 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = BonsaiHooks.useTotalTradingRewards().data;
-  const periodTradingRewards = BonsaiHooks.useHistoricalTradingRewardsFilled().data;
+  const { data: periodTradingRewards = EMPTY_ARR, status } =
+    BonsaiHooks.useHistoricalTradingRewardsFilled();
+  const isLoading = status === 'pending';
 
   const rewardsData = useMemo(() => {
     if (canViewAccount) {
@@ -250,7 +253,7 @@ export const TradingRewardsChart = ({
         renderTooltip={renderTooltip}
         onTooltipContext={setTooltipContext}
         onZoom={onZoomSnap}
-        slotEmpty={slotEmpty}
+        slotEmpty={isLoading ? <LoadingSpace id="trading-rewards-chart" /> : slotEmpty}
         defaultZoomDomain={defaultZoomDomain}
         minZoomDomain={TRADING_REWARDS_TIME_RESOLUTION * 2}
         numGridLines={0}
