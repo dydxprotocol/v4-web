@@ -36,8 +36,13 @@ export function useFunkitBuyNobleUsdc() {
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
+  const enableFunWithNewDepositFlow =
+    useStatsigGateValue(StatsigFlags.ffEnableFunkitNew) &&
+    showNewDepositFlow &&
+    testFlags.showInstantDepositToggle;
+
   const config = useMemo(() => {
-    return showNewDepositFlow
+    return enableFunWithNewDepositFlow
       ? {
           onConfirmation: (checkoutId: string) => {
             // TODO: Supply remaining transfer event data once Funkit provides it
@@ -55,7 +60,7 @@ export function useFunkitBuyNobleUsdc() {
             dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
           },
         };
-  }, [dispatch, showNewDepositFlow]);
+  }, [dispatch, enableFunWithNewDepositFlow]);
 
   const { beginCheckout } = useFunkitCheckout(config);
   const startCheckout = useCallback(async () => {

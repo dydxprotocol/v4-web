@@ -108,7 +108,7 @@ export const DepositForm = ({
   }, [localDydxWallet, sourceAccount.chain, walletClient]);
 
   const ffEnableFunkit =
-    (useStatsigGateValue(StatsigFlags.ffEnableFunkit) || testFlags.showInstantDepositToggle) &&
+    (useStatsigGateValue(StatsigFlags.ffEnableFunkitNew) || testFlags.showInstantDepositToggle) &&
     import.meta.env.VITE_FUNKIT_API_KEY &&
     sourceAccount.chain === WalletNetworkType.Evm;
 
