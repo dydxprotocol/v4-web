@@ -301,11 +301,18 @@ export const DepositForm = ({
             type={ButtonType.Button}
             tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
           >
-            <div>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })} <span tw="sr-only">Coinbase</span>
-            </div>
-            <div tw="flex text-color-text-1">
-              <CoinbaseBrandIcon />
+            <div tw="inline-flex gap-[0.5ch]">
+              {stringGetter({
+                key: STRING_KEYS.DEPOSIT_WITH,
+                params: {
+                  TARGET: (
+                    <div tw="inline text-color-text-1">
+                      <CoinbaseBrandIcon />
+                    </div>
+                  ),
+                },
+              })}{' '}
+              <span tw="sr-only">Coinbase</span>
             </div>
           </Button>
         </div>
@@ -324,11 +331,18 @@ export const DepositForm = ({
               type={ButtonType.Button}
               tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
             >
-              <div>
-                {stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })} <span tw="sr-only">FunKit</span>
-              </div>
-              <div tw="flex text-color-text-1">
-                <FunkitIcon />
+              <div tw="inline-flex gap-[0.5ch]">
+                {stringGetter({
+                  key: STRING_KEYS.DEPOSIT_WITH,
+                  params: {
+                    TARGET: (
+                      <div tw="inline text-color-text-1">
+                        <FunkitIcon />
+                      </div>
+                    ),
+                  },
+                })}{' '}
+                <span tw="sr-only">FunKit</span>
               </div>
             </Button>
           </div>
