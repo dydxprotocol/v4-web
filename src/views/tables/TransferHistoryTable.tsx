@@ -156,6 +156,7 @@ export const TransferHistoryTable = ({
     <$Table
       label="Transfers"
       data={transfers}
+      tableId="transfer-history"
       getRowKey={(row: SubaccountTransfer) => row.id}
       columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
         getTransferHistoryTableColumnDef({

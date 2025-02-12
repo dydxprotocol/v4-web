@@ -7,6 +7,9 @@ import { DydxAddress } from '@/constants/wallets';
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 
+import { stringifyTransactionError } from './errors';
+import { log } from './telemetry';
+
 type KeplrComplianceStorage = {
   version?: string;
   [address: DydxAddress]: {
@@ -15,7 +18,7 @@ type KeplrComplianceStorage = {
   };
 };
 
-export const signComplianceSignature = async (
+const signComplianceSignature = async (
   message: string,
   action: string,
   status: string,
@@ -37,7 +40,7 @@ export const signComplianceSignature = async (
   };
 };
 
-export const signComplianceSignatureKeplr = async (
+const signComplianceSignatureKeplr = async (
   message: string,
   signer: DydxAddress,
   chainId: string
@@ -78,6 +81,74 @@ export const signComplianceSignatureKeplr = async (
     pubKey: pubKey.value,
   };
 };
+
+export const signCompliancePayload = async (
+  address: string,
+  params: {
+    message: string;
+    action: string;
+    status: string;
+    chainId: string;
+  }
+): Promise<string> => {
+  try {
+    const hdkey = hdKeyManager.getHdkey(address);
+    if (hdkey?.privateKey && hdkey.publicKey) {
+      const { signedMessage, timestamp } = await signComplianceSignature(
+        params.message,
+        params.action,
+        params.status,
+        hdkey
+      );
+      return JSON.stringify({
+        signedMessage,
+        publicKey: Buffer.from(hdkey.publicKey).toString('base64'),
+        timestamp,
+      });
+    }
+    if (window.keplr && params.chainId && address) {
+      const { signedMessage, pubKey } = await signComplianceSignatureKeplr(
+        params.message,
+        address as DydxAddress,
+        params.chainId
+      );
+      return JSON.stringify({
+        signedMessage,
+        publicKey: pubKey,
+        isKeplr: true,
+      });
+    }
+    throw new Error('Missing hdkey');
+  } catch (error) {
+    log('DydxChainTransactions/signComplianceMessage', error);
+    return stringifyTransactionError(error);
+  }
+};
+
+class HDKeyManager {
+  private address: string | undefined;
+
+  private hdkey: Hdkey | undefined;
+
+  setHdkey(address: string | undefined, hdkey: Hdkey) {
+    this.address = address;
+    this.hdkey = hdkey;
+  }
+
+  getHdkey(localWalletAddress: string): Hdkey | undefined {
+    if (localWalletAddress !== this.address) {
+      return undefined;
+    }
+    return this.hdkey;
+  }
+
+  clearHdkey() {
+    this.hdkey = undefined;
+    this.address = undefined;
+  }
+}
+
+export const hdKeyManager = new HDKeyManager();
 
 export const isBlockedGeo = (geo: string): boolean => {
   return [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes);

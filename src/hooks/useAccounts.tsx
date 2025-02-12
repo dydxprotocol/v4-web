@@ -1,9 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { OfflineAminoSigner } from '@cosmjs/amino';
+import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { OfflineDirectSigner as KeplrOfflineDirectSigner } from '@keplr-wallet/types';
 import { usePrivy } from '@privy-io/react-auth';
+import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { AES, enc } from 'crypto-js';
+import Long from 'long';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import {
@@ -29,7 +34,7 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isBlockedGeo } from '@/lib/compliance';
+import { hdKeyManager, isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -158,7 +163,9 @@ const useAccountsContext = () => {
         signature,
       });
       setLocalDydxWallet(wallet);
-      setHdKey({ mnemonic, privateKey, publicKey });
+      const key = { mnemonic, privateKey, publicKey };
+      setHdKey(key);
+      hdKeyManager.setHdkey(wallet.address, key);
     },
     [getWalletFromSignature]
   );
@@ -178,7 +185,9 @@ const useAccountsContext = () => {
         try {
           const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
           if (dydxOfflineSigner) {
-            setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
+            setLocalDydxWallet(
+              await LocalWallet.fromOfflineSigner(castDirectSigner(dydxOfflineSigner))
+            );
             dispatch(setOnboardingState(OnboardingState.AccountConnected));
           }
         } catch (error) {
@@ -262,15 +271,15 @@ const useAccountsContext = () => {
 
       const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
       if (nobleOfflineSigner !== undefined) {
-        nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+        nobleWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(nobleOfflineSigner));
       }
       const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
       if (osmosisOfflineSigner !== undefined) {
-        osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
+        osmosisWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(osmosisOfflineSigner));
       }
       const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
       if (neutronOfflineSigner !== undefined) {
-        neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
+        neutronWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(neutronOfflineSigner));
       }
 
       if (nobleWallet !== undefined) {
@@ -332,6 +341,7 @@ const useAccountsContext = () => {
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
+    hdKeyManager.clearHdkey();
   };
 
   const disconnect = async () => {
@@ -379,3 +389,23 @@ const useAccountsContext = () => {
     dydxAccountGraz,
   };
 };
+
+// cosmjs and keplr types now disagree, even with latest versions of both for some reason
+const castDirectSigner = (
+  old: OfflineAminoSigner & KeplrOfflineDirectSigner
+): OfflineDirectSigner & OfflineAminoSigner => ({
+  ...old,
+  signDirect: async (signerAddress: string, signDoc: SignDoc): Promise<DirectSignResponse> => {
+    const res = await old.signDirect(signerAddress, {
+      ...signDoc,
+      accountNumber: Long.fromNumber(Number(signDoc.accountNumber)),
+    });
+    return {
+      ...res,
+      signed: {
+        ...res.signed,
+        accountNumber: BigInt(res.signed.accountNumber.toString()),
+      },
+    };
+  },
+});

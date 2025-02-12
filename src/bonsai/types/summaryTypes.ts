@@ -1,4 +1,4 @@
-import { ClobModule, FeeTierModule } from '@dydxprotocol/v4-client-js';
+import { ClobModule, ComplianceReason, FeeTierModule } from '@dydxprotocol/v4-client-js';
 import { type BigNumber } from 'bignumber.js';
 
 import {
@@ -308,3 +308,18 @@ export type AggregatedTradingReward = {
   cumulativeAmount: number;
   date: number;
 };
+
+export enum ComplianceStatus {
+  COMPLIANT = 'COMPLIANT',
+  FIRST_STRIKE_CLOSE_ONLY = 'FIRST_STRIKE_CLOSE_ONLY',
+  FIRST_STRIKE = 'FIRST_STRIKE',
+  CLOSE_ONLY = 'CLOSE_ONLY',
+  BLOCKED = 'BLOCKED',
+  UNKNOWN = 'UNKNOWN',
+}
+export interface ComplianceResponse {
+  status: ComplianceStatus;
+  reason?: ComplianceReason;
+  updatedAt?: string;
+}
+export type Compliance = ComplianceResponse & { geo?: string };

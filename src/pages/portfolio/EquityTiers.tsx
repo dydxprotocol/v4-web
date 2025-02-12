@@ -46,6 +46,7 @@ export const EquityTiers = () => {
         <$Table
           label={stringGetter({ key: STRING_KEYS.EQUITY_TIERS })}
           data={equityTiers ?? []}
+          tableId="equity-tiers"
           getRowKey={(row: EquityTierSummary) => row.requiredTotalNetCollateralUSD}
           columns={
             [

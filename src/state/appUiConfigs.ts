@@ -38,6 +38,7 @@ export interface AppUIConfigsState {
   shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
   horizontalPanelHeightPx: number;
+  tablePageSizes: { [tableKey: string]: number };
 }
 
 export const initialState: AppUIConfigsState = {
@@ -49,6 +50,7 @@ export const initialState: AppUIConfigsState = {
   shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
   horizontalPanelHeightPx: 288,
+  tablePageSizes: {},
 };
 
 export const appUiConfigsSlice = createSlice({
@@ -109,6 +111,12 @@ export const appUiConfigsSlice = createSlice({
       const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
       state.favoritedMarkets = newFavoritedMarkets;
     },
+    setTablePageSize: (
+      state: AppUIConfigsState,
+      { payload: { pageSize, tableId } }: PayloadAction<{ tableId: string; pageSize: number }>
+    ) => {
+      state.tablePageSizes[tableId] = pageSize;
+    },
   },
 });
 
@@ -122,4 +130,5 @@ export const {
   favoriteMarket,
   unfavoriteMarket,
   setHorizontalPanelHeightPx,
+  setTablePageSize,
 } = appUiConfigsSlice.actions;

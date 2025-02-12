@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
+import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
-import { ComplianceStatus } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
@@ -107,7 +107,6 @@ export const useComplianceState = () => {
     onboardingState === OnboardingState.Disconnected;
 
   return {
-    geo,
     complianceStatus,
     complianceState,
     complianceMessage,

@@ -7,7 +7,12 @@ import {
   OrdersData,
   ParentSubaccountData,
 } from '@/bonsai/types/rawTypes';
-import { AccountStats, ConfigTiers, UserFeeTier } from '@/bonsai/types/summaryTypes';
+import {
+  AccountStats,
+  ComplianceResponse,
+  ConfigTiers,
+  UserFeeTier,
+} from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -32,6 +37,16 @@ export type HeightState = {
   latest: Loadable<HeightResponse>;
   // latest in front, will contain latest IFF latest is successful or error
   lastFewResults: Array<LoadableSuccess<HeightResponse> | LoadableError<HeightResponse>>;
+};
+
+export type ComplianceErrors = {
+  errors?: any[];
+};
+
+export type ComplianceState = {
+  geo: Loadable<string | undefined>;
+  sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
+  localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
 };
 
 export interface RawDataState {
@@ -61,6 +76,7 @@ export interface RawDataState {
     validatorHeight: HeightState;
   };
   configs: Loadable<ConfigTiers>;
+  compliance: ComplianceState;
 }
 
 const initialState: RawDataState = {
@@ -86,6 +102,11 @@ const initialState: RawDataState = {
     validatorHeight: { lastFewResults: [], latest: loadableIdle() },
   },
   configs: loadableIdle(),
+  compliance: {
+    geo: loadableIdle(),
+    localAddressScreenV2: loadableIdle(),
+    sourceAddressScreenV2: loadableIdle(),
+  },
 };
 
 export const rawSlice = createSlice({
@@ -163,6 +184,21 @@ export const rawSlice = createSlice({
     setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
       appendToHeight(state.heights.validatorHeight, action.payload);
     },
+    setComplianceGeoRaw: (state, action: PayloadAction<Loadable<string | undefined>>) => {
+      state.compliance.geo = action.payload;
+    },
+    setLocalAddressScreenV2Raw: (
+      state,
+      action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+    ) => {
+      state.compliance.localAddressScreenV2 = action.payload;
+    },
+    setSourceAddressScreenV2Raw: (
+      state,
+      action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+    ) => {
+      state.compliance.sourceAddressScreenV2 = action.payload;
+    },
   },
 });
 
@@ -195,4 +231,7 @@ export const {
   setValidatorHeightRaw,
   setAccountFeeTierRaw,
   setConfigTiers,
+  setComplianceGeoRaw,
+  setLocalAddressScreenV2Raw,
+  setSourceAddressScreenV2Raw,
 } = rawSlice.actions;

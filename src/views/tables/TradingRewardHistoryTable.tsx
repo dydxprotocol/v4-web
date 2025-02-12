@@ -142,6 +142,7 @@ export const TradingRewardHistoryTable = ({
       className={className}
       label={stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       data={rewardsData}
+      tableId="trading-rewards"
       getRowKey={getRowKey}
       columns={columns}
       slotEmpty={

@@ -1,12 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import {
-  Subaccount,
-  type Compliance,
-  type Nullable,
-  type TradingRewards,
-  type UsageRestriction,
-} from '@/constants/abacus';
+import { Subaccount, type Nullable, type TradingRewards } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
@@ -19,9 +13,6 @@ export type AccountState = {
 
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
-
-  restriction?: Nullable<UsageRestriction>;
-  compliance?: Compliance;
 };
 
 const initialState: AccountState = {
@@ -36,10 +27,6 @@ const initialState: AccountState = {
     [OnboardingGuard.hasPreviousTransactions]: undefined,
   },
   onboardingState: OnboardingState.Disconnected,
-
-  // Restriction
-  restriction: undefined,
-  compliance: undefined,
 };
 
 export const accountSlice = createSlice({
@@ -60,12 +47,7 @@ export const accountSlice = createSlice({
       ...state,
       onboardingState: action.payload,
     }),
-    setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
-      state.restriction = action.payload;
-    },
-    setCompliance: (state, action: PayloadAction<Compliance>) => {
-      state.compliance = action.payload;
-    },
+
     setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       state.subaccountForPostOrders = action.payload;
     },
@@ -78,8 +60,6 @@ export const accountSlice = createSlice({
 export const {
   setOnboardingGuard,
   setOnboardingState,
-  setRestrictionType,
-  setCompliance,
   setSubaccountForPostOrders,
   clearSubaccountState,
 } = accountSlice.actions;

@@ -31,18 +31,15 @@ import {
   type HumanReadableTransferPayload,
   type HumanReadableWithdrawPayload,
 } from '@/constants/abacus';
-import { Hdkey } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { DydxAddress } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setInitializationError } from '@/state/app';
 import { placeOrderTimeout } from '@/state/localOrders';
 
 import { dd } from '../analytics/datadog';
-import { signComplianceSignature, signComplianceSignatureKeplr } from '../compliance';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { log } from '../telemetry';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
@@ -58,8 +55,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private nobleClient: NobleClient | undefined;
 
   private store: RootStore | undefined;
-
-  private hdkey: Hdkey | undefined;
 
   private localWallet: LocalWallet | undefined;
 
@@ -78,10 +73,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     this.store = store;
   }
 
-  setHdkey(hdkey: Hdkey) {
-    this.hdkey = hdkey;
-  }
-
   setLocalWallet(localWallet: LocalWallet) {
     this.localWallet = localWallet;
     if (this.localWallet.address) this.populateAccountNumberCache(this.localWallet.address);
@@ -90,7 +81,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   clearAccounts() {
     this.localWallet = undefined;
     this.nobleWallet = undefined;
-    this.hdkey = undefined;
   }
 
   setNobleWallet(nobleWallet: LocalWallet) {
@@ -530,46 +520,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
-  async signCompliancePayload(params: {
-    message: string;
-    action: string;
-    status: string;
-    chainId: string;
-  }): Promise<string> {
-    const address = this.localWallet?.address;
-    try {
-      if (this.hdkey?.privateKey && this.hdkey.publicKey) {
-        const { signedMessage, timestamp } = await signComplianceSignature(
-          params.message,
-          params.action,
-          params.status,
-          this.hdkey
-        );
-        return JSON.stringify({
-          signedMessage,
-          publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
-          timestamp,
-        });
-      }
-      if (window.keplr && params.chainId && address) {
-        const { signedMessage, pubKey } = await signComplianceSignatureKeplr(
-          params.message,
-          address as DydxAddress,
-          params.chainId
-        );
-        return JSON.stringify({
-          signedMessage,
-          publicKey: pubKey,
-          isKeplr: true,
-        });
-      }
-      throw new Error('Missing hdkey');
-    } catch (error) {
-      log('DydxChainTransactions/signComplianceMessage', error);
-      return stringifyTransactionError(error);
-    }
-  }
-
   async subaccountTransfer(params: {
     senderAddress: string;
     subaccountNumber: number;
@@ -662,8 +612,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           break;
         }
         case TransactionType.SignCompliancePayload: {
-          const result = await this.signCompliancePayload(params);
-          callback(result);
+          // this is now handled in bonsai, so the abacus call is a no-op
           break;
         }
         default: {

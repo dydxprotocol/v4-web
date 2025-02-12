@@ -15,7 +15,7 @@ import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 
 import { type RootStore } from '@/state/_store';
-import { setCompliance, setRestrictionType, setSubaccountForPostOrders } from '@/state/account';
+import { setSubaccountForPostOrders } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -50,14 +50,6 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setInputs(updatedState.input));
       }
 
-      if (changes.has(Changes.restriction)) {
-        dispatch(setRestrictionType(updatedState.restriction));
-      }
-
-      if (changes.has(Changes.compliance) && updatedState.compliance) {
-        dispatch(setCompliance(updatedState.compliance));
-      }
-
       // this can be migrated when the trade/close position forms are migrated
       if (changes.has(Changes.markets)) {
         dispatch(
@@ -81,8 +73,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   // this can be migrated when the trade/close position forms are migrated
-  lastOrderChanged(order: SubaccountOrder) {
-    this.store?.dispatch(setLatestOrder({ clientId: order.clientId, id: order.id }));
+  lastOrderChanged(order: SubaccountOrder | null | undefined) {
+    this.store?.dispatch(
+      setLatestOrder(order == null ? order : { clientId: order.clientId, id: order.id })
+    );
   }
 
   errorsEmitted(errors: ParsingErrors) {
