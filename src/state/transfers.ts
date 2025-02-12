@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TransferAssetRelease } from '@skip-go/client';
 
 import { TokenForTransfer } from '@/constants/tokens';
 import { DydxAddress } from '@/constants/wallets';
@@ -19,10 +20,12 @@ export type Withdraw = {
   type: 'withdraw';
   txHash: string;
   chainId: string;
+  destinationChainId: string;
   status: 'pending' | 'success' | 'error';
   estimatedAmountUsd: string;
   finalAmountUsd?: string;
   isInstantWithdraw: boolean;
+  transferAssetRelease: TransferAssetRelease | null; // Where the asset was transferred to
 };
 
 export type Transfer = Deposit | Withdraw;
