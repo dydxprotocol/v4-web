@@ -336,6 +336,7 @@ export const FillsTable = forwardRef(
       <$Table
         key={currentMarket ?? 'all-fills'}
         label="Fills"
+        tableId="fills"
         data={
           isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
         }

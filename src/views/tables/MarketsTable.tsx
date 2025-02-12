@@ -289,6 +289,7 @@ export const MarketsTable = forwardRef(
         <$Table
           withInnerBorders
           data={hasMarketIds ? filteredMarkets : []}
+          tableId="markets-main"
           getRowKey={(row: MarketData) => row.id}
           getIsRowPinned={(row: MarketData) => row.isFavorite}
           label="Markets"

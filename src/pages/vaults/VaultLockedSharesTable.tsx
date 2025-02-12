@@ -104,6 +104,7 @@ const VaultLockedSharesTable = ({
     <$Table
       withInnerBorders
       data={lockedShares}
+      tableId="vault-locked-shares"
       getRowKey={(row) => `${row.amountUsdc ?? ''}${row.unlockBlockHeight ?? ''}`}
       label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       defaultSortDescriptor={{

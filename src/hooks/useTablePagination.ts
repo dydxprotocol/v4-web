@@ -1,25 +1,56 @@
 /**
  * @description Hook to handle pagination on table views
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { MenuItem } from '@/constants/menus';
 
-import { PageSize } from '@/components/Table/TablePaginationRow';
+import { PAGE_SIZES, PageSize } from '@/components/Table/TablePaginationRow';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { setTablePageSize } from '@/state/appUiConfigs';
+import { getSavedTablePageSize } from '@/state/appUiConfigsSelectors';
+
+import { useParameterizedSelector } from './useParameterizedSelector';
 
 const MAX_NUM_PAGE_BUTTONS = 7;
 const PAGE_TOGGLE_PLACEHOLDER = '...';
+
+function validPageSizeOrUndefined(num: number | undefined): PageSize | undefined {
+  if (num == null) {
+    return undefined;
+  }
+  if (PAGE_SIZES.indexOf(num as PageSize) >= 0) {
+    return num as PageSize;
+  }
+  return undefined;
+}
 
 export const useTablePagination = ({
   initialPageSize,
   totalRows,
   shouldResetOnTotalRowsChange,
+  tableId,
 }: {
   initialPageSize: PageSize;
   totalRows: number;
   shouldResetOnTotalRowsChange?: boolean;
+  tableId: string;
 }) => {
-  const [pageSize, setPageSize] = useState(initialPageSize);
+  const savedPageSize = useParameterizedSelector(getSavedTablePageSize, tableId);
+  const [pageSize, setPageSizeState] = useState(
+    validPageSizeOrUndefined(savedPageSize) ?? initialPageSize
+  );
+  const dispatch = useAppDispatch();
+  const setPageSize = useCallback(
+    (next: PageSize) => {
+      setPageSizeState(next);
+      if (tableId) {
+        dispatch(setTablePageSize({ tableId, pageSize: next }));
+      }
+    },
+    [dispatch, tableId]
+  );
   const [currentPage, setCurrentPage] = useState(0);
   const [pages, setPages] = useState<MenuItem<string>[]>([]);
 

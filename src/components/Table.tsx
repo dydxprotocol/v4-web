@@ -96,6 +96,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   label?: string;
   columns: ColumnDef<TableRowData>[];
   data: Array<TableRowData | CustomRowConfig>;
+  tableId: string;
   getRowKey: (rowData: TableRowData, rowIndex?: number) => Key;
   getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
   defaultSortDescriptor?: SortDescriptor;
@@ -130,6 +131,7 @@ export type AllTableProps<TableRowData extends BaseTableRowData | CustomRowConfi
 export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   label = '',
   columns,
+  tableId,
   data = [],
   getRowKey,
   getRowAttributes,
@@ -159,6 +161,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     initialPageSize,
     totalRows: data.length,
     shouldResetOnTotalRowsChange,
+    tableId,
   });
 
   const currentBreakpoints = useBreakpoints();

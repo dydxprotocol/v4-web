@@ -242,6 +242,7 @@ export const MarketsCompactTable = ({
       data={sortedMarkets.slice(0, 3)}
       getRowKey={(row) => row.id}
       label="Markets"
+      tableId="markets-compact"
       onRowAction={(market: Key) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
       }

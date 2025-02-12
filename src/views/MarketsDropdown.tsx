@@ -234,6 +234,7 @@ const MarketsDropdownContent = ({
         <$Table
           withInnerBorders
           data={filteredMarkets}
+          tableId="markets-dropdown"
           getRowKey={(row: MarketData) => row.id}
           getIsRowPinned={(row: MarketData) => row.isFavorite}
           onRowAction={onRowAction}
