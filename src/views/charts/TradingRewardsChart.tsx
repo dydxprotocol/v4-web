@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiHooks } from '@/bonsai/ontology';
-import { curveLinear } from '@visx/curve';
+import { curveStepAfter } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
@@ -82,7 +82,7 @@ export const TradingRewardsChart = ({
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = BonsaiHooks.useTotalTradingRewards().data;
   const { data: periodTradingRewards = EMPTY_ARR, status } =
-    BonsaiHooks.useHistoricalTradingRewardsFilled();
+    BonsaiHooks.useDailyCumulativeTradingRewards();
   const isLoading = status === 'pending';
 
   const rewardsData = useMemo(() => {
@@ -186,7 +186,7 @@ export const TradingRewardsChart = ({
         xAccessor: xAccessorFunc,
         yAccessor: yAccessorFunc,
         colorAccessor: () => 'var(--trading-rewards-line-color)',
-        getCurve: () => curveLinear,
+        getCurve: () => curveStepAfter,
       },
     ],
     [xAccessorFunc, yAccessorFunc]

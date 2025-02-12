@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -39,7 +37,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { BIG_NUMBERS } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
@@ -71,8 +68,8 @@ const Profile = () => {
   const { sourceAccount, dydxAddress } = useAccounts();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { disableConnectButton } = useComplianceState();
-  const historicalTradingRewardsFilled =
-    BonsaiHooks.useHistoricalTradingRewardsFilled().data ?? EMPTY_ARR;
+  const historicalTradingRewardsWeekly =
+    BonsaiHooks.useHistoricalTradingRewardsWeekly().data ?? EMPTY_ARR;
 
   const { data: ensName } = useEnsName({
     address:
@@ -82,10 +79,7 @@ const Profile = () => {
     chainId: ENS_CHAIN_ID,
   });
 
-  const currentWeekTradingReward = useMemo(() => {
-    const sevenDaySlice = historicalTradingRewardsFilled.slice(-7);
-    return sevenDaySlice.reduce((acc, { amount }) => acc.plus(amount), BIG_NUMBERS.ZERO).toNumber();
-  }, [historicalTradingRewardsFilled]);
+  const currentWeekTradingReward = historicalTradingRewardsWeekly[0]?.tradingReward;
 
   const actions: Action[] = [
     {

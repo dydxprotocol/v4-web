@@ -14,8 +14,9 @@ import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
 import {
+  useDailyCumulativeTradingRewards,
   useHistoricalTradingRewards,
-  useHistoricalTradingRewardsFilled,
+  useHistoricalTradingRewardsWeekly,
   useTotalTradingRewards,
 } from './rest/historicalTradingRewards';
 import {
@@ -348,10 +349,11 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
 interface BonsaiHooksShape {
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
+  useDailyCumulativeTradingRewards: () => Loadable<AggregatedTradingReward[]>;
   useHistoricalTradingRewards: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
-  useHistoricalTradingRewardsFilled: () => Loadable<AggregatedTradingReward[]>;
-  useTotalTradingRewards: () => Loadable<BigNumber>;
+  useHistoricalTradingRewardsWeekly: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
   useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
+  useTotalTradingRewards: () => Loadable<BigNumber>;
   useStakingRewards: () => Loadable<StakingRewards>;
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
   useStakingDelegations: () => Loadable<StakingDelegationsResult>;
@@ -360,8 +362,9 @@ interface BonsaiHooksShape {
 export const BonsaiHooks: BonsaiHooksShape = {
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
+  useDailyCumulativeTradingRewards,
   useHistoricalTradingRewards,
-  useHistoricalTradingRewardsFilled,
+  useHistoricalTradingRewardsWeekly,
   useParentSubaccountHistoricalPnls,
   useStakingRewards,
   useTotalTradingRewards,
