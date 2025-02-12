@@ -18,8 +18,7 @@ import { isPresent } from '@/lib/typeUtils';
 import { calculateDailyCumulativeTradingRewards } from '../calculators/historicalTradingRewards';
 import { useIndexerClient } from './lib/useIndexer';
 
-const MAX_REQUESTS = 15;
-const MAX_TIME_DAYS = 91;
+const MAX_REQUESTS = 10;
 
 export function useHistoricalTradingRewards() {
   const address = useAppSelector(getUserWalletAddress);
@@ -56,14 +55,6 @@ export function useHistoricalTradingRewards() {
         }
 
         allResults.push(...resultArr);
-
-        if (
-          allResults.length > 0 &&
-          new Date(allResults.at(-1)!.startedAt).getTime() <
-            new Date().getTime() - timeUnits.day * MAX_TIME_DAYS
-        ) {
-          break;
-        }
       }
 
       return allResults;
