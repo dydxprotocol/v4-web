@@ -21,7 +21,6 @@ import { WarningIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { DiffArrow } from '@/components/DiffArrow';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -364,28 +363,7 @@ export const DepositForm = ({
             />
           </div>
         )}
-        {true ? (
-          receipt
-        ) : (
-          <div tw="flex justify-between text-small">
-            <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}</div>
-            <div
-              tw="flex items-center gap-0.375"
-              style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}
-            >
-              <Output tw="inline text-color-text-0" type={OutputType.Fiat} value={freeCollateral} />
-              {depositRoute && <DiffArrow tw="text-green" />}
-              {depositRoute && (
-                <Output
-                  slotLeft="~"
-                  tw="inline"
-                  type={OutputType.Fiat}
-                  value={updatedFreeCollateral}
-                />
-              )}
-            </div>
-          </div>
-        )}
+        {receipt}
       </div>
       {!depositSteps?.length && !awaitingWalletAction && (
         <OtherDepositOptions
