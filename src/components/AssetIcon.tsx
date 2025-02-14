@@ -35,7 +35,7 @@ export const AssetIcon = ({
   }
 
   return logoUrl ? (
-    <Container className={className}>
+    <$Container className={className}>
       <$AssetIcon
         src={logoUrl}
         alt={symbol ?? 'logo'}
@@ -49,9 +49,9 @@ export const AssetIcon = ({
           }
         }}
       />
-    </Container>
+    </$Container>
   ) : isAssetSymbol(symbol) ? (
-    <Container className={className}>
+    <$Container className={className}>
       <$AssetIcon src={ASSET_ICON_MAP[symbol]} alt={symbol} />
       {chainId && (
         <img
@@ -60,13 +60,13 @@ export const AssetIcon = ({
           alt={CHAIN_INFO[chainId]?.name}
         />
       )}
-    </Container>
+    </$Container>
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
 };
 
-const Container = styled.div`
+const $Container = styled.div`
   height: var(--asset-icon-size, 1em);
   min-height: var(--asset-icon-size, 1em);
   width: var(--asset-icon-size, 1em);
