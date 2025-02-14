@@ -22,13 +22,11 @@ export const AssetIcon = ({
   symbol,
   className,
   chainId,
-  style,
 }: {
   logoUrl?: Nullable<string>;
   symbol?: Nullable<string>;
   className?: string;
   chainId?: string;
-  style?: React.CSSProperties;
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -37,7 +35,7 @@ export const AssetIcon = ({
   }
 
   return logoUrl ? (
-    <Container className={className} style={style}>
+    <Container className={className}>
       <$AssetIcon
         src={logoUrl}
         alt={symbol ?? 'logo'}
