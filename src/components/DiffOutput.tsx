@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -17,7 +19,13 @@ type StyleProps = {
   layout?: 'row' | 'column';
 };
 
-export type DiffOutputProps = DiffArrowProps & OutputProps & ElementProps & StyleProps;
+export type DiffOutputProps = DiffArrowProps &
+  OutputProps &
+  ElementProps &
+  StyleProps & {
+    newValueSlotLeft?: ReactNode;
+    newValueSlotRight?: ReactNode;
+  };
 
 export const DiffOutput = ({
   className,
@@ -30,6 +38,9 @@ export const DiffOutput = ({
   value,
   newValue,
 
+  newValueSlotLeft,
+  newValueSlotRight,
+
   ...outputProps
 }: DiffOutputProps) => (
   <$DiffOutput className={className} layout={layout} withDiff={withDiff}>
@@ -37,7 +48,12 @@ export const DiffOutput = ({
     {withDiff && (
       <$DiffValue hasInvalidNewValue={hasInvalidNewValue}>
         <DiffArrow direction={direction} sign={sign} />
-        <Output value={newValue} {...outputProps} />
+        <Output
+          value={newValue}
+          {...outputProps}
+          slotLeft={newValueSlotLeft}
+          slotRight={newValueSlotRight}
+        />
       </$DiffValue>
     )}
   </$DiffOutput>
