@@ -63,7 +63,7 @@ export const PositionTile = ({
     >
       <div>
         {showNarrowVariation && (
-          <AssetIcon logoUrl={assetImgUrl} symbol={symbol} tw="text-[2.25rem]" />
+          <AssetIcon logoUrl={assetImgUrl} symbol={symbol} tw="[--asset-icon-size:2.25rem]" />
         )}
         <div tw="inlineRow">
           <PositionSideTag positionSide={currentPositionSide} size={TagSize.Medium} />

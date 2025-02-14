@@ -37,7 +37,7 @@ export const ChainSelect = ({
               key={chainId}
             >
               <div tw="flex items-center gap-0.75">
-                <AssetIcon tw="h-[2rem] w-[2rem]" logoUrl={CHAIN_INFO[chainId]?.icon} />
+                <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={CHAIN_INFO[chainId]?.icon} />
                 <div tw="flex flex-col items-start gap-0.125">
                   <div tw="text-medium font-medium">{CHAIN_INFO[chainId]?.name}</div>
                 </div>

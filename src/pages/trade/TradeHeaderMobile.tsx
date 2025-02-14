@@ -46,7 +46,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
     </div>
   ) : (
     <div tw="inlineRow gap-[1ch]">
-      <AssetIcon logoUrl={imageUrl} symbol={id} tw="text-[2.5rem]" />
+      <AssetIcon tw="[--asset-icon-size:2.5rem]" logoUrl={imageUrl} symbol={id} />
       <$Name>
         <h3>{name}</h3>
         <span>{displayableTicker}</span>

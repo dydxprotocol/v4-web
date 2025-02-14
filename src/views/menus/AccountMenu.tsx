@@ -140,7 +140,7 @@ export const AccountMenu = () => {
               <AssetIcon
                 logoUrl={chainTokenImage}
                 symbol={chainTokenLabel}
-                tw="z-[2] text-[1.75rem]"
+                tw="z-[2] [--asset-icon-size:1.75rem]"
               />
               <$Column>
                 {walletInfo && walletInfo.name !== WalletType.Keplr ? (
@@ -527,9 +527,7 @@ const $label = styled.div`
   font-size: var(--fontSize-mini);
   color: var(--color-text-0);
 
-  img {
-    font-size: 1rem;
-  }
+  --asset-icon-size: 1rem;
 `;
 
 const $Balances = styled.div`

@@ -498,9 +498,7 @@ const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
   height: 100%;
 
-  img {
-    font-size: 1.1em;
-  }
+  --asset-icon-size: 1.1em;
 `;
 const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}

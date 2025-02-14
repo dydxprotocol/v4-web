@@ -75,7 +75,7 @@ export const UnstakeFormPreviewContents = ({
           <AssetIcon
             logoUrl={chainTokenImage}
             symbol={chainTokenLabel}
-            tw="text-[length:--icon-size] [--icon-size:2.25rem]"
+            tw="[--asset-icon-size:--icon-size] [--icon-size:2.25rem]"
           />
           <Output
             value={delegationsToUnstake.reduce(
