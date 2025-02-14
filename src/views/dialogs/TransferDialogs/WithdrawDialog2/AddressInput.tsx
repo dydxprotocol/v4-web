@@ -85,7 +85,7 @@ export const AddressInput = ({
         onClick={onDestinationClicked}
       >
         <div tw="flex items-center gap-0.5">
-          <AssetIcon tw="h-[2rem] w-[2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
+          <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
           <div>{CHAIN_INFO[destinationChain]?.name}</div>
         </div>
         {sourceAccount.chain !== WalletNetworkType.Solana && (

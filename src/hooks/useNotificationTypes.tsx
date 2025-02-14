@@ -357,7 +357,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished =
             (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
-            <$AssetIcon logoUrl={usdcImage} symbol="USDC" />
+            <AssetIcon tw="[--asset-icon-size: 1.5rem]" logoUrl={usdcImage} symbol="USDC" />
           ) : (
             <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
           );
@@ -477,7 +477,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
             {
-              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
+              icon: (
+                <AssetIcon
+                  tw="[--asset-icon-size: 1.5rem]"
+                  logoUrl={chainTokenImage}
+                  symbol={chainTokenLabel}
+                />
+              ),
               title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
               body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
               toastSensitivity: 'foreground',
@@ -851,7 +857,5 @@ export const notificationTypes: NotificationTypeConfig[] = [
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;
-
-const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
 const $WarningIcon = tw(Icon)`text-color-warning`;

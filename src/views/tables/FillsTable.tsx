@@ -98,7 +98,7 @@ const getFillsTableColumnDef = ({
               <AssetIcon
                 logoUrl={marketSummary?.logo}
                 symbol={marketSummary?.assetId}
-                tw="text-[2.25rem]"
+                tw="[--asset-icon-size:2.25rem]"
               />
             }
           >

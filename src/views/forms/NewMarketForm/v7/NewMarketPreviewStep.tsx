@@ -167,7 +167,7 @@ export const NewMarketPreviewStep = ({
       <$AssetContainer>
         <$LabelText>{stringGetter({ key: STRING_KEYS.AMOUNT_TO_DEPOSIT })}</$LabelText>
         <$AssetIconContainer>
-          <AssetIcon tw="h-2 w-2" logoUrl={usdcImage} symbol="USDC" />
+          <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={usdcImage} symbol="USDC" />
           <Output useGrouping type={OutputType.Fiat} value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH} />
         </$AssetIconContainer>
       </$AssetContainer>
@@ -177,7 +177,11 @@ export const NewMarketPreviewStep = ({
       <$AssetContainer>
         <$LabelText>{stringGetter({ key: STRING_KEYS.MARKET_TO_LAUNCH })}</$LabelText>
         <$AssetIconContainer>
-          <AssetIcon tw="h-2 w-2" logoUrl={launchableAsset?.logo} symbol={baseAsset} />
+          <AssetIcon
+            tw="[--asset-icon-size:2rem]"
+            logoUrl={launchableAsset?.logo}
+            symbol={baseAsset}
+          />
           <Output useGrouping type={OutputType.Text} value={baseAsset} />
         </$AssetIconContainer>
       </$AssetContainer>

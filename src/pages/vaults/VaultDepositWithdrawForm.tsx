@@ -643,7 +643,7 @@ export const VaultDepositWithdrawForm = ({
         <$SourceLabel>{inputFormConfig.formLabel}</$SourceLabel>
         <$TargetLabel>{stringGetter({ key: STRING_KEYS.DESTINATION })}</$TargetLabel>
         <$SourceBox>
-          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="h-2 w-2" />
+          <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={usdcImage} symbol="USDC" />
           <Output value={amount} type={OutputType.Fiat} />
         </$SourceBox>
         <$Arrow>

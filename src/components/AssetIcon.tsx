@@ -22,11 +22,13 @@ export const AssetIcon = ({
   symbol,
   className,
   chainId,
+  style,
 }: {
   logoUrl?: Nullable<string>;
   symbol?: Nullable<string>;
   className?: string;
   chainId?: string;
+  style?: React.CSSProperties;
 }) => {
   const [isError, setIsError] = useState(false);
 
@@ -35,23 +37,24 @@ export const AssetIcon = ({
   }
 
   return logoUrl ? (
-    <$AssetIcon
-      src={logoUrl}
-      className={className}
-      alt={symbol ?? 'logo'}
-      tw="h-[1em] w-auto rounded-[50%]"
-      onError={({ currentTarget }) => {
-        currentTarget.onerror = null;
-        if (isAssetSymbol(symbol)) {
-          currentTarget.src = ASSET_ICON_MAP[symbol];
-        } else {
-          setIsError(true);
-        }
-      }}
-    />
+    <Container className={className} style={style}>
+      <$AssetIcon
+        src={logoUrl}
+        alt={symbol ?? 'logo'}
+        tw="h-[1em] w-auto rounded-[50%]"
+        onError={({ currentTarget }) => {
+          currentTarget.onerror = null;
+          if (isAssetSymbol(symbol)) {
+            currentTarget.src = ASSET_ICON_MAP[symbol];
+          } else {
+            setIsError(true);
+          }
+        }}
+      />
+    </Container>
   ) : isAssetSymbol(symbol) ? (
-    <div tw="relative flex items-center justify-center">
-      <$AssetIcon src={ASSET_ICON_MAP[symbol]} className={className} alt={symbol} />
+    <Container className={className}>
+      <$AssetIcon src={ASSET_ICON_MAP[symbol]} alt={symbol} />
       {chainId && (
         <img
           tw="absolute bottom-[-2px] right-[-2px] h-[50%] w-[50%] rounded-9 border border-solid border-color-layer-4"
@@ -59,20 +62,32 @@ export const AssetIcon = ({
           alt={CHAIN_INFO[chainId]?.name}
         />
       )}
-    </div>
+    </Container>
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
   );
 };
 
-const $AssetIcon = styled.img`
-  --asset-icon-size: 1em;
-  background-color: var(--color-white);
+const Container = styled.div`
+  height: var(--asset-icon-size, 1em);
+  min-height: var(--asset-icon-size, 1em);
+  width: var(--asset-icon-size, 1em);
+  min-width: var(--asset-icon-size, 1em);
+  background-color: var(--asset-icon-backgroundColor, var(--color-white));
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
-  height: var(--asset-icon-size);
-  min-height: var(--asset-icon-size);
-  width: var(--asset-icon-size);
-  min-width: var(--asset-icon-size);
+const $AssetIcon = styled.img`
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  min-width: 100%;
+  object-fit: cover;
+  transform: scale(1.05); // Scale in order to hide outline from '--asset-icon-backgroundColor'
 
   border-radius: 50%;
 `;

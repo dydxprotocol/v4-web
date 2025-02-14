@@ -14,9 +14,9 @@ export const MarketTableCell = ({ asset }: { asset?: Asset }) => {
       tw="font-bold text-color-text-2"
       slotLeft={
         <AssetIcon
+          tw="[--asset-icon-size:1.25rem] tablet:[--asset-icon-size:2.25rem]"
           logoUrl={asset?.resources?.imageUrl}
           symbol={asset?.id}
-          tw="text-[1.25rem] tablet:text-[2.25rem]"
         />
       }
     >
@@ -35,9 +35,9 @@ export const MarketSummaryTableCell = ({
       tw="font-bold text-color-text-2"
       slotLeft={
         <AssetIcon
+          tw="[--asset-icon-size:1.25rem] tablet:[--asset-icon-size:2.25rem]"
           logoUrl={marketSummary?.logo}
           symbol={marketSummary?.assetId}
-          tw="text-[1.25rem] tablet:text-[2.25rem]"
         />
       }
     >

@@ -134,9 +134,9 @@ const $Icon = styled.div`
   float: left;
 
   line-height: 1;
+  --asset-icon-size: 1.5rem;
 
-  > svg,
-  img {
+  > svg {
     width: 1.5rem;
     height: 1.5rem;
   }

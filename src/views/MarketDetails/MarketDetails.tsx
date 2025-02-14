@@ -50,7 +50,11 @@ export const MarketDetails = ({
       <header tw="column gap-1.25">
         <div tw="row flex-wrap gap-0.5">
           <$MarketTitle>
-            <AssetIcon symbol={assetIcon.symbol} logoUrl={assetIcon.logoUrl} />
+            <AssetIcon
+              tw="[--asset-icon-size: 2.25rem]"
+              symbol={assetIcon.symbol}
+              logoUrl={assetIcon.logoUrl}
+            />
             {assetName}
           </$MarketTitle>
           {isTablet && <MarketLinks tw="[place-self:start_end]" />}
@@ -129,11 +133,6 @@ const $MarketTitle = styled.h3`
   ${layoutMixins.row}
   font: var(--font-large-medium);
   gap: 0.5rem;
-
-  img {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
 `;
 const $MarketDescription = styled.div`
   ${layoutMixins.column}
