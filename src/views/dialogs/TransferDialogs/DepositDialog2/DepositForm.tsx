@@ -29,7 +29,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { Deposit } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
-import { MustNumber } from '@/lib/numbers';
+import { MustBigNumber, MustNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
@@ -110,8 +110,11 @@ export const DepositForm = ({
     : true;
 
   const isDebouncedAmountSame = debouncedAmount === amount;
-  const isDepositingMoreThanMin =
-    depositRoute?.usdAmountIn && MustNumber(depositRoute.usdAmountIn) > MIN_DEPOSIT_AMOUNT;
+  const isDepositingMoreThanMin = Boolean(
+    depositRoute?.usdAmountIn && MustNumber(depositRoute.usdAmountIn) >= MIN_DEPOSIT_AMOUNT
+  );
+
+  const hasInput = MustBigNumber(depositRoute?.usdAmountIn).gt(0);
 
   const depositDisabled =
     isFetching ||
@@ -122,18 +125,20 @@ export const DepositForm = ({
 
   const depositButtonInner = useMemo(() => {
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
-    if (!isDepositingMoreThanMin) {
-      <div tw="flex items-center gap-0.5">
-        <div tw="flex items-center text-color-error">
-          <WarningIcon />
+    if (hasInput && !isDepositingMoreThanMin) {
+      return (
+        <div tw="flex items-center gap-0.5">
+          <div tw="flex items-center text-color-error">
+            <WarningIcon />
+          </div>
+          <div>
+            {stringGetter({
+              key: STRING_KEYS.MINIMUM_DEPOSIT,
+              params: { MIN_DEPOSIT_USDC: '$10' },
+            })}
+          </div>
         </div>
-        <div>
-          {stringGetter({
-            key: STRING_KEYS.MINIMUM_DEPOSIT,
-            params: { MIN_DEPOSIT_USDC: '$10' },
-          })}
-        </div>
-      </div>;
+      );
     }
     if (error)
       return (
@@ -154,7 +159,15 @@ export const DepositForm = ({
     if (!signer) return <div>{stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}</div>;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [error, hasSufficientBalance, stringGetter, token.denom, signer]);
+  }, [
+    error,
+    hasInput,
+    hasSufficientBalance,
+    stringGetter,
+    token.denom,
+    signer,
+    isDepositingMoreThanMin,
+  ]);
 
   const { data: steps } = useDepositSteps({
     sourceAccount,
@@ -345,7 +358,6 @@ export const DepositForm = ({
                 isLoading:
                   isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
               }}
-              disabled={depositDisabled}
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
             >
