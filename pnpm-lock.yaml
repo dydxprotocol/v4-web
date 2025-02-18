@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.13.39
     version: 1.13.39
   '@dydxprotocol/v4-client-js':
-    specifier: 1.17.0
-    version: 1.17.0
+    specifier: 1.19.0
+    version: 1.19.0
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.262
     version: 1.1.262
@@ -54,8 +54,8 @@ dependencies:
     specifier: ^5.5.3
     version: 5.5.3
   '@keplr-wallet/types':
-    specifier: ^0.12.184
-    version: 0.12.184(starknet@6.11.0)
+    specifier: ^0.12.188
+    version: 0.12.188(starknet@6.11.0)
   '@privy-io/react-auth':
     specifier: ^1.73.0
     version: 1.73.1(@babel/core@7.23.9)(@types/react@18.3.3)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)(typescript@5.7.2)
@@ -1951,8 +1951,8 @@ packages:
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.17.0:
-    resolution: {integrity: sha512-tJ5U1c3Wni/pZvD4J1ndx67BDHijCEFeqMW/fOpDYyhmltgUgdBv4JohcPSvZ9jbWQt26TOvsQHyYlwSlPZBqg==}
+  /@dydxprotocol/v4-client-js@1.19.0:
+    resolution: {integrity: sha512-BmSv3EE1qtGWVWA8B+RJfVLVKhYRoUWp24pZXbPXCnLp3SWnIWdL/B0V0ZycN8M+UAvxFY0Lk8SVUAq2kj1BKQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -3763,8 +3763,8 @@ packages:
       starknet: 6.11.0
     dev: false
 
-  /@keplr-wallet/types@0.12.184(starknet@6.11.0):
-    resolution: {integrity: sha512-Gkh63flUwePbOJZv7h2qktg/UFSzq+l77yRjhXoDjedvzqK6s98NB/fym/VEyE+IG+l+PW50sLCGG4B2QY3Img==}
+  /@keplr-wallet/types@0.12.188(starknet@6.11.0):
+    resolution: {integrity: sha512-ZRppVqDrnGi5Np7EQiR7TzCs7206W3XjeaQBdj+h/0MMce+Wqa3QAQoUGl1h43JnULcVml3RqPHRmSzGJwg4Cg==}
     peerDependencies:
       starknet: ^6
     dependencies:
@@ -15163,7 +15163,7 @@ packages:
       '@cosmsnap/snapper': 0.1.31
       '@dao-dao/cosmiframe': 0.1.0(@cosmjs/amino@0.32.4)(@cosmjs/proto-signing@0.32.4)
       '@keplr-wallet/cosmos': 0.12.121
-      '@keplr-wallet/types': 0.12.184(starknet@6.11.0)
+      '@keplr-wallet/types': 0.12.188(starknet@6.11.0)
       '@leapwallet/cosmos-social-login-capsule-provider': 0.0.39(@cosmjs/encoding@0.32.4)(@cosmjs/proto-signing@0.32.4)(fp-ts@2.16.8)
       '@metamask/providers': 12.0.0
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
