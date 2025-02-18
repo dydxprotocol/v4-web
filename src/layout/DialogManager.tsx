@@ -47,7 +47,6 @@ import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
 import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2/WithdrawDialog2';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
-import { UnlimitedAnnouncementDialog } from '@/views/dialogs/UnlimitedAnnouncementDialog/UnlimitedAnnouncementDialog';
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
@@ -116,7 +115,6 @@ export const DialogManager = React.memo(() => {
     Trade: (args) => <TradeDialog {...args} {...modalProps} />,
     Triggers: (args) => <TriggersDialog {...args} {...modalProps} />,
     Transfer: (args) => <TransferDialog {...args} {...modalProps} />,
-    UnlimitedAnnouncement: (args) => <UnlimitedAnnouncementDialog {...args} {...modalProps} />,
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
