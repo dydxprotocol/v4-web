@@ -22,6 +22,7 @@ import {
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
+import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
@@ -186,10 +187,10 @@ export const selectAccountFillsLoading = createAppSelector(
 );
 
 export const selectAccountTransfers = createAppSelector(
-  [selectRawTransfersRestData, selectRawTransfersLiveData],
-  (rest, live): SubaccountTransfer[] => {
+  [selectRawTransfersRestData, selectRawTransfersLiveData, selectParentSubaccountInfo],
+  (rest, live, { wallet }): SubaccountTransfer[] => {
     return orderBy(
-      Object.values(calculateTransfers(rest?.transfers, live)).map((o) => ({
+      Object.values(calculateTransfers(rest?.transfers, live, wallet)).map((o) => ({
         ...o,
         id: o.transactionHash,
       })),
