@@ -8,7 +8,7 @@ import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 export function calculateDailyCumulativeTradingRewards(
   tradingRewards?: IndexerHistoricalTradingRewardAggregation[]
 ) {
-  if (tradingRewards == null) {
+  if (tradingRewards == null || tradingRewards.length === 0) {
     return EMPTY_ARR;
   }
 
@@ -22,7 +22,7 @@ export function calculateDailyCumulativeTradingRewards(
   // Calculate cumulative amount
   let cumulativeAmountBN = BIG_NUMBERS.ZERO;
 
-  return sortedRewards.map(({ startedAt, tradingReward }) => {
+  const sortedCumulative = sortedRewards.map(({ startedAt, tradingReward }) => {
     const tradingRewardBN = MustBigNumber(tradingReward);
     cumulativeAmountBN = cumulativeAmountBN.plus(tradingRewardBN);
 
@@ -32,4 +32,15 @@ export function calculateDailyCumulativeTradingRewards(
       cumulativeAmount: cumulativeAmountBN.toNumber(),
     };
   });
+  if (sortedCumulative.length === 0) {
+    return sortedCumulative;
+  }
+  const finalPoint = sortedCumulative.at(-1)!;
+  const firstPoint = sortedCumulative.at(0)!;
+  // add a start point and end point
+  return [
+    { cumulativeAmount: 0, amount: 0, date: firstPoint.date - 1000 },
+    ...sortedCumulative,
+    { cumulativeAmount: finalPoint.cumulativeAmount, amount: 0, date: new Date().getTime() },
+  ];
 }
