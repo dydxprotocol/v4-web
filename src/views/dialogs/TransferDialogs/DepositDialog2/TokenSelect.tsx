@@ -89,7 +89,7 @@ export const TokenSelect = ({
             >
               <div tw="flex items-center gap-0.75">
                 <AssetIcon
-                  tw="h-[2rem] w-[2rem]"
+                  tw="[--asset-icon-size:2rem]"
                   symbol={getTokenSymbol(balance.denom)}
                   chainId={balance.chainId}
                 />
@@ -143,7 +143,7 @@ export const TokenSelect = ({
             >
               <div tw="flex items-center gap-0.75">
                 <AssetIcon
-                  tw="h-[2rem] w-[2rem]"
+                  tw="[--asset-icon-size:2rem]"
                   symbol={getTokenSymbol(balance.denom)}
                   chainId={balance.chainId}
                 />

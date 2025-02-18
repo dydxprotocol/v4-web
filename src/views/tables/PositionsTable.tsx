@@ -110,7 +110,7 @@ const getPositionsTableColumnDef = ({
               <AssetIcon
                 logoUrl={marketSummary?.logo}
                 symbol={marketSummary?.assetId}
-                tw="inlineRow min-w-[unset] text-[2.25rem]"
+                tw="inlineRow min-w-[unset] [--asset-icon-size:2.25rem]"
               />
             }
           >

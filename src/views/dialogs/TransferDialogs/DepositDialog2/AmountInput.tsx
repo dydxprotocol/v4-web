@@ -124,7 +124,7 @@ export const AmountInput = ({
       >
         <div tw="flex items-center gap-0.5">
           <AssetIcon
-            tw="h-[2rem] w-[2rem]"
+            tw="[--asset-icon-size:2rem]"
             symbol={getTokenSymbol(token.denom)}
             chainId={token.chainId}
           />

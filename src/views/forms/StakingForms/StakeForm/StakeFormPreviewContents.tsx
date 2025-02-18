@@ -45,7 +45,7 @@ export const StakeFormPreviewContents = ({
           <AssetIcon
             logoUrl={chainTokenImage}
             symbol={chainTokenLabel}
-            tw="text-[length:--icon-size] [--icon-size:2.25rem]"
+            tw="[--asset-icon-size:--icon-size] [--icon-size:2.25rem]"
           />
           <Output value={stakedAmount} type={OutputType.Asset} tag={chainTokenLabel} />
         </>

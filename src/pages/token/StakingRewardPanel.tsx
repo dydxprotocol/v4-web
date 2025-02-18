@@ -115,10 +115,7 @@ const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
 
   height: 100%;
-
-  img {
-    font-size: 1.3rem;
-  }
+  --asset-icon-size: 1.3rem;
 `;
 
 const $PositiveOutput = styled(Output)`

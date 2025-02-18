@@ -186,10 +186,7 @@ const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
   color: var(--color-text-2);
-
-  img {
-    font-size: 1.5rem;
-  }
+  --asset-icon-size: 1.5rem;
 `;
 const $TotalBalance = styled(Details)`
   div {

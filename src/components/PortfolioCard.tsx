@@ -29,7 +29,7 @@ export const PortfolioCard = ({
   return (
     <$PortfolioCard>
       <$MarketRow>
-        {assetIcon ?? <AssetIcon logoUrl={assetImgUrl} />}
+        {assetIcon ?? <AssetIcon tw="[--asset-icon-size:1.25rem]" logoUrl={assetImgUrl} />}
         {assetName}
       </$MarketRow>
       <div tw="spacedRow mt-0.5 px-0.625 py-0">
@@ -57,8 +57,4 @@ const $MarketRow = styled.div`
   gap: 0.5rem;
   padding: 0 0.625rem;
   font: var(--font-small-book);
-
-  img {
-    font-size: 1.25rem; // 20px x 20px
-  }
 `;
