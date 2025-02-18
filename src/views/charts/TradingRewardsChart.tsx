@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveStepAfter } from '@visx/curve';
@@ -122,12 +122,9 @@ export const TradingRewardsChart = ({
   // e.g. oldest date is 31 days old -> show 30d option, but not 90d
   const getPeriodOptions = useCallback(
     (oldestMs: number): TradingRewardsPeriod[] =>
-      tradingRewardsPeriods.reduce((acc: TradingRewardsPeriod[], period) => {
-        if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
-          acc.push(period);
-        }
-        return acc;
-      }, []),
+      tradingRewardsPeriods.filter((period) => {
+        return oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false);
+      }),
     [msForPeriod, newestDataPointDate, now]
   );
 
@@ -160,13 +157,19 @@ export const TradingRewardsChart = ({
     [periodOptions, msForPeriod]
   );
 
+  const hasSetDomainWithData = useRef(false);
   useEffect(() => {
+    if (rewardsData.length > 0 && !hasSetDomainWithData.current) {
+      hasSetDomainWithData.current = true;
+      setDefaultZoomDomain(msForPeriod(selectedPeriod));
+      return;
+    }
     if (isZooming) {
       setDefaultZoomDomain(undefined);
     } else {
       setDefaultZoomDomain(msForPeriod(selectedPeriod));
     }
-  }, [isZooming, msForPeriod, selectedPeriod]);
+  }, [isZooming, msForPeriod, selectedPeriod, rewardsData]);
 
   const onToggleInteract = () => setIsZooming(false);
 
