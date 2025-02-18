@@ -155,7 +155,7 @@ const useDydxClientContext = () => {
   }, [compositeClient, setSelectedGasDenom]);
 
   // ------ Wallet Methods ------ //
-  const getWalletFromSignature = async ({ signature }: { signature: string }) => {
+  const getWalletFromSignature = useCallback(async ({ signature }: { signature: string }) => {
     const { mnemonic, privateKey, publicKey } =
       // This method should be renamed to deriveHDKeyFromSignature as it is used for both solana and ethereum signatures
       onboarding.deriveHDKeyFromEthereumSignature(signature);
@@ -166,7 +166,7 @@ const useDydxClientContext = () => {
       privateKey,
       publicKey,
     };
-  };
+  }, []);
 
   // ------ Public Methods ------ //
   const requestAllPerpetualMarkets = async () => {

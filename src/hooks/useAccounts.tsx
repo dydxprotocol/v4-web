@@ -1,14 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { OfflineAminoSigner } from '@cosmjs/amino';
-import { DirectSignResponse, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
-import { OfflineDirectSigner as KeplrOfflineDirectSigner } from '@keplr-wallet/types';
 import { usePrivy } from '@privy-io/react-auth';
-import { SignDoc } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { AES, enc } from 'crypto-js';
-import Long from 'long';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import {
@@ -172,6 +167,8 @@ const useAccountsContext = () => {
 
   const signMessageAsync = useSignForWalletDerivation(sourceAccount.walletInfo);
 
+  const hasLocalDydxWallet = Boolean(localDydxWallet);
+
   useEffect(() => {
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
@@ -185,16 +182,14 @@ const useAccountsContext = () => {
         try {
           const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
           if (dydxOfflineSigner) {
-            setLocalDydxWallet(
-              await LocalWallet.fromOfflineSigner(castDirectSigner(dydxOfflineSigner))
-            );
+            setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
             dispatch(setOnboardingState(OnboardingState.AccountConnected));
           }
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
         }
       } else if (sourceAccount.chain === WalletNetworkType.Evm) {
-        if (!localDydxWallet) {
+        if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (
@@ -228,7 +223,7 @@ const useAccountsContext = () => {
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else if (sourceAccount.chain === WalletNetworkType.Solana) {
-        if (!localDydxWallet) {
+        if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
@@ -249,7 +244,22 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, localDydxWallet, blockedGeo]);
+  }, [
+    authenticated,
+    ready,
+    signerWagmi,
+    signerWagmi,
+    hasLocalDydxWallet,
+    isConnectedGraz,
+    blockedGeo,
+    selectedDydxChainId,
+    sourceAccount,
+    dispatch,
+    signMessageAsync,
+    setWalletFromSignature,
+    geo,
+    getCosmosOfflineSigner,
+  ]);
 
   // abacus
   useEffect(() => {
@@ -269,28 +279,32 @@ const useAccountsContext = () => {
         neutronWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
       }
 
-      const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
-      if (nobleOfflineSigner !== undefined) {
-        nobleWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(nobleOfflineSigner));
-      }
-      const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
-      if (osmosisOfflineSigner !== undefined) {
-        osmosisWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(osmosisOfflineSigner));
-      }
-      const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
-      if (neutronOfflineSigner !== undefined) {
-        neutronWallet = await LocalWallet.fromOfflineSigner(castDirectSigner(neutronOfflineSigner));
-      }
+      try {
+        const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
+        if (nobleOfflineSigner !== undefined) {
+          nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+        }
+        const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
+        if (osmosisOfflineSigner !== undefined) {
+          osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
+        }
+        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
+        if (neutronOfflineSigner !== undefined) {
+          neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
+        }
 
-      if (nobleWallet !== undefined) {
-        abacusStateManager.setNobleWallet(nobleWallet);
-        setLocalNobleWallet(nobleWallet);
-      }
-      if (osmosisWallet !== undefined) {
-        setLocalOsmosisWallet(osmosisWallet);
-      }
-      if (neutronWallet !== undefined) {
-        setLocalNeutronWallet(neutronWallet);
+        if (nobleWallet !== undefined) {
+          abacusStateManager.setNobleWallet(nobleWallet);
+          setLocalNobleWallet(nobleWallet);
+        }
+        if (osmosisWallet !== undefined) {
+          setLocalOsmosisWallet(osmosisWallet);
+        }
+        if (neutronWallet !== undefined) {
+          setLocalNeutronWallet(neutronWallet);
+        }
+      } catch (error) {
+        log('useAccounts/setCosmosWallets', error);
       }
     };
     setCosmosWallets();
@@ -389,23 +403,3 @@ const useAccountsContext = () => {
     dydxAccountGraz,
   };
 };
-
-// cosmjs and keplr types now disagree, even with latest versions of both for some reason
-const castDirectSigner = (
-  old: OfflineAminoSigner & KeplrOfflineDirectSigner
-): OfflineDirectSigner & OfflineAminoSigner => ({
-  ...old,
-  signDirect: async (signerAddress: string, signDoc: SignDoc): Promise<DirectSignResponse> => {
-    const res = await old.signDirect(signerAddress, {
-      ...signDoc,
-      accountNumber: Long.fromNumber(Number(signDoc.accountNumber)),
-    });
-    return {
-      ...res,
-      signed: {
-        ...res.signed,
-        accountNumber: BigInt(res.signed.accountNumber.toString()),
-      },
-    };
-  },
-});

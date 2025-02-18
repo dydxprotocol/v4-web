@@ -89,9 +89,7 @@ export const useWalletConnection = () => {
     async (chainId: string) => {
       if (isConnectedGraz) {
         const keplr = window.keplr;
-
         const offlineSigner = await keplr?.getOfflineSigner(chainId);
-
         return offlineSigner;
       }
 
