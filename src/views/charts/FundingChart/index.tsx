@@ -93,7 +93,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
         },
       ]}
       tickFormatY={(value) =>
-        `${(getAllFundingRates(value)[fundingRateView] * 100).toFixed(FUNDING_DECIMALS)}%`
+        `${(getAllFundingRates(value)[fundingRateView] * 100).toFixed(fundingRateView === FundingRateResolution.Annualized ? 0 : FUNDING_DECIMALS)}%`
       }
       renderXAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
