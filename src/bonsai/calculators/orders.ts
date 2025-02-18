@@ -47,7 +47,7 @@ function calculateSubaccountOrder(
 ): SubaccountOrder {
   let order: SubaccountOrder = {
     marketId: base.ticker,
-    status: calculateBaseOrderStatus(base),
+    status: calculateBaseOrderStatus(base, protocolHeight),
     displayId: getDisplayableTickerFromMarket(base.ticker),
     expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
     updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).valueOf()),
@@ -156,7 +156,12 @@ function maybeUpdateOrderIfExpired(
   return order;
 }
 
-function calculateBaseOrderStatus(order: IndexerCompositeOrderObject): OrderStatus | undefined {
+const ORDER_CANCELLING_ALLOWANCE_BLOCKS = 25;
+
+function calculateBaseOrderStatus(
+  order: IndexerCompositeOrderObject,
+  protocolHeight: HeightResponse
+): OrderStatus | undefined {
   const status = order.status;
   if (status == null) {
     return undefined;
@@ -188,6 +193,18 @@ function calculateBaseOrderStatus(order: IndexerCompositeOrderObject): OrderStat
   const isUserCanceled =
     order.removalReason === 'USER_CANCELED' ||
     order.removalReason === 'ORDER_REMOVAL_REASON_USER_CANCELED';
+
+  if (isBestEffortCanceled) {
+    const { goodTilBlock } = order;
+    if (goodTilBlock == null) {
+      return OrderStatus.Canceled;
+    }
+    if (
+      MustBigNumber(goodTilBlock).plus(ORDER_CANCELLING_ALLOWANCE_BLOCKS).lt(protocolHeight.height)
+    ) {
+      return OrderStatus.Canceled;
+    }
+  }
 
   if (isShortTermOrder && isBestEffortCanceled && !isUserCanceled) {
     return OrderStatus.Pending;
