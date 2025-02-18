@@ -38,9 +38,9 @@ export function createForm<
   SummaryArgs,
   Summary,
 >(config: {
-  processInput: Reducer;
-  calculateSummary: (state: NoInfer<State>, args: SummaryArgs) => Summary;
-  getErrors: (state: NoInfer<State>, summary: NoInfer<Summary>) => ValidationError[];
+  reducer: Reducer;
+  calculateSummary: (state: State, args: SummaryArgs) => Summary;
+  getErrors: (state: State, summary: NoInfer<Summary>) => ValidationError[];
 }) {
   return config;
 }
