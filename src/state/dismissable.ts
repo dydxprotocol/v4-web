@@ -5,7 +5,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface DismissableState {
   hasSeenPredictionMarketIntroDialog: boolean;
   dismissedAffiliateBanner: boolean;
-  hasSeenUnlimitedAnnouncement: boolean;
+  hasSeenUnlimitedAnnouncement: boolean; // deprecated
   hasDismissedPmlBanner: boolean;
 }
 
@@ -26,9 +26,6 @@ export const dismissableSlice = createSlice({
     setDismissedAffiliateBanner: (state, action: PayloadAction<boolean>) => {
       state.dismissedAffiliateBanner = action.payload;
     },
-    markUnlimitedAnnouncementSeen: (state) => {
-      state.hasSeenUnlimitedAnnouncement = true;
-    },
     setHasDismissedPmlBanner: (state, action: PayloadAction<boolean>) => {
       state.hasDismissedPmlBanner = action.payload;
     },
@@ -38,6 +35,5 @@ export const dismissableSlice = createSlice({
 export const {
   setHasSeenPredictionMarketIntroDialog,
   setDismissedAffiliateBanner,
-  markUnlimitedAnnouncementSeen,
   setHasDismissedPmlBanner,
 } = dismissableSlice.actions;

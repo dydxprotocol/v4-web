@@ -43,7 +43,6 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
-import { DialogTypes } from './constants/dialogs';
 import { funkitConfig, funkitTheme } from './constants/funkit';
 import { LocalStorageKey } from './constants/localStorage';
 import { SkipProvider } from './hooks/transfers/skipClient';
@@ -60,13 +59,10 @@ import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
-import { getIsAccountConnected } from './state/accountSelectors';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
-import { openDialog } from './state/dialogs';
-import { getHasSeenUnlimitedAnnouncement } from './state/dismissableSelectors';
 import breakpoints from './styles/breakpoints';
 
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -86,7 +82,6 @@ const Content = () => {
   useCommandMenu();
   useUpdateTransfers();
   useReferralCode();
-  useUnlimitedLaunchDialog();
   useUiRefreshMigrations();
 
   const { isTablet, isNotTablet } = useBreakpoints();
@@ -193,18 +188,6 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
     <Component {...props}>{children}</Component>
   );
 };
-
-function useUnlimitedLaunchDialog() {
-  const hasSeenUnlimitedAnnouncement = useAppSelector(getHasSeenUnlimitedAnnouncement);
-  const isAccountConnected = useAppSelector(getIsAccountConnected);
-
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    if (isAccountConnected && !hasSeenUnlimitedAnnouncement) {
-      dispatch(openDialog(DialogTypes.UnlimitedAnnouncement({})));
-    }
-  }, [dispatch, hasSeenUnlimitedAnnouncement, isAccountConnected]);
-}
 
 const providers = [
   wrapProvider(PrivyProvider, {

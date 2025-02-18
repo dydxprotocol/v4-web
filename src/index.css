@@ -97,6 +97,16 @@ b {
   font-weight: 700;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 /* Fixes the smart banner being unclickable. We want this to rise above all app banners */
 .smartbanner--ios,
 .smartbanner--android {
