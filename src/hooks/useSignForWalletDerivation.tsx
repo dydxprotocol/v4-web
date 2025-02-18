@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import stableStringify from 'fast-json-stable-stringify';
 import { useSignTypedData } from 'wagmi';
@@ -17,7 +17,7 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
   const ethereumChainId = useEnvConfig('ethereumChainId');
   const chainId = Number(ethereumChainId);
 
-  const signTypedData = getSignTypedData(selectedDydxChainId);
+  const signTypedData = useMemo(() => getSignTypedData(selectedDydxChainId), [selectedDydxChainId]);
 
   const { signTypedDataAsync } = useSignTypedData();
 
