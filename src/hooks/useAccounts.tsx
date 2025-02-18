@@ -244,22 +244,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [
-    authenticated,
-    ready,
-    signerWagmi,
-    signerWagmi,
-    hasLocalDydxWallet,
-    isConnectedGraz,
-    blockedGeo,
-    selectedDydxChainId,
-    sourceAccount,
-    dispatch,
-    signMessageAsync,
-    setWalletFromSignature,
-    geo,
-    getCosmosOfflineSigner,
-  ]);
+  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
   // abacus
   useEffect(() => {
