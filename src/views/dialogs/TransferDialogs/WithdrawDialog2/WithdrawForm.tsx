@@ -86,6 +86,7 @@ export const WithdrawForm = ({
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
 
   const { executeWithdraw, isLoading } = useWithdrawStep({
+    destinationAddress,
     withdrawRoute: selectedRoute,
     onWithdraw,
     onWithdrawSigned,

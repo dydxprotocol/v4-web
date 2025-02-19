@@ -28,10 +28,12 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
 
 export function useWithdrawStep({
+  destinationAddress,
   withdrawRoute,
   onWithdraw,
   onWithdrawSigned,
 }: {
+  destinationAddress: string;
   withdrawRoute?: RouteResponse;
   onWithdraw: (withdraw: Withdraw) => void;
   onWithdrawSigned: () => void;
@@ -64,9 +66,18 @@ export function useWithdrawStep({
       nobleAddress,
       dydxAddress,
       osmosisAddress,
-      neutronAddress
+      neutronAddress,
+      destinationAddress
     );
-  }, [dydxAddress, neutronAddress, nobleAddress, osmosisAddress, sourceAccount, withdrawRoute]);
+  }, [
+    dydxAddress,
+    neutronAddress,
+    nobleAddress,
+    osmosisAddress,
+    sourceAccount,
+    withdrawRoute,
+    destinationAddress,
+  ]);
 
   const getCosmosSigner = useCallback(
     async (chainID: string) => {
