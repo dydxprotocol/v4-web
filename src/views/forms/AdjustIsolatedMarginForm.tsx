@@ -6,6 +6,8 @@ import {
   AdjustIsolatedMarginType,
 } from '@/bonsai/forms/adjustIsolatedMargin';
 import { ErrorType, useFormValues } from '@/bonsai/lib/forms';
+import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
+import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
@@ -42,7 +44,7 @@ import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
+import { useDisappearingValue } from '@/lib/disappearingValue';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -93,31 +95,29 @@ export const AdjustIsolatedMarginForm = ({
     );
   };
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessageRaw, setErrorMessageRaw] = useDisappearingValue<string>(undefined);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const { adjustIsolatedMarginOfPosition } = useSubaccount();
-  const onSubmit = () => {
-    setErrorMessage(null);
+  const { transferBetweenSubaccounts } = useSubaccount();
+  const onSubmit = async () => {
+    setErrorMessageRaw(undefined);
     setIsSubmitting(true);
 
-    // TODO
-    adjustIsolatedMarginOfPosition({
-      onError: (errorParams) => {
-        setIsSubmitting(false);
-        setErrorMessage(
-          stringGetter({
-            key: errorParams.errorStringKey,
-            fallback: errorParams.errorMessage ?? '',
-          })
-        );
-      },
-      onSuccess: () => {
-        setIsSubmitting(false);
-        abacusStateManager.clearAdjustIsolatedMarginInputValues();
+    try {
+      if (summary.payload == null) {
+        logBonsaiError('AdjustIsolatedMarginForm', 'attempted to submit with empty payload');
+        throw new Error('No payload found');
+      }
+      const result = await transferBetweenSubaccounts(summary.payload);
+      if (isOperationSuccess(result)) {
+        actions.initializeForm(childSubaccountNumber);
         onIsolatedMarginAdjustment?.();
-      },
-    });
+      } else if (isOperationFailure(result)) {
+        setErrorMessageRaw(result.errorString);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderDiffOutput = ({
@@ -297,6 +297,14 @@ export const AdjustIsolatedMarginForm = ({
 
     return 'neutral';
   }, [state.type, summary.inputs.amount]);
+
+  const errorMessage = useMemo(() => {
+    if (errorMessageRaw != null) {
+      // TODO parse out error message somewhere
+      return stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR });
+    }
+    return undefined;
+  }, [errorMessageRaw, stringGetter]);
 
   const CenterElement =
     !!alertMessage || !!errorMessage ? (

@@ -100,10 +100,19 @@ interface InputSummary {
   maxAmount?: string;
 }
 
+export interface SubaccountTransferPayload {
+  senderAddress: string;
+  subaccountNumber: number;
+  amount: string;
+  destinationAddress: string;
+  destinationSubaccountNumber: number;
+}
+
 interface SummaryData {
   accountBefore: AccountDetails;
   accountAfter: AccountDetails;
   inputs: InputSummary;
+  payload: SubaccountTransferPayload | undefined;
 }
 
 // leave this much free collateral so the transaction doesn't fail collaterliazation checks due to price movements
@@ -196,22 +205,44 @@ function calculateSummary(
     return undefined;
   });
 
-  const accountAfter = calc(() => {
-    const operationDetails = calc(() => {
-      if (state.childSubaccountNumber == null) {
-        return undefined;
-      }
-      if (state.type === AdjustIsolatedMarginType.ADD) {
-        return { source: 0, target: state.childSubaccountNumber };
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (state.type === AdjustIsolatedMarginType.REMOVE) {
-        return { source: state.childSubaccountNumber, target: 0 };
-      }
-      assertNever(state.type);
+  const operationDetails = calc(() => {
+    if (state.childSubaccountNumber == null) {
       return undefined;
-    });
+    }
+    if (accountData.rawParentSubaccountData?.parentSubaccount == null) {
+      return undefined;
+    }
+    if (state.type === AdjustIsolatedMarginType.ADD) {
+      return { source: 0, target: state.childSubaccountNumber };
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (state.type === AdjustIsolatedMarginType.REMOVE) {
+      return { source: state.childSubaccountNumber, target: 0 };
+    }
+    assertNever(state.type);
+    return undefined;
+  });
 
+  const payload = calc(() => {
+    const accountAddress = accountData.rawParentSubaccountData?.address;
+    if (
+      accountAddress == null ||
+      operationDetails == null ||
+      inputs?.amount == null ||
+      MustBigNumber(inputs.amount).lte(0)
+    ) {
+      return undefined;
+    }
+    return {
+      senderAddress: accountAddress,
+      subaccountNumber: operationDetails.source,
+      amount: inputs.amount,
+      destinationAddress: accountAddress,
+      destinationSubaccountNumber: operationDetails.target,
+    };
+  });
+
+  const accountAfter = calc(() => {
     if (operationDetails == null) {
       return undefined;
     }
@@ -242,6 +273,7 @@ function calculateSummary(
     accountAfter: accountAfter ?? {},
     accountBefore: accountBefore ?? {},
     inputs: inputs ?? {},
+    payload,
   };
 }
 
@@ -325,6 +357,13 @@ class AdjustIsolatedMarginFormValidationErrors {
     });
   }
 
+  noPayload(): ValidationError {
+    return this.createError({
+      code: 'MISSING_PAYLOAD',
+      type: ErrorType.error,
+    });
+  }
+
   noBeforeData(): ValidationError {
     return this.createError({
       code: 'COULDNT_COMPUTE_PRE_OPERATION',
@@ -402,6 +441,10 @@ function getErrors(
 
   if (beforeDetails.crossFreeCollateral == null || beforeDetails.positionMargin == null) {
     validationErrors.push(errors.noBeforeData());
+  }
+
+  if (summary.payload == null) {
+    validationErrors.push(errors.noPayload());
   }
 
   return validationErrors;
