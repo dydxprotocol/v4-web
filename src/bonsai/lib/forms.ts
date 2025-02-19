@@ -43,6 +43,7 @@ export type BasicForm<State, Reducer extends VanillaReducer<State, any>, Summary
   getErrors: (state: State, inputs: SummaryArgs, summary: NoInfer<Summary>) => ValidationError[];
 };
 
+// no-op for typing reasons
 export function createForm<
   State,
   Reducer extends VanillaReducer<State, any>,
@@ -64,6 +65,7 @@ export type VanillaReducer<
   actions: Actions;
 };
 
+// no-op for typing reasons
 export function createVanillaReducer<
   State,
   Actions extends { [key: string]: (state: NoInfer<State>, arg: any) => NoInfer<State> },

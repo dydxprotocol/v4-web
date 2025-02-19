@@ -79,8 +79,8 @@ export const AdjustIsolatedMarginForm = ({
     actions.initializeForm(childSubaccountNumber);
   }, [actions, childSubaccountNumber]);
 
-  const setAmount = ({ value }: { value?: string }) => {
-    actions.setAmount(value ?? '');
+  const setAmount = ({ formattedValue }: { formattedValue?: string }) => {
+    actions.setAmount(formattedValue ?? '');
   };
 
   const setPercent = (value: string) => {
@@ -339,7 +339,6 @@ export const AdjustIsolatedMarginForm = ({
       </GradientCard>
     );
 
-  console.log(errors);
   return (
     <$Form
       onSubmit={(e: FormEvent) => {
@@ -426,6 +425,7 @@ function useForm() {
   const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
   const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
+
   const inputs = useMemo(
     () => ({
       rawParentSubaccountData,
@@ -434,5 +434,6 @@ function useForm() {
     }),
     [canViewAccount, rawParentSubaccountData, rawRelevantMarkets]
   );
+
   return useFormValues(AdjustIsolatedMarginFormFns, inputs);
 }
