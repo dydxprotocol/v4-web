@@ -8,7 +8,6 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import { UsdcDepositArgs, UsdcWithdrawArgs } from './calculators/accountActions';
 import { HistoricalFundingObject } from './calculators/funding';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
@@ -43,6 +42,7 @@ import {
   selectParentSubaccountOpenPositionsLoading,
   selectParentSubaccountSummary,
   selectParentSubaccountSummaryLoading,
+  selectRelevantMarketsData,
   selectUnopenedIsolatedPositions,
 } from './selectors/account';
 import {
@@ -63,6 +63,8 @@ import {
 import { selectAccountBalances } from './selectors/balances';
 import {
   selectRawIndexerHeightDataLoading,
+  selectRawMarketsData,
+  selectRawParentSubaccountData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
@@ -85,7 +87,9 @@ import {
   StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
+import { DepositUsdcProps, WithdrawUsdcProps } from './types/operationTypes';
 import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
+import { MarketsData, ParentSubaccountDataBase } from './types/rawTypes';
 import {
   AccountBalances,
   AggregatedTradingReward,
@@ -247,6 +251,21 @@ export const BonsaiCore: BonsaiCoreShape = {
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
 };
 
+interface BonsaiRawShape {
+  parentSubaccountBase: BasicSelector<ParentSubaccountDataBase | undefined>;
+  // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
+  // e.g. any place order
+  parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  // DANGER: updates a lot
+  allMarkets: BasicSelector<MarketsData | undefined>;
+}
+
+export const BonsaiRaw: BonsaiRawShape = {
+  parentSubaccountBase: selectRawParentSubaccountData,
+  parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  allMarkets: selectRawMarketsData,
+};
+
 interface BonsaiHelpersShape {
   currentMarket: {
     marketInfo: BasicSelector<PerpetualMarketSummary | undefined>;
@@ -293,13 +312,13 @@ interface BonsaiHelpersShape {
     deposit: {
       createSelectParentSubaccountSummary: ParameterizedSelector<
         GroupedSubaccountSummary | undefined,
-        [UsdcDepositArgs]
+        [DepositUsdcProps]
       >;
     };
     withdraw: {
       createSelectParentSubaccountSummary: ParameterizedSelector<
         GroupedSubaccountSummary | undefined,
-        [UsdcWithdrawArgs]
+        [WithdrawUsdcProps]
       >;
     };
   };

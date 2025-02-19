@@ -171,7 +171,7 @@ export function useDepositDeltas({ depositAmount }: { depositAmount?: string }) 
   const depositInput = useMemo(
     () => ({
       subaccountNumber: 0,
-      depositAmount,
+      amount: depositAmount ?? '',
     }),
     [depositAmount]
   );

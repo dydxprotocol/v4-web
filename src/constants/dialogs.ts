@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
 
-import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
+import { PositionUniqueId, SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { BigNumberish } from '@/lib/numbers';
 
-import { Nullable, SubaccountPosition } from './abacus';
+import { Nullable } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 
@@ -16,7 +16,7 @@ export type DialogProps<T> = T & SharedDialogProps;
 
 export type AcknowledgeTermsDialogProps = {};
 export type AdjustIsolatedMarginDialogProps = {
-  positionId: SubaccountPosition['id'];
+  positionId: SubaccountPosition['uniqueId'];
 };
 export type AdjustTargetLeverageDialogProps = {};
 export type ClosePositionDialogProps = {};

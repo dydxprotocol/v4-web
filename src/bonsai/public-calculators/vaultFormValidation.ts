@@ -5,6 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { ErrorType, ValidationError } from '../lib/forms';
 import { VaultAccount } from './vaultAccount';
 
 export interface VaultFormData {
@@ -24,41 +25,6 @@ export interface VaultFormAccountData {
   marginUsage?: number;
   freeCollateral?: number;
   canViewAccount?: boolean;
-}
-
-export interface ValidationError {
-  code: string;
-  type: ErrorType;
-  fields?: string[];
-  action?: string | null;
-  link?: string | null;
-  linkText?: string | null;
-  resources: ErrorResources;
-}
-
-export interface ErrorResources {
-  title?: ErrorString;
-  text?: ErrorString;
-  action?: string | null;
-}
-
-export interface ErrorString {
-  stringKey: string;
-}
-
-export interface ErrorParam {
-  key: string;
-  value?: string;
-  format?: ErrorFormat | null;
-}
-
-export enum ErrorFormat {
-  Percent = 'Percent',
-}
-
-export enum ErrorType {
-  error = 'error',
-  warning = 'warning',
 }
 
 export interface VaultDepositWithdrawSubmissionData {

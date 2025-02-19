@@ -56,6 +56,7 @@
           "@/bonsai/*/*",
           "!@/bonsai/ontology",
           "!@/bonsai/public-calculators/*",
+          "!@/bonsai/forms/*",
           "!@/bonsai/lib/*",
           "!@/bonsai/types/summaryTypes",
           "!@/bonsai/types/orderbookTypes"
