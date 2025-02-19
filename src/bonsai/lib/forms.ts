@@ -40,7 +40,7 @@ export function createForm<
 >(config: {
   reducer: Reducer;
   calculateSummary: (state: State, args: SummaryArgs) => Summary;
-  getErrors: (state: State, summary: NoInfer<Summary>) => ValidationError[];
+  getErrors: (state: State, inputs: SummaryArgs, summary: NoInfer<Summary>) => ValidationError[];
 }) {
   return config;
 }

@@ -1,14 +1,11 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  AdjustIsolatedMarginInputField,
-  IsolatedMarginAdjustmentType,
-  type SubaccountPosition,
-} from '@/constants/abacus';
+import { AdjustIsolatedMarginInputField, IsolatedMarginAdjustmentType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import {
   ButtonAction,
@@ -48,7 +45,7 @@ import { objectEntries } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
-  marketId: SubaccountPosition['id'];
+  positionId: SubaccountPosition['uniqueId'];
   onIsolatedMarginAdjustment?(): void;
 };
 
@@ -61,12 +58,16 @@ const SIZE_PERCENT_OPTIONS = {
 };
 
 export const AdjustIsolatedMarginForm = ({
-  marketId,
+  positionId,
   onIsolatedMarginAdjustment,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { subaccountNumber: childSubaccountNumber, marginValueInitial: freeCollateral } =
-    orEmptyObj(useParameterizedSelector(getOpenPositionFromId, marketId));
+  const {
+    subaccountNumber: childSubaccountNumber,
+    marginValueInitial: freeCollateral,
+    market: marketId = '',
+  } = orEmptyObj(useParameterizedSelector(getOpenPositionFromId, positionId));
+
   const { marginUsage } = orEmptyObj(
     useParameterizedSelector(getOpenPositionFromIdForPostOrder, marketId)
   );

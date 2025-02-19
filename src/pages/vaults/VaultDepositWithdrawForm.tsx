@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { ErrorType } from '@/bonsai/public-calculators/vaultFormValidation';
+import { ErrorType } from '@/bonsai/lib/forms';
 import { IndexedTx } from '@cosmjs/stargate';
 import BigNumber from 'bignumber.js';
 import { NumberFormatValues } from 'react-number-format';
