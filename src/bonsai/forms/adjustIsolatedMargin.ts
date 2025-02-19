@@ -410,7 +410,7 @@ function getErrors(
   return validationErrors;
 }
 
-export const AdjustIsolatedMarginForm = createForm({
+export const AdjustIsolatedMarginFormFns = createForm({
   reducer,
   calculateSummary,
   getErrors,

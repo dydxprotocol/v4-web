@@ -1,11 +1,21 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import {
+  AdjustIsolatedMarginFormFns,
+  AdjustIsolatedMarginInputType,
+  AdjustIsolatedMarginType,
+} from '@/bonsai/forms/adjustIsolatedMargin';
+import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import Abacus from '@dydxprotocol/v4-abacus';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AdjustIsolatedMarginInputField, IsolatedMarginAdjustmentType } from '@/constants/abacus';
+import {
+  AdjustIsolatedMarginInputField,
+  IsolatedMarginAdjustmentType,
+  Nullable,
+} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import {
   ButtonAction,
@@ -34,6 +44,7 @@ import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getOpenPositionFromId, getOpenPositionFromIdForPostOrder } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
@@ -83,6 +94,14 @@ export const AdjustIsolatedMarginForm = ({
     amountPercent,
     summary,
   } = adjustIsolatedMarginInputs ?? {};
+
+  useFormValues({
+    amount: adjustIsolatedMarginInputs?.amount,
+    amountInput: adjustIsolatedMarginInputs?.amountInput,
+    amountPercent: adjustIsolatedMarginInputs?.amountPercent,
+    childSubaccountNumber: adjustIsolatedMarginInputs?.childSubaccountNumber,
+    type: adjustIsolatedMarginInputs?.type,
+  });
 
   useEffect(() => {
     abacusStateManager.setAdjustIsolatedMarginValue({
@@ -480,3 +499,52 @@ const $Form = styled.form`
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;
+
+function useFormValues({
+  amount,
+  amountInput,
+  amountPercent,
+  childSubaccountNumber,
+  type,
+}: {
+  type: Nullable<Abacus.exchange.dydx.abacus.output.input.IsolatedMarginAdjustmentType>;
+  amount: Nullable<string>;
+  amountPercent: Nullable<string>;
+  amountInput: Nullable<Abacus.exchange.dydx.abacus.output.input.IsolatedMarginInputType>;
+  childSubaccountNumber: Nullable<number>;
+}) {
+  const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
+  const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const state = useMemo(
+    () => ({
+      type: type?.name === 'Add' ? AdjustIsolatedMarginType.ADD : AdjustIsolatedMarginType.REMOVE,
+      childSubaccountNumber: childSubaccountNumber ?? 0,
+      amountInput:
+        amountInput?.name === 'Amount'
+          ? {
+              type: AdjustIsolatedMarginInputType.AMOUNT as const,
+              amount: amount ?? '',
+            }
+          : {
+              type: AdjustIsolatedMarginInputType.PERCENT as const,
+              percent: amountPercent ?? '',
+            },
+    }),
+    [amount, amountInput?.name, amountPercent, childSubaccountNumber, type?.name]
+  );
+  const inputs = useMemo(
+    () => ({
+      rawParentSubaccountData,
+      rawRelevantMarkets,
+      canViewAccount,
+    }),
+    [canViewAccount, rawParentSubaccountData, rawRelevantMarkets]
+  );
+  const summary = useMemo(() => {
+    return AdjustIsolatedMarginFormFns.calculateSummary(state, inputs);
+  }, [state, inputs]);
+  const errors = useMemo(() => {
+    return AdjustIsolatedMarginFormFns.getErrors(state, inputs, summary);
+  }, [inputs, state, summary]);
+}
