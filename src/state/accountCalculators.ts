@@ -16,16 +16,12 @@ import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [getOnboardingState, getOnboardingGuards],
-  (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
-    const { hasPreviousTransactions } = onboardingGuards;
-
+  [getOnboardingState],
+  (onboardingState: OnboardingState) => {
     return {
       [OnboardingState.Disconnected]: OnboardingSteps.ChooseWallet,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
-      [OnboardingState.AccountConnected]: !hasPreviousTransactions
-        ? OnboardingSteps.DepositFunds
-        : undefined,
+      [OnboardingState.AccountConnected]: undefined,
     }[onboardingState];
   }
 );

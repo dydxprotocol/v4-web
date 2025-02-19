@@ -4,7 +4,6 @@ import { SolAddress } from './wallets';
 export enum OnboardingSteps {
   ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
-  DepositFunds = 'DepositFunds',
 }
 
 /**

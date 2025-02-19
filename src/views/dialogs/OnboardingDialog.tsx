@@ -4,10 +4,8 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
-import { AnalyticsEvents } from '@/constants/analytics';
-import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
+import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
@@ -28,16 +26,12 @@ import { Link } from '@/components/Link';
 import { Ring } from '@/components/Ring';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
-import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
 
-import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
-import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
@@ -57,12 +51,6 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen(false);
-    if (currentOnboardingStep === OnboardingSteps.DepositFunds) {
-      setIsOpen(false);
-      dispatch(
-        forceOpenDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
-      );
-    }
   }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
 
   const setIsOpenFromDialog = (open: boolean) => {
@@ -143,27 +131,6 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
               </$Content>
             ),
             width: '23rem',
-          },
-          [OnboardingSteps.DepositFunds]: {
-            title: stringGetter({ key: STRING_KEYS.DEPOSIT }),
-            description: !isMainnet && 'Test funds will be sent directly to your dYdX account.',
-            children: (
-              <$Content>
-                {isMainnet ? (
-                  <DepositForm
-                    onDeposit={(event) => {
-                      track(AnalyticsEvents.TransferDeposit(event ?? {}));
-                    }}
-                  />
-                ) : (
-                  <TestnetDepositForm
-                    onDeposit={() => {
-                      track(AnalyticsEvents.TransferFaucet());
-                    }}
-                  />
-                )}
-              </$Content>
-            ),
           },
         }[currentOnboardingStep])}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
