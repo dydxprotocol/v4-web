@@ -287,7 +287,7 @@ class AdjustIsolatedMarginFormValidationErrors {
       code: 'AMOUNT_EMPTY',
       type: ErrorType.error,
       fields: ['amount'],
-      titleKey: STRING_KEYS.ENTER_AMOUNT,
+      titleKey: STRING_KEYS.MODIFY_MARGIN_AMOUNT,
     });
   }
 

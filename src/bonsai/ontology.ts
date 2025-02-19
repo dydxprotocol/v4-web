@@ -253,7 +253,10 @@ export const BonsaiCore: BonsaiCoreShape = {
 
 interface BonsaiRawShape {
   parentSubaccountBase: BasicSelector<ParentSubaccountDataBase | undefined>;
+  // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
+  // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
 }
 
