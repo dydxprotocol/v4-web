@@ -139,21 +139,28 @@ export const AdjustIsolatedMarginForm = ({
     />
   );
 
-  const alertMessage = useMemo(() => {
-    return errors.find((e) => e.type === ErrorType.error) ?? errors.at(0);
-  }, [errors]);
-
-  const ctaErrorActionStringKey =
-    alertMessage?.type === ErrorType.error
-      ? alertMessage.resources.title?.stringKey ?? alertMessage.resources.text?.stringKey
+  const ctaErrorAction = useMemo(() => {
+    const message = errors.find(
+      (e) => e.type === ErrorType.error && e.resources.title?.stringKey != null
+    );
+    return message?.resources.title?.stringKey
+      ? stringGetter({ key: message.resources.title.stringKey })
       : undefined;
-  const ctaErrorAction = ctaErrorActionStringKey
-    ? stringGetter({ key: ctaErrorActionStringKey })
-    : undefined;
+  }, [errors, stringGetter]);
 
-  const alertTextStringKey =
-    alertMessage?.resources.text?.stringKey ?? alertMessage?.resources.title?.stringKey;
-  const alertText = alertTextStringKey ? stringGetter({ key: alertTextStringKey }) : undefined;
+  const { text: alertText, message: alertMessage } = useMemo(() => {
+    const message = errors.find((e) => e.resources.text?.stringKey != null);
+    return {
+      text: message?.resources.text?.stringKey
+        ? stringGetter({ key: message.resources.text.stringKey })
+        : undefined,
+      message,
+    };
+  }, [errors, stringGetter]);
+
+  const hasErrors = useMemo(() => {
+    return errors.some((e) => e.type === ErrorType.error);
+  }, [errors]);
 
   const {
     crossFreeCollateral,
@@ -332,6 +339,7 @@ export const AdjustIsolatedMarginForm = ({
       </GradientCard>
     );
 
+  console.log(errors);
   return (
     <$Form
       onSubmit={(e: FormEvent) => {
@@ -386,11 +394,11 @@ export const AdjustIsolatedMarginForm = ({
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
-          disabled={isSubmitting || ctaErrorAction !== undefined}
+          disabled={isSubmitting || hasErrors}
           state={
             isSubmitting
               ? ButtonState.Loading
-              : ctaErrorAction
+              : hasErrors
                 ? ButtonState.Disabled
                 : ButtonState.Default
           }

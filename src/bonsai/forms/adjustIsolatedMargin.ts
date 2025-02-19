@@ -306,7 +306,6 @@ class AdjustIsolatedMarginFormValidationErrors {
     return this.createError({
       code: 'NO_ISOLATED_POSITION',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 
@@ -323,8 +322,6 @@ class AdjustIsolatedMarginFormValidationErrors {
     return this.createError({
       code: 'COULDNT_COMPUTE_POST_OPERATION',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
-      textKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 
@@ -332,8 +329,6 @@ class AdjustIsolatedMarginFormValidationErrors {
     return this.createError({
       code: 'COULDNT_COMPUTE_PRE_OPERATION',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
-      textKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 
@@ -342,7 +337,8 @@ class AdjustIsolatedMarginFormValidationErrors {
       code: 'TRANSFER_MORE_THAN_FREE',
       type: ErrorType.error,
       fields: ['amount'],
-      titleKey: STRING_KEYS.TRANSFER_MORE_THAN_FREE,
+      textKey: STRING_KEYS.TRANSFER_MORE_THAN_FREE,
+      titleKey: STRING_KEYS.MODIFY_MARGIN_AMOUNT,
     });
   }
 
@@ -351,7 +347,8 @@ class AdjustIsolatedMarginFormValidationErrors {
       code: 'INVALID_NEW_POSITION_LEVERAGE',
       type: ErrorType.error,
       fields: ['amount'],
-      titleKey: STRING_KEYS.INVALID_NEW_POSITION_LEVERAGE,
+      textKey: STRING_KEYS.INVALID_NEW_POSITION_LEVERAGE,
+      titleKey: STRING_KEYS.MODIFY_MARGIN_AMOUNT,
     });
   }
 }
