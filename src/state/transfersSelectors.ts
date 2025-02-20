@@ -23,8 +23,8 @@ export const selectPendingDeposits = () =>
       if (!dydxAddress || !transfersByAddress[dydxAddress]) return [];
 
       return transfersByAddress[dydxAddress].filter(
-        (transfer) => isDeposit(transfer) && transfer.status === 'pending'
-      ) as Deposit[];
+        (transfer): transfer is Deposit => isDeposit(transfer) && transfer.status === 'pending'
+      );
     }
   );
 
@@ -50,15 +50,15 @@ export const selectDeposit = () =>
     ],
     (allTransfers, txHash, chainId) => {
       return allTransfers.find(
-        (transfer) =>
+        (transfer): transfer is Deposit =>
           isDeposit(transfer) && transfer.txHash === txHash && transfer.chainId === chainId
-      ) as Deposit | undefined;
+      );
     }
   );
 
 export const selectWithdraw = () =>
   createAppSelector([selectAllTransfers, (s, id: string) => id], (allTransfers, id) => {
-    return allTransfers.find((transfer) => isWithdraw(transfer) && transfer.id === id) as
-      | Withdraw
-      | undefined;
+    return allTransfers.find(
+      (transfer): transfer is Withdraw => isWithdraw(transfer) && transfer.id === id
+    );
   });
