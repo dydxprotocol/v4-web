@@ -58,29 +58,12 @@ function makeCompositeClient({
   );
 
   (async () => {
-    const networkOptimizer = new NetworkOptimizer();
     const indexerUrl = networkConfig.endpoints.indexers[0];
-
     if (indexerUrl == null) {
       throw new Error('No indexer urls found');
     }
 
-    // Timer to measure how long it takes to find the optimal node
-    const t0 = performance.now();
-
-    const validatorUrl = await networkOptimizer.findOptimalNode(
-      networkConfig.endpoints.validators,
-      chainId
-    );
-
-    const t1 = performance.now();
-
-    logBonsaiInfo('CompositeClientManager', 'findOptimalNode', {
-      validatorUrl,
-      validatorList: networkConfig.endpoints.validators,
-      chainId,
-      duration: t1 - t0,
-    });
+    const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
 
     if (clientWrapper.dead) {
       return;
@@ -141,6 +124,23 @@ export function alwaysUseCurrentNetworkClient(store: RootStore) {
       CompositeClientManager.markDone({ network, dispatch: store.dispatch });
     };
   });
+}
+
+async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: string[]) {
+  const networkOptimizer = new NetworkOptimizer();
+  // Timer to measure how long it takes to find the optimal node
+  const t0 = performance.now();
+  const validatorUrl = await networkOptimizer.findOptimalNode(validatorEndpoints, chainId);
+  const t1 = performance.now();
+
+  logBonsaiInfo('CompositeClientManager', 'findOptimalNode', {
+    validatorUrl,
+    validatorList: validatorEndpoints,
+    chainId,
+    duration: t1 - t0,
+  });
+
+  return validatorUrl;
 }
 
 function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
