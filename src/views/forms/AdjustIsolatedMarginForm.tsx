@@ -5,9 +5,9 @@ import {
   AdjustIsolatedMarginInputType,
   AdjustIsolatedMarginType,
 } from '@/bonsai/forms/adjustIsolatedMargin';
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { ErrorType, useFormValues } from '@/bonsai/lib/forms';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
@@ -105,7 +105,6 @@ export const AdjustIsolatedMarginForm = ({
 
     try {
       if (summary.payload == null) {
-        logBonsaiError('AdjustIsolatedMarginForm', 'attempted to submit with empty payload');
         throw new Error('No payload found');
       }
       const result = await transferBetweenSubaccounts(summary.payload);
@@ -114,6 +113,10 @@ export const AdjustIsolatedMarginForm = ({
         onIsolatedMarginAdjustment?.();
       } else if (isOperationFailure(result)) {
         setErrorMessageRaw(result.errorString);
+      }
+    } catch (e) {
+      if (e?.message != null && typeof e.message === 'string') {
+        setErrorMessageRaw(e.message);
       }
     } finally {
       setIsSubmitting(false);
@@ -300,8 +303,11 @@ export const AdjustIsolatedMarginForm = ({
 
   const errorMessage = useMemo(() => {
     if (errorMessageRaw != null) {
-      // TODO parse out error message somewhere
-      return stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR });
+      const parsingResult = parseTransactionError(
+        'AdjustIsolatedMargin SubaccountTransfer',
+        errorMessageRaw
+      );
+      return stringGetter({ key: parsingResult?.stringKey ?? STRING_KEYS.UNKNOWN_ERROR });
     }
     return undefined;
   }, [errorMessageRaw, stringGetter]);
