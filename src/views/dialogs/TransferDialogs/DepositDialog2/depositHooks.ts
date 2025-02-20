@@ -1,7 +1,6 @@
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
-import { v4 as uuid } from 'uuid';
 import { Address, WalletClient, maxUint256 } from 'viem';
 import { useChainId } from 'wagmi';
 
@@ -180,7 +179,7 @@ export function useDepositSteps({
       // TODO(deposit2.0): Update .executeRoute call here once the SDK allows passing in the updated signer object
       // passing in updatedSkipClient is hack until that is available
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
-        const depositId = `deposit-${uuid()}`;
+        const depositId = `deposit-${crypto.randomUUID()}`;
 
         try {
           await updatedSkipClient.executeRoute({
