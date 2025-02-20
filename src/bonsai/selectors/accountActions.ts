@@ -2,12 +2,10 @@ import { createAppSelector } from '@/state/appTypes';
 
 import {
   applyOperationsToSubaccount,
-  createUsdcDepositOperations,
-  createUsdcWithdrawalOperations,
-  UsdcDepositArgs,
-  UsdcWithdrawArgs,
+  createBatchedOperations,
 } from '../calculators/accountActions';
 import { calculateParentSubaccountSummary } from '../calculators/subaccount';
+import { DepositUsdcProps, SubaccountOperations, WithdrawUsdcProps } from '../types/operationTypes';
 import { selectRelevantMarketsData } from './account';
 import { selectRawParentSubaccountData } from './base';
 
@@ -16,14 +14,14 @@ export const createSelectParentSubaccountSummaryDeposit = () =>
     [
       selectRawParentSubaccountData,
       selectRelevantMarketsData,
-      (_s, input: UsdcDepositArgs) => input,
+      (_s, input: DepositUsdcProps) => input,
     ],
     (parentSubaccount, markets, depositInputs) => {
       if (parentSubaccount == null || markets == null) {
         return undefined;
       }
 
-      const operations = createUsdcDepositOperations(parentSubaccount, depositInputs);
+      const operations = createBatchedOperations(SubaccountOperations.DepositUsdc(depositInputs));
       const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
       const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
       return result;
@@ -35,14 +33,16 @@ export const createSelectParentSubaccountSummaryWithdrawal = () =>
     [
       selectRawParentSubaccountData,
       selectRelevantMarketsData,
-      (_s, input: UsdcWithdrawArgs) => input,
+      (_s, input: WithdrawUsdcProps) => input,
     ],
     (parentSubaccount, markets, withdrawalInputs) => {
       if (parentSubaccount == null || markets == null) {
         return undefined;
       }
 
-      const operations = createUsdcWithdrawalOperations(parentSubaccount, withdrawalInputs);
+      const operations = createBatchedOperations(
+        SubaccountOperations.WithdrawUsdc(withdrawalInputs)
+      );
       const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
       const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
       return result;

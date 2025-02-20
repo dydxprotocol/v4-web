@@ -5,6 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { ErrorType, simpleValidationError, ValidationError } from '../lib/validationErrors';
 import { VaultAccount } from './vaultAccount';
 
 export interface VaultFormData {
@@ -24,41 +25,6 @@ export interface VaultFormAccountData {
   marginUsage?: number;
   freeCollateral?: number;
   canViewAccount?: boolean;
-}
-
-export interface ValidationError {
-  code: string;
-  type: ErrorType;
-  fields?: string[];
-  action?: string | null;
-  link?: string | null;
-  linkText?: string | null;
-  resources: ErrorResources;
-}
-
-export interface ErrorResources {
-  title?: ErrorString;
-  text?: ErrorString;
-  action?: string | null;
-}
-
-export interface ErrorString {
-  stringKey: string;
-}
-
-export interface ErrorParam {
-  key: string;
-  value?: string;
-  format?: ErrorFormat | null;
-}
-
-export enum ErrorFormat {
-  Percent = 'Percent',
-}
-
-export enum ErrorType {
-  error = 'error',
-  warning = 'warning',
 }
 
 export interface VaultDepositWithdrawSubmissionData {
@@ -93,47 +59,10 @@ export interface VaultFormValidationResult {
   submissionData?: VaultDepositWithdrawSubmissionData;
   summaryData: VaultFormSummaryData;
 }
-interface CreateErrorParams {
-  code: string;
-  type: ErrorType;
-  fields?: string[];
-  titleKey?: string;
-  textKey?: string;
-}
 
 class VaultFormValidationErrors {
-  private createError({
-    code,
-    type,
-    fields,
-    titleKey,
-    textKey,
-  }: CreateErrorParams): ValidationError {
-    return {
-      code,
-      type,
-      fields,
-      action: null,
-      link: null,
-      linkText: null,
-      resources: {
-        title: titleKey
-          ? {
-              stringKey: titleKey,
-            }
-          : undefined,
-        text: textKey
-          ? {
-              stringKey: textKey,
-            }
-          : undefined,
-        action: null,
-      },
-    };
-  }
-
   amountEmpty(operation: VaultFormAction): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'AMOUNT_EMPTY',
       type: ErrorType.error,
       fields: ['amount'],
@@ -145,7 +74,7 @@ class VaultFormValidationErrors {
   }
 
   accountDataMissing(canViewAccount?: boolean): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'ACCOUNT_DATA_MISSING',
       type: ErrorType.error,
       titleKey:
@@ -156,7 +85,7 @@ class VaultFormValidationErrors {
   }
 
   depositTooHigh(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'DEPOSIT_TOO_HIGH',
       type: ErrorType.error,
       fields: ['amount'],
@@ -166,7 +95,7 @@ class VaultFormValidationErrors {
   }
 
   depositTooLow(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'DEPOSIT_TOO_LOW',
       type: ErrorType.error,
       fields: ['amount'],
@@ -176,7 +105,7 @@ class VaultFormValidationErrors {
   }
 
   withdrawTooHigh(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'WITHDRAW_TOO_HIGH',
       type: ErrorType.error,
       fields: ['amount'],
@@ -186,7 +115,7 @@ class VaultFormValidationErrors {
   }
 
   withdrawTooLow(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'WITHDRAW_TOO_LOW',
       type: ErrorType.error,
       fields: ['amount'],
@@ -196,7 +125,7 @@ class VaultFormValidationErrors {
   }
 
   withdrawingLockedBalance(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'WITHDRAWING_LOCKED_BALANCE',
       type: ErrorType.error,
       fields: ['amount'],
@@ -206,7 +135,7 @@ class VaultFormValidationErrors {
   }
 
   slippageTooHigh(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'SLIPPAGE_TOO_HIGH',
       type: ErrorType.warning,
       textKey: STRING_KEYS.SLIPPAGE_WARNING,
@@ -214,7 +143,7 @@ class VaultFormValidationErrors {
   }
 
   mustAckSlippage(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'MUST_ACK_SLIPPAGE',
       type: ErrorType.error,
       fields: ['acknowledgeSlippage'],
@@ -223,7 +152,7 @@ class VaultFormValidationErrors {
   }
 
   mustAckTerms(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'MUST_ACK_TERMS',
       type: ErrorType.error,
       fields: ['acknowledgeTerms'],
@@ -232,21 +161,21 @@ class VaultFormValidationErrors {
   }
 
   vaultAccountMissing(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'VAULT_ACCOUNT_MISSING',
       type: ErrorType.error,
     });
   }
 
   slippageResponseMissing(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'SLIPPAGE_RESPONSE_MISSING',
       type: ErrorType.error,
     });
   }
 
   slippageResponseWrongShares(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'SLIPPAGE_RESPONSE_WRONG_SHARES',
       type: ErrorType.error,
     });

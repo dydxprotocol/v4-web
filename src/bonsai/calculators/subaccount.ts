@@ -244,13 +244,13 @@ function calculatePositionDerivedExtra(
   subaccountSummary: SubaccountSummary
 ): SubaccountPositionDerivedExtra {
   const { equity, maintenanceRiskTotal } = subaccountSummary;
-  const { signedSize, notional, value, marginMode, adjustedMmf, adjustedImf, maintenanceRisk } =
+  const { signedSize, notional, value, marginMode, adjustedMmf, maintenanceRisk, initialRisk } =
     position;
 
   const leverage = equity.gt(0) ? notional.div(equity) : null;
 
-  const marginValueMaintenance = marginMode === 'ISOLATED' ? equity : notional.times(adjustedMmf);
-  const marginValueInitial = marginMode === 'ISOLATED' ? equity : notional.times(adjustedImf);
+  const marginValueMaintenance = marginMode === 'ISOLATED' ? equity : maintenanceRisk;
+  const marginValueInitial = marginMode === 'ISOLATED' ? equity : initialRisk;
 
   const liquidationPrice = calc(() => {
     const otherPositionsRisk = maintenanceRiskTotal.minus(maintenanceRisk);

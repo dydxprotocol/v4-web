@@ -1,5 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
+import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { type IndexedTx } from '@cosmjs/stargate';
@@ -44,7 +47,7 @@ import {
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { track } from '@/lib/analytics/analytics';
-import { getValidErrorParamsFromParsingError } from '@/lib/errors';
+import { getValidErrorParamsFromParsingError, stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
@@ -119,6 +122,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           throw error;
         }
       },
+
       withdrawFromSubaccount: async ({
         subaccountClient,
         amount,
@@ -138,6 +142,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           throw error;
         }
       },
+
       transferFromSubaccountToAddress: async ({
         subaccountClient,
         assetId = 0,
@@ -1025,6 +1030,49 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, subaccountClient]
   );
 
+  const transferBetweenSubaccounts = useCallback(
+    async (params: SubaccountTransferPayload) => {
+      try {
+        const subaccount = localDydxWallet
+          ? new SubaccountClient(localDydxWallet, params.subaccountNumber)
+          : undefined;
+
+        if (subaccount == null) {
+          throw new Error('local wallet client not initialized');
+        }
+
+        if (!compositeClient) {
+          throw new Error('Missing compositeClient or localWallet');
+        }
+
+        if (params.senderAddress !== subaccount.address) {
+          throw new Error('Sender address does not match local wallet');
+        }
+
+        const tx = await compositeClient.transferToSubaccount(
+          subaccount,
+          params.destinationAddress,
+          params.destinationSubaccountNumber,
+          parseFloat(params.amount).toFixed(6),
+          DEFAULT_TRANSACTION_MEMO
+        );
+
+        const parsedTx = parseToPrimitives(tx);
+        logBonsaiInfo('useSubaccount/subaccountTransfer', 'Successful subaccount transfer', {
+          parsedTx,
+        });
+        return wrapOperationSuccess(parsedTx);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError('useSubaccount/subaccountTransfer', 'Failed subaccount transfer', {
+          parsed,
+        });
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [compositeClient, localDydxWallet]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -1036,6 +1084,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     sendSkipWithdraw,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
+    transferBetweenSubaccounts,
 
     // Trading Methods
     placeOrder,
