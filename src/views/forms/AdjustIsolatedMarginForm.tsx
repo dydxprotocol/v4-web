@@ -6,8 +6,14 @@ import {
   AdjustIsolatedMarginType,
 } from '@/bonsai/forms/adjustIsolatedMargin';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
-import { ErrorType, useFormValues } from '@/bonsai/lib/forms';
+import { useFormValues } from '@/bonsai/lib/forms';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
+import {
+  ErrorType,
+  getAlertsToRender,
+  getFormDisabledButtonStringKey,
+  ValidationAlertMessage,
+} from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
@@ -143,23 +149,13 @@ export const AdjustIsolatedMarginForm = ({
   );
 
   const ctaErrorAction = useMemo(() => {
-    const message = errors.find(
-      (e) => e.type === ErrorType.error && e.resources.title?.stringKey != null
-    );
-    return message?.resources.title?.stringKey
-      ? stringGetter({ key: message.resources.title.stringKey })
-      : undefined;
+    const key = getFormDisabledButtonStringKey(errors);
+    return key ? stringGetter({ key }) : undefined;
   }, [errors, stringGetter]);
 
-  const { text: alertText, message: alertMessage } = useMemo(() => {
-    const message = errors.find((e) => e.resources.text?.stringKey != null);
-    return {
-      text: message?.resources.text?.stringKey
-        ? stringGetter({ key: message.resources.text.stringKey })
-        : undefined,
-      message,
-    };
-  }, [errors, stringGetter]);
+  const validationAlert = useMemo(() => {
+    return getAlertsToRender(errors)?.[0];
+  }, [errors]);
 
   const hasErrors = useMemo(() => {
     return errors.some((e) => e.type === ErrorType.error);
@@ -313,15 +309,9 @@ export const AdjustIsolatedMarginForm = ({
   }, [errorMessageRaw, stringGetter]);
 
   const CenterElement =
-    !!alertMessage || !!errorMessage ? (
+    !!validationAlert || !!errorMessage ? (
       <>
-        {alertMessage && (
-          <AlertMessage
-            type={alertMessage.type === ErrorType.error ? AlertType.Error : AlertType.Warning}
-          >
-            {alertText}
-          </AlertMessage>
-        )}
+        {validationAlert && <ValidationAlertMessage error={validationAlert} />}
         {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       </>
     ) : (

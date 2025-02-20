@@ -2,40 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { mapValues } from 'lodash';
 
-export interface ValidationError {
-  code: string;
-  type: ErrorType;
-  fields?: string[];
-  action?: string | null;
-  link?: string | null;
-  linkText?: string | null;
-  resources: ErrorResources;
-}
-
-export interface ErrorResources {
-  title?: ErrorString;
-  text?: ErrorString;
-  action?: string | null;
-}
-
-export interface ErrorString {
-  stringKey: string;
-}
-
-export interface ErrorParam {
-  key: string;
-  value?: string;
-  format?: ErrorFormat | null;
-}
-
-export enum ErrorFormat {
-  Percent = 'Percent',
-}
-
-export enum ErrorType {
-  error = 'error',
-  warning = 'warning',
-}
+import { ValidationError } from './validationErrors';
 
 export type BasicForm<State, Reducer extends VanillaReducer<State, any>, SummaryArgs, Summary> = {
   reducer: Reducer;

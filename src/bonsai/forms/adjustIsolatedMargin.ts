@@ -15,7 +15,8 @@ import {
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
 } from '../calculators/subaccount';
-import { createForm, createVanillaReducer, ErrorType, ValidationError } from '../lib/forms';
+import { createForm, createVanillaReducer } from '../lib/forms';
+import { ErrorType, simpleValidationError, ValidationError } from '../lib/validationErrors';
 import { SubaccountOperations } from '../types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 
@@ -278,44 +279,8 @@ function calculateSummary(
 }
 
 class AdjustIsolatedMarginFormValidationErrors {
-  private createError({
-    code,
-    type,
-    fields,
-    titleKey,
-    textKey,
-  }: {
-    code: string;
-    type: ErrorType;
-    fields?: string[];
-    titleKey?: string;
-    textKey?: string;
-  }): ValidationError {
-    return {
-      code,
-      type,
-      fields,
-      action: null,
-      link: null,
-      linkText: null,
-      resources: {
-        title: titleKey
-          ? {
-              stringKey: titleKey,
-            }
-          : undefined,
-        text: textKey
-          ? {
-              stringKey: textKey,
-            }
-          : undefined,
-        action: null,
-      },
-    };
-  }
-
   amountEmpty(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'AMOUNT_EMPTY',
       type: ErrorType.error,
       fields: ['amount'],
@@ -324,7 +289,7 @@ class AdjustIsolatedMarginFormValidationErrors {
   }
 
   accountDataMissing(canViewAccount?: boolean): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'ACCOUNT_DATA_MISSING',
       type: ErrorType.error,
       titleKey:
@@ -335,14 +300,14 @@ class AdjustIsolatedMarginFormValidationErrors {
   }
 
   noIsolatedPosition(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'NO_ISOLATED_POSITION',
       type: ErrorType.error,
     });
   }
 
   invalidSubaccountNumber(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'INVALID_SUBACCOUNT_NUMBER',
       type: ErrorType.error,
       titleKey: STRING_KEYS.UNKNOWN_ERROR,
@@ -351,28 +316,28 @@ class AdjustIsolatedMarginFormValidationErrors {
   }
 
   noAfterData(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'COULDNT_COMPUTE_POST_OPERATION',
       type: ErrorType.error,
     });
   }
 
   noPayload(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'MISSING_PAYLOAD',
       type: ErrorType.error,
     });
   }
 
   noBeforeData(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'COULDNT_COMPUTE_PRE_OPERATION',
       type: ErrorType.error,
     });
   }
 
   addMoreThanFreeCollateral(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'TRANSFER_MORE_THAN_FREE',
       type: ErrorType.error,
       fields: ['amount'],
@@ -382,7 +347,7 @@ class AdjustIsolatedMarginFormValidationErrors {
   }
 
   invalidNewPositionLeverage(): ValidationError {
-    return this.createError({
+    return simpleValidationError({
       code: 'INVALID_NEW_POSITION_LEVERAGE',
       type: ErrorType.error,
       fields: ['amount'],
