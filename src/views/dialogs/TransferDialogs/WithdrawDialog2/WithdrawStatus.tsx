@@ -15,14 +15,13 @@ import { Output, OutputType } from '@/components/Output';
 import { selectWithdraw } from '@/state/transfersSelectors';
 
 type WithdrawStatusProps = {
-  txHash?: string;
-  chainId?: string;
+  id?: string;
   onClose: () => void;
 };
 
-export const WithdrawStatus = ({ txHash = '', chainId = '', onClose }: WithdrawStatusProps) => {
+export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
   const stringGetter = useStringGetter();
-  const withdraw = useParameterizedSelector(selectWithdraw, txHash, chainId);
+  const withdraw = useParameterizedSelector(selectWithdraw, id);
 
   const transferSuccess = withdraw?.status === 'success';
   const transferError = withdraw?.status === 'error';
@@ -50,7 +49,7 @@ export const WithdrawStatus = ({ txHash = '', chainId = '', onClose }: WithdrawS
         value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
         type={OutputType.Fiat}
         slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
-        slotRight="USDC"
+        slotRight=" USDC"
       />
     );
 

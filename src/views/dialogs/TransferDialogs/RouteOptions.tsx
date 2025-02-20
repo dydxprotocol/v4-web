@@ -121,31 +121,31 @@ export const TransferRouteOptions = ({
     DateTime.fromMillis(slowRouteDuration)
   );
   const slowRouteTitle = slowRouteSpeed
-    ? slowRouteSpeed <= 60
-      ? stringGetter({ key: STRING_KEYS.INSTANT })
-      : `${timeString}${stringGetter({ key: unitStringKey })}`
+    ? `${timeString}${stringGetter({ key: unitStringKey })}`
     : stringGetter({ key: STRING_KEYS.DEFAULT });
 
   return (
     <div tw="flex gap-0.5">
-      <RouteOption
-        icon={
-          <span
-            css={[
-              selectedSpeed === 'fast' && !isLoading
-                ? tw`text-color-favorite`
-                : `text-color-text-0`,
-            ]}
-          >
-            <LightningIcon />
-          </span>
-        }
-        selected={selectedSpeed === 'fast'}
-        disabled={disabled || !goFastOperation || isLoading}
-        onClick={() => onSelectSpeed('fast')}
-        title={stringGetter({ key: STRING_KEYS.INSTANT })}
-        description={fastRouteDescription}
-      />
+      {type === 'deposit' && (
+        <RouteOption
+          icon={
+            <span
+              css={[
+                selectedSpeed === 'fast' && !isLoading
+                  ? tw`text-color-favorite`
+                  : `text-color-text-0`,
+              ]}
+            >
+              <LightningIcon />
+            </span>
+          }
+          selected={selectedSpeed === 'fast'}
+          disabled={disabled || !goFastOperation || isLoading}
+          onClick={() => onSelectSpeed('fast')}
+          title={stringGetter({ key: STRING_KEYS.INSTANT })}
+          description={fastRouteDescription}
+        />
+      )}
       <RouteOption
         icon={
           <span
