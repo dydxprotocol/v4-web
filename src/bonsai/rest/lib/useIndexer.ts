@@ -28,7 +28,7 @@ export function useIndexerClient() {
       setClient(undefined);
       CompositeClientManager.markDone(clientConfig);
     };
-  }, [selectedNetwork, indexerReady]);
+  }, [selectedNetwork, indexerReady, dispatch]);
 
   return { indexerClient: client, key: `${selectedNetwork}-${indexerReady}` };
 }
@@ -53,7 +53,7 @@ export function useCompositeClient() {
       setClient(undefined);
       CompositeClientManager.markDone(clientConfig);
     };
-  }, [selectedNetwork, compositeClientReady]);
+  }, [selectedNetwork, compositeClientReady, dispatch]);
 
   return { compositeClient: client, key: `${selectedNetwork}-${compositeClientReady}` };
 }
