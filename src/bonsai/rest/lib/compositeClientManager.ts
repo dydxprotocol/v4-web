@@ -29,6 +29,8 @@ type CompositeClientWrapper = {
   compositeClient?: CompositeClient;
   indexer?: IndexerClient;
   tearDown: () => void;
+  compositeClientPromise: Promise<CompositeClient>;
+  indexerPromise: Promise<IndexerClient>;
 };
 
 function makeCompositeClient({
@@ -50,23 +52,9 @@ function makeCompositeClient({
     throw new Error(`Unknown chain id: ${chainId}`);
   }
 
-  const clientWrapper: CompositeClientWrapper = {
-    tearDown: () => {
-      clientWrapper.dead = true;
-      dispatch(
-        setNetworkStateRaw({
-          networkId: network,
-          stateToMerge: { compositeClientReady: false, indexerClientReady: false },
-        })
-      );
-    },
-  };
-
-  dispatch(
-    setNetworkStateRaw({
-      networkId: network,
-      stateToMerge: { compositeClientReady: false, indexerClientReady: false },
-    })
+  const { clientWrapper, setCompositeClient, setIndexerClient } = initializeClientWrapper(
+    dispatch,
+    network
   );
 
   (async () => {
@@ -98,13 +86,8 @@ function makeCompositeClient({
       return;
     }
     const indexerConfig = new IndexerConfig(indexerUrl.api, indexerUrl.socket);
-    clientWrapper.indexer = new IndexerClient(indexerConfig);
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { indexerClientReady: true },
-      })
-    );
+    setIndexerClient(new IndexerClient(indexerConfig));
+
     const statsigFlags = await getStatsigConfigAsync();
     const compositeClient = await CompositeClient.connect(
       new Network(
@@ -129,18 +112,13 @@ function makeCompositeClient({
         )
       )
     );
+
     // this shouldn't be necessary - can actually be false
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (clientWrapper.dead) {
       return;
     }
-    clientWrapper.compositeClient = compositeClient;
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { compositeClientReady: true },
-      })
-    );
+    setCompositeClient(compositeClient);
   })();
   return clientWrapper;
 }
@@ -163,4 +141,73 @@ export function alwaysUseCurrentNetworkClient(store: RootStore) {
       CompositeClientManager.markDone({ network, dispatch: store.dispatch });
     };
   });
+}
+
+function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
+  const indexerDeferred = createDeferred<IndexerClient>();
+  const compositeClientDeferred = createDeferred<CompositeClient>();
+  const clientWrapper: CompositeClientWrapper = {
+    compositeClientPromise: compositeClientDeferred.promise,
+    indexerPromise: indexerDeferred.promise,
+    tearDown: () => {
+      clientWrapper.dead = true;
+      indexerDeferred.reject();
+      compositeClientDeferred.reject();
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { compositeClientReady: false, indexerClientReady: false },
+        })
+      );
+    },
+  };
+  const setIndexerClient = (c: IndexerClient) => {
+    clientWrapper.indexer = c;
+    indexerDeferred.resolve(c);
+    dispatch(
+      setNetworkStateRaw({
+        networkId: network,
+        stateToMerge: { indexerClientReady: true },
+      })
+    );
+  };
+  const setCompositeClient = (c: CompositeClient) => {
+    clientWrapper.compositeClient = c;
+    compositeClientDeferred.resolve(c);
+    dispatch(
+      setNetworkStateRaw({
+        networkId: network,
+        stateToMerge: { compositeClientReady: true },
+      })
+    );
+  };
+  dispatch(
+    setNetworkStateRaw({
+      networkId: network,
+      stateToMerge: { compositeClientReady: false, indexerClientReady: false },
+    })
+  );
+  return {
+    clientWrapper,
+    setIndexerClient,
+    setCompositeClient,
+  };
+}
+
+interface Deferred<T> {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+  reject: (error?: Error) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T) => void;
+  let reject!: (error?: Error) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
 }
