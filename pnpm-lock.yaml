@@ -211,7 +211,7 @@ dependencies:
     version: 3.1.2(@react-spring/web@9.7.2)(react-dom@18.2.0)(react@18.2.0)
   '@wagmi/core':
     specifier: ^2.16.3
-    version: 2.16.3(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.22.17)
+    version: 2.16.4(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(use-sync-external-store@1.4.0)(viem@2.22.17)
   bignumber.js:
     specifier: ^9.1.1
     version: 9.1.1
@@ -315,7 +315,7 @@ dependencies:
     specifier: ^2.22.17
     version: 2.22.17(typescript@5.7.2)
   wagmi:
-    specifier: ^2.14.11
+    specifier: ^2.14.9
     version: 2.14.11(@tanstack/react-query@5.37.1)(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.22.17)
 
 devDependencies:
@@ -3171,7 +3171,7 @@ packages:
       '@vanilla-extract/css': 1.15.3(babel-plugin-macros@3.1.0)
       '@vanilla-extract/dynamic': 2.1.0
       '@vanilla-extract/sprinkles': 1.6.1(@vanilla-extract/css@1.15.3)
-      '@wagmi/core': 2.16.3(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.22.17)
+      '@wagmi/core': 2.16.4(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(use-sync-external-store@1.4.0)(viem@2.22.17)
       bech32: 2.0.0
       clsx: 2.1.1
       qrcode: 1.5.3
@@ -3238,7 +3238,7 @@ packages:
     dependencies:
       '@funkit/chains': 0.1.2(viem@2.22.17)
       '@funkit/core': 2.3.6(typescript@5.7.2)(viem@2.22.17)
-      '@wagmi/core': 2.16.3(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.22.17)
+      '@wagmi/core': 2.16.4(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(use-sync-external-store@1.4.0)(viem@2.22.17)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       viem: 2.22.17(typescript@5.7.2)
@@ -9836,30 +9836,6 @@ packages:
       - supports-color
       - utf-8-validate
       - zod
-    dev: false
-
-  /@wagmi/core@2.16.3(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(viem@2.22.17):
-    resolution: {integrity: sha512-SVovoWHaQ2AIkmGf+ucNijT6AHXcTMffFcLmcFF6++y21x+ge7Gkh3UoJiU91SDDv8n08eTQ9jbyia3GEgU5jQ==}
-    peerDependencies:
-      '@tanstack/query-core': '>=5.0.0'
-      typescript: '>=5.0.4'
-      viem: 2.x
-    peerDependenciesMeta:
-      '@tanstack/query-core':
-        optional: true
-      typescript:
-        optional: true
-    dependencies:
-      eventemitter3: 5.0.1
-      mipd: 0.0.7(typescript@5.7.2)
-      typescript: 5.7.2
-      viem: 2.22.17(typescript@5.7.2)
-      zustand: 5.0.0(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(use-sync-external-store@1.4.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-      - react
-      - use-sync-external-store
     dev: false
 
   /@wagmi/core@2.16.4(@types/react@18.3.3)(immer@10.1.1)(react@18.2.0)(typescript@5.7.2)(use-sync-external-store@1.4.0)(viem@2.22.17):

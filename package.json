@@ -150,7 +150,7 @@
     "use-latest": "^1.2.1",
     "uuid": "^11.1.0",
     "viem": "^2.22.17",
-    "wagmi": "^2.14.11"
+    "wagmi": "^2.14.9"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
