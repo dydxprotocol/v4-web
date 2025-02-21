@@ -210,15 +210,16 @@ function calculateSummary(
     if (state.childSubaccountNumber == null) {
       return undefined;
     }
-    if (accountData.rawParentSubaccountData?.parentSubaccount == null) {
+    const parentSubaccountNumber = accountData.rawParentSubaccountData?.parentSubaccount;
+    if (parentSubaccountNumber == null) {
       return undefined;
     }
     if (state.type === AdjustIsolatedMarginType.ADD) {
-      return { source: 0, target: state.childSubaccountNumber };
+      return { source: parentSubaccountNumber, target: state.childSubaccountNumber };
     }
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (state.type === AdjustIsolatedMarginType.REMOVE) {
-      return { source: state.childSubaccountNumber, target: 0 };
+      return { source: state.childSubaccountNumber, target: parentSubaccountNumber };
     }
     assertNever(state.type);
     return undefined;
