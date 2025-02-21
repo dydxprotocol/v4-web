@@ -47,8 +47,9 @@ export const getNonZeroPendingPositions = createAppSelector(
 
 export const getOpenPositionFromId = () =>
   createAppSelector(
-    [getOpenPositions, (s, marketId: string) => marketId],
-    (allOpenPositions, marketId) => allOpenPositions?.find(({ market }) => market === marketId)
+    [getOpenPositions, (s, positionId: PositionUniqueId) => positionId],
+    (allOpenPositions, positionId) =>
+      allOpenPositions?.find(({ uniqueId }) => uniqueId === positionId)
   );
 
 export const getOpenPositionFromIdForPostOrder = () =>

@@ -1,14 +1,22 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
+import {
+  AdjustIsolatedMarginFormFns,
+  AdjustIsolatedMarginInputType,
+  AdjustIsolatedMarginType,
+} from '@/bonsai/forms/adjustIsolatedMargin';
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
+import { useFormValues } from '@/bonsai/lib/forms';
+import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
+import {
+  ErrorType,
+  getAlertsToRender,
+  getFormDisabledButtonStringKey,
+} from '@/bonsai/lib/validationErrors';
+import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
-import {
-  AdjustIsolatedMarginInputField,
-  IsolatedMarginAdjustmentType,
-  type SubaccountPosition,
-} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import {
   ButtonAction,
@@ -35,20 +43,20 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getOpenPositionFromId, getOpenPositionFromIdForPostOrder } from '@/state/accountSelectors';
+import { calculateCanViewAccount } from '@/state/accountCalculators';
+import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
-import { getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
+import { useDisappearingValue } from '@/lib/disappearingValue';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
-  marketId: SubaccountPosition['id'];
+  positionId: SubaccountPosition['uniqueId'];
   onIsolatedMarginAdjustment?(): void;
 };
 
@@ -61,97 +69,64 @@ const SIZE_PERCENT_OPTIONS = {
 };
 
 export const AdjustIsolatedMarginForm = ({
-  marketId,
+  positionId,
   onIsolatedMarginAdjustment,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { subaccountNumber: childSubaccountNumber, marginValueInitial: freeCollateral } =
-    orEmptyObj(useParameterizedSelector(getOpenPositionFromId, marketId));
-  const { marginUsage } = orEmptyObj(
-    useParameterizedSelector(getOpenPositionFromIdForPostOrder, marketId)
+  const { subaccountNumber: childSubaccountNumber, market: marketId = '' } = orEmptyObj(
+    useParameterizedSelector(getOpenPositionFromId, positionId)
   );
 
   const { tickSizeDecimals } = orEmptyObj(
     useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, marketId)
   );
-  const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
-  const {
-    type: isolatedMarginAdjustmentType,
-    amount,
-    amountPercent,
-    summary,
-  } = adjustIsolatedMarginInputs ?? {};
+  const { errors, summary, actions, state } = useForm();
 
   useEffect(() => {
-    abacusStateManager.setAdjustIsolatedMarginValue({
-      value: marketId,
-      field: AdjustIsolatedMarginInputField.Market,
-    });
-  }, [marketId]);
+    actions.initializeForm(childSubaccountNumber);
+  }, [actions, childSubaccountNumber]);
 
-  useEffect(() => {
-    abacusStateManager.setAdjustIsolatedMarginValue({
-      value: childSubaccountNumber,
-      field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
-    });
-
-    return () => {
-      abacusStateManager.setAdjustIsolatedMarginValue({
-        value: null,
-        field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
-      });
-      abacusStateManager.clearAdjustIsolatedMarginInputValues();
-      abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
-    };
-  }, [childSubaccountNumber]);
-
-  const setAmount = ({ floatValue }: { floatValue?: number }) => {
-    abacusStateManager.setAdjustIsolatedMarginValue({
-      value: floatValue,
-      field: AdjustIsolatedMarginInputField.Amount,
-    });
+  const setAmount = ({ formattedValue }: { formattedValue?: string }) => {
+    actions.setAmount(formattedValue ?? '');
   };
 
   const setPercent = (value: string) => {
-    abacusStateManager.setAdjustIsolatedMarginValue({
-      value,
-      field: AdjustIsolatedMarginInputField.AmountPercent,
-    });
+    actions.setPercent(value);
   };
 
-  const setMarginAction = (marginAction: string) => {
-    abacusStateManager.setAdjustIsolatedMarginValue({
-      value: marginAction,
-      field: AdjustIsolatedMarginInputField.Type,
-    });
+  const setMarginAction = (type: string) => {
+    actions.setType(
+      type === 'ADD' ? AdjustIsolatedMarginType.ADD : AdjustIsolatedMarginType.REMOVE
+    );
   };
 
-  const { adjustIsolatedMarginOfPosition } = useSubaccount();
-
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessageRaw, setErrorMessageRaw] = useDisappearingValue<string>(undefined);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const onSubmit = () => {
-    setErrorMessage(null);
+  const { transferBetweenSubaccounts } = useSubaccount();
+  const onSubmit = async () => {
+    setErrorMessageRaw(undefined);
     setIsSubmitting(true);
 
-    adjustIsolatedMarginOfPosition({
-      onError: (errorParams) => {
-        setIsSubmitting(false);
-        setErrorMessage(
-          stringGetter({
-            key: errorParams.errorStringKey,
-            fallback: errorParams.errorMessage ?? '',
-          })
-        );
-      },
-      onSuccess: () => {
-        setIsSubmitting(false);
-        abacusStateManager.clearAdjustIsolatedMarginInputValues();
+    try {
+      if (summary.payload == null) {
+        throw new Error('No payload found');
+      }
+      const result = await transferBetweenSubaccounts(summary.payload);
+      if (isOperationSuccess(result)) {
+        actions.initializeForm(childSubaccountNumber);
         onIsolatedMarginAdjustment?.();
-      },
-    });
+      } else if (isOperationFailure(result)) {
+        setErrorMessageRaw(result.errorString);
+      }
+    } catch (e) {
+      if (e?.message != null && typeof e.message === 'string') {
+        setErrorMessageRaw(e.message);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderDiffOutput = ({
@@ -173,81 +148,33 @@ export const AdjustIsolatedMarginForm = ({
     />
   );
 
+  const ctaErrorAction = useMemo(() => {
+    const key = getFormDisabledButtonStringKey(errors);
+    return key ? stringGetter({ key }) : undefined;
+  }, [errors, stringGetter]);
+
+  const validationAlert = useMemo(() => {
+    return getAlertsToRender(errors)?.[0];
+  }, [errors]);
+
+  const hasErrors = useMemo(() => {
+    return errors.some((e) => e.type === ErrorType.error);
+  }, [errors]);
+
   const {
     crossFreeCollateral,
-    crossFreeCollateralUpdated,
     crossMarginUsage,
-    crossMarginUsageUpdated,
-    positionMargin,
-    positionMarginUpdated,
     positionLeverage,
-    positionLeverageUpdated,
+    positionMargin,
     liquidationPrice,
-    liquidationPriceUpdated,
-  } = summary ?? {};
-
-  /**
-   * TODO: Handle by adding AdjustIsolatedMarginValidator within Abacus
-   */
-  const marketMaxLeverage = useParameterizedSelector(getMarketMaxLeverage, marketId);
-
-  const alertMessage = useMemo(() => {
-    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
-      if (MustBigNumber(amount).gt(MustBigNumber(crossFreeCollateral))) {
-        return {
-          message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
-          type: AlertType.Error,
-        };
-      }
-
-      if (crossMarginUsageUpdated && MustBigNumber(crossMarginUsageUpdated).gte(1)) {
-        return {
-          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
-          type: AlertType.Error,
-        };
-      }
-    } else if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
-      if (MustBigNumber(amount).gte(MustBigNumber(freeCollateral))) {
-        return {
-          message: stringGetter({ key: STRING_KEYS.TRANSFER_MORE_THAN_FREE }),
-          type: AlertType.Error,
-        };
-      }
-
-      if (marginUsage?.postOrder && MustBigNumber(marginUsage.postOrder).gte(1)) {
-        return {
-          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
-          type: AlertType.Error,
-        };
-      }
-
-      if (positionLeverageUpdated && MustBigNumber(positionLeverageUpdated).gt(marketMaxLeverage)) {
-        return {
-          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_POSITION_LEVERAGE }),
-          type: AlertType.Error,
-        };
-      }
-    }
-
-    return null;
-  }, [
-    amount,
-    crossFreeCollateral,
-    crossMarginUsageUpdated,
-    freeCollateral,
-    isolatedMarginAdjustmentType,
-    marginUsage,
-    marketMaxLeverage,
-    positionLeverageUpdated,
-    stringGetter,
-  ]);
-
-  // currently the only action that trader can take to fix the errors/validations is modify the amount
-  const ctaErrorAction =
-    alertMessage?.type === AlertType.Error
-      ? stringGetter({ key: STRING_KEYS.MODIFY_MARGIN_AMOUNT })
-      : undefined;
-
+  } = summary.accountBefore;
+  const {
+    crossFreeCollateral: crossFreeCollateralUpdated,
+    crossMarginUsage: crossMarginUsageUpdated,
+    positionLeverage: positionLeverageUpdated,
+    positionMargin: positionMarginUpdated,
+    liquidationPrice: liquidationPriceUpdated,
+  } = summary.accountAfter;
   const {
     freeCollateralDiffOutput,
     marginUsageDiffOutput,
@@ -287,15 +214,15 @@ export const AdjustIsolatedMarginForm = ({
       crossFreeCollateralUpdated,
       crossMarginUsage,
       crossMarginUsageUpdated,
-      positionMargin,
-      positionMarginUpdated,
       positionLeverage,
       positionLeverageUpdated,
+      positionMargin,
+      positionMarginUpdated,
     ]
   );
 
   const formConfig =
-    isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add
+    state.type === AdjustIsolatedMarginType.ADD
       ? {
           formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_ADD }),
           buttonLabel: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
@@ -354,53 +281,67 @@ export const AdjustIsolatedMarginForm = ({
         };
 
   const gradientToColor = useMemo(() => {
-    if (MustBigNumber(amount).isZero()) {
+    if (MustBigNumber(summary.inputs.amount).isZero()) {
       return 'neutral';
     }
 
-    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+    if (state.type === AdjustIsolatedMarginType.ADD) {
       return 'positive';
     }
 
-    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (state.type === AdjustIsolatedMarginType.REMOVE) {
       return 'negative';
     }
 
     return 'neutral';
-  }, [amount, isolatedMarginAdjustmentType]);
+  }, [state.type, summary.inputs.amount]);
 
-  const CenterElement = alertMessage ? (
-    <AlertMessage type={alertMessage.type}>{alertMessage.message}</AlertMessage>
-  ) : errorMessage ? (
-    <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-  ) : (
-    <GradientCard
-      fromColor="neutral"
-      toColor={gradientToColor}
-      tw="spacedRow h-4 items-center rounded-0.5 px-1 py-0.75"
-    >
-      <div tw="column font-small-medium">
-        <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
-        <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
-      </div>
-      <div>
-        <DiffOutput
-          withSubscript
-          withDiff={
-            !!liquidationPriceUpdated &&
-            liquidationPrice !== liquidationPriceUpdated &&
-            MustBigNumber(amount).gt(0)
-          }
-          sign={NumberSign.Negative}
-          layout="column"
-          value={liquidationPrice}
-          newValue={liquidationPriceUpdated}
-          type={OutputType.Fiat}
-          fractionDigits={tickSizeDecimals}
-        />
-      </div>
-    </GradientCard>
-  );
+  const errorMessage = useMemo(() => {
+    if (errorMessageRaw != null) {
+      const parsingResult = parseTransactionError(
+        'AdjustIsolatedMargin SubaccountTransfer',
+        errorMessageRaw
+      );
+      return stringGetter({ key: parsingResult?.stringKey ?? STRING_KEYS.UNKNOWN_ERROR });
+    }
+    return undefined;
+  }, [errorMessageRaw, stringGetter]);
+
+  const CenterElement =
+    !!validationAlert || !!errorMessage ? (
+      <>
+        {validationAlert && <ValidationAlertMessage error={validationAlert} />}
+        {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
+      </>
+    ) : (
+      <GradientCard
+        fromColor="neutral"
+        toColor={gradientToColor}
+        tw="spacedRow h-4 items-center rounded-0.5 px-1 py-0.75"
+      >
+        <div tw="column font-small-medium">
+          <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.ESTIMATED })}</span>
+          <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
+        </div>
+        <div>
+          <DiffOutput
+            withSubscript
+            withDiff={
+              !!liquidationPriceUpdated &&
+              liquidationPrice !== liquidationPriceUpdated &&
+              MustBigNumber(summary.inputs.amount).gt(0)
+            }
+            sign={NumberSign.Negative}
+            layout="column"
+            value={liquidationPrice}
+            newValue={liquidationPriceUpdated}
+            type={OutputType.Fiat}
+            fractionDigits={tickSizeDecimals}
+          />
+        </div>
+      </GradientCard>
+    );
 
   return (
     <$Form
@@ -411,15 +352,15 @@ export const AdjustIsolatedMarginForm = ({
     >
       <ToggleGroup
         size={ButtonSize.Small}
-        value={isolatedMarginAdjustmentType?.name ?? IsolatedMarginAdjustmentType.Add.name}
+        value={state.type}
         onValueChange={setMarginAction}
         items={[
           {
-            value: IsolatedMarginAdjustmentType.Add.name,
+            value: AdjustIsolatedMarginType.ADD,
             label: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
           },
           {
-            value: IsolatedMarginAdjustmentType.Remove.name,
+            value: AdjustIsolatedMarginType.REMOVE,
             label: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }),
           },
         ]}
@@ -431,7 +372,7 @@ export const AdjustIsolatedMarginForm = ({
             label: key,
             value: MustBigNumber(value).toFixed(PERCENT_DECIMALS),
           }))}
-          value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
+          value={MustBigNumber(summary.inputs.percent).toFixed(PERCENT_DECIMALS)}
           onValueChange={setPercent}
           shape={ButtonShape.Rectangle}
         />
@@ -440,7 +381,11 @@ export const AdjustIsolatedMarginForm = ({
           <FormInput
             type={InputType.Currency}
             label={formConfig.formLabel}
-            value={amount}
+            value={
+              state.amountInput.type === AdjustIsolatedMarginInputType.AMOUNT
+                ? state.amountInput.amount
+                : summary.inputs.amount
+            }
             onInput={setAmount}
           />
         </WithDetailsReceipt>
@@ -452,11 +397,11 @@ export const AdjustIsolatedMarginForm = ({
         <Button
           type={ButtonType.Submit}
           action={ButtonAction.Primary}
-          disabled={isSubmitting || ctaErrorAction !== undefined}
+          disabled={isSubmitting || hasErrors}
           state={
             isSubmitting
               ? ButtonState.Loading
-              : ctaErrorAction
+              : hasErrors
                 ? ButtonState.Disabled
                 : ButtonState.Default
           }
@@ -479,3 +424,19 @@ const $Form = styled.form`
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;
+function useForm() {
+  const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
+  const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+
+  const inputs = useMemo(
+    () => ({
+      rawParentSubaccountData,
+      rawRelevantMarkets,
+      canViewAccount,
+    }),
+    [canViewAccount, rawParentSubaccountData, rawRelevantMarkets]
+  );
+
+  return useFormValues(AdjustIsolatedMarginFormFns, inputs);
+}

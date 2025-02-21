@@ -71,7 +71,7 @@ export function useWithdrawalDeltas({ withdrawAmount }: { withdrawAmount: string
   const withdrawInput = useMemo(
     () => ({
       subaccountNumber: 0,
-      withdrawAmount,
+      amount: withdrawAmount,
     }),
     [withdrawAmount]
   );

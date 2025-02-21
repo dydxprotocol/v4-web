@@ -1,30 +1,27 @@
 import { ofType, unionize, UnionOf } from 'unionize';
 
-import {
-  IndexerAssetPositionResponseObject,
-  IndexerPerpetualPositionResponseObject,
-} from '@/types/indexer/indexerApiGen';
-
-export type AddPerpetualPositionProps = {
+export type DepositUsdcProps = {
   subaccountNumber: number;
-  market: string;
-  changes: Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>;
+  amount: string;
 };
 
-export type ModifyPerpetualPositionProps = {
-  changes: Partial<Omit<IndexerPerpetualPositionResponseObject, 'market' | 'subaccountNumber'>>;
-};
-
-export type ModifyUsdcAssetPositionProps = {
+export type WithdrawUsdcProps = {
   subaccountNumber: number;
-  changes: IndexerAssetPositionResponseObject;
+  amount: string;
 };
 
+export type SubaccountTransferProps = {
+  senderSubaccountNumber: number;
+  recipientSubaccountNumber: number;
+  amount: string;
+};
+
+// Define the union of operations
 export const SubaccountOperations = unionize(
   {
-    AddPerpetualPosition: ofType<AddPerpetualPositionProps>(),
-    ModifyPerpetualPosition: ofType<ModifyPerpetualPositionProps>(),
-    ModifyUsdcAssetPosition: ofType<ModifyUsdcAssetPositionProps>(),
+    DepositUsdc: ofType<DepositUsdcProps>(),
+    WithdrawUsdc: ofType<WithdrawUsdcProps>(),
+    SubaccountTransfer: ofType<SubaccountTransferProps>(),
   },
   { tag: 'operation' as const, value: 'payload' as const }
 );
