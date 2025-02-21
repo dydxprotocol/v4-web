@@ -2,7 +2,6 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import assign from 'lodash/assign';
 
 import {
-  type AdjustIsolatedMarginInputs,
   type ClosePositionInputs,
   type InputError,
   type Inputs,
@@ -29,7 +28,6 @@ export interface InputsState {
   inputErrors?: Nullable<InputError[]>;
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
-  adjustIsolatedMarginInputs?: Nullable<AdjustIsolatedMarginInputs>;
   closePositionFormInputs: ClosePositionFormInputs;
   closePositionInputs?: Nullable<ClosePositionInputs>;
   triggerFormInputs: TriggerFormInputs;

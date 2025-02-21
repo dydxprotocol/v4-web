@@ -107,12 +107,6 @@ export const getTriggerOrdersInputs = (state: RootState) => state.inputs.trigger
 export const getTriggerFormInputs = (state: RootState) => state.inputs.triggerFormInputs;
 
 /**
- * @returns AdjustIsolatedMarginInputs
- */
-export const getAdjustIsolatedMarginInputs = (state: RootState) =>
-  state.inputs.adjustIsolatedMarginInputs;
-
-/**
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {
