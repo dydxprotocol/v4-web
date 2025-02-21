@@ -25,6 +25,7 @@ import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/co
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { USDC_DECIMALS } from '@/constants/tokens';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
@@ -1053,7 +1054,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           subaccount,
           params.destinationAddress,
           params.destinationSubaccountNumber,
-          parseFloat(params.amount).toFixed(6),
+          parseFloat(params.amount).toFixed(USDC_DECIMALS),
           DEFAULT_TRANSACTION_MEMO
         );
 

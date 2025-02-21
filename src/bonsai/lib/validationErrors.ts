@@ -1,10 +1,3 @@
-import { AlertType } from '@/constants/alerts';
-import { STRING_KEYS } from '@/constants/localization';
-
-import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { AlertMessage } from '@/components/AlertMessage';
-
 export interface ValidationError {
   code: string;
   type: ErrorType;
@@ -60,29 +53,6 @@ export function getFormDisabledButtonStringKey(errors: ValidationError[]) {
   return errors.find((e) => e.resources.title?.stringKey != null && e.type === ErrorType.error)
     ?.resources.title?.stringKey;
 }
-
-export const ValidationAlertMessage = ({
-  className,
-  error,
-}: {
-  error: ValidationError;
-  className?: string;
-}) => {
-  const stringGetter = useStringGetter();
-  return (
-    <AlertMessage
-      type={error.type === ErrorType.error ? AlertType.Error : AlertType.Warning}
-      className={className}
-    >
-      {stringGetter({
-        key:
-          error.resources.text?.stringKey ??
-          error.resources.title?.stringKey ??
-          STRING_KEYS.UNKNOWN_ERROR,
-      })}
-    </AlertMessage>
-  );
-};
 
 interface SimpleValidationErrorParams {
   code: string;

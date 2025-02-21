@@ -12,7 +12,6 @@ import {
   ErrorType,
   getAlertsToRender,
   getFormDisabledButtonStringKey,
-  ValidationAlertMessage,
 } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
@@ -44,6 +43,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
@@ -424,7 +424,6 @@ const $Form = styled.form`
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;
-
 function useForm() {
   const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
   const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
