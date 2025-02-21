@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
+import { initial } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { CosmosChainId } from '@/constants/graz';
@@ -20,23 +21,27 @@ import { formatNumberOutput, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { Withdraw } from '@/state/transfers';
+import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
+import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
 
 export function useWithdrawStep({
   destinationAddress,
   withdrawRoute,
   onWithdraw,
+  onWithdrawBroadcastUpdate,
   onWithdrawSigned,
 }: {
   destinationAddress: string;
   withdrawRoute?: RouteResponse;
   onWithdraw: (withdraw: Withdraw) => void;
-  onWithdrawSigned: () => void;
+  onWithdrawBroadcastUpdate: (withdrawId: string, subtransaction: WithdrawSubtransaction) => void;
+  onWithdrawSigned: (withdrawId: string) => void;
 }) {
   const stringGetter = useStringGetter();
   const { skipClient } = useSkipClient();
@@ -101,7 +106,11 @@ export function useWithdrawStep({
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
       if (!userAddresses) throw new Error('No user addresses found');
-      if (!localDydxWallet && !localNobleWallet) throw new Error('No local wallets found');
+      if (!localDydxWallet || !localNobleWallet || !dydxAddress) {
+        throw new Error('No local wallets found');
+      }
+
+      const withdrawId = `withdraw-${crypto.randomUUID()}`;
 
       await skipClient.executeRoute({
         getCosmosSigner,
@@ -120,22 +129,43 @@ export function useWithdrawStep({
           msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
         onTransactionSigned: async () => {
-          onWithdrawSigned();
+          onWithdrawSigned(withdrawId);
         },
         onTransactionBroadcast: async ({ txHash, chainID }) => {
-          const baseWithdraw = {
-            type: 'withdraw' as const,
-            txHash,
-            chainId: chainID,
-            destinationChainId: withdrawRoute.destAssetChainID,
-            status: 'pending' as const,
-            estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
-            isInstantWithdraw: isInstantTransfer(withdrawRoute),
-            transferAssetRelease: null,
-          };
+          // First Broadcast will always originate from v4 chain
+          if (chainID === DYDX_DEPOSIT_CHAIN) {
+            // Create subtransactions for each chain in the withdrawRoute excluding the last chain. Only the v4 chain will have a txHash at this point
+            const subtransactions: WithdrawSubtransaction[] = initial(
+              withdrawRoute.requiredChainAddresses
+            ).map((chainId) => ({
+              chainId,
+              txHash: chainId === chainID ? txHash : undefined,
+              status: chainId === chainID ? ('pending' as const) : ('idle' as const),
+            }));
 
-          track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
-          onWithdraw(baseWithdraw);
+            const baseWithdraw: Withdraw = {
+              id: withdrawId,
+              transactions: subtransactions,
+              type: 'withdraw' as const,
+              status: 'pending' as const,
+              destinationChainId: withdrawRoute.destAssetChainID,
+              estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
+              isInstantWithdraw: isInstantTransfer(withdrawRoute),
+              transferAssetRelease: null,
+            };
+
+            track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
+            onWithdraw(baseWithdraw);
+          } else {
+            // Update the subtransaction with the txHash
+            const subtransaction: WithdrawSubtransaction = {
+              chainId: chainID,
+              txHash,
+              status: 'pending' as const,
+            };
+
+            onWithdrawBroadcastUpdate(withdrawId, subtransaction);
+          }
         },
       });
       return {
@@ -143,6 +173,7 @@ export function useWithdrawStep({
       };
     } catch (error) {
       track(AnalyticsEvents.WithdrawError({ error: error.message }));
+      log('withdrawHooks/executeWithdraw', error);
 
       return {
         success: false,

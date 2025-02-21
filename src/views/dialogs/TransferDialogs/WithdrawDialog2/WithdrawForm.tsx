@@ -21,7 +21,7 @@ import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
-import { Withdraw } from '@/state/transfers';
+import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
 import { log } from '@/lib/telemetry';
@@ -41,6 +41,7 @@ export const WithdrawForm = ({
   destinationChain,
   onChainSelect,
   onWithdraw,
+  onWithdrawBroadcastUpdate,
   onWithdrawSigned,
 }: {
   amount: string;
@@ -50,7 +51,8 @@ export const WithdrawForm = ({
   destinationChain: string;
   onChainSelect: () => void;
   onWithdraw: (withdraw: Withdraw) => void;
-  onWithdrawSigned: () => void;
+  onWithdrawBroadcastUpdate: (withdrawId: string, subtransaction: WithdrawSubtransaction) => void;
+  onWithdrawSigned: (withdrawId: string) => void;
 }) => {
   const stringGetter = useStringGetter();
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
@@ -89,6 +91,7 @@ export const WithdrawForm = ({
     destinationAddress,
     withdrawRoute: selectedRoute,
     onWithdraw,
+    onWithdrawBroadcastUpdate,
     onWithdrawSigned,
   });
 
