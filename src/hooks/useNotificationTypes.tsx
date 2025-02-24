@@ -422,11 +422,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const { appleAppStoreUrl } = useMobileAppUrl();
 
-      const simpleUsExpirationDate = new Date('2025-03-24T23:59:59');
+      const simpleIosExpirationDate = new Date('2025-03-24T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
-        if (currentDate < simpleUsExpirationDate) {
+        if (currentDate < simpleIosExpirationDate) {
           trigger(ReleaseUpdateNotificationIds.SimpleIosExperience, {
             title: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_TITLE }),
             body: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_BODY }),
