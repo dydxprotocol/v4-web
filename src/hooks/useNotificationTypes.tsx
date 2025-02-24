@@ -28,6 +28,7 @@ import {
   MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
+  ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
@@ -423,6 +424,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const featureFlags = useAllStatsigGateValues();
       const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
+      const simpleUsExpirationDate = new Date('2025-03-24T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
@@ -448,6 +450,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
             },
             []
           );
+        }
+
+        if (currentDate < simpleUsExpirationDate) {
+          trigger(ReleaseUpdateNotificationIds.SimpleIosExperience, {
+            title: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_TITLE }),
+            body: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_BODY }),
+            toastSensitivity: 'foreground',
+            groupKey: ReleaseUpdateNotificationIds.SimpleIosExperience,
+            icon: <Icon iconName={IconName.Sparkles} />,
+          });
         }
       }, [stringGetter]);
     },
