@@ -1102,7 +1102,7 @@
   "80002": {
     "name": "Polygon Amoy",
     "fallbackRpcUrl": "https://rpc-amoy.polygon.technology",
-    "alchemyRpcUrl": "https://polygon-mumbai.g.alchemy.com/v2"
+    "alchemyRpcUrl": "https://polygon-amoy.g.alchemy.com/v2"
   },
   "80084": {
     "name": "Berachain bArtio",
