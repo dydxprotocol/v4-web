@@ -18,12 +18,10 @@ import {
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
-import { PREDICTION_MARKET } from '@/constants/markets';
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
   INCENTIVES_SEASON_NOTIFICATION_ID,
-  MarketLaunchNotificationIds,
   MarketUpdateNotificationIds,
   MarketWindDownNotificationIds,
   NotificationDisplayData,
@@ -33,7 +31,7 @@ import {
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
-import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
+import { StatsigDynamicConfigs } from '@/constants/statsig';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -49,7 +47,6 @@ import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotifi
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNotification';
-import { MarketLaunchTrumpwinNotification } from '@/views/notifications/MarketLaunchTrumpwinNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
@@ -78,8 +75,9 @@ import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useIncentivesSeason } from './useIncentivesSeason';
 import { useLocaleSeparators } from './useLocaleSeparators';
+import { useMobileAppUrl } from './useMobileAppUrl';
 import { useParameterizedSelector } from './useParameterizedSelector';
-import { useAllStatsigDynamicConfigValues, useAllStatsigGateValues } from './useStatsig';
+import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
@@ -422,43 +420,26 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const featureFlags = useAllStatsigGateValues();
-      const tradeUSElectionExpirationDate = new Date('2024-10-21T23:59:59');
+      const { appleAppStoreUrl } = useMobileAppUrl();
+
       const simpleUsExpirationDate = new Date('2025-03-24T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
-        if (
-          featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
-          currentDate <= tradeUSElectionExpirationDate
-        ) {
-          trigger(
-            MarketLaunchNotificationIds.TrumpWin,
-            {
-              title: stringGetter({ key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_TITLE }),
-              body: stringGetter({
-                key: STRING_KEYS.TRUMPWIN_MARKET_LAUNCH_BODY,
-                params: { MARKET: PREDICTION_MARKET.TRUMPWIN },
-              }),
-              renderCustomBody({ isToast, notification }) {
-                return (
-                  <MarketLaunchTrumpwinNotification isToast={isToast} notification={notification} />
-                );
-              },
-              toastSensitivity: 'foreground',
-              groupKey: MarketLaunchNotificationIds.TrumpWin,
-            },
-            []
-          );
-        }
-
         if (currentDate < simpleUsExpirationDate) {
           trigger(ReleaseUpdateNotificationIds.SimpleIosExperience, {
             title: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_TITLE }),
             body: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_BODY }),
             toastSensitivity: 'foreground',
             groupKey: ReleaseUpdateNotificationIds.SimpleIosExperience,
-            icon: <Icon iconName={IconName.Sparkles} />,
+            icon: <Icon tw="text-color-text-2" iconName={IconName.Sparkles} />,
+            actionAltText: stringGetter({ key: STRING_KEYS.DOWNLOAD_IOS_APP }),
+            renderActionSlot: () =>
+              appleAppStoreUrl && (
+                <Link isAccent href={appleAppStoreUrl}>
+                  {stringGetter({ key: STRING_KEYS.DOWNLOAD_IOS_APP })} →
+                </Link>
+              ),
           });
         }
       }, [stringGetter]);
