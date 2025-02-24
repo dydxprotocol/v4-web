@@ -35,6 +35,8 @@ export interface ParentSubaccountData {
   };
 }
 
+export type ParentSubaccountDataBase = Omit<ParentSubaccountData, 'live'>;
+
 export interface ChildSubaccountData {
   address: string;
 

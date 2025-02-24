@@ -216,6 +216,7 @@ export const AffiliatesLeaderboard = () => {
         <$Table
           withInnerBorders
           data={affiliates ?? EMPTY_ARR}
+          tableId="affiliate-leaderboard"
           getRowKey={(row: IAffiliateLeaderboardStats) => row.rank}
           label={stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD })}
           columns={columns}

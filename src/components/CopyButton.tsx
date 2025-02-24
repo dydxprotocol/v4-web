@@ -44,7 +44,7 @@ export const CopyButton = ({
   return buttonType === 'text' ? (
     <$InlineRow onClick={copy} copied={copied}>
       {children}
-      <$Icon copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
+      <$Icon $copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
     </$InlineRow>
   ) : buttonType === 'icon' ? (
     <WithTooltip
@@ -86,9 +86,9 @@ const $InlineRow = styled.div<{ copied: boolean }>`
         `}
 `;
 
-const $Icon = styled(Icon)<{ copied: boolean }>`
-  ${({ copied }) =>
-    copied &&
+const $Icon = styled(Icon)<{ $copied: boolean }>`
+  ${({ $copied }) =>
+    $copied &&
     css`
       color: var(--color-success);
     `}

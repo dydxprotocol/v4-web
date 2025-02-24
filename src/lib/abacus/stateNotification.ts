@@ -1,11 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { kollections } from '@dydxprotocol/v4-abacus';
-import { fromPairs } from 'lodash';
 
 import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
-  AccountBalance,
   Nullable,
   ParsingErrors,
   PerpetualState,
@@ -17,16 +15,7 @@ import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 
 import { type RootStore } from '@/state/_store';
-import {
-  setCompliance,
-  setRestrictionType,
-  setStakingBalances,
-  setStakingDelegations,
-  setStakingRewards,
-  setSubaccountForPostOrders,
-  setTradingRewards,
-  setUnbondingDelegations,
-} from '@/state/account';
+import { setSubaccountForPostOrders } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
@@ -57,40 +46,8 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
-      if (changes.has(Changes.accountBalances)) {
-        if (updatedState.account?.stakingBalances) {
-          const stakingBalances: Record<string, AccountBalance> = fromPairs(
-            updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
-          );
-          dispatch(setStakingBalances(stakingBalances));
-        }
-        if (updatedState.account?.stakingDelegations) {
-          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
-        }
-        if (updatedState.account?.unbondingDelegation) {
-          dispatch(setUnbondingDelegations(updatedState.account.unbondingDelegation.toArray()));
-        }
-        if (updatedState.account?.stakingRewards) {
-          dispatch(setStakingRewards(updatedState.account.stakingRewards));
-        }
-      }
-
-      if (changes.has(Changes.tradingRewards)) {
-        if (updatedState.account?.tradingRewards) {
-          dispatch(setTradingRewards(updatedState.account.tradingRewards));
-        }
-      }
-
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
-      }
-
-      if (changes.has(Changes.restriction)) {
-        dispatch(setRestrictionType(updatedState.restriction));
-      }
-
-      if (changes.has(Changes.compliance) && updatedState.compliance) {
-        dispatch(setCompliance(updatedState.compliance));
       }
 
       // this can be migrated when the trade/close position forms are migrated
@@ -116,8 +73,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   // this can be migrated when the trade/close position forms are migrated
-  lastOrderChanged(order: SubaccountOrder) {
-    this.store?.dispatch(setLatestOrder({ clientId: order.clientId, id: order.id }));
+  lastOrderChanged(order: SubaccountOrder | null | undefined) {
+    this.store?.dispatch(
+      setLatestOrder(order == null ? order : { clientId: order.clientId, id: order.id })
+    );
   }
 
   errorsEmitted(errors: ParsingErrors) {

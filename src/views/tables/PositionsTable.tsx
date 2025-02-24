@@ -110,7 +110,7 @@ const getPositionsTableColumnDef = ({
               <AssetIcon
                 logoUrl={marketSummary?.logo}
                 symbol={marketSummary?.assetId}
-                tw="inlineRow min-w-[unset] text-[2.25rem]"
+                tw="inlineRow min-w-[unset] [--asset-icon-size:2.25rem]"
               />
             }
           >
@@ -504,6 +504,7 @@ export const PositionsTable = forwardRef(
         key={currentMarket ?? 'positions'}
         label={stringGetter({ key: STRING_KEYS.POSITIONS })}
         data={positionsData}
+        tableId="positions"
         columns={columnKeys.map((key: PositionsTableColumnKey) =>
           getPositionsTableColumnDef({
             key,

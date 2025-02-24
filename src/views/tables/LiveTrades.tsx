@@ -157,6 +157,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     <$LiveTradesTable
       className={className}
       key="live-trades"
+      tableId="live-trades"
       label="Recent Trades"
       data={rows}
       columns={columns}

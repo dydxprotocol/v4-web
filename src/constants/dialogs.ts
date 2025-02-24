@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
 
-import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
+import { PositionUniqueId, SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { BigNumberish } from '@/lib/numbers';
 
-import { Nullable, SubaccountPosition } from './abacus';
+import { Nullable } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 
@@ -16,7 +16,7 @@ export type DialogProps<T> = T & SharedDialogProps;
 
 export type AcknowledgeTermsDialogProps = {};
 export type AdjustIsolatedMarginDialogProps = {
-  positionId: SubaccountPosition['id'];
+  positionId: SubaccountPosition['uniqueId'];
 };
 export type AdjustTargetLeverageDialogProps = {};
 export type ClosePositionDialogProps = {};
@@ -83,7 +83,6 @@ export type TriggersDialogProps = {
   navigateToMarketOrders: (market: string) => void;
 };
 export type TransferDialogProps = { selectedAsset?: DydxChainAsset };
-export type UnlimitedAnnouncementDialogProps = {};
 export type UnstakeDialogProps = {};
 export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHDRAW' };
 export type WithdrawDialogProps = {};
@@ -98,6 +97,9 @@ export type CriteriaDialogProps = {
   stakedAmount?: bigint;
   userTier?: number | 'vip';
 };
+export type CoinbaseDepositDialogProps = {
+  onBack?: () => void;
+};
 
 export const DialogTypes = unionize(
   {
@@ -109,7 +111,7 @@ export const DialogTypes = unionize(
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
-    CoinbaseDepositDialog: ofType<{}>(),
+    CoinbaseDepositDialog: ofType<CoinbaseDepositDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     Deposit: ofType<DepositDialogProps>(),
@@ -145,7 +147,6 @@ export const DialogTypes = unionize(
     Trade: ofType<TradeDialogProps>(),
     Transfer: ofType<TransferDialogProps>(),
     Triggers: ofType<TriggersDialogProps>(),
-    UnlimitedAnnouncement: ofType<UnlimitedAnnouncementDialogProps>(),
     Unstake: ofType<UnstakeDialogProps>(),
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw: ofType<WithdrawDialogProps>(),

@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
@@ -20,10 +19,7 @@ export const RewardHistoryPanel = () => {
       <div tw="px-0.5 py-0 text-color-text-2 font-large-book">
         {stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       </div>
-      <TradingRewardHistoryTable
-        period={HistoricalTradingRewardsPeriod.DAILY}
-        tw="[--computed-radius:0.875rem]"
-      />
+      <TradingRewardHistoryTable tw="[--computed-radius:0.875rem]" />
       <$Description>
         {stringGetter({
           key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION,

@@ -6,7 +6,26 @@ import { TokenConfigsResult } from '@/hooks/useTokenConfigs';
 
 import { AccountBalances } from '../types/summaryTypes';
 
-function convertAmount(amount: string | undefined, decimals: number): string | undefined {
+export function processCoinAmount(
+  tokenConfig: TokenConfigsResult,
+  denom: string | undefined,
+  amount: string | undefined
+): string | undefined {
+  if (amount == null || denom == null) {
+    return undefined;
+  }
+
+  const decimals = Object.values(tokenConfig.tokensConfigs).find(
+    (t) => t.denom === denom
+  )?.decimals;
+  if (decimals == null) {
+    return undefined;
+  }
+
+  return formatUnits(BigInt(amount), decimals);
+}
+
+export function convertAmount(amount: string | undefined, decimals: number): string | undefined {
   if (amount == null) {
     return undefined;
   }

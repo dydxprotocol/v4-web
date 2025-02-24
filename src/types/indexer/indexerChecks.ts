@@ -3,6 +3,7 @@ import typia from 'typia';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerHistoricalPnlResponse,
+  IndexerHistoricalTradingRewardAggregationsResponse,
   IndexerOrderbookResponseObject,
   IndexerParentSubaccountTransferResponse,
   IndexerTradeResponse,
@@ -51,3 +52,5 @@ export const isParentSubaccountBlockRewardResponse =
 export const isPerpetualMarketSparklineResponse =
   typia.createAssert<IndexerSparklineResponseObject>();
 export const isIndexerHistoricalPnlResponse = typia.createAssert<IndexerHistoricalPnlResponse>();
+export const isIndexerHistoricalTradingRewardAggregationResponse =
+  typia.createAssert<IndexerHistoricalTradingRewardAggregationsResponse>();

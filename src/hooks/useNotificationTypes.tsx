@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, isEqual } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
-import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
@@ -279,12 +279,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
         // eslint-disable-next-line no-restricted-syntax
         for (const transfer of userTransfers) {
           const { type, status } = transfer;
-          const id = `${transfer.chainId}-${transfer.txHash}`;
+          const id = transfer.id;
+
           const finalAmount = formatNumberOutput(
             transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
             OutputType.Fiat,
             { decimalSeparator, groupSeparator, selectedLocale }
           );
+
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
@@ -293,6 +295,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });
+
             body = isSuccess
               ? stringGetter({
                   key: STRING_KEYS.WITHDRAW_COMPLETE,
@@ -304,6 +307,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
             });
+
             body = isSuccess
               ? stringGetter({
                   key: STRING_KEYS.DEPOSIT_AVAILABLE,
@@ -357,7 +361,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished =
             (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
           const icon = isCosmosDeposit ? (
-            <$AssetIcon logoUrl={usdcImage} symbol="USDC" />
+            <AssetIcon tw="[--asset-icon-size: 1.5rem]" logoUrl={usdcImage} symbol="USDC" />
           ) : (
             <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
           );
@@ -477,7 +481,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger(
             MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
             {
-              icon: <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />,
+              icon: (
+                <AssetIcon
+                  tw="[--asset-icon-size: 1.5rem]"
+                  logoUrl={chainTokenImage}
+                  symbol={chainTokenLabel}
+                />
+              ),
               title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
               body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
               toastSensitivity: 'foreground',
@@ -851,7 +861,5 @@ export const notificationTypes: NotificationTypeConfig[] = [
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;
-
-const $AssetIcon = tw(AssetIcon)`text-[1.5rem]`;
 
 const $WarningIcon = tw(Icon)`text-color-warning`;

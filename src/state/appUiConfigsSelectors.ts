@@ -61,3 +61,9 @@ export const getIsMarketFavorited = () =>
     [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],
     (favoritedMarkets, marketId) => favoritedMarkets.includes(marketId)
   );
+
+export const getSavedTablePageSize = () =>
+  createAppSelector(
+    [(state) => state.appUiConfigs.tablePageSizes, (_s, id: string) => id],
+    (pageSizes, id) => pageSizes[id]
+  );

@@ -39,11 +39,23 @@ export function getUserAddressesForRoute(
   nobleAddress?: string,
   dydxAddress?: string,
   osmosisAddress?: string,
-  neutronAddress?: string
+  neutronAddress?: string,
+  destinationAddress?: string // Withdraw Only: The final stop for the transfer
 ): UserAddress[] {
   const chains = route.requiredChainAddresses;
+  const destinationChain = route.destAssetChainID;
 
-  return chains.map((chainId) => {
+  return chains.map((chainId, idx) => {
+    // Withdraw Only: The last chain in the route and the destination address is valid
+    if (
+      chainId === destinationChain &&
+      idx === chains.length - 1 &&
+      destinationAddress &&
+      isValidWithdrawalAddress(destinationAddress, chainId)
+    ) {
+      return { chainID: chainId, address: destinationAddress };
+    }
+
     switch (chainId) {
       case CosmosChainId.Noble:
         if (!nobleAddress) throw new Error('nobleAddress undefined');

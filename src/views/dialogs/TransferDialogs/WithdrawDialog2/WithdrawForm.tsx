@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
@@ -20,8 +21,9 @@ import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
-import { Withdraw } from '@/state/transfers';
+import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
+import { track } from '@/lib/analytics/analytics';
 import { log } from '@/lib/telemetry';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -39,6 +41,8 @@ export const WithdrawForm = ({
   destinationChain,
   onChainSelect,
   onWithdraw,
+  onWithdrawBroadcastUpdate,
+  onWithdrawSigned,
 }: {
   amount: string;
   setAmount: Dispatch<SetStateAction<string>>;
@@ -47,6 +51,8 @@ export const WithdrawForm = ({
   destinationChain: string;
   onChainSelect: () => void;
   onWithdraw: (withdraw: Withdraw) => void;
+  onWithdrawBroadcastUpdate: (withdrawId: string, subtransaction: WithdrawSubtransaction) => void;
+  onWithdrawSigned: (withdrawId: string) => void;
 }) => {
   const stringGetter = useStringGetter();
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
@@ -82,8 +88,11 @@ export const WithdrawForm = ({
   const selectedRoute = selectedSpeed === 'fast' ? routes?.fast : routes?.slow;
 
   const { executeWithdraw, isLoading } = useWithdrawStep({
+    destinationAddress,
     withdrawRoute: selectedRoute,
     onWithdraw,
+    onWithdrawBroadcastUpdate,
+    onWithdrawSigned,
   });
 
   // ------ Errors + Validation ------ //
@@ -185,6 +194,21 @@ export const WithdrawForm = ({
   );
 
   const onWithdrawClick = async () => {
+    if (withdrawDisabled) return;
+
+    track(
+      AnalyticsEvents.WithdrawInitiated({
+        sourceAssetDenom: selectedRoute.sourceAssetDenom,
+        sourceAssetChainID: selectedRoute.sourceAssetChainID,
+        amountIn: selectedRoute.amountIn,
+        amountOut: selectedRoute.amountOut,
+        usdAmountOut: selectedRoute.usdAmountOut,
+        estimatedAmountOut: selectedRoute.estimatedAmountOut,
+        swapPriceImpactPercent: selectedRoute.swapPriceImpactPercent,
+        estimatedRouteDurationSeconds: selectedRoute.estimatedRouteDurationSeconds,
+      })
+    );
+
     executeWithdraw();
   };
 

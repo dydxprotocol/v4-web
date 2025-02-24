@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TransferAssetRelease } from '@skip-go/client';
 
 import { TokenForTransfer } from '@/constants/tokens';
 import { DydxAddress } from '@/constants/wallets';
 
 export type Deposit = {
+  id: string;
   type: 'deposit';
   txHash: string;
   chainId: string;
@@ -15,14 +17,22 @@ export type Deposit = {
   isInstantDeposit: boolean;
 };
 
-export type Withdraw = {
-  type: 'withdraw';
-  txHash: string;
+export type WithdrawSubtransaction = {
+  txHash?: string; // Optional due to not knowing the txHash until time of broadcast. (Withdraws may have several broadcasted transactions)
   chainId: string;
-  status: 'pending' | 'success' | 'error';
+  status: 'idle' | 'pending' | 'success' | 'error';
+};
+
+export type Withdraw = {
+  id: string;
+  type: 'withdraw';
+  transactions: WithdrawSubtransaction[];
   estimatedAmountUsd: string;
   finalAmountUsd?: string;
   isInstantWithdraw: boolean;
+  destinationChainId: string;
+  transferAssetRelease: TransferAssetRelease | null; // Where the asset was transferred to
+  status: 'pending' | 'success' | 'error';
 };
 
 export type Transfer = Deposit | Withdraw;
@@ -93,7 +103,7 @@ export const transfersSlice = createSlice({
       state,
       action: PayloadAction<{
         dydxAddress: DydxAddress;
-        withdraw: Partial<Withdraw> & { txHash: string; chainId: string };
+        withdraw: Partial<Withdraw>;
       }>
     ) => {
       const { dydxAddress, withdraw } = action.payload;
@@ -101,12 +111,36 @@ export const transfersSlice = createSlice({
       if (!accountTransfers?.length) return;
 
       state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
-        if (
-          isWithdraw(transfer) &&
-          transfer.txHash === withdraw.txHash &&
-          transfer.chainId === withdraw.chainId
-        ) {
+        if (isWithdraw(transfer) && transfer.id === withdraw.id) {
           return { ...transfer, ...withdraw };
+        }
+
+        return transfer;
+      });
+    },
+    onWithdrawBroadcast: (
+      state,
+      action: PayloadAction<{
+        dydxAddress: DydxAddress;
+        withdrawId: string;
+        subtransaction: WithdrawSubtransaction;
+      }>
+    ) => {
+      const { dydxAddress, withdrawId, subtransaction } = action.payload;
+      const accountTransfers = state.transfersByDydxAddress[dydxAddress];
+      if (!accountTransfers?.length) return;
+
+      state.transfersByDydxAddress[dydxAddress] = accountTransfers.map((transfer) => {
+        if (isWithdraw(transfer) && transfer.id === withdrawId) {
+          const currentTransactions = transfer.transactions.map((sub) => {
+            if (sub.chainId === subtransaction.chainId) {
+              return subtransaction;
+            }
+
+            return sub;
+          });
+
+          transfer.transactions = currentTransactions;
         }
 
         return transfer;
@@ -115,4 +149,5 @@ export const transfersSlice = createSlice({
   },
 });
 
-export const { addDeposit, addWithdraw, updateDeposit, updateWithdraw } = transfersSlice.actions;
+export const { addDeposit, addWithdraw, onWithdrawBroadcast, updateDeposit, updateWithdraw } =
+  transfersSlice.actions;

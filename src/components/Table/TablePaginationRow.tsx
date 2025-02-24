@@ -26,7 +26,7 @@ type ElementProps = {
   pages: MenuItem<string>[];
   totalRows: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
-  setPageSize: Dispatch<SetStateAction<PageSize>>;
+  setPageSize: (val: PageSize) => void;
 };
 
 export const TablePaginationRow = ({

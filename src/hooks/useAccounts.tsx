@@ -29,7 +29,7 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { isBlockedGeo } from '@/lib/compliance';
+import { hdKeyManager, isBlockedGeo } from '@/lib/compliance';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -158,12 +158,16 @@ const useAccountsContext = () => {
         signature,
       });
       setLocalDydxWallet(wallet);
-      setHdKey({ mnemonic, privateKey, publicKey });
+      const key = { mnemonic, privateKey, publicKey };
+      setHdKey(key);
+      hdKeyManager.setHdkey(wallet.address, key);
     },
     [getWalletFromSignature]
   );
 
   const signMessageAsync = useSignForWalletDerivation(sourceAccount.walletInfo);
+
+  const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
     (async () => {
@@ -185,7 +189,7 @@ const useAccountsContext = () => {
           log('useAccounts/setLocalDydxWallet', error);
         }
       } else if (sourceAccount.chain === WalletNetworkType.Evm) {
-        if (!localDydxWallet) {
+        if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (
@@ -219,7 +223,7 @@ const useAccountsContext = () => {
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else if (sourceAccount.chain === WalletNetworkType.Solana) {
-        if (!localDydxWallet) {
+        if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
@@ -240,7 +244,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, localDydxWallet, blockedGeo]);
+  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
   // abacus
   useEffect(() => {
@@ -260,28 +264,32 @@ const useAccountsContext = () => {
         neutronWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
       }
 
-      const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
-      if (nobleOfflineSigner !== undefined) {
-        nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
-      }
-      const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
-      if (osmosisOfflineSigner !== undefined) {
-        osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
-      }
-      const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
-      if (neutronOfflineSigner !== undefined) {
-        neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
-      }
+      try {
+        const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
+        if (nobleOfflineSigner !== undefined) {
+          nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+        }
+        const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
+        if (osmosisOfflineSigner !== undefined) {
+          osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
+        }
+        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
+        if (neutronOfflineSigner !== undefined) {
+          neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
+        }
 
-      if (nobleWallet !== undefined) {
-        abacusStateManager.setNobleWallet(nobleWallet);
-        setLocalNobleWallet(nobleWallet);
-      }
-      if (osmosisWallet !== undefined) {
-        setLocalOsmosisWallet(osmosisWallet);
-      }
-      if (neutronWallet !== undefined) {
-        setLocalNeutronWallet(neutronWallet);
+        if (nobleWallet !== undefined) {
+          abacusStateManager.setNobleWallet(nobleWallet);
+          setLocalNobleWallet(nobleWallet);
+        }
+        if (osmosisWallet !== undefined) {
+          setLocalOsmosisWallet(osmosisWallet);
+        }
+        if (neutronWallet !== undefined) {
+          setLocalNeutronWallet(neutronWallet);
+        }
+      } catch (error) {
+        log('useAccounts/setCosmosWallets', error);
       }
     };
     setCosmosWallets();
@@ -332,6 +340,7 @@ const useAccountsContext = () => {
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
+    hdKeyManager.clearHdkey();
   };
 
   const disconnect = async () => {

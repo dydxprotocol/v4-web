@@ -104,9 +104,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetails
 
   return (
     <DetailsDialog
-      slotIcon={
-        <AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} tw="text-[1em]" />
-      }
+      slotIcon={<AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} />}
       title={type && stringGetter({ key: getIndexerFillTypeStringKey(type) })}
       items={detailItems}
       setIsOpen={setIsOpen}

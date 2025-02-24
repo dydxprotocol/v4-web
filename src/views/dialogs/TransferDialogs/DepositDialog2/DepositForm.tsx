@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import { useWalletClient } from 'wagmi';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TokenForTransfer } from '@/constants/tokens';
+import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
+import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { SkipRouteSpeed, useSkipClient } from '@/hooks/transfers/skipClient';
@@ -17,23 +17,26 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
-import { CoinbaseBrandIcon, WarningIcon } from '@/icons';
+import { WarningIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
-import { DiffArrow } from '@/components/DiffArrow';
+import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
+import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+import { useAppSelector } from '@/state/appTypes';
 import { Deposit } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
+import { MustBigNumber, MustNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
 import { getTokenSymbol } from '../utils';
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
+import { OtherDepositOptions } from './OtherDepositOptions';
 import { DepositStep, useDepositSteps } from './depositHooks';
 import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 
@@ -52,7 +55,6 @@ export const DepositForm = ({
   onClose: () => void;
   onDeposit: (deposit: Deposit) => void;
 }) => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
@@ -108,13 +110,22 @@ export const DepositForm = ({
     : true;
 
   const isDebouncedAmountSame = debouncedAmount === amount;
+  const isDepositingMoreThanMin = Boolean(
+    depositRoute?.usdAmountIn && MustNumber(depositRoute.usdAmountIn) >= MIN_DEPOSIT_AMOUNT
+  );
+
+  const hasInput = MustBigNumber(depositRoute?.usdAmountIn).gt(0);
 
   const depositDisabled =
-    isFetching || !hasSufficientBalance || !depositRoute || !isDebouncedAmountSame;
+    isFetching ||
+    !hasSufficientBalance ||
+    !depositRoute ||
+    !isDebouncedAmountSame ||
+    !isDepositingMoreThanMin;
 
   const depositButtonInner = useMemo(() => {
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
-    if (error)
+    if (hasInput && !isDepositingMoreThanMin) {
       return (
         <div tw="flex items-center gap-0.5">
           <div tw="flex items-center text-color-error">
@@ -128,11 +139,35 @@ export const DepositForm = ({
           </div>
         </div>
       );
+    }
+    if (error)
+      return (
+        <div tw="flex items-center gap-0.5">
+          <div tw="flex items-center text-color-error">
+            <WithTooltip tooltipString={error.message}>
+              <WarningIcon />
+            </WithTooltip>
+          </div>
+          <div>
+            {stringGetter({
+              key: STRING_KEYS.DEPOSIT_FUNDS,
+            })}
+          </div>
+        </div>
+      );
 
     if (!signer) return <div>{stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}</div>;
 
     return stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS });
-  }, [error, hasSufficientBalance, stringGetter, token.denom, signer]);
+  }, [
+    error,
+    hasInput,
+    hasSufficientBalance,
+    stringGetter,
+    token.denom,
+    signer,
+    isDepositingMoreThanMin,
+  ]);
 
   const { data: steps } = useDepositSteps({
     sourceAccount,
@@ -254,7 +289,40 @@ export const DepositForm = ({
     }
   };
 
-  const coinbaseOptionDisabled = Boolean(depositSteps?.length ?? awaitingWalletAction);
+  const receipt = selectedRoute && (
+    <Details
+      tw="font-small-book"
+      items={[
+        {
+          key: 'amount',
+          label: stringGetter({ key: STRING_KEYS.ESTIMATED_AMOUNT_RECEIVED }),
+          value: (
+            <Output
+              tw="inline"
+              type={OutputType.Fiat}
+              isLoading={isFetching}
+              value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
+            />
+          ),
+        },
+        {
+          key: 'availableBalance',
+          label: stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE }),
+          value: (
+            <DiffOutput
+              withDiff={!!depositRoute && updatedFreeCollateral?.gt(0)}
+              isLoading={isFetching}
+              type={OutputType.Fiat}
+              sign={NumberSign.Positive}
+              value={freeCollateral}
+              newValue={updatedFreeCollateral}
+              newValueSlotLeft="~"
+            />
+          ),
+        },
+      ]}
+    />
+  );
 
   return (
     <div tw="flex min-h-10 flex-col p-1.25">
@@ -275,29 +343,6 @@ export const DepositForm = ({
           onSelectSpeed={setSelectedSpeed}
           type="deposit"
         />
-        <div tw="flex flex-col gap-0.5" style={{ opacity: coinbaseOptionDisabled ? '0.5' : '1' }}>
-          <div tw="flex items-center gap-1">
-            <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
-            <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.OR })}</div>
-            <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
-          </div>
-          <Button
-            onClick={() => {
-              dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({})));
-              onClose();
-            }}
-            disabled={coinbaseOptionDisabled}
-            type={ButtonType.Button}
-            tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
-          >
-            <div>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_WITH })} <span tw="sr-only">Coinbase</span>
-            </div>
-            <div tw="flex text-color-text-1">
-              <CoinbaseBrandIcon />
-            </div>
-          </Button>
-        </div>
       </div>
       <div tw="flex flex-col gap-0.75">
         {!depositSteps?.length && (
@@ -313,7 +358,6 @@ export const DepositForm = ({
                 isLoading:
                   isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
               }}
-              disabled={depositDisabled}
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
             >
@@ -331,25 +375,15 @@ export const DepositForm = ({
             />
           </div>
         )}
-        <div tw="flex justify-between text-small">
-          <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.AVAILABLE_BALANCE })}</div>
-          <div
-            tw="flex items-center gap-0.375"
-            style={{ color: isFetching ? 'var(--color-text-0)' : undefined }}
-          >
-            <Output tw="inline text-color-text-0" type={OutputType.Fiat} value={freeCollateral} />
-            {depositRoute && <DiffArrow tw="text-green" />}
-            {depositRoute && (
-              <Output
-                slotLeft="~"
-                tw="inline"
-                type={OutputType.Fiat}
-                value={updatedFreeCollateral}
-              />
-            )}
-          </div>
-        </div>
+        {receipt}
       </div>
+      {!depositSteps?.length && !awaitingWalletAction && (
+        <OtherDepositOptions
+          awaitingWalletAction={awaitingWalletAction}
+          depositSteps={depositSteps}
+          onClose={onClose}
+        />
+      )}
     </div>
   );
 };

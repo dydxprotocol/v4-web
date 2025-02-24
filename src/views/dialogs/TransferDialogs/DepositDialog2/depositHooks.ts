@@ -179,6 +179,8 @@ export function useDepositSteps({
       // TODO(deposit2.0): Update .executeRoute call here once the SDK allows passing in the updated signer object
       // passing in updatedSkipClient is hack until that is available
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
+        const depositId = `deposit-${crypto.randomUUID()}`;
+
         try {
           await updatedSkipClient.executeRoute({
             route: depositRoute,
@@ -188,6 +190,7 @@ export function useDepositSteps({
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
               const baseDeposit = {
+                id: depositId,
                 type: 'deposit' as const,
                 txHash,
                 chainId: chainID,

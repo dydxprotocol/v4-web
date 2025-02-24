@@ -28,7 +28,6 @@ import {
   ApiData,
   AsyncAbacusStateManager,
   ClosePositionInputField,
-  ComplianceAction,
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
@@ -309,7 +308,6 @@ class AbacusStateManager {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
-      if (hdkey) this.chainTransactions.setHdkey(hdkey);
       if (connectedWallet?.connectorType === ConnectorType.Cosmos) {
         this.stateManager.walletConnectionType = AbacusWalletConnectionType.Cosmos;
       } else if (connectedWallet?.connectorType === ConnectorType.PhantomSolana) {
@@ -491,11 +489,6 @@ class AbacusStateManager {
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
-
-  triggerCompliance = (
-    action: typeof ComplianceAction.VALID_SURVEY | typeof ComplianceAction.INVALID_SURVEY,
-    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
-  ): void => this.stateManager.triggerCompliance(action, callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>

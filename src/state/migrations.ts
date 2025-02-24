@@ -6,6 +6,7 @@ import { migration1 } from './migrations/1';
 import { migration2 } from './migrations/2';
 import { migration3 } from './migrations/3';
 import { migration4 } from './migrations/4';
+import { migration5 } from './migrations/5';
 
 /**
  * @description Migrate function should be used when the expected param for your migration is a previous state with reducer data
@@ -25,6 +26,7 @@ export const migrations: MigrationManifest = {
   2: migration2,
   3: migration3,
   4: (state: PersistedState) => migrate(state, migration4),
+  6: migration5,
 } as const;
 
 /*

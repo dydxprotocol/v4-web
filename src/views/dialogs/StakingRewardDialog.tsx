@@ -12,6 +12,7 @@ import { DialogProps, StakingRewardDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
+import { refreshStakingData } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -120,6 +121,8 @@ export const StakingRewardDialog = ({
       const tx = await withdrawReward(validators);
       const txHash = hashFromTx(tx.hash);
 
+      refreshStakingData();
+
       track(
         AnalyticsEvents.ClaimTransaction({
           txHash,
@@ -158,7 +161,7 @@ export const StakingRewardDialog = ({
             />
             {usdcLabel}
           </$Pill>
-          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="text-[5rem]" />
+          <AssetIcon logoUrl={usdcImage} symbol="USDC" tw="[--asset-icon-size:5rem]" />
         </div>
         <h3 tw="z-[1] text-color-text-2 font-extra-bold">
           {stringGetter({ key: STRING_KEYS.YOU_EARNED })}

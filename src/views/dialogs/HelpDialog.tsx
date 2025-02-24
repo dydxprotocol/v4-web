@@ -94,7 +94,7 @@ export const HelpDialog = ({ setIsOpen }: DialogProps<HelpDialogProps>) => {
                   : `${BASE_ROUTE}${AppRoute.Terms}`
               }
             >
-              {stringGetter({ key: STRING_KEYS.DEPLOYER_TERMS_AND_CONDITIONS })}
+              {stringGetter({ key: STRING_KEYS.OUR_TERMS_AND_CONDITIONS })}
             </Link>
           ),
           TERMS_OF_USE: <TermsOfUseLink isInline hrefOverride={tos} />,

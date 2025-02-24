@@ -31,30 +31,23 @@ export function useUpdateTransfers() {
 
     for (let i = 0; i < pendingTransfers.length; i += 1) {
       const transfer = pendingTransfers[i]!;
-      const { chainId, txHash } = transfer;
-      const transferKey = `${chainId}-${txHash}`;
-      if (transactionToCallback.current[transferKey]) continue;
 
-      transactionToCallback.current[transferKey] = true;
+      if (isDeposit(transfer)) {
+        const { chainId, txHash } = transfer;
+        const transferKey = `${chainId}-${txHash}`;
+        if (transactionToCallback.current[transferKey]) continue;
 
-      skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
-        // Assume the final asset transfer is always USDC
-        const finalAmount = response.transferAssetRelease?.amount
-          ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
-          : undefined;
+        transactionToCallback.current[transferKey] = true;
 
-        const status = handleResponseStatus(response.status);
-        if (isDeposit(transfer)) {
+        skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
+          // Assume the final asset transfer is always USDC
+          const finalAmount = response.transferAssetRelease?.amount
+            ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
+            : undefined;
+
+          const status = handleResponseStatus(response.status);
           const { token, ...rest } = transfer;
-          track(
-            AnalyticsEvents.DepositFinalized({
-              ...rest,
-              tokenInChainId: token.chainId,
-              tokenInDenom: token.denom,
-              status,
-              finalAmountUsd: finalAmount,
-            })
-          );
+
           dispatch(
             updateDeposit({
               dydxAddress,
@@ -65,28 +58,98 @@ export function useUpdateTransfers() {
               },
             })
           );
-        }
 
-        if (isWithdraw(transfer)) {
-          dispatch(
-            updateWithdraw({
-              dydxAddress,
-              withdraw: {
-                ...transfer,
-                finalAmountUsd: finalAmount,
+          if (status === 'success') {
+            track(
+              AnalyticsEvents.DepositFinalized({
+                ...rest,
+                tokenInChainId: token.chainId,
+                tokenInDenom: token.denom,
                 status,
-              },
-            })
-          );
-        }
+                finalAmountUsd: finalAmount,
+              })
+            );
 
-        if (status === 'success') {
-          appQueryClient.invalidateQueries({
-            queryKey: ['validator', 'accountBalances'],
-            exact: false,
-          });
+            appQueryClient.invalidateQueries({
+              queryKey: ['validator', 'accountBalances'],
+              exact: false,
+            });
+          }
+        });
+      }
+
+      if (isWithdraw(transfer)) {
+        const { transactions } = transfer;
+        const hasError = transactions.some((tx) => tx.status === 'error');
+
+        if (!hasError) {
+          const currentTransaction = transactions.find(
+            ({ status }) => status === 'pending' || status === 'idle'
+          );
+          const currentTransactionIdx = transactions.findIndex(
+            ({ status }) => status === 'pending' || status === 'idle'
+          );
+
+          if (currentTransaction && currentTransaction.txHash) {
+            const chainId = currentTransaction.chainId;
+            const txHash = currentTransaction.txHash;
+            const transferKey = `${chainId}-${txHash}`;
+            if (transactionToCallback.current[transferKey]) continue;
+
+            transactionToCallback.current[transferKey] = true;
+
+            skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
+              // Assume the final asset transfer is always USDC
+              const finalAmount = transfer.transferAssetRelease?.amount
+                ? formatUnits(BigInt(transfer.transferAssetRelease.amount), USDC_DECIMALS)
+                : undefined;
+
+              const currentTransactionStatus = handleResponseStatus(response.status);
+              const currentTransactionError = currentTransactionStatus === 'error';
+              const transactionsCopy = [...transactions];
+
+              transactionsCopy[currentTransactionIdx] = {
+                ...currentTransaction,
+                status: currentTransactionStatus,
+              };
+
+              const hasPending = transactionsCopy.some(
+                (tx) => tx.status === 'pending' || tx.status === 'idle'
+              );
+
+              const status = currentTransactionError ? 'error' : hasPending ? 'pending' : 'success';
+
+              dispatch(
+                updateWithdraw({
+                  dydxAddress,
+                  withdraw: {
+                    ...transfer,
+                    transactions: transactionsCopy,
+                    finalAmountUsd: finalAmount,
+                    status,
+                  },
+                })
+              );
+
+              if (status === 'success') {
+                track(
+                  AnalyticsEvents.WithdrawFinalized({
+                    ...transfer,
+                    finalAmountUsd: finalAmount,
+                    status,
+                    transferAssetRelease: response.transferAssetRelease,
+                  })
+                );
+
+                appQueryClient.invalidateQueries({
+                  queryKey: ['validator', 'accountBalances'],
+                  exact: false,
+                });
+              }
+            });
+          }
         }
-      });
+      }
     }
   }, [dydxAddress, pendingTransfers, skipClient, dispatch]);
 }

@@ -23,9 +23,11 @@ export enum NumberSign {
 // Deposit/Withdraw
 export const MAX_CCTP_TRANSFER_AMOUNT = 1_000_000;
 export const MIN_CCTP_TRANSFER_AMOUNT = 11;
+export const MIN_DEPOSIT_AMOUNT = 10;
 export const MAX_PRICE_IMPACT = 0.02; // 2%
 export const DEFAULT_GAS_LIMIT = 160000;
 export const COSMOS_GAS_RESERVE = 0.05;
+export const EVM_GAS_RESERVE_AMOUNT = 0.01;
 
 // Launch Market
 export const DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH = 10_000;

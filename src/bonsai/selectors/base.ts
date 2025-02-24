@@ -58,3 +58,9 @@ export const selectRawAccountFeeTierData = (state: RootState) => state.raw.accou
 export const selectRawAccountStatsData = (state: RootState) => state.raw.account.stats.data;
 
 export const selectRawAccountBalancesData = (state: RootState) => state.raw.account.balances.data;
+
+export const selectRawLocalAddressScreenV2 = (state: RootState) =>
+  state.raw.compliance.localAddressScreenV2;
+export const selectRawSourceAddressScreenV2 = (state: RootState) =>
+  state.raw.compliance.sourceAddressScreenV2;
+export const selectRawGeo = (state: RootState) => state.raw.compliance.geo;

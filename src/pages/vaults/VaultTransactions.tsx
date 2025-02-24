@@ -147,6 +147,7 @@ export const VaultTransactionsTable = ({
     <$Table
       withInnerBorders
       data={transactions}
+      tableId="vault-transactions"
       getRowKey={(row) => row.id ?? ''}
       label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
       defaultSortDescriptor={{

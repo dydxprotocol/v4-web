@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { EVM_GAS_RESERVE_AMOUNT, TOKEN_DECIMALS } from '@/constants/numbers';
 import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -32,7 +32,7 @@ function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
-const GAS_RESERVE_AMOUNT = parseUnits('0.01', ETH_DECIMALS);
+const GAS_RESERVE_AMOUNT = parseUnits(EVM_GAS_RESERVE_AMOUNT.toString(), ETH_DECIMALS);
 
 export const AmountInput = ({
   value,
@@ -53,11 +53,13 @@ export const AmountInput = ({
     onChange(e.target.value);
   };
 
+  const isNativeToken = isNativeTokenDenom(token.denom);
+
   const onClickMax = () => {
     if (!tokenBalance.raw) return;
 
     const balanceAmount = BigInt(tokenBalance.raw!);
-    if (isNativeTokenDenom(token.denom)) {
+    if (isNativeToken) {
       const amount =
         balanceAmount > GAS_RESERVE_AMOUNT ? balanceAmount - GAS_RESERVE_AMOUNT : balanceAmount;
       onChange(formatUnits(amount, token.decimals));
@@ -122,7 +124,7 @@ export const AmountInput = ({
       >
         <div tw="flex items-center gap-0.5">
           <AssetIcon
-            tw="h-[2rem] w-[2rem]"
+            tw="[--asset-icon-size:2rem]"
             symbol={getTokenSymbol(token.denom)}
             chainId={token.chainId}
           />

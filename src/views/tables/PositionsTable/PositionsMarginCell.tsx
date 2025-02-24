@@ -37,7 +37,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
               onClick={() =>
                 // todo this handoff should be using uniqueid
                 dispatch(
-                  openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.market }))
+                  openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.uniqueId }))
                 )
               }
             />

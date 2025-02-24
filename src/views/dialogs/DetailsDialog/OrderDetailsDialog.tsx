@@ -213,9 +213,7 @@ export const OrderDetailsDialog = ({
 
   return (
     <DetailsDialog
-      slotIcon={
-        <AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} tw="text-[1em]" />
-      }
+      slotIcon={<AssetIcon logoUrl={marketSummary?.logo} symbol={marketSummary?.assetId} />}
       title={type != null && stringGetter({ key: getIndexerOrderTypeStringKey(type) })}
       slotFooter={
         isAccountViewOnly || (status != null && isNewOrderStatusClearable(status)) ? null : (

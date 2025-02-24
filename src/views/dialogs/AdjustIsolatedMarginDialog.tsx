@@ -40,7 +40,7 @@ export const AdjustIsolatedMarginDialog = ({
     >
       <div tw="column gap-1">
         <AdjustIsolatedMarginForm
-          marketId={positionId}
+          positionId={positionId}
           onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
         />
       </div>

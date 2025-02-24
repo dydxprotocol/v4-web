@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { DialogProps } from '@/constants/dialogs';
+import { CoinbaseDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -15,7 +15,10 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
 
 const THREE_SECOND_DELAY = 3000;
-export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
+export const CoinbaseDepositDialog = ({
+  onBack,
+  setIsOpen,
+}: DialogProps<CoinbaseDepositDialogProps>) => {
   const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
   const { nobleAddress } = useAccounts();
@@ -32,6 +35,7 @@ export const CoinbaseDepositDialog = ({ setIsOpen }: DialogProps<{}>) => {
     <Dialog
       isOpen
       hasHeaderBorder
+      onBack={onBack}
       setIsOpen={setIsOpen}
       title={<div tw="text-center">{stringGetter({ key: STRING_KEYS.DEPOSIT_VIA_COINBASE })}</div>}
     >

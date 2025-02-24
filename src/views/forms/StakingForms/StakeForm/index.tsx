@@ -12,7 +12,7 @@ import { NumberSign } from '@/constants/numbers';
 import { StakeFormSteps } from '@/constants/stakingForms';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useStakingValidator } from '@/hooks/useStakingValidator';
+import { refreshStakingData, useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -127,6 +127,8 @@ export const StakeForm = ({
       setIsLoading(true);
       const tx = await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
       const txHash = hashFromTx(tx.hash);
+
+      refreshStakingData();
 
       track(
         AnalyticsEvents.StakeTransaction({

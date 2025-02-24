@@ -2,7 +2,6 @@ import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { PositionUniqueId, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { groupBy, keyBy, mapValues } from 'lodash';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
@@ -48,8 +47,9 @@ export const getNonZeroPendingPositions = createAppSelector(
 
 export const getOpenPositionFromId = () =>
   createAppSelector(
-    [getOpenPositions, (s, marketId: string) => marketId],
-    (allOpenPositions, marketId) => allOpenPositions?.find(({ market }) => market === marketId)
+    [getOpenPositions, (s, positionId: PositionUniqueId) => positionId],
+    (allOpenPositions, positionId) =>
+      allOpenPositions?.find(({ uniqueId }) => uniqueId === positionId)
   );
 
 export const getOpenPositionFromIdForPostOrder = () =>
@@ -290,87 +290,28 @@ export const getIsAccountConnected = (state: RootState) =>
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
 
 /**
- *  @returns user wallet staking balances
- * */
-export const getStakingBalances = (state: RootState) => state.account.stakingBalances;
-
-/**
- *  @returns user wallet staking delegations
- * */
-export const getStakingDelegations = (state: RootState) => state.account.stakingDelegations;
-
-/**
- *  @returns user unbonding delegations
- * */
-export const getUnbondingDelegations = (state: RootState) => state.account.unbondingDelegations;
-
-/**
- *  @returns user staking rewards
- * */
-export const getStakingRewards = (state: RootState) => state.account.stakingRewards;
-
-/**
- * @returns account all time trading rewards
+ * @returns compliance status of the current session
  */
-export const getTotalTradingRewards = (state: RootState) => state.account.tradingRewards?.total;
-
-/**
- * @returns account trading rewards aggregated by period
- */
-export const getHistoricalTradingRewards = (state: RootState) =>
-  state.account.tradingRewards?.filledHistory;
-
-/**
- * @returns account historical trading rewards for the specified perid
- */
-export const getTradingRewardsEventsForPeriod = () =>
-  createAppSelector(
-    [(state: RootState) => state.account.tradingRewards?.rawHistory, (s, period: string) => period],
-    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
-  );
-
-/**
- * @returns account historical trading rewards for the specified perid
- */
-export const getHistoricalTradingRewardsForPeriod = () =>
-  createAppSelector(
-    [getHistoricalTradingRewards, (s, period: string) => period],
-    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)?.toArray()
-  );
-
-const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPeriod();
-/**
- * @returns account historical trading rewards for the current week
- */
-export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
-  [(s) => historicalRewardsForCurrentWeekSelector(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
-  (historicalTradingRewards) => historicalTradingRewards?.[0]
+export const getComplianceStatus = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.status
 );
 
 /**
- * @returns UsageRestriction of the current session
- */
-export const getUsageRestriction = (state: RootState) => state.account.restriction;
-
-/**
- * @returns RestrictionType from the current session
- */
-export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;
-
-/**
  * @returns compliance status of the current session
  */
-export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
-
-/**
- * @returns compliance status of the current session
- */
-export const getComplianceUpdatedAt = (state: RootState) => state.account.compliance?.updatedAt;
+export const getComplianceUpdatedAt = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.updatedAt
+);
 
 /**
  * @returns compliance geo of the current session
  */
-export const getGeo = (state: RootState) => state.account.compliance?.geo;
+export const getGeo = createAppSelector(
+  [BonsaiCore.compliance.data],
+  (compliance) => compliance.geo
+);
 
 export const getAccountUiMemory = (state: RootState) => state.accountUiMemory;
 export const getCurrentAccountMemory = createAppSelector(

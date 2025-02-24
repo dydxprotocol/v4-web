@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { BonsaiHooks } from '@/bonsai/ontology';
+import { sumBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -9,6 +10,7 @@ import { formatUnits } from 'viem';
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -26,11 +28,11 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { GovernancePanel } from './GovernancePanel';
@@ -54,14 +56,12 @@ const RewardsPage = () => {
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
 
-  const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
+  const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
-  const totalUsdcRewards = (totalRewards?.toArray() ?? []).reduce((total: number, reward) => {
-    if (reward.denom === usdcDenom && reward.amount) {
-      return total + parseFloat(reward.amount);
-    }
-    return total;
-  }, 0);
+  const totalUsdcRewards = sumBy(
+    (totalRewards ?? EMPTY_ARR).filter((reward) => reward.denom === usdcDenom && reward.amount),
+    (a) => a.amount
+  );
 
   const ethereumChainId = useEnvConfig('ethereumChainId');
   const chainId = Number(ethereumChainId);

@@ -98,7 +98,7 @@ const getFillsTableColumnDef = ({
               <AssetIcon
                 logoUrl={marketSummary?.logo}
                 symbol={marketSummary?.assetId}
-                tw="text-[2.25rem]"
+                tw="[--asset-icon-size:2.25rem]"
               />
             }
           >
@@ -336,6 +336,7 @@ export const FillsTable = forwardRef(
       <$Table
         key={currentMarket ?? 'all-fills'}
         label="Fills"
+        tableId="fills"
         data={
           isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
         }

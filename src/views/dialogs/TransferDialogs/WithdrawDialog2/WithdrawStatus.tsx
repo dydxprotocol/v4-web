@@ -15,40 +15,51 @@ import { Output, OutputType } from '@/components/Output';
 import { selectWithdraw } from '@/state/transfersSelectors';
 
 type WithdrawStatusProps = {
-  txHash: string;
-  chainId: string;
+  id?: string;
   onClose: () => void;
 };
 
-export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps) => {
+export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
   const stringGetter = useStringGetter();
-  const withdraw = useParameterizedSelector(selectWithdraw, txHash, chainId);
+  const withdraw = useParameterizedSelector(selectWithdraw, id);
 
   const transferSuccess = withdraw?.status === 'success';
+  const transferError = withdraw?.status === 'error';
+  const transferAssetRelease = withdraw?.transferAssetRelease;
 
   const statusDescription = useMemo(() => {
     if (transferSuccess) return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN });
+    if (transferError) {
+      if (transferAssetRelease && transferAssetRelease.released) {
+        // TODO: Localize
+        return `An error has occured funds were withdrawn to ${transferAssetRelease.chainID}`;
+      }
 
+      return stringGetter({ key: STRING_KEYS.WITHDRAWAL_FAILED_TRY_AGAIN });
+    }
     return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN_SHORTLY });
-  }, [stringGetter, transferSuccess]);
+  }, [stringGetter, transferAssetRelease, transferError, transferSuccess]);
 
-  if (!withdraw) return null;
-
-  const WithdrawalOutput = (
-    <Output
-      tw="inline"
-      value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
-      type={OutputType.Fiat}
-      slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
-      slotRight="USDC"
-    />
-  );
+  const WithdrawalOutput =
+    withdraw == null ? (
+      <Output tw="inline" value={null} type={OutputType.Fiat} isLoading />
+    ) : (
+      <Output
+        tw="inline"
+        value={withdraw.finalAmountUsd ?? withdraw.estimatedAmountUsd}
+        type={OutputType.Fiat}
+        slotLeft={withdraw.finalAmountUsd ? undefined : '~'}
+        slotRight=" USDC"
+      />
+    );
 
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
       <div tw="flex flex-col gap-0.5">
         {!transferSuccess ? (
           <LoadingSpinner tw="self-center" id="deposit-status" size="64" strokeWidth="4" />
+        ) : transferError ? (
+          <Icon tw="self-center text-color-error" iconName={IconName.Warning} size="64px" />
         ) : (
           <Icon tw="self-center" iconName={IconName.SuccessCircle} size="64px" />
         )}
@@ -68,10 +79,14 @@ export const WithdrawStatus = ({ txHash, chainId, onClose }: WithdrawStatusProps
         <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_WITHDRAWAL })}</div>
         <div tw="flex items-center gap-0.125">
           {WithdrawalOutput}
-          <AssetIcon symbol="USDC" chainId={withdraw.chainId} />
+          {withdraw && <AssetIcon symbol="USDC" chainId={withdraw.destinationChainId} />}
         </div>
       </div>
-      <Button onClick={onClose} action={transferSuccess ? ButtonAction.Primary : ButtonAction.Base}>
+      <Button
+        state={{ isLoading: !withdraw && !transferError }}
+        onClick={onClose}
+        action={transferSuccess ? ButtonAction.Primary : ButtonAction.Base}
+      >
         {stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
     </div>
