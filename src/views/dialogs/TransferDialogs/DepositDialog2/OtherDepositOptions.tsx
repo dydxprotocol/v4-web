@@ -50,7 +50,7 @@ export const OtherDepositOptions = ({
 
   return (
     <>
-      <div tw="flex flex-col gap-0.5" css={otherOptionsDisabled && tw`opacity-50`}>
+      <div tw="mt-[0.75rem] flex flex-col gap-1" css={otherOptionsDisabled && tw`opacity-50`}>
         <div tw="flex items-center gap-1">
           <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
           <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.OR })}</div>
@@ -87,7 +87,7 @@ export const OtherDepositOptions = ({
         </Button>
       </div>
       {ffEnableFunkit && (
-        <div tw="flex flex-col gap-0.5" css={otherOptionsDisabled && tw`opacity-50`}>
+        <div tw="mt-[0.75rem] flex flex-col gap-1" css={otherOptionsDisabled && tw`opacity-50`}>
           <div tw="flex items-center gap-1">
             <hr tw="flex-1 border-[0.5px] border-solid border-color-border" />
             <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.OR })}</div>
