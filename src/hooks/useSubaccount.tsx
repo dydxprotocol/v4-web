@@ -22,6 +22,7 @@ import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/co
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { timeUnits } from '@/constants/time';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
@@ -40,6 +41,7 @@ import {
   placeOrderFailed,
   placeOrderSubmitted,
 } from '@/state/localOrders';
+import { selectPendingWithdraws } from '@/state/transfersSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
@@ -51,6 +53,7 @@ import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
+import { useParameterizedSelector } from './useParameterizedSelector';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -278,13 +281,32 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   }, [dispatch, dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //
+  const pendingWithdraws = useParameterizedSelector(selectPendingWithdraws, dydxAddress);
+  const hasPendingWithdraws = useMemo(() => {
+    if (pendingWithdraws.length > 0) {
+      const idleTimes = pendingWithdraws.reduce((acc, w) => {
+        if (w.transactions.some((t) => t.status === 'idle')) {
+          if (w.updatedAt) {
+            return [...acc, w.updatedAt];
+          }
+        }
+
+        return acc;
+      }, [] as number[]);
+
+      return idleTimes.some((t) => t > Date.now() - 10 * timeUnits.minute);
+    }
+
+    return false;
+  }, [pendingWithdraws]);
+
   const rebalanceWalletFunds = useCallback(
     async (balance: string) => {
       if (!subaccountClient) return;
       const balanceAmount = parseFloat(balance);
       const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
       const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
-      if (shouldDeposit) {
+      if (shouldDeposit && !hasPendingWithdraws) {
         await depositToSubaccount({
           amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
           subaccountClient,
@@ -296,7 +318,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         });
       }
     },
-    [subaccountClient, depositToSubaccount, withdrawFromSubaccount]
+    [subaccountClient, depositToSubaccount, withdrawFromSubaccount, hasPendingWithdraws]
   );
 
   const balances = useAppSelector(BonsaiCore.account.balances.data);

@@ -9,10 +9,14 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { Tag, TagSize } from '@/components/Tag';
 
 import { selectDeposit } from '@/state/transfersSelectors';
+
+import { truncateAddress } from '@/lib/wallet';
 
 import { getTokenSymbol } from '../utils';
 
@@ -73,6 +77,14 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           ? stringGetter({ key: STRING_KEYS.START_TRADING })
           : stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
+
+      {deposit.explorerLink && (
+        <Tag tw="ml-auto" size={TagSize.Small} key={deposit.txHash}>
+          <Link href={deposit.explorerLink} isAccent isInline withIcon>
+            {truncateAddress(deposit.txHash, '')}
+          </Link>
+        </Tag>
+      )}
     </div>
   );
 };

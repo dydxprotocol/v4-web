@@ -232,7 +232,7 @@ export const WithdrawForm = ({
         type="withdraw"
       />
       <Button
-        tw="mt-2 w-full"
+        tw="mt-1 w-full"
         state={{
           isLoading: isFetching || isLoading,
           isDisabled: withdrawDisabled,

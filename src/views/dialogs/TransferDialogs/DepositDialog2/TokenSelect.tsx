@@ -5,8 +5,11 @@ import { partition } from 'lodash';
 import { parseUnits } from 'viem';
 
 import { CHAIN_INFO } from '@/constants/chains';
+import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TokenForTransfer } from '@/constants/tokens';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
@@ -27,6 +30,7 @@ export const TokenSelect = ({
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
+  const stringGetter = useStringGetter();
   const { isLoading, data } = useBalances();
 
   const [withBalances, noBalances] = useMemo(() => {
@@ -68,7 +72,9 @@ export const TokenSelect = ({
   return (
     <div tw="flex flex-col gap-0.5 py-1">
       {withBalances.length > 0 && (
-        <div tw="px-1.25 pt-0.125 font-medium text-color-text-0">Your tokens</div>
+        <div tw="px-1.25 pt-0.125 font-medium text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.YOUR_TOKENS })}
+        </div>
       )}
       <div tw="flex flex-col">
         {withBalances.map((balance, i) => (
@@ -123,7 +129,9 @@ export const TokenSelect = ({
 
       {noBalances.length > 0 && (
         <div tw="px-1.25 pt-0.125 font-medium text-color-text-0">
-          {withBalances.length > 0 ? 'Other tokens' : 'All tokens'}
+          {withBalances.length > 0
+            ? stringGetter({ key: STRING_KEYS.OTHER_TOKENS })
+            : stringGetter({ key: STRING_KEYS.SUPPORTED_TOKENS })}
         </div>
       )}
 

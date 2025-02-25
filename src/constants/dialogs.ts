@@ -88,6 +88,7 @@ export type VaultDepositWithdrawDialogProps = { initialType?: 'DEPOSIT' | 'WITHD
 export type WithdrawDialogProps = {};
 export type WithdrawDialog2Props = {};
 export type DepositDialog2Props = {};
+export type TransferStatusDialogProps = { transferId: string };
 export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
   estimatedUnblockTime?: string | null;
@@ -146,6 +147,7 @@ export const DialogTypes = unionize(
     StakingReward: ofType<StakingRewardDialogProps>(),
     Trade: ofType<TradeDialogProps>(),
     Transfer: ofType<TransferDialogProps>(),
+    TransferStatus: ofType<TransferStatusDialogProps>(),
     Triggers: ofType<TriggersDialogProps>(),
     Unstake: ofType<UnstakeDialogProps>(),
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),

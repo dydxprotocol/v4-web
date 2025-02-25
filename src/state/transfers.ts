@@ -15,12 +15,15 @@ export type Deposit = {
   estimatedAmountUsd: string;
   finalAmountUsd?: string;
   isInstantDeposit: boolean;
+  explorerLink?: string;
+  updatedAt?: number;
 };
 
 export type WithdrawSubtransaction = {
   txHash?: string; // Optional due to not knowing the txHash until time of broadcast. (Withdraws may have several broadcasted transactions)
   chainId: string;
   status: 'idle' | 'pending' | 'success' | 'error';
+  explorerLink?: string;
 };
 
 export type Withdraw = {
@@ -33,6 +36,7 @@ export type Withdraw = {
   destinationChainId: string;
   transferAssetRelease: TransferAssetRelease | null; // Where the asset was transferred to
   status: 'pending' | 'success' | 'error';
+  updatedAt?: number;
 };
 
 export type Transfer = Deposit | Withdraw;
@@ -63,7 +67,9 @@ export const transfersSlice = createSlice({
         state.transfersByDydxAddress[dydxAddress] = [];
       }
 
-      state.transfersByDydxAddress[dydxAddress].push(deposit);
+      const newDeposit = { ...deposit, updatedAt: Date.now() };
+
+      state.transfersByDydxAddress[dydxAddress].push(newDeposit);
     },
     updateDeposit: (
       state,
@@ -82,7 +88,7 @@ export const transfersSlice = createSlice({
           transfer.txHash === deposit.txHash &&
           transfer.chainId === deposit.chainId
         ) {
-          return { ...transfer, ...deposit };
+          return { ...transfer, ...deposit, updatedAt: Date.now() };
         }
 
         return transfer;
@@ -97,7 +103,9 @@ export const transfersSlice = createSlice({
         state.transfersByDydxAddress[dydxAddress] = [];
       }
 
-      state.transfersByDydxAddress[dydxAddress].push(withdraw);
+      const newWithdraw = { ...withdraw, updatedAt: Date.now() };
+
+      state.transfersByDydxAddress[dydxAddress].push(newWithdraw);
     },
     updateWithdraw: (
       state,
@@ -134,13 +142,17 @@ export const transfersSlice = createSlice({
         if (isWithdraw(transfer) && transfer.id === withdrawId) {
           const currentTransactions = transfer.transactions.map((sub) => {
             if (sub.chainId === subtransaction.chainId) {
-              return subtransaction;
+              return {
+                ...sub,
+                ...subtransaction,
+              };
             }
 
             return sub;
           });
 
           transfer.transactions = currentTransactions;
+          transfer.updatedAt = Date.now();
         }
 
         return transfer;
