@@ -47,7 +47,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
     return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN_SHORTLY });
   }, [stringGetter, transferAssetRelease, transferError, transferSuccess]);
 
-  const WithdrawalOutput =
+  const withdrawalOutput =
     withdraw == null ? (
       <Output tw="inline" value={null} type={OutputType.Fiat} isLoading />
     ) : (
@@ -60,7 +60,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       />
     );
 
-  const WithdrawalExplorerLinks = withdraw?.transactions
+  const withdrawalExplorerLinks = withdraw?.transactions
     .map((t) => {
       if (!t.explorerLink) return null;
 
@@ -90,7 +90,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
               ? stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })
               : stringGetter({
                   key: STRING_KEYS.WITHDRAW_COMPLETE,
-                  params: { AMOUNT_USD: WithdrawalOutput },
+                  params: { AMOUNT_USD: withdrawalOutput },
                 })}
           </div>
           <div tw="text-color-text-0">{statusDescription}</div>
@@ -99,7 +99,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       <div tw="flex items-center justify-between self-stretch">
         <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_WITHDRAWAL })}</div>
         <div tw="flex items-center gap-0.125">
-          {WithdrawalOutput}
+          {withdrawalOutput}
           {withdraw && <AssetIcon symbol="USDC" chainId={withdraw.destinationChainId} />}
         </div>
       </div>
@@ -111,8 +111,8 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
         {stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
 
-      {WithdrawalExplorerLinks?.length && (
-        <div tw="row ml-auto gap-0.5">{WithdrawalExplorerLinks}</div>
+      {withdrawalExplorerLinks?.length && (
+        <div tw="row ml-auto gap-0.5">{withdrawalExplorerLinks}</div>
       )}
     </div>
   );
