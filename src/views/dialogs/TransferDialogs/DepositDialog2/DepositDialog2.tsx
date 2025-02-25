@@ -68,7 +68,9 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   // TODO(deposit2): localization
   const dialogTitle =
-    formState === 'form' ? stringGetter({ key: STRING_KEYS.DEPOSIT }) : 'Select Token';
+    formState === 'form'
+      ? stringGetter({ key: STRING_KEYS.DEPOSIT })
+      : stringGetter({ key: STRING_KEYS.SELECT_TOKEN });
 
   const onShowForm = () => {
     setFormState('form');

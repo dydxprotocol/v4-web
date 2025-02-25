@@ -229,6 +229,7 @@ export function useDepositSteps({
       depositRoute?.amountIn,
       depositRoute?.sourceAssetChainID,
       depositRoute?.sourceAssetDenom,
+      depositRoute?.operations,
       walletChainId,
     ],
     queryFn: getStepsQuery,

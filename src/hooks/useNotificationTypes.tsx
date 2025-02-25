@@ -332,6 +332,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [decimalSeparator, groupSeparator, selectedLocale, stringGetter, userTransfers]);
     },
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+
+      return (transferId: string) => {
+        dispatch(openDialog(DialogTypes.TransferStatus({ transferId })));
+      };
+    },
   },
   {
     type: NotificationType.SkipTransfer,
