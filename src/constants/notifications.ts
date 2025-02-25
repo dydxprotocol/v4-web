@@ -239,6 +239,7 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesS6Ended = 'incentives-s6-ended',
   KeplrSupport = 'keplr-support',
   PhantomSupport = 'phantom-support',
+  SimpleIosExperience = 'simple-ios-experience',
 }
 
 // Incentives Season
