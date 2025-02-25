@@ -31,8 +31,10 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
     if (transferSuccess) return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_WITHDRAWN });
     if (transferError) {
       if (transferAssetRelease && transferAssetRelease.released) {
-        // TODO: Localize
-        return `An error has occured funds were withdrawn to ${transferAssetRelease.chainID}`;
+        return stringGetter({
+          key: STRING_KEYS.WITHDRAWN_TO_CHAINID,
+          params: { CHAIN_ID: transferAssetRelease.chainID },
+        });
       }
 
       return stringGetter({ key: STRING_KEYS.WITHDRAWAL_FAILED_TRY_AGAIN });
