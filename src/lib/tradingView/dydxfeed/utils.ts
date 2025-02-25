@@ -5,7 +5,6 @@ import { Mark, MarkCustomColor, ResolutionString } from 'public/tradingview/char
 
 import { RESOLUTION_TO_INTERVAL_MS } from '@/constants/candles';
 import { STRING_KEYS, StringGetterFunction, SupportedLocales } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { ThemeColorBase } from '@/constants/styles/colors';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
@@ -14,6 +13,7 @@ import { formatNumberOutput, OutputType } from '@/components/Output';
 import { RootStore } from '@/state/_store';
 import { getFillDetails } from '@/state/accountSelectors';
 
+import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 
 /**
@@ -43,6 +43,7 @@ export function getBarTime(
 export const getMarkForOrderFills = (
   store: RootStore,
   orderFills: SubaccountFill[],
+  stepSizeDecimals: number,
   orderId: string,
   barStartMs: number,
   resolution: ResolutionString,
@@ -61,10 +62,10 @@ export const getMarkForOrderFills = (
     }
   );
   const formattedSize = formatNumberOutput(
-    sum(orderFills.map((fill) => fill.size)),
+    sum(orderFills.map((fill) => MustBigNumber(fill.size).toNumber())),
     OutputType.Asset,
     {
-      fractionDigits: TOKEN_DECIMALS,
+      fractionDigits: stepSizeDecimals,
       decimalSeparator: localeSeparators.decimal,
       groupSeparator: localeSeparators.group,
       selectedLocale,
