@@ -28,6 +28,18 @@ export const selectPendingDeposits = () =>
     }
   );
 
+export const selectPendingWithdraws = () =>
+  createAppSelector(
+    [getTransfersByAddress, (s, dydxAddress?: DydxAddress) => dydxAddress],
+    (transfersByAddress, dydxAddress): Withdraw[] => {
+      if (!dydxAddress || !transfersByAddress[dydxAddress]) return [];
+
+      return transfersByAddress[dydxAddress].filter(
+        (transfer): transfer is Withdraw => isWithdraw(transfer) && transfer.status === 'pending'
+      );
+    }
+  );
+
 const selectAllTransfers = createAppSelector([getTransfersByAddress], (transfersByDydxAddress) =>
   Object.values(transfersByDydxAddress).flat()
 );
@@ -55,6 +67,11 @@ export const selectDeposit = () =>
       );
     }
   );
+
+export const selectTransfer = () =>
+  createAppSelector([selectAllTransfers, (s, id: string) => id], (allTransfers, id) => {
+    return allTransfers.find((transfer): transfer is Transfer => transfer.id === id);
+  });
 
 export const selectWithdraw = () =>
   createAppSelector([selectAllTransfers, (s, id: string) => id], (allTransfers, id) => {

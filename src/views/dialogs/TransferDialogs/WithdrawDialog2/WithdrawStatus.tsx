@@ -9,10 +9,15 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { Tag, TagSize } from '@/components/Tag';
 
 import { selectWithdraw } from '@/state/transfersSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { truncateAddress } from '@/lib/wallet';
 
 type WithdrawStatusProps = {
   id?: string;
@@ -55,6 +60,20 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       />
     );
 
+  const WithdrawalExplorerLinks = withdraw?.transactions
+    .map((t) => {
+      if (!t.explorerLink) return null;
+
+      return (
+        <Tag size={TagSize.Small} key={t.txHash}>
+          <Link href={t.explorerLink} withIcon isAccent isInline>
+            {truncateAddress(t.txHash, '')}
+          </Link>
+        </Tag>
+      );
+    })
+    .filter(isTruthy);
+
   return (
     <div tw="flex flex-col gap-1 px-2 pb-1.5 pt-2.5">
       <div tw="flex flex-col gap-0.5">
@@ -91,6 +110,10 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       >
         {stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
+
+      {WithdrawalExplorerLinks?.length && (
+        <div tw="row ml-auto gap-0.5">{WithdrawalExplorerLinks}</div>
+      )}
     </div>
   );
 };
