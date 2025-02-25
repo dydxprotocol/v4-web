@@ -115,7 +115,7 @@
     "@visx/threshold": "^3.0.0",
     "@visx/tooltip": "^3.1.2",
     "@visx/xychart": "^3.1.2",
-    "@wagmi/core": "^2.16.4",
+    "@wagmi/core": "^2.16.3",
     "bignumber.js": "^9.1.1",
     "buffer": "^6.0.3",
     "cmdk": "^0.2.0",
@@ -149,7 +149,7 @@
     "unionize": "^3.1.0",
     "use-latest": "^1.2.1",
     "viem": "^2.22.17",
-    "wagmi": "^2.14.11"
+    "wagmi": "^2.14.9"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
