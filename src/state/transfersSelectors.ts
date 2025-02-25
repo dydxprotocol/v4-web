@@ -70,7 +70,7 @@ export const selectDeposit = () =>
 
 export const selectTransfer = () =>
   createAppSelector([selectAllTransfers, (s, id: string) => id], (allTransfers, id) => {
-    return allTransfers.find((transfer): transfer is Transfer => transfer.id === id);
+    return allTransfers.find((transfer) => transfer.id === id);
   });
 
 export const selectWithdraw = () =>
