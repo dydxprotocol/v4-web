@@ -393,15 +393,24 @@ function calculateTriggerOrderDetails(
 
 function calculateTriggerPriceValues(
   triggerPrice: BigNumber,
-  size: BigNumber,
+  unsignedSize: BigNumber,
   position: SubaccountPosition,
   isStopLoss: boolean
 ): Omit<TriggerOrderDetails, 'size' | 'limitPrice'> {
   const entryPrice = position.baseEntryPrice;
   const positionSide = position.side;
-  const positionNotional = position.notional;
-  const leverage = position.leverage ?? BIG_NUMBERS.ONE;
-  const scaledLeverage = BigNumber.max(leverage.abs(), BIG_NUMBERS.ONE);
+  const effectiveEntryMargin = clampBn(
+    // notional over leverage is subaccount equity
+    // minus current position value plus entry position value ==> entry equity
+    position.notional
+      .div(position.leverage?.abs() ?? BIG_NUMBERS.ONE)
+      .minus(position.value)
+      .plus(position.signedSize.times(entryPrice)),
+    BIG_NUMBERS.ONE,
+    // for isolated we really want to use the original margin, but it can go negative if you withdraw
+    // so we keep it above 1
+    position.marginMode === 'ISOLATED' ? BIG_NUMBERS.ONE : unsignedSize.times(entryPrice)
+  );
 
   return {
     triggerPrice: triggerPrice.toString(),
@@ -507,6 +516,9 @@ function calculateTriggerPriceFromUsdcDiff(
 
   return null;
 }
+
+const clampBn = (n: BigNumber, min: BigNumber, max: BigNumber) =>
+  BigNumber.max(min, BigNumber.min(max, n));
 
 /**
  * Calculate trigger price from percent difference
