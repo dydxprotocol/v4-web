@@ -142,6 +142,7 @@ export const getDydxDatafeed = (
       getMarkForOrderFills(
         store,
         orderFills,
+        market.stepSizeDecimals,
         orderId,
         fromMs,
         resolution,
