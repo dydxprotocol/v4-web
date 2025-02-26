@@ -10,7 +10,7 @@ import BigNumber from 'bignumber.js';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
-import { calc } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { getPositionBaseEquity } from '../calculators/subaccount';
@@ -242,7 +242,20 @@ interface SummaryData {
   payload: TriggerOrdersPayload | undefined;
 }
 
-function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {}
+function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {
+  const effectiveEntryMargin = mapIfPresent(
+    inputData.position,
+    getPositionEffectiveEntryMargin
+  )?.toNumber();
+  const stopLossOrder = calculateTriggerOrderDetails(state.stopLossOrder, true, state, inputData);
+  const takeProfitOrder = calculateTriggerOrderDetails(
+    state.takeProfitOrder,
+    false,
+    state,
+    inputData
+  );
+  return { effectiveEntryMargin, stopLossOrder, takeProfitOrder };
+}
 
 function getErrors(
   state: TriggerOrdersFormState,
@@ -259,11 +272,11 @@ export const TriggerOrdersFormFns = createForm({
 export function calculateTriggerOrderDetails(
   triggerOrder: TriggerOrderState,
   isStopLoss: boolean,
-  position: SubaccountPosition | undefined,
-  existingTriggerOrders?: SubaccountOrder[],
-  useCustomSize?: boolean,
-  customSize?: string,
-  showLimits?: boolean
+  {
+    showLimits,
+    size: { checked: useCustomSize, size: customSize },
+  }: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
+  { position, existingTriggerOrders }: InputData
 ): TriggerOrderDetails {
   const details: TriggerOrderDetails = {};
 
