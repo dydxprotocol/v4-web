@@ -1,10 +1,6 @@
-import {
-  OrderExecution,
-  OrderFlags,
-  OrderSide,
-  OrderTimeInForce,
-  OrderType,
-} from '@dydxprotocol/v4-client-js';
+import { getPositionBaseEquity } from '@/bonsai/calculators/subaccount';
+import { MarketInfo, SubaccountOrder, SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import { OrderExecution, OrderFlags, OrderSide, OrderType } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { timeUnits } from '@/constants/time';
@@ -14,236 +10,20 @@ import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 import { AttemptNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
-import { getPositionBaseEquity } from '../calculators/subaccount';
-import { createForm, createVanillaReducer } from '../lib/forms';
-import { ValidationError } from '../lib/validationErrors';
-import { MarketInfo, SubaccountOrder, SubaccountPosition } from '../types/summaryTypes';
+import {
+  CancelOrderPayload,
+  InputData,
+  PlaceOrderMarketInfo,
+  PlaceOrderPayload,
+  SummaryData,
+  TriggerOrderDetails,
+  TriggerOrdersFormState,
+  TriggerOrdersPayload,
+  TriggerOrderState,
+  TriggerPriceInputType,
+} from './types';
 
-export interface TriggerOrdersFormState {
-  marketId?: string;
-  size: {
-    checked: boolean;
-    size: string;
-  };
-  showLimits: boolean;
-
-  stopLossOrder: TriggerOrderState;
-  takeProfitOrder: TriggerOrderState;
-}
-
-export interface TriggerOrderState {
-  // if provided, we are modifying an order so priceInput will populate with order details if undefined
-  orderId?: string;
-
-  // ignored if showLimits is false
-  limitPrice?: string;
-
-  // if undefined, try using existing order details, otherwise empty inputs
-  priceInput?:
-    | { type: TriggerPriceInputType.TriggerPrice; triggerPrice: string }
-    | { type: TriggerPriceInputType.PercentDiff; percentDiff: string }
-    | { type: TriggerPriceInputType.UsdcDiff; usdcDiff: string };
-}
-
-export enum TriggerPriceInputType {
-  TriggerPrice = 'TRIGGER_PRICE',
-  PercentDiff = 'PERCENT_DIFF',
-  UsdcDiff = 'USDC_DIFF',
-}
-
-export const initialState: TriggerOrdersFormState = {
-  marketId: undefined,
-  size: {
-    checked: false,
-    size: '',
-  },
-  showLimits: false,
-  stopLossOrder: {},
-  takeProfitOrder: {},
-};
-
-const reducer = createVanillaReducer({
-  initialState,
-  actions: {
-    setMarketId: (state, marketId: string | undefined) => ({
-      ...initialState,
-      marketId,
-    }),
-
-    setSizeChecked: (state, checked: boolean) => ({
-      ...state,
-      size: {
-        ...state.size,
-        checked,
-      },
-    }),
-
-    setSize: (state, size: string) => ({
-      ...state,
-      size: {
-        ...state.size,
-        size,
-      },
-    }),
-
-    setShowLimits: (state, showLimits: boolean) => ({
-      ...state,
-      showLimits,
-    }),
-
-    // Stop Loss actions
-    setStopLossOrderId: (state, orderId: string | undefined) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        orderId,
-      },
-    }),
-
-    setStopLossLimitPrice: (state, limitPrice: string | undefined) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        limitPrice,
-      },
-    }),
-
-    setStopLossTriggerPrice: (state, triggerPrice: string) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        priceInput: {
-          type: TriggerPriceInputType.TriggerPrice,
-          triggerPrice,
-        },
-      },
-    }),
-
-    setStopLossPercentDiff: (state, percentDiff: string) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        priceInput: {
-          type: TriggerPriceInputType.PercentDiff,
-          percentDiff,
-        },
-      },
-    }),
-
-    setStopLossUsdcDiff: (state, usdcDiff: string) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        priceInput: {
-          type: TriggerPriceInputType.UsdcDiff,
-          usdcDiff,
-        },
-      },
-    }),
-
-    clearStopLossPriceInput: (state) => ({
-      ...state,
-      stopLossOrder: {
-        ...state.stopLossOrder,
-        priceInput: undefined,
-      },
-    }),
-
-    // Take Profit actions
-    setTakeProfitOrderId: (state, orderId: string | undefined) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        orderId,
-      },
-    }),
-
-    setTakeProfitLimitPrice: (state, limitPrice: string | undefined) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        limitPrice,
-      },
-    }),
-
-    setTakeProfitTriggerPrice: (state, triggerPrice: string) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        priceInput: {
-          type: TriggerPriceInputType.TriggerPrice,
-          triggerPrice,
-        },
-      },
-    }),
-
-    setTakeProfitPercentDiff: (state, percentDiff: string) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        priceInput: {
-          type: TriggerPriceInputType.PercentDiff,
-          percentDiff,
-        },
-      },
-    }),
-
-    setTakeProfitUsdcDiff: (state, usdcDiff: string) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        priceInput: {
-          type: TriggerPriceInputType.UsdcDiff,
-          usdcDiff,
-        },
-      },
-    }),
-
-    clearTakeProfitPriceInput: (state) => ({
-      ...state,
-      takeProfitOrder: {
-        ...state.takeProfitOrder,
-        priceInput: undefined,
-      },
-    }),
-
-    initializeForm: (state, marketId: string | undefined) => ({
-      ...initialState,
-      marketId,
-    }),
-
-    reset: () => initialState,
-  },
-});
-
-interface InputData {
-  position?: SubaccountPosition;
-  market?: MarketInfo;
-  existingTriggerOrders?: SubaccountOrder[];
-  canViewAccount?: boolean;
-}
-
-interface TriggerOrdersPayload {
-  placeOrderPayloads: PlaceOrderPayload[];
-  cancelOrderPayloads: CancelOrderPayload[];
-}
-
-interface TriggerOrderDetails {
-  triggerPrice?: string;
-  limitPrice?: string;
-  percentDiff?: string;
-  usdcDiff?: string;
-  size?: string;
-}
-
-interface SummaryData {
-  effectiveEntryMargin?: number;
-  stopLossOrder: TriggerOrderDetails;
-  takeProfitOrder: TriggerOrderDetails;
-  payload: TriggerOrdersPayload | undefined;
-}
-
-function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {
+export function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {
   const effectiveEntryMargin = mapIfPresent(
     inputData.position,
     getEffectiveBaseEquityFn
@@ -259,18 +39,6 @@ function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): 
 
   return { effectiveEntryMargin, stopLossOrder, takeProfitOrder, payload };
 }
-
-function getErrors(
-  state: TriggerOrdersFormState,
-  inputData: InputData,
-  summary: SummaryData
-): ValidationError[] {}
-
-export const TriggerOrdersFormFns = createForm({
-  reducer,
-  calculateSummary,
-  getErrors,
-});
 
 function calculateTriggerOrderPayload(
   stopLossOrder: TriggerOrderDetails,
@@ -846,43 +614,3 @@ function calculateTriggerPriceFromPercentDiff(
 
 // so we switch easily bewteen possible implementations
 const getEffectiveBaseEquityFn = getPositionBaseEquity;
-
-// todo move this to somewhere central
-interface CancelOrderPayload {
-  subaccountNumber: number;
-  orderId: string;
-  clientId: number;
-  orderFlags: OrderFlags;
-  clobPairId: number;
-  goodTilBlock?: number;
-  goodTilBlockTime?: number;
-}
-
-interface PlaceOrderPayload {
-  subaccountNumber: number;
-  marketId: string;
-  type: OrderType;
-  side: OrderSide;
-  price: number;
-  size: number;
-  clientId: number;
-  timeInForce?: OrderTimeInForce;
-  goodTilTimeInSeconds?: number;
-  execution?: OrderExecution;
-  postOnly?: boolean;
-  reduceOnly?: boolean;
-  triggerPrice?: number;
-  marketInfo?: PlaceOrderMarketInfo;
-  currentHeight?: number;
-  goodTilBlock?: number;
-  memo?: string;
-}
-
-// have to hard code because it isn't properly exported from v4-clients
-interface PlaceOrderMarketInfo {
-  clobPairId: number;
-  atomicResolution: number;
-  stepBaseQuantums: number;
-  quantumConversionExponent: number;
-  subticksPerTick: number;
-}
