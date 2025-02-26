@@ -13,6 +13,7 @@ import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
+import { getPositionBaseEquity } from '../calculators/subaccount';
 import { createForm, createVanillaReducer } from '../lib/forms';
 import { ValidationError } from '../lib/validationErrors';
 import { MarketInfo, SubaccountOrder, SubaccountPosition } from '../types/summaryTypes';
@@ -255,11 +256,10 @@ export const TriggerOrdersFormFns = createForm({
   getErrors,
 });
 
-function calculateTriggerOrderDetails(
+export function calculateTriggerOrderDetails(
   triggerOrder: TriggerOrderState,
   isStopLoss: boolean,
   position: SubaccountPosition | undefined,
-  market: MarketInfo | undefined,
   existingTriggerOrders?: SubaccountOrder[],
   useCustomSize?: boolean,
   customSize?: string,
@@ -287,7 +287,8 @@ function calculateTriggerOrderDetails(
   details.size = size.toString();
 
   // handle no price input
-  if (triggerOrder.priceInput == null) {
+  const priceInput = triggerOrder.priceInput;
+  if (priceInput == null) {
     if (triggerOrder.orderId) {
       const existingOrder = existingTriggerOrders?.find(
         (order) => order.id === triggerOrder.orderId
@@ -296,102 +297,56 @@ function calculateTriggerOrderDetails(
       if (existingOrder) {
         const triggerPrice = existingOrder.triggerPrice;
         // We could calculate other fields based on the trigger price
-        if (triggerPrice != null && triggerPrice.isFinite() && triggerPrice.gt(0)) {
-          details = { ...details, ...calculateDerivedValues(triggerPrice, isStopLoss) };
+        if (triggerPrice != null && triggerPrice.isFinite()) {
+          return {
+            ...details,
+            ...calculateTriggerPriceValues(triggerPrice, size, position, isStopLoss),
+          };
         }
       }
     }
     return details;
   }
 
-  // Process based on input type
-  switch (triggerOrder.priceInput.type) {
-    case TriggerPriceInputType.TriggerPrice: {
-      const triggerPrice = parseFloat(triggerOrder.priceInput.triggerPrice);
-      if (isNaN(triggerPrice)) return details;
-
-      details.triggerPrice = triggerPrice.toString();
-
-      // Calculate derived values (usdcDiff and percentDiff)
-      const size = parseFloat(details.size || '0');
-      calculateDerivedValues(
-        details,
-        triggerPrice,
-        size,
-        positionSide,
-        entryPrice,
-        positionNotional,
-        scaledLeverage,
-        isStopLoss
+  const newTriggerPrice = calc(() => {
+    if (priceInput.type === TriggerPriceInputType.TriggerPrice) {
+      return MustBigNumber(priceInput.triggerPrice);
+    }
+    if (priceInput.type === TriggerPriceInputType.UsdcDiff) {
+      return MustBigNumber(
+        calculateTriggerPriceFromUsdcDiff(
+          MustBigNumber(priceInput.usdcDiff),
+          size,
+          position,
+          isStopLoss
+        )
       );
-      break;
     }
-
-    case TriggerPriceInputType.UsdcDiff: {
-      const usdcDiff = parseFloat(triggerOrder.priceInput.usdcDiff);
-      if (isNaN(usdcDiff)) return details;
-
-      details.usdcDiff = usdcDiff.toString();
-
-      // Calculate triggerPrice
-      const size = parseFloat(details.size || '0');
-      if (size > 0) {
-        const triggerPrice = calculateTriggerPriceFromUsdcDiff(
-          usdcDiff,
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (priceInput.type === TriggerPriceInputType.PercentDiff) {
+      return MustBigNumber(
+        calculateTriggerPriceFromPercentDiff(
+          MustBigNumber(priceInput.percentDiff),
           size,
-          positionSide,
-          entryPrice,
+          position,
           isStopLoss
-        );
-
-        if (triggerPrice !== null) {
-          details.triggerPrice = triggerPrice.toString();
-
-          // Calculate percentDiff
-          if (positionNotional > 0) {
-            details.percentDiff = ((usdcDiff / positionNotional) * scaledLeverage * 100).toString();
-          }
-        }
-      }
-      break;
+        )
+      );
     }
+    assertNever(priceInput);
+    return BIG_NUMBERS.ZERO;
+  });
 
-    case TriggerPriceInputType.PercentDiff: {
-      const percentDiff = parseFloat(triggerOrder.priceInput.percentDiff);
-      if (isNaN(percentDiff)) return details;
-
-      details.percentDiff = percentDiff.toString();
-
-      // Calculate usdcDiff
-      if (positionNotional > 0) {
-        details.usdcDiff = ((percentDiff * positionNotional) / scaledLeverage / 100).toString();
-      }
-
-      // Calculate triggerPrice
-      const size = parseFloat(details.size || '0');
-      if (size > 0 && positionNotional > 0) {
-        const triggerPrice = calculateTriggerPriceFromPercentDiff(
-          percentDiff,
-          size,
-          positionSide,
-          entryPrice,
-          positionNotional,
-          scaledLeverage,
-          isStopLoss
-        );
-
-        if (triggerPrice !== null) {
-          details.triggerPrice = triggerPrice.toString();
-        }
-      }
-      break;
-    }
+  if (!newTriggerPrice.isFinite()) {
+    return details;
   }
-
-  return details;
+  return {
+    ...details,
+    ...calculateTriggerPriceValues(newTriggerPrice, size, position, isStopLoss),
+  };
 }
 
-function calculateTriggerPriceValues(
+export function calculateTriggerPriceValues(
   triggerPrice: BigNumber,
   unsignedSize: BigNumber,
   position: SubaccountPosition,
@@ -399,39 +354,29 @@ function calculateTriggerPriceValues(
 ): Omit<TriggerOrderDetails, 'size' | 'limitPrice'> {
   const entryPrice = position.baseEntryPrice;
   const positionSide = position.side;
-  const effectiveEntryMargin = clampBn(
-    // notional over leverage is subaccount equity
-    // minus current position value plus entry position value ==> entry equity
-    position.notional
-      .div(position.leverage?.abs() ?? BIG_NUMBERS.ONE)
-      .minus(position.value)
-      .plus(position.signedSize.times(entryPrice)),
-    BIG_NUMBERS.ONE,
-    // for isolated we really want to use the original margin, but it can go negative if you withdraw
-    // so we keep it above 1
-    position.marginMode === 'ISOLATED' ? BIG_NUMBERS.ONE : unsignedSize.times(entryPrice)
-  );
+
+  const effectiveEntryMargin = unsignedSize
+    .div(position.unsignedSize)
+    .times(getPositionEffectiveEntryMargin(position));
 
   return {
     triggerPrice: triggerPrice.toString(),
 
     percentDiff: calc(() => {
-      if (!positionNotional.isGreaterThan(0)) return undefined;
+      if (effectiveEntryMargin.isZero() || !effectiveEntryMargin.isFinite()) return undefined;
 
       if (isStopLoss) {
         if (positionSide === IndexerPositionSide.LONG) {
-          return size
-            .times(scaledLeverage)
+          return unsignedSize
             .times(entryPrice.minus(triggerPrice))
-            .div(positionNotional)
+            .div(effectiveEntryMargin)
             .toString();
         }
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (positionSide === IndexerPositionSide.SHORT) {
-          return size
-            .times(scaledLeverage)
+          return unsignedSize
             .times(triggerPrice.minus(entryPrice))
-            .div(positionNotional)
+            .div(effectiveEntryMargin)
             .toString();
         }
         assertNever(positionSide);
@@ -440,18 +385,16 @@ function calculateTriggerPriceValues(
 
       // take profit order
       if (positionSide === IndexerPositionSide.LONG) {
-        return size
-          .times(scaledLeverage)
+        return unsignedSize
           .times(triggerPrice.minus(entryPrice))
-          .div(positionNotional)
+          .div(effectiveEntryMargin)
           .toString();
       }
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (positionSide === IndexerPositionSide.SHORT) {
-        return size
-          .times(scaledLeverage)
+        return unsignedSize
           .times(entryPrice.minus(triggerPrice))
-          .div(positionNotional)
+          .div(effectiveEntryMargin)
           .toString();
       }
       assertNever(positionSide);
@@ -459,13 +402,14 @@ function calculateTriggerPriceValues(
     }),
 
     usdcDiff: calc(() => {
+      if (effectiveEntryMargin.isZero() || !effectiveEntryMargin.isFinite()) return undefined;
       if (isStopLoss) {
         if (positionSide === IndexerPositionSide.LONG) {
-          return size.times(entryPrice.minus(triggerPrice)).toString();
+          return unsignedSize.times(entryPrice.minus(triggerPrice)).toString();
         }
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (positionSide === IndexerPositionSide.SHORT) {
-          return size.times(triggerPrice.minus(entryPrice)).toString();
+          return unsignedSize.times(triggerPrice.minus(entryPrice)).toString();
         }
         assertNever(positionSide);
         return undefined;
@@ -473,11 +417,11 @@ function calculateTriggerPriceValues(
 
       // take profit order
       if (positionSide === IndexerPositionSide.LONG) {
-        return size.times(triggerPrice.minus(entryPrice)).toString();
+        return unsignedSize.times(triggerPrice.minus(entryPrice)).toString();
       }
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (positionSide === IndexerPositionSide.SHORT) {
-        return size.times(entryPrice.minus(triggerPrice)).toString();
+        return unsignedSize.times(entryPrice.minus(triggerPrice)).toString();
       }
       assertNever(positionSide);
       return undefined;
@@ -485,74 +429,59 @@ function calculateTriggerPriceValues(
   };
 }
 
-/**
- * Calculate trigger price from USD difference
- */
-function calculateTriggerPriceFromUsdcDiff(
-  usdcDiff: number,
-  size: number,
-  positionSide: string,
-  entryPrice: number,
+export function calculateTriggerPriceFromUsdcDiff(
+  usdcDiff: BigNumber,
+  size: BigNumber,
+  position: SubaccountPosition,
   isStopLoss: boolean
-): number | null {
-  if (size <= 0) return null;
-
-  if (isStopLoss) {
-    if (positionSide === 'LONG') {
-      return entryPrice - usdcDiff / size;
-    }
-    if (positionSide === 'SHORT') {
-      return entryPrice + usdcDiff / size;
-    }
-  } else {
-    // take profit
-    if (positionSide === 'LONG') {
-      return entryPrice + usdcDiff / size;
-    }
-    if (positionSide === 'SHORT') {
-      return entryPrice - usdcDiff / size;
-    }
+): BigNumber | undefined {
+  if (size.lte(0)) {
+    return undefined;
   }
 
-  return null;
-}
-
-const clampBn = (n: BigNumber, min: BigNumber, max: BigNumber) =>
-  BigNumber.max(min, BigNumber.min(max, n));
-
-/**
- * Calculate trigger price from percent difference
- */
-function calculateTriggerPriceFromPercentDiff(
-  percentDiff: number,
-  size: number,
-  positionSide: string,
-  entryPrice: number,
-  positionNotional: number,
-  scaledLeverage: number,
-  isStopLoss: boolean
-): number | null {
-  if (size <= 0 || positionNotional <= 0) return null;
-
-  const percentDecimal = percentDiff / 100;
+  const entryPrice = position.baseEntryPrice;
+  const priceDiff = usdcDiff.div(size);
 
   if (isStopLoss) {
-    if (positionSide === 'LONG') {
-      return entryPrice - (percentDecimal * positionNotional) / (scaledLeverage * size);
-    } else if (positionSide === 'SHORT') {
-      return entryPrice + (percentDecimal * positionNotional) / (scaledLeverage * size);
+    if (position.side === IndexerPositionSide.LONG) {
+      return entryPrice.minus(priceDiff);
     }
-  } else {
-    // take profit
-    if (positionSide === 'LONG') {
-      return entryPrice + (percentDecimal * positionNotional) / (scaledLeverage * size);
-    } else if (positionSide === 'SHORT') {
-      return entryPrice - (percentDecimal * positionNotional) / (scaledLeverage * size);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (position.side === IndexerPositionSide.SHORT) {
+      return entryPrice.plus(priceDiff);
     }
   }
-
-  return null;
+  // take profit
+  if (position.side === IndexerPositionSide.LONG) {
+    return entryPrice.plus(priceDiff);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (position.side === IndexerPositionSide.SHORT) {
+    return entryPrice.minus(priceDiff);
+  }
+  return undefined;
 }
+
+export function calculateTriggerPriceFromPercentDiff(
+  percentDiff: BigNumber,
+  size: BigNumber,
+  position: SubaccountPosition,
+  isStopLoss: boolean
+): BigNumber | undefined {
+  if (position.unsignedSize.lte(0)) {
+    return undefined;
+  }
+
+  const priceDiff = size
+    .div(position.unsignedSize)
+    .times(getPositionEffectiveEntryMargin(position))
+    .times(percentDiff);
+
+  return calculateTriggerPriceFromUsdcDiff(priceDiff, size, position, isStopLoss);
+}
+
+// so i can switch easily, temp
+const getPositionEffectiveEntryMargin = getPositionBaseEquity;
 
 // todo move this to somewhere central
 interface CancelOrderPayload {

@@ -32,6 +32,9 @@ export const ToBigNumber = (amount: BigNumberish): BigNumber => {
   return MustBigNumber(amount);
 };
 
+export const clampBn = (n: BigNumber, min: BigNumber, max: BigNumber) =>
+  BigNumber.max(min, BigNumber.min(max, n));
+
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.
  */
