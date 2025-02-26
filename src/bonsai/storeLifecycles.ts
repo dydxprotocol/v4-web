@@ -44,4 +44,5 @@ export const storeLifecycles = [
   setUpGeoQuery,
   setUpIndexerSourceAddressScreenV2Query,
   setUpIndexerLocalAddressScreenV2Query,
+  setUpUsdcRebalanceLifecycle,
 ] as const;

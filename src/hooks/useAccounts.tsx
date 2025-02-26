@@ -25,7 +25,7 @@ import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
+import { clearSavedEncryptedSignature, setHasOfflineSigner, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -161,8 +161,9 @@ const useAccountsContext = () => {
       const key = { mnemonic, privateKey, publicKey };
       setHdKey(key);
       hdKeyManager.setHdkey(wallet.address, key);
+      dispatch(setHasOfflineSigner(true));
     },
-    [getWalletFromSignature]
+    [getWalletFromSignature, dispatch]
   );
 
   const signMessageAsync = useSignForWalletDerivation(sourceAccount.walletInfo);
@@ -176,13 +177,13 @@ const useAccountsContext = () => {
         const wallet = new LocalWallet();
         wallet.address = sourceAccount.address;
         setLocalDydxWallet(wallet);
-
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
       } else if (sourceAccount.chain === WalletNetworkType.Cosmos && isConnectedGraz) {
         try {
           const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
           if (dydxOfflineSigner) {
             setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
+            dispatch(setHasOfflineSigner(true));
             dispatch(setOnboardingState(OnboardingState.AccountConnected));
           }
         } catch (error) {
@@ -207,6 +208,7 @@ const useAccountsContext = () => {
             } catch (error) {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
+              dispatch(setHasOfflineSigner(false));
             }
           } else if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
             try {
@@ -217,6 +219,7 @@ const useAccountsContext = () => {
             } catch (error) {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
+              dispatch(setHasOfflineSigner(false));
             }
           }
         } else {
@@ -234,10 +237,12 @@ const useAccountsContext = () => {
             } catch (error) {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
+              dispatch(setHasOfflineSigner(false));
             }
           }
         } else {
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          dispatch(setHasOfflineSigner(true));
         }
       } else {
         disconnectLocalDydxWallet();
@@ -341,6 +346,7 @@ const useAccountsContext = () => {
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
+    dispatch(setHasOfflineSigner(false));
   };
 
   const disconnect = async () => {
