@@ -7,11 +7,12 @@ import {
 } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { timeUnits } from '@/constants/time';
+import { IndexerOrderType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { AttemptNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { getPositionBaseEquity } from '../calculators/subaccount';
 import { createForm, createVanillaReducer } from '../lib/forms';
@@ -245,7 +246,7 @@ interface SummaryData {
 function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {
   const effectiveEntryMargin = mapIfPresent(
     inputData.position,
-    getPositionEffectiveEntryMargin
+    getEffectiveBaseEquityFn
   )?.toNumber();
   const stopLossOrder = calculateTriggerOrderDetails(state.stopLossOrder, true, state, inputData);
   const takeProfitOrder = calculateTriggerOrderDetails(
@@ -254,7 +255,9 @@ function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): 
     state,
     inputData
   );
-  return { effectiveEntryMargin, stopLossOrder, takeProfitOrder };
+  const payload = calculateTriggerOrderPayload(stopLossOrder, takeProfitOrder, state, inputData);
+
+  return { effectiveEntryMargin, stopLossOrder, takeProfitOrder, payload };
 }
 
 function getErrors(
@@ -269,7 +272,355 @@ export const TriggerOrdersFormFns = createForm({
   getErrors,
 });
 
-export function calculateTriggerOrderDetails(
+function calculateTriggerOrderPayload(
+  stopLossOrder: TriggerOrderDetails,
+  takeProfitOrder: TriggerOrderDetails,
+  state: TriggerOrdersFormState,
+  inputData: InputData
+): TriggerOrdersPayload | undefined {
+  const { position } = inputData;
+
+  // Position is always required to calculate order details
+  if (!position) {
+    return undefined;
+  }
+
+  const placeOrderPayloads: PlaceOrderPayload[] = [];
+  const cancelOrderPayloads: CancelOrderPayload[] = [];
+
+  if (
+    state.stopLossOrder.orderId != null ||
+    state.stopLossOrder.priceInput != null ||
+    state.stopLossOrder.limitPrice != null
+  ) {
+    const actions = getTriggerOrderActions(
+      true, // isStopLoss
+      state.stopLossOrder,
+      stopLossOrder,
+      state,
+      position,
+      inputData
+    );
+
+    // If actions is undefined, it means we're missing required data
+    if (actions === undefined) {
+      return undefined;
+    }
+
+    if (actions.cancelPayload) cancelOrderPayloads.push(actions.cancelPayload);
+    if (actions.placePayload) placeOrderPayloads.push(actions.placePayload);
+  }
+
+  if (
+    state.takeProfitOrder.orderId != null ||
+    state.takeProfitOrder.priceInput != null ||
+    state.takeProfitOrder.limitPrice != null
+  ) {
+    const actions = getTriggerOrderActions(
+      false,
+      state.takeProfitOrder,
+      takeProfitOrder,
+      state,
+      position,
+      inputData
+    );
+
+    // If actions is undefined, it means we're missing required data
+    if (actions === undefined) {
+      return undefined;
+    }
+
+    if (actions.cancelPayload) cancelOrderPayloads.push(actions.cancelPayload);
+    if (actions.placePayload) placeOrderPayloads.push(actions.placePayload);
+  }
+
+  // Only return a payload if there's at least one action to take
+  if (placeOrderPayloads.length === 0 && cancelOrderPayloads.length === 0) {
+    return undefined;
+  }
+
+  return {
+    placeOrderPayloads,
+    cancelOrderPayloads,
+  };
+}
+
+interface TriggerOrderActions {
+  cancelPayload?: CancelOrderPayload;
+  placePayload?: PlaceOrderPayload;
+}
+
+function getTriggerOrderActions(
+  isStopLoss: boolean,
+  triggerOrderState: TriggerOrderState,
+  triggerOrderDetails: TriggerOrderDetails,
+  formState: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
+  position: SubaccountPosition,
+  inputData: InputData
+): TriggerOrderActions | undefined {
+  const { orderId } = triggerOrderState;
+  const { triggerPrice } = triggerOrderDetails;
+  const actions: TriggerOrderActions = {};
+
+  // Cases:
+  // 1. Existing order -> update (cancel + place)
+  // 2. Existing order -> nothing should be done (no changes)
+  // 3. Existing order -> should delete (cancel)
+  // 4. No existing order -> create a new one (place)
+  // 5. No existing order -> nothing should be done (no input)
+
+  if (orderId) {
+    // We need existingTriggerOrders when we have an orderId
+    const { existingTriggerOrders } = inputData;
+    if (!existingTriggerOrders) {
+      return undefined; // Missing required data
+    }
+
+    const existingOrder = existingTriggerOrders.find((order) => order.id === orderId);
+    if (!existingOrder) {
+      return undefined; // Missing required data (order doesn't exist)
+    }
+
+    if (triggerPrice) {
+      // Check if order needs updating
+      if (
+        !isTriggerOrderEqualToExistingOrder(
+          triggerOrderDetails,
+          existingOrder,
+          formState.showLimits
+        )
+      ) {
+        // Case 1: Existing order -> update
+        actions.cancelPayload = createCancelOrderPayload(existingOrder);
+
+        // We need market data to create a new order
+        const { market } = inputData;
+        if (!market) {
+          return undefined; // Missing required data
+        }
+
+        actions.placePayload = createPlaceOrderPayload(
+          isStopLoss,
+          triggerOrderDetails,
+          position,
+          market,
+          formState.showLimits
+        );
+      }
+      // Case 2: Existing order -> no change needed
+    } else {
+      // Case 3: Existing order -> should delete
+      actions.cancelPayload = createCancelOrderPayload(existingOrder);
+    }
+  } else if (triggerPrice) {
+    // Case 4: No existing order -> create new
+    // We need market data to create a new order
+    const { market } = inputData;
+    if (!market) {
+      return undefined; // Missing required data
+    }
+
+    actions.placePayload = createPlaceOrderPayload(
+      isStopLoss,
+      triggerOrderDetails,
+      position,
+      market,
+      formState.showLimits
+    );
+  }
+
+  // Case 5: nothing to do
+  return actions;
+}
+
+function isTriggerOrderEqualToExistingOrder(
+  triggerOrderDetails: TriggerOrderDetails,
+  existingOrder: SubaccountOrder,
+  showLimits: boolean
+): boolean {
+  const sizesEqual =
+    triggerOrderDetails.size != null &&
+    MustBigNumber(triggerOrderDetails.size).eq(existingOrder.size);
+
+  const triggerPricesEqual =
+    existingOrder.triggerPrice != null &&
+    triggerOrderDetails.triggerPrice != null &&
+    MustBigNumber(triggerOrderDetails.triggerPrice).eq(existingOrder.triggerPrice);
+
+  // Only check limit price if using limit orders
+  const limitPriceCheck = calc(() => {
+    const isExistingLimit =
+      existingOrder.type === IndexerOrderType.TAKEPROFIT ||
+      existingOrder.type === IndexerOrderType.STOPLIMIT;
+    const showingLimits = showLimits;
+    if (isExistingLimit) {
+      // must be showing limits and equal
+      if (!showingLimits) {
+        return false;
+      }
+      return (
+        triggerOrderDetails.limitPrice != null &&
+        MustBigNumber(triggerOrderDetails.limitPrice).eq(existingOrder.price)
+      );
+    }
+    // must be hiding limits
+    return !showingLimits;
+  });
+
+  return sizesEqual && triggerPricesEqual && limitPriceCheck;
+}
+
+function createCancelOrderPayload(order: SubaccountOrder): CancelOrderPayload | undefined {
+  const clientId = AttemptNumber(order.clientId);
+  const clobPairId = order.clobPairId;
+  if (clientId == null || clobPairId == null) {
+    return undefined;
+  }
+
+  const orderFlags =
+    order.orderFlags === '0'
+      ? OrderFlags.SHORT_TERM
+      : order.orderFlags === '32'
+        ? OrderFlags.CONDITIONAL
+        : order.orderFlags === '64'
+          ? OrderFlags.LONG_TERM
+          : undefined;
+
+  if (orderFlags == null) {
+    return undefined;
+  }
+
+  return {
+    subaccountNumber: order.subaccountNumber,
+    orderId: order.id,
+    clientId,
+    orderFlags,
+    clobPairId,
+    goodTilBlock: order.goodTilBlock,
+    goodTilBlockTime: order.goodTilBlockTime,
+  };
+}
+
+function createPlaceOrderPayload(
+  isStopLoss: boolean,
+  orderDetails: TriggerOrderDetails,
+  position: SubaccountPosition,
+  market: MarketInfo,
+  showLimits: boolean
+): PlaceOrderPayload | undefined {
+  // Parse and validate numeric inputs
+  const size = AttemptNumber(orderDetails.size);
+  const triggerPrice = AttemptNumber(orderDetails.triggerPrice);
+
+  if (size == null || triggerPrice == null) {
+    return undefined;
+  }
+
+  // Determine order type and side based on position side and order type
+  const positionSide = position.side;
+  const side = positionSide === IndexerPositionSide.LONG ? OrderSide.SELL : OrderSide.BUY;
+
+  const orderType = isStopLoss
+    ? showLimits
+      ? OrderType.STOP_LIMIT
+      : OrderType.STOP_MARKET
+    : showLimits
+      ? OrderType.TAKE_PROFIT_LIMIT
+      : OrderType.TAKE_PROFIT_MARKET;
+
+  const maxUnsignedInt = 4294967295;
+  const clientId = Math.floor(Math.random() * maxUnsignedInt);
+  const goodTilTimeInSeconds = 28 * timeUnits.day; // 28 days
+
+  const clobPairId = AttemptNumber(market.clobPairId);
+  if (clobPairId == null) {
+    return undefined;
+  }
+  const marketInfo: PlaceOrderMarketInfo = {
+    clobPairId,
+    atomicResolution: market.atomicResolution,
+    stepBaseQuantums: market.stepBaseQuantums,
+    quantumConversionExponent: market.quantumConversionExponent,
+    subticksPerTick: market.subticksPerTick,
+  };
+
+  const price = getPrice(orderType, side, orderDetails, market.ticker);
+  if (price == null) {
+    return undefined;
+  }
+
+  return {
+    subaccountNumber: position.subaccountNumber,
+    marketId: position.market,
+    type: orderType,
+    side,
+    price,
+    size,
+    clientId,
+    // TP/SL orders always have null timeInForce. IOC/PostOnly/GTD is distinguished by execution
+    timeInForce: undefined,
+    execution:
+      orderType === OrderType.STOP_MARKET || orderType === OrderType.TAKE_PROFIT_MARKET
+        ? OrderExecution.IOC
+        : OrderExecution.DEFAULT,
+    goodTilTimeInSeconds,
+    reduceOnly: true,
+    postOnly: false,
+    triggerPrice,
+    marketInfo,
+  };
+}
+
+const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
+const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
+const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
+const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
+const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
+// const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
+// const SLIPPAGE_STEP_SIZE = 0.00001;
+
+function getPrice(
+  orderType: OrderType,
+  side: OrderSide,
+  orderDetails: TriggerOrderDetails,
+  market: string
+): number | undefined {
+  const triggerPrice = AttemptNumber(orderDetails.triggerPrice);
+  if (triggerPrice == null) {
+    return undefined;
+  }
+
+  // For market orders, calculate price with slippage based on the trigger price
+  if (orderType === OrderType.STOP_MARKET || orderType === OrderType.TAKE_PROFIT_MARKET) {
+    const isMajorMarket = MAJOR_MARKETS.has(market);
+
+    // Slippage percentages based on market type and order type
+    const slippagePercentage = calc(() => {
+      if (isMajorMarket) {
+        return orderType === OrderType.STOP_MARKET
+          ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET
+          : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET;
+      }
+      return orderType === OrderType.STOP_MARKET
+        ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER
+        : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER;
+    });
+
+    if (side === OrderSide.BUY) {
+      return triggerPrice * (1 + slippagePercentage);
+    }
+    return triggerPrice * (1 - slippagePercentage);
+  }
+
+  // For limit orders, use the limit price
+  if (orderType === OrderType.STOP_LIMIT || orderType === OrderType.TAKE_PROFIT_LIMIT) {
+    return AttemptNumber(orderDetails.limitPrice);
+  }
+
+  return undefined;
+}
+
+function calculateTriggerOrderDetails(
   triggerOrder: TriggerOrderState,
   isStopLoss: boolean,
   {
@@ -359,7 +710,7 @@ export function calculateTriggerOrderDetails(
   };
 }
 
-export function calculateTriggerPriceValues(
+function calculateTriggerPriceValues(
   triggerPrice: BigNumber,
   unsignedSize: BigNumber,
   position: SubaccountPosition,
@@ -370,7 +721,7 @@ export function calculateTriggerPriceValues(
 
   const effectiveEntryMargin = unsignedSize
     .div(position.unsignedSize)
-    .times(getPositionEffectiveEntryMargin(position));
+    .times(getEffectiveBaseEquityFn(position));
 
   return {
     triggerPrice: triggerPrice.toString(),
@@ -442,7 +793,7 @@ export function calculateTriggerPriceValues(
   };
 }
 
-export function calculateTriggerPriceFromUsdcDiff(
+function calculateTriggerPriceFromUsdcDiff(
   usdcDiff: BigNumber,
   size: BigNumber,
   position: SubaccountPosition,
@@ -475,7 +826,7 @@ export function calculateTriggerPriceFromUsdcDiff(
   return undefined;
 }
 
-export function calculateTriggerPriceFromPercentDiff(
+function calculateTriggerPriceFromPercentDiff(
   percentDiff: BigNumber,
   size: BigNumber,
   position: SubaccountPosition,
@@ -487,14 +838,14 @@ export function calculateTriggerPriceFromPercentDiff(
 
   const priceDiff = size
     .div(position.unsignedSize)
-    .times(getPositionEffectiveEntryMargin(position))
+    .times(getEffectiveBaseEquityFn(position))
     .times(percentDiff);
 
   return calculateTriggerPriceFromUsdcDiff(priceDiff, size, position, isStopLoss);
 }
 
-// so i can switch easily, temp
-const getPositionEffectiveEntryMargin = getPositionBaseEquity;
+// so we switch easily bewteen possible implementations
+const getEffectiveBaseEquityFn = getPositionBaseEquity;
 
 // todo move this to somewhere central
 interface CancelOrderPayload {

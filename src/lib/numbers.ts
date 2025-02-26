@@ -32,6 +32,21 @@ export const ToBigNumber = (amount: BigNumberish): BigNumber => {
   return MustBigNumber(amount);
 };
 
+export const ToNumber = (amount: string): number => {
+  return ToBigNumber(amount).toNumber();
+};
+
+export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+  if (amount == null) {
+    return undefined;
+  }
+  const bn = new BigNumber(amount);
+  if (!bn.isFinite()) {
+    return undefined;
+  }
+  return bn.toNumber();
+};
+
 export const clampBn = (n: BigNumber, min: BigNumber, max: BigNumber) =>
   BigNumber.max(min, BigNumber.min(max, n));
 
