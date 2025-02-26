@@ -6,12 +6,14 @@ import { formatUnits } from 'viem';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
+import { store } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch } from '@/state/appTypes';
-import { isDeposit, isWithdraw, updateDeposit, updateWithdraw } from '@/state/transfers';
+import { isDeposit, isWithdraw, updateDeposit, updateWithdraw, Withdraw } from '@/state/transfers';
 import { selectPendingTransfers } from '@/state/transfersSelectors';
 
 import { track } from '@/lib/analytics/analytics';
+import { log } from '@/lib/telemetry';
 
 import { useSkipClient } from './transfers/skipClient';
 import { useAccounts } from './useAccounts';
@@ -26,6 +28,18 @@ export function useUpdateTransfers() {
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});
 
+  const getSubtransactionAndIdx = (withdraw: Withdraw) => {
+    const subtransaction = withdraw.transactions.find(
+      ({ status }) => status === 'pending' || status === 'idle'
+    );
+
+    const subtransactionIdx = withdraw.transactions.findIndex(
+      ({ status }) => status === 'pending' || status === 'idle'
+    );
+
+    return { subtransaction, subtransactionIdx };
+  };
+
   useEffect(() => {
     if (!dydxAddress || !pendingTransfers.length) return;
 
@@ -39,43 +53,63 @@ export function useUpdateTransfers() {
 
         transactionToCallback.current[transferKey] = true;
 
-        skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
-          // Assume the final asset transfer is always USDC
-          const finalAmount = response.transferAssetRelease?.amount
-            ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
-            : undefined;
+        skipClient
+          .waitForTransaction({
+            chainID: chainId,
+            txHash,
+            async onTransactionTracked(txInfo) {
+              if (!txInfo.explorerLink) return;
+              dispatch(
+                updateDeposit({
+                  dydxAddress,
+                  deposit: {
+                    ...transfer,
+                    explorerLink: txInfo.explorerLink,
+                  },
+                })
+              );
+            },
+          })
+          .then((response) => {
+            // Assume the final asset transfer is always USDC
+            const finalAmount = response.transferAssetRelease?.amount
+              ? formatUnits(BigInt(response.transferAssetRelease.amount), USDC_DECIMALS)
+              : undefined;
 
-          const status = handleResponseStatus(response.status);
-          const { token, ...rest } = transfer;
+            const status = handleResponseStatus(response.status);
+            const { token, ...rest } = transfer;
 
-          dispatch(
-            updateDeposit({
-              dydxAddress,
-              deposit: {
-                ...transfer,
-                finalAmountUsd: finalAmount,
-                status,
-              },
-            })
-          );
-
-          if (status === 'success') {
-            track(
-              AnalyticsEvents.DepositFinalized({
-                ...rest,
-                tokenInChainId: token.chainId,
-                tokenInDenom: token.denom,
-                status,
-                finalAmountUsd: finalAmount,
+            dispatch(
+              updateDeposit({
+                dydxAddress,
+                deposit: {
+                  ...transfer,
+                  finalAmountUsd: finalAmount,
+                  status,
+                },
               })
             );
 
-            appQueryClient.invalidateQueries({
-              queryKey: ['validator', 'accountBalances'],
-              exact: false,
-            });
-          }
-        });
+            if (status === 'success') {
+              track(
+                AnalyticsEvents.DepositFinalized({
+                  ...rest,
+                  tokenInChainId: token.chainId,
+                  tokenInDenom: token.denom,
+                  status,
+                  finalAmountUsd: finalAmount,
+                })
+              );
+
+              appQueryClient.invalidateQueries({
+                queryKey: ['validator', 'accountBalances'],
+                exact: false,
+              });
+            }
+          })
+          .catch((error) => {
+            log('useUpdateTransfers/deposit', error);
+          });
       }
 
       if (isWithdraw(transfer)) {
@@ -83,70 +117,115 @@ export function useUpdateTransfers() {
         const hasError = transactions.some((tx) => tx.status === 'error');
 
         if (!hasError) {
-          const currentTransaction = transactions.find(
-            ({ status }) => status === 'pending' || status === 'idle'
-          );
-          const currentTransactionIdx = transactions.findIndex(
-            ({ status }) => status === 'pending' || status === 'idle'
-          );
+          const { subtransaction: trackedSubtransaction } = getSubtransactionAndIdx(transfer);
 
-          if (currentTransaction && currentTransaction.txHash) {
-            const chainId = currentTransaction.chainId;
-            const txHash = currentTransaction.txHash;
+          if (trackedSubtransaction && trackedSubtransaction.txHash) {
+            const chainId = trackedSubtransaction.chainId;
+            const txHash = trackedSubtransaction.txHash;
             const transferKey = `${chainId}-${txHash}`;
             if (transactionToCallback.current[transferKey]) continue;
 
             transactionToCallback.current[transferKey] = true;
 
-            skipClient.waitForTransaction({ chainID: chainId, txHash }).then((response) => {
-              // Assume the final asset transfer is always USDC
-              const finalAmount = transfer.transferAssetRelease?.amount
-                ? formatUnits(BigInt(transfer.transferAssetRelease.amount), USDC_DECIMALS)
-                : undefined;
+            skipClient
+              .waitForTransaction({
+                chainID: chainId,
+                txHash,
+                async onTransactionTracked(txInfo) {
+                  if (!txInfo.explorerLink) return;
+                  const subTransactions = transfer.transactions.map((t) => {
+                    if (t.txHash === txInfo.txHash) {
+                      return {
+                        ...t,
+                        explorerLink: txInfo.explorerLink,
+                      };
+                    }
 
-              const currentTransactionStatus = handleResponseStatus(response.status);
-              const currentTransactionError = currentTransactionStatus === 'error';
-              const transactionsCopy = [...transactions];
+                    return t;
+                  });
 
-              transactionsCopy[currentTransactionIdx] = {
-                ...currentTransaction,
-                status: currentTransactionStatus,
-              };
+                  dispatch(
+                    updateWithdraw({
+                      dydxAddress,
+                      withdraw: {
+                        ...transfer,
+                        transactions: subTransactions,
+                      },
+                    })
+                  );
+                },
+              })
+              .then((response) => {
+                const latestTransfer =
+                  store
+                    .getState()
+                    .transfers.transfersByDydxAddress[
+                      dydxAddress
+                    ]?.find((t): t is Withdraw => isWithdraw(t) && t.id === transfer.id) ??
+                  transfer;
 
-              const hasPending = transactionsCopy.some(
-                (tx) => tx.status === 'pending' || tx.status === 'idle'
-              );
+                const { subtransaction, subtransactionIdx } =
+                  getSubtransactionAndIdx(latestTransfer);
 
-              const status = currentTransactionError ? 'error' : hasPending ? 'pending' : 'success';
+                // Assume the final asset transfer is always USDC
+                const finalAmount = latestTransfer.transferAssetRelease?.amount
+                  ? formatUnits(BigInt(latestTransfer.transferAssetRelease.amount), USDC_DECIMALS)
+                  : undefined;
 
-              dispatch(
-                updateWithdraw({
-                  dydxAddress,
-                  withdraw: {
-                    ...transfer,
-                    transactions: transactionsCopy,
-                    finalAmountUsd: finalAmount,
-                    status,
-                  },
-                })
-              );
+                const currentTransactionStatus = handleResponseStatus(response.status);
+                const currentTransactionError = currentTransactionStatus === 'error';
+                const transactionsCopy = [...latestTransfer.transactions];
 
-              if (status === 'success') {
-                track(
-                  AnalyticsEvents.WithdrawFinalized({
-                    ...transfer,
-                    finalAmountUsd: finalAmount,
-                    status,
-                    transferAssetRelease: response.transferAssetRelease,
+                if (!subtransaction) {
+                  throw new Error('No subtransaction found');
+                }
+
+                transactionsCopy[subtransactionIdx] = {
+                  ...subtransaction,
+                  status: currentTransactionStatus,
+                };
+
+                const hasPending = transactionsCopy.some(
+                  (tx) => tx.status === 'pending' || tx.status === 'idle'
+                );
+
+                const status = currentTransactionError
+                  ? 'error'
+                  : hasPending
+                    ? 'pending'
+                    : 'success';
+
+                dispatch(
+                  updateWithdraw({
+                    dydxAddress,
+                    withdraw: {
+                      ...latestTransfer,
+                      transactions: transactionsCopy,
+                      finalAmountUsd: finalAmount,
+                      status,
+                    },
                   })
                 );
 
-                appQueryClient.invalidateQueries({
-                  queryKey: ['validator', 'accountBalances'],
-                  exact: false,
-                });
-              }
-            });
+                if (status === 'success') {
+                  track(
+                    AnalyticsEvents.WithdrawFinalized({
+                      ...transfer,
+                      finalAmountUsd: finalAmount,
+                      status,
+                      transferAssetRelease: response.transferAssetRelease,
+                    })
+                  );
+
+                  appQueryClient.invalidateQueries({
+                    queryKey: ['validator', 'accountBalances'],
+                    exact: false,
+                  });
+                }
+              })
+              .catch((error) => {
+                log('useUpdateTransfers/withdraw', error);
+              });
           }
         }
       }
