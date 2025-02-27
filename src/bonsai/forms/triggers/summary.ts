@@ -59,7 +59,8 @@ function calculateTriggerOrderPayload(
   if (
     state.stopLossOrder.orderId != null ||
     state.stopLossOrder.priceInput != null ||
-    state.stopLossOrder.limitPrice != null
+    state.stopLossOrder.limitPrice != null ||
+    state.size.checked
   ) {
     const actions = getTriggerOrderActions(
       true, // isStopLoss
@@ -82,7 +83,8 @@ function calculateTriggerOrderPayload(
   if (
     state.takeProfitOrder.orderId != null ||
     state.takeProfitOrder.priceInput != null ||
-    state.takeProfitOrder.limitPrice != null
+    state.takeProfitOrder.limitPrice != null ||
+    state.size.checked
   ) {
     const actions = getTriggerOrderActions(
       false,

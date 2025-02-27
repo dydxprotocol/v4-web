@@ -1,7 +1,18 @@
-import { ErrorType, simpleValidationError, ValidationError } from '@/bonsai/lib/validationErrors';
+import { getSimpleOrderStatus } from '@/bonsai/calculators/orders';
+import {
+  ErrorFormat,
+  ErrorType,
+  simpleValidationError,
+  ValidationError,
+} from '@/bonsai/lib/validationErrors';
+import { OrderStatus } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+
+import { calc } from '@/lib/do';
+import { AttemptBigNumber, AttemptNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
+import { isPresent } from '@/lib/typeUtils';
 
 import {
   InputData,
@@ -16,62 +27,244 @@ export function getErrors(
   inputData: InputData,
   summary: SummaryData
 ): ValidationError[] {
-  const errors = new TriggerOrderFormValidationErrors();
   const validationErrors: ValidationError[] = [];
 
-  // Basic input validation
-  if (inputData.position == null) {
-    validationErrors.push(errors.positionNotFound());
-  }
-
-  // Market state validation
-  if (state.marketId == null || inputData.market == null) {
+  // make sure referenced market is here
+  if (
+    state.marketId == null ||
+    inputData.market == null ||
+    state.marketId !== inputData.market.ticker
+  ) {
     validationErrors.push(errors.invalidMarket());
   }
 
-  // Position validation
-  const position = inputData.position;
-  if (!position || position.size.current === 0) {
+  // make sure we have a position and it's in a good state
+  if (
+    inputData.position == null ||
+    inputData.position.unsignedSize.lte(0) ||
+    inputData.position.market !== state.marketId ||
+    inputData.position.status !== IndexerPerpetualPositionStatus.OPEN
+  ) {
     validationErrors.push(errors.positionNotFound());
   }
 
-  // Validate Stop Loss Order
-  if (state.stopLossOrder.orderId || state.stopLossOrder.priceInput) {
-    validateTriggerOrder(
-      true, // isStopLoss
-      state.stopLossOrder,
-      summary.stopLossOrder,
-      state,
-      inputData,
-      validationErrors,
-      errors
+  // make sure any referenced orders are here and open
+  const requiredOrders = [state.stopLossOrder.orderId, state.takeProfitOrder.orderId].filter(
+    isPresent
+  );
+  requiredOrders.forEach((orderId) => {
+    const order = inputData.existingTriggerOrders?.find((o) => o.id === orderId);
+    if (
+      order == null ||
+      getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
+    ) {
+      validationErrors.push(errors.orderNotFound());
+    }
+  });
+
+  if (
+    state.stopLossOrder.orderId != null ||
+    state.stopLossOrder.priceInput != null ||
+    state.stopLossOrder.limitPrice != null ||
+    state.size.checked
+  ) {
+    validationErrors.push(
+      ...validateTriggerOrder(true, state.stopLossOrder, summary.stopLossOrder, state, inputData)
     );
   }
 
-  // Validate Take Profit Order
-  if (state.takeProfitOrder.orderId || state.takeProfitOrder.priceInput) {
-    validateTriggerOrder(
-      false, // isStopLoss
-      state.takeProfitOrder,
-      summary.takeProfitOrder,
-      state,
-      inputData,
-      validationErrors,
-      errors
+  if (
+    state.takeProfitOrder.orderId != null ||
+    state.takeProfitOrder.priceInput != null ||
+    state.takeProfitOrder.limitPrice != null ||
+    state.size.checked
+  ) {
+    validationErrors.push(
+      ...validateTriggerOrder(
+        false,
+        state.takeProfitOrder,
+        summary.takeProfitOrder,
+        state,
+        inputData
+      )
     );
   }
 
   // Size validation if using custom size
   if (state.size.checked) {
-    validateCustomSize(state.size.size, inputData, validationErrors, errors);
+    validationErrors.push(...validateCustomSize(state.size.size, inputData));
   }
 
-  // Summary/Payload validation
-  if (!summary) {
-    validationErrors.push(errors.noSummaryData());
+  if (
+    summary.payload == null ||
+    (summary.payload.cancelOrderPayloads.length === 0 &&
+      summary.payload.placeOrderPayloads.length === 0)
+  ) {
+    validationErrors.push(errors.noPayload());
   }
 
   return validationErrors;
+}
+
+function validateTriggerOrder(
+  isStopLoss: boolean,
+  state: TriggerOrderState,
+  details: TriggerOrderDetails,
+  formState: TriggerOrdersFormState,
+  inputData: InputData
+): ValidationError[] {
+  const validationErrors: ValidationError[] = [];
+  const { position, market } = inputData;
+  if (!position || !market) return validationErrors;
+
+  // we allow fully empty state if you're cancelling the order, but otherwise you need to be modifying something
+  const isModifyingOrder = state.orderId != null;
+
+  const validatedTriggerPrice = calc(() => {
+    const triggerPrice = details.triggerPrice;
+    if (triggerPrice == null) {
+      return { isUserInput: false, validationErrors: [] };
+    }
+
+    const triggerPriceNum = AttemptBigNumber(triggerPrice);
+    const oraclePrice = market.oraclePrice;
+    const isLong = position.side === IndexerPositionSide.LONG;
+    const localErrors: ValidationError[] = [];
+
+    // Price positivity check
+    if (triggerPriceNum == null || triggerPriceNum.lte(0)) {
+      localErrors.push(errors.priceNotPositive());
+      return { isUserInput: true, validationErrors: localErrors };
+    }
+
+    // we need a valid oracle to validate orders
+    if (oraclePrice == null) {
+      localErrors.push(errors.missingOraclePrice());
+      return { isUserInput: true, validationErrors: localErrors };
+    }
+
+    // Oracle price validation
+    if (isStopLoss) {
+      // we're long and stop loss means we are selling when price is below trigger price
+      if (isLong && MustBigNumber(oraclePrice).lte(triggerPriceNum)) {
+        localErrors.push(errors.stopLossTriggerAboveIndex());
+        // if we are short then stop loss means buy when price is above trigger
+      } else if (!isLong && MustBigNumber(oraclePrice).gte(triggerPriceNum)) {
+        localErrors.push(errors.stopLossTriggerBelowIndex());
+      }
+    } else {
+      // we're long and taking profit, which means sell when oracle is greater than trigger
+      if (isLong && MustBigNumber(oraclePrice).gte(triggerPriceNum)) {
+        localErrors.push(errors.takeProfitTriggerBelowIndex());
+        // we're short and taking profit which means buy when price is below trigger
+      } else if (!isLong && MustBigNumber(oraclePrice).lte(triggerPriceNum)) {
+        localErrors.push(errors.takeProfitTriggerAboveIndex());
+      }
+    }
+
+    // Liquidation price validation
+    const liquidationPrice = position.liquidationPrice;
+    if (liquidationPrice && isStopLoss) {
+      if (isLong && triggerPriceNum <= liquidationPrice) {
+        localErrors.push(errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber()));
+      } else if (!isLong && triggerPriceNum >= liquidationPrice) {
+        localErrors.push(errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber()));
+      }
+    }
+
+    return { isUserInput: true, validationErrors: localErrors };
+  });
+
+  const validatedLimitPrice = calc(() => {
+    if (!formState.showLimits) {
+      return { isUserInput: false, validationErrors: [] };
+    }
+
+    const limitPrice = AttemptNumber(details.limitPrice);
+    const triggerPrice = AttemptNumber(details.triggerPrice);
+
+    const isSellOrder = position.side === IndexerPositionSide.LONG;
+
+    const localErrors: ValidationError[] = [];
+
+    if (limitPrice == null) {
+      localErrors.push(
+        isSellOrder ? errors.limitPriceMustBeBelowTrigger() : errors.limitPriceMustBeAboveTrigger()
+      );
+    } else if (limitPrice <= 0) {
+      localErrors.push(errors.priceNotPositive());
+    } else if (triggerPrice != null) {
+      if (isSellOrder && limitPrice >= triggerPrice) {
+        localErrors.push(errors.limitPriceMustBeBelowTrigger());
+      } else if (!isSellOrder && limitPrice <= triggerPrice) {
+        localErrors.push(errors.limitPriceMustBeAboveTrigger());
+      }
+    }
+
+    return { isUserInput: true, validationErrors: localErrors };
+  });
+
+  const validatedSize = calc(() => {
+    if (!formState.size.checked || !details.size) {
+      return { isUserInput: false, validationErrors: [] };
+    }
+
+    return {
+      isUserInput: true,
+      validationErrors: validateCustomSize(formState.size.size, inputData),
+    };
+  });
+
+  if (isModifyingOrder) {
+    // any user provided inputs must be valid since they'll override the order
+    // but if they're all empty we'll just cancel the order and do nothing
+    if (validatedTriggerPrice.isUserInput) {
+      validationErrors.push(...validatedTriggerPrice.validationErrors);
+    }
+    if (validatedLimitPrice.isUserInput) {
+      validationErrors.push(...validatedLimitPrice.validationErrors);
+    }
+    if (validatedSize.isUserInput) {
+      validationErrors.push(...validatedSize.validationErrors);
+    }
+  } else {
+    // we need at least a valid trigger price and if limit is checked we need valid limit
+    // and if size is checked we need valid size
+    if (!validatedTriggerPrice.isUserInput) {
+      validationErrors.push(errors.triggerPriceRequired());
+    } else {
+      validationErrors.push(...validatedTriggerPrice.validationErrors);
+    }
+
+    // todo check if we should allow empty and do a sane default
+    if (formState.showLimits && validatedLimitPrice.validationErrors.length > 0) {
+      validationErrors.push(...validatedLimitPrice.validationErrors);
+    }
+
+    // todo check if we should allow empty and do a sane default
+    if (formState.size.checked && validatedSize.validationErrors.length > 0) {
+      validationErrors.push(...validatedSize.validationErrors);
+    }
+  }
+
+  return validationErrors;
+}
+
+function validateCustomSize(size: string, inputData: InputData): ValidationError[] {
+  const { market, position } = inputData;
+  if (!market || !position) return [];
+
+  const sizeNum = AttemptBigNumber(size);
+
+  if (sizeNum == null || sizeNum.lt(market.stepSize)) {
+    return [errors.sizeBelowMinimum(MustNumber(market.stepSize), market.displayableTicker)];
+  }
+
+  if (sizeNum.gt(position.unsignedSize)) {
+    return [errors.sizeExceedsPosition()];
+  }
+
+  return [];
 }
 
 class TriggerOrderFormValidationErrors {
@@ -92,6 +285,14 @@ class TriggerOrderFormValidationErrors {
       code: 'NO_POSITION',
       type: ErrorType.error,
       titleKey: STRING_KEYS.NO_POSITION,
+    });
+  }
+
+  orderNotFound(): ValidationError {
+    return simpleValidationError({
+      code: 'NO_ORDER_MATCHING_ORDER_ID',
+      type: ErrorType.error,
+      titleKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 
@@ -119,7 +320,7 @@ class TriggerOrderFormValidationErrors {
   // Take Profit specific errors
   takeProfitTriggerBelowIndex(): ValidationError {
     return simpleValidationError({
-      code: 'TRIGGER_MUST_ABOVE_INDEX_PRICE',
+      code: 'TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
       titleKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
@@ -129,11 +330,31 @@ class TriggerOrderFormValidationErrors {
 
   takeProfitTriggerAboveIndex(): ValidationError {
     return simpleValidationError({
-      code: 'TRIGGER_MUST_BELOW_INDEX_PRICE',
+      code: 'TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
       titleKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE,
       textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE,
+    });
+  }
+
+  stopLossTriggerBelowIndex(): ValidationError {
+    return simpleValidationError({
+      code: 'STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE',
+      type: ErrorType.error,
+      fields: ['stopLossPrice.triggerPrice'],
+      titleKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+      textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+    });
+  }
+
+  stopLossTriggerAboveIndex(): ValidationError {
+    return simpleValidationError({
+      code: 'STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE',
+      type: ErrorType.error,
+      fields: ['stopLossPrice.triggerPrice'],
+      titleKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
+      textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
     });
   }
 
@@ -164,16 +385,16 @@ class TriggerOrderFormValidationErrors {
       code: 'ORDER_SIZE_BELOW_MIN_SIZE',
       type: ErrorType.error,
       fields: ['size'],
-      titleKey: STRING_KEYS.ORDER_SIZE_BELOW_MIN_SIZE,
+      titleKey: STRING_KEYS.MODIFY_SIZE_FIELD,
       textKey: STRING_KEYS.ORDER_SIZE_BELOW_MIN_SIZE,
       textParams: {
         MIN_SIZE: {
           value: minSize,
-          format: 'size',
+          format: ErrorFormat.Size,
         },
         MARKET: {
           value: marketId,
-          format: 'string',
+          format: ErrorFormat.String,
         },
       },
     });
@@ -184,8 +405,7 @@ class TriggerOrderFormValidationErrors {
       code: 'SIZE_EXCEEDS_POSITION',
       type: ErrorType.error,
       fields: ['size'],
-      titleKey: STRING_KEYS.SIZE_EXCEEDS_POSITION,
-      textKey: STRING_KEYS.SIZE_EXCEEDS_POSITION,
+      titleKey: STRING_KEYS.MODIFY_SIZE_FIELD,
     });
   }
 
@@ -217,6 +437,14 @@ class TriggerOrderFormValidationErrors {
     });
   }
 
+  missingOraclePrice(): ValidationError {
+    return simpleValidationError({
+      code: 'MISSING_ORACLE_PRICE',
+      type: ErrorType.error,
+      titleKey: STRING_KEYS.UNKNOWN_ERROR,
+    });
+  }
+
   invalidMarket(): ValidationError {
     return simpleValidationError({
       code: 'INVALID_MARKET',
@@ -230,167 +458,24 @@ class TriggerOrderFormValidationErrors {
       code: 'REQUIRED_TRIGGER_PRICE',
       type: ErrorType.error,
       fields: ['price.triggerPrice'],
-      actionStringKey: 'APP.TRADE.ENTER_TRIGGER_PRICE',
+      titleKey: STRING_KEYS.ENTER_TRIGGER_PRICE,
     });
   }
 
-  stopLossTriggerNearLiquidation(liquidationPrice: number, tickSize: string): ValidationError {
+  stopLossTriggerNearLiquidation(liquidationPrice: number): ValidationError {
     return simpleValidationError({
       code: 'SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
-      actionStringKey: 'APP.TRADE.MODIFY_TRIGGER_PRICE',
-      titleStringKey: 'ERRORS.TRIGGERS_FORM_TITLE.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
-      textStringKey: 'ERRORS.TRIGGERS_FORM.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE_NO_LIMIT',
+      titleKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
+      textKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE_NO_LIMIT,
       textParams: {
         TRIGGER_PRICE_LIMIT: {
           value: liquidationPrice,
-          format: 'price',
-          tickSize: tickSize,
+          format: ErrorFormat.Price,
         },
       },
     });
   }
-
-  // Update existing errors with more specific messages...
-  limitPriceMustBeAboveTriggerStopLoss(): ValidationError {
-    return simpleValidationError({
-      code: 'LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-      fields: ['stopLossLimitPrice'],
-      titleStringKey: 'ERRORS.TRIGGERS_FORM_TITLE.STOP_LOSS_LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-      textStringKey: 'ERRORS.TRIGGERS_FORM.STOP_LOSS_LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-    });
-  }
-
-  limitPriceMustBeAboveTriggerTakeProfit(): ValidationError {
-    return simpleValidationError({
-      code: 'LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-      fields: ['takeProfitLimitPrice'],
-      titleStringKey: 'ERRORS.TRIGGERS_FORM_TITLE.TAKE_PROFIT_LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-      textStringKey: 'ERRORS.TRIGGERS_FORM.TAKE_PROFIT_LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-    });
-  }
 }
-
-function validateTriggerOrder(
-  isStopLoss: boolean,
-  triggerOrderState: TriggerOrderState,
-  triggerOrderDetails: TriggerOrderDetails,
-  formState: TriggerOrdersFormState,
-  inputData: InputData,
-  validationErrors: ValidationError[],
-  errors: TriggerOrderFormValidationErrors
-): void {
-  const { position, market } = inputData;
-  if (!position || !market) return;
-
-  // Required inputs validation
-  if (triggerOrderState.limitPrice && !triggerOrderDetails.triggerPrice) {
-    validationErrors.push(errors.triggerPriceRequired());
-    return;
-  }
-
-  const triggerPrice = triggerOrderDetails.triggerPrice;
-  if (!triggerPrice) return;
-
-  const oraclePrice = market.oraclePrice;
-  const isLong = position.side === IndexerPositionSide.LONG;
-  const triggerPriceNum = Number(triggerPrice);
-
-  // Price positivity checks
-  if (
-    triggerPriceNum <= 0 ||
-    (formState.showLimits &&
-      triggerOrderDetails.limitPrice &&
-      Number(triggerOrderDetails.limitPrice) <= 0)
-  ) {
-    validationErrors.push(errors.priceNotPositive());
-    return;
-  }
-
-  // Validate trigger price vs oracle price
-  if (isStopLoss) {
-    if (isLong && triggerPriceNum >= oraclePrice) {
-      validationErrors.push(errors.stopLossTriggerBelowIndex(oraclePrice, market.configs.tickSize));
-    } else if (!isLong && triggerPriceNum <= oraclePrice) {
-      validationErrors.push(errors.stopLossTriggerAboveIndex(oraclePrice, market.configs.tickSize));
-    }
-
-    // Validate trigger price vs liquidation price
-    const liquidationPrice = position.liquidationPrice;
-    if (liquidationPrice) {
-      if (isLong && triggerPriceNum <= liquidationPrice) {
-        validationErrors.push(
-          errors.stopLossTriggerNearLiquidation(liquidationPrice, market.configs.tickSize)
-        );
-      } else if (!isLong && triggerPriceNum >= liquidationPrice) {
-        validationErrors.push(
-          errors.stopLossTriggerNearLiquidation(liquidationPrice, market.configs.tickSize)
-        );
-      }
-    }
-  } else {
-    // Take Profit validation
-    if (isLong && triggerPriceNum <= oraclePrice) {
-      validationErrors.push(
-        errors.takeProfitTriggerBelowIndex(oraclePrice, market.configs.tickSize)
-      );
-    } else if (!isLong && triggerPriceNum >= oraclePrice) {
-      validationErrors.push(
-        errors.takeProfitTriggerAboveIndex(oraclePrice, market.configs.tickSize)
-      );
-    }
-  }
-
-  // Limit price validation when applicable
-  if (formState.showLimits && triggerOrderDetails.limitPrice) {
-    const limitPrice = Number(triggerOrderDetails.limitPrice);
-
-    if (isLong) {
-      if (limitPrice < triggerPriceNum) {
-        validationErrors.push(
-          isStopLoss
-            ? errors.limitPriceMustBeAboveTriggerStopLoss()
-            : errors.limitPriceMustBeAboveTriggerTakeProfit()
-        );
-      }
-    } else {
-      if (limitPrice > triggerPriceNum) {
-        validationErrors.push(
-          isStopLoss
-            ? errors.limitPriceMustBelowTriggerStopLoss()
-            : errors.limitPriceMustBelowTriggerTakeProfit()
-        );
-      }
-    }
-  }
-}
-
-function validateCustomSize(
-  size: string,
-  inputData: InputData,
-  validationErrors: ValidationError[],
-  errors: TriggerOrderFormValidationErrors
-): void {
-  const { market, position } = inputData;
-  if (!market || !position) return;
-
-  const sizeNum = Number(size);
-  if (sizeNum <= 0) return;
-
-  // Check minimum size
-  if (sizeNum < market.configs.minOrderSize) {
-    validationErrors.push(
-      errors.sizeBelowMinimum(
-        market.configs.minOrderSize,
-        market.id,
-        market.asset.symbol // Added asset symbol
-      )
-    );
-  }
-
-  // Check against position size
-  if (sizeNum > Math.abs(position.size.current)) {
-    validationErrors.push(errors.sizeExceedsPosition());
-  }
-}
+const errors = new TriggerOrderFormValidationErrors();

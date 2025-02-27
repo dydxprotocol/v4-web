@@ -36,7 +36,8 @@ export const ToNumber = (amount: string): number => {
   return ToBigNumber(amount).toNumber();
 };
 
-export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+// returns undefined if it's not parseable, otherwise a valid bignumber
+export const AttemptBigNumber = (amount: string | undefined | null): BigNumber | undefined => {
   if (amount == null) {
     return undefined;
   }
@@ -44,7 +45,11 @@ export const AttemptNumber = (amount: string | undefined | null): number | undef
   if (!bn.isFinite()) {
     return undefined;
   }
-  return bn.toNumber();
+  return bn;
+};
+
+export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+  return AttemptBigNumber(amount)?.toNumber();
 };
 
 export const clampBn = (n: BigNumber, min: BigNumber, max: BigNumber) =>
