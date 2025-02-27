@@ -5,7 +5,4 @@ import type { RootState } from './_store';
  */
 export const getSourceAccount = (state: RootState) => state.wallet.sourceAccount;
 
-/**
- * @returns whether the wallet has an offline signer
- */
-export const getHasOfflineSigner = (state: RootState) => state.wallet.hasOfflineSigner;
+export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalletNonce;

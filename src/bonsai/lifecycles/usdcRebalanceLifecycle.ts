@@ -5,7 +5,7 @@ import { TransactionMemo } from '@/constants/analytics';
 import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
@@ -66,13 +66,12 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
   const cleanupEffect = createChainTransactionStoreEffect(store, {
     selector: balanceAndTransfersSelector,
-    onChainTransaction: (compositeClient, subaccountClient, data) => {
+    onChainTransaction: (compositeClient, { subaccountClient, sourceAccount }, data) => {
       const { balances, hasNonExpiredPendingWithdraws } = data;
       const usdcBalance = balances.usdcAmount;
       const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
 
       async function rebalanceWalletFunds() {
-        console.log('rebalanceWalletFunds', usdcBalance);
         if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
           const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
           const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
@@ -80,22 +79,15 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
           if (isTransferInProgress) return;
 
-          if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
-            // Deposit
-            try {
-              setTransferInProgress(true);
+          try {
+            setTransferInProgress(true);
+            if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
               await compositeClient.depositToSubaccount(
                 subaccountClient,
                 usdcBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(USDC_DECIMALS),
                 TransactionMemo.depositToSubaccount
               );
-            } finally {
-              setTransferInProgress(false);
-            }
-          } else if (shouldWithdraw) {
-            // Withdraw
-            try {
-              setTransferInProgress(true);
+            } else if (shouldWithdraw) {
               await compositeClient.withdrawFromSubaccount(
                 subaccountClient,
                 MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
@@ -104,14 +96,20 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
                 undefined,
                 TransactionMemo.withdrawFromSubaccount
               );
-            } finally {
-              setTransferInProgress(false);
             }
+          } finally {
+            setTransferInProgress(false);
           }
         }
       }
 
       try {
+        // Don't auto-rebalance on Cosmos
+        // TODO: Add notification to prompt user to rebalance manually
+        if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+          return;
+        }
+
         rebalanceWalletFunds();
       } catch (error) {
         logBonsaiError('usdcRebalanceLifecycle', 'Errr trying to rebalanceWalletFunds', error);

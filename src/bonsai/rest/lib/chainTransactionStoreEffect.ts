@@ -7,10 +7,11 @@ import type { RootState, RootStore } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { getHasOfflineSigner } from '@/state/walletSelectors';
+import { SourceAccount } from '@/state/wallet';
+import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
-import { hdKeyManager } from '@/lib/hdKeyManager';
+import { localWalletManager } from '@/lib/hdKeyManager';
 
 import { createStoreEffect } from '../../lib/createStoreEffect';
 import { CompositeClientManager } from './compositeClientManager';
@@ -19,9 +20,12 @@ type ChainTransactionConfig<T> = {
   selector: (state: RootState) => T;
   onChainTransaction: (
     client: CompositeClient,
-    subaccountClient: SubaccountClient,
+    wallet: {
+      subaccountClient: SubaccountClient;
+      sourceAccount: SourceAccount;
+    },
     selectorResult: NoInfer<T>
-  ) => void;
+  ) => void | (() => void);
 };
 
 export function createChainTransactionStoreEffect<T>(
@@ -32,19 +36,21 @@ export function createChainTransactionStoreEffect<T>(
     [
       getSelectedNetwork,
       selectCompositeClientReady,
-      getHasOfflineSigner,
       selectParentSubaccountInfo,
       calculateIsAccountViewOnly,
       BonsaiCore.compliance.data,
+      getLocalWalletNonce,
+      getSourceAccount,
       config.selector,
     ],
     (
       network,
       compositeClientReady,
-      hasOfflineSigner,
       parentSubaccountInfo,
       isAccountViewOnly,
       compliance,
+      localWalletNonce,
+      sourceAccount,
       selectorResult
     ) => {
       const isAccountRestrictionFree =
@@ -58,8 +64,16 @@ export function createChainTransactionStoreEffect<T>(
         !isBlockedGeo(compliance.geo);
 
       return {
-        infrastructure: { network, compositeClientReady, isAccountRestrictionFree },
-        account: { parentSubaccountInfo, hasOfflineSigner },
+        infrastructure: {
+          network,
+          compositeClientReady,
+        },
+        account: {
+          isAccountRestrictionFree,
+          localWalletNonce,
+          parentSubaccountInfo,
+          sourceAccount,
+        },
         data: selectorResult,
       };
     }
@@ -69,7 +83,8 @@ export function createChainTransactionStoreEffect<T>(
     if (
       !infrastructure.compositeClientReady ||
       !account.parentSubaccountInfo.wallet ||
-      !infrastructure.isAccountRestrictionFree
+      !account.isAccountRestrictionFree ||
+      account.localWalletNonce == null
     ) {
       return undefined;
     }
@@ -80,12 +95,10 @@ export function createChainTransactionStoreEffect<T>(
     };
 
     const compositeClient = CompositeClientManager.use(clientConfig).compositeClient!;
-    const localDydxWallet = hdKeyManager.getLocalDydxWallet();
+    const localDydxWallet = localWalletManager.getLocalWallet(account.localWalletNonce); // Will be undefined if disconnected or connected w/ Keplr
     const isCorrectWallet = localDydxWallet?.address === account.parentSubaccountInfo.wallet;
 
-    const canWalletTransact = Boolean(
-      account.hasOfflineSigner && localDydxWallet && isCorrectWallet
-    );
+    const canWalletTransact = Boolean(localDydxWallet && isCorrectWallet);
 
     if (!canWalletTransact) {
       return undefined;
@@ -96,10 +109,16 @@ export function createChainTransactionStoreEffect<T>(
       account.parentSubaccountInfo.subaccount
     );
 
-    config.onChainTransaction(compositeClient, subaccountClient, data);
+    const wallet = {
+      subaccountClient,
+      sourceAccount: account.sourceAccount,
+    };
+
+    const cleanup = config.onChainTransaction(compositeClient, wallet, data);
 
     return () => {
       CompositeClientManager.markDone(clientConfig);
+      cleanup?.();
     };
   });
 }

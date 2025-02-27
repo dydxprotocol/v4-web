@@ -17,7 +17,7 @@ export interface WalletState {
     address?: string;
     subaccountNumber?: number;
   };
-  hasOfflineSigner: boolean;
+  localWalletNonce?: number;
 }
 
 const initialState: WalletState = {
@@ -31,15 +31,15 @@ const initialState: WalletState = {
     address: undefined,
     subaccountNumber: 0,
   },
-  hasOfflineSigner: false,
+  localWalletNonce: undefined,
 };
 
 export const walletSlice = createSlice({
   name: 'wallet',
   initialState,
   reducers: {
-    setHasOfflineSigner: (state, action: PayloadAction<boolean>) => {
-      state.hasOfflineSigner = action.payload;
+    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.localWalletNonce = action.payload;
     },
     setSourceAddress: (
       state,
@@ -89,7 +89,7 @@ export const walletSlice = createSlice({
 });
 
 export const {
-  setHasOfflineSigner,
+  setLocalWalletNonce,
   setSourceAddress,
   setWalletInfo,
   setSavedEncryptedSignature,
