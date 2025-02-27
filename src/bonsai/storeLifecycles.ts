@@ -1,4 +1,5 @@
 import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
+import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
 import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
 import {

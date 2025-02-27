@@ -29,7 +29,8 @@ import { clearSavedEncryptedSignature, setHasOfflineSigner, setLocalWallet } fro
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hdKeyManager, isBlockedGeo } from '@/lib/compliance';
+import { isBlockedGeo } from '@/lib/compliance';
+import { hdKeyManager } from '@/lib/hdKeyManager';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -160,7 +161,7 @@ const useAccountsContext = () => {
       setLocalDydxWallet(wallet);
       const key = { mnemonic, privateKey, publicKey };
       setHdKey(key);
-      hdKeyManager.setHdkey(wallet.address, key);
+      hdKeyManager.setHdkey(wallet.address, key, wallet);
       dispatch(setHasOfflineSigner(true));
     },
     [getWalletFromSignature, dispatch]

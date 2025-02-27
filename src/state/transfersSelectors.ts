@@ -1,6 +1,6 @@
 import { DydxAddress } from '@/constants/wallets';
 
-import { RootState } from './_store';
+import type { RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { Deposit, isDeposit, isWithdraw, Transfer, Withdraw } from './transfers';
 

@@ -1,4 +1,4 @@
-import { RootState } from './_store';
+import type { RootState } from './_store';
 
 /**
  * @returns saved wallet and account information
