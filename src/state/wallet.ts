@@ -17,6 +17,7 @@ export interface WalletState {
     address?: string;
     subaccountNumber?: number;
   };
+  localWalletNonce?: number;
 }
 
 const initialState: WalletState = {
@@ -30,12 +31,16 @@ const initialState: WalletState = {
     address: undefined,
     subaccountNumber: 0,
   },
+  localWalletNonce: undefined,
 };
 
 export const walletSlice = createSlice({
   name: 'wallet',
   initialState,
   reducers: {
+    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.localWalletNonce = action.payload;
+    },
     setSourceAddress: (
       state,
       action: PayloadAction<{ address: string; chain: WalletNetworkType }>
@@ -84,6 +89,7 @@ export const walletSlice = createSlice({
 });
 
 export const {
+  setLocalWalletNonce,
   setSourceAddress,
   setWalletInfo,
   setSavedEncryptedSignature,

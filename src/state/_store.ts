@@ -7,6 +7,7 @@ import storage from 'redux-persist/lib/storage';
 
 import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
+import { localWalletManager } from '@/lib/hdKeyManager';
 
 import { accountSlice } from './account';
 import { accountUiMemorySlice } from './accountUiMemory';
@@ -95,8 +96,9 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Set store so (Abacus & v4-Client) classes can getState and dispatch
+// Set store so (Abacus & localWalletManager) classes can getState and dispatch
 abacusStateManager.setStore(store);
+localWalletManager.setStore(store);
 
 runFn(async () => {
   // we ignore the cleanups for now since we want these running forever
