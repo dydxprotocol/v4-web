@@ -17,7 +17,7 @@ import {
 } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
-import { BIG_NUMBERS, clampBn, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
@@ -347,34 +347,6 @@ export function calculateUnopenedIsolatedPositions(
       orders: orderList,
     };
   }).filter(isTruthy);
-}
-
-export function getPositionEffectiveEntryMargin(
-  position: Pick<
-    SubaccountPosition,
-    | 'notional'
-    | 'value'
-    | 'signedSize'
-    | 'unsignedSize'
-    | 'baseEntryPrice'
-    | 'marginMode'
-    | 'leverage'
-  >
-) {
-  return clampBn(
-    // notional over leverage is subaccount equity
-    // minus current position value plus entry position value ==> entry equity
-    position.notional
-      .div(position.leverage?.abs() ?? BIG_NUMBERS.ONE)
-      .minus(position.value)
-      .plus(position.signedSize.times(position.baseEntryPrice)),
-    // don't let it go negative
-    BIG_NUMBERS.ONE,
-    // don't let it go above entry notional unless it's isolated
-    position.marginMode === 'ISOLATED'
-      ? MustBigNumber(Number.MAX_SAFE_INTEGER)
-      : position.unsignedSize.times(position.baseEntryPrice)
-  );
 }
 
 export function getPositionBaseEquity(
