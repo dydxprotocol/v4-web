@@ -15,34 +15,31 @@ import { AttemptBigNumber, AttemptNumber, MustBigNumber, MustNumber } from '@/li
 import { isPresent } from '@/lib/typeUtils';
 
 import {
-  InputData,
   SummaryData,
   TriggerOrderDetails,
+  TriggerOrderInputData,
   TriggerOrdersFormState,
   TriggerOrderState,
 } from './types';
 
 export function getErrors(
   state: TriggerOrdersFormState,
-  inputData: InputData,
+  inputData: TriggerOrderInputData,
   summary: SummaryData
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
 
   // make sure referenced market is here
-  if (
-    state.marketId == null ||
-    inputData.market == null ||
-    state.marketId !== inputData.market.ticker
-  ) {
+  if (inputData.market == null) {
     validationErrors.push(errors.invalidMarket());
   }
 
   // make sure we have a position and it's in a good state
   if (
     inputData.position == null ||
+    inputData.position.uniqueId !== state.positionId ||
     inputData.position.unsignedSize.lte(0) ||
-    inputData.position.market !== state.marketId ||
+    inputData.position.market !== inputData.market?.ticker ||
     inputData.position.status !== IndexerPerpetualPositionStatus.OPEN
   ) {
     validationErrors.push(errors.positionNotFound());
@@ -111,7 +108,7 @@ function validateTriggerOrder(
   state: TriggerOrderState,
   details: TriggerOrderDetails,
   formState: TriggerOrdersFormState,
-  inputData: InputData
+  inputData: TriggerOrderInputData
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
   const { position, market } = inputData;
@@ -250,7 +247,7 @@ function validateTriggerOrder(
   return validationErrors;
 }
 
-function validateCustomSize(size: string, inputData: InputData): ValidationError[] {
+function validateCustomSize(size: string, inputData: TriggerOrderInputData): ValidationError[] {
   const { market, position } = inputData;
   if (!market || !position) return [];
 
@@ -267,6 +264,7 @@ function validateCustomSize(size: string, inputData: InputData): ValidationError
   return [];
 }
 
+// todo - remove unused
 class TriggerOrderFormValidationErrors {
   // Basic validation errors
   accountDataMissing(canViewAccount?: boolean): ValidationError {

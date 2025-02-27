@@ -1,11 +1,12 @@
 import { createForm, createVanillaReducer } from '@/bonsai/lib/forms';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 
 import { getErrors } from './errors';
 import { calculateSummary } from './summary';
 import { TriggerOrdersFormState, TriggerPriceInputType } from './types';
 
 export const initialState: TriggerOrdersFormState = {
-  marketId: undefined,
+  positionId: undefined,
   size: {
     checked: false,
     size: '',
@@ -18,9 +19,9 @@ export const initialState: TriggerOrdersFormState = {
 const reducer = createVanillaReducer({
   initialState,
   actions: {
-    setMarketId: (state, marketId: string | undefined) => ({
+    setPositionId: (state, positionId: PositionUniqueId | undefined) => ({
       ...initialState,
-      marketId,
+      positionId,
     }),
 
     setSizeChecked: (state, checked: boolean) => ({
@@ -48,7 +49,8 @@ const reducer = createVanillaReducer({
     setStopLossOrderId: (state, orderId: string | undefined) => ({
       ...state,
       stopLossOrder: {
-        ...state.stopLossOrder,
+        priceInput: initialState.stopLossOrder.priceInput,
+        limitPrice: initialState.stopLossOrder.limitPrice,
         orderId,
       },
     }),
@@ -106,7 +108,8 @@ const reducer = createVanillaReducer({
     setTakeProfitOrderId: (state, orderId: string | undefined) => ({
       ...state,
       takeProfitOrder: {
-        ...state.takeProfitOrder,
+        priceInput: initialState.takeProfitOrder.priceInput,
+        limitPrice: initialState.takeProfitOrder.limitPrice,
         orderId,
       },
     }),
@@ -160,9 +163,9 @@ const reducer = createVanillaReducer({
       },
     }),
 
-    initializeForm: (state, marketId: string | undefined) => ({
+    initializeForm: (state, positionId: PositionUniqueId | undefined) => ({
       ...initialState,
-      marketId,
+      positionId,
     }),
 
     reset: () => initialState,

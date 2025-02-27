@@ -1,4 +1,9 @@
-import { MarketInfo, SubaccountOrder, SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import {
+  MarketInfo,
+  PositionUniqueId,
+  SubaccountOrder,
+  SubaccountPosition,
+} from '@/bonsai/types/summaryTypes';
 import {
   OrderExecution,
   OrderFlags,
@@ -8,7 +13,7 @@ import {
 } from '@dydxprotocol/v4-client-js';
 
 export interface TriggerOrdersFormState {
-  marketId?: string;
+  positionId?: PositionUniqueId;
   size: {
     checked: boolean;
     size: string;
@@ -39,11 +44,10 @@ export enum TriggerPriceInputType {
   UsdcDiff = 'USDC_DIFF',
 }
 
-export interface InputData {
+export interface TriggerOrderInputData {
   position?: SubaccountPosition;
   market?: MarketInfo;
   existingTriggerOrders?: SubaccountOrder[];
-  canViewAccount?: boolean;
 }
 
 export interface TriggerOrdersPayload {

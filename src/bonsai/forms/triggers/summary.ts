@@ -8,22 +8,25 @@ import { IndexerOrderType, IndexerPositionSide } from '@/types/indexer/indexerAp
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
-import { AttemptNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, AttemptNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import {
   CancelOrderPayload,
-  InputData,
   PlaceOrderMarketInfo,
   PlaceOrderPayload,
   SummaryData,
   TriggerOrderDetails,
+  TriggerOrderInputData,
   TriggerOrdersFormState,
   TriggerOrdersPayload,
   TriggerOrderState,
   TriggerPriceInputType,
 } from './types';
 
-export function calculateSummary(state: TriggerOrdersFormState, inputData: InputData): SummaryData {
+export function calculateSummary(
+  state: TriggerOrdersFormState,
+  inputData: TriggerOrderInputData
+): SummaryData {
   const effectiveEntryMargin = mapIfPresent(
     inputData.position,
     getEffectiveBaseEquityFn
@@ -44,7 +47,7 @@ function calculateTriggerOrderPayload(
   stopLossOrder: TriggerOrderDetails,
   takeProfitOrder: TriggerOrderDetails,
   state: TriggerOrdersFormState,
-  inputData: InputData
+  inputData: TriggerOrderInputData
 ): TriggerOrdersPayload | undefined {
   const { position } = inputData;
 
@@ -126,7 +129,7 @@ function getTriggerOrderActions(
   triggerOrderDetails: TriggerOrderDetails,
   formState: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
   position: SubaccountPosition,
-  inputData: InputData
+  inputData: TriggerOrderInputData
 ): TriggerOrderActions | undefined {
   const { orderId } = triggerOrderState;
   const { triggerPrice } = triggerOrderDetails;
@@ -397,7 +400,7 @@ function calculateTriggerOrderDetails(
     showLimits,
     size: { checked: useCustomSize, size: customSize },
   }: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
-  { position, existingTriggerOrders }: InputData
+  { position, existingTriggerOrders }: TriggerOrderInputData
 ): TriggerOrderDetails {
   const details: TriggerOrderDetails = {};
 
@@ -406,37 +409,44 @@ function calculateTriggerOrderDetails(
     return details;
   }
 
+  const existingOrder =
+    triggerOrder.orderId != null
+      ? existingTriggerOrders?.find((t) => t.id === triggerOrder.orderId)
+      : undefined;
+
   // Set the limit price if present and limits are enabled
   const parsedLimitPrice = MustBigNumber(triggerOrder.limitPrice);
   if (showLimits && parsedLimitPrice.isFinite() && parsedLimitPrice.gt(0)) {
-    details.limitPrice = triggerOrder.limitPrice?.toString();
+    details.limitPrice = parsedLimitPrice.toString();
+  } else if (existingOrder != null) {
+    details.limitPrice = existingOrder.price.toString();
+  } else {
+    // leave undefined if we don't need it
+    details.limitPrice = undefined;
   }
 
   // Calculate and set size
-  const parsedCustomSize = MustBigNumber(customSize);
-  const size =
-    useCustomSize && customSize && parsedCustomSize.isFinite() && parsedCustomSize.gt(0)
-      ? parsedCustomSize
-      : position.unsignedSize;
-  details.size = size.toString();
+  const parsedCustomSize = AttemptBigNumber(customSize);
+  if (useCustomSize && parsedCustomSize && parsedCustomSize.gt(0)) {
+    details.size = parsedCustomSize.toString();
+  } else if (existingOrder != null) {
+    details.size = existingOrder.size.toString();
+  } else {
+    details.size = position.unsignedSize.toString();
+  }
+  const size = MustBigNumber(details.size).abs();
 
   // handle no price input
   const priceInput = triggerOrder.priceInput;
   if (priceInput == null) {
-    if (triggerOrder.orderId) {
-      const existingOrder = existingTriggerOrders?.find(
-        (order) => order.id === triggerOrder.orderId
-      );
-
-      if (existingOrder) {
-        const triggerPrice = existingOrder.triggerPrice;
-        // We could calculate other fields based on the trigger price
-        if (triggerPrice != null && triggerPrice.isFinite()) {
-          return {
-            ...details,
-            ...calculateTriggerPriceValues(triggerPrice, size, position, isStopLoss),
-          };
-        }
+    if (existingOrder) {
+      const triggerPrice = existingOrder.triggerPrice;
+      // We could calculate other fields based on the trigger price
+      if (triggerPrice != null && triggerPrice.isFinite()) {
+        return {
+          ...details,
+          ...calculateTriggerPriceValues(triggerPrice, size, position, isStopLoss),
+        };
       }
     }
     return details;
