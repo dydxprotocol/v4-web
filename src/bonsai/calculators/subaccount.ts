@@ -277,13 +277,12 @@ function calculatePositionDerivedExtra(
     const entryValue = signedSize.multipliedBy(MustBigNumber(position.baseEntryPrice));
     const unrealizedPnlInner = value.minus(entryValue);
 
-    const scaledLeverage = leverage
-      ? BigNumber.max(leverage.abs(), BIG_NUMBERS.ONE)
-      : BIG_NUMBERS.ONE;
+    const baseEquity = getPositionBaseEquity({ ...position, leverage });
 
-    const unrealizedPnlPercentInner = !entryValue.isZero()
-      ? unrealizedPnlInner.dividedBy(entryValue.abs()).multipliedBy(scaledLeverage)
-      : null;
+    const unrealizedPnlPercentInner = baseEquity.isZero()
+      ? null
+      : unrealizedPnlInner.dividedBy(baseEquity);
+
     return { unrealizedPnlInner, unrealizedPnlPercentInner };
   });
 
@@ -348,4 +347,16 @@ export function calculateUnopenedIsolatedPositions(
       orders: orderList,
     };
   }).filter(isTruthy);
+}
+
+export function getPositionBaseEquity(
+  position: Pick<SubaccountPosition, 'signedSize' | 'baseEntryPrice' | 'leverage'>
+) {
+  const entryValue = position.signedSize.times(position.baseEntryPrice);
+
+  const scaledLeverage = position.leverage
+    ? BigNumber.max(position.leverage.abs(), BIG_NUMBERS.ONE)
+    : BIG_NUMBERS.ONE;
+
+  return entryValue.abs().div(scaledLeverage);
 }
