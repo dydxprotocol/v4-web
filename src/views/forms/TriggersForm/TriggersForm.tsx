@@ -1,11 +1,11 @@
 import { FormEvent } from 'react';
 
+import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ErrorType, ValidationError } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -28,7 +28,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
-import { getTradeInputAlert } from '@/lib/tradeData';
+import { AttemptNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -36,11 +36,10 @@ import { TriggerOrdersInputs } from './TriggerOrdersInputs';
 
 type ElementProps = {
   positionUniqueId: PositionUniqueId;
-  marketId: string;
   onViewOrdersClick: () => void;
 };
 
-export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: ElementProps) => {
+export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
@@ -65,13 +64,12 @@ export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: 
   const {
     differingOrderSizes,
     inputErrors,
-    inputSize,
+    summary,
     existingStopLossOrder,
     existingTakeProfitOrder,
     existsLimitOrder,
   } = useTriggerOrdersFormInputs({
-    marketId,
-    positionSize: signedSize?.toNumber() ?? null,
+    positionId: positionUniqueId,
     stopLossOrder: stopLossOrders?.length === 1 ? stopLossOrders[0] : undefined,
     takeProfitOrder: takeProfitOrders?.length === 1 ? takeProfitOrders[0] : undefined,
   });
@@ -80,15 +78,15 @@ export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: 
   const multipleTakeProfitOrders = (takeProfitOrders?.length ?? 0) > 1;
   const multipleStopLossOrders = (stopLossOrders?.length ?? 0) > 1;
 
-  const hasInputErrors = inputErrors?.some(
-    (error: ValidationError) => error.type !== ErrorType.warning
-  );
-  const inputAlert = getTradeInputAlert({
-    abacusInputErrors: inputErrors ?? [],
-    stringGetter,
-    stepSizeDecimals,
-    tickSizeDecimals,
-  });
+  const hasInputErrors = inputErrors.some((error) => error.type === ErrorType.error);
+
+  // TODO
+  // const inputAlert = getTradeInputAlert({
+  //   abacusInputErrors: inputErrors ?? [],
+  //   stringGetter,
+  //   stepSizeDecimals,
+  //   tickSizeDecimals,
+  // });
 
   // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
   // multiple, we hide the triggers button CTA
@@ -132,7 +130,7 @@ export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: 
           <AdvancedTriggersOptions
             symbol={symbol}
             existsLimitOrder={existsLimitOrder}
-            size={inputSize}
+            size={differingOrderSizes ? null : AttemptNumber(summary.stopLossOrder.size) ?? null}
             positionSize={signedSize ? signedSize.abs().toNumber() : null}
             differingOrderSizes={differingOrderSizes}
             multipleTakeProfitOrders={multipleTakeProfitOrders}
@@ -144,7 +142,8 @@ export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: 
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_AUTOMATICALLY_CANCELED })}{' '}
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
           </div>
-          <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
+          {/* // TODO */}
+          <WithTooltip tooltipString={hasInputErrors ? '' : undefined}>
             <Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
@@ -157,10 +156,11 @@ export const TriggersForm = ({ positionUniqueId, marketId, onViewOrdersClick }: 
               tw="w-full"
             >
               {hasInputErrors
-                ? stringGetter({
-                    key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
-                  })
-                : !!existingStopLossOrder || !!existingTakeProfitOrder
+                ? ''
+                : // ? stringGetter({
+                  //     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+                  //   })
+                  !!existingStopLossOrder || !!existingTakeProfitOrder
                   ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                   : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
             </Button>
