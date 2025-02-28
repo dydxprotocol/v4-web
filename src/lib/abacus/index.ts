@@ -35,7 +35,6 @@ import {
   TradeInputField,
   TransferInputField,
   TransferType,
-  TriggerOrdersInputField,
   UIImplementations,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
@@ -47,19 +46,10 @@ import {
   CLEARED_SIZE_INPUTS,
   CLEARED_TRADE_INPUTS,
 } from '@/constants/trade';
-import {
-  CLEARED_TRIGGER_LIMIT_INPUTS,
-  CLEARED_TRIGGER_ORDER_INPUTS,
-  TriggerFields,
-} from '@/constants/triggers';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import {
-  setClosePositionFormInputs,
-  setTradeFormInputs,
-  setTriggerFormInputs,
-} from '@/state/inputs';
+import { setClosePositionFormInputs, setTradeFormInputs } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { assertNever } from '../assertNever';
@@ -233,48 +223,6 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.MEMO });
   };
 
-  clearTriggerOrdersInputValues = ({ field }: { field: TriggerFields }) => {
-    if (field === TriggerFields.Limit || field === TriggerFields.All) {
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.stopLossLimitPrice,
-      });
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.takeProfitLimitPrice,
-      });
-      this.store?.dispatch(setTriggerFormInputs(CLEARED_TRIGGER_LIMIT_INPUTS));
-    }
-
-    if (field === TriggerFields.All) {
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.size });
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossPrice });
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.stopLossPercentDiff,
-      });
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossUsdcDiff });
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitPrice });
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.takeProfitPercentDiff,
-      });
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.takeProfitUsdcDiff,
-      });
-      this.store?.dispatch(setTriggerFormInputs(CLEARED_TRIGGER_ORDER_INPUTS));
-
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderId });
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderType });
-      this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderId });
-      this.setTriggerOrdersValue({
-        value: null,
-        field: TriggerOrdersInputField.takeProfitOrderType,
-      });
-    }
-  };
-
   clearAdjustIsolatedMarginInputValues = () => {
     this.setAdjustIsolatedMarginValue({
       value: null,
@@ -292,7 +240,6 @@ class AbacusStateManager {
       field: TransferInputField.type,
       value: null,
     });
-    this.clearTriggerOrdersInputValues({ field: TriggerFields.All });
     this.clearAdjustIsolatedMarginInputValues();
     this.clearTradeInputValues({ shouldResetSize: true });
   };

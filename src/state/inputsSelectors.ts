@@ -95,27 +95,6 @@ export const getInputClosePositionData = (state: RootState) => state.inputs.clos
 export const getTransferInputs = (state: RootState) => state.inputs.transferInputs;
 
 /**
- * @param state
- * @returns input errors for TriggerOrders
- */
-export const getTriggerOrdersInputErrors = (state: RootState) => {
-  const currentInput = state.inputs.current;
-  return currentInput === AbacusInputTypes.TriggerOrders ? getInputErrors(state) : EMPTY_ARR;
-};
-
-/**
- * @param state
- * @returns TriggerOrdersInputs
- */
-export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerOrdersInputs;
-
-/**
- * @param state
- * @returns Trigger Form Input states for display. Abacus inputs should track these values.
- */
-export const getTriggerFormInputs = (state: RootState) => state.inputs.triggerFormInputs;
-
-/**
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {

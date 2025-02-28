@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
@@ -13,7 +12,10 @@ import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getTriggersFormState } from '@/state/inputsSelectors';
+import { triggersFormActions } from '@/state/triggersForm';
+
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -40,24 +42,20 @@ export const OrderSizeInput = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
-  const [shouldShowCustomAmount, setShouldShowCustomAmount] = useState(false);
-  const [orderSize, setOrderSize] = useState(size);
+  const triggerFormInputValues = useAppSelector(getTriggersFormState);
+
+  const [localSize, setLocalSize] = useState(size);
 
   useEffect(() => {
-    setOrderSize(size);
-    setShouldShowCustomAmount(!!(size && size !== positionSize));
+    setLocalSize(size);
   }, [size]);
 
   const onCustomAmountToggle = (isToggled: boolean) => {
-    if (!isToggled) {
-      // Default to full position size
-      abacusStateManager.setTriggerOrdersValue({
-        value: MustBigNumber(positionSize).toString(),
-        field: TriggerOrdersInputField.size,
-      });
+    if (isToggled !== triggerFormInputValues.size.checked) {
+      dispatch(triggersFormActions.setSizeChecked(isToggled));
     }
-    setShouldShowCustomAmount(isToggled);
   };
 
   const setAbacusSize = (newSize: number | null) => {
@@ -65,18 +63,15 @@ export const OrderSizeInput = ({
       newSize && positionSize ? Math.min(positionSize, newSize) : newSize
     ).toString();
 
-    abacusStateManager.setTriggerOrdersValue({
-      value: newSize !== null ? newSizeString : null,
-      field: TriggerOrdersInputField.size,
-    });
+    dispatch(triggersFormActions.setSize(newSize !== null ? newSizeString : ''));
   };
 
   const onSizeInput = ({ floatValue }: { floatValue?: number }) => {
     if (floatValue) {
-      setOrderSize(Math.min(floatValue, positionSize ?? 0));
+      setLocalSize(Math.min(floatValue, positionSize ?? 0));
       setAbacusSize(floatValue);
     } else {
-      setOrderSize(null);
+      setLocalSize(null);
       setAbacusSize(null);
     }
   };
@@ -88,7 +83,7 @@ export const OrderSizeInput = ({
           <Checkbox
             id="order-size"
             disabled={differingOrderSizes}
-            checked={shouldShowCustomAmount}
+            checked={triggerFormInputValues.size.checked}
             onCheckedChange={onCustomAmountToggle}
           />
         </WithTooltip>
@@ -98,13 +93,13 @@ export const OrderSizeInput = ({
           {stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}
         </WithTooltip>
       }
-      open={shouldShowCustomAmount}
+      open={triggerFormInputValues.size.checked}
     >
       <div tw="flex items-center gap-0.25">
         <OrderSizeSlider
           setAbacusSize={(sizeString: string) => setAbacusSize(parseFloat(sizeString))}
-          setOrderSizeInput={(sizeString: string) => setOrderSize(parseFloat(sizeString))}
-          size={orderSize}
+          setOrderSizeInput={(sizeString: string) => setLocalSize(parseFloat(sizeString))}
+          size={localSize}
           positionSize={positionSize ?? undefined}
           stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}
           className={className}
@@ -112,7 +107,7 @@ export const OrderSizeInput = ({
         />
         <FormInput
           type={InputType.Number}
-          value={orderSize?.toString()}
+          value={localSize?.toString()}
           slotRight={<Tag>{getDisplayableAssetFromBaseAsset(symbol)}</Tag>}
           onInput={onSizeInput}
         />

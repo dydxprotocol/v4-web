@@ -470,7 +470,7 @@ function calculateTriggerOrderDetails(
     if (priceInput.type === TriggerPriceInputType.PercentDiff) {
       return MustBigNumber(
         calculateTriggerPriceFromPercentDiff(
-          MustBigNumber(priceInput.percentDiff),
+          MustBigNumber(priceInput.percentDiff).div(100),
           size,
           position,
           isStopLoss

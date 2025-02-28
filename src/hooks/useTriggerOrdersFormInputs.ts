@@ -28,7 +28,7 @@ export const useTriggerOrdersFormInputs = ({
     return () => {
       dispatch(triggersFormActions.reset());
     };
-  });
+  }, [dispatch]);
   useEffect(() => {
     dispatch(triggersFormActions.initializeForm(positionId));
   }, [dispatch, positionId]);
