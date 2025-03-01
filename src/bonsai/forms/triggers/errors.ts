@@ -400,7 +400,7 @@ class TriggerOrderFormValidationErrors {
     return simpleValidationError({
       code: 'MISSING_PAYLOAD',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
+      titleKey: STRING_KEYS.ENTER_TRIGGER_PRICE,
     });
   }
 
