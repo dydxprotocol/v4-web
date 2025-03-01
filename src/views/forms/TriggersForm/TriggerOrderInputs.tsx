@@ -112,7 +112,9 @@ export const TriggerOrderInputs = ({
   const inputTypeToUse =
     inputState.priceInput?.type === TriggerPriceInputType.PercentDiff
       ? InputType.Percent
-      : InputType.Currency;
+      : inputState.priceInput?.type === TriggerPriceInputType.UsdcDiff
+        ? InputType.Currency
+        : InputType.Percent;
 
   const getDecimalsForInputType = (inType: InputChangeType) => {
     switch (inType) {
@@ -245,7 +247,9 @@ export const TriggerOrderInputs = ({
               ? inputState.priceInput.percentDiff
               : inputState.priceInput?.type === TriggerPriceInputType.UsdcDiff
                 ? inputState.priceInput.usdcDiff
-                : summaryState.usdcDiff
+                : inputTypeToUse === InputType.Percent
+                  ? AttemptBigNumber(summaryState.percentDiff)?.times(100).toString()
+                  : summaryState.usdcDiff
           }
           onInput={inputTypeToUse === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
           allowNegative

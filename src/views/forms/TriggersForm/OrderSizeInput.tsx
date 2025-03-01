@@ -17,14 +17,14 @@ import { getTriggersFormState } from '@/state/inputsSelectors';
 import { triggersFormActions } from '@/state/triggersForm';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { MustBigNumber } from '@/lib/numbers';
+import { AttemptNumber } from '@/lib/numbers';
 
 import { OrderSizeSlider } from './OrderSizeSlider';
 
 type ElementProps = {
   symbol: string;
   differingOrderSizes: boolean;
-  size: number | null;
+  size: string | null;
   positionSize: number | null;
   stepSizeDecimals?: number;
 };
@@ -58,22 +58,13 @@ export const OrderSizeInput = ({
     }
   };
 
-  const setAbacusSize = (newSize: number | null) => {
-    const newSizeString = MustBigNumber(
-      newSize && positionSize ? Math.min(positionSize, newSize) : newSize
-    ).toString();
-
-    dispatch(triggersFormActions.setSize(newSize !== null ? newSizeString : ''));
+  const setAbacusSize = (newSize: string) => {
+    dispatch(triggersFormActions.setSize(newSize));
   };
 
-  const onSizeInput = ({ floatValue }: { floatValue?: number }) => {
-    if (floatValue) {
-      setLocalSize(Math.min(floatValue, positionSize ?? 0));
-      setAbacusSize(floatValue);
-    } else {
-      setLocalSize(null);
-      setAbacusSize(null);
-    }
+  const onSizeInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    setLocalSize(formattedValue);
+    setAbacusSize(formattedValue);
   };
 
   return (
@@ -97,9 +88,9 @@ export const OrderSizeInput = ({
     >
       <div tw="flex items-center gap-0.25">
         <OrderSizeSlider
-          setAbacusSize={(sizeString: string) => setAbacusSize(parseFloat(sizeString))}
-          setOrderSizeInput={(sizeString: string) => setLocalSize(parseFloat(sizeString))}
-          size={localSize}
+          setAbacusSize={(sizeString: string) => setAbacusSize(sizeString)}
+          setOrderSizeInput={(sizeString: string) => setLocalSize(sizeString)}
+          size={AttemptNumber(localSize) ?? null}
           positionSize={positionSize ?? undefined}
           stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}
           className={className}

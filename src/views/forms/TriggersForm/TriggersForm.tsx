@@ -1,6 +1,10 @@
-import { FormEvent } from 'react';
+import { FormEvent, useMemo } from 'react';
 
-import { ErrorType } from '@/bonsai/lib/validationErrors';
+import {
+  ErrorType,
+  getAlertsToRender,
+  getFormDisabledButtonStringKey,
+} from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
@@ -18,17 +22,15 @@ import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { WithTooltip } from '@/components/WithTooltip';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import {
   getSubaccountConditionalOrders,
   getSubaccountPositionByUniqueId,
 } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { closeDialog } from '@/state/dialogs';
+import { useAppSelector } from '@/state/appTypes';
 
-import { AttemptNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -41,7 +43,6 @@ type ElementProps = {
 
 export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   const { placeTriggerOrders } = useSubaccount();
@@ -78,16 +79,6 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   const multipleTakeProfitOrders = (takeProfitOrders?.length ?? 0) > 1;
   const multipleStopLossOrders = (stopLossOrders?.length ?? 0) > 1;
 
-  const hasInputErrors = inputErrors.some((error) => error.type === ErrorType.error);
-
-  // TODO
-  // const inputAlert = getTradeInputAlert({
-  //   abacusInputErrors: inputErrors ?? [],
-  //   stringGetter,
-  //   stepSizeDecimals,
-  //   tickSizeDecimals,
-  // });
-
   // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
   // multiple, we hide the triggers button CTA
   const existsEditableOrCreatableOrders = !(multipleTakeProfitOrders && multipleStopLossOrders);
@@ -106,14 +97,36 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   );
 
   const onSubmitOrders = async () => {
-    placeTriggerOrders();
-    dispatch(closeDialog());
+    if (summary.payload == null) {
+      return;
+    }
+    placeTriggerOrders(summary.payload);
   };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     onSubmitOrders();
   };
+
+  const validationAlert = useMemo(() => {
+    return getAlertsToRender(inputErrors)?.[0];
+  }, [inputErrors]);
+
+  const hasErrors = useMemo(() => {
+    return inputErrors.some((e) => e.type === ErrorType.error);
+  }, [inputErrors]);
+
+  const ctaErrorAction = useMemo(() => {
+    const key = getFormDisabledButtonStringKey(inputErrors);
+    return key ? stringGetter({ key }) : undefined;
+  }, [inputErrors, stringGetter]);
+
+  const ErrorElement = useMemo(() => {
+    if (validationAlert) {
+      return <ValidationAlertMessage error={validationAlert} />;
+    }
+    return null;
+  }, [validationAlert]);
 
   return (
     <form onSubmit={onSubmit} tw="column gap-[1.25ch]">
@@ -125,12 +138,13 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
       />
+      {ErrorElement}
       {existsEditableOrCreatableOrders && (
         <>
           <AdvancedTriggersOptions
             symbol={symbol}
             existsLimitOrder={existsLimitOrder}
-            size={differingOrderSizes ? null : AttemptNumber(summary.stopLossOrder.size) ?? null}
+            size={differingOrderSizes ? null : summary.stopLossOrder.size ?? null}
             positionSize={signedSize ? signedSize.abs().toNumber() : null}
             differingOrderSizes={differingOrderSizes}
             multipleTakeProfitOrders={multipleTakeProfitOrders}
@@ -142,29 +156,21 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_AUTOMATICALLY_CANCELED })}{' '}
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
           </div>
-          {/* // TODO */}
-          <WithTooltip tooltipString={hasInputErrors ? '' : undefined}>
-            <Button
-              action={ButtonAction.Primary}
-              type={ButtonType.Submit}
-              state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
-              slotLeft={
-                hasInputErrors ? (
-                  <Icon iconName={IconName.Warning} tw="text-color-warning" />
-                ) : undefined
-              }
-              tw="w-full"
-            >
-              {hasInputErrors
-                ? ''
-                : // ? stringGetter({
-                  //     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
-                  //   })
-                  !!existingStopLossOrder || !!existingTakeProfitOrder
-                  ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-                  : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-            </Button>
-          </WithTooltip>
+          <Button
+            action={ButtonAction.Primary}
+            type={ButtonType.Submit}
+            state={{ isDisabled: hasErrors || isAccountViewOnly }}
+            slotLeft={
+              hasErrors ? <Icon iconName={IconName.Warning} tw="text-color-warning" /> : undefined
+            }
+            tw="w-full"
+          >
+            {hasErrors
+              ? ctaErrorAction
+              : !!existingStopLossOrder || !!existingTakeProfitOrder
+                ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+                : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+          </Button>
         </>
       )}
     </form>

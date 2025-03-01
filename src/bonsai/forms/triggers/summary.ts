@@ -429,6 +429,8 @@ function calculateTriggerOrderDetails(
   const parsedCustomSize = AttemptBigNumber(customSize);
   if (useCustomSize && parsedCustomSize && parsedCustomSize.gt(0)) {
     details.size = parsedCustomSize.toString();
+  } else if (useCustomSize && customSize.trim().length === 0) {
+    details.size = existingOrder?.size.toString() ?? position.unsignedSize.toString();
   } else if (existingOrder != null) {
     details.size = existingOrder.size.toString();
   } else {

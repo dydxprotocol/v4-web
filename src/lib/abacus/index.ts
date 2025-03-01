@@ -12,7 +12,6 @@ import type {
   HumanReadableCloseAllPositionsPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
-  HumanReadableTriggerOrdersPayload,
   Nullable,
   OrderbookGroupings,
   ParsingError,
@@ -424,14 +423,6 @@ class AbacusStateManager {
     ) => void
   ): Nullable<HumanReadableSubaccountTransferPayload> =>
     this.stateManager.commitAdjustIsolatedMargin(callback);
-
-  triggerOrders = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: Nullable<HumanReadableTriggerOrdersPayload>
-    ) => void
-  ): Nullable<HumanReadableTriggerOrdersPayload> => this.stateManager.commitTriggerOrders(callback);
 
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void

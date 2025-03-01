@@ -59,23 +59,25 @@ export function getErrors(
     }
   });
 
-  if (
-    state.stopLossOrder.orderId != null ||
+  const modifyingSize = state.size.checked && state.size.size.trim().length > 0;
+
+  const affectingSl =
     state.stopLossOrder.priceInput != null ||
     state.stopLossOrder.limitPrice != null ||
-    state.size.checked
-  ) {
+    (state.stopLossOrder.orderId != null && modifyingSize);
+
+  if (affectingSl) {
     validationErrors.push(
       ...validateTriggerOrder(true, state.stopLossOrder, summary.stopLossOrder, state, inputData)
     );
   }
 
-  if (
-    state.takeProfitOrder.orderId != null ||
+  const affectingTp =
     state.takeProfitOrder.priceInput != null ||
     state.takeProfitOrder.limitPrice != null ||
-    state.size.checked
-  ) {
+    (state.takeProfitOrder.orderId != null && modifyingSize);
+
+  if (affectingTp) {
     validationErrors.push(
       ...validateTriggerOrder(
         false,
@@ -85,6 +87,10 @@ export function getErrors(
         inputData
       )
     );
+  }
+
+  if (!affectingSl && !affectingTp) {
+    validationErrors.push(errors.triggerPriceRequired());
   }
 
   // Size validation if using custom size
@@ -251,6 +257,11 @@ function validateCustomSize(size: string, inputData: TriggerOrderInputData): Val
   const { market, position } = inputData;
   if (!market || !position) return [];
 
+  // if empty, use position size
+  if (size.trim().length === 0) {
+    return [];
+  }
+
   const sizeNum = AttemptBigNumber(size);
 
   if (sizeNum == null || sizeNum.lt(market.stepSize)) {
@@ -264,20 +275,8 @@ function validateCustomSize(size: string, inputData: TriggerOrderInputData): Val
   return [];
 }
 
-// todo - remove unused
 class TriggerOrderFormValidationErrors {
   // Basic validation errors
-  accountDataMissing(canViewAccount?: boolean): ValidationError {
-    return simpleValidationError({
-      code: 'ACCOUNT_DATA_MISSING',
-      type: ErrorType.error,
-      titleKey:
-        canViewAccount != null && canViewAccount
-          ? STRING_KEYS.NOT_ALLOWED
-          : STRING_KEYS.CONNECT_WALLET,
-    });
-  }
-
   positionNotFound(): ValidationError {
     return simpleValidationError({
       code: 'NO_POSITION',
@@ -294,34 +293,13 @@ class TriggerOrderFormValidationErrors {
     });
   }
 
-  // Stop Loss specific errors
-  stopLossTriggerBelowLiquidation(): ValidationError {
-    return simpleValidationError({
-      code: 'SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
-      type: ErrorType.error,
-      fields: ['stopLossPrice.triggerPrice'],
-      titleKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
-      textKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
-    });
-  }
-
-  stopLossTriggerAboveLiquidation(): ValidationError {
-    return simpleValidationError({
-      code: 'BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
-      type: ErrorType.error,
-      fields: ['stopLossPrice.triggerPrice'],
-      titleKey: STRING_KEYS.BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
-      textKey: STRING_KEYS.BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
-    });
-  }
-
   // Take Profit specific errors
   takeProfitTriggerBelowIndex(): ValidationError {
     return simpleValidationError({
       code: 'TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
-      titleKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+      titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
     });
   }
@@ -331,7 +309,7 @@ class TriggerOrderFormValidationErrors {
       code: 'TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
-      titleKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE,
+      titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE,
     });
   }
@@ -341,7 +319,7 @@ class TriggerOrderFormValidationErrors {
       code: 'STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
-      titleKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+      titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE,
     });
   }
@@ -351,7 +329,7 @@ class TriggerOrderFormValidationErrors {
       code: 'STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
-      titleKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
+      titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
     });
   }
@@ -362,7 +340,7 @@ class TriggerOrderFormValidationErrors {
       code: 'LIMIT_MUST_ABOVE_TRIGGER_PRICE',
       type: ErrorType.error,
       fields: ['limitPrice'],
-      titleKey: STRING_KEYS.LIMIT_MUST_ABOVE_TRIGGER_PRICE,
+      titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
       textKey: STRING_KEYS.LIMIT_MUST_ABOVE_TRIGGER_PRICE,
     });
   }
@@ -372,7 +350,7 @@ class TriggerOrderFormValidationErrors {
       code: 'LIMIT_MUST_BELOW_TRIGGER_PRICE',
       type: ErrorType.error,
       fields: ['limitPrice'],
-      titleKey: STRING_KEYS.LIMIT_MUST_BELOW_TRIGGER_PRICE,
+      titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
       textKey: STRING_KEYS.LIMIT_MUST_BELOW_TRIGGER_PRICE,
     });
   }
@@ -413,17 +391,8 @@ class TriggerOrderFormValidationErrors {
       code: 'PRICE_MUST_POSITIVE',
       type: ErrorType.error,
       fields: ['triggerPrice', 'limitPrice'],
-      titleKey: STRING_KEYS.PRICE_MUST_POSITIVE,
+      titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
       textKey: STRING_KEYS.PRICE_MUST_POSITIVE,
-    });
-  }
-
-  // Summary/Payload errors
-  noSummaryData(): ValidationError {
-    return simpleValidationError({
-      code: 'MISSING_SUMMARY_DATA',
-      type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 
@@ -465,7 +434,7 @@ class TriggerOrderFormValidationErrors {
       code: 'SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
-      titleKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE,
+      titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE_NO_LIMIT,
       textParams: {
         TRIGGER_PRICE_LIMIT: {

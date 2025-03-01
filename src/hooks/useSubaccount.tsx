@@ -1,6 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
+import {
+  CancelOrderPayload,
+  PlaceOrderPayload,
+  TriggerOrdersPayload,
+} from '@/bonsai/forms/triggers/types';
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -17,17 +23,16 @@ import type {
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
-  HumanReadableTriggerOrdersPayload,
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
-import { ErrorParams } from '@/constants/errors';
+import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { TradeTypes } from '@/constants/trade';
+import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { clearSubaccountState } from '@/state/account';
@@ -44,13 +49,18 @@ import {
   closeAllPositionsSubmitted,
   placeOrderFailed,
   placeOrderSubmitted,
+  placeOrderTimeout,
 } from '@/state/localOrders';
 import { selectPendingWithdraws } from '@/state/transfersSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { track } from '@/lib/analytics/analytics';
-import { getValidErrorParamsFromParsingError, stringifyTransactionError } from '@/lib/errors';
+import {
+  getValidErrorParamsFromParsingError,
+  StatefulOrderError,
+  stringifyTransactionError,
+} from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
@@ -658,74 +668,191 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     }
   }, [dispatch]);
 
+  const doCancelOrder = useCallback(
+    async (payload: CancelOrderPayload) => {
+      try {
+        if (!compositeClient) {
+          throw new Error('client not initialized');
+        }
+
+        const {
+          subaccountNumber: subaccountNumberToUse,
+          clientId,
+          orderFlags,
+          clobPairId,
+          goodTilBlock,
+          goodTilBlockTime,
+        } = payload;
+
+        const subaccountClientToUse = localDydxWallet
+          ? new SubaccountClient(localDydxWallet, subaccountNumberToUse)
+          : undefined;
+
+        if (subaccountClientToUse == null) {
+          throw new Error('wallet not initialized');
+        }
+
+        const tx = await compositeClient.cancelRawOrder(
+          subaccountClientToUse,
+          clientId,
+          orderFlags,
+          clobPairId,
+          goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,
+          goodTilBlockTime === 0 ? undefined : goodTilBlockTime ?? undefined
+        );
+
+        const parsedTx = parseToPrimitives(tx);
+        logBonsaiInfo('useSubaccount/doCancelOrder', 'Successfully canceled order', {
+          payload,
+          parsedTx,
+        });
+        return wrapOperationSuccess(parsedTx);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError('useSubaccount/doCancelOrder', 'Failed to cancel order', {
+          payload,
+          parsed,
+        });
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [compositeClient, localDydxWallet]
+  );
+
+  const doPlaceOrder = useCallback(
+    async (params: PlaceOrderPayload) => {
+      try {
+        if (!compositeClient) {
+          throw new Error('client not initialized');
+        }
+        if (!localDydxWallet) {
+          throw new Error('wallet not initialized');
+        }
+
+        const {
+          subaccountNumber: subaccountNumberToUse,
+          marketId,
+          type,
+          side,
+          price,
+          size,
+          clientId,
+          timeInForce,
+          goodTilTimeInSeconds,
+          goodTilBlock,
+          execution,
+          postOnly,
+          reduceOnly,
+          triggerPrice,
+          marketInfo,
+          currentHeight,
+        } = params;
+
+        // Set timeout for order to be considered failed if not committed
+        setTimeout(() => {
+          dispatch(placeOrderTimeout(clientId.toString()));
+        }, UNCOMMITTED_ORDER_TIMEOUT_MS);
+
+        const subaccountClientToUse = new SubaccountClient(localDydxWallet, subaccountNumberToUse);
+
+        // Place order
+        const tx = await compositeClient.placeOrder(
+          subaccountClientToUse,
+          marketId,
+          type,
+          side,
+          price,
+          size,
+          clientId,
+          timeInForce,
+          goodTilTimeInSeconds ?? 0,
+          execution,
+          postOnly ?? undefined,
+          reduceOnly ?? undefined,
+          triggerPrice ?? undefined,
+          marketInfo ?? undefined,
+          currentHeight ?? undefined,
+          goodTilBlock ?? undefined,
+          TransactionMemo.placeOrder
+        );
+
+        // Handle stateful orders
+        if ((tx as IndexedTx | undefined)?.code !== 0) {
+          throw new StatefulOrderError('Stateful order has failed to commit.', tx);
+        }
+
+        const parsedTx = parseToPrimitives(tx);
+
+        logBonsaiInfo('useSubaccount/doPlaceOrder', 'Successfully placed order', {
+          params,
+          parsedTx,
+        });
+
+        return wrapOperationSuccess(parsedTx);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        // Don't log broadcast errors which are expected in some cases
+        logBonsaiError('useSubaccount/doPlaceOrder', 'Failed to place order', {
+          params,
+          parsed,
+        });
+
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [compositeClient, localDydxWallet, dispatch]
+  );
+
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
-    async ({
-      onError,
-      onSuccess,
-    }: {
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: () => void;
-    } = {}) => {
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadableTriggerOrdersPayload>
-      ) => {
-        const placeOrderPayloads = data?.placeOrderPayloads.toArray() ?? [];
-        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
+    (payload: TriggerOrdersPayload) => {
+      const { placeOrderPayloads, cancelOrderPayloads } = payload;
 
-        if (success) {
-          // #OrderOnlyConfirmedCancelViaIndexer
-          // even though trigger orders are probably confirmed canceled, we use indexer as source of truth to trigger order status toast
-          onSuccess?.();
-        } else {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          onError?.(errorParams);
+      placeOrderPayloads.forEach(async (placeOrderPayload) => {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: placeOrderPayload.marketId,
+            clientId: placeOrderPayload.clientId.toString(),
+            orderType: placeOrderPayload.type as unknown as TradeTypes,
+          })
+        );
 
-          placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
-            dispatch(
-              placeOrderFailed({
-                clientId: payload.clientId,
-                errorParams,
-              })
-            );
-          });
+        const res = await doPlaceOrder(placeOrderPayload);
 
-          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
-            dispatch(
-              cancelOrderFailed({
-                orderId: payload.orderId,
-                errorParams,
-              })
-            );
-          });
-        }
-      };
-
-      const triggerOrderParams = abacusStateManager.triggerOrders(callback);
-
-      triggerOrderParams?.placeOrderPayloads
-        .toArray()
-        .forEach((payload: HumanReadablePlaceOrderPayload) => {
+        if (res.type === 'failure') {
+          const parsed = parseTransactionError('placeTriggerOrders/placeOrder', res.errorString);
           dispatch(
-            placeOrderSubmitted({
-              marketId: payload.marketId,
-              clientId: payload.clientId,
-              orderType: payload.type as TradeTypes,
+            placeOrderFailed({
+              clientId: placeOrderPayload.clientId.toString(),
+              errorParams:
+                parsed != null
+                  ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }
+                  : DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
             })
           );
-        });
+        }
+      });
 
-      triggerOrderParams?.cancelOrderPayloads
-        .toArray()
-        .forEach((payload: HumanReadableCancelOrderPayload) => {
-          dispatch(cancelOrderSubmitted(payload.orderId));
-        });
+      cancelOrderPayloads.forEach(async (cancelOrderPayload) => {
+        dispatch(cancelOrderSubmitted(cancelOrderPayload.orderId));
 
-      return triggerOrderParams;
+        const res = await doCancelOrder(cancelOrderPayload);
+
+        if (res.type === 'failure') {
+          const parsed = parseTransactionError('placeTriggerOrders/cancelOrder', res.errorString);
+          dispatch(
+            cancelOrderFailed({
+              orderId: cancelOrderPayload.orderId,
+              errorParams:
+                parsed != null
+                  ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }
+                  : DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+            })
+          );
+        }
+      });
     },
-    [dispatch]
+    [dispatch, doCancelOrder, doPlaceOrder]
   );
 
   // ------ Listing Method ------ //

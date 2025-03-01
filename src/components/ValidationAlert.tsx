@@ -25,6 +25,7 @@ export const ValidationAlertMessage = ({
           error.resources.text?.stringKey ??
           error.resources.title?.stringKey ??
           STRING_KEYS.UNKNOWN_ERROR,
+        params: error.resources.text?.params ?? error.resources.title?.params ?? {},
       })}
     </AlertMessage>
   );
