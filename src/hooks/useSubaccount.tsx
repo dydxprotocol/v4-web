@@ -62,6 +62,7 @@ import {
   stringifyTransactionError,
 } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
+import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
@@ -84,6 +85,8 @@ export const SubaccountProvider = ({ ...props }) => {
 };
 
 export const useSubaccount = () => useContext(SubaccountContext);
+
+const chainTxExecutor = new SerialTaskExecutor();
 
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
@@ -808,22 +811,16 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     (payload: TriggerOrdersPayload) => {
       const { placeOrderPayloads, cancelOrderPayloads } = payload;
 
-      placeOrderPayloads.forEach(async (placeOrderPayload) => {
-        dispatch(
-          placeOrderSubmitted({
-            marketId: placeOrderPayload.marketId,
-            clientId: placeOrderPayload.clientId.toString(),
-            orderType: placeOrderPayload.type as unknown as TradeTypes,
-          })
-        );
+      cancelOrderPayloads.forEach(async (cancelOrderPayload) => {
+        dispatch(cancelOrderSubmitted(cancelOrderPayload.orderId));
 
-        const res = await doPlaceOrder(placeOrderPayload);
+        const res = await chainTxExecutor.enqueue(() => doCancelOrder(cancelOrderPayload));
 
         if (res.type === 'failure') {
-          const parsed = parseTransactionError('placeTriggerOrders/placeOrder', res.errorString);
+          const parsed = parseTransactionError('placeTriggerOrders/cancelOrder', res.errorString);
           dispatch(
-            placeOrderFailed({
-              clientId: placeOrderPayload.clientId.toString(),
+            cancelOrderFailed({
+              orderId: cancelOrderPayload.orderId,
               errorParams:
                 parsed != null
                   ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }
@@ -833,16 +830,22 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
       });
 
-      cancelOrderPayloads.forEach(async (cancelOrderPayload) => {
-        dispatch(cancelOrderSubmitted(cancelOrderPayload.orderId));
+      placeOrderPayloads.forEach(async (placeOrderPayload) => {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: placeOrderPayload.marketId,
+            clientId: placeOrderPayload.clientId.toString(),
+            orderType: placeOrderPayload.type as unknown as TradeTypes,
+          })
+        );
 
-        const res = await doCancelOrder(cancelOrderPayload);
+        const res = await chainTxExecutor.enqueue(() => doPlaceOrder(placeOrderPayload));
 
         if (res.type === 'failure') {
-          const parsed = parseTransactionError('placeTriggerOrders/cancelOrder', res.errorString);
+          const parsed = parseTransactionError('placeTriggerOrders/placeOrder', res.errorString);
           dispatch(
-            cancelOrderFailed({
-              orderId: cancelOrderPayload.orderId,
+            placeOrderFailed({
+              clientId: placeOrderPayload.clientId.toString(),
               errorParams:
                 parsed != null
                   ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }

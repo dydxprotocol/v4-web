@@ -303,7 +303,7 @@ function createPlaceOrderPayload(
 
   const maxUnsignedInt = 4294967295;
   const clientId = Math.floor(Math.random() * maxUnsignedInt);
-  const goodTilTimeInSeconds = 28 * timeUnits.day; // 28 days
+  const goodTilTimeInSeconds = (28 * timeUnits.day) / 1000;
 
   const clobPairId = AttemptNumber(market.clobPairId);
   if (clobPairId == null) {

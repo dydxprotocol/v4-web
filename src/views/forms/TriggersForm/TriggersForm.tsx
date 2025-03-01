@@ -29,7 +29,8 @@ import {
   getSubaccountConditionalOrders,
   getSubaccountPositionByUniqueId,
 } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closeDialog } from '@/state/dialogs';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -96,11 +97,14 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
     </$PriceBox>
   );
 
+  const dispatch = useAppDispatch();
+
   const onSubmitOrders = async () => {
     if (summary.payload == null) {
       return;
     }
     placeTriggerOrders(summary.payload);
+    dispatch(closeDialog());
   };
 
   const onSubmit = async (e: FormEvent) => {
