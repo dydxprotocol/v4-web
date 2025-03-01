@@ -27,6 +27,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
+  createGetOpenOrdersCount,
   createGetUnseenFillsCount,
   createGetUnseenOpenOrdersCount,
   createGetUnseenOrderHistoryCount,
@@ -87,11 +88,15 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
   const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
 
-  const unseenOrders = useParameterizedSelector(
+  const openOrdersCount = useParameterizedSelector(
+    createGetOpenOrdersCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const unseenOpenOrdersCount = useParameterizedSelector(
     createGetUnseenOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
-  const ordersTagNumber = shortenNumberForDisplay(unseenOrders);
+  const ordersTagNumber = shortenNumberForDisplay(openOrdersCount);
 
   const numTotalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
@@ -103,7 +108,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
   const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
 
-  const hasUnseenOrderUpdates = unseenOrders > 0;
+  const hasUnseenOrderUpdates = unseenOpenOrdersCount > 0;
   const hasUnseenFillUpdates = numUnseenFills > 0;
 
   const initialPageSize = 20;
