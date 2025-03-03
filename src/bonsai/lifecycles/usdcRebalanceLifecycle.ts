@@ -127,6 +127,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
   return () => {
     cleanupEffect();
+    latestRebalanceData = undefined;
     setTransferInProgress(false);
   };
 }
