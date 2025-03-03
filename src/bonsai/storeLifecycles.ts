@@ -11,6 +11,7 @@ import { setUpFillsQuery } from './rest/fills';
 import { setUpGeoQuery } from './rest/geo';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
+import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
 import { setUpSparklinesQuery } from './rest/sparklines';
 import { setUpTransfersQuery } from './rest/transfers';
@@ -46,4 +47,5 @@ export const storeLifecycles = [
   setUpIndexerSourceAddressScreenV2Query,
   setUpIndexerLocalAddressScreenV2Query,
   setUpUsdcRebalanceLifecycle,
+  setUpNobleBalanceQuery,
 ] as const;

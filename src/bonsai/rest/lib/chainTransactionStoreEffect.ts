@@ -98,7 +98,7 @@ export function createChainTransactionStoreEffect<T>(
     const localDydxWallet = localWalletManager.getLocalWallet(account.localWalletNonce); // Will be undefined if disconnected or connected w/ Keplr
     const isCorrectWallet = localDydxWallet?.address === account.parentSubaccountInfo.wallet;
 
-    const canWalletTransact = Boolean(localDydxWallet && isCorrectWallet);
+    const canWalletTransact = Boolean(localDydxWallet?.offlineSigner && isCorrectWallet);
 
     if (!canWalletTransact) {
       return undefined;

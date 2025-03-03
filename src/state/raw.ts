@@ -31,6 +31,7 @@ import {
 interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
+  nobleClientReady: boolean;
 }
 
 export type HeightState = {
@@ -60,6 +61,7 @@ export interface RawDataState {
   };
   account: {
     balances: Loadable<Coin[]>;
+    nobleUsdcBalance: Loadable<Coin>;
     stats: Loadable<AccountStats | undefined>;
     feeTier: Loadable<UserFeeTier | undefined>;
     parentSubaccount: Loadable<ParentSubaccountData>;
@@ -89,6 +91,7 @@ const initialState: RawDataState = {
   account: {
     parentSubaccount: loadableIdle(),
     balances: loadableIdle(),
+    nobleUsdcBalance: loadableIdle(),
     stats: loadableIdle(),
     feeTier: loadableIdle(),
     fills: loadableIdle(),
@@ -141,6 +144,9 @@ export const rawSlice = createSlice({
     setAccountBalancesRaw: (state, action: PayloadAction<Loadable<Coin[]>>) => {
       state.account.balances = action.payload;
     },
+    setAccountNobleUsdcBalanceRaw: (state, action: PayloadAction<Loadable<Coin>>) => {
+      state.account.nobleUsdcBalance = action.payload;
+    },
     setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
       state.account.stats = action.payload;
     },
@@ -174,7 +180,11 @@ export const rawSlice = createSlice({
     ) => {
       const { networkId, stateToMerge } = action.payload;
       state.network[networkId] = {
-        ...(state.network[networkId] ?? { compositeClientReady: false, indexerClientReady: false }),
+        ...(state.network[networkId] ?? {
+          compositeClientReady: false,
+          indexerClientReady: false,
+          nobleClientReady: false,
+        }),
         ...stateToMerge,
       };
     },
@@ -223,6 +233,7 @@ export const {
   setAccountBalancesRaw,
   setAccountStatsRaw,
   setAccountFillsRaw,
+  setAccountNobleUsdcBalanceRaw,
   setAccountOrdersRaw,
   setAccountTransfersRaw,
   setAccountBlockTradingRewardsRaw,
