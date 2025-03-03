@@ -5,7 +5,7 @@ import {
   simpleValidationError,
   ValidationError,
 } from '@/bonsai/lib/validationErrors';
-import { OrderStatus } from '@/bonsai/types/summaryTypes';
+import { MarketInfo, OrderStatus } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
@@ -169,9 +169,13 @@ function validateTriggerOrder(
     const liquidationPrice = position.liquidationPrice;
     if (liquidationPrice && isStopLoss) {
       if (isLong && triggerPriceNum <= liquidationPrice) {
-        localErrors.push(errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber()));
+        localErrors.push(
+          errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber(), market)
+        );
       } else if (!isLong && triggerPriceNum >= liquidationPrice) {
-        localErrors.push(errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber()));
+        localErrors.push(
+          errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber(), market)
+        );
       }
     }
 
@@ -265,7 +269,7 @@ function validateCustomSize(size: string, inputData: TriggerOrderInputData): Val
   const sizeNum = AttemptBigNumber(size);
 
   if (sizeNum == null || sizeNum.lt(market.stepSize)) {
-    return [errors.sizeBelowMinimum(MustNumber(market.stepSize), market.displayableTicker)];
+    return [errors.sizeBelowMinimum(MustNumber(market.stepSize), market)];
   }
 
   if (sizeNum.gt(position.unsignedSize)) {
@@ -356,7 +360,7 @@ class TriggerOrderFormValidationErrors {
   }
 
   // Size errors
-  sizeBelowMinimum(minSize: number, marketId: string): ValidationError {
+  sizeBelowMinimum(minSize: number, market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'ORDER_SIZE_BELOW_MIN_SIZE',
       type: ErrorType.error,
@@ -367,9 +371,10 @@ class TriggerOrderFormValidationErrors {
         MIN_SIZE: {
           value: minSize,
           format: ErrorFormat.Size,
+          decimals: market.stepSizeDecimals,
         },
         MARKET: {
-          value: marketId,
+          value: market.displayableAsset,
           format: ErrorFormat.String,
         },
       },
@@ -429,7 +434,7 @@ class TriggerOrderFormValidationErrors {
     });
   }
 
-  stopLossTriggerNearLiquidation(liquidationPrice: number): ValidationError {
+  stopLossTriggerNearLiquidation(liquidationPrice: number, market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE',
       type: ErrorType.error,
@@ -440,6 +445,7 @@ class TriggerOrderFormValidationErrors {
         TRIGGER_PRICE_LIMIT: {
           value: liquidationPrice,
           format: ErrorFormat.Price,
+          decimals: market.tickSizeDecimals,
         },
       },
     });

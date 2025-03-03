@@ -24,6 +24,7 @@ export interface ErrorString {
 export interface ErrorParam {
   value: string | number;
   format?: ErrorFormat | null;
+  decimals?: number;
 }
 
 export enum ErrorFormat {
