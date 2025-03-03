@@ -18,7 +18,7 @@ import { CompositeClientManager } from './compositeClientManager';
 
 type ChainTransactionConfig<T> = {
   selector: (state: RootState) => T;
-  onChainTransaction: (
+  onResultUpdate: (
     client: CompositeClient,
     wallet: {
       subaccountClient: SubaccountClient;
@@ -114,7 +114,7 @@ export function createChainTransactionStoreEffect<T>(
       sourceAccount: account.sourceAccount,
     };
 
-    const cleanup = config.onChainTransaction(compositeClient, wallet, data);
+    const cleanup = config.onResultUpdate(compositeClient, wallet, data);
 
     return () => {
       CompositeClientManager.markDone(clientConfig);

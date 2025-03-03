@@ -67,7 +67,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
   const cleanupEffect = createChainTransactionStoreEffect(store, {
     selector: balanceAndTransfersSelector,
-    onChainTransaction: (compositeClient, { subaccountClient, sourceAccount }, data) => {
+    onResultUpdate: (compositeClient, { subaccountClient, sourceAccount }, data) => {
       latestRebalanceData = data;
 
       async function rebalanceWalletFunds() {
