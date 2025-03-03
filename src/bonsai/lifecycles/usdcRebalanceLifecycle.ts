@@ -55,6 +55,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   );
 
   let transferInProgress = false;
+  let latestRebalanceData: ReturnType<typeof balanceAndTransfersSelector> | undefined;
 
   function setTransferInProgress(value: boolean) {
     transferInProgress = value;
@@ -67,17 +68,19 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const cleanupEffect = createChainTransactionStoreEffect(store, {
     selector: balanceAndTransfersSelector,
     onChainTransaction: (compositeClient, { subaccountClient, sourceAccount }, data) => {
-      const { balances, hasNonExpiredPendingWithdraws } = data;
-      const usdcBalance = balances.usdcAmount;
-      const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+      latestRebalanceData = data;
 
       async function rebalanceWalletFunds() {
+        const isTransferInProgress = getTransferInProgress();
+        if (isTransferInProgress || !latestRebalanceData) return;
+
+        const { balances, hasNonExpiredPendingWithdraws } = latestRebalanceData;
+        const usdcBalance = balances.usdcAmount;
+        const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+
         if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
           const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
           const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
-          const isTransferInProgress = getTransferInProgress();
-
-          if (isTransferInProgress) return;
 
           try {
             setTransferInProgress(true);
@@ -99,6 +102,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             }
           } finally {
             setTransferInProgress(false);
+
+            // Check if we received new updates that need to be processed, while we were processing the previous rebalance
+            if (latestRebalanceData !== data) {
+              rebalanceWalletFunds();
+            }
           }
         }
       }
