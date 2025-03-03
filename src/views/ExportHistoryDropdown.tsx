@@ -81,10 +81,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         return {
           type: fill.type,
           liquidity: fill.liquidity,
-          time: new Date(fill.createdAt).toLocaleString(selectedLocale, {
-            dateStyle: 'short',
-            timeStyle: 'short',
-          }),
+          time: new Date(fill.createdAt).toISOString(),
           amount: fill.size,
           price,
           fee,
