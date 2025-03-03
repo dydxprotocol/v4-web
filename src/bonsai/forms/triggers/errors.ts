@@ -168,11 +168,11 @@ function validateTriggerOrder(
     // Liquidation price validation
     const liquidationPrice = position.liquidationPrice;
     if (liquidationPrice && isStopLoss) {
-      if (isLong && triggerPriceNum <= liquidationPrice) {
+      if (isLong && triggerPriceNum.lte(liquidationPrice)) {
         localErrors.push(
           errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber(), market)
         );
-      } else if (!isLong && triggerPriceNum >= liquidationPrice) {
+      } else if (!isLong && triggerPriceNum.gte(liquidationPrice)) {
         localErrors.push(
           errors.stopLossTriggerNearLiquidation(liquidationPrice.toNumber(), market)
         );
