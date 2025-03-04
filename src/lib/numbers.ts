@@ -32,6 +32,22 @@ export const ToBigNumber = (amount: BigNumberish): BigNumber => {
   return MustBigNumber(amount);
 };
 
+// returns undefined if it's not parseable, otherwise a valid bignumber
+export const AttemptBigNumber = (amount: string | undefined | null): BigNumber | undefined => {
+  if (amount == null) {
+    return undefined;
+  }
+  const bn = new BigNumber(amount);
+  if (!bn.isFinite()) {
+    return undefined;
+  }
+  return bn;
+};
+
+export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+  return AttemptBigNumber(amount)?.toNumber();
+};
+
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.
  */

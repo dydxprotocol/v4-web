@@ -18,16 +18,20 @@ export interface ErrorResources {
 
 export interface ErrorString {
   stringKey: string;
+  params?: { [key: string]: ErrorParam };
 }
 
 export interface ErrorParam {
-  key: string;
-  value?: string;
+  value: string | number;
   format?: ErrorFormat | null;
+  decimals?: number;
 }
 
 export enum ErrorFormat {
   Percent = 'Percent',
+  Size = 'Size',
+  Price = 'Price',
+  String = 'String',
 }
 
 export enum ErrorType {
@@ -60,6 +64,8 @@ interface SimpleValidationErrorParams {
   fields?: string[];
   titleKey?: string;
   textKey?: string;
+  titleParams?: { [key: string]: ErrorParam };
+  textParams?: { [key: string]: ErrorParam };
 }
 
 export function simpleValidationError({
@@ -68,6 +74,8 @@ export function simpleValidationError({
   fields,
   titleKey,
   textKey,
+  textParams,
+  titleParams,
 }: SimpleValidationErrorParams): ValidationError {
   return {
     code,
@@ -80,11 +88,13 @@ export function simpleValidationError({
       title: titleKey
         ? {
             stringKey: titleKey,
+            params: titleParams,
           }
         : undefined,
       text: textKey
         ? {
             stringKey: textKey,
+            params: textParams,
           }
         : undefined,
       action: null,
