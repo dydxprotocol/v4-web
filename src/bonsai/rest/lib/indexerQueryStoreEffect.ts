@@ -188,16 +188,17 @@ export function createNobleQueryStoreEffect<T, R>(
       config.onNoQuery();
       return undefined;
     }
+
     const clientConfig = {
       network: infrastructure.network,
       dispatch: store.dispatch,
     };
+
     const nobleClient = CompositeClientManager.use(clientConfig).nobleClient!;
 
     const queryFn = config.getQueryFn(nobleClient, queryData);
     if (!queryFn) {
       CompositeClientManager.markDone(clientConfig);
-      nobleClient.disconnect();
       config.onNoQuery();
       return undefined;
     }
@@ -205,7 +206,7 @@ export function createNobleQueryStoreEffect<T, R>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
     const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['validator', ...config.getQueryKey(queryData), clientConfig.network],
+      queryKey: ['nobleClient', ...config.getQueryKey(queryData), clientConfig.network],
       queryFn,
       ...baseOptions,
       ...otherOpts,
@@ -226,7 +227,6 @@ export function createNobleQueryStoreEffect<T, R>(
 
     return () => {
       unsubscribe();
-      nobleClient.disconnect();
       CompositeClientManager.markDone(clientConfig);
     };
   });
