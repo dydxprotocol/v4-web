@@ -14,7 +14,8 @@ import { getTransfersByAddress } from '@/state/transfersSelectors';
 
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
-import { logBonsaiError } from '../logs';
+import { createSemaphore, SupersededError } from '../lib/semaphore';
+import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createChainTransactionStoreEffect } from '../rest/lib/chainTransactionStoreEffect';
 import { selectParentSubaccountInfo } from '../socketSelectors';
@@ -55,7 +56,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   );
 
   let transferInProgress = false;
-  let latestRebalanceData: ReturnType<typeof balanceAndTransfersSelector> | undefined;
+  const activeRebalance = createSemaphore();
 
   function setTransferInProgress(value: boolean) {
     transferInProgress = value;
@@ -68,13 +69,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const cleanupEffect = createChainTransactionStoreEffect(store, {
     selector: balanceAndTransfersSelector,
     onResultUpdate: (compositeClient, { subaccountClient, sourceAccount }, data) => {
-      latestRebalanceData = data;
-
       async function rebalanceWalletFunds() {
         const isTransferInProgress = getTransferInProgress();
-        if (isTransferInProgress || !latestRebalanceData) return;
+        if (isTransferInProgress) return;
 
-        const { balances, hasNonExpiredPendingWithdraws } = latestRebalanceData;
+        const { balances, hasNonExpiredPendingWithdraws } = data;
         const usdcBalance = balances.usdcAmount;
         const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
 
@@ -84,50 +83,68 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
           try {
             setTransferInProgress(true);
+
             if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
+              const amountToDeposit = usdcBalanceBN
+                .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
+                .toFixed(USDC_DECIMALS);
+
+              logBonsaiInfo('usdcRebalanceLifecycle', 'depositing funds for gas', {
+                amountToDeposit,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+              });
+
               await compositeClient.depositToSubaccount(
                 subaccountClient,
-                usdcBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(USDC_DECIMALS),
+                amountToDeposit,
                 TransactionMemo.depositToSubaccount
               );
             } else if (shouldWithdraw) {
+              const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
+                .minus(usdcBalanceBN)
+                .toFixed(USDC_DECIMALS);
+
+              logBonsaiInfo('usdcRebalanceLifecycle', 'withdrawing funds for gas', {
+                amountToWithdraw,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+              });
+
               await compositeClient.withdrawFromSubaccount(
                 subaccountClient,
-                MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
-                  .minus(usdcBalanceBN)
-                  .toFixed(USDC_DECIMALS),
+                amountToWithdraw,
                 undefined,
                 TransactionMemo.withdrawFromSubaccount
               );
             }
           } finally {
             setTransferInProgress(false);
-
-            // Check if we received new updates that need to be processed, while we were processing the previous rebalance
-            if (latestRebalanceData !== data) {
-              rebalanceWalletFunds();
-            }
           }
         }
       }
 
-      try {
-        // Don't auto-rebalance on Cosmos
-        // TODO: Add notification to prompt user to rebalance manually
-        if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-          return;
-        }
-
-        rebalanceWalletFunds();
-      } catch (error) {
-        logBonsaiError('usdcRebalanceLifecycle', 'Errr trying to rebalanceWalletFunds', error);
+      // Don't auto-rebalance on Cosmos
+      // TODO: Add notification to prompt user to rebalance manually
+      if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+        logBonsaiInfo('usdcRebalanceLifecycle', 'skipping rebalance, user has native wallet');
+        return;
       }
+
+      activeRebalance
+        .run(() => rebalanceWalletFunds())
+        .catch((error) => {
+          if (error instanceof SupersededError) {
+            return;
+          }
+
+          logBonsaiError('usdcRebalanceLifecycle', 'error trying to rebalanceWalletFunds', {
+            error,
+          });
+        });
     },
   });
 
   return () => {
     cleanupEffect();
-    latestRebalanceData = undefined;
     setTransferInProgress(false);
   };
 }

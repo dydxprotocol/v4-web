@@ -117,8 +117,8 @@ export function createChainTransactionStoreEffect<T>(
     const cleanup = config.onResultUpdate(compositeClient, wallet, data);
 
     return () => {
-      CompositeClientManager.markDone(clientConfig);
       cleanup?.();
+      CompositeClientManager.markDone(clientConfig);
     };
   });
 }
