@@ -171,12 +171,12 @@ const useAccountsContext = () => {
   const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
-    if (localDydxWallet) {
-      localWalletManager.setLocalWallet(localDydxWallet);
+    if (localDydxWallet && localNobleWallet) {
+      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet]);
+  }, [localDydxWallet, localNobleWallet]);
 
   useEffect(() => {
     (async () => {

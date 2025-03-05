@@ -41,13 +41,16 @@ class LocalWalletManager {
 
   private localWallet: LocalWallet | undefined;
 
+  private localNobleWallet: LocalWallet | undefined;
+
   setStore(store: RootStore) {
     this.store = store;
   }
 
-  setLocalWallet(localWallet: LocalWallet) {
+  setLocalWallet(localWallet: LocalWallet, localNobleWallet: LocalWallet) {
     this.localWalletNonce = this.localWalletNonce != null ? this.localWalletNonce + 1 : 0;
     this.localWallet = localWallet;
+    this.localNobleWallet = localNobleWallet;
 
     if (!this.store) {
       log('LocalWalletManager: store has not been set');
@@ -64,9 +67,18 @@ class LocalWalletManager {
     return this.localWallet;
   }
 
+  getLocalNobleWallet(localWalletNonce: number): LocalWallet | undefined {
+    if (localWalletNonce !== this.localWalletNonce) {
+      return undefined;
+    }
+
+    return this.localNobleWallet;
+  }
+
   clearLocalWallet() {
     this.localWalletNonce = undefined;
     this.localWallet = undefined;
+    this.localNobleWallet = undefined;
   }
 }
 

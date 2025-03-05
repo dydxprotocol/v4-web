@@ -592,8 +592,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           break;
         }
         case TransactionType.SendNobleIBC: {
-          const result = await this.sendNobleIBC(params);
-          callback(result);
+          // this is now handled in bonsai, so the abacus call is a no-op
           break;
         }
         case TransactionType.WithdrawToNobleIBC: {
