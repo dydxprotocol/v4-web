@@ -6,6 +6,7 @@ import { HeightState } from '@/state/raw';
 import { assertNever } from '@/lib/assertNever';
 
 import { isLoadableError, isLoadableSuccess } from '../lib/loadable';
+import { logBonsaiInfo } from '../logs';
 import { ApiState, ApiStatus } from '../types/summaryTypes';
 
 enum NetworkStatus {
@@ -150,13 +151,20 @@ export function computeApiState(heights: {
     validatorState,
   });
 
-  return {
+  const result = {
     status,
     haltedBlock,
     trailingBlocks,
     indexerHeight: indexerHeight?.height,
     validatorHeight: validatorHeight?.height,
   };
+  if (result.status !== ApiStatus.NORMAL) {
+    logBonsaiInfo('ComputeApiStatus', 'Computed non-normal status', {
+      ...result,
+      rawHeights: heights,
+    });
+  }
+  return result;
 }
 
 function loadingWithNoData(height: HeightState) {
