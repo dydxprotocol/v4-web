@@ -20,19 +20,19 @@ enum NetworkStatus {
 
 const MAX_NUM_BLOCK_DELAY = 50;
 
-function computeNetworkState(heightState: SimplifiedHeightState): NetworkStatus {
+function computeNetworkState(heightState: HeightState): NetworkStatus {
   // If no last few results, we're unknown
-  if (heightState.length === 0) {
+  if (heightState.lastFewResults.length === 0) {
     return NetworkStatus.UNKNOWN;
   }
 
   // all errors or at least 3 errors in a row
-  if (heightState.slice(0, 3).every(isLoadableError)) {
+  if (heightState.lastFewResults.slice(0, 3).every(isLoadableError)) {
     return NetworkStatus.UNREACHABLE;
   }
 
   // guaranteed this has >=1 element
-  const successResults = heightState.filter(isLoadableSuccess);
+  const successResults = heightState.lastFewResults.filter(isLoadableSuccess);
 
   // Check for same block height
   if (successResults.length >= 6) {
@@ -133,24 +133,19 @@ export function getLatestHeight(heightState: HeightState): HeightResponse | unde
   return heightState.lastFewResults.find((s) => s.data?.response != null)?.data?.response;
 }
 
-type SimplifiedHeightState = HeightState['lastFewResults'];
-
 export function computeApiState(heights: {
   indexerHeight: HeightState;
   validatorHeight: HeightState;
 }): ApiState | undefined {
-  const indexerHeights = heights.indexerHeight;
-  const validatorHeights = heights.validatorHeight;
-
-  if (loadingWithNoData(indexerHeights) || loadingWithNoData(validatorHeights)) {
+  if (loadingWithNoData(heights.indexerHeight) || loadingWithNoData(heights.validatorHeight)) {
     return undefined;
   }
 
-  const indexerState = computeNetworkState(indexerHeights.lastFewResults);
-  const validatorState = computeNetworkState(validatorHeights.lastFewResults);
+  const indexerState = computeNetworkState(heights.indexerHeight);
+  const validatorState = computeNetworkState(heights.validatorHeight);
 
-  const indexerHeight = getLatestHeight(indexerHeights);
-  const validatorHeight = getLatestHeight(validatorHeights);
+  const indexerHeight = getLatestHeight(heights.indexerHeight);
+  const validatorHeight = getLatestHeight(heights.validatorHeight);
 
   const { status, haltedBlock, trailingBlocks } = getApiState({
     indexerHeight,
@@ -166,14 +161,12 @@ export function computeApiState(heights: {
     indexerHeight: indexerHeight?.height,
     validatorHeight: validatorHeight?.height,
   };
-
   if (result.status !== ApiStatus.NORMAL) {
     logBonsaiInfo('ComputeApiStatus', 'Computed non-normal status', {
       ...result,
       rawHeights: heights,
     });
   }
-
   return result;
 }
 
