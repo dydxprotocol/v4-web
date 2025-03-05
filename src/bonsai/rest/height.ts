@@ -29,7 +29,9 @@ export function setUpIndexerHeightQuery(store: RootStore) {
     selector: () => true,
     getQueryKey: () => ['indexerHeight'],
     getQueryFn: (indexerClient) => {
-      return () => indexerClient.utility.getHeight();
+      return () => {
+        return indexerClient.utility.getHeight();
+      };
     },
     onResult: (height) => {
       store.dispatch(
@@ -56,7 +58,9 @@ export function setUpValidatorHeightQuery(store: RootStore) {
     selector: () => true,
     getQueryKey: () => ['validatorHeight'],
     getQueryFn: (compositeClient) => {
-      return () => compositeClient.validatorClient.get.latestBlock();
+      return () => {
+        return compositeClient.validatorClient.get.latestBlock();
+      };
     },
     onResult: (height) => {
       store.dispatch(
