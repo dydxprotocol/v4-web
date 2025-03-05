@@ -1,6 +1,7 @@
 import { validation } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -10,6 +11,7 @@ import {
   applyOperationsToSubaccount,
   createBatchedOperations,
 } from '../calculators/accountActions';
+import { convertAmount } from '../calculators/balances';
 import { calculateParentSubaccountSummary } from '../calculators/subaccount';
 import { createForm, createVanillaReducer } from '../lib/forms';
 import {
@@ -77,24 +79,25 @@ const reducer = createVanillaReducer({
   },
 });
 
-interface TransferFormInputData {
-  rawParentSubaccountData?: ParentSubaccountDataBase;
-  rawRelevantMarkets?: MarketsData;
-  walletBalances?: AccountBalances;
-  feeResult?: TransferFeeData; // Fee data provided by consumer
-  usingUsdcForGas: boolean;
-  nativeTokenOraclePrice?: number;
-  canViewAccount?: boolean;
+export interface TransferFormInputData {
+  rawParentSubaccountData: ParentSubaccountDataBase | undefined;
+  rawRelevantMarkets: MarketsData | undefined;
+  walletBalances: AccountBalances | undefined;
+  feeResult: TransferFeeData | undefined; // Fee data provided by consumer
+  canViewAccount: boolean | undefined;
   display: {
     usdcName: string;
     usdcDecimals: number;
+    usdcDenom: string;
     nativeName: string;
     nativeDecimals: number;
+    nativeDenom: string;
   };
 }
 
-interface TransferFeeData {
-  amount: string;
+export interface TransferFeeData {
+  amount: string | undefined;
+  denom: string | undefined;
   requestedFor: TransferFormState['amountInput'];
 }
 
@@ -109,7 +112,6 @@ interface AccountDetails {
 interface InputSummary {
   token: TransferToken;
   amount?: string;
-  usdcEquivalent?: string; // For native token transfers
   recipientAddress: string;
   memo?: string;
 }
@@ -129,7 +131,7 @@ interface TransferNativeTokenPayload {
 
 export type TransferPayload = TransferUsdcPayload | TransferNativeTokenPayload;
 
-interface TransferSummaryData {
+export interface TransferSummaryData {
   accountBefore: AccountDetails;
   accountAfter: AccountDetails;
   inputs: InputSummary;
@@ -155,21 +157,16 @@ function calculateSummary(
     amount: parsedAmount?.toString(),
     recipientAddress: state.recipientAddress,
     memo: state.memo,
-    usdcEquivalent: calc(() => {
-      if (state.amountInput.type === TransferToken.NATIVE) {
-        if (inputData.nativeTokenOraclePrice != null && parsedAmount != null) {
-          return parsedAmount.times(inputData.nativeTokenOraclePrice).toString();
-        }
-        return undefined;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (state.amountInput.type === TransferToken.USDC) {
-        return parsedAmount?.toString();
-      }
-      assertNever(state.amountInput);
-      return undefined;
-    }),
   };
+
+  const feeDenom =
+    inputData.feeResult?.denom == null
+      ? undefined
+      : inputData.feeResult.denom === inputData.display.usdcDenom
+        ? TransferToken.USDC
+        : TransferToken.NATIVE;
+
+  const usingUsdcForGas = feeDenom === TransferToken.USDC;
 
   const parsedFee = calc(() => {
     if (!inputData.feeResult) {
@@ -182,9 +179,19 @@ function calculateSummary(
       parsedAmount != null &&
       AttemptBigNumber(inputData.feeResult.requestedFor.amount)?.eq(parsedAmount);
 
-    return isRequestMatchingCurrentInput ? AttemptBigNumber(inputData.feeResult.amount) : undefined;
+    const attemptFee = isRequestMatchingCurrentInput
+      ? AttemptBigNumber(inputData.feeResult.amount)
+      : undefined;
+
+    if (attemptFee == null) {
+      return attemptFee;
+    }
+
+    return convertAmount(
+      inputData.feeResult.amount,
+      usingUsdcForGas ? inputData.display.usdcDecimals : inputData.display.nativeDecimals
+    );
   });
-  const feeDenom = inputData.usingUsdcForGas ? TransferToken.USDC : TransferToken.NATIVE;
 
   const payload = calc((): TransferPayload | undefined => {
     if (!parsedAmount || !state.recipientAddress || parsedAmount.lte(0)) {
@@ -213,9 +220,10 @@ function calculateSummary(
   });
 
   const accountAfter = calc((): AccountDetails | undefined => {
-    if (!parsedAmount || !parsedFee) {
+    if (!parsedAmount) {
       return undefined;
     }
+    const feeToUse = parsedFee ?? '0';
 
     if (!inputData.rawParentSubaccountData || !inputData.rawRelevantMarkets) {
       return undefined;
@@ -227,9 +235,7 @@ function calculateSummary(
       }
 
       if (state.amountInput.type === TransferToken.USDC) {
-        const totalAmountLost = parsedAmount.plus(
-          inputData.usingUsdcForGas ? parsedFee : MustBigNumber(0)
-        );
+        const totalAmountLost = parsedAmount.plus(usingUsdcForGas ? feeToUse : MustBigNumber(0));
 
         return createBatchedOperations(
           SubaccountOperations.WithdrawUsdc({
@@ -240,10 +246,10 @@ function calculateSummary(
       }
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (state.amountInput.type === TransferToken.NATIVE) {
-        if (inputData.usingUsdcForGas) {
+        if (usingUsdcForGas) {
           return createBatchedOperations(
             SubaccountOperations.WithdrawUsdc({
-              amount: parsedFee.toString(),
+              amount: feeToUse.toString(),
               subaccountNumber: inputData.rawParentSubaccountData.parentSubaccount,
             })
           );
@@ -269,7 +275,7 @@ function calculateSummary(
         const currentBalanceBN = MustBigNumber(accountBefore.availableNativeBalance);
         const amountDeduction =
           state.amountInput.type === TransferToken.NATIVE ? parsedAmount : BIG_NUMBERS.ZERO;
-        const feeDeduction = inputData.usingUsdcForGas ? BIG_NUMBERS.ZERO : parsedFee;
+        const feeDeduction = usingUsdcForGas ? BIG_NUMBERS.ZERO : feeToUse;
 
         return currentBalanceBN.minus(amountDeduction).minus(feeDeduction).toNumber();
       }),
@@ -312,7 +318,6 @@ class TransferFormValidationErrors {
       code: 'AMOUNT_EMPTY',
       type: ErrorType.error,
       fields: ['amountInput.amount'],
-      titleKey: STRING_KEYS.MODIFY_SIZE_FIELD,
     });
   }
 
@@ -388,11 +393,17 @@ class TransferFormValidationErrors {
     });
   }
 
+  invalidFeeResponse(): ValidationError {
+    return simpleValidationError({
+      code: 'INVALID_FEE_RESPONSE',
+      type: ErrorType.error,
+    });
+  }
+
   noPayload(): ValidationError {
     return simpleValidationError({
       code: 'MISSING_PAYLOAD',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.UNKNOWN_ERROR,
     });
   }
 }
@@ -444,13 +455,25 @@ export function getErrors(
     validationErrors.push(errors.missingMemo());
   }
 
+  if (
+    inputData.feeResult == null ||
+    inputData.feeResult.amount == null ||
+    !(
+      inputData.feeResult.requestedFor.type === state.amountInput.type &&
+      amount != null &&
+      AttemptBigNumber(inputData.feeResult.requestedFor.amount)?.eq(amount)
+    )
+  ) {
+    validationErrors.push(errors.invalidFeeResponse());
+  }
+
   // Gas fee validations - if post balance is less than 0 and there wasn't a balance error above it's because of gas fee
   if ((summary.accountAfter.freeCollateral ?? 0) < 0) {
     validationErrors.push(
       errors.insufficientUsdcGas(
         inputData.display.usdcName,
         summary.accountBefore.freeCollateral ?? 0,
-        inputData.display.usdcDecimals
+        USD_DECIMALS
       )
     );
   }
@@ -460,7 +483,7 @@ export function getErrors(
       errors.insufficientNativeGas(
         inputData.display.nativeName,
         summary.accountBefore.availableNativeBalance ?? 0,
-        inputData.display.nativeDecimals
+        TOKEN_DECIMALS
       )
     );
   }

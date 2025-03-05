@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
+import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
-import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
@@ -50,6 +50,7 @@ import { selectPendingWithdraws } from '@/state/transfersSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { track } from '@/lib/analytics/analytics';
+import { assertNever } from '@/lib/assertNever';
 import { getValidErrorParamsFromParsingError, stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -99,13 +100,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [faucetClient]
   );
 
-  const {
-    depositToSubaccount,
-    withdrawFromSubaccount,
-    transferFromSubaccountToAddress,
-    transferNativeToken,
-    sendSkipWithdrawFromSubaccount,
-  } = useMemo(
+  const { depositToSubaccount, withdrawFromSubaccount, sendSkipWithdrawFromSubaccount } = useMemo(
     () => ({
       depositToSubaccount: async ({
         subaccountClient,
@@ -143,79 +138,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           );
         } catch (error) {
           log('useSubaccount/withdrawFromSubaccount', error);
-          throw error;
-        }
-      },
-
-      transferFromSubaccountToAddress: async ({
-        subaccountClient,
-        assetId = 0,
-        amount,
-        recipient,
-      }: {
-        subaccountClient: SubaccountClient;
-        assetId?: number;
-        amount: number;
-        recipient: string;
-      }) => {
-        try {
-          return await compositeClient?.validatorClient.post.send(
-            subaccountClient.wallet,
-            () =>
-              new Promise((resolve) => {
-                const msg =
-                  compositeClient.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
-                    subaccountClient.address,
-                    subaccountClient.subaccountNumber,
-                    assetId,
-                    Long.fromNumber(amount * QUANTUM_MULTIPLIER),
-                    recipient
-                  );
-
-                resolve([msg]);
-              }),
-            false,
-            undefined,
-            `${DEFAULT_TRANSACTION_MEMO} | transfer usdc to ${subaccountClient.address}`,
-            Method.BroadcastTxCommit
-          );
-        } catch (error) {
-          log('useSubaccount/transferFromSubaccountToAddress', error);
-          throw error;
-        }
-      },
-
-      transferNativeToken: async ({
-        subaccountClient,
-        amount,
-        recipient,
-        memo,
-      }: {
-        subaccountClient: SubaccountClient;
-        amount: number;
-        recipient: string;
-        memo?: string;
-      }) => {
-        try {
-          return await compositeClient?.validatorClient.post.send(
-            subaccountClient.wallet,
-            () =>
-              new Promise((resolve) => {
-                const msg = compositeClient.sendTokenMessage(
-                  subaccountClient.wallet,
-                  amount.toString(),
-                  recipient
-                );
-
-                resolve([msg]);
-              }),
-            false,
-            compositeClient.validatorClient.post.defaultDydxGasPrice,
-            memo,
-            Method.BroadcastTxCommit
-          );
-        } catch (error) {
-          log('useSubaccount/transferNativeToken', error);
           throw error;
         }
       },
@@ -397,18 +319,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   // ------ Transfer Methods ------ //
-
-  const transfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string, memo?: string) => {
-      if (!subaccountClient) {
-        return undefined;
-      }
-      return (await (coinDenom === usdcDenom
-        ? transferFromSubaccountToAddress({ subaccountClient, amount, recipient })
-        : transferNativeToken({ subaccountClient, amount, recipient, memo }))) as IndexedTx;
-    },
-    [subaccountClient, transferFromSubaccountToAddress, transferNativeToken, usdcDenom]
-  );
 
   const sendSkipWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
@@ -1096,6 +1006,141 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, localDydxWallet]
   );
 
+  const createTransferMessage = useCallback(
+    (payload: TransferPayload) => {
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      if (payload.type === TransferToken.USDC) {
+        return compositeClient.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
+          subaccountClient.address,
+          subaccountClient.subaccountNumber,
+          0, // assetId default
+          Long.fromNumber(payload.amount * QUANTUM_MULTIPLIER),
+          payload.recipient
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (payload.type === TransferToken.NATIVE) {
+        return compositeClient.sendTokenMessage(
+          subaccountClient.wallet,
+          payload.amount.toString(),
+          payload.recipient
+        );
+      }
+      assertNever(payload);
+      return undefined;
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const simulateTransfer = useCallback(
+    async (payload: TransferPayload) => {
+      try {
+        if (subaccountClient == null) {
+          throw new Error('local wallet client not initialized');
+        }
+
+        if (compositeClient == null) {
+          throw new Error('Missing compositeClient or localWallet');
+        }
+
+        const gasPrice =
+          payload.type === TransferToken.USDC
+            ? undefined
+            : compositeClient.validatorClient.post.defaultDydxGasPrice;
+
+        const message = createTransferMessage(payload);
+
+        if (message == null) {
+          throw new Error('invalid message generated');
+        }
+
+        const tx = await compositeClient.simulate(
+          subaccountClient.wallet,
+          () => Promise.resolve([message]),
+          gasPrice
+        );
+
+        const parsedTx = parseToPrimitives(tx);
+        logBonsaiInfo('useSubaccount/simulateTransfer', 'Successful transfer simulation', {
+          payload,
+          parsedTx,
+        });
+        return wrapOperationSuccess(parsedTx);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError('useSubaccount/simulateTransfer', 'Failed transfer simulation', {
+          transferType: payload.type,
+          parsed,
+        });
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [subaccountClient, compositeClient, createTransferMessage]
+  );
+
+  const transfer = useCallback(
+    async (payload: TransferPayload) => {
+      try {
+        if (subaccountClient == null) {
+          throw new Error('local wallet client not initialized');
+        }
+
+        if (compositeClient == null) {
+          throw new Error('Missing compositeClient or localWallet');
+        }
+
+        const transferMemo =
+          payload.type === TransferToken.USDC
+            ? `${DEFAULT_TRANSACTION_MEMO} | transfer usdc to ${subaccountClient.address}`
+            : payload.memo;
+
+        const gasPrice =
+          payload.type === TransferToken.USDC
+            ? undefined
+            : compositeClient.validatorClient.post.defaultDydxGasPrice;
+
+        const message = createTransferMessage(payload);
+
+        if (message == null) {
+          throw new Error('invalid message generated');
+        }
+
+        const result = await compositeClient.validatorClient.post.send(
+          subaccountClient.wallet,
+          () => Promise.resolve([message]),
+          false,
+          gasPrice,
+          transferMemo,
+          Method.BroadcastTxCommit
+        );
+
+        const parsedResult = parseToPrimitives(result);
+        logBonsaiInfo('useSubaccount/transfer', 'Successful transfer', {
+          transferType: payload.type,
+          parsedResult,
+        });
+
+        return wrapOperationSuccess(parsedResult);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError('useSubaccount/transfer', 'Failed transfer', {
+          transferType: payload.type,
+          parsed,
+        });
+
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [subaccountClient, compositeClient, createTransferMessage]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -1104,6 +1149,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Transfer Methods
     transfer,
+    simulateTransfer,
     sendSkipWithdraw,
     adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
