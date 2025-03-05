@@ -192,8 +192,6 @@ export type AccountStats = {
 
 export interface ApiState {
   status: ApiStatus;
-  validatorHeight: number | undefined;
-  indexerHeight: number | undefined;
   haltedBlock?: number | undefined;
   trailingBlocks?: number | undefined;
 }

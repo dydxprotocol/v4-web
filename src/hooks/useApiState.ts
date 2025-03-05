@@ -76,7 +76,10 @@ export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useAppSelector(BonsaiCore.network.apiState);
   const initializationError = useAppSelector(getInitializationError);
-  const { haltedBlock, validatorHeight, indexerHeight, status, trailingBlocks } = apiState ?? {};
+  const validatorHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
+  const indexerHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
+
+  const { haltedBlock, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({
     apiState,
     initializationError,
@@ -85,8 +88,8 @@ export const useApiState = () => {
 
   return {
     haltedBlock,
-    height: validatorHeight,
-    indexerHeight,
+    height: validatorHeight?.height,
+    indexerHeight: indexerHeight?.height,
     status,
     connectionError,
     statusErrorMessage,
