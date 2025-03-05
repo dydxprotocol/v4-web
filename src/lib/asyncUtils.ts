@@ -19,3 +19,22 @@ export function wrapAndLogError<T>(
     }
   };
 }
+
+export function promiseWithTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  errorMessage: string = 'Operation timed out'
+): Promise<T> {
+  let timeoutId: NodeJS.Timeout | undefined;
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(errorMessage));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  });
+}

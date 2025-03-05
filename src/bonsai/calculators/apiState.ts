@@ -177,7 +177,7 @@ function loadingWithNoData(heightsRaw: HeightState): boolean {
     return true;
   }
   const mostRecent = heights[0]!;
-  const nowTime = new Date().getTime();
+  const nowTime = Date.now();
 
   if (mostRecent.data?.requestTime == null) {
     logBonsaiError('computeApiState', 'unexpectedly found null requestTime or data', { heights });
