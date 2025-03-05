@@ -16,7 +16,7 @@ enum NetworkStatus {
   NORMAL = 'NORMAL',
 }
 
-const MAX_NUM_BLOCK_DELAY = 25;
+const MAX_NUM_BLOCK_DELAY = 50;
 
 function computeNetworkState(heightState: HeightState): NetworkStatus {
   // If no last few results, we're unknown
