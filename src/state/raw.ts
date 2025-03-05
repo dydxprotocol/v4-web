@@ -35,6 +35,7 @@ interface NetworkState {
 
 export type HeightEntry = {
   requestTime: string;
+  receivedTime: string;
   // always undefined if Loadable is error
   response: HeightResponse | undefined;
 };

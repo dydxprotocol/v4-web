@@ -35,10 +35,14 @@ export function setUpIndexerHeightQuery(store: RootStore) {
           );
           return loadableLoaded({
             requestTime,
+            receivedTime: new Date().toISOString(),
             response: { time: result.time, height: MustBigNumber(result.height).toNumber() },
           });
         } catch (e) {
-          return loadableError({ requestTime, response: undefined }, e);
+          return loadableError(
+            { requestTime, receivedTime: new Date().toISOString(), response: undefined },
+            e
+          );
         }
       };
 
@@ -77,13 +81,17 @@ export function setUpValidatorHeightQuery(store: RootStore) {
           );
           return loadableLoaded({
             requestTime,
+            receivedTime: new Date().toISOString(),
             response: {
               time: result.header.time,
               height: result.header.height,
             },
           });
         } catch (e) {
-          return loadableError({ requestTime, response: undefined }, e);
+          return loadableError(
+            { requestTime, receivedTime: new Date().toISOString(), response: undefined },
+            e
+          );
         }
       };
 
