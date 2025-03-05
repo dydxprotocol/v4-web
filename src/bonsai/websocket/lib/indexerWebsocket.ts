@@ -161,13 +161,15 @@ export class IndexerWebsocket {
       return;
     }
 
-    logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
-      channel,
-      id,
-      socketNonNull: this.socket != null,
-      socketActive: Boolean(this.socket?.isActive()),
-      wsId: this.indexerWsId,
-    });
+    if (detailedLogging) {
+      logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
+        channel,
+        id,
+        socketNonNull: this.socket != null,
+        socketActive: Boolean(this.socket?.isActive()),
+        wsId: this.indexerWsId,
+      });
+    }
 
     if (this.socket != null && this.socket.isActive()) {
       this.subscriptions.getSubscription(channel, id)!.sentSubMessage = true;
