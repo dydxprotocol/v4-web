@@ -11,7 +11,7 @@ import { OrderSizeInput } from './OrderSizeInput';
 type ElementProps = {
   symbol: string;
   existsLimitOrder: boolean;
-  size: number | null;
+  size: string | null;
   positionSize: number | null;
   differingOrderSizes: boolean;
   multipleTakeProfitOrders: boolean;

@@ -3,6 +3,7 @@ import {
   IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
 
+import { getSimpleOrderStatus as getSimpleOrderStatusInner } from '../calculators/orders';
 import { ChildSubaccountData } from '../types/rawTypes';
 
 export function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObject) {
@@ -58,3 +59,5 @@ export function newUsdcAssetPosition({
     symbol: 'USDC',
   };
 }
+
+export const getSimpleOrderStatus = getSimpleOrderStatusInner;
