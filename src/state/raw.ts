@@ -34,10 +34,17 @@ interface NetworkState {
   nobleClientReady: boolean;
 }
 
+export type HeightEntry = {
+  requestTime: string;
+  receivedTime: string;
+  // always undefined if Loadable is error
+  response: HeightResponse | undefined;
+};
+
 export type HeightState = {
-  latest: Loadable<HeightResponse>;
+  latest: Loadable<HeightEntry>;
   // latest in front, will contain latest IFF latest is successful or error
-  lastFewResults: Array<LoadableSuccess<HeightResponse> | LoadableError<HeightResponse>>;
+  lastFewResults: Array<LoadableSuccess<HeightEntry> | LoadableError<HeightEntry>>;
 };
 
 export type ComplianceErrors = {
@@ -188,10 +195,10 @@ export const rawSlice = createSlice({
         ...stateToMerge,
       };
     },
-    setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
+    setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
       appendToHeight(state.heights.indexerHeight, action.payload);
     },
-    setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightResponse>>) => {
+    setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
       appendToHeight(state.heights.validatorHeight, action.payload);
     },
     setComplianceGeoRaw: (state, action: PayloadAction<Loadable<string | undefined>>) => {
@@ -214,7 +221,7 @@ export const rawSlice = createSlice({
 
 const HEIGHTS_BUFFER_LENGTH = 12;
 
-function appendToHeight(height: WritableDraft<HeightState>, response: Loadable<HeightResponse>) {
+function appendToHeight(height: WritableDraft<HeightState>, response: Loadable<HeightEntry>) {
   height.latest = response;
   if (response.status === 'error' || response.status === 'success') {
     height.lastFewResults.unshift(response);

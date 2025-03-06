@@ -46,23 +46,34 @@ const baseOptions: PassedQueryOptions<any> = {
   staleTime: timeUnits.second * 30,
 };
 
-export function createIndexerQueryStoreEffect<T, R>(
+type InfraSetupConfig<ClientType, T> = {
+  selector: (state: RootState) => T;
+
+  // this is called if the client changes in any way or your selector data changes
+  // IF YOU RETURN UNDEFINED YOU PROMISE YOU ARE TOTALLY DONE USING THE CLIENT AND IT WILL BE GARBAGE COLLECTED
+  handle: (clientId: string, client: ClientType, result: T) => undefined | (() => void);
+
+  // called if client isn't ready or possible to construct
+  handleNoClient: undefined | (() => void);
+};
+
+export function createIndexerStoreEffect<T>(
   store: RootStore,
-  config: QuerySetupConfig<IndexerClient, T, R>
+  config: InfraSetupConfig<IndexerClient, T>
 ) {
   const fullSelector = createAppSelector(
     [getSelectedNetwork, selectIndexerReady, config.selector],
     (network, indexerReady, selectorResult) => ({
       infrastructure: { network, indexerReady },
-      queryData: selectorResult,
+      selectorResult,
     })
   );
 
   return createStoreEffect(store, fullSelector, (fullResult) => {
-    const { infrastructure, queryData } = fullResult;
+    const { infrastructure, selectorResult } = fullResult;
 
     if (!infrastructure.indexerReady) {
-      config.onNoQuery();
+      config.handleNoClient?.();
       return undefined;
     }
 
@@ -72,34 +83,105 @@ export function createIndexerQueryStoreEffect<T, R>(
     };
     const indexerClient = CompositeClientManager.use(clientConfig).indexer!;
 
-    const queryFn = config.getQueryFn(indexerClient, queryData);
-    if (!queryFn) {
+    const unsubscribe = config.handle(
+      `${infrastructure.network}-${infrastructure.indexerReady}`,
+      indexerClient,
+      selectorResult
+    );
+
+    if (unsubscribe == null) {
       CompositeClientManager.markDone(clientConfig);
-      config.onNoQuery();
       return undefined;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
-    const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['indexer', ...config.getQueryKey(queryData), clientConfig.network],
-      queryFn,
-      ...baseOptions,
-      ...otherOpts,
-    });
+    return () => {
+      unsubscribe();
+      CompositeClientManager.markDone(clientConfig);
+    };
+  });
+}
 
-    const unsubscribe = observer.subscribe((result) => {
-      try {
-        config.onResult(result);
-      } catch (e) {
-        logBonsaiError(
-          'IndexerQueryStoreEffect',
-          'Error handling result from react query store effect',
-          e,
-          result
-        );
+export function createIndexerQueryStoreEffect<T, R>(
+  store: RootStore,
+  config: QuerySetupConfig<IndexerClient, T, R>
+) {
+  return createIndexerStoreEffect(store, {
+    selector: config.selector,
+    handle: (clientId, indexerClient, queryData) => {
+      const queryFn = config.getQueryFn(indexerClient, queryData);
+
+      if (!queryFn) {
+        config.onNoQuery();
+        return undefined;
       }
-    });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
+      const observer = new QueryObserver(appQueryClient, {
+        queryKey: ['indexer', ...config.getQueryKey(queryData), clientId],
+        queryFn,
+        ...baseOptions,
+        ...otherOpts,
+      });
+
+      const unsubscribe = observer.subscribe((result) => {
+        try {
+          config.onResult(result);
+        } catch (e) {
+          logBonsaiError(
+            'IndexerQueryStoreEffect',
+            'Error handling result from react query store effect',
+            e,
+            result
+          );
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    },
+    handleNoClient: () => {
+      config.onNoQuery();
+    },
+  });
+}
+
+export function createValidatorStoreEffect<T>(
+  store: RootStore,
+  config: InfraSetupConfig<CompositeClient, T>
+) {
+  const fullSelector = createAppSelector(
+    [getSelectedNetwork, selectCompositeClientReady, config.selector],
+    (network, compositeClientReady, selectorResult) => ({
+      infrastructure: { network, compositeClientReady },
+      selectorResult,
+    })
+  );
+
+  return createStoreEffect(store, fullSelector, (fullResult) => {
+    const { infrastructure, selectorResult } = fullResult;
+
+    if (!infrastructure.compositeClientReady) {
+      config.handleNoClient?.();
+      return undefined;
+    }
+    const clientConfig = {
+      network: infrastructure.network,
+      dispatch: store.dispatch,
+    };
+    const compositeClient = CompositeClientManager.use(clientConfig).compositeClient!;
+
+    const unsubscribe = config.handle(
+      `${infrastructure.network}-${infrastructure.compositeClientReady}`,
+      compositeClient,
+      selectorResult
+    );
+
+    if (unsubscribe == null) {
+      CompositeClientManager.markDone(clientConfig);
+      return undefined;
+    }
 
     return () => {
       unsubscribe();
@@ -112,60 +194,44 @@ export function createValidatorQueryStoreEffect<T, R>(
   store: RootStore,
   config: QuerySetupConfig<CompositeClient, T, R>
 ) {
-  const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectCompositeClientReady, config.selector],
-    (network, compositeClientReady, selectorResult) => ({
-      infrastructure: { network, compositeClientReady },
-      queryData: selectorResult,
-    })
-  );
-
-  return createStoreEffect(store, fullSelector, (fullResult) => {
-    const { infrastructure, queryData } = fullResult;
-
-    if (!infrastructure.compositeClientReady) {
+  return createValidatorStoreEffect(store, {
+    selector: config.selector,
+    handleNoClient: () => {
       config.onNoQuery();
-      return undefined;
-    }
-    const clientConfig = {
-      network: infrastructure.network,
-      dispatch: store.dispatch,
-    };
-    const compositeClient = CompositeClientManager.use(clientConfig).compositeClient!;
-
-    const queryFn = config.getQueryFn(compositeClient, queryData);
-    if (!queryFn) {
-      CompositeClientManager.markDone(clientConfig);
-      config.onNoQuery();
-      return undefined;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
-    const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['validator', ...config.getQueryKey(queryData), clientConfig.network],
-      queryFn,
-      ...baseOptions,
-      ...otherOpts,
-    });
-
-    const unsubscribe = observer.subscribe((result) => {
-      try {
-        config.onResult(result);
-      } catch (e) {
-        logBonsaiError(
-          'ValidatorQueryStoreEffect',
-          'Error handling result from react query store effect',
-          e,
-          result
-        );
+    },
+    handle: (clientId, compositeClient, queryData) => {
+      const queryFn = config.getQueryFn(compositeClient, queryData);
+      if (!queryFn) {
+        config.onNoQuery();
+        return undefined;
       }
-    });
 
-    return () => {
-      unsubscribe();
-      CompositeClientManager.markDone(clientConfig);
-    };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
+      const observer = new QueryObserver(appQueryClient, {
+        queryKey: ['validator', ...config.getQueryKey(queryData), clientId],
+        queryFn,
+        ...baseOptions,
+        ...otherOpts,
+      });
+
+      const unsubscribe = observer.subscribe((result) => {
+        try {
+          config.onResult(result);
+        } catch (e) {
+          logBonsaiError(
+            'ValidatorQueryStoreEffect',
+            'Error handling result from react query store effect',
+            e,
+            result
+          );
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    },
   });
 }
 
@@ -175,8 +241,8 @@ export function createNobleQueryStoreEffect<T, R>(
 ) {
   const fullSelector = createAppSelector(
     [getSelectedNetwork, selectNobleClientReady, config.selector],
-    (network, nobleClientRead, selectorResult) => ({
-      infrastructure: { network, nobleClientRead },
+    (network, nobleClientReady, selectorResult) => ({
+      infrastructure: { network, nobleClientReady },
       queryData: selectorResult,
     })
   );
@@ -184,7 +250,7 @@ export function createNobleQueryStoreEffect<T, R>(
   return createStoreEffect(store, fullSelector, (fullResult) => {
     const { infrastructure, queryData } = fullResult;
 
-    if (!infrastructure.nobleClientRead) {
+    if (!infrastructure.nobleClientReady) {
       config.onNoQuery();
       return undefined;
     }

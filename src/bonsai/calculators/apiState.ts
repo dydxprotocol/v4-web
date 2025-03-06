@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
 
+import { timeUnits } from '@/constants/time';
+
 import { HeightState } from '@/state/raw';
 
 import { assertNever } from '@/lib/assertNever';
 
 import { isLoadableError, isLoadableSuccess } from '../lib/loadable';
+import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { ApiState, ApiStatus } from '../types/summaryTypes';
 
 enum NetworkStatus {
@@ -15,7 +18,7 @@ enum NetworkStatus {
   NORMAL = 'NORMAL',
 }
 
-const MAX_NUM_BLOCK_DELAY = 25;
+const MAX_NUM_BLOCK_DELAY = 50;
 
 function computeNetworkState(heightState: HeightState): NetworkStatus {
   // If no last few results, we're unknown
@@ -33,10 +36,10 @@ function computeNetworkState(heightState: HeightState): NetworkStatus {
 
   // Check for same block height
   if (successResults.length >= 6) {
-    const firstHeight = successResults[0]!.data.height;
+    const firstHeight = successResults[0]!.data.response!.height;
     const allSameHeight = successResults
       .slice(0, 6)
-      .every((result) => result.data.height === firstHeight);
+      .every((result) => result.data.response!.height === firstHeight);
 
     if (allSameHeight) {
       return NetworkStatus.HALTED;
@@ -127,7 +130,7 @@ function getApiState({
 }
 
 export function getLatestHeight(heightState: HeightState): HeightResponse | undefined {
-  return heightState.lastFewResults.find((s) => s.data != null)?.data;
+  return heightState.lastFewResults.find((s) => s.data?.response != null)?.data?.response;
 }
 
 export function computeApiState(heights: {
@@ -137,6 +140,7 @@ export function computeApiState(heights: {
   if (loadingWithNoData(heights.indexerHeight) || loadingWithNoData(heights.validatorHeight)) {
     return undefined;
   }
+
   const indexerState = computeNetworkState(heights.indexerHeight);
   const validatorState = computeNetworkState(heights.validatorHeight);
 
@@ -150,18 +154,40 @@ export function computeApiState(heights: {
     validatorState,
   });
 
-  return {
+  const result = {
     status,
     haltedBlock,
     trailingBlocks,
     indexerHeight: indexerHeight?.height,
     validatorHeight: validatorHeight?.height,
   };
+  if (result.status !== ApiStatus.NORMAL) {
+    logBonsaiInfo('ComputeApiStatus', 'Computed non-normal status', {
+      ...result,
+      rawHeights: heights,
+    });
+  }
+  return result;
 }
 
-function loadingWithNoData(height: HeightState) {
-  return (
-    height.latest.data == null &&
-    (height.latest.status === 'pending' || height.latest.status === 'idle')
-  );
+function loadingWithNoData(heightsRaw: HeightState): boolean {
+  const heights = heightsRaw.lastFewResults;
+
+  if (heights.length === 0) {
+    return true;
+  }
+  const mostRecent = heights[0]!;
+  const nowTime = Date.now();
+
+  if (mostRecent.data?.requestTime == null) {
+    logBonsaiError('computeApiState', 'unexpectedly found null requestTime or data', { heights });
+    return true;
+  }
+  const mostRecentTime = new Date(mostRecent.data?.requestTime ?? new Date()).getTime();
+
+  // if we haven't made any requests in 45 seconds, just throw it all away and pretend we have no data at all
+  if (nowTime - mostRecentTime > timeUnits.second * 45) {
+    return true;
+  }
+  return false;
 }

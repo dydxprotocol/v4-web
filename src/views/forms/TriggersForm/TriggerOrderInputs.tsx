@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
-
-import { shallowEqual } from 'react-redux';
+import {
+  TriggerOrderDetails,
+  TriggerOrderState,
+  TriggerPriceInputType,
+} from '@/bonsai/forms/triggers/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import {
-  Nullable,
-  TriggerOrdersInputPrice,
-  type TriggerOrdersInputFields,
-} from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -28,22 +25,14 @@ import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setTriggerFormInputs } from '@/state/inputs';
-import { getTriggerFormInputs } from '@/state/inputsSelectors';
+import { useAppDispatch } from '@/state/appTypes';
+import { triggersFormActions } from '@/state/triggersForm';
 
-import abacusStateManager from '@/lib/abacus';
 import { assertNever } from '@/lib/assertNever';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { AttemptBigNumber, AttemptNumber, MustBigNumber, getNumberSign } from '@/lib/numbers';
 
 type InputChangeType = InputType.Currency | InputType.Percent;
-
-type InputOrderFields = {
-  triggerPriceField: TriggerOrdersInputFields;
-  percentDiffField: TriggerOrdersInputFields;
-  usdcDiffField: TriggerOrdersInputFields;
-};
 
 type ElementProps = {
   symbol: string;
@@ -54,10 +43,11 @@ type ElementProps = {
     price: string;
     output: string;
   };
-  inputOrderFields: InputOrderFields;
+  inputState: TriggerOrderState;
+  summaryState: TriggerOrderDetails;
+  isStopLoss: boolean;
   isMultiple: boolean;
   isNegativeDiff: boolean;
-  price: Nullable<TriggerOrdersInputPrice>;
   tickSizeDecimals?: number;
   onViewOrdersClick: () => void;
 };
@@ -66,128 +56,65 @@ export const TriggerOrderInputs = ({
   symbol,
   tooltipId,
   stringKeys,
-  inputOrderFields,
   isMultiple,
+  inputState,
+  summaryState,
   isNegativeDiff,
-  price,
+  isStopLoss,
   tickSizeDecimals,
   onViewOrdersClick,
 }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const triggerFormInputValues = useAppSelector(getTriggerFormInputs, shallowEqual);
-  const formTriggerPrice = triggerFormInputValues[inputOrderFields.triggerPriceField.rawValue];
-  const formPercentDiff = triggerFormInputValues[inputOrderFields.percentDiffField.rawValue];
-  const formUsdcDiff = triggerFormInputValues[inputOrderFields.usdcDiffField.rawValue];
-
-  const [inputType, setInputType] = useState<InputChangeType>(InputType.Percent);
-
-  // Update State variables if their inputs are not being source of calculations
-  // Or if they have been reset to null
-  useEffect(() => {
-    const { input, triggerPrice, percentDiff, usdcDiff } = price ?? {};
-    if (input !== inputOrderFields.triggerPriceField.rawValue || triggerPrice === null) {
-      dispatch(
-        setTriggerFormInputs({
-          [inputOrderFields.triggerPriceField.rawValue]: triggerPrice
-            ? MustBigNumber(triggerPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS)
-            : '',
-        })
-      );
-    }
-    if (input !== inputOrderFields.percentDiffField.rawValue || percentDiff === null) {
-      dispatch(
-        setTriggerFormInputs({
-          [inputOrderFields.percentDiffField.rawValue]: percentDiff
-            ? MustBigNumber(percentDiff).toFixed(PERCENT_DECIMALS)
-            : '',
-        })
-      );
-    }
-    if (input !== inputOrderFields.usdcDiffField.rawValue || usdcDiff === null) {
-      dispatch(
-        setTriggerFormInputs({
-          [inputOrderFields.usdcDiffField.rawValue]: usdcDiff
-            ? MustBigNumber(usdcDiff).toFixed(tickSizeDecimals ?? USD_DECIMALS)
-            : '',
-        })
-      );
-    }
-  }, [dispatch, tickSizeDecimals, price, inputOrderFields]);
-
   const clearPriceInputFields = () => {
-    abacusStateManager.setTriggerOrdersValue({
-      value: null,
-      field: inputOrderFields.triggerPriceField,
-    });
-    abacusStateManager.setTriggerOrdersValue({
-      value: null,
-      field: inputOrderFields.percentDiffField,
-    });
-    abacusStateManager.setTriggerOrdersValue({
-      value: null,
-      field: inputOrderFields.usdcDiffField,
-    });
+    dispatch(
+      isStopLoss
+        ? triggersFormActions.clearStopLossPriceInput()
+        : triggersFormActions.clearTakeProfitPriceInput()
+    );
   };
 
   const onTriggerPriceInput = ({
-    floatValue,
     formattedValue,
   }: {
     floatValue?: number;
     formattedValue: string;
   }) => {
     dispatch(
-      setTriggerFormInputs({ [inputOrderFields.triggerPriceField.rawValue]: formattedValue })
+      isStopLoss
+        ? triggersFormActions.setStopLossTriggerPrice(formattedValue)
+        : triggersFormActions.setTakeProfitTriggerPrice(formattedValue)
     );
-
-    const newPrice = MustBigNumber(floatValue).toFixed(tickSizeDecimals ?? USD_DECIMALS);
-    abacusStateManager.setTriggerOrdersValue({
-      value: formattedValue === '' || newPrice === 'NaN' ? null : newPrice,
-      field: inputOrderFields.triggerPriceField,
-    });
   };
 
   const onPercentageDiffInput = ({
-    floatValue,
     formattedValue,
   }: {
     floatValue?: number;
     formattedValue: string;
   }) => {
     dispatch(
-      setTriggerFormInputs({
-        [inputOrderFields.percentDiffField.rawValue]: formattedValue,
-      })
+      isStopLoss
+        ? triggersFormActions.setStopLossPercentDiff(formattedValue)
+        : triggersFormActions.setTakeProfitPercentDiff(formattedValue)
     );
-
-    const newPercentage = MustBigNumber(floatValue).toFixed(PERCENT_DECIMALS);
-    abacusStateManager.setTriggerOrdersValue({
-      value: formattedValue === '' || newPercentage === 'NaN' ? null : newPercentage,
-      field: inputOrderFields.percentDiffField,
-    });
   };
 
-  const onUsdcDiffInput = ({
-    floatValue,
-    formattedValue,
-  }: {
-    floatValue?: number;
-    formattedValue: string;
-  }) => {
+  const onUsdcDiffInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
     dispatch(
-      setTriggerFormInputs({
-        [inputOrderFields.usdcDiffField.rawValue]: formattedValue,
-      })
+      isStopLoss
+        ? triggersFormActions.setStopLossUsdcDiff(formattedValue)
+        : triggersFormActions.setTakeProfitUsdcDiff(formattedValue)
     );
-
-    const newAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals ?? USD_DECIMALS);
-    abacusStateManager.setTriggerOrdersValue({
-      value: formattedValue === '' || newAmount === 'NaN' ? null : newAmount,
-      field: inputOrderFields.usdcDiffField,
-    });
   };
+
+  const inputTypeToUse =
+    inputState.priceInput?.type === TriggerPriceInputType.PercentDiff
+      ? InputType.Percent
+      : inputState.priceInput?.type === TriggerPriceInputType.UsdcDiff
+        ? InputType.Currency
+        : InputType.Percent;
 
   const getDecimalsForInputType = (inType: InputChangeType) => {
     switch (inType) {
@@ -202,12 +129,9 @@ export const TriggerOrderInputs = ({
   };
 
   const signedOutput = () => {
-    const formattedPercentDiff = formPercentDiff
-      ? MustBigNumber(formPercentDiff).div(100).toNumber()
-      : null;
-    const formattedUsdcDiff = formUsdcDiff ? MustBigNumber(formUsdcDiff).toNumber() : null;
-
-    const outputType = inputType === InputType.Percent ? OutputType.Fiat : OutputType.Percent;
+    const formattedPercentDiff = AttemptNumber(summaryState.percentDiff);
+    const formattedUsdcDiff = AttemptNumber(summaryState.usdcDiff);
+    const outputType = inputTypeToUse === InputType.Percent ? OutputType.Fiat : OutputType.Percent;
     const value = outputType === OutputType.Fiat ? formattedUsdcDiff : formattedPercentDiff;
     const outputValue = value && isNegativeDiff ? MustBigNumber(value).toNumber() * -1 : value;
 
@@ -292,21 +216,42 @@ export const TriggerOrderInputs = ({
           }
           type={InputType.Currency}
           decimals={tickSizeDecimals}
-          value={formTriggerPrice}
+          value={
+            inputState.priceInput?.type === TriggerPriceInputType.TriggerPrice
+              ? inputState.priceInput.triggerPrice
+              : summaryState.triggerPrice
+          }
           onInput={onTriggerPriceInput}
           allowNegative
         />
         <FormInput
           id={`${tooltipId}-priceDiff`}
           label={stringGetter({ key: stringKeys.output })}
-          decimals={getDecimalsForInputType(inputType)}
-          type={inputType}
+          decimals={getDecimalsForInputType(inputTypeToUse)}
+          type={inputTypeToUse}
           slotRight={priceDiffSelector({
-            value: inputType,
-            onValueChange: (value: InputChangeType) => setInputType(value),
+            value: inputTypeToUse,
+            onValueChange: (value: InputChangeType) =>
+              value === InputType.Percent
+                ? onPercentageDiffInput({
+                    formattedValue:
+                      AttemptBigNumber(summaryState.percentDiff)
+                        ?.times(100)
+                        .integerValue()
+                        .toString() ?? '',
+                  })
+                : onUsdcDiffInput({ formattedValue: summaryState.usdcDiff ?? '' }),
           })}
-          value={inputType === InputType.Percent ? formPercentDiff : formUsdcDiff}
-          onInput={inputType === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
+          value={
+            inputState.priceInput?.type === TriggerPriceInputType.PercentDiff
+              ? inputState.priceInput.percentDiff
+              : inputState.priceInput?.type === TriggerPriceInputType.UsdcDiff
+                ? inputState.priceInput.usdcDiff
+                : inputTypeToUse === InputType.Percent
+                  ? AttemptBigNumber(summaryState.percentDiff)?.times(100).toString()
+                  : summaryState.usdcDiff
+          }
+          onInput={inputTypeToUse === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
           allowNegative
         />
       </$InlineRow>
