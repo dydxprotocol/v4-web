@@ -1,10 +1,9 @@
 import { shallowEqual } from 'react-redux';
 
-import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
+import { getTriggersFormState, getTriggersFormSummary } from '@/state/inputsSelectors';
 
 import { TriggerOrderInputs } from './TriggerOrderInputs';
 
@@ -23,8 +22,8 @@ export const TriggerOrdersInputs = ({
   tickSizeDecimals,
   onViewOrdersClick,
 }: ElementProps) => {
-  const { stopLossOrder, takeProfitOrder } =
-    useAppSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
+  const triggerFormInputValues = useAppSelector(getTriggersFormState);
+  const triggerFormSummary = useAppSelector(getTriggersFormSummary, shallowEqual);
 
   return (
     <>
@@ -37,14 +36,11 @@ export const TriggerOrdersInputs = ({
           price: STRING_KEYS.TP_PRICE,
           output: STRING_KEYS.GAIN,
         }}
-        inputOrderFields={{
-          triggerPriceField: TriggerOrdersInputField.takeProfitPrice,
-          percentDiffField: TriggerOrdersInputField.takeProfitPercentDiff,
-          usdcDiffField: TriggerOrdersInputField.takeProfitUsdcDiff,
-        }}
         isMultiple={multipleTakeProfitOrders}
         isNegativeDiff={false}
-        price={takeProfitOrder?.price}
+        inputState={triggerFormInputValues.takeProfitOrder}
+        summaryState={triggerFormSummary.summary.takeProfitOrder}
+        isStopLoss={false}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
       />
@@ -57,14 +53,11 @@ export const TriggerOrdersInputs = ({
           price: STRING_KEYS.SL_PRICE,
           output: STRING_KEYS.LOSS,
         }}
-        inputOrderFields={{
-          triggerPriceField: TriggerOrdersInputField.stopLossPrice,
-          percentDiffField: TriggerOrdersInputField.stopLossPercentDiff,
-          usdcDiffField: TriggerOrdersInputField.stopLossUsdcDiff,
-        }}
         isMultiple={multipleStopLossOrders}
         isNegativeDiff
-        price={stopLossOrder?.price}
+        inputState={triggerFormInputValues.stopLossOrder}
+        summaryState={triggerFormSummary.summary.stopLossOrder}
+        isStopLoss
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
       />

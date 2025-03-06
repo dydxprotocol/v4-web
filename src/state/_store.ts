@@ -29,6 +29,7 @@ import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
+import { triggersFormSlice } from './triggersForm';
 import { vaultsSlice } from './vaults';
 import { walletSlice } from './wallet';
 
@@ -42,6 +43,7 @@ const reducers = {
   dismissable: dismissableSlice.reducer,
   funkitDeposits: funkitDepositsSlice.reducer,
   inputs: inputsSlice.reducer,
+  triggersForm: triggersFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
