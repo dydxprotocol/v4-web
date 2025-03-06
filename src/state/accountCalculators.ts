@@ -2,6 +2,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
+import { ConnectorType } from '@/constants/wallets';
 
 import {
   getOnboardingGuards,
@@ -14,6 +15,7 @@ import { isNewOrderStatusOpen } from '@/lib/orders';
 
 import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
+import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState],
@@ -23,16 +25,6 @@ export const calculateOnboardingStep = createAppSelector(
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
       [OnboardingState.AccountConnected]: undefined,
     }[onboardingState];
-  }
-);
-
-/**
- * @description calculate whether an account is in a state where they can trade
- */
-export const calculateCanAccountTrade = createAppSelector(
-  [getOnboardingState],
-  (onboardingState: OnboardingState) => {
-    return onboardingState === OnboardingState.AccountConnected;
   }
 );
 
@@ -49,12 +41,23 @@ export const calculateCanViewAccount = createAppSelector(
 
 /**
  * @description calculate whether the client is in view only mode
- * (Onboarding State is WalletConnected and Abacus has a connected subaccount)
  */
 export const calculateIsAccountViewOnly = createAppSelector(
-  [getOnboardingState, calculateCanViewAccount],
-  (onboardingState: OnboardingState, canViewAccountInfo: boolean) =>
-    onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
+  [getOnboardingState, calculateCanViewAccount, getSourceAccount],
+  (onboardingState: OnboardingState, canViewAccountInfo: boolean, sourceAccount) =>
+    sourceAccount.walletInfo?.connectorType === ConnectorType.Test
+      ? true
+      : onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
+);
+
+/**
+ * @description calculate whether an account is in a state where they can trade
+ */
+export const calculateCanAccountTrade = createAppSelector(
+  [getOnboardingState, calculateIsAccountViewOnly],
+  (onboardingState: OnboardingState, isAccountViewOnly: boolean) => {
+    return onboardingState === OnboardingState.AccountConnected && !isAccountViewOnly;
+  }
 );
 
 /**

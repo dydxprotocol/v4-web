@@ -1,50 +1,67 @@
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
-import { setIndexerHeightRaw, setValidatorHeightRaw } from '@/state/raw';
+import { HeightEntry, setIndexerHeightRaw, setValidatorHeightRaw } from '@/state/raw';
 
+import { promiseWithTimeout } from '@/lib/asyncUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { loadableIdle } from '../lib/loadable';
-import { mapLoadableData } from '../lib/mapLoadable';
 import {
-  createIndexerQueryStoreEffect,
-  createValidatorQueryStoreEffect,
+  Loadable,
+  loadableError,
+  loadableIdle,
+  loadableLoaded,
+  loadablePending,
+} from '../lib/loadable';
+import {
+  createIndexerStoreEffect,
+  createValidatorStoreEffect,
 } from './lib/indexerQueryStoreEffect';
-import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
-// fetch every ten seconds no matter what...could probably just set up a setInterval instead
-const heightPollingOptions = {
-  refetchInterval: timeUnits.second * 10,
-  refetchIntervalInBackground: true,
-  networkMode: 'always' as const,
-  staleTime: 0,
-  retry: 0,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-};
+const requestFrequency = timeUnits.second * 10;
+// fail request if it takes longer than this
+const requestTimeout = requestFrequency - timeUnits.second;
 
 export function setUpIndexerHeightQuery(store: RootStore) {
-  const cleanupEffect = createIndexerQueryStoreEffect(store, {
+  const cleanupEffect = createIndexerStoreEffect(store, {
     selector: () => true,
-    getQueryKey: () => ['indexerHeight'],
-    getQueryFn: (indexerClient) => {
-      return () => indexerClient.utility.getHeight();
+    handleNoClient: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
+    handle: (_, indexerClient) => {
+      const doRequest = async (): Promise<Loadable<HeightEntry>> => {
+        const requestTime = new Date().toISOString();
+        try {
+          const result = await promiseWithTimeout(
+            indexerClient.utility.getHeight(),
+            requestTimeout
+          );
+          return loadableLoaded({
+            requestTime,
+            receivedTime: new Date().toISOString(),
+            response: { time: result.time, height: MustBigNumber(result.height).toNumber() },
+          });
+        } catch (e) {
+          return loadableError(
+            { requestTime, receivedTime: new Date().toISOString(), response: undefined },
+            e
+          );
+        }
+      };
+
+      const interval = setInterval(async () => {
+        store.dispatch(
+          setIndexerHeightRaw(
+            loadablePending(store.getState().raw.heights.indexerHeight.latest.data)
+          )
+        );
+        store.dispatch(setIndexerHeightRaw(await doRequest()));
+      }, requestFrequency);
+
+      return () => {
+        clearInterval(interval);
+      };
     },
-    onResult: (height) => {
-      store.dispatch(
-        setIndexerHeightRaw(
-          mapLoadableData(queryResultToLoadable(height), (data) => ({
-            time: data.time,
-            // TODO: the client types are just wrong :(
-            height: MustBigNumber(data.height).toNumber(),
-          }))
-        )
-      );
-    },
-    onNoQuery: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
-    ...heightPollingOptions,
   });
+
   return () => {
     cleanupEffect();
     store.dispatch(setIndexerHeightRaw(loadableIdle()));
@@ -52,25 +69,48 @@ export function setUpIndexerHeightQuery(store: RootStore) {
 }
 
 export function setUpValidatorHeightQuery(store: RootStore) {
-  const cleanupEffect = createValidatorQueryStoreEffect(store, {
+  const cleanupEffect = createValidatorStoreEffect(store, {
     selector: () => true,
-    getQueryKey: () => ['validatorHeight'],
-    getQueryFn: (compositeClient) => {
-      return () => compositeClient.validatorClient.get.latestBlock();
+    handleNoClient: () => store.dispatch(setValidatorHeightRaw(loadableIdle())),
+    handle: (_, compositeClient) => {
+      const doRequest = async (): Promise<Loadable<HeightEntry>> => {
+        const requestTime = new Date().toISOString();
+        try {
+          const result = await promiseWithTimeout(
+            compositeClient.validatorClient.get.latestBlock(),
+            requestTimeout
+          );
+          return loadableLoaded({
+            requestTime,
+            receivedTime: new Date().toISOString(),
+            response: {
+              time: result.header.time,
+              height: result.header.height,
+            },
+          });
+        } catch (e) {
+          return loadableError(
+            { requestTime, receivedTime: new Date().toISOString(), response: undefined },
+            e
+          );
+        }
+      };
+
+      const interval = setInterval(async () => {
+        store.dispatch(
+          setValidatorHeightRaw(
+            loadablePending(store.getState().raw.heights.validatorHeight.latest.data)
+          )
+        );
+        store.dispatch(setValidatorHeightRaw(await doRequest()));
+      }, requestFrequency);
+
+      return () => {
+        clearInterval(interval);
+      };
     },
-    onResult: (height) => {
-      store.dispatch(
-        setValidatorHeightRaw(
-          mapLoadableData(queryResultToLoadable(height), (d) => ({
-            height: d.header.height,
-            time: d.header.time,
-          }))
-        )
-      );
-    },
-    onNoQuery: () => store.dispatch(setValidatorHeightRaw(loadableIdle())),
-    ...heightPollingOptions,
   });
+
   return () => {
     cleanupEffect();
     store.dispatch(setValidatorHeightRaw(loadableIdle()));

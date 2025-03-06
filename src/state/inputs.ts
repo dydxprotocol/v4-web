@@ -8,20 +8,17 @@ import {
   type Nullable,
   type TradeInputs,
   type TransferInputs,
-  type TriggerOrdersInputs,
 } from '@/constants/abacus';
 import {
   CLEARED_CLOSE_POSITION_INPUTS,
   CLEARED_SIZE_INPUTS,
   CLEARED_TRADE_INPUTS,
 } from '@/constants/trade';
-import { CLEARED_TRIGGER_LIMIT_INPUTS, CLEARED_TRIGGER_ORDER_INPUTS } from '@/constants/triggers';
 
 import { safeAssign } from '@/lib/objectHelpers';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
 type ClosePositionFormInputs = typeof CLEARED_CLOSE_POSITION_INPUTS;
-type TriggerFormInputs = typeof CLEARED_TRIGGER_ORDER_INPUTS & typeof CLEARED_TRIGGER_LIMIT_INPUTS;
 
 export interface InputsState {
   current?: Nullable<string>;
@@ -30,8 +27,6 @@ export interface InputsState {
   tradeInputs?: Nullable<TradeInputs>;
   closePositionFormInputs: ClosePositionFormInputs;
   closePositionInputs?: Nullable<ClosePositionInputs>;
-  triggerFormInputs: TriggerFormInputs;
-  triggerOrdersInputs?: Nullable<TriggerOrdersInputs>;
   transferInputs?: Nullable<TransferInputs>;
 }
 
@@ -47,11 +42,6 @@ const initialState: InputsState = {
   },
   tradeInputs: undefined,
   transferInputs: undefined,
-  triggerFormInputs: {
-    ...CLEARED_TRIGGER_ORDER_INPUTS,
-    ...CLEARED_TRIGGER_LIMIT_INPUTS,
-  },
-  triggerOrdersInputs: undefined,
 };
 
 export const inputsSlice = createSlice({
@@ -92,11 +82,7 @@ export const inputsSlice = createSlice({
     ) => {
       state.closePositionFormInputs = assign({}, state.closePositionFormInputs, action.payload);
     },
-    setTriggerFormInputs: (state, action: PayloadAction<Partial<TriggerFormInputs>>) => {
-      state.triggerFormInputs = assign({}, state.triggerFormInputs, action.payload);
-    },
   },
 });
 
-export const { setInputs, setTradeFormInputs, setClosePositionFormInputs, setTriggerFormInputs } =
-  inputsSlice.actions;
+export const { setInputs, setTradeFormInputs, setClosePositionFormInputs } = inputsSlice.actions;
