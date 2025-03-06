@@ -169,5 +169,6 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
   return () => {
     noopCleanupEffect();
+    activeRebalance.clear();
   };
 }

@@ -172,5 +172,6 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
 
   return () => {
     cleanupEffect();
+    activeSweep.clear();
   };
 }
