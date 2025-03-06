@@ -147,18 +147,18 @@ function validateTriggerOrder(
     if (isStopLoss) {
       // we're long and stop loss means we are selling when price is below trigger price
       if (isLong && MustBigNumber(oraclePrice).lte(triggerPriceNum)) {
-        localErrors.push(errors.stopLossTriggerAboveIndex());
+        localErrors.push(errors.stopLossTriggerAboveIndex(market));
         // if we are short then stop loss means buy when price is above trigger
       } else if (!isLong && MustBigNumber(oraclePrice).gte(triggerPriceNum)) {
-        localErrors.push(errors.stopLossTriggerBelowIndex());
+        localErrors.push(errors.stopLossTriggerBelowIndex(market));
       }
     } else {
       // we're long and taking profit, which means sell when oracle is greater than trigger
       if (isLong && MustBigNumber(oraclePrice).gte(triggerPriceNum)) {
-        localErrors.push(errors.takeProfitTriggerBelowIndex());
+        localErrors.push(errors.takeProfitTriggerBelowIndex(market));
         // we're short and taking profit which means buy when price is below trigger
       } else if (!isLong && MustBigNumber(oraclePrice).lte(triggerPriceNum)) {
-        localErrors.push(errors.takeProfitTriggerAboveIndex());
+        localErrors.push(errors.takeProfitTriggerAboveIndex(market));
       }
     }
 
@@ -295,43 +295,71 @@ class TriggerOrderFormValidationErrors {
   }
 
   // Take Profit specific errors
-  takeProfitTriggerBelowIndex(): ValidationError {
+  takeProfitTriggerBelowIndex(market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
       titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+      textParams: {
+        INDEX_PRICE: {
+          value: market.oraclePrice ?? 0,
+          format: ErrorFormat.Price,
+          decimals: market.tickSizeDecimals,
+        },
+      },
     });
   }
 
-  takeProfitTriggerAboveIndex(): ValidationError {
+  takeProfitTriggerAboveIndex(market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['takeProfitPrice.triggerPrice'],
       titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_BELOW_INDEX_PRICE,
+      textParams: {
+        INDEX_PRICE: {
+          value: market.oraclePrice ?? 0,
+          format: ErrorFormat.Price,
+          decimals: market.tickSizeDecimals,
+        },
+      },
     });
   }
 
-  stopLossTriggerBelowIndex(): ValidationError {
+  stopLossTriggerBelowIndex(market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
       titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+      textParams: {
+        INDEX_PRICE: {
+          value: market.oraclePrice ?? 0,
+          format: ErrorFormat.Price,
+          decimals: market.tickSizeDecimals,
+        },
+      },
     });
   }
 
-  stopLossTriggerAboveIndex(): ValidationError {
+  stopLossTriggerAboveIndex(market: MarketInfo): ValidationError {
     return simpleValidationError({
       code: 'STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE',
       type: ErrorType.error,
       fields: ['stopLossPrice.triggerPrice'],
       titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
       textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
+      textParams: {
+        INDEX_PRICE: {
+          value: market.oraclePrice ?? 0,
+          format: ErrorFormat.Price,
+          decimals: market.tickSizeDecimals,
+        },
+      },
     });
   }
 
