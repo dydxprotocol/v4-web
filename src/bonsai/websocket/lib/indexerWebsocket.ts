@@ -21,6 +21,8 @@ interface SubscriptionHandlerInput {
   handleUpdates: (updates: any[], fullMessage: any) => void;
 }
 
+const detailedLogging: boolean = false;
+
 type SubscriptionHandlerTrackingMetadata = {
   receivedBaseData: boolean;
   sentSubMessage: boolean;
@@ -159,13 +161,15 @@ export class IndexerWebsocket {
       return;
     }
 
-    logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
-      channel,
-      id,
-      socketNonNull: this.socket != null,
-      socketActive: Boolean(this.socket?.isActive()),
-      wsId: this.indexerWsId,
-    });
+    if (detailedLogging) {
+      logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
+        channel,
+        id,
+        socketNonNull: this.socket != null,
+        socketActive: Boolean(this.socket?.isActive()),
+        wsId: this.indexerWsId,
+      });
+    }
 
     if (this.socket != null && this.socket.isActive()) {
       this.subscriptions.getSubscription(channel, id)!.sentSubMessage = true;
@@ -200,13 +204,15 @@ export class IndexerWebsocket {
       return;
     }
 
-    logBonsaiInfo('IndexerWebsocket', 'removing subscription', {
-      channel,
-      id,
-      socketNonNull: this.socket != null,
-      socketActive: Boolean(this.socket?.isActive()),
-      wsId: this.indexerWsId,
-    });
+    if (detailedLogging) {
+      logBonsaiInfo('IndexerWebsocket', 'removing subscription', {
+        channel,
+        id,
+        socketNonNull: this.socket != null,
+        socketActive: Boolean(this.socket?.isActive()),
+        wsId: this.indexerWsId,
+      });
+    }
 
     if (this.socket != null && this.socket.isActive() && sub.sentSubMessage) {
       this.socket.send({
@@ -338,11 +344,13 @@ export class IndexerWebsocket {
       } else if (message.type === 'connected') {
         // do nothing
       } else if (message.type === 'unsubscribed') {
-        logBonsaiInfo('IndexerWebsocket', `unsubscribe confirmed`, {
-          channel: message.channel,
-          id: message.id,
-          wsId: this.indexerWsId,
-        });
+        if (detailedLogging) {
+          logBonsaiInfo('IndexerWebsocket', `unsubscribe confirmed`, {
+            channel: message.channel,
+            id: message.id,
+            wsId: this.indexerWsId,
+          });
+        }
       } else if (
         message.type === 'subscribed' ||
         message.type === 'channel_batch_data' ||
@@ -366,11 +374,13 @@ export class IndexerWebsocket {
           return;
         }
         if (message.type === 'subscribed') {
-          logBonsaiInfo('IndexerWebsocket', `subscription confirmed`, {
-            channel,
-            id,
-            wsId: this.indexerWsId,
-          });
+          if (detailedLogging) {
+            logBonsaiInfo('IndexerWebsocket', `subscription confirmed`, {
+              channel,
+              id,
+              wsId: this.indexerWsId,
+            });
+          }
           sub.receivedBaseData = true;
           sub.handleBaseData(message.contents, message);
         } else if (message.type === 'channel_data') {

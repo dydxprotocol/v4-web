@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
@@ -18,6 +17,7 @@ import { formatRelativeTime } from '@/lib/dateTime';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { useApiState } from './useApiState';
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -31,8 +31,7 @@ export const useWithdrawalInfo = ({
 }) => {
   const { getWithdrawalAndTransferGatingStatus, getWithdrawalCapacityByDenom } = useDydxClient();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
-  const apiState = useAppSelector(BonsaiCore.network.apiState);
-  const { validatorHeight: height } = orEmptyObj(apiState);
+  const { height } = orEmptyObj(useApiState());
   const selectedLocale = useAppSelector(getSelectedLocale);
   const dispatch = useAppDispatch();
   const { withdrawalSafetyEnabled } = useEnvFeatures();
