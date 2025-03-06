@@ -1,12 +1,10 @@
-import { formatUnits } from 'viem';
-
 import { USDC_DECIMALS } from '@/constants/tokens';
 
 import { selectTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { createAppSelector } from '@/state/appTypes';
 
-import { calculateBalances } from '../calculators/balances';
+import { calculateBalances, convertAmount } from '../calculators/balances';
 import { selectRawAccountBalancesData, selectRawAccountNobleUsdcBalanceData } from './base';
 
 export const selectAccountBalances = createAppSelector(
@@ -16,5 +14,5 @@ export const selectAccountBalances = createAppSelector(
 
 export const selectAccountNobleUsdcBalance = createAppSelector(
   [selectRawAccountNobleUsdcBalanceData],
-  (balances) => (balances ? formatUnits(BigInt(balances.amount), USDC_DECIMALS) : undefined)
+  (balances) => convertAmount(balances?.amount, USDC_DECIMALS)
 );

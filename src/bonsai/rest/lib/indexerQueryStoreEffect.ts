@@ -241,8 +241,8 @@ export function createNobleQueryStoreEffect<T, R>(
 ) {
   const fullSelector = createAppSelector(
     [getSelectedNetwork, selectNobleClientReady, config.selector],
-    (network, nobleClientRead, selectorResult) => ({
-      infrastructure: { network, nobleClientRead },
+    (network, nobleClientReady, selectorResult) => ({
+      infrastructure: { network, nobleClientReady },
       queryData: selectorResult,
     })
   );
@@ -250,7 +250,7 @@ export function createNobleQueryStoreEffect<T, R>(
   return createStoreEffect(store, fullSelector, (fullResult) => {
     const { infrastructure, queryData } = fullResult;
 
-    if (!infrastructure.nobleClientRead) {
+    if (!infrastructure.nobleClientReady) {
       config.onNoQuery();
       return undefined;
     }

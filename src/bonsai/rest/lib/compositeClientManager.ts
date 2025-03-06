@@ -97,6 +97,14 @@ function makeCompositeClient({
       )
     );
 
+    // this shouldn't be necessary - can actually be false
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (clientWrapper.dead) {
+      return;
+    }
+
+    setCompositeClient(compositeClient);
+
     const nobleClient = await StargateClient.connect(networkConfig.endpoints.nobleValidator);
 
     // this shouldn't be necessary - can actually be false
@@ -104,7 +112,7 @@ function makeCompositeClient({
     if (clientWrapper.dead) {
       return;
     }
-    setCompositeClient(compositeClient);
+
     setNobleClient(nobleClient);
   })();
   return clientWrapper;
