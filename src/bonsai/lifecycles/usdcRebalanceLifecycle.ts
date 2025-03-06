@@ -134,7 +134,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
               .toFixed(USDC_DECIMALS);
 
-            logBonsaiInfo('usdcRebalanceLifecycle', 'depositing funds for gas', {
+            logBonsaiInfo('usdcRebalanceLifecycle', 'depositing excess USDC into subaccount 0', {
               amountToDeposit,
               targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
             });
