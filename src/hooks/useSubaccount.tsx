@@ -677,6 +677,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if (!compositeClient) {
           throw new Error('client not initialized');
         }
+        if (!localDydxWallet) {
+          throw new Error('wallet not initialized');
+        }
 
         const {
           subaccountNumber: subaccountNumberToUse,
@@ -687,13 +690,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           goodTilBlockTime,
         } = payload;
 
-        const subaccountClientToUse = localDydxWallet
-          ? new SubaccountClient(localDydxWallet, subaccountNumberToUse)
-          : undefined;
-
-        if (subaccountClientToUse == null) {
-          throw new Error('wallet not initialized');
-        }
+        const subaccountClientToUse = new SubaccountClient(localDydxWallet, subaccountNumberToUse);
 
         const tx = await compositeClient.cancelRawOrder(
           subaccountClientToUse,

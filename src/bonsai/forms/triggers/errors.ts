@@ -51,10 +51,7 @@ export function getErrors(
   );
   requiredOrders.forEach((orderId) => {
     const order = inputData.existingTriggerOrders?.find((o) => o.id === orderId);
-    if (
-      order == null ||
-      getSimpleOrderStatus(order.status ?? OrderStatus.Open) !== OrderStatus.Open
-    ) {
+    if (order?.status == null || getSimpleOrderStatus(order.status) !== OrderStatus.Open) {
       validationErrors.push(errors.orderNotFound());
     }
   });

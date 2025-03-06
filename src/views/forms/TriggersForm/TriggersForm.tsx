@@ -125,13 +125,6 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
     return key ? stringGetter({ key }) : undefined;
   }, [inputErrors, stringGetter]);
 
-  const ErrorElement = useMemo(() => {
-    if (validationAlert) {
-      return <ValidationAlertMessage error={validationAlert} />;
-    }
-    return null;
-  }, [validationAlert]);
-
   return (
     <form onSubmit={onSubmit} tw="column gap-[1.25ch]">
       {priceInfo}
@@ -142,7 +135,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
       />
-      {ErrorElement}
+      {validationAlert && <ValidationAlertMessage error={validationAlert} />}
       {existsEditableOrCreatableOrders && (
         <>
           <AdvancedTriggersOptions
