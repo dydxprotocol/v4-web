@@ -6,6 +6,7 @@ import {
   TransferFormInputData,
   TransferToken,
 } from '@/bonsai/forms/transfers';
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { useFormValues } from '@/bonsai/lib/forms';
 import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore, BonsaiRaw } from '@/bonsai/ontology';
@@ -171,7 +172,11 @@ export const TransferForm = ({
             ? stringGetter({
                 key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                 params: {
-                  ERROR_MESSAGE: err.message ?? stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                  ERROR_MESSAGE: stringGetter({
+                    key:
+                      parseTransactionError('TransferForm onTransfer', err.message)?.stringKey ??
+                      STRING_KEYS.UNKNOWN_ERROR,
+                  }),
                 },
               })
             : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
