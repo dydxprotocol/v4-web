@@ -20,7 +20,6 @@ export const ValidationAlertMessage = ({
   className?: string;
 }) => {
   const stringGetter = useStringGetter();
-  console.log(error);
   return (
     <AlertMessage
       type={error.type === ErrorType.error ? AlertType.Error : AlertType.Warning}
