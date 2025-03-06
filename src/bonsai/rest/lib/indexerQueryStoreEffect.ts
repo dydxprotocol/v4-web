@@ -190,7 +190,51 @@ export function createValidatorStoreEffect<T>(
   });
 }
 
-<<<<<<< HEAD
+export function createValidatorQueryStoreEffect<T, R>(
+  store: RootStore,
+  config: QuerySetupConfig<CompositeClient, T, R>
+) {
+  return createValidatorStoreEffect(store, {
+    selector: config.selector,
+    handleNoClient: () => {
+      config.onNoQuery();
+    },
+    handle: (clientId, compositeClient, queryData) => {
+      const queryFn = config.getQueryFn(compositeClient, queryData);
+      if (!queryFn) {
+        config.onNoQuery();
+        return undefined;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
+      const observer = new QueryObserver(appQueryClient, {
+        queryKey: ['validator', ...config.getQueryKey(queryData), clientId],
+        queryFn,
+        ...baseOptions,
+        ...otherOpts,
+      });
+
+      const unsubscribe = observer.subscribe((result) => {
+        try {
+          config.onResult(result);
+        } catch (e) {
+          logBonsaiError(
+            'ValidatorQueryStoreEffect',
+            'Error handling result from react query store effect',
+            e,
+            result
+          );
+        }
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    },
+  });
+}
+
 export function createNobleQueryStoreEffect<T, R>(
   store: RootStore,
   config: QuerySetupConfig<StargateClient, T, R>
@@ -251,49 +295,5 @@ export function createNobleQueryStoreEffect<T, R>(
       unsubscribe();
       CompositeClientManager.markDone(clientConfig);
     };
-=======
-export function createValidatorQueryStoreEffect<T, R>(
-  store: RootStore,
-  config: QuerySetupConfig<CompositeClient, T, R>
-) {
-  return createValidatorStoreEffect(store, {
-    selector: config.selector,
-    handleNoClient: () => {
-      config.onNoQuery();
-    },
-    handle: (clientId, compositeClient, queryData) => {
-      const queryFn = config.getQueryFn(compositeClient, queryData);
-      if (!queryFn) {
-        config.onNoQuery();
-        return undefined;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
-      const observer = new QueryObserver(appQueryClient, {
-        queryKey: ['validator', ...config.getQueryKey(queryData), clientId],
-        queryFn,
-        ...baseOptions,
-        ...otherOpts,
-      });
-
-      const unsubscribe = observer.subscribe((result) => {
-        try {
-          config.onResult(result);
-        } catch (e) {
-          logBonsaiError(
-            'ValidatorQueryStoreEffect',
-            'Error handling result from react query store effect',
-            e,
-            result
-          );
-        }
-      });
-
-      return () => {
-        unsubscribe();
-      };
-    },
->>>>>>> jared/tra-994-rebalancewallet-when-balance-for-gas-is-too-low-or-when
   });
 }
