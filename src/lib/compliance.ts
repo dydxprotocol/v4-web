@@ -8,6 +8,7 @@ import { DydxAddress } from '@/constants/wallets';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 
 import { stringifyTransactionError } from './errors';
+import { hdKeyManager } from './hdKeyManager';
 import { log } from './telemetry';
 
 type KeplrComplianceStorage = {
@@ -124,31 +125,6 @@ export const signCompliancePayload = async (
     return stringifyTransactionError(error);
   }
 };
-
-class HDKeyManager {
-  private address: string | undefined;
-
-  private hdkey: Hdkey | undefined;
-
-  setHdkey(address: string | undefined, hdkey: Hdkey) {
-    this.address = address;
-    this.hdkey = hdkey;
-  }
-
-  getHdkey(localWalletAddress: string): Hdkey | undefined {
-    if (localWalletAddress !== this.address) {
-      return undefined;
-    }
-    return this.hdkey;
-  }
-
-  clearHdkey() {
-    this.hdkey = undefined;
-    this.address = undefined;
-  }
-}
-
-export const hdKeyManager = new HDKeyManager();
 
 export const isBlockedGeo = (geo: string): boolean => {
   return [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes);

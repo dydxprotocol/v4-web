@@ -29,7 +29,8 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hdKeyManager, isBlockedGeo } from '@/lib/compliance';
+import { isBlockedGeo } from '@/lib/compliance';
+import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -170,13 +171,20 @@ const useAccountsContext = () => {
   const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
+    if (localDydxWallet) {
+      localWalletManager.setLocalWallet(localDydxWallet);
+    } else {
+      localWalletManager.clearLocalWallet();
+    }
+  }, [localDydxWallet]);
+
+  useEffect(() => {
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         const wallet = new LocalWallet();
         wallet.address = sourceAccount.address;
         setLocalDydxWallet(wallet);
-
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
       } else if (sourceAccount.chain === WalletNetworkType.Cosmos && isConnectedGraz) {
         try {
