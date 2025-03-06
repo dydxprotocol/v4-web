@@ -5,7 +5,6 @@ import { sumBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import tw from 'twin.macro';
-import { formatUnits } from 'viem';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
@@ -54,7 +53,6 @@ const RewardsPage = () => {
   const canViewAccount = useAppSelector(calculateCanViewAccount);
 
   const { usdcDenom } = useTokenConfigs();
-  const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -77,11 +75,7 @@ const RewardsPage = () => {
   const showGeoblockedPanel = complianceState !== ComplianceStates.FULL_ACCESS;
   const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel;
 
-  const stakingRewardPanel = (
-    <StakingRewardPanel
-      usdcRewards={MustBigNumber(formatUnits(BigInt(totalUsdcRewards), usdcDecimals))}
-    />
-  );
+  const stakingRewardPanel = <StakingRewardPanel usdcRewards={totalUsdcRewards} />;
   const legalDisclaimer = (
     <div tw="text-color-text-0 font-mini-book">
       {stringGetter({
