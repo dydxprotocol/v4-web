@@ -9,11 +9,12 @@ import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { calc } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { processCoinAmount } from '../calculators/balances';
+import { convertAmount, processCoinAmount } from '../calculators/balances';
 import { useCompositeClient } from './lib/useIndexer';
 
 export type Balance = {
@@ -175,10 +176,23 @@ export const useStakingRewards = () => {
 
       const totalRewards = parsedResponse.total
         .filter((reward) => reward.denom && reward.amount)
-        .map((reward) => ({
-          denom: reward.denom!,
-          amount: MustNumber(processCoinAmount(tokenConfigs, reward.denom, reward.amount)),
-        }));
+        .map((reward) => {
+          const actualAmount = calc(() => {
+            const decimals = Object.values(tokenConfigs.tokensConfigs).find(
+              (t) => t.denom === reward.denom
+            )?.decimals;
+            if (decimals == null) {
+              return undefined;
+            }
+
+            // for some reason this endpoint adds 18 decimals
+            return convertAmount(reward.amount, decimals + 18);
+          });
+          return {
+            denom: reward.denom!,
+            amount: MustNumber(actualAmount),
+          };
+        });
 
       return {
         validators,
