@@ -32,3 +32,22 @@ export function mapNullableQueryResult<T>(
 ): Omit<UseQueryResult<T | undefined>, 'refetch'> {
   return { ...res, data: res.data?.data };
 }
+
+export function promiseWithTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  errorMessage: string = 'Operation timed out'
+): Promise<T> {
+  let timeoutId: NodeJS.Timeout | undefined;
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(errorMessage));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  });
+}
