@@ -76,3 +76,12 @@ export function useFormValues<
   }, [form, inputs, state, summary]);
   return { state, actions, summary, errors };
 }
+
+export function convertVanillaReducerActionsToReduxToolkitReducers<
+  State,
+  Actions extends { [key: string]: (state: NoInfer<State>, arg: any) => NoInfer<State> },
+>(
+  reducer: VanillaReducer<State, Actions>
+): { [K in keyof Actions]: (s: State, arg: { payload: Parameters<Actions[K]>[1] }) => State } {
+  return mapValues(reducer.actions, (action) => (s: State, p: any) => action(s, p.payload)) as any;
+}

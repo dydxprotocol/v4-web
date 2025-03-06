@@ -33,7 +33,6 @@ export const TriggersDialog = ({
     >
       <TriggersForm
         positionUniqueId={positionUniqueId}
-        marketId={marketId}
         onViewOrdersClick={() => {
           dispatch(closeDialog());
           navigateToMarketOrders(marketId);

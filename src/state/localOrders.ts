@@ -1,3 +1,4 @@
+import { getSimpleOrderStatus } from '@/bonsai/lib/subaccountUtils';
 import {
   OrderStatus,
   SubaccountFill,
@@ -7,7 +8,7 @@ import {
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
-import _ from 'lodash';
+import { intersection, mapValues, uniq } from 'lodash';
 
 import { Nullable } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
@@ -23,7 +24,6 @@ import {
 } from '@/constants/trade';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { isNewOrderStatusCanceled } from '@/lib/orders';
 
 export interface LocalOrdersState {
   localPlaceOrders: LocalPlaceOrderData[];
@@ -52,38 +52,54 @@ export const localOrdersSlice = createSlice({
       const { payload: orders } = action;
       let { localCloseAllPositions } = state;
       const canceledOrders = orders.filter(
-        (order) => order.status != null && isNewOrderStatusCanceled(order.status)
+        (order) =>
+          order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Canceled
       );
-      const filledOrderClientIds = orders
-        .filter((order) => order.status === OrderStatus.Filled)
-        .map((order) => order.clientId)
-        .filter(isTruthy);
+      const placedOrderClientIds = new Set(
+        orders
+          .filter(
+            (order) =>
+              order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Open
+          )
+          .map((o) => o.clientId)
+      );
+      const filledOrderClientIds = new Set(
+        orders
+          .filter(
+            (order) =>
+              order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Filled
+          )
+          .map((order) => order.clientId)
+          .filter(isTruthy)
+      );
 
       // no relevant cancel or filled orders
-      if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.length))
+      if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.size))
         return state;
 
-      const canceledOrderIdsInPayload = canceledOrders.map((order) => order.id);
+      const canceledOrderIdsInPayload = new Set(canceledOrders.map((order) => order.id));
       // ignore locally canceled orders since it's intentional and already handled
       // by local cancel tracking and notification
       const isOrderCanceledByBackend = (orderId: string) =>
-        canceledOrderIdsInPayload.includes(orderId) &&
+        canceledOrderIdsInPayload.has(orderId) &&
         !state.localCancelOrders.some((order) => order.orderId === orderId);
 
       const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
-        const newCanceledOrderIds = _.intersection(batch.orderIds, canceledOrderIdsInPayload);
-        return _.uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
+        const newCanceledOrderIds = batch.orderIds.filter((o) => canceledOrderIdsInPayload.has(o));
+        return uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
       };
 
       if (localCloseAllPositions) {
         localCloseAllPositions = {
           ...localCloseAllPositions,
-          filledOrderClientIds: _.uniq([
-            ..._.intersection(localCloseAllPositions.submittedOrderClientIds, filledOrderClientIds),
+          filledOrderClientIds: uniq([
+            ...localCloseAllPositions.submittedOrderClientIds.filter((id) =>
+              filledOrderClientIds.has(id)
+            ),
             ...localCloseAllPositions.filledOrderClientIds,
           ]),
-          failedOrderClientIds: _.uniq([
-            ..._.intersection(
+          failedOrderClientIds: uniq([
+            ...intersection(
               localCloseAllPositions.submittedOrderClientIds,
               canceledOrders.map((order) => order.clientId).filter(isTruthy)
             ),
@@ -94,22 +110,39 @@ export const localOrdersSlice = createSlice({
 
       return {
         ...state,
-        localPlaceOrders: state.localPlaceOrders.map((order) =>
-          order.orderId &&
-          canceledOrderIdsInPayload.includes(order.orderId) &&
-          isOrderCanceledByBackend(order.orderId)
-            ? {
-                ...order,
-                submissionStatus: PlaceOrderStatuses.Canceled,
-              }
-            : order
-        ),
+        localPlaceOrders: state.localPlaceOrders.map((order) => {
+          // Check if order should be canceled
+          if (
+            order.orderId &&
+            canceledOrderIdsInPayload.has(order.orderId) &&
+            isOrderCanceledByBackend(order.orderId)
+          ) {
+            return {
+              ...order,
+              submissionStatus: PlaceOrderStatuses.Canceled,
+            };
+          }
+
+          if (
+            order.clientId &&
+            order.submissionStatus < PlaceOrderStatuses.Placed &&
+            placedOrderClientIds.has(order.clientId)
+          ) {
+            return {
+              ...order,
+              orderId: orders.find((o) => o.clientId === order.clientId)?.id,
+              submissionStatus: PlaceOrderStatuses.Placed,
+            };
+          }
+
+          return order;
+        }),
         localCancelOrders: state.localCancelOrders.map((order) =>
-          canceledOrderIdsInPayload.includes(order.orderId)
+          canceledOrderIdsInPayload.has(order.orderId)
             ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
             : order
         ),
-        localCancelAlls: _.mapValues(state.localCancelAlls, (batch) => ({
+        localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
           ...batch,
           canceledOrderIds: getNewCanceledOrderIds(batch),
         })),
@@ -121,8 +154,8 @@ export const localOrdersSlice = createSlice({
       if (filledOrderIds.length === 0) return state;
 
       const getFailedToCancelOrderIds = (batch: LocalCancelAllData) => {
-        const newFailedCancelOrderIds = _.intersection(batch.orderIds, filledOrderIds);
-        return _.uniq([...(batch.failedOrderIds ?? []), ...newFailedCancelOrderIds]);
+        const newFailedCancelOrderIds = intersection(batch.orderIds, filledOrderIds);
+        return uniq([...(batch.failedOrderIds ?? []), ...newFailedCancelOrderIds]);
       };
 
       return {
@@ -140,7 +173,7 @@ export const localOrdersSlice = createSlice({
         localCancelOrders: state.localCancelOrders.filter(
           (order) => !filledOrderIds.includes(order.orderId)
         ),
-        localCancelAlls: _.mapValues(state.localCancelAlls, (batch) => ({
+        localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
           ...batch,
           failedOrderIds: getFailedToCancelOrderIds(batch),
         })),
