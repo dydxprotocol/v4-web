@@ -133,6 +133,8 @@ export function getLatestHeight(heightState: HeightState): HeightResponse | unde
   return heightState.lastFewResults.find((s) => s.data?.response != null)?.data?.response;
 }
 
+let lastLoggedStatus: ApiStatus | undefined;
+
 export function computeApiState(heights: {
   indexerHeight: HeightState;
   validatorHeight: HeightState;
@@ -161,12 +163,19 @@ export function computeApiState(heights: {
     indexerHeight: indexerHeight?.height,
     validatorHeight: validatorHeight?.height,
   };
+
   if (result.status !== ApiStatus.NORMAL) {
-    logBonsaiInfo('ComputeApiStatus', 'Computed non-normal status', {
-      ...result,
-      rawHeights: heights,
-    });
+    if (result.status !== lastLoggedStatus) {
+      lastLoggedStatus = result.status;
+      logBonsaiInfo('ComputeApiStatus', 'Computed non-normal status', {
+        ...result,
+        rawHeights: heights,
+      });
+    }
+  } else {
+    lastLoggedStatus = undefined;
   }
+
   return result;
 }
 
