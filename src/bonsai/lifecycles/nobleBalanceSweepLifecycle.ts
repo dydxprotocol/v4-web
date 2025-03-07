@@ -1,4 +1,4 @@
-import { GAS_MULTIPLIER, NobleClient } from '@dydxprotocol/v4-client-js';
+import { GAS_MULTIPLIER, LocalWallet, NobleClient } from '@dydxprotocol/v4-client-js';
 import { CosmosTx, SkipClient, Tx } from '@skip-go/client';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
@@ -37,7 +37,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   );
 
   let nobleSigningClient: NobleClient | undefined;
-  let nobleAddress: string | undefined;
+  let storedNobleLocalWallet: LocalWallet | undefined;
   const skipClient = new SkipClient();
 
   const activeSweep = createSemaphore();
@@ -64,9 +64,14 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         }
 
         // Set up Noble and Skip clients
-        if (nobleAddress !== nobleLocalWallet.address || nobleSigningClient == null) {
+        if (nobleSigningClient == null) {
           nobleSigningClient = new NobleClient(nobleClientRpcUrl);
+        }
+
+        // No need to reconnect if the nobleLocalWallet is the same as the stored one
+        if (storedNobleLocalWallet !== nobleLocalWallet) {
           await nobleSigningClient.connect(nobleLocalWallet);
+          storedNobleLocalWallet = nobleLocalWallet;
         }
 
         // Get MsgDirectResponse and construct ibc message
@@ -174,7 +179,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   return () => {
     noopCleanupEffect();
     activeSweep.clear();
-    nobleAddress = undefined;
+    storedNobleLocalWallet = undefined;
     nobleSigningClient = undefined;
   };
 }
