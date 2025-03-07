@@ -1,5 +1,6 @@
 import { GAS_MULTIPLIER, LocalWallet, NobleClient } from '@dydxprotocol/v4-client-js';
 import { CosmosTx, SkipClient, Tx } from '@skip-go/client';
+import { parseUnits } from 'viem';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
@@ -12,7 +13,6 @@ import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors'
 
 import { MaybeBigNumber } from '@/lib/numbers';
 
-import { convertAmount } from '../calculators/balances';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
@@ -21,6 +21,9 @@ import { createNobleTransactionStoreEffect } from '../rest/lib/nobleTransactionS
 function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: number[] } {
   return 'cosmosTx' in tx;
 }
+
+// 0.1 USDC buffer to account for IBC fees
+const USDC_IBC_FEE_BUFFER = 0.1;
 
 /**
  * @description Lifecycle for sweeping all USDC on Noble to dYdX chain. This is used to sweep deposits that only land within Noble.
@@ -51,7 +54,11 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
     ) => {
       async function sweepNobleBalance() {
         const balanceBN = MaybeBigNumber(balance);
-        if (balance == null || balanceBN == null || balanceBN.lte(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP)) {
+        if (
+          balance == null ||
+          balanceBN == null ||
+          balanceBN.lte(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP + USDC_IBC_FEE_BUFFER)
+        ) {
           return;
         }
 
@@ -76,10 +83,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
 
         // Get MsgDirectResponse and construct ibc message
         const balanceToSweep = balanceBN.minus(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP).toString();
-        const amountIn = convertAmount(balanceToSweep, tokenConfig.usdc.decimals)?.toString();
-        if (amountIn == null) {
-          return;
-        }
+        const amountIn = parseUnits(balanceToSweep, tokenConfig.usdc.decimals).toString();
 
         const msgDirectResponse = await skipClient.msgsDirect({
           sourceAssetDenom: 'uusdc',
