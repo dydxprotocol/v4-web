@@ -37,6 +37,14 @@ export function createSemaphore() {
         })();
       });
     },
+    clear() {
+      if (pendingDeferred != null) {
+        pendingDeferred.reject(new SupersededError('Semaphore cleared'));
+        currentDeferredId = 0;
+        pendingDeferred = null;
+        runningRequest = Promise.resolve();
+      }
+    },
   };
 }
 

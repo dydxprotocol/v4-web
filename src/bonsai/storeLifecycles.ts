@@ -1,4 +1,5 @@
 import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
+import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
 import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
 import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
@@ -48,4 +49,5 @@ export const storeLifecycles = [
   setUpIndexerLocalAddressScreenV2Query,
   setUpUsdcRebalanceLifecycle,
   setUpNobleBalanceQuery,
+  setUpNobleBalanceSweepLifecycle,
 ] as const;

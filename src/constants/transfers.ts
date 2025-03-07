@@ -1,5 +1,7 @@
 import { WalletNetworkType } from '@/constants/wallets';
 
+import { timeUnits } from './time';
+
 export enum TransferType {
   Deposit = 'DEPOSIT',
   Withdraw = 'WITHDRAW',
@@ -82,3 +84,5 @@ export const getNetworkTypeFromWalletNetworkType = (
   }
   return 'evm';
 };
+
+export const TIME_UNTIL_IDLE_WITHDRAW_IS_CONSIDERED_EXPIRED = 10 * timeUnits.minute;

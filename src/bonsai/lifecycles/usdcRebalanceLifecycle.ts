@@ -3,16 +3,13 @@ import BigNumber from 'bignumber.js';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { TransactionMemo } from '@/constants/analytics';
-import { EMPTY_ARR } from '@/constants/objects';
-import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { DydxAddress, WalletNetworkType } from '@/constants/wallets';
+import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { createAppSelector } from '@/state/appTypes';
-import { isWithdraw } from '@/state/transfers';
-import { getTransfersByAddress } from '@/state/transfersSelectors';
+import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
@@ -25,8 +22,6 @@ import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { ComplianceStatus } from '../types/summaryTypes';
-
-const TIME_UNTIL_IDLE_WITHDRAW_IS_CONSIDERED_EXPIRED = 10 * timeUnits.minute;
 
 const selectTxAuthorizedAccount = createAppSelector(
   [
@@ -75,32 +70,17 @@ const selectTxAuthorizedAccount = createAppSelector(
  */
 export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const balanceAndTransfersSelector = createAppSelector(
-    [selectTxAuthorizedAccount, BonsaiCore.account.balances.data, getTransfersByAddress],
-    (txAuthorizedAccount, balances, transfersByAddress) => {
+    [
+      selectTxAuthorizedAccount,
+      BonsaiCore.account.balances.data,
+      selectHasNonExpiredPendingWithdraws,
+    ],
+    (txAuthorizedAccount, balances, hasNonExpiredPendingWithdraws) => {
       if (!txAuthorizedAccount) {
         return undefined;
       }
 
-      const { subaccountClient, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
-
-      const pendingWithdraws = parentSubaccountInfo.wallet
-        ? transfersByAddress[parentSubaccountInfo.wallet as DydxAddress]?.filter(isWithdraw) ??
-          EMPTY_ARR
-        : EMPTY_ARR;
-
-      const idleTimes = pendingWithdraws.reduce<number[]>((acc, w) => {
-        if (w.transactions.some((t) => t.status === 'idle')) {
-          if (w.updatedAt) {
-            return [...acc, w.updatedAt];
-          }
-        }
-
-        return acc;
-      }, []);
-
-      const hasNonExpiredPendingWithdraws = idleTimes.some(
-        (t) => t > Date.now() - TIME_UNTIL_IDLE_WITHDRAW_IS_CONSIDERED_EXPIRED
-      );
+      const { subaccountClient, sourceAccount } = txAuthorizedAccount;
 
       return {
         subaccountClient,
@@ -189,5 +169,6 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
   return () => {
     noopCleanupEffect();
+    activeRebalance.clear();
   };
 }
