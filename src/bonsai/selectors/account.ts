@@ -1,3 +1,4 @@
+import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
@@ -6,6 +7,8 @@ import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+
+import { convertBech32Address } from '@/lib/addressUtils';
 
 import { calculateFills } from '../calculators/fills';
 import {
@@ -203,4 +206,20 @@ export const selectAccountTransfers = createAppSelector(
 export const selectAccountTransfersLoading = createAppSelector(
   [selectRawTransfersRest, selectRawParentSubaccount],
   mergeLoadableStatus
+);
+
+export const selectAccountNobleWalletAddress = createAppSelector(
+  [selectParentSubaccountInfo],
+  (parentSubaccountInfo) => {
+    if (parentSubaccountInfo.wallet == null) {
+      return undefined;
+    }
+
+    const nobleWalletAddress = convertBech32Address({
+      address: parentSubaccountInfo.wallet,
+      bech32Prefix: NOBLE_BECH32_PREFIX,
+    });
+
+    return nobleWalletAddress;
+  }
 );

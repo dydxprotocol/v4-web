@@ -1,5 +1,10 @@
 import { logBonsaiError } from '@/bonsai/logs';
-import { selectCompositeClientReady, selectIndexerReady } from '@/bonsai/socketSelectors';
+import {
+  selectCompositeClientReady,
+  selectIndexerReady,
+  selectNobleClientReady,
+} from '@/bonsai/socketSelectors';
+import { StargateClient } from '@cosmjs/stargate';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 
@@ -227,5 +232,68 @@ export function createValidatorQueryStoreEffect<T, R>(
         unsubscribe();
       };
     },
+  });
+}
+
+export function createNobleQueryStoreEffect<T, R>(
+  store: RootStore,
+  config: QuerySetupConfig<StargateClient, T, R>
+) {
+  const fullSelector = createAppSelector(
+    [getSelectedNetwork, selectNobleClientReady, config.selector],
+    (network, nobleClientReady, selectorResult) => ({
+      infrastructure: { network, nobleClientReady },
+      queryData: selectorResult,
+    })
+  );
+
+  return createStoreEffect(store, fullSelector, (fullResult) => {
+    const { infrastructure, queryData } = fullResult;
+
+    if (!infrastructure.nobleClientReady) {
+      config.onNoQuery();
+      return undefined;
+    }
+
+    const clientConfig = {
+      network: infrastructure.network,
+      dispatch: store.dispatch,
+    };
+
+    const nobleClient = CompositeClientManager.use(clientConfig).nobleClient!;
+
+    const queryFn = config.getQueryFn(nobleClient, queryData);
+    if (!queryFn) {
+      CompositeClientManager.markDone(clientConfig);
+      config.onNoQuery();
+      return undefined;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
+    const observer = new QueryObserver(appQueryClient, {
+      queryKey: ['nobleClient', ...config.getQueryKey(queryData), clientConfig.network],
+      queryFn,
+      ...baseOptions,
+      ...otherOpts,
+    });
+
+    const unsubscribe = observer.subscribe((result) => {
+      try {
+        config.onResult(result);
+      } catch (e) {
+        logBonsaiError(
+          'NobleClientQueryStoreEffect',
+          'Error handling result from react query store effect',
+          e,
+          result
+        );
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      CompositeClientManager.markDone(clientConfig);
+    };
   });
 }
