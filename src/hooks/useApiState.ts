@@ -16,8 +16,8 @@ export enum ConnectionErrorType {
 
 const ErrorMessageMap = {
   [ConnectionErrorType.CHAIN_DISRUPTION]: {
-    title: STRING_KEYS.CHAIN_DISRUPTION_DETECTED,
-    body: STRING_KEYS.CHAIN_DISRUPTION_DETECTED_BODY,
+    title: STRING_KEYS.CONNECTION_ISSUE_DETECTED,
+    body: STRING_KEYS.CONNECTION_ISSUE_DETECTED_BODY,
   },
   [ConnectionErrorType.INDEXER_TRAILING]: {
     title: STRING_KEYS.ORDERBOOK_LAGGING,
