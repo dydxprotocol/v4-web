@@ -52,7 +52,10 @@ export const TransferButtonAndReceipt = ({
   const selectedTokenConfig = isValidKey(selectedAsset, tokensConfigs)
     ? tokensConfigs[selectedAsset]
     : undefined;
-  const feeTokenConfig = isValidKey(feeAsset, tokensConfigs) ? tokensConfigs[feeAsset] : undefined;
+  const feeTokenConfig =
+    summary.feeDenom != null && isValidKey(feeAsset, tokensConfigs)
+      ? tokensConfigs[feeAsset]
+      : undefined;
 
   const balance = isUSDCSelected
     ? summary.accountBefore.freeCollateral

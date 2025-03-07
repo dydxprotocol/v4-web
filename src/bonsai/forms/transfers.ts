@@ -103,7 +103,6 @@ export interface TransferFeeData {
 
 interface AccountDetails {
   availableNativeBalance?: number;
-
   equity?: number;
   freeCollateral?: number;
   leverage?: number;
