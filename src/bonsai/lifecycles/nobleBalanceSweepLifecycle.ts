@@ -1,6 +1,5 @@
 import { GAS_MULTIPLIER, NobleClient } from '@dydxprotocol/v4-client-js';
 import { CosmosTx, SkipClient, Tx } from '@skip-go/client';
-import { parseUnits } from 'viem';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
@@ -13,6 +12,7 @@ import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors'
 
 import { MaybeBigNumber } from '@/lib/numbers';
 
+import { convertAmount } from '../calculators/balances';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
@@ -67,6 +67,11 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
 
         // Get MsgDirectResponse and construct ibc message
         const balanceToSweep = balanceBN.minus(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP).toString();
+        const amountIn = convertAmount(balanceToSweep, tokenConfig.usdc.decimals)?.toString();
+        if (amountIn == null) {
+          return;
+        }
+
         const msgDirectResponse = await skipClient.msgsDirect({
           sourceAssetDenom: 'uusdc',
           sourceAssetChainID: 'noble-1',
@@ -76,7 +81,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
             [chainId]: dydxAddress,
             'noble-1': nobleLocalWallet.address,
           },
-          amountIn: parseUnits(balanceToSweep, tokenConfig.usdc.decimals).toString(),
+          amountIn,
           slippageTolerancePercent: '1',
         });
 

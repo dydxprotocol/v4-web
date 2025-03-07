@@ -83,7 +83,7 @@ export function createNobleTransactionStoreEffect<T>(
     [getSelectedNetwork, selectNobleTxAuthorizedAccount, config.selector],
     (network, nobleTxAuthorizedAccount, selectorResult) => {
       if (!nobleTxAuthorizedAccount) return undefined;
-      const { localNobleWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
+      const { localNobleWallet, sourceAccount, parentSubaccountInfo } = nobleTxAuthorizedAccount;
 
       return {
         network,
