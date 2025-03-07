@@ -13,7 +13,7 @@ import {
 import { selectAllMarketsInfo } from '@/bonsai/selectors/markets';
 import { MarketsInfo } from '@/bonsai/types/summaryTypes';
 import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -25,6 +25,7 @@ import { getVaultForm, selectVaultFormStateExceptAmount } from '@/state/vaultSel
 
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
+import { mapNullableQueryResult, wrapNullable } from '@/lib/asyncUtils';
 import { mapIfPresent } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
@@ -38,17 +39,6 @@ import { useDydxClient } from './useDydxClient';
 import { useEnvConfig } from './useEnvConfig';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
-
-// it's illegal to return undefined from use query so we just wrap results in a data object
-function wrapNullable<T>(data: T | undefined): { data: T | undefined } {
-  return { data };
-}
-
-function mapNullableQueryResult<T>(
-  res: Omit<UseQueryResult<{ data: T }>, 'refetch'>
-): Omit<UseQueryResult<T | undefined>, 'refetch'> {
-  return { ...res, data: res.data?.data };
-}
 
 const vaultQueryOptions = {
   staleTime: timeUnits.minute / 4,
