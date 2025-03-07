@@ -35,7 +35,7 @@ type NobleChainTransactionConfig<T> = {
   ) => void | (() => void);
 };
 
-const selectTxAuthorizedAccount = createAppSelector(
+const selectNobleTxAuthorizedAccount = createAppSelector(
   [
     selectParentSubaccountInfo,
     getSourceAccount,
@@ -80,9 +80,9 @@ export function createNobleTransactionStoreEffect<T>(
   config: NobleChainTransactionConfig<T>
 ) {
   const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectTxAuthorizedAccount, config.selector],
-    (network, txAuthorizedAccount, selectorResult) => {
-      if (!txAuthorizedAccount) return undefined;
+    [getSelectedNetwork, selectNobleTxAuthorizedAccount, config.selector],
+    (network, nobleTxAuthorizedAccount, selectorResult) => {
+      if (!nobleTxAuthorizedAccount) return undefined;
       const { localNobleWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
 
       return {
