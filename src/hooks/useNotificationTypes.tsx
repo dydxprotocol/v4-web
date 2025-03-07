@@ -471,15 +471,44 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.MarketUpdate,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
-      const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
+      const openPositions = useAppSelector(
+        BonsaiCore.account.parentSubaccountPositions.data,
+        shallowEqual
+      );
       const currentDate = new Date();
       const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
+      const proposal226VoteStartDate = new Date('2025-03-07T15:02:38.517926238Z');
+      const proposal226ExpirationDate = new Date('2025-03-18T15:02:38.517926238Z');
+      const proposal226EffectedMarkets = [
+        'ATH-USD',
+        'BEAM-USD',
+        'DRIFT-USD',
+        'EIGEN-USD',
+        'ENA-USD',
+        'MORPHO-USD',
+        'MOVE-USD',
+        'ONDO-USD',
+        'PENGU-USD',
+        'PNUT-USD',
+        'POL-USD',
+        'S-USD',
+        'USUAL-USD',
+        'XMR-USD',
+        'ZEN-USD',
+      ];
+
+      const hasPositionInProposal226EffectedMarkets = openPositions?.some((position) =>
+        proposal226EffectedMarkets.includes(position.market)
+      );
 
       useEffect(() => {
-        if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
+        if (
+          hasPositionInProposal226EffectedMarkets &&
+          currentDate >= proposal226VoteStartDate &&
+          currentDate <= proposal226ExpirationDate
+        ) {
           trigger(
-            MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+            MarketUpdateNotificationIds.MarketUpdateProposal226,
             {
               icon: (
                 <AssetIcon
@@ -488,18 +517,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   symbol={chainTokenLabel}
                 />
               ),
-              title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
-              body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
+              title: stringGetter({ key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.TITLE' }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.BODY',
+                params: {
+                  MARKETS: proposal226EffectedMarkets.join(', '),
+                },
+              }),
               toastSensitivity: 'foreground',
-              groupKey: MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
+              groupKey: MarketUpdateNotificationIds.MarketUpdateProposal226,
             },
             []
           );
         }
-      }, [stringGetter, chainTokenImage, chainTokenLabel]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel, hasPositionInProposal226EffectedMarkets]);
     },
     useNotificationAction: () => {
-      return () => {};
+      return (id) => {
+        if (id === MarketUpdateNotificationIds.MarketUpdateProposal226) {
+          globalThis.open('https://www.mintscan.io/dydx/proposals/226', '_blank');
+        }
+      };
     },
   },
   {
