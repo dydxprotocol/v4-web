@@ -28,6 +28,8 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
+import { calc } from '@/lib/do';
+
 interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
@@ -213,6 +215,18 @@ const HEIGHTS_BUFFER_LENGTH = 12;
 
 function appendToHeight(height: WritableDraft<HeightState>, response: Loadable<HeightEntry>) {
   height.latest = response;
+
+  // only want to append results with a different request time
+  // we can get duplicates because of how the react query lifecycle works
+  const matchesMostRecentSaved = calc(() => {
+    const latest = height.lastFewResults[0];
+    return (
+      latest?.data?.requestTime != null && latest.data.requestTime === response.data?.requestTime
+    );
+  });
+  if (matchesMostRecentSaved) {
+    return;
+  }
   if (response.status === 'error' || response.status === 'success') {
     height.lastFewResults.unshift(response);
   }
