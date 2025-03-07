@@ -510,8 +510,29 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   symbol={chainTokenLabel}
                 />
               ),
-              title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
-              body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
+              title: stringGetter({ key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.TITLE' }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.BODY',
+                params: {
+                  MARKETS: [
+                    'ATH-USD',
+                    'BEAM-USD',
+                    'DRIFT-USD',
+                    'EIGEN-USD',
+                    'ENA-USD',
+                    'MORPHO-USD',
+                    'MOVE-USD',
+                    'ONDO-USD',
+                    'PENGU-USD',
+                    'PNUT-USD',
+                    'POL-USD',
+                    'S-USD',
+                    'USUAL-USD',
+                    'XMR-USD',
+                    'ZEN-USD',
+                  ].join(', '),
+                },
+              }),
               toastSensitivity: 'foreground',
               groupKey: MarketUpdateNotificationIds.MarketUpdateProposal226,
             },
@@ -521,7 +542,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [stringGetter, chainTokenImage, chainTokenLabel]);
     },
     useNotificationAction: () => {
-      return () => {};
+      return (id) => {
+        if (id === MarketUpdateNotificationIds.MarketUpdateProposal226) {
+          globalThis.open('https://www.mintscan.io/dydx/proposals/226', '_blank');
+        }
+      };
     },
   },
   {
