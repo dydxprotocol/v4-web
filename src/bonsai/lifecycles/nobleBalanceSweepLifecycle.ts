@@ -4,7 +4,7 @@ import { CosmosTx, SkipClient, Tx } from '@skip-go/client';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
 import { WalletNetworkType } from '@/constants/wallets';
-import { isNobleIbcMsg } from '@/types/indexer/skip';
+import { isNobleIbcMsg } from '@/types/skip';
 
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
