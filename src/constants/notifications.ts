@@ -272,6 +272,7 @@ export enum MarketWindDownNotificationIds {
 
 export enum MarketUpdateNotificationIds {
   MarketUpdateSolLiquidityTier = 'market-update-sol-liquidity-tier',
+  MarketUpdateProposal226 = 'market-update-proposal-226',
 }
 
 export enum FeedbackRequestNotificationIds {
