@@ -9,7 +9,7 @@ type NobleIbcMsg = {
   };
   sender: string;
   receiver: string;
-  timeout_height: {};
+  timeout_height: any; // This is usually an empty object but Skip may return something here.
   timeout_timestamp: number;
 };
 
