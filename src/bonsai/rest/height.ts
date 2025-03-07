@@ -84,10 +84,8 @@ export function setUpIndexerHeightQuery(store: RootStore) {
       return () => doIndexerHeightQuery(indexerClient);
     },
     onNoQuery: () => store.dispatch(setIndexerHeightRaw(loadableIdle())),
-    onResult: (result) => {
-      console.log('res', result);
-      store.dispatch(setIndexerHeightRaw(collapseLoadables(queryResultToLoadable(result))));
-    },
+    onResult: (result) =>
+      store.dispatch(setIndexerHeightRaw(collapseLoadables(queryResultToLoadable(result)))),
     getQueryKey: () => ['indexerHeight'],
     ...heightPollingOptions,
   });
