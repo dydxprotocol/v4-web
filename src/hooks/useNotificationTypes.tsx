@@ -471,35 +471,42 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.MarketUpdate,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const proposal148VoteEndDate = new Date('2024-09-02T15:00:29.517926238Z');
-      const proposal148ExpirationDate = new Date('2024-09-09T15:00:29.517926238Z');
-      const proposal226VoteStartDate = new Date('2025-03-07T15:02:38.517926238Z');
-      const proposal226ExpirationDate = new Date('2025-03-18T15:02:38.517926238Z');
+      const openPositions = useAppSelector(
+        BonsaiCore.account.parentSubaccountPositions.data,
+        shallowEqual
+      );
       const currentDate = new Date();
       const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
+      const proposal226VoteStartDate = new Date('2025-03-07T15:02:38.517926238Z');
+      const proposal226ExpirationDate = new Date('2025-03-18T15:02:38.517926238Z');
+      const proposal226EffectedMarkets = [
+        'ATH-USD',
+        'BEAM-USD',
+        'DRIFT-USD',
+        'EIGEN-USD',
+        'ENA-USD',
+        'MORPHO-USD',
+        'MOVE-USD',
+        'ONDO-USD',
+        'PENGU-USD',
+        'PNUT-USD',
+        'POL-USD',
+        'S-USD',
+        'USUAL-USD',
+        'XMR-USD',
+        'ZEN-USD',
+      ];
+
+      const hasPositionInProposal226EffectedMarkets = openPositions?.some((position) =>
+        proposal226EffectedMarkets.includes(position.market)
+      );
 
       useEffect(() => {
-        if (currentDate >= proposal148VoteEndDate && currentDate <= proposal148ExpirationDate) {
-          trigger(
-            MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
-            {
-              icon: (
-                <AssetIcon
-                  tw="[--asset-icon-size: 1.5rem]"
-                  logoUrl={chainTokenImage}
-                  symbol={chainTokenLabel}
-                />
-              ),
-              title: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.TITLE' }),
-              body: stringGetter({ key: 'NOTIFICATIONS.LIQUIDITY_TIER_UPDATE_SOL_USD.BODY' }),
-              toastSensitivity: 'foreground',
-              groupKey: MarketUpdateNotificationIds.MarketUpdateSolLiquidityTier,
-            },
-            []
-          );
-        }
-
-        if (currentDate >= proposal226VoteStartDate && currentDate <= proposal226ExpirationDate) {
+        if (
+          hasPositionInProposal226EffectedMarkets &&
+          currentDate >= proposal226VoteStartDate &&
+          currentDate <= proposal226ExpirationDate
+        ) {
           trigger(
             MarketUpdateNotificationIds.MarketUpdateProposal226,
             {
@@ -514,23 +521,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: stringGetter({
                 key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.BODY',
                 params: {
-                  MARKETS: [
-                    'ATH-USD',
-                    'BEAM-USD',
-                    'DRIFT-USD',
-                    'EIGEN-USD',
-                    'ENA-USD',
-                    'MORPHO-USD',
-                    'MOVE-USD',
-                    'ONDO-USD',
-                    'PENGU-USD',
-                    'PNUT-USD',
-                    'POL-USD',
-                    'S-USD',
-                    'USUAL-USD',
-                    'XMR-USD',
-                    'ZEN-USD',
-                  ].join(', '),
+                  MARKETS: proposal226EffectedMarkets.join(', '),
                 },
               }),
               toastSensitivity: 'foreground',
@@ -539,7 +530,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter, chainTokenImage, chainTokenLabel]);
+      }, [stringGetter, chainTokenImage, chainTokenLabel, hasPositionInProposal226EffectedMarkets]);
     },
     useNotificationAction: () => {
       return (id) => {
