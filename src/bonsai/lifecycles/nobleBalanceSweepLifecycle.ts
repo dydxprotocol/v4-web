@@ -40,6 +40,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   );
 
   let nobleSigningClient: NobleClient | undefined;
+  let storedNobleClientRpcUrl: string | undefined;
   let storedNobleLocalWallet: LocalWallet | undefined;
   const skipClient = new SkipClient();
 
@@ -71,8 +72,9 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         }
 
         // Set up Noble and Skip clients
-        if (nobleSigningClient == null) {
+        if (nobleSigningClient == null || storedNobleClientRpcUrl !== nobleClientRpcUrl) {
           nobleSigningClient = new NobleClient(nobleClientRpcUrl);
+          storedNobleClientRpcUrl = nobleClientRpcUrl;
         }
 
         // No need to reconnect if the nobleLocalWallet is the same as the stored one
@@ -185,5 +187,6 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
     activeSweep.clear();
     storedNobleLocalWallet = undefined;
     nobleSigningClient = undefined;
+    storedNobleClientRpcUrl = undefined;
   };
 }
