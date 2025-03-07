@@ -1,6 +1,7 @@
 import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
 import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import { logBonsaiInfo } from '@/bonsai/logs';
+import { StargateClient } from '@cosmjs/stargate';
 import {
   CompositeClient,
   IndexerClient,
@@ -28,9 +29,11 @@ type CompositeClientWrapper = {
   dead?: boolean;
   compositeClient?: CompositeClient;
   indexer?: IndexerClient;
+  nobleClient?: StargateClient;
   tearDown: () => void;
   compositeClientPromise: Promise<CompositeClient>;
   indexerPromise: Promise<IndexerClient>;
+  nobleClientPromise: Promise<StargateClient>;
 };
 
 function makeCompositeClient({
@@ -52,10 +55,8 @@ function makeCompositeClient({
     throw new Error(`Unknown chain id: ${chainId}`);
   }
 
-  const { clientWrapper, setCompositeClient, setIndexerClient } = initializeClientWrapper(
-    dispatch,
-    network
-  );
+  const { clientWrapper, setCompositeClient, setIndexerClient, setNobleClient } =
+    initializeClientWrapper(dispatch, network);
 
   (async () => {
     const indexerUrl = networkConfig.endpoints.indexers[0];
@@ -101,7 +102,18 @@ function makeCompositeClient({
     if (clientWrapper.dead) {
       return;
     }
+
     setCompositeClient(compositeClient);
+
+    const nobleClient = await StargateClient.connect(networkConfig.endpoints.nobleValidator);
+
+    // this shouldn't be necessary - can actually be false
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (clientWrapper.dead) {
+      return;
+    }
+
+    setNobleClient(nobleClient);
   })();
   return clientWrapper;
 }
@@ -146,17 +158,24 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
 function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
   const indexerDeferred = createDeferred<IndexerClient>();
   const compositeClientDeferred = createDeferred<CompositeClient>();
+  const nobleClientDeferred = createDeferred<StargateClient>();
   const clientWrapper: CompositeClientWrapper = {
     compositeClientPromise: compositeClientDeferred.promise,
     indexerPromise: indexerDeferred.promise,
+    nobleClientPromise: nobleClientDeferred.promise,
     tearDown: () => {
       clientWrapper.dead = true;
       indexerDeferred.reject();
       compositeClientDeferred.reject();
+      nobleClientDeferred.reject();
       dispatch(
         setNetworkStateRaw({
           networkId: network,
-          stateToMerge: { compositeClientReady: false, indexerClientReady: false },
+          stateToMerge: {
+            compositeClientReady: false,
+            indexerClientReady: false,
+            nobleClientReady: false,
+          },
         })
       );
     },
@@ -181,16 +200,31 @@ function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
       })
     );
   };
+  const setNobleClient = (c: StargateClient) => {
+    clientWrapper.nobleClient = c;
+    nobleClientDeferred.resolve(c);
+    dispatch(
+      setNetworkStateRaw({
+        networkId: network,
+        stateToMerge: { nobleClientReady: true },
+      })
+    );
+  };
   dispatch(
     setNetworkStateRaw({
       networkId: network,
-      stateToMerge: { compositeClientReady: false, indexerClientReady: false },
+      stateToMerge: {
+        compositeClientReady: false,
+        indexerClientReady: false,
+        nobleClientReady: false,
+      },
     })
   );
   return {
     clientWrapper,
     setIndexerClient,
     setCompositeClient,
+    setNobleClient,
   };
 }
 
