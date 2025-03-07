@@ -37,6 +37,9 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   );
 
   let nobleSigningClient: NobleClient | undefined;
+  let nobleAddress: string | undefined;
+  const skipClient = new SkipClient();
+
   const activeSweep = createSemaphore();
 
   const noopCleanupEffect = createNobleTransactionStoreEffect(store, {
@@ -61,9 +64,10 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         }
 
         // Set up Noble and Skip clients
-        nobleSigningClient = new NobleClient(nobleClientRpcUrl);
-        await nobleSigningClient.connect(nobleLocalWallet);
-        const skipClient = new SkipClient();
+        if (nobleAddress !== nobleLocalWallet.address || nobleSigningClient == null) {
+          nobleSigningClient = new NobleClient(nobleClientRpcUrl);
+          await nobleSigningClient.connect(nobleLocalWallet);
+        }
 
         // Get MsgDirectResponse and construct ibc message
         const balanceToSweep = balanceBN.minus(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP).toString();
@@ -170,5 +174,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   return () => {
     noopCleanupEffect();
     activeSweep.clear();
+    nobleAddress = undefined;
+    nobleSigningClient = undefined;
   };
 }
