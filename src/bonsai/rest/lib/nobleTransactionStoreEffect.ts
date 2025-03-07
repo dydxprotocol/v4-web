@@ -1,5 +1,5 @@
 import { BonsaiCore } from '@/bonsai/ontology';
-import { selectNobleClientReady, selectParentSubaccountInfo } from '@/bonsai/socketSelectors';
+import { selectParentSubaccountInfo } from '@/bonsai/socketSelectors';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { LocalWallet, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 
@@ -17,17 +17,17 @@ import { isBlockedGeo } from '@/lib/compliance';
 import { localWalletManager } from '@/lib/hdKeyManager';
 
 import { createStoreEffect } from '../../lib/createStoreEffect';
-import { CompositeClientManager } from './compositeClientManager';
 
 type NobleChainTransactionConfig<T> = {
   selector: (state: RootState) => T;
-  onResultUpdate: (
+  handle: (
     environment: {
       nobleClientRpcUrl: string;
       tokenConfig: (typeof TOKEN_CONFIG_MAP)[DydxChainId];
       chainId: DydxChainId;
     },
     wallet: {
+      dydxAddress: string | undefined;
       sourceAccount: SourceAccount;
       nobleLocalWallet: LocalWallet;
     },
@@ -35,94 +35,81 @@ type NobleChainTransactionConfig<T> = {
   ) => void | (() => void);
 };
 
+const selectTxAuthorizedAccount = createAppSelector(
+  [
+    selectParentSubaccountInfo,
+    getSourceAccount,
+    calculateIsAccountViewOnly,
+    BonsaiCore.compliance.data,
+    getLocalWalletNonce,
+  ],
+  (parentSubaccountInfo, sourceAccount, isAccountViewOnly, complianceData, localWalletNonce) => {
+    const isAccountRestrictionFree =
+      !isAccountViewOnly &&
+      ![
+        ComplianceStatus.BLOCKED,
+        ComplianceStatus.CLOSE_ONLY,
+        ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
+      ].includes(complianceData.status) &&
+      complianceData.geo &&
+      !isBlockedGeo(complianceData.geo);
+
+    if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
+      return undefined;
+    }
+
+    const localNobleWallet = localWalletManager.getLocalNobleWallet(localWalletNonce);
+    const nobleAddress = convertBech32Address({
+      address: parentSubaccountInfo.wallet,
+      bech32Prefix: NOBLE_BECH32_PREFIX,
+    });
+    const isCorrectWallet = localNobleWallet?.address === nobleAddress;
+
+    if (!isCorrectWallet || localNobleWallet == null) return undefined;
+
+    return {
+      localNobleWallet,
+      sourceAccount,
+      parentSubaccountInfo,
+    };
+  }
+);
+
 export function createNobleTransactionStoreEffect<T>(
   store: RootStore,
   config: NobleChainTransactionConfig<T>
 ) {
   const fullSelector = createAppSelector(
-    [
-      getSelectedNetwork,
-      selectNobleClientReady,
-      selectParentSubaccountInfo,
-      calculateIsAccountViewOnly,
-      BonsaiCore.compliance.data,
-      getLocalWalletNonce,
-      getSourceAccount,
-      config.selector,
-    ],
-    (
-      network,
-      nobleClientReady,
-      parentSubaccountInfo,
-      isAccountViewOnly,
-      compliance,
-      localWalletNonce,
-      sourceAccount,
-      selectorResult
-    ) => {
-      const isAccountRestrictionFree =
-        !isAccountViewOnly &&
-        ![
-          ComplianceStatus.BLOCKED,
-          ComplianceStatus.CLOSE_ONLY,
-          ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
-        ].includes(compliance.status) &&
-        compliance.geo &&
-        !isBlockedGeo(compliance.geo);
+    [getSelectedNetwork, selectTxAuthorizedAccount, config.selector],
+    (network, txAuthorizedAccount, selectorResult) => {
+      if (!txAuthorizedAccount) return undefined;
+      const { localNobleWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
 
       return {
-        infrastructure: {
-          network,
-          nobleClientReady,
-        },
-        account: {
-          isAccountRestrictionFree,
-          localWalletNonce,
-          parentSubaccountInfo,
-          sourceAccount,
-        },
+        network,
+        localNobleWallet,
+        parentSubaccountInfo,
+        sourceAccount,
         data: selectorResult,
       };
     }
   );
 
-  return createStoreEffect(store, fullSelector, ({ infrastructure, account, data }) => {
-    if (
-      !infrastructure.nobleClientReady ||
-      !account.parentSubaccountInfo.wallet ||
-      !account.isAccountRestrictionFree ||
-      account.localWalletNonce == null
-    ) {
+  return createStoreEffect(store, fullSelector, (selectorResults) => {
+    if (selectorResults == null) {
       return undefined;
     }
 
-    const clientConfig = {
-      network: infrastructure.network,
-      dispatch: store.dispatch,
-    };
-    const chainId = ENVIRONMENT_CONFIG_MAP[infrastructure.network].dydxChainId as DydxChainId;
-    const nobleClientRpcUrl =
-      ENVIRONMENT_CONFIG_MAP[infrastructure.network].endpoints.nobleValidator;
-
-    const localNobleWallet = localWalletManager.getLocalNobleWallet(account.localWalletNonce); // Will be undefined if disconnected or connected w/ Keplr
-
-    const convertedWalletAddress = convertBech32Address({
-      address: account.parentSubaccountInfo.wallet,
-      bech32Prefix: NOBLE_BECH32_PREFIX,
-    });
-
-    const isCorrectWallet = localNobleWallet?.address === convertedWalletAddress;
-
-    const canWalletTransact = Boolean(localNobleWallet?.offlineSigner && isCorrectWallet);
-
-    if (!canWalletTransact || localNobleWallet == null) {
-      return undefined;
-    }
-
+    const { network, localNobleWallet, parentSubaccountInfo, sourceAccount, data } =
+      selectorResults;
+    const environmentInfo = ENVIRONMENT_CONFIG_MAP[network];
+    const chainId = environmentInfo.dydxChainId as DydxChainId;
+    const nobleClientRpcUrl = environmentInfo.endpoints.nobleValidator;
     const tokenConfig = TOKEN_CONFIG_MAP[chainId];
 
     const wallet = {
-      sourceAccount: account.sourceAccount,
+      sourceAccount,
+      dydxAddress: parentSubaccountInfo.wallet,
       nobleLocalWallet: localNobleWallet,
     };
 
@@ -132,11 +119,10 @@ export function createNobleTransactionStoreEffect<T>(
       chainId,
     };
 
-    const cleanup = config.onResultUpdate(environment, wallet, data);
+    const cleanup = config.handle(environment, wallet, data);
 
     return () => {
       cleanup?.();
-      CompositeClientManager.markDone(clientConfig);
     };
   });
 }

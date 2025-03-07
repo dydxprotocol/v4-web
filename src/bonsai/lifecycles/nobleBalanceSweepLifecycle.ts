@@ -17,7 +17,6 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createNobleTransactionStoreEffect } from '../rest/lib/nobleTransactionStoreEffect';
-import { selectParentSubaccountInfo } from '../socketSelectors';
 
 function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: number[] } {
   return 'cosmosTx' in tx;
@@ -28,14 +27,9 @@ function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: numb
  */
 export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   const accountAndBalanceSelector = createAppSelector(
-    [
-      selectParentSubaccountInfo,
-      BonsaiCore.account.nobleUsdcBalance.data,
-      selectHasNonExpiredPendingWithdraws,
-    ],
-    (parentSubaccountInfo, balance, hasNonExpiredPendingWithdraws) => {
+    [BonsaiCore.account.nobleUsdcBalance.data, selectHasNonExpiredPendingWithdraws],
+    (balance, hasNonExpiredPendingWithdraws) => {
       return {
-        parentSubaccountInfo,
         balance,
         hasNonExpiredPendingWithdraws,
       };
@@ -45,12 +39,12 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   let nobleSigningClient: NobleClient | undefined;
   const activeSweep = createSemaphore();
 
-  const cleanupEffect = createNobleTransactionStoreEffect(store, {
+  const noopCleanupEffect = createNobleTransactionStoreEffect(store, {
     selector: accountAndBalanceSelector,
-    onResultUpdate: (
+    handle: (
       { nobleClientRpcUrl, tokenConfig, chainId },
-      wallet,
-      { parentSubaccountInfo, balance, hasNonExpiredPendingWithdraws }
+      { dydxAddress, nobleLocalWallet, sourceAccount },
+      { balance, hasNonExpiredPendingWithdraws }
     ) => {
       async function sweepNobleBalance() {
         const balanceBN = MaybeBigNumber(balance);
@@ -58,18 +52,17 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           return;
         }
 
-        if (wallet.nobleLocalWallet.address == null || parentSubaccountInfo.wallet == null) {
+        if (nobleLocalWallet.address == null || dydxAddress == null) {
           return;
         }
 
         if (hasNonExpiredPendingWithdraws) {
-          logBonsaiInfo('nobleBalanceSweepLifecycle', 'skipping sweep, user has pending withdraws');
           return;
         }
 
         // Set up Noble and Skip clients
         nobleSigningClient = new NobleClient(nobleClientRpcUrl);
-        await nobleSigningClient.connect(wallet.nobleLocalWallet);
+        await nobleSigningClient.connect(nobleLocalWallet);
         const skipClient = new SkipClient();
 
         // Get MsgDirectResponse and construct ibc message
@@ -80,8 +73,8 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           destAssetDenom: tokenConfig.usdc.denom,
           destAssetChainID: chainId,
           chainIdsToAddresses: {
-            [chainId]: parentSubaccountInfo.wallet,
-            'noble-1': wallet.nobleLocalWallet.address,
+            [chainId]: dydxAddress,
+            'noble-1': nobleLocalWallet.address,
           },
           amountIn: parseUnits(balanceToSweep, tokenConfig.usdc.decimals).toString(),
           slippageTolerancePercent: '1',
@@ -141,14 +134,13 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         await nobleSigningClient.send(
           [ibcMsg],
           undefined,
-          `${DEFAULT_TRANSACTION_MEMO} | ${wallet.nobleLocalWallet.address}`
+          `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
         );
       }
 
       // Don't auto-sweep on Cosmos
       // TODO: Add notification to prompt user to sweep manually
-      if (wallet.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        logBonsaiInfo('nobleBalanceSweepLifecycle', 'skipping sweep on Cosmos');
+      if (sourceAccount.chain === WalletNetworkType.Cosmos) {
         return;
       }
 
@@ -171,7 +163,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   });
 
   return () => {
-    cleanupEffect();
+    noopCleanupEffect();
     activeSweep.clear();
   };
 }
