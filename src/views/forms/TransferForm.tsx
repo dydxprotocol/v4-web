@@ -1,20 +1,22 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 
+import { TransferToken } from '@/bonsai/forms/transfers';
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
+import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { Nullable, TransferInputField, TransferType } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
-import { DydxChainAsset, WalletType } from '@/constants/wallets';
+import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useTransferForm } from '@/hooks/transferHooks';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useRestrictions } from '@/hooks/useRestrictions';
@@ -37,16 +39,15 @@ import { OutputType } from '@/components/Output';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferButtonAndReceipt';
 
-import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
-import { MustBigNumber } from '@/lib/numbers';
+import { useDisappearingValue } from '@/lib/disappearingValue';
+import { calc } from '@/lib/do';
 import { log } from '@/lib/telemetry';
 import { isValidKey } from '@/lib/typeUtils';
 
@@ -63,80 +64,34 @@ export const TransferForm = ({
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
 
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { freeCollateral: freeCollateralPost } =
-    useAppSelector(getSubaccountForPostOrder, shallowEqual) ?? {};
-  const { dydxAddress, sourceAccount } = useAccounts();
+  const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
-  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } =
     useTokenConfigs();
   useWithdrawalInfo({ transferType: 'transfer' });
 
+  const form = useTransferForm(selectedAsset === DydxChainAsset.USDC);
+
   const {
-    address: recipientAddress,
-    size,
-    fee,
-    token,
     memo,
-  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+    amountInput: { amount, type: transferType },
+    recipientAddress,
+  } = form.state;
 
   // Form states
-  const [error, setError] = useState<string>();
+  const [error, setError] = useDisappearingValue<string>();
   const [isLoading, setIsLoading] = useState(false);
 
-  // temp fix: TODO: reset fees when changing token in Abacus
-  const [currentFee, setCurrentFee] = useState(fee);
-  useEffect(() => {
-    setCurrentFee(fee);
-  }, [fee]);
-
-  const asset = token ?? selectedAsset;
-  const isChainTokenSelected = asset === DydxChainAsset.CHAINTOKEN;
-  const isUSDCSelected = asset === DydxChainAsset.USDC;
-  const amount = isUSDCSelected ? size?.usdcSize : size?.size;
-  const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
-  const showMemoField = isChainTokenSelected;
-
-  const balance = isUSDCSelected ? freeCollateral : nativeTokenBalance;
-
-  // BN
-  const newBalanceBN = isUSDCSelected
-    ? MustBigNumber(freeCollateralPost?.postOrder)
-    : nativeTokenBalance.minus(size?.size ?? 0);
-
-  const amountBN = MustBigNumber(amount);
-  const balanceBN = MustBigNumber(balance);
-
-  const onChangeAsset = (newAsset: Nullable<string>) => {
+  const onChangeAsset = (newAsset: Nullable<DydxChainAsset>) => {
     setError(undefined);
-    setCurrentFee(undefined);
 
-    if (newAsset) {
-      abacusStateManager.setTransferValue({
-        value: newAsset,
-        field: TransferInputField.token,
-      });
+    if (newAsset === DydxChainAsset.CHAINTOKEN) {
+      form.actions.setNativeAmount('');
+    } else if (newAsset === DydxChainAsset.USDC) {
+      form.actions.setUsdcAmount('');
     }
   };
-
-  useEffect(() => {
-    if (sourceAccount.walletInfo?.name === WalletType.Keplr && dydxAddress) {
-      abacusStateManager.setTransfersSourceAddress(dydxAddress);
-    }
-
-    abacusStateManager.setTransferValue({
-      value: TransferType.transferOut.rawValue,
-      field: TransferInputField.type,
-    });
-
-    onChangeAsset(selectedAsset);
-
-    return () => {
-      abacusStateManager.resetInputState();
-    };
-  }, []);
 
   const { sanctionedAddresses } = useRestrictions();
 
@@ -149,14 +104,25 @@ export const TransferForm = ({
     [recipientAddress, sanctionedAddresses, dydxAddress]
   );
 
-  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
-  const showMemoEmptyWarning = showMemoField && !memo && isAddressValid && isAmountValid; // only show warning if user has inputted mandatory fields
+  const isUSDCSelected = transferType === TransferToken.USDC;
+  const isChainTokenSelected = transferType === TransferToken.NATIVE;
+  const showMemoField = isChainTokenSelected;
+
+  const asset = isUSDCSelected ? DydxChainAsset.USDC : DydxChainAsset.CHAINTOKEN;
 
   const { screenAddresses } = useDydxClient();
 
+  const canSubmit = useMemo(
+    () =>
+      form.errors.find((e) => e.type === ErrorType.error) == null && form.summary.payload != null,
+    [form.errors, form.summary.payload]
+  );
   const onTransfer = async () => {
-    const assetDenom = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset].denom : undefined;
-    if (!isAmountValid || !isAddressValid || !fee || !assetDenom) return;
+    // const assetDenom = isValidKey(asset, tokensConfigs) ? tokensConfigs[asset].denom : undefined;
+    const payload = form.summary.payload;
+    if (!canSubmit || payload == null) {
+      return;
+    }
     setIsLoading(true);
     setError(undefined);
 
@@ -178,19 +144,13 @@ export const TransferForm = ({
           })
         );
       } else {
-        const txResponse = await transfer(
-          amountBN.toNumber(),
-          recipientAddress!,
-          assetDenom,
-          memo ?? undefined
-        );
-
-        if (txResponse?.code === 0) {
+        const txResponse = await transfer(payload);
+        if (txResponse.type === 'success') {
           // eslint-disable-next-line no-console
-          console.log('TransferForm > txReceipt > ', txResponse.hash);
+          console.log('TransferForm > txReceipt > ', txResponse.payload.hash);
           onDone?.();
         } else {
-          throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
+          throw new Error(txResponse.errorString || 'Transaction did not commit.');
         }
       }
     } catch (err) {
@@ -202,7 +162,11 @@ export const TransferForm = ({
             ? stringGetter({
                 key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                 params: {
-                  ERROR_MESSAGE: err.message ?? stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                  ERROR_MESSAGE: stringGetter({
+                    key:
+                      parseTransactionError('TransferForm onTransfer', err.message)?.stringKey ??
+                      STRING_KEYS.UNKNOWN_ERROR,
+                  }),
                 },
               })
             : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
@@ -215,24 +179,19 @@ export const TransferForm = ({
   };
 
   const onChangeAddress = (value?: string) => {
-    abacusStateManager.setTransferValue({
-      value,
-      field: TransferInputField.address,
-    });
+    form.actions.setRecipientAddress(value ?? '');
   };
 
-  const onChangeAmount = (value?: number) => {
-    abacusStateManager.setTransferValue({
-      value,
-      field: isUSDCSelected ? TransferInputField.usdcSize : TransferInputField.size,
-    });
+  const onChangeAmount = (value?: string) => {
+    if (isUSDCSelected) {
+      form.actions.setUsdcAmount(value ?? '');
+    } else {
+      form.actions.setNativeAmount(value ?? '');
+    }
   };
 
   const onChangeMemo = (value: string) => {
-    abacusStateManager.setTransferValue({
-      value,
-      field: TransferInputField.MEMO,
-    });
+    form.actions.setMemo(value);
   };
 
   const onPasteAddress = async () => {
@@ -286,6 +245,19 @@ export const TransferForm = ({
     },
   ];
 
+  const { balanceBefore, balanceAfter } = calc(() => {
+    if (isUSDCSelected) {
+      return {
+        balanceBefore: form.summary.accountBefore.freeCollateral,
+        balanceAfter: form.summary.accountAfter.freeCollateral,
+      };
+    }
+    return {
+      balanceBefore: form.summary.accountBefore.availableNativeBalance,
+      balanceAfter: form.summary.accountAfter.availableNativeBalance,
+    };
+  });
+
   const amountDetailItems = [
     {
       key: 'amount',
@@ -297,11 +269,14 @@ export const TransferForm = ({
       value: (
         <DiffOutput
           type={OutputType.Asset}
-          value={balanceBN}
+          value={balanceBefore}
           sign={NumberSign.Negative}
-          newValue={newBalanceBN}
-          hasInvalidNewValue={newBalanceBN.isNegative()}
-          withDiff={Boolean(amount && balance) && !amountBN.isNaN()}
+          newValue={balanceAfter}
+          hasInvalidNewValue={(balanceAfter ?? 0) < 0}
+          withDiff={
+            form.summary.inputs.amount != null && balanceBefore != null && balanceAfter != null
+          }
+          fractionDigits={isUSDCSelected ? USD_DECIMALS : TOKEN_DECIMALS}
         />
       ),
     },
@@ -329,11 +304,25 @@ export const TransferForm = ({
     </$FormInputToggleButton>
   );
 
-  const onToggleMaxButton = useCallback(
-    (isPressed: boolean) =>
-      isPressed ? onChangeAmount(balanceBN.toNumber()) : onChangeAmount(undefined),
-    [balanceBN, onChangeAmount]
+  const onToggleMaxButton = (isPressed: boolean) =>
+    isPressed ? onChangeAmount(balanceBefore?.toString() ?? '') : onChangeAmount(undefined);
+
+  const firstError = useMemo(
+    () => form.errors.find((e) => e.type === ErrorType.error),
+    [form.errors]
   );
+  const ctaErrorAction = useMemo(() => {
+    const key = firstError?.resources.title?.stringKey;
+    return key ? stringGetter({ key }) : undefined;
+  }, [firstError?.resources.title?.stringKey, stringGetter]);
+
+  const validationAlert = useMemo(() => {
+    return firstError?.resources.text?.stringKey != null ? firstError : undefined;
+  }, [firstError]);
+
+  const hasErrors = useMemo(() => {
+    return firstError != null;
+  }, [firstError]);
 
   return (
     <$Form
@@ -355,11 +344,11 @@ export const TransferForm = ({
             </span>
           }
           type={InputType.Text}
-          value={recipientAddress ?? ''}
+          value={recipientAddress}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           slotRight={renderFormInputButton({
             label: stringGetter({ key: STRING_KEYS.PASTE }),
-            isInputEmpty: recipientAddress == null || recipientAddress === '',
+            isInputEmpty: recipientAddress.trim() === '',
             onClear: () => onChangeAddress(''),
             onClick: onPasteAddress,
           })}
@@ -376,20 +365,9 @@ export const TransferForm = ({
         </$NetworkSelectMenu>
       </$Row>
 
-      {recipientAddress && !isAddressValid && (
-        <AlertMessage type={AlertType.Error} tw="-mt-0.75">
-          {stringGetter({
-            key:
-              dydxAddress === recipientAddress
-                ? STRING_KEYS.TRANSFER_TO_YOURSELF
-                : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
-          })}
-        </AlertMessage>
-      )}
-
       <$SelectMenu
         label={stringGetter({ key: STRING_KEYS.ASSET })}
-        value={token ?? ''}
+        value={asset}
         onValueChange={onChangeAsset}
       >
         {assetOptions.map(({ value, label }) => (
@@ -405,14 +383,16 @@ export const TransferForm = ({
         <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           type={InputType.Number}
-          onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
-          value={amount ?? undefined}
+          onChange={({ formattedValue }: NumberFormatValues) => onChangeAmount(formattedValue)}
+          value={amount}
+          decimals={isUSDCSelected ? USD_DECIMALS : TOKEN_DECIMALS}
           slotRight={
             isUSDCSelected &&
-            balanceBN.gt(0) && (
+            balanceBefore != null &&
+            balanceBefore > 0 && (
               <FormMaxInputToggleButton
                 size={ButtonSize.XSmall}
-                isInputEmpty={size?.usdcSize == null}
+                isInputEmpty={amount.trim().length === 0}
                 isLoading={isLoading}
                 onPressedChange={onToggleMaxButton}
               />
@@ -440,31 +420,20 @@ export const TransferForm = ({
         />
       )}
 
-      {showMemoEmptyWarning && (
-        <AlertMessage type={AlertType.Warning}>
-          {stringGetter({
-            key: STRING_KEYS.TRANSFER_WITHOUT_MEMO,
-          })}
-        </AlertMessage>
-      )}
-
-      {showNotEnoughGasWarning && (
-        <AlertMessage type={AlertType.Warning}>
-          {stringGetter({
-            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-            params: { TOKEN: usdcLabel, BALANCE: usdcBalance },
-          })}
-        </AlertMessage>
-      )}
-
+      {validationAlert && <ValidationAlertMessage error={validationAlert} />}
       {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
 
       <$Footer>
         <TransferButtonAndReceipt
-          selectedAsset={asset}
-          fee={currentFee ?? undefined}
-          isDisabled={!isAmountValid || !isAddressValid || !currentFee || isLoading}
-          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !currentFee)}
+          summary={form.summary}
+          isDisabled={isLoading || hasErrors}
+          isLoading={isLoading}
+          slotLeft={
+            ctaErrorAction ? (
+              <Icon iconName={IconName.Warning} tw="text-color-warning" />
+            ) : undefined
+          }
+          buttonText={ctaErrorAction ?? undefined}
         />
       </$Footer>
     </$Form>
