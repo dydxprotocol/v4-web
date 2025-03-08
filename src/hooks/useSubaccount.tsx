@@ -1248,9 +1248,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       ];
 
       const jsonString = JSON.stringify(subAuthenticators);
-      console.log('jsonString', jsonString);
       const encodedData = new TextEncoder().encode(jsonString);
-      console.log('encodedData', encodedData);
+
       return compositeClient.addAuthenticator(
         subaccountClient,
         AuthenticatorType.ALL_OF,

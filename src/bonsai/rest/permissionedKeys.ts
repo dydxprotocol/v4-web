@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
+import { AccountAuthenticator } from '@/constants/validators';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -9,12 +10,6 @@ import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { isPresent } from '@/lib/typeUtils';
 
 import { useCompositeClient } from './lib/useIndexer';
-
-export type AccountAuthenticator = {
-  id: string;
-  type: string;
-  config: string;
-};
 
 export function useAuthorizedAccounts() {
   const address = useAppSelector(getUserWalletAddress);

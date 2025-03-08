@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
 import { BonsaiHooks } from '@/bonsai/ontology';
-import { AccountAuthenticator } from '@/bonsai/rest/permissionedKeys';
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
+import { AccountAuthenticator } from '@/constants/validators';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -21,14 +21,12 @@ export const AuthorizedAccountsTable = ({ className }: { className?: string }) =
   const stringGetter = useStringGetter();
   const authorizedAccounts = BonsaiHooks.useAuthorizedAccounts();
 
-  const { isTablet } = useBreakpoints();
-
   const columns = useMemo<ColumnDef<AuthorizedAccountTableRow>[]>(
     () => [
       {
         columnKey: 'id',
         getCellValue: (row) => row.id,
-        label: 'id',
+        label: stringGetter({ key: STRING_KEYS.ADDRESS }),
         renderCell: ({ id }) => <TableCell>{id}</TableCell>,
       },
       {
@@ -44,7 +42,7 @@ export const AuthorizedAccountsTable = ({ className }: { className?: string }) =
         renderCell: ({ config }) => <TableCell>{config}</TableCell>,
       },
     ],
-    []
+    [stringGetter]
   );
 
   return (

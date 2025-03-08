@@ -5,7 +5,7 @@ import { DialogTypes } from '@/constants/dialogs';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
-import { AddPermissionedAccountDialog } from '@/views/dialogs/AddPermissionedAccountDialog';
+import { AddPermissionedAccountDialog } from '@/views/dialogs/AddPermissionedAccountDialog/AddPermissionedAccountDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
