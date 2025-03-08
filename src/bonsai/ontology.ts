@@ -2,6 +2,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
+import { AccountAuthenticator } from '@/constants/validators';
 import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
@@ -18,7 +19,7 @@ import {
   useHistoricalTradingRewardsWeekly,
   useTotalTradingRewards,
 } from './rest/historicalTradingRewards';
-import { AccountAuthenticator, useAuthorizedAccounts } from './rest/permissionedKeys';
+import { useAuthorizedAccounts } from './rest/permissionedKeys';
 import {
   StakingDelegationsResult,
   StakingRewards,
