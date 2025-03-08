@@ -18,6 +18,7 @@ import {
   useHistoricalTradingRewardsWeekly,
   useTotalTradingRewards,
 } from './rest/historicalTradingRewards';
+import { AccountAuthenticator, useAuthorizedAccounts } from './rest/permissionedKeys';
 import {
   StakingDelegationsResult,
   StakingRewards,
@@ -376,6 +377,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
 };
 
 interface BonsaiHooksShape {
+  useAuthorizedAccounts: () => Loadable<AccountAuthenticator[]>;
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
   useDailyCumulativeTradingRewards: () => Loadable<AggregatedTradingReward[]>;
@@ -389,6 +391,7 @@ interface BonsaiHooksShape {
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
+  useAuthorizedAccounts,
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
   useDailyCumulativeTradingRewards,

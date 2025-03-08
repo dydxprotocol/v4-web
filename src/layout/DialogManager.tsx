@@ -5,6 +5,7 @@ import { DialogTypes } from '@/constants/dialogs';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
+import { AddPermissionedAccountDialog } from '@/views/dialogs/AddPermissionedAccountDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
@@ -71,6 +72,7 @@ export const DialogManager = React.memo(() => {
 
   return DialogTypes.match(activeDialog, {
     AcknowledgeTerms: (args) => <AcknowledgeTermsDialog {...args} {...modalProps} />,
+    AddPermissionedAccount: (args) => <AddPermissionedAccountDialog {...args} {...modalProps} />,
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
     AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,

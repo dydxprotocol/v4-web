@@ -4,6 +4,7 @@ import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import { Item } from '@radix-ui/react-dropdown-menu';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -18,6 +19,7 @@ import {
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 import { DydxChainAsset, WalletNetworkType, wallets, WalletType } from '@/constants/wallets';
 
@@ -100,7 +102,7 @@ export const AccountMenu = () => {
   };
 
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
-
+  const navigate = useNavigate();
   const usedBalanceBN = MustBigNumber(usdcBalance);
 
   const showConfirmPendingDeposit =
@@ -380,6 +382,12 @@ export const AccountMenu = () => {
               },
             ]
           : []),
+        {
+          value: 'Permissioned Accounts',
+          icon: <Icon iconName={IconName.Lock} />,
+          label: 'Permissioned Accounts',
+          onSelect: () => navigate(AppRoute.PermissionedKeys),
+        },
         {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,

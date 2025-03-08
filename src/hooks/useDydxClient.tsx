@@ -522,6 +522,14 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  // Permissioned Keys
+  const getAuthorizedAccounts = useCallback(
+    async (address: string) => {
+      return compositeClient?.getAuthenticators(address);
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -555,7 +563,7 @@ const useDydxClientContext = () => {
     getAffiliateInfo,
     getAllAffiliateTiers,
     getReferredBy,
-
+    getAuthorizedAccounts,
     // vault methods
     getMegavaultHistoricalPnl,
     getMegavaultPositions,

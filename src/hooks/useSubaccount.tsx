@@ -11,11 +11,17 @@ import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { toBase64 } from '@cosmjs/encoding';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import { type Nullable } from '@dydxprotocol/v4-abacus';
-import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import {
+  AuthenticatorType,
+  SubaccountClient,
+  TYPE_URL_MSG_PLACE_ORDER,
+  type LocalWallet,
+} from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
@@ -1220,6 +1226,55 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, compositeClient, createTransferMessage]
   );
 
+  const addAuthorizedAccount = useCallback(
+    async (addressToAuthorize: string) => {
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      const subAuthenticators = [
+        {
+          type: AuthenticatorType.SIGNATURE_VERIFICATION,
+          config: addressToAuthorize,
+        },
+        {
+          type: AuthenticatorType.MESSAGE_FILTER,
+          config: toBase64(new TextEncoder().encode(TYPE_URL_MSG_PLACE_ORDER)),
+        },
+      ];
+
+      const jsonString = JSON.stringify(subAuthenticators);
+      console.log('jsonString', jsonString);
+      const encodedData = new TextEncoder().encode(jsonString);
+      console.log('encodedData', encodedData);
+      return compositeClient.addAuthenticator(
+        subaccountClient,
+        AuthenticatorType.ALL_OF,
+        encodedData
+      );
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const removeAuthorizedAccount = useCallback(
+    async (idToRemove: Long) => {
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      return compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+    },
+    [compositeClient, subaccountClient]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -1261,5 +1316,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getVaultAccountInfo,
     depositToMegavault,
     withdrawFromMegavault,
+
+    // Permissioned Keys
+    addAuthorizedAccount,
+    removeAuthorizedAccount,
   };
 };

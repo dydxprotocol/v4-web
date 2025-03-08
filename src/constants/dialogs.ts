@@ -101,10 +101,12 @@ export type CriteriaDialogProps = {
 export type CoinbaseDepositDialogProps = {
   onBack?: () => void;
 };
+export type AddPermissionedAccountDialogProps = {};
 
 export const DialogTypes = unionize(
   {
     AcknowledgeTerms: ofType<AcknowledgeTermsDialogProps>(),
+    AddPermissionedAccount: ofType<AddPermissionedAccountDialogProps>(),
     AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
     AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
     CancelAllOrdersConfirmation: ofType<CancelAllOrdersConfirmationDialogProps>(),

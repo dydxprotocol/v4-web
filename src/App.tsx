@@ -75,6 +75,7 @@ const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
+const PermissionedKeysPage = lazy(() => import('@/pages/permissioned-keys/PermissionedKeys'));
 
 const Content = () => {
   useInitializePage();
@@ -145,6 +146,7 @@ const Content = () => {
               </Route>
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
+              <Route path={AppRoute.PermissionedKeys} element={<PermissionedKeysPage />} />
               <Route
                 path="*"
                 element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
