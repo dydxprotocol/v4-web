@@ -1,27 +1,36 @@
 import { useMemo } from 'react';
 
-import { useMetadataService } from './useMetadataService';
-import { usePerpetualMarkets } from './userPerpetualMarkets';
+import { mergeLoadableStatusState } from '@/bonsai/lib/mapLoadable';
+import { BonsaiCore } from '@/bonsai/ontology';
+
+import { useAppSelector } from '@/state/appTypes';
+
+import { getMarketIdFromAsset } from '@/lib/assetUtils';
 
 export const useLaunchableMarkets = () => {
-  const perpetualMarketsFetch = usePerpetualMarkets();
-  const metadataServiceData = useMetadataService();
+  const perpsRaw = useAppSelector(BonsaiCore.markets.markets.data);
+  const assetsRaw = useAppSelector(BonsaiCore.markets.assets.data);
+  const loadingStateMarkets = useAppSelector(BonsaiCore.markets.markets.loading);
+  const loadingStateAssets = useAppSelector(BonsaiCore.markets.assets.loading);
+  const loadingState = mergeLoadableStatusState(loadingStateMarkets, loadingStateAssets);
 
   const filteredPotentialMarkets: { id: string; asset: string }[] = useMemo(() => {
-    const assets = Object.keys(metadataServiceData.data).map((asset) => {
+    const assets = Object.values(assetsRaw ?? {}).map((asset) => {
       return {
-        id: `${asset}-USD`,
-        asset,
+        id: getMarketIdFromAsset(asset.assetId),
+        asset: asset.assetId,
       };
     });
 
     return assets.filter(({ id }) => {
-      return !perpetualMarketsFetch.data?.[id];
+      return (perpsRaw ?? {})[id] == null;
     });
-  }, [perpetualMarketsFetch.data, metadataServiceData.data]);
+  }, [assetsRaw, perpsRaw]);
 
   return {
-    ...metadataServiceData,
     data: filteredPotentialMarkets,
+    isLoading:
+      (Object.keys(perpsRaw ?? {}).length === 0 || Object.keys(assetsRaw ?? {}).length === 0) &&
+      (loadingState === 'idle' || loadingState === 'pending'),
   };
 };
