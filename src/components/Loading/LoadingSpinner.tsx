@@ -54,7 +54,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
-type LoadingSpaceProps = { className?: string; description?: ReactNode; id: string };
+type LoadingSpaceProps = { className?: string; description?: ReactNode; id?: string };
 
 export const LoadingSpace: React.FC<LoadingSpaceProps> = ({
   className,
