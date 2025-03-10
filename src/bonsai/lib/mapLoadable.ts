@@ -31,3 +31,19 @@ export function mergeLoadableStatus(...status: Array<Loadable<any>>): Loadable<a
   }
   return 'success';
 }
+
+// CAUTION: doesn't take into account the actual data state so shouldn't be trusted alone, also check for data presence
+export function mergeLoadableStatusState(
+  ...status: Array<Loadable<any>['status']>
+): Loadable<any>['status'] {
+  if (status.some((s) => s === 'error')) {
+    return 'error';
+  }
+  if (status.some((s) => s === 'pending')) {
+    return 'pending';
+  }
+  if (status.some((s) => s === 'idle')) {
+    return 'idle';
+  }
+  return 'success';
+}

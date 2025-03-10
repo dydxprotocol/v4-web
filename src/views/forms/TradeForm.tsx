@@ -37,6 +37,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -333,11 +334,7 @@ export const TradeForm = ({
 
   // prevent real trading if null/zero oracle price or we are out of sync with abacus somehow
   if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
-    return (
-      <div tw="flex h-full w-full items-center p-1 text-center">
-        {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
-      </div>
-    );
+    return <LoadingSpace />;
   }
 
   return (
