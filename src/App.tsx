@@ -57,6 +57,7 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
+import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { appQueryClient } from './state/appQueryClient';
@@ -146,7 +147,9 @@ const Content = () => {
               </Route>
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
-              <Route path={AppRoute.PermissionedKeys} element={<PermissionedKeysPage />} />
+              {testFlags.showPermissionedKeys && (
+                <Route path={AppRoute.PermissionedKeys} element={<PermissionedKeysPage />} />
+              )}
               <Route
                 path="*"
                 element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
