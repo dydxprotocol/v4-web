@@ -584,6 +584,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const doPlaceOrder = useCallback(
     async (params: PlaceOrderPayload) => {
       try {
+        track(AnalyticsEvents.TradePlaceOrder(params as any)); // type is close enough but it's annoying to fully convert
+
         if (!compositeClient) {
           throw new Error('client not initialized');
         }
