@@ -67,7 +67,7 @@ function calculateSubaccountOrder(
     size: MustBigNumber(base.size),
     totalFilled: MustBigNumber(base.totalFilled),
     goodTilBlock: MaybeBigNumber(base.goodTilBlock)?.toNumber(),
-    goodTilBlockTime: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
+    goodTilBlockTimeMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
     createdAtHeight: MaybeBigNumber(base.createdAtHeight)?.toNumber(),
     postOnly: !!base.postOnly,
     reduceOnly: !!base.reduceOnly,
