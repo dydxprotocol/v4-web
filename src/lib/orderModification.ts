@@ -41,7 +41,7 @@ export const canModifyOrderTypeFromChart = (order: SubaccountOrderNew) => {
 // https://github.com/dydxprotocol/v4-clients/blob/4227bd06a6f4503d863dcd99b3aba703cb94c40b/v4-client-js/src/clients/composite-client.ts#L253
 const calculateGoodTilTimeInSeconds = (goodTilBlockTimeMilliseconds: number) => {
   const nowMs = Date.now();
-  return Math.round((futugoodTilBlockTimeMillisecondsreMs - nowMs) / 1000);
+  return Math.round((goodTilBlockTimeMilliseconds - nowMs) / 1000);
 };
 
 const getMarketInfo = (marketId: string) => {
