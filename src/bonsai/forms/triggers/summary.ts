@@ -441,7 +441,7 @@ function calculateTriggerOrderDetails(
 
   // handle no price input
   const priceInput = triggerOrder.priceInput;
-  if (priceInput == null) {
+  if (priceInput === undefined) {
     if (existingOrder) {
       const triggerPrice = existingOrder.triggerPrice;
       // We could calculate other fields based on the trigger price
@@ -452,6 +452,10 @@ function calculateTriggerOrderDetails(
         };
       }
     }
+    return details;
+  }
+  // no trigger price
+  if (priceInput === null) {
     return details;
   }
 
