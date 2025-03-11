@@ -104,6 +104,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     timeInForce != null ? indexerToAbacusTimeInForce(timeInForce).rawValue : undefined,
     // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
     isMarketOrderTypeNew(type) ? OrderExecution.IOC : null,
+    // todo bonsai broke the goodtilblocktime by making it milliseconds
     goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime / 1000),
     goodTilBlock,
     getMarketInfo(marketId)
