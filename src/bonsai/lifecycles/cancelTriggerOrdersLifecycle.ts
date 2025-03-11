@@ -1,5 +1,5 @@
-import { SubaccountClient } from '@dydxprotocol/v4-client-js';
-import { groupBy } from 'lodash';
+import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
+import { keyBy } from 'lodash';
 
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
@@ -7,6 +7,11 @@ import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerAp
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
+import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { stringifyTransactionError } from '@/lib/errors';
+import { SerialTaskExecutor } from '@/lib/serialExecutor';
+
+import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
@@ -30,8 +35,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         return undefined;
       }
 
-      const groupedPositions = groupBy(positions, 'uniqueId');
-      const ordersToCancel: Set<SubaccountOrder> = new Set();
+      const groupedPositions = keyBy(positions, (o) => o.uniqueId);
 
       const filteredOrders = orders.filter((o) => {
         const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
@@ -41,91 +45,116 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
       });
 
       // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
-      filteredOrders.forEach((o) => {
-        const position = groupedPositions[o.positionUniqueId]?.[0];
-        if (position == null) {
-          ordersToCancel.add(o);
-        } else if (position.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) {
-          ordersToCancel.add(o);
-        } else if (
-          position.side === IndexerPositionSide.SHORT &&
-          o.side === IndexerOrderSide.SELL
-        ) {
-          ordersToCancel.add(o);
-        }
+      const ordersToCancel = filteredOrders.filter((o) => {
+        const position = groupedPositions[o.positionUniqueId];
+        const isOrphan = position == null;
+        const hasInvalidReduceOnlyOrder =
+          (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
+          (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
+
+        return isOrphan || hasInvalidReduceOnlyOrder;
       });
 
       return {
         ...authorizedAccount,
-        ordersToCancel: Array.from(ordersToCancel),
+        ordersToCancel,
       };
     }
   );
 
   const activeOrderCancellations = createSemaphore();
   let canceledOrderIds = new Set<string>();
+  const chainTxExecutor = new SerialTaskExecutor();
+
+  async function doCancelOrder(
+    client: CompositeClient,
+    localDydxWallet: LocalWallet,
+    order: SubaccountOrder
+  ) {
+    try {
+      const {
+        id,
+        clientId,
+        subaccountNumber,
+        orderFlags,
+        clobPairId,
+        goodTilBlock,
+        goodTilBlockTime,
+      } = order;
+
+      if (clientId == null || orderFlags == null || clobPairId == null) {
+        throw new Error('missing required fields');
+      }
+
+      canceledOrderIds.add(id);
+      const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
+      const clientIdInt = parseInt(clientId, 10);
+      const orderFlagsInt = parseInt(orderFlags, 10);
+      const goodTilBlockTimeSeconds = goodTilBlockTime
+        ? Math.floor(goodTilBlockTime / 1000)
+        : undefined;
+
+      const tx = await client.cancelRawOrder(
+        subaccountClient,
+        clientIdInt,
+        orderFlagsInt,
+        clobPairId,
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        goodTilBlock || undefined, // goodTilBlock of 0 will be submitted as undefined
+        goodTilBlockTimeSeconds
+      );
+
+      const parsedTx = parseToPrimitives(tx);
+
+      logBonsaiInfo(
+        'cancelOrphanedTriggerOrdersLifecycle',
+        'successfully cancelled trigger order',
+        {
+          id,
+          clientIdInt,
+          orderFlagsInt,
+          clobPairId,
+          goodTilBlock,
+        }
+      );
+
+      return wrapOperationSuccess(parsedTx);
+    } catch (error) {
+      const parsed = stringifyTransactionError(error);
+      logBonsaiError('cancelOrphanedTriggerOrdersLifecycle', 'Failed to cancel trigger orders', {
+        error,
+      });
+      return wrapOperationFailure(parsed);
+    }
+  }
 
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector,
     handle: (_clientId, compositeClient, data) => {
-      if (data == null) {
+      if (data == null || !data.localDydxWallet) {
         return undefined;
       }
 
       async function cancelTriggerOrdersWithClosedOrFlippedPositions() {
         const { ordersToCancel, localDydxWallet } = data!;
 
-        ordersToCancel.forEach(async (o) => {
-          const {
-            id,
-            clientId,
-            subaccountNumber,
-            orderFlags,
-            clobPairId,
-            goodTilBlock,
-            goodTilBlockTime,
-          } = o;
+        await Promise.all(
+          ordersToCancel.map(async (o) => {
+            if (canceledOrderIds.has(o.id)) {
+              return null;
+            }
 
-          if (canceledOrderIds.has(id)) {
-            return;
-          }
+            canceledOrderIds.add(o.id);
 
-          if (clientId == null || orderFlags == null || clobPairId == null) {
-            throw new Error('Missing required fields');
-          }
-
-          const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
-          const clientIdInt = parseInt(clientId, 10);
-          const orderFlagsInt = parseInt(orderFlags, 10);
-          const goodTilBlockTimeSeconds = goodTilBlockTime
-            ? Math.floor(goodTilBlockTime / 1000)
-            : undefined;
-
-          canceledOrderIds.add(id);
-
-          logBonsaiInfo('cancelOrphanedTriggerOrdersLifecycle', 'cancelling trigger order', {
-            id,
-            clientIdInt,
-            orderFlagsInt,
-            clobPairId,
-            goodTilBlock,
-          });
-
-          await compositeClient.cancelRawOrder(
-            subaccountClient,
-            clientIdInt,
-            orderFlagsInt,
-            clobPairId,
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            goodTilBlock || undefined, // goodTilBlock of 0 will be submitted as undefined
-            goodTilBlockTimeSeconds
-          );
-
-          // TODO: track analytics event TradeCancelOrder and TradeCancelOrderSubmissionConfirmed
-        });
+            // chainTxExecutor.enqueue returns a Promise of the operation result
+            return chainTxExecutor.enqueue(() =>
+              doCancelOrder(compositeClient, localDydxWallet!, o)
+            );
+          })
+        );
       }
 
-      if (data.sourceAccount.chain === WalletNetworkType.Cosmos || data.localDydxWallet == null) {
+      if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
         return undefined;
       }
 
@@ -136,10 +165,9 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             return;
           }
 
-          // TODO: track analytics event TradeCancelOrderSubmissionFailed
           logBonsaiError(
             'cancelOrphanedTriggerOrdersLifecycle',
-            'error trying to cancel trigger orders',
+            'Failed to cancel trigger orders',
             {
               error,
             }
@@ -154,6 +182,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   return () => {
     canceledOrderIds = new Set<string>();
     activeOrderCancellations.clear();
+    chainTxExecutor.clear();
     noopCleanupEffect();
   };
 }
