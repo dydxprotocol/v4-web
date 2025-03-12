@@ -17,6 +17,8 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 
+import { truncateAddress } from '@/lib/wallet';
+
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
 const CONTENT_SECTIONS = [
@@ -75,14 +77,19 @@ export const ReferralDialog = ({ setIsOpen, refCode }: DialogProps<ReferralDialo
       setIsOpen={setIsOpen}
       withClose={false}
       title={
-        <span tw="flex flex-row items-center gap-[0.5ch]">
-          {stringGetter({
-            key:
-              !isNotEligible && !invalidReferralCode
-                ? STRING_KEYS.YOUR_FRIEND
-                : STRING_KEYS.WELCOME_DYDX,
-          })}
-          {!isNotEligible && !invalidReferralCode && <span tw="text-color-text-1">{refCode}</span>}
+        <span tw="flex flex-row items-end gap-[0.5ch]">
+          {!isNotEligible && !invalidReferralCode ? (
+            <>
+              <span tw="text-color-text-1">{refCode}</span>
+              <span tw="mb-0.25 text-color-text-0 font-small-book">
+                ({truncateAddress(referralAddress)})
+              </span>
+            </>
+          ) : (
+            stringGetter({
+              key: STRING_KEYS.WELCOME_DYDX,
+            })
+          )}
         </span>
       }
       description={stringGetter({
