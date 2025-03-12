@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
 import {
@@ -21,13 +22,12 @@ const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   unit: TimeUnit.DAY,
 };
 
-function getOrderFormFieldStates(form: TradeForm): TradeFormFieldStates {
+export function getTradeFormFieldStates(
+  form: TradeForm,
+  existingPositionMarginMode: MarginMode | undefined,
+  maxMarketLeverage: number
+): TradeFormFieldStates {
   const { type } = form;
-
-  // External data dependencies - these would come from your app state
-  const hasExistingPosition: boolean = false; // Should be determined from your position data
-  const existingPositionMarginMode: MarginMode | undefined = undefined; // Should come from position data
-  const maxMarketLeverage: number = 100; // Should come from market data
 
   // Default values for each field type to use when renderedValue is needed
   const defaults: Required<TradeForm> = {
@@ -37,7 +37,7 @@ function getOrderFormFieldStates(form: TradeForm): TradeFormFieldStates {
     size: OrderSizeInputs.SIZE({ value: '' }),
     reduceOnly: false,
     marginMode: MarginMode.CROSS,
-    targetLeverage: '10', // DEFAULT_TARGET_LEVERAGE is 10, capped by maxMarketLeverage
+    targetLeverage: BigNumber.min(2, maxMarketLeverage).toString(10),
     limitPrice: '', // Allow it to be empty until user inputs something
     postOnly: false,
     timeInForce: TimeInForce.GTT,
@@ -77,13 +77,15 @@ function getOrderFormFieldStates(form: TradeForm): TradeFormFieldStates {
 
   // Helper to set margin mode field with correct handling for existing positions
   function setMarginMode(result: TradeFormFieldStates): void {
-    if (hasExistingPosition) {
+    if (existingPositionMarginMode != null) {
       // Force the margin mode to match existing position and disable it
-      result.marginMode = visible({
-        rawValue: existingPositionMarginMode,
-        defaultValue: existingPositionMarginMode ?? defaults.marginMode,
+      result.marginMode = {
+        visible: true,
+        rawValue: form.marginMode,
+        renderedValue: existingPositionMarginMode,
+        required: true,
         disabled: true,
-      });
+      };
     } else {
       result.marginMode = visible({
         rawValue: form.marginMode,

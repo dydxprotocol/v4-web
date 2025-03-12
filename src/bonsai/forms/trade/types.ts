@@ -1,3 +1,9 @@
+import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
+import {
+  GroupedSubaccountSummary,
+  PerpetualMarketSummary,
+  SubaccountPosition,
+} from '@/bonsai/types/summaryTypes';
 import unionize, { ofType, UnionOf } from 'unionize';
 
 export enum TimeUnit {
@@ -129,25 +135,66 @@ export type FieldState<T> =
 
 // Type for the transformed form with field states
 export type TradeFormFieldStates = {
-  [K in keyof TradeForm]: FieldState<TradeForm[K]>;
+  [K in keyof TradeForm]-?: FieldState<TradeForm[K]>;
 };
 
+export type SelectionOption<T extends string> = {
+  value: T;
+  stringKey: string;
+};
 export type TradeFormOptions = {
-  maximumLeverage: number;
+  orderTypeOptions: SelectionOption<TradeFormType>[];
+  executionOptions: SelectionOption<ExecutionType>[];
+  timeInForceOptions: SelectionOption<TimeInForce>[];
+  goodTilUnitOptions: SelectionOption<TimeUnit>[];
+};
 
-  orderTypeOptions: string[];
-  executionOptions: string[];
-  timeInForceOptions: string[];
-  goodTilUnitOptions: string[];
+export type TradeSummary = {
+  price?: number;
+  payloadPrice?: number;
+
+  size?: number;
+  usdcSize?: number;
+  leverage?: number;
+  balancePercent?: number;
+
+  maximumLeverage: number;
+  minimumLeverage: number;
+
+  closePositionPercent?: number;
+  closeSize?: number;
+
+  slippage?: number;
+  fee?: number;
+  total?: number;
+  reward?: number;
+  filled: boolean;
+
+  positionMargin?: number;
+  positionLeverage?: number;
+
+  indexSlippage?: number;
+  feeRate?: number;
 };
 
 export type TradeFormSummary = {
   fieldStates: TradeFormFieldStates;
   options: TradeFormOptions;
-  payload: TradePayload;
-  tradeInfo: TradeInfo;
-  accountBefore: TradeAccount;
-  accountAfter: TradeAccount;
-  positionBefore: TradePosition;
-  positionAfter: TradePosition;
+
+  tradeInfo: TradeSummary;
+
+  accountBefore?: GroupedSubaccountSummary;
+  accountAfter?: GroupedSubaccountSummary;
+  positionBefore?: SubaccountPosition;
+  positionAfter?: SubaccountPosition;
+};
+
+// given record, get the value type
+type RecordValueType<T> = T extends { [key: string]: infer V } ? V : never;
+
+export type TradeFormInputData = {
+  rawParentSubaccountData: ParentSubaccountDataBase | undefined;
+  rawRelevantMarkets: MarketsData | undefined;
+  currentTradeMarket: RecordValueType<MarketsData> | undefined;
+  currentTradeMarketSummary: PerpetualMarketSummary | undefined;
 };
