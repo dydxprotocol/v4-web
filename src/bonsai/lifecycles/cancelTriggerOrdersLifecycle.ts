@@ -9,7 +9,6 @@ import { createAppSelector } from '@/state/appTypes';
 
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { stringifyTransactionError } from '@/lib/errors';
-import { SerialTaskExecutor } from '@/lib/serialExecutor';
 
 import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
@@ -64,7 +63,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
 
   const activeOrderCancellations = createSemaphore();
   let canceledOrderIds = new Set<string>();
-  const chainTxExecutor = new SerialTaskExecutor();
 
   async function doCancelOrder(
     client: CompositeClient,
@@ -79,7 +77,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         orderFlags,
         clobPairId,
         goodTilBlock,
-        goodTilBlockTime,
+        goodTilBlockTimeSeconds,
       } = order;
 
       if (clientId == null || orderFlags == null || clobPairId == null) {
@@ -90,9 +88,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
       const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
       const clientIdInt = parseInt(clientId, 10);
       const orderFlagsInt = parseInt(orderFlags, 10);
-      const goodTilBlockTimeSeconds = goodTilBlockTime
-        ? Math.floor(goodTilBlockTime / 1000)
-        : undefined;
 
       const tx = await client.cancelRawOrder(
         subaccountClient,
@@ -101,7 +96,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         clobPairId,
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         goodTilBlock || undefined, // goodTilBlock of 0 will be submitted as undefined
-        goodTilBlockTimeSeconds
+        goodTilBlockTimeSeconds || undefined // goodTilBlockTimeSeconds of 0 will be submitted as undefined
       );
 
       const parsedTx = parseToPrimitives(tx);
@@ -146,10 +141,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
 
             canceledOrderIds.add(o.id);
 
-            // chainTxExecutor.enqueue returns a Promise of the operation result
-            return chainTxExecutor.enqueue(() =>
-              doCancelOrder(compositeClient, localDydxWallet!, o)
-            );
+            return doCancelOrder(compositeClient, localDydxWallet!, o);
           })
         );
       }
@@ -182,7 +174,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   return () => {
     canceledOrderIds = new Set<string>();
     activeOrderCancellations.clear();
-    chainTxExecutor.clear();
     noopCleanupEffect();
   };
 }
