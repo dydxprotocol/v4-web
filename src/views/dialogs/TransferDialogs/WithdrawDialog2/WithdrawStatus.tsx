@@ -12,7 +12,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { Tag, TagSize } from '@/components/Tag';
 
 import { selectWithdraw } from '@/state/transfersSelectors';
 
@@ -65,11 +64,9 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       if (!t.explorerLink) return null;
 
       return (
-        <Tag size={TagSize.Small} key={t.txHash}>
-          <Link href={t.explorerLink} withIcon isAccent isInline>
-            {truncateAddress(t.txHash, '')}
-          </Link>
-        </Tag>
+        <Link key={t.txHash} href={t.explorerLink} withIcon isAccent isInline>
+          {truncateAddress(t.txHash, '')}
+        </Link>
       );
     })
     .filter(isTruthy);
@@ -112,7 +109,12 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       </Button>
 
       {withdrawalExplorerLinks?.length && (
-        <div tw="row ml-auto gap-0.5">{withdrawalExplorerLinks}</div>
+        <div tw="row justify-between">
+          <span tw="text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTIONS_SHORT })}
+          </span>
+          <div tw="row ml-auto gap-0.5 font-small-book">{withdrawalExplorerLinks}</div>
+        </div>
       )}
     </div>
   );

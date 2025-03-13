@@ -4,6 +4,7 @@ import { RouteResponse } from '@skip-go/client';
 import { DateTime } from 'luxon';
 import tw from 'twin.macro';
 
+import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
@@ -98,15 +99,26 @@ export const TransferRouteOptions = ({
       return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC }) : '-';
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
+    const chainName =
+      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.name;
+
+    const gasFeeAdjustment =
+      type === 'deposit' && chainName ? (
+        <span tw="text-color-text-0 font-mini-book">
+          {` + ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
+        </span>
+      ) : null;
+
     return (
       <span tw="inline-block">
         {slowOperationFee?.gt(0) ? (
           <Output
-            tw="inline-block"
+            tw="inline-block min-w-0"
             type={OutputType.Fiat}
             fractionDigits={USD_DECIMALS}
             value={slowOperationFee}
             isLoading={isLoading}
+            slotRight={gasFeeAdjustment}
           />
         ) : (
           <span tw="text-color-positive">{stringGetter({ key: STRING_KEYS.FREE })}</span>
@@ -186,7 +198,7 @@ const RouteOption = ({
   return (
     <button
       type="button"
-      tw="box-border flex flex-1 items-center gap-0.75 rounded-1 border-2 border-solid p-1"
+      tw="box-border flex min-w-0 flex-1 items-center gap-0.75 rounded-1 border-2 border-solid p-1"
       disabled={disabled}
       onClick={onClick}
       style={{

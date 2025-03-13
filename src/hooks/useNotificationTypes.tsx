@@ -21,12 +21,8 @@ import {
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
-  INCENTIVES_SEASON_NOTIFICATION_ID,
-  MarketUpdateNotificationIds,
-  MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
@@ -41,7 +37,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification } from '@/components/Notification';
-import { formatNumberOutput, Output, OutputType } from '@/components/Output';
+import { formatNumberOutput, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
@@ -73,9 +69,7 @@ import { formatSeconds } from '@/lib/timeUtils';
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
-import { useIncentivesSeason } from './useIncentivesSeason';
 import { useLocaleSeparators } from './useLocaleSeparators';
-import { useMobileAppUrl } from './useMobileAppUrl';
 import { useParameterizedSelector } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
@@ -102,7 +96,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useAppSelector(getAbacusNotifications, isEqual);
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual);
       const ordersById = groupBy(orders, 'id');
       const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
 
@@ -193,9 +187,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual);
       const ordersById = groupBy(orders, 'id');
-      const fills = useAppSelector(getSubaccountFills, shallowEqual) ?? [];
+      const fills = useAppSelector(getSubaccountFills, shallowEqual);
       const fillsById = groupBy(fills, 'id');
       const marketIds = useAppSelector(getMarketIds, shallowEqual);
       const navigate = useNavigate();
@@ -425,207 +419,21 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
   {
     type: NotificationType.ReleaseUpdates,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const { appleAppStoreUrl } = useMobileAppUrl();
-
-      const simpleIosExpirationDate = new Date('2025-03-24T23:59:59');
-      const currentDate = new Date();
-
-      useEffect(() => {
-        if (currentDate < simpleIosExpirationDate) {
-          trigger(ReleaseUpdateNotificationIds.SimpleIosExperience, {
-            title: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_TITLE }),
-            body: stringGetter({ key: STRING_KEYS.SIMPLE_IOS_RELEASE_BODY }),
-            toastSensitivity: 'foreground',
-            groupKey: ReleaseUpdateNotificationIds.SimpleIosExperience,
-            icon: <Icon tw="text-color-text-2" iconName={IconName.Sparkles} />,
-            actionAltText: stringGetter({ key: STRING_KEYS.DOWNLOAD_IOS_APP }),
-            renderActionSlot: () =>
-              appleAppStoreUrl && (
-                <Link isAccent href={appleAppStoreUrl}>
-                  {stringGetter({ key: STRING_KEYS.DOWNLOAD_IOS_APP })} →
-                </Link>
-              ),
-          });
-        }
-      }, [stringGetter]);
-    },
+    useTrigger: ({ trigger: _trigger }) => {},
     useNotificationAction: () => {
-      const { chainTokenLabel } = useTokenConfigs();
-      const { incentivesDistributedSeasonId } = useIncentivesSeason();
-
-      const navigate = useNavigate();
-
-      return (notificationId: string) => {
-        if (
-          notificationId === INCENTIVES_SEASON_NOTIFICATION_ID ||
-          notificationId === incentivesDistributedSeasonId
-        ) {
-          navigate(`${chainTokenLabel}`);
-        }
-      };
+      return () => {};
     },
   },
   {
     type: NotificationType.MarketUpdate,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const openPositions = useAppSelector(
-        BonsaiCore.account.parentSubaccountPositions.data,
-        shallowEqual
-      );
-      const currentDate = new Date();
-      const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
-      const proposal226VoteStartDate = new Date('2025-03-07T15:02:38.517926238Z');
-      const proposal226ExpirationDate = new Date('2025-03-18T15:02:38.517926238Z');
-      const proposal226EffectedMarkets = [
-        'ATH-USD',
-        'BEAM-USD',
-        'DRIFT-USD',
-        'EIGEN-USD',
-        'ENA-USD',
-        'MORPHO-USD',
-        'MOVE-USD',
-        'ONDO-USD',
-        'PENGU-USD',
-        'PNUT-USD',
-        'POL-USD',
-        'S-USD',
-        'USUAL-USD',
-        'XMR-USD',
-        'ZEN-USD',
-      ];
-
-      const hasPositionInProposal226EffectedMarkets = openPositions?.some((position) =>
-        proposal226EffectedMarkets.includes(position.market)
-      );
-
-      useEffect(() => {
-        if (
-          hasPositionInProposal226EffectedMarkets &&
-          currentDate >= proposal226VoteStartDate &&
-          currentDate <= proposal226ExpirationDate
-        ) {
-          trigger(
-            MarketUpdateNotificationIds.MarketUpdateProposal226,
-            {
-              icon: (
-                <AssetIcon
-                  tw="[--asset-icon-size: 1.5rem]"
-                  logoUrl={chainTokenImage}
-                  symbol={chainTokenLabel}
-                />
-              ),
-              title: stringGetter({ key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.TITLE' }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.UPGRADE_MARKETS_TO_CROSS_MARGIN.BODY',
-                params: {
-                  MARKETS: proposal226EffectedMarkets.join(', '),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: MarketUpdateNotificationIds.MarketUpdateProposal226,
-            },
-            []
-          );
-        }
-      }, [stringGetter, chainTokenImage, chainTokenLabel, hasPositionInProposal226EffectedMarkets]);
-    },
+    useTrigger: ({ trigger: _trigger }) => {},
     useNotificationAction: () => {
-      return (id) => {
-        if (id === MarketUpdateNotificationIds.MarketUpdateProposal226) {
-          globalThis.open('https://www.mintscan.io/dydx/proposals/226', '_blank');
-        }
-      };
+      return (_id) => {};
     },
   },
   {
     type: NotificationType.MarketWindDown,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const dynamicConfigs = useAllStatsigDynamicConfigValues();
-      const maticWindDownProposal = dynamicConfigs[StatsigDynamicConfigs.dcMaticProposalNotif];
-      const { contractLossMechanismLearnMore } = useURLConfigs();
-
-      const MATICWindDownProposalExpirationDate = '2024-09-02T14:33:25.000Z';
-      const MATICWindDownDate = MATICWindDownProposalExpirationDate;
-      const MATICWindDownExpirationDate = '2024-10-04T23:59:59.000Z';
-      const MATICMarket = 'MATIC-USD';
-
-      const currentDate = new Date();
-      const outputDate = (
-        <Output tw="inline-block" type={OutputType.DateTime} value={MATICWindDownDate} />
-      );
-
-      useEffect(() => {
-        if (
-          maticWindDownProposal &&
-          maticWindDownProposal !== '' &&
-          currentDate <= new Date(MATICWindDownProposalExpirationDate)
-        ) {
-          trigger(MarketWindDownNotificationIds.MarketWindDownProposalMatic, {
-            title: stringGetter({
-              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.TITLE',
-              params: {
-                MARKET: MATICMarket,
-              },
-            }),
-            body: stringGetter({
-              key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.BODY',
-              params: {
-                MARKET: MATICMarket,
-                DATE: outputDate,
-                HERE_LINK: (
-                  <Link isInline isAccent href={maticWindDownProposal}>
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </Link>
-                ),
-              },
-            }),
-            toastSensitivity: 'foreground',
-            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalMatic,
-          });
-        }
-      }, [stringGetter]);
-
-      useEffect(() => {
-        if (
-          maticWindDownProposal &&
-          maticWindDownProposal !== '' &&
-          contractLossMechanismLearnMore &&
-          currentDate >= new Date(MATICWindDownDate) &&
-          currentDate <= new Date(MATICWindDownExpirationDate)
-        ) {
-          trigger(
-            MarketWindDownNotificationIds.MarketWindDownMatic,
-            {
-              title: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.TITLE',
-                params: {
-                  MARKET: MATICMarket,
-                },
-              }),
-              body: stringGetter({
-                key: 'NOTIFICATIONS.MARKET_WIND_DOWN.BODY',
-                params: {
-                  MARKET: MATICMarket,
-                  DATE: outputDate,
-                  HERE_LINK: (
-                    <Link isInline isAccent href={contractLossMechanismLearnMore}>
-                      {stringGetter({ key: STRING_KEYS.HERE })}
-                    </Link>
-                  ),
-                },
-              }),
-              toastSensitivity: 'foreground',
-              groupKey: MarketWindDownNotificationIds.MarketWindDownMatic,
-            },
-            []
-          );
-        }
-      }, [stringGetter]);
-    },
+    useTrigger: ({ trigger: _trigger }) => {},
     useNotificationAction: () => {
       return () => {};
     },
