@@ -55,6 +55,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
     ) => {
       async function sweepNobleBalance() {
         const balanceBN = MaybeBigNumber(balance);
+        console.log('test usdcBalance', { balance });
         if (
           balance == null ||
           balanceBN == null ||
@@ -64,10 +65,15 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         }
 
         if (nobleLocalWallet.address == null || dydxAddress == null) {
+          console.log('test nobleLocalWallet.address or dydxAddress is null', {
+            nobleLocalWallet,
+            dydxAddress,
+          });
           return;
         }
 
         if (hasNonExpiredPendingWithdraws) {
+          console.log('test hasNonExpiredPendingWithdraws', { hasNonExpiredPendingWithdraws });
           return;
         }
 
@@ -104,6 +110,8 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         const cosmosTx = msgDirectTx && isCosmosTx(msgDirectTx) ? msgDirectTx.cosmosTx : null;
         const msg = cosmosTx?.msgs.at(0);
 
+        console.log('test msg', { msg });
+
         if (msg == null) {
           throw new Error(`No msg found in msgDirectResponse: ${JSON.stringify(msgDirectTx)}`);
         }
@@ -120,6 +128,8 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
             timeoutTimestamp: parsedMsg.timeout_timestamp,
           },
         };
+
+        console.log('test ibcMsg', { ibcMsg });
 
         logBonsaiInfo('nobleBalanceSweepLifecycle', 'simulate sweep USDC from Noble to dYdX', {
           balance,
