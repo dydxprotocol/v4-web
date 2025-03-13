@@ -321,12 +321,7 @@ export const useChartLines = ({
 
   const updateOrderLines = useCallback(() => {
     const pendingOrderAdjustments = pendingOrderAdjustmentsRef.current;
-    // We don't need to worry about clearing chart lines for cancelled market orders since they will persist in
-    // currentMarketOrders, just with a cancelReason
-    if (!currentMarketOrders) {
-      return;
-    }
-
+    const currentKeys = new Set<string>();
     currentMarketOrders.forEach((order) => {
       const {
         id,
@@ -373,6 +368,7 @@ export const useChartLines = ({
           delete chartLinesRef.current[key];
         }
       } else {
+        currentKeys.add(key);
         if (maybeOrderLine) {
           if (maybeOrderLine.getPrice() !== formattedPrice) {
             maybeOrderLine.setPrice(formattedPrice);
@@ -412,6 +408,15 @@ export const useChartLines = ({
         }
       }
     });
+
+    // remove chart lines that we don't see in the open orders array
+    Object.entries(chartLinesRef.current)
+      .filter(([_e, c]) => c.chartLineType === OrderSide.BUY || c.chartLineType === OrderSide.SELL)
+      .filter(([key]) => !currentKeys.has(key))
+      .forEach(([key, line]) => {
+        line.line.remove();
+        delete chartLinesRef.current[key];
+      });
   }, [
     currentMarketOrders,
     currentMarketOrdersAbacus,

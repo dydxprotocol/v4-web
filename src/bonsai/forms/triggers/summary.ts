@@ -270,8 +270,7 @@ function createCancelOrderPayload(order: SubaccountOrder): CancelOrderPayload | 
     orderFlags,
     clobPairId,
     goodTilBlock: order.goodTilBlock,
-    goodTilBlockTime:
-      order.goodTilBlockTime != null ? order.goodTilBlockTime / 1000 : order.goodTilBlockTime,
+    goodTilBlockTime: order.goodTilBlockTimeSeconds,
   };
 }
 
@@ -441,7 +440,7 @@ function calculateTriggerOrderDetails(
 
   // handle no price input
   const priceInput = triggerOrder.priceInput;
-  if (priceInput == null) {
+  if (priceInput === undefined) {
     if (existingOrder) {
       const triggerPrice = existingOrder.triggerPrice;
       // We could calculate other fields based on the trigger price
@@ -452,6 +451,10 @@ function calculateTriggerOrderDetails(
         };
       }
     }
+    return details;
+  }
+  // no trigger price
+  if (priceInput === null) {
     return details;
   }
 

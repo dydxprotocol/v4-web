@@ -33,6 +33,7 @@ export interface TriggerOrderState {
 
   // if undefined, try using existing order details, otherwise empty inputs
   priceInput?:
+    | null // null means delete
     | { type: TriggerPriceInputType.TriggerPrice; triggerPrice: string }
     | { type: TriggerPriceInputType.PercentDiff; percentDiff: string }
     | { type: TriggerPriceInputType.UsdcDiff; usdcDiff: string };

@@ -6,6 +6,7 @@ import { useWalletClient } from 'wagmi';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
 import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
@@ -289,6 +290,16 @@ export const DepositForm = ({
     }
   };
 
+  const chainName =
+    selectedRoute?.sourceAssetChainID && CHAIN_INFO[selectedRoute.sourceAssetChainID]?.name;
+
+  const gasFeeAdjustment =
+    selectedSpeed === 'slow' && chainName ? (
+      <span tw="text-color-text-0 font-mini-book">
+        {` - ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
+      </span>
+    ) : null;
+
   const receipt = selectedRoute && (
     <Details
       tw="font-small-book"
@@ -302,6 +313,7 @@ export const DepositForm = ({
               type={OutputType.Fiat}
               isLoading={isFetching}
               value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
+              slotRight={gasFeeAdjustment}
             />
           ),
         },
