@@ -69,7 +69,7 @@ export function calculateTradeSummary(
     baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE
   );
 
-  const tradeInfo: TradeSummary = calculateTradeInfo();
+  const tradeInfo: TradeSummary = calculateTradeInfo(fieldStates, baseAccount, accountData);
 
   const baseAccountAfter = calc(() => {
     if (accountData.rawParentSubaccountData == null) {
