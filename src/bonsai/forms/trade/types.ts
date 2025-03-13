@@ -1,7 +1,6 @@
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
   GroupedSubaccountSummary,
-  PerpetualMarketSummary,
   SubaccountOrder,
   SubaccountPosition,
 } from '@/bonsai/types/summaryTypes';
@@ -199,6 +198,5 @@ export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
   currentTradeMarket: RecordValueType<MarketsData> | undefined;
-  currentTradeMarketSummary: PerpetualMarketSummary | undefined;
   currentTradeMarketOpenOrders: SubaccountOrder[];
 };

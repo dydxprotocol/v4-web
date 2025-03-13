@@ -24,12 +24,22 @@ const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   unit: TimeUnit.DAY,
 };
 
+const DEFAULT_ISOLATED_TARGET_LEVERAGE = 2.0;
+
 export function getTradeFormFieldStates(
   form: TradeForm,
   existingPositionMarginMode: MarginMode | undefined,
+  existingPositionLeverage: number | undefined,
   maxMarketLeverage: number
 ): TradeFormFieldStates {
   const { type } = form;
+
+  const defaultTargetLeverage = calc(() => {
+    if (existingPositionMarginMode === MarginMode.ISOLATED && existingPositionLeverage != null) {
+      return BigNumber.min(existingPositionLeverage, maxMarketLeverage);
+    }
+    return BigNumber.min(DEFAULT_ISOLATED_TARGET_LEVERAGE, maxMarketLeverage);
+  });
 
   const defaults: Required<TradeForm> = {
     type: TradeFormType.LIMIT,
@@ -38,7 +48,7 @@ export function getTradeFormFieldStates(
     size: OrderSizeInputs.SIZE({ value: '' }),
     reduceOnly: false,
     marginMode: MarginMode.CROSS,
-    targetLeverage: BigNumber.min(2, maxMarketLeverage).toString(10),
+    targetLeverage: defaultTargetLeverage.toString(10),
     limitPrice: '',
     postOnly: false,
     timeInForce: TimeInForce.GTT,
@@ -59,60 +69,28 @@ export function getTradeFormFieldStates(
     })
   ) as TradeFormFieldStates;
 
-  function modifyField<T>(
-    field: FieldState<T>,
-    state: FieldState<T>['state'],
-    forceValue?: NonNullable<T>
-  ): FieldState<T> {
-    return {
-      ...field,
-      state,
-      ...(forceValue != null ? { renderedValue: forceValue } : {}),
-    };
-  }
-  function makeVisible(states: TradeFormFieldStates, keys: Array<keyof TradeFormFieldStates>) {
-    keys.forEach((key) => {
-      states[key] = {
-        ...(states[key] as any),
-        effectiveValue: states[key].rawValue ?? states[key].effectiveValue ?? defaults[key],
-        state: 'visible',
-      };
-    });
-  }
-  function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
-    field.state = 'visible-disabled';
-    field.effectiveValue = forceValue;
-  }
-  function forceValueAndHide<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
-    field.state = 'relevant-hidden';
-    field.effectiveValue = forceValue;
+  function targetLeverageVisibleIfIsolated(result: TradeFormFieldStates): void {
+    if (result.marginMode.effectiveValue === MarginMode.ISOLATED) {
+      makeVisible(result, ['targetLeverage']);
+    }
   }
 
   function setMarginMode(result: TradeFormFieldStates): void {
     if (existingPositionMarginMode != null) {
-      // Force the margin mode to match existing position and disable it
-      result.marginMode = modifyField(
-        result.marginMode,
-        'visible-disabled',
-        existingPositionMarginMode
-      );
+      forceValueAndDisable(result.marginMode, existingPositionMarginMode);
     } else {
-      result.marginMode = modifyField(result.marginMode, 'visible');
+      makeVisible(result, ['marginMode']);
     }
   }
 
-  function handleSizeInput(result: TradeFormFieldStates): void {
-    // LEVERAGE input should only be visible for CROSS margin
-    if (form.size?.type === 'LEVERAGE' && result.marginMode.effectiveValue !== MarginMode.CROSS) {
-      // Reset to SIZE input if leverage is selected but margin mode isn't CROSS
-      result.size = modifyField(result.size, 'visible', OrderSizeInputs.SIZE({ value: '' }));
-    }
-  }
-
-  function setTargetLeverage(result: TradeFormFieldStates): void {
-    if (result.marginMode.effectiveValue === MarginMode.ISOLATED) {
-      result.targetLeverage = modifyField(result.targetLeverage, 'visible');
-    }
+  function makeVisible(states: TradeFormFieldStates, keys: Array<keyof TradeFormFieldStates>) {
+    keys.forEach((key) => {
+      states[key] = {
+        ...(states[key] as any),
+        effectiveValue: states[key].effectiveValue ?? states[key].rawValue ?? defaults[key],
+        state: 'visible',
+      };
+    });
   }
 
   baseResult.type = modifyField(baseResult.type, 'visible');
@@ -123,8 +101,8 @@ export function getTradeFormFieldStates(
       case TradeFormType.MARKET:
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
         setMarginMode(result);
-        handleSizeInput(result);
-        setTargetLeverage(result);
+        preventLeverageInputOnIsolated(result);
+        targetLeverageVisibleIfIsolated(result);
 
         return result;
       case TradeFormType.LIMIT:
@@ -139,8 +117,8 @@ export function getTradeFormFieldStates(
           'postOnly',
         ]);
         setMarginMode(result);
-        handleSizeInput(result);
-        setTargetLeverage(result);
+        preventLeverageInputOnIsolated(result);
+        targetLeverageVisibleIfIsolated(result);
 
         // goodTil is only visible and required for GTT
         if (result.timeInForce.effectiveValue === TimeInForce.GTT) {
@@ -165,8 +143,8 @@ export function getTradeFormFieldStates(
           'reduceOnly',
         ]);
         setMarginMode(result);
-        handleSizeInput(result);
-        setTargetLeverage(result);
+        preventLeverageInputOnIsolated(result);
+        targetLeverageVisibleIfIsolated(result);
 
         // reduceOnly is only visible when execution is IOC
         if (result.execution.effectiveValue !== ExecutionType.IOC) {
@@ -186,8 +164,8 @@ export function getTradeFormFieldStates(
           'reduceOnly',
         ]);
         setMarginMode(result);
-        handleSizeInput(result);
-        setTargetLeverage(result);
+        preventLeverageInputOnIsolated(result);
+        targetLeverageVisibleIfIsolated(result);
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
@@ -202,4 +180,37 @@ export function getTradeFormFieldStates(
     }
     return result;
   });
+}
+
+function modifyField<T>(
+  field: FieldState<T>,
+  state: FieldState<T>['state'],
+  forceValue?: NonNullable<T>
+): FieldState<T> {
+  return {
+    ...field,
+    state,
+    ...(forceValue != null ? { renderedValue: forceValue } : {}),
+  };
+}
+
+function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
+  field.state = 'visible-disabled';
+  field.effectiveValue = forceValue;
+}
+
+function forceValueAndHide<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
+  field.state = 'relevant-hidden';
+  field.effectiveValue = forceValue;
+}
+
+function preventLeverageInputOnIsolated(result: TradeFormFieldStates): void {
+  // LEVERAGE input should only be visible for CROSS margin
+  if (
+    result.size.rawValue?.type === 'LEVERAGE' &&
+    result.marginMode.effectiveValue === MarginMode.ISOLATED
+  ) {
+    // Reset to SIZE input if leverage is selected but margin mode isn't CROSS
+    result.size.effectiveValue = OrderSizeInputs.SIZE({ value: '' });
+  }
 }

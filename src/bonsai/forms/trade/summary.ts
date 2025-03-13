@@ -18,7 +18,7 @@ import { orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { calc, mapIfPresent } from '@/lib/do';
-import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
+import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { AttemptNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -60,20 +60,13 @@ export function calculateTradeSummary(
       getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
   );
 
-  const marketMaxLeverage = calculateMarketMaxLeverage({
-    effectiveInitialMarginFraction:
-      accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction,
-    initialMarginFraction: AttemptNumber(
-      accountData.currentTradeMarketSummary?.initialMarginFraction
-    ),
-  });
-
   const options = calculateTradeFormOptions(state.type);
 
   const fieldStates = getTradeFormFieldStates(
     state,
     baseAccount?.position?.marginMode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED,
-    marketMaxLeverage
+    baseAccount?.position?.leverage?.toNumber(),
+    baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE
   );
 
   const tradeInfo: TradeSummary = calculateTradeInfo();
@@ -87,7 +80,7 @@ export function calculateTradeSummary(
       tradeInfo,
       accountData.currentTradeMarketOpenOrders.length > 0,
       fieldStates,
-      accountData.currentTradeMarketSummary?.oraclePrice ?? undefined
+      accountData.currentTradeMarket?.oraclePrice ?? undefined
     );
 
     if (operationInformation.subaccountNumber == null) {
