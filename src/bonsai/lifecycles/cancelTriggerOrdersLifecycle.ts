@@ -96,6 +96,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         clobPairId,
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         goodTilBlock || undefined, // goodTilBlock of 0 will be submitted as undefined
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         goodTilBlockTimeSeconds || undefined // goodTilBlockTimeSeconds of 0 will be submitted as undefined
       );
 
