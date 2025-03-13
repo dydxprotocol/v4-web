@@ -2,6 +2,7 @@ import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
   GroupedSubaccountSummary,
   PerpetualMarketSummary,
+  SubaccountOrder,
   SubaccountPosition,
 } from '@/bonsai/types/summaryTypes';
 import unionize, { ofType, UnionOf } from 'unionize';
@@ -14,7 +15,7 @@ export enum TimeUnit {
 }
 
 export enum ExecutionType {
-  DEFAULT = 'DEFAULT',
+  GOOD_TIL_DATE = 'GOOD_TIL_DATE',
   IOC = 'IOC',
   POST_ONLY = 'POST_ONLY',
 }
@@ -123,15 +124,11 @@ export type TradeForm = {
 };
 
 // Define the FieldState type with conditional properties
-export type FieldState<T> =
-  | {
-      visible: true;
-      rawValue: T | undefined;
-      renderedValue: NonNullable<T>;
-      required: boolean;
-      disabled: boolean;
-    }
-  | { visible: false; rawValue: T | undefined; renderedValue: T | undefined };
+export type FieldState<T> = {
+  rawValue: T | undefined;
+  effectiveValue: T | undefined;
+  state: 'irrelevant' | 'relevant-hidden' | 'visible-disabled' | 'visible';
+};
 
 // Type for the transformed form with field states
 export type TradeFormFieldStates = {
@@ -147,22 +144,28 @@ export type TradeFormOptions = {
   executionOptions: SelectionOption<ExecutionType>[];
   timeInForceOptions: SelectionOption<TimeInForce>[];
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
+  showLeverageSlider: boolean;
 };
 
 export type TradeSummary = {
-  price?: number;
+  inputSummary: {
+    averageFillPrice?: number;
+
+    size?: number;
+    usdcSize?: number;
+    leverage?: number;
+    balancePercent?: number;
+
+    closePositionPercent?: number;
+    closePositionSize?: number;
+  };
+
+  subaccountNumber: number;
+  transferToSubaccountAmount: string;
   payloadPrice?: number;
 
-  size?: number;
-  usdcSize?: number;
-  leverage?: number;
-  balancePercent?: number;
-
-  maximumLeverage: number;
-  minimumLeverage: number;
-
-  closePositionPercent?: number;
-  closeSize?: number;
+  maximumLeverage?: number;
+  minimumLeverage?: number;
 
   slippage?: number;
   fee?: number;
@@ -170,8 +173,8 @@ export type TradeSummary = {
   reward?: number;
   filled: boolean;
 
-  positionMargin?: number;
-  positionLeverage?: number;
+  // if this trade is effectively closing the position, for simulation purposes
+  isPositionClosed: boolean;
 
   indexSlippage?: number;
   feeRate?: number;
@@ -197,4 +200,5 @@ export type TradeFormInputData = {
   rawRelevantMarkets: MarketsData | undefined;
   currentTradeMarket: RecordValueType<MarketsData> | undefined;
   currentTradeMarketSummary: PerpetualMarketSummary | undefined;
+  currentTradeMarketOpenOrders: SubaccountOrder[];
 };

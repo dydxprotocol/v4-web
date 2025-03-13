@@ -1,8 +1,13 @@
+import {
+  applyOperationsToSubaccount,
+  createBatchedOperations,
+} from '@/bonsai/calculators/accountActions';
 import { getPositionUniqueId } from '@/bonsai/calculators/helpers';
 import {
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
 } from '@/bonsai/calculators/subaccount';
+import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
   GroupedSubaccountSummary,
@@ -12,9 +17,10 @@ import {
 import { orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
-import { mapIfPresent } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { AttemptNumber } from '@/lib/numbers';
+import { isPresent } from '@/lib/typeUtils';
 
 import { getTradeFormFieldStates } from './fields';
 import {
@@ -25,13 +31,15 @@ import {
   TimeInForce,
   TimeUnit,
   TradeForm,
+  TradeFormFieldStates,
   TradeFormInputData,
   TradeFormOptions,
   TradeFormSummary,
   TradeFormType,
+  TradeSummary,
 } from './types';
 
-export function getTradeSummary(
+export function calculateTradeSummary(
   state: TradeForm,
   accountData: TradeFormInputData
 ): TradeFormSummary {
@@ -52,18 +60,72 @@ export function getTradeSummary(
       getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
   );
 
+  const marketMaxLeverage = calculateMarketMaxLeverage({
+    effectiveInitialMarginFraction:
+      accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction,
+    initialMarginFraction: AttemptNumber(
+      accountData.currentTradeMarketSummary?.initialMarginFraction
+    ),
+  });
+
+  const options = calculateTradeFormOptions(state.type);
+
   const fieldStates = getTradeFormFieldStates(
     state,
     baseAccount?.position?.marginMode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED,
-    calculateMarketMaxLeverage({
-      effectiveInitialMarginFraction:
-        accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction,
-      initialMarginFraction: AttemptNumber(
-        accountData.currentTradeMarketSummary?.initialMarginFraction
-      ),
-    })
+    marketMaxLeverage
   );
-  const options = calculateTradeFormOptions(fieldStates.type.renderedValue);
+
+  const tradeInfo: TradeSummary = calculateTradeInfo();
+
+  const baseAccountAfter = calc(() => {
+    if (accountData.rawParentSubaccountData == null) {
+      return undefined;
+    }
+
+    const operationInformation = calculateTradeOperationsForSimulation(
+      tradeInfo,
+      accountData.currentTradeMarketOpenOrders.length > 0,
+      fieldStates,
+      accountData.currentTradeMarketSummary?.oraclePrice ?? undefined
+    );
+
+    if (operationInformation.subaccountNumber == null) {
+      return undefined;
+    }
+
+    const operations = createBatchedOperations(
+      ...[
+        operationInformation.transferToIsolatedSubaccountAmount != null
+          ? SubaccountOperations.SubaccountTransfer({
+              senderSubaccountNumber: accountData.rawParentSubaccountData.parentSubaccount,
+              amount: operationInformation.transferToIsolatedSubaccountAmount,
+              recipientSubaccountNumber: operationInformation.subaccountNumber,
+            })
+          : undefined,
+        operationInformation.tradeToApply != null
+          ? SubaccountOperations.ApplyTrade(operationInformation.tradeToApply)
+          : undefined,
+        operationInformation.reclaimFunds
+          ? SubaccountOperations.SubaccountTransferFull({
+              recipientSubaccountNumber: accountData.rawParentSubaccountData.parentSubaccount,
+              senderSubaccountNumber: operationInformation.subaccountNumber,
+            })
+          : undefined,
+      ].filter(isPresent)
+    );
+
+    return mapIfPresent(
+      accountData.rawParentSubaccountData,
+      rawMarkets,
+      (rawParentSubaccountData, markets) =>
+        getRelevantAccountDetails(
+          applyOperationsToSubaccount(rawParentSubaccountData, operations),
+          markets,
+          positionIdToUse
+        )
+    );
+  });
 
   return {
     fieldStates,
@@ -74,8 +136,8 @@ export function getTradeSummary(
     accountBefore: baseAccount?.account,
     positionBefore: baseAccount?.position,
 
-    accountAfter,
-    positionAfter,
+    accountAfter: baseAccountAfter?.account,
+    positionAfter: baseAccountAfter?.position,
   };
 }
 
@@ -102,7 +164,7 @@ const timeInForceOptions: SelectionOption<TimeInForce>[] = [
 
 // Define execution option arrays
 const allExecutionOptions: SelectionOption<ExecutionType>[] = [
-  { value: ExecutionType.DEFAULT, stringKey: 'APP.TRADE.GOOD_TIL_DATE' },
+  { value: ExecutionType.GOOD_TIL_DATE, stringKey: 'APP.TRADE.GOOD_TIL_DATE' },
   { value: ExecutionType.IOC, stringKey: 'APP.TRADE.IMMEDIATE_OR_CANCEL' },
   { value: ExecutionType.POST_ONLY, stringKey: 'APP.TRADE.POST_ONLY' },
 ];
@@ -134,9 +196,11 @@ function calculateTradeFormOptions(orderType: TradeFormType | undefined): TradeF
         [TradeFormType.LIMIT]: () => allExecutionOptions,
         [TradeFormType.STOP_LIMIT]: () => allExecutionOptions,
         [TradeFormType.TAKE_PROFIT_LIMIT]: () => allExecutionOptions,
+
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.STOP_MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TAKE_PROFIT_MARKET]: () => iocOnlyExecutionOptions,
+
         [TradeFormType.CLOSE_POSITION]: () => emptyExecutionOptions,
       })
     : emptyExecutionOptions;
@@ -146,6 +210,7 @@ function calculateTradeFormOptions(orderType: TradeFormType | undefined): TradeF
     executionOptions,
     timeInForceOptions,
     goodTilUnitOptions,
+    showLeverageSlider: orderType === TradeFormType.MARKET,
   };
 }
 
@@ -176,4 +241,52 @@ function getPositionIdToUseForTrade(
   return positionToUse != null
     ? getPositionUniqueId(positionToUse.market, positionToUse.subaccountNumber)
     : undefined;
+}
+
+interface TradeInfoForSimulation {
+  subaccountNumber?: number;
+  transferToIsolatedSubaccountAmount?: string;
+  tradeToApply?: ApplyTradeProps;
+  reclaimFunds?: boolean;
+}
+
+function calculateTradeOperationsForSimulation(
+  tradeInfo: TradeSummary,
+  hasOpenOrdersInMarket: boolean,
+  fields: TradeFormFieldStates,
+  marketOraclePrice: string | undefined
+): TradeInfoForSimulation {
+  const marketIdRaw = fields.marketId.effectiveValue;
+  const sideRaw = fields.side.effectiveValue;
+  const sizeRaw = tradeInfo.inputSummary.size;
+  const averagePriceRaw = tradeInfo.inputSummary.averageFillPrice;
+  const feeRaw = tradeInfo.fee ?? 0;
+  const reduceOnlyRaw = fields.reduceOnly.effectiveValue ?? false;
+
+  return {
+    subaccountNumber: tradeInfo.subaccountNumber,
+    transferToIsolatedSubaccountAmount: tradeInfo.transferToSubaccountAmount,
+    reclaimFunds:
+      tradeInfo.isPositionClosed &&
+      fields.marginMode.effectiveValue === MarginMode.ISOLATED &&
+      hasOpenOrdersInMarket,
+    tradeToApply: mapIfPresent(
+      marketIdRaw,
+      sideRaw,
+      sizeRaw,
+      averagePriceRaw,
+      feeRaw,
+      reduceOnlyRaw,
+      (marketId, side, size, averagePrice, fee, reduceOnly) => ({
+        subaccountNumber: tradeInfo.subaccountNumber,
+        marketId,
+        side,
+        size,
+        averagePrice,
+        fee,
+        reduceOnly,
+        marketOraclePrice: AttemptNumber(marketOraclePrice) ?? averagePrice,
+      })
+    ),
+  };
 }
