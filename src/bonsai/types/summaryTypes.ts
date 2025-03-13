@@ -151,7 +151,8 @@ export type SubaccountOrder = {
   remainingSize: BigNumber | undefined;
   totalFilled: BigNumber | undefined;
   goodTilBlock: number | undefined;
-  goodTilBlockTime: number | undefined;
+  goodTilBlockTimeMilliseconds: number | undefined;
+  goodTilBlockTimeSeconds: number | undefined;
   createdAtHeight: number | undefined;
   expiresAtMilliseconds: number | undefined;
   updatedAtMilliseconds: number | undefined;

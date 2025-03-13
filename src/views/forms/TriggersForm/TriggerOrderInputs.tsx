@@ -248,7 +248,7 @@ export const TriggerOrderInputs = ({
               : inputState.priceInput?.type === TriggerPriceInputType.UsdcDiff
                 ? inputState.priceInput.usdcDiff
                 : inputTypeToUse === InputType.Percent
-                  ? AttemptBigNumber(summaryState.percentDiff)?.times(100).toString()
+                  ? AttemptBigNumber(summaryState.percentDiff)?.times(100).toString(10)
                   : summaryState.usdcDiff
           }
           onInput={inputTypeToUse === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}

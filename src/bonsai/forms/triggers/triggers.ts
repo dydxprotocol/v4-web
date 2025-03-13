@@ -100,7 +100,7 @@ const reducer = createVanillaReducer({
       ...state,
       stopLossOrder: {
         ...state.stopLossOrder,
-        priceInput: undefined,
+        priceInput: null,
       },
     }),
 
@@ -159,7 +159,7 @@ const reducer = createVanillaReducer({
       ...state,
       takeProfitOrder: {
         ...state.takeProfitOrder,
-        priceInput: undefined,
+        priceInput: null,
       },
     }),
 

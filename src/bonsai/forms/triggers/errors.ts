@@ -57,11 +57,14 @@ export function getErrors(
   });
 
   const modifyingSize = state.size.checked && state.size.size.trim().length > 0;
+  const modifyingSl = state.stopLossOrder.orderId != null;
+  const deletingSl = modifyingSl && state.stopLossOrder.priceInput === null;
 
   const affectingSl =
     state.stopLossOrder.priceInput != null ||
     state.stopLossOrder.limitPrice != null ||
-    (state.stopLossOrder.orderId != null && modifyingSize);
+    deletingSl ||
+    (modifyingSl && modifyingSize);
 
   if (affectingSl) {
     validationErrors.push(
@@ -69,10 +72,14 @@ export function getErrors(
     );
   }
 
+  const modifyingTp = state.takeProfitOrder.orderId != null;
+  const deletingTp = modifyingTp && state.takeProfitOrder.priceInput === null;
+
   const affectingTp =
     state.takeProfitOrder.priceInput != null ||
     state.takeProfitOrder.limitPrice != null ||
-    (state.takeProfitOrder.orderId != null && modifyingSize);
+    deletingTp ||
+    (modifyingTp && modifyingSize);
 
   if (affectingTp) {
     validationErrors.push(
