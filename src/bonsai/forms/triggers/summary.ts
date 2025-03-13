@@ -270,10 +270,7 @@ function createCancelOrderPayload(order: SubaccountOrder): CancelOrderPayload | 
     orderFlags,
     clobPairId,
     goodTilBlock: order.goodTilBlock,
-    goodTilBlockTime:
-      order.goodTilBlockTimeMilliseconds != null
-        ? order.goodTilBlockTimeMilliseconds / 1000
-        : order.goodTilBlockTimeMilliseconds,
+    goodTilBlockTime: order.goodTilBlockTimeSeconds,
   };
 }
 
