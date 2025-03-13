@@ -165,10 +165,9 @@ export const getClosePositionFormInputs = (state: RootState) =>
 export const getTriggersFormState = (state: RootState) => state.triggersForm;
 
 const myPositionSelector = getSubaccountPositionByUniqueId();
-const getTriggersFormPosition = createAppSelector(
-  [(s) => s, getTriggersFormState],
-  (state, formState) =>
-    formState.positionId != null ? myPositionSelector(state, formState.positionId) : undefined
+export const getTriggersFormPosition = createAppSelector(
+  [(s) => s, (s) => getTriggersFormState(s).positionId],
+  (state, positionId) => (positionId != null ? myPositionSelector(state, positionId) : undefined)
 );
 
 const myMarketSelector = BonsaiHelpers.markets.createSelectMarketSummaryById();

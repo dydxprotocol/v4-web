@@ -39,10 +39,9 @@ export const canModifyOrderTypeFromChart = (order: SubaccountOrderNew) => {
 
 // Inverse of calculateGoodTilBlockTime in v4-client
 // https://github.com/dydxprotocol/v4-clients/blob/4227bd06a6f4503d863dcd99b3aba703cb94c40b/v4-client-js/src/clients/composite-client.ts#L253
-const calculateGoodTilTimeInSeconds = (goodTilBlockTime: number) => {
-  const futureMs = goodTilBlockTime * 1000;
-  const nowMs = Date.now();
-  return Math.round((futureMs - nowMs) / 1000);
+const calculateGoodTilTimeInSeconds = (goodTilBlockTimeSeconds: number) => {
+  const nowSeconds = Date.now() / 1000;
+  return Math.round(goodTilBlockTimeSeconds - nowSeconds);
 };
 
 const getMarketInfo = (marketId: string) => {
@@ -73,7 +72,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     size,
     timeInForce,
     goodTilBlock,
-    goodTilBlockTime,
+    goodTilBlockTimeSeconds,
     postOnly,
     reduceOnly,
     price,
@@ -104,7 +103,8 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     timeInForce != null ? indexerToAbacusTimeInForce(timeInForce).rawValue : undefined,
     // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
     isMarketOrderTypeNew(type) ? OrderExecution.IOC : null,
-    goodTilBlockTime && calculateGoodTilTimeInSeconds(goodTilBlockTime),
+    // todo bonsai broke the goodtilblocktime by making it milliseconds
+    goodTilBlockTimeSeconds && calculateGoodTilTimeInSeconds(goodTilBlockTimeSeconds),
     goodTilBlock,
     getMarketInfo(marketId)
   );

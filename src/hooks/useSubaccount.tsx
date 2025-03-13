@@ -584,6 +584,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const doPlaceOrder = useCallback(
     async (params: PlaceOrderPayload) => {
       try {
+        track(AnalyticsEvents.TradePlaceOrder(params as any)); // type is close enough but it's annoying to fully convert
+
         if (!compositeClient) {
           throw new Error('client not initialized');
         }
@@ -667,10 +669,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(
-    (payload: TriggerOrdersPayload) => {
+    async (payload: TriggerOrdersPayload) => {
       const { placeOrderPayloads, cancelOrderPayloads } = payload;
 
-      cancelOrderPayloads.forEach(async (cancelOrderPayload) => {
+      const cancels = cancelOrderPayloads.map(async (cancelOrderPayload) => {
         dispatch(cancelOrderSubmitted(cancelOrderPayload.orderId));
 
         const res = await chainTxExecutor.enqueue(() => doCancelOrder(cancelOrderPayload));
@@ -687,9 +689,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             })
           );
         }
+        return res;
       });
 
-      placeOrderPayloads.forEach(async (placeOrderPayload) => {
+      const places = placeOrderPayloads.map(async (placeOrderPayload) => {
         dispatch(
           placeOrderSubmitted({
             marketId: placeOrderPayload.marketId,
@@ -712,7 +715,11 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             })
           );
         }
+        return res;
       });
+      const cancelResults = await Promise.all([...cancels, ...places]);
+      const placeResults = await Promise.all([...cancels, ...places]);
+      return { cancelResults, placeResults };
     },
     [dispatch, doCancelOrder, doPlaceOrder]
   );

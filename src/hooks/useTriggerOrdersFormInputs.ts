@@ -4,7 +4,7 @@ import { PositionUniqueId, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { shallowEqual, useDispatch } from 'react-redux';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getTriggersFormSummary } from '@/state/inputsSelectors';
+import { getTriggersFormPosition, getTriggersFormSummary } from '@/state/inputsSelectors';
 import { triggersFormActions } from '@/state/triggersForm';
 
 import { isLimitOrderTypeNew } from '@/lib/orders';
@@ -21,6 +21,7 @@ export const useTriggerOrdersFormInputs = ({
   const dispatch = useDispatch();
   const { errors, summary } = useAppSelector(getTriggersFormSummary, shallowEqual);
 
+  const position = useAppSelector(getTriggersFormPosition);
   const stopLossOrderSize = stopLossOrder?.size.toNumber();
   const takeProfitOrderSize = takeProfitOrder?.size.toNumber();
 
@@ -41,6 +42,29 @@ export const useTriggerOrdersFormInputs = ({
     dispatch(triggersFormActions.setTakeProfitOrderId(takeProfitOrder?.id));
   }, [dispatch, takeProfitOrder?.id]);
 
+  const differingOrderSizes =
+    takeProfitOrderSize != null &&
+    stopLossOrderSize != null &&
+    takeProfitOrderSize !== stopLossOrderSize;
+
+  // show size slider if size is non-full
+  useEffect(() => {
+    if (position == null) {
+      return;
+    }
+    if (differingOrderSizes) {
+      return;
+    }
+    if (
+      summary.stopLossOrder.size != null &&
+      position.unsignedSize.gt(summary.stopLossOrder.size)
+    ) {
+      dispatch(triggersFormActions.setSizeChecked(true));
+    }
+    // we only want to run on mount or when position id changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [position?.uniqueId]);
+
   return {
     inputErrors: errors,
     summary,
@@ -49,10 +73,7 @@ export const useTriggerOrdersFormInputs = ({
     existingTakeProfitOrder: takeProfitOrder,
 
     // True if an SL + TP order exist, and if they are set on different order sizes
-    differingOrderSizes:
-      takeProfitOrderSize != null &&
-      stopLossOrderSize != null &&
-      takeProfitOrderSize !== stopLossOrderSize,
+    differingOrderSizes,
 
     // Boolean to signify whether the limit box should be checked on initial render of the triggers order form
     existsLimitOrder:
