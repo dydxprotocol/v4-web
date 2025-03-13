@@ -12,7 +12,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { Tag, TagSize } from '@/components/Tag';
 
 import { selectDeposit } from '@/state/transfersSelectors';
 
@@ -79,11 +78,14 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
       </Button>
 
       {deposit.explorerLink && (
-        <Tag tw="ml-auto" size={TagSize.Small} key={deposit.txHash}>
-          <Link href={deposit.explorerLink} isAccent isInline withIcon>
+        <div tw="row justify-between">
+          <span tw="text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTIONS_SHORT })}
+          </span>
+          <Link tw="font-small-book" href={deposit.explorerLink} isAccent isInline withIcon>
             {truncateAddress(deposit.txHash, '')}
           </Link>
-        </Tag>
+        </div>
       )}
     </div>
   );

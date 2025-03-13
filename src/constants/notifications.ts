@@ -234,12 +234,12 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
-  DiscoveryProgram = 'discovery-program',
-  Twitter200BVolume = 'twitter-200b-volume',
-  IncentivesS6Ended = 'incentives-s6-ended',
-  KeplrSupport = 'keplr-support',
-  PhantomSupport = 'phantom-support',
-  SimpleIosExperience = 'simple-ios-experience',
+  DiscoveryProgram = 'discovery-program', // Deprecated
+  Twitter200BVolume = 'twitter-200b-volume', // Deprecated
+  IncentivesS6Ended = 'incentives-s6-ended', // Deprecated
+  KeplrSupport = 'keplr-support', // Deprecated
+  PhantomSupport = 'phantom-support', // Deprecated
+  SimpleIosExperience = 'simple-ios-experience', // Deprecated
 }
 
 // Incentives Season
@@ -259,20 +259,20 @@ export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistribute
 }
 
 export enum MarketLaunchNotificationIds {
-  TrumpWin = 'market-launch-trumpwin',
+  TrumpWin = 'market-launch-trumpwin', // Deprecated
 }
 
 export enum MarketWindDownNotificationIds {
-  MarketWindDownFetAgix = 'market-wind-down-fet-agix',
-  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
-  MarketUpdateProposalRndr = 'market-update-proposal-rndr',
-  MarketWindDownMatic = 'market-wind-down-matic',
-  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic',
+  MarketWindDownFetAgix = 'market-wind-down-fet-agix', // Deprecated
+  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix', // Deprecated
+  MarketUpdateProposalRndr = 'market-update-proposal-rndr', // Deprecated
+  MarketWindDownMatic = 'market-wind-down-matic', // Deprecated
+  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic', // Deprecated
 }
 
 export enum MarketUpdateNotificationIds {
   MarketUpdateSolLiquidityTier = 'market-update-sol-liquidity-tier', // Deprecated
-  MarketUpdateProposal226 = 'market-update-proposal-226',
+  MarketUpdateProposal226 = 'market-update-proposal-226', // Deprecated
 }
 
 export enum FeedbackRequestNotificationIds {
