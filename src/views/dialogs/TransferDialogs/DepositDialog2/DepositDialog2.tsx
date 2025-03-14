@@ -98,9 +98,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       withAnimation
       hasHeaderBorder
       setIsOpen={setIsOpen}
-      slotIcon={formState === 'form' && <div />} // Empty icon to help with center alignment of title
       onBack={formState !== 'form' ? onShowForm : undefined}
-      title={<div tw="text-center">{dialogTitle}</div>}
+      title={dialogTitle}
       placement={DialogPlacement.Default}
     >
       {currentDeposit && (
