@@ -58,6 +58,7 @@ import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
+import { MarketsMobile } from './pages/markets/simple-ui/Mobile';
 import { persistor } from './state/_store';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
@@ -101,6 +102,26 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+
+  if (isTablet) {
+    return (
+      <>
+        <GlobalStyle />
+        <Suspense fallback={<LoadingSpace id="main" />}>
+          <Routes>
+            <Route path={AppRoute.Markets} element={<MarketsMobile />} />
+            <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
+          </Routes>
+        </Suspense>
+
+        <NotificationsToastArea tw="z-[2]" />
+
+        <$DialogArea ref={dialogAreaRef}>
+          <DialogManager />
+        </$DialogArea>
+      </>
+    );
+  }
 
   return (
     <>
