@@ -452,10 +452,9 @@ export enum TransactionMemo {
   depositToSubaccount = `${DEFAULT_TRANSACTION_MEMO} | deposit from wallet to subaccount`,
   withdrawFromSubaccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from subaccount to wallet`,
   withdrawFromAccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from account`,
-
   placeOrder = `${DEFAULT_TRANSACTION_MEMO} | Place Order`,
   cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
-
+  reclaimIsolatedMarginFunds = `${DEFAULT_TRANSACTION_MEMO} | Reclaim Isolated Margin Funds`,
   launchMarket = `${DEFAULT_TRANSACTION_MEMO} | Launch Market`,
 }
 

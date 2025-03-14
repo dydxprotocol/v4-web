@@ -17,7 +17,13 @@ import {
 } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
-import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
+import {
+  BIG_NUMBERS,
+  BigNumberish,
+  MaybeBigNumber,
+  MustBigNumber,
+  ToBigNumber,
+} from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
@@ -35,6 +41,10 @@ import {
 } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 import { getMarketEffectiveInitialMarginForMarket } from './markets';
+
+export function isParentSubaccount(subaccountNumber: BigNumberish): boolean {
+  return MustBigNumber(subaccountNumber).lt(NUM_PARENT_SUBACCOUNTS);
+}
 
 export function calculateParentSubaccountPositions(
   parent: ParentSubaccountDataBase,
@@ -200,7 +210,7 @@ function calculateDerivedPositionCore(
   position: SubaccountPositionBase,
   market: IndexerWsBaseMarketObject | undefined
 ): SubaccountPositionDerivedCore {
-  const marginMode = position.subaccountNumber < NUM_PARENT_SUBACCOUNTS ? 'CROSS' : 'ISOLATED';
+  const marginMode = isParentSubaccount(position.subaccountNumber) ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
     market != null
       ? getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO
