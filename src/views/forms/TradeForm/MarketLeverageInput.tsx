@@ -26,6 +26,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -63,7 +64,9 @@ export const MarketLeverageInput = ({
   });
 
   const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
-  const maxMarketLeverageBN = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+  const maxMarketLeverageBN = preferredIMF
+    ? BIG_NUMBERS.ONE.div(preferredIMF)
+    : MustBigNumber(FALLBACK_MARKET_LEVERAGE);
   const maxLeverageBN = MustBigNumber(maxLeverage ?? maxMarketLeverageBN).abs();
 
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
