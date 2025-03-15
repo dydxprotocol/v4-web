@@ -57,8 +57,8 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
+import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
-import { MarketsMobile } from './pages/markets/simple-ui/Mobile';
 import { persistor } from './state/_store';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
@@ -76,6 +76,9 @@ const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
 const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
+
+// Simple UI
+const SimpleMarketsPage = lazy(() => import('@/pages/markets/simple-ui/MarketsMobile'));
 
 const Content = () => {
   useInitializePage();
@@ -103,13 +106,13 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  if (isTablet) {
+  if (isTablet && testFlags.simpleUi) {
     return (
       <>
         <GlobalStyle />
         <Suspense fallback={<LoadingSpace id="main" />}>
           <Routes>
-            <Route path={AppRoute.Markets} element={<MarketsMobile />} />
+            <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
             <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
           </Routes>
         </Suspense>

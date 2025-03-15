@@ -46,10 +46,10 @@ const UnconnectedPortfolioOverview = () => {
 
 const ConnectedPortfolioOverview = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
-  const { equity, leverage, marginUsage } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const { equity } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const isLoadingSubaccount =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
-  const { isLoading: isLoadingPnl } = BonsaiHooks.useParentSubaccountHistoricalPnls();
+  const isLoadingPnl = BonsaiHooks.useParentSubaccountHistoricalPnls().status === 'pending';
   const [visibleData, setVisibleData] = useState<PnlDatum[]>();
 
   const { accountEquity, pnlDiff, pnlDiffPercent, pnlDiffSign } = usePortfolioValues({
@@ -124,6 +124,15 @@ const PortfolioOverview = () => {
           icon: <Icon iconName={IconName.HelpCircle} />,
           onSelect: () => {
             dispatch(openDialog(DialogTypes.Help()));
+          },
+        },
+        {
+          value: 'disconnect-wallet',
+          label: stringGetter({ key: STRING_KEYS.SIGN_OUT }),
+          highlightColor: 'destroy',
+          icon: <Icon iconName={IconName.Arrow} />,
+          onSelect: () => {
+            dispatch(openDialog(DialogTypes.DisconnectWallet()));
           },
         },
       ]}

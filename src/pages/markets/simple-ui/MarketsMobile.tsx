@@ -2,7 +2,7 @@ import { MarketsTable } from '@/views/tables/MarketsTable';
 
 import PortfolioOverview from './PortfolioOverview';
 
-export const MarketsMobile = () => {
+const MarketsMobile = () => {
   return (
     <div tw="flexColumn h-full overflow-hidden">
       <div tw="flexColumn h-20">
@@ -14,3 +14,5 @@ export const MarketsMobile = () => {
     </div>
   );
 };
+
+export default MarketsMobile;

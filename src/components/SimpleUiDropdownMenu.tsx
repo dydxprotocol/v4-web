@@ -32,6 +32,14 @@ export const SimpleUiDropdownMenu = forwardRefFn(
                 tw="row justify-between p-1 font-small-book first:rounded-tl-[0.5rem] first:rounded-tr-[0.5rem] last:rounded-bl-[0.5rem] last:rounded-br-[0.5rem]"
                 key={item.value}
                 onSelect={item.onSelect}
+                css={{
+                  color: {
+                    accent: 'var(--color-accent)',
+                    create: 'var(--color-green)',
+                    destroy: 'var(--color-red)',
+                    none: undefined,
+                  }[item.highlightColor ?? 'none'],
+                }}
               >
                 <span>{item.label}</span>
                 {item.icon}
