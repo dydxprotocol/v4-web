@@ -1,8 +1,12 @@
+import { OrderbookProcessedData } from '@/bonsai/types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
   GroupedSubaccountSummary,
+  PerpetualMarketSummary,
   SubaccountOrder,
   SubaccountPosition,
+  SubaccountSummary,
+  UserStats,
 } from '@/bonsai/types/summaryTypes';
 import unionize, { ofType, UnionOf } from 'unionize';
 
@@ -41,30 +45,19 @@ export type GoodUntilTime = {
 
 type SizeInput = { value: string };
 type UsdcSizeInput = { value: string };
-type LeverageInput = { value: string };
-type BalancePercentInput = { value: string };
-type PositionSizeInput = { value: string };
-type PositionPercentInput = { value: string };
+type AvailablePercentInput = { value: string };
+type SignedLeverageInput = { value: string };
 
 export const OrderSizeInputs = unionize(
   {
     SIZE: ofType<SizeInput>(),
     USDC_SIZE: ofType<UsdcSizeInput>(),
-    LEVERAGE: ofType<LeverageInput>(),
-    BALANCE_PERCENT: ofType<BalancePercentInput>(),
+    AVAILABLE_PERCENT: ofType<AvailablePercentInput>(),
+    SIGNED_POSITION_LEVERAGE: ofType<SignedLeverageInput>(),
   },
   { tag: 'type' as const, value: 'value' as const }
 );
 export type OrderSizeInput = UnionOf<typeof OrderSizeInputs>;
-
-export const ClosePositionSizeInputs = unionize(
-  {
-    SIZE: ofType<PositionSizeInput>(),
-    POSITION_PERCENT: ofType<PositionPercentInput>(),
-  },
-  { tag: 'type' as const, value: 'value' as const }
-);
-export type ClosePositionSizeInput = UnionOf<typeof ClosePositionSizeInputs>;
 
 export enum TradeFormType {
   MARKET = 'MARKET',
@@ -73,7 +66,6 @@ export enum TradeFormType {
   STOP_LIMIT = 'STOP_LIMIT',
   TAKE_PROFIT_MARKET = 'TAKE_PROFIT_MARKET',
   TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
-  CLOSE_POSITION = 'CLOSE_POSITION',
 }
 
 type OrderMatcher<T> = {
@@ -116,10 +108,6 @@ export type TradeForm = {
 
   // Time-related fields
   goodTil?: GoodUntilTime;
-
-  // Close position fields
-  positionId?: string;
-  closeSize?: ClosePositionSizeInput; // Using the proper union type for close position sizes
 };
 
 // Define the FieldState type with conditional properties
@@ -146,25 +134,29 @@ export type TradeFormOptions = {
   showLeverageSlider: boolean;
 };
 
+export type TradeSizeSummary = {
+  size?: number;
+  usdcSize?: number;
+  leverageSigned?: number;
+  balancePercent?: number;
+};
+
+export type TradeInputSummary = {
+  size?: TradeSizeSummary;
+  averageFillPrice?: number;
+};
+
 export type TradeSummary = {
-  inputSummary: {
-    averageFillPrice?: number;
-
-    size?: number;
-    usdcSize?: number;
-    leverage?: number;
-    balancePercent?: number;
-
-    closePositionPercent?: number;
-    closePositionSize?: number;
-  };
+  inputSummary: TradeInputSummary;
 
   subaccountNumber: number;
   transferToSubaccountAmount: string;
   payloadPrice?: number;
 
-  maximumLeverage?: number;
-  minimumLeverage?: number;
+  // minimum is essentially the current position leverage or zero
+  minimumSignedLeverage?: number;
+  // maximum is how far the current order side can push leverage
+  maximumSignedLeverage?: number;
 
   slippage?: number;
   fee?: number;
@@ -198,5 +190,15 @@ export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
   currentTradeMarket: RecordValueType<MarketsData> | undefined;
-  currentTradeMarketOpenOrders: SubaccountOrder[];
+  currentTradeMarketSummary: PerpetualMarketSummary | undefined;
+  currentTradeMarketOpenOrders: SubaccountOrder[]; // todo remove maybe
+  currentTradeMarketOrderbook: OrderbookProcessedData | undefined;
+  allOpenOrders: SubaccountOrder[];
+  userFeeStats: UserStats;
+};
+
+export type TradeAccountDetails = {
+  account?: GroupedSubaccountSummary;
+  position?: SubaccountPosition;
+  subaccountSummaries?: { [subaccountNumber: string]: SubaccountSummary | undefined };
 };

@@ -83,7 +83,7 @@ export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountData
   );
 }
 
-const calculateSubaccountSummary = weakMapMemoize(
+export const calculateSubaccountSummary = weakMapMemoize(
   (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
     const core = calculateSubaccountSummaryCore(subaccountData, markets);
     return {

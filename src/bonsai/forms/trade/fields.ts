@@ -5,7 +5,6 @@ import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
 
 import {
-  ClosePositionSizeInputs,
   ExecutionType,
   FieldState,
   GoodUntilTime,
@@ -55,8 +54,6 @@ export function getTradeFormFieldStates(
     triggerPrice: '',
     execution: ExecutionType.GOOD_TIL_DATE,
     goodTil: DEFAULT_GOOD_TIL_TIME,
-    positionId: '',
-    closeSize: ClosePositionSizeInputs.POSITION_PERCENT({ value: '100' }),
   };
 
   // Initialize all fields as not visible
@@ -101,7 +98,6 @@ export function getTradeFormFieldStates(
       case TradeFormType.MARKET:
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
         setMarginMode(result);
-        preventLeverageInputOnIsolated(result);
         targetLeverageVisibleIfIsolated(result);
 
         return result;
@@ -117,7 +113,6 @@ export function getTradeFormFieldStates(
           'postOnly',
         ]);
         setMarginMode(result);
-        preventLeverageInputOnIsolated(result);
         targetLeverageVisibleIfIsolated(result);
 
         // goodTil is only visible and required for GTT
@@ -143,7 +138,6 @@ export function getTradeFormFieldStates(
           'reduceOnly',
         ]);
         setMarginMode(result);
-        preventLeverageInputOnIsolated(result);
         targetLeverageVisibleIfIsolated(result);
 
         // reduceOnly is only visible when execution is IOC
@@ -164,15 +158,10 @@ export function getTradeFormFieldStates(
           'reduceOnly',
         ]);
         setMarginMode(result);
-        preventLeverageInputOnIsolated(result);
         targetLeverageVisibleIfIsolated(result);
 
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
-        return result;
-      case TradeFormType.CLOSE_POSITION:
-        forceValueAndHide(result.type, TradeFormType.CLOSE_POSITION);
-        makeVisible(result, ['positionId', 'closeSize']);
         return result;
       default:
         assertNever(type);
@@ -199,18 +188,8 @@ function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T
   field.effectiveValue = forceValue;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function forceValueAndHide<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
   field.state = 'relevant-hidden';
   field.effectiveValue = forceValue;
-}
-
-function preventLeverageInputOnIsolated(result: TradeFormFieldStates): void {
-  // LEVERAGE input should only be visible for CROSS margin
-  if (
-    result.size.rawValue?.type === 'LEVERAGE' &&
-    result.marginMode.effectiveValue === MarginMode.ISOLATED
-  ) {
-    // Reset to SIZE input if leverage is selected but margin mode isn't CROSS
-    result.size.effectiveValue = OrderSizeInputs.SIZE({ value: '' });
-  }
 }

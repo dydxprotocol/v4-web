@@ -1,6 +1,5 @@
 import { createVanillaReducer } from '../../lib/forms';
 import {
-  ClosePositionSizeInputs,
   ExecutionType,
   MarginMode,
   OrderSide,
@@ -13,20 +12,14 @@ import {
 
 const getMinimumRequiredFields = (
   type: TradeFormType = TradeFormType.LIMIT,
-  marketId?: string,
-  positionId?: string
+  marketId?: string
 ): TradeForm => {
   // Base form only includes type
   const baseForm: TradeForm = { type };
 
   // Add marketId if provided
-  if (type !== TradeFormType.CLOSE_POSITION && marketId) {
+  if (marketId) {
     baseForm.marketId = marketId;
-  }
-
-  // Add positionId if provided and order type is CLOSE_POSITION
-  if (type === TradeFormType.CLOSE_POSITION && positionId) {
-    baseForm.positionId = positionId;
   }
 
   return baseForm;
@@ -38,21 +31,12 @@ export const tradeFormReducer = createVanillaReducer({
     // Initialize order form
     initializeForm: (
       state,
-      {
-        marketId,
-        orderType,
-        positionId,
-      }: { orderType: TradeFormType; marketId: string | undefined; positionId: string | undefined }
-    ) => getMinimumRequiredFields(orderType, marketId, positionId),
+      { marketId, orderType }: { orderType: TradeFormType; marketId: string | undefined }
+    ) => getMinimumRequiredFields(orderType, marketId),
 
     // Basic order properties
     setOrderType: (state, type: TradeFormType) => {
-      const newState = getMinimumRequiredFields(type, state.marketId, state.positionId);
-
-      // If the new type is CLOSE_POSITION, just use the defaults
-      if (type === TradeFormType.CLOSE_POSITION) {
-        return newState;
-      }
+      const newState = getMinimumRequiredFields(type, state.marketId);
 
       // Preserve size, marginMode, side and reduceOnly when changing order types
       return {
@@ -66,7 +50,7 @@ export const tradeFormReducer = createVanillaReducer({
 
     setMarketId: (state, marketId: string) => {
       // Reset the form when changing market ID
-      return getMinimumRequiredFields(state.type, marketId, state.positionId);
+      return getMinimumRequiredFields(state.type, marketId);
     },
 
     setSide: (state, side: OrderSide) => ({
@@ -90,30 +74,9 @@ export const tradeFormReducer = createVanillaReducer({
       size: OrderSizeInputs.USDC_SIZE({ value }),
     }),
 
-    setSizeLeverage: (state, value: string) => ({
+    setSizeAvailablePercent: (state, value: string) => ({
       ...state,
-      size: OrderSizeInputs.LEVERAGE({ value }),
-    }),
-
-    setSizeBalancePercent: (state, value: string) => ({
-      ...state,
-      size: OrderSizeInputs.BALANCE_PERCENT({ value }),
-    }),
-
-    // Close position size actions
-    setClosePositionPositionId: (state, positionId: string) => {
-      // Reset the form when changing position ID
-      return getMinimumRequiredFields(state.type, state.marketId, positionId);
-    },
-
-    setClosePositionSizeToken: (state, value: string) => ({
-      ...state,
-      closeSize: ClosePositionSizeInputs.SIZE({ value }),
-    }),
-
-    setClosePositionSizePercent: (state, value: string) => ({
-      ...state,
-      closeSize: ClosePositionSizeInputs.POSITION_PERCENT({ value }),
+      size: OrderSizeInputs.AVAILABLE_PERCENT({ value }),
     }),
 
     // Price related actions
@@ -158,6 +121,6 @@ export const tradeFormReducer = createVanillaReducer({
       targetLeverage,
     }),
 
-    reset: (state) => getMinimumRequiredFields(state.type, state.marketId, state.positionId),
+    reset: (state) => getMinimumRequiredFields(state.type, state.marketId),
   },
 });

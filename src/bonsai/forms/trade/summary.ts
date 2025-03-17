@@ -6,15 +6,12 @@ import { getPositionUniqueId } from '@/bonsai/calculators/helpers';
 import {
   calculateParentSubaccountPositions,
   calculateParentSubaccountSummary,
+  calculateSubaccountSummary,
 } from '@/bonsai/calculators/subaccount';
 import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
-import {
-  GroupedSubaccountSummary,
-  PositionUniqueId,
-  SubaccountPosition,
-} from '@/bonsai/types/summaryTypes';
-import { orderBy } from 'lodash';
+import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
+import { mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { calc, mapIfPresent } from '@/lib/do';
@@ -23,6 +20,7 @@ import { AttemptNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { getTradeFormFieldStates } from './fields';
+import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
   MarginMode,
@@ -30,6 +28,7 @@ import {
   SelectionOption,
   TimeInForce,
   TimeUnit,
+  TradeAccountDetails,
   TradeForm,
   TradeFormFieldStates,
   TradeFormInputData,
@@ -193,8 +192,6 @@ function calculateTradeFormOptions(orderType: TradeFormType | undefined): TradeF
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.STOP_MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TAKE_PROFIT_MARKET]: () => iocOnlyExecutionOptions,
-
-        [TradeFormType.CLOSE_POSITION]: () => emptyExecutionOptions,
       })
     : emptyExecutionOptions;
 
@@ -211,13 +208,16 @@ function getRelevantAccountDetails(
   rawParentSubaccountData: ParentSubaccountDataBase,
   rawRelevantMarkets: MarketsData,
   positionUniqueId?: PositionUniqueId
-): { account: GroupedSubaccountSummary; position?: SubaccountPosition } {
+): TradeAccountDetails {
   const account = calculateParentSubaccountSummary(rawParentSubaccountData, rawRelevantMarkets);
   const positions = calculateParentSubaccountPositions(rawParentSubaccountData, rawRelevantMarkets);
   const position = positions.find(
     (p) => positionUniqueId != null && p.uniqueId === positionUniqueId
   );
-  return { position, account };
+  const subaccountSummaries = mapValues(rawParentSubaccountData.childSubaccounts, (subaccount) =>
+    subaccount != null ? calculateSubaccountSummary(subaccount, rawRelevantMarkets) : subaccount
+  );
+  return { position, account, subaccountSummaries };
 }
 
 function getPositionIdToUseForTrade(
@@ -227,6 +227,7 @@ function getPositionIdToUseForTrade(
   if (marketId == null || marketId.trim().length === 0) {
     return undefined;
   }
+
   const allPositions = Object.values(rawParentSubaccountData?.childSubaccounts ?? {}).flatMap(
     (o) => (o != null ? o.openPerpetualPositions[marketId] ?? [] : [])
   );
@@ -266,7 +267,7 @@ function calculateTradeOperationsForSimulation(
     tradeToApply: mapIfPresent(
       marketIdRaw,
       sideRaw,
-      sizeRaw,
+      sizeRaw?.size,
       averagePriceRaw,
       feeRaw,
       reduceOnlyRaw,
