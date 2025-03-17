@@ -96,6 +96,7 @@ export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
 
 // Wallets
+export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
 export { default as BitpieIcon } from './wallets/bitpie.svg';

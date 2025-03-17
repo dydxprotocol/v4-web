@@ -93,6 +93,10 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
 );
 
 const buttonSizeVariants = {
+  [ButtonSize.XXSmall]: css`
+    --button-font: var(--font-tiny-book);
+    --button-height: 1.25rem;
+  `,
   [ButtonSize.XSmall]: css`
     --button-font: var(--font-mini-book);
     --button-height: 1.75rem;

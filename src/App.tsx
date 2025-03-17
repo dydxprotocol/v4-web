@@ -110,13 +110,14 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <Suspense fallback={<LoadingSpace id="main" />}>
-          <Routes>
-            <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
-            <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
-          </Routes>
-        </Suspense>
-
+        <main tw="h-[100vh] w-[100vw]">
+          <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
+            <Routes>
+              <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
+              <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
+            </Routes>
+          </Suspense>
+        </main>
         <NotificationsToastArea tw="z-[2]" />
 
         <$DialogArea ref={dialogAreaRef}>

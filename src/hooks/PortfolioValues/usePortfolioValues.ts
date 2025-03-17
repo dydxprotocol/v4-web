@@ -49,9 +49,9 @@ export const usePortfolioValues = ({
     let pnlDiff;
     let pnlDiffPercent;
     if (earliestVisibleDatum && latestVisibleDatum) {
-      const fullTimeframeDiff = MustBigNumber(latestVisibleDatum.totalPnl).minus(
-        earliestVisibleDatum.totalPnl
-      );
+      const latestPnlRounded = MustBigNumber(latestVisibleDatum.totalPnl).toFixed(4);
+      const earliestPnlRounded = MustBigNumber(earliestVisibleDatum.totalPnl).toFixed(4);
+      const fullTimeframeDiff = MustBigNumber(latestPnlRounded).minus(earliestPnlRounded);
 
       pnlDiff = activeDatum
         ? MustBigNumber(activeDatum.totalPnl).minus(earliestVisibleDatum.totalPnl)

@@ -24,7 +24,7 @@ import { getCurrentMarketId } from './currentMarketSelectors';
 
 /**
  * @param state
- * @returns Abacus' subaccount object
+ * @returns SubaccountSummaryDerived object
  */
 export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 

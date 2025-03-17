@@ -1,16 +1,12 @@
-import { MarketsTable } from '@/views/tables/MarketsTable';
-
 import PortfolioOverview from './PortfolioOverview';
 
 const MarketsMobile = () => {
   return (
-    <div tw="flexColumn h-full overflow-hidden">
-      <div tw="flexColumn h-20">
+    <div tw="flexColumn relative h-full overflow-auto">
+      <div tw="flexColumn h-20 min-h-20">
         <PortfolioOverview />
       </div>
-      <div tw="flexColumn overflow-y-auto">
-        <MarketsTable />
-      </div>
+      <div tw="flexColumn">Market Table Placeholder</div>
     </div>
   );
 };
