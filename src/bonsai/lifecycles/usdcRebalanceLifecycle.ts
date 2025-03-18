@@ -150,10 +150,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
             const maybeSubaccountNumber = objectEntries(childSubaccountSummaries).find(
               ([_, summary]) => {
-                if (
-                  summary.freeCollateral.gt(amountToWithdraw) &&
-                  (summary.marginUsage == null || summary.marginUsage.lt(0.4))
-                ) {
+                if (summary.freeCollateral.gt(amountToWithdraw)) {
                   return true;
                 }
 
