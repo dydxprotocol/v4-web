@@ -120,6 +120,63 @@
     }
   },
   {
+    "id": "phantom-wallet",
+    "name": "Phantom Wallet",
+    "description": "",
+    "homepage": "https://phantom.com/",
+    "chains": [
+      "solana"
+    ],
+    "versions": [
+      "1"
+    ],
+    "app": {
+      "browser": "",
+      "ios": "https://apps.apple.com/us/app/phantom-crypto-wallet/id1598432977",
+      "android": "https://play.google.com/store/apps/details?id=app.phantom",
+      "mac": "",
+      "windows": "",
+      "linux": ""
+    },
+    "mobile": {
+      "native": "phantom:",
+      "universal": ""
+    },
+    "desktop": {
+      "native": "",
+      "universal": ""
+    },
+    "metadata": {
+      "shortName": "Phantom",
+      "colors": {
+        "primary": "rgb(255, 255, 255)",
+        "secondary": ""
+      }
+    },
+    "config": {
+      "comment": "Phantom",
+      "iosMinVersion": "1.8.0",
+      "encoding": "=\"#%/<>?@\\^`{|}:&",
+      "connections": [
+        {
+          "type": "phantomWallet",
+          "native": "phantom:",
+          "universal": ""
+        }
+      ],
+      "methods": [
+          "eth_sendTransaction",
+          "personal_sign",
+          "eth_signTypedData",
+          "wallet_addEthereumChain"
+      ]
+    },
+    "userFields": {
+      "analyticEvent": "PHANTOM",
+      "imageName": "phantom-wallet.png"
+    }
+  },
+  {
     "id": "9d373b43ad4d2cf190fb1a774ec964a1addf406d6fd24af94ab7596e58c291b2",
     "name": "imToken",
     "description": "",
