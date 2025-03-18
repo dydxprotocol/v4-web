@@ -58,7 +58,11 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
       // All conditional orders labeled under "Stop Order"
       allTradeTypeItems.length > 2
         ? {
-            label: stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
+            label:
+              selectedTradeType === TradeTypes.TAKE_PROFIT ||
+              selectedTradeType === TradeTypes.TAKE_PROFIT_MARKET
+                ? stringGetter({ key: STRING_KEYS.TAKE_PROFIT })
+                : stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
             value: '' as TradeTypes,
             subitems: allTradeTypeItems.slice(2),
           }
