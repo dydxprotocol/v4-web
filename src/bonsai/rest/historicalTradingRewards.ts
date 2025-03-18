@@ -17,6 +17,7 @@ import { isPresent } from '@/lib/typeUtils';
 
 import { calculateDailyCumulativeTradingRewards } from '../calculators/historicalTradingRewards';
 import { Loadable } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { AggregatedTradingReward } from '../types/summaryTypes';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
@@ -83,10 +84,7 @@ export function useHistoricalTradingRewardsWeekly() {
     }, BIG_NUMBERS.ZERO);
   }, [tradingRewards]);
 
-  return {
-    ...historicalTradingRewardsQuery,
-    data: weeklyReward,
-  };
+  return mapLoadableData(historicalTradingRewardsQuery, () => weeklyReward);
 }
 
 /**
@@ -102,26 +100,19 @@ export function useTotalTradingRewards() {
     }, BIG_NUMBERS.ZERO);
   }, [tradingRewards]);
 
-  return {
-    ...historicalTradingRewardsQuery,
-    data: lifetimeTradingRewards,
-  };
+  return mapLoadableData(historicalTradingRewardsQuery, () => lifetimeTradingRewards);
 }
 
 /**
  * @returns chartData for daily cumulative trading rewards (includes dummy entries for days that have no trading rewards)
  */
 export function useDailyCumulativeTradingRewards(): Loadable<AggregatedTradingReward[]> {
-  const { data: tradingRewards, status, error } = useHistoricalTradingRewards();
+  const loadable = useHistoricalTradingRewards();
 
   const chartData = useMemo(
-    () => calculateDailyCumulativeTradingRewards(tradingRewards),
-    [tradingRewards]
+    () => calculateDailyCumulativeTradingRewards(loadable.data),
+    [loadable.data]
   );
 
-  return {
-    error,
-    data: chartData,
-    status,
-  };
+  return mapLoadableData(loadable, () => chartData);
 }

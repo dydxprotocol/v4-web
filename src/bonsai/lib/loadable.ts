@@ -1,12 +1,8 @@
-export type LoadablePending<T> = { status: 'pending'; data?: T; error?: undefined };
-export type LoadableSuccess<T> = { status: 'success'; data: T; error?: undefined };
-export type LoadableIdle<T> = { status: 'idle'; data?: T; error?: undefined };
+export type LoadablePending<T> = { status: 'pending'; data?: T };
+export type LoadableSuccess<T> = { status: 'success'; data: T };
+export type LoadableIdle = { status: 'idle'; data: undefined };
 export type LoadableError<T> = { status: 'error'; data?: T; error: any };
-export type Loadable<T> =
-  | LoadableIdle<T>
-  | LoadableSuccess<T>
-  | LoadablePending<T>
-  | LoadableError<T>;
+export type Loadable<T> = LoadableIdle | LoadableSuccess<T> | LoadablePending<T> | LoadableError<T>;
 export type LoadableStatus = Loadable<any>['status'];
 
 export function loadablePending<T>(data?: T) {
@@ -37,6 +33,6 @@ export function isLoadablePending<T>(obj: Loadable<T>): obj is LoadablePending<T
   return obj.status === 'pending';
 }
 
-export function isLoadableIdle<T>(obj: Loadable<T>): obj is LoadableIdle<T> {
+export function isLoadableIdle<T>(obj: Loadable<T>): obj is LoadableIdle {
   return obj.status === 'idle';
 }
