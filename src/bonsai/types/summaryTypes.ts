@@ -1,4 +1,10 @@
-import { ClobModule, ComplianceReason, FeeTierModule } from '@dydxprotocol/v4-client-js';
+import {
+  ClobModule,
+  ComplianceReason,
+  FeeTierModule,
+  PricesModule,
+  RewardsModule,
+} from '@dydxprotocol/v4-client-js';
 import { type BigNumber } from 'bignumber.js';
 
 import {
@@ -264,6 +270,11 @@ export type ConfigTiers = {
   feeTiers: FeeTiers | undefined;
   equityTiers: EquityTiers | undefined;
 };
+
+export type RewardsParams = NonNullable<ToPrimitives<RewardsModule.QueryParamsResponse['params']>>;
+export type TokenPriceResponse = NonNullable<
+  ToPrimitives<PricesModule.QueryMarketPriceResponse['marketPrice']>
+>;
 
 export interface FeeTierSummary {
   id: string;

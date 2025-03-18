@@ -31,6 +31,8 @@ import {
   TradeSummary,
 } from './types';
 
+const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
+
 export function calculateTradeInfo(
   fieldStates: TradeFormFieldStates,
   baseAccount: TradeAccountDetails | undefined,
@@ -44,10 +46,66 @@ export function calculateTradeInfo(
     accountData.allOpenOrders,
     accountData.rawParentSubaccountData
   );
+  const leverageLimits = getSignedLeverageLimits(
+    baseAccount?.position,
+    accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction ?? undefined,
+    trade.side,
+    trade.reduceOnly ?? false
+  );
 
   const summaryBase = calc(() => {
     switch (trade.type) {
       case TradeFormType.MARKET:
+        return calc(() => {
+          const calculated = calculateMarketOrder(trade, baseAccount, accountData);
+          const orderbookBase = accountData.currentTradeMarketOrderbook;
+          return {
+            inputSummary: calculated.summary,
+            subaccountNumber: subaccountToUse,
+            transferToSubaccountAmount: '',
+            payloadPrice: mapIfPresent(calculated.marketOrder?.averagePrice, (price) => {
+              if (trade.side == null || trade.side === OrderSide.BUY) {
+                return price * (1 + MARKET_ORDER_MAX_SLIPPAGE);
+              }
+              return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
+            }),
+            minimumSignedLeverage: leverageLimits.minLeverage,
+            maximumSignedLeverage: leverageLimits.maxLeverage,
+            slippage: mapIfPresent(
+              calculated.marketOrder?.worstPrice,
+              orderbookBase?.midPrice,
+              (worstPrice, midMarketPrice) => {
+                return midMarketPrice <= 0
+                  ? 0
+                  : Math.abs(worstPrice - midMarketPrice) / midMarketPrice;
+              }
+            ),
+            fee: calculated.marketOrder?.totalFees,
+            total: mapIfPresent(
+              calculated.marketOrder?.totalFees,
+              calculated.marketOrder?.usdcSize,
+              (fees, size) => -1 * fees + size * (trade.side === OrderSide.SELL ? 1 : -1)
+            ),
+            reward: undefined,
+            filled: calculated.marketOrder?.filled,
+            isPositionClosed:
+              mapIfPresent(
+                calculated.marketOrder?.size,
+                baseAccount?.position?.unsignedSize.toNumber(),
+                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+                (filled, size, stepSize) => Math.abs(filled - size) < stepSize / 2
+              ) ?? false,
+            indexSlippage: mapIfPresent(
+              calculated.marketOrder?.worstPrice,
+              AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
+              (worstPrice, oraclePrice) => {
+                // todo this is different from abacus, we should double check where this is used
+                return oraclePrice <= 0 ? 0 : Math.abs(worstPrice - oraclePrice) / oraclePrice;
+              }
+            ),
+            feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
+          };
+        });
       case TradeFormType.STOP_MARKET:
       case TradeFormType.TAKE_PROFIT_MARKET:
         return calc(() => {
@@ -157,7 +215,7 @@ function createMarketOrder(
       simulateMarketOrder(
         effectiveSizeTarget,
         orderbook,
-        accountData.userFeeStats.makerFeeRate ?? 0,
+        accountData.userFeeStats.takerFeeRate ?? 0,
         oraclePrice,
         equity,
         freeCollateral,
@@ -322,33 +380,37 @@ function calculateSubaccountToUseForTrade(
 function getSignedLeverageLimits(
   currentPosition: SubaccountPosition | undefined,
   marketEffectiveImf: number | undefined,
-  side: OrderSide | undefined
+  side: OrderSide | undefined,
+  reduceOnly: boolean
 ): { minLeverage: BigNumber; maxLeverage: BigNumber } {
-  // Calculate current position leverage with appropriate sign
-  const positionLeverageUnsigned = currentPosition?.leverage ?? BIG_NUMBERS.ZERO;
-  const positionLeverageSigned = positionLeverageUnsigned.times(
-    currentPosition?.signedSize.lt(BIG_NUMBERS.ZERO) ? -1 : 1
-  );
+  const sideToUse = side ?? OrderSide.BUY;
 
-  // Calculate maximum leverage (unsigned)
   const effectiveImf = marketEffectiveImf ?? 1;
-  const maxLeverageUnsigned = BIG_NUMBERS.ONE.div(effectiveImf === 0 ? 1 : effectiveImf);
+  const marketMaxLeverage = BIG_NUMBERS.ONE.div(effectiveImf === 0 ? 1 : effectiveImf);
 
-  if (side == null || side === OrderSide.BUY) {
-    // For BUY orders (going positive)
-    return {
-      // Min leverage is the current position leverage
-      minLeverage: positionLeverageSigned,
-      // Max leverage is the maximum positive leverage allowed
-      maxLeverage: maxLeverageUnsigned,
-    };
-  }
-  // For SELL orders (going negative)
+  const hasPosition = currentPosition != null && !currentPosition.signedSize.isZero();
+  const positionLeverageUnsigned = currentPosition?.leverage ?? BIG_NUMBERS.ZERO;
+  const isPositionLong = hasPosition && currentPosition?.signedSize.gt(BIG_NUMBERS.ZERO);
+  const positionLeverageSigned = positionLeverageUnsigned.times(isPositionLong ? 1 : -1);
+
+  const isOrderBuy = sideToUse === OrderSide.BUY;
+  const isOrderIncreasingPosition =
+    !hasPosition || (isPositionLong && isOrderBuy) || (!isPositionLong && !isOrderBuy);
+
   return {
-    // Min leverage is the current position leverage
     minLeverage: positionLeverageSigned,
-    // Max leverage is the maximum negative leverage allowed
-    maxLeverage: maxLeverageUnsigned.times(-1),
+    maxLeverage: calc(() => {
+      if (reduceOnly) {
+        if (isOrderIncreasingPosition) {
+          // Can't increase position with reduceOnly
+          return positionLeverageSigned;
+        }
+        // Can reduce position to zero
+        return BIG_NUMBERS.ZERO;
+      }
+      // Not reduceOnly, use standard market limits
+      return isOrderBuy ? marketMaxLeverage : marketMaxLeverage.times(-1);
+    }),
   };
 }
 
@@ -429,7 +491,8 @@ function calculateEffectiveSizeTarget(
       const signedLimits = getSignedLeverageLimits(
         baseAccount?.position,
         accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction ?? undefined,
-        trade.side
+        trade.side,
+        trade.reduceOnly ?? false
       );
       if (trade.side === OrderSide.BUY) {
         // going positive

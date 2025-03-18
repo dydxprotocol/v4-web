@@ -11,6 +11,8 @@ import {
   AccountStats,
   ComplianceResponse,
   ConfigTiers,
+  RewardsParams,
+  TokenPriceResponse,
   UserFeeTier,
 } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
@@ -88,6 +90,10 @@ export interface RawDataState {
   };
   configs: Loadable<ConfigTiers>;
   compliance: ComplianceState;
+  rewards: {
+    data: Loadable<RewardsParams | undefined>;
+    price: Loadable<TokenPriceResponse | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -118,6 +124,10 @@ const initialState: RawDataState = {
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
+  },
+  rewards: {
+    data: loadableIdle(),
+    price: loadableIdle(),
   },
 };
 
@@ -218,6 +228,15 @@ export const rawSlice = createSlice({
     ) => {
       state.compliance.sourceAddressScreenV2 = action.payload;
     },
+    setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
+      state.rewards.data = action.payload;
+    },
+    setRewardsTokenPrice: (
+      state,
+      action: PayloadAction<Loadable<TokenPriceResponse | undefined>>
+    ) => {
+      state.rewards.price = action.payload;
+    },
   },
 });
 
@@ -266,4 +285,6 @@ export const {
   setComplianceGeoRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
+  setRewardsParams,
+  setRewardsTokenPrice,
 } = rawSlice.actions;
