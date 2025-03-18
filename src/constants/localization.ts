@@ -1,6 +1,5 @@
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import {
-  APP_NATIVE,
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
   LOCALE_DATA,
@@ -41,7 +40,6 @@ export const EN_LOCALE_DATA = {
 };
 
 export const STRING_KEYS = {
-  ...APP_NATIVE,
   ...APP_STRING_KEYS,
   ...ERRORS_STRING_KEYS,
   ...WARNINGS_STRING_KEYS,
