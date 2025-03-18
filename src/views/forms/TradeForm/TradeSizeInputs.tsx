@@ -55,12 +55,11 @@ export const TradeSizeInputs = () => {
   const stringGetter = useStringGetter();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
-  const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+  const { stepSizeDecimals, tickSizeDecimals, assetId, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -145,8 +144,8 @@ export const TradeSizeInputs = () => {
   };
 
   const dispatchSetDisplayUnit = debounce((newDisplayUnit) => {
-    if (!id) return;
-    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId: id }));
+    if (!assetId) return;
+    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId }));
   }, NORMAL_DEBOUNCE_MS);
 
   const onUsdcToggle = useCallback(
@@ -171,7 +170,7 @@ export const TradeSizeInputs = () => {
         <$Tooltip>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Tooltip>
       ) : showUSDInput && amountInput ? (
         <$Tooltip>
-          ≈ {amountInput} {id && <Tag>{id}</Tag>}
+          ≈ {amountInput} {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
         </$Tooltip>
       ) : undefined;
 
@@ -186,12 +185,25 @@ export const TradeSizeInputs = () => {
       </$ToggleButton>
     );
 
-    return slotTooltip ? (
-      <WithTooltip slotTooltip={slotTooltip} side="left" align="center">
-        {toggleButton}
-      </WithTooltip>
-    ) : (
-      toggleButton
+    const tooltipContainer = (
+      <div
+        tw="pointer-events-none absolute z-10 select-none text-nowrap pr-0.5 font-small-book"
+        style={{ right: '100%' }}
+      >
+        {slotTooltip}
+      </div>
+    );
+    return (
+      <div tw="row relative gap-0.5">
+        {slotTooltip ? (
+          <>
+            {tooltipContainer}
+            {toggleButton}
+          </>
+        ) : (
+          toggleButton
+        )}
+      </div>
     );
   };
 
@@ -219,12 +231,12 @@ export const TradeSizeInputs = () => {
         <>
           <WithTooltip
             tooltip={inputConfig.tooltipId as TooltipStringKeys}
-            stringParams={{ SYMBOL: getDisplayableAssetFromBaseAsset(id) }}
+            stringParams={{ SYMBOL: getDisplayableAssetFromBaseAsset(assetId) }}
             side="right"
           >
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {id && <DisplayUnitTag assetId={id} entryPoint="tradeAmountInputAssetTag" />}
+          {assetId && <DisplayUnitTag assetId={assetId} entryPoint="tradeAmountInputAssetTag" />}
         </>
       }
       slotRight={inputToggleButton()}
