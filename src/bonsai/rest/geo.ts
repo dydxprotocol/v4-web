@@ -11,7 +11,9 @@ import { setComplianceGeoRaw } from '@/state/raw';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { logBonsaiError } from '../logs';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
   try {
@@ -48,13 +50,8 @@ export function setUpGeoQuery(store: RootStore) {
 
     const unsubscribe = observer.subscribe((result) => {
       try {
-        const data = result.data?.data;
         store.dispatch(
-          setComplianceGeoRaw({
-            error: result.error,
-            status: result.status,
-            data,
-          })
+          setComplianceGeoRaw(mapLoadableData(queryResultToLoadable(result), (r) => r.data))
         );
       } catch (e) {
         logBonsaiError('Geo', 'Error handling result from react query store effect', e, result);

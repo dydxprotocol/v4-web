@@ -165,13 +165,13 @@ export const TradeSizeInputs = () => {
   }, [showUSDInput]);
 
   const inputToggleButton = () => {
-    const slotTooltip =
+    const conversionText =
       !showUSDInput && usdAmountInput ? (
-        <$Tooltip>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Tooltip>
+        <$Conversion>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Conversion>
       ) : showUSDInput && amountInput ? (
-        <$Tooltip>
+        <$Conversion>
           ≈ {amountInput} {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
-        </$Tooltip>
+        </$Conversion>
       ) : undefined;
 
     const toggleButton = (
@@ -185,19 +185,19 @@ export const TradeSizeInputs = () => {
       </$ToggleButton>
     );
 
-    const tooltipContainer = (
+    const conversionContainer = (
       <div
         tw="pointer-events-none absolute z-10 select-none text-nowrap pr-0.5 font-small-book"
         style={{ right: '100%' }}
       >
-        {slotTooltip}
+        {conversionText}
       </div>
     );
     return (
       <div tw="row relative gap-0.5">
-        {slotTooltip ? (
+        {conversionText ? (
           <>
-            {tooltipContainer}
+            {conversionContainer}
             {toggleButton}
           </>
         ) : (
@@ -284,4 +284,4 @@ const $ToggleButton = styled(ToggleButton)`
   }
 `;
 
-const $Tooltip = tw.div`inline-flex`;
+const $Conversion = tw.div`inline-flex`;
