@@ -43,6 +43,10 @@ export const MigratePanel = ({ className }: { className?: string }) => {
     isCosmosChain: false,
   });
 
+  if (MustBigNumber(tokenBalance).lte(0)) {
+    return null;
+  }
+
   return isNotTablet ? (
     <$MigratePanel
       className={className}
