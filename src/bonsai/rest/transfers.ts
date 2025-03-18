@@ -7,8 +7,10 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpTransfersQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'transfers']);
@@ -25,14 +27,9 @@ export function setUpTransfersQuery(store: RootStore) {
     },
     onResult: (transfers) => {
       store.dispatch(
-        setAccountTransfersRaw({
-          status: transfers.status,
-          data:
-            transfers.data != null
-              ? isParentSubaccountTransferResponse(transfers.data)
-              : transfers.data,
-          error: transfers.error,
-        })
+        setAccountTransfersRaw(
+          mapLoadableData(queryResultToLoadable(transfers), isParentSubaccountTransferResponse)
+        )
       );
     },
     onNoQuery: () => store.dispatch(setAccountTransfersRaw(loadableIdle())),
