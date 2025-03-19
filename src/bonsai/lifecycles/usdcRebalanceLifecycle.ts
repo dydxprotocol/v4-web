@@ -9,6 +9,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
@@ -143,6 +144,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             );
 
             await sleep(SLEEP_TIME);
+
+            appQueryClient.invalidateQueries({
+              queryKey: ['validator', 'accountBalances'],
+              exact: false,
+            });
           } else if (shouldWithdraw) {
             const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
               .minus(usdcBalanceBN)
@@ -180,6 +186,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             );
 
             await sleep(SLEEP_TIME);
+
+            appQueryClient.invalidateQueries({
+              queryKey: ['validator', 'accountBalances'],
+              exact: false,
+            });
           }
         }
       }

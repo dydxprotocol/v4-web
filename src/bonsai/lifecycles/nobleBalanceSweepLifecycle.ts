@@ -9,6 +9,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { isNobleIbcMsg } from '@/types/skip';
 
 import type { RootStore } from '@/state/_store';
+import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
@@ -27,8 +28,8 @@ function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: numb
 // 0.1 USDC buffer to account for IBC fees
 const USDC_IBC_FEE_BUFFER = 0.1;
 
-// Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction
-const SLEEP_TIME = timeUnits.second * 10;
+// Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction. IBC transactions should not exceed 1 minute unless network is congested/degraded.
+const SLEEP_TIME = timeUnits.second * 30;
 
 /**
  * @description Lifecycle for sweeping all USDC on Noble to dYdX chain. This is used to sweep deposits that only land within Noble.
@@ -164,6 +165,16 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         );
 
         await sleep(SLEEP_TIME);
+
+        appQueryClient.invalidateQueries({
+          queryKey: ['validator', 'accountBalances'],
+          exact: false,
+        });
+
+        appQueryClient.invalidateQueries({
+          queryKey: ['nobleClient', 'nobleBalances'],
+          exact: false,
+        });
       }
 
       // Don't auto-sweep on Cosmos
