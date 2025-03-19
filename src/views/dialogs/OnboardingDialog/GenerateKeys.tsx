@@ -23,9 +23,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
-import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
-import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { setSavedEncryptedSignature } from '@/state/wallet';
@@ -44,7 +42,6 @@ type ElementProps = {
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
   const { sourceAccount, setWalletFromSignature } = useAccounts();
 
@@ -157,7 +154,7 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       await setWalletFromSignature(signature);
 
       // 3: Remember me (encrypt and store signature)
-      if (shouldRememberMe && staticEncryptionKey) {
+      if (staticEncryptionKey) {
         const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
         dispatch(setSavedEncryptedSignature(encryptedSignature));
       }
@@ -228,18 +225,6 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
       </div>
 
       <$Footer>
-        <label htmlFor="remember-me" tw="spacedRow text-color-text-1 font-small-bold">
-          <WithTooltip withIcon tooltip="remember-me">
-            {stringGetter({ key: STRING_KEYS.REMEMBER_ME })}
-          </WithTooltip>
-
-          <Switch
-            name="remember-me"
-            disabled={!staticEncryptionKey || isDeriving}
-            checked={shouldRememberMe}
-            onCheckedChange={setShouldRememberMe}
-          />
-        </label>
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
         <WithReceipt
           slotReceipt={

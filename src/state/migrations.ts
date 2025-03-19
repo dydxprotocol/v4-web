@@ -38,7 +38,6 @@ export function customCreateMigrate(options: MigrationConfig): PersistMigrate {
   const defaultMigrate = createMigrate(migrations, options);
 
   return async (state: PersistedState, currentVersion: number) => {
-    console.log('startup', state);
     if (state !== undefined) {
       return defaultMigrate(state, currentVersion);
     }

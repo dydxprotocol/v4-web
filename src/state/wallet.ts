@@ -65,12 +65,10 @@ export const walletSlice = createSlice({
       if (state.sourceAccount.chain === WalletNetworkType.Cosmos) {
         throw new Error('cosmos wallets should not require signatures for derived addresses');
       }
-      console.log('setting signature', action.payload);
 
       state.sourceAccount.encryptedSignature = action.payload;
     },
     clearSavedEncryptedSignature: (state) => {
-      console.log('Clearing signature');
       state.sourceAccount.encryptedSignature = undefined;
     },
     setLocalWallet: (
@@ -80,7 +78,6 @@ export const walletSlice = createSlice({
       state.localWallet = payload;
     },
     clearSourceAccount: (state) => {
-      console.log('Clearing account');
       state.sourceAccount = {
         address: undefined,
         chain: undefined,

@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
@@ -82,7 +74,7 @@ const useAccountsContext = () => {
   const { ready, authenticated } = usePrivy();
 
   const blockedGeo = useMemo(() => {
-    return geo && isBlockedGeo(geo) && checkForGeo;
+    return geo != null && isBlockedGeo(geo) && checkForGeo;
   }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
@@ -186,27 +178,7 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet]);
 
-  const lastSeen = useRef<Record<string, any>>({});
-
   useEffect(() => {
-    const thisSet: Record<string, any> = {
-      signerWagmi,
-      isConnectedGraz,
-      sourceAccount,
-      hasLocalDydxWallet,
-      blockedGeo,
-    };
-
-    console.log(lastSeen.current, thisSet);
-    Object.keys(thisSet).forEach((k) => {
-      if (thisSet[k] !== lastSeen.current[k]) {
-        console.log('changed:', k, thisSet[k], lastSeen.current[k]);
-      }
-    });
-
-    lastSeen.current = thisSet;
-
-    const myId = Math.floor(Math.random() * 1000);
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
@@ -225,9 +197,7 @@ const useAccountsContext = () => {
           log('useAccounts/setLocalDydxWallet', error);
         }
       } else if (sourceAccount.chain === WalletNetworkType.Evm) {
-        console.log(myId, 'a');
         if (!hasLocalDydxWallet) {
-          console.log(myId, 'b');
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (
@@ -235,7 +205,6 @@ const useAccountsContext = () => {
             authenticated &&
             ready
           ) {
-            console.log(myId, 'privy');
             try {
               // Give Privy a second to finish the auth flow before getting the signature
               await sleep();
@@ -247,30 +216,25 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
-          } else if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
-            console.log(myId, 'saved');
+          } else if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
-              console.log(myId, 'sig', signature);
 
               await setWalletFromSignature(signature);
-              console.log(myId, 'set');
               dispatch(setOnboardingState(OnboardingState.AccountConnected));
             } catch (error) {
-              console.log(myId, 'set error', error);
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
           }
         } else {
-          console.log(myId, 'c');
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else if (sourceAccount.chain === WalletNetworkType.Solana) {
         if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
-          if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
+          if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
               await setWalletFromSignature(signature);
@@ -287,7 +251,6 @@ const useAccountsContext = () => {
         disconnectLocalDydxWallet();
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
-      console.log(myId, 'done');
     })();
   }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
