@@ -179,6 +179,7 @@ const useAccountsContext = () => {
   }, [localDydxWallet, localNobleWallet]);
 
   useEffect(() => {
+    const myId = Math.floor(Math.random() * 1000);
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
@@ -197,7 +198,9 @@ const useAccountsContext = () => {
           log('useAccounts/setLocalDydxWallet', error);
         }
       } else if (sourceAccount.chain === WalletNetworkType.Evm) {
+        console.log(myId, 'a');
         if (!hasLocalDydxWallet) {
+          console.log(myId, 'b');
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
           if (
@@ -205,6 +208,7 @@ const useAccountsContext = () => {
             authenticated &&
             ready
           ) {
+            console.log(myId, 'privy');
             try {
               // Give Privy a second to finish the auth flow before getting the signature
               await sleep();
@@ -217,17 +221,22 @@ const useAccountsContext = () => {
               dispatch(clearSavedEncryptedSignature());
             }
           } else if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
+            console.log(myId, 'saved');
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
+              console.log(myId, 'sig', signature);
 
               await setWalletFromSignature(signature);
+              console.log(myId, 'set');
               dispatch(setOnboardingState(OnboardingState.AccountConnected));
             } catch (error) {
+              console.log(myId, 'set error', error);
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
           }
         } else {
+          console.log(myId, 'c');
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else if (sourceAccount.chain === WalletNetworkType.Solana) {
@@ -251,6 +260,7 @@ const useAccountsContext = () => {
         disconnectLocalDydxWallet();
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
+      console.log(myId, 'done');
     })();
   }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
