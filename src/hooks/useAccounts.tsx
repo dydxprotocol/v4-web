@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
@@ -178,7 +186,24 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet]);
 
+  const lastSeen = useRef<Record<string, any>>({});
+
   useEffect(() => {
+    const thisSet: Record<string, any> = {
+      signerWagmi,
+      isConnectedGraz,
+      sourceAccount,
+      hasLocalDydxWallet,
+      blockedGeo,
+    };
+    Object.keys(thisSet).forEach((k) => {
+      if (thisSet[k] !== lastSeen.current[k]) {
+        console.log('changed:', k, thisSet[k], lastSeen.current[k]);
+      }
+    });
+
+    lastSeen.current = thisSet;
+
     const myId = Math.floor(Math.random() * 1000);
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
