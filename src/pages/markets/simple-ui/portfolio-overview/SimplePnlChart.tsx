@@ -34,6 +34,26 @@ export enum HistoricalPnlPeriod {
   Period90d = 'Period90d',
 }
 
+export function getMsForPeriod(
+  period: HistoricalPnlPeriod,
+  earliestDate?: number,
+  latestDate?: number,
+  clampMax: boolean = true
+) {
+  const maxPeriod = earliestDate && latestDate ? latestDate - earliestDate : 90 * timeUnits.day;
+  switch (period) {
+    case HistoricalPnlPeriod.Period1d:
+      return clampMax ? Math.min(maxPeriod, 1 * timeUnits.day) : 1 * timeUnits.day;
+    case HistoricalPnlPeriod.Period7d:
+      return clampMax ? Math.min(maxPeriod, 7 * timeUnits.day) : 7 * timeUnits.day;
+    case HistoricalPnlPeriod.Period30d:
+      return clampMax ? Math.min(maxPeriod, 30 * timeUnits.day) : 30 * timeUnits.day;
+    case HistoricalPnlPeriod.Period90d:
+    default:
+      return clampMax ? Math.min(maxPeriod, 90 * timeUnits.day) : 90 * timeUnits.day;
+  }
+}
+
 const PNL_TIME_RESOLUTION = 1 * timeUnits.hour;
 
 type ElementProps = {
@@ -70,21 +90,7 @@ const SimplePnlChart = ({
     (period: HistoricalPnlPeriod, clampMax: boolean = true) => {
       const earliestCreatedAt = data[0]?.createdAt;
       const latestCreatedAt = data[data.length - 1]?.createdAt;
-      const maxPeriod =
-        earliestCreatedAt && latestCreatedAt
-          ? latestCreatedAt - earliestCreatedAt
-          : 90 * timeUnits.day;
-      switch (period) {
-        case HistoricalPnlPeriod.Period1d:
-          return clampMax ? Math.min(maxPeriod, 1 * timeUnits.day) : 1 * timeUnits.day;
-        case HistoricalPnlPeriod.Period7d:
-          return clampMax ? Math.min(maxPeriod, 7 * timeUnits.day) : 7 * timeUnits.day;
-        case HistoricalPnlPeriod.Period30d:
-          return clampMax ? Math.min(maxPeriod, 30 * timeUnits.day) : 30 * timeUnits.day;
-        case HistoricalPnlPeriod.Period90d:
-        default:
-          return clampMax ? Math.min(maxPeriod, 90 * timeUnits.day) : 90 * timeUnits.day;
-      }
+      return getMsForPeriod(period, earliestCreatedAt, latestCreatedAt, clampMax);
     },
     [data]
   );

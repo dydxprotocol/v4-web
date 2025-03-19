@@ -31,27 +31,7 @@ import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import SimplePnlChart, { HistoricalPnlPeriod, PnlSide } from './SimplePnlChart';
-
-function msForPeriod(
-  period: HistoricalPnlPeriod,
-  earliestDate?: number,
-  latestDate?: number,
-  clampMax: boolean = true
-) {
-  const maxPeriod = earliestDate && latestDate ? latestDate - earliestDate : 90 * timeUnits.day;
-  switch (period) {
-    case HistoricalPnlPeriod.Period1d:
-      return clampMax ? Math.min(maxPeriod, 1 * timeUnits.day) : 1 * timeUnits.day;
-    case HistoricalPnlPeriod.Period7d:
-      return clampMax ? Math.min(maxPeriod, 7 * timeUnits.day) : 7 * timeUnits.day;
-    case HistoricalPnlPeriod.Period30d:
-      return clampMax ? Math.min(maxPeriod, 30 * timeUnits.day) : 30 * timeUnits.day;
-    case HistoricalPnlPeriod.Period90d:
-    default:
-      return clampMax ? Math.min(maxPeriod, 90 * timeUnits.day) : 90 * timeUnits.day;
-  }
-}
+import SimplePnlChart, { getMsForPeriod, HistoricalPnlPeriod, PnlSide } from './SimplePnlChart';
 
 const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -106,9 +86,16 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
       };
     }
 
+    if (marginUsage?.gt(0.4)) {
+      return {
+        marginLabel: stringGetter({ key: STRING_KEYS.HIGH_RISK }),
+        tagSign: TagSign.Negative,
+      };
+    }
+
     return {
-      marginLabel: stringGetter({ key: STRING_KEYS.HIGH_RISK }),
-      tagSign: TagSign.Negative,
+      marginLabel: stringGetter({ key: STRING_KEYS.LOW_RISK }),
+      tagSign: TagSign.Neutral,
     };
   }, [marginUsage, stringGetter]);
 
@@ -120,7 +107,7 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
       HistoricalPnlPeriod.Period90d,
     ].map((period) => ({
       value: period,
-      label: formatRelativeTime(msForPeriod(period, earliestCreatedAt, latestCreatedAt, false), {
+      label: formatRelativeTime(getMsForPeriod(period, earliestCreatedAt, latestCreatedAt, false), {
         locale: selectedLocale,
         relativeToTimestamp: 0,
         largestUnit: 'day',
@@ -180,13 +167,11 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
           type={OutputType.Fiat}
           isLoading={isChartLoading}
           slotRight={
-            <Output
-              tw="ml-0.5"
-              value={pnlDiffPercent}
-              type={OutputType.Percent}
-              slotLeft="("
-              slotRight=")"
-            />
+            pnlDiffPercent && (
+              <span tw="ml-0.5">
+                (<Output tw="inline" value={pnlDiffPercent} type={OutputType.Percent} />)
+              </span>
+            )
           }
         />
 
@@ -200,7 +185,7 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
               }}
             >
               {formatRelativeTime(
-                msForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
+                getMsForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
                 {
                   locale: selectedLocale,
                   relativeToTimestamp: 0,
