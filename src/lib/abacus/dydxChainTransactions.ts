@@ -135,7 +135,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastTimeoutMs: 60_000,
             },
             DEFAULT_TRANSACTION_MEMO,
-            true
+            false
           )
         )
       );
