@@ -67,6 +67,7 @@ const selectTxAuthorizedAccount = createAppSelector(
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
 const SLEEP_TIME = timeUnits.second * 10;
+const INVALIDATION_SLEEP_TIME = timeUnits.second * 10;
 
 /**
  * @description Lifecycle for rebalancing USDC across chains. This will handle auto-deposits from dYdX Wallet as well as auto-withdrawals to dYdX Wallet.
@@ -149,6 +150,8 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               queryKey: ['validator', 'accountBalances'],
               exact: false,
             });
+
+            await sleep(INVALIDATION_SLEEP_TIME);
           } else if (shouldWithdraw) {
             const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
               .minus(usdcBalanceBN)
@@ -191,6 +194,8 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               queryKey: ['validator', 'accountBalances'],
               exact: false,
             });
+
+            await sleep(INVALIDATION_SLEEP_TIME);
           }
         }
       }

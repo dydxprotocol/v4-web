@@ -30,6 +30,7 @@ const USDC_IBC_FEE_BUFFER = 0.1;
 
 // Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction. IBC transactions should not exceed 1 minute unless network is congested/degraded.
 const SLEEP_TIME = timeUnits.second * 30;
+const INVALIDATION_SLEEP_TIME = timeUnits.second * 10;
 
 /**
  * @description Lifecycle for sweeping all USDC on Noble to dYdX chain. This is used to sweep deposits that only land within Noble.
@@ -175,6 +176,8 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           queryKey: ['nobleClient', 'nobleBalances'],
           exact: false,
         });
+
+        await sleep(INVALIDATION_SLEEP_TIME);
       }
 
       // Don't auto-sweep on Cosmos
