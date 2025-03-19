@@ -41,7 +41,7 @@ import { placeOrderTimeout } from '@/state/localOrders';
 
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
-import { log } from '../telemetry';
+import { log, logInfo } from '../telemetry';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
 import { parseToPrimitives } from './parseToPrimitives';
 
@@ -114,6 +114,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         CHAINTOKEN_DECIMALS,
       } = parsedParams;
 
+      logInfo('dydxChainTransactions connectNetwork', { parsedParams });
+
       const compositeClient = await CompositeClient.connect(
         new Network(
           chainId,
@@ -133,7 +135,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastTimeoutMs: 60_000,
             },
             DEFAULT_TRANSACTION_MEMO,
-            true
+            false
           )
         )
       );
@@ -740,7 +742,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
       }
     } catch (error) {
-      log('DydxChainTransactions/get', error);
+      log('DydxChainTransactions/get', error, { type, paramsInJson });
       callback(null);
     }
   }

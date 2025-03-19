@@ -16,6 +16,10 @@ import { BIG_NUMBERS } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { calculateDailyCumulativeTradingRewards } from '../calculators/historicalTradingRewards';
+import { Loadable } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
+import { AggregatedTradingReward } from '../types/summaryTypes';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
 
 const MAX_REQUESTS = 10;
@@ -24,44 +28,46 @@ export function useHistoricalTradingRewards() {
   const address = useAppSelector(getUserWalletAddress);
   const { indexerClient, key: indexerKey } = useIndexerClient();
 
-  return useQuery({
-    enabled: isPresent(address) && isPresent(indexerClient),
-    queryKey: ['indexer', 'account', 'historicalTradingRewards', address, indexerKey],
-    queryFn: async () => {
-      if (address == null || indexerClient == null) {
-        throw new Error('Invalid historical trading rewards query state');
-      }
-
-      const allResults: IndexerHistoricalTradingRewardAggregation[] = [];
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition
-      for (let request = 0; request < MAX_REQUESTS; request += 1) {
-        // eslint-disable-next-line no-await-in-loop
-        const thisResult = await indexerClient.account.getHistoricalTradingRewardsAggregations(
-          address,
-          TradingRewardAggregationPeriod.DAILY,
-          undefined,
-          // one second before oldest current result
-          mapIfPresent(allResults.at(-1), (r) =>
-            new Date(new Date(r.startedAt).getTime() - timeUnits.second).toISOString()
-          ) ?? undefined
-        );
-
-        const typedResult = isIndexerHistoricalTradingRewardAggregationResponse(thisResult);
-        const resultArr = typedResult.rewards;
-
-        // so this only happens when the actual response was empty
-        if (resultArr.length === 0) {
-          break;
+  return queryResultToLoadable(
+    useQuery({
+      enabled: isPresent(address) && isPresent(indexerClient),
+      queryKey: ['indexer', 'account', 'historicalTradingRewards', address, indexerKey],
+      queryFn: async () => {
+        if (address == null || indexerClient == null) {
+          throw new Error('Invalid historical trading rewards query state');
         }
 
-        allResults.push(...resultArr);
-      }
+        const allResults: IndexerHistoricalTradingRewardAggregation[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition
+        for (let request = 0; request < MAX_REQUESTS; request += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          const thisResult = await indexerClient.account.getHistoricalTradingRewardsAggregations(
+            address,
+            TradingRewardAggregationPeriod.DAILY,
+            undefined,
+            // one second before oldest current result
+            mapIfPresent(allResults.at(-1), (r) =>
+              new Date(new Date(r.startedAt).getTime() - timeUnits.second).toISOString()
+            ) ?? undefined
+          );
 
-      return allResults;
-    },
-    refetchInterval: timeUnits.hour,
-    staleTime: timeUnits.hour,
-  });
+          const typedResult = isIndexerHistoricalTradingRewardAggregationResponse(thisResult);
+          const resultArr = typedResult.rewards;
+
+          // so this only happens when the actual response was empty
+          if (resultArr.length === 0) {
+            break;
+          }
+
+          allResults.push(...resultArr);
+        }
+
+        return allResults;
+      },
+      refetchInterval: timeUnits.hour,
+      staleTime: timeUnits.hour,
+    })
+  );
 }
 
 export function useHistoricalTradingRewardsWeekly() {
@@ -78,10 +84,7 @@ export function useHistoricalTradingRewardsWeekly() {
     }, BIG_NUMBERS.ZERO);
   }, [tradingRewards]);
 
-  return {
-    ...historicalTradingRewardsQuery,
-    data: weeklyReward,
-  };
+  return mapLoadableData(historicalTradingRewardsQuery, () => weeklyReward);
 }
 
 /**
@@ -97,26 +100,19 @@ export function useTotalTradingRewards() {
     }, BIG_NUMBERS.ZERO);
   }, [tradingRewards]);
 
-  return {
-    ...historicalTradingRewardsQuery,
-    data: lifetimeTradingRewards,
-  };
+  return mapLoadableData(historicalTradingRewardsQuery, () => lifetimeTradingRewards);
 }
 
 /**
  * @returns chartData for daily cumulative trading rewards (includes dummy entries for days that have no trading rewards)
  */
-export function useDailyCumulativeTradingRewards() {
-  const { data: tradingRewards, status, error } = useHistoricalTradingRewards();
+export function useDailyCumulativeTradingRewards(): Loadable<AggregatedTradingReward[]> {
+  const loadable = useHistoricalTradingRewards();
 
   const chartData = useMemo(
-    () => calculateDailyCumulativeTradingRewards(tradingRewards),
-    [tradingRewards]
+    () => calculateDailyCumulativeTradingRewards(loadable.data),
+    [loadable.data]
   );
 
-  return {
-    error,
-    data: chartData,
-    status,
-  };
+  return mapLoadableData(loadable, () => chartData);
 }

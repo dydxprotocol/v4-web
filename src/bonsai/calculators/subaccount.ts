@@ -146,9 +146,9 @@ function calculateSubaccountSummaryCore(
 
 function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): SubaccountSummaryDerived {
   const { initialRiskTotal, notionalTotal, quoteBalance, valueTotal } = core;
-  const equity = valueTotal.plus(quoteBalance);
+  const equity = BigNumber.max(valueTotal.plus(quoteBalance), BIG_NUMBERS.ZERO);
 
-  const freeCollateral = equity.minus(initialRiskTotal);
+  const freeCollateral = BigNumber.max(equity.minus(initialRiskTotal), BIG_NUMBERS.ZERO);
 
   let leverage = null;
   let marginUsage = null;

@@ -105,7 +105,7 @@ const useDydxClientContext = () => {
                   broadcastTimeoutMs: 60_000,
                 },
                 DEFAULT_TRANSACTION_MEMO,
-                true
+                false
               )
             )
           );

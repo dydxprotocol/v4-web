@@ -18,7 +18,9 @@ import {
   mapFundingChartObject,
 } from '../calculators/funding';
 import { Loadable } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { selectCurrentMarketInfo } from '../selectors/summary';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
 
 export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingObject[]> => {
@@ -56,8 +58,5 @@ export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingO
     ].filter(isTruthy);
   }, [historicalFundingQuery.data, nextFundingRate]);
 
-  return {
-    ...historicalFundingQuery,
-    data,
-  };
+  return mapLoadableData(queryResultToLoadable(historicalFundingQuery), () => data);
 };

@@ -9,8 +9,10 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpOrdersQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'orders']);
@@ -37,14 +39,11 @@ export function setUpOrdersQuery(store: RootStore) {
     },
     onResult: (orders) => {
       store.dispatch(
-        setAccountOrdersRaw({
-          status: orders.status,
-          data:
-            orders.data != null
-              ? keyBy(isParentSubaccountOrders(orders.data), (o) => o.id ?? '')
-              : orders.data,
-          error: orders.error,
-        })
+        setAccountOrdersRaw(
+          mapLoadableData(queryResultToLoadable(orders), (data) =>
+            keyBy(isParentSubaccountOrders(data), (o) => o.id ?? '')
+          )
+        )
       );
     },
     onNoQuery: () => store.dispatch(setAccountOrdersRaw(loadableIdle())),

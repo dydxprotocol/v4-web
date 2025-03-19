@@ -1,3 +1,4 @@
+import { OnboardingState } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 
@@ -31,7 +32,9 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
     disableConnectButton,
     onboardingState,
     isAccountViewOnly,
-    isOnboardingDisabled: disableConnectButton || isAccountViewOnly,
+    isOnboardingDisabled:
+      disableConnectButton ||
+      (onboardingState === OnboardingState.AccountConnected && isAccountViewOnly),
   };
 };
 
