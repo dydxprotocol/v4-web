@@ -175,9 +175,8 @@ export const useAnalytics = () => {
   // AnalyticsEvent.NavigateDialog
   // AnalyticsEvent.NavigateDialogClose
   const activeDialog = useAppSelector(getActiveDialog);
-  const [previousActiveDialogType, setPreviousActiveDialogType] = useState<
-    DialogTypesTypes | undefined
-  >();
+  const previousActiveDialogTypeRef = useRef<DialogTypesTypes | undefined>(undefined);
+  const previousActiveDialogType = previousActiveDialogTypeRef.current;
 
   useEffect(
     () => {
@@ -194,7 +193,7 @@ export const useAnalytics = () => {
         track(AnalyticsEvents.NavigateDialogClose({ type: previousActiveDialogType }));
       }
 
-      setPreviousActiveDialogType(activeDialog?.type);
+      previousActiveDialogTypeRef.current = activeDialog?.type;
     },
     // This effect should only trigger on updates to the current active dialog, not previousActiveDialogType
     // eslint-disable-next-line react-hooks/exhaustive-deps

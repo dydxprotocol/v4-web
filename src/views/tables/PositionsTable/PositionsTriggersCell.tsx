@@ -231,7 +231,7 @@ const $TableCell = styled(TableCell)`
   gap: 0.75em;
   justify-content: center;
 
-  --output-width: 80px;
+  --output-width: 70px;
 `;
 
 const $Container = styled.div<{ $align: 'right' | 'left' }>`

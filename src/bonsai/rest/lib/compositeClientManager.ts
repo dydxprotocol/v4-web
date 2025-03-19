@@ -23,8 +23,6 @@ import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
-import { getStatsigConfigAsync } from '@/lib/statsig';
-
 type CompositeClientWrapper = {
   dead?: boolean;
   compositeClient?: CompositeClient;
@@ -72,7 +70,6 @@ function makeCompositeClient({
     const indexerConfig = new IndexerConfig(indexerUrl.api, indexerUrl.socket);
     setIndexerClient(new IndexerClient(indexerConfig));
 
-    const statsigFlags = await getStatsigConfigAsync();
     const compositeClient = await CompositeClient.connect(
       new Network(
         chainId,
@@ -92,7 +89,7 @@ function makeCompositeClient({
             broadcastTimeoutMs: 60_000,
           },
           DEFAULT_TRANSACTION_MEMO,
-          statsigFlags.ff_enable_timestamp_nonce
+          false
         )
       )
     );

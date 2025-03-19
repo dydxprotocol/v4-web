@@ -4,6 +4,7 @@ import { parseUnits } from 'viem';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
+import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 import { isNobleIbcMsg } from '@/types/skip';
 
@@ -12,6 +13,7 @@ import { createAppSelector } from '@/state/appTypes';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
 import { MaybeBigNumber } from '@/lib/numbers';
+import { sleep } from '@/lib/timeUtils';
 
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
@@ -24,6 +26,9 @@ function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: numb
 
 // 0.1 USDC buffer to account for IBC fees
 const USDC_IBC_FEE_BUFFER = 0.1;
+
+// Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction
+const SLEEP_TIME = timeUnits.second * 10;
 
 /**
  * @description Lifecycle for sweeping all USDC on Noble to dYdX chain. This is used to sweep deposits that only land within Noble.
@@ -145,6 +150,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           'nobleBalanceSweepLifecycle',
           'send transaction to sweep USDC from Noble to dYdX',
           {
+            balance,
             fee,
             amount: parsedMsg.token.amount,
             feeAdjustedAmount,
@@ -156,6 +162,8 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           undefined,
           `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
         );
+
+        await sleep(SLEEP_TIME);
       }
 
       // Don't auto-sweep on Cosmos

@@ -119,7 +119,7 @@ const getPositionsTableColumnDef = ({
               value={signedSize}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
-              tag={marketSummary?.assetId}
+              tag={marketSummary?.displayableAsset}
             />
             <div tw="inlineRow">
               <$PositionSide>

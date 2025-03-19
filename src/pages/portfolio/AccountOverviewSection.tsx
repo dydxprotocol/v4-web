@@ -16,7 +16,7 @@ import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHook
 
 import { Link } from '@/components/Link';
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
-import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
+import { Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -38,7 +38,7 @@ export const MegavaultYieldTag = () => {
     vault?.thirtyDayReturnPercent == null ||
     vault.thirtyDayReturnPercent < EMBARRASSING_APR_THRESHOLD
   ) {
-    return <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>;
+    return null;
   }
 
   return (
