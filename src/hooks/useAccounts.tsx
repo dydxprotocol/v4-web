@@ -196,6 +196,8 @@ const useAccountsContext = () => {
       hasLocalDydxWallet,
       blockedGeo,
     };
+
+    console.log(lastSeen.current, thisSet);
     Object.keys(thisSet).forEach((k) => {
       if (thisSet[k] !== lastSeen.current[k]) {
         console.log('changed:', k, thisSet[k], lastSeen.current[k]);
