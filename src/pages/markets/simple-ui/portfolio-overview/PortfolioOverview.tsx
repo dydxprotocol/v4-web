@@ -16,8 +16,8 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import ConnectedPortfolioOverview from './portfolio-overview/ConnectedPortfolioOverview';
-import UnconnectedPortfolioOverview from './portfolio-overview/UnconnectedPortfolioOverview';
+import ConnectedPortfolioOverview from './ConnectedPortfolioOverview';
+import UnconnectedPortfolioOverview from './UnconnectedPortfolioOverview';
 
 const PortfolioOverview = () => {
   const stringGetter = useStringGetter();
