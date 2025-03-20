@@ -1,4 +1,5 @@
-import PortfolioOverview from './PortfolioOverview';
+import { MarketsList } from './markets-view/MarketsList';
+import PortfolioOverview from './portfolio-overview/PortfolioOverview';
 
 const MarketsMobile = () => {
   return (
@@ -6,7 +7,9 @@ const MarketsMobile = () => {
       <div tw="flexColumn h-20 min-h-20">
         <PortfolioOverview />
       </div>
-      <div tw="flexColumn">Market Table Placeholder</div>
+      <div tw="flexColumn h-full">
+        <MarketsList />
+      </div>
     </div>
   );
 };
