@@ -16,6 +16,8 @@ import {
 
 import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 
+import type { SubaccountPnlTick } from '../rest/historicalPnl';
+
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 
 // Helper type to select properties that can be strings (including in unions)
@@ -321,4 +323,7 @@ export interface ComplianceResponse {
   reason?: ComplianceReason;
   updatedAt?: string;
 }
+
 export type Compliance = ComplianceResponse & { geo?: string };
+
+export type SubaccountPnlEntry = SubaccountPnlTick;

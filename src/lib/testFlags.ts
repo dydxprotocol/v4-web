@@ -67,6 +67,10 @@ class TestFlags {
   get showNewWithdrawFlow() {
     return !!this.queryParams.withdraw_rewrite;
   }
+
+  get simpleUi() {
+    return !!this.queryParams.simple_ui;
+  }
 }
 
 export const testFlags = new TestFlags();

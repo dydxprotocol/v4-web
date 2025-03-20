@@ -23,6 +23,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { Icon, IconName } from '@/components/Icon';
 
+import { testFlags } from '@/lib/testFlags';
+
 export enum DialogPlacement {
   Default = 'Default',
   Sidebar = 'Sidebar',
@@ -213,7 +215,7 @@ const $Container = styled(Content)<{
   $withAnimation?: boolean;
 }>`
   /* Params */
-  --dialog-inset: 1rem;
+  --dialog-inset: ${testFlags.simpleUi ? '2px' : '1rem'};
   --dialog-width: 30rem;
   --dialog-backgroundColor: var(--color-layer-3);
   --dialog-radius: 1rem;
