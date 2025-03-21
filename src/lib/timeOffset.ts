@@ -10,7 +10,7 @@ import { sleep } from './timeUtils';
 
 const MAX_TIME_TO_WAIT_FOR_FAST_REQUEST = 10000;
 
-export async function getTimestampOffset() {
+async function getTimestampOffset() {
   // create two promises that never throw and race them
   const offsetPromise = calc(async () => {
     try {
