@@ -23,7 +23,7 @@ import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
-import { browserTimeOffsetPromise } from '@/lib/timeUtils';
+import { browserTimeOffsetPromise } from '@/lib/timeOffset';
 
 type CompositeClientWrapper = {
   dead?: boolean;

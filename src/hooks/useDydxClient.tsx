@@ -29,7 +29,7 @@ import { useAppSelector } from '@/state/appTypes';
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { log } from '@/lib/telemetry';
-import { browserTimeOffsetPromise } from '@/lib/timeUtils';
+import { browserTimeOffsetPromise } from '@/lib/timeOffset';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';

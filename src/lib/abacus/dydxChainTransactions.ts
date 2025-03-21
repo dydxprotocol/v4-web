@@ -42,7 +42,7 @@ import { placeOrderTimeout } from '@/state/localOrders';
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { log, logInfo } from '../telemetry';
-import { browserTimeOffsetPromise } from '../timeUtils';
+import { browserTimeOffsetPromise } from '../timeOffset';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
 import { parseToPrimitives } from './parseToPrimitives';
 
