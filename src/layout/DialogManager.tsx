@@ -7,7 +7,6 @@ import { isMainnet } from '@/constants/networks';
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
-import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
 import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
 import { CloseAllPositionsConfirmationDialog } from '@/views/dialogs/CloseAllPositionsConfirmationDialog';
@@ -74,7 +73,6 @@ export const DialogManager = React.memo(() => {
   return DialogTypes.match(activeDialog, {
     AcknowledgeTerms: (args) => <AcknowledgeTermsDialog {...args} {...modalProps} />,
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
-    AdjustTargetLeverage: (args) => <AdjustTargetLeverageDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
     CloseAllPositionsConfirmation: (args) => (
       <CloseAllPositionsConfirmationDialog {...args} {...modalProps} />

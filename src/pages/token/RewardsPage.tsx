@@ -1,12 +1,9 @@
-import { useEffect } from 'react';
-
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { sumBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -26,10 +23,6 @@ import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
-
-import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -50,7 +43,6 @@ const RewardsPage = () => {
 
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const canViewAccount = useAppSelector(calculateCanViewAccount);
 
   const { usdcDenom } = useTokenConfigs();
 
@@ -86,11 +78,6 @@ const RewardsPage = () => {
       })}
     </div>
   );
-
-  useEffect(() => {
-    // Initialize daily data for rewards table + chart
-    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
-  }, [canViewAccount]);
 
   return (
     <$Page>
