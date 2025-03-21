@@ -23,6 +23,8 @@ import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
+import { browserTimeOffsetPromise } from '@/lib/timeUtils';
+
 type CompositeClientWrapper = {
   dead?: boolean;
   compositeClient?: CompositeClient;
@@ -89,7 +91,8 @@ function makeCompositeClient({
             broadcastTimeoutMs: 60_000,
           },
           DEFAULT_TRANSACTION_MEMO,
-          false
+          true,
+          (await browserTimeOffsetPromise).offset
         )
       )
     );

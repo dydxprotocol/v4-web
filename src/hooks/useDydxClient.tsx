@@ -29,6 +29,7 @@ import { useAppSelector } from '@/state/appTypes';
 import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { log } from '@/lib/telemetry';
+import { browserTimeOffsetPromise } from '@/lib/timeUtils';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
@@ -105,7 +106,8 @@ const useDydxClientContext = () => {
                   broadcastTimeoutMs: 60_000,
                 },
                 DEFAULT_TRANSACTION_MEMO,
-                false
+                true,
+                (await browserTimeOffsetPromise).offset
               )
             )
           );

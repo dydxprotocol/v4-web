@@ -1,8 +1,13 @@
+import { logBonsaiInfo } from '@/bonsai/logs';
+import { utils } from '@dydxprotocol/v4-client-js';
+import { isFinite } from 'lodash';
 import { DateTime, type Duration } from 'luxon';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import { BigNumberish } from '@/lib/numbers';
+
+import { calc } from './do';
 
 export const getTimestamp = (value?: BigNumberish | null) =>
   value
@@ -90,3 +95,49 @@ export async function sleep(ms = 1000) {
     setTimeout(() => resolve(null), ms);
   });
 }
+
+const URL_WITH_ACCURATE_TIME_THAT_IS_VERY_FAST_AND_RELIABLE = '/configs/exchanges.json';
+const MAX_TIME_TO_WAIT_FOR_FAST_REQUEST = 10000;
+
+export async function getTimestampOffset() {
+  // create two promises that never throw and race them
+  const offsetPromise = calc(async () => {
+    try {
+      const start = Date.now();
+      const res = await fetch(URL_WITH_ACCURATE_TIME_THAT_IS_VERY_FAST_AND_RELIABLE);
+      const end = Date.now();
+
+      const serverDate = res.headers.get('date');
+      if (serverDate == null) {
+        return 0;
+      }
+      const serverMs = Date.parse(serverDate);
+      if (!isFinite(serverMs)) {
+        return 0;
+      }
+      return utils.calculateClockOffsetFromFetchDateHeader(start, serverMs, end);
+    } catch (e) {
+      return 0;
+    }
+  });
+  const defaultPromise = calc(async () => {
+    try {
+      await sleep(MAX_TIME_TO_WAIT_FOR_FAST_REQUEST);
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  });
+
+  const start = Date.now();
+  const offset = await Promise.race([offsetPromise, defaultPromise]);
+  return {
+    offset,
+    requestDuration: Date.now() - start,
+  };
+}
+
+export const browserTimeOffsetPromise = sleep(0).then(() => getTimestampOffset());
+browserTimeOffsetPromise.then((result) => {
+  logBonsaiInfo('browserTimeOffsetCalculator', 'calculated time offset', result);
+});
