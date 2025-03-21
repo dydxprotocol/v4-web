@@ -28,7 +28,6 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
 import { objectEntries } from '@/lib/objectHelpers';
@@ -92,11 +91,6 @@ export const PnlChart = ({
   );
 
   const [isZooming, setIsZooming] = useState(false);
-
-  // Fetch 90d data once in Abacus for the chart
-  useEffect(() => {
-    abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
-  }, []);
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
