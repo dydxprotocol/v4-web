@@ -16,6 +16,7 @@ import {
 
 import { signCompliancePayload } from '@/lib/compliance';
 import { mapIfPresent } from '@/lib/do';
+import { removeTrailingSlash } from '@/lib/stringifyHelpers';
 
 import { loadableIdle, loadableLoaded } from '../lib/loadable';
 import { logBonsaiError } from '../logs';
@@ -67,10 +68,6 @@ const selectChainIdAndLocalAddress = createAppSelector(
     network,
   })
 );
-
-function removeTrailingSlash(str: string) {
-  return str.endsWith('/') ? str.slice(0, -1) : str;
-}
 
 export enum ComplianceAction {
   CONNECT = 'CONNECT',
