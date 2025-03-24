@@ -2,10 +2,6 @@ import { useMemo, useState } from 'react';
 
 import { ListOnScrollProps } from 'react-window';
 
-import { STRING_KEYS } from '@/constants/localization';
-
-import { useStringGetter } from '@/hooks/useStringGetter';
-
 import { MarketsList } from './markets-view/MarketsList';
 import PortfolioOverview from './portfolio-overview/PortfolioOverview';
 
@@ -13,7 +9,6 @@ import PortfolioOverview from './portfolio-overview/PortfolioOverview';
 const PORTFOLIO_MAX_HEIGHT = 320; // Starting height in pixels
 
 const MarketsMobile = () => {
-  const stringGetter = useStringGetter();
   const [scrollPosition, setScrollPosition] = useState(0);
 
   const onScroll = (listProps: ListOnScrollProps) => {
@@ -27,17 +22,16 @@ const MarketsMobile = () => {
 
     return {
       maxHeight: `${PORTFOLIO_MAX_HEIGHT + translateY}px`,
+      transition: 'height 0.2s ease-out',
       transform: `translateY(${translateY}px)`,
-      transition: 'height 0.1s ease-out',
     } satisfies React.CSSProperties;
   }, [scrollPosition]);
 
   return (
     <div tw="flexColumn relative h-full">
-      <div style={portfolioStyles}>
+      <div css={portfolioStyles}>
         <PortfolioOverview />
       </div>
-      <div tw="row h-2 px-1.25 font-small-bold">{stringGetter({ key: STRING_KEYS.MARKETS })}</div>
       <div tw="flex-1">
         <MarketsList onScroll={onScroll} />
       </div>

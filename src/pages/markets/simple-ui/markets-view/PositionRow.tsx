@@ -1,21 +1,45 @@
 import { CSSProperties } from 'react';
 
-import { STRING_KEYS } from '@/constants/localization';
-import { MarketData } from '@/constants/markets';
+import { BonsaiHelpers } from '@/bonsai/ontology';
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 
+import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 
-const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties }) => {
+const PositionRow = ({
+  position,
+  style,
+}: {
+  position: SubaccountPosition;
+  style: CSSProperties;
+}) => {
   const stringGetter = useStringGetter();
+  const market = useParameterizedSelector(
+    BonsaiHelpers.markets.createSelectMarketSummaryById,
+    position.market
+  );
+
+  if (!market) return null;
 
   const percentChangeColor = market.percentChange24h
     ? market.percentChange24h >= 0
       ? 'var(--color-positive)'
       : 'var(--color-negative)'
     : 'var(--color-text-1)';
+
+  const side =
+    position.side === IndexerPositionSide.LONG
+      ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+      : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
+
+  const sideColor =
+    position.side === IndexerPositionSide.LONG ? 'var(--color-positive)' : 'var(--color-negative)';
 
   return (
     <div
@@ -26,15 +50,15 @@ const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties
         <AssetIcon logoUrl={market.logo} tw="size-[2.25rem] min-w-[2.25rem]" />
         <div tw="flexColumn gap-0.25">
           <span tw="overflow-hidden text-ellipsis whitespace-nowrap">
+            <span tw="mr-0.25" css={{ color: sideColor }}>
+              {side}
+            </span>
             {market.displayableAsset}
           </span>
           <Output
             tw="text-color-text-1 font-mini-book"
-            type={OutputType.CompactFiat}
-            value={market.volume24h ?? market.spotVolume24h}
-            slotLeft={
-              <span tw="mr-0.5 text-color-text-0">{stringGetter({ key: STRING_KEYS.VOLUME })}</span>
-            }
+            type={OutputType.Fiat}
+            value={position.notional}
           />
         </div>
       </div>
@@ -60,4 +84,4 @@ const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties
   );
 };
 
-export default MarketRow;
+export default PositionRow;
