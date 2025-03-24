@@ -18,6 +18,7 @@ import { MarketInfo, MarketsInfo } from '../types/summaryTypes';
 export interface VaultDetails {
   totalValue?: number;
   thirtyDayReturnPercent?: number;
+  ninetyDayReturnPercent?: number;
   history?: VaultHistoryEntry[];
 }
 
@@ -85,23 +86,37 @@ export function calculateVaultSummary(
   const latestTime = latestEntry.date;
 
   const thirtyDaysAgoTime = latestTime - 30 * timeUnits.day;
+  const ninetyDaysAgoTime = latestTime - 90 * timeUnits.day;
 
   const thirtyDaysAgoEntry =
     history.find((entry) => entry.date <= thirtyDaysAgoTime) ?? history.at(-1)!; // we know length > 0 at this point
 
+  const ninetyDaysAgoEntry =
+    history.find((entry) => entry.date <= ninetyDaysAgoTime) ?? history.at(-1)!; // we know length > 0 at this point
+
   const totalValue = latestEntry.equity;
   const latestTotalPnl = latestEntry.totalPnl;
-  const thirtyDaysAgoTotalPnl = thirtyDaysAgoEntry.totalPnl;
 
+  // 30D
+  const thirtyDaysAgoTotalPnl = thirtyDaysAgoEntry.totalPnl;
   const pnlDifference = latestTotalPnl - thirtyDaysAgoTotalPnl;
   const timeDifferenceMs = latestEntry.date - thirtyDaysAgoEntry.date;
 
-  const thirtyDayReturnPercent = totalValue !== 0 ? pnlDifference / totalValue : 0;
+  // 90D
+  const ninetyDaysAgoTotalPnl = ninetyDaysAgoEntry.totalPnl;
+  const ninetyDaysPnlDifference = latestTotalPnl - ninetyDaysAgoTotalPnl;
+  const ninetyDaysTimeDifferenceMs = latestEntry.date - ninetyDaysAgoEntry.date;
 
+  const thirtyDayReturnPercent = totalValue !== 0 ? pnlDifference / totalValue : 0;
+  const ninetyDayReturnPercent = totalValue !== 0 ? ninetyDaysPnlDifference / totalValue : 0;
   return {
     totalValue,
     thirtyDayReturnPercent:
       timeDifferenceMs > 0 ? (thirtyDayReturnPercent * 365 * timeUnits.day) / timeDifferenceMs : 0,
+    ninetyDayReturnPercent:
+      ninetyDaysTimeDifferenceMs > 0
+        ? (ninetyDayReturnPercent * 365 * timeUnits.day) / ninetyDaysTimeDifferenceMs
+        : 0,
     history,
   };
 }
