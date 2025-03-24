@@ -2,15 +2,18 @@ import { useMemo, useState } from 'react';
 
 import { ListOnScrollProps } from 'react-window';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { MarketsList } from './markets-view/MarketsList';
 import PortfolioOverview from './portfolio-overview/PortfolioOverview';
 
 // Config values for the animation
 const PORTFOLIO_MAX_HEIGHT = 320; // Starting height in pixels
-const PORTFOLIO_MIN_HEIGHT = 0; // Collapsed height
-const COLLAPSE_THRESHOLD = 320; // Scroll threshold for complete collapse
 
 const MarketsMobile = () => {
+  const stringGetter = useStringGetter();
   const [scrollPosition, setScrollPosition] = useState(0);
 
   const onScroll = (listProps: ListOnScrollProps) => {
@@ -19,18 +22,13 @@ const MarketsMobile = () => {
 
   // Calculate portfolio styles based on scroll position
   const portfolioStyles = useMemo(() => {
-    // Calculate height based on scroll position
-    const heightProgress = Math.min(scrollPosition / COLLAPSE_THRESHOLD, 1);
-    const portfolioContainerHeight =
-      PORTFOLIO_MAX_HEIGHT - heightProgress * (PORTFOLIO_MAX_HEIGHT - PORTFOLIO_MIN_HEIGHT);
+    // Calculate translateY to move the element off screen
+    const translateY = -Math.min(scrollPosition, PORTFOLIO_MAX_HEIGHT);
 
     return {
-      height: `${portfolioContainerHeight}px`,
-      transform: `translateY(0 - ${portfolioContainerHeight}px)`,
-      transition: 'transform 0.1s ease-out',
-      overflow: 'hidden',
-      position: 'relative',
-      zIndex: 2,
+      maxHeight: `${PORTFOLIO_MAX_HEIGHT + translateY}px`,
+      transform: `translateY(${translateY}px)`,
+      transition: 'height 0.1s ease-out',
     } satisfies React.CSSProperties;
   }, [scrollPosition]);
 
@@ -39,7 +37,7 @@ const MarketsMobile = () => {
       <div style={portfolioStyles}>
         <PortfolioOverview />
       </div>
-      <div tw="row sticky top-0 h-2 px-1.25 font-small-bold">Markets</div>
+      <div tw="row h-2 px-1.25 font-small-bold">{stringGetter({ key: STRING_KEYS.MARKETS })}</div>
       <div tw="flex-1">
         <MarketsList onScroll={onScroll} />
       </div>
