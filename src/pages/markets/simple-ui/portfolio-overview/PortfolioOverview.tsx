@@ -86,7 +86,7 @@ const PortfolioOverview = () => {
   );
 
   return (
-    <div tw="flexColumn h-full">
+    <div tw="flexColumn h-full min-h-20">
       {onboardingState === OnboardingState.Disconnected ? (
         <UnconnectedPortfolioOverview tw="h-20" />
       ) : (

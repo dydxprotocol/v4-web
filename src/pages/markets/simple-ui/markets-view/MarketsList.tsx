@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List } from 'react-window';
+import { VariableSizeList as List, ListOnScrollProps } from 'react-window';
 
 import { MarketFilters } from '@/constants/markets';
 
@@ -15,10 +15,10 @@ import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import MarketRow from './MarketRow';
 
-export const MarketsList = () => {
+export const MarketsList = ({ onScroll }: { onScroll?: (props: ListOnScrollProps) => void }) => {
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
-  const { filteredMarkets, marketFilters, hasMarketIds } = useMarketsData({
+  const { filteredMarkets, hasMarketIds } = useMarketsData({
     filter,
     searchFilter,
   });
@@ -31,15 +31,20 @@ export const MarketsList = () => {
     <div tw="relative h-full w-full">
       <AutoSizer>
         {({ width, height }) => (
-          <List itemCount={filteredMarkets.length} width={width} height={height} itemSize={60}>
-            {({ index, style }) => (
-              <MarketRow key={index} market={filteredMarkets[index]!} style={style} />
-            )}
+          <List
+            itemCount={filteredMarkets.length}
+            width={width}
+            height={height}
+            itemSize={() => 60}
+            onScroll={onScroll}
+            itemKey={(index: number) => `market-${filteredMarkets[index]?.id}`}
+          >
+            {({ index, style }) => <MarketRow market={filteredMarkets[index]!} style={style} />}
           </List>
         )}
       </AutoSizer>
       <div
-        tw="absolute bottom-0 left-0 right-0 h-[4.5rem]"
+        tw="fixed bottom-0 left-0 right-0 h-[4.5rem]"
         css={{
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
         }}
