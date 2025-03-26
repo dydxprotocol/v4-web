@@ -29,11 +29,10 @@ const MarketsMobile = () => {
 
   return (
     <div tw="flexColumn relative h-full">
-      <div css={portfolioStyles}>
-        <PortfolioOverview />
-      </div>
+      {/* <div css={portfolioStyles}>
+      </div> */}
       <div tw="flex-1">
-        <MarketsList onScroll={onScroll} />
+        <MarketsList onScroll={onScroll} slotTop={<PortfolioOverview tw="w-[100vw]" />} />
       </div>
     </div>
   );

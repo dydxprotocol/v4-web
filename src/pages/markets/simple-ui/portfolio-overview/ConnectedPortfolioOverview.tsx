@@ -149,7 +149,7 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const portfolioOverviewValues = (
     <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125">
       <Output
-        tw="text-color-text-2 font-extra-bold"
+        tw="font-extra-large-bold text-color-text-2"
         value={accountEquity}
         type={OutputType.Fiat}
         isLoading={isLoadingSubaccount}

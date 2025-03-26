@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
@@ -62,7 +62,13 @@ const narrowListItemType = (index: number, items: ListItem[]) => {
   return listItem;
 };
 
-export const MarketsList = ({ onScroll }: { onScroll?: (props: ListOnScrollProps) => void }) => {
+export const MarketsList = ({
+  onScroll,
+  slotTop,
+}: {
+  onScroll?: (props: ListOnScrollProps) => void;
+  slotTop?: ReactNode;
+}) => {
   const stringGetter = useStringGetter();
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
@@ -146,39 +152,46 @@ export const MarketsList = ({ onScroll }: { onScroll?: (props: ListOnScrollProps
 
   return (
     <div tw="relative h-full w-full">
-      {stickyLabel && <div tw="row h-[3.75rem] px-1.25 font-small-bold">{stickyLabel}</div>}{' '}
       <AutoSizer>
         {({ width, height }) => (
-          <List
-            tw="pb-[8.75rem]"
-            itemCount={items.length}
-            width={width}
-            height={height}
-            itemSize={() => 60}
-            onScroll={(listOnScrollProps: ListOnScrollProps) => {
-              setScrollPosition(listOnScrollProps.scrollOffset);
-              onScroll?.(listOnScrollProps);
-            }}
-            itemKey={getItemKey}
-          >
-            {({ index, style }) => {
-              const listItem = narrowListItemType(index, items);
+          <div>
+            {slotTop}
+            {stickyLabel && (
+              <div tw="row h-[3.75rem] px-1.25 text-color-text-2 font-medium-bold">
+                {stickyLabel}
+              </div>
+            )}
+            <List
+              tw="pb-[8.75rem]"
+              itemCount={items.length}
+              width={width}
+              height={height}
+              itemSize={() => 60}
+              onScroll={(listOnScrollProps: ListOnScrollProps) => {
+                setScrollPosition(listOnScrollProps.scrollOffset);
+                onScroll?.(listOnScrollProps);
+              }}
+              itemKey={getItemKey}
+            >
+              {({ index, style }) => {
+                const listItem = narrowListItemType(index, items);
 
-              if (listItem.itemType === 'position') {
-                return <PositionRow position={listItem.item} style={style} />;
-              }
+                if (listItem.itemType === 'position') {
+                  return <PositionRow position={listItem.item} style={style} />;
+                }
 
-              if (listItem.itemType === 'market') {
-                return <MarketRow market={listItem.item} style={style} />;
-              }
+                if (listItem.itemType === 'market') {
+                  return <MarketRow market={listItem.item} style={style} />;
+                }
 
-              return (
-                <div tw="row px-1.25 font-small-bold" style={style}>
-                  {listItem.item}
-                </div>
-              );
-            }}
-          </List>
+                return (
+                  <div tw="row px-1.25 text-color-text-2 font-medium-bold" style={style}>
+                    {listItem.item}
+                  </div>
+                );
+              }}
+            </List>
+          </div>
         )}
       </AutoSizer>
       <div
@@ -188,7 +201,7 @@ export const MarketsList = ({ onScroll }: { onScroll?: (props: ListOnScrollProps
         }}
       >
         <SearchInput
-          tw="mx-1.25"
+          tw="mx-1.25 h-[3.25rem]"
           placeholder="Search"
           value={searchFilter}
           onTextChange={setSearchFilter}

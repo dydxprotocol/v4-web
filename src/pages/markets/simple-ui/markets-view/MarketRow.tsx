@@ -31,9 +31,11 @@ const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties
           <Output
             tw="text-color-text-1 font-mini-book"
             type={OutputType.CompactFiat}
-            value={market.volume24h ?? market.spotVolume24h}
+            value={market.marketCap}
             slotLeft={
-              <span tw="mr-0.5 text-color-text-0">{stringGetter({ key: STRING_KEYS.VOLUME })}</span>
+              <span tw="mr-0.25 text-color-text-0">
+                {stringGetter({ key: STRING_KEYS.MARKET })}
+              </span>
             }
           />
         </div>
