@@ -10,10 +10,12 @@ export const SimpleUiDropdownMenu = forwardRefFn(
     className,
     children,
     items,
+    slotTop,
   }: {
     className?: string;
     children: React.ReactNode;
     items: DropdownMenuItem<T>[];
+    slotTop?: React.ReactNode;
   }) => {
     return (
       <Root>
@@ -22,21 +24,29 @@ export const SimpleUiDropdownMenu = forwardRefFn(
         </Trigger>
 
         <Portal>
-          <Content tw="w-10 overflow-hidden rounded-[0.5rem] bg-color-layer-4">
+          <Content tw="z-1 w-10 overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4">
+            {slotTop && (
+              <>
+                <div tw="px-1 py-0.5">{slotTop}</div>
+                <Separator tw="border-b-[length:--border-width] border-b-color-border [border-bottom-style:solid]" />
+              </>
+            )}
             {items.map((item, idx) => (
               <Fragment key={item.value}>
                 <Item
-                  tw="row cursor-pointer select-none justify-between px-1 py-0.75 font-small-book first:rounded-tl-[0.5rem] first:rounded-tr-[0.5rem] last:rounded-bl-[0.5rem] last:rounded-br-[0.5rem] disabled:cursor-default"
+                  tw="row cursor-pointer select-none justify-between px-1 py-0.75 font-medium-book first:rounded-tl-[0.5rem] first:rounded-tr-[0.5rem] last:rounded-bl-[0.5rem] last:rounded-br-[0.5rem] disabled:cursor-default"
                   onSelect={item.onSelect}
                   disabled={!item.onSelect}
                   css={{
+                    ...(item.active ? { backgroundColor: 'var(--color-layer-3)' } : {}),
                     cursor: item.onSelect ? 'pointer' : 'not-allowed',
                     color: {
+                      active: 'var(--color-text-0)',
                       accent: 'var(--color-accent)',
                       create: 'var(--color-green)',
                       destroy: 'var(--color-red)',
-                      none: item.onSelect ? undefined : 'var(--color-text-0)',
-                    }[item.highlightColor ?? 'none'],
+                      none: item.onSelect ? undefined : 'var(--color-text-1)',
+                    }[item.highlightColor ?? item.active ? 'active' : 'none'],
                   }}
                 >
                   <span>{item.label}</span>

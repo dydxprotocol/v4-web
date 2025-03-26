@@ -76,7 +76,7 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
   const appMenu = (
     <SimpleUiDropdownMenu tw="absolute right-1.25 top-1.25 rounded-[50%]" items={menuItems}>
       <Button
-        tw="size-2 border border-solid border-[color:var(--color-border)]"
+        tw="size-2 min-w-2 border border-solid border-[color:var(--color-border)]"
         shape={ButtonShape.Circle}
         size={ButtonSize.XSmall}
       >

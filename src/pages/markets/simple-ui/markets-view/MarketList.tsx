@@ -1,18 +1,23 @@
-import * as React from 'react';
+import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData, MarketFilters } from '@/constants/markets';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { SearchInput } from '@/components/SearchInput';
+import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
+import { SortIcon } from '@/components/SortIcon';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
@@ -24,7 +29,7 @@ import PositionRow from './PositionRow';
 
 type CustomItem = {
   itemType: 'custom';
-  item: React.ReactNode;
+  item: ReactNode;
 };
 
 type PositionItem = {
@@ -35,6 +40,7 @@ type PositionItem = {
 type HeaderItem = {
   itemType: 'header';
   item: string;
+  slotRight?: ReactNode;
 };
 
 type MarketItem = {
@@ -72,10 +78,41 @@ const narrowListItemType = (item: ListItem) => {
   return item;
 };
 
+enum MarketsSortType {
+  Price = 'price',
+  Volume = 'volume',
+  Gainers = 'gainers',
+  Losers = 'losers',
+  Favorites = 'favorites',
+}
+
+const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
+  return markets.sort((a, b) => {
+    if (sortType === MarketsSortType.Price) {
+      return (b.oraclePrice ?? 0) - (a.oraclePrice ?? 0);
+    }
+
+    if (sortType === MarketsSortType.Volume) {
+      return (b.volume24h ?? 0) - (a.volume24h ?? 0);
+    }
+
+    if (sortType === MarketsSortType.Gainers) {
+      return (b.percentChange24h ?? 0) - (a.percentChange24h ?? 0);
+    }
+
+    if (sortType === MarketsSortType.Losers) {
+      return (a.percentChange24h ?? 0) - (b.percentChange24h ?? 0);
+    }
+
+    return (a.isFavorite ? 1 : 0) - (b.isFavorite ? 1 : 0);
+  });
+};
+
 const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
   const stringGetter = useStringGetter();
   const filter: MarketFilters = useAppSelector(getMarketFilter);
-  const [searchFilter, setSearchFilter] = React.useState<string>();
+  const [searchFilter, setSearchFilter] = useState<string>();
+  const [sortType, setSortType] = useState<MarketsSortType>(MarketsSortType.Volume);
   const openPositions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
   const openPositionsLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.loading) === 'pending';
@@ -85,7 +122,50 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
     searchFilter,
   });
 
-  const items: ListItem[] = React.useMemo(
+  const sortedMarkets = sortMarkets(filteredMarkets, sortType);
+
+  const sortItems = useMemo(
+    () => [
+      {
+        label: stringGetter({ key: STRING_KEYS.PRICE }),
+        value: MarketsSortType.Price,
+        active: sortType === MarketsSortType.Price,
+        icon: <Icon iconName={IconName.Price} />,
+        onSelect: () => setSortType(MarketsSortType.Price),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.VOLUME }),
+        value: MarketsSortType.Volume,
+        active: sortType === MarketsSortType.Volume,
+        icon: <Icon iconName={IconName.Volume} />,
+        onSelect: () => setSortType(MarketsSortType.Volume),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.GAINERS }),
+        value: MarketsSortType.Gainers,
+        active: sortType === MarketsSortType.Gainers,
+        icon: <Icon iconName={IconName.TrendingUp} />,
+        onSelect: () => setSortType(MarketsSortType.Gainers),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.LOSERS }),
+        value: MarketsSortType.Losers,
+        active: sortType === MarketsSortType.Losers,
+        icon: <Icon iconName={IconName.TrendingDown} />,
+        onSelect: () => setSortType(MarketsSortType.Losers),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.FAVORITES }),
+        value: MarketsSortType.Favorites,
+        active: sortType === MarketsSortType.Favorites,
+        icon: <Icon iconName={IconName.Star} />,
+        onSelect: () => setSortType(MarketsSortType.Favorites),
+      },
+    ],
+    [stringGetter, sortType]
+  );
+
+  const items: ListItem[] = useMemo(
     () => [
       ...(slotTop ? [{ itemType: 'custom' as const, item: slotTop }] : []),
       ...(openPositions?.length
@@ -100,20 +180,34 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
             })),
           ]
         : []),
-      { itemType: 'header' as const, item: stringGetter({ key: STRING_KEYS.MARKETS }) },
-      ...filteredMarkets.map((market) => ({
+      {
+        itemType: 'header' as const,
+        item: stringGetter({ key: STRING_KEYS.MARKETS }),
+        slotRight: (
+          <SimpleUiDropdownMenu
+            tw="z-1"
+            items={sortItems}
+            slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
+          >
+            <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
+              <SortIcon />
+            </Button>
+          </SimpleUiDropdownMenu>
+        ),
+      },
+      ...sortedMarkets.map((market) => ({
         itemType: 'market' as const,
         item: market,
       })),
     ],
-    [openPositions, filteredMarkets, stringGetter, slotTop]
+    [openPositions, sortedMarkets, stringGetter, slotTop, sortItems]
   );
 
-  const parentRef = React.useRef<HTMLDivElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  const activeStickyIndexRef = React.useRef(0);
+  const activeStickyIndexRef = useRef(0);
 
-  const stickyIndexes = React.useMemo(
+  const stickyIndexes = useMemo(
     () =>
       items.map((item, idx) => (item.itemType === 'header' ? idx : undefined)).filter(isPresent),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,7 +222,7 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
     count: items.length,
     estimateSize: (index: number) => (slotTop && index === 0 ? 320 : 60),
     getScrollElement: () => parentRef.current,
-    rangeExtractor: React.useCallback(
+    rangeExtractor: useCallback(
       (range: Range) => {
         activeStickyIndexRef.current =
           [...stickyIndexes].reverse().find((index) => range.startIndex >= index) ?? 0;
@@ -212,8 +306,9 @@ const ItemRenderer = ({ item }: { item: ListItem }) => {
   }
 
   return (
-    <div tw="row h-[60px] bg-color-layer-2 px-1.25 text-color-text-2 font-medium-bold">
+    <div tw="row h-[60px] justify-between bg-color-layer-2 px-1.25 text-color-text-2 font-medium-bold">
       {listItem.item}
+      {listItem.slotRight}
     </div>
   );
 };
