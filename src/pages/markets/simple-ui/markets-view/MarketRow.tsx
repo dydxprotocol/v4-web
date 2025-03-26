@@ -1,5 +1,3 @@
-import { CSSProperties } from 'react';
-
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
 
@@ -8,7 +6,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 
-const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties }) => {
+const MarketRow = ({ className, market }: { className?: string; market: MarketData }) => {
   const stringGetter = useStringGetter();
 
   const percentChangeColor = market.percentChange24h
@@ -19,7 +17,7 @@ const MarketRow = ({ market, style }: { market: MarketData; style: CSSProperties
 
   return (
     <div
-      style={style}
+      className={className}
       tw="row cursor-pointer justify-between gap-0.5 px-1.5 hover:bg-color-layer-4"
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">

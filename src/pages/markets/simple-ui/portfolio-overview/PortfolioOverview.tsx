@@ -86,11 +86,11 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
   );
 
   return (
-    <div tw="flexColumn h-full min-h-20 w-full" className={className}>
+    <div tw="flexColumn relative h-20 w-full" className={className}>
       {onboardingState === OnboardingState.Disconnected ? (
-        <UnconnectedPortfolioOverview tw="h-20 w-full" />
+        <UnconnectedPortfolioOverview tw="h-full w-full" />
       ) : (
-        <ConnectedPortfolioOverview tw="h-20 w-full" />
+        <ConnectedPortfolioOverview tw="h-full w-full" />
       )}
 
       {appMenu}
