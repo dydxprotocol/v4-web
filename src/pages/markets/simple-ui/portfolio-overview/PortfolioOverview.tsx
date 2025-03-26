@@ -16,10 +16,10 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import ConnectedPortfolioOverview from './portfolio-overview/ConnectedPortfolioOverview';
-import UnconnectedPortfolioOverview from './portfolio-overview/UnconnectedPortfolioOverview';
+import ConnectedPortfolioOverview from './ConnectedPortfolioOverview';
+import UnconnectedPortfolioOverview from './UnconnectedPortfolioOverview';
 
-const PortfolioOverview = () => {
+const PortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { openOnboardingDialog, onboardingState, isOnboardingDisabled, isAccountViewOnly } =
@@ -86,11 +86,11 @@ const PortfolioOverview = () => {
   );
 
   return (
-    <div tw="flexColumn h-full">
+    <div tw="flexColumn relative h-20 w-full" className={className}>
       {onboardingState === OnboardingState.Disconnected ? (
-        <UnconnectedPortfolioOverview tw="h-20" />
+        <UnconnectedPortfolioOverview tw="h-full w-full" />
       ) : (
-        <ConnectedPortfolioOverview tw="h-20" />
+        <ConnectedPortfolioOverview tw="h-full w-full" />
       )}
 
       {appMenu}
