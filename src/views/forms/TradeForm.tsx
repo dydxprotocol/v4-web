@@ -53,6 +53,7 @@ import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
+import { log } from '@/lib/telemetry';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -234,6 +235,7 @@ export const TradeForm = ({
 
     placeOrder({
       onError: (errorParams: ErrorParams) => {
+        log('TradeForm/onPlaceOrder', undefined, { errorParams });
         setPlaceOrderError(
           stringGetter({
             key: errorParams.errorStringKey,
