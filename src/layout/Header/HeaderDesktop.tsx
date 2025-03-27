@@ -84,7 +84,8 @@ export const HeaderDesktop = () => {
           value: 'VAULT',
           label: (
             <>
-              {stringGetter({ key: STRING_KEYS.MEGAVAULT })} <MegavaultYieldTag />
+              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}{' '}
+              <MegavaultYieldTag yieldType="ninetyDay" />
             </>
           ),
           href: AppRoute.Vault,

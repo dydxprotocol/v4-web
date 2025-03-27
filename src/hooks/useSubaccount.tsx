@@ -23,7 +23,6 @@ import { formatUnits, parseUnits } from 'viem';
 import type {
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
-  HumanReadableSubaccountTransferPayload,
   ParsingError,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
@@ -326,34 +325,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       return hashFromTx(tx.hash);
     },
     [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
-  );
-
-  const adjustIsolatedMarginOfPosition = useCallback(
-    ({
-      onError,
-      onSuccess,
-    }: {
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (
-        subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
-      ) => void;
-    }) => {
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadableSubaccountTransferPayload>
-      ) => {
-        if (success) {
-          onSuccess?.(data);
-        } else {
-          onError?.(getValidErrorParamsFromParsingError(parsingError));
-        }
-      };
-
-      const subaccountTransferPayload = abacusStateManager.adjustIsolatedMarginOfPosition(callback);
-      return subaccountTransferPayload;
-    },
-    []
   );
 
   // ------ Faucet Methods ------ //
@@ -1237,7 +1208,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     transfer,
     simulateTransfer,
     sendSkipWithdraw,
-    adjustIsolatedMarginOfPosition,
     depositCurrentBalance,
     transferBetweenSubaccounts,
 
