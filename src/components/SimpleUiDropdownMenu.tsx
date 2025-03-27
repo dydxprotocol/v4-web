@@ -46,7 +46,7 @@ export const SimpleUiDropdownMenu = forwardRefFn(
                       create: 'var(--color-green)',
                       destroy: 'var(--color-red)',
                       none: item.onSelect ? undefined : 'var(--color-text-1)',
-                    }[item.highlightColor ?? item.active ? 'active' : 'none'],
+                    }[item.highlightColor ?? (item.active ? 'active' : 'none')],
                   }}
                 >
                   <span>{item.label}</span>
