@@ -28,7 +28,12 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
-import { getUserAddressesForRoute, isInstantTransfer, parseWithdrawError } from '../utils';
+import {
+  getUserAddressesForRoute,
+  isInstantTransfer,
+  isValidWithdrawalAddress,
+  parseWithdrawError,
+} from '../utils';
 
 export function useWithdrawStep({
   destinationAddress,
@@ -57,10 +62,14 @@ export function useWithdrawStep({
   const [isLoading, setIsLoading] = useState(false);
 
   const userAddresses: UserAddress[] | undefined = useMemo(() => {
+    const lastChainId = withdrawRoute?.requiredChainAddresses.at(-1);
+
     if (
+      destinationAddress.trim() === '' ||
       dydxAddress == null ||
       withdrawRoute == null ||
-      withdrawRoute.requiredChainAddresses.length === 0
+      lastChainId == null ||
+      !isValidWithdrawalAddress(destinationAddress, lastChainId)
     ) {
       return undefined;
     }
