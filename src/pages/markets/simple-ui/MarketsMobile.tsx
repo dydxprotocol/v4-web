@@ -5,7 +5,12 @@ const MarketsMobile = () => {
   return (
     <div tw="flexColumn relative h-[100vh]">
       <div tw="h-full flex-1">
-        <MarketsList2 slotTop={<PortfolioOverview tw="w-[100vw]" />} />
+        <MarketsList2
+          slotTop={{
+            content: <PortfolioOverview tw="w-[100vw]" />,
+            height: 320,
+          }}
+        />
       </div>
     </div>
   );

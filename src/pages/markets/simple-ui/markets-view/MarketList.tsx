@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { Range } from '@tanstack/react-virtual';
@@ -84,7 +84,14 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
   });
 };
 
-const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
+const MarketList = ({
+  slotTop,
+}: {
+  slotTop?: {
+    content: ReactNode;
+    height: number;
+  };
+}) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
@@ -188,7 +195,9 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
 
   const defaultViewItems: ListItem[] = useMemo(
     () => [
-      ...(slotTop ? [{ itemType: 'custom' as const, item: slotTop, customHeight: 320 }] : []),
+      ...(slotTop
+        ? [{ itemType: 'custom' as const, item: slotTop.content, customHeight: slotTop.height }]
+        : []),
       ...(openPositions?.length
         ? [
             {
