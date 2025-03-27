@@ -235,7 +235,7 @@ export const TradeForm = ({
 
     placeOrder({
       onError: (errorParams: ErrorParams) => {
-        log('TradeForm/onPlaceOrder', undefined, { errorParams });
+        log('TradeForm/onPlaceOrder', new Error(errorParams.errorMessage), { errorParams });
         setPlaceOrderError(
           stringGetter({
             key: errorParams.errorStringKey,
