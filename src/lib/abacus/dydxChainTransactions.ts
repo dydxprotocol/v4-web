@@ -42,6 +42,7 @@ import { placeOrderTimeout } from '@/state/localOrders';
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { log, logInfo } from '../telemetry';
+import { browserTimeOffsetPromise } from '../timeOffset';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
 import { parseToPrimitives } from './parseToPrimitives';
 
@@ -135,7 +136,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastTimeoutMs: 60_000,
             },
             DEFAULT_TRANSACTION_MEMO,
-            false
+            true,
+            (await browserTimeOffsetPromise).offset
           )
         )
       );
