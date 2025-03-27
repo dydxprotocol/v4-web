@@ -15,13 +15,16 @@ import {
   BIG_NUMBERS,
   clampBn,
   MustBigNumber,
+  MustNumber,
 } from '@/lib/numbers';
 
 import {
+  ExecutionType,
   MarginMode,
   OrderSide,
   OrderSizeInput,
   OrderSizeInputs,
+  TimeInForce,
   TradeAccountDetails,
   TradeForm,
   TradeFormFieldStates,
@@ -53,24 +56,23 @@ export function calculateTradeInfo(
     trade.reduceOnly ?? false
   );
 
-  const summaryBase = calc(() => {
+  return calc((): TradeSummary => {
     switch (trade.type) {
       case TradeFormType.MARKET:
-        return calc(() => {
+        return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
           return {
-            inputSummary: calculated.summary,
+            inputSummary: calculated.summary ?? { size: undefined, averageFillPrice: undefined },
             subaccountNumber: subaccountToUse,
-            transferToSubaccountAmount: '',
             payloadPrice: mapIfPresent(calculated.marketOrder?.averagePrice, (price) => {
               if (trade.side == null || trade.side === OrderSide.BUY) {
                 return price * (1 + MARKET_ORDER_MAX_SLIPPAGE);
               }
               return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
             }),
-            minimumSignedLeverage: leverageLimits.minLeverage,
-            maximumSignedLeverage: leverageLimits.maxLeverage,
+            minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
+            maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
             slippage: mapIfPresent(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice,
@@ -84,16 +86,20 @@ export function calculateTradeInfo(
             total: mapIfPresent(
               calculated.marketOrder?.totalFees,
               calculated.marketOrder?.usdcSize,
-              (fees, size) => -1 * fees + size * (trade.side === OrderSide.SELL ? 1 : -1)
+              (fees, size) => size * (trade.side === OrderSide.SELL ? 1 : -1) - fees
             ),
-            reward: undefined,
-            filled: calculated.marketOrder?.filled,
+            filled: calculated.marketOrder?.filled ?? false,
             isPositionClosed:
               mapIfPresent(
                 calculated.marketOrder?.size,
                 baseAccount?.position?.unsignedSize.toNumber(),
+                baseAccount?.position?.side,
+                trade.side,
                 AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
-                (filled, size, stepSize) => Math.abs(filled - size) < stepSize / 2
+                (filled, size, positionSide, orderSide, stepSize) =>
+                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
+                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
+                  Math.abs(filled - size) < stepSize / 2
               ) ?? false,
             indexSlippage: mapIfPresent(
               calculated.marketOrder?.worstPrice,
@@ -104,20 +110,73 @@ export function calculateTradeInfo(
               }
             ),
             feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
+            transferToSubaccountAmount: '',
+            reward: undefined,
           };
         });
       case TradeFormType.STOP_MARKET:
       case TradeFormType.TAKE_PROFIT_MARKET:
-        return calc(() => {
+        return calc((): TradeSummary => {
           const calculated = calculateMarketOrder();
           return {} as TradeSummary;
         });
       case TradeFormType.LIMIT:
       case TradeFormType.STOP_LIMIT:
       case TradeFormType.TAKE_PROFIT_LIMIT:
-        return calc(() => {
-          const calculated = calculateMarketOrder();
-          return {} as TradeSummary;
+        return calc((): TradeSummary => {
+          const timeInForce = trade.timeInForce;
+          const execution = trade.execution;
+          const isMaker =
+            (trade.type === TradeFormType.LIMIT && timeInForce === TimeInForce.GTT) ||
+            execution === ExecutionType.POST_ONLY;
+
+          const feeRate = isMaker
+            ? accountData.userFeeStats.makerFeeRate
+            : accountData.userFeeStats.takerFeeRate;
+          const price = AttemptNumber(trade.limitPrice);
+          const inputSummary = calculateLimitOrderInputSummary(
+            trade.size,
+            trade.limitPrice,
+            baseAccount
+          );
+
+          const totalFees = mapIfPresent(
+            feeRate,
+            inputSummary.size?.usdcSize,
+            (fee, usdc) => fee * usdc
+          );
+
+          return {
+            subaccountNumber: subaccountToUse,
+            minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
+            maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            slippage: 0,
+            indexSlippage: 0,
+            filled: true,
+            feeRate,
+            inputSummary,
+            fee: totalFees,
+            payloadPrice: price,
+            isPositionClosed:
+              mapIfPresent(
+                inputSummary.size?.size,
+                baseAccount?.position?.unsignedSize.toNumber(),
+                baseAccount?.position?.side,
+                trade.side,
+                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+                (filled, size, positionSide, orderSide, stepSize) =>
+                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
+                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
+                  Math.abs(filled - size) < stepSize / 2
+              ) ?? false,
+            total: mapIfPresent(
+              totalFees,
+              inputSummary.size?.usdcSize,
+              (fees, size) => size * (trade.side === OrderSide.SELL ? 1 : -1) - fees
+            ),
+            transferToSubaccountAmount: '', // todo
+            reward: 0, // todo
+          };
         });
       default:
         assertNever(trade.type);
@@ -348,13 +407,13 @@ function calculateSubaccountToUseForTrade(
   existingPositionSubaccount: number | undefined,
   allOpenOrders: SubaccountOrder[],
   rawParentSubaccountData: ParentSubaccountDataBase | undefined
-) {
+): number {
   //   const byExistingPosition = baseAccount?.position?.subaccountNumber;
   if (existingPositionSubaccount != null) {
     return existingPositionSubaccount;
   }
   if (marginMode == null || marginMode === MarginMode.CROSS) {
-    return rawParentSubaccountData?.parentSubaccount;
+    return rawParentSubaccountData?.parentSubaccount ?? 0;
   }
   // it's isolated, so return first available one
   const inUseSubaccountIdStrings = new Set([
@@ -517,4 +576,40 @@ function calculateEffectiveSizeTarget(
       };
     },
   });
+}
+
+function calculateLimitOrderInputSummary(
+  size: OrderSizeInput | undefined,
+  limitPrice: string | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  baseAccount: TradeAccountDetails | undefined
+): TradeInputSummary {
+  const price = MustNumber(limitPrice);
+  const effectiveSize =
+    size != null
+      ? OrderSizeInputs.match(size, {
+          // not supported
+          AVAILABLE_PERCENT: () => 0.0,
+          // not supported
+          SIGNED_POSITION_LEVERAGE: () => 0.0,
+          SIZE: ({ value }) => AttemptNumber(value) ?? 0.0,
+          USDC_SIZE: ({ value }) => divideIfNonZeroElse(MustNumber(value), price, 0),
+        })
+      : 0.0;
+
+  return {
+    averageFillPrice: price,
+    size: {
+      // not supported
+      balancePercent: undefined,
+      // not supported
+      leverageSigned: undefined,
+      size: effectiveSize,
+      usdcSize: effectiveSize * price,
+    },
+  };
+}
+
+function divideIfNonZeroElse(numerator: number, denominator: number, backup: number) {
+  return denominator !== 0 ? numerator / denominator : backup;
 }
