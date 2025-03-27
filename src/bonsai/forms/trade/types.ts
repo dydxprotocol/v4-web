@@ -1,8 +1,10 @@
 import { OrderbookProcessedData } from '@/bonsai/types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
+  FeeTierSummary,
   GroupedSubaccountSummary,
   PerpetualMarketSummary,
+  RewardParamsSummary,
   SubaccountOrder,
   SubaccountPosition,
   SubaccountSummary,
@@ -135,15 +137,15 @@ export type TradeFormOptions = {
 };
 
 export type TradeSizeSummary = {
-  size?: number;
-  usdcSize?: number;
-  leverageSigned?: number;
-  balancePercent?: number;
+  size: number | undefined;
+  usdcSize: number | undefined;
+  leverageSigned: number | undefined;
+  balancePercent: number | undefined;
 };
 
 export type TradeInputSummary = {
-  size?: TradeSizeSummary;
-  averageFillPrice?: number;
+  size: TradeSizeSummary | undefined;
+  averageFillPrice: number | undefined;
 };
 
 export type TradeSummary = {
@@ -151,24 +153,24 @@ export type TradeSummary = {
 
   subaccountNumber: number;
   transferToSubaccountAmount: string;
-  payloadPrice?: number;
+  payloadPrice: number | undefined;
 
   // minimum is essentially the current position leverage or zero
-  minimumSignedLeverage?: number;
+  minimumSignedLeverage: number | undefined;
   // maximum is how far the current order side can push leverage
-  maximumSignedLeverage?: number;
+  maximumSignedLeverage: number | undefined;
 
-  slippage?: number;
-  fee?: number;
-  total?: number;
-  reward?: number;
+  slippage: number | undefined;
+  fee: number | undefined;
+  total: number | undefined;
+  reward: number | undefined;
   filled: boolean;
 
   // if this trade is effectively closing the position, for simulation purposes
   isPositionClosed: boolean;
 
-  indexSlippage?: number;
-  feeRate?: number;
+  indexSlippage: number | undefined;
+  feeRate: number | undefined;
 };
 
 export type TradeFormSummary = {
@@ -195,6 +197,8 @@ export type TradeFormInputData = {
   currentTradeMarketOrderbook: OrderbookProcessedData | undefined;
   allOpenOrders: SubaccountOrder[];
   userFeeStats: UserStats;
+  feeTiers: FeeTierSummary[] | undefined;
+  rewardParams: RewardParamsSummary;
 };
 
 export type TradeAccountDetails = {

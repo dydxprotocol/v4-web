@@ -1,6 +1,11 @@
 import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
 import { ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
-import { SubaccountOrder, SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import {
+  FeeTierSummary,
+  RewardParamsSummary,
+  SubaccountOrder,
+  SubaccountPosition,
+} from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
@@ -110,15 +115,37 @@ export function calculateTradeInfo(
               }
             ),
             feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
-            transferToSubaccountAmount: '',
-            reward: undefined,
+            transferToSubaccountAmount: '', // todo
+            reward: calculateTakerReward(
+              calculated.marketOrder?.usdcSize,
+              calculated.marketOrder?.totalFees,
+              accountData.rewardParams,
+              accountData.feeTiers
+            ),
           };
         });
       case TradeFormType.STOP_MARKET:
       case TradeFormType.TAKE_PROFIT_MARKET:
         return calc((): TradeSummary => {
-          const calculated = calculateMarketOrder();
-          return {} as TradeSummary;
+          const calculated = calculateMarketOrder(trade, baseAccount, accountData);
+          const orderbookBase = accountData.currentTradeMarketOrderbook;
+          const feeRate = accountData.userFeeStats.takerFeeRate ?? 0;
+
+          return {
+            indexSlippage: 0,
+            minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
+            maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            subaccountNumber: subaccountToUse,
+            feeRate,
+            filled: calculated.marketOrder?.filled ?? false,
+
+            reward: calculateTakerReward(
+              inputSummary.size?.usdcSize,
+              totalFees,
+              accountData.rewardParams,
+              accountData.feeTiers
+            ),
+          };
         });
       case TradeFormType.LIMIT:
       case TradeFormType.STOP_LIMIT:
@@ -175,11 +202,19 @@ export function calculateTradeInfo(
               (fees, size) => size * (trade.side === OrderSide.SELL ? 1 : -1) - fees
             ),
             transferToSubaccountAmount: '', // todo
-            reward: 0, // todo
+            reward: isMaker
+              ? calculateMakerReward(totalFees, accountData.rewardParams)
+              : calculateTakerReward(
+                  inputSummary.size?.usdcSize,
+                  totalFees,
+                  accountData.rewardParams,
+                  accountData.feeTiers
+                ),
           };
         });
       default:
         assertNever(trade.type);
+        throw new Error('invalid trade type');
     }
   });
 }
@@ -612,4 +647,51 @@ function calculateLimitOrderInputSummary(
 
 function divideIfNonZeroElse(numerator: number, denominator: number, backup: number) {
   return denominator !== 0 ? numerator / denominator : backup;
+}
+
+function calculateTakerReward(
+  usdcSize: number | undefined,
+  fee: number | undefined,
+  rewardsParams: RewardParamsSummary | undefined,
+  feeTiers: FeeTierSummary[] | undefined
+): number | undefined {
+  const feeMultiplier = rewardsParams?.feeMultiplier;
+  const tokenPrice = rewardsParams?.tokenPrice;
+  const notional = usdcSize;
+  const maxMakerRebate = findMaxMakerRebate(feeTiers);
+
+  if (
+    fee != null &&
+    feeMultiplier != null &&
+    tokenPrice != null &&
+    fee > 0.0 &&
+    notional != null &&
+    tokenPrice > 0.0
+  ) {
+    return (feeMultiplier * (fee - maxMakerRebate * notional)) / tokenPrice;
+  }
+  return undefined;
+}
+
+function calculateMakerReward(
+  fee: number | undefined,
+  rewardsParams: RewardParamsSummary | undefined
+): number | undefined {
+  const feeMultiplier = rewardsParams?.feeMultiplier;
+  const tokenPrice = rewardsParams?.tokenPrice;
+
+  if (fee != null && feeMultiplier != null && tokenPrice != null && fee > 0.0 && tokenPrice > 0.0) {
+    return (fee * feeMultiplier) / tokenPrice;
+  }
+  return undefined;
+}
+
+function findMaxMakerRebate(feeTiers: FeeTierSummary[] | undefined): number {
+  if (feeTiers == null || feeTiers.length === 0) return 0.0;
+
+  const negativeRates = feeTiers.map((tier) => tier.maker ?? 0.0).filter((rate) => rate < 0.0);
+
+  if (negativeRates.length === 0) return 0.0;
+
+  return Math.abs(Math.min(...negativeRates));
 }

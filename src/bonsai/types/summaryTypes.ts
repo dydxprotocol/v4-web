@@ -333,3 +333,8 @@ export interface ComplianceResponse {
   updatedAt?: string;
 }
 export type Compliance = ComplianceResponse & { geo?: string };
+
+export type RewardParamsSummary = {
+  feeMultiplier: number | undefined;
+  tokenPrice: number | undefined;
+};
