@@ -1,12 +1,18 @@
-import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import {
+  CustomItem,
+  ListItem,
+  MarketItem,
+  MarketsSortType,
+  PositionItem,
+} from '@/constants/marketList';
 import { MarketData, MarketFilters } from '@/constants/markets';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -15,40 +21,18 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-import { SearchInput } from '@/components/SearchInput';
 import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 import { SortIcon } from '@/components/SortIcon';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { isPresent } from '@/lib/typeUtils';
 
+import MarketFilterRow from './MarketFilterRow';
 import MarketRow from './MarketRow';
 import PositionRow from './PositionRow';
-
-type CustomItem = {
-  itemType: 'custom';
-  item: ReactNode;
-};
-
-type PositionItem = {
-  itemType: 'position';
-  item: SubaccountPosition;
-};
-
-type HeaderItem = {
-  itemType: 'header';
-  item: string;
-  slotRight?: ReactNode;
-};
-
-type MarketItem = {
-  itemType: 'market';
-  item: MarketData;
-};
-
-type ListItem = PositionItem | HeaderItem | MarketItem | CustomItem;
 
 const isPositionItem = (item: ListItem): item is PositionItem => {
   return item.itemType === 'position';
@@ -78,14 +62,6 @@ const narrowListItemType = (item: ListItem) => {
   return item;
 };
 
-enum MarketsSortType {
-  Price = 'price',
-  Volume = 'volume',
-  Gainers = 'gainers',
-  Losers = 'losers',
-  Favorites = 'favorites',
-}
-
 const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
   return markets.sort((a, b) => {
     if (sortType === MarketsSortType.Price) {
@@ -110,17 +86,37 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
 
 const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
+
+  // Filters and sort
   const filter: MarketFilters = useAppSelector(getMarketFilter);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState<string>();
   const [sortType, setSortType] = useState<MarketsSortType>(MarketsSortType.Volume);
+
+  // Markets and Filters
+  const { filteredMarkets, hasMarketIds, marketFilters } = useMarketsData({
+    filter: isSearchOpen ? filter : MarketFilters.ALL,
+    searchFilter,
+  });
+
+  // Positions
   const openPositions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
   const openPositionsLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.loading) === 'pending';
 
-  const { filteredMarkets, hasMarketIds } = useMarketsData({
-    filter,
-    searchFilter,
-  });
+  const setFilter = useCallback(
+    (newFilter: MarketFilters) => {
+      dispatch(setMarketFilter(newFilter));
+    },
+    [dispatch]
+  );
+
+  const onCloseSearch = useCallback(() => {
+    setIsSearchOpen(false);
+    setSearchFilter(undefined);
+    setFilter(MarketFilters.ALL);
+  }, [setFilter, setIsSearchOpen, setSearchFilter]);
 
   const sortedMarkets = sortMarkets(filteredMarkets, sortType);
 
@@ -165,14 +161,40 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
     [stringGetter, sortType]
   );
 
-  const items: ListItem[] = useMemo(
+  const searchViewItems: ListItem[] = useMemo(
     () => [
-      ...(slotTop ? [{ itemType: 'custom' as const, item: slotTop }] : []),
+      {
+        itemType: 'custom' as const,
+        item: (
+          <MarketFilterRow
+            filter={filter}
+            marketFilters={marketFilters}
+            onCloseSearch={onCloseSearch}
+            setFilter={setFilter}
+            setSearchFilter={setSearchFilter}
+            sortItems={sortItems}
+          />
+        ),
+        isSticky: true,
+        customHeight: 180,
+      },
+      ...sortedMarkets.map((market) => ({
+        itemType: 'market' as const,
+        item: market,
+      })),
+    ],
+    [sortedMarkets, filter, marketFilters, onCloseSearch, setFilter, setSearchFilter, sortItems]
+  );
+
+  const defaultViewItems: ListItem[] = useMemo(
+    () => [
+      ...(slotTop ? [{ itemType: 'custom' as const, item: slotTop, customHeight: 320 }] : []),
       ...(openPositions?.length
         ? [
             {
               itemType: 'header' as const,
               item: stringGetter({ key: STRING_KEYS.YOUR_POSITIONS }),
+              isSticky: true,
             },
             ...openPositions.map((position) => ({
               itemType: 'position' as const,
@@ -183,6 +205,7 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
       {
         itemType: 'header' as const,
         item: stringGetter({ key: STRING_KEYS.MARKETS }),
+        isSticky: true,
         slotRight: (
           <SimpleUiDropdownMenu
             tw="z-1"
@@ -203,15 +226,24 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
     [openPositions, sortedMarkets, stringGetter, slotTop, sortItems]
   );
 
+  const items = useMemo(() => {
+    return isSearchOpen ? searchViewItems : defaultViewItems;
+  }, [isSearchOpen, searchViewItems, defaultViewItems]);
+
+  const getHeight = useCallback(
+    (index: number) => {
+      return items[index]?.customHeight ?? 60;
+    },
+    [items]
+  );
+
   const parentRef = useRef<HTMLDivElement>(null);
 
   const activeStickyIndexRef = useRef(0);
 
   const stickyIndexes = useMemo(
-    () =>
-      items.map((item, idx) => (item.itemType === 'header' ? idx : undefined)).filter(isPresent),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items.length]
+    () => items.map((item, idx) => (item.isSticky ? idx : undefined)).filter(isPresent),
+    [items]
   );
 
   const isSticky = (index: number) => stickyIndexes.includes(index);
@@ -220,7 +252,7 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
 
   const rowVirtualizer = useVirtualizer({
     count: items.length,
-    estimateSize: (index: number) => (slotTop && index === 0 ? 320 : 60),
+    estimateSize: getHeight,
     getScrollElement: () => parentRef.current,
     rangeExtractor: useCallback(
       (range: Range) => {
@@ -240,7 +272,13 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
   }
 
   return (
-    <div ref={parentRef} tw="relative h-full max-h-full w-full max-w-full overflow-auto pb-6">
+    <div
+      ref={parentRef}
+      tw="relative h-full max-h-full w-full max-w-full overflow-auto"
+      css={{
+        paddingBottom: isSearchOpen ? '1rem' : '6rem',
+      }}
+    >
       <div
         tw="relative w-full"
         style={{
@@ -274,17 +312,21 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
       </div>
 
       <div
-        tw="fixed bottom-0 left-0 right-0 h-[5.5rem]"
+        tw="fixed bottom-0 left-0 right-0 flex h-[5.5rem]"
         css={{
+          display: isSearchOpen ? 'none' : 'flex',
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
         }}
       >
-        <SearchInput
-          tw="mx-1.25 h-[3.25rem]"
-          placeholder={stringGetter({ key: STRING_KEYS.SEARCH })}
-          value={searchFilter}
-          onTextChange={setSearchFilter}
-        />
+        <button
+          type="button"
+          aria-label="Search"
+          tw="p-[0 0.75rem] row mx-1.25 h-[3.25rem] w-auto flex-1 cursor-pointer gap-0.5 rounded-[2.5rem] bg-color-layer-5 text-color-text-0 font-base-book"
+          onClick={() => setIsSearchOpen(true)}
+        >
+          <Icon tw="scale-x-[-1] scale-y-[1]" iconName={IconName.Search} />
+          <span>{stringGetter({ key: STRING_KEYS.SEARCH })}...</span>
+        </button>
       </div>
     </div>
   );
@@ -292,21 +334,25 @@ const MarketList = ({ slotTop }: { slotTop?: React.ReactNode }) => {
 
 const ItemRenderer = ({ item }: { item: ListItem }) => {
   const listItem = narrowListItemType(item);
+  const height = listItem.customHeight ?? 60;
 
   if (listItem.itemType === 'position') {
-    return <PositionRow tw="h-[60px]" position={listItem.item} />;
+    return <PositionRow css={{ height }} position={listItem.item} />;
   }
 
   if (listItem.itemType === 'market') {
-    return <MarketRow tw="h-[60px]" market={listItem.item} />;
+    return <MarketRow css={{ height }} market={listItem.item} />;
   }
 
   if (listItem.itemType === 'custom') {
-    return <div tw="h-[320px]">{listItem.item}</div>;
+    return <div css={{ height }}>{listItem.item}</div>;
   }
 
   return (
-    <div tw="row h-[60px] justify-between bg-color-layer-2 px-1.25 text-color-text-2 font-medium-bold">
+    <div
+      tw="row justify-between bg-color-layer-2 px-1.25 text-color-text-2 font-medium-bold"
+      css={{ height }}
+    >
       {listItem.item}
       {listItem.slotRight}
     </div>
