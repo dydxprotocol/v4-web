@@ -32,7 +32,7 @@ async function getTimestampOffset() {
       if (!isFinite(serverMs)) {
         return 0;
       }
-      return Math.floor(utils.calculateClockOffsetFromFetchDateHeader(start, serverMs, end));
+      return utils.calculateClockOffsetFromFetchDateHeader(start, serverMs, end);
     } catch (e) {
       return 0;
     }
