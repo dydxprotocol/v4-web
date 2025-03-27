@@ -47,12 +47,7 @@ export function getUserAddressesForRoute(
 
   return chains.map((chainId, idx) => {
     // Withdraw Only: The last chain in the route and the destination address is valid
-    if (
-      chainId === destinationChain &&
-      idx === chains.length - 1 &&
-      destinationAddress &&
-      isValidWithdrawalAddress(destinationAddress, chainId)
-    ) {
+    if (chainId === destinationChain && idx === chains.length - 1 && destinationAddress) {
       return { chainID: chainId, address: destinationAddress };
     }
 

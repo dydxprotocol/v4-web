@@ -138,20 +138,22 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               parentSubaccountInfo.subaccount
             );
 
-            await compositeClient.depositToSubaccount(
-              subaccountClient,
-              amountToDeposit,
-              TransactionMemo.depositToSubaccount
-            );
+            try {
+              await compositeClient.depositToSubaccount(
+                subaccountClient,
+                amountToDeposit,
+                TransactionMemo.depositToSubaccount
+              );
+            } finally {
+              await sleep(SLEEP_TIME);
 
-            await sleep(SLEEP_TIME);
+              appQueryClient.invalidateQueries({
+                queryKey: ['validator', 'accountBalances'],
+                exact: false,
+              });
 
-            appQueryClient.invalidateQueries({
-              queryKey: ['validator', 'accountBalances'],
-              exact: false,
-            });
-
-            await sleep(INVALIDATION_SLEEP_TIME);
+              await sleep(INVALIDATION_SLEEP_TIME);
+            }
           } else if (shouldWithdraw) {
             const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
               .minus(usdcBalanceBN)
@@ -181,21 +183,23 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               subaccountNumber,
             });
 
-            await compositeClient.withdrawFromSubaccount(
-              subaccountClient,
-              amountToWithdraw,
-              undefined,
-              TransactionMemo.withdrawFromSubaccount
-            );
+            try {
+              await compositeClient.withdrawFromSubaccount(
+                subaccountClient,
+                amountToWithdraw,
+                undefined,
+                TransactionMemo.withdrawFromSubaccount
+              );
+            } finally {
+              await sleep(SLEEP_TIME);
 
-            await sleep(SLEEP_TIME);
+              appQueryClient.invalidateQueries({
+                queryKey: ['validator', 'accountBalances'],
+                exact: false,
+              });
 
-            appQueryClient.invalidateQueries({
-              queryKey: ['validator', 'accountBalances'],
-              exact: false,
-            });
-
-            await sleep(INVALIDATION_SLEEP_TIME);
+              await sleep(INVALIDATION_SLEEP_TIME);
+            }
           }
         }
       }
