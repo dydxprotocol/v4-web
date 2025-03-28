@@ -84,6 +84,32 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
   });
 };
 
+const POSITION_ROW_HEIGHT = 60;
+const MARKET_ROW_HEIGHT = 60;
+const HEADER_ROW_HEIGHT = 52;
+
+const getItemHeight = (item: ListItem) => {
+  const customHeight = item.customHeight;
+  const itemType = item.itemType;
+
+  if (itemType === 'custom') {
+    if (customHeight == null) {
+      throw new Error(`MarketList: ${item} has no custom height`);
+    }
+
+    return customHeight;
+  }
+
+  return (
+    customHeight ??
+    {
+      position: POSITION_ROW_HEIGHT,
+      market: MARKET_ROW_HEIGHT,
+      header: HEADER_ROW_HEIGHT,
+    }[itemType]
+  );
+};
+
 const MarketList = ({
   slotTop,
 }: {
@@ -239,13 +265,6 @@ const MarketList = ({
     return isSearchOpen ? searchViewItems : defaultViewItems;
   }, [isSearchOpen, searchViewItems, defaultViewItems]);
 
-  const getHeight = useCallback(
-    (index: number) => {
-      return items[index]?.customHeight ?? 60;
-    },
-    [items]
-  );
-
   const parentRef = useRef<HTMLDivElement>(null);
 
   const activeStickyIndexRef = useRef(0);
@@ -261,7 +280,7 @@ const MarketList = ({
 
   const rowVirtualizer = useVirtualizer({
     count: items.length,
-    estimateSize: getHeight,
+    estimateSize: (index: number) => getItemHeight(items[index]!),
     getScrollElement: () => parentRef.current,
     rangeExtractor: useCallback(
       (range: Range) => {
@@ -343,7 +362,7 @@ const MarketList = ({
 
 const ItemRenderer = ({ item }: { item: ListItem }) => {
   const listItem = narrowListItemType(item);
-  const height = listItem.customHeight ?? 60;
+  const height = getItemHeight(item);
 
   if (listItem.itemType === 'position') {
     return <PositionRow css={{ height }} position={listItem.item} />;
@@ -359,7 +378,7 @@ const ItemRenderer = ({ item }: { item: ListItem }) => {
 
   return (
     <div
-      tw="row justify-between bg-color-layer-2 px-1.25 text-color-text-2 font-medium-bold"
+      tw="flex flex-row items-end justify-between bg-color-layer-2 px-1.25 pb-[0.75rem] text-color-text-2 font-medium-bold"
       css={{ height }}
     >
       {listItem.item}

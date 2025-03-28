@@ -21,8 +21,8 @@ const MarketRow = ({ className, market }: { className?: string; market: MarketDa
       tw="row cursor-pointer justify-between gap-0.5 px-1.5 hover:bg-color-layer-4"
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
-        <AssetIcon logoUrl={market.logo} tw="size-[2.25rem] min-w-[2.25rem]" />
-        <div tw="flexColumn gap-0.25">
+        <AssetIcon logoUrl={market.logo} tw="size-[2.75rem] min-w-[2.75rem]" />
+        <div tw="flexColumn gap-0.125">
           <span tw="overflow-hidden text-ellipsis whitespace-nowrap">
             {market.displayableAsset}
           </span>
@@ -39,7 +39,7 @@ const MarketRow = ({ className, market }: { className?: string; market: MarketDa
         </div>
       </div>
 
-      <div tw="flex flex-col items-end gap-0.25 text-end">
+      <div tw="flex flex-col items-end gap-0.125 text-end">
         <Output
           tw="text-color-text-2"
           withSubscript
