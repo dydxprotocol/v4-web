@@ -74,7 +74,11 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
   ].filter(isTruthy);
 
   const appMenu = (
-    <SimpleUiDropdownMenu tw="absolute right-1.25 top-1.25 rounded-[50%]" items={menuItems}>
+    <SimpleUiDropdownMenu
+      align="end"
+      tw="absolute right-1.25 top-1.25 rounded-[50%]"
+      items={menuItems}
+    >
       <Button
         tw="size-2 min-w-2 border border-solid border-[color:var(--color-border)]"
         shape={ButtonShape.Circle}

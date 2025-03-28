@@ -243,6 +243,7 @@ const MarketList = ({
         isSticky: true,
         slotRight: (
           <SimpleUiDropdownMenu
+            align="end"
             tw="z-1"
             items={sortItems}
             slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}

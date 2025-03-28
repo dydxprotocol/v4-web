@@ -5,14 +5,23 @@ import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
 
 import { DropdownMenuItem } from './DropdownMenu';
 
+type StyleProps = {
+  align?: 'center' | 'start' | 'end';
+  side?: 'top' | 'bottom';
+  sideOffset?: number;
+  className?: string;
+};
+
 export const SimpleUiDropdownMenu = forwardRefFn(
   <T extends string>({
     className,
     children,
     items,
     slotTop,
-  }: {
-    className?: string;
+    align,
+    side,
+    sideOffset,
+  }: StyleProps & {
     children: React.ReactNode;
     items: DropdownMenuItem<T>[];
     slotTop?: React.ReactNode;
@@ -24,7 +33,12 @@ export const SimpleUiDropdownMenu = forwardRefFn(
         </Trigger>
 
         <Portal>
-          <Content tw="z-1 w-10 overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4">
+          <Content
+            align={align}
+            side={side}
+            sideOffset={sideOffset}
+            tw="z-1 w-10 overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4"
+          >
             {slotTop && (
               <>
                 <div tw="px-1 py-0.5">{slotTop}</div>
