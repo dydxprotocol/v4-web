@@ -81,6 +81,12 @@ const MarketFilterRow = ({
               };
             }) satisfies MenuItem<MarketFilters>[]
           }
+          style={{
+            '--button-toggle-on-border': 'none',
+            '--button-toggle-off-border': 'solid var(--default-border-width) var(--color-border)',
+            '--button-toggle-off-backgroundColor': 'transparent',
+            '--button-toggle-on-backgroundColor': 'var(--color-layer-4)',
+          }}
           value={filter}
           onValueChange={setFilter}
           overflow="scroll"

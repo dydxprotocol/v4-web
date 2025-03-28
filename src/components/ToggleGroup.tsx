@@ -32,6 +32,7 @@ type StyleProps = {
   slotBefore?: React.ReactNode;
   truncateLabel?: boolean;
   withSeparators?: boolean;
+  style?: React.CSSProperties;
 };
 
 export const ToggleGroup = forwardRefFn(
@@ -45,6 +46,7 @@ export const ToggleGroup = forwardRefFn(
       onInteraction,
 
       className,
+      style,
       overflow = 'scroll',
       truncateLabel = true,
       withSeparators = false,
@@ -71,6 +73,7 @@ export const ToggleGroup = forwardRefFn(
         <$ToggleButton
           size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
           shape={shape}
+          style={style}
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           disabled={item.disabled || disabled}
           $withSeparators={withSeparators}
