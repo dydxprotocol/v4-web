@@ -252,7 +252,7 @@ const MarketList = ({
         item: stringGetter({ key: STRING_KEYS.MARKETS }),
         isSticky: true,
         slotRight: (
-          <div tw="row gap-0.5">
+          <div tw="row mb-[-6px] gap-0.5">
             <span tw="text-color-text-0 font-small-book">
               {sortItems.find((item) => item.value === sortType)?.label}
             </span>
