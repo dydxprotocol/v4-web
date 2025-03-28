@@ -40,6 +40,11 @@ import {
 } from './types';
 
 const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
+const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
+const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
+const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
+const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
+const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
 
 export function calculateTradeInfo(
   fieldStates: TradeFormFieldStates,
@@ -67,6 +72,7 @@ export function calculateTradeInfo(
         return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
+
           return {
             inputSummary: calculated.summary ?? { size: undefined, averageFillPrice: undefined },
             subaccountNumber: subaccountToUse,
@@ -78,20 +84,15 @@ export function calculateTradeInfo(
             }),
             minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
             maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
-            slippage: mapIfPresent(
+            slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
-              orderbookBase?.midPrice,
-              (worstPrice, midMarketPrice) => {
-                return midMarketPrice <= 0
-                  ? 0
-                  : Math.abs(worstPrice - midMarketPrice) / midMarketPrice;
-              }
+              orderbookBase?.midPrice
             ),
             fee: calculated.marketOrder?.totalFees,
-            total: mapIfPresent(
-              calculated.marketOrder?.totalFees,
+            total: calculateOrderTotal(
               calculated.marketOrder?.usdcSize,
-              (fees, size) => size * (trade.side === OrderSide.SELL ? 1 : -1) - fees
+              calculated.marketOrder?.totalFees,
+              trade.side
             ),
             filled: calculated.marketOrder?.filled ?? false,
             isPositionClosed:
@@ -109,9 +110,12 @@ export function calculateTradeInfo(
             indexSlippage: mapIfPresent(
               calculated.marketOrder?.worstPrice,
               AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
-              (worstPrice, oraclePrice) => {
-                // todo this is different from abacus, we should double check where this is used
-                return oraclePrice <= 0 ? 0 : Math.abs(worstPrice - oraclePrice) / oraclePrice;
+              trade.side,
+              (worstPrice, oraclePrice, side) => {
+                return (
+                  (side === OrderSide.BUY ? worstPrice - oraclePrice : oraclePrice - worstPrice) /
+                  oraclePrice
+                );
               }
             ),
             feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
@@ -129,7 +133,80 @@ export function calculateTradeInfo(
         return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
+
+          const slippageFromMidPrice = calculateMarketOrderSlippage(
+            calculated.marketOrder?.worstPrice,
+            orderbookBase?.midPrice
+          );
+          const slippageFromMarket = calculateMarketOrderSlippage(
+            calculated.marketOrder?.averagePrice,
+            orderbookBase?.midPrice
+          );
+          const adjustedSlippagePercentage = mapIfPresent(
+            trade.marketId,
+            slippageFromMarket,
+            (marketId, slippage) => {
+              const isMajorMarket = MAJOR_MARKETS.has(marketId);
+              const additionalBuffer = calc(() => {
+                if (isMajorMarket) {
+                  return trade.type === TradeFormType.STOP_MARKET
+                    ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET
+                    : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET;
+                }
+                return trade.type === TradeFormType.STOP_MARKET
+                  ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER
+                  : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER;
+              });
+
+              return slippage + additionalBuffer;
+            }
+          );
+          const price = mapIfPresent(
+            AttemptNumber(trade.triggerPrice),
+            slippageFromMidPrice,
+            (trigger, slippage) => {
+              return trade.side === OrderSide.BUY
+                ? trigger * (1 + slippage)
+                : trigger * (1 - slippage);
+            }
+          );
+          const payloadPrice = mapIfPresent(
+            AttemptNumber(trade.triggerPrice),
+            adjustedSlippagePercentage,
+            (trigger, adjustedSlippage) => {
+              return trade.side === OrderSide.BUY
+                ? trigger * (1 + adjustedSlippage)
+                : trigger * (1 - adjustedSlippage);
+            }
+          );
+
+          const size = calculated.marketOrder?.size;
+          const usdcSize = mapIfPresent(price, size, (p, s) => p * s);
           const feeRate = accountData.userFeeStats.takerFeeRate ?? 0;
+          const totalFees = mapIfPresent(usdcSize, (u) => u * feeRate);
+
+          const isPositionClosed =
+            mapIfPresent(
+              size,
+              baseAccount?.position?.unsignedSize.toNumber(),
+              AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+              (orderSize, positionSize, stepSize) =>
+                Math.abs(orderSize - positionSize) < stepSize / 2
+            ) ?? false;
+
+          const inputSummary = {
+            size: {
+              size,
+              usdcSize,
+              // not supported
+              leverageSigned: undefined,
+              // not supported
+              balancePercent: undefined,
+            },
+            averageFillPrice: price,
+          };
+
+          const total = calculateOrderTotal(usdcSize, totalFees, trade.side);
 
           return {
             indexSlippage: 0,
@@ -138,9 +215,15 @@ export function calculateTradeInfo(
             subaccountNumber: subaccountToUse,
             feeRate,
             filled: calculated.marketOrder?.filled ?? false,
-
+            inputSummary,
+            fee: totalFees,
+            isPositionClosed,
+            slippage: slippageFromMidPrice,
+            total,
+            transferToSubaccountAmount: '', // todo
+            payloadPrice,
             reward: calculateTakerReward(
-              inputSummary.size?.usdcSize,
+              usdcSize,
               totalFees,
               accountData.rewardParams,
               accountData.feeTiers
@@ -196,11 +279,7 @@ export function calculateTradeInfo(
                     (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
                   Math.abs(filled - size) < stepSize / 2
               ) ?? false,
-            total: mapIfPresent(
-              totalFees,
-              inputSummary.size?.usdcSize,
-              (fees, size) => size * (trade.side === OrderSide.SELL ? 1 : -1) - fees
-            ),
+            total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
             transferToSubaccountAmount: '', // todo
             reward: isMaker
               ? calculateMakerReward(totalFees, accountData.rewardParams)
@@ -694,4 +773,21 @@ function findMaxMakerRebate(feeTiers: FeeTierSummary[] | undefined): number {
   if (negativeRates.length === 0) return 0.0;
 
   return Math.abs(Math.min(...negativeRates));
+}
+
+function calculateMarketOrderSlippage(
+  worstPrice: number | undefined,
+  midPrice: number | undefined
+) {
+  return mapIfPresent(worstPrice, midPrice, (worst, mid) => {
+    return mid <= 0 ? 0 : Math.abs(worst - mid) / mid;
+  });
+}
+
+function calculateOrderTotal(
+  usdcSize: number | undefined,
+  totalFees: number | undefined,
+  side: OrderSide | undefined
+) {
+  return mapIfPresent(usdcSize, (u) => u * (side === OrderSide.SELL ? 1 : -1) - (totalFees ?? 0));
 }
