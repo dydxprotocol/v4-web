@@ -42,7 +42,7 @@ const PositionRow = ({
   return (
     <div
       className={className}
-      tw="row cursor-pointer justify-between gap-0.5 px-1.5 hover:bg-color-layer-4"
+      tw="row cursor-pointer justify-between gap-0.5 px-[1.25rem] hover:bg-color-layer-4"
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <AssetIcon logoUrl={market.logo} tw="size-[2.75rem] min-w-[2.75rem]" />
