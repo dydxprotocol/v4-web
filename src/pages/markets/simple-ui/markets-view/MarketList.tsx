@@ -206,6 +206,7 @@ const MarketList = ({
             setFilter={setFilter}
             setSearchFilter={setSearchFilter}
             sortItems={sortItems}
+            sortTypeLabel={sortItems.find((item) => item.value === sortType)?.label ?? ''}
           />
         ),
         isSticky: true,
@@ -216,7 +217,16 @@ const MarketList = ({
         item: market,
       })),
     ],
-    [sortedMarkets, filter, marketFilters, onCloseSearch, setFilter, setSearchFilter, sortItems]
+    [
+      sortedMarkets,
+      filter,
+      marketFilters,
+      onCloseSearch,
+      setFilter,
+      setSearchFilter,
+      sortItems,
+      sortType,
+    ]
   );
 
   const defaultViewItems: ListItem[] = useMemo(
@@ -242,16 +252,21 @@ const MarketList = ({
         item: stringGetter({ key: STRING_KEYS.MARKETS }),
         isSticky: true,
         slotRight: (
-          <SimpleUiDropdownMenu
-            align="end"
-            tw="z-1"
-            items={sortItems}
-            slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
-          >
-            <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
-              <SortIcon />
-            </Button>
-          </SimpleUiDropdownMenu>
+          <div tw="row gap-0.5">
+            <span tw="text-color-text-0 font-small-book">
+              {sortItems.find((item) => item.value === sortType)?.label}
+            </span>
+            <SimpleUiDropdownMenu
+              align="end"
+              tw="z-1"
+              items={sortItems}
+              slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
+            >
+              <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
+                <SortIcon />
+              </Button>
+            </SimpleUiDropdownMenu>
+          </div>
         ),
       },
       ...sortedMarkets.map((market) => ({

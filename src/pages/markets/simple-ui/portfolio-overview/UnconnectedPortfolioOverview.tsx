@@ -29,7 +29,7 @@ const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => 
         <Output tw="text-color-text-2 font-extra-bold" value={0} type={OutputType.Fiat} />
         <Output tw="text-color-positive" value={0} type={OutputType.Percent} />
       </div>
-      <div tw="flexColumn w-full items-center justify-center px-2 text-center">
+      <div tw="flexColumn w-full items-center justify-center px-1.25 text-center">
         {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
 
         <Button

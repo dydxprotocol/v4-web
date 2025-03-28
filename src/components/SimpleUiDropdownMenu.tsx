@@ -28,7 +28,7 @@ export const SimpleUiDropdownMenu = forwardRefFn(
   }) => {
     return (
       <Root>
-        <Trigger tw="w-fit" className={className} asChild>
+        <Trigger className={className} asChild>
           {children}
         </Trigger>
 
@@ -37,7 +37,7 @@ export const SimpleUiDropdownMenu = forwardRefFn(
             align={align}
             side={side}
             sideOffset={sideOffset}
-            tw="z-1 w-10 overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4"
+            tw="z-1 w-fit overflow-hidden rounded-[0.5rem] border border-solid border-color-border bg-color-layer-4"
           >
             {slotTop && (
               <>
@@ -63,8 +63,8 @@ export const SimpleUiDropdownMenu = forwardRefFn(
                     }[item.highlightColor ?? (item.active ? 'active' : 'none')],
                   }}
                 >
-                  <span>{item.label}</span>
-                  {item.icon}
+                  <span tw="whitespace-nowrap">{item.label}</span>
+                  {item.icon && <span tw="row ml-1">{item.icon}</span>}
                 </Item>
                 {idx !== items.length - 1 && (
                   <Separator tw="border-b-[length:--border-width] border-b-color-border [border-bottom-style:solid]" />

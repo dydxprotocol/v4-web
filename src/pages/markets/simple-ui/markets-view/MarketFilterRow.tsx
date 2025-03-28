@@ -23,6 +23,7 @@ const MarketFilterRow = ({
   setFilter,
   setSearchFilter,
   sortItems,
+  sortTypeLabel,
 }: {
   filter: MarketFilters;
   marketFilters: MarketFilters[];
@@ -30,6 +31,7 @@ const MarketFilterRow = ({
   setFilter: (filter: MarketFilters) => void;
   setSearchFilter: (searchFilter: string) => void;
   sortItems: DropdownMenuItem<MarketsSortType>[];
+  sortTypeLabel: string;
 }) => {
   const stringGetter = useStringGetter();
   return (
@@ -41,16 +43,19 @@ const MarketFilterRow = ({
             {stringGetter({ key: STRING_KEYS.MARKETS })}
           </span>
         </div>
-        <SimpleUiDropdownMenu
-          align="end"
-          tw="z-1"
-          items={sortItems}
-          slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
-        >
-          <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
-            <SortIcon />
-          </Button>
-        </SimpleUiDropdownMenu>
+        <div tw="row gap-0.5">
+          <span tw="text-color-text-0 font-small-book">{sortTypeLabel}</span>
+          <SimpleUiDropdownMenu
+            align="end"
+            tw="z-1"
+            items={sortItems}
+            slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
+          >
+            <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
+              <SortIcon />
+            </Button>
+          </SimpleUiDropdownMenu>
+        </div>
       </div>
       <div tw="flexColumn gap-1">
         <SearchInput

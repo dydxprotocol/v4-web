@@ -80,7 +80,7 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
       items={menuItems}
     >
       <Button
-        tw="size-2 min-w-2 border border-solid border-[color:var(--color-border)]"
+        tw="size-2.25 min-w-2.25 border border-solid border-[color:var(--color-border)]"
         shape={ButtonShape.Circle}
         size={ButtonSize.XSmall}
       >
