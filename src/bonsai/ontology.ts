@@ -75,6 +75,7 @@ import {
   selectCurrentMarketDepthChart,
   selectCurrentMarketMidPrice,
 } from './selectors/orderbook';
+import { selectRewardsSummary } from './selectors/rewards';
 import {
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
@@ -103,6 +104,7 @@ import {
   PendingIsolatedPosition,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
+  RewardParamsSummary,
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
@@ -186,6 +188,7 @@ interface BonsaiCoreShape {
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
+  rewardParams: { data: BasicSelector<RewardParamsSummary> };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -255,6 +258,7 @@ export const BonsaiCore: BonsaiCoreShape = {
     feeTiers: selectFeeTiers,
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
+  rewardParams: { data: selectRewardsSummary },
 };
 
 interface BonsaiRawShape {
