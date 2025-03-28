@@ -74,9 +74,13 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
   ].filter(isTruthy);
 
   const appMenu = (
-    <SimpleUiDropdownMenu tw="absolute right-1.25 top-1.25 rounded-[50%]" items={menuItems}>
+    <SimpleUiDropdownMenu
+      align="end"
+      tw="absolute right-1.25 top-1.25 rounded-[50%]"
+      items={menuItems}
+    >
       <Button
-        tw="size-2 border border-solid border-[color:var(--color-border)]"
+        tw="size-2.25 min-w-2.25 border border-solid border-[color:var(--color-border)]"
         shape={ButtonShape.Circle}
         size={ButtonSize.XSmall}
       >
@@ -86,7 +90,7 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
   );
 
   return (
-    <div tw="flexColumn relative h-20 w-full" className={className}>
+    <div tw="flexColumn relative h-[12.5rem] w-full" className={className}>
       {onboardingState === OnboardingState.Disconnected ? (
         <UnconnectedPortfolioOverview tw="h-full w-full" />
       ) : (

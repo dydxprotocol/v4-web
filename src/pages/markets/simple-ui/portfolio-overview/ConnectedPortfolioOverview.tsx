@@ -107,6 +107,7 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
       HistoricalPnlPeriod.Period90d,
     ].map((period) => ({
       value: period,
+      active: selectedPeriod === period,
       label: formatRelativeTime(getMsForPeriod(period, earliestCreatedAt, latestCreatedAt, false), {
         locale: selectedLocale,
         relativeToTimestamp: 0,
@@ -114,7 +115,7 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
       }),
       onSelect: () => setSelectedPeriod(period),
     }));
-  }, [earliestCreatedAt, latestCreatedAt, selectedLocale]);
+  }, [earliestCreatedAt, latestCreatedAt, selectedLocale, selectedPeriod]);
 
   const data = useMemo(
     () =>

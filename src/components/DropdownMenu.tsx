@@ -24,6 +24,7 @@ export type DropdownMenuItem<T> = {
   label: React.ReactNode;
   onSelect?: (e: Event) => void;
   separator?: boolean;
+  active?: boolean;
   highlightColor?: 'accent' | 'create' | 'destroy';
 };
 
