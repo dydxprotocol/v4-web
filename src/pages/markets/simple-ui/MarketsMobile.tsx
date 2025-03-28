@@ -8,7 +8,7 @@ const MarketsMobile = () => {
         <MarketsList2
           slotTop={{
             content: <PortfolioOverview tw="w-[100vw]" />,
-            height: 320,
+            height: 200,
           }}
         />
       </div>

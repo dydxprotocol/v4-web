@@ -261,6 +261,7 @@ const MarketList = ({
               tw="z-1"
               items={sortItems}
               slotTop={<span tw="text-color-text-0 font-small-book">Sort by</span>}
+              side="bottom"
             >
               <Button tw="size-2 min-w-2" shape={ButtonShape.Circle} size={ButtonSize.XXSmall}>
                 <SortIcon />
