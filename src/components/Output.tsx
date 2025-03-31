@@ -188,7 +188,8 @@ export function formatNumberOutput(
     [OutputType.Fiat]: () => getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' }),
     [OutputType.SmallFiat]: () => getFormattedVal(valueBN, SMALL_USD_DECIMALS, { prefix: '$' }),
     [OutputType.CompactFiat]: () => {
-      if (!isNumber(value)) {
+      const numValue = valueBN.toNumber();
+      if (!isNumber(numValue)) {
         return null;
       }
 
@@ -197,7 +198,7 @@ export function formatNumberOutput(
         currency: 'USD',
         notation: 'compact',
         maximumSignificantDigits: 3,
-      }).format(Math.abs(value));
+      }).format(Math.abs(numValue));
     },
     [OutputType.Asset]: () => getFormattedVal(valueBN, TOKEN_DECIMALS),
     [OutputType.Percent]: () =>

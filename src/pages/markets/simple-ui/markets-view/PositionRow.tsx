@@ -2,6 +2,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -40,9 +41,10 @@ const PositionRow = ({
     position.side === IndexerPositionSide.LONG ? 'var(--color-positive)' : 'var(--color-negative)';
 
   return (
-    <div
+    <a
       className={className}
       tw="row cursor-pointer justify-between gap-0.5 px-[1.25rem] hover:bg-color-layer-4"
+      href={`${AppRoute.Trade}/${market.ticker}`}
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <AssetIcon logoUrl={market.logo} tw="size-[2.75rem] min-w-[2.75rem]" />
@@ -78,7 +80,7 @@ const PositionRow = ({
           value={market.percentChange24h}
         />
       </div>
-    </div>
+    </a>
   );
 };
 

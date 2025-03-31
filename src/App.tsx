@@ -79,6 +79,7 @@ const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
 
 // Simple UI
 const SimpleMarketsPage = lazy(() => import('@/pages/markets/simple-ui/MarketsMobile'));
+const SimpleAssetPage = lazy(() => import('@/pages/trade/simple-ui/AssetPage'));
 
 const Content = () => {
   useInitializePage();
@@ -114,6 +115,10 @@ const Content = () => {
           <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
             <Routes>
               <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
+              <Route path={AppRoute.Trade}>
+                <Route path=":market" element={<SimpleAssetPage />} />
+                <Route path={AppRoute.Trade} element={<SimpleAssetPage />} />
+              </Route>
               <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
             </Routes>
           </Suspense>

@@ -12,7 +12,13 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: string }) => {
+export const MarketLinks = ({
+  className,
+  launchableMarketId,
+}: {
+  className?: string;
+  launchableMarketId?: string;
+}) => {
   const { urls: marketUrls } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -44,7 +50,7 @@ export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: strin
   ].filter(({ href }) => href);
 
   return (
-    <div tw="row ml-auto gap-0.5">
+    <div tw="row ml-auto gap-0.5" className={className}>
       {linkItems.map(
         ({ key, href, icon }) =>
           href && <$IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
