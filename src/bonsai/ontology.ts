@@ -8,6 +8,8 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
+import { RecordValueType } from '@/lib/typeUtils';
+
 import { HistoricalFundingObject } from './calculators/funding';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
@@ -34,6 +36,7 @@ import {
   selectAccountOrdersLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
+  selectCurrentMarketInfoRaw,
   selectCurrentMarketOpenOrders,
   selectCurrentMarketOrderHistory,
   selectOpenOrders,
@@ -266,6 +269,7 @@ interface BonsaiRawShape {
   // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
   // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  currentMarket: BasicSelector<RecordValueType<MarketsData> | undefined>;
   // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
 }
@@ -273,6 +277,7 @@ interface BonsaiRawShape {
 export const BonsaiRaw: BonsaiRawShape = {
   parentSubaccountBase: selectRawParentSubaccountData,
   parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  currentMarket: selectCurrentMarketInfoRaw,
   allMarkets: selectRawMarketsData,
 };
 

@@ -1,5 +1,5 @@
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { calculateAllMarkets, formatSparklineData } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -24,7 +24,7 @@ export const selectSparkLinesData = createAppSelector([selectRawSparklinesData],
 );
 
 export const selectCurrentMarketOrderbook = createAppSelector(
-  [selectRawOrderbooks, getCurrentMarketId],
+  [selectRawOrderbooks, getCurrentMarketIdIfTradeable],
   (rawOrderbooks, currentMarketId) => {
     if (!currentMarketId || !rawOrderbooks[currentMarketId]) {
       return undefined;

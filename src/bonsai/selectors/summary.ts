@@ -3,7 +3,7 @@ import { shallowEqual } from 'react-redux';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -24,7 +24,7 @@ export const selectAllMarketSummaries = createAppSelector(
 );
 
 export const selectCurrentMarketInfo = createAppSelector(
-  [selectAllMarketSummaries, getCurrentMarketId],
+  [selectAllMarketSummaries, getCurrentMarketIdIfTradeable],
   (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );
 

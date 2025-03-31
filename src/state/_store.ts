@@ -27,6 +27,7 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { tradeFormSlice } from './tradeForm';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
 import { triggersFormSlice } from './triggersForm';
@@ -44,6 +45,7 @@ const reducers = {
   funkitDeposits: funkitDepositsSlice.reducer,
   inputs: inputsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
+  tradeForm: tradeFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,

@@ -12,6 +12,8 @@ import {
 } from '@/bonsai/types/summaryTypes';
 import unionize, { ofType, UnionOf } from 'unionize';
 
+import { RecordValueType } from '@/lib/typeUtils';
+
 export enum TimeUnit {
   MINUTE = 'M',
   HOUR = 'H',
@@ -186,9 +188,6 @@ export type TradeFormSummary = {
   positionBefore?: SubaccountPosition;
   positionAfter?: SubaccountPosition;
 };
-
-// given record, get the value type
-type RecordValueType<T> = T extends { [key: string]: infer V } ? V : never;
 
 export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
