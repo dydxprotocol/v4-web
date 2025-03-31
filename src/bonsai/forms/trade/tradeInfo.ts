@@ -2,6 +2,7 @@ import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
 import { ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
   FeeTierSummary,
+  PerpetualMarketSummary,
   RewardParamsSummary,
   SubaccountOrder,
   SubaccountPosition,
@@ -45,6 +46,8 @@ const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
 const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
+const MAX_LEVERAGE_BUFFER_PERCENT = 0.98;
+const DEFAULT_TARGET_LEVERAGE = 2.0;
 
 export function calculateTradeInfo(
   fieldStates: TradeFormFieldStates,
@@ -119,7 +122,15 @@ export function calculateTradeInfo(
               }
             ),
             feeRate: accountData.userFeeStats.takerFeeRate ?? 0,
-            transferToSubaccountAmount: '', // todo
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              calculated.summary?.size?.size ?? 0,
+              calculated.summary?.averageFillPrice ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary
+            ),
             reward: calculateTakerReward(
               calculated.marketOrder?.usdcSize,
               calculated.marketOrder?.totalFees,
@@ -220,7 +231,15 @@ export function calculateTradeInfo(
             isPositionClosed,
             slippage: slippageFromMidPrice,
             total,
-            transferToSubaccountAmount: '', // todo
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              inputSummary.size.size ?? 0,
+              price ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary
+            ),
             payloadPrice,
             reward: calculateTakerReward(
               usdcSize,
@@ -280,7 +299,15 @@ export function calculateTradeInfo(
                   Math.abs(filled - size) < stepSize / 2
               ) ?? false,
             total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
-            transferToSubaccountAmount: '', // todo
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              inputSummary.size?.size ?? 0,
+              price ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary
+            ),
             reward: isMaker
               ? calculateMakerReward(totalFees, accountData.rewardParams)
               : calculateTakerReward(
@@ -790,4 +817,162 @@ function calculateOrderTotal(
   side: OrderSide | undefined
 ) {
   return mapIfPresent(usdcSize, (u) => u * (side === OrderSide.SELL ? 1 : -1) - (totalFees ?? 0));
+}
+
+function calculateIsolatedTransferAmount(
+  trade: TradeForm,
+  tradeSize: number,
+  tradePrice: number,
+  subaccountToUse: number,
+  parentSubaccount: number | undefined,
+  existingPosition: SubaccountPosition | undefined,
+  tradeMarketSummary: PerpetualMarketSummary | undefined
+): number {
+  if (!getShouldTransferCollateral(trade, subaccountToUse, existingPosition, parentSubaccount)) {
+    return 0;
+  }
+  return (
+    calculateIsolatedMarginTransferAmount(
+      trade,
+      tradeSize,
+      tradePrice,
+      existingPosition,
+      tradeMarketSummary
+    ) ?? 0
+  );
+}
+
+function getShouldTransferCollateral(
+  trade: TradeForm,
+  subaccountToUse: number,
+  existingPosition: SubaccountPosition | undefined,
+  parentSubaccount: number | undefined
+): boolean {
+  const isIsolatedOrder =
+    trade.marginMode === MarginMode.ISOLATED && subaccountToUse !== parentSubaccount;
+  const isReduceOnly = trade.reduceOnly ?? false;
+  const isIncreasingSize = isTradeIncreasingPositionSize(
+    trade.side,
+    existingPosition?.side,
+    trade.reduceOnly
+  );
+  return isIsolatedOrder && isIncreasingSize && !isReduceOnly;
+}
+
+function isTradeIncreasingPositionSize(
+  tradeSide: OrderSide | undefined,
+  positionSide: IndexerPositionSide | undefined,
+  reduceOnly: boolean | undefined
+) {
+  if (reduceOnly === true) {
+    return false;
+  }
+  return (
+    positionSide == null ||
+    tradeSide == null ||
+    (tradeSide === OrderSide.BUY && positionSide === IndexerPositionSide.LONG) ||
+    (tradeSide === OrderSide.SELL && positionSide === IndexerPositionSide.SHORT)
+  );
+}
+
+function calculateIsolatedMarginTransferAmount(
+  trade: TradeForm,
+  tradeSize: number,
+  tradePrice: number,
+  existingPosition: SubaccountPosition | undefined,
+  tradeMarketSummary: PerpetualMarketSummary | undefined
+): number | undefined {
+  const oraclePrice = AttemptNumber(tradeMarketSummary?.oraclePrice);
+  const side = trade.side;
+  if (side == null || oraclePrice == null) {
+    return undefined;
+  }
+
+  const effectiveImf = tradeMarketSummary?.effectiveInitialMarginFraction ?? 0;
+  const marketMaxLeverage = 1 / (effectiveImf === 0 ? 1 : effectiveImf);
+  const targetLeverage =
+    AttemptNumber(trade.targetLeverage) ?? Math.min(DEFAULT_TARGET_LEVERAGE, marketMaxLeverage);
+
+  const baseTradeSizeSigned = tradeSize * (trade.side === OrderSide.SELL ? -1 : 1);
+  const positionSizeDifference = isTradeIncreasingPositionSize(
+    trade.side,
+    existingPosition?.side,
+    trade.reduceOnly
+  )
+    ? baseTradeSizeSigned
+    : trade.reduceOnly
+      ? // reduce only + decreasing size
+        calc(() => {
+          if (
+            existingPosition?.side === IndexerPositionSide.LONG &&
+            trade.side === OrderSide.SELL
+          ) {
+            const size = Math.min(existingPosition.unsignedSize.toNumber(), tradeSize);
+            return size * -1;
+          }
+          if (
+            existingPosition?.side === IndexerPositionSide.SHORT &&
+            trade.side === OrderSide.BUY
+          ) {
+            const size = Math.min(existingPosition.unsignedSize.toNumber(), tradeSize);
+            return size;
+          }
+          return baseTradeSizeSigned;
+        })
+      : baseTradeSizeSigned;
+
+  return calculateIsolatedMarginTransferAmountFromValues(
+    targetLeverage,
+    side,
+    oraclePrice,
+    tradePrice,
+    marketMaxLeverage,
+    positionSizeDifference
+  );
+}
+
+function calculateIsolatedMarginTransferAmountFromValues(
+  targetLeverage: number,
+  side: OrderSide,
+  oraclePrice: number,
+  price: number,
+  maxMarketLeverage: number,
+  positionSizeDifference: number
+): number | undefined {
+  const adjustedTargetLeverage = Math.min(
+    targetLeverage,
+    maxMarketLeverage * MAX_LEVERAGE_BUFFER_PERCENT
+  );
+
+  if (adjustedTargetLeverage === 0) {
+    return undefined;
+  }
+
+  return getTransferAmountFromTargetLeverage(
+    price,
+    oraclePrice,
+    side,
+    positionSizeDifference,
+    adjustedTargetLeverage
+  );
+}
+
+function getTransferAmountFromTargetLeverage(
+  price: number,
+  oraclePrice: number,
+  side: OrderSide,
+  size: number,
+  targetLeverage: number
+): number {
+  if (targetLeverage === 0) {
+    return 0;
+  }
+
+  const naiveTransferAmount = (price * size) / targetLeverage;
+
+  // Calculate price difference for immediate PnL impact
+  const priceDiff = side === OrderSide.BUY ? price - oraclePrice : oraclePrice - price;
+
+  // Return the maximum of the naive transfer and the adjusted transfer amount
+  return Math.max((oraclePrice * size) / targetLeverage + priceDiff * size, naiveTransferAmount);
 }

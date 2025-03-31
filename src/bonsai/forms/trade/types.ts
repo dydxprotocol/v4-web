@@ -152,7 +152,7 @@ export type TradeSummary = {
   inputSummary: TradeInputSummary;
 
   subaccountNumber: number;
-  transferToSubaccountAmount: string;
+  transferToSubaccountAmount: number;
   payloadPrice: number | undefined;
 
   // minimum is essentially the current position leverage or zero
@@ -191,12 +191,13 @@ type RecordValueType<T> = T extends { [key: string]: infer V } ? V : never;
 export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
-  currentTradeMarket: RecordValueType<MarketsData> | undefined;
-  currentTradeMarketSummary: PerpetualMarketSummary | undefined;
   currentTradeMarketOpenOrders: SubaccountOrder[]; // todo remove maybe
-  currentTradeMarketOrderbook: OrderbookProcessedData | undefined;
   allOpenOrders: SubaccountOrder[];
   userFeeStats: UserStats;
+
+  currentTradeMarket: RecordValueType<MarketsData> | undefined;
+  currentTradeMarketSummary: PerpetualMarketSummary | undefined;
+  currentTradeMarketOrderbook: OrderbookProcessedData | undefined;
   feeTiers: FeeTierSummary[] | undefined;
   rewardParams: RewardParamsSummary;
 };
