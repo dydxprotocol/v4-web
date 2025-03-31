@@ -90,26 +90,26 @@ export type TradeForm = {
   type: TradeFormType;
 
   // Common fields for standard orders
-  marketId?: string;
-  side?: OrderSide;
-  size?: OrderSizeInput; // Using the proper union type for sizes
-  reduceOnly?: boolean;
+  marketId: string | undefined;
+  side: OrderSide | undefined;
+  size: OrderSizeInput | undefined; // Using the proper union type for sizes
+  reduceOnly: boolean | undefined;
 
   // isolated
-  marginMode?: MarginMode;
-  targetLeverage?: string;
+  marginMode: MarginMode | undefined;
+  targetLeverage: string | undefined;
 
   // Limit order fields
-  limitPrice?: string;
-  postOnly?: boolean;
-  timeInForce?: TimeInForce;
+  limitPrice: string | undefined;
+  postOnly: boolean | undefined;
+  timeInForce: TimeInForce | undefined;
 
   // Conditional order fields
-  triggerPrice?: string;
-  execution?: ExecutionType;
+  triggerPrice: string | undefined;
+  execution: ExecutionType | undefined;
 
   // Time-related fields
-  goodTil?: GoodUntilTime;
+  goodTil: GoodUntilTime | undefined;
 };
 
 // Define the FieldState type with conditional properties
@@ -175,6 +175,8 @@ export type TradeSummary = {
 
 export type TradeFormSummary = {
   fieldStates: TradeFormFieldStates;
+  effectiveTrade: TradeForm;
+
   options: TradeFormOptions;
 
   tradeInfo: TradeSummary;

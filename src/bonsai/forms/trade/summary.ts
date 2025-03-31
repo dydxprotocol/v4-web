@@ -16,7 +16,7 @@ import { weakMapMemoize } from 'reselect';
 
 import { calc, mapIfPresent } from '@/lib/do';
 import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
-import { AttemptNumber } from '@/lib/numbers';
+import { AttemptNumber, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { getTradeFormFieldStates } from './fields';
@@ -119,8 +119,11 @@ export function calculateTradeSummary(
     );
   });
 
+  const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
+
   return {
     fieldStates,
+    effectiveTrade,
     options,
 
     tradeInfo,
@@ -259,7 +262,9 @@ function calculateTradeOperationsForSimulation(
 
   return {
     subaccountNumber: tradeInfo.subaccountNumber,
-    transferToIsolatedSubaccountAmount: tradeInfo.transferToSubaccountAmount,
+    transferToIsolatedSubaccountAmount: MustBigNumber(
+      tradeInfo.transferToSubaccountAmount
+    ).toString(10),
     reclaimFunds:
       tradeInfo.isPositionClosed &&
       fields.marginMode.effectiveValue === MarginMode.ISOLATED &&

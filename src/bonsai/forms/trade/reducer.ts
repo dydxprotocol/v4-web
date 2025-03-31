@@ -15,7 +15,21 @@ const getMinimumRequiredFields = (
   marketId?: string
 ): TradeForm => {
   // Base form only includes type
-  const baseForm: TradeForm = { type };
+  const baseForm: TradeForm = {
+    type,
+    execution: undefined,
+    goodTil: undefined,
+    limitPrice: undefined,
+    marginMode: undefined,
+    marketId: undefined,
+    postOnly: undefined,
+    reduceOnly: undefined,
+    side: undefined,
+    size: undefined,
+    targetLeverage: undefined,
+    timeInForce: undefined,
+    triggerPrice: undefined,
+  };
 
   // Add marketId if provided
   if (marketId) {
