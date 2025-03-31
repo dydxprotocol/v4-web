@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
@@ -41,8 +41,8 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import {
   getCurrentInput,
   getInputTradeData,
@@ -50,6 +50,7 @@ import {
   useTradeFormData,
 } from '@/state/inputsSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
@@ -100,7 +101,12 @@ export const TradeForm = ({
   );
 
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
-  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(tradeFormActions.setMarketId(currentMarketId));
+  }, [currentMarketId, dispatch]);
 
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
 

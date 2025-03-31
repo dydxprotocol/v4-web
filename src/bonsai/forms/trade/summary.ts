@@ -63,7 +63,11 @@ export function calculateTradeSummary(
 
   const fieldStates = getTradeFormFieldStates(
     state,
-    baseAccount?.position?.marginMode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED,
+    baseAccount?.position?.marginMode == null
+      ? undefined
+      : baseAccount.position.marginMode === 'CROSS'
+        ? MarginMode.CROSS
+        : MarginMode.ISOLATED,
     baseAccount?.position?.leverage?.toNumber(),
     baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE
   );

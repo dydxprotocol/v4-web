@@ -1,9 +1,6 @@
-import { useMemo } from 'react';
-
 import { TriggerOrdersFormFns } from '@/bonsai/forms/triggers/triggers';
 import { TriggerOrderInputData } from '@/bonsai/forms/triggers/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 
 import { AbacusInputTypes } from '@/constants/abacus';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
@@ -15,42 +12,7 @@ import {
   getSubaccountPositionByUniqueId,
 } from './accountSelectors';
 import { getSelectedNetwork } from './appSelectors';
-import { createAppSelector, useAppSelector } from './appTypes';
-
-/**
- * @param state
- * @returns TradeInputs
- */
-export const getInputTradeData = (state: RootState) => state.inputs.tradeInputs;
-
-/**
- * @param state
- * @returns Size data in TradeInputs
- */
-export const getInputTradeSizeData = (state: RootState) => state.inputs.tradeInputs?.size;
-
-/**
- * @param state
- * @returns AbacusOrderSide in TradeInputs
- */
-export const getTradeSide = (state: RootState) => state.inputs.tradeInputs?.side;
-
-/**
- * @param state
- * @returns TradeInputs options (config for what TradeInputFields to render)
- */
-export const getInputTradeOptions = (state: RootState) => state.inputs.tradeInputs?.options;
-
-/**
- * @returns The selected MarginMode in TradeInputs. 'CROSS' or 'ISOLATED'
- */
-export const getInputTradeMarginMode = (state: RootState) => state.inputs.tradeInputs?.marginMode;
-
-/**
- * @returns The specified targetLeverage for the next placed order
- */
-export const getInputTradeTargetLeverage = (state: RootState) =>
-  state.inputs.tradeInputs?.targetLeverage;
+import { createAppSelector } from './appTypes';
 
 /**
  * @param state
@@ -93,68 +55,6 @@ export const getInputClosePositionData = (state: RootState) => state.inputs.clos
  * @returns TransferInputs
  */
 export const getTransferInputs = (state: RootState) => state.inputs.transferInputs;
-
-/**
- * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
- */
-export const useTradeFormData = () => {
-  const selector = useMemo(
-    () =>
-      createAppSelector(
-        [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
-        (tradeData, tradeOptions, tradeErrors) => {
-          const { price, size, summary } = tradeData ?? {};
-
-          const {
-            needsLimitPrice,
-            needsMarginMode,
-            needsTargetLeverage,
-            needsTrailingPercent,
-            needsTriggerPrice,
-            needsGoodUntil,
-            needsPostOnly,
-            needsReduceOnly,
-            postOnlyTooltip,
-            reduceOnlyTooltip,
-
-            executionOptions,
-            marginModeOptions,
-            timeInForceOptions,
-          } = tradeOptions ?? {};
-
-          return {
-            price,
-            size,
-            summary,
-
-            needsLimitPrice,
-            needsMarginMode,
-            needsTargetLeverage,
-            needsTrailingPercent,
-            needsTriggerPrice,
-            needsGoodUntil,
-            needsPostOnly,
-            needsReduceOnly,
-            postOnlyTooltip,
-            reduceOnlyTooltip,
-
-            executionOptions,
-            marginModeOptions,
-            timeInForceOptions,
-
-            tradeErrors,
-          };
-        }
-      ),
-    []
-  );
-  return useAppSelector(selector, shallowEqual);
-};
-
-/**
- * @returns Tradeform Input states for display. Abacus inputs should track these values.
- */
-export const getTradeFormInputs = (state: RootState) => state.inputs.tradeFormInputs;
 
 /**
  * @returns ClosePositionForm Input states for display

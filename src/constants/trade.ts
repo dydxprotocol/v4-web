@@ -1,6 +1,9 @@
+import { TradeFormType } from '@/bonsai/forms/trade/types';
+
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeUnitShort } from '@/constants/time';
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { ErrorParams } from './errors';
 
@@ -22,7 +25,7 @@ enum ClosingTradeTypes {
   FINAL_SETTLEMENT = 'FINAL_SETTLEMENT',
 }
 
-export type OrderType = TradeTypes | ClosingTradeTypes;
+export type OrderType = ClosingTradeTypes | TradeFormType | IndexerOrderType;
 
 export enum PositionSide {
   None = 'NONE',
@@ -46,41 +49,48 @@ export const ORDER_TYPE_STRINGS: Record<
     descriptionKey: string | null;
   }
 > = {
-  [TradeTypes.LIMIT]: {
+  [TradeFormType.LIMIT]: {
     orderTypeKeyShort: STRING_KEYS.LIMIT_ORDER_SHORT,
     orderTypeKey: STRING_KEYS.LIMIT_ORDER,
     descriptionKey: STRING_KEYS.LIMIT_ORDER_DESCRIPTION,
   },
-  [TradeTypes.MARKET]: {
+  [TradeFormType.MARKET]: {
     orderTypeKeyShort: STRING_KEYS.MARKET_ORDER_SHORT,
     orderTypeKey: STRING_KEYS.MARKET_ORDER,
     descriptionKey: STRING_KEYS.MARKET_ORDER_DESCRIPTION,
   },
-  [TradeTypes.STOP_LIMIT]: {
+  [TradeFormType.STOP_LIMIT]: {
     orderTypeKeyShort: STRING_KEYS.STOP_LIMIT,
     orderTypeKey: STRING_KEYS.STOP_LIMIT,
     descriptionKey: STRING_KEYS.STOP_LIMIT_DESCRIPTION,
   },
-  [TradeTypes.STOP_MARKET]: {
+  [TradeFormType.STOP_MARKET]: {
     orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
     orderTypeKey: STRING_KEYS.STOP_MARKET,
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
-  [TradeTypes.TAKE_PROFIT]: {
+  [TradeFormType.TAKE_PROFIT_LIMIT]: {
     orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
   },
-  [TradeTypes.TAKE_PROFIT_MARKET]: {
+  [TradeFormType.TAKE_PROFIT_MARKET]: {
     orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_MARKET_DESCRIPTION,
   },
-  [TradeTypes.TRAILING_STOP]: {
+
+  [IndexerOrderType.TAKEPROFIT]: {
+    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT,
+    orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
+    descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
+  },
+  [IndexerOrderType.TRAILINGSTOP]: {
     orderTypeKeyShort: STRING_KEYS.TRAILING_STOP,
     orderTypeKey: STRING_KEYS.TRAILING_STOP,
     descriptionKey: STRING_KEYS.TRAILING_STOP_DESCRIPTION,
   },
+
   [ClosingTradeTypes.LIQUIDATED]: {
     orderTypeKeyShort: STRING_KEYS.LIQUIDATED,
     orderTypeKey: STRING_KEYS.LIQUIDATED,

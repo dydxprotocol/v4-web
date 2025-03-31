@@ -90,10 +90,9 @@ export function getTradeFormFieldStates(
     });
   }
 
-  baseResult.type = modifyField(baseResult.type, 'visible');
-
   return calc(() => {
     const result = { ...baseResult };
+    makeVisible(result, ['type']);
     switch (type) {
       case TradeFormType.MARKET:
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
@@ -171,25 +170,7 @@ export function getTradeFormFieldStates(
   });
 }
 
-function modifyField<T>(
-  field: FieldState<T>,
-  state: FieldState<T>['state'],
-  forceValue?: NonNullable<T>
-): FieldState<T> {
-  return {
-    ...field,
-    state,
-    ...(forceValue != null ? { renderedValue: forceValue } : {}),
-  };
-}
-
 function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
   field.state = 'visible-disabled';
-  field.effectiveValue = forceValue;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function forceValueAndHide<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
-  field.state = 'relevant-hidden';
   field.effectiveValue = forceValue;
 }

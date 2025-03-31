@@ -62,7 +62,7 @@ export const tradeFormReducer = createVanillaReducer({
       };
     },
 
-    setMarketId: (state, marketId: string) => {
+    setMarketId: (state, marketId: string | undefined) => {
       // Reset the form when changing market ID
       return getMinimumRequiredFields(state.type, marketId);
     },

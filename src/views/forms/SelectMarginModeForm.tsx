@@ -1,8 +1,7 @@
-import { shallowEqual } from 'react-redux';
+import { MarginMode } from '@/bonsai/forms/trade/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -11,38 +10,34 @@ import { formMixins } from '@/styles/formMixins';
 
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeMarginMode } from '@/state/inputsSelectors';
-
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 export const SelectMarginModeForm = ({
   onChangeMarginMode,
 }: {
   onChangeMarginMode?: () => void;
 }) => {
-  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
-  const marginModeValue = marginMode?.rawValue;
+  const marginMode = useAppSelector(getTradeFormValues).marginMode;
+  const dispatch = useAppDispatch();
 
   const stringGetter = useStringGetter();
 
   const setMarginMode = (value: string) => {
-    abacusStateManager.setTradeValue({
-      value,
-      field: TradeInputField.marginMode,
-    });
+    dispatch(tradeFormActions.setMarginMode(value as MarginMode));
     onChangeMarginMode?.();
   };
 
   return (
     <$Form>
       <$RadioButtonCards
-        value={marginModeValue}
+        value={marginMode}
         onValueChange={setMarginMode}
         radioItems={[
           {
-            value: AbacusMarginMode.Cross.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue]! }),
+            value: MarginMode.CROSS,
+            label: stringGetter({ key: STRING_KEYS.CROSS }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
@@ -50,8 +45,8 @@ export const SelectMarginModeForm = ({
             ),
           },
           {
-            value: AbacusMarginMode.Isolated.rawValue,
-            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue]! }),
+            value: MarginMode.ISOLATED,
+            label: stringGetter({ key: STRING_KEYS.ISOLATED }),
             body: (
               <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}

@@ -40,15 +40,11 @@ import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
-import {
-  CLEARED_CLOSE_POSITION_INPUTS,
-  CLEARED_SIZE_INPUTS,
-  CLEARED_TRADE_INPUTS,
-} from '@/constants/trade';
+import { CLEARED_CLOSE_POSITION_INPUTS } from '@/constants/trade';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import { setClosePositionFormInputs, setTradeFormInputs } from '@/state/inputs';
+import { setClosePositionFormInputs } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { assertNever } from '../assertNever';
@@ -181,8 +177,6 @@ class AbacusStateManager {
     this.setTradeValue({ value: null, field: TradeInputField.triggerPrice });
     this.setTradeValue({ value: null, field: TradeInputField.limitPrice });
 
-    this.store?.dispatch(setTradeFormInputs(CLEARED_TRADE_INPUTS));
-
     if (shouldResetSize) {
       this.clearTradeInputSizeValues();
     }
@@ -195,8 +189,6 @@ class AbacusStateManager {
 
     this.setTradeValue({ value: null, field: TradeInputField.leverage });
     this.setTradeValue({ value: null, field: TradeInputField.targetLeverage });
-
-    this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
   };
 
   clearClosePositionInputValues = ({

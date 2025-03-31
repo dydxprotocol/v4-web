@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
+import { OrderSide } from '@/bonsai/forms/trade/types';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,23 +17,21 @@ import { TagSize } from '@/components/Tag';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData } from '@/state/inputsSelectors';
-
-import { getSelectedOrderSide, getSelectedTradeType } from '@/lib/tradeData';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 export const TradeDialogTrigger = () => {
   const stringGetter = useStringGetter();
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const currentTradeSummary = useAppSelector(getTradeFormSummary);
+  const currentTrade = useAppSelector(getTradeFormValues);
 
-  const { side, type, summary } = currentTradeData ?? {};
-  const { total } = summary ?? {};
-  const selectedTradeType = getSelectedTradeType(type);
-  const selectedOrderSide = getSelectedOrderSide(side);
+  const total = currentTradeSummary.summary.tradeInfo.total;
+  const selectedTradeType = currentTrade.type;
+  const selectedOrderSide = currentTrade.side ?? OrderSide.BUY;
 
-  const hasSummary = !!total;
+  const hasSummary = total != null && total !== 0;
 
   return (
     <TradeDialog

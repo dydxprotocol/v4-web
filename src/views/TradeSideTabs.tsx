@@ -1,10 +1,8 @@
 import React from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -13,12 +11,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Tabs } from '@/components/Tabs';
 
 import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-import { getTradeSide } from '@/state/inputsSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
-import { getSelectedOrderSide } from '@/lib/tradeData';
 
 type ElementProps = {
   sharedContent: React.ReactNode;
@@ -34,8 +31,8 @@ export const TradeSideTabs = ({ sharedContent, className }: ElementProps & Style
   const onboardingState = useAppSelector(getOnboardingState);
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
-  const side = useAppSelector(getTradeSide, shallowEqual);
-  const selectedOrderSide = getSelectedOrderSide(side);
+  const side = useAppSelector(getTradeFormValues).side ?? OrderSide.BUY;
+  const dispatch = useAppDispatch();
 
   const items = [
     { value: OrderSide.BUY, label: stringGetter({ key: STRING_KEYS.BUY_LONG }) },
@@ -47,17 +44,11 @@ export const TradeSideTabs = ({ sharedContent, className }: ElementProps & Style
       className={className}
       fullWidthTabs
       dividerStyle="underline"
-      activeTab={selectedOrderSide}
-      value={selectedOrderSide}
+      activeTab={side}
+      value={side}
       items={items}
       onValueChange={(newSide: OrderSide) => {
-        abacusStateManager.setTradeValue({
-          value:
-            newSide === OrderSide.BUY
-              ? AbacusOrderSide.Buy.rawValue
-              : AbacusOrderSide.Sell.rawValue,
-          field: TradeInputField.side,
-        });
+        dispatch(tradeFormActions.setSide(newSide));
       }}
       disabled={!allowChangingOrderType}
       sharedContent={sharedContent}

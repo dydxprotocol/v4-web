@@ -4,7 +4,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { AbacusInputTypes, Nullable } from '@/constants/abacus';
+import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
@@ -22,8 +22,7 @@ import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { setTradeFormInputs } from '@/state/inputs';
-import { getCurrentInput } from '@/state/inputsSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -118,20 +117,15 @@ export const CanvasOrderbook = forwardRef(
     /**
      * Row action
      */
-    const currentInput = useAppSelector(getCurrentInput);
     const dispatch = useAppDispatch();
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
-        if (currentInput === AbacusInputTypes.Trade && price) {
+        if (price) {
           // avoid scientific notation for when converting small number to string
-          dispatch(
-            setTradeFormInputs({
-              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals),
-            })
-          );
+          dispatch(tradeFormActions.setLimitPrice(MustBigNumber(price).toFixed(tickSizeDecimals)));
         }
       },
-      [dispatch, currentInput, tickSizeDecimals]
+      [dispatch, tickSizeDecimals]
     );
 
     const displayUnit = useAppSelector(getSelectedDisplayUnit);

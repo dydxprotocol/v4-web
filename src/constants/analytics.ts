@@ -1,3 +1,4 @@
+import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
@@ -13,7 +14,6 @@ import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
-import type { TradeTypes } from './trade';
 import { DisplayUnit } from './trade';
 import type { DydxAddress } from './wallets';
 
@@ -246,7 +246,7 @@ export const AnalyticsEvents = unionize(
 
     // Trading
     TradeOrderTypeSelected: ofType<{
-      type: TradeTypes;
+      type: TradeFormType;
     }>(),
     DisplayUnitToggled: ofType<{
       newDisplayUnit: DisplayUnit;

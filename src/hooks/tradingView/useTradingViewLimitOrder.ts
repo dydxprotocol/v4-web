@@ -3,15 +3,13 @@ import { useCallback, useEffect, useRef } from 'react';
 import BigNumber from 'bignumber.js';
 import { ContextMenuItem } from 'public/tradingview/charting_library';
 
-import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
+import { AbacusOrderSide } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { TradeTypes } from '@/constants/trade';
 
 import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setTradeFormInputs } from '@/state/inputs';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
@@ -50,6 +48,7 @@ export function useTradingViewLimitOrder(
       )?.midPrice;
       if (!bookPrice) return [];
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [side, textKey] =
         bookPrice < price
           ? [AbacusOrderSide.Sell, STRING_KEYS.DRAFT_LIMIT_SELL]
@@ -59,11 +58,12 @@ export function useTradingViewLimitOrder(
 
       const onDraftLimitOrder = () => {
         // Allow user to keep their previous size input
-        abacusStateManager.clearTradeInputValues({ shouldResetSize: false });
-        abacusStateManager.setTradeValue({ field: TradeInputField.type, value: TradeTypes.LIMIT });
-        abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side.rawValue });
+        // TODO - this!
+        // abacusStateManager.clearTradeInputValues({ shouldResetSize: false });
+        // abacusStateManager.setTradeValue({ field: TradeInputField.type, value: TradeTypes.LIMIT });
+        // abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side.rawValue });
 
-        dispatch(setTradeFormInputs({ limitPriceInput: formattedPrice }));
+        // dispatch(setTradeFormInputs({ limitPriceInput: formattedPrice }));
 
         track(
           AnalyticsEvents.TradingViewLimitOrderDrafted({
