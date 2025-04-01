@@ -26,8 +26,7 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
   const marginMode = useAppSelector(getTradeFormValues).marginMode ?? MarginMode.CROSS;
   const dispatch = useAppDispatch();
 
-  const needsMarginMode =
-    useAppSelector(getTradeFormSummary).summary.fieldStates.marginMode.state === 'visible';
+  const needsMarginMode = useAppSelector(getTradeFormSummary).summary.options.needsMarginMode;
 
   const setMarginMode = (mode: string) => {
     dispatch(tradeFormActions.setMarginMode(mode as MarginMode));

@@ -23,6 +23,8 @@ export interface InputsState {
   closePositionInputs?: Nullable<ClosePositionInputs>;
   // todo - remove when we can get rid of old deposit/withdraw
   transferInputs?: Nullable<TransferInputs>;
+
+  currentTradePageForm: 'TRADE' | 'CLOSE_POSITION';
 }
 
 const initialState: InputsState = {
@@ -32,6 +34,7 @@ const initialState: InputsState = {
     ...CLEARED_CLOSE_POSITION_INPUTS,
   },
   transferInputs: undefined,
+  currentTradePageForm: 'TRADE',
 };
 
 export const inputsSlice = createSlice({
@@ -58,7 +61,11 @@ export const inputsSlice = createSlice({
     ) => {
       state.closePositionFormInputs = assign({}, state.closePositionFormInputs, action.payload);
     },
+
+    setTradePageForm: (state, action: PayloadAction<'TRADE' | 'CLOSE_POSITION'>) => {
+      state.currentTradePageForm = action.payload;
+    },
   },
 });
 
-export const { setInputs, setClosePositionFormInputs } = inputsSlice.actions;
+export const { setInputs, setClosePositionFormInputs, setTradePageForm } = inputsSlice.actions;

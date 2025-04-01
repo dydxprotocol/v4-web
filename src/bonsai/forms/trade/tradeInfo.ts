@@ -590,7 +590,7 @@ function getSignedLeverageLimits(
 
   const hasPosition = currentPosition != null && !currentPosition.signedSize.isZero();
   const positionLeverageUnsigned = currentPosition?.leverage ?? BIG_NUMBERS.ZERO;
-  const isPositionLong = hasPosition && currentPosition?.signedSize.gt(BIG_NUMBERS.ZERO);
+  const isPositionLong = hasPosition && currentPosition.signedSize.gt(BIG_NUMBERS.ZERO);
   const positionLeverageSigned = positionLeverageUnsigned.times(isPositionLong ? 1 : -1);
 
   const isOrderBuy = sideToUse === OrderSide.BUY;

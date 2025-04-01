@@ -26,6 +26,8 @@ export const getInputErrors = (state: RootState) => state.inputs.inputErrors;
  */
 export const getCurrentInput = (state: RootState) => state.inputs.current;
 
+export const getCurrentTradePageForm = (state: RootState) => state.inputs.currentTradePageForm;
+
 /**
  * @param state
  * @returns input errors for Trade

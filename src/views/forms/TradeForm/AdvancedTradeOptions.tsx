@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -25,48 +24,48 @@ import { InputType } from '@/components/Input';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
-  const currentTradeFormConfig = useAppSelector(getInputTradeOptions, shallowEqual);
-  const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
+  const currentTradeFormConfig = currentTradeFormSummary.options;
+  const inputTradeData = useAppSelector(getTradeFormValues);
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData ?? {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData;
 
   const {
     executionOptions,
-    needsGoodUntil,
-    needsPostOnly,
-    needsReduceOnly,
-    postOnlyTooltip,
-    reduceOnlyTooltip,
     timeInForceOptions,
-  } = currentTradeFormConfig ?? {};
+    needsReduceOnly,
+    needsPostOnly,
+    needsGoodUntil,
+    needsPostOnlyTooltip,
+    needsReduceOnlyTooltip,
+  } = currentTradeFormConfig;
 
   const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = !!needsPostOnly || !!postOnlyTooltip;
-  const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
+  const showPostOnly = needsPostOnly || needsPostOnlyTooltip;
+  const showReduceOnly = needsReduceOnly || needsReduceOnlyTooltip;
 
-  const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
-  const hasTimeInForce = !!timeInForceOptions?.toArray().length;
-  const needsTimeRow = !!needsGoodUntil || hasTimeInForce;
+  const needsExecution = executionOptions.length > 0 || needsPostOnly || needsReduceOnly;
+  const hasTimeInForce = timeInForceOptions.length > 0;
+  const needsTimeRow = needsGoodUntil || hasTimeInForce;
 
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {
-      abacusStateManager.setTradeValue({
-        value: true,
-        field: TradeInputField.reduceOnly,
-      });
+      dispatch(tradeFormActions.setReduceOnly(true));
     }
-  }, [complianceState]);
+  }, [complianceState, dispatch]);
 
   const necessary = needsTimeRow || needsExecution;
   if (!necessary) {
@@ -94,10 +93,10 @@ export const AdvancedTradeOptions = () => {
                 }
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
-                {timeInForceOptions.toArray().map(({ type, stringKey }) => (
+                {timeInForceOptions.map(({ value, stringKey }) => (
                   <$SelectItem
-                    key={type}
-                    value={type}
+                    key={value}
+                    value={value}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
@@ -147,7 +146,7 @@ export const AdvancedTradeOptions = () => {
         )}
         {needsExecution && (
           <>
-            {executionOptions && execution != null && (
+            {executionOptions.length > 0 && execution != null && (
               <$SelectMenu
                 value={execution}
                 label={stringGetter({ key: STRING_KEYS.EXECUTION })}
@@ -158,10 +157,10 @@ export const AdvancedTradeOptions = () => {
                   })
                 }
               >
-                {executionOptions.toArray().map(({ type, stringKey }) => (
+                {executionOptions.map(({ value, stringKey }) => (
                   <$SelectItem
-                    key={type}
-                    value={type}
+                    key={value}
+                    value={value}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
@@ -169,28 +168,13 @@ export const AdvancedTradeOptions = () => {
             )}
             {showReduceOnly && (
               <Checkbox
-                checked={
-                  (!!reduceOnly && !reduceOnlyTooltip) ||
-                  complianceState === ComplianceStates.CLOSE_ONLY ||
-                  false
-                }
-                disabled={!!reduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
-                onCheckedChange={(checked) =>
-                  abacusStateManager.setTradeValue({
-                    value: checked,
-                    field: TradeInputField.reduceOnly,
-                  })
-                }
+                checked={!!reduceOnly}
+                disabled={needsReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
+                onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
                 id="reduce-only"
                 label={
                   <WithTooltip
-                    tooltip={
-                      needsReduceOnly
-                        ? 'reduce-only'
-                        : reduceOnlyTooltip?.titleStringKey.includes('REDUCE_ONLY_EXECUTION_IOC')
-                          ? 'reduce-only-execution-ioc'
-                          : 'reduce-only-timeinforce-ioc'
-                    }
+                    tooltip={needsReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
                     side="right"
                   >
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
@@ -200,14 +184,9 @@ export const AdvancedTradeOptions = () => {
             )}
             {showPostOnly && (
               <Checkbox
-                checked={!!postOnly && !postOnlyTooltip}
-                disabled={!!postOnlyTooltip}
-                onCheckedChange={(checked) =>
-                  abacusStateManager.setTradeValue({
-                    value: checked,
-                    field: TradeInputField.postOnly,
-                  })
-                }
+                checked={!!postOnly}
+                disabled={needsPostOnlyTooltip}
+                onCheckedChange={(checked) => dispatch(tradeFormActions.setPostOnly(checked))}
                 id="post-only"
                 label={
                   <WithTooltip

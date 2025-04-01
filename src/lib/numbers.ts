@@ -37,7 +37,9 @@ export const ToNumber = (amount: string): number => {
 };
 
 // returns undefined if it's not parseable, otherwise a valid bignumber
-export const AttemptBigNumber = (amount: string | undefined | null): BigNumber | undefined => {
+export const AttemptBigNumber = (
+  amount: string | number | undefined | null
+): BigNumber | undefined => {
   if (amount == null) {
     return undefined;
   }
@@ -48,7 +50,7 @@ export const AttemptBigNumber = (amount: string | undefined | null): BigNumber |
   return bn;
 };
 
-export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+export const AttemptNumber = (amount: string | number | undefined | null): number | undefined => {
   return AttemptBigNumber(amount)?.toNumber();
 };
 

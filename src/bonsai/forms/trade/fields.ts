@@ -174,3 +174,11 @@ function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T
   field.state = 'visible-disabled';
   field.effectiveValue = forceValue;
 }
+
+export function isFieldStateVisible<T>(field: FieldState<T>) {
+  return field.state === 'visible' || field.state === 'visible-disabled';
+}
+
+export function isFieldStateEnabled<T>(field: FieldState<T>) {
+  return field.state === 'visible';
+}

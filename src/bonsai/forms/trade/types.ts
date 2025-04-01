@@ -135,7 +135,18 @@ export type TradeFormOptions = {
   executionOptions: SelectionOption<ExecutionType>[];
   timeInForceOptions: SelectionOption<TimeInForce>[];
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
-  showLeverageSlider: boolean;
+
+  needsLeverage: boolean;
+  needsMarginMode: boolean;
+  needsSize: boolean;
+  needsLimitPrice: boolean;
+  needsTargetLeverage: boolean;
+  needsTriggerPrice: boolean;
+  needsGoodUntil: boolean;
+  needsReduceOnly: boolean;
+  needsPostOnly: boolean;
+  needsReduceOnlyTooltip: boolean;
+  needsPostOnlyTooltip: boolean;
 };
 
 export type TradeSizeSummary = {
@@ -158,9 +169,9 @@ export type TradeSummary = {
   payloadPrice: number | undefined;
 
   // minimum is essentially the current position leverage or zero
-  minimumSignedLeverage: number | undefined;
+  minimumSignedLeverage: number;
   // maximum is how far the current order side can push leverage
-  maximumSignedLeverage: number | undefined;
+  maximumSignedLeverage: number;
 
   slippage: number | undefined;
   fee: number | undefined;
@@ -176,9 +187,7 @@ export type TradeSummary = {
 };
 
 export type TradeFormSummary = {
-  fieldStates: TradeFormFieldStates;
   effectiveTrade: TradeForm;
-
   options: TradeFormOptions;
 
   tradeInfo: TradeSummary;

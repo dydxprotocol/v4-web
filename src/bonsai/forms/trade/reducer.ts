@@ -93,6 +93,11 @@ export const tradeFormReducer = createVanillaReducer({
       size: OrderSizeInputs.AVAILABLE_PERCENT({ value }),
     }),
 
+    setSizeLeverageSigned: (state, value: string) => ({
+      ...state,
+      size: OrderSizeInputs.SIGNED_POSITION_LEVERAGE({ value }),
+    }),
+
     // Price related actions
     setLimitPrice: (state, limitPrice: string) => ({
       ...state,

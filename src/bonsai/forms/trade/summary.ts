@@ -19,7 +19,7 @@ import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { AttemptNumber, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
-import { getTradeFormFieldStates } from './fields';
+import { getTradeFormFieldStates, isFieldStateEnabled } from './fields';
 import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
@@ -59,8 +59,6 @@ export function calculateTradeSummary(
       getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
   );
 
-  const options = calculateTradeFormOptions(state.type);
-
   const fieldStates = getTradeFormFieldStates(
     state,
     baseAccount?.position?.marginMode == null
@@ -71,6 +69,8 @@ export function calculateTradeSummary(
     baseAccount?.position?.leverage?.toNumber(),
     baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE
   );
+
+  const options = calculateTradeFormOptions(state.type, fieldStates);
 
   const tradeInfo: TradeSummary = calculateTradeInfo(fieldStates, baseAccount, accountData);
 
@@ -126,7 +126,6 @@ export function calculateTradeSummary(
   const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
 
   return {
-    fieldStates,
     effectiveTrade,
     options,
 
@@ -189,7 +188,10 @@ const memoizedMergeMarkets = weakMapMemoize(
   }
 );
 
-function calculateTradeFormOptions(orderType: TradeFormType | undefined): TradeFormOptions {
+function calculateTradeFormOptions(
+  orderType: TradeFormType | undefined,
+  fields: TradeFormFieldStates
+): TradeFormOptions {
   const executionOptions: SelectionOption<ExecutionType>[] = orderType
     ? matchOrderType(orderType, {
         [TradeFormType.LIMIT]: () => allExecutionOptions,
@@ -207,7 +209,22 @@ function calculateTradeFormOptions(orderType: TradeFormType | undefined): TradeF
     executionOptions,
     timeInForceOptions,
     goodTilUnitOptions,
-    showLeverageSlider: orderType === TradeFormType.MARKET,
+
+    needsLeverage:
+      orderType === TradeFormType.MARKET &&
+      (fields.marginMode.effectiveValue == null ||
+        fields.marginMode.effectiveValue === MarginMode.CROSS),
+
+    needsMarginMode: isFieldStateEnabled(fields.marginMode),
+    needsSize: isFieldStateEnabled(fields.size),
+    needsLimitPrice: isFieldStateEnabled(fields.limitPrice),
+    needsTargetLeverage: isFieldStateEnabled(fields.targetLeverage),
+    needsTriggerPrice: isFieldStateEnabled(fields.triggerPrice),
+    needsGoodUntil: isFieldStateEnabled(fields.goodTil),
+    needsReduceOnly: isFieldStateEnabled(fields.reduceOnly),
+    needsPostOnly: isFieldStateEnabled(fields.postOnly),
+    needsPostOnlyTooltip: fields.postOnly.state === 'visible-disabled',
+    needsReduceOnlyTooltip: fields.reduceOnly.state === 'visible-disabled',
   };
 }
 

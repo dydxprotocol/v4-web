@@ -1,21 +1,17 @@
 import { useState } from 'react';
 
+import { MarginMode, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  AbacusInputTypes,
-  AbacusMarginMode,
-  AbacusPositionSide,
-  type TradeInputSummary,
-} from '@/constants/abacus';
+import { AbacusPositionSide, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
-import { MobilePlaceOrderSteps, TradeTypes } from '@/constants/trade';
+import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -46,7 +42,8 @@ import {
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
+import { getCurrentTradePageForm } from '@/state/inputsSelectors';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
@@ -93,9 +90,9 @@ export const PlaceOrderButtonAndReceipt = ({
   const { complianceState } = useComplianceState();
   const { selectedTradeType } = useTradeTypeOptions();
 
+  const currentForm = useAppSelector(getCurrentTradePageForm);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
-  const currentInput = useAppSelector(getCurrentInput);
 
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
@@ -116,7 +113,8 @@ export const PlaceOrderButtonAndReceipt = ({
     useAppSelector(getCurrentMarketPositionDataForPostTrade, shallowEqual)
   );
 
-  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
+  const tradeValues = useAppSelector(getTradeFormValues);
+  const { marginMode } = tradeValues;
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
@@ -124,8 +122,8 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const closeOnlyTradingUnavailable =
     complianceState === ComplianceStates.CLOSE_ONLY &&
-    selectedTradeType !== TradeTypes.MARKET &&
-    currentInput !== AbacusInputTypes.ClosePosition;
+    selectedTradeType !== TradeFormType.MARKET &&
+    currentForm !== 'CLOSE_POSITION';
 
   const tradingUnavailable =
     closeOnlyTradingUnavailable ||
@@ -133,11 +131,7 @@ export const PlaceOrderButtonAndReceipt = ({
     connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
 
   const shouldEnableTrade =
-    canAccountTrade &&
-    !hasMissingData &&
-    !hasValidationErrors &&
-    currentInput !== AbacusInputTypes.Transfer &&
-    !tradingUnavailable;
+    canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
   const { fee, price: expectedPrice, reward } = summary ?? {};
 
@@ -145,7 +139,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const areInputsFilled = fee != null || reward != null;
 
   const renderMarginValue = () => {
-    if (marginMode === AbacusMarginMode.Cross) {
+    if (marginMode === MarginMode.CROSS) {
       const currentCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.toNumber(),

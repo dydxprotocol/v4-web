@@ -58,6 +58,7 @@ export const getTradeFormSummary = createAppSelector(
   [getCurrentMarketIdIfTradeable, getTradeFormInputData, getTradeFormRawState],
   (marketId, inputData, state) => {
     const summary = TradeFormFns.calculateSummary(state, inputData);
+    console.log(summary);
     return {
       summary,
       errors: TradeFormFns.getErrors(state, inputData, summary),

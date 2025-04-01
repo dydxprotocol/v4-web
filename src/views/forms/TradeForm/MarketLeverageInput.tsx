@@ -1,9 +1,7 @@
-import { BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { minBy } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
@@ -18,18 +16,12 @@ import { PositionSideTag } from '@/components/PositionSideTag';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import {
-  getCurrentMarketPositionData,
-  getCurrentMarketPositionDataForPostTrade,
-} from '@/state/accountSelectors';
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { getTradeFormSummary } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
-import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { clamp } from '@/lib/math';
+import { AttemptBigNumber, AttemptNumber, MustBigNumber } from '@/lib/numbers';
 
 import { LeverageSlider } from './LeverageSlider';
 
@@ -44,77 +36,51 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
-  const { leverage: currentLeverage, signedSize: currentSize } =
+  const { leverage: currentLeverage } =
     useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
-  const { size: postPositionSize, leverage: postPositionLeverage } =
-    useAppSelector(getCurrentMarketPositionDataForPostTrade) ?? {};
-  const { side } = useAppSelector(getInputTradeData, shallowEqual) ?? {};
-  const { maxLeverage } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const { postOrder: postOrderSize } = postPositionSize ?? {};
-  const { postOrder: postOrderLeverage } = postPositionLeverage ?? {};
+  const tradeSummary = useAppSelector(getTradeFormSummary).summary;
+  const leftLeverage = tradeSummary.tradeInfo.minimumSignedLeverage;
+  const rightLeverage = tradeSummary.tradeInfo.maximumSignedLeverage;
 
-  const orderSide = getSelectedOrderSide(side);
-  const { currentPositionSide, newPositionSide } = hasPositionSideChanged({
-    currentSize: currentSize?.toNumber(),
-    postOrderSize,
-  });
+  const minLeverage = Math.min(leftLeverage, rightLeverage);
+  const maxLeverage = Math.max(leftLeverage, rightLeverage);
 
-  const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
-  const maxMarketLeverageBN = preferredIMF
-    ? BIG_NUMBERS.ONE.div(preferredIMF)
-    : MustBigNumber(FALLBACK_MARKET_LEVERAGE);
-  const maxLeverageBN = MustBigNumber(maxLeverage ?? maxMarketLeverageBN).abs();
+  const effectiveLeverageInput = clamp(
+    AttemptBigNumber(leverageInputValue)?.toNumber() ?? 0,
+    minLeverage,
+    maxLeverage
+  );
 
-  const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
+  const onLeverageInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    const numberVal = AttemptNumber(formattedValue);
 
-  const getSignedLeverage = (newLeverage: string | number) => {
-    const newLeverageBN = MustBigNumber(newLeverage);
-    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverageBN)
-      ? maxLeverageBN
-      : newLeverageBN;
-    const newLeverageSignedBN =
-      leveragePosition === PositionSide.Short ||
-      (leveragePosition === PositionSide.None && orderSide === OrderSide.SELL)
-        ? newLeverageBNCapped.abs().negated()
-        : newLeverageBNCapped.abs();
+    if (numberVal == null) {
+      setLeverageInputValue(formattedValue);
+      return;
+    }
 
-    return newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS);
+    const validValues = [];
+
+    if (numberVal >= minLeverage && numberVal <= maxLeverage) {
+      validValues.push(numberVal);
+    }
+    const opposite = -1 * numberVal;
+    if (opposite >= minLeverage && opposite <= maxLeverage) {
+      validValues.push(opposite);
+    }
+    if (validValues.length === 0) {
+      setLeverageInputValue(formattedValue);
+    }
+
+    const minDistanceFromLeft = minBy(validValues, (v) => Math.abs(leftLeverage - v))!;
+    setLeverageInputValue(MustBigNumber(minDistanceFromLeft).toFixed(LEVERAGE_DECIMALS));
   };
 
-  const onLeverageInput = ({
-    floatValue,
-    formattedValue,
-  }: {
-    floatValue?: number;
-    formattedValue: string;
-  }) => {
-    setLeverageInputValue(formattedValue);
-    const newLeverage = MustBigNumber(floatValue).toFixed();
-
-    abacusStateManager.setTradeValue({
-      value:
-        formattedValue === '' || newLeverage === 'NaN' ? null : getSignedLeverage(formattedValue),
-      field: TradeInputField.leverage,
-    });
-  };
-
-  const onLeverageSideToggle = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    if (leveragePosition === PositionSide.None) return;
-
-    const inputValue = leverageInputValue || currentLeverage;
-    const newInputValue = MustBigNumber(inputValue).negated().toFixed(LEVERAGE_DECIMALS);
-
-    setLeverageInputValue(newInputValue);
-    abacusStateManager.setTradeValue({
-      value: newInputValue,
-      field: TradeInputField.leverage,
-    });
+  const onLeverageSideToggle = () => {
+    const flippedValue = effectiveLeverageInput * -1;
+    const clampedValue = clamp(flippedValue, minLeverage, maxLeverage);
+    setLeverageInputValue(AttemptBigNumber(clampedValue)?.toFixed(LEVERAGE_DECIMALS) ?? '');
   };
 
   return (
@@ -126,18 +92,25 @@ export const MarketLeverageInput = ({
             <WithTooltip tooltip="leverage" side="right">
               {stringGetter({ key: STRING_KEYS.LEVERAGE })}
             </WithTooltip>
+            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
             <div onClick={onLeverageSideToggle} tw="cursor-pointer">
-              <PositionSideTag positionSide={leveragePosition} />
+              <PositionSideTag
+                positionSide={
+                  effectiveLeverageInput === 0
+                    ? PositionSide.None
+                    : effectiveLeverageInput > 0
+                      ? PositionSide.Long
+                      : PositionSide.Short
+                }
+              />
             </div>
           </div>
         }
       >
         <LeverageSlider
-          leverage={currentLeverage}
-          leverageInputValue={getSignedLeverage(leverageInputValue)}
-          maxLeverage={maxLeverageBN}
-          orderSide={orderSide}
-          positionSide={currentPositionSide}
+          leftLeverageSigned={leftLeverage}
+          rightLeverageSigned={rightLeverage}
+          leverageInput={leverageInputValue}
           setLeverageInputValue={setLeverageInputValue}
         />
       </$WithLabel>
@@ -146,15 +119,17 @@ export const MarketLeverageInput = ({
           onInput={onLeverageInput}
           placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
           type={InputType.Leverage}
-          value={leverageInputValue ?? ''}
+          value={leverageInputValue}
         />
       </$InnerInputContainer>
     </$InputContainer>
   );
 };
+
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
+  --input-backgroundColor: none;
 
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
 
@@ -170,7 +145,7 @@ const $WithLabel = styled(WithLabel)`
 const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-backgroundColor: var(--color-layer-5);
-  --input-borderColor: var(--color-layer-7);
+  --input-borderColor: none;
   --input-height: 2.25rem;
   --input-width: 5rem;
 

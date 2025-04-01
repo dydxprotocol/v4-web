@@ -1,18 +1,17 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { debounce } from 'lodash';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
-import { DisplayUnit, TradeSizeInput } from '@/constants/trade';
+import { DisplayUnit } from '@/constants/trade';
 
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -29,124 +28,58 @@ import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
-import { setTradeFormInputs } from '@/state/inputs';
-import {
-  getInputTradeOptions,
-  getInputTradeSizeData,
-  getTradeFormInputs,
-} from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { MarketLeverageInput } from './MarketLeverageInput';
 import { TargetLeverageInput } from './TargetLeverageInput';
-import { TradePercentSizeToggle } from './TradePercentSizeToggle';
 
 export const TradeSizeInputs = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
-  const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
-  const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const tradeValues = useAppSelector(getTradeFormValues);
+  const tradeSummary = useAppSelector(getTradeFormSummary).summary;
 
   const { stepSizeDecimals, tickSizeDecimals, assetId, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const {
-    size,
-    usdcSize,
-    leverage,
-    balancePercent,
-    input: lastEditedInput,
-  } = inputTradeSizeData ?? {};
-  const { needsBalancePercent, needsLeverage, needsTargetLeverage } =
-    currentTradeInputOptions ?? {};
+  const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
+
+  const { needsLeverage, needsTargetLeverage } = tradeSummary.options;
+
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
-  const { amountInput, usdAmountInput, leverageInput, balancePercentInput } = useAppSelector(
-    getTradeFormInputs,
-    shallowEqual
-  );
-
-  const isAccountConnected = useAppSelector(getIsAccountConnected);
-
-  useEffect(() => {
-    // reset size inputs since abacus size is not properly synced/edited before account connection
-    abacusStateManager.clearTradeInputSizeValues();
-  }, [isAccountConnected]);
-
-  // Update State variables if their inputs are not being source of calculations
-  // Or if they have been reset to null
-  useEffect(() => {
-    if (lastEditedInput !== TradeSizeInput.Size || size == null) {
-      dispatch(setTradeFormInputs({ amountInput: size ? size.toString() : '' }));
-    }
-    if (lastEditedInput !== TradeSizeInput.Usdc || usdcSize == null) {
-      dispatch(setTradeFormInputs({ usdAmountInput: usdcSize ? usdcSize.toString() : '' }));
-    }
-    if (lastEditedInput !== TradeSizeInput.Leverage || leverage == null) {
-      dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
-    }
-    if (lastEditedInput !== TradeSizeInput.BalancePercent || balancePercent == null) {
-      dispatch(
-        setTradeFormInputs({
-          balancePercentInput: balancePercent ? balancePercent.toString() : '',
-        })
-      );
-    }
-  }, [size, usdcSize, leverage, balancePercent, lastEditedInput, dispatch]);
-
-  const onSizeInput = ({
-    floatValue,
-    formattedValue,
-  }: {
-    floatValue?: number;
-    formattedValue: string;
-  }) => {
-    dispatch(setTradeFormInputs({ amountInput: formattedValue }));
-    const newAmount = MustBigNumber(floatValue).toFixed(decimals);
-
-    abacusStateManager.setTradeValue({
-      value: formattedValue === '' || newAmount === 'NaN' ? null : newAmount,
-      field: TradeInputField.size,
-    });
+  const onSizeInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    dispatch(tradeFormActions.setSizeToken(formattedValue));
   };
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const showUSDInput = displayUnit === DisplayUnit.Fiat;
 
-  const onUSDCInput = ({
-    floatValue,
-    formattedValue,
-  }: {
-    floatValue?: number;
-    formattedValue: string;
-  }) => {
-    dispatch(setTradeFormInputs({ usdAmountInput: formattedValue }));
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
-
-    abacusStateManager.setTradeValue({
-      value: formattedValue === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
-      field: TradeInputField.usdcSize,
-    });
+  const onUSDCInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    dispatch(tradeFormActions.setSizeUsd(formattedValue));
   };
 
-  const dispatchSetDisplayUnit = debounce((newDisplayUnit) => {
-    if (!assetId) return;
-    dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId }));
-  }, NORMAL_DEBOUNCE_MS);
+  const dispatchSetDisplayUnit = useMemo(
+    () =>
+      debounce((newDisplayUnit: DisplayUnit) => {
+        if (!assetId) return;
+        dispatch(setDisplayUnit({ newDisplayUnit, entryPoint: 'tradeAmountInput', assetId }));
+      }, NORMAL_DEBOUNCE_MS),
+    [assetId, dispatch]
+  );
 
   const onUsdcToggle = useCallback(
     (isPressed: boolean) => {
@@ -156,21 +89,20 @@ export const TradeSizeInputs = () => {
     [dispatchSetDisplayUnit]
   );
 
-  useEffect(() => {
-    // when display unit is toggled globally, set the last input to the corresponding unit for calculation
-    abacusStateManager.setTradeValue({
-      field: TradeInputField.lastInput,
-      value: showUSDInput ? TradeInputField.usdcSize.rawValue : TradeInputField.size.rawValue,
-    });
-  }, [showUSDInput]);
-
   const inputToggleButton = () => {
     const conversionText =
-      !showUSDInput && usdAmountInput ? (
-        <$Conversion>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Conversion>
-      ) : showUSDInput && amountInput ? (
+      !showUSDInput && effectiveSizes.usdcSize != null ? (
+        <$Conversion>{`≈ ${formatNumberOutput(effectiveSizes.usdcSize, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Conversion>
+      ) : showUSDInput && effectiveSizes.size != null ? (
         <$Conversion>
-          ≈ {amountInput} {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
+          ≈{' '}
+          {formatNumberOutput(effectiveSizes.size, OutputType.Asset, {
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
+            fractionDigits: decimals,
+          })}{' '}
+          {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
         </$Conversion>
       ) : undefined;
 
@@ -212,13 +144,20 @@ export const TradeSizeInputs = () => {
       onInput: onSizeInput,
       type: InputType.Number,
       tooltipId: 'order-amount',
-      value: amountInput,
+      value:
+        tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
+          ? tradeValues.size.value.value
+          : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
     },
     [DisplayUnit.Fiat]: {
       onInput: onUSDCInput,
       type: InputType.Currency,
       tooltipId: 'order-amount-usd',
-      value: usdAmountInput,
+      value:
+        tradeValues.size != null && OrderSizeInputs.is.USDC_SIZE(tradeValues.size)
+          ? tradeValues.size.value.value
+          : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(tickSizeDecimals ?? USD_DECIMALS) ??
+            '',
     },
   }[displayUnit];
 
@@ -241,7 +180,7 @@ export const TradeSizeInputs = () => {
       }
       slotRight={inputToggleButton()}
       type={inputConfig.type}
-      value={inputConfig.value || ''}
+      value={inputConfig.value ?? ''}
     />
   );
 
@@ -250,22 +189,20 @@ export const TradeSizeInputs = () => {
       {sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
-          leverageInputValue={leverageInput}
+          leverageInputValue={
+            tradeValues.size != null &&
+            OrderSizeInputs.is.SIGNED_POSITION_LEVERAGE(tradeValues.size)
+              ? tradeValues.size.value.value
+              : effectiveSizes.leverageSigned != null
+                ? MustBigNumber(effectiveSizes.leverageSigned).toString(10)
+                : MustBigNumber(tradeSummary.tradeInfo.minimumSignedLeverage).toString(10)
+          }
           setLeverageInputValue={(value: string) =>
-            dispatch(setTradeFormInputs({ leverageInput: value }))
+            dispatch(tradeFormActions.setSizeLeverageSigned(value))
           }
         />
       )}
       {needsTargetLeverage && <TargetLeverageInput />}
-
-      {needsBalancePercent && (
-        <TradePercentSizeToggle
-          balancePercentValue={balancePercentInput}
-          setBalancePercentInputValue={(value: string) =>
-            dispatch(setTradeFormInputs({ balancePercentInput: value }))
-          }
-        />
-      )}
     </div>
   );
 };
