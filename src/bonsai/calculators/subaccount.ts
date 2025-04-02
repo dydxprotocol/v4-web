@@ -70,6 +70,7 @@ export function calculateParentSubaccountSummary(
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,
+    parentSubaccountEquity: parentSummary.equity,
     equity: Object.values(summaries)
       .filter(isPresent)
       .map((s) => s.equity)
@@ -161,6 +162,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
   return {
     freeCollateral,
     equity,
+    parentSubaccountEquity: equity,
     leverage,
     marginUsage,
   };

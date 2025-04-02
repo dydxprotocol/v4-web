@@ -407,7 +407,7 @@ function createMarketOrder(
 
   return mapIfPresent(
     AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
-    baseAccount?.account?.equity.toNumber(),
+    baseAccount?.account?.parentSubaccountEquity.toNumber(),
     baseAccount?.account?.freeCollateral.toNumber(),
     AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
     trade.side,
@@ -486,10 +486,9 @@ function simulateMarketOrder(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (effectiveSizeTarget.type === 'leverage') {
       const targetLeverage = effectiveSizeTarget.target;
-      const denominator =
-        operationMultipler * oraclePrice * (targetLeverage - 1) -
-        targetLeverage * feeRate +
-        targetLeverage * operationMultipler * rowPrice;
+      const aFactor =
+        oraclePrice * operationMultipler - rowPrice * feeRate - rowPrice * operationMultipler;
+      const denominator = targetLeverage * aFactor - operationMultipler * oraclePrice;
       const numerator = thisPositionValue - targetLeverage * equity;
       const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
       sizeToTake = maxSizeAtThisPrice;

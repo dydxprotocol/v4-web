@@ -107,11 +107,9 @@ export const ClosePositionForm = ({
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const {
-    size: sizeData,
-    type,
-    summary,
-  } = orEmptyObj(useAppSelector(getInputClosePositionData, shallowEqual));
+  const { size: sizeData, type } = orEmptyObj(
+    useAppSelector(getInputClosePositionData, shallowEqual)
+  );
 
   const {
     amountInput,
@@ -372,7 +370,7 @@ export const ClosePositionForm = ({
         onClearInputs={onClearInputs}
         actionStringKey={inputAlert?.actionStringKey}
         validationErrorString={alertContent}
-        summary={summary ?? undefined}
+        summary={undefined} // todo
         currentStep={currentStep}
         confirmButtonConfig={{
           stringKey: STRING_KEYS.CLOSE_ORDER,

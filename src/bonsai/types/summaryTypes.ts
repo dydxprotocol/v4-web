@@ -57,6 +57,7 @@ export type SubaccountSummaryCore = {
 
 export type SubaccountSummaryDerived = {
   freeCollateral: BigNumber;
+  parentSubaccountEquity: BigNumber;
   equity: BigNumber;
 
   leverage: BigNumber | null;

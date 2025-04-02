@@ -1,17 +1,16 @@
 import { useState } from 'react';
 
-import { MarginMode, TradeFormType } from '@/bonsai/forms/trade/types';
+import { MarginMode, TradeFormSummary, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusPositionSide, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -36,10 +35,6 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
-import {
-  getCurrentMarketPositionData,
-  getCurrentMarketPositionDataForPostTrade,
-} from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentTradePageForm } from '@/state/inputsSelectors';
@@ -62,7 +57,7 @@ type ConfirmButtonConfig = {
 
 type ElementProps = {
   actionStringKey?: string;
-  summary?: TradeInputSummary;
+  summary?: TradeFormSummary;
   hasInput: boolean;
   hasValidationErrors?: boolean;
   validationErrorString?: string;
@@ -106,12 +101,10 @@ export const PlaceOrderButtonAndReceipt = ({
     leverage,
     notional: notionalTotal,
     adjustedImf,
-    marginValueMaintenance: equity,
-  } = orEmptyObj(useAppSelector(getCurrentMarketPositionData, shallowEqual));
+    marginValueMaintenance,
+  } = orEmptyObj(summary?.positionBefore);
 
-  const postOrderPositionData = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionDataForPostTrade, shallowEqual)
-  );
+  const postOrderPositionData = orEmptyObj(summary?.positionAfter);
 
   const tradeValues = useAppSelector(getTradeFormValues);
   const { marginMode } = tradeValues;
@@ -133,7 +126,9 @@ export const PlaceOrderButtonAndReceipt = ({
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
-  const { fee, price: expectedPrice, reward } = summary ?? {};
+  const { tradeInfo } = summary ?? {};
+  const { fee, inputSummary, reward } = tradeInfo ?? {};
+  const expectedPrice = inputSummary?.averageFillPrice;
 
   // approximation for whether inputs are filled by whether summary has been calculated
   const areInputsFilled = fee != null || reward != null;
@@ -149,8 +144,8 @@ export const PlaceOrderButtonAndReceipt = ({
 
       const postOrderCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
-          notionalTotal: postOrderPositionData.notionalTotal?.postOrder,
-          adjustedImf: postOrderPositionData.adjustedImf?.postOrder,
+          notionalTotal: postOrderPositionData.notional?.toNumber(),
+          adjustedImf: postOrderPositionData.adjustedImf?.toNumber(),
         })
       );
 
@@ -169,11 +164,14 @@ export const PlaceOrderButtonAndReceipt = ({
       <DiffOutput
         useGrouping
         type={OutputType.Fiat}
-        value={equity}
-        newValue={postOrderPositionData.equity?.postOrder}
+        value={marginValueMaintenance}
+        newValue={postOrderPositionData.marginValueMaintenance}
         withDiff={
           areInputsFilled &&
-          getDoubleValuesHasDiff(equity?.toNumber(), postOrderPositionData.equity?.postOrder)
+          getDoubleValuesHasDiff(
+            marginValueMaintenance?.toNumber(),
+            postOrderPositionData.marginValueMaintenance?.toNumber()
+          )
         }
       />
     );
@@ -202,7 +200,7 @@ export const PlaceOrderButtonAndReceipt = ({
         label: (
           <WithTooltip
             tooltip={
-              postOrderPositionData.side?.postOrder === AbacusPositionSide.SHORT
+              postOrderPositionData.side === IndexerPositionSide.SHORT
                 ? 'liquidation-price-short'
                 : 'liquidation-price-long'
             }
@@ -218,12 +216,12 @@ export const PlaceOrderButtonAndReceipt = ({
             type={OutputType.Fiat}
             fractionDigits={tickSizeDecimals}
             value={liquidationPrice}
-            newValue={postOrderPositionData.liquidationPrice?.postOrder}
+            newValue={postOrderPositionData.liquidationPrice}
             withDiff={
               areInputsFilled &&
               getDoubleValuesHasDiff(
                 liquidationPrice?.toNumber(),
-                postOrderPositionData.liquidationPrice?.postOrder
+                postOrderPositionData.liquidationPrice?.toNumber()
               )
             }
           />
@@ -250,12 +248,12 @@ export const PlaceOrderButtonAndReceipt = ({
             useGrouping
             type={OutputType.Multiple}
             value={nullIfZero(leverage?.toNumber())}
-            newValue={postOrderPositionData.leverage?.postOrder}
+            newValue={postOrderPositionData.leverage}
             withDiff={
               areInputsFilled &&
               getDoubleValuesHasDiff(
                 leverage?.toNumber(),
-                postOrderPositionData.leverage?.postOrder
+                postOrderPositionData.leverage?.toNumber()
               )
             }
             showSign={ShowSign.None}

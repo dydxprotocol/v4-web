@@ -9,7 +9,6 @@ import styled, { css } from 'styled-components';
 
 import {
   TradeInputErrorAction,
-  TradeInputField,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
 } from '@/constants/abacus';
@@ -46,7 +45,6 @@ import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormRawState, getTradeFormSummary } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { getTradeInputAlert } from '@/lib/tradeData';
@@ -113,8 +111,8 @@ export const TradeForm = ({
   });
 
   const onTradeTypeChange = (tradeType: TradeFormType) => {
-    abacusStateManager.clearTradeInputValues();
-    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
+    dispatch(tradeFormActions.reset());
+    dispatch(tradeFormActions.setOrderType(tradeType));
   };
 
   const rawInput = useAppSelector(getTradeFormRawState);
@@ -193,7 +191,6 @@ export const TradeForm = ({
     stepSizeDecimals,
     stringGetter,
     tickSizeDecimals,
-    tradeErrors,
   ]);
 
   const orderSideAction = {
@@ -253,7 +250,7 @@ export const TradeForm = ({
       },
     });
 
-    abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
+    dispatch(tradeFormActions.reset());
   };
 
   const tabletActionsRow = isTablet && (
@@ -324,10 +321,10 @@ export const TradeForm = ({
     <PlaceOrderButtonAndReceipt
       hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
-      onClearInputs={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
+      onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={inputAlert?.actionStringKey}
       validationErrorString={shortAlertContent}
-      summary={undefined} // TODODODODODDODODODOD
+      summary={summary}
       currentStep={currentStep}
       showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
       confirmButtonConfig={{
@@ -338,7 +335,7 @@ export const TradeForm = ({
     />
   );
 
-  // prevent real trading if null/zero oracle price or we are out of sync with abacus somehow
+  // prevent real trading if null/zero oracle price or we are out of sync with form state
   if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
     return <LoadingSpace />;
   }
