@@ -197,9 +197,9 @@ export const TradeSizeInputs = () => {
                 ? MustBigNumber(effectiveSizes.leverageSigned).toString(10)
                 : MustBigNumber(tradeSummary.tradeInfo.minimumSignedLeverage).toString(10)
           }
-          setLeverageInputValue={(value: string) =>
-            dispatch(tradeFormActions.setSizeLeverageSigned(value))
-          }
+          setLeverageInputValue={(value: string) => {
+            dispatch(tradeFormActions.setSizeLeverageSigned(value));
+          }}
         />
       )}
       {needsTargetLeverage && <TargetLeverageInput />}

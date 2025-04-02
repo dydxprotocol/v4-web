@@ -47,7 +47,7 @@ export const MarketLeverageInput = ({
   const maxLeverage = Math.max(leftLeverage, rightLeverage);
 
   const effectiveLeverageInput = clamp(
-    AttemptBigNumber(leverageInputValue)?.toNumber() ?? 0,
+    AttemptNumber(leverageInputValue) ?? leftLeverage,
     minLeverage,
     maxLeverage
   );
@@ -71,16 +71,17 @@ export const MarketLeverageInput = ({
     }
     if (validValues.length === 0) {
       setLeverageInputValue(formattedValue);
+      return;
     }
 
     const minDistanceFromLeft = minBy(validValues, (v) => Math.abs(leftLeverage - v))!;
-    setLeverageInputValue(MustBigNumber(minDistanceFromLeft).toFixed(LEVERAGE_DECIMALS));
+    setLeverageInputValue(MustBigNumber(minDistanceFromLeft).toFixed(4));
   };
 
   const onLeverageSideToggle = () => {
     const flippedValue = effectiveLeverageInput * -1;
     const clampedValue = clamp(flippedValue, minLeverage, maxLeverage);
-    setLeverageInputValue(AttemptBigNumber(clampedValue)?.toFixed(LEVERAGE_DECIMALS) ?? '');
+    setLeverageInputValue(AttemptBigNumber(clampedValue)?.toFixed(4) ?? '');
   };
 
   return (
