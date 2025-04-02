@@ -141,6 +141,62 @@ export function calculateTradeSummary(
   };
 }
 
+export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSummary {
+  return {
+    effectiveTrade: {
+      type: TradeFormType.LIMIT,
+      marketId,
+      side: undefined,
+      size: undefined,
+      reduceOnly: undefined,
+      marginMode: undefined,
+      targetLeverage: undefined,
+      limitPrice: undefined,
+      postOnly: undefined,
+      timeInForce: undefined,
+      triggerPrice: undefined,
+      execution: undefined,
+      goodTil: undefined,
+    },
+    options: {
+      orderTypeOptions: [],
+      executionOptions: [],
+      timeInForceOptions: [],
+      goodTilUnitOptions: [],
+      needsLeverage: false,
+      needsMarginMode: false,
+      needsSize: false,
+      needsLimitPrice: false,
+      needsTargetLeverage: false,
+      needsTriggerPrice: false,
+      needsGoodUntil: false,
+      needsReduceOnly: false,
+      needsPostOnly: false,
+      needsReduceOnlyTooltip: false,
+      needsPostOnlyTooltip: false,
+    },
+    tradeInfo: {
+      inputSummary: {
+        size: undefined,
+        averageFillPrice: undefined,
+      },
+      subaccountNumber: 0,
+      transferToSubaccountAmount: 0,
+      payloadPrice: undefined,
+      minimumSignedLeverage: 0,
+      maximumSignedLeverage: 0,
+      slippage: undefined,
+      fee: undefined,
+      total: undefined,
+      reward: undefined,
+      filled: false,
+      isPositionClosed: false,
+      indexSlippage: undefined,
+      feeRate: undefined,
+    },
+  };
+}
+
 const orderTypeOptions: SelectionOption<TradeFormType>[] = [
   { value: TradeFormType.LIMIT, stringKey: 'APP.TRADE.LIMIT_ORDER_SHORT' },
   { value: TradeFormType.MARKET, stringKey: 'APP.TRADE.MARKET_ORDER_SHORT' },

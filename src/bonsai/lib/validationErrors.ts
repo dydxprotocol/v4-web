@@ -101,3 +101,11 @@ export function simpleValidationError({
     },
   };
 }
+
+export function createMinimalError(): ValidationError {
+  return {
+    code: 'ERROR',
+    type: ErrorType.error,
+    resources: {},
+  };
+}

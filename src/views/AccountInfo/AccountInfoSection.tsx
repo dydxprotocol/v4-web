@@ -28,7 +28,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getTradeFormSummary } from '@/state/tradeFormSelectors';
+import { getCurrentSelectedFormSummary } from '@/state/tradeFormSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -69,7 +69,7 @@ export const AccountInfoSection = () => {
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const parentSubaccountAfterOperation = orEmptyObj(
-    useAppSelector(getTradeFormSummary).summary.accountAfter
+    useAppSelector(getCurrentSelectedFormSummary).summary.accountAfter
   );
   const {
     freeCollateral: availableBalancePost,

@@ -15,6 +15,7 @@ import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { appUiConfigsSlice } from './appUiConfigs';
+import { closePositionFormSlice } from './closePositionForm';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
 import { funkitDepositsSlice } from './funkitDeposits';
@@ -46,6 +47,7 @@ const reducers = {
   inputs: inputsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
+  closePositionForm: closePositionFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,

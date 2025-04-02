@@ -1,12 +1,21 @@
+import { getErrorTradeSummary } from '@/bonsai/forms/trade/summary';
 import { TradeFormFns } from '@/bonsai/forms/trade/trade';
-import { TradeFormInputData } from '@/bonsai/forms/trade/types';
+import { OrderSide, TradeFormInputData, TradeFormType } from '@/bonsai/forms/trade/types';
+import { createMinimalError } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { minBy } from 'lodash';
 
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+
+import { assertNever } from '@/lib/assertNever';
 import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { isPresent } from '@/lib/typeUtils';
 
 import { RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketIdIfTradeable } from './currentMarketSelectors';
+
+export const getCurrentlySelectedForm = (state: RootState) => state.inputs.currentTradePageForm;
 
 export const getTradeFormRawState = (state: RootState) => state.tradeForm;
 
@@ -59,8 +68,12 @@ const getTradeFormInputData = createAppSelector(
 export const getTradeFormSummary = createAppSelector(
   [getCurrentMarketIdIfTradeable, getTradeFormInputData, getTradeFormRawState],
   (marketId, inputData, state) => {
+    if (marketId == null || marketId !== state.marketId) {
+      return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
+    }
     const summary = TradeFormFns.calculateSummary(state, inputData);
-    console.log(purgeBigNumbers(summary), purgeBigNumbers(inputData));
+    console.log('trade', purgeBigNumbers(summary), purgeBigNumbers(inputData));
+
     return {
       summary,
       errors: TradeFormFns.getErrors(state, inputData, summary),
@@ -71,4 +84,76 @@ export const getTradeFormSummary = createAppSelector(
 export const getTradeFormValues = createAppSelector(
   [getTradeFormSummary],
   (s) => s.summary.effectiveTrade
+);
+
+export const getClosePositionFormRawState = (state: RootState) => state.closePositionForm;
+
+export const getClosePositionFormSummary = createAppSelector(
+  [getCurrentMarketIdIfTradeable, getTradeFormInputData, getClosePositionFormRawState],
+  (currentMarketId, inputData, state) => {
+    const { size, marketId } = state;
+
+    if (currentMarketId == null || currentMarketId !== marketId) {
+      return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
+    }
+
+    const currentPosition = minBy(
+      Object.values(inputData.rawParentSubaccountData?.childSubaccounts ?? {})
+        .map((a) => a?.openPerpetualPositions[currentMarketId])
+        .filter(isPresent),
+      (a) => a.subaccountNumber
+    );
+
+    if (currentPosition == null) {
+      return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
+    }
+
+    const summary = TradeFormFns.calculateSummary(
+      {
+        type: TradeFormType.MARKET,
+        size,
+        marketId,
+        reduceOnly: true,
+        side: currentPosition.side === IndexerPositionSide.LONG ? OrderSide.SELL : OrderSide.BUY,
+
+        // let these default
+        marginMode: undefined,
+        targetLeverage: undefined,
+        limitPrice: undefined,
+        postOnly: undefined,
+        timeInForce: undefined,
+        triggerPrice: undefined,
+        execution: undefined,
+        goodTil: undefined,
+      },
+      inputData
+    );
+
+    console.log('Close', purgeBigNumbers(summary), purgeBigNumbers(inputData));
+
+    return {
+      summary,
+      errors: TradeFormFns.getErrors(state, inputData, summary),
+    };
+  }
+);
+
+export const getClosePositionFormValues = createAppSelector(
+  [getClosePositionFormSummary],
+  (s) => s.summary.effectiveTrade
+);
+
+export const getCurrentSelectedFormSummary = createAppSelector(
+  [getCurrentlySelectedForm, getClosePositionFormSummary, getTradeFormSummary],
+  (selected, close, trade) => {
+    if (selected === 'TRADE') {
+      return trade;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (selected === 'CLOSE_POSITION') {
+      return close;
+    }
+    assertNever(selected);
+    return trade;
+  }
 );
