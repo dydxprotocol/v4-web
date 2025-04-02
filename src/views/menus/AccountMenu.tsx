@@ -47,6 +47,7 @@ import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
@@ -455,6 +456,7 @@ const AssetActions = memo(
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
   }) => {
+    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const showNewDepositFlow =
       useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
     const showNewWithdrawFlow =
@@ -464,19 +466,22 @@ const AssetActions = memo(
       <div tw="inlineRow">
         {[
           withOnboarding &&
-            complianceState === ComplianceStates.FULL_ACCESS && {
+            complianceState === ComplianceStates.FULL_ACCESS &&
+            !isAccountViewOnly && {
               dialog: showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}),
               iconName: IconName.Deposit,
               tooltipStringKey: STRING_KEYS.DEPOSIT,
             },
           withOnboarding &&
-            hasBalance && {
+            hasBalance &&
+            !isAccountViewOnly && {
               dialog: showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw({}),
               iconName: IconName.Withdraw,
               tooltipStringKey: STRING_KEYS.WITHDRAW,
             },
           hasBalance &&
-            complianceState === ComplianceStates.FULL_ACCESS && {
+            complianceState === ComplianceStates.FULL_ACCESS &&
+            !isAccountViewOnly && {
               dialog: DialogTypes.Transfer({ selectedAsset: asset }),
               iconName: IconName.Send,
               tooltipStringKey: STRING_KEYS.TRANSFER,

@@ -1,5 +1,5 @@
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
-import { RouteResponse } from '@skip-go/client';
+import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { StatsigFlags } from '@/constants/statsig';
@@ -415,7 +415,11 @@ export const AnalyticsEvents = unionize(
         >
       >(),
     DepositSubmitted: ofType<
-      Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
+      Omit<Deposit, 'token'> & {
+        tokenInChainId: string;
+        tokenInDenom: string;
+        userAddresses: UserAddress[];
+      }
     >(),
     DepositFinalized: ofType<
       Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
