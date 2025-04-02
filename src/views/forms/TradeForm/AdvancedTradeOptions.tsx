@@ -59,7 +59,7 @@ export const AdvancedTradeOptions = () => {
 
   const needsExecution = executionOptions.length > 0 || needsPostOnly || needsReduceOnly;
   const hasTimeInForce = timeInForceOptions.length > 0;
-  const needsTimeRow = needsGoodUntil || hasTimeInForce;
+  const needsTimeRow = needsGoodUntil || (hasTimeInForce && timeInForce != null);
 
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {

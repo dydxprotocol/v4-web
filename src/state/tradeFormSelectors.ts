@@ -2,6 +2,8 @@ import { TradeFormFns } from '@/bonsai/forms/trade/trade';
 import { TradeFormInputData } from '@/bonsai/forms/trade/types';
 import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 
+import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+
 import { RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketIdIfTradeable } from './currentMarketSelectors';
@@ -58,7 +60,7 @@ export const getTradeFormSummary = createAppSelector(
   [getCurrentMarketIdIfTradeable, getTradeFormInputData, getTradeFormRawState],
   (marketId, inputData, state) => {
     const summary = TradeFormFns.calculateSummary(state, inputData);
-    console.log(summary);
+    console.log(purgeBigNumbers(summary), purgeBigNumbers(inputData));
     return {
       summary,
       errors: TradeFormFns.getErrors(state, inputData, summary),

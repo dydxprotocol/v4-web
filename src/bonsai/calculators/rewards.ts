@@ -20,7 +20,7 @@ export function calculateRewardsSummary(
       (feeMultiplier) => feeMultiplier / QUANTUM_MULTIPLIER
     ),
     tokenPrice: mapIfPresent(tokenPrice, tokenPriceExponent, (p, exp) =>
-      AttemptNumber(convertAmount(p, exp))
+      AttemptNumber(convertAmount(p, exp * -1))
     ),
   };
 }

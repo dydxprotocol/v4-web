@@ -245,6 +245,8 @@ function applyTradeToSubaccount(
         const remainingSize = MustBigNumber(reductionResult.remainingSize);
         if (reductionResult.isClosed) {
           delete subaccount.openPerpetualPositions[marketId];
+        } else {
+          subaccount.openPerpetualPositions[marketId] = reductionResult.position;
         }
         if (remainingSize.gt(0) && !reduceOnly) {
           subaccount.openPerpetualPositions[marketId] = createNewPositionFromTrade({
@@ -253,9 +255,7 @@ function applyTradeToSubaccount(
           });
           // simple adjustment contains fees and adjustment for new position
           // so we just add the quote adjustment from the reduce
-          finalAmountToAddToQuoteBalance = getSimpleQuoteBalanceAdjustment(tradeProps).plus(
-            quoteAdjustmentForReductionWithoutFees
-          );
+          finalAmountToAddToQuoteBalance = getSimpleQuoteBalanceAdjustment(tradeProps);
         } else {
           // just remove fees
           finalAmountToAddToQuoteBalance = quoteAdjustmentForReductionWithoutFees.minus(

@@ -92,7 +92,9 @@ export function calculateTradeSummary(
 
     const operations = createBatchedOperations(
       ...[
-        operationInformation.transferToIsolatedSubaccountAmount != null
+        operationInformation.transferToIsolatedSubaccountAmount != null &&
+        operationInformation.subaccountNumber !==
+          accountData.rawParentSubaccountData.parentSubaccount
           ? SubaccountOperations.SubaccountTransfer({
               senderSubaccountNumber: accountData.rawParentSubaccountData.parentSubaccount,
               amount: operationInformation.transferToIsolatedSubaccountAmount,

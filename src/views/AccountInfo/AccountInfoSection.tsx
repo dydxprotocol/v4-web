@@ -1,6 +1,5 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
@@ -27,9 +26,9 @@ import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
-import { getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getTradeFormSummary } from '@/state/tradeFormSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -58,7 +57,6 @@ export const AccountInfoSection = () => {
   const { complianceState } = useComplianceState();
   const { dydxAccounts } = useAccounts();
 
-  const subAccountAbacus = orEmptyObj(useAppSelector(getSubaccountForPostOrder, shallowEqual));
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
   const isLoadingData =
@@ -70,15 +68,17 @@ export const AccountInfoSection = () => {
     useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
+  const parentSubaccountAfterOperation = orEmptyObj(
+    useAppSelector(getTradeFormSummary).summary.accountAfter
+  );
   const {
     freeCollateral: availableBalancePost,
     marginUsage: marginUsagePost,
     equity: portfolioValuePost,
-  } = subAccountAbacus;
+  } = parentSubaccountAfterOperation;
 
   const isPostOrderBalanceNegative =
-    isNumber(availableBalancePost?.postOrder) &&
-    MustBigNumber(availableBalancePost.postOrder).lt(0);
+    isNumber(availableBalancePost) && MustBigNumber(availableBalancePost).lt(0);
 
   const withdrawButton = (
     <$Button
@@ -135,12 +135,10 @@ export const AccountInfoSection = () => {
         <AccountInfoDiffOutput
           hasError={false}
           hideDiff
-          isPositive={MustBigNumber(portfolioValuePost?.postOrder).gt(
-            MustBigNumber(portfolioValue)
-          )}
+          isPositive={MustBigNumber(portfolioValuePost).gt(MustBigNumber(portfolioValue))}
           type={OutputType.Fiat}
           value={portfolioValue}
-          valuePost={portfolioValuePost?.postOrder}
+          valuePost={portfolioValuePost?.toNumber()}
         />
       ),
     },
@@ -155,16 +153,14 @@ export const AccountInfoSection = () => {
         <AccountInfoDiffOutput
           hasError={isPostOrderBalanceNegative}
           hideDiff={isPostOrderBalanceNegative}
-          isPositive={MustBigNumber(availableBalancePost?.postOrder).gt(
-            MustBigNumber(availableBalance)
-          )}
+          isPositive={MustBigNumber(availableBalancePost).gt(MustBigNumber(availableBalance))}
           type={OutputType.Fiat}
           value={
-            MustBigNumber(availableBalance).lt(0) && availableBalancePost?.postOrder === null
+            MustBigNumber(availableBalance).lt(0) && availableBalancePost == null
               ? undefined
               : availableBalance
           }
-          valuePost={availableBalancePost?.postOrder}
+          valuePost={availableBalancePost?.toNumber()}
         />
       ),
     },
@@ -178,14 +174,14 @@ export const AccountInfoSection = () => {
       value: (
         <>
           <WithTooltip tooltip="margin-used" side="left">
-            <MarginUsageRing value={getUsageValue(marginUsage, marginUsagePost?.postOrder)} />
+            <MarginUsageRing value={getUsageValue(marginUsage, marginUsagePost?.toNumber())} />
           </WithTooltip>
           <AccountInfoDiffOutput
             hasError={false}
-            isPositive={MustBigNumber(marginUsagePost?.postOrder).gt(MustBigNumber(marginUsage))}
+            isPositive={MustBigNumber(marginUsagePost).gt(MustBigNumber(marginUsage))}
             type={OutputType.Percent}
             value={marginUsage}
-            valuePost={marginUsagePost?.postOrder}
+            valuePost={marginUsagePost?.toNumber()}
           />
         </>
       ),
