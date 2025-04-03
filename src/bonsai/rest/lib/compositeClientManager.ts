@@ -11,7 +11,7 @@ import {
   ValidatorConfig,
 } from '@dydxprotocol/v4-client-js';
 
-import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
+import { AnalyticsUserProperties, DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import {
   DydxChainId,
   DydxNetwork,
@@ -23,6 +23,7 @@ import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
+import { identify } from '@/lib/analytics/analytics';
 import { browserTimeOffsetPromise } from '@/lib/timeOffset';
 
 type CompositeClientWrapper = {
@@ -145,6 +146,7 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
   const validatorUrl = await networkOptimizer.findOptimalNode(validatorEndpoints, chainId);
   const t1 = performance.now();
 
+  identify(AnalyticsUserProperties.BonsaiValidatorUrl(validatorUrl));
   logBonsaiInfo('CompositeClientManager', 'findOptimalNode', {
     validatorUrl,
     validatorList: validatorEndpoints,

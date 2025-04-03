@@ -31,7 +31,11 @@ import {
   type HumanReadableTransferPayload,
   type HumanReadableWithdrawPayload,
 } from '@/constants/abacus';
-import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import {
+  AnalyticsUserProperties,
+  DEFAULT_TRANSACTION_MEMO,
+  TransactionMemo,
+} from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
@@ -39,6 +43,7 @@ import { type RootStore } from '@/state/_store';
 import { setInitializationError } from '@/state/app';
 import { placeOrderTimeout } from '@/state/localOrders';
 
+import { identify } from '../analytics/analytics';
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
 import { log, logInfo } from '../telemetry';
@@ -116,6 +121,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       } = parsedParams;
 
       logInfo('dydxChainTransactions connectNetwork', { parsedParams });
+      identify(AnalyticsUserProperties.AbacusValidatorUrl(validatorUrl));
 
       const compositeClient = await CompositeClient.connect(
         new Network(

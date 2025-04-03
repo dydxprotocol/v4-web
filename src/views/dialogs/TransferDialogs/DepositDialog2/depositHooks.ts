@@ -204,6 +204,7 @@ export function useDepositSteps({
                   ...baseDeposit,
                   tokenInChainId: depositToken.chainId,
                   tokenInDenom: depositToken.denom,
+                  userAddresses,
                 })
               );
               onDeposit({ ...baseDeposit, token: depositToken });
