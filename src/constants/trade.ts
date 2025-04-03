@@ -154,24 +154,6 @@ export enum MobilePlaceOrderSteps {
   PlaceOrderFailed = 'PlaceOrderFailed',
 }
 
-export const CLEARED_TRADE_INPUTS = {
-  limitPriceInput: '',
-  triggerPriceInput: '',
-  trailingPercentInput: '',
-};
-
-export const CLEARED_SIZE_INPUTS = {
-  amountInput: '',
-  usdAmountInput: '',
-  leverageInput: '',
-  targetLeverageInput: '',
-  balancePercentInput: '',
-};
-
-export const CLEARED_CLOSE_POSITION_INPUTS = {
-  limitPriceInput: '',
-};
-
 export enum PlaceOrderStatuses {
   Submitted = 0,
   Placed = 1,

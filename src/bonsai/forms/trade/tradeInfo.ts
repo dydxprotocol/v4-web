@@ -498,7 +498,7 @@ function simulateMarketOrder(
 
     sizeToTake = clampBn(MustBigNumber(sizeToTake), BIG_NUMBERS.ZERO, MustBigNumber(rowSize))
       .div(marketStepSize)
-      .decimalPlaces(0, BigNumber.ROUND_DOWN)
+      .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
       .times(marketStepSize)
       .toNumber();
 

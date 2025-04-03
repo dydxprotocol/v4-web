@@ -1,36 +1,30 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
+import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useDispatch } from 'react-redux';
 
-import { AbacusOrderType, ClosePositionInputField } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { useAppSelector } from '@/state/appTypes';
-import { setClosePositionFormInputs } from '@/state/inputs';
-import { getClosePositionFormInputs, getInputClosePositionData } from '@/state/inputsSelectors';
+import { closePositionFormActions } from '@/state/closePositionForm';
+import {
+  getClosePositionFormSummary,
+  getClosePositionFormValues,
+} from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
+import { calc, mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const useClosePositionFormInputs = () => {
-  const closePositionFormInputValues = useAppSelector(getClosePositionFormInputs, shallowEqual);
-  const { limitPriceInput } = closePositionFormInputValues;
   const dispatch = useDispatch();
 
-  const {
-    size: sizeData,
-    price,
-    type,
-  } = orEmptyObj(useAppSelector(getInputClosePositionData, shallowEqual));
+  const { size, limitPrice } = useAppSelector(getClosePositionFormValues);
+  const { summary } = useAppSelector(getClosePositionFormSummary);
 
-  const useLimit = type === AbacusOrderType.Limit;
-  const { size } = sizeData ?? {};
-  const { limitPrice } = price ?? {};
-
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+  const { tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -39,34 +33,26 @@ export const useClosePositionFormInputs = () => {
     shallowEqual
   )?.toNumber();
 
-  // when useLimit is toggled to true, set limit price input to use the mid price set in abacus
-  useEffect(() => {
-    if (useLimit && limitPrice)
-      dispatch(setClosePositionFormInputs({ limitPriceInput: limitPrice.toString() }));
-  }, [useLimit]);
+  const onAmountInput = useCallback(
+    ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+      dispatch(closePositionFormActions.setSizeToken(formattedValue));
+    },
+    [dispatch]
+  );
 
-  const onAmountInput = ({ floatValue }: { floatValue?: number }) => {
-    const closeAmount = MustBigNumber(floatValue)
-      .abs()
-      .toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
+  const setLimitPrice = useCallback(
+    (value: string) => {
+      dispatch(closePositionFormActions.setLimitPrice(value));
+    },
+    [dispatch]
+  );
 
-    abacusStateManager.setClosePositionValue({
-      value: floatValue ? closeAmount : null,
-      field: ClosePositionInputField.size,
-    });
-  };
-
-  const setLimitPrice = useCallback((value: string) => {
-    dispatch(setClosePositionFormInputs({ limitPriceInput: value }));
-    abacusStateManager.setClosePositionValue({
-      value,
-      field: ClosePositionInputField.limitPrice,
-    });
-  }, []);
-
-  const onLimitPriceInput = ({ value }: NumberFormatValues) => {
-    setLimitPrice(value);
-  };
+  const onLimitPriceInput = useCallback(
+    ({ value }: NumberFormatValues) => {
+      setLimitPrice(value);
+    },
+    [setLimitPrice]
+  );
 
   const setLimitPriceToMidPrice = useCallback(() => {
     if (!midMarketPrice) return;
@@ -76,9 +62,17 @@ export const useClosePositionFormInputs = () => {
     setLimitPrice(midMarketPriceValue);
   }, [midMarketPrice, setLimitPrice, tickSizeDecimals]);
 
+  const amountInput = calc(() => {
+    const calculated = mapIfPresent(summary.tradeInfo.inputSummary.size?.size, (effectiveSize) =>
+      MustBigNumber(effectiveSize).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS)
+    );
+    const input = size != null && OrderSizeInputs.is.SIZE(size) ? size.value.value : undefined;
+    return input ?? calculated ?? '';
+  });
+
   return {
-    amountInput: size,
-    limitPriceInput,
+    amountInput,
+    limitPriceInput: limitPrice,
     onAmountInput,
     onLimitPriceInput,
     setLimitPriceToMidPrice: midMarketPrice ? setLimitPriceToMidPrice : undefined,

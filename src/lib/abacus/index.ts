@@ -40,11 +40,9 @@ import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
-import { CLEARED_CLOSE_POSITION_INPUTS } from '@/constants/trade';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import { setClosePositionFormInputs } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { assertNever } from '../assertNever';
@@ -196,7 +194,6 @@ class AbacusStateManager {
   }: {
     shouldFocusOnTradeInput?: boolean;
   } = {}) => {
-    this.store?.dispatch(setClosePositionFormInputs(CLEARED_CLOSE_POSITION_INPUTS));
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.percent });
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.size });
     this.setClosePositionValue({ value: null, field: ClosePositionInputField.limitPrice });

@@ -1,27 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import assign from 'lodash/assign';
 
 import {
-  type ClosePositionInputs,
   type InputError,
   type Inputs,
   type Nullable,
   type TransferInputs,
 } from '@/constants/abacus';
-import { CLEARED_CLOSE_POSITION_INPUTS } from '@/constants/trade';
 
 import { safeAssign } from '@/lib/objectHelpers';
 
-type ClosePositionFormInputs = typeof CLEARED_CLOSE_POSITION_INPUTS;
-
 export interface InputsState {
+  // remove all these when old withdraw form is gone
   current?: Nullable<string>;
   inputErrors?: Nullable<InputError[]>;
-  // tradeFormInputs: TradeFormInputs;
-  // tradeInputs?: Nullable<TradeInputs>;
-  closePositionFormInputs: ClosePositionFormInputs;
-  closePositionInputs?: Nullable<ClosePositionInputs>;
-  // todo - remove when we can get rid of old deposit/withdraw
   transferInputs?: Nullable<TransferInputs>;
 
   currentTradePageForm: 'TRADE' | 'CLOSE_POSITION';
@@ -30,9 +21,6 @@ export interface InputsState {
 const initialState: InputsState = {
   current: undefined,
   inputErrors: undefined,
-  closePositionFormInputs: {
-    ...CLEARED_CLOSE_POSITION_INPUTS,
-  },
   transferInputs: undefined,
   currentTradePageForm: 'TRADE',
 };
@@ -42,24 +30,16 @@ export const inputsSlice = createSlice({
   initialState,
   reducers: {
     setInputs: (state, action: PayloadAction<Nullable<Inputs>>) => {
-      const { current, errors, closePosition, transfer } = action.payload ?? {};
+      const { current, errors, transfer } = action.payload ?? {};
 
       return {
         ...state,
         current: current?.rawValue,
         inputErrors: errors?.toArray(),
-        closePositionInputs: closePosition,
         transferInputs: safeAssign({}, transfer, {
           isCctp: !!transfer?.isCctp,
         }),
       };
-    },
-
-    setClosePositionFormInputs: (
-      state,
-      action: PayloadAction<Partial<ClosePositionFormInputs>>
-    ) => {
-      state.closePositionFormInputs = assign({}, state.closePositionFormInputs, action.payload);
     },
 
     setTradePageForm: (state, action: PayloadAction<'TRADE' | 'CLOSE_POSITION'>) => {
@@ -68,4 +48,4 @@ export const inputsSlice = createSlice({
   },
 });
 
-export const { setInputs, setClosePositionFormInputs, setTradePageForm } = inputsSlice.actions;
+export const { setInputs, setTradePageForm } = inputsSlice.actions;

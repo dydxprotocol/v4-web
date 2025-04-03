@@ -1,17 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
+import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import {
-  AbacusOrderType,
-  ClosePositionInputField,
-  ErrorType,
-  ValidationError,
-  type HumanReadablePlaceOrderPayload,
-  type Nullable,
-} from '@/constants/abacus';
+import { type HumanReadablePlaceOrderPayload, type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
@@ -50,11 +44,15 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { closePositionFormActions } from '@/state/closePositionForm';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
-import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
+import { setTradePageForm } from '@/state/inputs';
+import {
+  getClosePositionFormSummary,
+  getClosePositionFormValues,
+} from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
@@ -100,39 +98,33 @@ export const ClosePositionForm = ({
 
   const { closePosition } = useSubaccount();
 
-  const market = useAppSelector(getCurrentMarketId);
+  const market = useAppSelector(getCurrentMarketIdIfTradeable);
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
 
   const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const { size: sizeData, type } = orEmptyObj(
-    useAppSelector(getInputClosePositionData, shallowEqual)
-  );
+  const { type } = useAppSelector(getClosePositionFormValues);
+  const summary = useAppSelector(getClosePositionFormSummary);
+  const useLimit = type === TradeFormType.LIMIT;
 
   const {
     amountInput,
-    limitPriceInput,
     onAmountInput,
-    onLimitPriceInput,
     setLimitPriceToMidPrice,
+    limitPriceInput,
+    onLimitPriceInput,
   } = useClosePositionFormInputs();
 
-  const { percent } = sizeData ?? {};
-  const useLimit = type === AbacusOrderType.Limit;
-
-  const closePositionInputErrors = useAppSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const { signedSize: currentPositionSize } = currentPositionData ?? {};
   const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
-  const hasInputErrors = closePositionInputErrors?.some(
-    (error: ValidationError) => error.type !== ErrorType.warning
-  );
+  const hasInputErrors = false; // todo
 
   const inputAlert = getTradeInputAlert({
-    abacusInputErrors: closePositionInputErrors ?? [],
+    abacusInputErrors: [], // todo
     stringGetter,
     stepSizeDecimals,
     tickSizeDecimals,
@@ -158,35 +150,40 @@ export const ClosePositionForm = ({
     alertContentLinkText = inputAlert.linkText;
   }
 
+  // default to market
   useEffect(() => {
+    dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+    dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
+    // todo - do this in a smarter way, maybe remove it from the state
+    dispatch(setTradePageForm('CLOSE_POSITION'));
+  }, [dispatch]);
+
+  useEffect(() => {
+    // todo figure out if this is necessary and if stuff is broken since we now require market matches
     if (currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder) return;
 
-    abacusStateManager.setClosePositionValue({
-      value: market,
-      field: ClosePositionInputField.market,
-    });
-  }, [market, currentStep]);
+    dispatch(closePositionFormActions.setMarketId(market));
+    dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
+  }, [market, currentStep, dispatch]);
 
   const onLastOrderIndexed = useCallback(() => {
     if (!isFirstRender) {
-      abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+      dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+      dispatch(closePositionFormActions.reset());
       onClosePositionSuccess?.();
 
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
         setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
       }
     }
-  }, [currentStep, isFirstRender]);
+  }, [currentStep, dispatch, isFirstRender, onClosePositionSuccess, setCurrentStep]);
 
   const { setUnIndexedClientId } = useOnLastOrderIndexed({
     callback: onLastOrderIndexed,
   });
 
   const onSelectPercentage = (optionVal: string) => {
-    abacusStateManager.setClosePositionValue({
-      value: optionVal,
-      field: ClosePositionInputField.percent,
-    });
+    dispatch(closePositionFormActions.setSizeAvailablePercent(optionVal));
   };
 
   const onSubmit = (e: FormEvent) => {
@@ -233,8 +230,15 @@ export const ClosePositionForm = ({
     onClearInputs();
   };
 
+  const onUseLimitCheckedChange = (checked: boolean) => {
+    dispatch(
+      closePositionFormActions.setOrderType(checked ? TradeFormType.LIMIT : TradeFormType.MARKET)
+    );
+  };
+
   const onClearInputs = () => {
-    abacusStateManager.clearClosePositionInputValues();
+    dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+    dispatch(closePositionFormActions.reset());
   };
 
   const midMarketPriceButton = (
@@ -242,13 +246,6 @@ export const ClosePositionForm = ({
       {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
     </$MidPriceButton>
   );
-
-  const onUseLimitCheckedChange = (checked: boolean) => {
-    abacusStateManager.setClosePositionValue({
-      value: checked,
-      field: ClosePositionInputField.useLimit,
-    });
-  };
 
   const alertMessage = alertContent && (
     <AlertMessage type={alertType}>
@@ -284,9 +281,12 @@ export const ClosePositionForm = ({
       <$ToggleGroup
         items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key === MAX_KEY ? stringGetter({ key: STRING_KEYS.FULL_CLOSE }) : key,
-          value: value.toString(),
+          value: MustBigNumber(value).toFixed(2),
         }))}
-        value={percent?.toString() ?? ''}
+        // todo this is currently broken if limit order
+        value={MustBigNumber(summary.summary.tradeInfo.inputSummary.size?.balancePercent).toFixed(
+          2
+        )}
         onValueChange={onSelectPercentage}
         shape={ButtonShape.Rectangle}
       />
@@ -370,7 +370,7 @@ export const ClosePositionForm = ({
         onClearInputs={onClearInputs}
         actionStringKey={inputAlert?.actionStringKey}
         validationErrorString={alertContent}
-        summary={undefined} // todo
+        summary={summary.summary}
         currentStep={currentStep}
         confirmButtonConfig={{
           stringKey: STRING_KEYS.CLOSE_ORDER,

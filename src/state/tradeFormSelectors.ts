@@ -91,9 +91,14 @@ export const getClosePositionFormRawState = (state: RootState) => state.closePos
 export const getClosePositionFormSummary = createAppSelector(
   [getCurrentMarketIdIfTradeable, getTradeFormInputData, getClosePositionFormRawState],
   (currentMarketId, inputData, state) => {
-    const { size, marketId } = state;
+    const { size, marketId, type } = state;
 
-    if (currentMarketId == null || currentMarketId !== marketId) {
+    if (
+      currentMarketId == null ||
+      currentMarketId !== marketId ||
+      // we only allow limit and market close
+      (type !== TradeFormType.LIMIT && type !== TradeFormType.MARKET)
+    ) {
       return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
     }
 
@@ -110,7 +115,7 @@ export const getClosePositionFormSummary = createAppSelector(
 
     const summary = TradeFormFns.calculateSummary(
       {
-        type: TradeFormType.MARKET,
+        type,
         size,
         marketId,
         reduceOnly: true,
