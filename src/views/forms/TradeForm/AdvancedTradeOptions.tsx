@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
+import { ExecutionType, TimeInForce, TimeUnit } from '@/bonsai/forms/trade/types';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
@@ -27,8 +27,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
-
-import abacusStateManager from '@/lib/abacus';
 
 export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
@@ -86,10 +84,9 @@ export const AdvancedTradeOptions = () => {
               <$SelectMenu
                 value={timeInForce}
                 onValueChange={(selectedTimeInForceOption: string) =>
-                  abacusStateManager.setTradeValue({
-                    value: selectedTimeInForceOption,
-                    field: TradeInputField.timeInForceType,
-                  })
+                  dispatch(
+                    tradeFormActions.setTimeInForce(selectedTimeInForceOption as TimeInForce)
+                  )
                 }
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
@@ -111,10 +108,9 @@ export const AdvancedTradeOptions = () => {
                   key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
                 })}
                 onChange={({ value }: NumberFormatValues) => {
-                  abacusStateManager.setTradeValue({
-                    value: Number(value),
-                    field: TradeInputField.goodTilDuration,
-                  });
+                  dispatch(
+                    tradeFormActions.setGoodTilTime({ duration: value, unit: unit ?? TimeUnit.DAY })
+                  );
                 }}
                 value={duration ?? ''}
                 slotRight={
@@ -122,10 +118,12 @@ export const AdvancedTradeOptions = () => {
                     <$InnerSelectMenu
                       value={unit}
                       onValueChange={(goodTilTimeTimescale: string) => {
-                        abacusStateManager.setTradeValue({
-                          value: goodTilTimeTimescale,
-                          field: TradeInputField.goodTilUnit,
-                        });
+                        dispatch(
+                          tradeFormActions.setGoodTilTime({
+                            duration: duration ?? '',
+                            unit: goodTilTimeTimescale as TimeUnit,
+                          })
+                        );
                       }}
                     >
                       {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
@@ -150,11 +148,8 @@ export const AdvancedTradeOptions = () => {
               <$SelectMenu
                 value={execution}
                 label={stringGetter({ key: STRING_KEYS.EXECUTION })}
-                onValueChange={(selectedTimeInForceOption: string) =>
-                  abacusStateManager.setTradeValue({
-                    value: selectedTimeInForceOption,
-                    field: TradeInputField.execution,
-                  })
+                onValueChange={(selectedExecution: string) =>
+                  dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType))
                 }
               >
                 {executionOptions.map(({ value, stringKey }) => (

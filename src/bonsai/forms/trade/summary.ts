@@ -14,6 +14,8 @@ import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
+import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
+
 import { calc, mapIfPresent } from '@/lib/do';
 import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { AttemptNumber, MustBigNumber } from '@/lib/numbers';
@@ -67,7 +69,8 @@ export function calculateTradeSummary(
         ? MarginMode.CROSS
         : MarginMode.ISOLATED,
     baseAccount?.position?.leverage?.toNumber(),
-    baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE
+    baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE,
+    accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
   );
 
   const options = calculateTradeFormOptions(state.type, fieldStates);

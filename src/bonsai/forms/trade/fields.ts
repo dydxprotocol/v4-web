@@ -29,7 +29,8 @@ export function getTradeFormFieldStates(
   form: TradeForm,
   existingPositionMarginMode: MarginMode | undefined,
   existingPositionLeverage: number | undefined,
-  maxMarketLeverage: number
+  maxMarketLeverage: number,
+  marketIsIsolatedOnly: boolean | undefined
 ): TradeFormFieldStates {
   const { type } = form;
 
@@ -73,7 +74,9 @@ export function getTradeFormFieldStates(
   }
 
   function setMarginMode(result: TradeFormFieldStates): void {
-    if (existingPositionMarginMode != null) {
+    if (marketIsIsolatedOnly) {
+      forceValueAndDisable(result.marginMode, MarginMode.ISOLATED);
+    } else if (existingPositionMarginMode != null) {
       forceValueAndDisable(result.marginMode, existingPositionMarginMode);
     } else {
       makeVisible(result, ['marginMode']);
