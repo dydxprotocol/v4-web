@@ -1,5 +1,5 @@
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
-import { RouteResponse } from '@skip-go/client';
+import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { StatsigFlags } from '@/constants/statsig';
@@ -80,6 +80,10 @@ export const AnalyticsUserProperties = unionize(
 
     // Affiliate
     AffiliateAddress: ofType<string | null>(),
+
+    // validators
+    BonsaiValidatorUrl: ofType<string | null>(),
+    AbacusValidatorUrl: ofType<string | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -99,6 +103,8 @@ export const AnalyticsUserPropertyLoggableTypes = {
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
+  AbacusValidatorUrl: 'abacusValidator',
+  BonsaiValidatorUrl: 'bonsaiValidator',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
@@ -415,7 +421,11 @@ export const AnalyticsEvents = unionize(
         >
       >(),
     DepositSubmitted: ofType<
-      Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
+      Omit<Deposit, 'token'> & {
+        tokenInChainId: string;
+        tokenInDenom: string;
+        userAddresses: UserAddress[];
+      }
     >(),
     DepositFinalized: ofType<
       Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }

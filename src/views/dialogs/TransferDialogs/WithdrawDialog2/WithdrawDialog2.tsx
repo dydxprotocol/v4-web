@@ -41,6 +41,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         : CosmosChainId.Noble
   );
   // prev values
+  const prevDestinationChain = usePrevious(destinationChain);
   const prevDestinationAddress = usePrevious(destinationAddress);
   const previousChainRef = usePrevious(CHAIN_INFO[destinationChain]?.walletNetworkType);
 
@@ -63,53 +64,89 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
 
   useEffect(() => {
     const currentDestinationChainType = CHAIN_INFO[destinationChain]?.walletNetworkType;
+    const maybeSolAddress =
+      sourceAccount.chain === WalletNetworkType.Solana ? sourceAccount.address : undefined;
+    const maybeEvmAddress =
+      sourceAccount.chain === WalletNetworkType.Evm ? sourceAccount.address : undefined;
 
-    // Do not update destination address if chainType goes from EVM -> EVM
-    // Cosmos uses different Bech32Prefixes for different chains, so it is excluded from this check
-    if (
-      currentDestinationChainType === WalletNetworkType.Evm &&
-      previousChainRef === currentDestinationChainType &&
-      prevDestinationAddress !== ''
-    )
-      return;
-
-    setDestinationAddress(() => {
-      if (dydxAddress) {
-        if (destinationChain === CosmosChainId.Neutron) {
-          return convertBech32Address({
-            address: dydxAddress,
-            bech32Prefix: NEUTRON_BECH32_PREFIX,
-          });
+    if (prevDestinationAddress === '') {
+      if (currentDestinationChainType === WalletNetworkType.Solana) {
+        if (maybeSolAddress) {
+          setDestinationAddress(maybeSolAddress);
         }
-
-        if (destinationChain === CosmosChainId.Osmosis) {
-          return convertBech32Address({ address: dydxAddress, bech32Prefix: OSMO_BECH32_PREFIX });
+      } else if (currentDestinationChainType === WalletNetworkType.Evm) {
+        if (maybeEvmAddress) {
+          setDestinationAddress(maybeEvmAddress);
         }
-      }
-
-      if (destinationChain === CosmosChainId.Noble && nobleAddress) {
-        return nobleAddress;
-      }
-
-      if (sourceAccount.address != null) {
-        const { address: sourceWalletAddress } = sourceAccount;
-        if (
-          destinationChain === SOLANA_MAINNET_ID &&
-          sourceAccount.chain === WalletNetworkType.Solana
-        ) {
-          return sourceWalletAddress;
-        }
-
-        if (
-          isEvmDepositChainId(destinationChain) &&
-          sourceAccount.chain === WalletNetworkType.Evm
-        ) {
-          return sourceWalletAddress;
+      } else if (currentDestinationChainType === WalletNetworkType.Cosmos) {
+        if (dydxAddress) {
+          if (destinationChain === CosmosChainId.Neutron) {
+            setDestinationAddress(
+              convertBech32Address({
+                address: dydxAddress,
+                bech32Prefix: NEUTRON_BECH32_PREFIX,
+              })
+            );
+          } else if (destinationChain === CosmosChainId.Osmosis) {
+            setDestinationAddress(
+              convertBech32Address({ address: dydxAddress, bech32Prefix: OSMO_BECH32_PREFIX })
+            );
+          } else if (destinationChain === CosmosChainId.Noble && nobleAddress) {
+            setDestinationAddress(nobleAddress);
+          }
         }
       }
+    } else {
+      if (
+        currentDestinationChainType === WalletNetworkType.Evm &&
+        previousChainRef === currentDestinationChainType
+      ) {
+        return;
+      }
 
-      return '';
-    });
+      if (prevDestinationChain !== destinationChain) {
+        setDestinationAddress(() => {
+          if (dydxAddress) {
+            if (destinationChain === CosmosChainId.Neutron) {
+              return convertBech32Address({
+                address: dydxAddress,
+                bech32Prefix: NEUTRON_BECH32_PREFIX,
+              });
+            }
+
+            if (destinationChain === CosmosChainId.Osmosis) {
+              return convertBech32Address({
+                address: dydxAddress,
+                bech32Prefix: OSMO_BECH32_PREFIX,
+              });
+            }
+          }
+
+          if (destinationChain === CosmosChainId.Noble && nobleAddress) {
+            return nobleAddress;
+          }
+
+          if (sourceAccount.address != null) {
+            const { address: sourceWalletAddress } = sourceAccount;
+            if (
+              destinationChain === SOLANA_MAINNET_ID &&
+              sourceAccount.chain === WalletNetworkType.Solana
+            ) {
+              return sourceWalletAddress;
+            }
+
+            if (
+              isEvmDepositChainId(destinationChain) &&
+              sourceAccount.chain === WalletNetworkType.Evm
+            ) {
+              return sourceWalletAddress;
+            }
+          }
+
+          return '';
+        });
+      }
+    }
   }, [
     destinationChain,
     dydxAddress,
@@ -117,6 +154,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     sourceAccount,
     prevDestinationAddress,
     previousChainRef,
+    prevDestinationChain,
   ]);
 
   const onWithdrawSigned = (withdrawId: string) => {

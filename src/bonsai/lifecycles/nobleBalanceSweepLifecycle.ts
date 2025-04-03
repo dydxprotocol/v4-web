@@ -132,52 +132,53 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           balance,
           balanceToSweep: balanceToSweep.toString(),
         });
+        try {
+          // Simulate transaction to get fee
+          const fee = await nobleSigningClient.simulateTransaction([ibcMsg]);
 
-        // Simulate transaction to get fee
-        const fee = await nobleSigningClient.simulateTransaction([ibcMsg]);
+          const feeAdjustedAmount =
+            parseInt(ibcMsg.value.token.amount, 10) -
+            Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
-        const feeAdjustedAmount =
-          parseInt(ibcMsg.value.token.amount, 10) -
-          Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
+          ibcMsg.value.token.amount = feeAdjustedAmount.toString();
 
-        ibcMsg.value.token.amount = feeAdjustedAmount.toString();
-
-        if (feeAdjustedAmount <= 0) {
-          throw new Error(
-            `fee to ibc send is greater than amount to be transferred. amount: ${parsedMsg.token.amount} fee: ${JSON.stringify(fee)}, feeAdjustedAmount: ${feeAdjustedAmount}`
-          );
-        }
-
-        logBonsaiInfo(
-          'nobleBalanceSweepLifecycle',
-          'send transaction to sweep USDC from Noble to dYdX',
-          {
-            balance,
-            fee,
-            amount: parsedMsg.token.amount,
-            feeAdjustedAmount,
+          if (feeAdjustedAmount <= 0) {
+            throw new Error(
+              `fee to ibc send is greater than amount to be transferred. amount: ${parsedMsg.token.amount} fee: ${JSON.stringify(fee)}, feeAdjustedAmount: ${feeAdjustedAmount}`
+            );
           }
-        );
 
-        await nobleSigningClient.send(
-          [ibcMsg],
-          undefined,
-          `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
-        );
+          logBonsaiInfo(
+            'nobleBalanceSweepLifecycle',
+            'send transaction to sweep USDC from Noble to dYdX',
+            {
+              balance,
+              fee,
+              amount: parsedMsg.token.amount,
+              feeAdjustedAmount,
+            }
+          );
 
-        await sleep(SLEEP_TIME);
+          await nobleSigningClient.send(
+            [ibcMsg],
+            undefined,
+            `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
+          );
+        } finally {
+          await sleep(SLEEP_TIME);
 
-        appQueryClient.invalidateQueries({
-          queryKey: ['validator', 'accountBalances'],
-          exact: false,
-        });
+          appQueryClient.invalidateQueries({
+            queryKey: ['validator', 'accountBalances'],
+            exact: false,
+          });
 
-        appQueryClient.invalidateQueries({
-          queryKey: ['nobleClient', 'nobleBalances'],
-          exact: false,
-        });
+          appQueryClient.invalidateQueries({
+            queryKey: ['nobleClient', 'nobleBalances'],
+            exact: false,
+          });
 
-        await sleep(INVALIDATION_SLEEP_TIME);
+          await sleep(INVALIDATION_SLEEP_TIME);
+        }
       }
 
       // Don't auto-sweep on Cosmos

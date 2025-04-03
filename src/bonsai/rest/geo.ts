@@ -46,6 +46,9 @@ export function setUpGeoQuery(store: RootStore) {
       queryFn: () => fetchGeo(endpoint),
       refetchInterval: timeUnits.minute * 10,
       staleTime: timeUnits.minute * 10,
+      retry: 5,
+      // most failures are rate limiting so we should exponentially backoff
+      retryDelay: (attempt) => timeUnits.second * 3 * 2 ** attempt,
     });
 
     const unsubscribe = observer.subscribe((result) => {

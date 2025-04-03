@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.13.39
     version: 1.13.39
   '@dydxprotocol/v4-client-js':
-    specifier: 1.19.0
-    version: 1.19.0
+    specifier: 1.21.3
+    version: 1.21.3
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.271
     version: 1.1.271
@@ -1951,8 +1951,8 @@ packages:
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.19.0:
-    resolution: {integrity: sha512-BmSv3EE1qtGWVWA8B+RJfVLVKhYRoUWp24pZXbPXCnLp3SWnIWdL/B0V0ZycN8M+UAvxFY0Lk8SVUAq2kj1BKQ==}
+  /@dydxprotocol/v4-client-js@1.21.3:
+    resolution: {integrity: sha512-Pat9omWhz6++4xMrwxzToskk2uOEJdhRnp1dhYB38HHCmZbuP3ZBrs6sGjBudUM7z7KOokwFNCbcsZL+qxq0rw==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4

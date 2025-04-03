@@ -18,7 +18,6 @@ export type AcknowledgeTermsDialogProps = {};
 export type AdjustIsolatedMarginDialogProps = {
   positionId: SubaccountPosition['uniqueId'];
 };
-export type AdjustTargetLeverageDialogProps = {};
 export type ClosePositionDialogProps = {};
 export type CloseAllPositionsConfirmationDialogProps = {};
 export type CancelAllOrdersConfirmationDialogProps = { marketId?: string };
@@ -106,7 +105,6 @@ export const DialogTypes = unionize(
   {
     AcknowledgeTerms: ofType<AcknowledgeTermsDialogProps>(),
     AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
-    AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
     CancelAllOrdersConfirmation: ofType<CancelAllOrdersConfirmationDialogProps>(),
     CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),

@@ -26,6 +26,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { Deposit } from '@/state/transfers';
 
@@ -60,6 +61,7 @@ export const DepositForm = ({
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
   const { data: walletClient } = useWalletClient();
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
@@ -122,7 +124,8 @@ export const DepositForm = ({
     !hasSufficientBalance ||
     !depositRoute ||
     !isDebouncedAmountSame ||
-    !isDepositingMoreThanMin;
+    !isDepositingMoreThanMin ||
+    isAccountViewOnly;
 
   const depositButtonInner = useMemo(() => {
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
