@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef } from 'react';
 
+import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import { ContextMenuItem } from 'public/tradingview/charting_library';
 
-import { AbacusOrderSide } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
 import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
 
-import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 
 import { useStringGetter } from '../useStringGetter';
@@ -37,33 +38,30 @@ export function useTradingViewLimitOrder(
     tickSizeDecimalsRef.current = tickSizeDecimals;
   }, [isUserConnected, marketId, tickSizeDecimals]);
 
+  const bookPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data)?.toNumber();
+
   return useCallback(
     (_: number, price: number) => {
       if (!userConnectedRef.current || price < 0 || !marketIdRef.current) {
         return [];
       }
 
-      const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
-        marketIdRef.current
-      )?.midPrice;
       if (!bookPrice) return [];
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [side, textKey] =
         bookPrice < price
-          ? [AbacusOrderSide.Sell, STRING_KEYS.DRAFT_LIMIT_SELL]
-          : [AbacusOrderSide.Buy, STRING_KEYS.DRAFT_LIMIT_BUY];
+          ? [OrderSide.SELL, STRING_KEYS.DRAFT_LIMIT_SELL]
+          : [OrderSide.BUY, STRING_KEYS.DRAFT_LIMIT_BUY];
 
       const formattedPrice = BigNumber(price).toFixed(tickSizeDecimalsRef.current ?? USD_DECIMALS);
 
       const onDraftLimitOrder = () => {
         // Allow user to keep their previous size input
-        // TODO - this!
-        // abacusStateManager.clearTradeInputValues({ shouldResetSize: false });
-        // abacusStateManager.setTradeValue({ field: TradeInputField.type, value: TradeTypes.LIMIT });
-        // abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side.rawValue });
-
-        // dispatch(setTradeFormInputs({ limitPriceInput: formattedPrice }));
+        dispatch(tradeFormActions.reset(true));
+        dispatch(tradeFormActions.setOrderType(TradeFormType.LIMIT));
+        dispatch(tradeFormActions.setSide(side));
+        dispatch(tradeFormActions.setLimitPrice(formattedPrice));
 
         track(
           AnalyticsEvents.TradingViewLimitOrderDrafted({
@@ -81,6 +79,6 @@ export function useTradingViewLimitOrder(
         },
       ];
     },
-    [dispatch, stringGetter]
+    [bookPrice, dispatch, stringGetter]
   );
 }

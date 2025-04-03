@@ -140,6 +140,12 @@ export const tradeFormReducer = createVanillaReducer({
       targetLeverage,
     }),
 
-    reset: (state) => getMinimumRequiredFields(state.type, state.marketId),
+    reset: (state, keepSize?: boolean) => {
+      if (!keepSize) {
+        return getMinimumRequiredFields(state.type, state.marketId);
+      }
+      const size = state.size;
+      return { ...getMinimumRequiredFields(state.type, state.marketId), size };
+    },
   },
 });
