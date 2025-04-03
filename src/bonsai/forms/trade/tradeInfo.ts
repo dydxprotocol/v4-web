@@ -625,10 +625,7 @@ function calculateEffectiveSizeTarget(
       if (percent == null) {
         return undefined;
       }
-      // we don't support target leverage for isolated positions, makes no sense since we're transferring collateral with trade
-      if (trade.marginMode === MarginMode.ISOLATED) {
-        return undefined;
-      }
+
       const isDecreasingOrFlipping =
         baseAccount?.position != null &&
         ((trade.side === OrderSide.BUY &&
@@ -636,8 +633,7 @@ function calculateEffectiveSizeTarget(
           (trade.side === OrderSide.SELL &&
             baseAccount.position.side === IndexerPositionSide.LONG));
       const isReduceOnly = !!trade.reduceOnly;
-      const parentSubaccountFreeCollateral =
-        baseAccount?.account?.freeCollateral ?? BIG_NUMBERS.ZERO;
+
       if (isReduceOnly && isDecreasingOrFlipping && baseAccount.position != null) {
         const target = baseAccount.position.unsignedSize.times(percent);
         return {
@@ -645,6 +641,12 @@ function calculateEffectiveSizeTarget(
           type: 'size' as const,
         };
       }
+      // we don't support target leverage for isolated positions, makes no sense since we're transferring collateral with trade
+      if (trade.marginMode === MarginMode.ISOLATED) {
+        return undefined;
+      }
+      const parentSubaccountFreeCollateral =
+        baseAccount?.account?.freeCollateral ?? BIG_NUMBERS.ZERO;
       const marketEffectiveImf =
         accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction ?? 1;
       const usdcTarget = parentSubaccountFreeCollateral
