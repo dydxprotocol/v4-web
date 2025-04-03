@@ -17,11 +17,24 @@ export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
   new BigNumber(amount || 0);
 
 // undefined if falsey otherwise a valid bignumber
-export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined =>
-  amount ? MustBigNumber(amount) : undefined;
+export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined => {
+  if (amount == null) {
+    return undefined;
+  }
+  if (amount === '') {
+    return undefined;
+  }
+  if (typeof amount === 'number' && Number.isNaN(amount)) {
+    return undefined;
+  }
+  if (BigNumber.isBigNumber(amount) && !amount.isFinite()) {
+    return undefined;
+  }
+  return MustBigNumber(amount);
+};
 
 export const MaybeNumber = (amount?: BigNumberish | null): number | undefined =>
-  amount ? MustBigNumber(amount).toNumber() : undefined;
+  MaybeBigNumber(amount)?.toNumber();
 
 export const MustNumber = (amount?: BigNumberish | null): number =>
   MustBigNumber(amount).toNumber();

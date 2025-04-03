@@ -30,7 +30,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentSelectedFormSummary } from '@/state/tradeFormSelectors';
 
-import { isNumber, MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -78,7 +78,7 @@ export const AccountInfoSection = () => {
   } = parentSubaccountAfterOperation;
 
   const isPostOrderBalanceNegative =
-    isNumber(availableBalancePost) && MustBigNumber(availableBalancePost).lt(0);
+    availableBalancePost != null && MustBigNumber(availableBalancePost).lt(0);
 
   const withdrawButton = (
     <$Button

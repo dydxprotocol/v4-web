@@ -144,6 +144,7 @@ export const TradeSizeInputs = () => {
       onInput: onSizeInput,
       type: InputType.Number,
       tooltipId: 'order-amount',
+      decimals,
       value:
         tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
           ? tradeValues.size.value.value
@@ -153,18 +154,18 @@ export const TradeSizeInputs = () => {
       onInput: onUSDCInput,
       type: InputType.Currency,
       tooltipId: 'order-amount-usd',
+      decimals: USD_DECIMALS,
       value:
         tradeValues.size != null && OrderSizeInputs.is.USDC_SIZE(tradeValues.size)
           ? tradeValues.size.value.value
-          : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(tickSizeDecimals ?? USD_DECIMALS) ??
-            '',
+          : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? '',
     },
   }[displayUnit];
 
   const sizeInput = (
     <FormInput
       id="trade-amount"
-      decimals={decimals}
+      decimals={inputConfig.decimals}
       onInput={inputConfig.onInput}
       label={
         <>

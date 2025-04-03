@@ -46,6 +46,7 @@ const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
 const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
+const MAX_TARGET_LEVERAGE_BUFFER_PERCENT = 0.98;
 const MAX_LEVERAGE_BUFFER_PERCENT = 0.98;
 const DEFAULT_TARGET_LEVERAGE = 2.0;
 
@@ -608,7 +609,9 @@ function getSignedLeverageLimits(
         return BIG_NUMBERS.ZERO;
       }
       // Not reduceOnly, use standard market limits
-      return isOrderBuy ? marketMaxLeverage : marketMaxLeverage.times(-1);
+      return (isOrderBuy ? marketMaxLeverage : marketMaxLeverage.times(-1)).times(
+        MAX_LEVERAGE_BUFFER_PERCENT
+      );
     }),
   };
 }
@@ -942,7 +945,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
 ): number | undefined {
   const adjustedTargetLeverage = Math.min(
     targetLeverage,
-    maxMarketLeverage * MAX_LEVERAGE_BUFFER_PERCENT
+    maxMarketLeverage * MAX_TARGET_LEVERAGE_BUFFER_PERCENT
   );
 
   if (adjustedTargetLeverage === 0) {
