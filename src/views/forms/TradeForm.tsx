@@ -40,10 +40,13 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
-import { getCurrentTradePageForm } from '@/state/inputsSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import { getTradeFormRawState, getTradeFormSummary } from '@/state/tradeFormSelectors';
+import {
+  getCurrentTradePageForm,
+  getTradeFormRawState,
+  getTradeFormSummary,
+} from '@/state/tradeFormSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';

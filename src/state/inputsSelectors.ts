@@ -12,8 +12,6 @@ import {
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 
-export const getCurrentTradePageForm = (state: RootState) => state.inputs.currentTradePageForm;
-
 /**
  * @param state
  * @returns TransferInputs

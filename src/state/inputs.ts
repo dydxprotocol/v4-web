@@ -14,15 +14,12 @@ export interface InputsState {
   current?: Nullable<string>;
   inputErrors?: Nullable<InputError[]>;
   transferInputs?: Nullable<TransferInputs>;
-
-  currentTradePageForm: 'TRADE' | 'CLOSE_POSITION';
 }
 
 const initialState: InputsState = {
   current: undefined,
   inputErrors: undefined,
   transferInputs: undefined,
-  currentTradePageForm: 'TRADE',
 };
 
 export const inputsSlice = createSlice({
@@ -41,11 +38,7 @@ export const inputsSlice = createSlice({
         }),
       };
     },
-
-    setTradePageForm: (state, action: PayloadAction<'TRADE' | 'CLOSE_POSITION'>) => {
-      state.currentTradePageForm = action.payload;
-    },
   },
 });
 
-export const { setInputs, setTradePageForm } = inputsSlice.actions;
+export const { setInputs } = inputsSlice.actions;

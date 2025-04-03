@@ -37,8 +37,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentTradePageForm } from '@/state/inputsSelectors';
-import { getTradeFormValues } from '@/state/tradeFormSelectors';
+import { getCurrentTradePageForm, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';

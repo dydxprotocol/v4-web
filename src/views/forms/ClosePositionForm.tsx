@@ -47,7 +47,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { closeDialog } from '@/state/dialogs';
-import { setTradePageForm } from '@/state/inputs';
 import {
   getClosePositionFormSummary,
   getClosePositionFormValues,
@@ -154,14 +153,9 @@ export const ClosePositionForm = ({
   useEffect(() => {
     dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
     dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
-    // todo - do this in a smarter way, maybe remove it from the state
-    dispatch(setTradePageForm('CLOSE_POSITION'));
   }, [dispatch]);
 
   useEffect(() => {
-    // todo figure out if this is necessary and if stuff is broken since we now require market matches
-    if (currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder) return;
-
     dispatch(closePositionFormActions.setMarketId(market));
     dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
   }, [market, currentStep, dispatch]);
@@ -170,6 +164,7 @@ export const ClosePositionForm = ({
     if (!isFirstRender) {
       dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
       dispatch(closePositionFormActions.reset());
+      dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
       onClosePositionSuccess?.();
 
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {

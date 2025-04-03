@@ -5,6 +5,7 @@ import { createMinimalError } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { minBy } from 'lodash';
 
+import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
@@ -14,8 +15,7 @@ import { isPresent } from '@/lib/typeUtils';
 import { RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketIdIfTradeable } from './currentMarketSelectors';
-
-export const getCurrentlySelectedForm = (state: RootState) => state.inputs.currentTradePageForm;
+import { getActiveDialog, getActiveTradeBoxDialog } from './dialogsSelectors';
 
 export const getTradeFormRawState = (state: RootState) => state.tradeForm;
 
@@ -148,8 +148,21 @@ export const getClosePositionFormValues = createAppSelector(
   (s) => s.summary.effectiveTrade
 );
 
+export const getCurrentTradePageForm = createAppSelector(
+  [getActiveDialog, getActiveTradeBoxDialog],
+  (dialog, tradeDialog) => {
+    if (dialog != null && DialogTypes.is.ClosePosition(dialog)) {
+      return 'CLOSE_POSITION';
+    }
+    if (tradeDialog != null && TradeBoxDialogTypes.is.ClosePosition(tradeDialog)) {
+      return 'CLOSE_POSITION';
+    }
+    return 'TRADE';
+  }
+);
+
 export const getCurrentSelectedFormSummary = createAppSelector(
-  [getCurrentlySelectedForm, getClosePositionFormSummary, getTradeFormSummary],
+  [getCurrentTradePageForm, getClosePositionFormSummary, getTradeFormSummary],
   (selected, close, trade) => {
     if (selected === 'TRADE') {
       return trade;

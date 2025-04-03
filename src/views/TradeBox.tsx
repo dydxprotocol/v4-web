@@ -9,7 +9,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
-import { SelectMarginModeForm } from '@/views/forms/SelectMarginModeForm';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
@@ -30,12 +29,6 @@ export const TradeBox = () => {
     TradeBoxDialogTypes.match<{ title: string; content: JSX.Element; onClose?(): void }>(
       activeDialog,
       {
-        SelectMarginMode: () => ({
-          title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-          content: (
-            <SelectMarginModeForm onChangeMarginMode={() => dispatch(closeDialogInTradeBox())} />
-          ),
-        }),
         ClosePosition: () => ({
           title: stringGetter({ key: STRING_KEYS.CLOSE_POSITION }),
           content: (

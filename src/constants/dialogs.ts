@@ -163,7 +163,6 @@ export type SelectMarginModeFormProps = {};
 export const TradeBoxDialogTypes = unionize(
   {
     ClosePosition: ofType<ClosePositionFormProps>(),
-    SelectMarginMode: ofType<SelectMarginModeFormProps>(),
   },
   { tag: 'type' as const, value: 'props' as const }
 );
