@@ -25,6 +25,7 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
     () =>
       signTypedDataAsync({
         ...signTypedData,
+        // @ts-ignore
         domain: {
           ...signTypedData.domain,
           chainId,
