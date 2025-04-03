@@ -82,7 +82,7 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         value: Tab.Details,
       },
     ];
-  }, [launchableMarketId, selectedLocale, stringGetter]);
+  }, [dispatch, launchableMarketId, selectedLocale, stringGetter]);
 
   return (
     <Tabs

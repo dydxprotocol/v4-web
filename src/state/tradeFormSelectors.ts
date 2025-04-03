@@ -72,6 +72,7 @@ export const getTradeFormSummary = createAppSelector(
       return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
     }
     const summary = TradeFormFns.calculateSummary(state, inputData);
+    // eslint-disable-next-line no-console
     console.log('trade', purgeBigNumbers(summary), purgeBigNumbers(inputData));
 
     return {
@@ -134,6 +135,7 @@ export const getClosePositionFormSummary = createAppSelector(
       inputData
     );
 
+    // eslint-disable-next-line no-console
     console.log('Close', purgeBigNumbers(summary), purgeBigNumbers(inputData));
 
     return {
