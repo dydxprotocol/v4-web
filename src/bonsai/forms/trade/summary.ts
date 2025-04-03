@@ -119,11 +119,12 @@ export function calculateTradeSummary(
     return mapIfPresent(
       accountData.rawParentSubaccountData,
       rawMarkets,
-      (rawParentSubaccountData, markets) =>
+      state.marketId,
+      (rawParentSubaccountData, markets, stateMarketId) =>
         getRelevantAccountDetails(
           applyOperationsToSubaccount(rawParentSubaccountData, operations),
           markets,
-          positionIdToUse
+          getPositionUniqueId(stateMarketId, tradeInfo.subaccountNumber)
         )
     );
   });
