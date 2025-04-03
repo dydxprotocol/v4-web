@@ -3,35 +3,21 @@ import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   AbacusStateNotificationProtocol,
-  AdjustIsolatedMarginInputFields,
-  ClosePositionInputFields,
-  HistoricalPnlPeriods,
-  HistoricalTradingRewardsPeriod,
-  HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
   HumanReadableCloseAllPositionsPayload,
   HumanReadablePlaceOrderPayload,
-  HumanReadableSubaccountTransferPayload,
   Nullable,
-  OrderbookGroupings,
   ParsingError,
-  TradeInputFields,
   TransferInputFields,
-  TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
   AbacusHelper,
   AbacusWalletConnectionType,
-  AdjustIsolatedMarginInputField,
-  ApiData,
   AsyncAbacusStateManager,
-  ClosePositionInputField,
   CoroutineTimer,
-  HistoricalPnlPeriod,
   IOImplementations,
   StatsigConfig,
-  TradeInputField,
   TransferInputField,
   TransferType,
   UIImplementations,
@@ -169,57 +155,11 @@ class AbacusStateManager {
     }
   };
 
-  // ------ Input Values ------ //
-  clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
-    this.setTradeValue({ value: null, field: TradeInputField.trailingPercent });
-    this.setTradeValue({ value: null, field: TradeInputField.triggerPrice });
-    this.setTradeValue({ value: null, field: TradeInputField.limitPrice });
-
-    if (shouldResetSize) {
-      this.clearTradeInputSizeValues();
-    }
-  };
-
-  clearTradeInputSizeValues = () => {
-    this.setTradeValue({ value: null, field: TradeInputField.size });
-    this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
-    this.setTradeValue({ value: null, field: TradeInputField.balancePercent });
-
-    this.setTradeValue({ value: null, field: TradeInputField.leverage });
-    this.setTradeValue({ value: null, field: TradeInputField.targetLeverage });
-  };
-
-  clearClosePositionInputValues = ({
-    shouldFocusOnTradeInput,
-  }: {
-    shouldFocusOnTradeInput?: boolean;
-  } = {}) => {
-    this.setClosePositionValue({ value: null, field: ClosePositionInputField.percent });
-    this.setClosePositionValue({ value: null, field: ClosePositionInputField.size });
-    this.setClosePositionValue({ value: null, field: ClosePositionInputField.limitPrice });
-    this.setClosePositionValue({ value: false, field: ClosePositionInputField.useLimit });
-
-    if (shouldFocusOnTradeInput) {
-      this.clearTradeInputValues({ shouldResetSize: true });
-    }
-  };
-
   clearTransferInputValues = () => {
     this.setTransferValue({ value: null, field: TransferInputField.address });
     this.setTransferValue({ value: null, field: TransferInputField.size });
     this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
     this.setTransferValue({ value: null, field: TransferInputField.MEMO });
-  };
-
-  clearAdjustIsolatedMarginInputValues = () => {
-    this.setAdjustIsolatedMarginValue({
-      value: null,
-      field: AdjustIsolatedMarginInputField.Amount,
-    });
-    this.setAdjustIsolatedMarginValue({
-      value: null,
-      field: AdjustIsolatedMarginInputField.AmountPercent,
-    });
   };
 
   resetInputState = () => {
@@ -228,8 +168,6 @@ class AbacusStateManager {
       field: TransferInputField.type,
       value: null,
     });
-    this.clearAdjustIsolatedMarginInputValues();
-    this.clearTradeInputValues({ shouldResetSize: true });
   };
 
   // ------ Set Data ------ //
@@ -268,32 +206,11 @@ class AbacusStateManager {
 
   setMarket = (marketId: string) => {
     this.currentMarket = marketId;
-    this.clearTradeInputValues({ shouldResetSize: true });
     this.stateManager.market = marketId;
   };
 
   setSelectedGasDenom = (denom: SelectedGasDenom) => {
     this.chainTransactions.setSelectedGasDenom(denom);
-  };
-
-  setTradeValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: Nullable<TradeInputFields>;
-  }) => {
-    this.stateManager.trade(abacusValueToString(value), field);
-  };
-
-  setAdjustIsolatedMarginValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: AdjustIsolatedMarginInputFields;
-  }) => {
-    this.stateManager.adjustIsolatedMargin(abacusValueToString(value), field);
   };
 
   setTransferValue = ({
@@ -306,47 +223,12 @@ class AbacusStateManager {
     this.stateManager.transfer(abacusValueToString(value), field);
   };
 
-  setTriggerOrdersValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: TriggerOrdersInputFields;
-  }) => {
-    this.stateManager.triggerOrders(abacusValueToString(value), field);
-  };
-
-  setHistoricalPnlPeriod = (
-    period: (typeof HistoricalPnlPeriod)[keyof typeof HistoricalPnlPeriod]
-  ) => {
-    this.stateManager.historicalPnlPeriod = period;
-  };
-
-  setHistoricalTradingRewardPeriod = (
-    period: (typeof HistoricalTradingRewardsPeriod)[keyof typeof HistoricalTradingRewardsPeriod]
-  ) => {
-    this.stateManager.historicalTradingRewardPeriod = period;
-  };
-
-  refreshHistoricalTradingRewards = () =>
-    this.stateManager.refresh(ApiData.HISTORICAL_TRADING_REWARDS);
-
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;
 
     if (this.currentMarket) {
       this.setMarket(this.currentMarket);
     }
-  };
-
-  setClosePositionValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: ClosePositionInputFields;
-  }) => {
-    this.stateManager.closePosition(abacusValueToString(value), field);
   };
 
   setLocaleSeparators = ({ group, decimal }: LocaleSeparators) => {
@@ -404,44 +286,11 @@ class AbacusStateManager {
       ?.payloads.toArray()
       .map((p) => p.orderId) ?? [];
 
-  adjustIsolatedMarginOfPosition = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: Nullable<HumanReadableSubaccountTransferPayload>
-    ) => void
-  ): Nullable<HumanReadableSubaccountTransferPayload> =>
-    this.stateManager.commitAdjustIsolatedMargin(callback);
-
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
 
   // ------ Utils ------ //
-  getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
-    this.stateManager.historicalPnlPeriod;
-
-  getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
-    this.stateManager.historicalTradingRewardPeriod;
-
-  modifyOrderbookLevel = (grouping: OrderbookGroupings) => {
-    this.stateManager.orderbookGrouping = grouping;
-  };
-
-  handleCandlesSubscription = ({
-    channelId,
-    subscribe,
-  }: {
-    channelId: string;
-    subscribe: boolean;
-  }) => {
-    this.websocket.handleCandlesSubscription({ channelId, subscribe });
-  };
-
-  sendSocketRequest = (requestText: string) => {
-    this.websocket.send(requestText);
-  };
-
   getChainById = (chainId: string) => {
     return this.stateManager.getChainById(chainId);
   };

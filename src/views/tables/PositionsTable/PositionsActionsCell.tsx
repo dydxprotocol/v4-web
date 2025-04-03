@@ -17,11 +17,10 @@ import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-
-import abacusStateManager from '@/lib/abacus';
 
 type ElementProps = {
   marketId: string;
@@ -64,7 +63,7 @@ export const PositionsActionsCell = ({
     );
 
     if (!isPressed) {
-      abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+      dispatch(closePositionFormActions.reset());
     }
   };
 

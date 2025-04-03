@@ -11,10 +11,9 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-
-import abacusStateManager from '@/lib/abacus';
 
 import { TradeBoxOrderView } from './TradeBoxOrderView';
 
@@ -35,7 +34,7 @@ export const TradeBox = () => {
             <ClosePositionForm onClosePositionSuccess={() => dispatch(closeDialogInTradeBox())} />
           ),
           onClose: () => {
-            abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+            dispatch(closePositionFormActions.reset());
           },
         }),
       }

@@ -26,10 +26,10 @@ import {
   getCurrentMarketPositionDataForPostTrade,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS, isNumber, MustBigNumber } from '@/lib/numbers';
 import { hasPositionSideChanged } from '@/lib/tradeData';
@@ -325,8 +325,9 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
                 : closeDialogInTradeBox()
             );
 
-            if (!isPressed)
-              abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+            if (!isPressed) {
+              dispatch(closePositionFormActions.reset());
+            }
           }}
         >
           {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}

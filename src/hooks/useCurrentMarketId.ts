@@ -155,7 +155,6 @@ export const useCurrentMarketId = () => {
           abacusStateManager.setMarket(DEFAULT_MARKETID);
         }
       }
-      abacusStateManager.setTradeValue({ value: null, field: null });
     }
 
     if (isViewingUnlaunchedMarket) {
