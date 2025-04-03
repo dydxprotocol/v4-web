@@ -80,6 +80,10 @@ export const AnalyticsUserProperties = unionize(
 
     // Affiliate
     AffiliateAddress: ofType<string | null>(),
+
+    // validators
+    BonsaiValidatorUrl: ofType<string | null>(),
+    AbacusValidatorUrl: ofType<string | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -99,6 +103,8 @@ export const AnalyticsUserPropertyLoggableTypes = {
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
+  AbacusValidatorUrl: 'abacusValidator',
+  BonsaiValidatorUrl: 'bonsaiValidator',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
