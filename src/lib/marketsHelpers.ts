@@ -10,6 +10,8 @@ import {
 import { BIG_NUMBERS, MustBigNumber } from './numbers';
 import { safeAssign } from './objectHelpers';
 
+export const FALLBACK_MARKET_LEVERAGE = 5;
+
 export function calculateMarketMaxLeverage({
   effectiveInitialMarginFraction,
   initialMarginFraction,
@@ -22,7 +24,7 @@ export function calculateMarketMaxLeverage({
     return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
   }
 
-  return 10; // default
+  return FALLBACK_MARKET_LEVERAGE; // default
 }
 
 export function getMarketDataFromPerpetualMarketSummary(

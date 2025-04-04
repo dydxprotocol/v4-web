@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -14,10 +13,11 @@ import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
 import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
 
-import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber } from '@/lib/numbers';
 
 enum Tab {
   Price = 'Price',
@@ -29,6 +29,7 @@ enum Tab {
 export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
+  const dispatch = useAppDispatch();
 
   const [value, setValue] = useState(Tab.Price);
 
@@ -59,15 +60,9 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         content: (
           <DepthChart
             onChartClick={({ side, price, size }) => {
-              abacusStateManager.setTradeValue({ field: TradeInputField.side, value: side });
-              abacusStateManager.setTradeValue({
-                field: TradeInputField.limitPrice,
-                value: price,
-              });
-              abacusStateManager.setTradeValue({
-                field: TradeInputField.size,
-                value: size,
-              });
+              dispatch(tradeFormActions.setLimitPrice(MustBigNumber(price).toString(10)));
+              dispatch(tradeFormActions.setSide(side));
+              dispatch(tradeFormActions.setSizeToken(MustBigNumber(size).toString(10)));
             }}
             stringGetter={stringGetter}
             selectedLocale={selectedLocale}
@@ -87,7 +82,7 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         value: Tab.Details,
       },
     ];
-  }, [launchableMarketId, selectedLocale, stringGetter]);
+  }, [dispatch, launchableMarketId, selectedLocale, stringGetter]);
 
   return (
     <Tabs

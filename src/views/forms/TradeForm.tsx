@@ -1,17 +1,14 @@
-import { useCallback, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
-  AbacusInputTypes,
-  ErrorType,
   TradeInputErrorAction,
-  TradeInputField,
-  ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
 } from '@/constants/abacus';
@@ -20,7 +17,7 @@ import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -41,20 +38,19 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import {
-  getCurrentInput,
-  getInputTradeData,
-  getTradeFormInputs,
-  useTradeFormData,
-} from '@/state/inputsSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
+import {
+  getCurrentTradePageForm,
+  getTradeFormRawState,
+  getTradeFormSummary,
+} from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
-import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
+import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -92,42 +88,51 @@ export const TradeForm = ({
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
 
-  const { price, size, summary, tradeErrors } = useTradeFormData();
+  const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
 
-  const currentInput = useAppSelector(getCurrentInput);
+  const currentInput = useAppSelector(getCurrentTradePageForm);
   const { tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
-  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
+  const dispatch = useAppDispatch();
 
-  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
+  useEffect(() => {
+    dispatch(tradeFormActions.setMarketId(currentMarketId));
+  }, [currentMarketId, dispatch]);
 
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const tradeFormInputValues = summary.effectiveTrade;
 
-  const { marketId, side } = currentTradeData ?? {};
-
-  const selectedOrderSide = getSelectedOrderSide(side);
+  const { marketId, side } = tradeFormInputValues;
+  const selectedOrderSide = side ?? OrderSide.BUY;
 
   const { selectedTradeType, tradeTypeItems: allTradeTypeItems } = useTradeTypeOptions({
     showAll: true,
     showAssetIcon: true,
   });
 
-  const onTradeTypeChange = (tradeType: TradeTypes) => {
-    abacusStateManager.clearTradeInputValues();
-    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
+  const onTradeTypeChange = (tradeType: TradeFormType) => {
+    dispatch(tradeFormActions.reset());
+    dispatch(tradeFormActions.setOrderType(tradeType));
   };
 
+  const rawInput = useAppSelector(getTradeFormRawState);
   const isInputFilled =
-    Object.values(tradeFormInputValues).some((val) => val !== '') ||
-    Object.values(price ?? {}).some((val) => !!val) ||
-    [size?.size, size?.usdcSize, size?.leverage].some((val) => val != null);
+    [
+      rawInput.triggerPrice,
+      rawInput.limitPrice,
+      rawInput.targetLeverage,
+      rawInput.reduceOnly,
+      rawInput.goodTil,
+      rawInput.execution,
+      rawInput.postOnly,
+      rawInput.timeInForce,
+    ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
 
   const hasInputErrors =
-    !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
-    currentInput !== AbacusInputTypes.Trade;
+    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
 
   const { getNotificationPreferenceForType } = useNotifications();
 
@@ -145,7 +150,7 @@ export const TradeForm = ({
     let alertContentLinkText;
 
     const inputAlertInner = getTradeInputAlert({
-      abacusInputErrors: tradeErrors ?? [],
+      abacusInputErrors: [], // TODO
       stringGetter,
       stepSizeDecimals,
       tickSizeDecimals,
@@ -189,7 +194,6 @@ export const TradeForm = ({
     stepSizeDecimals,
     stringGetter,
     tickSizeDecimals,
-    tradeErrors,
   ]);
 
   const orderSideAction = {
@@ -249,7 +253,7 @@ export const TradeForm = ({
       },
     });
 
-    abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
+    dispatch(tradeFormActions.reset());
   };
 
   const tabletActionsRow = isTablet && (
@@ -293,7 +297,7 @@ export const TradeForm = ({
                 action={ButtonAction.Navigation}
                 size={ButtonSize.XSmall}
                 iconSize="1.25em"
-                onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+                onClick={() => onTradeTypeChange(TradeFormType.LIMIT)}
               />
             )}
           </div>
@@ -320,10 +324,10 @@ export const TradeForm = ({
     <PlaceOrderButtonAndReceipt
       hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
-      onClearInputs={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
+      onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={inputAlert?.actionStringKey}
       validationErrorString={shortAlertContent}
-      summary={summary ?? undefined}
+      summary={summary}
       currentStep={currentStep}
       showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
       confirmButtonConfig={{
@@ -334,7 +338,7 @@ export const TradeForm = ({
     />
   );
 
-  // prevent real trading if null/zero oracle price or we are out of sync with abacus somehow
+  // prevent real trading if null/zero oracle price or we are out of sync with form state
   if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
     return <LoadingSpace />;
   }
@@ -346,7 +350,8 @@ export const TradeForm = ({
           <PositionPreview />
           {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
         </>
-      ) : currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
+      ) : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
         <TradeSideTabs
           tw="overflow-visible"
           sharedContent={

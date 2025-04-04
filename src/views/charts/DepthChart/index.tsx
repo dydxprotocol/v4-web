@@ -200,7 +200,7 @@ export const DepthChart = ({
           nice: true,
           zero: true,
           // Add 5% top "padding"
-          domain: [range[0], lerp(1.05, ...range)],
+          domain: [0, lerp(1.05, ...range)],
         }}
       >
         <EventEmitterProvider>

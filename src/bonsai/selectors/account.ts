@@ -6,7 +6,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 
@@ -72,6 +72,11 @@ export const selectRelevantMarketsData = createAppSelector(
   }
 );
 
+export const selectCurrentMarketInfoRaw = createAppSelector(
+  [selectRawMarketsData, getCurrentMarketIdIfTradeable],
+  (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
+);
+
 export const selectParentSubaccountSummary = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData],
   (parentSubaccount, markets) => {
@@ -128,13 +133,13 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
 });
 
 export const selectCurrentMarketOpenOrders = createAppSelector(
-  [getCurrentMarketId, selectOpenOrders],
+  [getCurrentMarketIdIfTradeable, selectOpenOrders],
   (currentMarketId, orders) =>
     !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
 );
 
 export const selectCurrentMarketOrderHistory = createAppSelector(
-  [getCurrentMarketId, selectOrderHistory],
+  [getCurrentMarketIdIfTradeable, selectOrderHistory],
   (currentMarketId, orders) =>
     !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
 );
@@ -179,7 +184,7 @@ export const selectAccountFills = createAppSelector(
 );
 
 export const getCurrentMarketAccountFills = createAppSelector(
-  [getCurrentMarketId, selectAccountFills],
+  [getCurrentMarketIdIfTradeable, selectAccountFills],
   (currentMarketId, fills) =>
     !currentMarketId ? EMPTY_ARR : fills.filter((f) => f.market === currentMarketId)
 );

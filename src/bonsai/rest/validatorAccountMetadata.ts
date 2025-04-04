@@ -1,7 +1,13 @@
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
-import { setAccountBalancesRaw, setAccountFeeTierRaw, setAccountStatsRaw } from '@/state/raw';
+import {
+  setAccountBalancesRaw,
+  setAccountFeeTierRaw,
+  setAccountStatsRaw,
+  setRewardsParams,
+  setRewardsTokenPrice,
+} from '@/state/raw';
 
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 
@@ -87,5 +93,56 @@ export function setUpAccountFeeTierQuery(store: RootStore) {
   return () => {
     cleanupEffect();
     store.dispatch(setAccountFeeTierRaw(loadableIdle()));
+  };
+}
+
+export function setUpRewardsParamsQuery(store: RootStore) {
+  const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    selector: () => true,
+    getQueryKey: () => ['rewardsParams'],
+    getQueryFn: (compositeClient) => {
+      return () => compositeClient.validatorClient.get.getRewardsParams();
+    },
+    onResult: (result) => {
+      store.dispatch(
+        setRewardsParams(
+          mapLoadableData(queryResultToLoadable(result), (d) => parseToPrimitives(d).params)
+        )
+      );
+    },
+    onNoQuery: () => store.dispatch(setRewardsParams(loadableIdle())),
+    refetchInterval: timeUnits.hour,
+    staleTime: timeUnits.hour,
+  });
+  return () => {
+    cleanupEffect();
+    store.dispatch(setRewardsParams(loadableIdle()));
+  };
+}
+
+export function setUpRewardsTokenPriceQuery(store: RootStore) {
+  const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    selector: (state) => state.raw.rewards.data.data?.marketId,
+    getQueryKey: (market) => ['rewardsParamsTokenPrice', market],
+    getQueryFn: (compositeClient, market) => {
+      if (market == null) {
+        return null;
+      }
+      return () => compositeClient.validatorClient.get.getPrice(market);
+    },
+    onResult: (result) => {
+      store.dispatch(
+        setRewardsTokenPrice(
+          mapLoadableData(queryResultToLoadable(result), (d) => parseToPrimitives(d).marketPrice)
+        )
+      );
+    },
+    onNoQuery: () => store.dispatch(setRewardsTokenPrice(loadableIdle())),
+    refetchInterval: timeUnits.hour,
+    staleTime: timeUnits.hour,
+  });
+  return () => {
+    cleanupEffect();
+    store.dispatch(setRewardsTokenPrice(loadableIdle()));
   };
 }
