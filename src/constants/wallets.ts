@@ -164,7 +164,6 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     primaryType: 'dYdX',
     domain: {
       name: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataDomainName,
-      verifyingContract: '',
     },
     types: {
       dYdX: [{ name: 'action', type: 'string' }],
