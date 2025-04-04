@@ -22,12 +22,12 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
   const { signTypedDataAsync } = useSignTypedData();
 
   const signEvmMessage = useCallback(
-    () =>
+    (isMetaMask: boolean) =>
       signTypedDataAsync({
         ...signTypedData,
-        // @ts-ignore
         domain: {
           ...signTypedData.domain,
+          ...(isMetaMask ? ({ verifyingContract: '' } as {}) : {}),
           chainId,
         },
       }),
@@ -46,8 +46,12 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
     if (wallet?.connectorType === ConnectorType.PhantomSolana) {
       return signSolanaMessage();
     }
-    return signEvmMessage();
-  }, [signEvmMessage, signSolanaMessage, wallet?.connectorType]);
+
+    const isMetaMask =
+      wallet?.connectorType === ConnectorType.Injected && wallet.name === 'MetaMask';
+
+    return signEvmMessage(isMetaMask);
+  }, [signEvmMessage, signSolanaMessage, wallet?.connectorType, wallet?.name]);
 
   return signMessage;
 }
