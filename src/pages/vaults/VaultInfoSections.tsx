@@ -179,8 +179,7 @@ export const VaultHeader = ({ className }: { className?: string }) => {
     {
       key: '30d-apr',
       label: stringGetter({ key: STRING_KEYS.EST_APR_PLAIN }),
-      // tooltip: 'vault-apr' as const
-      // TODO: add ninety day apr tooltip
+      tooltip: 'vault-apr-90d' as const,
       value: <MegaVaultYieldOutput yieldType="ninetyDay" />,
     },
     {
