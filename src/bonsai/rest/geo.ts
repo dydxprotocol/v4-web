@@ -12,26 +12,21 @@ import { setComplianceGeoRaw } from '@/state/raw';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
-import { logBonsaiError } from '../logs';
+import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
-  try {
-    const response = await fetch(url);
+  const response = await fetch(url);
 
-    if (!response.ok) {
-      return { data: undefined };
-    }
-
-    const payload = await response.json();
-
-    const country = payload?.geo?.country;
-
-    return { data: typeof country === 'string' ? country : undefined };
-  } catch (error) {
-    logBonsaiError('Geo', 'Error fetching geo data:', { error });
-    throw error;
+  if (!response.ok) {
+    return { data: undefined };
   }
+
+  const payload = await response.json();
+
+  const country = payload?.geo?.country;
+
+  return { data: typeof country === 'string' ? country : undefined };
 }
 
 export function setUpGeoQuery(store: RootStore) {
@@ -43,7 +38,7 @@ export function setUpGeoQuery(store: RootStore) {
   return createStoreEffect(store, geoEndpoint, (endpoint) => {
     const observer = new QueryObserver(appQueryClient, {
       queryKey: ['geo', endpoint],
-      queryFn: () => fetchGeo(endpoint),
+      queryFn: wrapAndLogBonsaiError(() => fetchGeo(endpoint), 'geo'),
       refetchInterval: timeUnits.minute * 10,
       staleTime: timeUnits.minute * 10,
       retry: 5,
