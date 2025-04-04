@@ -51,7 +51,7 @@ export const TradeSizeInputs = () => {
   const tradeValues = useAppSelector(getTradeFormValues);
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
 
-  const { stepSizeDecimals, tickSizeDecimals, assetId, displayableAsset } = orEmptyObj(
+  const { stepSizeDecimals, assetId, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
