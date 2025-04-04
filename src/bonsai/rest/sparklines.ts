@@ -13,6 +13,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpSparklinesQuery(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'sparklines',
     selector: selectParentSubaccountInfo,
     getQueryKey: () => ['market', 'sparklines'],
     getQueryFn: (indexerClient) => {
