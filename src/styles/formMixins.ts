@@ -91,8 +91,8 @@ export const formMixins = {
 
   inputInnerSelectMenu: css`
     --trigger-textColor: var(--color-text-1);
-    --trigger-backgroundColor: var(--color-layer-5);
-    --trigger-open-backgroundColor: var(--color-layer-5);
+    --trigger-backgroundColor: var(--color-layer-6);
+    --trigger-open-backgroundColor: var(--color-layer-6);
     --trigger-border: none;
     --trigger-padding: 0 0.33rem;
     --trigger-height: 1.875rem;
