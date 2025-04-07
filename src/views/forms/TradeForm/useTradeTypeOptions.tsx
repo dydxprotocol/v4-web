@@ -55,7 +55,10 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
               selectedTradeType === TradeFormType.TAKE_PROFIT_LIMIT ||
               selectedTradeType === TradeFormType.TAKE_PROFIT_MARKET
                 ? stringGetter({ key: STRING_KEYS.TAKE_PROFIT })
-                : stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
+                : selectedTradeType === TradeFormType.STOP_LIMIT ||
+                    selectedTradeType === TradeFormType.STOP_MARKET
+                  ? stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT })
+                  : stringGetter({ key: STRING_KEYS.ADVANCED }),
             value: '' as TradeFormType,
             subitems: allTradeTypeItems.slice(2),
           }
