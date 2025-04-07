@@ -74,7 +74,7 @@ export function calculateTradeInfo(
     switch (trade.type) {
       case TradeFormType.MARKET:
         return calc((): TradeSummary => {
-          const calculated = calculateMarketOrder(trade, baseAccount, accountData);
+          const calculated = calculateMarketOrder(trade, baseAccount, accountData, subaccountToUse);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
 
           return {
@@ -143,7 +143,7 @@ export function calculateTradeInfo(
       case TradeFormType.STOP_MARKET:
       case TradeFormType.TAKE_PROFIT_MARKET:
         return calc((): TradeSummary => {
-          const calculated = calculateMarketOrder(trade, baseAccount, accountData);
+          const calculated = calculateMarketOrder(trade, baseAccount, accountData, subaccountToUse);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
 
           const slippageFromMidPrice = calculateMarketOrderSlippage(
@@ -348,12 +348,13 @@ interface OrderbookUsage {
 function calculateMarketOrder(
   trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
-  accountData: TradeFormInputData
+  accountData: TradeFormInputData,
+  subaccountNumber: number
 ): {
   marketOrder: TradeInputMarketOrder | undefined;
   summary: TradeInputSummary | undefined;
 } {
-  const marketOrder = createMarketOrder(trade, baseAccount, accountData);
+  const marketOrder = createMarketOrder(trade, baseAccount, accountData, subaccountNumber);
 
   return {
     marketOrder,
@@ -377,7 +378,8 @@ type SizeTarget = {
 function createMarketOrder(
   trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
-  accountData: TradeFormInputData
+  accountData: TradeFormInputData,
+  subaccountNumber: number
 ): TradeInputMarketOrder | undefined {
   const orderbookBase = accountData.currentTradeMarketOrderbook;
   const orderbook =
@@ -408,7 +410,10 @@ function createMarketOrder(
 
   return mapIfPresent(
     AttemptNumber(accountData.currentTradeMarketSummary?.oraclePrice),
-    baseAccount?.account?.parentSubaccountEquity.toNumber(),
+    mapIfPresent(
+      baseAccount?.subaccountSummaries,
+      (summaries) => summaries[subaccountNumber]?.equity.toNumber() ?? 0
+    ),
     baseAccount?.account?.freeCollateral.toNumber(),
     AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
     trade.side,
@@ -432,7 +437,7 @@ function simulateMarketOrder(
   orderbook: CanvasOrderbookLine[],
   feeRate: number,
   oraclePrice: number,
-  crossAccountEquity: number,
+  subaccountEquity: number,
   crossAccountFreeCollateral: number,
   marketStepSize: number,
   side: OrderSide,
@@ -444,7 +449,7 @@ function simulateMarketOrder(
   let totalCostWithoutFees = 0;
   let totalCost = 0;
   let thisPositionValue = existingPosition == null ? 0 : existingPosition.value.toNumber();
-  let equity = crossAccountEquity;
+  let equity = subaccountEquity;
   const orderbookRows: OrderbookUsage[] = [];
   let filled = false;
 
@@ -530,6 +535,7 @@ function simulateMarketOrder(
     size: totalSize,
     usdcSize: totalCostWithoutFees,
 
+    // todo this isn't quite right, doesn't take into account increase->decrease trades (side swap)
     balancePercent: totalCost / crossAccountFreeCollateral,
     totalFees: totalCost - totalCostWithoutFees,
     leverageSigned:
@@ -689,7 +695,7 @@ function calculateEffectiveSizeTarget(
         return undefined;
       }
       // we don't support target leverage for isolated positions, makes no sense since we're transferring collateral with trade
-      if (trade.marginMode === MarginMode.ISOLATED) {
+      if (trade.marginMode === MarginMode.ISOLATED && !trade.reduceOnly) {
         return undefined;
       }
       const signedLimits = getSignedLeverageLimits(

@@ -169,7 +169,8 @@ export const PlaceOrderButtonAndReceipt = ({
           areInputsFilled &&
           getDoubleValuesHasDiff(
             marginValueMaintenance?.toNumber(),
-            postOrderPositionData.marginValueMaintenance?.toNumber()
+            postOrderPositionData.marginValueMaintenance?.toNumber() ??
+              (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }
       />
@@ -220,7 +221,8 @@ export const PlaceOrderButtonAndReceipt = ({
               areInputsFilled &&
               getDoubleValuesHasDiff(
                 liquidationPrice?.toNumber(),
-                postOrderPositionData.liquidationPrice?.toNumber()
+                postOrderPositionData.liquidationPrice?.toNumber() ??
+                  (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
               )
             }
           />
@@ -246,13 +248,14 @@ export const PlaceOrderButtonAndReceipt = ({
           <DiffOutput
             useGrouping
             type={OutputType.Multiple}
-            value={nullIfZero(leverage?.toNumber())}
+            value={leverage?.toNumber()}
             newValue={postOrderPositionData.leverage}
             withDiff={
               areInputsFilled &&
               getDoubleValuesHasDiff(
                 leverage?.toNumber(),
-                postOrderPositionData.leverage?.toNumber()
+                postOrderPositionData.leverage?.toNumber() ??
+                  (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
               )
             }
             showSign={ShowSign.None}

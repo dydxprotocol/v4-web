@@ -190,6 +190,8 @@ export const TradeSizeInputs = () => {
       {sizeInput}
       {needsLeverage && (
         <MarketLeverageInput
+          leftLeverage={tradeSummary.tradeInfo.minimumSignedLeverage}
+          rightLeverage={tradeSummary.tradeInfo.maximumSignedLeverage}
           leverageInputValue={
             tradeValues.size != null &&
             OrderSizeInputs.is.SIGNED_POSITION_LEVERAGE(tradeValues.size)

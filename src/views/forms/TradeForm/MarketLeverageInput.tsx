@@ -18,7 +18,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getTradeFormSummary } from '@/state/tradeFormSelectors';
 
 import { clamp } from '@/lib/math';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber } from '@/lib/numbers';
@@ -28,20 +27,20 @@ import { LeverageSlider } from './LeverageSlider';
 type ElementProps = {
   leverageInputValue: string;
   setLeverageInputValue: (value: string) => void;
+  leftLeverage: number;
+  rightLeverage: number;
 };
 
 export const MarketLeverageInput = ({
   leverageInputValue,
   setLeverageInputValue,
+  leftLeverage,
+  rightLeverage,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const { leverage: currentLeverage } =
     useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
-
-  const tradeSummary = useAppSelector(getTradeFormSummary).summary;
-  const leftLeverage = tradeSummary.tradeInfo.minimumSignedLeverage;
-  const rightLeverage = tradeSummary.tradeInfo.maximumSignedLeverage;
 
   const minLeverage = Math.min(leftLeverage, rightLeverage);
   const maxLeverage = Math.max(leftLeverage, rightLeverage);

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
-import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { type HumanReadablePlaceOrderPayload, type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -53,12 +53,12 @@ import {
 } from '@/state/tradeFormSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { objectEntries } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
+import { MarketLeverageInput } from './TradeForm/MarketLeverageInput';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
 const MAX_KEY = 'MAX';
@@ -104,9 +104,11 @@ export const ClosePositionForm = ({
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const { type } = useAppSelector(getClosePositionFormValues);
+  const tradeValues = useAppSelector(getClosePositionFormValues);
+  const { type } = tradeValues;
   const summary = useAppSelector(getClosePositionFormSummary);
   const useLimit = type === TradeFormType.LIMIT;
+  const effectiveSizes = summary.summary.tradeInfo.inputSummary.size;
 
   const {
     amountInput,
@@ -273,17 +275,19 @@ export const ClosePositionForm = ({
         tw="w-full"
       />
 
-      <$ToggleGroup
-        items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
-          label: key === MAX_KEY ? stringGetter({ key: STRING_KEYS.FULL_CLOSE }) : key,
-          value: MustBigNumber(value).toFixed(2),
-        }))}
-        // todo this is currently broken if limit order
-        value={MustBigNumber(summary.summary.tradeInfo.inputSummary.size?.balancePercent).toFixed(
-          2
-        )}
-        onValueChange={onSelectPercentage}
-        shape={ButtonShape.Rectangle}
+      <MarketLeverageInput
+        leftLeverage={summary.summary.tradeInfo.minimumSignedLeverage}
+        rightLeverage={summary.summary.tradeInfo.maximumSignedLeverage}
+        leverageInputValue={
+          tradeValues.size != null && OrderSizeInputs.is.SIGNED_POSITION_LEVERAGE(tradeValues.size)
+            ? tradeValues.size.value.value
+            : effectiveSizes?.leverageSigned != null
+              ? MustBigNumber(effectiveSizes.leverageSigned).toString(10)
+              : MustBigNumber(summary.summary.tradeInfo.minimumSignedLeverage).toString(10)
+        }
+        setLeverageInputValue={(value: string) => {
+          dispatch(closePositionFormActions.setSizeLeverageSigned(value));
+        }}
       />
 
       {(enableLimitClose || testFlags.showLimitClose) && (
