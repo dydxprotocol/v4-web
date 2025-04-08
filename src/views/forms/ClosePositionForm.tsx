@@ -38,7 +38,6 @@ import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
-import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
@@ -60,16 +59,6 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { MarketLeverageInput } from './TradeForm/MarketLeverageInput';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
-
-const MAX_KEY = 'MAX';
-
-const SIZE_PERCENT_OPTIONS = {
-  '10%': 0.1,
-  '25%': 0.25,
-  '50%': 0.5,
-  '75%': 0.75,
-  [MAX_KEY]: 1,
-};
 
 type ElementProps = {
   onClosePositionSuccess?: () => void;
@@ -178,10 +167,6 @@ export const ClosePositionForm = ({
   const { setUnIndexedClientId } = useOnLastOrderIndexed({
     callback: onLastOrderIndexed,
   });
-
-  const onSelectPercentage = (optionVal: string) => {
-    dispatch(closePositionFormActions.setSizeAvailablePercent(optionVal));
-  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -365,7 +350,7 @@ export const ClosePositionForm = ({
 
       <PlaceOrderButtonAndReceipt
         hasValidationErrors={hasInputErrors}
-        hasInput={amountInput != null}
+        hasInput={!!amountInput}
         onClearInputs={onClearInputs}
         actionStringKey={inputAlert?.actionStringKey}
         validationErrorString={alertContent}
@@ -470,15 +455,6 @@ const $Right = styled.div`
   padding-top: var(--dialog-content-paddingTop);
   padding-bottom: var(--form-rowGap);
   gap: 1rem;
-`;
-const $ToggleGroup = styled(ToggleGroup)`
-  ${formMixins.inputToggleGroup}
-
-  @media ${breakpoints.mobile} {
-    > :last-child {
-      flex-basis: 100%;
-    }
-  }
 `;
 
 const $InputsColumn = styled.div`

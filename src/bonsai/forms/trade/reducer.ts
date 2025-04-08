@@ -70,6 +70,7 @@ export const tradeFormReducer = createVanillaReducer({
     setSide: (state, side: OrderSide) => ({
       ...state,
       side,
+      size: undefined,
     }),
 
     setMarginMode: (state, marginMode: MarginMode) => ({

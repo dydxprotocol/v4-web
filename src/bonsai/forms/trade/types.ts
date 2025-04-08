@@ -153,7 +153,6 @@ export type TradeSizeSummary = {
   size: number | undefined;
   usdcSize: number | undefined;
   leverageSigned: number | undefined;
-  balancePercent: number | undefined;
 };
 
 export type TradeInputSummary = {
@@ -201,6 +200,7 @@ export type TradeFormSummary = {
 export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+
   currentTradeMarketOpenOrders: SubaccountOrder[]; // todo remove maybe
   allOpenOrders: SubaccountOrder[];
   userFeeStats: UserStats;

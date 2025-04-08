@@ -88,6 +88,9 @@ export function calculateTradeInfo(
             }),
             minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
             maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            // maximumSignedLeverage:
+            //   getMaxCrossMarketOrderSizeSummary(trade, baseAccount, accountData, subaccountToUse)
+            //     ?.leverageSigned ?? leverageLimits.maxLeverage.toNumber(),
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
@@ -333,7 +336,6 @@ interface TradeInputMarketOrder {
 
   size?: number;
   usdcSize?: number;
-  balancePercent?: number;
   leverageSigned?: number;
 
   worstPrice?: number;
@@ -361,7 +363,6 @@ function calculateMarketOrder(
     summary: {
       averageFillPrice: marketOrder?.averagePrice,
       size: {
-        balancePercent: marketOrder?.balancePercent,
         leverageSigned: marketOrder?.leverageSigned,
         size: marketOrder?.size,
         usdcSize: marketOrder?.usdcSize,
@@ -372,14 +373,26 @@ function calculateMarketOrder(
 
 type SizeTarget = {
   target: BigNumber;
-  type: 'size' | 'usdc' | 'leverage';
+  type: 'size' | 'usdc' | 'leverage' | 'maximum';
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getMaxCrossMarketOrderSizeSummary(
+  trade: TradeForm,
+  baseAccount: TradeAccountDetails | undefined,
+  accountData: TradeFormInputData,
+  subaccountNumber: number
+) {
+  const result = createMarketOrder(trade, baseAccount, accountData, subaccountNumber, true);
+  return result;
+}
 
 function createMarketOrder(
   trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
   accountData: TradeFormInputData,
-  subaccountNumber: number
+  subaccountNumber: number,
+  overrideToMaximumSize?: boolean
 ): TradeInputMarketOrder | undefined {
   const orderbookBase = accountData.currentTradeMarketOrderbook;
   const orderbook =
@@ -393,16 +406,11 @@ function createMarketOrder(
     return undefined;
   }
 
-  if (trade.size == null) {
-    return undefined;
-  }
-
-  const effectiveSizeTarget = calculateEffectiveSizeTarget(
-    trade.size,
-    trade,
-    baseAccount,
-    accountData
-  );
+  const effectiveSizeTarget = overrideToMaximumSize
+    ? { target: BIG_NUMBERS.ZERO, type: 'maximum' as const }
+    : trade.size != null
+      ? calculateEffectiveSizeTarget(trade.size, trade, baseAccount, accountData)
+      : undefined;
 
   if (effectiveSizeTarget == null) {
     return undefined;
@@ -414,10 +422,14 @@ function createMarketOrder(
       baseAccount?.subaccountSummaries,
       (summaries) => summaries[subaccountNumber]?.equity.toNumber() ?? 0
     ),
-    baseAccount?.account?.freeCollateral.toNumber(),
+    mapIfPresent(
+      baseAccount?.subaccountSummaries,
+      (summaries) => summaries[subaccountNumber]?.freeCollateral.toNumber() ?? 0
+    ),
     AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+    AttemptNumber(accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction),
     trade.side,
-    (oraclePrice, equity, freeCollateral, stepSize, orderSide) =>
+    (oraclePrice, equity, freeCollateral, stepSize, marketEffectiveImf, orderSide) =>
       simulateMarketOrder(
         effectiveSizeTarget,
         orderbook,
@@ -426,7 +438,9 @@ function createMarketOrder(
         equity,
         freeCollateral,
         stepSize,
+        marketEffectiveImf,
         orderSide,
+        trade.reduceOnly ?? false,
         baseAccount?.position
       )
   );
@@ -438,9 +452,12 @@ function simulateMarketOrder(
   feeRate: number,
   oraclePrice: number,
   subaccountEquity: number,
-  crossAccountFreeCollateral: number,
+  subaccountFreeCollateral: number,
   marketStepSize: number,
+  marketEffectiveImf: number,
   side: OrderSide,
+  // currently only used for the 'maximum' size
+  reduceOnly: boolean,
   existingPosition: SubaccountPosition | undefined
 ): TradeInputMarketOrder | undefined {
   const operationMultipler = side === OrderSide.BUY ? 1 : -1;
@@ -450,6 +467,8 @@ function simulateMarketOrder(
   let totalCost = 0;
   let thisPositionValue = existingPosition == null ? 0 : existingPosition.value.toNumber();
   let equity = subaccountEquity;
+  const initialRiskWithoutPosition =
+    subaccountEquity - subaccountFreeCollateral - (existingPosition?.initialRisk.toNumber() ?? 0);
   const orderbookRows: OrderbookUsage[] = [];
   let filled = false;
 
@@ -467,7 +486,6 @@ function simulateMarketOrder(
               .toNumber()
           : 0,
       averagePrice: 0,
-      balancePercent: 0,
       worstPrice: 0,
     };
   }
@@ -489,7 +507,6 @@ function simulateMarketOrder(
       const maxSizeForRemainingUsdc =
         (effectiveSizeTarget.target - totalCost) / (rowPrice * (1 + feeRate));
       sizeToTake = maxSizeForRemainingUsdc;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (effectiveSizeTarget.type === 'leverage') {
       const targetLeverage = effectiveSizeTarget.target;
       const aFactor =
@@ -498,6 +515,64 @@ function simulateMarketOrder(
       const numerator = thisPositionValue - targetLeverage * equity;
       const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
       sizeToTake = maxSizeAtThisPrice;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (effectiveSizeTarget.type === 'maximum') {
+      const increasing =
+        (thisPositionValue <= 0 && side === OrderSide.SELL) ||
+        (thisPositionValue >= 0 && side === OrderSide.BUY);
+
+      if (increasing) {
+        const numerator =
+          0 -
+          equity +
+          initialRiskWithoutPosition +
+          marketEffectiveImf * Math.abs(thisPositionValue);
+        const denominator =
+          oraclePrice * operationMultipler -
+          rowPrice * feeRate -
+          rowPrice * operationMultipler -
+          marketEffectiveImf * oraclePrice;
+        const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
+        sizeToTake = maxSizeAtThisPrice;
+      } else if (existingPosition != null) {
+        // we want to decrease as much as possible then start increasing
+        const remainingPosition = existingPosition.unsignedSize.toNumber() - totalSize;
+        if (rowSize > remainingPosition) {
+          // we can sell everything here
+          sizeToTake = remainingPosition;
+
+          if (!reduceOnly) {
+            const newPositionValue = 0; // we sold everything
+
+            // formula copied from below
+            const newEquity =
+              equity +
+              // update to notional
+              sizeToTake * operationMultipler * oraclePrice +
+              // update to quote for cost
+              sizeToTake * operationMultipler * -1 * rowPrice +
+              // update to quote for fees
+              sizeToTake * rowPrice * feeRate * -1;
+
+            // then we sell everything we can with the remaining usdc, back to the increasing case
+            const numerator =
+              0 -
+              newEquity +
+              initialRiskWithoutPosition +
+              marketEffectiveImf * Math.abs(newPositionValue);
+            const denominator =
+              oraclePrice * operationMultipler -
+              rowPrice * feeRate -
+              rowPrice * operationMultipler -
+              marketEffectiveImf * oraclePrice;
+            const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
+            sizeToTake += maxSizeAtThisPrice;
+          }
+        } else {
+          // just sell as much as we can, then we're done
+          sizeToTake = remainingPosition;
+        }
+      }
     } else {
       assertNever(effectiveSizeTarget.type);
     }
@@ -530,17 +605,15 @@ function simulateMarketOrder(
 
   return {
     orderbook: orderbookRows,
-    averagePrice: totalCostWithoutFees / totalSize,
+    averagePrice: totalSize <= 0 ? undefined : totalCostWithoutFees / totalSize,
 
     size: totalSize,
     usdcSize: totalCostWithoutFees,
 
-    // todo this isn't quite right, doesn't take into account increase->decrease trades (side swap)
-    balancePercent: totalCost / crossAccountFreeCollateral,
     totalFees: totalCost - totalCostWithoutFees,
     leverageSigned:
       equity <= 0
-        ? 0
+        ? undefined
         : ((existingPosition?.value.toNumber() ?? 0) +
             totalSize * oraclePrice * operationMultipler) /
           equity,
@@ -751,8 +824,6 @@ function calculateLimitOrderInputSummary(
   return {
     averageFillPrice: price,
     size: {
-      // not supported
-      balancePercent: undefined,
       // not supported
       leverageSigned: undefined,
       size: effectiveSize,
