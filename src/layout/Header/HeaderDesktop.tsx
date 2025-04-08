@@ -28,7 +28,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { MegavaultYieldTag } from '@/pages/portfolio/AccountOverviewSection';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
@@ -82,12 +81,7 @@ export const HeaderDesktop = () => {
         },
         {
           value: 'VAULT',
-          label: (
-            <>
-              {stringGetter({ key: STRING_KEYS.MEGAVAULT })}{' '}
-              <MegavaultYieldTag yieldType="ninetyDay" />
-            </>
-          ),
+          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
           href: AppRoute.Vault,
         },
         affiliatesEnabled && {
