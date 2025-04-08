@@ -81,7 +81,7 @@ export const HeaderDesktop = () => {
         },
         {
           value: 'VAULT',
-          label: <>{stringGetter({ key: STRING_KEYS.MEGAVAULT })}</>,
+          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
           href: AppRoute.Vault,
         },
         affiliatesEnabled && {
