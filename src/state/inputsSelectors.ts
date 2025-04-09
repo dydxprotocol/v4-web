@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { TriggerOrdersFormFns } from '@/bonsai/forms/triggers/triggers';
 import { TriggerOrderInputData } from '@/bonsai/forms/triggers/types';
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
 import { AbacusInputTypes } from '@/constants/abacus';
@@ -198,11 +198,31 @@ const getSubaccountConditionalOrdersForTriggers = createAppSelector(
 );
 
 const getTriggersFormInputData = createAppSelector(
-  [getSubaccountConditionalOrdersForTriggers, getTriggersFormMarket, getTriggersFormPosition],
-  (existingTriggerOrders, market, position): TriggerOrderInputData => ({
+  [
+    getSubaccountConditionalOrdersForTriggers,
+    getTriggersFormMarket,
+    getTriggersFormPosition,
+    BonsaiCore.account.openOrders.data,
+    BonsaiCore.configs.equityTiers,
+    BonsaiRaw.parentSubaccountBase,
+    BonsaiRaw.parentSubaccountRelevantMarkets,
+  ],
+  (
     existingTriggerOrders,
     market,
     position,
+    allOpenOrders,
+    equityTiers,
+    rawParentSubaccountData,
+    rawRelevantMarkets
+  ): TriggerOrderInputData => ({
+    existingTriggerOrders,
+    market,
+    position,
+    equityTiers,
+    allOpenOrders,
+    rawParentSubaccountData,
+    rawRelevantMarkets,
   })
 );
 
