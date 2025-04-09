@@ -11,6 +11,7 @@ import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
 
@@ -40,7 +41,7 @@ export function useParentSubaccountHistoricalPnls() {
     useQuery({
       enabled: isPresent(address) && isPresent(subaccount) && isPresent(indexerClient),
       queryKey: ['indexer', 'account', 'historicalPnl', address, subaccount, indexerKey],
-      queryFn: async () => {
+      queryFn: wrapAndLogBonsaiError(async () => {
         if (address == null || subaccount == null || indexerClient == null) {
           throw new Error('Invalid historical pnl query state');
         }
@@ -83,7 +84,7 @@ export function useParentSubaccountHistoricalPnls() {
           }
         }
         return allResults.map(toPnlPoint).reverse();
-      },
+      }, 'parentSubaccountHistoricalPnls'),
       refetchInterval: timeUnits.hour,
       staleTime: timeUnits.hour,
     })

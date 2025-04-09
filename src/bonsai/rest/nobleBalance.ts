@@ -10,6 +10,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpNobleBalanceQuery(store: RootStore) {
   const cleanUpEffect = createNobleQueryStoreEffect(store, {
+    name: 'nobleBalance',
     selector: selectAccountNobleWalletAddress,
     getQueryKey: (data) => ['nobleBalances', data],
     getQueryFn: (nobleClient, data) => {

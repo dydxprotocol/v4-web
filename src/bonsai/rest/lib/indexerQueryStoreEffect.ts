@@ -1,4 +1,4 @@
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import {
   selectCompositeClientReady,
   selectIndexerReady,
@@ -34,6 +34,7 @@ type PassedQueryOptions<R> = Pick<
 >;
 
 type QuerySetupConfig<ClientType, T, R> = {
+  name: string;
   selector: (state: RootState) => T;
   getQueryKey: (selectorResult: NoInfer<T>) => any[];
   getQueryFn: (client: ClientType, selectorResult: NoInfer<T>) => (() => Promise<R>) | null;
@@ -119,7 +120,7 @@ export function createIndexerQueryStoreEffect<T, R>(
       const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
       const observer = new QueryObserver(appQueryClient, {
         queryKey: ['indexer', ...config.getQueryKey(queryData), clientId],
-        queryFn,
+        queryFn: wrapAndLogBonsaiError(queryFn, config.name),
         ...baseOptions,
         ...otherOpts,
       });
@@ -210,7 +211,7 @@ export function createValidatorQueryStoreEffect<T, R>(
       const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
       const observer = new QueryObserver(appQueryClient, {
         queryKey: ['validator', ...config.getQueryKey(queryData), clientId],
-        queryFn,
+        queryFn: wrapAndLogBonsaiError(queryFn, config.name),
         ...baseOptions,
         ...otherOpts,
       });
@@ -273,7 +274,7 @@ export function createNobleQueryStoreEffect<T, R>(
     const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
     const observer = new QueryObserver(appQueryClient, {
       queryKey: ['nobleClient', ...config.getQueryKey(queryData), clientConfig.network],
-      queryFn,
+      queryFn: wrapAndLogBonsaiError(queryFn, config.name),
       ...baseOptions,
       ...otherOpts,
     });

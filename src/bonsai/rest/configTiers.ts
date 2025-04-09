@@ -12,6 +12,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpConfigTiersQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'configTiers',
     selector: () => true,
     getQueryKey: () => ['configTiers'],
     getQueryFn: (compositeClient) => {

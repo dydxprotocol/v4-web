@@ -18,6 +18,7 @@ import { isPresent } from '@/lib/typeUtils';
 import { calculateDailyCumulativeTradingRewards } from '../calculators/historicalTradingRewards';
 import { Loadable } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
+import { wrapAndLogBonsaiError } from '../logs';
 import { AggregatedTradingReward } from '../types/summaryTypes';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
@@ -32,7 +33,7 @@ export function useHistoricalTradingRewards() {
     useQuery({
       enabled: isPresent(address) && isPresent(indexerClient),
       queryKey: ['indexer', 'account', 'historicalTradingRewards', address, indexerKey],
-      queryFn: async () => {
+      queryFn: wrapAndLogBonsaiError(async () => {
         if (address == null || indexerClient == null) {
           throw new Error('Invalid historical trading rewards query state');
         }
@@ -63,7 +64,7 @@ export function useHistoricalTradingRewards() {
         }
 
         return allResults;
-      },
+      }, 'historicalTradingRewards'),
       refetchInterval: timeUnits.hour,
       staleTime: timeUnits.hour,
     })

@@ -1,3 +1,5 @@
+import { timeUnits } from '@/constants/time';
+
 import { log, logInfo } from '@/lib/telemetry';
 
 export function logBonsaiError(source: string, message: string, ...args: any[]) {
@@ -6,4 +8,33 @@ export function logBonsaiError(source: string, message: string, ...args: any[]) 
 
 export function logBonsaiInfo(source: string, message: string, ...args: any[]) {
   logInfo(`bonsai: ${source}: ${message}`, { context: args });
+}
+
+const LOG_THRESHOLD_MS = timeUnits.second * 10;
+
+export function wrapAndLogBonsaiError<T, Args extends any[]>(
+  fn: (...args: Args) => Promise<T> | T,
+  logId: string
+): (...args: Args) => Promise<T> {
+  return async (...args) => {
+    const start = Date.now();
+    try {
+      const result = await Promise.resolve(fn(...args));
+      const duration = Date.now() - start;
+      if (duration > LOG_THRESHOLD_MS) {
+        logBonsaiInfo(
+          logId,
+          `Long request time detected for ${logId}: ${Math.floor(duration / 1000)}s`,
+          {
+            duration,
+          }
+        );
+      }
+      return result;
+    } catch (error) {
+      const duration = Date.now() - start;
+      logBonsaiError(logId, `Error fetching ${logId} data`, { error, duration });
+      throw error;
+    }
+  };
 }

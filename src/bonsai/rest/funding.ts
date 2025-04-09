@@ -19,6 +19,7 @@ import {
 } from '../calculators/funding';
 import { Loadable } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
+import { wrapAndLogBonsaiError } from '../logs';
 import { selectCurrentMarketInfo } from '../selectors/summary';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
@@ -31,7 +32,7 @@ export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingO
   const historicalFundingQuery = useQuery({
     enabled: Boolean(currentMarketId) && Boolean(indexerClient),
     queryKey: ['historicalFunding', currentMarketId, indexerKey],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       if (!currentMarketId) {
         throw new Error('Invalid marketId found');
       } else if (!indexerClient) {
@@ -42,7 +43,7 @@ export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingO
         await indexerClient.markets.getPerpetualMarketHistoricalFunding(currentMarketId);
 
       return result.historicalFunding.reverse().map(mapFundingChartObject);
-    },
+    }, 'currentMarketHistoricalFunding'),
     refetchInterval: timeUnits.hour,
     staleTime: timeUnits.hour,
   });

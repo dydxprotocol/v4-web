@@ -40,6 +40,7 @@ const pollingOptions = {
 
 export function setUpIndexerSourceAddressScreenV2Query(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'sourceAddressScreenV2',
     selector: getUserSourceWalletAddress,
     getQueryKey: (address) => ['screenSourceWalletV2', address],
     getQueryFn: (indexerClient, address) => {
@@ -154,6 +155,7 @@ async function updateCompliance({
 
 export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'localAddressScreenV2',
     selector: selectChainIdAndLocalAddress,
     getQueryKey: ({ address, chainId, network }) => [
       'screenLocalWalletV2',
