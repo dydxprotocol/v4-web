@@ -8,7 +8,7 @@ import {
 
 import { dd } from './datadog';
 
-const DEBUG_ANALYTICS = true;
+const DEBUG_ANALYTICS = false;
 
 export const identify = (property: AnalyticsUserProperty) => {
   const propertyTypeToLog = AnalyticsUserPropertyLoggableTypes[property.type];
