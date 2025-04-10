@@ -9,7 +9,6 @@ import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { isPresent } from '@/lib/typeUtils';
 
 import { RootState } from './_store';
@@ -73,7 +72,7 @@ export const getTradeFormSummary = createAppSelector(
     }
     const summary = TradeFormFns.calculateSummary(state, inputData);
     // eslint-disable-next-line no-console
-    console.log('trade', purgeBigNumbers(summary), purgeBigNumbers(inputData));
+    // console.log('trade', purgeBigNumbers(summary), purgeBigNumbers(inputData));
 
     return {
       summary,
@@ -136,7 +135,7 @@ export const getClosePositionFormSummary = createAppSelector(
     );
 
     // eslint-disable-next-line no-console
-    console.log('Close', purgeBigNumbers(summary), purgeBigNumbers(inputData));
+    // console.log('Close', purgeBigNumbers(summary), purgeBigNumbers(inputData));
 
     return {
       summary,

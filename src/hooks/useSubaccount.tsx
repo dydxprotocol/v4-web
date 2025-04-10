@@ -20,11 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
 
-import type {
-  HumanReadableCancelOrderPayload,
-  HumanReadablePlaceOrderPayload,
-  ParsingError,
-} from '@/constants/abacus';
+import type { HumanReadablePlaceOrderPayload, ParsingError } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
@@ -40,8 +36,6 @@ import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import {
-  cancelAllOrderFailed,
-  cancelAllSubmitted,
   cancelOrderFailed,
   cancelOrderSubmitted,
   clearLocalOrders,
@@ -407,71 +401,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
-  );
-
-  const cancelOrder = useCallback(
-    ({
-      orderId,
-      onError,
-      onSuccess,
-    }: {
-      orderId: string;
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: () => void;
-    }) => {
-      const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
-        if (success) {
-          onSuccess?.();
-        } else {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          dispatch(
-            cancelOrderFailed({
-              orderId,
-              errorParams,
-            })
-          );
-          onError?.(errorParams);
-        }
-      };
-
-      dispatch(cancelOrderSubmitted(orderId));
-      abacusStateManager.cancelOrder(orderId, callback);
-    },
-    [dispatch]
-  );
-
-  const openOrders = useAppSelector(BonsaiCore.account.openOrders.data);
-
-  // when marketId is provided, only cancel orders for that market, otherwise cancel globally
-  const cancelAllOrders = useCallback(
-    (marketId?: string) => {
-      // this is for each single cancel transaction
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadableCancelOrderPayload>
-      ) => {
-        const matchedOrder = openOrders.find((order) => order.id === data?.orderId);
-        // ##OrderOnlyConfirmedCancelViaIndexer: success here does not necessarily mean orders are successfully canceled,
-        // we use indexer response as source of truth on whether the order is actually canceled
-        if (!success) {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          if (matchedOrder) {
-            dispatch(
-              cancelAllOrderFailed({
-                order: matchedOrder,
-                errorParams,
-              })
-            );
-          }
-        }
-      };
-
-      const orderIds = abacusStateManager.getCancelableOrderIds(marketId);
-      dispatch(cancelAllSubmitted({ marketId, orderIds }));
-      abacusStateManager.cancelAllOrders(marketId, callback);
-    },
-    [dispatch, openOrders]
   );
 
   const closeAllPositions = useCallback(() => {
@@ -1215,8 +1144,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     placeOrder,
     closePosition,
     closeAllPositions,
-    cancelOrder,
-    cancelAllOrders,
     placeTriggerOrders,
 
     // Listing Methods

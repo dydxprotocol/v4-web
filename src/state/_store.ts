@@ -1,4 +1,6 @@
+import { createAccountTransactionSupervisor } from '@/bonsai/AccountTransactionSupervisor';
 // eslint-disable-next-line no-restricted-imports
+import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
 import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -105,6 +107,11 @@ export const persistor = persistStore(store);
 // Set store so (Abacus & localWalletManager) classes can getState and dispatch
 abacusStateManager.setStore(store);
 localWalletManager.setStore(store);
+
+export const accountTransactionManager = createAccountTransactionSupervisor(
+  store,
+  CompositeClientManager
+);
 
 runFn(async () => {
   // we ignore the cleanups for now since we want these running forever

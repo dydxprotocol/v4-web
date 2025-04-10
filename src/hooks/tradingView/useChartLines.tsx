@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
@@ -17,6 +18,7 @@ import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { Icon, IconName } from '@/components/Icon';
 
+import { accountTransactionManager } from '@/state/_store';
 import {
   getCurrentMarketOrders,
   getCurrentMarketOrdersForPostOrder,
@@ -26,19 +28,13 @@ import {
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import {
-  cancelOrderFailed,
-  cancelOrderSubmitted,
-  placeOrderFailed,
-  placeOrderSubmitted,
-  setLatestOrder,
-} from '@/state/localOrders';
+import { placeOrderFailed, placeOrderSubmitted, setLatestOrder } from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import {
-  cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
   getOrderModificationError,
@@ -275,7 +271,6 @@ export const useChartLines = ({
       addPendingOrderAdjustment(orderPayload, order.id);
 
       // Dispatch both actions here so that the user sees both cancel + submitting notifications together
-      dispatch(cancelOrderSubmitted(order.id));
       dispatch(
         placeOrderSubmitted({
           marketId: orderPayload.marketId,
@@ -284,18 +279,14 @@ export const useChartLines = ({
         })
       );
 
-      const { success: cancelSuccess } = await cancelOrderAsync(order.id);
-      if (!cancelSuccess) {
-        dispatch(
-          cancelOrderFailed({
-            orderId: order.id,
-            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-          })
-        );
+      const cancelResult = await accountTransactionManager.cancelOrder({
+        orderId: order.id,
+      });
+      if (!isOperationSuccess(cancelResult)) {
         dispatch(
           placeOrderFailed({
             clientId: orderPayload.clientId,
-            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+            errorParams: operationFailureToErrorParams(cancelResult),
           })
         );
         orderLine.setPrice(oldPrice);
