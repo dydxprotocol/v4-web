@@ -148,7 +148,9 @@ export const TradeSizeInputs = () => {
       value:
         tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
           ? tradeValues.size.value.value
-          : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
+          : tradeValues.size == null || tradeValues.size.value.value === ''
+            ? ''
+            : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
     },
     [DisplayUnit.Fiat]: {
       onInput: onUSDCInput,
@@ -158,7 +160,9 @@ export const TradeSizeInputs = () => {
       value:
         tradeValues.size != null && OrderSizeInputs.is.USDC_SIZE(tradeValues.size)
           ? tradeValues.size.value.value
-          : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? '',
+          : tradeValues.size == null || tradeValues.size.value.value === ''
+            ? ''
+            : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? '',
     },
   }[displayUnit];
 
