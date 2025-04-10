@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import {
   isOperationFailure,
@@ -16,7 +17,9 @@ import {
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
-import { type RootStore } from '@/state/_store';
+import { timeUnits } from '@/constants/time';
+
+import { type RootState, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import {
   cancelAllOrderFailed,
@@ -31,8 +34,8 @@ import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpe
 import { stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { AttemptNumber } from '@/lib/numbers';
-import { SerialTaskExecutor } from '@/lib/serialExecutor';
 
+import { getSimpleOrderStatus } from './calculators/orders';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
 
 interface ClientWalletPair {
@@ -54,16 +57,13 @@ export class AccountTransactionSupervisor {
 
   private compositeClientManager: typeof CompositeClientManager;
 
-  private orderCancelExecutor: SerialTaskExecutor;
-
-  private unsubscribes: Array<(() => void) | null> = [];
+  private stateNotifier: StateConditionNotifier;
 
   constructor(store: RootStore, compositeClientManager: typeof CompositeClientManager) {
     this.store = store;
     this.compositeClientManager = compositeClientManager;
-    this.orderCancelExecutor = new SerialTaskExecutor();
 
-    this.subscribeToOrderUpdates();
+    this.stateNotifier = new StateConditionNotifier(store);
   }
 
   private hasValidLocalWallet(): boolean {
@@ -117,23 +117,52 @@ export class AccountTransactionSupervisor {
     };
   }
 
-  private wrapOperation<T, Payload>(
+  private wrapOperation<T, Payload, P, Q>(
     nameForLogging: string,
     payload: Payload,
-    fn: (payload: Payload) => Promise<T>
+    fn: (payload: Payload) => Promise<T>,
+    tracking?: Tracker<P, Q>
   ): () => Promise<OperationResult<ToPrimitives<T>>> {
     return async () => {
       try {
+        const startTime = Date.now();
         logBonsaiInfo(nameForLogging, 'Attempting operation', { payload });
 
         const tx = await fn(payload);
 
         const parsedTx = parseToPrimitives(tx);
 
+        const submittedTime = Date.now();
         logBonsaiInfo(nameForLogging, 'Successful operation', {
           payload,
           parsedTx,
+          timeToSubmit: submittedTime - startTime,
         });
+
+        if (tracking != null) {
+          this.stateNotifier.notifyWhenTrue(
+            tracking.selector,
+            tracking.validator,
+            (resultOrNull) => {
+              const confirmedTime = Date.now();
+              if (resultOrNull != null) {
+                logBonsaiInfo(nameForLogging, 'Successfully confirmed operation', {
+                  payload,
+                  parsedTx,
+                  result: resultOrNull,
+                  totalTimeToConfirm: confirmedTime - startTime,
+                  timeToConfirmAfterSubmitted: confirmedTime - submittedTime,
+                });
+              } else {
+                logBonsaiError(nameForLogging, 'Failed to confirm operation', {
+                  payload,
+                  parsedTx,
+                  result: resultOrNull,
+                });
+              }
+            }
+          );
+        }
 
         return wrapOperationSuccess(parsedTx);
       } catch (error) {
@@ -148,14 +177,6 @@ export class AccountTransactionSupervisor {
         return wrapOperationFailure(errorString, parsed);
       }
     };
-  }
-
-  private subscribeToOrderUpdates(): void {
-    this.unsubscribes.push(
-      this.store.subscribe(() => {
-        // todo
-      })
-    );
   }
 
   private createCancelOrderPayload(orderId: string): CancelOrderPayload | undefined {
@@ -253,7 +274,20 @@ export class AccountTransactionSupervisor {
           payload.goodTilBlock === 0 ? undefined : payload.goodTilBlock,
           payload.goodTilBlockTime === 0 ? undefined : payload.goodTilBlockTime
         );
-      })
+      }),
+      {
+        selector: BonsaiCore.account.allOrders.data,
+        validator: (orders) => {
+          const order = orders.find((o) => o.id === orderId);
+          if (
+            order?.status != null &&
+            getSimpleOrderStatus(order.status) === OrderStatus.Canceled
+          ) {
+            return order;
+          }
+          return undefined;
+        },
+      }
     )();
   }
 
@@ -277,7 +311,7 @@ export class AccountTransactionSupervisor {
     this.store.dispatch(cancelOrderSubmitted(orderId));
 
     // Queue the cancellation to avoid race conditions
-    const result = await this.orderCancelExecutor.enqueue(() => this.executeCancelOrder(orderId));
+    const result = await this.executeCancelOrder(orderId);
 
     if (isOperationFailure(result)) {
       this.store.dispatch(
@@ -319,9 +353,7 @@ export class AccountTransactionSupervisor {
     // Execute all cancel operations and collect results
     const results = await Promise.all(
       orderIds.map(async (orderId) => {
-        const result = await this.orderCancelExecutor.enqueue(() =>
-          this.executeCancelOrder(orderId)
-        );
+        const result = await this.executeCancelOrder(orderId);
 
         if (isOperationFailure(result)) {
           const order = BonsaiCore.account.allOrders
@@ -352,8 +384,7 @@ export class AccountTransactionSupervisor {
   }
 
   public tearDown(): void {
-    this.unsubscribes.forEach((u) => u?.());
-    this.unsubscribes = [];
+    this.stateNotifier.tearDown();
   }
 }
 
@@ -363,3 +394,108 @@ export const createAccountTransactionSupervisor = (
 ): AccountTransactionSupervisor => {
   return new AccountTransactionSupervisor(store, compositeClientManager);
 };
+
+type SelectorFn<Selected> = (state: RootState) => Selected;
+type ValidationFn<Selected, Result> = (selected: Selected) => Result | null | undefined;
+type NotificationCallback<Result> = (result: Result | null) => void;
+
+interface Tracker<Selected, Result> {
+  selector: SelectorFn<Selected>;
+  validator: ValidationFn<NoInfer<Selected>, Result>;
+}
+
+interface TrackedCondition<Selected, Result> {
+  selector: SelectorFn<Selected>;
+  validator: ValidationFn<NoInfer<Selected>, Result>;
+  callback: NotificationCallback<NoInfer<Result>>;
+  lastValue: Selected | null;
+  timeoutId: NodeJS.Timeout | undefined;
+}
+
+class StateConditionNotifier {
+  private store: RootStore;
+
+  private trackedConditions: Array<TrackedCondition<any, any>> = [];
+
+  private unsubscribeStore: (() => void) | null = null;
+
+  constructor(store: RootStore) {
+    this.store = store;
+    this.setupStoreSubscription();
+  }
+
+  private setupStoreSubscription(): void {
+    this.unsubscribeStore = this.store.subscribe(() => {
+      const state = this.store.getState();
+
+      this.trackedConditions.forEach((condition) => {
+        const currentValue = condition.selector(state);
+
+        if (condition.lastValue === currentValue) {
+          return;
+        }
+
+        condition.lastValue = currentValue;
+
+        const validationResult = condition.validator(currentValue);
+        if (validationResult != null) {
+          clearTimeout(condition.timeoutId);
+          this.trackedConditions = this.trackedConditions.filter((t) => t !== condition);
+          condition.callback(validationResult);
+        }
+      });
+    });
+  }
+
+  public notifyWhenTrue<Selected, Result>(
+    selector: SelectorFn<Selected>,
+    validator: ValidationFn<NoInfer<Selected>, Result>,
+    callback: NotificationCallback<NoInfer<Result>>,
+    timeoutMs: number = timeUnits.second * 30
+  ): () => void {
+    const state = this.store.getState();
+    const initialValue = selector(state);
+
+    // Check if already true
+    const validationResult = validator(initialValue);
+    if (validationResult != null) {
+      callback(validationResult);
+      return () => null;
+    }
+
+    const condition: TrackedCondition<any, any> = {
+      selector,
+      validator,
+      callback,
+      lastValue: initialValue,
+      timeoutId: undefined,
+    };
+    // Set up timeout
+    condition.timeoutId = setTimeout(() => {
+      this.trackedConditions = this.trackedConditions.filter((t) => t !== condition);
+      callback(null);
+    }, timeoutMs);
+
+    this.trackedConditions.push(condition);
+    return () => {
+      clearTimeout(condition.timeoutId);
+      this.trackedConditions = this.trackedConditions.filter((t) => t !== condition);
+    };
+  }
+
+  public tearDown(): void {
+    // Clear all timeouts
+    this.trackedConditions.forEach((condition) => {
+      if (condition.timeoutId) {
+        clearTimeout(condition.timeoutId);
+      }
+    });
+
+    // Clear the map
+    this.trackedConditions = [];
+
+    // Unsubscribe from store
+    this.unsubscribeStore?.();
+    this.unsubscribeStore = null;
+  }
+}
