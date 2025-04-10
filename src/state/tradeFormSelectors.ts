@@ -176,3 +176,10 @@ export const getCurrentSelectedFormSummary = createAppSelector(
     return trade;
   }
 );
+
+export const getCurrentSelectedFormPositionSummary = createAppSelector(
+  [getCurrentSelectedFormSummary],
+  (summary) => {
+    return summary.summary.positionAfter;
+  }
+);

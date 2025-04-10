@@ -65,17 +65,6 @@ export const getCurrentMarketPositionData = createAppSelector(
 
 /**
  * @param state
- * @returns AccountPositions of the current market
- */
-export const getCurrentMarketPositionDataForPostTrade = createAppSelector(
-  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.openPositions],
-  (marketId, positions) => {
-    return positions?.toArray().find((p) => p.id === marketId);
-  }
-);
-
-/**
- * @param state
  * @returns list of orders for the currently connected subaccount
  */
 export const getSubaccountOrders = BonsaiCore.account.allOrders.data;
