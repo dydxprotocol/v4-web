@@ -21,7 +21,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { accountTransactionManager } from '@/state/_store';
 import {
   getCurrentMarketOrders,
-  getCurrentMarketOrdersForPostOrder,
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
@@ -77,10 +76,6 @@ export const useChartLines = ({
   const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useAppSelector(
     getCurrentMarketOrders,
-    shallowEqual
-  );
-  const currentMarketOrdersAbacus = useAppSelector(
-    getCurrentMarketOrdersForPostOrder,
     shallowEqual
   );
 
@@ -394,7 +389,7 @@ export const useChartLines = ({
               AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
             );
             removePendingOrderAdjustment(order.clientId);
-            dispatch(setLatestOrder(currentMarketOrdersAbacus.find((o) => o.id === order.id)));
+            dispatch(setLatestOrder(currentMarketOrders.find((o) => o.id === order.id)));
           }
         }
       }
@@ -410,7 +405,6 @@ export const useChartLines = ({
       });
   }, [
     currentMarketOrders,
-    currentMarketOrdersAbacus,
     stringGetter,
     tvWidget,
     setLineColorsAndFont,

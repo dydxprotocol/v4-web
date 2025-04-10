@@ -52,12 +52,6 @@ export const getOpenPositionFromId = () =>
       allOpenPositions?.find(({ uniqueId }) => uniqueId === positionId)
   );
 
-export const getOpenPositionFromIdForPostOrder = () =>
-  createAppSelector(
-    [(s) => s.account.subaccountForPostOrders?.openPositions, (s, marketId: string) => marketId],
-    (allOpenPositions, marketId) => allOpenPositions?.toArray().find(({ id }) => id === marketId)
-  );
-
 /**
  * @param state
  * @returns AccountPositions of the current market
@@ -105,14 +99,6 @@ export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
     !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
-);
-
-export const getCurrentMarketOrdersForPostOrder = createAppSelector(
-  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.orders],
-  (currentMarketId, marketOrders) =>
-    !currentMarketId
-      ? EMPTY_ARR
-      : marketOrders?.toArray().filter((o) => o.marketId === currentMarketId) ?? EMPTY_ARR
 );
 
 /**
