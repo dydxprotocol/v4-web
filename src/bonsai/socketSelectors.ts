@@ -47,3 +47,10 @@ export const selectNobleClientReady = createAppSelector(
     return !!networks[network]?.nobleClientReady;
   }
 );
+
+export const selectClientInitializationError = createAppSelector(
+  [getSelectedNetwork, (state: RootState) => state.raw.network],
+  (network, networks) => {
+    return !!networks[network]?.errorInitializing;
+  }
+);

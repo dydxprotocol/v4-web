@@ -76,13 +76,15 @@ export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useAppSelector(BonsaiCore.network.apiState);
   const initializationError = useAppSelector(getInitializationError);
+  const bonsaiInitializationError = useAppSelector(BonsaiCore.network.clientInitializationError);
   const validatorHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
   const indexerHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
 
   const { haltedBlock, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({
     apiState,
-    initializationError,
+    initializationError:
+      initializationError ?? bonsaiInitializationError ? 'Unknown error' : undefined,
   });
   const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
 

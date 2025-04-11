@@ -87,6 +87,7 @@ import {
   StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
+import { selectClientInitializationError } from './socketSelectors';
 import { DepositUsdcProps, WithdrawUsdcProps } from './types/operationTypes';
 import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from './types/rawTypes';
@@ -180,6 +181,7 @@ interface BonsaiCoreShape {
       loading: BasicSelector<LoadableStatus>;
     };
     apiState: BasicSelector<ApiState | undefined>;
+    clientInitializationError: BasicSelector<boolean | undefined>;
   };
   configs: {
     feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
@@ -248,6 +250,7 @@ export const BonsaiCore: BonsaiCoreShape = {
       data: selectLatestValidatorHeight,
       loading: selectRawValidatorHeightDataLoading,
     },
+    clientInitializationError: selectClientInitializationError,
     apiState: selectApiState,
   },
   configs: {
