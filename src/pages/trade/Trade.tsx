@@ -11,7 +11,6 @@ import {
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
-import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -64,7 +63,6 @@ const TradePage = () => {
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
-  useTradeFormInputs();
 
   if (isViewingUnlaunchedMarket) {
     return <LaunchableMarket />;

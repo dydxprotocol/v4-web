@@ -11,15 +11,12 @@ import type {
   SubaccountOrder,
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 
 import { type RootStore } from '@/state/_store';
-import { setSubaccountForPostOrders } from '@/state/account';
 import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
-import { setAbacusHasMarkets } from '@/state/perpetuals';
 
 import { track } from '../analytics/analytics';
 
@@ -43,32 +40,11 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     if (!this.store) return;
     const { dispatch } = this.store;
     const changes = new Set(incomingChanges?.changes.toArray() ?? []);
-    const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
     if (updatedState) {
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
       }
-
-      // this can be migrated when the trade/close position forms are migrated
-      if (changes.has(Changes.markets)) {
-        dispatch(
-          setAbacusHasMarkets(
-            updatedState.marketIds() != null && updatedState.marketIds()!.size > 0
-          )
-        );
-      }
-
-      // this can be migrated when all forms are migrated
-      subaccountNumbers?.forEach((subaccountId: number) => {
-        if (changes.has(Changes.subaccount)) {
-          const subaccountData = updatedState.subaccount(subaccountId);
-          const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
-          if (!isChildSubaccount) {
-            dispatch(setSubaccountForPostOrders(subaccountData));
-          }
-        }
-      });
     }
   }
 

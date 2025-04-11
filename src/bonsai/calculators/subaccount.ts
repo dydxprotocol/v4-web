@@ -70,6 +70,7 @@ export function calculateParentSubaccountSummary(
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,
+    parentSubaccountEquity: parentSummary.equity,
     equity: Object.values(summaries)
       .filter(isPresent)
       .map((s) => s.equity)
@@ -83,7 +84,7 @@ export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountData
   );
 }
 
-const calculateSubaccountSummary = weakMapMemoize(
+export const calculateSubaccountSummary = weakMapMemoize(
   (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
     const core = calculateSubaccountSummaryCore(subaccountData, markets);
     return {
@@ -161,6 +162,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
   return {
     freeCollateral,
     equity,
+    parentSubaccountEquity: equity,
     leverage,
     marginUsage,
   };

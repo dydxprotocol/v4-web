@@ -1,3 +1,5 @@
+import { STRING_KEY_VALUES } from '@/constants/localization';
+
 import { calc } from '@/lib/do';
 
 import { logBonsaiError, logBonsaiInfo } from '../logs';
@@ -100,10 +102,14 @@ export const parseTransactionError = (
       return undefined;
     }
   });
-  if (attemptedParseJson?.stringKey == null) {
+  if (
+    attemptedParseJson?.stringKey == null ||
+    STRING_KEY_VALUES[attemptedParseJson.stringKey] == null
+  ) {
     logBonsaiError('parseTransactionError', `Failed to parse a ${operationNameForLogging} error`, {
       input: response,
       output: attemptedParseJson,
+      stringKey: attemptedParseJson?.stringKey,
     });
     return {
       message: response,

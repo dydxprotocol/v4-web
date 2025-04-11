@@ -55,7 +55,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
-import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
+import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -68,7 +68,6 @@ import { dd } from '@/lib/analytics/datadog';
 import { getRouteErrorMessageOverride } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -89,10 +88,6 @@ export const WithdrawForm = () => {
     () => MustBigNumber(freeCollateralBNBase),
     [freeCollateralBNBase]
   );
-  const { freeCollateral: freeCollateralPost } = orEmptyObj(
-    useAppSelector(getSubaccountForPostOrder)
-  );
-  const freeCollateralPostOrder = freeCollateralPost?.postOrder;
 
   const {
     requestPayload,
@@ -422,9 +417,9 @@ export const WithdrawForm = () => {
         <DiffOutput
           type={OutputType.Fiat}
           value={freeCollateralBN}
-          newValue={freeCollateralPostOrder}
+          newValue={MustBigNumber(freeCollateralBN).minus(MustBigNumber(withdrawAmount))}
           sign={NumberSign.Negative}
-          hasInvalidNewValue={MustBigNumber(withdrawAmount).minus(freeCollateralBN).isNegative()}
+          hasInvalidNewValue={MustBigNumber(freeCollateralBN).minus(withdrawAmount).isNegative()}
           withDiff={
             Boolean(withdrawAmount) && !debouncedAmountBN.isNaN() && !debouncedAmountBN.isZero()
           }

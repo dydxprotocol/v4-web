@@ -18,6 +18,7 @@ type ElementProps = {
   valuePost: Nullable<number>;
 };
 
+const EPSILON_FOR_ACCOUNT_INFOS = 1e-6;
 export const AccountInfoDiffOutput = ({
   hasError,
   hideDiff,
@@ -30,8 +31,9 @@ export const AccountInfoDiffOutput = ({
   const postOrderValue = MaybeBigNumber(valuePost);
   const hasDiffPostOrder =
     postOrderValue != null &&
+    currentValue != null &&
     postOrderValue.isFinite() &&
-    !currentValue?.eq(postOrderValue) &&
+    !postOrderValue.minus(currentValue).abs().lte(EPSILON_FOR_ACCOUNT_INFOS) &&
     !hideDiff;
 
   return (

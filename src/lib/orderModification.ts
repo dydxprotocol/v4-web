@@ -1,16 +1,10 @@
 import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
-import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
+import Abacus from '@dydxprotocol/v4-abacus';
 import { OrderExecution } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
-import {
-  AbacusOrderSide,
-  AbacusOrderType,
-  HumanReadableCancelOrderPayload,
-  ParsingError,
-  PlaceOrderMarketInfo,
-} from '@/constants/abacus';
+import { AbacusOrderSide, AbacusOrderType, PlaceOrderMarketInfo } from '@/constants/abacus';
 import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
@@ -163,20 +157,6 @@ export function indexerToAbacusTimeInForce(
       return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
   }
 }
-
-export const cancelOrderAsync = (
-  orderId: string
-): Promise<{
-  success: boolean;
-  parsingError: Nullable<ParsingError>;
-  data: Nullable<HumanReadableCancelOrderPayload>;
-}> => {
-  return new Promise((resolve) => {
-    abacusStateManager.cancelOrder(orderId, (success, parsingError, data) => {
-      resolve({ success, parsingError, data });
-    });
-  });
-};
 
 export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPrice: number) => {
   // Ensure newPrice makes the order remain on the same side of the book
