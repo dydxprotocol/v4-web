@@ -67,6 +67,7 @@ export const LeverageSlider = ({
     return getValueAtFraction(val, leftLeverage, rightLeverage);
   };
 
+  const midPercent = midpointFraction != null ? 100 * midpointFraction : undefined;
   return (
     <div className={className} tw="h-[1.375rem]">
       <$Slider
@@ -83,14 +84,16 @@ export const LeverageSlider = ({
         )}
         onSliderDrag={onSliderDrag}
         onValueCommit={onValueCommit}
-        $midpoint={midpointFraction != null ? 100 * midpointFraction : undefined}
+        midPercent={midPercent}
+        $midpoint={midPercent}
         $flipped={!rightIsPositive}
       />
     </div>
   );
 };
+
 const $Slider = styled(Slider)<{ $midpoint?: number; $flipped: boolean }>`
-  --slider-track-backgroundColor: var(--color-layer-4);
+  --slider-track-backgroundColor: var(--color-layer-2);
 
   ${({ $midpoint, $flipped }) => css`
     --slider-track-background: linear-gradient(
