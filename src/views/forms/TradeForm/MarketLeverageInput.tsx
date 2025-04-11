@@ -73,8 +73,8 @@ export const MarketLeverageInput = ({
       return;
     }
 
-    const minDistanceFromLeft = minBy(validValues, (v) => Math.abs(leftLeverage - v))!;
-    setLeverageInputValue(MustBigNumber(minDistanceFromLeft).toFixed(4));
+    const minDistanceFromCurrent = minBy(validValues, (v) => Math.abs(effectiveLeverageInput - v))!;
+    setLeverageInputValue(MustBigNumber(minDistanceFromCurrent).toFixed(4));
   };
 
   const onLeverageSideToggle = () => {

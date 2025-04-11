@@ -84,7 +84,7 @@ export const LeverageSlider = ({
         )}
         onSliderDrag={onSliderDrag}
         onValueCommit={onValueCommit}
-        midPercent={midPercent}
+        midPercent={midPercent != null && midPercent > 0 ? midPercent : undefined}
         $midpoint={midPercent}
         $flipped={!rightIsPositive}
       />
