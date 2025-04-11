@@ -27,7 +27,7 @@ const DEFAULT_ISOLATED_TARGET_LEVERAGE = 2.0;
 
 export function getTradeFormFieldStates(
   form: TradeForm,
-  existingPositionMarginMode: MarginMode | undefined,
+  existingPositionOrOpenOrderMarginMode: MarginMode | undefined,
   existingPositionLeverage: number | undefined,
   maxMarketLeverage: number,
   marketIsIsolatedOnly: boolean | undefined
@@ -35,7 +35,10 @@ export function getTradeFormFieldStates(
   const { type } = form;
 
   const defaultTargetLeverage = calc(() => {
-    if (existingPositionMarginMode === MarginMode.ISOLATED && existingPositionLeverage != null) {
+    if (
+      existingPositionOrOpenOrderMarginMode === MarginMode.ISOLATED &&
+      existingPositionLeverage != null
+    ) {
       return BigNumber.min(existingPositionLeverage, maxMarketLeverage);
     }
     return BigNumber.min(DEFAULT_ISOLATED_TARGET_LEVERAGE, maxMarketLeverage);
@@ -76,8 +79,8 @@ export function getTradeFormFieldStates(
   function setMarginMode(result: TradeFormFieldStates): void {
     if (marketIsIsolatedOnly) {
       forceValueAndDisable(result.marginMode, MarginMode.ISOLATED);
-    } else if (existingPositionMarginMode != null) {
-      forceValueAndDisable(result.marginMode, existingPositionMarginMode);
+    } else if (existingPositionOrOpenOrderMarginMode != null) {
+      forceValueAndDisable(result.marginMode, existingPositionOrOpenOrderMarginMode);
     } else {
       makeVisible(result, ['marginMode']);
     }

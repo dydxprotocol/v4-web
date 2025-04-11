@@ -60,6 +60,7 @@ export function calculateTradeInfo(
   const subaccountToUse = calculateSubaccountToUseForTrade(
     trade.marginMode,
     baseAccount?.position?.subaccountNumber,
+    accountData.currentTradeMarketOpenOrders?.[0]?.subaccountNumber,
     accountData.allOpenOrders,
     accountData.rawParentSubaccountData
   );
@@ -625,12 +626,15 @@ function simulateMarketOrder(
 function calculateSubaccountToUseForTrade(
   marginMode: MarginMode | undefined,
   existingPositionSubaccount: number | undefined,
+  openOrderSubaccount: number | undefined,
   allOpenOrders: SubaccountOrder[],
   rawParentSubaccountData: ParentSubaccountDataBase | undefined
 ): number {
-  //   const byExistingPosition = baseAccount?.position?.subaccountNumber;
   if (existingPositionSubaccount != null) {
     return existingPositionSubaccount;
+  }
+  if (openOrderSubaccount != null) {
+    return openOrderSubaccount;
   }
   if (marginMode == null || marginMode === MarginMode.CROSS) {
     return rawParentSubaccountData?.parentSubaccount ?? 0;

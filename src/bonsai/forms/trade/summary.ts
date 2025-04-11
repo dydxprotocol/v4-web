@@ -62,13 +62,24 @@ export function calculateTradeSummary(
       getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
   );
 
+  const existingPositionOrOpenOrderMarginMode = calc(() => {
+    if (baseAccount?.position != null) {
+      const mode = baseAccount.position.marginMode;
+      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
+    }
+    if (accountData.currentTradeMarketOpenOrders.length > 0) {
+      const mode = accountData.currentTradeMarketOpenOrders[0]!.marginMode;
+      if (mode == null) {
+        return mode;
+      }
+      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
+    }
+    return undefined;
+  });
+
   const fieldStates = getTradeFormFieldStates(
     state,
-    baseAccount?.position?.marginMode == null
-      ? undefined
-      : baseAccount.position.marginMode === 'CROSS'
-        ? MarginMode.CROSS
-        : MarginMode.ISOLATED,
+    existingPositionOrOpenOrderMarginMode,
     baseAccount?.position?.leverage?.toNumber(),
     baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE,
     accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
@@ -364,7 +375,7 @@ function calculateTradeOperationsForSimulation(
     reclaimFunds:
       tradeInfo.isPositionClosed &&
       fields.marginMode.effectiveValue === MarginMode.ISOLATED &&
-      hasOpenOrdersInMarket,
+      !hasOpenOrdersInMarket,
     tradeToApply: mapIfPresent(
       marketIdRaw,
       sideRaw,
