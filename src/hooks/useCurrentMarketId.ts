@@ -21,8 +21,6 @@ import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelect
 import { setCurrentMarketId, setCurrentMarketIdIfTradeable } from '@/state/perpetuals';
 import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
-
 import { useMarketsData } from './useMarketsData';
 import { useParameterizedSelector } from './useParameterizedSelector';
 
@@ -35,7 +33,6 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const abacusHasMarketIds = useAppSelector((s) => s.perpetuals.abacusHasMarkets);
   const currentMarketOraclePrice = useParameterizedSelector(
     BonsaiHelpers.markets.createSelectMarketSummaryById,
     marketId
@@ -141,22 +138,6 @@ export const useCurrentMarketId = () => {
   }, [hasMarketIds, hasLoadedLaunchableMarkets, isViewingUnlaunchedMarket, marketId, navigate]);
 
   useEffect(() => {
-    // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (abacusHasMarketIds) {
-      if (isViewingUnlaunchedMarket) {
-        abacusStateManager.setMarket(DEFAULT_MARKETID);
-      } else {
-        if (marketId) {
-          const isMarketReadyForSubscription = hasMarketOraclePrice;
-          if (isMarketReadyForSubscription) {
-            abacusStateManager.setMarket(marketId);
-          }
-        } else {
-          abacusStateManager.setMarket(DEFAULT_MARKETID);
-        }
-      }
-    }
-
     if (isViewingUnlaunchedMarket) {
       dispatch(setCurrentMarketIdIfTradeable(undefined));
     } else {
@@ -169,14 +150,7 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketIdIfTradeable(undefined));
       }
     }
-  }, [
-    isViewingUnlaunchedMarket,
-    selectedNetwork,
-    abacusHasMarketIds,
-    hasMarketOraclePrice,
-    marketId,
-    dispatch,
-  ]);
+  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketOraclePrice, marketId, dispatch]);
 
   return {
     isViewingUnlaunchedMarket,

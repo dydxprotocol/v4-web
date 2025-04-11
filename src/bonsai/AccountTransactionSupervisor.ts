@@ -20,6 +20,7 @@ import {
 import { timeUnits } from '@/constants/time';
 
 import { type RootState, type RootStore } from '@/state/_store';
+import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import {
   cancelAllOrderFailed,
@@ -419,14 +420,24 @@ class StateConditionNotifier {
 
   private unsubscribeStore: (() => void) | null = null;
 
+  private currentDydxAddress: string | undefined;
+
   constructor(store: RootStore) {
     this.store = store;
+    this.currentDydxAddress = getUserWalletAddress(store.getState());
     this.setupStoreSubscription();
   }
 
   private setupStoreSubscription(): void {
     this.unsubscribeStore = this.store.subscribe(() => {
       const state = this.store.getState();
+
+      // if address changes, clear all listeners
+      const dydxAddress = getUserWalletAddress(state);
+      if (dydxAddress !== this.currentDydxAddress) {
+        this.currentDydxAddress = dydxAddress;
+        this.clearAllConditions();
+      }
 
       this.trackedConditions.forEach((condition) => {
         const currentValue = condition.selector(state);
@@ -447,6 +458,7 @@ class StateConditionNotifier {
     });
   }
 
+  // if user address changes, callback is never called
   public notifyWhenTrue<Selected, Result>(
     selector: SelectorFn<Selected>,
     validator: ValidationFn<NoInfer<Selected>, Result>,
@@ -483,7 +495,7 @@ class StateConditionNotifier {
     };
   }
 
-  public tearDown(): void {
+  private clearAllConditions(): void {
     // Clear all timeouts
     this.trackedConditions.forEach((condition) => {
       if (condition.timeoutId) {
@@ -493,6 +505,10 @@ class StateConditionNotifier {
 
     // Clear the map
     this.trackedConditions = [];
+  }
+
+  public tearDown(): void {
+    this.clearAllConditions();
 
     // Unsubscribe from store
     this.unsubscribeStore?.();

@@ -28,8 +28,6 @@ import { getCurrentMarketId } from './currentMarketSelectors';
  */
 export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
-export const getSubaccountForPostOrder = (s: RootState) => s.account.subaccountForPostOrders;
-
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.

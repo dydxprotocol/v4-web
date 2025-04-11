@@ -30,7 +30,6 @@ import { USDC_DECIMALS } from '@/constants/tokens';
 import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
-import { clearSubaccountState } from '@/state/account';
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -208,7 +207,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const dydxAddress = localDydxWallet?.address as DydxAddress;
 
   useEffect(() => {
-    dispatch(clearSubaccountState());
     dispatch(clearLocalOrders());
   }, [dispatch, dydxAddress]);
 
