@@ -36,8 +36,8 @@ dependencies:
     specifier: 1.21.3
     version: 1.21.3
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.275
-    version: 1.1.275
+    specifier: ^1.1.278
+    version: 1.1.278
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1980,8 +1980,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.275:
-    resolution: {integrity: sha512-yFyhOgeWWxNWKrnNAFVtsMgwPPvEM+wecDvkBqQEOucHaHE9f/kpAjMDlH2qjQFLdH/M8m1c87E+6sCGa1TpZA==}
+  /@dydxprotocol/v4-localization@1.1.278:
+    resolution: {integrity: sha512-mbUIYHJr12C5O9/POoHKuoKWvTvy+VzfdHVzT0B+u2LQAFP0CNRlO1Y7rixRfXoAJw1MOYXUSiD12PsjHdFr6g==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -14879,6 +14879,7 @@ packages:
 
   /get-starknet-core@4.0.0:
     resolution: {integrity: sha512-6pLmidQZkC3wZsrHY99grQHoGpuuXqkbSP65F8ov1/JsEI8DDLkhsAuLCKFzNOK56cJp+f1bWWfTJ57e9r5eqQ==}
+    deprecated: Package no longer supported. Please use @starknet-io/get-starknet-core
     dependencies:
       '@starknet-io/types-js': 0.7.10
     dev: false
