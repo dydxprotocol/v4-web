@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 
-import { clamp, debounce } from 'lodash';
+import { clamp } from 'lodash';
 import styled, { css } from 'styled-components';
+
+import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
 
 import { Slider } from '@/components/Slider';
 
@@ -27,34 +29,31 @@ export const LeverageSlider = ({
   const leftLeverage = MustNumber(leftLeverageSigned);
   const rightLeverage = MustNumber(rightLeverageSigned);
 
-  const [localLeverage, setLocalLeverage] = useState(leverage ?? leftLeverageSigned);
-
-  useEffect(() => {
-    setLocalLeverage(leverage ?? leftLeverageSigned);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leverage]);
-
-  const debouncedSetLeverage = useMemo(
-    () =>
-      debounce((newLeverage: string) => {
-        setLeverageInputValue(newLeverage);
-      }, 100),
+  const setLeverageSlow = useCallback(
+    (thisLeverage: number) => {
+      setLeverageInputValue(MustBigNumber(thisLeverage).toFixed(4));
+    },
     [setLeverageInputValue]
   );
 
+  const {
+    value: localLeverage,
+    setValue: setLocalLeverage,
+    commitValue: commitLocalLeverage,
+  } = useQuickUpdatingState({
+    setValueSlow: setLeverageSlow,
+    slowValue: leverage ?? leftLeverageSigned,
+    debounceMs: 100,
+  });
+
   const onSliderDrag = ([newLeverage]: number[]) => {
     const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
-    const leverageString = MustBigNumber(thisLeverage).toFixed(4);
     setLocalLeverage(thisLeverage);
-    debouncedSetLeverage(leverageString);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
     const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
-    const leverageString = MustBigNumber(thisLeverage).toFixed(4);
-    debouncedSetLeverage.cancel();
-    setLocalLeverage(thisLeverage);
-    setLeverageInputValue(leverageString);
+    commitLocalLeverage(thisLeverage);
   };
 
   const midpointFraction = getZeroFractionBetween(leftLeverage, rightLeverage);
@@ -84,7 +83,9 @@ export const LeverageSlider = ({
         )}
         onSliderDrag={onSliderDrag}
         onValueCommit={onValueCommit}
-        midPercent={midPercent != null && midPercent > 0 ? midPercent : undefined}
+        midPercent={
+          midPercent != null && midPercent > 0 && midPercent < 100 ? midPercent : undefined
+        }
         $midpoint={midPercent}
         $flipped={!rightIsPositive}
       />

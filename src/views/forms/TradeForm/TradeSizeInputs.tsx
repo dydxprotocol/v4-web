@@ -36,9 +36,11 @@ import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
-import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
+import { mapIfPresent } from '@/lib/do';
+import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { AmountCloseInput } from './AmountCloseInput';
 import { MarketLeverageInput } from './MarketLeverageInput';
 import { TargetLeverageInput } from './TargetLeverageInput';
 
@@ -57,7 +59,7 @@ export const TradeSizeInputs = () => {
 
   const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
 
-  const { needsLeverage, needsTargetLeverage } = tradeSummary.options;
+  const { needsLeverage, needsTargetLeverage, needsAmountClose } = tradeSummary.options;
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -210,6 +212,30 @@ export const TradeSizeInputs = () => {
         />
       )}
       {needsTargetLeverage && <TargetLeverageInput />}
+      {needsAmountClose && (
+        <AmountCloseInput
+          amountClosePercentInput={(tradeValues.size != null &&
+          OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+            ? AttemptBigNumber(tradeValues.size.value.value)
+            : AttemptBigNumber(
+                mapIfPresent(
+                  effectiveSizes.size,
+                  tradeSummary.positionBefore?.unsignedSize.toNumber(),
+                  (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
+                )
+              )
+          )
+            ?.times(100)
+            .toFixed(0)}
+          setAmountCloseInput={(value: string | undefined) => {
+            dispatch(
+              tradeFormActions.setSizeAvailablePercent(
+                mapIfPresent(value, (v) => MaybeBigNumber(v)?.div(100).toFixed(2)) ?? ''
+              )
+            );
+          }}
+        />
+      )}
     </div>
   );
 };

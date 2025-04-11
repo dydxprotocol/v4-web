@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
+import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -35,11 +36,22 @@ export const TargetLeverageInput = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
+  const setLeverageSlow = useCallback(
+    (newLeverageString: string | undefined) => {
+      dispatch(tradeFormActions.setTargetLeverage(newLeverageString ?? ''));
+    },
+    [dispatch]
+  );
 
-  useEffect(() => {
-    setLeverage(targetLeverage ?? '');
-  }, [targetLeverage]);
+  const {
+    value: leverage,
+    setValue: setLeverage,
+    commitValue: commitLeverageState,
+  } = useQuickUpdatingState<string | undefined>({
+    setValueSlow: setLeverageSlow,
+    slowValue: targetLeverage ?? '',
+    debounceMs: 100,
+  });
 
   const maxLeverage = useMemo(() => {
     return calculateMarketMaxLeverage({
@@ -49,15 +61,17 @@ export const TargetLeverageInput = () => {
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   const onSliderDrag = ([newLeverage]: number[]) => {
-    setLeverage(newLeverage!.toString());
+    const newLeverageString = mapIfPresent(newLeverage, (lev) =>
+      MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
+    );
+    setLeverage(newLeverageString);
   };
 
   const commitLeverage = (newLeverage: number | undefined) => {
     const newLeverageString = mapIfPresent(newLeverage, (lev) =>
       MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
     );
-    setLeverage(newLeverageString ?? '');
-    dispatch(tradeFormActions.setTargetLeverage(newLeverageString ?? ''));
+    commitLeverageState(newLeverageString);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
@@ -94,7 +108,7 @@ export const TargetLeverageInput = () => {
         <Input
           placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
           type={InputType.Leverage}
-          value={leverage}
+          value={targetLeverage ?? ''}
           max={maxLeverage}
           onChange={({ floatValue }: NumberFormatValues) => {
             commitLeverage(floatValue);
@@ -123,7 +137,7 @@ const $WithLabel = styled(WithLabel)`
 const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-backgroundColor: var(--color-layer-5);
-  --input-borderColor: var(--color-layer-7);
+  --input-borderColor: none;
   --input-height: 2.25rem;
   --input-width: 5rem;
 

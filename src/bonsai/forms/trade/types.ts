@@ -137,6 +137,7 @@ export type TradeFormOptions = {
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
 
   needsLeverage: boolean;
+  needsAmountClose: boolean;
   needsMarginMode: boolean;
   needsSize: boolean;
   needsLimitPrice: boolean;

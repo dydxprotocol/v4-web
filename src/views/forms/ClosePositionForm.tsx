@@ -51,13 +51,14 @@ import {
   getClosePositionFormValues,
 } from '@/state/tradeFormSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { mapIfPresent } from '@/lib/do';
+import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
-import { MarketLeverageInput } from './TradeForm/MarketLeverageInput';
+import { AmountCloseInput } from './TradeForm/AmountCloseInput';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
 type ElementProps = {
@@ -260,18 +261,26 @@ export const ClosePositionForm = ({
         tw="w-full"
       />
 
-      <MarketLeverageInput
-        leftLeverage={summary.summary.tradeInfo.minimumSignedLeverage}
-        rightLeverage={summary.summary.tradeInfo.maximumSignedLeverage}
-        leverageInputValue={
-          tradeValues.size != null && OrderSizeInputs.is.SIGNED_POSITION_LEVERAGE(tradeValues.size)
-            ? tradeValues.size.value.value
-            : effectiveSizes?.leverageSigned != null
-              ? MustBigNumber(effectiveSizes.leverageSigned).toString(10)
-              : MustBigNumber(summary.summary.tradeInfo.minimumSignedLeverage).toString(10)
-        }
-        setLeverageInputValue={(value: string) => {
-          dispatch(closePositionFormActions.setSizeLeverageSigned(value));
+      <AmountCloseInput
+        amountClosePercentInput={(tradeValues.size != null &&
+        OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+          ? AttemptBigNumber(tradeValues.size.value.value)
+          : AttemptBigNumber(
+              mapIfPresent(
+                effectiveSizes?.size,
+                summary.summary.positionBefore?.unsignedSize.toNumber(),
+                (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
+              )
+            )
+        )
+          ?.times(100)
+          .toFixed(0)}
+        setAmountCloseInput={(value: string | undefined) => {
+          dispatch(
+            closePositionFormActions.setSizeAvailablePercent(
+              mapIfPresent(value, (v) => MaybeBigNumber(v)?.div(100).toFixed(2)) ?? ''
+            )
+          );
         }}
       />
 

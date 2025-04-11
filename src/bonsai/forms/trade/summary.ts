@@ -14,7 +14,7 @@ import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import { mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
-import { IndexerPerpetualMarketType } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualMarketType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { calc, mapIfPresent } from '@/lib/do';
 import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
@@ -27,6 +27,7 @@ import {
   ExecutionType,
   MarginMode,
   matchOrderType,
+  OrderSide,
   SelectionOption,
   TimeInForce,
   TimeUnit,
@@ -73,7 +74,7 @@ export function calculateTradeSummary(
     accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
   );
 
-  const options = calculateTradeFormOptions(state.type, fieldStates);
+  const options = calculateTradeFormOptions(state.type, fieldStates, baseAccount);
 
   const tradeInfo: TradeSummary = calculateTradeInfo(fieldStates, baseAccount, accountData);
 
@@ -168,6 +169,7 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       timeInForceOptions: [],
       goodTilUnitOptions: [],
       needsLeverage: false,
+      needsAmountClose: false,
       needsMarginMode: false,
       needsSize: false,
       needsLimitPrice: false,
@@ -252,7 +254,8 @@ const memoizedMergeMarkets = weakMapMemoize(
 
 function calculateTradeFormOptions(
   orderType: TradeFormType | undefined,
-  fields: TradeFormFieldStates
+  fields: TradeFormFieldStates,
+  baseAccount: TradeAccountDetails | undefined
 ): TradeFormOptions {
   const executionOptions: SelectionOption<ExecutionType>[] = orderType
     ? matchOrderType(orderType, {
@@ -266,21 +269,31 @@ function calculateTradeFormOptions(
       })
     : emptyExecutionOptions;
 
+  const isCross =
+    fields.marginMode.effectiveValue == null ||
+    fields.marginMode.effectiveValue === MarginMode.CROSS;
+
+  const tradeSide = fields.side.effectiveValue;
+  const reduceOnly = fields.reduceOnly.effectiveValue;
+  const isDecreasing =
+    (baseAccount?.position?.side === IndexerPositionSide.LONG && tradeSide === OrderSide.SELL) ||
+    (baseAccount?.position?.side === IndexerPositionSide.SHORT && tradeSide === OrderSide.BUY);
+
   return {
     orderTypeOptions,
     executionOptions,
     timeInForceOptions,
     goodTilUnitOptions,
 
-    needsLeverage:
-      orderType === TradeFormType.MARKET &&
-      (fields.marginMode.effectiveValue == null ||
-        fields.marginMode.effectiveValue === MarginMode.CROSS),
+    needsLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
+    needsAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
+    needsTargetLeverage:
+      isFieldStateEnabled(fields.targetLeverage) &&
+      (orderType !== TradeFormType.MARKET || !reduceOnly),
 
     needsMarginMode: isFieldStateEnabled(fields.marginMode),
     needsSize: isFieldStateEnabled(fields.size),
     needsLimitPrice: isFieldStateEnabled(fields.limitPrice),
-    needsTargetLeverage: isFieldStateEnabled(fields.targetLeverage),
     needsTriggerPrice: isFieldStateEnabled(fields.triggerPrice),
     needsGoodUntil: isFieldStateEnabled(fields.goodTil),
     needsReduceOnly: isFieldStateEnabled(fields.reduceOnly),
