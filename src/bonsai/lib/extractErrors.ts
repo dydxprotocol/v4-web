@@ -146,7 +146,7 @@ export const parseTransactionError = (
       return undefined;
     } catch {
       // is not json
-      if (response.startsWith('429:  - ')) {
+      if (response.startsWith('429:')) {
         return {
           message: '429 - Too many requests',
           stringKey: STRING_KEYS.ERROR_MANY_REQUESTS,
