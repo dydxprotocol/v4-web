@@ -96,6 +96,15 @@ export function getTradeFormFieldStates(
     });
   }
 
+  function defaultSizeIfSizeInputIsInvalid(states: TradeFormFieldStates) {
+    if (
+      states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' ||
+      states.size.effectiveValue?.type === 'SIGNED_POSITION_LEVERAGE'
+    ) {
+      states.size.effectiveValue = defaults.size;
+    }
+  }
+
   return calc(() => {
     const result = { ...baseResult };
     makeVisible(result, ['type']);
@@ -117,6 +126,7 @@ export function getTradeFormFieldStates(
           'reduceOnly',
           'postOnly',
         ]);
+        defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
         targetLeverageVisibleIfIsolated(result);
 
@@ -142,6 +152,7 @@ export function getTradeFormFieldStates(
           'execution',
           'reduceOnly',
         ]);
+        defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
         targetLeverageVisibleIfIsolated(result);
 
@@ -162,6 +173,7 @@ export function getTradeFormFieldStates(
           'execution',
           'reduceOnly',
         ]);
+        defaultSizeIfSizeInputIsInvalid(result);
         setMarginMode(result);
         targetLeverageVisibleIfIsolated(result);
 
