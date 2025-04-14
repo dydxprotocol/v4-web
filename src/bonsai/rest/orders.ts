@@ -17,6 +17,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 export function setUpOrdersQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'orders']);
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'orders',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'orders', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
