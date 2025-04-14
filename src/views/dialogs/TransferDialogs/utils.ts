@@ -1,6 +1,6 @@
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { ChainMismatchError, isAddress, UserRejectedRequestError } from 'viem';
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
@@ -135,7 +135,8 @@ export function isValidWithdrawalAddress(address: string, chainId: string): bool
     case arbitrum.id.toString():
     case base.id.toString():
     case optimism.id.toString():
-    case polygon.id.toString(): {
+    case polygon.id.toString():
+    case avalanche.id.toString(): {
       return isAddress(address, { strict: true });
     }
     default: {

@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from './graz';
 import { SOLANA_MAINNET_ID } from './solana';
@@ -34,6 +34,11 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
   [polygon.id]: {
     name: 'Polygon',
     icon: '/chains/polygon.png',
+    walletNetworkType: WalletNetworkType.Evm,
+  },
+  [avalanche.id]: {
+    name: 'Avalanche',
+    icon: '/chains/avalanche.png',
     walletNetworkType: WalletNetworkType.Evm,
   },
   [SOLANA_MAINNET_ID]: {
