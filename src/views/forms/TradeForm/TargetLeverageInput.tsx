@@ -67,15 +67,15 @@ export const TargetLeverageInput = () => {
     setLeverage(newLeverageString);
   };
 
-  const commitLeverage = (newLeverage: number | undefined) => {
-    const newLeverageString = mapIfPresent(newLeverage, (lev) =>
-      MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
-    );
-    commitLeverageState(newLeverageString);
+  const commitLeverage = (newLeverage: string) => {
+    commitLeverageState(newLeverage);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
-    commitLeverage(newLeverage);
+    const newLeverageString = mapIfPresent(newLeverage, (lev) =>
+      MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
+    );
+    commitLeverage(newLeverageString ?? '');
   };
 
   return (
@@ -110,8 +110,8 @@ export const TargetLeverageInput = () => {
           type={InputType.Leverage}
           value={targetLeverage ?? ''}
           max={maxLeverage}
-          onChange={({ floatValue }: NumberFormatValues) => {
-            commitLeverage(floatValue);
+          onChange={({ value }: NumberFormatValues) => {
+            commitLeverage(value);
           }}
         />
       </$InnerInputContainer>

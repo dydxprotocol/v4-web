@@ -35,13 +35,12 @@ export const AmountCloseInput = ({
     setAmountClose(newValueString ?? '');
   };
 
-  const commitValue = (newValue: number | undefined) => {
-    const newValueString = mapIfPresent(newValue, (lev) => MustBigNumber(lev).toFixed(0));
-    commitAmountClose(newValueString ?? '');
+  const commitValue = (newValue: string | undefined) => {
+    commitAmountClose(newValue);
   };
 
   const onValueCommit = ([newValue]: number[]) => {
-    commitValue(newValue);
+    commitValue(MustBigNumber(newValue).toFixed(0));
   };
 
   return (
@@ -64,8 +63,8 @@ export const AmountCloseInput = ({
           type={InputType.Percent}
           value={amountClosePercentInput}
           max={100}
-          onChange={({ floatValue }: NumberFormatValues) => {
-            commitValue(floatValue);
+          onChange={({ value }: NumberFormatValues) => {
+            commitValue(value);
           }}
         />
       </$InnerInputContainer>
