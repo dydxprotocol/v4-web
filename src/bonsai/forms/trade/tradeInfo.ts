@@ -77,6 +77,12 @@ export function calculateTradeInfo(
         return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData, subaccountToUse);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
+          const calculatedMaxLeverage = getMaxCrossMarketOrderSizeSummary(
+            trade,
+            baseAccount,
+            accountData,
+            subaccountToUse
+          )?.leverageSigned;
 
           return {
             inputSummary: calculated.summary ?? { size: undefined, averageFillPrice: undefined },
@@ -88,10 +94,11 @@ export function calculateTradeInfo(
               return price * (1 - MARKET_ORDER_MAX_SLIPPAGE);
             }),
             minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
-            maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
-            // maximumSignedLeverage:
-            //   getMaxCrossMarketOrderSizeSummary(trade, baseAccount, accountData, subaccountToUse)
-            //     ?.leverageSigned ?? leverageLimits.maxLeverage.toNumber(),
+            maximumSignedLeverage: getSignedLeverageLimitsForMarketOrder(
+              leverageLimits,
+              calculatedMaxLeverage
+            ).toNumber(),
+            // leverageLimits.maxLeverage.toNumber(),
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
@@ -501,6 +508,8 @@ function simulateMarketOrder(
     const rowSize = currentRow.size;
 
     let sizeToTake = 0;
+    const sizeEquityImpact =
+      oraclePrice * operationMultipler - rowPrice * feeRate - rowPrice * operationMultipler;
 
     if (effectiveSizeTarget.type === 'size') {
       sizeToTake = effectiveSizeTarget.target - totalSize;
@@ -510,10 +519,36 @@ function simulateMarketOrder(
       sizeToTake = maxSizeForRemainingUsdc;
     } else if (effectiveSizeTarget.type === 'leverage') {
       const targetLeverage = effectiveSizeTarget.target;
-      const aFactor =
-        oraclePrice * operationMultipler - rowPrice * feeRate - rowPrice * operationMultipler;
-      const denominator = targetLeverage * aFactor - operationMultipler * oraclePrice;
-      const numerator = thisPositionValue - targetLeverage * equity;
+
+      // numerator is the target quantity, which in this case is targetPositionValue - currentPositionValue,
+      // which is a positionValueDelta
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      const numerator = calc(() => {
+        const base = targetLeverage * equity - thisPositionValue;
+        // if we're heading in the wrong direciton, go nowhere
+        if (base * operationMultipler < 0) {
+          return 0;
+        }
+        return base;
+      });
+
+      // denominator is the impact of each unit size on the target quantity (positionValue)
+      // for each unit size we add, how is position value affected
+      // and as above, position value is changing proportional to targetLeverage * equity - thisPositionValue
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      const denominator = calc(() => {
+        const base = -(targetLeverage * sizeEquityImpact - operationMultipler * oraclePrice);
+
+        if (base * operationMultipler < 0) {
+          // somehow adding size is taking position value in the opposite diretion
+          // which means leverage is going down as size goes up
+          // so let's force take the whole row I guess, by making numerator/denominator very large
+          return numerator / Number.MAX_SAFE_INTEGER;
+        }
+
+        return base;
+      });
+
       const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
       sizeToTake = maxSizeAtThisPrice;
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -523,17 +558,12 @@ function simulateMarketOrder(
         (thisPositionValue >= 0 && side === OrderSide.BUY);
 
       if (increasing) {
-        const numerator =
-          0 -
-          equity +
-          initialRiskWithoutPosition +
-          marketEffectiveImf * Math.abs(thisPositionValue);
-        const denominator =
-          oraclePrice * operationMultipler -
-          rowPrice * feeRate -
-          rowPrice * operationMultipler -
-          marketEffectiveImf * oraclePrice;
-        const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
+        const currentFreeCollateral =
+          equity - initialRiskWithoutPosition - marketEffectiveImf * Math.abs(thisPositionValue);
+        const numerator = Math.max(currentFreeCollateral, 0);
+        const denominator = Math.max(-(sizeEquityImpact - marketEffectiveImf * oraclePrice), 0);
+        // if denominator is 0 that means each unit size is increasing free collateral
+        const maxSizeAtThisPrice = denominator === 0 ? rowSize : numerator / denominator;
         sizeToTake = maxSizeAtThisPrice;
       } else if (existingPosition != null) {
         // we want to decrease as much as possible then start increasing
@@ -545,28 +575,17 @@ function simulateMarketOrder(
           if (!reduceOnly) {
             const newPositionValue = 0; // we sold everything
 
-            // formula copied from below
-            const newEquity =
-              equity +
-              // update to notional
-              sizeToTake * operationMultipler * oraclePrice +
-              // update to quote for cost
-              sizeToTake * operationMultipler * -1 * rowPrice +
-              // update to quote for fees
-              sizeToTake * rowPrice * feeRate * -1;
+            const newEquity = equity + sizeToTake * sizeEquityImpact;
+            const newFreeCollateral =
+              newEquity -
+              initialRiskWithoutPosition -
+              marketEffectiveImf * Math.abs(newPositionValue);
 
             // then we sell everything we can with the remaining usdc, back to the increasing case
-            const numerator =
-              0 -
-              newEquity +
-              initialRiskWithoutPosition +
-              marketEffectiveImf * Math.abs(newPositionValue);
-            const denominator =
-              oraclePrice * operationMultipler -
-              rowPrice * feeRate -
-              rowPrice * operationMultipler -
-              marketEffectiveImf * oraclePrice;
-            const maxSizeAtThisPrice = denominator === 0 ? 0 : numerator / denominator;
+            const numerator = Math.max(newFreeCollateral, 0);
+            const denominator = Math.max(-(sizeEquityImpact - marketEffectiveImf * oraclePrice), 0);
+            // if denominator is 0 that means each unit size is increasing free collateral
+            const maxSizeAtThisPrice = denominator === 0 ? rowSize : numerator / denominator;
             sizeToTake += maxSizeAtThisPrice;
           }
         } else {
@@ -697,6 +716,20 @@ function getSignedLeverageLimits(
       );
     }),
   };
+}
+
+function getSignedLeverageLimitsForMarketOrder(
+  limits: {
+    minLeverage: BigNumber;
+    maxLeverage: BigNumber;
+  },
+  maxCalculated: number | undefined
+) {
+  return (
+    mapIfPresent(maxCalculated, (m) =>
+      AttemptBigNumber(m)?.decimalPlaces(2, BigNumber.ROUND_DOWN).times(MAX_LEVERAGE_BUFFER_PERCENT)
+    ) ?? limits.maxLeverage
+  );
 }
 
 function calculateEffectiveSizeTarget(
