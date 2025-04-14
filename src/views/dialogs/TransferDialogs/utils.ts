@@ -19,6 +19,10 @@ export function getTokenSymbol(denom: string) {
     return 'POL';
   }
 
+  if (denom === 'avalanche-native') {
+    return 'AVAX';
+  }
+
   if (isNativeTokenDenom(denom)) return 'ETH';
 
   return 'USDC';
