@@ -12,13 +12,16 @@ import metadataClient from '@/clients/metadataService';
 
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
-import { logBonsaiError } from '../logs';
+import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpAssetsQuery(store: RootStore) {
   const observer = new QueryObserver(appQueryClient, {
     queryKey: ['metadata', 'assets'],
-    queryFn: () => Promise.all([metadataClient.getAssetInfo(), metadataClient.getAssetPrices()]),
+    queryFn: wrapAndLogBonsaiError(
+      () => Promise.all([metadataClient.getAssetInfo(), metadataClient.getAssetPrices()]),
+      'assetsQuery'
+    ),
     refetchInterval: timeUnits.minute * 5,
     staleTime: timeUnits.minute * 5,
   });

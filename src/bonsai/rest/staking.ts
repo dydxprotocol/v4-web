@@ -15,6 +15,7 @@ import { MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { convertAmount, processCoinAmount } from '../calculators/balances';
+import { wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useCompositeClient } from './lib/useIndexer';
 
@@ -43,8 +44,8 @@ export const useStakingDelegations = () => {
   return queryResultToLoadable(
     useQuery({
       queryKey: ['validator', 'staking', 'delegations', address, client.key],
-      enabled: isPresent(address) && isPresent(client),
-      queryFn: async (): Promise<StakingDelegationsResult> => {
+      enabled: isPresent(address) && isPresent(client.compositeClient),
+      queryFn: wrapAndLogBonsaiError(async (): Promise<StakingDelegationsResult> => {
         if (!address || !client.compositeClient) {
           throw new Error('Invalid staking delegations query state');
         }
@@ -86,7 +87,7 @@ export const useStakingDelegations = () => {
           balances,
           delegations,
         };
-      },
+      }, 'stakingDelegations'),
       refetchInterval: timeUnits.hour,
       staleTime: timeUnits.hour,
     })
@@ -116,8 +117,8 @@ export const useUnbondingDelegations = () => {
   return queryResultToLoadable(
     useQuery({
       queryKey: ['validator', 'staking', 'unbonding-delegations', address, client.key],
-      enabled: isPresent(address) && isPresent(client),
-      queryFn: async (): Promise<UnbondingDelegation[]> => {
+      enabled: isPresent(address) && isPresent(client.compositeClient),
+      queryFn: wrapAndLogBonsaiError(async (): Promise<UnbondingDelegation[]> => {
         if (!address || !client.compositeClient) {
           throw new Error('Invalid unbonding delegations query state');
         }
@@ -143,7 +144,7 @@ export const useUnbondingDelegations = () => {
         );
 
         return unbondingDelegations;
-      },
+      }, 'unbondingDelegations'),
       refetchInterval: timeUnits.hour,
       staleTime: timeUnits.hour,
     })
@@ -168,8 +169,8 @@ export const useStakingRewards = () => {
   return queryResultToLoadable(
     useQuery({
       queryKey: ['validator', 'staking', 'staking-rewards', address, client.key],
-      enabled: isPresent(address) && isPresent(client),
-      queryFn: async (): Promise<StakingRewards> => {
+      enabled: isPresent(address) && isPresent(client.compositeClient),
+      queryFn: wrapAndLogBonsaiError(async (): Promise<StakingRewards> => {
         if (!address || !client.compositeClient) {
           throw new Error('Invalid staking rewards query state');
         }
@@ -206,7 +207,7 @@ export const useStakingRewards = () => {
           validators,
           totalRewards,
         };
-      },
+      }, 'stakingRewards'),
       refetchInterval: timeUnits.hour,
       staleTime: timeUnits.hour,
     })
