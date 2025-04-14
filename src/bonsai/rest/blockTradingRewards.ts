@@ -19,6 +19,7 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
   ]);
 
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'blockTradingRewards',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'blockTradingRewards', data],
     getQueryFn: (indexerClient, data) => {

@@ -36,6 +36,7 @@ interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
   nobleClientReady: boolean;
+  errorInitializing: boolean;
 }
 
 export type HeightEntry = {
@@ -203,6 +204,7 @@ export const rawSlice = createSlice({
           compositeClientReady: false,
           indexerClientReady: false,
           nobleClientReady: false,
+          errorInitializing: false,
         }),
         ...stateToMerge,
       };

@@ -19,6 +19,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpAccountBalancesQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'accountBalances',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['accountBalances', data.wallet],
     getQueryFn: (compositeClient, data) => {
@@ -42,6 +43,7 @@ export function setUpAccountBalancesQuery(store: RootStore) {
 
 export function setUpAccountStatsQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'accountStats',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['accountStats', data.wallet],
     getQueryFn: (compositeClient, data) => {
@@ -71,6 +73,7 @@ export function setUpAccountStatsQuery(store: RootStore) {
 
 export function setUpAccountFeeTierQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'accountFeeTier',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['userFeeTier', data.wallet],
     getQueryFn: (compositeClient, data) => {
