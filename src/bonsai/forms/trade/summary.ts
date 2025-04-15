@@ -161,15 +161,15 @@ export function calculateTradeSummary(
         if (options.needsTriggerPrice && triggerPrice == null) {
           return undefined;
         }
-        const clobPairId = AttemptNumber(market.clobPairId);
-        if (clobPairId == null) {
-          return undefined;
-        }
         const goodTilTimeParsed = AttemptNumber(effectiveTrade.goodTil?.duration);
         if (
           options.needsGoodUntil &&
           (goodTilTimeParsed == null || effectiveTrade.goodTil == null)
         ) {
+          return undefined;
+        }
+        const clobPairId = AttemptNumber(market.clobPairId);
+        if (clobPairId == null) {
           return undefined;
         }
         const marketInfo: PlaceOrderMarketInfo = {
