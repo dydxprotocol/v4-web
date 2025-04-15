@@ -372,6 +372,7 @@ class TriggerOrderFormValidationErrors {
     return simpleValidationError({
       code: 'OPEN_ORDERS_EXCEEDS_EQUITY_TIER_LIMIT',
       type: ErrorType.error,
+      learnMoreUrlKey: 'equityTiersLearnMore',
       textKey: STRING_KEYS.TRIGGERS_EQUITY_TIER_ERROR,
       textParams: {
         CURRENT_EQUITY: {
