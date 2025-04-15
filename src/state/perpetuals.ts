@@ -37,7 +37,6 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
     },
-
     resetPerpetualsState: () =>
       ({
         ...initialState,

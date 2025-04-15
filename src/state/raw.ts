@@ -32,6 +32,8 @@ import {
 
 import { calc } from '@/lib/do';
 
+import { autoBatchAllReducers } from './autoBatchHelpers';
+
 interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
@@ -135,7 +137,7 @@ const initialState: RawDataState = {
 export const rawSlice = createSlice({
   name: 'Raw data',
   initialState,
-  reducers: {
+  reducers: autoBatchAllReducers<RawDataState>()({
     setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
       state.markets.allMarkets = action.payload;
     },
@@ -239,7 +241,7 @@ export const rawSlice = createSlice({
     ) => {
       state.rewards.price = action.payload;
     },
-  },
+  }),
 });
 
 const HEIGHTS_BUFFER_LENGTH = 12;

@@ -27,13 +27,14 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
           `Long request time detected for ${logId}: ${Math.floor(duration / 1000)}s`,
           {
             duration,
+            source: logId,
           }
         );
       }
       return result;
     } catch (error) {
       const duration = Date.now() - start;
-      logBonsaiError(logId, `Error fetching ${logId} data`, { error, duration });
+      logBonsaiError(logId, `Error fetching ${logId} data`, { error, duration, source: logId });
       throw error;
     }
   };

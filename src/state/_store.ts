@@ -90,6 +90,10 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(appMiddleware as Middleware, localizationMiddleware as Middleware),
+  enhancers: (getDefaultEnhancers) =>
+    getDefaultEnhancers({
+      autoBatch: { type: 'timer', timeout: 250 },
+    }),
   devTools:
     process.env.NODE_ENV !== 'production'
       ? {
