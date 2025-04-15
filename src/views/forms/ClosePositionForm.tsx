@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
+import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { type HumanReadablePlaceOrderPayload, type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
-import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -22,7 +21,6 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -41,6 +39,7 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
+import { accountTransactionManager } from '@/state/_store';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';
@@ -52,6 +51,7 @@ import {
 } from '@/state/tradeFormSelectors';
 
 import { mapIfPresent } from '@/lib/do';
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 import { getTradeInputAlert } from '@/lib/tradeData';
@@ -84,8 +84,6 @@ export const ClosePositionForm = ({
   const enableLimitClose = useStatsigGateValue(StatsigFlags.ffEnableLimitClose);
 
   const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
-
-  const { closePosition } = useSubaccount();
 
   const market = useAppSelector(getCurrentMarketIdIfTradeable);
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
@@ -192,25 +190,27 @@ export const ClosePositionForm = ({
     }
   };
 
-  const onClosePosition = () => {
+  const onClosePosition = async () => {
     setClosePositionError(undefined);
 
-    closePosition({
-      onError: (errorParams: ErrorParams) => {
-        setClosePositionError(
-          stringGetter({
-            key: errorParams.errorStringKey,
-            fallback: errorParams.errorMessage ?? '',
-          })
-        );
-        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
-      },
-      onSuccess: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => {
-        setUnIndexedClientId(placeOrderPayload?.clientId);
-      },
-    });
-
+    const payload = summary.summary.tradePayload;
+    if (payload == null) {
+      return;
+    }
     onClearInputs();
+    const result = await accountTransactionManager.placeOrder(payload);
+    if (isOperationSuccess(result)) {
+      setUnIndexedClientId(payload.clientId.toString());
+    } else {
+      const errorParams = operationFailureToErrorParams(result);
+      setClosePositionError(
+        stringGetter({
+          key: errorParams.errorStringKey,
+          fallback: errorParams.errorMessage ?? '',
+        })
+      );
+      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
+    }
   };
 
   const onUseLimitCheckedChange = (checked: boolean) => {

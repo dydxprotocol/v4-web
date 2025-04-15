@@ -11,16 +11,21 @@ import {
 import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
+import { OrderExecution, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
 import { mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
+import { TransactionMemo } from '@/constants/analytics';
+import { timeUnits } from '@/constants/time';
 import { IndexerPerpetualMarketType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
-import { AttemptNumber, MustBigNumber } from '@/lib/numbers';
+import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
 import { getTradeFormFieldStates, isFieldStateEnabled } from './fields';
 import { calculateTradeInfo } from './tradeInfo';
 import {
@@ -143,11 +148,136 @@ export function calculateTradeSummary(
 
   const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
 
+  const tradePayload = calc((): PlaceOrderPayload | undefined => {
+    return mapIfPresent(
+      accountData.currentTradeMarketSummary,
+      effectiveTrade.marketId,
+      effectiveTrade.type,
+      effectiveTrade.side,
+      tradeInfo.inputSummary.size?.size,
+      tradeInfo.payloadPrice,
+      (market, marketId, type, side, size, price): PlaceOrderPayload | undefined => {
+        const triggerPrice = AttemptNumber(effectiveTrade.triggerPrice);
+        if (options.needsTriggerPrice && triggerPrice == null) {
+          return undefined;
+        }
+        const clobPairId = AttemptNumber(market.clobPairId);
+        if (clobPairId == null) {
+          return undefined;
+        }
+        const goodTilTimeParsed = AttemptNumber(effectiveTrade.goodTil?.duration);
+        if (
+          options.needsGoodUntil &&
+          (goodTilTimeParsed == null || effectiveTrade.goodTil == null)
+        ) {
+          return undefined;
+        }
+        const marketInfo: PlaceOrderMarketInfo = {
+          clobPairId,
+          atomicResolution: market.atomicResolution,
+          stepBaseQuantums: market.stepBaseQuantums,
+          quantumConversionExponent: market.quantumConversionExponent,
+          subticksPerTick: market.subticksPerTick,
+        };
+
+        const clientId = Math.floor(Math.random() * MAX_INT_ROUGHLY);
+
+        return {
+          subaccountNumber: tradeInfo.subaccountNumber,
+          transferToSubaccountAmount: tradeInfo.transferToSubaccountAmount,
+          marketId,
+          type: tradeFormTypeToOrderType(type),
+          side,
+          price,
+          size,
+          clientId,
+          timeInForce: calc(() => {
+            if (options.timeInForceOptions.length === 0) {
+              return undefined;
+            }
+
+            if (effectiveTrade.type === TradeFormType.MARKET) {
+              return OrderTimeInForce.IOC;
+            }
+
+            if (effectiveTrade.timeInForce == null) {
+              return OrderTimeInForce.IOC;
+            }
+            if (effectiveTrade.timeInForce === TimeInForce.IOC) {
+              return OrderTimeInForce.IOC;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (effectiveTrade.timeInForce === TimeInForce.GTT) {
+              return OrderTimeInForce.GTT;
+            }
+            assertNever(effectiveTrade.timeInForce);
+            return OrderTimeInForce.IOC;
+          }),
+          postOnly: options.needsPostOnly ? effectiveTrade.postOnly : undefined,
+          reduceOnly: options.needsReduceOnly ? effectiveTrade.reduceOnly : undefined,
+          triggerPrice: options.needsTriggerPrice ? triggerPrice : undefined,
+          execution: calc(() => {
+            if (options.executionOptions.length > 0) {
+              if (effectiveTrade.execution == null) {
+                return OrderExecution.DEFAULT;
+              }
+              if (effectiveTrade.execution === ExecutionType.GOOD_TIL_DATE) {
+                return OrderExecution.DEFAULT;
+              }
+              if (effectiveTrade.execution === ExecutionType.IOC) {
+                return OrderExecution.IOC;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              if (effectiveTrade.execution === ExecutionType.POST_ONLY) {
+                return OrderExecution.POST_ONLY;
+              }
+              assertNever(effectiveTrade.execution);
+            }
+            return undefined;
+          }),
+          goodTilTimeInSeconds: calc(() => {
+            if (options.needsGoodUntil) {
+              const duration = goodTilTimeParsed;
+              const unit = effectiveTrade.goodTil?.unit;
+              if (duration == null || unit == null) {
+                // should have returned above
+                // eslint-disable-next-line no-console
+                console.error('unexpected null good til duration or unit');
+                return undefined;
+              }
+              if (unit === TimeUnit.DAY) {
+                return (timeUnits.day * duration) / timeUnits.second;
+              }
+              if (unit === TimeUnit.HOUR) {
+                return (timeUnits.hour * duration) / timeUnits.second;
+              }
+              if (unit === TimeUnit.MINUTE) {
+                return (timeUnits.minute * duration) / timeUnits.second;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              if (unit === TimeUnit.WEEK) {
+                return (timeUnits.week * duration) / timeUnits.second;
+              }
+              assertNever(unit);
+            }
+            return undefined;
+          }),
+          marketInfo,
+          // will be provided at submission time
+          goodTilBlock: undefined,
+          currentHeight: undefined,
+          memo: TransactionMemo.placeOrder,
+        };
+      }
+    );
+    return undefined;
+  });
   return {
     effectiveTrade,
     options,
 
     tradeInfo,
+    tradePayload,
 
     accountBefore: baseAccount?.account,
     positionBefore: baseAccount?.position,
@@ -192,6 +322,7 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       needsReduceOnlyTooltip: false,
       needsPostOnlyTooltip: false,
     },
+    tradePayload: undefined,
     tradeInfo: {
       inputSummary: {
         size: undefined,
@@ -395,4 +526,46 @@ function calculateTradeOperationsForSimulation(
       })
     ),
   };
+}
+
+export function tradeFormTypeToOrderType(tradeFormType: TradeFormType): OrderType {
+  switch (tradeFormType) {
+    case TradeFormType.MARKET:
+      return OrderType.MARKET;
+    case TradeFormType.LIMIT:
+      return OrderType.LIMIT;
+    case TradeFormType.STOP_MARKET:
+      return OrderType.STOP_MARKET;
+    case TradeFormType.STOP_LIMIT:
+      return OrderType.STOP_LIMIT;
+    case TradeFormType.TAKE_PROFIT_MARKET:
+      return OrderType.TAKE_PROFIT_MARKET;
+    case TradeFormType.TAKE_PROFIT_LIMIT:
+      // Note: There's a naming difference here - TAKE_PROFIT_LIMIT maps to TAKE_PROFIT
+      return OrderType.TAKE_PROFIT_LIMIT;
+    default:
+      assertNever(tradeFormType);
+      return OrderType.MARKET;
+  }
+}
+
+export function orderTypeToTradeFormType(orderType: OrderType): TradeFormType {
+  switch (orderType) {
+    case OrderType.MARKET:
+      return TradeFormType.MARKET;
+    case OrderType.LIMIT:
+      return TradeFormType.LIMIT;
+    case OrderType.STOP_MARKET:
+      return TradeFormType.STOP_MARKET;
+    case OrderType.STOP_LIMIT:
+      return TradeFormType.STOP_LIMIT;
+    case OrderType.TAKE_PROFIT_MARKET:
+      return TradeFormType.TAKE_PROFIT_MARKET;
+    case OrderType.TAKE_PROFIT_LIMIT:
+      // Note: Handling the naming difference in reverse
+      return TradeFormType.TAKE_PROFIT_LIMIT;
+    default:
+      assertNever(orderType);
+      return TradeFormType.MARKET;
+  }
 }

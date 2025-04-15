@@ -3,8 +3,6 @@ import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   AbacusStateNotificationProtocol,
-  HumanReadableCloseAllPositionsPayload,
-  HumanReadablePlaceOrderPayload,
   Nullable,
   ParsingError,
   TransferInputFields,
@@ -235,31 +233,6 @@ class AbacusStateManager {
   };
 
   // ------ Transactions ------ //
-
-  placeOrder = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: Nullable<HumanReadablePlaceOrderPayload>
-    ) => void
-  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitPlaceOrder(callback);
-
-  closePosition = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: Nullable<HumanReadablePlaceOrderPayload>
-    ) => void
-  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitClosePosition(callback);
-
-  closeAllPositions = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: Nullable<HumanReadablePlaceOrderPayload>
-    ) => void
-  ): Nullable<HumanReadableCloseAllPositionsPayload> =>
-    this.stateManager.closeAllPositions(callback);
 
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void

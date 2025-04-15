@@ -8,36 +8,58 @@ import {
   wrapOperationSuccess,
 } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { BonsaiCore } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiRaw } from '@/bonsai/ontology';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
+import { IndexedTx } from '@cosmjs/stargate';
 import {
   CompositeClient,
   LocalWallet,
+  OrderExecution,
   OrderFlags,
+  OrderSide,
+  OrderTimeInForce,
+  OrderType,
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
+import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
+import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { type RootState, type RootStore } from '@/state/_store';
-import { getUserWalletAddress } from '@/state/accountInfoSelectors';
+import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { createAppSelector } from '@/state/appTypes';
 import {
   cancelAllOrderFailed,
   cancelAllSubmitted,
   cancelOrderFailed,
   cancelOrderSubmitted,
+  closeAllPositionsSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
+  placeOrderTimeout,
 } from '@/state/localOrders';
 import { getLocalWalletNonce } from '@/state/walletSelectors';
 
 import { parseToPrimitives, ToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { calc, mapIfPresent } from '@/lib/do';
 import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpers';
-import { stringifyTransactionError } from '@/lib/errors';
+import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
-import { AttemptNumber } from '@/lib/numbers';
+import { AttemptBigNumber, AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
+import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { sleep } from '@/lib/timeUtils';
+import { isPresent } from '@/lib/typeUtils';
 
 import { getSimpleOrderStatus } from './calculators/orders';
+import { calculateSubaccountSummary } from './calculators/subaccount';
+import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
+
+const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
+const SHORT_TERM_ORDER_DURATION = 20;
+const POST_TRANSFER_PLACE_ORDER_DELAY = 250;
 
 interface ClientWalletPair {
   compositeClient: CompositeClient;
@@ -150,7 +172,7 @@ export class AccountTransactionSupervisor {
                 logBonsaiInfo(nameForLogging, 'Successfully confirmed operation', {
                   payload,
                   parsedTx,
-                  result: resultOrNull,
+                  result: purgeBigNumbers(resultOrNull),
                   totalTimeToConfirm: confirmedTime - startTime,
                   timeToConfirmAfterSubmitted: confirmedTime - submittedTime,
                 });
@@ -311,6 +333,363 @@ export class AccountTransactionSupervisor {
       .map((order) => order.id);
   }
 
+  private getCloseAllPositionsPayloads(): PlaceOrderPayload[] | undefined {
+    const state = this.store.getState();
+    const positions = BonsaiCore.account.parentSubaccountPositions.data(state);
+
+    if (positions == null || positions.length === 0) {
+      // technically could be fine, just no-op
+      return [];
+    }
+
+    // Get current blockchain height for goodTilBlock
+    const validatorHeight = BonsaiCore.network.validatorHeight.data(state);
+    if (validatorHeight == null) {
+      logBonsaiError(
+        'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
+        'cannot generate close all positions payload because validatorHeight is null'
+      );
+      return undefined;
+    }
+    const currentHeight = validatorHeight.height;
+
+    const markets = BonsaiCore.markets.markets.data(state);
+    if (markets == null) {
+      logBonsaiError(
+        'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
+        'cannot generate close all positions payload because markets is null'
+      );
+      return undefined;
+    }
+
+    return positions
+      .filter((position) => position.unsignedSize.gt(0))
+      .map((position): PlaceOrderPayload | undefined => {
+        const clientId = Math.floor(Math.random() * MAX_INT_ROUGHLY);
+
+        // Get market information to calculate price with slippage
+        const marketId = position.market;
+        const market = markets[marketId];
+        const oraclePrice = AttemptBigNumber(market?.oraclePrice);
+
+        if (!market || oraclePrice == null || oraclePrice.isZero()) {
+          logBonsaiError(
+            'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
+            'cannot generate close position payload because market is null or oracle is bad',
+            { market }
+          );
+          return undefined;
+        }
+
+        // Determine order side (opposite of position side)
+        const positionSize = position.signedSize;
+        const side = positionSize.isGreaterThan(0) ? OrderSide.SELL : OrderSide.BUY;
+
+        // Calculate price with slippage
+        const price =
+          side === OrderSide.BUY
+            ? oraclePrice.times(1 + MARKET_ORDER_MAX_SLIPPAGE).toNumber()
+            : oraclePrice.times(1 - MARKET_ORDER_MAX_SLIPPAGE).toNumber();
+
+        const clobPairId = AttemptNumber(market.clobPairId);
+        if (clobPairId == null) {
+          return undefined;
+        }
+        const marketInfo: PlaceOrderMarketInfo = {
+          clobPairId,
+          atomicResolution: market.atomicResolution,
+          stepBaseQuantums: market.stepBaseQuantums,
+          quantumConversionExponent: market.quantumConversionExponent,
+          subticksPerTick: market.subticksPerTick,
+        };
+
+        // Calculate goodTilBlock if we have current height
+        const goodTilBlock = currentHeight + SHORT_TERM_ORDER_DURATION;
+
+        // Return the order payload
+        return {
+          subaccountNumber: position.subaccountNumber,
+          marketId,
+          clientId,
+          type: OrderType.MARKET,
+          side,
+          price,
+          size: positionSize.abs().toNumber(),
+          reduceOnly: true,
+          postOnly: false,
+          timeInForce: OrderTimeInForce.IOC,
+          execution: OrderExecution.DEFAULT,
+          goodTilBlock,
+          goodTilTimeInSeconds: undefined,
+          memo: TransactionMemo.placeOrder,
+          triggerPrice: undefined,
+          transferToSubaccountAmount: undefined,
+          marketInfo,
+          currentHeight,
+        };
+      })
+      .filter(isPresent);
+  }
+
+  private async executeSubaccountTransfer(outerPayload: {
+    amount: number;
+    fromSubaccountNumber: number;
+    toSubaccountNumber: number;
+    targetAddress: string;
+  }) {
+    const selectSubaccountBalance = createAppSelector(
+      BonsaiRaw.parentSubaccountBase,
+      BonsaiRaw.allMarkets,
+      (subaccount, markets) => {
+        const summary = mapIfPresent(
+          subaccount?.childSubaccounts[outerPayload.toSubaccountNumber],
+          markets,
+          (s, m) => calculateSubaccountSummary(s, m)
+        );
+        return summary?.equity.toNumber() ?? 0;
+      }
+    );
+    const startState = this.store.getState();
+    const startBalance = selectSubaccountBalance(startState);
+
+    const result = await this.wrapOperation(
+      'AccountTransactionSupervisor/executeSubaccountTransfer',
+      outerPayload,
+      this.doClientAndWalletOperation(async ({ compositeClient, localWallet }, payload) => {
+        const isIsolatedCancel = payload.toSubaccountNumber === 0;
+
+        const tx = await compositeClient.transferToSubaccount(
+          new SubaccountClient(localWallet, payload.fromSubaccountNumber),
+          payload.targetAddress,
+          payload.toSubaccountNumber,
+          MustBigNumber(payload.amount).toFixed(6),
+          isIsolatedCancel ? TransactionMemo.cancelOrderTransfer : DEFAULT_TRANSACTION_MEMO
+        );
+
+        return tx;
+      }),
+      {
+        selector: selectSubaccountBalance,
+        validator: (balance) => {
+          if (balance >= startBalance + outerPayload.amount * 0.9) {
+            return { newBalance: balance };
+          }
+          return undefined;
+        },
+      }
+    )();
+    return result;
+  }
+
+  private async executePlaceOrder(payload: PlaceOrderPayload): Promise<OperationResult<any>> {
+    const placeOrderResult = await this.wrapOperation(
+      'AccountTransactionSupervisor/placeOrder',
+      payload,
+      this.doClientAndWalletOperation(async ({ compositeClient, localWallet }, innerPayload) => {
+        const {
+          subaccountNumber: subaccountNumberToUse,
+          marketId,
+          type,
+          side,
+          price,
+          size,
+          clientId,
+          timeInForce,
+          goodTilTimeInSeconds,
+          goodTilBlock,
+          execution,
+          postOnly,
+          reduceOnly,
+          triggerPrice,
+          marketInfo,
+          currentHeight,
+          memo,
+        } = innerPayload;
+
+        // Set timeout for order to be considered failed if not committed
+        setTimeout(() => {
+          this.store.dispatch(placeOrderTimeout(clientId.toString()));
+        }, UNCOMMITTED_ORDER_TIMEOUT_MS);
+
+        const subaccountClientToUse = new SubaccountClient(localWallet, subaccountNumberToUse);
+
+        // Place order
+        const tx = await compositeClient.placeOrder(
+          subaccountClientToUse,
+          marketId,
+          type,
+          side,
+          price,
+          size,
+          clientId,
+          timeInForce,
+          goodTilTimeInSeconds ?? 0,
+          execution,
+          postOnly ?? undefined,
+          reduceOnly ?? undefined,
+          triggerPrice ?? undefined,
+          marketInfo ?? undefined,
+          currentHeight ?? undefined,
+          goodTilBlock ?? undefined,
+          memo
+        );
+
+        if ((tx as IndexedTx | undefined)?.code !== 0) {
+          throw new StatefulOrderError('Stateful order has failed to commit.', tx);
+        }
+
+        return tx;
+      }),
+      {
+        selector: BonsaiCore.account.allOrders.data,
+        validator: (orders) => {
+          const order = orders.find((o) => o.clientId === `${payload.clientId}`);
+          if (order != null) {
+            return order;
+          }
+          return undefined;
+        },
+      }
+    )();
+
+    if (isOperationFailure(placeOrderResult)) {
+      this.store.dispatch(
+        placeOrderFailed({
+          clientId: `${payload.clientId}`,
+          errorParams: operationFailureToErrorParams(placeOrderResult),
+        })
+      );
+    }
+
+    return placeOrderResult;
+  }
+
+  // does subaccount transfer and place order and manages local order state
+  public async placeOrder(payloadBase: PlaceOrderPayload): Promise<OperationResult<any>> {
+    const maybeErr = this.maybeNoLocalWalletError('placeOrder');
+    if (maybeErr) {
+      return maybeErr;
+    }
+
+    const sourceSubaccount = getSubaccountId(this.store.getState());
+    const sourceAddress = getUserWalletAddress(this.store.getState());
+    if (sourceSubaccount == null || sourceAddress == null) {
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/placeOrder',
+        'unknown parent subaccount number or address'
+      );
+    }
+
+    const validatorHeight = BonsaiCore.network.validatorHeight.data(this.store.getState());
+    if (validatorHeight == null) {
+      return wrapSimpleError('AccountTransactionSupervisor/placeOrder', 'validator height unknown');
+    }
+    const currentHeight = validatorHeight.height;
+    const isShortTermOrder = calc(() => {
+      if (payloadBase.type === OrderType.MARKET) {
+        return true;
+      }
+      if (payloadBase.type === OrderType.LIMIT) {
+        if (payloadBase.timeInForce === OrderTimeInForce.GTT) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    });
+    const payload: PlaceOrderPayload = {
+      ...payloadBase,
+      currentHeight,
+      goodTilBlock: isShortTermOrder ? currentHeight + SHORT_TERM_ORDER_DURATION : undefined,
+    };
+
+    this.store.dispatch(
+      placeOrderSubmitted({
+        marketId: payload.marketId,
+        clientId: `${payload.clientId}`,
+        orderType: payload.type as unknown as TradeTypes,
+      })
+    );
+
+    const overallResult = await this.wrapOperation(
+      'AccountTransactionSupervisor/placeOrderWrapper',
+      payload,
+      async (innerPayload) => {
+        const subaccountTransferResult = await calc(async () => {
+          if (
+            innerPayload.transferToSubaccountAmount != null &&
+            innerPayload.transferToSubaccountAmount > 0
+          ) {
+            const res = await this.executeSubaccountTransfer({
+              fromSubaccountNumber: sourceSubaccount,
+              toSubaccountNumber: innerPayload.subaccountNumber,
+              amount: innerPayload.transferToSubaccountAmount,
+              targetAddress: sourceAddress,
+            });
+            await sleep(POST_TRANSFER_PLACE_ORDER_DELAY);
+            return res;
+          }
+
+          return wrapOperationSuccess({});
+        });
+
+        if (isOperationFailure(subaccountTransferResult)) {
+          throw new Error(subaccountTransferResult.errorString);
+        }
+        const placeOrderResult = await this.executePlaceOrder(payload);
+        if (isOperationFailure(placeOrderResult)) {
+          throw new Error(placeOrderResult.errorString);
+        }
+        return placeOrderResult.payload;
+      }
+    )();
+
+    if (isOperationFailure(overallResult)) {
+      this.store.dispatch(
+        placeOrderFailed({
+          clientId: `${payload.clientId}`,
+          errorParams: operationFailureToErrorParams(overallResult),
+        })
+      );
+    }
+    return overallResult;
+  }
+
+  public async closeAllPositions() {
+    const maybeErr = this.maybeNoLocalWalletError('closeAllPositions');
+    if (maybeErr) {
+      return maybeErr;
+    }
+
+    const closePayloads = this.getCloseAllPositionsPayloads();
+
+    if (closePayloads == null) {
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/closeAllPositions',
+        'error generating close position payloads'
+      );
+    }
+
+    if (closePayloads.length === 0) {
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/closeAllPositions',
+        'no positions to close'
+      );
+    }
+
+    this.store.dispatch(closeAllPositionsSubmitted(closePayloads.map((p) => `${p.clientId}`)));
+
+    const results = await Promise.all(closePayloads.map((p) => this.executePlaceOrder(p)));
+
+    if (results.every(isOperationSuccess)) {
+      return wrapOperationSuccess({
+        results,
+      });
+    }
+
+    return results.find(isOperationFailure)!;
+  }
+
   public async cancelOrder({ orderId }: { orderId: string }) {
     const maybeErr = this.maybeNoLocalWalletError('cancelOrder');
     if (maybeErr) {
@@ -336,7 +715,7 @@ export class AccountTransactionSupervisor {
   }
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
-    const maybeErr = this.maybeNoLocalWalletError('cancelOrder');
+    const maybeErr = this.maybeNoLocalWalletError('cancelAllOrders');
     if (maybeErr) {
       return maybeErr;
     }
@@ -374,7 +753,6 @@ export class AccountTransactionSupervisor {
       })
     );
 
-    // Return success if at least one order was successfully canceled
     const allSuccess = results.every(isOperationSuccess);
     if (allSuccess) {
       return wrapOperationSuccess({

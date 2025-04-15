@@ -1,20 +1,16 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
-import {
-  TradeInputErrorAction,
-  type HumanReadablePlaceOrderPayload,
-  type Nullable,
-} from '@/constants/abacus';
+import { TradeInputErrorAction } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
-import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
@@ -24,7 +20,6 @@ import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -38,6 +33,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
+import { accountTransactionManager } from '@/state/_store';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
@@ -48,8 +44,8 @@ import {
   getTradeFormSummary,
 } from '@/state/tradeFormSelectors';
 
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
-import { log } from '@/lib/telemetry';
 import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -84,7 +80,6 @@ export const TradeForm = ({
   const [showOrderbook, setShowOrderbook] = useState(false);
 
   const stringGetter = useStringGetter();
-  const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
 
@@ -234,26 +229,27 @@ export const TradeForm = ({
     callback: onLastOrderIndexed,
   });
 
-  const onPlaceOrder = () => {
+  const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
-
-    placeOrder({
-      onError: (errorParams: ErrorParams) => {
-        log('TradeForm/onPlaceOrder', new Error(errorParams.errorMessage), { errorParams });
-        setPlaceOrderError(
-          stringGetter({
-            key: errorParams.errorStringKey,
-            fallback: errorParams.errorMessage ?? '',
-          })
-        );
-        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
-      },
-      onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
-        setUnIndexedClientId(placeOrderPayload?.clientId);
-      },
-    });
-
     dispatch(tradeFormActions.reset());
+
+    const payload = summary.tradePayload;
+    if (payload == null) {
+      return;
+    }
+    const result = await accountTransactionManager.placeOrder(payload);
+    if (isOperationSuccess(result)) {
+      setUnIndexedClientId(payload.clientId.toString());
+    } else {
+      const errorParams = operationFailureToErrorParams(result);
+      setPlaceOrderError(
+        stringGetter({
+          key: errorParams.errorStringKey,
+          fallback: errorParams.errorMessage ?? '',
+        })
+      );
+      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
+    }
   };
 
   const tabletActionsRow = isTablet && (

@@ -4,6 +4,7 @@ import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
+export const MAX_INT_ROUGHLY = 2e9;
 
 export const BIG_NUMBERS = {
   ZERO: new BigNumber(0),

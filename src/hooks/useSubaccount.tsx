@@ -14,17 +14,15 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
 
-import type { HumanReadablePlaceOrderPayload, ParsingError } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
-import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
+import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
@@ -38,7 +36,6 @@ import {
   cancelOrderFailed,
   cancelOrderSubmitted,
   clearLocalOrders,
-  closeAllPositionsSubmitted,
   placeOrderFailed,
   placeOrderSubmitted,
   placeOrderTimeout,
@@ -48,11 +45,7 @@ import abacusStateManager from '@/lib/abacus';
 import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
-import {
-  getValidErrorParamsFromParsingError,
-  StatefulOrderError,
-  stringifyTransactionError,
-} from '@/lib/errors';
+import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
@@ -333,103 +326,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       throw error;
     }
   }, [dydxAddress, getFaucetFunds, getNativeTokens, subaccountNumber]);
-
-  // ------ Trading Methods ------ //
-  const placeOrder = useCallback(
-    ({
-      isClosePosition = false,
-      onError,
-      onSuccess,
-    }: {
-      isClosePosition?: boolean;
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => {
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadablePlaceOrderPayload>
-      ) => {
-        if (success) {
-          onSuccess?.(data);
-        } else {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          onError?.(errorParams);
-
-          if (data?.clientId !== undefined) {
-            dispatch(
-              placeOrderFailed({
-                clientId: data.clientId,
-                errorParams,
-              })
-            );
-          }
-        }
-      };
-
-      let placeOrderParams;
-
-      if (isClosePosition) {
-        placeOrderParams = abacusStateManager.closePosition(callback);
-      } else {
-        placeOrderParams = abacusStateManager.placeOrder(callback);
-      }
-
-      if (placeOrderParams?.clientId) {
-        dispatch(
-          placeOrderSubmitted({
-            marketId: placeOrderParams.marketId,
-            clientId: placeOrderParams.clientId,
-            orderType: placeOrderParams.type as TradeTypes,
-          })
-        );
-      }
-
-      return placeOrderParams;
-    },
-    [dispatch]
-  );
-
-  const closePosition = useCallback(
-    ({
-      onError,
-      onSuccess,
-    }: {
-      onError: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
-    [placeOrder]
-  );
-
-  const closeAllPositions = useCallback(() => {
-    // this is for each single close position / place order transaction
-    const callback = (
-      success: boolean,
-      parsingError?: Nullable<ParsingError>,
-      data?: Nullable<HumanReadablePlaceOrderPayload>
-    ) => {
-      if (!success) {
-        const errorParams = getValidErrorParamsFromParsingError(parsingError);
-        if (data?.clientId !== undefined) {
-          dispatch(
-            placeOrderFailed({
-              clientId: data.clientId,
-              errorParams,
-            })
-          );
-        }
-      }
-    };
-
-    const payload = abacusStateManager.closeAllPositions(callback);
-    if (payload) {
-      dispatch(
-        closeAllPositionsSubmitted(
-          payload.payloads.toArray().map((orderPayload) => orderPayload.clientId)
-        )
-      );
-    }
-  }, [dispatch]);
 
   const doCancelOrder = useCallback(
     async (payload: CancelOrderPayload) => {
@@ -1139,9 +1035,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     transferBetweenSubaccounts,
 
     // Trading Methods
-    placeOrder,
-    closePosition,
-    closeAllPositions,
     placeTriggerOrders,
 
     // Listing Methods

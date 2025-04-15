@@ -6,13 +6,14 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LocalCloseAllPositionsData } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
+
+import { accountTransactionManager } from '@/state/_store';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 
@@ -26,7 +27,6 @@ export const CloseAllPositionsNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const { closeAllPositions } = useSubaccount();
 
   const { submittedOrderClientIds, filledOrderClientIds, failedOrderClientIds } =
     localCloseAllPositions;
@@ -67,7 +67,7 @@ export const CloseAllPositionsNotification = ({
     <Button
       tw="w-full"
       size={ButtonSize.Small}
-      onClick={closeAllPositions}
+      onClick={() => accountTransactionManager.closeAllPositions()}
       action={ButtonAction.Secondary}
     >
       {stringGetter({ key: STRING_KEYS.TRY_AGAIN })}

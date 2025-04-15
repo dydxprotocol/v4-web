@@ -14,6 +14,8 @@ import unionize, { ofType, UnionOf } from 'unionize';
 
 import { RecordValueType } from '@/lib/typeUtils';
 
+import { PlaceOrderPayload } from '../triggers/types';
+
 export enum TimeUnit {
   MINUTE = 'M',
   HOUR = 'H',
@@ -191,6 +193,7 @@ export type TradeFormSummary = {
   options: TradeFormOptions;
 
   tradeInfo: TradeSummary;
+  tradePayload: PlaceOrderPayload | undefined;
 
   accountBefore?: GroupedSubaccountSummary;
   accountAfter?: GroupedSubaccountSummary;
