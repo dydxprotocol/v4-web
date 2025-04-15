@@ -105,6 +105,8 @@ export enum ChainId {
   ARB_SEPOLIA = '421614',
   BASE_MAINNET = '8453',
   BASE_SEPOLIA = '84532',
+  AVALANCHE_MAINNET = '43114',
+  AVALANCHE_FUJI = '43113',
 }
 
 export const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
@@ -131,6 +133,10 @@ export const getAlchemyRPCUrlForChainId = (chainId: ChainId) => {
       return `https://base-mainnet.g.alchemy.com/v2/${alchemyKey}`;
     case ChainId.BASE_SEPOLIA:
       return `https://base-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+    case ChainId.AVALANCHE_MAINNET:
+      return `https://avax-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+    case ChainId.AVALANCHE_FUJI:
+      return `https://avax-fuji.g.alchemy.com/v2/${alchemyKey}`;
     default:
       return undefined;
   }

@@ -8,7 +8,7 @@ import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId, NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { WalletNetworkType } from '@/constants/wallets';
+import { WalletNetworkType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import usePrevious from '@/hooks/usePrevious';
@@ -32,7 +32,11 @@ import { WithdrawStatus } from './WithdrawStatus';
 
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const { dydxAddress, sourceAccount, nobleAddress } = useAccounts();
-  const [destinationAddress, setDestinationAddress] = useState(sourceAccount.address ?? '');
+  const isPrivy = sourceAccount.walletInfo?.name === WalletType.Privy;
+  const [destinationAddress, setDestinationAddress] = useState(
+    isPrivy ? '' : sourceAccount.address ?? ''
+  );
+
   const [destinationChain, setDestinationChain] = useState(
     sourceAccount.chain === WalletNetworkType.Evm
       ? mainnet.id.toString()
@@ -67,7 +71,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     const maybeSolAddress =
       sourceAccount.chain === WalletNetworkType.Solana ? sourceAccount.address : undefined;
     const maybeEvmAddress =
-      sourceAccount.chain === WalletNetworkType.Evm ? sourceAccount.address : undefined;
+      sourceAccount.chain === WalletNetworkType.Evm && !isPrivy ? sourceAccount.address : undefined;
 
     if (prevDestinationAddress === '') {
       if (currentDestinationChainType === WalletNetworkType.Solana) {
@@ -137,7 +141,8 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
 
             if (
               isEvmDepositChainId(destinationChain) &&
-              sourceAccount.chain === WalletNetworkType.Evm
+              sourceAccount.chain === WalletNetworkType.Evm &&
+              !isPrivy
             ) {
               return sourceWalletAddress;
             }
@@ -155,6 +160,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     prevDestinationAddress,
     previousChainRef,
     prevDestinationChain,
+    isPrivy,
   ]);
 
   const onWithdrawSigned = (withdrawId: string) => {
