@@ -6,6 +6,8 @@ import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage } from '@/lib/localStorage';
 
+import { autoBatchAllReducers } from './autoBatchHelpers';
+
 export type AccountState = {
   tradingRewards?: TradingRewards;
 
@@ -48,12 +50,14 @@ export const accountSlice = createSlice({
       onboardingState: action.payload,
     }),
 
-    setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
-      state.subaccountForPostOrders = action.payload;
-    },
-    clearSubaccountState: (state) => {
-      state.subaccountForPostOrders = undefined;
-    },
+    ...autoBatchAllReducers<AccountState>()({
+      setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
+        state.subaccountForPostOrders = action.payload;
+      },
+      clearSubaccountState: (state) => {
+        state.subaccountForPostOrders = undefined;
+      },
+    }),
   },
 });
 
