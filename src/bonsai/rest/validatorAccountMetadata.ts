@@ -101,6 +101,7 @@ export function setUpAccountFeeTierQuery(store: RootStore) {
 
 export function setUpRewardsParamsQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'rewardsParams',
     selector: () => true,
     getQueryKey: () => ['rewardsParams'],
     getQueryFn: (compositeClient) => {
@@ -125,6 +126,7 @@ export function setUpRewardsParamsQuery(store: RootStore) {
 
 export function setUpRewardsTokenPriceQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'rewardsParamsTokenPrice',
     selector: (state) => state.raw.rewards.data.data?.marketId,
     getQueryKey: (market) => ['rewardsParamsTokenPrice', market],
     getQueryFn: (compositeClient, market) => {
