@@ -1,3 +1,4 @@
+import { logBonsaiError } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
@@ -212,6 +213,11 @@ export function useDepositSteps({
           });
           return { success: true };
         } catch (e) {
+          logBonsaiError('depositHooks', 'error executing Skip Go Deposit Route', {
+            error: e,
+            route: depositRoute,
+          });
+
           return {
             success: false,
             errorMessage: stringGetter({ key: parseError(e, STRING_KEYS.YOUR_DEPOSIT_FAILED) }),
