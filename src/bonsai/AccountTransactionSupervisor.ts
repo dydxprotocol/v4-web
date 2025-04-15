@@ -264,7 +264,7 @@ export class AccountTransactionSupervisor {
       cancelPayload,
       this.doClientAndWalletOperation(async ({ compositeClient, localWallet }, payload) => {
         // Create a SubaccountClient using the wallet and subaccount number
-        const subaccountClient = new SubaccountClient(localWallet, cancelPayload.subaccountNumber);
+        const subaccountClient = new SubaccountClient(localWallet, payload.subaccountNumber);
 
         // Initiate the cancellation using cancelRawOrder
         return compositeClient.cancelRawOrder(
@@ -302,6 +302,15 @@ export class AccountTransactionSupervisor {
     return undefined;
   }
 
+  private getCancelableOrderIds(marketId?: string): string[] {
+    const state = this.store.getState();
+    const orders = BonsaiCore.account.openOrders.data(state);
+
+    return orders
+      .filter((order) => marketId == null || order.marketId === marketId)
+      .map((order) => order.id);
+  }
+
   public async cancelOrder({ orderId }: { orderId: string }) {
     const maybeErr = this.maybeNoLocalWalletError('cancelOrder');
     if (maybeErr) {
@@ -324,15 +333,6 @@ export class AccountTransactionSupervisor {
     }
 
     return result;
-  }
-
-  private getCancelableOrderIds(marketId?: string): string[] {
-    const state = this.store.getState();
-    const orders = BonsaiCore.account.openOrders.data(state);
-
-    return orders
-      .filter((order) => marketId == null || order.marketId === marketId)
-      .map((order) => order.id);
   }
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
