@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
@@ -25,7 +26,6 @@ import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
 import { MustBigNumber } from '@/lib/numbers';
-import { log } from '@/lib/telemetry';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import {
@@ -182,7 +182,10 @@ export function useWithdrawStep({
       };
     } catch (error) {
       track(AnalyticsEvents.WithdrawError({ error: error.message }));
-      log('withdrawHooks/executeWithdraw', error);
+      logBonsaiError('withdrawHooks', 'error executing Skip Go Withdraw Route', {
+        error,
+        route: withdrawRoute,
+      });
 
       return {
         success: false,
