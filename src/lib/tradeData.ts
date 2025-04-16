@@ -9,7 +9,6 @@ import {
   ValidationError,
   type AbacusOrderSides,
   type ErrorFormatType,
-  type Nullable,
   type SubaccountPosition,
   type TradeState,
 } from '@/constants/abacus';
@@ -20,6 +19,7 @@ import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { PositionSide, TradeTypes } from '@/constants/trade';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 export const getSelectedTradeType = (type: Nullable<AbacusOrderTypes>) => {
   return type ? (type.rawValue as TradeTypes) : TradeTypes.LIMIT;

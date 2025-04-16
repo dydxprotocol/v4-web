@@ -1,5 +1,7 @@
-import { Nullable, SubaccountPosition, type Asset, type PerpetualMarket } from '@/constants/abacus';
+import { SubaccountPosition, type Asset, type PerpetualMarket } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { safeAssign } from './objectHelpers';
 

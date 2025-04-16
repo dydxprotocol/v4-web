@@ -4,7 +4,6 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 
-import type { Nullable } from '@/constants/abacus';
 import {
   DepthChartDatum,
   DepthChartPoint,
@@ -22,6 +21,7 @@ import { TooltipContent } from '@/components/visx/TooltipContent';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type DepthChartTooltipProps = {

@@ -1,6 +1,8 @@
-import { Nullable, ParsingError } from '@/constants/abacus';
+import { ParsingError } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import { STRING_KEY_VALUES } from '@/constants/localization';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { log } from './telemetry';
 

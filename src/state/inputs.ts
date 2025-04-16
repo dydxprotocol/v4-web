@@ -5,7 +5,6 @@ import {
   type ClosePositionInputs,
   type InputError,
   type Inputs,
-  type Nullable,
   type TradeInputs,
   type TransferInputs,
 } from '@/constants/abacus';
@@ -16,6 +15,7 @@ import {
 } from '@/constants/trade';
 
 import { safeAssign } from '@/lib/objectHelpers';
+import { Nullable } from '@/lib/typeUtils';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
 type ClosePositionFormInputs = typeof CLEARED_CLOSE_POSITION_INPUTS;

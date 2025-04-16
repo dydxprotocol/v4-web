@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { ASSET_ICON_MAP } from '@/constants/assets';
 import { CHAIN_INFO } from '@/constants/chains';
+
+import { Nullable } from '@/lib/typeUtils';
 
 export type AssetSymbol = keyof typeof ASSET_ICON_MAP;
 

@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
 
@@ -13,7 +12,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';

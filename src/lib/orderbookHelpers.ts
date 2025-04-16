@@ -1,5 +1,7 @@
 //  ------ Canvas helper methods ------ //
-import type { MarketOrderbook, Nullable, PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import type { MarketOrderbook, PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+
+import { Nullable } from '@/lib/typeUtils';
 
 /**
  * @returns top left x,y and bottom x,y from array idx
