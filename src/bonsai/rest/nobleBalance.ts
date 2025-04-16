@@ -1,4 +1,5 @@
 import { NOBLE_USDC_DENOM } from '@/constants/denoms';
+import { timeUnits } from '@/constants/time';
 
 import type { RootStore } from '@/state/_store';
 import { setAccountNobleUsdcBalanceRaw } from '@/state/raw';
@@ -24,6 +25,8 @@ export function setUpNobleBalanceQuery(store: RootStore) {
       store.dispatch(setAccountNobleUsdcBalanceRaw(queryResultToLoadable(result)));
     },
     onNoQuery: () => store.dispatch(setAccountNobleUsdcBalanceRaw(loadableIdle())),
+    refetchInterval: timeUnits.minute,
+    staleTime: timeUnits.minute,
   });
 
   return () => {

@@ -64,7 +64,7 @@ export const AddressInput = ({
         <input
           onBlur={onBlur}
           onFocus={onFocus}
-          placeholder={sourceAccount.address}
+          placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           tw="flex-1 text-ellipsis bg-color-layer-4 text-large font-medium outline-none"
           value={value}
           onChange={onValueChange}
