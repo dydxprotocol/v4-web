@@ -203,7 +203,7 @@ export const OrderDetailsDialog = ({
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  // we update short term orders to pending status when they are best effort canceled in Abacus
+  // we update short term orders to pending status when they are best effort canceled
   const isBestEffortCanceled =
     (status === OrderStatus.Pending && removalReason != null) || status === OrderStatus.Canceling;
 

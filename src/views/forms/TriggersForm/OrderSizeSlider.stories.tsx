@@ -17,8 +17,8 @@ export const OrderSizeSliderStory: Story<Parameters<typeof OrderSizeSlider>[0]> 
     <StoryWrapper>
       <$Container>
         <OrderSizeSlider
-          setAbacusSize={() => null}
-          setOrderSizeInput={(sizeString: string) => setSize(parseFloat(sizeString))}
+          setSize={() => null}
+          setLocalSize={(sizeString: string) => setSize(parseFloat(sizeString))}
           size={size}
           stepSizeDecimals={TOKEN_DECIMALS}
           positionSize={100}

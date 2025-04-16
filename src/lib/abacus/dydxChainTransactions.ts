@@ -1,5 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
+import Abacus from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
   GAS_MULTIPLIER,
@@ -39,6 +39,7 @@ import { parseToPrimitives } from '../parseToPrimitives';
 import { log, logInfo } from '../telemetry';
 import { browserTimeOffsetPromise } from '../timeOffset';
 import { hashFromTx } from '../txUtils';
+import { Nullable } from '../typeUtils';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();

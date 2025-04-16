@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
-import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
@@ -19,6 +18,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { accountTransactionManager } from '@/state/_store';
 
 import { isNewOrderStatusClearable } from '@/lib/orders';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   orderId: string;
