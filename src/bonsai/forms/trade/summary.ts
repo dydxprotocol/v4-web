@@ -26,7 +26,7 @@ import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
-import { getTradeFormFieldStates, isFieldStateEnabled } from './fields';
+import { getTradeFormFieldStates, isFieldStateEnabled, isFieldStateRelevant } from './fields';
 import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
@@ -154,18 +154,15 @@ export function calculateTradeSummary(
       effectiveTrade.marketId,
       effectiveTrade.type,
       effectiveTrade.side,
-      tradeInfo.inputSummary.size?.size,
-      tradeInfo.payloadPrice,
+      AttemptNumber(tradeInfo.inputSummary.size?.size),
+      AttemptNumber(tradeInfo.payloadPrice),
       (market, marketId, type, side, size, price): PlaceOrderPayload | undefined => {
         const triggerPrice = AttemptNumber(effectiveTrade.triggerPrice);
         if (options.needsTriggerPrice && triggerPrice == null) {
           return undefined;
         }
         const goodTilTimeParsed = AttemptNumber(effectiveTrade.goodTil?.duration);
-        if (
-          options.needsGoodUntil &&
-          (goodTilTimeParsed == null || effectiveTrade.goodTil == null)
-        ) {
+        if (options.needsGoodTil && (goodTilTimeParsed == null || effectiveTrade.goodTil == null)) {
           return undefined;
         }
         const clobPairId = AttemptNumber(market.clobPairId);
@@ -236,7 +233,7 @@ export function calculateTradeSummary(
             return undefined;
           }),
           goodTilTimeInSeconds: calc(() => {
-            if (options.needsGoodUntil) {
+            if (options.needsGoodTil) {
               const duration = goodTilTimeParsed;
               const unit = effectiveTrade.goodTil?.unit;
               if (duration == null || unit == null) {
@@ -309,18 +306,32 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       executionOptions: [],
       timeInForceOptions: [],
       goodTilUnitOptions: [],
-      needsLeverage: false,
-      needsAmountClose: false,
+      showLeverage: false,
+      showAmountClose: false,
+
       needsMarginMode: false,
       needsSize: false,
       needsLimitPrice: false,
       needsTargetLeverage: false,
       needsTriggerPrice: false,
-      needsGoodUntil: false,
+      needsGoodTil: false,
       needsReduceOnly: false,
       needsPostOnly: false,
-      needsReduceOnlyTooltip: false,
-      needsPostOnlyTooltip: false,
+      showReduceOnlyTooltip: false,
+      showPostOnlyTooltip: false,
+      needsTimeInForce: false,
+      needsExecution: false,
+
+      showSize: false,
+      showReduceOnly: false,
+      showMarginMode: false,
+      showTargetLeverage: false,
+      showLimitPrice: false,
+      showPostOnly: false,
+      showTimeInForce: false,
+      showTriggerPrice: false,
+      showExecution: false,
+      showGoodTil: false,
     },
     tradePayload: undefined,
     tradeInfo: {
@@ -421,28 +432,44 @@ function calculateTradeFormOptions(
     (baseAccount?.position?.side === IndexerPositionSide.LONG && tradeSide === OrderSide.SELL) ||
     (baseAccount?.position?.side === IndexerPositionSide.SHORT && tradeSide === OrderSide.BUY);
 
-  return {
+  const options: TradeFormOptions = {
     orderTypeOptions,
     executionOptions,
     timeInForceOptions,
     goodTilUnitOptions,
 
-    needsLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
-    needsAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
-    needsTargetLeverage:
+    needsTargetLeverage: isFieldStateRelevant(fields.targetLeverage),
+    needsMarginMode: isFieldStateRelevant(fields.marginMode),
+    needsSize: isFieldStateRelevant(fields.size),
+    needsLimitPrice: isFieldStateRelevant(fields.limitPrice),
+    needsTriggerPrice: isFieldStateRelevant(fields.triggerPrice),
+    needsGoodTil: isFieldStateRelevant(fields.goodTil),
+    needsReduceOnly: isFieldStateRelevant(fields.reduceOnly),
+    needsPostOnly: isFieldStateRelevant(fields.postOnly),
+    needsTimeInForce: isFieldStateRelevant(fields.timeInForce),
+    needsExecution: isFieldStateRelevant(fields.execution),
+
+    showLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
+    showAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
+
+    showTargetLeverage:
       isFieldStateEnabled(fields.targetLeverage) &&
       (orderType !== TradeFormType.MARKET || !reduceOnly),
 
-    needsMarginMode: isFieldStateEnabled(fields.marginMode),
-    needsSize: isFieldStateEnabled(fields.size),
-    needsLimitPrice: isFieldStateEnabled(fields.limitPrice),
-    needsTriggerPrice: isFieldStateEnabled(fields.triggerPrice),
-    needsGoodUntil: isFieldStateEnabled(fields.goodTil),
-    needsReduceOnly: isFieldStateEnabled(fields.reduceOnly),
-    needsPostOnly: isFieldStateEnabled(fields.postOnly),
-    needsPostOnlyTooltip: fields.postOnly.state === 'visible-disabled',
-    needsReduceOnlyTooltip: fields.reduceOnly.state === 'visible-disabled',
+    showMarginMode: isFieldStateEnabled(fields.marginMode),
+    showSize: isFieldStateEnabled(fields.size),
+    showLimitPrice: isFieldStateEnabled(fields.limitPrice),
+    showTriggerPrice: isFieldStateEnabled(fields.triggerPrice),
+    showGoodTil: isFieldStateEnabled(fields.goodTil),
+    showTimeInForce: isFieldStateEnabled(fields.timeInForce),
+    showExecution: isFieldStateEnabled(fields.execution),
+    showReduceOnly: isFieldStateEnabled(fields.reduceOnly),
+    showPostOnly: isFieldStateEnabled(fields.postOnly),
+
+    showPostOnlyTooltip: fields.postOnly.state === 'disabled',
+    showReduceOnlyTooltip: fields.reduceOnly.state === 'disabled',
   };
+  return options;
 }
 
 function getRelevantAccountDetails(

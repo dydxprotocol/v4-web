@@ -90,8 +90,8 @@ export function getTradeFormFieldStates(
     keys.forEach((key) => {
       states[key] = {
         ...(states[key] as any),
+        state: 'enabled',
         effectiveValue: states[key].effectiveValue ?? states[key].rawValue ?? defaults[key],
-        state: 'visible',
       };
     });
   }
@@ -189,14 +189,14 @@ export function getTradeFormFieldStates(
 }
 
 function forceValueAndDisable<T>(field: FieldState<T>, forceValue: NonNullable<T>) {
-  field.state = 'visible-disabled';
+  field.state = 'disabled';
   field.effectiveValue = forceValue;
 }
 
-export function isFieldStateVisible<T>(field: FieldState<T>) {
-  return field.state === 'visible' || field.state === 'visible-disabled';
+export function isFieldStateRelevant<T>(field: FieldState<T>) {
+  return field.state === 'enabled' || field.state === 'disabled';
 }
 
 export function isFieldStateEnabled<T>(field: FieldState<T>) {
-  return field.state === 'visible';
+  return field.state === 'enabled';
 }

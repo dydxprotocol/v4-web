@@ -43,21 +43,23 @@ export const AdvancedTradeOptions = () => {
   const {
     executionOptions,
     timeInForceOptions,
-    needsReduceOnly,
-    needsPostOnly,
-    needsGoodUntil,
-    needsPostOnlyTooltip,
-    needsReduceOnlyTooltip,
+
+    showReduceOnly,
+    showPostOnly,
+    showGoodTil,
+
+    showPostOnlyTooltip,
+    showReduceOnlyTooltip,
   } = currentTradeFormConfig;
 
   const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = needsPostOnly || needsPostOnlyTooltip;
-  const showReduceOnly = needsReduceOnly || needsReduceOnlyTooltip;
+  const shouldShowPostOnly = showPostOnly || showPostOnlyTooltip;
+  const shouldShowReduceOnly = showReduceOnly || showReduceOnlyTooltip;
 
-  const needsExecution = executionOptions.length > 0 || needsPostOnly || needsReduceOnly;
+  const needsExecution = executionOptions.length > 0 || showPostOnly || showReduceOnly;
   const hasTimeInForce = timeInForceOptions.length > 0;
-  const needsTimeRow = needsGoodUntil || (hasTimeInForce && timeInForce != null);
+  const needsTimeRow = showGoodTil || (hasTimeInForce && timeInForce != null);
 
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {
@@ -99,7 +101,7 @@ export const AdvancedTradeOptions = () => {
                 ))}
               </$SelectMenu>
             )}
-            {needsGoodUntil && (
+            {showGoodTil && (
               <$FormInput
                 id="trade-good-til-time"
                 type={InputType.Number}
@@ -161,15 +163,15 @@ export const AdvancedTradeOptions = () => {
                 ))}
               </$SelectMenu>
             )}
-            {showReduceOnly && (
+            {shouldShowReduceOnly && (
               <Checkbox
                 checked={!!reduceOnly}
-                disabled={needsReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
+                disabled={showReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
                 onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
                 id="reduce-only"
                 label={
                   <WithTooltip
-                    tooltip={needsReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
+                    tooltip={showReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
                     side="right"
                   >
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
@@ -177,15 +179,15 @@ export const AdvancedTradeOptions = () => {
                 }
               />
             )}
-            {showPostOnly && (
+            {shouldShowPostOnly && (
               <Checkbox
                 checked={!!postOnly}
-                disabled={needsPostOnlyTooltip}
+                disabled={showPostOnlyTooltip}
                 onCheckedChange={(checked) => dispatch(tradeFormActions.setPostOnly(checked))}
                 id="post-only"
                 label={
                   <WithTooltip
-                    tooltip={needsPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
+                    tooltip={showPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
                     side="right"
                   >
                     {stringGetter({ key: STRING_KEYS.POST_ONLY })}

@@ -44,7 +44,7 @@ export const TradeFormInputs = () => {
   const stringGetter = useStringGetter();
 
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
-  const { needsLimitPrice, needsTriggerPrice } = tradeSummary.options;
+  const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
   const tradeFormValues = useAppSelector(getTradeFormValues);
   const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
   const { tickSizeDecimals } = orEmptyObj(
@@ -60,7 +60,7 @@ export const TradeFormInputs = () => {
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || hasSetMidMarketLimit) {
+    if (!midMarketPrice || !showLimitPrice || hasSetMidMarketLimit) {
       return;
     }
     dispatch(
@@ -69,7 +69,7 @@ export const TradeFormInputs = () => {
       )
     );
     setHasSetMidMarketLimit(true);
-  }, [dispatch, midMarketPrice, needsLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
+  }, [dispatch, midMarketPrice, showLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
@@ -87,7 +87,7 @@ export const TradeFormInputs = () => {
   );
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
-  if (needsTriggerPrice) {
+  if (showTriggerPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.TriggerPrice,
       inputType: InputType.Currency,
@@ -107,7 +107,7 @@ export const TradeFormInputs = () => {
     });
   }
 
-  if (needsLimitPrice) {
+  if (showLimitPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.LimitPrice,
       inputType: InputType.Currency,

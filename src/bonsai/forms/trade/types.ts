@@ -96,6 +96,7 @@ export type TradeForm = {
   // Common fields for standard orders
   marketId: string | undefined;
   side: OrderSide | undefined;
+
   size: OrderSizeInput | undefined; // Using the proper union type for sizes
   reduceOnly: boolean | undefined;
 
@@ -120,7 +121,8 @@ export type TradeForm = {
 export type FieldState<T> = {
   rawValue: T | undefined;
   effectiveValue: T | undefined;
-  state: 'irrelevant' | 'relevant-hidden' | 'visible-disabled' | 'visible';
+  // disabled means it's relevant but can't currently be edited
+  state: 'irrelevant' | 'disabled' | 'enabled';
 };
 
 // Type for the transformed form with field states
@@ -138,18 +140,35 @@ export type TradeFormOptions = {
   timeInForceOptions: SelectionOption<TimeInForce>[];
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
 
-  needsLeverage: boolean;
-  needsAmountClose: boolean;
-  needsMarginMode: boolean;
+  showLeverage: boolean;
+  showAmountClose: boolean;
+
+  // these mean the field is relevant to the trade and trade payload in any way (potentially)
   needsSize: boolean;
-  needsLimitPrice: boolean;
-  needsTargetLeverage: boolean;
-  needsTriggerPrice: boolean;
-  needsGoodUntil: boolean;
   needsReduceOnly: boolean;
+  needsMarginMode: boolean;
+  needsTargetLeverage: boolean;
+  needsLimitPrice: boolean;
   needsPostOnly: boolean;
-  needsReduceOnlyTooltip: boolean;
-  needsPostOnlyTooltip: boolean;
+  needsTimeInForce: boolean;
+  needsTriggerPrice: boolean;
+  needsExecution: boolean;
+  needsGoodTil: boolean;
+
+  // these mean show + allow editing this field
+  showSize: boolean;
+  showReduceOnly: boolean;
+  showMarginMode: boolean;
+  showTargetLeverage: boolean;
+  showLimitPrice: boolean;
+  showPostOnly: boolean;
+  showTimeInForce: boolean;
+  showTriggerPrice: boolean;
+  showExecution: boolean;
+  showGoodTil: boolean;
+
+  showReduceOnlyTooltip: boolean;
+  showPostOnlyTooltip: boolean;
 };
 
 export type TradeSizeSummary = {

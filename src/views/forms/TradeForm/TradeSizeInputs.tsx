@@ -59,7 +59,7 @@ export const TradeSizeInputs = () => {
 
   const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
 
-  const { needsLeverage, needsTargetLeverage, needsAmountClose } = tradeSummary.options;
+  const { showLeverage, showTargetLeverage, showAmountClose } = tradeSummary.options;
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -194,7 +194,7 @@ export const TradeSizeInputs = () => {
   return (
     <div tw="flexColumn gap-[--form-input-gap]">
       {sizeInput}
-      {needsLeverage && (
+      {showLeverage && (
         <MarketLeverageInput
           leftLeverage={tradeSummary.tradeInfo.minimumSignedLeverage}
           rightLeverage={tradeSummary.tradeInfo.maximumSignedLeverage}
@@ -211,8 +211,8 @@ export const TradeSizeInputs = () => {
           }}
         />
       )}
-      {needsTargetLeverage && <TargetLeverageInput />}
-      {needsAmountClose && (
+      {showTargetLeverage && <TargetLeverageInput />}
+      {showAmountClose && (
         <AmountCloseInput
           amountClosePercentInput={(tradeValues.size != null &&
           OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
