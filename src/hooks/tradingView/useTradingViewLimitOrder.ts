@@ -9,6 +9,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
+import { store } from '@/state/_store';
 import { getIsAccountConnected } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
@@ -38,10 +39,10 @@ export function useTradingViewLimitOrder(
     tickSizeDecimalsRef.current = tickSizeDecimals;
   }, [isUserConnected, marketId, tickSizeDecimals]);
 
-  const bookPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data)?.toNumber();
-
   return useCallback(
     (_: number, price: number) => {
+      // this must be inline because this reference must stay stable from when trading view initializes
+      const bookPrice = BonsaiHelpers.currentMarket.midPrice.data(store.getState())?.toNumber();
       if (!userConnectedRef.current || price < 0 || !marketIdRef.current) {
         return [];
       }
@@ -79,6 +80,6 @@ export function useTradingViewLimitOrder(
         },
       ];
     },
-    [bookPrice, dispatch, stringGetter]
+    [dispatch, stringGetter]
   );
 }

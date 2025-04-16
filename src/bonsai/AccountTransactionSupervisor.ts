@@ -160,6 +160,7 @@ export class AccountTransactionSupervisor {
           payload,
           parsedTx,
           timeToSubmit: submittedTime - startTime,
+          source: nameForLogging,
         });
 
         if (tracking != null) {
@@ -175,12 +176,14 @@ export class AccountTransactionSupervisor {
                   result: purgeBigNumbers(resultOrNull),
                   totalTimeToConfirm: confirmedTime - startTime,
                   timeToConfirmAfterSubmitted: confirmedTime - submittedTime,
+                  source: nameForLogging,
                 });
               } else {
                 logBonsaiError(nameForLogging, 'Failed to confirm operation', {
                   payload,
                   parsedTx,
                   result: resultOrNull,
+                  source: nameForLogging,
                 });
               }
             }
@@ -195,6 +198,7 @@ export class AccountTransactionSupervisor {
           payload,
           parsed,
           errorString,
+          source: nameForLogging,
         });
 
         return wrapOperationFailure(errorString, parsed);
@@ -641,6 +645,16 @@ export class AccountTransactionSupervisor {
           throw new Error(placeOrderResult.errorString);
         }
         return placeOrderResult.payload;
+      },
+      {
+        selector: BonsaiCore.account.allOrders.data,
+        validator: (orders) => {
+          const order = orders.find((o) => o.clientId === `${payload.clientId}`);
+          if (order != null) {
+            return order;
+          }
+          return undefined;
+        },
       }
     )();
 

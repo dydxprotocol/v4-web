@@ -62,7 +62,9 @@ export const localOrdersSlice = createSlice({
           orders
             .filter(
               (order) =>
-                order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Open
+                order.status != null &&
+                (getSimpleOrderStatus(order.status) === OrderStatus.Open ||
+                  getSimpleOrderStatus(order.status) === OrderStatus.Filled)
             )
             .map((o) => o.clientId)
         );
