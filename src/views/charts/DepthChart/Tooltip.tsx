@@ -21,8 +21,7 @@ import { TooltipContent } from '@/components/visx/TooltipContent';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { Nullable } from '@/lib/typeUtils';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 type DepthChartTooltipProps = {
   chartPointAtPointer: DepthChartPoint;

@@ -48,8 +48,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { calc } from '@/lib/do';
 import { log } from '@/lib/telemetry';
-import { Nullable } from '@/lib/typeUtils';
-import { isValidKey } from '@/lib/typeUtils';
+import { isValidKey, Nullable } from '@/lib/typeUtils';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
