@@ -1,5 +1,10 @@
 /* eslint-disable max-classes-per-file */
-import { logBonsaiError, logBonsaiInfo, LONG_REQUEST_LOG_THRESHOLD_MS } from '@/bonsai/logs';
+import {
+  logBonsaiError,
+  logBonsaiInfo,
+  LONG_REQUEST_LOG_THRESHOLD_MS,
+  OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS,
+} from '@/bonsai/logs';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';
@@ -391,7 +396,8 @@ export class IndexerWebsocket {
           if (
             !sub.receivedBaseData &&
             sub.firstSubscriptionTimeMs != null &&
-            Date.now() - sub.firstSubscriptionTimeMs > LONG_REQUEST_LOG_THRESHOLD_MS
+            Date.now() - sub.firstSubscriptionTimeMs > LONG_REQUEST_LOG_THRESHOLD_MS &&
+            Date.now() - sub.firstSubscriptionTimeMs < OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS
           ) {
             const duration = Date.now() - sub.firstSubscriptionTimeMs;
             logBonsaiInfo(
