@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { Subaccount, type Nullable, type TradingRewards } from '@/constants/abacus';
+import { Subaccount, type TradingRewards } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { Nullable } from '@/lib/typeUtils';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
