@@ -388,7 +388,6 @@ export class IndexerWebsocket {
               wsId: this.indexerWsId,
             });
           }
-          console.log('time', Date.now() - sub.firstSubscriptionTimeMs!);
           if (
             !sub.receivedBaseData &&
             sub.firstSubscriptionTimeMs != null &&
