@@ -10,7 +10,7 @@ export function logBonsaiInfo(source: string, message: string, ...args: any[]) {
   logInfo(`bonsai: ${source}: ${message}`, { context: args });
 }
 
-const LOG_THRESHOLD_MS = timeUnits.second * 10;
+export const LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 10;
 
 export function wrapAndLogBonsaiError<T, Args extends any[]>(
   fn: (...args: Args) => Promise<T> | T,
@@ -21,7 +21,7 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
     try {
       const result = await Promise.resolve(fn(...args));
       const duration = Date.now() - start;
-      if (duration > LOG_THRESHOLD_MS) {
+      if (duration > LONG_REQUEST_LOG_THRESHOLD_MS) {
         logBonsaiInfo(
           logId,
           `Long request time detected for ${logId}: ${Math.floor(duration / 1000)}s`,
