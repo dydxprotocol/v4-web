@@ -2,7 +2,6 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import type { Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -32,7 +31,7 @@ import { getCurrentSelectedFormSummary } from '@/state/tradeFormSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 

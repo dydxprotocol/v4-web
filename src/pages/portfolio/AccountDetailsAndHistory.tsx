@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
@@ -28,7 +27,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 const usePortfolioValues = ({
   equity,

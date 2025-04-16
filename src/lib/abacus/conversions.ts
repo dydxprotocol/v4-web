@@ -1,6 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { AbacusOrderSide, type AbacusOrderSides, type Nullable } from '@/constants/abacus';
+import { AbacusOrderSide, type AbacusOrderSides } from '@/constants/abacus';
+
+import { Nullable } from '@/lib/typeUtils';
 
 /** @deprecated use ORDER_SIDES from constants/abacus */
 export const convertAbacusOrderSide = (abacusOrderSide: Nullable<AbacusOrderSides>) => {

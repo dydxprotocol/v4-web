@@ -3,10 +3,10 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
+import { Nullable } from '@/lib/typeUtils';
+
 import { STRING_KEYS } from './localization';
 import { TradeTypes } from './trade';
-
-export type Nullable<T> = T | null | undefined;
 
 // ------ V4 Protocols ------ //
 export const AbacusAppConfig = Abacus.exchange.dydx.abacus.state.v2.supervisor.AppConfigsV2;

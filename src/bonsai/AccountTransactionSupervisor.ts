@@ -42,12 +42,12 @@ import {
 } from '@/state/localOrders';
 import { getLocalWalletNonce } from '@/state/walletSelectors';
 
-import { parseToPrimitives, ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { calc, mapIfPresent } from '@/lib/do';
 import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpers';
 import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { AttemptBigNumber, AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
+import { parseToPrimitives, ToPrimitives } from '@/lib/parseToPrimitives';
 import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';

@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
@@ -36,6 +35,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
+import { Nullable } from '@/lib/typeUtils';
 
 export const OrderDetailsDialog = ({
   orderId,

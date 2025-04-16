@@ -20,7 +20,7 @@ import {
   IndexerWsTradeResponseObject,
 } from '@/types/indexer/indexerManual';
 
-import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { ToPrimitives } from '@/lib/parseToPrimitives';
 
 type ReplaceBigNumberInUnion<T> = T extends string ? BigNumber : T;
 

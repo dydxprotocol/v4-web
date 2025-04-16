@@ -9,7 +9,7 @@ import {
   setRewardsTokenPrice,
 } from '@/state/raw';
 
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
 
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';

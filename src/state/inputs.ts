@@ -1,13 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import {
-  type InputError,
-  type Inputs,
-  type Nullable,
-  type TransferInputs,
-} from '@/constants/abacus';
+import { type InputError, type Inputs, type TransferInputs } from '@/constants/abacus';
 
 import { safeAssign } from '@/lib/objectHelpers';
+import { Nullable } from '@/lib/typeUtils';
 
 export interface InputsState {
   // remove all these when old withdraw form is gone

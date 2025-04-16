@@ -3,7 +3,6 @@ import { Separator } from '@radix-ui/react-separator';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -28,6 +27,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrderNew } from '@/lib/orders';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   marketId: string;

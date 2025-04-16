@@ -16,7 +16,6 @@ import {
   AbacusOrderType,
   AbacusOrderTypes,
   KotlinIrEnumValues,
-  Nullable,
   OrderStatus,
   SubaccountFill,
   TRADE_TYPES,
@@ -31,6 +30,7 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
+import { Nullable } from '@/lib/typeUtils';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {

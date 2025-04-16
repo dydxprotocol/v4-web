@@ -3,7 +3,6 @@ import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   AbacusStateNotificationProtocol,
-  Nullable,
   ParsingError,
   TransferInputFields,
 } from '@/constants/abacus';
@@ -27,6 +26,8 @@ import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { getTransferInputs } from '@/state/inputsSelectors';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';

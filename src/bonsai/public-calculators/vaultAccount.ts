@@ -3,8 +3,8 @@ import { orderBy, sumBy } from 'lodash';
 
 import { IndexerTransferBetweenResponse, IndexerTransferType } from '@/types/indexer/indexerApiGen';
 
-import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { MaybeNumber, MustBigNumber } from '@/lib/numbers';
+import { ToPrimitives } from '@/lib/parseToPrimitives';
 
 export interface VaultAccount {
   balanceUsdc?: number;

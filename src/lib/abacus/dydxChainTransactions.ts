@@ -35,10 +35,10 @@ import { setInitializationError } from '@/state/app';
 import { identify } from '../analytics/analytics';
 import { dd } from '../analytics/datadog';
 import { stringifyTransactionError } from '../errors';
+import { parseToPrimitives } from '../parseToPrimitives';
 import { log, logInfo } from '../telemetry';
 import { browserTimeOffsetPromise } from '../timeOffset';
 import { hashFromTx } from '../txUtils';
-import { parseToPrimitives } from './parseToPrimitives';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();

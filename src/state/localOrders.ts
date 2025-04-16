@@ -10,7 +10,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
 import { intersection, mapValues, uniq } from 'lodash';
 
-import { Nullable } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
   CANCEL_ALL_ORDERS_KEY,
@@ -24,6 +23,7 @@ import {
 } from '@/constants/trade';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { Nullable } from '@/lib/typeUtils';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
