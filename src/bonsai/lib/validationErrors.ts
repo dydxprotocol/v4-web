@@ -1,3 +1,5 @@
+import { LINKS_CONFIG_MAP } from '@/constants/networks';
+
 export interface ValidationError {
   code: string;
   type: ErrorType;
@@ -13,6 +15,7 @@ export interface ErrorResources {
   title?: ErrorString;
   // text is for showing in alerts
   text?: ErrorString;
+  learnMoreUrlKey?: keyof (typeof LINKS_CONFIG_MAP)[keyof typeof LINKS_CONFIG_MAP];
   action?: string | null;
 }
 
@@ -66,6 +69,7 @@ interface SimpleValidationErrorParams {
   textKey?: string;
   titleParams?: { [key: string]: ErrorParam };
   textParams?: { [key: string]: ErrorParam };
+  learnMoreUrlKey?: keyof (typeof LINKS_CONFIG_MAP)[keyof typeof LINKS_CONFIG_MAP];
 }
 
 export function simpleValidationError({
@@ -76,6 +80,7 @@ export function simpleValidationError({
   textKey,
   textParams,
   titleParams,
+  learnMoreUrlKey,
 }: SimpleValidationErrorParams): ValidationError {
   return {
     code,
@@ -85,6 +90,7 @@ export function simpleValidationError({
     link: null,
     linkText: null,
     resources: {
+      learnMoreUrlKey,
       title: titleKey
         ? {
             stringKey: titleKey,

@@ -4,12 +4,17 @@ import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
+import { LINKS_CONFIG_MAP } from '@/constants/networks';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { assertNever } from '@/lib/assertNever';
 
 import { AlertMessage } from './AlertMessage';
+import { Link } from './Link';
 import { Output, OutputType } from './Output';
 
 export const ValidationAlertMessage = ({
@@ -20,6 +25,11 @@ export const ValidationAlertMessage = ({
   className?: string;
 }) => {
   const stringGetter = useStringGetter();
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const links = LINKS_CONFIG_MAP[selectedDydxChainId];
+
+  const ourLink =
+    error.resources.learnMoreUrlKey != null ? links[error.resources.learnMoreUrlKey] : undefined;
   return (
     <AlertMessage
       type={error.type === ErrorType.error ? AlertType.Error : AlertType.Warning}
@@ -36,6 +46,14 @@ export const ValidationAlertMessage = ({
             renderParams({ params: error.resources.title?.params }) ??
             {},
         })}
+        {ourLink != null ? (
+          <>
+            {' '}
+            <Link tw="inline-block" href={ourLink}>
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            </Link>
+          </>
+        ) : undefined}
       </span>
     </AlertMessage>
   );
