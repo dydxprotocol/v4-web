@@ -284,12 +284,6 @@ export type NetworkConfig = Partial<{
 
 export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
 
-export type PerpetualMarketOrderbookLevel = OrderbookLine & {
-  side?: 'ask' | 'bid';
-  mine: number | undefined;
-  key: string;
-};
-
 export enum AbacusInputTypes {
   AdjustIsolatedMargin = 'adjustIsolatedMargin',
   ClosePosition = 'closePosition',

@@ -1,5 +1,4 @@
-//  ------ Canvas helper methods ------ //
-import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import { CanvasOrderbookLine } from '@/bonsai/types/orderbookTypes';
 
 /**
  * @returns top left x,y and bottom x,y from array idx
@@ -15,7 +14,7 @@ export const getRektFromIdx = ({
   canvasWidth: number;
   canvasHeight: number;
   rowHeight: number;
-  side: PerpetualMarketOrderbookLevel['side'];
+  side: CanvasOrderbookLine['side'];
 }) => {
   /**
    * Does not change
