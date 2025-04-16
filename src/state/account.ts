@@ -1,14 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { type TradingRewards } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage } from '@/lib/localStorage';
 
 export type AccountState = {
-  tradingRewards?: TradingRewards;
-
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
 };
