@@ -7,6 +7,7 @@ import tw from 'twin.macro';
 import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+import { SKIP_GO_FAST_TRANSFER_LIMIT } from '@/constants/skip';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -42,7 +43,7 @@ export const TransferRouteOptions = ({
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { decimal, group } = useLocaleSeparators();
-  const limitAmount = formatNumberOutput(10_000, OutputType.CompactNumber, {
+  const limitAmount = formatNumberOutput(SKIP_GO_FAST_TRANSFER_LIMIT, OutputType.CompactNumber, {
     selectedLocale,
     decimalSeparator: decimal,
     groupSeparator: group,
@@ -61,8 +62,8 @@ export const TransferRouteOptions = ({
     if (!routes || disabled)
       return type === 'deposit'
         ? stringGetter({
-            key: STRING_KEYS.SKIP_FAST_ROUTE_DESC,
-            params: { LIMIT_AMOUNT: limitAmount },
+            key: STRING_KEYS.SKIP_FAST_ROUTE_DESC_1,
+            params: { FEE: '0.1', LIMIT_AMOUNT: limitAmount },
           })
         : '-';
     if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
@@ -96,16 +97,16 @@ export const TransferRouteOptions = ({
     );
 
     if (!routes || disabled)
-      return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC }) : '-';
+      return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC_1 }) : '-';
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
-    const chainName =
-      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.name;
+    const gasDenom =
+      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.gasDenom;
 
     const gasFeeAdjustment =
-      type === 'deposit' && chainName ? (
+      type === 'deposit' && gasDenom ? (
         <span tw="text-color-text-0 font-mini-book">
-          {` + ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
+          {` + ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES_SHORT, params: { CHAIN: gasDenom } })}`}
         </span>
       ) : null;
 

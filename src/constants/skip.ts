@@ -37,3 +37,9 @@ export type SkipStatusResponse = {
 };
 
 export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;
+
+/**
+ * @url https://docs.skip.build/go/advanced-transfer/go-fast
+ * @description The maximum amount that can be transferred using the Go Fast route. All chains currently (4/15/2025) have the same limit.
+ */
+export const SKIP_GO_FAST_TRANSFER_LIMIT = 17_500;
