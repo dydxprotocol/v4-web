@@ -4,7 +4,6 @@ import { kollections } from '@dydxprotocol/v4-abacus';
 import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
-  Nullable,
   ParsingErrors,
   PerpetualState,
   PerpetualStateChanges,
@@ -20,6 +19,8 @@ import { setInputs } from '@/state/inputs';
 import { setLatestOrder } from '@/state/localOrders';
 import { updateNotifications } from '@/state/notifications';
 import { setAbacusHasMarkets } from '@/state/perpetuals';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { track } from '../analytics/analytics';
 

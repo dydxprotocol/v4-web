@@ -52,7 +52,6 @@ import {
 } from '@/state/localOrders';
 
 import abacusStateManager from '@/lib/abacus';
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
 import {
@@ -61,6 +60,7 @@ import {
   stringifyTransactionError,
 } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';

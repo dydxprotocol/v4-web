@@ -6,8 +6,8 @@ import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { BigNumberish } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
-import { Nullable } from './abacus';
 import { IAffiliateStats } from './affiliates';
 import { DydxChainAsset } from './wallets';
 

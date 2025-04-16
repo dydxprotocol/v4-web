@@ -1,4 +1,6 @@
-import type { AbacusFileSystemProtocol, Nullable } from '@/constants/abacus';
+import type { AbacusFileSystemProtocol } from '@/constants/abacus';
+
+import { Nullable } from '@/lib/typeUtils';
 
 class AbacusFileSystem implements AbacusFileSystemProtocol {
   readTextFile(): Nullable<string> {

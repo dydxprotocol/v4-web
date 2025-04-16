@@ -2,9 +2,9 @@ import React from 'react';
 
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
-
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { AssetIcon } from './AssetIcon';
 

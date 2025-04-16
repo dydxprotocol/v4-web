@@ -46,10 +46,10 @@ import { placeOrderTimeout } from '@/state/localOrders';
 import { identify } from '../analytics/analytics';
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
+import { parseToPrimitives } from '../parseToPrimitives';
 import { log, logInfo } from '../telemetry';
 import { browserTimeOffsetPromise } from '../timeOffset';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
-import { parseToPrimitives } from './parseToPrimitives';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();

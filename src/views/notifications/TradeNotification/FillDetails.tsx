@@ -1,7 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -12,6 +11,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BigNumberish } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 export const FillDetails = ({
   orderSide,

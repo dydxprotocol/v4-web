@@ -1,7 +1,8 @@
-import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { IconName } from '@/components/Icon';
+
+import { Nullable } from '@/lib/typeUtils';
 
 /**
  * @description MarketData used for MarketTable and List components

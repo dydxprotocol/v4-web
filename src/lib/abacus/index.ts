@@ -12,7 +12,6 @@ import type {
   HumanReadableCloseAllPositionsPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
-  Nullable,
   OrderbookGroupings,
   ParsingError,
   TradeInputFields,
@@ -50,6 +49,8 @@ import { ConnectorType, WalletInfo } from '@/constants/wallets';
 import { type RootStore } from '@/state/_store';
 import { setClosePositionFormInputs, setTradeFormInputs } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
