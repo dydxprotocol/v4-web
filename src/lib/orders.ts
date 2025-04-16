@@ -7,30 +7,13 @@ import {
   PerpetualMarketSummary,
   SubaccountFill as SubaccountFillNew,
 } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
-import {
-  AbacusOrderSide,
-  AbacusOrderStatus,
-  AbacusOrderType,
-  AbacusOrderTypes,
-  KotlinIrEnumValues,
-  OrderStatus,
-  SubaccountFill,
-  TRADE_TYPES,
-  type Asset,
-  type PerpetualMarket,
-  type SubaccountFundingPayment,
-  type SubaccountOrder,
-} from '@/constants/abacus';
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { IconName } from '@/components/Icon';
-
-import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
-import { Nullable } from '@/lib/typeUtils';
 
 export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
@@ -133,36 +116,12 @@ export const getOrderStatusInfoNew = ({ status }: { status: OrderStatusNew }) =>
 export const isNewOrderStatusOpen = (status: OrderStatusNew) =>
   getSimpleOrderStatus(status) === OrderStatusNew.Open;
 
-export const isOrderStatusOpen = (status: OrderStatus) =>
-  [
-    AbacusOrderStatus.Open,
-    AbacusOrderStatus.Pending,
-    AbacusOrderStatus.PartiallyFilled,
-    AbacusOrderStatus.Untriggered,
-  ].some((orderStatus) => status === orderStatus);
-
-export const isOrderStatusClearable = (status: OrderStatus) =>
-  status === AbacusOrderStatus.Filled || isOrderStatusCanceled(status);
-
 export const isNewOrderStatusClearable = (status: OrderStatusNew) =>
   getSimpleOrderStatus(status) === OrderStatusNew.Canceled ||
   getSimpleOrderStatus(status) === OrderStatusNew.Filled;
 
-export const isOrderStatusCanceled = (status: OrderStatus) =>
-  [AbacusOrderStatus.Canceled, AbacusOrderStatus.PartiallyCanceled].some(
-    (orderStatus) => status === orderStatus
-  );
 export const isNewOrderStatusCanceled = (status: OrderStatusNew) =>
   getSimpleOrderStatus(status) === OrderStatusNew.Canceled;
-
-export const isMarketOrderType = (type?: AbacusOrderTypes) =>
-  type &&
-  [
-    AbacusOrderType.Market,
-    AbacusOrderType.StopMarket,
-    AbacusOrderType.TakeProfitMarket,
-    AbacusOrderType.TrailingStop,
-  ].some(({ ordinal }) => ordinal === type.ordinal);
 
 export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
   type &&
@@ -173,22 +132,10 @@ export const isMarketOrderTypeNew = (type?: IndexerOrderType) =>
     IndexerOrderType.TRAILINGSTOP,
   ].includes(type);
 
-export const isLimitOrderType = (type?: AbacusOrderTypes) =>
-  type &&
-  [AbacusOrderType.Limit, AbacusOrderType.StopLimit, AbacusOrderType.TakeProfitLimit].some(
-    ({ ordinal }) => ordinal === type.ordinal
-  );
-
 export const isLimitOrderTypeNew = (type?: IndexerOrderType) =>
   type &&
   [IndexerOrderType.LIMIT, IndexerOrderType.STOPLIMIT, IndexerOrderType.TAKEPROFIT].includes(type);
 
-export const isStopLossOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
-  const validOrderTypes = isSlTpLimitOrdersEnabled
-    ? [AbacusOrderType.StopLimit, AbacusOrderType.StopMarket]
-    : [AbacusOrderType.StopMarket];
-  return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
-};
 export const isStopLossOrderNew = (
   order: NewSubaccountOrder,
   isSlTpLimitOrdersEnabled: boolean
@@ -197,13 +144,6 @@ export const isStopLossOrderNew = (
     ? [IndexerOrderType.STOPLIMIT, IndexerOrderType.STOPMARKET]
     : [IndexerOrderType.STOPMARKET];
   return order.reduceOnly && validOrderTypes.includes(order.type);
-};
-
-export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
-  const validOrderTypes = isSlTpLimitOrdersEnabled
-    ? [AbacusOrderType.TakeProfitLimit, AbacusOrderType.TakeProfitMarket]
-    : [AbacusOrderType.TakeProfitMarket];
-  return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
 
 export const isTakeProfitOrderNew = (
@@ -216,38 +156,9 @@ export const isTakeProfitOrderNew = (
   return order.reduceOnly && validOrderTypes.includes(order.type);
 };
 
-export const isSellOrder = (order: SubaccountOrder) => {
-  return order.side.ordinal === AbacusOrderSide.Sell.ordinal;
-};
-
 export const isSellOrderNew = (order: NewSubaccountOrder) => {
   return order.side === IndexerOrderSide.SELL;
 };
-
-type AddedProps = {
-  asset: Asset | undefined;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
-  orderSide?: Nullable<OrderSide>;
-};
-
-export const getHydratedTradingData = <
-  T extends SubaccountOrder | SubaccountFill | SubaccountFundingPayment,
->({
-  data,
-  assets,
-  perpetualMarkets,
-}: {
-  data: T;
-  assets: Record<string, Asset>;
-  perpetualMarkets: Record<string, PerpetualMarket>;
-}): T & AddedProps => ({
-  ...data,
-  asset: assets[perpetualMarkets[data.marketId]?.assetId ?? ''],
-  stepSizeDecimals: perpetualMarkets[data.marketId]?.configs?.stepSizeDecimals,
-  tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
-  ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
-});
 
 type NewAddedProps = {
   marketSummary: PerpetualMarketSummary | undefined;
@@ -284,9 +195,6 @@ export const getHydratedFill = ({
     tickSizeDecimals: marketSummaries[data.market ?? '']?.tickSizeDecimals ?? USD_DECIMALS,
   };
 };
-
-export const getTradeType = (orderType: string) =>
-  TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];
 
 export const getAverageFillPrice = (fills: SubaccountFillNew[]) => {
   let total = BigNumber(0);

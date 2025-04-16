@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { Subaccount, type TradingRewards } from '@/constants/abacus';
+import { Subaccount } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
@@ -10,8 +10,6 @@ import { Nullable } from '@/lib/typeUtils';
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
 export type AccountState = {
-  tradingRewards?: TradingRewards;
-
   subaccountForPostOrders?: Nullable<Subaccount>;
 
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;

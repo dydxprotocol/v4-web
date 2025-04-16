@@ -1,7 +1,5 @@
 //  ------ Canvas helper methods ------ //
-import type { MarketOrderbook, PerpetualMarketOrderbookLevel } from '@/constants/abacus';
-
-import { Nullable } from '@/lib/typeUtils';
+import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 
 /**
  * @returns top left x,y and bottom x,y from array idx
@@ -93,42 +91,5 @@ export const getHistogramXValues = ({
   return {
     bar,
     gradient,
-  };
-};
-
-// ------ Orderbook helper methods ------ //
-export const processOrderbookToCreateMap = ({
-  orderbookMap,
-  newOrderbook,
-}: {
-  orderbookMap?: {
-    asks: Record<string, number>;
-    bids: Record<string, number>;
-  };
-  newOrderbook: Nullable<MarketOrderbook>;
-}) => {
-  // Create Orderbooks Map indexed by Price
-  const asks = newOrderbook?.asks?.toArray() ?? [];
-  const bids = newOrderbook?.bids?.toArray() ?? [];
-  const prevAsks = orderbookMap?.asks ?? {};
-  const prevBids = orderbookMap?.bids ?? {};
-  const newAsks = Object.fromEntries(asks.map((ask) => [ask.price, ask.size]) ?? {});
-  const newBids = Object.fromEntries(bids.map((bid) => [bid.price, bid.size]) ?? {});
-
-  Object.keys(prevAsks).forEach((price) => {
-    if (!newAsks[price] || newAsks[price] === 0) {
-      newAsks[price] = 0;
-    }
-  });
-
-  Object.keys(prevBids).forEach((price) => {
-    if (!newBids[price] || newBids[price] === 0) {
-      newBids[price] = 0;
-    }
-  });
-
-  return {
-    newAsks,
-    newBids,
   };
 };
