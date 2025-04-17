@@ -181,6 +181,6 @@ export const getCurrentSelectedFormSummary = createAppSelector(
 export const getCurrentSelectedFormPositionSummary = createAppSelector(
   [getCurrentSelectedFormSummary],
   (summary) => {
-    return summary.summary.positionAfter;
+    return summary.summary.accountDetailsAfter?.position;
   }
 );

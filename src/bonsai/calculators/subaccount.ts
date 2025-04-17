@@ -22,6 +22,7 @@ import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 import {
+  ChildSubaccountSummaries,
   GroupedSubaccountSummary,
   PendingIsolatedPosition,
   SubaccountOrder,
@@ -301,7 +302,7 @@ function calculatePositionDerivedExtra(
 export function calculateChildSubaccountSummaries(
   parent: ParentSubaccountDataBase,
   markets: MarketsData
-): Record<string, SubaccountSummary> {
+): ChildSubaccountSummaries {
   return pickBy(
     mapValues(
       parent.childSubaccounts,
@@ -319,7 +320,7 @@ export function calculateChildSubaccountSummaries(
  * - childSubaccount has equity
  */
 export function calculateUnopenedIsolatedPositions(
-  childSubaccounts: Record<string, SubaccountSummary>,
+  childSubaccounts: ChildSubaccountSummaries,
   orders: SubaccountOrder[],
   positions: SubaccountPosition[]
 ): PendingIsolatedPosition[] {

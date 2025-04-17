@@ -8,7 +8,7 @@ import {
   wrapOperationSuccess,
 } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { BonsaiCore, BonsaiRaw } from '@/bonsai/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import { IndexedTx } from '@cosmjs/stargate';
 import {
@@ -42,7 +42,7 @@ import {
 } from '@/state/localOrders';
 import { getLocalWalletNonce } from '@/state/walletSelectors';
 
-import { calc, mapIfPresent } from '@/lib/do';
+import { calc } from '@/lib/do';
 import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpers';
 import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
@@ -53,7 +53,6 @@ import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
 
 import { getSimpleOrderStatus } from './calculators/orders';
-import { calculateSubaccountSummary } from './calculators/subaccount';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
 
@@ -442,14 +441,9 @@ export class AccountTransactionSupervisor {
     targetAddress: string;
   }) {
     const selectSubaccountBalance = createAppSelector(
-      BonsaiRaw.parentSubaccountBase,
-      BonsaiRaw.allMarkets,
-      (subaccount, markets) => {
-        const summary = mapIfPresent(
-          subaccount?.childSubaccounts[outerPayload.toSubaccountNumber],
-          markets,
-          (s, m) => calculateSubaccountSummary(s, m)
-        );
+      BonsaiCore.account.childSubaccountSummaries.data,
+      (summaries) => {
+        const summary = summaries?.[outerPayload.toSubaccountNumber];
         return summary?.equity.toNumber() ?? 0;
       }
     );

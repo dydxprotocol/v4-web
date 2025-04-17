@@ -66,6 +66,8 @@ export type SubaccountSummaryDerived = {
 
 export type SubaccountSummary = SubaccountSummaryCore & SubaccountSummaryDerived;
 export type GroupedSubaccountSummary = SubaccountSummaryDerived;
+// includes parent but it's the basic summary, not aggregated in any way
+export type ChildSubaccountSummaries = Record<string, SubaccountSummaryDerived>;
 
 export type SubaccountPositionBase = ConvertStringToBigNumber<
   IndexerPerpetualPositionResponseObject,

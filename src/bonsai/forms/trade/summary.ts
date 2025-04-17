@@ -30,6 +30,7 @@ import { getTradeFormFieldStates, isFieldStateEnabled, isFieldStateRelevant } fr
 import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
+  GoodUntilTime,
   MarginMode,
   matchOrderType,
   OrderSide,
@@ -161,7 +162,7 @@ export function calculateTradeSummary(
         if (options.needsTriggerPrice && triggerPrice == null) {
           return undefined;
         }
-        const goodTilTimeParsed = AttemptNumber(effectiveTrade.goodTil?.duration);
+        const goodTilTimeParsed = AttemptNumber(getGoodTilInSeconds(effectiveTrade.goodTil));
         if (options.needsGoodTil && (goodTilTimeParsed == null || effectiveTrade.goodTil == null)) {
           return undefined;
         }
@@ -232,33 +233,7 @@ export function calculateTradeSummary(
             }
             return undefined;
           }),
-          goodTilTimeInSeconds: calc(() => {
-            if (options.needsGoodTil) {
-              const duration = goodTilTimeParsed;
-              const unit = effectiveTrade.goodTil?.unit;
-              if (duration == null || unit == null) {
-                // should have returned above
-                // eslint-disable-next-line no-console
-                console.error('unexpected null good til duration or unit');
-                return undefined;
-              }
-              if (unit === TimeUnit.DAY) {
-                return (timeUnits.day * duration) / timeUnits.second;
-              }
-              if (unit === TimeUnit.HOUR) {
-                return (timeUnits.hour * duration) / timeUnits.second;
-              }
-              if (unit === TimeUnit.MINUTE) {
-                return (timeUnits.minute * duration) / timeUnits.second;
-              }
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              if (unit === TimeUnit.WEEK) {
-                return (timeUnits.week * duration) / timeUnits.second;
-              }
-              assertNever(unit);
-            }
-            return undefined;
-          }),
+          goodTilTimeInSeconds: options.needsGoodTil ? goodTilTimeParsed : undefined,
           marketInfo,
           // will be provided at submission time
           goodTilBlock: undefined,
@@ -276,11 +251,8 @@ export function calculateTradeSummary(
     tradeInfo,
     tradePayload,
 
-    accountBefore: baseAccount?.account,
-    positionBefore: baseAccount?.position,
-
-    accountAfter: baseAccountAfter?.account,
-    positionAfter: baseAccountAfter?.position,
+    accountDetailsBefore: baseAccount,
+    accountDetailsAfter: baseAccountAfter,
   };
 }
 
@@ -334,10 +306,13 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showGoodTil: false,
     },
     tradePayload: undefined,
+    accountDetailsAfter: undefined,
+    accountDetailsBefore: undefined,
     tradeInfo: {
       inputSummary: {
         size: undefined,
         averageFillPrice: undefined,
+        worstFillPrice: undefined,
       },
       subaccountNumber: 0,
       transferToSubaccountAmount: 0,
@@ -595,4 +570,30 @@ export function orderTypeToTradeFormType(orderType: OrderType): TradeFormType {
       assertNever(orderType);
       return TradeFormType.MARKET;
   }
+}
+
+export function getGoodTilInSeconds(goodTil: GoodUntilTime | undefined) {
+  if (goodTil == null) {
+    return undefined;
+  }
+  const duration = AttemptNumber(goodTil.duration);
+  if (duration == null || duration < 0) {
+    return undefined;
+  }
+  const unit = goodTil.unit;
+  if (unit === TimeUnit.DAY) {
+    return (timeUnits.day * duration) / timeUnits.second;
+  }
+  if (unit === TimeUnit.HOUR) {
+    return (timeUnits.hour * duration) / timeUnits.second;
+  }
+  if (unit === TimeUnit.MINUTE) {
+    return (timeUnits.minute * duration) / timeUnits.second;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (unit === TimeUnit.WEEK) {
+    return (timeUnits.week * duration) / timeUnits.second;
+  }
+  assertNever(unit);
+  return undefined;
 }

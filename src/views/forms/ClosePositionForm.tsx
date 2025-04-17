@@ -268,7 +268,7 @@ export const ClosePositionForm = ({
           : AttemptBigNumber(
               mapIfPresent(
                 effectiveSizes?.size,
-                summary.summary.positionBefore?.unsignedSize.toNumber(),
+                summary.summary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
                 (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
               )
             )

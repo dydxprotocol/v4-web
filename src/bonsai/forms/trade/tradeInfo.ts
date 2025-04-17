@@ -85,7 +85,11 @@ export function calculateTradeInfo(
           )?.leverageSigned;
 
           return {
-            inputSummary: calculated.summary ?? { size: undefined, averageFillPrice: undefined },
+            inputSummary: calculated.summary ?? {
+              size: undefined,
+              averageFillPrice: undefined,
+              worstFillPrice: undefined,
+            },
             subaccountNumber: subaccountToUse,
             payloadPrice: mapIfPresent(calculated.marketOrder?.averagePrice, (price) => {
               if (trade.side == null || trade.side === OrderSide.BUY) {
@@ -227,6 +231,7 @@ export function calculateTradeInfo(
               balancePercent: undefined,
             },
             averageFillPrice: price,
+            worstFillPrice: price,
           };
 
           const total = calculateOrderTotal(usdcSize, totalFees, trade.side);
@@ -370,6 +375,7 @@ function calculateMarketOrder(
     marketOrder,
     summary: {
       averageFillPrice: marketOrder?.averagePrice,
+      worstFillPrice: marketOrder?.worstPrice,
       size: {
         leverageSigned: marketOrder?.leverageSigned,
         size: marketOrder?.size,
@@ -493,8 +499,8 @@ function simulateMarketOrder(
               .times(existingPosition.value.div(existingPosition.value.abs()))
               .toNumber()
           : 0,
-      averagePrice: 0,
-      worstPrice: 0,
+      averagePrice: undefined,
+      worstPrice: undefined,
     };
   }
   const effectiveSizeTarget = {
@@ -860,6 +866,7 @@ function calculateLimitOrderInputSummary(
 
   return {
     averageFillPrice: price,
+    worstFillPrice: price,
     size: {
       // not supported
       leverageSigned: undefined,

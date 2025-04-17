@@ -24,7 +24,6 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectChildSubaccountSummaries } from '../selectors/account';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { ComplianceStatus } from '../types/summaryTypes';
 
@@ -77,7 +76,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
     [
       selectTxAuthorizedAccount,
       BonsaiCore.account.balances.data,
-      selectChildSubaccountSummaries,
+      BonsaiCore.account.childSubaccountSummaries.data,
       selectHasNonExpiredPendingWithdraws,
     ],
     (txAuthorizedAccount, balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {

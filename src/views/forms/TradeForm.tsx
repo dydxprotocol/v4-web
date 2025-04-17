@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { ErrorType } from '@/bonsai/lib/validationErrors';
+import {
+  ErrorType,
+  getAlertsToRender,
+  getFormDisabledButtonStringKey,
+} from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -28,10 +32,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { accountTransactionManager } from '@/state/_store';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -44,9 +48,9 @@ import {
   getTradeFormSummary,
 } from '@/state/tradeFormSelectors';
 
+import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
-import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -55,7 +59,6 @@ import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
-import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
 import { TradeFormInputs } from './TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
@@ -76,7 +79,7 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [placeOrderError, setPlaceOrderError] = useState<string>();
+  const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
   const stringGetter = useStringGetter();
@@ -138,58 +141,33 @@ export const TradeForm = ({
     alertType,
     shouldPromptUserToPlaceLimitOrder,
   } = useMemo(() => {
-    let alertContentInner;
-    let alertTypeInner = AlertType.Error;
-
-    let alertContentLink;
-    let alertContentLinkText;
-
-    const inputAlertInner = getTradeInputAlert({
-      abacusInputErrors: [], // TODO
-      stringGetter,
-      stepSizeDecimals,
-      tickSizeDecimals,
-    });
+    const mainAlert = getAlertsToRender(tradeErrors)?.[0];
+    const key = getFormDisabledButtonStringKey(tradeErrors);
+    const ctaAlert = key ? stringGetter({ key }) : undefined;
 
     const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
       NotificationType.OrderStatus
     );
 
-    if (placeOrderError && !isErrorShownInOrderStatusToast) {
-      alertContentInner = placeOrderError;
-    } else if (inputAlertInner) {
-      alertContentInner = inputAlertInner.alertString;
-      alertTypeInner = inputAlertInner.type;
-      alertContentLink = inputAlertInner.link;
-      alertContentLinkText = inputAlertInner.linkText;
-    }
+    const shouldPromptUserToPlaceLimitOrderInner =
+      mainAlert?.code === 'MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE';
 
-    const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
-      (errorCode) => inputAlertInner?.code === errorCode
-    );
     return {
-      shortAlertContent: alertContentInner,
-      alertContent: alertContentInner && (
-        <div tw="inline-block">
-          {alertContentInner}{' '}
-          {alertContentLinkText && alertContentLink && (
-            <Link isInline href={alertContentLink}>
-              {alertContentLinkText}
-            </Link>
-          )}
-        </div>
-      ),
-      alertType: alertTypeInner,
+      shortAlertContent: ctaAlert,
+      alertContent:
+        placeOrderError != null && !isErrorShownInOrderStatusToast ? (
+          <div tw="inline-block">{placeOrderError}</div>
+        ) : mainAlert != null ? (
+          <ValidationAlertMessage error={mainAlert} />
+        ) : undefined,
+      alertType:
+        placeOrderError != null && !isErrorShownInOrderStatusToast
+          ? ErrorType.error
+          : mainAlert?.type,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
-      inputAlert: inputAlertInner,
+      inputAlert: mainAlert,
     };
-  }, [
-    getNotificationPreferenceForType,
-    placeOrderError,
-    stepSizeDecimals,
-    stringGetter,
-    tickSizeDecimals,
-  ]);
+  }, [getNotificationPreferenceForType, placeOrderError, stringGetter, tradeErrors]);
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -274,30 +252,23 @@ export const TradeForm = ({
 
   const tradeFormMessages = (
     <>
-      <TradeFormInfoMessages marketId={marketId} />
-
       {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
         <AlertMessage type={AlertType.Error}>
           <span>{complianceMessage}</span>
         </AlertMessage>
       )}
 
-      {alertContent && (
-        <AlertMessage type={alertType}>
-          <div tw="row gap-0.75">
-            {alertContent}
-            {shouldPromptUserToPlaceLimitOrder && (
-              <$IconButton
-                iconName={IconName.Arrow}
-                shape={ButtonShape.Circle}
-                action={ButtonAction.Navigation}
-                size={ButtonSize.XSmall}
-                iconSize="1.25em"
-                onClick={() => onTradeTypeChange(TradeFormType.LIMIT)}
-              />
-            )}
-          </div>
-        </AlertMessage>
+      {alertContent}
+
+      {shouldPromptUserToPlaceLimitOrder && (
+        <$IconButton
+          iconName={IconName.Arrow}
+          shape={ButtonShape.Circle}
+          action={ButtonAction.Navigation}
+          size={ButtonSize.XSmall}
+          iconSize="1.25em"
+          onClick={() => onTradeTypeChange(TradeFormType.LIMIT)}
+        />
       )}
     </>
   );
@@ -321,7 +292,7 @@ export const TradeForm = ({
       hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
       onClearInputs={() => dispatch(tradeFormActions.reset())}
-      actionStringKey={inputAlert?.actionStringKey}
+      actionStringKey={ale}
       validationErrorString={shortAlertContent}
       summary={summary}
       currentStep={currentStep}

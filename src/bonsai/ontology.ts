@@ -36,6 +36,7 @@ import {
   selectAccountOrdersLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
+  selectChildSubaccountSummaries,
   selectCurrentMarketInfoRaw,
   selectCurrentMarketOpenOrders,
   selectCurrentMarketOrderHistory,
@@ -101,6 +102,7 @@ import {
   AllAssetData,
   ApiState,
   AssetData,
+  ChildSubaccountSummaries,
   Compliance,
   EquityTiersSummary,
   FeeTierSummary,
@@ -133,6 +135,10 @@ interface BonsaiCoreShape {
     };
     parentSubaccountPositions: {
       data: BasicSelector<SubaccountPosition[] | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    childSubaccountSummaries: {
+      data: BasicSelector<ChildSubaccountSummaries | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
     openOrders: {
@@ -205,6 +211,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     parentSubaccountPositions: {
       data: selectParentSubaccountOpenPositions,
       loading: selectParentSubaccountOpenPositionsLoading,
+    },
+    childSubaccountSummaries: {
+      data: selectChildSubaccountSummaries,
+      loading: selectParentSubaccountSummaryLoading,
     },
     allOrders: {
       data: selectAccountOrders,

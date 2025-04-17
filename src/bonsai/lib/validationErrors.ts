@@ -63,7 +63,7 @@ export function getFormDisabledButtonStringKey(errors: ValidationError[]) {
 
 interface SimpleValidationErrorParams {
   code: string;
-  type: ErrorType;
+  type?: ErrorType;
   fields?: string[];
   titleKey?: string;
   textKey?: string;
@@ -74,7 +74,7 @@ interface SimpleValidationErrorParams {
 
 export function simpleValidationError({
   code,
-  type,
+  type = ErrorType.error,
   fields,
   titleKey,
   textKey,

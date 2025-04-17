@@ -68,7 +68,7 @@ export const AccountInfoSection = () => {
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const parentSubaccountAfterOperation = orEmptyObj(
-    useAppSelector(getCurrentSelectedFormSummary).summary.accountAfter
+    useAppSelector(getCurrentSelectedFormSummary).summary.accountDetailsAfter?.account
   );
   const {
     freeCollateral: availableBalancePost,

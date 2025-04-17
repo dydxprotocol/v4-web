@@ -180,6 +180,7 @@ export type TradeSizeSummary = {
 export type TradeInputSummary = {
   size: TradeSizeSummary | undefined;
   averageFillPrice: number | undefined;
+  worstFillPrice: number | undefined;
 };
 
 export type TradeSummary = {
@@ -214,10 +215,8 @@ export type TradeFormSummary = {
   tradeInfo: TradeSummary;
   tradePayload: PlaceOrderPayload | undefined;
 
-  accountBefore?: GroupedSubaccountSummary;
-  accountAfter?: GroupedSubaccountSummary;
-  positionBefore?: SubaccountPosition;
-  positionAfter?: SubaccountPosition;
+  accountDetailsBefore: TradeAccountDetails | undefined;
+  accountDetailsAfter: TradeAccountDetails | undefined;
 };
 
 export type TradeFormInputData = {

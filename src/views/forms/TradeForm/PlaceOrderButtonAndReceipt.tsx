@@ -101,9 +101,9 @@ export const PlaceOrderButtonAndReceipt = ({
     notional: notionalTotal,
     adjustedImf,
     marginValueMaintenance,
-  } = orEmptyObj(summary?.positionBefore);
+  } = orEmptyObj(summary?.accountDetailsBefore?.position);
 
-  const postOrderPositionData = orEmptyObj(summary?.positionAfter);
+  const postOrderPositionData = orEmptyObj(summary?.accountDetailsAfter?.position);
 
   const tradeValues = useAppSelector(getTradeFormValues);
   const { marginMode } = tradeValues;

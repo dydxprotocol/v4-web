@@ -220,7 +220,7 @@ export const TradeSizeInputs = () => {
             : AttemptBigNumber(
                 mapIfPresent(
                   effectiveSizes.size,
-                  tradeSummary.positionBefore?.unsignedSize.toNumber(),
+                  tradeSummary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
                   (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
                 )
               )
