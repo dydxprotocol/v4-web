@@ -4,7 +4,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { AbacusInputTypes, Nullable } from '@/constants/abacus';
+import { AbacusInputTypes } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
@@ -26,7 +26,7 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderbookControls } from './OrderbookControls';
 import { OrderbookMiddleRow, OrderbookRow } from './OrderbookRow';

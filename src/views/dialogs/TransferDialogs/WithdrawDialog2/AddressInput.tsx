@@ -52,7 +52,7 @@ export const AddressInput = ({
 
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
-      <div tw="flex flex-1 flex-col gap-0.5 text-small">
+      <div tw="flex min-w-0 flex-1 flex-col gap-0.5 text-small">
         <div>
           {stringGetter({ key: STRING_KEYS.ADDRESS })}{' '}
           {!hasValidAddress && !isFocused && value.trim() !== '' && (

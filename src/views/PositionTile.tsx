@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
@@ -16,6 +15,7 @@ import { TagSize } from '@/components/Tag';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 import { hasPositionSideChanged } from '@/lib/tradeData';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   assetImgUrl: Nullable<string>;

@@ -27,7 +27,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { log } from '@/lib/telemetry';
 import { browserTimeOffsetPromise } from '@/lib/timeOffset';
 

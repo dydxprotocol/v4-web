@@ -3,7 +3,6 @@ import { ReactNode } from 'react';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
@@ -21,7 +20,7 @@ import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 
 import { getAssetFromMarketId } from '@/lib/assetUtils';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   launchableMarketId: string;
