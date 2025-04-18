@@ -1,3 +1,4 @@
+import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
 import { subscribeOnStream, unsubscribeFromStream } from '@/bonsai/websocket/candlesForTradingView';
@@ -177,7 +178,10 @@ export const getDydxDatafeed = (
     const toMs = to * 1000 + 1;
 
     try {
-      const fetchedCandles: Candle[] | undefined = await getCandlesForDatafeed({
+      const fetchedCandles: Candle[] | undefined = await wrapAndLogBonsaiError(
+        getCandlesForDatafeed,
+        'candles'
+      )({
         marketId: symbolInfo.ticker!,
         resolution,
         fromMs,
