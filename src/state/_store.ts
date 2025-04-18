@@ -7,8 +7,6 @@ import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import { GroupingMultiplier } from '@/constants/orderbook';
-
 import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
@@ -105,8 +103,9 @@ export const store = configureStore({
               helpers: transformOntologyObject(BonsaiHelpers, (a, path) => {
                 const result = a(state);
                 if (isFunction(result)) {
+                  // this parameterized selector requires no arguments and is important
                   if (path === '.currentMarket.orderbook.createSelectGroupedData') {
-                    return result(state, GroupingMultiplier.ONE);
+                    return result(state);
                   }
                   return undefined;
                 }
