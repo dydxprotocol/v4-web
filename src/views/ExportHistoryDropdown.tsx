@@ -51,28 +51,6 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
       const trades = await requestAllAccountFills(dydxAddress, subaccountNumber);
 
       const csvTrades = trades.map((fill) => {
-        const fee = formatNumberOutput(fill.fee, OutputType.Fiat, {
-          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-          groupSeparator: LOCALE_GROUP_SEPARATOR,
-          selectedLocale,
-        });
-
-        const price = formatNumberOutput(fill.price, OutputType.Fiat, {
-          decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-          groupSeparator: LOCALE_GROUP_SEPARATOR,
-          selectedLocale,
-        });
-
-        const total = formatNumberOutput(
-          MustBigNumber(fill.price).times(fill.size),
-          OutputType.Fiat,
-          {
-            decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-            groupSeparator: LOCALE_GROUP_SEPARATOR,
-            selectedLocale,
-          }
-        );
-
         const sideKey = {
           [OrderSide.BUY]: STRING_KEYS.BUY,
           [OrderSide.SELL]: STRING_KEYS.SELL,
@@ -83,9 +61,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           liquidity: fill.liquidity,
           time: new Date(fill.createdAt).toISOString(),
           amount: fill.size,
-          price,
-          fee,
-          total,
+          price: fill.price,
+          fee: fill.fee,
+          total: MustBigNumber(fill.price).times(fill.size).toString(10),
           market: fill.market,
           side: sideKey
             ? stringGetter({
