@@ -4,12 +4,10 @@ import {
   AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderTypes,
-  ErrorFormat,
   type AbacusOrderSides,
-  type ErrorFormatType,
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
-import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { PositionSide, TradeTypes } from '@/constants/trade';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -50,40 +48,6 @@ export const hasPositionSideChanged = ({
     newPositionSide,
     positionSideHasChanged: postOrderSize !== undefined && currentPositionSide !== newPositionSide,
   };
-};
-
-const formatErrorParam = ({
-  value,
-  format,
-  stepSizeDecimals,
-  tickSizeDecimals,
-}: {
-  value: Nullable<string>;
-  format: Nullable<ErrorFormatType>;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
-}) => {
-  switch (format) {
-    case ErrorFormat.Percent: {
-      const percentBN = MustBigNumber(value);
-      return `${percentBN.times(100).toFixed(PERCENT_DECIMALS)}%`;
-    }
-    case ErrorFormat.Size: {
-      const sizeBN = MustBigNumber(value);
-      return sizeBN.toFixed(stepSizeDecimals ?? 0);
-    }
-    case ErrorFormat.Price: {
-      const dollarBN = MustBigNumber(value);
-      return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
-    }
-    case ErrorFormat.UsdcPrice: {
-      const dollarBN = MustBigNumber(value);
-      return `$${dollarBN.toFixed(USD_DECIMALS)}`;
-    }
-    default: {
-      return value ?? '';
-    }
-  }
 };
 
 export const calculateCrossPositionMargin = ({

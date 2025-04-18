@@ -59,7 +59,6 @@ type ElementProps = {
   summary?: TradeFormSummary;
   hasInput: boolean;
   hasValidationErrors?: boolean;
-  validationErrorString?: string;
   currentStep?: MobilePlaceOrderSteps;
   showDeposit?: boolean;
   confirmButtonConfig: ConfirmButtonConfig;
@@ -71,7 +70,6 @@ export const PlaceOrderButtonAndReceipt = ({
   summary,
   hasInput,
   hasValidationErrors,
-  validationErrorString,
   currentStep,
   showDeposit,
   confirmButtonConfig,
@@ -125,12 +123,12 @@ export const PlaceOrderButtonAndReceipt = ({
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
-  const { tradeInfo } = summary ?? {};
+  const { tradeInfo, tradePayload } = summary ?? {};
   const { fee, inputSummary, reward } = tradeInfo ?? {};
   const expectedPrice = inputSummary?.averageFillPrice;
 
   // approximation for whether inputs are filled by whether summary has been calculated
-  const areInputsFilled = fee != null || reward != null;
+  const areInputsFilled = tradePayload != null;
 
   const renderMarginValue = () => {
     if (marginMode === MarginMode.CROSS) {
@@ -417,9 +415,7 @@ export const PlaceOrderButtonAndReceipt = ({
         ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
           depositButton
         ) : (
-          <WithTooltip tooltipString={showValidatorErrors ? validationErrorString : undefined}>
-            {submitButton}
-          </WithTooltip>
+          submitButton
         )}
       </WithDetailsReceipt>
     </$Footer>

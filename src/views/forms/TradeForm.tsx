@@ -2,17 +2,11 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import {
-  ErrorType,
-  getAlertsToRender,
-  getFormDisabledButtonStringKey,
-} from '@/bonsai/lib/validationErrors';
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
-import { TradeInputErrorAction } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -51,7 +45,6 @@ import {
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -89,9 +82,6 @@ export const TradeForm = ({
   const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
 
   const currentInput = useAppSelector(getCurrentTradePageForm);
-  const { tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
 
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
@@ -120,7 +110,6 @@ export const TradeForm = ({
   const isInputFilled =
     [
       rawInput.triggerPrice,
-      rawInput.limitPrice,
       rawInput.targetLeverage,
       rawInput.reduceOnly,
       rawInput.goodTil,
@@ -134,40 +123,34 @@ export const TradeForm = ({
 
   const { getNotificationPreferenceForType } = useNotifications();
 
-  const {
-    inputAlert,
-    alertContent,
-    shortAlertContent,
-    alertType,
-    shouldPromptUserToPlaceLimitOrder,
-  } = useMemo(() => {
-    const mainAlert = getAlertsToRender(tradeErrors)?.[0];
-    const key = getFormDisabledButtonStringKey(tradeErrors);
-    const ctaAlert = key ? stringGetter({ key }) : undefined;
+  const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
+    const primaryAlert = getHighestPriorityAlert(tradeErrors);
 
     const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
       NotificationType.OrderStatus
     );
 
     const shouldPromptUserToPlaceLimitOrderInner =
-      mainAlert?.code === 'MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE';
+      primaryAlert?.code === 'MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE';
 
     return {
-      shortAlertContent: ctaAlert,
+      shortAlertKey: primaryAlert?.resources.title?.stringKey,
       alertContent:
         placeOrderError != null && !isErrorShownInOrderStatusToast ? (
-          <div tw="inline-block">{placeOrderError}</div>
-        ) : mainAlert != null ? (
-          <ValidationAlertMessage error={mainAlert} />
+          <AlertMessage type={AlertType.Error}>
+            <div tw="inline-block">{placeOrderError}</div>
+          </AlertMessage>
+        ) : primaryAlert != null && primaryAlert.resources.text?.stringKey != null ? (
+          <ValidationAlertMessage error={primaryAlert} />
         ) : undefined,
       alertType:
         placeOrderError != null && !isErrorShownInOrderStatusToast
           ? ErrorType.error
-          : mainAlert?.type,
+          : primaryAlert?.type,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
-      inputAlert: mainAlert,
+      inputAlert: primaryAlert,
     };
-  }, [getNotificationPreferenceForType, placeOrderError, stringGetter, tradeErrors]);
+  }, [getNotificationPreferenceForType, placeOrderError, tradeErrors]);
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -292,11 +275,10 @@ export const TradeForm = ({
       hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
       onClearInputs={() => dispatch(tradeFormActions.reset())}
-      actionStringKey={ale}
-      validationErrorString={shortAlertContent}
+      actionStringKey={shortAlertKey}
       summary={summary}
       currentStep={currentStep}
-      showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+      showDeposit={false}
       confirmButtonConfig={{
         stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
         buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
@@ -315,7 +297,7 @@ export const TradeForm = ({
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <>
           <PositionPreview />
-          {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
+          {alertContent}
         </>
       ) : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (

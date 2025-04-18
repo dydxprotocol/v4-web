@@ -48,6 +48,7 @@ export function calculateTradeFormErrors(
   errors.push(...validatePositionState(summary));
   errors.push(...validateAccountState(inputData, summary));
   errors.push(...validateRestrictions(inputData, summary));
+  errors.push(...validateTradeFormSummaryFields(summary));
 
   return errors;
 }
@@ -148,6 +149,20 @@ function validateFieldsBasic(
   const state = summary.effectiveTrade;
   const info = summary.tradeInfo;
 
+  if (options.needsLimitPrice) {
+    const limitPrice = AttemptNumber(info.payloadPrice) ?? 0;
+    if (limitPrice <= 0) {
+      errors.push(
+        simpleValidationError({
+          code: 'REQUIRED_LIMIT_PRICE',
+          type: ErrorType.error,
+          fields: ['limitPrice'],
+          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
+        })
+      );
+    }
+  }
+
   if (options.needsSize) {
     const sizeValue = AttemptNumber(info.inputSummary.size?.size) ?? 0;
     if (sizeValue <= 0) {
@@ -180,20 +195,6 @@ function validateFieldsBasic(
               format: ErrorFormat.String,
             },
           },
-        })
-      );
-    }
-  }
-
-  if (options.needsLimitPrice) {
-    const limitPrice = AttemptNumber(info.payloadPrice) ?? 0;
-    if (limitPrice <= 0) {
-      errors.push(
-        simpleValidationError({
-          code: 'REQUIRED_LIMIT_PRICE',
-          type: ErrorType.error,
-          fields: ['limitPrice'],
-          titleKey: STRING_KEYS.ENTER_LIMIT_PRICE,
         })
       );
     }
@@ -994,3 +995,123 @@ function validateRestrictions(
 
   return errors;
 }
+
+function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  if (summary.tradePayload == null) {
+    errors.push(simpleValidationError({ code: 'MISSING_TRADE_PAYLOAD' }));
+  }
+
+  if (summary.tradeInfo.inputSummary.size?.size == null || summary.tradeInfo.payloadPrice == null) {
+    errors.push(simpleValidationError({ code: 'MISSING__METRICS' }));
+  }
+
+  if (summary.accountDetailsBefore == null || summary.accountDetailsBefore.account == null) {
+    errors.push(simpleValidationError({ code: 'MISSING_ACCOUNT_DETAILS_BEFORE' }));
+  }
+
+  if (summary.accountDetailsAfter == null || summary.accountDetailsAfter.account == null) {
+    errors.push(simpleValidationError({ code: 'MISSING_ACCOUNT_DETAILS_AFTER' }));
+  }
+
+  return errors;
+}
+
+/*
+function validateAccountRequirements(
+  inputData: TradeFormInputData,
+  summary: TradeFormSummary
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  // Check if wallet is connected
+  const walletError = validateWalletConnected(inputData);
+  if (walletError) {
+    errors.push(walletError);
+    return errors; // Return early as other checks depend on wallet
+  }
+
+  // Check if account is connected
+  const accountError = validateAccountConnected(inputData);
+  if (accountError) {
+    errors.push(accountError);
+    return errors; // Return early as equity check depends on account
+  }
+
+  // Check if account has equity
+  const equityError = validateAccountEquity(inputData, summary);
+  if (equityError) {
+    errors.push(equityError);
+  }
+
+  return errors;
+}
+
+function validateWalletConnected(inputData: TradeFormInputData): ValidationError | undefined {
+  // Check if wallet is connected
+  const isWalletConnected = inputData.rawParentSubaccountData?.isWalletConnected;
+
+  if (!isWalletConnected) {
+    return simpleValidationError({
+      code: 'REQUIRED_WALLET',
+      type: ErrorType.error,
+      titleKey: STRING_KEYS.CONNECT_WALLET_TO_TRADE,
+      textKey: STRING_KEYS.CONNECT_WALLET_TO_TRADE,
+      action: ErrorAction.CONNECT_WALLET,
+    });
+  }
+
+  return undefined;
+}
+
+function validateAccountConnected(inputData: TradeFormInputData): ValidationError | undefined {
+  // Check if account is connected
+  const isAccountConnected = inputData.rawParentSubaccountData?.isAccountConnected;
+
+  if (!isAccountConnected) {
+    return simpleValidationError({
+      code: 'REQUIRED_ACCOUNT',
+      type: ErrorType.error,
+      titleKey: STRING_KEYS.DEPOSIT_TO_TRADE,
+      textKey: STRING_KEYS.DEPOSIT_TO_TRADE,
+      action: ErrorAction.DEPOSIT,
+    });
+  }
+
+  return undefined;
+}
+
+function validateAccountEquity(
+  inputData: TradeFormInputData,
+  summary: TradeFormSummary
+): ValidationError | undefined {
+  const subaccountNumber = summary.tradeInfo.subaccountNumber;
+
+  // Check if this is a child subaccount for isolated margin
+  const isChildSubaccountForIsolatedMargin =
+    subaccountNumber != null && subaccountNumber >= NUM_PARENT_SUBACCOUNTS;
+
+  // Get parent or current subaccount
+  const subaccountBefore = summary.accountBefore?.subaccountSummaries?.[subaccountNumber];
+
+  // Check equity
+  const equity = subaccountBefore?.equity?.toNumber();
+
+  if (equity != null && equity > 0) {
+    return undefined;
+  } else if (isChildSubaccountForIsolatedMargin) {
+    // Equity is null when placing an Isolated Margin trade on a child subaccount
+    // or when a child subaccount has not been created yet
+    return undefined;
+  } else {
+    return simpleValidationError({
+      code: 'NO_EQUITY_DEPOSIT_FIRST',
+      type: ErrorType.error,
+      titleKey: STRING_KEYS.NO_EQUITY_DEPOSIT_FIRST,
+      textKey: STRING_KEYS.NO_EQUITY_DEPOSIT_FIRST,
+      action: ErrorAction.DEPOSIT,
+    });
+  }
+}
+*/

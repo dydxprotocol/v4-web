@@ -158,6 +158,9 @@ export function calculateTradeSummary(
       AttemptNumber(tradeInfo.inputSummary.size?.size),
       AttemptNumber(tradeInfo.payloadPrice),
       (market, marketId, type, side, size, price): PlaceOrderPayload | undefined => {
+        if (size <= 0) {
+          return undefined;
+        }
         const triggerPrice = AttemptNumber(effectiveTrade.triggerPrice);
         if (options.needsTriggerPrice && triggerPrice == null) {
           return undefined;

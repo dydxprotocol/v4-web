@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
+import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -33,9 +34,9 @@ import { Collapsible } from '@/components/Collapsible';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
@@ -50,11 +51,11 @@ import {
   getClosePositionFormValues,
 } from '@/state/tradeFormSelectors';
 
+import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
-import { getTradeInputAlert } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -83,7 +84,9 @@ export const ClosePositionForm = ({
   const isFirstRender = useIsFirstRender();
   const enableLimitClose = useStatsigGateValue(StatsigFlags.ffEnableLimitClose);
 
-  const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
+  const [closePositionError, setClosePositionError] = useDisappearingValue<string | undefined>(
+    undefined
+  );
 
   const market = useAppSelector(getCurrentMarketIdIfTradeable);
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
@@ -94,9 +97,9 @@ export const ClosePositionForm = ({
 
   const tradeValues = useAppSelector(getClosePositionFormValues);
   const { type } = tradeValues;
-  const summary = useAppSelector(getClosePositionFormSummary);
+  const { summary, errors } = useAppSelector(getClosePositionFormSummary);
   const useLimit = type === TradeFormType.LIMIT;
-  const effectiveSizes = summary.summary.tradeInfo.inputSummary.size;
+  const effectiveSizes = summary.tradeInfo.inputSummary.size;
 
   const {
     amountInput,
@@ -110,34 +113,34 @@ export const ClosePositionForm = ({
   const { signedSize: currentPositionSize } = currentPositionData ?? {};
   const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
-  const hasInputErrors = false; // todo
-
-  const inputAlert = getTradeInputAlert({
-    abacusInputErrors: [], // todo
-    stringGetter,
-    stepSizeDecimals,
-    tickSizeDecimals,
-  });
+  const hasInputErrors = errors.find((e) => e.type === ErrorType.error) != null;
 
   const { getNotificationPreferenceForType } = useNotifications();
-  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
-    NotificationType.OrderStatus
-  );
 
-  let alertContent;
-  let alertType = AlertType.Error;
+  const { alertContent, shortAlertKey } = useMemo(() => {
+    const primaryAlert = getHighestPriorityAlert(errors);
 
-  let alertContentLink;
-  let alertContentLinkText;
+    const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+      NotificationType.OrderStatus
+    );
 
-  if (closePositionError && !isErrorShownInOrderStatusToast) {
-    alertContent = closePositionError;
-  } else if (inputAlert) {
-    alertContent = inputAlert.alertString;
-    alertType = inputAlert.type;
-    alertContentLink = inputAlert.link;
-    alertContentLinkText = inputAlert.linkText;
-  }
+    return {
+      shortAlertKey: primaryAlert?.resources.title?.stringKey,
+      alertContent:
+        closePositionError != null && !isErrorShownInOrderStatusToast ? (
+          <AlertMessage type={AlertType.Error}>
+            <div tw="inline-block">{closePositionError}</div>
+          </AlertMessage>
+        ) : primaryAlert != null && primaryAlert.resources.text?.stringKey != null ? (
+          <ValidationAlertMessage error={primaryAlert} />
+        ) : undefined,
+      alertType:
+        closePositionError != null && !isErrorShownInOrderStatusToast
+          ? ErrorType.error
+          : primaryAlert?.type,
+      inputAlert: primaryAlert,
+    };
+  }, [closePositionError, errors, getNotificationPreferenceForType]);
 
   // default to market
   useEffect(() => {
@@ -193,7 +196,7 @@ export const ClosePositionForm = ({
   const onClosePosition = async () => {
     setClosePositionError(undefined);
 
-    const payload = summary.summary.tradePayload;
+    const payload = summary.tradePayload;
     if (payload == null) {
       return;
     }
@@ -230,19 +233,6 @@ export const ClosePositionForm = ({
     </$MidPriceButton>
   );
 
-  const alertMessage = alertContent && (
-    <AlertMessage type={alertType}>
-      <div tw="inline-block">
-        {alertContent}{' '}
-        {alertContentLinkText && alertContentLink && (
-          <Link isInline href={alertContentLink}>
-            {alertContentLinkText}
-          </Link>
-        )}
-      </div>
-    </AlertMessage>
-  );
-
   const inputs = (
     <$InputsColumn>
       <FormInput
@@ -268,7 +258,7 @@ export const ClosePositionForm = ({
           : AttemptBigNumber(
               mapIfPresent(
                 effectiveSizes?.size,
-                summary.summary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
+                summary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
                 (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
               )
             )
@@ -321,7 +311,7 @@ export const ClosePositionForm = ({
         </Collapsible>
       )}
 
-      {alertMessage}
+      {alertContent}
     </$InputsColumn>
   );
 
@@ -333,7 +323,7 @@ export const ClosePositionForm = ({
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <div tw="flexColumn gap-[--form-input-gap]">
           <PositionPreview />
-          {alertMessage}
+          {alertContent}
         </div>
       ) : (
         <$MobileLayout $showOrderbook={showOrderbook}>
@@ -361,9 +351,8 @@ export const ClosePositionForm = ({
         hasValidationErrors={hasInputErrors}
         hasInput={!!amountInput}
         onClearInputs={onClearInputs}
-        actionStringKey={inputAlert?.actionStringKey}
-        validationErrorString={alertContent}
-        summary={summary.summary}
+        actionStringKey={shortAlertKey}
+        summary={summary}
         currentStep={currentStep}
         confirmButtonConfig={{
           stringKey: STRING_KEYS.CLOSE_ORDER,

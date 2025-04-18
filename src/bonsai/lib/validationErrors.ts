@@ -61,6 +61,13 @@ export function getFormDisabledButtonStringKey(errors: ValidationError[]) {
     ?.resources.title?.stringKey;
 }
 
+export function getHighestPriorityAlert(errors: ValidationError[]) {
+  return (
+    errors.find((e) => e.type === ErrorType.error) ??
+    errors.find((e) => e.type === ErrorType.warning)
+  );
+}
+
 interface SimpleValidationErrorParams {
   code: string;
   type?: ErrorType;

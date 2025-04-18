@@ -72,12 +72,18 @@ export const getTradeFormSummary = createAppSelector(
       return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
     }
     const summary = TradeFormFns.calculateSummary(state, inputData);
+    const errors = TradeFormFns.getErrors(state, inputData, summary);
     // eslint-disable-next-line no-console
-    console.log('trade', purgeBigNumbers(summary), purgeBigNumbers(inputData));
+    console.log(
+      'trade',
+      purgeBigNumbers(summary),
+      purgeBigNumbers(errors),
+      purgeBigNumbers(inputData)
+    );
 
     return {
       summary,
-      errors: TradeFormFns.getErrors(state, inputData, summary),
+      errors,
     };
   }
 );
