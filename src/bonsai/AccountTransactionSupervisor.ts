@@ -606,6 +606,7 @@ export class AccountTransactionSupervisor {
         marketId: payload.marketId,
         clientId: `${payload.clientId}`,
         orderType: payload.type as unknown as TradeTypes,
+        subaccountNumber: payload.subaccountNumber,
       })
     );
 

@@ -492,6 +492,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             marketId: placeOrderPayload.marketId,
             clientId: placeOrderPayload.clientId.toString(),
             orderType: placeOrderPayload.type as unknown as TradeTypes,
+            subaccountNumber: placeOrderPayload.subaccountNumber,
           })
         );
 

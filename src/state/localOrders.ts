@@ -208,7 +208,12 @@ export const localOrdersSlice = createSlice({
     },
     placeOrderSubmitted: (
       state,
-      action: PayloadAction<{ marketId: string; clientId: string; orderType: TradeTypes }>
+      action: PayloadAction<{
+        marketId: string;
+        clientId: string;
+        subaccountNumber: number;
+        orderType: TradeTypes;
+      }>
     ) => {
       state.localPlaceOrders.push({
         ...action.payload,
