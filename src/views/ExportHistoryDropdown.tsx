@@ -115,15 +115,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         ],
       });
     }
-  }, [
-    dydxAddress,
-    subaccountNumber,
-    requestAllAccountFills,
-    stringGetter,
-    LOCALE_DECIMAL_SEPARATOR,
-    LOCALE_GROUP_SEPARATOR,
-    selectedLocale,
-  ]);
+  }, [dydxAddress, subaccountNumber, requestAllAccountFills, stringGetter]);
 
   const exportTransfers = useCallback(async () => {
     if (dydxAddress && subaccountNumber !== undefined) {
