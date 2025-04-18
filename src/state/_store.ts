@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import { BonsaiCore, BonsaiHelpers, transformOntologyObject } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { isFunction } from 'lodash';
@@ -7,9 +7,12 @@ import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
+import { GroupingMultiplier } from '@/constants/orderbook';
+
 import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
+import { transformOntologyObject } from '@/lib/transformOntology';
 
 import { accountSlice } from './account';
 import { accountUiMemorySlice } from './accountUiMemory';
@@ -99,9 +102,12 @@ export const store = configureStore({
             localization: { ...state.localization, localeData: '<LONG BLOB>' },
             ontology: {
               core: transformOntologyObject(BonsaiCore, (a) => a(state)),
-              helpers: transformOntologyObject(BonsaiHelpers, (a) => {
+              helpers: transformOntologyObject(BonsaiHelpers, (a, path) => {
                 const result = a(state);
                 if (isFunction(result)) {
+                  if (path === '.currentMarket.orderbook.createSelectGroupedData') {
+                    return result(state, GroupingMultiplier.ONE);
+                  }
                   return undefined;
                 }
                 return result;
