@@ -1,6 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
+import { BonsaiCore, BonsaiHelpers, transformOntologyObject } from '@/bonsai/ontology';
 import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
+import { isFunction } from 'lodash';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
@@ -95,6 +97,16 @@ export const store = configureStore({
             ...state,
             tradingView: '<LONG BLOB>',
             localization: { ...state.localization, localeData: '<LONG BLOB>' },
+            ontology: {
+              core: transformOntologyObject(BonsaiCore, (a) => a(state)),
+              helpers: transformOntologyObject(BonsaiHelpers, (a) => {
+                const result = a(state);
+                if (isFunction(result)) {
+                  return undefined;
+                }
+                return result;
+              }),
+            },
           }),
         }
       : false,
