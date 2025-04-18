@@ -170,6 +170,7 @@ export type LocalPlaceOrderData = {
   marketId: string;
   clientId: string;
   orderId?: string;
+  subaccountNumber: number;
   orderType: TradeTypes;
   submissionStatus: PlaceOrderStatuses;
   errorParams?: ErrorParams;

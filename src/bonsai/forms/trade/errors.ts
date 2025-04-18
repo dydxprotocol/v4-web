@@ -858,8 +858,14 @@ function isTriggerOrder(type: TradeFormType): boolean {
  * Validates that all positions remain valid after the order
  */
 function validateSubaccountMargin(summary: TradeFormSummary): ValidationError | undefined {
-  // Check if this is a reducing limit order (which is allowed)
-  if (limitOrderReducing(summary)) {
+  if (summary.effectiveTrade.marginMode !== MarginMode.ISOLATED) {
+    return undefined;
+  }
+
+  if (
+    summary.accountDetailsAfter?.position == null ||
+    summary.accountDetailsAfter.position.unsignedSize.isZero()
+  ) {
     return undefined;
   }
 
@@ -868,7 +874,7 @@ function validateSubaccountMargin(summary: TradeFormSummary): ValidationError | 
       summary.tradeInfo.subaccountNumber
     ]?.freeCollateral.toNumber();
   const postOrderFreeCollateral =
-    summary.accountDetailsAfter?.subaccountSummaries?.[
+    summary.accountDetailsAfter.subaccountSummaries?.[
       summary.tradeInfo.subaccountNumber
     ]?.freeCollateral.toNumber();
 
@@ -888,29 +894,6 @@ function validateSubaccountMargin(summary: TradeFormSummary): ValidationError | 
   }
 
   return undefined;
-}
-
-/**
- * Checks if the order is a reducing limit order
- */
-function limitOrderReducing(summary: TradeFormSummary): boolean {
-  const state = summary.effectiveTrade;
-  if (state.type !== TradeFormType.LIMIT) {
-    return false;
-  }
-  if (state.reduceOnly) {
-    return true;
-  }
-  const positionSizeBefore = summary.accountDetailsBefore?.position?.signedSize.toNumber() ?? 0;
-  const positionSizeAfter = summary.accountDetailsAfter?.position?.signedSize.toNumber() ?? 0;
-
-  return (
-    positionSizeBefore !== 0 &&
-    // same side
-    positionSizeAfter * positionSizeBefore > 0 &&
-    // got smaller
-    Math.abs(positionSizeAfter) < Math.abs(positionSizeBefore)
-  );
 }
 
 /**
@@ -1017,101 +1000,3 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
 
   return errors;
 }
-
-/*
-function validateAccountRequirements(
-  inputData: TradeFormInputData,
-  summary: TradeFormSummary
-): ValidationError[] {
-  const errors: ValidationError[] = [];
-
-  // Check if wallet is connected
-  const walletError = validateWalletConnected(inputData);
-  if (walletError) {
-    errors.push(walletError);
-    return errors; // Return early as other checks depend on wallet
-  }
-
-  // Check if account is connected
-  const accountError = validateAccountConnected(inputData);
-  if (accountError) {
-    errors.push(accountError);
-    return errors; // Return early as equity check depends on account
-  }
-
-  // Check if account has equity
-  const equityError = validateAccountEquity(inputData, summary);
-  if (equityError) {
-    errors.push(equityError);
-  }
-
-  return errors;
-}
-
-function validateWalletConnected(inputData: TradeFormInputData): ValidationError | undefined {
-  // Check if wallet is connected
-  const isWalletConnected = inputData.rawParentSubaccountData?.isWalletConnected;
-
-  if (!isWalletConnected) {
-    return simpleValidationError({
-      code: 'REQUIRED_WALLET',
-      type: ErrorType.error,
-      titleKey: STRING_KEYS.CONNECT_WALLET_TO_TRADE,
-      textKey: STRING_KEYS.CONNECT_WALLET_TO_TRADE,
-      action: ErrorAction.CONNECT_WALLET,
-    });
-  }
-
-  return undefined;
-}
-
-function validateAccountConnected(inputData: TradeFormInputData): ValidationError | undefined {
-  // Check if account is connected
-  const isAccountConnected = inputData.rawParentSubaccountData?.isAccountConnected;
-
-  if (!isAccountConnected) {
-    return simpleValidationError({
-      code: 'REQUIRED_ACCOUNT',
-      type: ErrorType.error,
-      titleKey: STRING_KEYS.DEPOSIT_TO_TRADE,
-      textKey: STRING_KEYS.DEPOSIT_TO_TRADE,
-      action: ErrorAction.DEPOSIT,
-    });
-  }
-
-  return undefined;
-}
-
-function validateAccountEquity(
-  inputData: TradeFormInputData,
-  summary: TradeFormSummary
-): ValidationError | undefined {
-  const subaccountNumber = summary.tradeInfo.subaccountNumber;
-
-  // Check if this is a child subaccount for isolated margin
-  const isChildSubaccountForIsolatedMargin =
-    subaccountNumber != null && subaccountNumber >= NUM_PARENT_SUBACCOUNTS;
-
-  // Get parent or current subaccount
-  const subaccountBefore = summary.accountBefore?.subaccountSummaries?.[subaccountNumber];
-
-  // Check equity
-  const equity = subaccountBefore?.equity?.toNumber();
-
-  if (equity != null && equity > 0) {
-    return undefined;
-  } else if (isChildSubaccountForIsolatedMargin) {
-    // Equity is null when placing an Isolated Margin trade on a child subaccount
-    // or when a child subaccount has not been created yet
-    return undefined;
-  } else {
-    return simpleValidationError({
-      code: 'NO_EQUITY_DEPOSIT_FIRST',
-      type: ErrorType.error,
-      titleKey: STRING_KEYS.NO_EQUITY_DEPOSIT_FIRST,
-      textKey: STRING_KEYS.NO_EQUITY_DEPOSIT_FIRST,
-      action: ErrorAction.DEPOSIT,
-    });
-  }
-}
-*/

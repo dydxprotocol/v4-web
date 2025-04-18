@@ -953,7 +953,15 @@ function calculateIsolatedTransferAmount(
   existingPosition: SubaccountPosition | undefined,
   tradeMarketSummary: PerpetualMarketSummary | undefined
 ): number {
-  if (!getShouldTransferCollateral(trade, subaccountToUse, existingPosition, parentSubaccount)) {
+  if (
+    !getShouldTransferCollateral(
+      trade,
+      tradeSize,
+      subaccountToUse,
+      existingPosition,
+      parentSubaccount
+    )
+  ) {
     return 0;
   }
   return (
@@ -969,6 +977,7 @@ function calculateIsolatedTransferAmount(
 
 function getShouldTransferCollateral(
   trade: TradeForm,
+  tradeSize: number,
   subaccountToUse: number,
   existingPosition: SubaccountPosition | undefined,
   parentSubaccount: number | undefined
@@ -976,28 +985,8 @@ function getShouldTransferCollateral(
   const isIsolatedOrder =
     trade.marginMode === MarginMode.ISOLATED && subaccountToUse !== parentSubaccount;
   const isReduceOnly = trade.reduceOnly ?? false;
-  const isIncreasingSize = isTradeIncreasingPositionSize(
-    trade.side,
-    existingPosition?.side,
-    trade.reduceOnly
-  );
+  const isIncreasingSize = getPositionSizeDifference(trade, tradeSize, existingPosition) > 0;
   return isIsolatedOrder && isIncreasingSize && !isReduceOnly;
-}
-
-function isTradeIncreasingPositionSize(
-  tradeSide: OrderSide | undefined,
-  positionSide: IndexerPositionSide | undefined,
-  reduceOnly: boolean | undefined
-) {
-  if (reduceOnly === true) {
-    return false;
-  }
-  return (
-    positionSide == null ||
-    tradeSide == null ||
-    (tradeSide === OrderSide.BUY && positionSide === IndexerPositionSide.LONG) ||
-    (tradeSide === OrderSide.SELL && positionSide === IndexerPositionSide.SHORT)
-  );
 }
 
 function calculateIsolatedMarginTransferAmount(
@@ -1018,14 +1007,7 @@ function calculateIsolatedMarginTransferAmount(
   const targetLeverage =
     AttemptNumber(trade.targetLeverage) ?? Math.min(DEFAULT_TARGET_LEVERAGE, marketMaxLeverage);
 
-  const baseTradeSizeSigned = tradeSize * (trade.side === OrderSide.SELL ? -1 : 1);
-  const positionSizeBefore = existingPosition?.signedSize.toNumber() ?? 0;
-  const positionSizeAfterNotAccountingForReduceOnly = positionSizeBefore + baseTradeSizeSigned;
-  const positionSizeAfter =
-    trade.reduceOnly && positionSizeBefore * positionSizeAfterNotAccountingForReduceOnly <= 0
-      ? 0
-      : positionSizeAfterNotAccountingForReduceOnly;
-  const positionSizeDifference = Math.abs(positionSizeAfter) - Math.abs(positionSizeBefore);
+  const positionSizeDifference = getPositionSizeDifference(trade, tradeSize, existingPosition);
 
   return calculateIsolatedMarginTransferAmountFromValues(
     targetLeverage,
@@ -1035,6 +1017,22 @@ function calculateIsolatedMarginTransferAmount(
     marketMaxLeverage,
     positionSizeDifference
   );
+}
+
+function getPositionSizeDifference(
+  trade: TradeForm,
+  tradeSize: number,
+  existingPosition: SubaccountPosition | undefined
+) {
+  const baseTradeSizeSigned = tradeSize * (trade.side === OrderSide.SELL ? -1 : 1);
+  const positionSizeBefore = existingPosition?.signedSize.toNumber() ?? 0;
+  const positionSizeAfterNotAccountingForReduceOnly = positionSizeBefore + baseTradeSizeSigned;
+  const positionSizeAfter =
+    trade.reduceOnly && positionSizeBefore * positionSizeAfterNotAccountingForReduceOnly <= 0
+      ? 0
+      : positionSizeAfterNotAccountingForReduceOnly;
+  const positionSizeDifference = Math.abs(positionSizeAfter) - Math.abs(positionSizeBefore);
+  return positionSizeDifference;
 }
 
 function calculateIsolatedMarginTransferAmountFromValues(
