@@ -1019,32 +1019,13 @@ function calculateIsolatedMarginTransferAmount(
     AttemptNumber(trade.targetLeverage) ?? Math.min(DEFAULT_TARGET_LEVERAGE, marketMaxLeverage);
 
   const baseTradeSizeSigned = tradeSize * (trade.side === OrderSide.SELL ? -1 : 1);
-  const positionSizeDifference = isTradeIncreasingPositionSize(
-    trade.side,
-    existingPosition?.side,
-    trade.reduceOnly
-  )
-    ? baseTradeSizeSigned
-    : trade.reduceOnly
-      ? // reduce only + decreasing size
-        calc(() => {
-          if (
-            existingPosition?.side === IndexerPositionSide.LONG &&
-            trade.side === OrderSide.SELL
-          ) {
-            const size = Math.min(existingPosition.unsignedSize.toNumber(), tradeSize);
-            return size * -1;
-          }
-          if (
-            existingPosition?.side === IndexerPositionSide.SHORT &&
-            trade.side === OrderSide.BUY
-          ) {
-            const size = Math.min(existingPosition.unsignedSize.toNumber(), tradeSize);
-            return size;
-          }
-          return baseTradeSizeSigned;
-        })
-      : baseTradeSizeSigned;
+  const positionSizeBefore = existingPosition?.signedSize.toNumber() ?? 0;
+  const positionSizeAfterNotAccountingForReduceOnly = positionSizeBefore + baseTradeSizeSigned;
+  const positionSizeAfter =
+    trade.reduceOnly && positionSizeBefore * positionSizeAfterNotAccountingForReduceOnly <= 0
+      ? 0
+      : positionSizeAfterNotAccountingForReduceOnly;
+  const positionSizeDifference = Math.abs(positionSizeAfter) - Math.abs(positionSizeBefore);
 
   return calculateIsolatedMarginTransferAmountFromValues(
     targetLeverage,
@@ -1073,13 +1054,17 @@ function calculateIsolatedMarginTransferAmountFromValues(
     return undefined;
   }
 
-  return getTransferAmountFromTargetLeverage(
+  const amount = getTransferAmountFromTargetLeverage(
     price,
     oraclePrice,
     side,
     positionSizeDifference,
     adjustedTargetLeverage
   );
+  if (amount <= 0) {
+    return undefined;
+  }
+  return amount;
 }
 
 function getTransferAmountFromTargetLeverage(

@@ -882,7 +882,7 @@ function validateSubaccountMargin(summary: TradeFormSummary): ValidationError | 
     return simpleValidationError({
       code: 'ORDER_WITH_CURRENT_ORDERS_INVALID',
       type: ErrorType.error,
-      titleKey: STRING_KEYS.ORDER_WITH_CURRENT_ORDERS_INVALID,
+      titleKey: STRING_KEYS.MODIFY_TARGET_LEVERAGE,
       textKey: STRING_KEYS.ORDER_WITH_CURRENT_ORDERS_INVALID,
     });
   }
