@@ -1,14 +1,15 @@
-type OperationSuccess<T> = {
+export type OperationSuccess<T> = {
   type: 'success';
   payload: T;
 };
 
-type OperationFailure = {
+export type OperationFailure = {
   type: 'failure';
   errorString: string;
+  displayInfo?: { message: string; stringKey?: string | null };
 };
 
-type OperationResult<T> = OperationSuccess<T> | OperationFailure;
+export type OperationResult<T> = OperationSuccess<T> | OperationFailure;
 
 export function wrapOperationSuccess<T>(payload: T): OperationSuccess<T> {
   return {
@@ -17,10 +18,14 @@ export function wrapOperationSuccess<T>(payload: T): OperationSuccess<T> {
   };
 }
 
-export function wrapOperationFailure(errorString: string): OperationFailure {
+export function wrapOperationFailure(
+  errorString: string,
+  displayInfo?: { message: string; stringKey?: string | null }
+): OperationFailure {
   return {
     type: 'failure',
     errorString,
+    displayInfo,
   };
 }
 

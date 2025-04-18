@@ -92,22 +92,23 @@ export interface CancelOrderPayload {
 
 export interface PlaceOrderPayload {
   subaccountNumber: number;
+  transferToSubaccountAmount: number | undefined;
   marketId: string;
   type: OrderType;
   side: OrderSide;
   price: number;
   size: number;
   clientId: number;
-  timeInForce?: OrderTimeInForce;
-  goodTilTimeInSeconds?: number;
-  execution?: OrderExecution;
-  postOnly?: boolean;
-  reduceOnly?: boolean;
-  triggerPrice?: number;
-  marketInfo?: PlaceOrderMarketInfo;
-  currentHeight?: number;
-  goodTilBlock?: number;
-  memo?: string;
+  timeInForce: OrderTimeInForce | undefined;
+  goodTilTimeInSeconds: number | undefined;
+  execution: OrderExecution | undefined;
+  postOnly: boolean | undefined;
+  reduceOnly: boolean | undefined;
+  triggerPrice: number | undefined;
+  marketInfo: PlaceOrderMarketInfo | undefined;
+  currentHeight: number | undefined;
+  goodTilBlock: number | undefined;
+  memo: string | undefined;
 }
 
 // have to hard code because it isn't properly exported from v4-clients

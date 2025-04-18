@@ -27,10 +27,10 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountForPostOrder } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { mapIfPresent } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -94,7 +94,6 @@ export const DepositButtonAndReceipt = ({
   });
 
   const { equity } = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
-  const { equity: newEquity } = orEmptyObj(useAppSelector(getSubaccountForPostOrder));
 
   const {
     summary,
@@ -104,6 +103,7 @@ export const DepositButtonAndReceipt = ({
     warning: routeWarning,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
+  const newEquity = mapIfPresent(equity?.toNumber(), summary?.toAmount, (a, b) => a + b);
   const { usdcLabel } = useTokenConfigs();
 
   const sourceChainName =
@@ -189,7 +189,7 @@ export const DepositButtonAndReceipt = ({
           <DiffOutput
             type={OutputType.Fiat}
             value={equity}
-            newValue={newEquity?.postOrder} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
+            newValue={newEquity}
             sign={NumberSign.Positive}
             withDiff={equity !== newEquity && !!newEquity}
           />

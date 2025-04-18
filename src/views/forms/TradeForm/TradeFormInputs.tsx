@@ -2,7 +2,6 @@ import { Ref, useEffect, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -21,8 +20,8 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setTradeFormInputs } from '@/state/inputs';
-import { getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -44,10 +43,10 @@ export const TradeFormInputs = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const { needsLimitPrice, needsTrailingPercent, needsTriggerPrice } = useTradeFormData();
-  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
-  const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
-  const { marketId, type } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
+  const tradeSummary = useAppSelector(getTradeFormSummary).summary;
+  const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
+  const tradeFormValues = useAppSelector(getTradeFormValues);
+  const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -57,27 +56,27 @@ export const TradeFormInputs = () => {
 
   useEffect(() => {
     setHasSetMidMarketLimit(false);
-  }, [marketId, type?.rawValue]);
+  }, [marketId, type]);
 
   useEffect(() => {
     // when limit price input is empty and mid price is available, set limit price input to mid price
-    if (!midMarketPrice || !needsLimitPrice || hasSetMidMarketLimit) {
+    if (!midMarketPrice || !showLimitPrice || hasSetMidMarketLimit) {
       return;
     }
     dispatch(
-      setTradeFormInputs({
-        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-      })
+      tradeFormActions.setLimitPrice(
+        MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS)
+      )
     );
     setHasSetMidMarketLimit(true);
-  }, [dispatch, midMarketPrice, needsLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
+  }, [dispatch, midMarketPrice, showLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
 
   const onMidMarketPriceClick = () => {
     if (!midMarketPrice) return;
     dispatch(
-      setTradeFormInputs({
-        limitPriceInput: MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-      })
+      tradeFormActions.setLimitPrice(
+        MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS)
+      )
     );
   };
 
@@ -88,7 +87,7 @@ export const TradeFormInputs = () => {
   );
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
-  if (needsTriggerPrice) {
+  if (showTriggerPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.TriggerPrice,
       inputType: InputType.Currency,
@@ -101,14 +100,14 @@ export const TradeFormInputs = () => {
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ triggerPriceInput: value }));
+        dispatch(tradeFormActions.setTriggerPrice(value));
       },
-      value: triggerPriceInput ?? '',
+      value: triggerPrice ?? '',
       decimals: tickSizeDecimals ?? USD_DECIMALS,
     });
   }
 
-  if (needsLimitPrice) {
+  if (showLimitPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.LimitPrice,
       inputType: InputType.Currency,
@@ -121,27 +120,11 @@ export const TradeFormInputs = () => {
         </>
       ),
       onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ limitPriceInput: value }));
+        dispatch(tradeFormActions.setLimitPrice(value));
       },
-      value: limitPriceInput,
+      value: limitPrice ?? '',
       decimals: tickSizeDecimals ?? USD_DECIMALS,
       slotRight: midMarketPrice ? midMarketPriceButton : undefined,
-    });
-  }
-
-  if (needsTrailingPercent) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.TrailingPercent,
-      inputType: InputType.Percent,
-      label: (
-        <WithTooltip tooltip="trailing-percent" side="right">
-          {stringGetter({ key: STRING_KEYS.TRAILING_PERCENT })}
-        </WithTooltip>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ trailingPercentInput: value }));
-      },
-      value: trailingPercentInput ?? '',
     });
   }
 

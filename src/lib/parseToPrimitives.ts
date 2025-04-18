@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import Long from 'long';
 
 import { bytesToBigInt } from './numbers';
@@ -24,7 +25,7 @@ export type ToPrimitives<T> = T extends Long | Uint8Array | Date | bigint | Long
       : T;
 
 export function parseToPrimitives<T>(x: T): ToPrimitives<T> {
-  if (typeof x === 'number' || typeof x === 'string' || typeof x === 'boolean' || x == null) {
+  if (x == null || typeof x === 'number' || typeof x === 'string' || typeof x === 'boolean') {
     return x as any;
   }
 
@@ -32,8 +33,21 @@ export function parseToPrimitives<T>(x: T): ToPrimitives<T> {
     return x.map((item) => parseToPrimitives(item)) as any;
   }
 
-  if (Long.isLong(x)) {
+  if (Long.isLong(x) || x instanceof Long) {
     return x.toString() as any;
+  }
+
+  if (x instanceof BigNumber) {
+    return x.toString() as any;
+  }
+
+  if (typeof x === 'bigint') {
+    return x.toString() as any;
+  }
+
+  const buffer = (x as any).buffer;
+  if (buffer instanceof Uint8Array) {
+    return bytesToBigInt(buffer).toString() as any;
   }
 
   if (x instanceof Uint8Array) {
@@ -53,10 +67,6 @@ export function parseToPrimitives<T>(x: T): ToPrimitives<T> {
       }
     }
     return parsedObj as any;
-  }
-
-  if (typeof x === 'bigint') {
-    return x.toString() as any;
   }
 
   throw new Error(`Unsupported data type: ${typeof x}`);

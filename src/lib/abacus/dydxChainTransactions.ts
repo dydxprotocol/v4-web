@@ -1,6 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { type IndexedTx } from '@cosmjs/stargate';
-import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
+import Abacus from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
   GAS_MULTIPLIER,
@@ -8,13 +7,8 @@ import {
   Network,
   NetworkOptimizer,
   NobleClient,
-  OrderExecution,
-  OrderSide,
-  OrderTimeInForce,
-  OrderType,
   SubaccountClient,
   ValidatorConfig,
-  encodeJson,
   type LocalWallet,
   type SelectedGasDenom,
 } from '@dydxprotocol/v4-client-js';
@@ -26,8 +20,6 @@ import {
   TransactionType,
   TransactionTypes,
   type AbacusDYDXChainTransactionsProtocol,
-  type HumanReadableCancelOrderPayload,
-  type HumanReadablePlaceOrderPayload,
   type HumanReadableTransferPayload,
   type HumanReadableWithdrawPayload,
 } from '@/constants/abacus';
@@ -36,20 +28,18 @@ import {
   DEFAULT_TRANSACTION_MEMO,
   TransactionMemo,
 } from '@/constants/analytics';
-import { DydxChainId, isTestnet } from '@/constants/networks';
-import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { type RootStore } from '@/state/_store';
 import { setInitializationError } from '@/state/app';
-import { placeOrderTimeout } from '@/state/localOrders';
 
 import { identify } from '../analytics/analytics';
 import { dd } from '../analytics/datadog';
-import { StatefulOrderError, stringifyTransactionError } from '../errors';
+import { stringifyTransactionError } from '../errors';
 import { parseToPrimitives } from '../parseToPrimitives';
 import { log, logInfo } from '../telemetry';
 import { browserTimeOffsetPromise } from '../timeOffset';
-import { getMintscanTxLink, hashFromTx } from '../txUtils';
+import { hashFromTx } from '../txUtils';
+import { Nullable } from '../typeUtils';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();
@@ -179,116 +169,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setSelectedGasDenom(denom: SelectedGasDenom) {
     this.compositeClient?.setSelectedGasDenom(denom);
-  }
-
-  async placeOrderTransaction(params: HumanReadablePlaceOrderPayload): Promise<string> {
-    if (!this.compositeClient || !this.localWallet)
-      throw new Error('Missing compositeClient or localWallet');
-
-    try {
-      const {
-        subaccountNumber,
-        marketId,
-        type,
-        side,
-        price,
-        size,
-        clientId,
-        timeInForce,
-        goodTilTimeInSeconds,
-        goodTilBlock,
-        execution,
-        postOnly,
-        reduceOnly,
-        triggerPrice,
-        marketInfo,
-        currentHeight,
-      } = params || {};
-
-      setTimeout(() => {
-        this.store?.dispatch(placeOrderTimeout(clientId));
-      }, UNCOMMITTED_ORDER_TIMEOUT_MS);
-
-      const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
-
-      // Place order
-      const tx = await this.compositeClient.placeOrder(
-        subaccountClient,
-        marketId,
-        type as OrderType,
-        side as OrderSide,
-        price,
-        size,
-        parseInt(clientId, 10),
-        timeInForce as OrderTimeInForce,
-        goodTilTimeInSeconds ?? 0,
-        execution as OrderExecution,
-        postOnly ?? undefined,
-        reduceOnly ?? undefined,
-        triggerPrice ?? undefined,
-        marketInfo ?? undefined,
-        currentHeight ?? undefined,
-        goodTilBlock ?? undefined,
-        TransactionMemo.placeOrder
-      );
-
-      // Handle stateful orders
-      if ((tx as IndexedTx | undefined)?.code !== 0) {
-        throw new StatefulOrderError('Stateful order has failed to commit.', tx);
-      }
-
-      const encodedTx = encodeJson(tx);
-      const parsedTx = JSON.parse(encodedTx);
-      const hash = parsedTx.hash.toUpperCase();
-
-      if (isTestnet) {
-        // eslint-disable-next-line no-console
-        console.log(
-          getMintscanTxLink(this.compositeClient.network.getString() as DydxChainId, hash)
-        );
-        // eslint-disable-next-line no-console
-      } else console.log(`txHash: ${hash}`);
-
-      return encodedTx;
-    } catch (error) {
-      if (error?.name !== 'BroadcastError') {
-        log('DydxChainTransactions/placeOrderTransaction', error);
-      }
-      return stringifyTransactionError(error);
-    }
-  }
-
-  async cancelOrderTransaction(params: HumanReadableCancelOrderPayload): Promise<string> {
-    if (!this.compositeClient || !this.localWallet) {
-      throw new Error('Missing compositeClient or localWallet');
-    }
-
-    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
-      params ?? {};
-
-    try {
-      const tx = await this.compositeClient.cancelRawOrder(
-        new SubaccountClient(this.localWallet, subaccountNumber),
-        parseInt(clientId, 10),
-        orderFlags,
-        clobPairId,
-        goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,
-        goodTilBlockTime === 0 ? undefined : goodTilBlockTime ?? undefined
-      );
-
-      const encodedTx = encodeJson(tx);
-
-      if (import.meta.env.MODE === 'development') {
-        const parsedTx = JSON.parse(encodedTx);
-        // eslint-disable-next-line no-console
-        console.log(parsedTx, parsedTx.hash.toUpperCase());
-      }
-
-      return encodedTx;
-    } catch (error) {
-      log('DydxChainTransactions/cancelOrderTransaction', error);
-      return stringifyTransactionError(error);
-    }
   }
 
   async simulateWithdrawTransaction(params: HumanReadableWithdrawPayload): Promise<string> {
@@ -576,8 +456,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       switch (type) {
         case TransactionType.PlaceOrder: {
-          const result = await this.placeOrderTransaction(params);
-          callback(result);
+          // this is now handled in bonsai, so the abacus call is a no-op
           break;
         }
         case TransactionType.SubaccountTransfer: {
@@ -586,8 +465,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           break;
         }
         case TransactionType.CancelOrder: {
-          const result = await this.cancelOrderTransaction(params);
-          callback(result);
+          // this is now handled in bonsai, so the abacus call is a no-op
           break;
         }
         case TransactionType.simulateWithdraw: {

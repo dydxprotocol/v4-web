@@ -2,7 +2,6 @@ import { forwardRef, Key, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { PerpetualMarketSummary, SubaccountFill } from '@/bonsai/types/summaryTypes';
-import { Nullable } from '@dydxprotocol/v4-abacus';
 import type { ColumnSize } from '@react-types/table';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -34,7 +33,7 @@ import { openDialog } from '@/state/dialogs';
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedFill } from '@/lib/orders';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 import {
   getIndexerFillTypeStringKey,

@@ -1,19 +1,17 @@
 import { useCallback } from 'react';
 
+import { TradeFormType } from '@/bonsai/forms/trade/types';
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
-import { TradeTypes } from '@/constants/trade';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tabs } from '@/components/Tabs';
 
 import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
-
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
 
 import { TradeSideTabs } from './TradeSideTabs';
 import { TradeForm } from './forms/TradeForm';
@@ -21,12 +19,16 @@ import { MarginAndLeverageButtons } from './forms/TradeForm/MarginAndLeverageBut
 import { useTradeTypeOptions } from './forms/TradeForm/useTradeTypeOptions';
 
 export const TradeBoxOrderView = () => {
-  const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
-    if (tradeType) {
-      abacusStateManager.clearTradeInputValues();
-      abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
-    }
-  }, []);
+  const dispatch = useAppDispatch();
+
+  const onTradeTypeChange = useCallback(
+    (tradeType?: TradeFormType) => {
+      if (tradeType != null) {
+        dispatch(tradeFormActions.setOrderType(tradeType));
+      }
+    },
+    [dispatch]
+  );
 
   const { selectedTradeType, tradeTypeItems } = useTradeTypeOptions();
 

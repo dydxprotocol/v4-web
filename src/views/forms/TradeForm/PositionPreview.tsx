@@ -11,11 +11,9 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { PositionTile } from '@/views/PositionTile';
 
-import {
-  getCurrentMarketPositionData,
-  getCurrentMarketPositionDataForPostTrade,
-} from '@/state/accountSelectors';
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentSelectedFormPositionSummary } from '@/state/tradeFormSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -35,8 +33,8 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const { signedSize: positionSize, notional: notionalTotal } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
-  const { size: positionSizePostOrder } = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionDataForPostTrade)
+  const { signedSize: positionSizePostOrder } = orEmptyObj(
+    useAppSelector(getCurrentSelectedFormPositionSummary)
   );
 
   return (
@@ -56,7 +54,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         assetImgUrl={imageUrl}
         currentSize={positionSize?.toNumber()}
         notionalTotal={notionalTotal?.toNumber()}
-        postOrderSize={positionSizePostOrder?.postOrder}
+        postOrderSize={positionSizePostOrder?.toNumber()}
         stepSizeDecimals={stepSizeDecimals}
         symbol={id}
         tickSizeDecimals={tickSizeDecimals}

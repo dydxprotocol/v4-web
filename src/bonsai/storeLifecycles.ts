@@ -20,6 +20,8 @@ import {
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpAccountStatsQuery,
+  setUpRewardsParamsQuery,
+  setUpRewardsTokenPriceQuery,
 } from './rest/validatorAccountMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
@@ -50,4 +52,6 @@ export const storeLifecycles = [
   setUpUsdcRebalanceLifecycle,
   setUpNobleBalanceQuery,
   setUpNobleBalanceSweepLifecycle,
+  setUpRewardsParamsQuery,
+  setUpRewardsTokenPriceQuery,
 ] as const;

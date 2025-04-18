@@ -32,7 +32,6 @@ export interface LocalOrdersState {
   localCancelOrders: LocalCancelOrderData[];
   localCancelAlls: Record<string, LocalCancelAllData>;
   localCloseAllPositions?: LocalCloseAllPositionsData;
-  latestOrder?: Nullable<{ clientId?: string | null; id?: string | null }>;
 }
 
 const initialState: LocalOrdersState = {
@@ -40,7 +39,6 @@ const initialState: LocalOrdersState = {
   localCancelOrders: [],
   localCancelAlls: {},
   localCloseAllPositions: undefined,
-  latestOrder: undefined,
 };
 
 export const localOrdersSlice = createSlice({
@@ -62,7 +60,9 @@ export const localOrdersSlice = createSlice({
           orders
             .filter(
               (order) =>
-                order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Open
+                order.status != null &&
+                (getSimpleOrderStatus(order.status) === OrderStatus.Open ||
+                  getSimpleOrderStatus(order.status) === OrderStatus.Filled)
             )
             .map((o) => o.clientId)
         );
@@ -190,7 +190,6 @@ export const localOrdersSlice = createSlice({
       action: PayloadAction<Nullable<{ clientId?: string | null; id: string }>>
     ) => {
       const { clientId, id } = action.payload ?? {};
-      state.latestOrder = action.payload;
 
       if (clientId) {
         state.localPlaceOrders = state.localPlaceOrders.map((order) =>
@@ -206,7 +205,12 @@ export const localOrdersSlice = createSlice({
     },
     placeOrderSubmitted: (
       state,
-      action: PayloadAction<{ marketId: string; clientId: string; orderType: TradeTypes }>
+      action: PayloadAction<{
+        marketId: string;
+        clientId: string;
+        subaccountNumber: number;
+        orderType: TradeTypes;
+      }>
     ) => {
       state.localPlaceOrders.push({
         ...action.payload,

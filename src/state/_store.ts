@@ -1,4 +1,6 @@
+import { createAccountTransactionSupervisor } from '@/bonsai/AccountTransactionSupervisor';
 // eslint-disable-next-line no-restricted-imports
+import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
 import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -15,6 +17,7 @@ import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { appUiConfigsSlice } from './appUiConfigs';
+import { closePositionFormSlice } from './closePositionForm';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
 import { funkitDepositsSlice } from './funkitDeposits';
@@ -27,6 +30,7 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { tradeFormSlice } from './tradeForm';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
 import { triggersFormSlice } from './triggersForm';
@@ -44,6 +48,8 @@ const reducers = {
   funkitDeposits: funkitDepositsSlice.reducer,
   inputs: inputsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
+  tradeForm: tradeFormSlice.reducer,
+  closePositionForm: closePositionFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
@@ -105,6 +111,11 @@ export const persistor = persistStore(store);
 // Set store so (Abacus & localWalletManager) classes can getState and dispatch
 abacusStateManager.setStore(store);
 localWalletManager.setStore(store);
+
+export const accountTransactionManager = createAccountTransactionSupervisor(
+  store,
+  CompositeClientManager
+);
 
 runFn(async () => {
   // we ignore the cleanups for now since we want these running forever

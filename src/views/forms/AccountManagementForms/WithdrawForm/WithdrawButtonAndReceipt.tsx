@@ -23,12 +23,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccount, getSubaccountForPostOrder } from '@/state/accountSelectors';
+import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { mapIfPresent } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { RouteWarningMessage } from '../RouteWarningMessage';
 import { SlippageEditor } from '../SlippageEditor';
@@ -55,15 +55,29 @@ export const WithdrawButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
-  const { leverage: leveragePost } = orEmptyObj(useAppSelector(getSubaccountForPostOrder));
-  const leveragePostOrder = leveragePost?.postOrder;
+  const { leverage, equity } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+
   const {
     summary,
     requestPayload,
     exchange,
     warning: routeWarning,
   } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+
+  // leverage = notionalTotal / equity so newLeverage = (leverage * equity) / (equity - withdrawal)
+  const leveragePostOrder = mapIfPresent(
+    leverage?.toNumber(),
+    equity?.toNumber(),
+    summary?.usdcSize,
+    (l, e, s) => {
+      const newEquity = e - s;
+      if (newEquity < 0) {
+        return undefined;
+      }
+      return (l * e) / newEquity;
+    }
+  );
+
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
@@ -157,7 +171,7 @@ export const WithdrawButtonAndReceipt = ({
           newValue={leveragePostOrder}
           sign={NumberSign.Negative}
           withDiff={Boolean(
-            leverage && leveragePostOrder && leverage.toNumber() !== leveragePostOrder
+            leverage && leveragePostOrder != null && leverage.toNumber() !== leveragePostOrder
           )}
           tw="[--diffOutput-valueWithDiff-fontSize:1em]"
         />

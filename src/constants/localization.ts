@@ -1,4 +1,3 @@
-import { Nullable } from '@dydxprotocol/v4-abacus';
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
@@ -15,6 +14,7 @@ import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
 import formatString from '@/lib/formatString';
 import { objectFromEntries } from '@/lib/objectHelpers';
+import { Nullable } from '@/lib/typeUtils';
 
 import environments from '../../public/configs/v1/env.json';
 

@@ -10,8 +10,8 @@ import { Slider } from '@/components/Slider';
 import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
-  setAbacusSize: (value: string) => void;
-  setOrderSizeInput: (value: string) => void;
+  setSize: (value: string) => void;
+  setLocalSize: (value: string) => void;
   size: number | null;
   positionSize?: number;
   stepSizeDecimals: number;
@@ -22,8 +22,8 @@ type StyleProps = {
 };
 
 export const OrderSizeSlider = ({
-  setOrderSizeInput,
-  setAbacusSize,
+  setLocalSize,
+  setSize,
   size,
   positionSize,
   stepSizeDecimals,
@@ -33,24 +33,24 @@ export const OrderSizeSlider = ({
   const maxSize = positionSize ?? 0;
   const currSize = size ?? 0;
 
-  // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
-  const debouncedSetAbacusSize = useMemo(
-    () => debounce((newSize: string) => setAbacusSize(newSize), QUICK_DEBOUNCE_MS),
+  // Debounced slightly to avoid excessive updates while still providing a smooth slide
+  const debouncedSetSize = useMemo(
+    () => debounce((newSize: string) => setSize(newSize), QUICK_DEBOUNCE_MS),
     []
   );
 
   const onSliderDrag = ([newSize]: number[]) => {
     const roundedSize = MustBigNumber(newSize).toFixed(stepSizeDecimals);
-    setOrderSizeInput(roundedSize);
-    debouncedSetAbacusSize(roundedSize);
+    setLocalSize(roundedSize);
+    debouncedSetSize(roundedSize);
   };
 
   const onValueCommit = ([newSize]: number[]) => {
     const roundedSize = MustBigNumber(newSize).toFixed(stepSizeDecimals);
-    setOrderSizeInput(roundedSize);
-    // Ensure Abacus is updated with the latest, committed value
-    debouncedSetAbacusSize.cancel();
-    setAbacusSize(roundedSize);
+    setLocalSize(roundedSize);
+    // Ensure size is updated with the latest, committed value
+    debouncedSetSize.cancel();
+    setSize(roundedSize);
   };
 
   return (

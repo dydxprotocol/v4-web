@@ -56,10 +56,6 @@ class TestFlags {
     return !!this.queryParams.funkit_toggle;
   }
 
-  get disableAbacus() {
-    return this.booleanFlag(this.queryParams.disable_abacus);
-  }
-
   get showNewDepositFlow() {
     return !!this.queryParams.deposit_rewrite;
   }

@@ -4,20 +4,6 @@ import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
 
 /**
- * @param state
- * @returns latestOrder of the currently connected subaccount throughout this session
- */
-export const getLatestOrder = (state: RootState) => state.localOrders.latestOrder;
-
-/**
- * @returns the clientId of the latest order
- */
-export const getLatestOrderClientId = createAppSelector(
-  [getLatestOrder],
-  (order) => order?.clientId
-);
-
-/**
  * @returns a list of locally placed orders for the current FE session
  */
 export const getLocalPlaceOrders = (state: RootState) => state.localOrders.localPlaceOrders;

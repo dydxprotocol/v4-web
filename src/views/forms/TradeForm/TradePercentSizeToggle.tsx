@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 import { PERCENT_DECIMALS } from '@/constants/numbers';
 
@@ -8,7 +7,9 @@ import { formMixins } from '@/styles/formMixins';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+
 import { MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 
@@ -25,17 +26,16 @@ type ElementProps = {
   setBalancePercentInputValue: (value: string) => void;
 };
 
+// todo delete this file if we don't want these inputs
 export const TradePercentSizeToggle = ({
   balancePercentValue,
   setBalancePercentInputValue,
 }: ElementProps) => {
+  const dispatch = useAppDispatch();
+
   const updateBalancePercent = (balancePercent: string) => {
     setBalancePercentInputValue(balancePercent);
-
-    abacusStateManager.setTradeValue({
-      value: balancePercent,
-      field: TradeInputField.balancePercent,
-    });
+    dispatch(tradeFormActions.setSizeAvailablePercent(balancePercent));
   };
 
   const formattedBalancePercentValue = balancePercentValue
