@@ -19,7 +19,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -166,9 +166,7 @@ export const ClosePositionForm = ({
     }
   }, [currentStep, dispatch, isFirstRender, onClosePositionSuccess, setCurrentStep]);
 
-  const { setUnIndexedClientId } = useOnLastOrderIndexed({
-    callback: onLastOrderIndexed,
-  });
+  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();

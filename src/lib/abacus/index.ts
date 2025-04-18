@@ -31,7 +31,6 @@ import { Nullable } from '@/lib/typeUtils';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
-import { testFlags } from '../testFlags';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
@@ -39,7 +38,7 @@ import AbacusFormatter from './formatter';
 import AbacusLocalizer from './localizer';
 import AbacusLogger from './logger';
 import AbacusRest from './rest';
-import AbacusStateNotifier, { NoOpAbacusStateNotifier } from './stateNotification';
+import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
 import AbacusWebsocket from './websocket';
 
@@ -81,9 +80,7 @@ class AbacusStateManager {
   constructor() {
     this.store = undefined;
     this.currentMarket = undefined;
-    this.stateNotifier = testFlags.disableAbacus
-      ? new NoOpAbacusStateNotifier()
-      : new AbacusStateNotifier();
+    this.stateNotifier = new AbacusStateNotifier();
     this.analytics = new AbacusAnalytics();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
@@ -123,7 +120,6 @@ class AbacusStateManager {
   }
 
   start = ({ network }: { network?: DydxNetwork } = {}) => {
-    if (testFlags.disableAbacus) return;
     if (network) {
       this.stateManager.environmentId = network;
     }
@@ -133,7 +129,6 @@ class AbacusStateManager {
   };
 
   restart = ({ network }: { network?: DydxNetwork } = {}) => {
-    if (testFlags.disableAbacus) return;
     this.stateManager.readyToConnect = false;
     this.start({ network });
   };

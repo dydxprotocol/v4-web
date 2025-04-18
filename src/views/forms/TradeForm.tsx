@@ -16,7 +16,7 @@ import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -186,9 +186,7 @@ export const TradeForm = ({
     }
   }, [currentStep, setCurrentStep]);
 
-  const { setUnIndexedClientId } = useOnLastOrderIndexed({
-    callback: onLastOrderIndexed,
-  });
+  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);

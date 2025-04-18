@@ -32,7 +32,6 @@ export interface LocalOrdersState {
   localCancelOrders: LocalCancelOrderData[];
   localCancelAlls: Record<string, LocalCancelAllData>;
   localCloseAllPositions?: LocalCloseAllPositionsData;
-  latestOrder?: Nullable<{ clientId?: string | null; id?: string | null }>;
 }
 
 const initialState: LocalOrdersState = {
@@ -40,7 +39,6 @@ const initialState: LocalOrdersState = {
   localCancelOrders: [],
   localCancelAlls: {},
   localCloseAllPositions: undefined,
-  latestOrder: undefined,
 };
 
 export const localOrdersSlice = createSlice({
@@ -192,7 +190,6 @@ export const localOrdersSlice = createSlice({
       action: PayloadAction<Nullable<{ clientId?: string | null; id: string }>>
     ) => {
       const { clientId, id } = action.payload ?? {};
-      state.latestOrder = action.payload;
 
       if (clientId) {
         state.localPlaceOrders = state.localPlaceOrders.map((order) =>
