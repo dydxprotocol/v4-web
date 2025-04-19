@@ -17,6 +17,7 @@ import { createAppSelector } from '@/state/appTypes';
 
 import { createStoreEffect } from '../../lib/createStoreEffect';
 import { CompositeClientManager } from './compositeClientManager';
+import { safeSubscribeObserver } from './safeSubscribe';
 
 type PassedQueryOptions<R> = Pick<
   QueryObserverOptions<R>,
@@ -125,7 +126,7 @@ export function createIndexerQueryStoreEffect<T, R>(
         ...otherOpts,
       });
 
-      const unsubscribe = observer.subscribe((result) => {
+      const unsubscribe = safeSubscribeObserver(observer, (result) => {
         try {
           config.onResult(result);
         } catch (e) {
@@ -216,7 +217,7 @@ export function createValidatorQueryStoreEffect<T, R>(
         ...otherOpts,
       });
 
-      const unsubscribe = observer.subscribe((result) => {
+      const unsubscribe = safeSubscribeObserver(observer, (result) => {
         try {
           config.onResult(result);
         } catch (e) {
@@ -279,7 +280,7 @@ export function createNobleQueryStoreEffect<T, R>(
       ...otherOpts,
     });
 
-    const unsubscribe = observer.subscribe((result) => {
+    const unsubscribe = safeSubscribeObserver(observer, (result) => {
       try {
         config.onResult(result);
       } catch (e) {
