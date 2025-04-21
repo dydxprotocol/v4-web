@@ -104,7 +104,8 @@ export const WithdrawForm = ({
   }, [error]);
 
   const validationError = useProtocolWithdrawalValidation({
-    freeCollateral,
+    updatedFreeCollateral,
+    updatedMarginUsage,
     withdrawAmount: debouncedAmount,
     selectedRoute,
   });
