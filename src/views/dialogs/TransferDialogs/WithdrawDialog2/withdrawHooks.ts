@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
@@ -121,10 +121,21 @@ export function useWithdrawStep({
 
       const withdrawId = `withdraw-${crypto.randomUUID()}`;
 
+      logBonsaiInfo('withdrawHooks', 'withdraw initiated', {
+        withdrawId,
+        withdrawRoute,
+      });
+
       await skipClient.executeRoute({
         getCosmosSigner,
         route: withdrawRoute,
         userAddresses,
+        simulate: false,
+        getFallbackGasAmount: async (chainId) => {
+          if (chainId === 'dydx-mainnet-1') return 300_000; // or fill appropriate numbers
+          if (chainId === 'noble-1') return 200_000; // or fill appropriate numbers
+          return 300_000;
+        },
         beforeMsg: {
           msg: JSON.stringify({
             sender: {
@@ -162,10 +173,21 @@ export function useWithdrawStep({
               isInstantWithdraw: isInstantTransfer(withdrawRoute),
               transferAssetRelease: null,
             };
-
+            logBonsaiInfo('withdrawHooks', 'withdraw tx submitted', {
+              withdrawId,
+              txHash,
+              chainID,
+              withdrawRoute,
+            });
             track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
             onWithdraw(baseWithdraw);
           } else {
+            logBonsaiInfo('withdrawHooks', 'additional withdraw tx submitted', {
+              withdrawId,
+              txHash,
+              chainID,
+              withdrawRoute,
+            });
             // Update the subtransaction with the txHash
             const subtransaction: WithdrawSubtransaction = {
               chainId: chainID,
