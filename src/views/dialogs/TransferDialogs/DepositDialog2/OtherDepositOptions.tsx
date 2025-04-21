@@ -71,17 +71,22 @@ export const OtherDepositOptions = ({
           type={ButtonType.Button}
           tw="flex items-center border border-solid border-color-border bg-color-layer-4 px-2 py-1 font-medium"
         >
-          <div tw="inline-flex gap-[0.5ch]">
-            {stringGetter({
-              key: STRING_KEYS.DEPOSIT_WITH,
-              params: {
-                TARGET: (
-                  <div tw="inline text-color-text-1">
-                    <CoinbaseBrandIcon />
-                  </div>
-                ),
-              },
-            })}{' '}
+          <div tw="row w-full justify-between gap-[0.5ch]">
+            <span tw="row gap-[0.5ch]">
+              {stringGetter({
+                key: STRING_KEYS.DEPOSIT_WITH,
+                params: {
+                  TARGET: (
+                    <div tw="row mb-[1px] text-color-text-1">
+                      <CoinbaseBrandIcon />
+                    </div>
+                  ),
+                },
+              })}
+            </span>
+            <span tw="text-color-text-0 font-small-book">
+              {stringGetter({ key: STRING_KEYS.FREE_AND_INSTANT })}
+            </span>
             <span tw="sr-only">Coinbase</span>
           </div>
         </Button>
