@@ -217,7 +217,7 @@ const RouteOption = ({
   return (
     <button
       type="button"
-      tw="box-border flex min-w-0 flex-1 items-center gap-0.75 rounded-1 border-2 border-solid p-1"
+      tw="box-border flex min-w-0 flex-1 items-center gap-0.75 rounded-1 border-2 border-solid px-1 py-0.75"
       disabled={disabled}
       onClick={onClick}
       style={{
@@ -229,14 +229,14 @@ const RouteOption = ({
       {icon}
       <div tw="flex flex-col items-start gap-0.125 text-left">
         <div
-          tw="text-medium"
+          tw="text-base"
           style={{
             color: selected && !disabled ? 'var(--color-text-2)' : undefined,
           }}
         >
           {title}
         </div>
-        <div tw="text-small text-color-text-1">{description}</div>
+        <div tw="text-tiny text-color-text-1">{description}</div>
       </div>
     </button>
   );
