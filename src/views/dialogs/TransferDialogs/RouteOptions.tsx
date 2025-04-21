@@ -7,7 +7,12 @@ import tw from 'twin.macro';
 import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { SKIP_GO_FAST_TRANSFER_LIMIT } from '@/constants/skip';
+import {
+  SKIP_GO_BPS_FEE,
+  SKIP_GO_DESTINATION_FEE,
+  SKIP_GO_FAST_SOURCE_FEE_MAP,
+  SKIP_GO_FAST_TRANSFER_LIMIT,
+} from '@/constants/skip';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -24,6 +29,7 @@ import { BIG_NUMBERS } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type Props = {
+  chainId?: string;
   routes?: { slow?: RouteResponse; fast?: RouteResponse };
   isLoading: boolean;
   disabled: boolean;
@@ -33,6 +39,7 @@ type Props = {
 };
 
 export const TransferRouteOptions = ({
+  chainId,
   routes,
   isLoading,
   selectedSpeed,
@@ -59,13 +66,24 @@ export const TransferRouteOptions = ({
   }, [routes?.fast]);
 
   const fastRouteDescription = useMemo(() => {
-    if (!routes || disabled)
+    if (!routes || disabled) {
+      const sourceFee = SKIP_GO_FAST_SOURCE_FEE_MAP[chainId ?? ''];
+      const bpsFee = formatNumberOutput(SKIP_GO_BPS_FEE, OutputType.Percent, {
+        selectedLocale,
+        decimalSeparator: decimal,
+        groupSeparator: group,
+        fractionDigits: 0,
+      });
+
+      const estimatedFee = sourceFee ? `${sourceFee + SKIP_GO_DESTINATION_FEE} + ${bpsFee}` : '$';
+
       return type === 'deposit'
         ? stringGetter({
             key: STRING_KEYS.SKIP_FAST_ROUTE_DESC_1,
-            params: { FEE: '0.1', LIMIT_AMOUNT: limitAmount },
+            params: { FEE: estimatedFee, LIMIT_AMOUNT: limitAmount },
           })
         : '-';
+    }
     if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     const fastOperationFee = routes.fast.estimatedFees.reduce(
@@ -88,7 +106,7 @@ export const TransferRouteOptions = ({
         )}
       </span>
     );
-  }, [goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
+  }, [chainId, goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
 
   const slowRouteDescription = useMemo(() => {
     const slowOperationFee = routes?.slow?.estimatedFees.reduce(
