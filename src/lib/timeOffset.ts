@@ -1,4 +1,4 @@
-import { logBonsaiInfo } from '@/bonsai/logs';
+import { logBonsaiInfo, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { utils } from '@dydxprotocol/v4-client-js';
 import { isFinite } from 'lodash';
 
@@ -21,7 +21,10 @@ async function getTimestampOffset() {
         removeTrailingSlash
       );
       const start = Date.now();
-      const res = await fetch(`${indexerUrl}/v4/time`, { method: 'GET' });
+      const res = await wrapAndLogBonsaiError(
+        () => fetch(`${indexerUrl}/v4/time`, { method: 'GET' }),
+        'timeOffset'
+      )();
       const end = Date.now();
 
       const serverDate = (await res.json()).iso;
