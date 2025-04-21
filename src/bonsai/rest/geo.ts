@@ -14,6 +14,7 @@ import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
+import { safeSubscribeObserver } from './lib/safeSubscribe';
 
 async function fetchGeo(url: string): Promise<{ data: string | undefined }> {
   const response = await fetch(url);
@@ -46,7 +47,7 @@ export function setUpGeoQuery(store: RootStore) {
       retryDelay: (attempt) => timeUnits.second * 3 * 2 ** attempt,
     });
 
-    const unsubscribe = observer.subscribe((result) => {
+    const unsubscribe = safeSubscribeObserver(observer, (result) => {
       try {
         store.dispatch(
           setComplianceGeoRaw(mapLoadableData(queryResultToLoadable(result), (r) => r.data))
