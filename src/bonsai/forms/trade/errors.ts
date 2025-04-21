@@ -5,7 +5,7 @@ import {
   simpleValidationError,
   ValidationError,
 } from '@/bonsai/lib/validationErrors';
-import { OrderStatus } from '@/bonsai/types/summaryTypes';
+import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
@@ -16,6 +16,7 @@ import {
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
 
+import { mapIfPresent } from '@/lib/do';
 import { AttemptNumber } from '@/lib/numbers';
 
 import { getGoodTilInSeconds } from './summary';
@@ -23,6 +24,7 @@ import {
   ExecutionType,
   MarginMode,
   OrderSide,
+  TimeInForce,
   TradeForm,
   TradeFormInputData,
   TradeFormSummary,
@@ -49,6 +51,7 @@ export function calculateTradeFormErrors(
   errors.push(...validateAccountState(inputData, summary));
   errors.push(...validateRestrictions(inputData, summary));
   errors.push(...validateTradeFormSummaryFields(summary));
+  errors.push(...validateEquityTiers(inputData, summary));
 
   return errors;
 }
@@ -999,4 +1002,76 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
   }
 
   return errors;
+}
+
+function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSummary) {
+  const subaccountToUse = summary.tradePayload?.subaccountNumber;
+  if (subaccountToUse == null) {
+    return [];
+  }
+  if (inputData.equityTiers == null) {
+    return [];
+  }
+  const relevantOpenOrders = inputData.allOpenOrders.filter(
+    (o) => o.subaccountNumber === subaccountToUse && o.orderFlags !== OrderFlags.SHORT_TERM
+  );
+  const subaccountEquity = mapIfPresent(
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    summary.accountDetailsBefore?.subaccountSummaries?.[subaccountToUse]?.equity.toNumber() ?? 0,
+    summary.tradePayload?.transferToSubaccountAmount,
+    (equity, transferAmount) => {
+      return equity + transferAmount;
+    }
+  );
+  if (subaccountEquity == null) {
+    return [];
+  }
+  const myEquityTierLimit = inputData.equityTiers.statefulOrderEquityTiers.find(
+    (t) =>
+      subaccountEquity >= t.requiredTotalNetCollateralUSD &&
+      subaccountEquity < (t.nextLevelRequiredTotalNetCollateralUSD ?? Number.MAX_SAFE_INTEGER)
+  );
+  if (myEquityTierLimit == null) {
+    return [];
+  }
+
+  const isShortTerm =
+    summary.effectiveTrade.type === TradeFormType.MARKET ||
+    (summary.effectiveTrade.type === TradeFormType.LIMIT &&
+      summary.effectiveTrade.timeInForce === TimeInForce.IOC);
+
+  if (isShortTerm) {
+    return [];
+  }
+
+  if (relevantOpenOrders.length + 1 > myEquityTierLimit.maxOrders) {
+    const nextTierEquity =
+      myEquityTierLimit.nextLevelRequiredTotalNetCollateralUSD ?? Number.MAX_SAFE_INTEGER;
+    return [
+      simpleValidationError({
+        code: 'OPEN_ORDERS_EXCEEDS_EQUITY_TIER_LIMIT',
+        type: ErrorType.error,
+        learnMoreUrlKey: 'equityTiersLearnMore',
+        textKey: STRING_KEYS.TRIGGERS_EQUITY_TIER_ERROR,
+        textParams: {
+          CURRENT_EQUITY: {
+            value: subaccountEquity,
+            format: ErrorFormat.Price,
+            decimals: 0,
+          },
+          NEXT_TIER_EQUITY: {
+            value: nextTierEquity,
+            format: ErrorFormat.Price,
+            decimals: 0,
+          },
+          MAX_ORDERS: {
+            value: `${Math.round(myEquityTierLimit.maxOrders)}`,
+            format: ErrorFormat.String,
+            decimals: 0,
+          },
+        },
+      }),
+    ];
+  }
+  return [];
 }

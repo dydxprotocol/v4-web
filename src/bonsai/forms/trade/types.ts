@@ -1,6 +1,7 @@
 import { OrderbookProcessedData } from '@/bonsai/types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import {
+  EquityTiersSummary,
   FeeTierSummary,
   GroupedSubaccountSummary,
   PerpetualMarketSummary,
@@ -232,6 +233,7 @@ export type TradeFormInputData = {
   currentTradeMarketOrderbook: OrderbookProcessedData | undefined;
   feeTiers: FeeTierSummary[] | undefined;
   rewardParams: RewardParamsSummary;
+  equityTiers: EquityTiersSummary | undefined;
 };
 
 export type TradeAccountDetails = {

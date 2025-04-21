@@ -36,6 +36,7 @@ const getTradeFormInputData = createAppSelector(
     BonsaiHelpers.currentMarket.marketInfo,
     selectRawOrderbook,
     BonsaiRaw.currentMarket,
+    BonsaiCore.configs.equityTiers,
   ],
   (
     userFeeStats,
@@ -47,7 +48,8 @@ const getTradeFormInputData = createAppSelector(
     currentTradeMarketOpenOrders,
     currentTradeMarketSummary,
     currentTradeMarketOrderbook,
-    currentTradeMarket
+    currentTradeMarket,
+    equityTiers
   ): TradeFormInputData => ({
     rawParentSubaccountData,
     rawRelevantMarkets,
@@ -62,6 +64,7 @@ const getTradeFormInputData = createAppSelector(
     userFeeStats,
     feeTiers,
     rewardParams,
+    equityTiers,
   })
 );
 
