@@ -344,6 +344,7 @@ export const DepositForm = ({
           disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
+          chainId={token.chainId}
           type="deposit"
         />
       </div>
