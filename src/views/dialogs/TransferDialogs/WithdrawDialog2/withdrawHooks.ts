@@ -204,7 +204,7 @@ export function useWithdrawStep({
   };
 }
 
-const MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW = 0.95;
+const MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW = 0.98;
 
 export function useProtocolWithdrawalValidation({
   updatedFreeCollateral,
