@@ -89,12 +89,6 @@ export const getClosePositionInputErrors = (state: RootState) => {
 export const getInputClosePositionData = (state: RootState) => state.inputs.closePositionInputs;
 
 /**
- * @param state
- * @returns TransferInputs
- */
-export const getTransferInputs = (state: RootState) => state.inputs.transferInputs;
-
-/**
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {

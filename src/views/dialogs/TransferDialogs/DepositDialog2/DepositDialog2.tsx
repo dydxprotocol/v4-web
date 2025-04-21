@@ -100,7 +100,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       setIsOpen={setIsOpen}
       onBack={formState !== 'form' ? onShowForm : undefined}
       title={dialogTitle}
-      placement={DialogPlacement.Default}
+      placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       {currentDeposit && (
         <DepositStatus

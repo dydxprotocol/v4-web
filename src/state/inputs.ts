@@ -6,7 +6,6 @@ import {
   type InputError,
   type Inputs,
   type TradeInputs,
-  type TransferInputs,
 } from '@/constants/abacus';
 import {
   CLEARED_CLOSE_POSITION_INPUTS,
@@ -14,7 +13,6 @@ import {
   CLEARED_TRADE_INPUTS,
 } from '@/constants/trade';
 
-import { safeAssign } from '@/lib/objectHelpers';
 import { Nullable } from '@/lib/typeUtils';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
@@ -27,7 +25,6 @@ export interface InputsState {
   tradeInputs?: Nullable<TradeInputs>;
   closePositionFormInputs: ClosePositionFormInputs;
   closePositionInputs?: Nullable<ClosePositionInputs>;
-  transferInputs?: Nullable<TransferInputs>;
 }
 
 const initialState: InputsState = {
@@ -41,7 +38,6 @@ const initialState: InputsState = {
     ...CLEARED_CLOSE_POSITION_INPUTS,
   },
   tradeInputs: undefined,
-  transferInputs: undefined,
 };
 
 export const inputsSlice = createSlice({
@@ -49,15 +45,7 @@ export const inputsSlice = createSlice({
   initialState,
   reducers: {
     setInputs: (state, action: PayloadAction<Nullable<Inputs>>) => {
-      const {
-        current,
-        errors,
-        trade,
-        closePosition,
-        transfer,
-        triggerOrders,
-        adjustIsolatedMargin,
-      } = action.payload ?? {};
+      const { current, errors, trade, closePosition } = action.payload ?? {};
 
       return {
         ...state,
@@ -65,11 +53,6 @@ export const inputsSlice = createSlice({
         inputErrors: errors?.toArray(),
         tradeInputs: trade,
         closePositionInputs: closePosition,
-        adjustIsolatedMarginInputs: adjustIsolatedMargin,
-        transferInputs: safeAssign({}, transfer, {
-          isCctp: !!transfer?.isCctp,
-        }),
-        triggerOrdersInputs: triggerOrders,
       };
     },
 

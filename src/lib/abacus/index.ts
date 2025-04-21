@@ -10,7 +10,6 @@ import type {
   HumanReadableSubaccountTransferPayload,
   ParsingError,
   TradeInputFields,
-  TransferInputFields,
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
@@ -22,8 +21,6 @@ import {
   IOImplementations,
   StatsigConfig,
   TradeInputField,
-  TransferInputField,
-  TransferType,
   UIImplementations,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
@@ -39,7 +36,6 @@ import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { setClosePositionFormInputs, setTradeFormInputs } from '@/state/inputs';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { Nullable } from '@/lib/typeUtils';
 
@@ -159,12 +155,7 @@ class AbacusStateManager {
   };
 
   attemptDisconnectAccount = () => {
-    const state = this.store?.getState();
-    const { type: transferType } = (state && getTransferInputs(state)) ?? {};
-    // we don't want to disconnect the account if we switch network during the deposit form
-    if (transferType?.rawValue !== TransferType.deposit.rawValue) {
-      this.disconnectAccount();
-    }
+    this.disconnectAccount();
   };
 
   // ------ Input Values ------ //
@@ -207,19 +198,7 @@ class AbacusStateManager {
     }
   };
 
-  clearTransferInputValues = () => {
-    this.setTransferValue({ value: null, field: TransferInputField.address });
-    this.setTransferValue({ value: null, field: TransferInputField.size });
-    this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
-    this.setTransferValue({ value: null, field: TransferInputField.MEMO });
-  };
-
   resetInputState = () => {
-    this.clearTransferInputValues();
-    this.setTransferValue({
-      field: TransferInputField.type,
-      value: null,
-    });
     this.clearTradeInputValues({ shouldResetSize: true });
   };
 
@@ -250,10 +229,6 @@ class AbacusStateManager {
     }
   };
 
-  setTransfersSourceAddress = (evmAddress: string) => {
-    this.stateManager.sourceAddress = evmAddress;
-  };
-
   setSubaccountNumber = (subaccountNumber: number) =>
     (this.stateManager.subaccountNumber = subaccountNumber);
 
@@ -275,16 +250,6 @@ class AbacusStateManager {
     field: Nullable<TradeInputFields>;
   }) => {
     this.stateManager.trade(abacusValueToString(value), field);
-  };
-
-  setTransferValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: TransferInputFields;
-  }) => {
-    this.stateManager.transfer(abacusValueToString(value), field);
   };
 
   switchNetwork = (network: DydxNetwork) => {
