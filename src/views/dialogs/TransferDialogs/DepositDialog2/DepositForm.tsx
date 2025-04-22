@@ -39,7 +39,7 @@ import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
 import { OtherDepositOptions } from './OtherDepositOptions';
 import { DepositStep, useDepositSteps } from './depositHooks';
-import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
+import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 
 export const DepositForm = ({
   onTokenSelect,
@@ -255,6 +255,7 @@ export const DepositForm = ({
 
     track(
       AnalyticsEvents.DepositInitiated({
+        isInstantDeposit: isInstantDeposit(depositRoute),
         sourceAssetDenom: depositRoute.sourceAssetDenom,
         sourceAssetChainID: depositRoute.sourceAssetChainID,
         amountIn: depositRoute.amountIn,
