@@ -12,7 +12,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { ColorToken } from '@/constants/styles/base';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
@@ -158,27 +157,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               tw="relative"
             >
               <img src="/affiliates-share.png" alt="share affiliates" tw="w-full rounded-1" />
-              <$QrCode
-                size={68}
-                options={{
-                  margin: 0,
-                  backgroundOptions: {
-                    color: ColorToken.White,
-                  },
-                  dotsOptions: {
-                    type: 'dots',
-                    color: ColorToken.DarkGray13,
-                  },
-                  cornersSquareOptions: {
-                    type: 'extra-rounded',
-                    color: ColorToken.DarkGray13,
-                  },
-                  imageOptions: {
-                    margin: 0,
-                  },
-                }}
-                value={affiliatesUrl}
-              />
+              <$QrCode size={68} value={affiliatesUrl} />
             </div>
           )}
 
