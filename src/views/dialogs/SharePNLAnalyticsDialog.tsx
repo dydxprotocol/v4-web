@@ -152,7 +152,11 @@ export const SharePNLAnalyticsDialog = ({
             />
           </div>
 
-          <$QrCode size={68} value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ?? ''} />
+          {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
+            <$QrCode size={68} value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL} />
+          ) : (
+            <div tw="mt-1 size-[68px]" />
+          )}
         </div>
       </$ShareableCard>
 
