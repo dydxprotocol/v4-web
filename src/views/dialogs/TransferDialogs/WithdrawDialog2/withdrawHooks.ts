@@ -132,9 +132,9 @@ export function useWithdrawStep({
         userAddresses,
         simulate: false,
         getFallbackGasAmount: async (chainId) => {
-          if (chainId === 'dydx-mainnet-1') return 300_000; // or fill appropriate numbers
-          if (chainId === 'noble-1') return 200_000; // or fill appropriate numbers
-          return 300_000;
+          if (chainId === 'dydx-mainnet-1') return 500_000;
+          if (chainId === 'noble-1') return 300_000;
+          return 500_000;
         },
         beforeMsg: {
           msg: JSON.stringify({
