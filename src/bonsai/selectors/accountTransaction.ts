@@ -1,5 +1,3 @@
-import { SubaccountClient } from '@dydxprotocol/v4-client-js';
-
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
@@ -40,13 +38,7 @@ export const selectTxAuthorizedAccount = createAppSelector(
 
     if (!canWalletTransact) return undefined;
 
-    const subaccountClient = new SubaccountClient(
-      localDydxWallet!,
-      parentSubaccountInfo.subaccount
-    );
-
     return {
-      subaccountClient,
       localDydxWallet,
       sourceAccount,
       parentSubaccountInfo,
