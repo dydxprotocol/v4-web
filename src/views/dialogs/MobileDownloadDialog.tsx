@@ -15,8 +15,12 @@ import { QrCode } from '@/components/QrCode';
 
 const MobileQrCode = ({ url }: { url: string }) => {
   return (
-    <div tw="m-auto flex h-[200px] w-[200px] items-center">
-      <QrCode hasLogo value={url} />
+    <div tw="m-auto flex items-center">
+      <QrCode
+        tw="rounded-0.75 border-solid border-color-border bg-color-layer-4 p-1"
+        hasLogo
+        value={url}
+      />
     </div>
   );
 };

@@ -14,19 +14,23 @@ type StyleProps = {
   className?: string;
   hasLogo?: boolean;
   size?: number;
+  options?: {
+    cells?: Parameters<typeof Cuer.Cells>[0];
+    finder?: Parameters<typeof Cuer.Finder>[0];
+  };
 };
 
 const DARK_LOGO_MARK_URL = '/logos/logo-mark-dark.svg';
 const LIGHT_LOGO_MARK_URL = '/logos/logo-mark-light.svg';
 
 export const QrCode = memo(
-  ({ className, value, hasLogo, size = 300 }: ElementProps & StyleProps) => {
+  ({ className, value, hasLogo, size = 300, options }: ElementProps & StyleProps) => {
     const appTheme: AppTheme = useAppSelector(getAppTheme);
 
     return (
       <Cuer.Root className={className} size={size} value={value}>
-        <Cuer.Cells />
-        <Cuer.Finder radius={0.25} />
+        <Cuer.Cells {...options?.cells} />
+        <Cuer.Finder radius={0.25} {...options?.finder} />
         {hasLogo && (
           <Cuer.Arena>
             <img
