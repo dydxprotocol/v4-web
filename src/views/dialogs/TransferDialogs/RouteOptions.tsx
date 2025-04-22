@@ -68,11 +68,11 @@ export const TransferRouteOptions = ({
   const fastRouteDescription = useMemo(() => {
     if (!routes || disabled) {
       const sourceFee = SKIP_GO_FAST_SOURCE_FEE_MAP[chainId ?? ''];
-      const bpsFee = formatNumberOutput(SKIP_GO_BPS_FEE, OutputType.Percent, {
+      const bpsFee = formatNumberOutput(SKIP_GO_BPS_FEE / 100, OutputType.Percent, {
         selectedLocale,
         decimalSeparator: decimal,
         groupSeparator: group,
-        fractionDigits: 0,
+        fractionDigits: 1,
       });
 
       const estimatedFee = sourceFee ? `${sourceFee + SKIP_GO_DESTINATION_FEE} + ${bpsFee}` : '$';
