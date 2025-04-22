@@ -31,7 +31,11 @@ import {
   type HumanReadableTransferPayload,
   type HumanReadableWithdrawPayload,
 } from '@/constants/abacus';
-import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import {
+  AnalyticsUserProperties,
+  DEFAULT_TRANSACTION_MEMO,
+  TransactionMemo,
+} from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
@@ -39,11 +43,13 @@ import { type RootStore } from '@/state/_store';
 import { setInitializationError } from '@/state/app';
 import { placeOrderTimeout } from '@/state/localOrders';
 
+import { identify } from '../analytics/analytics';
 import { dd } from '../analytics/datadog';
 import { StatefulOrderError, stringifyTransactionError } from '../errors';
-import { log } from '../telemetry';
+import { parseToPrimitives } from '../parseToPrimitives';
+import { log, logInfo } from '../telemetry';
+import { browserTimeOffsetPromise } from '../timeOffset';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
-import { parseToPrimitives } from './parseToPrimitives';
 
 (BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();
@@ -112,8 +118,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         USDC_GAS_DENOM,
         CHAINTOKEN_DENOM,
         CHAINTOKEN_DECIMALS,
-        enableTimestampNonce,
       } = parsedParams;
+
+      logInfo('dydxChainTransactions connectNetwork', { parsedParams });
+      identify(AnalyticsUserProperties.AbacusValidatorUrl(validatorUrl));
 
       const compositeClient = await CompositeClient.connect(
         new Network(
@@ -134,7 +142,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
               broadcastTimeoutMs: 60_000,
             },
             DEFAULT_TRANSACTION_MEMO,
-            enableTimestampNonce
+            true,
+            (await browserTimeOffsetPromise).offset
           )
         )
       );
@@ -741,7 +750,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
       }
     } catch (error) {
-      log('DydxChainTransactions/get', error);
+      log('DydxChainTransactions/get', error, { type, paramsInJson });
       callback(null);
     }
   }

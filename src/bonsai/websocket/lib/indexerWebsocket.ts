@@ -1,5 +1,10 @@
 /* eslint-disable max-classes-per-file */
-import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
+import {
+  logBonsaiError,
+  logBonsaiInfo,
+  LONG_REQUEST_LOG_THRESHOLD_MS,
+  OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS,
+} from '@/bonsai/logs';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';
@@ -28,6 +33,7 @@ type SubscriptionHandlerTrackingMetadata = {
   sentSubMessage: boolean;
   // using subs for this data means we lose it when the user fully unsubscribes and thus might actually retry more often than expected
   // but this is fine since every consumer has subs wrapped in resource managers that prevent lots of churn
+  firstSubscriptionTimeMs: number | undefined;
   lastRetryBecauseErrorMs: number | undefined;
   lastRetryBecauseDuplicateMs: number | undefined;
 };
@@ -139,6 +145,7 @@ export class IndexerWebsocket {
     // below here is any metadata we want to allow maintaining between resubscribes
     lastRetryBecauseErrorMs = undefined,
     lastRetryBecauseDuplicateMs = undefined,
+    firstSubscriptionTimeMs = undefined,
   }: SubscriptionHandlerInput & Partial<SubscriptionHandlerTrackingMetadata>) => {
     const wasSuccessful = this.subscriptions.addSubscription({
       channel,
@@ -150,6 +157,7 @@ export class IndexerWebsocket {
       receivedBaseData: false,
       lastRetryBecauseErrorMs,
       lastRetryBecauseDuplicateMs,
+      firstSubscriptionTimeMs,
     });
 
     // fails if already exists
@@ -172,7 +180,11 @@ export class IndexerWebsocket {
     }
 
     if (this.socket != null && this.socket.isActive()) {
-      this.subscriptions.getSubscription(channel, id)!.sentSubMessage = true;
+      const sub = this.subscriptions.getSubscription(channel, id)!;
+      sub.sentSubMessage = true;
+      if (sub.firstSubscriptionTimeMs == null) {
+        sub.firstSubscriptionTimeMs = Date.now();
+      }
       this.socket.send({
         batched,
         channel,
@@ -380,6 +392,23 @@ export class IndexerWebsocket {
               id,
               wsId: this.indexerWsId,
             });
+          }
+          if (
+            !sub.receivedBaseData &&
+            sub.firstSubscriptionTimeMs != null &&
+            Date.now() - sub.firstSubscriptionTimeMs > LONG_REQUEST_LOG_THRESHOLD_MS &&
+            Date.now() - sub.firstSubscriptionTimeMs < OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS
+          ) {
+            const duration = Date.now() - sub.firstSubscriptionTimeMs;
+            logBonsaiInfo(
+              'IndexerWebsocket',
+              `Long request time detected for ${sub.channel}: ${Math.floor(duration / 1000)}s`,
+              {
+                duration,
+                channel,
+                id,
+              }
+            );
           }
           sub.receivedBaseData = true;
           sub.handleBaseData(message.contents, message);

@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import type { Nullable } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -14,6 +13,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details, DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { MarketLinks } from '../MarketLinks';
 

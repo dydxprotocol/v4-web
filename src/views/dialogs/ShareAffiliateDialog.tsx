@@ -159,25 +159,17 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             >
               <img src="/affiliates-share.png" alt="share affiliates" tw="w-full rounded-1" />
               <$QrCode
+                tw="rounded-0.75 bg-white p-0.5"
                 size={68}
+                value={affiliatesUrl}
                 options={{
-                  margin: 0,
-                  backgroundOptions: {
-                    color: ColorToken.White,
+                  cells: {
+                    fill: ColorToken.DarkGray13,
                   },
-                  dotsOptions: {
-                    type: 'dots',
-                    color: ColorToken.DarkGray13,
-                  },
-                  cornersSquareOptions: {
-                    type: 'extra-rounded',
-                    color: ColorToken.DarkGray13,
-                  },
-                  imageOptions: {
-                    margin: 0,
+                  finder: {
+                    fill: ColorToken.DarkGray13,
                   },
                 }}
-                value={affiliatesUrl}
               />
             </div>
           )}

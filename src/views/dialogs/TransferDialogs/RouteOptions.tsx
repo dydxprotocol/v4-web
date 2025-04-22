@@ -7,6 +7,12 @@ import tw from 'twin.macro';
 import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+import {
+  SKIP_GO_BPS_FEE,
+  SKIP_GO_DESTINATION_FEE,
+  SKIP_GO_FAST_SOURCE_FEE_MAP,
+  SKIP_GO_FAST_TRANSFER_LIMIT,
+} from '@/constants/skip';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
@@ -23,6 +29,7 @@ import { BIG_NUMBERS } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type Props = {
+  chainId?: string;
   routes?: { slow?: RouteResponse; fast?: RouteResponse };
   isLoading: boolean;
   disabled: boolean;
@@ -32,6 +39,7 @@ type Props = {
 };
 
 export const TransferRouteOptions = ({
+  chainId,
   routes,
   isLoading,
   selectedSpeed,
@@ -42,7 +50,7 @@ export const TransferRouteOptions = ({
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { decimal, group } = useLocaleSeparators();
-  const limitAmount = formatNumberOutput(10_000, OutputType.CompactNumber, {
+  const limitAmount = formatNumberOutput(SKIP_GO_FAST_TRANSFER_LIMIT, OutputType.CompactNumber, {
     selectedLocale,
     decimalSeparator: decimal,
     groupSeparator: group,
@@ -58,13 +66,24 @@ export const TransferRouteOptions = ({
   }, [routes?.fast]);
 
   const fastRouteDescription = useMemo(() => {
-    if (!routes || disabled)
+    if (!routes || disabled) {
+      const sourceFee = SKIP_GO_FAST_SOURCE_FEE_MAP[chainId ?? ''];
+      const bpsFee = formatNumberOutput(SKIP_GO_BPS_FEE / 100, OutputType.Percent, {
+        selectedLocale,
+        decimalSeparator: decimal,
+        groupSeparator: group,
+        fractionDigits: 1,
+      });
+
+      const estimatedFee = sourceFee ? `${sourceFee + SKIP_GO_DESTINATION_FEE} + ${bpsFee}` : '$';
+
       return type === 'deposit'
         ? stringGetter({
-            key: STRING_KEYS.SKIP_FAST_ROUTE_DESC,
-            params: { LIMIT_AMOUNT: limitAmount },
+            key: STRING_KEYS.SKIP_FAST_ROUTE_DESC_1,
+            params: { FEE: estimatedFee, LIMIT_AMOUNT: limitAmount },
           })
         : '-';
+    }
     if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     const fastOperationFee = routes.fast.estimatedFees.reduce(
@@ -87,7 +106,7 @@ export const TransferRouteOptions = ({
         )}
       </span>
     );
-  }, [goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
+  }, [chainId, goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
 
   const slowRouteDescription = useMemo(() => {
     const slowOperationFee = routes?.slow?.estimatedFees.reduce(
@@ -96,16 +115,16 @@ export const TransferRouteOptions = ({
     );
 
     if (!routes || disabled)
-      return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC }) : '-';
+      return type === 'deposit' ? stringGetter({ key: STRING_KEYS.SKIP_SLOW_ROUTE_DESC_1 }) : '-';
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
-    const chainName =
-      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.name;
+    const gasDenom =
+      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.gasDenom;
 
     const gasFeeAdjustment =
-      type === 'deposit' && chainName ? (
+      type === 'deposit' && gasDenom ? (
         <span tw="text-color-text-0 font-mini-book">
-          {` + ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
+          {` + ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES_SHORT, params: { CHAIN: gasDenom } })}`}
         </span>
       ) : null;
 
@@ -198,7 +217,7 @@ const RouteOption = ({
   return (
     <button
       type="button"
-      tw="box-border flex min-w-0 flex-1 items-center gap-0.75 rounded-1 border-2 border-solid p-1"
+      tw="box-border flex min-w-0 flex-1 items-center gap-0.75 rounded-1 border-2 border-solid px-1 py-0.75"
       disabled={disabled}
       onClick={onClick}
       style={{
@@ -210,14 +229,14 @@ const RouteOption = ({
       {icon}
       <div tw="flex flex-col items-start gap-0.125 text-left">
         <div
-          tw="text-medium"
+          tw="text-base"
           style={{
             color: selected && !disabled ? 'var(--color-text-2)' : undefined,
           }}
         >
           {title}
         </div>
-        <div tw="text-small text-color-text-1">{description}</div>
+        <div tw="text-tiny text-color-text-1">{description}</div>
       </div>
     </button>
   );

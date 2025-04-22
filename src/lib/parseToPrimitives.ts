@@ -1,6 +1,6 @@
 import Long from 'long';
 
-import { bytesToBigInt } from '../numbers';
+import { bytesToBigInt } from './numbers';
 
 // a type that looks like Long but isn't literally Long since our version is different from v4-clients
 type LongCatcher = {

@@ -34,7 +34,7 @@ export const AddressInput = ({
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
-  const [invalidAddress, setInvalidAddress] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
     onChange(e.target.value);
@@ -43,21 +43,19 @@ export const AddressInput = ({
   const hasValidAddress = isValidWithdrawalAddress(value, destinationChain);
 
   const onBlur = () => {
-    if (value.length > 0 && !hasValidAddress) {
-      setInvalidAddress(true);
-    }
+    setIsFocused(false);
   };
 
   const onFocus = () => {
-    setInvalidAddress(false);
+    setIsFocused(true);
   };
 
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
-      <div tw="flex flex-1 flex-col gap-0.5 text-small">
+      <div tw="flex min-w-0 flex-1 flex-col gap-0.5 text-small">
         <div>
           {stringGetter({ key: STRING_KEYS.ADDRESS })}{' '}
-          {invalidAddress && (
+          {!hasValidAddress && !isFocused && value.trim() !== '' && (
             <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.INVALID_ADDRESS_TITLE })}>
               <Icon tw="text-color-error" size="0.75rem" iconName={IconName.Warning} />
             </WithTooltip>

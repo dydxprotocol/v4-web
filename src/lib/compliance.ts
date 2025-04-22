@@ -52,6 +52,7 @@ const signComplianceSignatureKeplr = async (
 
   const stored = getLocalStorage<KeplrComplianceStorage>({
     key: LocalStorageKey.KeplrCompliance,
+    defaultValue: {},
   });
 
   const storedSignature = stored[signer]?.signature;

@@ -1,14 +1,15 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { Subaccount, type Nullable, type TradingRewards } from '@/constants/abacus';
+import { Subaccount } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { Nullable } from '@/lib/typeUtils';
+
+import { autoBatchAllReducers } from './autoBatchHelpers';
 
 export type AccountState = {
-  tradingRewards?: TradingRewards;
-
   subaccountForPostOrders?: Nullable<Subaccount>;
 
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
@@ -48,12 +49,14 @@ export const accountSlice = createSlice({
       onboardingState: action.payload,
     }),
 
-    setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
-      state.subaccountForPostOrders = action.payload;
-    },
-    clearSubaccountState: (state) => {
-      state.subaccountForPostOrders = undefined;
-    },
+    ...autoBatchAllReducers<AccountState>()({
+      setSubaccountForPostOrders: (state, action: PayloadAction<Nullable<Subaccount>>) => {
+        state.subaccountForPostOrders = action.payload;
+      },
+      clearSubaccountState: (state) => {
+        state.subaccountForPostOrders = undefined;
+      },
+    }),
   },
 });
 

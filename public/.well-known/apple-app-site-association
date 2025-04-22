@@ -49,6 +49,10 @@
                     {
                         "/": "/walletsegue",
                         "comment": "Callback link for WalletSegue/Coinbase SDK"
+                    },
+                    {
+                        "/": "/phantom/*",
+                        "comment": "Callback link for Phantom Wallet"
                     }
                 ]
             }

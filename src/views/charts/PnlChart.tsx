@@ -3,15 +3,10 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import { debounce, get } from 'lodash';
+import { debounce } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  HISTORICAL_PNL_PERIODS,
-  HistoricalPnlPeriod,
-  HistoricalPnlPeriods,
-} from '@/constants/abacus';
 import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
 import { timeUnits } from '@/constants/time';
 
@@ -28,16 +23,27 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
-import { objectEntries } from '@/lib/objectHelpers';
 
 enum PnlSide {
   Profit = 'Profit',
   Loss = 'Loss',
   Flat = 'Flat',
 }
+
+enum HistoricalPnlPeriod {
+  Period1d = '1d',
+  Period7d = '7d',
+  Period30d = '30d',
+  Period90d = '90d',
+}
+const allPeriods: HistoricalPnlPeriod[] = [
+  HistoricalPnlPeriod.Period1d,
+  HistoricalPnlPeriod.Period7d,
+  HistoricalPnlPeriod.Period30d,
+  HistoricalPnlPeriod.Period90d,
+];
 
 export type PnlDatum = {
   id: number;
@@ -49,9 +55,6 @@ export type PnlDatum = {
 };
 
 const PNL_TIME_RESOLUTION = 1 * timeUnits.hour;
-
-const getPeriodFromName = (periodName: string) =>
-  HISTORICAL_PNL_PERIODS[periodName as keyof typeof HISTORICAL_PNL_PERIODS];
 
 type ElementProps = {
   onTooltipContext?: (tooltipContext: TooltipContextType<PnlDatum>) => void;
@@ -83,20 +86,15 @@ export const PnlChart = ({
   const { data: pnlData } = BonsaiHooks.useParentSubaccountHistoricalPnls();
   const subaccountId = useAppSelector(getSubaccountId, shallowEqual);
 
-  const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriods[]>([
+  const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriod[]>([
     HistoricalPnlPeriod.Period1d,
   ]);
 
-  const [selectedPeriod, setSelectedPeriod] = useState<HistoricalPnlPeriods>(
+  const [selectedPeriod, setSelectedPeriod] = useState<HistoricalPnlPeriod>(
     HistoricalPnlPeriod.Period1d
   );
 
   const [isZooming, setIsZooming] = useState(false);
-
-  // Fetch 90d data once in Abacus for the chart
-  useEffect(() => {
-    abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
-  }, []);
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
@@ -132,7 +130,7 @@ export const PnlChart = ({
   );
 
   const msForPeriod = useCallback(
-    (period: HistoricalPnlPeriods, clampMax: Boolean = true) => {
+    (period: HistoricalPnlPeriod, clampMax: Boolean = true) => {
       const earliestCreatedAt = data[0]?.createdAt;
       const latestCreatedAt = data[data.length - 1]?.createdAt;
       const maxPeriod =
@@ -154,7 +152,8 @@ export const PnlChart = ({
     [data]
   );
 
-  const onSelectPeriod = (periodName: string) => setSelectedPeriod(getPeriodFromName(periodName));
+  const onSelectPeriod = (periodName: string) =>
+    setSelectedPeriod(periodName as HistoricalPnlPeriod);
 
   // Unselect selected period in toggle if user zooms in/out
   const onZoomSnap = useMemo(
@@ -183,13 +182,13 @@ export const PnlChart = ({
   // Include period option if oldest pnl is older than the previous option
   // e.g. oldest pnl is 31 days old -> show 90d option
   const getPeriodOptions = useCallback(
-    (oldestPnlMs: number): HistoricalPnlPeriods[] =>
-      objectEntries(HISTORICAL_PNL_PERIODS).reduce(
-        (acc: HistoricalPnlPeriods[], [, period], i, arr) => {
+    (oldestPnlMs: number): HistoricalPnlPeriod[] =>
+      allPeriods.reduce(
+        (acc: HistoricalPnlPeriod[], period, i, arr) => {
           if (oldestPnlMs < now - msForPeriod(period, false)) {
-            const nextPeriod = get(arr, [i + 1, 0]);
+            const nextPeriod = arr[i + 1];
             if (nextPeriod) {
-              acc.push(getPeriodFromName(nextPeriod));
+              acc.push(nextPeriod);
             }
           }
           return acc;
@@ -287,14 +286,14 @@ export const PnlChart = ({
         <div tw="isolate m-1 [place-self:start_end]">
           <ToggleGroup
             items={periodOptions.map((period) => ({
-              value: period.name,
+              value: period,
               label: formatRelativeTime(msForPeriod(period, false), {
                 locale: selectedLocale,
                 relativeToTimestamp: 0,
                 largestUnit: 'day',
               }),
             }))}
-            value={isZooming ? '' : selectedPeriod.name}
+            value={isZooming ? '' : selectedPeriod}
             onValueChange={onSelectPeriod}
             onInteraction={onToggleInteract}
           />

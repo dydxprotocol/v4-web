@@ -2,8 +2,8 @@ import { VaultModule } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { ToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { MustBigNumber } from '@/lib/numbers';
+import { ToPrimitives } from '@/lib/parseToPrimitives';
 
 import { ErrorType, simpleValidationError, ValidationError } from '../lib/validationErrors';
 import { VaultAccount } from './vaultAccount';

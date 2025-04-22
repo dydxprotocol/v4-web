@@ -7,7 +7,6 @@ import type { Dispatch } from '@reduxjs/toolkit';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { Nullable } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -42,7 +41,7 @@ import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedOrder, getOrderStatusInfoNew, isMarketOrderTypeNew } from '@/lib/orders';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderStatusIconNew } from '../OrderStatusIcon';
 import { CancelOrClearAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
