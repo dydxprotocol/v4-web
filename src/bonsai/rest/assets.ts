@@ -14,6 +14,7 @@ import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
 import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
+import { safeSubscribeObserver } from './lib/safeSubscribe';
 
 export function setUpAssetsQuery(store: RootStore) {
   const observer = new QueryObserver(appQueryClient, {
@@ -26,7 +27,7 @@ export function setUpAssetsQuery(store: RootStore) {
     staleTime: timeUnits.minute * 5,
   });
 
-  const unsubscribe = observer.subscribe((result) => {
+  const unsubscribe = safeSubscribeObserver(observer, (result) => {
     try {
       store.dispatch(
         setAllAssetsRaw(

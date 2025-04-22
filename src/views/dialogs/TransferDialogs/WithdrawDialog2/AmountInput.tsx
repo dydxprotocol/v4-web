@@ -12,6 +12,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { calc } from '@/lib/do';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type AmountInputProps = {
@@ -19,6 +20,7 @@ type AmountInputProps = {
   onChange: (newValue: string) => void;
 };
 
+const TARGET_MARGIN_USAGE_MAX = 0.95;
 export const AmountInput = ({ value, onChange }: AmountInputProps) => {
   const stringGetter = useStringGetter();
 
@@ -29,16 +31,27 @@ export const AmountInput = ({ value, onChange }: AmountInputProps) => {
   const isLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
 
-  const { freeCollateral } = orEmptyObj(
+  const { freeCollateral, equity } = orEmptyObj(
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
   );
 
+  const maxValue = calc(() => {
+    if (!freeCollateral || !equity) return undefined;
+    const reserved = equity.minus(freeCollateral);
+    if (reserved.gt(0.01)) {
+      return equity.minus(reserved.div(TARGET_MARGIN_USAGE_MAX));
+    }
+    return freeCollateral;
+  });
+
   const onClickMax = () => {
-    if (!freeCollateral) return;
-    onChange(freeCollateral.toString());
+    if (maxValue == null) {
+      return;
+    }
+    onChange(maxValue.toString());
   };
 
-  const onMaxDisabled = !freeCollateral || isLoading;
+  const isMaxDisabled = !maxValue || isLoading;
 
   return (
     <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
@@ -59,15 +72,15 @@ export const AmountInput = ({ value, onChange }: AmountInputProps) => {
             </>
           )}
 
-          {freeCollateral && (
+          {maxValue && (
             <>
               <span> • </span>
               <button
-                disabled={onMaxDisabled}
+                disabled={isMaxDisabled}
                 onClick={onClickMax}
                 type="button"
                 tw="font-medium"
-                style={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
+                style={{ color: isMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
               >
                 {stringGetter({ key: STRING_KEYS.MAX })}
               </button>

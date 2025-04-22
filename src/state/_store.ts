@@ -1,8 +1,10 @@
 import { createAccountTransactionSupervisor } from '@/bonsai/AccountTransactionSupervisor';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
 import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
 import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
+import { isFunction } from 'lodash';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
@@ -10,6 +12,7 @@ import storage from 'redux-persist/lib/storage';
 import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
+import { transformOntologyObject } from '@/lib/transformOntology';
 
 import { accountSlice } from './account';
 import { accountUiMemorySlice } from './accountUiMemory';
@@ -101,6 +104,20 @@ export const store = configureStore({
             ...state,
             tradingView: '<LONG BLOB>',
             localization: { ...state.localization, localeData: '<LONG BLOB>' },
+            ontology: {
+              core: transformOntologyObject(BonsaiCore, (a) => a(state)),
+              helpers: transformOntologyObject(BonsaiHelpers, (a, path) => {
+                const result = a(state);
+                if (isFunction(result)) {
+                  // this parameterized selector requires no arguments and is important
+                  if (path === '.currentMarket.orderbook.createSelectGroupedData') {
+                    return result(state);
+                  }
+                  return undefined;
+                }
+                return result;
+              }),
+            },
           }),
         }
       : false,

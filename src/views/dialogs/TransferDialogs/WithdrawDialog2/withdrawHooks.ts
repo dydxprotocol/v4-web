@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
@@ -25,7 +25,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
-import { MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber } from '@/lib/numbers';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import {
@@ -121,10 +121,21 @@ export function useWithdrawStep({
 
       const withdrawId = `withdraw-${crypto.randomUUID()}`;
 
+      logBonsaiInfo('withdrawHooks', 'withdraw initiated', {
+        withdrawId,
+        withdrawRoute,
+      });
+
       await skipClient.executeRoute({
         getCosmosSigner,
         route: withdrawRoute,
         userAddresses,
+        simulate: false,
+        getFallbackGasAmount: async (chainId) => {
+          if (chainId === 'dydx-mainnet-1') return 300_000; // or fill appropriate numbers
+          if (chainId === 'noble-1') return 200_000; // or fill appropriate numbers
+          return 300_000;
+        },
         beforeMsg: {
           msg: JSON.stringify({
             sender: {
@@ -162,10 +173,21 @@ export function useWithdrawStep({
               isInstantWithdraw: isInstantTransfer(withdrawRoute),
               transferAssetRelease: null,
             };
-
+            logBonsaiInfo('withdrawHooks', 'withdraw tx submitted', {
+              withdrawId,
+              txHash,
+              chainID,
+              withdrawRoute,
+            });
             track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
             onWithdraw(baseWithdraw);
           } else {
+            logBonsaiInfo('withdrawHooks', 'additional withdraw tx submitted', {
+              withdrawId,
+              txHash,
+              chainID,
+              withdrawRoute,
+            });
             // Update the subtransaction with the txHash
             const subtransaction: WithdrawSubtransaction = {
               chainId: chainID,
@@ -204,12 +226,16 @@ export function useWithdrawStep({
   };
 }
 
+const MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW = 0.98;
+
 export function useProtocolWithdrawalValidation({
-  freeCollateral,
+  updatedFreeCollateral,
+  updatedMarginUsage,
   withdrawAmount,
   selectedRoute,
 }: {
-  freeCollateral?: BigNumber;
+  updatedFreeCollateral?: BigNumber;
+  updatedMarginUsage?: BigNumber | null;
   withdrawAmount: string;
   selectedRoute?: RouteResponse;
 }): string | undefined {
@@ -217,18 +243,27 @@ export function useProtocolWithdrawalValidation({
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
   const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
-  const withdrawAmountBN = MustBigNumber(withdrawAmount);
+  const withdrawAmountBN = AttemptBigNumber(withdrawAmount);
 
-  if (withdrawAmount === '' || withdrawAmountBN.lte(0) || !selectedRoute) {
+  if (
+    withdrawAmountBN == null ||
+    withdrawAmount === '' ||
+    withdrawAmountBN.lte(0) ||
+    !selectedRoute
+  ) {
     return undefined;
   }
 
-  if (freeCollateral && withdrawAmountBN.gt(freeCollateral)) {
+  if (updatedFreeCollateral && updatedFreeCollateral.lte(0)) {
     return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
   }
 
-  // WithdrawalGating
+  if (updatedMarginUsage && updatedMarginUsage.gt(MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW)) {
+    return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+  }
+
   if (usdcWithdrawalCapacity.gt(0) && withdrawAmountBN.gt(usdcWithdrawalCapacity)) {
+    // WithdrawalGating
     return stringGetter({
       key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
       params: {

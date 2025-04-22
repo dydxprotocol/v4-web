@@ -6,7 +6,6 @@ import { useWalletClient } from 'wagmi';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
 import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
@@ -293,16 +292,6 @@ export const DepositForm = ({
     }
   };
 
-  const chainName =
-    selectedRoute?.sourceAssetChainID && CHAIN_INFO[selectedRoute.sourceAssetChainID]?.name;
-
-  const gasFeeAdjustment =
-    selectedSpeed === 'slow' && chainName ? (
-      <span tw="text-color-text-0 font-mini-book">
-        {` - ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
-      </span>
-    ) : null;
-
   const receipt = selectedRoute && (
     <Details
       tw="font-small-book"
@@ -316,7 +305,6 @@ export const DepositForm = ({
               type={OutputType.Fiat}
               isLoading={isFetching}
               value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
-              slotRight={gasFeeAdjustment}
             />
           ),
         },
@@ -356,15 +344,17 @@ export const DepositForm = ({
           disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
+          chainId={token.chainId}
           type="deposit"
         />
       </div>
       <div tw="flex flex-col gap-0.75">
         {!depositSteps?.length && (
-          <div tw="mt-2 flex flex-col gap-0.375">
+          <div tw="mt-0.5 flex flex-col gap-0.5">
             {currentStepError && (
               <div tw="text-center text-small text-color-error">{currentStepError}</div>
             )}
+            {receipt}
             <Button
               tw="w-full"
               onClick={onDepositClick}
@@ -390,7 +380,6 @@ export const DepositForm = ({
             />
           </div>
         )}
-        {receipt}
       </div>
       {!depositSteps?.length && !awaitingWalletAction && (
         <OtherDepositOptions

@@ -1,4 +1,4 @@
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
@@ -182,6 +182,11 @@ export function useDepositSteps({
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
         const depositId = `deposit-${crypto.randomUUID()}`;
 
+        logBonsaiInfo('depositHooks', 'deposit initiated', {
+          depositId,
+          depositRoute,
+        });
+
         try {
           await updatedSkipClient.executeRoute({
             route: depositRoute,
@@ -190,6 +195,13 @@ export function useDepositSteps({
             bypassApprovalCheck: true,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
+              logBonsaiInfo('depositHooks', 'deposit tx submitted', {
+                depositId,
+                txHash,
+                chainID,
+                depositRoute,
+              });
+
               const baseDeposit = {
                 id: depositId,
                 type: 'deposit' as const,
