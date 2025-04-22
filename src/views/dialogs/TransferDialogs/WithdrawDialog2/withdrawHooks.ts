@@ -229,12 +229,12 @@ export function useWithdrawStep({
 const MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW = 0.98;
 
 export function useProtocolWithdrawalValidation({
-  updatedFreeCollateral,
+  freeCollateral,
   updatedMarginUsage,
   withdrawAmount,
   selectedRoute,
 }: {
-  updatedFreeCollateral?: BigNumber;
+  freeCollateral?: BigNumber;
   updatedMarginUsage?: BigNumber | null;
   withdrawAmount: string;
   selectedRoute?: RouteResponse;
@@ -254,7 +254,7 @@ export function useProtocolWithdrawalValidation({
     return undefined;
   }
 
-  if (updatedFreeCollateral && updatedFreeCollateral.lte(0)) {
+  if (freeCollateral && withdrawAmountBN.gt(freeCollateral)) {
     return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
   }
 
