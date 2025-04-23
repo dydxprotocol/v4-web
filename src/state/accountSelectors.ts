@@ -232,9 +232,10 @@ export const getFillDetails = () =>
     }
   );
 
-const getFillsForOrderId = () =>
-  createAppSelector([(s, orderId) => orderId, getSubaccountFills], (orderId, fills) =>
-    orderId ? groupBy(fills, 'orderId')[orderId] ?? [] : []
+export const getFillsForOrderId = () =>
+  createAppSelector(
+    [(s, orderId: string | undefined) => orderId, getSubaccountFills],
+    (orderId, fills) => (orderId ? fills.filter((f) => f.orderId === orderId) : [])
   );
 
 /**
