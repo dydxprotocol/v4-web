@@ -10,9 +10,16 @@ import { Output, OutputType } from '@/components/Output';
 
 import { getNumberSign } from '@/lib/numbers';
 
-export const MegaVaultYieldOutput = ({ className }: { className?: string }) => {
+export const MegaVaultYieldOutput = ({
+  className,
+  yieldType = 'ninetyDay',
+}: {
+  className?: string;
+  yieldType?: 'ninetyDay' | 'thirtyDay';
+}) => {
   const vault = useLoadedVaultDetails().data;
-  const depositApr = vault?.thirtyDayReturnPercent;
+  const depositApr =
+    yieldType === 'ninetyDay' ? vault?.ninetyDayReturnPercent : vault?.thirtyDayReturnPercent;
   const numberSign = useMemo(() => getNumberSign(depositApr), [depositApr]);
 
   return (

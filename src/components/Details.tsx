@@ -2,7 +2,6 @@ import { Fragment } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { LoadingContext } from '@/contexts/LoadingContext';
@@ -11,6 +10,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
+
+import { Nullable } from '@/lib/typeUtils';
 
 export type DetailsItem = {
   // eslint-disable-next-line react/no-unused-prop-types

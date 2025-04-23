@@ -16,6 +16,7 @@ export function setUpTransfersQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh(['account', 'transfers']);
 
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'transfers',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'transfers', data],
     getQueryFn: (indexerClient, data) => {

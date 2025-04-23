@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { DydxAddress } from '@/constants/wallets';
 
 import { wrapAndLogError } from '@/lib/asyncUtils';
+import { calc } from '@/lib/do';
 
 type ChaosLabsIncentivesResponse = {
   dydxRewards: number;
@@ -32,34 +33,28 @@ export const useQueryChaosLabsIncentives = ({
           return resp.json();
         }
 
-        // Fetch all seasons 1-6 and sum the points
-        const responses = await Promise.all(
-          [1, 2, 3, 4, 5, 6].map(async (szn) => {
-            const resp = await fetch(
-              `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${szn}`
-            );
-            return resp.json();
-          })
-        );
+        const currentSeason: number | undefined = await calc(async () => {
+          const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/season`);
+          return (await resp.json()).currentSeason;
+        });
 
-        // Sum up the points from all seasons
-        const summedData = responses.reduce(
-          (acc, curr) => {
-            return {
-              dydxRewards: acc.dydxRewards + (curr.dydxRewards || 0),
-              incentivePoints: acc.incentivePoints + (curr.incentivePoints || 0),
-              marketMakingIncentivePoints:
-                acc.marketMakingIncentivePoints + (curr.marketMakingIncentivePoints || 0),
-            };
-          },
-          {
-            dydxRewards: 0,
-            incentivePoints: 0,
-            marketMakingIncentivePoints: 0,
-          }
-        );
+        if (currentSeason == null) {
+          return undefined;
+        }
 
-        return summedData;
+        const thisSeasonResponse = await calc(async () => {
+          return (
+            await fetch(
+              `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${currentSeason}`
+            )
+          ).json();
+        });
+
+        return {
+          dydxRewards: thisSeasonResponse.dydxRewards ?? 0,
+          incentivePoints: thisSeasonResponse.incentivePoints ?? 0,
+          marketMakingIncentivePoints: thisSeasonResponse.marketMakingIncentivePoints ?? 0,
+        };
       },
       'LaunchIncentives/fetchPoints',
       true

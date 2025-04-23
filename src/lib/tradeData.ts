@@ -9,9 +9,7 @@ import {
   ValidationError,
   type AbacusOrderSides,
   type ErrorFormatType,
-  type Nullable,
   type SubaccountPosition,
-  type TradeState,
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -20,6 +18,7 @@ import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { PositionSide, TradeTypes } from '@/constants/trade';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 export const getSelectedTradeType = (type: Nullable<AbacusOrderTypes>) => {
   return type ? (type.rawValue as TradeTypes) : TradeTypes.LIMIT;
@@ -177,10 +176,6 @@ export const getPositionMargin = ({ position }: { position: SubaccountPosition }
       : equity.current;
 
   return margin;
-};
-
-export const getTradeStateWithDoubleValuesHasDiff = (tradeState: Nullable<TradeState<number>>) => {
-  return !!tradeState && tradeState.current !== tradeState.postOrder;
 };
 
 export const getDoubleValuesHasDiff = (current: Nullable<number>, post: Nullable<number>) => {

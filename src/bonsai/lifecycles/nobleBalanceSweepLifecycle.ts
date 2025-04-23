@@ -9,6 +9,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { isNobleIbcMsg } from '@/types/skip';
 
 import type { RootStore } from '@/state/_store';
+import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
@@ -27,8 +28,9 @@ function isCosmosTx(tx: Tx): tx is { cosmosTx: CosmosTx; operationsIndices: numb
 // 0.1 USDC buffer to account for IBC fees
 const USDC_IBC_FEE_BUFFER = 0.1;
 
-// Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction
-const SLEEP_TIME = timeUnits.second * 10;
+// Sleep time between sweeps to ensure that the subaccount has time to process the previous transaction. IBC transactions should not exceed 1 minute unless network is congested/degraded.
+const SLEEP_TIME = timeUnits.second * 30;
+const INVALIDATION_SLEEP_TIME = timeUnits.second * 10;
 
 /**
  * @description Lifecycle for sweeping all USDC on Noble to dYdX chain. This is used to sweep deposits that only land within Noble.
@@ -130,40 +132,53 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           balance,
           balanceToSweep: balanceToSweep.toString(),
         });
+        try {
+          // Simulate transaction to get fee
+          const fee = await nobleSigningClient.simulateTransaction([ibcMsg]);
 
-        // Simulate transaction to get fee
-        const fee = await nobleSigningClient.simulateTransaction([ibcMsg]);
+          const feeAdjustedAmount =
+            parseInt(ibcMsg.value.token.amount, 10) -
+            Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
 
-        const feeAdjustedAmount =
-          parseInt(ibcMsg.value.token.amount, 10) -
-          Math.floor(parseInt(fee.amount[0]!.amount, 10) * GAS_MULTIPLIER);
+          ibcMsg.value.token.amount = feeAdjustedAmount.toString();
 
-        ibcMsg.value.token.amount = feeAdjustedAmount.toString();
-
-        if (feeAdjustedAmount <= 0) {
-          throw new Error(
-            `fee to ibc send is greater than amount to be transferred. amount: ${parsedMsg.token.amount} fee: ${JSON.stringify(fee)}, feeAdjustedAmount: ${feeAdjustedAmount}`
-          );
-        }
-
-        logBonsaiInfo(
-          'nobleBalanceSweepLifecycle',
-          'send transaction to sweep USDC from Noble to dYdX',
-          {
-            balance,
-            fee,
-            amount: parsedMsg.token.amount,
-            feeAdjustedAmount,
+          if (feeAdjustedAmount <= 0) {
+            throw new Error(
+              `fee to ibc send is greater than amount to be transferred. amount: ${parsedMsg.token.amount} fee: ${JSON.stringify(fee)}, feeAdjustedAmount: ${feeAdjustedAmount}`
+            );
           }
-        );
 
-        await nobleSigningClient.send(
-          [ibcMsg],
-          undefined,
-          `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
-        );
+          logBonsaiInfo(
+            'nobleBalanceSweepLifecycle',
+            'send transaction to sweep USDC from Noble to dYdX',
+            {
+              balance,
+              fee,
+              amount: parsedMsg.token.amount,
+              feeAdjustedAmount,
+            }
+          );
 
-        await sleep(SLEEP_TIME);
+          await nobleSigningClient.send(
+            [ibcMsg],
+            undefined,
+            `${DEFAULT_TRANSACTION_MEMO} | ${nobleLocalWallet.address}`
+          );
+        } finally {
+          await sleep(SLEEP_TIME);
+
+          appQueryClient.invalidateQueries({
+            queryKey: ['validator', 'accountBalances'],
+            exact: false,
+          });
+
+          appQueryClient.invalidateQueries({
+            queryKey: ['nobleClient', 'nobleBalances'],
+            exact: false,
+          });
+
+          await sleep(INVALIDATION_SLEEP_TIME);
+        }
       }
 
       // Don't auto-sweep on Cosmos

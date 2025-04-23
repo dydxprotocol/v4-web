@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
-import { CHAIN_INFO, isEvmDepositChainId } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
-import { CosmosChainId, NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
+import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { WalletNetworkType } from '@/constants/wallets';
+import { WalletNetworkType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import usePrevious from '@/hooks/usePrevious';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -24,15 +22,17 @@ import {
   WithdrawSubtransaction,
 } from '@/state/transfers';
 
-import { convertBech32Address } from '@/lib/addressUtils';
-
 import { ChainSelect } from './ChainSelect';
 import { WithdrawForm } from './WithdrawForm';
 import { WithdrawStatus } from './WithdrawStatus';
 
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const { dydxAddress, sourceAccount, nobleAddress } = useAccounts();
-  const [destinationAddress, setDestinationAddress] = useState(sourceAccount.address ?? '');
+  const { dydxAddress, sourceAccount } = useAccounts();
+  const isPrivy = sourceAccount.walletInfo?.name === WalletType.Privy;
+  const [destinationAddress, setDestinationAddress] = useState(
+    isPrivy ? '' : sourceAccount.address ?? ''
+  );
+
   const [destinationChain, setDestinationChain] = useState(
     sourceAccount.chain === WalletNetworkType.Evm
       ? mainnet.id.toString()
@@ -40,9 +40,6 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         ? SOLANA_MAINNET_ID
         : CosmosChainId.Noble
   );
-  // prev values
-  const prevDestinationAddress = usePrevious(destinationAddress);
-  const previousChainRef = usePrevious(CHAIN_INFO[destinationChain]?.walletNetworkType);
 
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
@@ -60,64 +57,6 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     setFormState('form');
     chainSelectRef.current?.scroll({ top: 0 });
   };
-
-  useEffect(() => {
-    const currentDestinationChainType = CHAIN_INFO[destinationChain]?.walletNetworkType;
-
-    // Do not update destination address if chainType goes from EVM -> EVM
-    // Cosmos uses different Bech32Prefixes for different chains, so it is excluded from this check
-    if (
-      currentDestinationChainType === WalletNetworkType.Evm &&
-      previousChainRef === currentDestinationChainType &&
-      prevDestinationAddress !== ''
-    )
-      return;
-
-    setDestinationAddress(() => {
-      if (dydxAddress) {
-        if (destinationChain === CosmosChainId.Neutron) {
-          return convertBech32Address({
-            address: dydxAddress,
-            bech32Prefix: NEUTRON_BECH32_PREFIX,
-          });
-        }
-
-        if (destinationChain === CosmosChainId.Osmosis) {
-          return convertBech32Address({ address: dydxAddress, bech32Prefix: OSMO_BECH32_PREFIX });
-        }
-      }
-
-      if (destinationChain === CosmosChainId.Noble && nobleAddress) {
-        return nobleAddress;
-      }
-
-      if (sourceAccount.address != null) {
-        const { address: sourceWalletAddress } = sourceAccount;
-        if (
-          destinationChain === SOLANA_MAINNET_ID &&
-          sourceAccount.chain === WalletNetworkType.Solana
-        ) {
-          return sourceWalletAddress;
-        }
-
-        if (
-          isEvmDepositChainId(destinationChain) &&
-          sourceAccount.chain === WalletNetworkType.Evm
-        ) {
-          return sourceWalletAddress;
-        }
-      }
-
-      return '';
-    });
-  }, [
-    destinationChain,
-    dydxAddress,
-    nobleAddress,
-    sourceAccount,
-    prevDestinationAddress,
-    previousChainRef,
-  ]);
 
   const onWithdrawSigned = (withdrawId: string) => {
     setCurrentWithdrawId(withdrawId);

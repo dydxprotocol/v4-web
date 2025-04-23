@@ -126,7 +126,7 @@ export const NewMarketForm = ({
       {
         key: 'est-apr',
         label: `${stringGetter({ key: STRING_KEYS.EST_APR_PLAIN })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
-        value: <MegaVaultYieldOutput />,
+        value: <MegaVaultYieldOutput yieldType="thirtyDay" />,
       },
       {
         key: 'lockup-period',

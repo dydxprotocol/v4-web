@@ -20,4 +20,8 @@ export const vaultTooltips = {
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.VAULT_APR_BODY }),
     learnMoreLink: urlConfigs?.vaultLearnMore,
   }),
+  'vault-apr-90d': ({ stringGetter, urlConfigs }) => ({
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.VAULT_APR_90D_BODY }),
+    learnMoreLink: urlConfigs?.vaultLearnMore,
+  }),
 } satisfies TooltipStrings;
