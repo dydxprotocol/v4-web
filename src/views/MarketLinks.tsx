@@ -1,12 +1,15 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
-import { ButtonType } from '@/constants/buttons';
+import { ButtonShape, ButtonStyle, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { IconName } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppSelector } from '@/state/appTypes';
 
@@ -15,10 +18,13 @@ import { orEmptyObj } from '@/lib/typeUtils';
 export const MarketLinks = ({
   className,
   launchableMarketId,
+  type = 'icons',
 }: {
   className?: string;
   launchableMarketId?: string;
+  type?: 'icons' | 'menu';
 }) => {
+  const stringGetter = useStringGetter();
   const { urls: marketUrls } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -34,20 +40,45 @@ export const MarketLinks = ({
   const linkItems = [
     {
       key: 'coinmarketcap',
+      label: 'Coinmarketcap',
       href: urls?.cmc ?? coinMarketCapsLink,
       icon: IconName.CoinMarketCap,
     },
     {
       key: 'whitepaper',
+      label: stringGetter({ key: STRING_KEYS.WHITEPAPER }),
       href: urls?.technicalDoc ?? whitepaperLink,
       icon: IconName.Whitepaper,
     },
     {
       key: 'project-website',
+      label: stringGetter({ key: STRING_KEYS.WEBSITE }),
       href: urls?.website ?? websiteLink,
       icon: IconName.Website,
     },
   ].filter(({ href }) => href);
+
+  if (type === 'menu') {
+    return (
+      <SimpleUiDropdownMenu
+        className={className}
+        align="end"
+        items={linkItems.map(({ key, href, icon, label }) => ({
+          key,
+          href,
+          icon: <Icon iconName={icon} />,
+          label,
+          value: href ?? '',
+        }))}
+      >
+        <IconButton
+          shape={ButtonShape.Square}
+          buttonStyle={ButtonStyle.WithoutBackground}
+          iconName={IconName.ThreeDot}
+        />
+      </SimpleUiDropdownMenu>
+    );
+  }
 
   return (
     <div tw="row ml-auto gap-0.5" className={className}>

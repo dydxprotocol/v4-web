@@ -19,7 +19,7 @@ const AssetPage = () => {
     <div>Launch on Desktop</div>
   ) : (
     <>
-      <div tw="h-[18.75rem] font-small-book">
+      <div tw="mb-2 h-[18.75rem] font-small-book">
         <TvChart />
       </div>
       <div tw="flexColumn gap-2 px-1.25 pb-[5.25rem]">

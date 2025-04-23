@@ -74,6 +74,7 @@ export enum ColorToken {
 export enum OpacityToken {
   Opacity16 = '29',
   Opacity20 = '33',
+  Opacity50 = '80',
   Opacity66 = 'A8',
   Opacity90 = 'E6',
 }

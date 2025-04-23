@@ -10,7 +10,7 @@ import { MidMarketPrice } from '@/views/MidMarketPrice';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 const AssetHeader = () => {
   const navigate = useNavigate();
@@ -24,21 +24,23 @@ const AssetHeader = () => {
         <img src={logo} alt={displayableAsset} tw="h-[2.25rem] w-[2.25rem] rounded-[50%]" />
         <div tw="flexColumn gap-0.125">
           <span tw="!leading-[18px] text-color-text-2 font-medium-bold">{displayableAsset}</span>
-          <span tw="font-small-regular">
-            <Output
-              tw="inline"
-              type={OutputType.CompactFiat}
-              value={marketCap}
-              slotRight={<span tw="ml-0.25 text-color-text-0">MC</span>}
-            />
-          </span>
+          {isPresent(marketCap) && (
+            <span tw="font-small-medium">
+              <Output
+                tw="inline"
+                type={OutputType.CompactFiat}
+                value={marketCap}
+                slotRight={<span tw="ml-0.25 text-color-text-0">MC</span>}
+              />
+            </span>
+          )}
         </div>
       </div>
 
       <div tw="flexColumn items-end justify-end gap-0.125">
         <MidMarketPrice tw="font-medium-bold" richColor={false} />
         <Output
-          tw="font-small-regular"
+          tw="font-small-medium"
           css={{
             color: MustBigNumber(percentChange24h).isZero()
               ? undefined

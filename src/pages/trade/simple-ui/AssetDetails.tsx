@@ -1,27 +1,52 @@
 import { useMemo } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 import { MarketLinks } from '@/views/MarketLinks';
 
 import { useAppSelector } from '@/state/appTypes';
 
 import { getAssetDescriptionStringKeys } from '@/lib/assetUtils';
 import { hasText } from '@/lib/hasString';
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const AssetDetails = () => {
   const stringGetter = useStringGetter();
+  const freeCollateral = useAppSelector(
+    BonsaiCore.account.parentSubaccountSummary.data
+  )?.freeCollateral;
   const marketData = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
-  const { assetId, volume24H, marketCap, openInterestUSDC, nextFundingRate } = marketData;
+  const {
+    assetId,
+    volume24H,
+    marketCap,
+    openInterestUSDC,
+    nextFundingRate,
+    initialMarginFraction,
+    effectiveInitialMarginFraction,
+  } = marketData;
   const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
+
+  const buyingPower = useMemo(() => {
+    const defaultMaxLeverage = initialMarginFraction
+      ? BIG_NUMBERS.ONE.div(initialMarginFraction)
+      : null;
+
+    const updatedMaxLeverage = effectiveInitialMarginFraction
+      ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+      : null;
+
+    const maxLeverage = updatedMaxLeverage ?? defaultMaxLeverage;
+
+    return freeCollateral?.times(maxLeverage ?? 1);
+  }, [initialMarginFraction, effectiveInitialMarginFraction, freeCollateral]);
 
   const detailItems = useMemo(() => {
     const nextFundingRateBN = MustBigNumber(nextFundingRate);
@@ -56,11 +81,17 @@ const AssetDetails = () => {
             }}
             type={OutputType.SmallPercent}
             value={nextFundingRate}
+            showSign={ShowSign.Both}
           />
         ),
       },
+      {
+        key: 'buyingPower',
+        label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}</span>,
+        value: <Output type={OutputType.Fiat} value={buyingPower} />,
+      },
     ];
-  }, [stringGetter, volume24H, marketCap, openInterestUSDC, nextFundingRate]);
+  }, [stringGetter, buyingPower, volume24H, marketCap, openInterestUSDC, nextFundingRate]);
 
   const primaryDescription = stringGetter({ key: primary });
   const secondaryDescription = stringGetter({ key: secondary });
@@ -69,25 +100,35 @@ const AssetDetails = () => {
 
   return (
     <div tw="flexColumn gap-1">
-      <div tw="flexColumn gap-1">
+      <div tw="flexColumn">
         <span tw="text-color-text-2 font-medium-bold">
           {stringGetter({ key: STRING_KEYS.DETAILS })}
         </span>
-        <Details tw="text-color-text-2 font-base-book" withSeparators items={detailItems} />
+        <Details
+          tw="text-color-text-2 font-base-book"
+          css={{
+            '--color-border': 'var(--color-border-faded)',
+          }}
+          withSeparators
+          items={detailItems}
+        />
       </div>
 
-      <div tw="flexColumn gap-1">
-        <div tw="row justify-between">
+      <div tw="flexColumn">
+        <div tw="row mb-0.25 justify-between">
           <span tw="text-color-text-2 font-medium-bold">
             {stringGetter({ key: STRING_KEYS.ABOUT })}
           </span>
-          <MarketLinks tw="[&>a]:text-color-text-2 [&>a]:visited:text-color-text-2" />
+          <MarketLinks
+            type="menu"
+            tw="font-large-book [&>a]:text-color-text-2 [&>a]:visited:text-color-text-2"
+          />
         </div>
         {hasDescription && (
-          <>
+          <div>
             <p tw="font-small-book">{stringGetter({ key: primary })}</p>
             <p tw="font-small-book">{stringGetter({ key: secondary })}</p>
-          </>
+          </div>
         )}
       </div>
     </div>

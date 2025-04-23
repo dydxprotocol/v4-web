@@ -14,7 +14,7 @@ const AssetPosition = () => {
   // const orders = useAppSelector(BonsaiHelpers.currentMarket.account.openOrders);
 
   return (
-    <div>
+    <div tw="grid">
       <div tw="row h-full gap-1 font-medium-bold">
         <div tw="row gap-0.5">
           <button
@@ -26,6 +26,7 @@ const AssetPosition = () => {
           >
             <span>{stringGetter({ key: STRING_KEYS.POSITION })}</span>
           </button>
+          <VerticalSeparator tw="flex h-full" fullHeight />
           <Tag>{stringGetter({ key: STRING_KEYS.NONE })}</Tag>
         </div>
 
