@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -11,6 +10,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 import { useStringGetter } from '../useStringGetter';
 
