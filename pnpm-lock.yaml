@@ -230,6 +230,9 @@ dependencies:
   crypto-js:
     specifier: ^4.1.1
     version: 4.1.1
+  cuer:
+    specifier: ^0.0.2
+    version: 0.0.2(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2)
   export-to-csv:
     specifier: ^1.2.3
     version: 1.2.3
@@ -238,7 +241,7 @@ dependencies:
     version: 2.1.0
   graz:
     specifier: ^0.1.19
-    version: 0.1.19(@cosmjs/amino@0.32.4)(@cosmjs/cosmwasm-stargate@0.32.4)(@cosmjs/launchpad@0.27.1)(@cosmjs/proto-signing@0.32.4)(@cosmjs/stargate@0.32.4)(@cosmjs/tendermint-rpc@0.32.4)(@leapwallet/cosmos-social-login-capsule-provider@0.0.39)(@types/react@18.3.3)(axios@1.7.7)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)
+    version: 0.1.19(@cosmjs/amino@0.32.4)(@cosmjs/cosmwasm-stargate@0.33.1)(@cosmjs/launchpad@0.27.1)(@cosmjs/proto-signing@0.32.4)(@cosmjs/stargate@0.32.4)(@cosmjs/tendermint-rpc@0.32.4)(@leapwallet/cosmos-social-login-capsule-provider@0.0.39)(@types/react@18.3.3)(axios@1.7.7)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)
   immer:
     specifier: ^10.1.1
     version: 10.1.1
@@ -260,9 +263,6 @@ dependencies:
   prometheus-query:
     specifier: ^3.4.0
     version: 3.4.0
-  qr-code-styling:
-    specifier: 1.6.0-rc.1
-    version: 1.6.0-rc.1
   query-string:
     specifier: ^8.1.0
     version: 8.1.0
@@ -1618,25 +1618,6 @@ packages:
       '@cosmjs/encoding': 0.33.1
       '@cosmjs/math': 0.33.1
       '@cosmjs/utils': 0.33.1
-    dev: false
-
-  /@cosmjs/cosmwasm-stargate@0.32.4:
-    resolution: {integrity: sha512-Fuo9BGEiB+POJ5WeRyBGuhyKR1ordvxZGLPuPosFJOH9U0gKMgcjwKMCgAlWFkMlHaTB+tNdA8AifWiHrI7VgA==}
-    dependencies:
-      '@cosmjs/amino': 0.32.4
-      '@cosmjs/crypto': 0.32.4
-      '@cosmjs/encoding': 0.32.4
-      '@cosmjs/math': 0.32.4
-      '@cosmjs/proto-signing': 0.32.4
-      '@cosmjs/stargate': 0.32.4
-      '@cosmjs/tendermint-rpc': 0.32.4
-      '@cosmjs/utils': 0.32.4
-      cosmjs-types: 0.9.0
-      pako: 2.1.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
     dev: false
 
   /@cosmjs/cosmwasm-stargate@0.33.1:
@@ -12649,6 +12630,22 @@ packages:
     resolution: {integrity: sha512-NOx7YDFWEsM/fTRAJjRpPp8t+MKRVvniAg9wQlUKx20MFrPs73WLJhFf5iteqrxNYnsy924K3Iroh3yNHeYd2g==}
     dev: true
 
+  /cuer@0.0.2(react-dom@18.2.0)(react@18.2.0)(typescript@5.7.2):
+    resolution: {integrity: sha512-MG1BYnnSLqBnO0dOBS1Qm/TEc9DnFa9Sz2jMA24OF4hGzs8UuPjpKBMkRPF3lrpC+7b3EzULwooX9djcvsM8IA==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      qr: 0.4.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      typescript: 5.7.2
+    dev: false
+
   /d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
     dependencies:
@@ -15272,7 +15269,7 @@ packages:
     resolution: {integrity: sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
-  /graz@0.1.19(@cosmjs/amino@0.32.4)(@cosmjs/cosmwasm-stargate@0.32.4)(@cosmjs/launchpad@0.27.1)(@cosmjs/proto-signing@0.32.4)(@cosmjs/stargate@0.32.4)(@cosmjs/tendermint-rpc@0.32.4)(@leapwallet/cosmos-social-login-capsule-provider@0.0.39)(@types/react@18.3.3)(axios@1.7.7)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0):
+  /graz@0.1.19(@cosmjs/amino@0.32.4)(@cosmjs/cosmwasm-stargate@0.33.1)(@cosmjs/launchpad@0.27.1)(@cosmjs/proto-signing@0.32.4)(@cosmjs/stargate@0.32.4)(@cosmjs/tendermint-rpc@0.32.4)(@leapwallet/cosmos-social-login-capsule-provider@0.0.39)(@types/react@18.3.3)(axios@1.7.7)(immer@10.1.1)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0):
     resolution: {integrity: sha512-KaRQJ7HTQp3vbX/bG2Oc9T3t/KyaIuU5dLoGU2QNFirNjIpRbhkBtCll9Li5A6+zw3O9bHkbZ1aUaKfuVyBS8w==}
     hasBin: true
     peerDependencies:
@@ -15286,7 +15283,7 @@ packages:
       react: '>=17'
     dependencies:
       '@cosmjs/amino': 0.32.4
-      '@cosmjs/cosmwasm-stargate': 0.32.4
+      '@cosmjs/cosmwasm-stargate': 0.33.1
       '@cosmjs/launchpad': 0.27.1
       '@cosmjs/proto-signing': 0.32.4
       '@cosmjs/stargate': 0.32.4
@@ -19571,14 +19568,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /qr-code-styling@1.6.0-rc.1:
-    resolution: {integrity: sha512-ModRIiW6oUnsP18QzrRYZSc/CFKFKIdj7pUs57AEVH20ajlglRpN3HukjHk0UbNMTlKGuaYl7Gt6/O5Gg2NU2Q==}
-    dependencies:
-      qrcode-generator: 1.4.4
-    dev: false
-
-  /qrcode-generator@1.4.4:
-    resolution: {integrity: sha512-HM7yY8O2ilqhmULxGMpcHSF1EhJJ9yBj8gvDEuZ6M+KGJ0YY2hKpnXvRD+hZPLrDVck3ExIGhmPtSdcjC+guuw==}
+  /qr@0.4.0:
+    resolution: {integrity: sha512-Edzwf8GAVJzEIjqPuMHnjwTniwhS92daMuROspUn4ssyYDB1c+AqWSP8Sx+1MJNfBb0+ePykQYWY7PykXZAuuA==}
     dev: false
 
   /qrcode@1.5.3:

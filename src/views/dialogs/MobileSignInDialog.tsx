@@ -58,7 +58,12 @@ const MobileQrCode = ({
 
   return (
     <$QrCodeContainer data-hj-suppress isShowing={isShowing} onClick={onClick}>
-      <QrCode hasLogo size={432} value={encryptedData} />
+      <QrCode
+        tw="rounded-0.75 border-solid border-color-border bg-color-layer-4 p-2"
+        hasLogo
+        size={432}
+        value={encryptedData}
+      />
       <span>{stringGetter({ key: STRING_KEYS.CLICK_TO_SHOW })}</span>
     </$QrCodeContainer>
   );

@@ -406,20 +406,21 @@ export const AnalyticsEvents = unionize(
     LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
 
     // Deposit
-    DepositInitiated:
-      ofType<
-        Pick<
-          RouteResponse,
-          | 'sourceAssetDenom'
-          | 'sourceAssetChainID'
-          | 'amountIn'
-          | 'amountOut'
-          | 'usdAmountOut'
-          | 'estimatedAmountOut'
-          | 'swapPriceImpactPercent'
-          | 'estimatedRouteDurationSeconds'
-        >
-      >(),
+    DepositInitiated: ofType<
+      Pick<
+        RouteResponse,
+        | 'sourceAssetDenom'
+        | 'sourceAssetChainID'
+        | 'amountIn'
+        | 'amountOut'
+        | 'usdAmountOut'
+        | 'estimatedAmountOut'
+        | 'swapPriceImpactPercent'
+        | 'estimatedRouteDurationSeconds'
+      > & {
+        isInstantDeposit: boolean;
+      }
+    >(),
     DepositSubmitted: ofType<
       Omit<Deposit, 'token'> & {
         tokenInChainId: string;
