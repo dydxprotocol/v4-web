@@ -10,7 +10,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
 import { intersection, mapValues, uniq } from 'lodash';
 
-import { Nullable } from '@/constants/abacus';
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
   CANCEL_ALL_ORDERS_KEY,
@@ -24,6 +23,9 @@ import {
 } from '@/constants/trade';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { Nullable } from '@/lib/typeUtils';
+
+import { autoBatchAllReducers } from './autoBatchHelpers';
 
 export interface LocalOrdersState {
   localPlaceOrders: LocalPlaceOrderData[];
@@ -48,107 +50,111 @@ export const localOrdersSlice = createSlice({
     clearLocalOrders: () => {
       return initialState;
     },
-    updateOrders: (state, action: PayloadAction<SubaccountOrder[]>) => {
-      const { payload: orders } = action;
-      let { localCloseAllPositions } = state;
-      const canceledOrders = orders.filter(
-        (order) =>
-          order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Canceled
-      );
-      const placedOrderClientIds = new Set(
-        orders
-          .filter(
-            (order) =>
-              order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Open
-          )
-          .map((o) => o.clientId)
-      );
-      const filledOrderClientIds = new Set(
-        orders
-          .filter(
-            (order) =>
-              order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Filled
-          )
-          .map((order) => order.clientId)
-          .filter(isTruthy)
-      );
+    ...autoBatchAllReducers<LocalOrdersState>()({
+      updateOrders: (state, action: PayloadAction<SubaccountOrder[]>) => {
+        const { payload: orders } = action;
+        let { localCloseAllPositions } = state;
+        const canceledOrders = orders.filter(
+          (order) =>
+            order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Canceled
+        );
+        const placedOrderClientIds = new Set(
+          orders
+            .filter(
+              (order) =>
+                order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Open
+            )
+            .map((o) => o.clientId)
+        );
+        const filledOrderClientIds = new Set(
+          orders
+            .filter(
+              (order) =>
+                order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Filled
+            )
+            .map((order) => order.clientId)
+            .filter(isTruthy)
+        );
 
-      // no relevant cancel or filled orders
-      if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.size))
-        return state;
+        // no relevant cancel or filled orders
+        if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.size))
+          return state;
 
-      const canceledOrderIdsInPayload = new Set(canceledOrders.map((order) => order.id));
-      // ignore locally canceled orders since it's intentional and already handled
-      // by local cancel tracking and notification
-      const isOrderCanceledByBackend = (orderId: string) =>
-        canceledOrderIdsInPayload.has(orderId) &&
-        !state.localCancelOrders.some((order) => order.orderId === orderId);
+        const canceledOrderIdsInPayload = new Set(canceledOrders.map((order) => order.id));
+        // ignore locally canceled orders since it's intentional and already handled
+        // by local cancel tracking and notification
+        const isOrderCanceledByBackend = (orderId: string) =>
+          canceledOrderIdsInPayload.has(orderId) &&
+          !state.localCancelOrders.some((order) => order.orderId === orderId);
 
-      const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
-        const newCanceledOrderIds = batch.orderIds.filter((o) => canceledOrderIdsInPayload.has(o));
-        return uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
-      };
-
-      if (localCloseAllPositions) {
-        localCloseAllPositions = {
-          ...localCloseAllPositions,
-          filledOrderClientIds: uniq([
-            ...localCloseAllPositions.submittedOrderClientIds.filter((id) =>
-              filledOrderClientIds.has(id)
-            ),
-            ...localCloseAllPositions.filledOrderClientIds,
-          ]),
-          failedOrderClientIds: uniq([
-            ...intersection(
-              localCloseAllPositions.submittedOrderClientIds,
-              canceledOrders.map((order) => order.clientId).filter(isTruthy)
-            ),
-            ...localCloseAllPositions.failedOrderClientIds,
-          ]),
+        const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
+          const newCanceledOrderIds = batch.orderIds.filter((o) =>
+            canceledOrderIdsInPayload.has(o)
+          );
+          return uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
         };
-      }
 
-      return {
-        ...state,
-        localPlaceOrders: state.localPlaceOrders.map((order) => {
-          // Check if order should be canceled
-          if (
-            order.orderId &&
-            canceledOrderIdsInPayload.has(order.orderId) &&
-            isOrderCanceledByBackend(order.orderId)
-          ) {
-            return {
-              ...order,
-              submissionStatus: PlaceOrderStatuses.Canceled,
-            };
-          }
+        if (localCloseAllPositions) {
+          localCloseAllPositions = {
+            ...localCloseAllPositions,
+            filledOrderClientIds: uniq([
+              ...localCloseAllPositions.submittedOrderClientIds.filter((id) =>
+                filledOrderClientIds.has(id)
+              ),
+              ...localCloseAllPositions.filledOrderClientIds,
+            ]),
+            failedOrderClientIds: uniq([
+              ...intersection(
+                localCloseAllPositions.submittedOrderClientIds,
+                canceledOrders.map((order) => order.clientId).filter(isTruthy)
+              ),
+              ...localCloseAllPositions.failedOrderClientIds,
+            ]),
+          };
+        }
 
-          if (
-            order.clientId &&
-            order.submissionStatus < PlaceOrderStatuses.Placed &&
-            placedOrderClientIds.has(order.clientId)
-          ) {
-            return {
-              ...order,
-              orderId: orders.find((o) => o.clientId === order.clientId)?.id,
-              submissionStatus: PlaceOrderStatuses.Placed,
-            };
-          }
+        return {
+          ...state,
+          localPlaceOrders: state.localPlaceOrders.map((order) => {
+            // Check if order should be canceled
+            if (
+              order.orderId &&
+              canceledOrderIdsInPayload.has(order.orderId) &&
+              isOrderCanceledByBackend(order.orderId)
+            ) {
+              return {
+                ...order,
+                submissionStatus: PlaceOrderStatuses.Canceled,
+              };
+            }
 
-          return order;
-        }),
-        localCancelOrders: state.localCancelOrders.map((order) =>
-          canceledOrderIdsInPayload.has(order.orderId)
-            ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
-            : order
-        ),
-        localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
-          ...batch,
-          canceledOrderIds: getNewCanceledOrderIds(batch),
-        })),
-        localCloseAllPositions,
-      };
-    },
+            if (
+              order.clientId &&
+              order.submissionStatus < PlaceOrderStatuses.Placed &&
+              placedOrderClientIds.has(order.clientId)
+            ) {
+              return {
+                ...order,
+                orderId: orders.find((o) => o.clientId === order.clientId)?.id,
+                submissionStatus: PlaceOrderStatuses.Placed,
+              };
+            }
+
+            return order;
+          }),
+          localCancelOrders: state.localCancelOrders.map((order) =>
+            canceledOrderIdsInPayload.has(order.orderId)
+              ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
+              : order
+          ),
+          localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
+            ...batch,
+            canceledOrderIds: getNewCanceledOrderIds(batch),
+          })),
+          localCloseAllPositions,
+        };
+      },
+    }),
     updateFilledOrders: (state, action: PayloadAction<SubaccountFill[]>) => {
       const filledOrderIds = action.payload.map((fill) => fill.orderId).filter(isTruthy);
       if (filledOrderIds.length === 0) return state;

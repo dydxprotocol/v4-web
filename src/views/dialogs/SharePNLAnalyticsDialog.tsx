@@ -129,7 +129,7 @@ export const SharePNLAnalyticsDialog = ({
           <LogoIcon tw="mt-auto h-auto w-[5.125rem]" />
         </div>
 
-        <div>
+        <div tw="grid">
           <div tw="grid grid-cols-[repeat(2,1fr)] gap-[1.125rem] gap-y-0.5">
             <$ShareableCardStatLabel>
               {stringGetter({ key: STRING_KEYS.ENTRY })}
@@ -152,19 +152,23 @@ export const SharePNLAnalyticsDialog = ({
             />
           </div>
 
-          <$QrCode
-            size={68}
-            options={{
-              margin: 0,
-              backgroundOptions: {
-                color: 'var(--color-layer-3)',
-              },
-              imageOptions: {
-                margin: 0,
-              },
-            }}
-            value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
-          />
+          {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
+            <$QrCode
+              tw="rounded-0.25 bg-color-layer-3"
+              size={68}
+              value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
+              options={{
+                cells: {
+                  fill: 'var(--color-text-2)',
+                },
+                finder: {
+                  fill: 'var(--color-text-2)',
+                },
+              }}
+            />
+          ) : (
+            <div tw="mt-1 size-[68px]" />
+          )}
         </div>
       </$ShareableCard>
 

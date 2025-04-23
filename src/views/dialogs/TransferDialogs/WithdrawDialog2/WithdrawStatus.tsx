@@ -108,7 +108,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
         {stringGetter({ key: STRING_KEYS.CLOSE })}
       </Button>
 
-      {withdrawalExplorerLinks?.length && (
+      {(withdrawalExplorerLinks?.length ?? 0) > 0 && (
         <div tw="row justify-between">
           <span tw="text-color-text-0">
             {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTIONS_SHORT })}

@@ -170,7 +170,14 @@ export const TradeSizeInputs = () => {
         <$Conversion>{`≈ ${formatNumberOutput(usdAmountInput, OutputType.Fiat, { decimalSeparator, groupSeparator, selectedLocale })}`}</$Conversion>
       ) : showUSDInput && amountInput ? (
         <$Conversion>
-          ≈ {amountInput} {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
+          ≈{' '}
+          {formatNumberOutput(amountInput, OutputType.Asset, {
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
+            fractionDigits: stepSizeDecimals,
+          })}{' '}
+          {displayableAsset && <Tag tw="ml-0.25">{displayableAsset}</Tag>}
         </$Conversion>
       ) : undefined;
 

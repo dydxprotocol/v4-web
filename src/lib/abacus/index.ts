@@ -3,32 +3,22 @@ import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   AbacusStateNotificationProtocol,
-  AdjustIsolatedMarginInputFields,
   ClosePositionInputFields,
-  HistoricalPnlPeriods,
-  HistoricalTradingRewardsPeriod,
-  HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
   HumanReadableCloseAllPositionsPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableSubaccountTransferPayload,
-  Nullable,
-  OrderbookGroupings,
   ParsingError,
   TradeInputFields,
   TransferInputFields,
-  TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
   AbacusHelper,
   AbacusWalletConnectionType,
-  AdjustIsolatedMarginInputField,
-  ApiData,
   AsyncAbacusStateManager,
   ClosePositionInputField,
   CoroutineTimer,
-  HistoricalPnlPeriod,
   IOImplementations,
   StatsigConfig,
   TradeInputField,
@@ -50,6 +40,8 @@ import { ConnectorType, WalletInfo } from '@/constants/wallets';
 import { type RootStore } from '@/state/_store';
 import { setClosePositionFormInputs, setTradeFormInputs } from '@/state/inputs';
 import { getTransferInputs } from '@/state/inputsSelectors';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
@@ -222,24 +214,12 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.MEMO });
   };
 
-  clearAdjustIsolatedMarginInputValues = () => {
-    this.setAdjustIsolatedMarginValue({
-      value: null,
-      field: AdjustIsolatedMarginInputField.Amount,
-    });
-    this.setAdjustIsolatedMarginValue({
-      value: null,
-      field: AdjustIsolatedMarginInputField.AmountPercent,
-    });
-  };
-
   resetInputState = () => {
     this.clearTransferInputValues();
     this.setTransferValue({
       field: TransferInputField.type,
       value: null,
     });
-    this.clearAdjustIsolatedMarginInputValues();
     this.clearTradeInputValues({ shouldResetSize: true });
   };
 
@@ -297,16 +277,6 @@ class AbacusStateManager {
     this.stateManager.trade(abacusValueToString(value), field);
   };
 
-  setAdjustIsolatedMarginValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: AdjustIsolatedMarginInputFields;
-  }) => {
-    this.stateManager.adjustIsolatedMargin(abacusValueToString(value), field);
-  };
-
   setTransferValue = ({
     value,
     field,
@@ -316,31 +286,6 @@ class AbacusStateManager {
   }) => {
     this.stateManager.transfer(abacusValueToString(value), field);
   };
-
-  setTriggerOrdersValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: TriggerOrdersInputFields;
-  }) => {
-    this.stateManager.triggerOrders(abacusValueToString(value), field);
-  };
-
-  setHistoricalPnlPeriod = (
-    period: (typeof HistoricalPnlPeriod)[keyof typeof HistoricalPnlPeriod]
-  ) => {
-    this.stateManager.historicalPnlPeriod = period;
-  };
-
-  setHistoricalTradingRewardPeriod = (
-    period: (typeof HistoricalTradingRewardsPeriod)[keyof typeof HistoricalTradingRewardsPeriod]
-  ) => {
-    this.stateManager.historicalTradingRewardPeriod = period;
-  };
-
-  refreshHistoricalTradingRewards = () =>
-    this.stateManager.refresh(ApiData.HISTORICAL_TRADING_REWARDS);
 
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;
@@ -429,16 +374,6 @@ class AbacusStateManager {
   ): void => this.stateManager.commitCCTPWithdraw(callback);
 
   // ------ Utils ------ //
-  getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
-    this.stateManager.historicalPnlPeriod;
-
-  getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
-    this.stateManager.historicalTradingRewardPeriod;
-
-  modifyOrderbookLevel = (grouping: OrderbookGroupings) => {
-    this.stateManager.orderbookGrouping = grouping;
-  };
-
   handleCandlesSubscription = ({
     channelId,
     subscribe,

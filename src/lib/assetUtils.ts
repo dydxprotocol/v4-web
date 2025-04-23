@@ -1,9 +1,10 @@
 import { Asset } from '@skip-go/client';
 
-import { Nullable } from '@/constants/abacus';
 import { isTokenCctp } from '@/constants/cctp';
 import { DEFAULT_QUOTE_ASSET } from '@/constants/markets';
 import { NetworkType } from '@/constants/transfers';
+
+import { Nullable } from '@/lib/typeUtils';
 
 /**
  *

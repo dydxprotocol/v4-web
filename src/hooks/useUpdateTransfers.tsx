@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { logBonsaiInfo } from '@/bonsai/logs';
 import { StatusState } from '@skip-go/client';
 import { formatUnits } from 'viem';
 
@@ -91,6 +92,13 @@ export function useUpdateTransfers() {
             );
 
             if (status === 'success') {
+              logBonsaiInfo('useUpdateTransfers', 'deposit finalized', {
+                ...rest,
+                tokenInChainId: token.chainId,
+                tokenInDenom: token.denom,
+                status,
+                finalAmountUsd: finalAmount,
+              });
               track(
                 AnalyticsEvents.DepositFinalized({
                   ...rest,
@@ -208,6 +216,12 @@ export function useUpdateTransfers() {
                 );
 
                 if (status === 'success') {
+                  logBonsaiInfo('useUpdateTransfers', 'withdraw finalized', {
+                    ...transfer,
+                    finalAmountUsd: finalAmount,
+                    status,
+                    transferAssetRelease: response.transferAssetRelease,
+                  });
                   track(
                     AnalyticsEvents.WithdrawFinalized({
                       ...transfer,

@@ -156,6 +156,7 @@
     "config": {
       "comment": "Phantom",
       "iosMinVersion": "1.8.0",
+      "androidPackage": "app.phantom",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
       "connections": [
         {

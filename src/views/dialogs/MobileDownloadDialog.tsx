@@ -1,20 +1,27 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
+import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, MobileDownloadDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { QrCode } from '@/components/QrCode';
 
 const MobileQrCode = ({ url }: { url: string }) => {
   return (
-    <$QrCodeContainer isShowing>
-      <QrCode hasLogo size={432} value={url} />
-    </$QrCodeContainer>
+    <div tw="m-auto flex items-center">
+      <QrCode
+        tw="rounded-0.75 border-solid border-color-border bg-color-layer-4 p-1"
+        hasLogo
+        value={url}
+      />
+    </div>
   );
 };
 
@@ -35,70 +42,23 @@ export const MobileDownloadDialog = ({
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP })}
+      description={stringGetter({ key: STRING_KEYS.SCAN_TO_DOWNLOAD })}
     >
-      <$Content>{content}</$Content>
+      <div tw="flexColumn gap-1.5">
+        {content}
+        <$Footer>
+          <Button tw="grow" onClick={() => setIsOpen(false)} action={ButtonAction.Primary}>
+            {stringGetter({ key: STRING_KEYS.CLOSE })}
+          </Button>
+        </$Footer>
+      </div>
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
+
+const $Footer = styled.div`
+  ${formMixins.footer};
+  ${layoutMixins.row}
+
   gap: 1rem;
-
-  strong {
-    font-weight: 900;
-    color: var(--color-text-2);
-  }
-
-  footer {
-    ${layoutMixins.row}
-    justify-content: space-between;
-
-    svg {
-      width: auto;
-    }
-  }
-`;
-
-const $QrCodeContainer = styled.figure<{ isShowing: boolean }>`
-  ${layoutMixins.stack}
-
-  overflow: hidden;
-  border-radius: 0.75em;
-
-  cursor: pointer;
-
-  transition: 0.2s;
-
-  &:hover {
-    filter: brightness(var(--hover-filter-base));
-  }
-
-  > * {
-    position: relative;
-    transition: 0.16s;
-  }
-
-  > :first-child {
-    pointer-events: none;
-
-    ${({ isShowing }) =>
-      !isShowing &&
-      css`
-        filter: blur(1rem) brightness(1.4);
-        will-change: filter;
-      `}
-  }
-
-  > span {
-    place-self: center;
-
-    font-size: 1.4em;
-    color: var(--color-text-2);
-
-    ${({ isShowing }) =>
-      isShowing &&
-      css`
-        opacity: 0;
-      `}
-  }
 `;

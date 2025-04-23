@@ -6,7 +6,6 @@ import { useWalletClient } from 'wagmi';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
 import { TokenForTransfer, USDC_DECIMALS } from '@/constants/tokens';
@@ -26,6 +25,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 import { Deposit } from '@/state/transfers';
 
@@ -39,7 +39,7 @@ import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
 import { OtherDepositOptions } from './OtherDepositOptions';
 import { DepositStep, useDepositSteps } from './depositHooks';
-import { useBalance, useDepositDeltas, useDepositRoutes } from './queries';
+import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 
 export const DepositForm = ({
   onTokenSelect,
@@ -60,6 +60,7 @@ export const DepositForm = ({
   const tokenBalance = useBalance(token.chainId, token.denom);
   const { skipClient } = useSkipClient();
   const { data: walletClient } = useWalletClient();
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
@@ -122,7 +123,8 @@ export const DepositForm = ({
     !hasSufficientBalance ||
     !depositRoute ||
     !isDebouncedAmountSame ||
-    !isDepositingMoreThanMin;
+    !isDepositingMoreThanMin ||
+    isAccountViewOnly;
 
   const depositButtonInner = useMemo(() => {
     if (!hasSufficientBalance) return `Insufficient ${getTokenSymbol(token.denom)}`;
@@ -253,6 +255,7 @@ export const DepositForm = ({
 
     track(
       AnalyticsEvents.DepositInitiated({
+        isInstantDeposit: isInstantDeposit(depositRoute),
         sourceAssetDenom: depositRoute.sourceAssetDenom,
         sourceAssetChainID: depositRoute.sourceAssetChainID,
         amountIn: depositRoute.amountIn,
@@ -290,16 +293,6 @@ export const DepositForm = ({
     }
   };
 
-  const chainName =
-    selectedRoute?.sourceAssetChainID && CHAIN_INFO[selectedRoute.sourceAssetChainID]?.name;
-
-  const gasFeeAdjustment =
-    selectedSpeed === 'slow' && chainName ? (
-      <span tw="text-color-text-0 font-mini-book">
-        {` - ${stringGetter({ key: STRING_KEYS.CHAIN_GAS_FEES, params: { CHAIN: chainName } })}`}
-      </span>
-    ) : null;
-
   const receipt = selectedRoute && (
     <Details
       tw="font-small-book"
@@ -313,7 +306,6 @@ export const DepositForm = ({
               type={OutputType.Fiat}
               isLoading={isFetching}
               value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
-              slotRight={gasFeeAdjustment}
             />
           ),
         },
@@ -353,15 +345,17 @@ export const DepositForm = ({
           disabled={!amount || parseUnits(amount, token.decimals) === BigInt(0)}
           selectedSpeed={selectedSpeed}
           onSelectSpeed={setSelectedSpeed}
+          chainId={token.chainId}
           type="deposit"
         />
       </div>
       <div tw="flex flex-col gap-0.75">
         {!depositSteps?.length && (
-          <div tw="mt-2 flex flex-col gap-0.375">
+          <div tw="mt-0.5 flex flex-col gap-0.5">
             {currentStepError && (
               <div tw="text-center text-small text-color-error">{currentStepError}</div>
             )}
+            {receipt}
             <Button
               tw="w-full"
               onClick={onDepositClick}
@@ -387,7 +381,6 @@ export const DepositForm = ({
             />
           </div>
         )}
-        {receipt}
       </div>
       {!depositSteps?.length && !awaitingWalletAction && (
         <OtherDepositOptions

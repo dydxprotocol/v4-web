@@ -30,14 +30,17 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 const EMBARRASSING_APR_THRESHOLD = 0.02;
 
-export const MegavaultYieldTag = () => {
+export const MegavaultYieldTag = ({
+  yieldType = 'ninetyDay',
+}: {
+  yieldType?: 'ninetyDay' | 'thirtyDay';
+}) => {
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
+  const returnPercent =
+    yieldType === 'ninetyDay' ? vault?.ninetyDayReturnPercent : vault?.thirtyDayReturnPercent;
 
-  if (
-    vault?.thirtyDayReturnPercent == null ||
-    vault.thirtyDayReturnPercent < EMBARRASSING_APR_THRESHOLD
-  ) {
+  if (returnPercent == null || returnPercent < EMBARRASSING_APR_THRESHOLD) {
     return null;
   }
 
@@ -50,7 +53,7 @@ export const MegavaultYieldTag = () => {
             <Output
               tw="mr-0.25"
               type={OutputType.Percent}
-              value={vault.thirtyDayReturnPercent}
+              value={returnPercent}
               fractionDigits={0}
             />
           ),

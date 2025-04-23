@@ -1,5 +1,7 @@
-import type { AbacusTrackingProtocol, Nullable } from '@/constants/abacus';
+import type { AbacusTrackingProtocol } from '@/constants/abacus';
 import type { AnalyticsEvent } from '@/constants/analytics';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { track } from '../analytics/analytics';
 import { log as telemetryLog } from '../telemetry';

@@ -12,7 +12,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import breakpoints from '@/styles/breakpoints';
@@ -20,7 +19,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
@@ -59,79 +57,32 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
 
 const IncentiveProgramDescription = () => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
 
-  const descriptionForTraders = (
+  const howItWorks = (
     <ul tw="list-inside text-color-text-0 font-small-book">
-      <li>
-        {stringGetter({
-          key: STRING_KEYS.REWARD_POOL_DESC,
-          params: {
-            REWARD_POOL: (
-              <Output
-                useGrouping
-                tw="inline"
-                type={OutputType.Fiat}
-                value={600_000}
-                fractionDigits={0}
-              />
-            ),
-            TOKEN: chainTokenLabel,
-          },
-        })}
-      </li>
-      <li>{stringGetter({ key: STRING_KEYS.REWARD_POOL_FOR_TRADERS_DESC_2 })}</li>
-      <li>{stringGetter({ key: STRING_KEYS.REWARD_POOL_FOR_TRADERS_DESC_3 })}</li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_IT_WORKS_1 })}</li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_IT_WORKS_2 })}</li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_IT_WORKS_3 })}</li>
     </ul>
   );
 
-  const descriptionForMarketMakers = (
+  const howToEarnMore = (
     <ul tw="list-inside text-color-text-0 font-small-book">
-      <li>
-        {stringGetter({
-          key: STRING_KEYS.REWARD_POOL_DESC,
-          params: {
-            REWARD_POOL: (
-              <Output
-                useGrouping
-                tw="inline"
-                type={OutputType.Fiat}
-                value={900_000}
-                fractionDigits={0}
-              />
-            ),
-            TOKEN: chainTokenLabel,
-          },
-        })}
-      </li>
-      <li>
-        {stringGetter({
-          key: STRING_KEYS.MORE_INFORMATION_HERE,
-          params: {
-            HERE: (
-              <Link
-                withIcon
-                tw="inline-flex text-color-accent visited:text-color-accent"
-                href="https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard"
-              >
-                {stringGetter({ key: STRING_KEYS.HERE })}
-              </Link>
-            ),
-          },
-        })}
-      </li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_1 })}</li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_2 })}</li>
+      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_3 })}</li>
     </ul>
   );
 
   return (
     <div tw="max-w-[calc(100vw - 2rem)] flex flex-col gap-1 rounded-0.5 bg-color-layer-1 px-1 py-0.5">
       <div>
-        <span>{stringGetter({ key: STRING_KEYS.REWARD_POOL_FOR_TRADERS })}</span>
-        {descriptionForTraders}
+        <span>{stringGetter({ key: STRING_KEYS.SURGE_HOW_IT_WORKS })}</span>
+        {howItWorks}
       </div>
       <div>
-        <span>{stringGetter({ key: STRING_KEYS.REWARD_POOL_FOR_MARKET_MAKERS })}</span>
-        {descriptionForMarketMakers}
+        <span>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN })}</span>
+        {howToEarnMore}
       </div>
     </div>
   );
@@ -142,7 +93,7 @@ const LaunchIncentivesTitle = () => {
   return (
     <$Title>
       {stringGetter({
-        key: STRING_KEYS.INCENTIVE_PROGRAM,
+        key: STRING_KEYS.SURGE_HEADLINE,
       })}
       <SuccessTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.ACTIVE })}</SuccessTag>
       <WithTooltip slotTooltip={<IncentiveProgramDescription />}>
@@ -192,25 +143,12 @@ const EstimatedRewards = () => {
 const LaunchIncentivesContent = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { chainTokenLabel } = useTokenConfigs();
 
   return (
     <$Column>
       <div tw="text-color-text-0">
         {stringGetter({
-          key: STRING_KEYS.EARN_POINTS_TO_QUALIFY_FOR_REWARDS,
-          params: {
-            REWARD_POOL: (
-              <Output
-                useGrouping
-                tw="inline text-color-text-1"
-                type={OutputType.Fiat}
-                value={1_500_000}
-                fractionDigits={0}
-              />
-            ),
-            TOKEN: chainTokenLabel,
-          },
+          key: STRING_KEYS.SURGE_BODY,
         })}{' '}
       </div>
 
