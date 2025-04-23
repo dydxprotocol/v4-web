@@ -163,7 +163,6 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
   return {
     freeCollateral,
     equity,
-    parentSubaccountEquity: equity,
     leverage,
     marginUsage,
   };

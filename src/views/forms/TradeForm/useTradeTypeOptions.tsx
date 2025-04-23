@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { shallowEqual } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
@@ -26,7 +27,10 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
 
   const { type: selectedTradeType } = currentTradeData;
 
-  const typeOptions = useAppSelector(getTradeFormSummary).summary.options.orderTypeOptions;
+  const typeOptions = useAppSelector(
+    (s) => getTradeFormSummary(s).summary.options.orderTypeOptions,
+    shallowEqual
+  );
 
   const allTradeTypeItems = useMemo((): Array<MenuItem<TradeFormType>> | undefined => {
     const allItems = typeOptions.map(({ value, stringKey }) => ({
