@@ -51,6 +51,7 @@ export const AdvancedTradeOptions = () => {
     showPostOnlyTooltip,
     showReduceOnlyTooltip,
   } = currentTradeFormConfig;
+  console.log(executionOptions);
 
   const { duration, unit } = goodTil ?? {};
 
@@ -85,11 +86,14 @@ export const AdvancedTradeOptions = () => {
             {hasTimeInForce && timeInForce != null && (
               <$SelectMenu
                 value={timeInForce}
-                onValueChange={(selectedTimeInForceOption: string) =>
+                onValueChange={(selectedTimeInForceOption: string) => {
+                  if (!selectedTimeInForceOption) {
+                    return;
+                  }
                   dispatch(
                     tradeFormActions.setTimeInForce(selectedTimeInForceOption as TimeInForce)
-                  )
-                }
+                  );
+                }}
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
                 {timeInForceOptions.map(({ value, stringKey }) => (
@@ -120,6 +124,9 @@ export const AdvancedTradeOptions = () => {
                     <$InnerSelectMenu
                       value={unit}
                       onValueChange={(goodTilTimeTimescale: string) => {
+                        if (!goodTilTimeTimescale) {
+                          return;
+                        }
                         dispatch(
                           tradeFormActions.setGoodTilTime({
                             duration: duration ?? '',
@@ -150,9 +157,12 @@ export const AdvancedTradeOptions = () => {
               <$SelectMenu
                 value={execution}
                 label={stringGetter({ key: STRING_KEYS.EXECUTION })}
-                onValueChange={(selectedExecution: string) =>
-                  dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType))
-                }
+                onValueChange={(selectedExecution: string) => {
+                  if (!selectedExecution) {
+                    return;
+                  }
+                  dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType));
+                }}
               >
                 {executionOptions.map(({ value, stringKey }) => (
                   <$SelectItem
