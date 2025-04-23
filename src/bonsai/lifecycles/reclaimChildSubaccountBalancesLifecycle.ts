@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { groupBy } from 'lodash';
 
 import { TransactionMemo } from '@/constants/analytics';
+import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
@@ -10,10 +11,11 @@ import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/ind
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { stringifyTransactionError } from '@/lib/errors';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { objectEntries, objectFromEntries } from '@/lib/objectHelpers';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
+import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
 
 import { isParentSubaccount } from '../calculators/subaccount';
@@ -23,6 +25,8 @@ import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore, BonsaiRaw } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
+
+const SLEEP_TIME = timeUnits.second * 10;
 
 export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   const selector = createAppSelector(
@@ -148,6 +152,8 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       );
 
       return wrapOperationFailure(parsed);
+    } finally {
+      await sleep(SLEEP_TIME);
     }
   }
 
