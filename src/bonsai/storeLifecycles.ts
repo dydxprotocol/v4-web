@@ -1,4 +1,4 @@
-import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
+import { setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
 import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
 import { setUpAssetsQuery } from './rest/assets';
@@ -44,7 +44,6 @@ export const storeLifecycles = [
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpConfigTiersQuery,
-  setUpLocalOrdersFillsSync,
   setUpLocalOrdersOrdersSync,
   setUpGeoQuery,
   setUpIndexerSourceAddressScreenV2Query,

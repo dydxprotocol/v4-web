@@ -49,7 +49,7 @@ export const OrderStatusNotification = ({
   const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
   const marketData = useParameterizedSelector(
     BonsaiHelpers.markets.createSelectMarketSummaryById,
-    localOrder.marketId
+    localOrder.cachedData.marketId
   );
   const averageFillPrice = useParameterizedSelector(
     getAverageFillPriceForOrder,
@@ -62,7 +62,7 @@ export const OrderStatusNotification = ({
 
   // force allow the ?. just in case it's not in the map
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
+  const titleKey = ORDER_TYPE_STRINGS[localOrder.cachedData.orderType]?.orderTypeKey;
   const indexedOrderStatus = order?.status;
   const submissionStatus = localOrder.submissionStatus;
 
@@ -104,6 +104,7 @@ export const OrderStatusNotification = ({
       }
       break;
     case PlaceOrderStatuses.Submitted:
+    case PlaceOrderStatuses.FailedSubmission:
       if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-color-warning" />;

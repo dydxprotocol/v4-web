@@ -1,14 +1,9 @@
 import { getSimpleOrderStatus } from '@/bonsai/lib/subaccountUtils';
-import {
-  OrderStatus,
-  SubaccountFill,
-  SubaccountOrder,
-  SubaccountOrder as SubaccountOrderNew,
-} from '@/bonsai/types/summaryTypes';
+import { OrderStatus, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import { OrderType } from '@dydxprotocol/v4-client-js';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { WritableDraft } from 'immer';
-import { intersection, mapValues, uniq } from 'lodash';
+import { keyBy } from 'lodash';
 
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
@@ -19,26 +14,33 @@ import {
   LocalCloseAllPositionsData,
   LocalPlaceOrderData,
   PlaceOrderStatuses,
-  TradeTypes,
 } from '@/constants/trade';
-
-import { isTruthy } from '@/lib/isTruthy';
-import { Nullable } from '@/lib/typeUtils';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
 export interface LocalOrdersState {
-  localPlaceOrders: LocalPlaceOrderData[];
-  localCancelOrders: LocalCancelOrderData[];
+  // key is client id since it is generated each submission
+  localPlaceOrders: Record<string, LocalPlaceOrderData>;
+  // key is uuid the submitter decides
+  localCancelOrders: Record<string, LocalCancelOrderData>;
+  // key is operationId - uuid
   localCancelAlls: Record<string, LocalCancelAllData>;
-  localCloseAllPositions?: LocalCloseAllPositionsData;
+  // key is a uuid the submitter decides
+  localCloseAllPositions: Record<string, LocalCloseAllPositionsData>;
 }
 
+export type PlaceOrderSubmissionPayload = {
+  marketId: string;
+  clientId: string;
+  subaccountNumber: number;
+  orderType: OrderType;
+};
+
 const initialState: LocalOrdersState = {
-  localPlaceOrders: [],
-  localCancelOrders: [],
+  localPlaceOrders: {},
+  localCancelOrders: {},
   localCancelAlls: {},
-  localCloseAllPositions: undefined,
+  localCloseAllPositions: {},
 };
 
 export const localOrdersSlice = createSlice({
@@ -51,256 +53,189 @@ export const localOrdersSlice = createSlice({
     ...autoBatchAllReducers<LocalOrdersState>()({
       updateOrders: (state, action: PayloadAction<SubaccountOrder[]>) => {
         const { payload: orders } = action;
-        let { localCloseAllPositions } = state;
+        const waitingForCancelConfirmations = Object.values(state.localCancelOrders).filter(
+          (o) => o.submissionStatus === CancelOrderStatuses.Submitted
+        );
+        const waitingForPlaceOrFillOrCancelConfirmations = Object.values(
+          state.localPlaceOrders
+        ).filter((p) => p.submissionStatus < PlaceOrderStatuses.Filled);
+
+        if (
+          waitingForCancelConfirmations.length === 0 &&
+          waitingForPlaceOrFillOrCancelConfirmations.length === 0
+        ) {
+          return;
+        }
+
         const canceledOrders = orders.filter(
           (order) =>
             order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Canceled
         );
-        const placedOrderClientIds = new Set(
-          orders
-            .filter(
-              (order) =>
-                order.status != null &&
-                (getSimpleOrderStatus(order.status) === OrderStatus.Open ||
-                  getSimpleOrderStatus(order.status) === OrderStatus.Filled)
-            )
-            .map((o) => o.clientId)
-        );
-        const filledOrderClientIds = new Set(
-          orders
-            .filter(
-              (order) =>
-                order.status != null && getSimpleOrderStatus(order.status) === OrderStatus.Filled
-            )
-            .map((order) => order.clientId)
-            .filter(isTruthy)
-        );
 
-        // no relevant cancel or filled orders
-        if (!canceledOrders.length && (!localCloseAllPositions || !filledOrderClientIds.size))
-          return state;
-
-        const canceledOrderIdsInPayload = new Set(canceledOrders.map((order) => order.id));
-        // ignore locally canceled orders since it's intentional and already handled
-        // by local cancel tracking and notification
-        const isOrderCanceledByBackend = (orderId: string) =>
-          canceledOrderIdsInPayload.has(orderId) &&
-          !state.localCancelOrders.some((order) => order.orderId === orderId);
-
-        const getNewCanceledOrderIds = (batch: LocalCancelAllData) => {
-          const newCanceledOrderIds = batch.orderIds.filter((o) =>
-            canceledOrderIdsInPayload.has(o)
-          );
-          return uniq([...(batch.canceledOrderIds ?? []), ...newCanceledOrderIds]);
-        };
-
-        if (localCloseAllPositions) {
-          localCloseAllPositions = {
-            ...localCloseAllPositions,
-            filledOrderClientIds: uniq([
-              ...localCloseAllPositions.submittedOrderClientIds.filter((id) =>
-                filledOrderClientIds.has(id)
-              ),
-              ...localCloseAllPositions.filledOrderClientIds,
-            ]),
-            failedOrderClientIds: uniq([
-              ...intersection(
-                localCloseAllPositions.submittedOrderClientIds,
-                canceledOrders.map((order) => order.clientId).filter(isTruthy)
-              ),
-              ...localCloseAllPositions.failedOrderClientIds,
-            ]),
-          };
+        if (waitingForCancelConfirmations.length > 0) {
+          const canceledOrderIds = new Set(canceledOrders.map((order) => order.id));
+          waitingForCancelConfirmations.forEach((c) => {
+            if (canceledOrderIds.has(c.orderId)) {
+              c.submissionStatus = CancelOrderStatuses.Canceled;
+            }
+          });
         }
 
-        return {
-          ...state,
-          localPlaceOrders: state.localPlaceOrders.map((order) => {
-            // Check if order should be canceled
-            if (
-              order.orderId &&
-              canceledOrderIdsInPayload.has(order.orderId) &&
-              isOrderCanceledByBackend(order.orderId)
-            ) {
-              return {
-                ...order,
-                submissionStatus: PlaceOrderStatuses.Canceled,
+        if (waitingForPlaceOrFillOrCancelConfirmations.length > 0) {
+          const ordersByClientId = keyBy(
+            orders.filter((o) => o.clientId != null),
+            (o) => o.clientId!
+          );
+
+          waitingForPlaceOrFillOrCancelConfirmations.forEach((p) => {
+            if (ordersByClientId[p.clientId] != null) {
+              const order = ordersByClientId[p.clientId]!;
+              if (
+                order.status != null &&
+                getSimpleOrderStatus(order.status) === OrderStatus.Canceled
+              ) {
+                p.submissionStatus = PlaceOrderStatuses.Canceled;
+              } else if (order.status === OrderStatus.Filled) {
+                p.submissionStatus = PlaceOrderStatuses.Filled;
+              } else if (
+                order.status != null &&
+                getSimpleOrderStatus(order.status) === OrderStatus.Open
+              ) {
+                p.submissionStatus = PlaceOrderStatuses.Placed;
+              }
+              p.orderId = order.id;
+              p.cachedData = {
+                ...p.cachedData,
+                status: order.status,
               };
             }
-
-            if (
-              order.clientId &&
-              order.submissionStatus < PlaceOrderStatuses.Placed &&
-              placedOrderClientIds.has(order.clientId)
-            ) {
-              return {
-                ...order,
-                orderId: orders.find((o) => o.clientId === order.clientId)?.id,
-                submissionStatus: PlaceOrderStatuses.Placed,
-              };
-            }
-
-            return order;
-          }),
-          localCancelOrders: state.localCancelOrders.map((order) =>
-            canceledOrderIdsInPayload.has(order.orderId)
-              ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
-              : order
-          ),
-          localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
-            ...batch,
-            canceledOrderIds: getNewCanceledOrderIds(batch),
-          })),
-          localCloseAllPositions,
-        };
+          });
+        }
       },
     }),
-    updateFilledOrders: (state, action: PayloadAction<SubaccountFill[]>) => {
-      const filledOrderIds = action.payload.map((fill) => fill.orderId).filter(isTruthy);
-      if (filledOrderIds.length === 0) return state;
-
-      const getFailedToCancelOrderIds = (batch: LocalCancelAllData) => {
-        const newFailedCancelOrderIds = intersection(batch.orderIds, filledOrderIds);
-        return uniq([...(batch.failedOrderIds ?? []), ...newFailedCancelOrderIds]);
-      };
-
-      return {
-        ...state,
-        localPlaceOrders: state.localPlaceOrders.map((order) =>
-          order.submissionStatus < PlaceOrderStatuses.Filled &&
-          order.orderId &&
-          filledOrderIds.includes(order.orderId)
-            ? {
-                ...order,
-                submissionStatus: PlaceOrderStatuses.Filled,
-              }
-            : order
-        ),
-        localCancelOrders: state.localCancelOrders.filter(
-          (order) => !filledOrderIds.includes(order.orderId)
-        ),
-        localCancelAlls: mapValues(state.localCancelAlls, (batch) => ({
-          ...batch,
-          failedOrderIds: getFailedToCancelOrderIds(batch),
-        })),
-      };
-    },
-    setLatestOrder: (
-      state,
-      action: PayloadAction<Nullable<{ clientId?: string | null; id: string }>>
-    ) => {
-      const { clientId, id } = action.payload ?? {};
-
-      if (clientId) {
-        state.localPlaceOrders = state.localPlaceOrders.map((order) =>
-          order.clientId === clientId && order.submissionStatus < PlaceOrderStatuses.Placed
-            ? {
-                ...order,
-                orderId: id,
-                submissionStatus: PlaceOrderStatuses.Placed,
-              }
-            : order
-        );
-      }
-    },
-    placeOrderSubmitted: (
-      state,
-      action: PayloadAction<{
-        marketId: string;
-        clientId: string;
-        subaccountNumber: number;
-        orderType: TradeTypes;
-      }>
-    ) => {
-      state.localPlaceOrders.push({
-        ...action.payload,
+    placeOrderSubmitted: (state, action: PayloadAction<PlaceOrderSubmissionPayload>) => {
+      const { clientId, marketId, orderType, subaccountNumber } = action.payload;
+      state.localPlaceOrders[clientId] = {
+        clientId,
         submissionStatus: PlaceOrderStatuses.Submitted,
-      });
+        cachedData: {
+          marketId,
+          orderType,
+          subaccountNumber,
+        },
+      };
     },
     placeOrderFailed: (
       state,
       action: PayloadAction<{ clientId: string; errorParams: ErrorParams }>
     ) => {
-      state.localPlaceOrders = state.localPlaceOrders.map((order) =>
-        order.clientId === action.payload.clientId
-          ? {
-              ...order,
-              errorParams: action.payload.errorParams,
-            }
-          : order
-      );
+      const { clientId, errorParams } = action.payload;
+      if (state.localPlaceOrders[clientId] == null) {
+        return;
+      }
+      state.localPlaceOrders[clientId] = {
+        ...state.localPlaceOrders[clientId],
+        submissionStatus: PlaceOrderStatuses.FailedSubmission,
+        errorParams,
+      };
     },
     placeOrderTimeout: (state, action: PayloadAction<string>) => {
-      const uncommitedOrders = state.localPlaceOrders
-        .filter(
-          (order) => order.submissionStatus === PlaceOrderStatuses.Submitted && !order.errorParams
-        )
-        .map((order) => order.clientId);
-      if (uncommitedOrders.includes(action.payload)) {
-        placeOrderFailed({
-          clientId: action.payload,
-          errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-        });
+      const clientId = action.payload;
+      if (
+        state.localPlaceOrders[clientId] == null ||
+        // only if status is still unknown
+        state.localPlaceOrders[clientId].submissionStatus !== PlaceOrderStatuses.Submitted
+      ) {
+        return;
       }
+      state.localPlaceOrders[clientId] = {
+        ...state.localPlaceOrders[clientId],
+        submissionStatus: PlaceOrderStatuses.FailedSubmission,
+        errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+      };
     },
-    cancelOrderSubmitted: (state, action: PayloadAction<string>) => {
-      state.localCancelOrders.push({
-        orderId: action.payload,
+    cancelOrderSubmitted: (
+      state,
+      action: PayloadAction<{ uuid: string; orderId: string; order: SubaccountOrder }>
+    ) => {
+      const { order, orderId, uuid } = action.payload;
+      state.localCancelOrders[uuid] = {
+        orderId,
         submissionStatus: CancelOrderStatuses.Submitted,
-      });
+        operationUuid: uuid,
+        cachedData: {
+          marketId: order.marketId,
+          orderType: order.type,
+          displayableId: order.displayId,
+        },
+      };
     },
     cancelOrderFailed: (
       state,
-      action: PayloadAction<{ orderId: string; errorParams: ErrorParams }>
+      action: PayloadAction<{ uuid: string; errorParams: ErrorParams }>
     ) => {
-      state.localCancelOrders = state.localCancelOrders.map((order) =>
-        order.orderId === action.payload.orderId
-          ? {
-              ...order,
-              errorParams: action.payload.errorParams,
-            }
-          : order
-      );
+      const { errorParams, uuid } = action.payload;
+      if (state.localCancelOrders[uuid] == null) {
+        return;
+      }
+      state.localCancelOrders[uuid] = {
+        ...state.localCancelOrders[uuid],
+        submissionStatus: CancelOrderStatuses.Failed,
+        errorParams,
+      };
     },
     cancelAllSubmitted: (
       state,
-      action: PayloadAction<{ marketId?: string; orderIds: string[] }>
-    ) => {
-      const { marketId, orderIds } = action.payload;
-      // when marketId is undefined, it means cancel all orders globally
-      const cancelAllKey = marketId ?? CANCEL_ALL_ORDERS_KEY;
-
-      state.localCancelAlls[cancelAllKey] = {
-        key: cancelAllKey,
-        orderIds,
-      };
-
-      state.localCancelOrders = [
-        ...state.localCancelOrders,
-        ...orderIds.map((orderId) => ({
-          orderId,
-          submissionStatus: CancelOrderStatuses.Submitted,
-          isSubmittedThroughCancelAll: true, // track this to skip certain notifications
-        })),
-      ];
-    },
-    cancelAllOrderFailed: (
-      state,
       action: PayloadAction<{
-        order: SubaccountOrderNew;
-        errorParams?: ErrorParams;
+        marketId?: string;
+        cancels: Array<{ uuid: string; orderId: string; order: SubaccountOrder }>;
       }>
     ) => {
-      const { order, errorParams } = action.payload;
-      updateCancelAllOrderIds(state, order.id, 'failedOrderIds', order.marketId);
-      if (errorParams) cancelOrderFailed({ orderId: order.id, errorParams });
-    },
-    closeAllPositionsSubmitted: (state, action: PayloadAction<string[]>) => {
-      state.localCloseAllPositions = {
-        submittedOrderClientIds: action.payload,
-        filledOrderClientIds: [],
-        failedOrderClientIds: [],
+      const { marketId, cancels } = action.payload;
+      // when marketId is undefined, it means cancel all orders globally
+      const cancelAllKey = marketId ?? CANCEL_ALL_ORDERS_KEY;
+      const uuid = crypto.randomUUID();
+
+      state.localCancelAlls[uuid] = {
+        cancelOrderOperationUuids: cancels.map((c) => c.uuid),
+        filterKey: cancelAllKey,
+        operationUuid: uuid,
       };
+
+      cancels.forEach((cancel) => {
+        state.localCancelOrders[cancel.uuid] = {
+          operationUuid: cancel.uuid,
+          orderId: cancel.orderId,
+          isSubmittedThroughCancelAll: true,
+          submissionStatus: CancelOrderStatuses.Submitted,
+          cachedData: {
+            marketId: cancel.order.marketId,
+            orderType: cancel.order.type,
+            displayableId: cancel.order.displayId,
+          },
+        };
+      });
+    },
+    closeAllPositionsSubmitted: (state, action: PayloadAction<PlaceOrderSubmissionPayload[]>) => {
+      const uuid = crypto.randomUUID();
+      const places = action.payload;
+      state.localCloseAllPositions[uuid] = {
+        clientIds: places.map((p) => p.clientId),
+        operationUuid: uuid,
+      };
+      places.forEach((place) => {
+        const { clientId, marketId, orderType, subaccountNumber } = place;
+        state.localPlaceOrders[clientId] = {
+          clientId,
+          submissionStatus: PlaceOrderStatuses.Submitted,
+          submittedThroughCloseAll: true,
+          cachedData: {
+            marketId,
+            orderType,
+            subaccountNumber,
+          },
+        };
+      });
     },
   },
 });
@@ -309,9 +244,6 @@ export const {
   clearLocalOrders,
 
   updateOrders,
-  updateFilledOrders,
-
-  setLatestOrder,
 
   placeOrderSubmitted,
   placeOrderFailed,
@@ -321,41 +253,6 @@ export const {
   cancelOrderFailed,
 
   cancelAllSubmitted,
-  cancelAllOrderFailed,
 
   closeAllPositionsSubmitted,
 } = localOrdersSlice.actions;
-
-// helper functions
-const updateCancelAllOrderIds = (
-  state: WritableDraft<LocalOrdersState>,
-  orderId: string,
-  key: 'canceledOrderIds' | 'failedOrderIds',
-  cancelAllKey: string
-) => {
-  const getNewOrderIds = (cancelAll: LocalCancelAllData) => {
-    const existingOrderIds = cancelAll[key] ?? [];
-    return cancelAll.orderIds.includes(orderId) && !existingOrderIds.includes(orderId)
-      ? [...existingOrderIds, orderId]
-      : existingOrderIds;
-  };
-
-  const updateKey = (currentKey: string) => ({
-    ...state.localCancelAlls[currentKey]!,
-    [key]: getNewOrderIds(state.localCancelAlls[currentKey]!),
-  });
-
-  state.localCancelAlls = {
-    ...state.localCancelAlls,
-    ...(state.localCancelAlls[CANCEL_ALL_ORDERS_KEY]
-      ? {
-          [CANCEL_ALL_ORDERS_KEY]: updateKey(CANCEL_ALL_ORDERS_KEY),
-        }
-      : {}),
-    ...(state.localCancelAlls[cancelAllKey]
-      ? {
-          [cancelAllKey]: updateKey(cancelAllKey),
-        }
-      : {}),
-  };
-};

@@ -9,10 +9,9 @@ import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { isPresent } from '@/lib/typeUtils';
 
-import { RootState } from './_store';
+import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketIdIfTradeable } from './currentMarketSelectors';
 import { getActiveDialog, getActiveTradeBoxDialog } from './dialogsSelectors';
@@ -76,15 +75,9 @@ export const getTradeFormSummary = createAppSelector(
     }
     const summary = TradeFormFns.calculateSummary(state, inputData);
     const errors = TradeFormFns.getErrors(state, inputData, summary);
-    // eslint-disable-next-line no-console
-    console.log(
-      'trade',
-      purgeBigNumbers(summary),
-      purgeBigNumbers(errors),
-      purgeBigNumbers(inputData)
-    );
 
     return {
+      inputData,
       summary,
       errors,
     };
@@ -144,10 +137,8 @@ export const getClosePositionFormSummary = createAppSelector(
       inputData
     );
 
-    // eslint-disable-next-line no-console
-    // console.log('Close', purgeBigNumbers(summary), purgeBigNumbers(inputData));
-
     return {
+      inputData,
       summary,
       errors: TradeFormFns.getErrors(state, inputData, summary),
     };

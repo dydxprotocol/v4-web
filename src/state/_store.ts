@@ -25,6 +25,7 @@ import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
 import { funkitDepositsSlice } from './funkitDeposits';
 import { inputsSlice } from './inputs';
+import { getTriggersFormSummary } from './inputsSelectors';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
 import { localizationSlice } from './localization';
@@ -34,6 +35,7 @@ import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
 import { tradeFormSlice } from './tradeForm';
+import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
 import { triggersFormSlice } from './triggersForm';
@@ -100,7 +102,7 @@ export const store = configureStore({
   devTools:
     process.env.NODE_ENV !== 'production'
       ? {
-          stateSanitizer: (state: any) => ({
+          stateSanitizer: (state: any): any => ({
             ...state,
             tradingView: '<LONG BLOB>',
             localization: { ...state.localization, localeData: '<LONG BLOB>' },
@@ -117,6 +119,11 @@ export const store = configureStore({
                 }
                 return result;
               }),
+              forms: {
+                trade: getTradeFormSummary(state),
+                closePosition: getClosePositionFormSummary(state),
+                triggers: getTriggersFormSummary(state),
+              },
             },
           }),
         }

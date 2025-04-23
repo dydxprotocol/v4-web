@@ -26,7 +26,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import { placeOrderFailed, setLatestOrder } from '@/state/localOrders';
+import { placeOrderFailed } from '@/state/localOrders';
 
 import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
@@ -368,7 +368,6 @@ export const useChartLines = ({
               AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
             );
             removePendingOrderAdjustment(order.clientId);
-            dispatch(setLatestOrder(currentMarketOrders.find((o) => o.id === order.id)));
           }
         }
       }
@@ -382,14 +381,7 @@ export const useChartLines = ({
         line.line.remove();
         delete chartLinesRef.current[key];
       });
-  }, [
-    currentMarketOrders,
-    stringGetter,
-    tvWidget,
-    setLineColorsAndFont,
-    onMoveOrderLine,
-    dispatch,
-  ]);
+  }, [currentMarketOrders, stringGetter, tvWidget, setLineColorsAndFont, onMoveOrderLine]);
 
   const clearChartLines = useCallback(() => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {

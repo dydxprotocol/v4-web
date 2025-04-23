@@ -45,9 +45,10 @@ export const OrderDetailsDialog = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
-  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
   const isOrderCanceling =
-    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
+    Object.values(localCancelOrders).find(
+      (order) => order.orderId === orderId && order.submissionStatus < CancelOrderStatuses.Canceled
+    ) != null;
 
   const {
     displayId,

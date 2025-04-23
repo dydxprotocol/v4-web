@@ -28,7 +28,7 @@ export const getLocalCloseAllPositions = (state: RootState) =>
  * @returns whether the subaccount has uncommitted orders (local orders that are only submitted and not placed)
  */
 export const getHasUncommittedOrders = createAppSelector([getLocalPlaceOrders], (placeOrders) =>
-  placeOrders.some(
-    (order) => order.submissionStatus === PlaceOrderStatuses.Submitted && !order.errorParams
+  Object.values(placeOrders).some(
+    (order) => order.submissionStatus === PlaceOrderStatuses.Submitted
   )
 );

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
-import { groupBy, isEqual } from 'lodash';
+import { groupBy, isEqual, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
@@ -28,6 +28,7 @@ import {
 } from '@/constants/notifications';
 import { AppRoute } from '@/constants/routes';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
+import { PlaceOrderStatuses } from '@/constants/trade';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -99,6 +100,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const orders = useAppSelector(getSubaccountOrders, shallowEqual);
       const ordersById = groupBy(orders, 'id');
       const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
+      const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
@@ -117,7 +119,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
               const order = ordersById[id]?.[0];
               const clientId: string | undefined = order?.clientId ?? undefined;
               const localOrderExists =
-                clientId && localPlaceOrders.some((ordr) => ordr.clientId === clientId);
+                clientId != null &&
+                order?.id != null &&
+                clientId.length > 0 &&
+                (localPlaceOrders[clientId] != null ||
+                  Object.values(localCancelOrders).find((c) => c.orderId === order.id) != null);
 
               if (localOrderExists) return; // already handled by OrderStatusNotification
 
@@ -528,9 +534,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const localPlace of localPlaceOrders) {
-          const key = localPlace.clientId.toString();
+        Object.values(localPlaceOrders).forEach((localPlace) => {
+          const key = localPlace.clientId;
+          // hide if it's a closeAll
+          if (localPlace.submittedThroughCloseAll && localPlace.errorParams == null) {
+            return;
+          }
+          // hide if it was cancelled locally
+          if (
+            localPlace.submissionStatus === PlaceOrderStatuses.Canceled &&
+            localPlace.orderId != null &&
+            Object.values(localCancelOrders).find((c) => c.orderId === localPlace.orderId) != null
+          ) {
+            return;
+          }
           trigger(
             key,
             {
@@ -539,7 +556,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               toastSensitivity: 'background',
               groupKey: key, // do not collapse
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              searchableContent: `${localPlace.marketId}|${localPlace.orderType}`,
+              searchableContent: `${localPlace.cachedData.marketId}|${localPlace.cachedData.orderType}`,
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderStatusNotification
                   isToast={isToast}
@@ -551,23 +568,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [localPlace.submissionStatus, localPlace.errorParams],
             true
           );
-        }
+        });
       }, [localPlaceOrders]);
 
       useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const localCancel of localCancelOrders) {
-          // ensure order exists
-          const existingOrder = allOrders.find((order) => order.id === localCancel.orderId);
-          if (!existingOrder) return;
-
+        Object.values(localCancelOrders).forEach((localCancel) => {
           // skip if this is from a cancel all operation and isn't an error
-          if (localCancel.isSubmittedThroughCancelAll && !localCancel.errorParams) return;
+          if (localCancel.isSubmittedThroughCancelAll && localCancel.errorParams == null) {
+            return;
+          }
+          const existingOrder = allOrders.find((order) => order.id === localCancel.orderId);
 
-          // share same notification with existing local order if exists
-          // so that canceling a local order will not add an extra notification
-          const key = (existingOrder.clientId ?? localCancel.orderId).toString();
-
+          const key = localCancel.operationUuid;
           trigger(
             key,
             {
@@ -576,7 +588,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               toastSensitivity: 'background',
               groupKey: key,
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              searchableContent: `${existingOrder.displayId}|${existingOrder.marketId}`,
+              searchableContent: `${existingOrder?.displayId}|${existingOrder?.marketId}|${localCancel.cachedData.marketId}|${localCancel.cachedData.orderType}`,
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderCancelNotification
                   isToast={isToast}
@@ -588,19 +600,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
             [localCancel.submissionStatus, localCancel.errorParams],
             true
           );
-        }
+        });
       }, [localCancelOrders]);
 
       useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const cancelAll of Object.values(localCancelAlls)) {
+        Object.values(localCancelAlls).forEach((cancelAll) => {
           trigger(
-            cancelAll.key,
+            cancelAll.operationUuid,
             {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS }),
               toastSensitivity: 'background',
-              groupKey: cancelAll.key,
+              groupKey: cancelAll.operationUuid,
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
               renderCustomBody: ({ isToast, notification }) => (
                 <CancelAllNotification
@@ -610,36 +621,37 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [cancelAll.canceledOrderIds, cancelAll.failedOrderIds, cancelAll.errorParams],
+            [cancelAll, pick(localCancelOrders, cancelAll.cancelOrderOperationUuids)],
             true
           );
-        }
-      }, [localCancelAlls]);
+        });
+      }, [localCancelAlls, localCancelOrders, stringGetter]);
 
       useEffect(() => {
-        if (!localCloseAllPositions) return;
-        const localCloseAllKey = localCloseAllPositions.submittedOrderClientIds.join('-');
-        // eslint-disable-next-line no-restricted-syntax
-        trigger(
-          localCloseAllKey,
-          {
-            icon: null,
-            title: stringGetter({ key: STRING_KEYS.CLOSE_ALL_POSITIONS }),
-            toastSensitivity: 'background',
-            groupKey: localCloseAllKey,
-            toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-            renderCustomBody: ({ isToast, notification }) => (
-              <CloseAllPositionsNotification
-                isToast={isToast}
-                localCloseAllPositions={localCloseAllPositions}
-                notification={notification}
-              />
-            ),
-          },
-          [localCloseAllPositions],
-          true
-        );
-      }, [localCloseAllPositions]);
+        Object.values(localCloseAllPositions).forEach((localCloseAll) => {
+          const localCloseAllKey = localCloseAll.operationUuid;
+          const clientIds = localCloseAll.clientIds;
+          trigger(
+            localCloseAllKey,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.CLOSE_ALL_POSITIONS }),
+              toastSensitivity: 'background',
+              groupKey: localCloseAllKey,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <CloseAllPositionsNotification
+                  isToast={isToast}
+                  localCloseAllPositions={localCloseAll}
+                  notification={notification}
+                />
+              ),
+            },
+            [localCloseAll, pick(localPlaceOrders, clientIds)],
+            true
+          );
+        });
+      }, [localCloseAllPositions, localPlaceOrders, stringGetter]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();

@@ -9,7 +9,7 @@ import {
 } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { OrderStatus } from '@/bonsai/types/summaryTypes';
+import { OrderStatus, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { IndexedTx } from '@cosmjs/stargate';
 import {
   CompositeClient,
@@ -24,14 +24,13 @@ import {
 
 import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
+import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { type RootState, type RootStore } from '@/state/_store';
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import {
-  cancelAllOrderFailed,
   cancelAllSubmitted,
   cancelOrderFailed,
   cancelOrderSubmitted,
@@ -327,13 +326,11 @@ export class AccountTransactionSupervisor {
     return undefined;
   }
 
-  private getCancelableOrderIds(marketId?: string): string[] {
+  private getCancelableOrders(marketId?: string): SubaccountOrder[] {
     const state = this.store.getState();
     const orders = BonsaiCore.account.openOrders.data(state);
 
-    return orders
-      .filter((order) => marketId == null || order.marketId === marketId)
-      .map((order) => order.id);
+    return orders.filter((order) => marketId == null || order.marketId === marketId);
   }
 
   private getCloseAllPositionsPayloads(): PlaceOrderPayload[] | undefined {
@@ -605,7 +602,7 @@ export class AccountTransactionSupervisor {
       placeOrderSubmitted({
         marketId: payload.marketId,
         clientId: `${payload.clientId}`,
-        orderType: payload.type as unknown as TradeTypes,
+        orderType: payload.type,
         subaccountNumber: payload.subaccountNumber,
       })
     );
@@ -686,7 +683,16 @@ export class AccountTransactionSupervisor {
       );
     }
 
-    this.store.dispatch(closeAllPositionsSubmitted(closePayloads.map((p) => `${p.clientId}`)));
+    this.store.dispatch(
+      closeAllPositionsSubmitted(
+        closePayloads.map((payload) => ({
+          marketId: payload.marketId,
+          clientId: `${payload.clientId}`,
+          orderType: payload.type,
+          subaccountNumber: payload.subaccountNumber,
+        }))
+      )
+    );
 
     const results = await Promise.all(closePayloads.map((p) => this.executePlaceOrder(p)));
 
@@ -706,7 +712,15 @@ export class AccountTransactionSupervisor {
     }
 
     // Dispatch action to track cancellation request
-    this.store.dispatch(cancelOrderSubmitted(orderId));
+    const uuid = crypto.randomUUID();
+    const order = this.getCancelableOrders().find((o) => o.id === orderId);
+    if (order == null) {
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/cancelOrder',
+        'invalid or missing order id'
+      );
+    }
+    this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
 
     // Queue the cancellation to avoid race conditions
     const result = await this.executeCancelOrder(orderId);
@@ -714,7 +728,7 @@ export class AccountTransactionSupervisor {
     if (isOperationFailure(result)) {
       this.store.dispatch(
         cancelOrderFailed({
-          orderId,
+          uuid,
           errorParams: operationFailureToErrorParams(result),
         })
       );
@@ -730,33 +744,42 @@ export class AccountTransactionSupervisor {
     }
 
     // Get all order IDs that can be canceled
-    const orderIds = this.getCancelableOrderIds(marketId);
+    const orders = this.getCancelableOrders(marketId);
 
-    if (orderIds.length === 0) {
+    if (orders.length === 0) {
       return wrapSimpleError('AccountTransactionSupervisor/cancelAllOrders', 'no orders to cancel');
     }
 
+    const orderdsWithUuids = orders.map((order) => ({
+      order,
+      uuid: crypto.randomUUID(),
+    }));
+
     // Dispatch action to track cancellation request
-    this.store.dispatch(cancelAllSubmitted({ marketId, orderIds }));
+    this.store.dispatch(
+      cancelAllSubmitted({
+        marketId,
+        cancels: orderdsWithUuids.map((o) => ({
+          order: o.order,
+          orderId: o.order.id,
+          uuid: o.uuid,
+        })),
+      })
+    );
 
     // Execute all cancel operations and collect results
     const results = await Promise.all(
-      orderIds.map(async (orderId) => {
-        const result = await this.executeCancelOrder(orderId);
+      orderdsWithUuids.map(async (orderAndId) => {
+        const { order, uuid } = orderAndId;
+        const result = await this.executeCancelOrder(order.id);
 
         if (isOperationFailure(result)) {
-          const order = BonsaiCore.account.allOrders
-            .data(this.store.getState())
-            .find((o) => o.id === orderId);
-
-          if (order) {
-            this.store.dispatch(
-              cancelAllOrderFailed({
-                order,
-                errorParams: operationFailureToErrorParams(result),
-              })
-            );
-          }
+          this.store.dispatch(
+            cancelOrderFailed({
+              uuid,
+              errorParams: operationFailureToErrorParams(result),
+            })
+          );
         }
         return result;
       })

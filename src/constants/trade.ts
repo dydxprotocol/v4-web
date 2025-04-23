@@ -1,4 +1,6 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { OrderStatus } from '@/bonsai/types/summaryTypes';
+import { OrderType as ClientOrderType } from '@dydxprotocol/v4-client-js';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
@@ -154,52 +156,66 @@ export enum MobilePlaceOrderSteps {
   PlaceOrderFailed = 'PlaceOrderFailed',
 }
 
+export enum DisplayUnit {
+  Asset = 'asset',
+  Fiat = 'fiat',
+}
+
 export enum PlaceOrderStatuses {
   Submitted = 0,
   Placed = 1,
+  // filled here means fully filled. Partial fills will be placed until the expire then Canceled.
   Filled = 2,
   Canceled = 3,
+  FailedSubmission = 4,
 }
 
 export enum CancelOrderStatuses {
   Submitted = 0,
   Canceled = 1,
+  Failed = 2,
 }
 
 export type LocalPlaceOrderData = {
-  marketId: string;
   clientId: string;
   orderId?: string;
-  subaccountNumber: number;
-  orderType: TradeTypes;
   submissionStatus: PlaceOrderStatuses;
   errorParams?: ErrorParams;
+  submittedThroughCloseAll?: boolean;
+
+  // short term orders may disappear to we cache some last seen data
+  cachedData: {
+    marketId: string;
+    orderType: ClientOrderType;
+    subaccountNumber: number;
+    status?: OrderStatus;
+  };
 };
 
 export type LocalCancelOrderData = {
+  operationUuid: string;
   orderId: string;
   submissionStatus: CancelOrderStatuses;
   errorParams?: ErrorParams;
   isSubmittedThroughCancelAll?: boolean;
+
+  // short term orders may effectively disappear so let's store everything we need to show the notification
+  cachedData: {
+    marketId: string;
+    orderType: IndexerOrderType;
+    displayableId: string;
+  };
 };
 
 export const CANCEL_ALL_ORDERS_KEY = 'all';
 export type LocalCancelAllData = {
-  key: string;
-  orderIds: string[];
-  canceledOrderIds?: string[];
-  failedOrderIds?: string[];
-  errorParams?: ErrorParams;
+  operationUuid: string;
+  // market id or 'all'
+  filterKey: string;
+  cancelOrderOperationUuids: string[];
 };
 
 export type LocalCloseAllPositionsData = {
-  submittedOrderClientIds: string[];
-  filledOrderClientIds: string[];
-  failedOrderClientIds: string[];
-  errorParams?: ErrorParams;
+  operationUuid: string;
+  clientIds: string[];
 };
-
-export enum DisplayUnit {
-  Asset = 'asset',
-  Fiat = 'fiat',
-}
