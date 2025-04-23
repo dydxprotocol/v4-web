@@ -167,6 +167,7 @@ function decreasePosition(
   const newSizeBn = MustBigNumber(currentPosition.size).plus(
     actualOperationSize.times(operationMultiplier)
   );
+  const signedSizeBn = newSizeBn.times(currentPosition.side === IndexerPositionSide.LONG ? 1 : -1);
 
   const newPosition = {
     ...currentPosition,
@@ -182,8 +183,11 @@ function decreasePosition(
     sumClose: actualOperationSize.plus(currentPosition.sumClose).toString(10),
     // decreasing doesn't change entry price
     entryPrice: currentPosition.entryPrice,
-    // we cant gain or lose unrealized pnl by decreasing position size
-    unrealizedPnl: currentPosition.unrealizedPnl,
+    // recalculate from scratch with new size
+    unrealizedPnl: signedSizeBn
+      .times(tradeProps.marketOraclePrice)
+      .minus(signedSizeBn.times(currentPosition.entryPrice))
+      .toString(10),
   };
 
   return {
