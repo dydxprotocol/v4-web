@@ -14,14 +14,13 @@ import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/heigh
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
+import { setUpRewardsParamsQuery, setUpRewardsTokenPriceQuery } from './rest/rewards';
 import { setUpSparklinesQuery } from './rest/sparklines';
 import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpAccountStatsQuery,
-  setUpRewardsParamsQuery,
-  setUpRewardsTokenPriceQuery,
 } from './rest/validatorAccountMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
