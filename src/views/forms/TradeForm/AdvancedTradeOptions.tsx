@@ -51,7 +51,6 @@ export const AdvancedTradeOptions = () => {
     showPostOnlyTooltip,
     showReduceOnlyTooltip,
   } = currentTradeFormConfig;
-  console.log(executionOptions);
 
   const { duration, unit } = goodTil ?? {};
 
