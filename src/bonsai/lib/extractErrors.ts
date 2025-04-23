@@ -4,7 +4,7 @@ import { calc } from '@/lib/do';
 
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 
-interface ParsingError {
+export interface ParsingError {
   message: string;
   stringKey?: string | null;
 }

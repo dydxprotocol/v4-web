@@ -330,6 +330,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       );
       return res;
     });
+    // return promises should only resolve when all are done
     const cancelResults = await Promise.all([...cancels, ...places]);
     const placeResults = await Promise.all([...cancels, ...places]);
     return { cancelResults, placeResults };

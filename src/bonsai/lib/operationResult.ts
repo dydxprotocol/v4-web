@@ -1,3 +1,5 @@
+import { ParsingError } from './extractErrors';
+
 export type OperationSuccess<T> = {
   type: 'success';
   payload: T;
@@ -6,7 +8,7 @@ export type OperationSuccess<T> = {
 export type OperationFailure = {
   type: 'failure';
   errorString: string;
-  displayInfo?: { message: string; stringKey?: string | null };
+  displayInfo?: ParsingError;
 };
 
 export type OperationResult<T> = OperationSuccess<T> | OperationFailure;
@@ -20,7 +22,7 @@ export function wrapOperationSuccess<T>(payload: T): OperationSuccess<T> {
 
 export function wrapOperationFailure(
   errorString: string,
-  displayInfo?: { message: string; stringKey?: string | null }
+  displayInfo?: ParsingError
 ): OperationFailure {
   return {
     type: 'failure',
