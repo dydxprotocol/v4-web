@@ -34,7 +34,7 @@ export const OrderCancelNotification = ({
   const { assetId, logo: logoUrl } = orEmptyObj(
     useParameterizedSelector(
       BonsaiHelpers.markets.createSelectMarketSummaryById,
-      localCancel.orderId
+      localCancel.cachedData.marketId
     )
   );
 

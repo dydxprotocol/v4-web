@@ -1,4 +1,5 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
@@ -260,8 +261,13 @@ export const AnalyticsEvents = unionize(
       entryPoint?: string;
       assetId: string;
     }>(),
+    TradePlaceOrderClick: ofType<
+      PlaceOrderPayload & {
+        isClosePosition: boolean;
+      }
+    >(),
     TradePlaceOrder: ofType<
-      HumanReadablePlaceOrderPayload & {
+      PlaceOrderPayload & {
         isClosePosition: boolean;
       }
     >(),
@@ -278,6 +284,7 @@ export const AnalyticsEvents = unionize(
       /** URL/IP of node the order was sent to */
       validatorUrl: string;
     }>(),
+    TriggerOrderClick: ofType<{ marketId: string }>(),
 
     // TradingView actions
     TradingViewOrderModificationSubmitted: ofType<
