@@ -13,7 +13,6 @@ import {
   TradeInputField,
   ValidationError,
   type HumanReadablePlaceOrderPayload,
-  type Nullable,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -53,8 +52,9 @@ import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
+import { log } from '@/lib/telemetry';
 import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -234,6 +234,7 @@ export const TradeForm = ({
 
     placeOrder({
       onError: (errorParams: ErrorParams) => {
+        log('TradeForm/onPlaceOrder', new Error(errorParams.errorMessage), { errorParams });
         setPlaceOrderError(
           stringGetter({
             key: errorParams.errorStringKey,

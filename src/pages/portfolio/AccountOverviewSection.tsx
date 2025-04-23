@@ -16,7 +16,7 @@ import { useLoadedVaultAccount, useLoadedVaultDetails } from '@/hooks/vaultsHook
 
 import { Link } from '@/components/Link';
 import { Output, OutputType, formatNumberOutput } from '@/components/Output';
-import { NewTag, Tag, TagSign, TagType } from '@/components/Tag';
+import { Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -30,15 +30,18 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 const EMBARRASSING_APR_THRESHOLD = 0.02;
 
-export const MegavaultYieldTag = () => {
+export const MegavaultYieldTag = ({
+  yieldType = 'ninetyDay',
+}: {
+  yieldType?: 'ninetyDay' | 'thirtyDay';
+}) => {
   const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
+  const returnPercent =
+    yieldType === 'ninetyDay' ? vault?.ninetyDayReturnPercent : vault?.thirtyDayReturnPercent;
 
-  if (
-    vault?.thirtyDayReturnPercent == null ||
-    vault.thirtyDayReturnPercent < EMBARRASSING_APR_THRESHOLD
-  ) {
-    return <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>;
+  if (returnPercent == null || returnPercent < EMBARRASSING_APR_THRESHOLD) {
+    return null;
   }
 
   return (
@@ -50,7 +53,7 @@ export const MegavaultYieldTag = () => {
             <Output
               tw="mr-0.25"
               type={OutputType.Percent}
-              value={vault.thirtyDayReturnPercent}
+              value={returnPercent}
               fractionDigits={0}
             />
           ),

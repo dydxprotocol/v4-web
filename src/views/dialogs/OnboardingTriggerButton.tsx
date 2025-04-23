@@ -53,7 +53,9 @@ export const OnboardingTriggerButton = ({
       size={size}
       type={ButtonType.Button}
       state={{
-        isDisabled: disableConnectButton || isAccountViewOnly,
+        isDisabled:
+          disableConnectButton ||
+          (onboardingState === OnboardingState.AccountConnected && isAccountViewOnly),
       }}
       onClick={openOnboardingDialog}
     >

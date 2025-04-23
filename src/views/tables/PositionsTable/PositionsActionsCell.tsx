@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,6 +21,7 @@ import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   marketId: string;

@@ -7,8 +7,10 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { refreshIndexerQueryOnAccountSocketRefresh } from '../accountRefreshSignal';
 import { loadableIdle } from '../lib/loadable';
+import { mapLoadableData } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { createIndexerQueryStoreEffect } from './lib/indexerQueryStoreEffect';
+import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpBlockTradingRewardsQuery(store: RootStore) {
   const cleanupListener = refreshIndexerQueryOnAccountSocketRefresh([
@@ -17,6 +19,7 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
   ]);
 
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'blockTradingRewards',
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'blockTradingRewards', data],
     getQueryFn: (indexerClient, data) => {
@@ -27,14 +30,12 @@ export function setUpBlockTradingRewardsQuery(store: RootStore) {
     },
     onResult: (blockTradingRewards) => {
       store.dispatch(
-        setAccountBlockTradingRewardsRaw({
-          status: blockTradingRewards.status,
-          data:
-            blockTradingRewards.data != null
-              ? isParentSubaccountBlockRewardResponse(blockTradingRewards.data)
-              : blockTradingRewards.data,
-          error: blockTradingRewards.error,
-        })
+        setAccountBlockTradingRewardsRaw(
+          mapLoadableData(
+            queryResultToLoadable(blockTradingRewards),
+            isParentSubaccountBlockRewardResponse
+          )
+        )
       );
     },
     onNoQuery: () => store.dispatch(setAccountBlockTradingRewardsRaw(loadableIdle())),

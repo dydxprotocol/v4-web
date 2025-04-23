@@ -3,7 +3,7 @@ import { timeUnits } from '@/constants/time';
 import { type RootStore } from '@/state/_store';
 import { setConfigTiers } from '@/state/raw';
 
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
 
 import { loadableIdle } from '../lib/loadable';
 import { mapLoadableData } from '../lib/mapLoadable';
@@ -12,6 +12,7 @@ import { queryResultToLoadable } from './lib/queryResultToLoadable';
 
 export function setUpConfigTiersQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'configTiers',
     selector: () => true,
     getQueryKey: () => ['configTiers'],
     getQueryFn: (compositeClient) => {

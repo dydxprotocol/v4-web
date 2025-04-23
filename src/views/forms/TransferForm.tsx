@@ -9,7 +9,6 @@ import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -49,7 +48,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { calc } from '@/lib/do';
 import { log } from '@/lib/telemetry';
-import { isValidKey } from '@/lib/typeUtils';
+import { isValidKey, Nullable } from '@/lib/typeUtils';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;

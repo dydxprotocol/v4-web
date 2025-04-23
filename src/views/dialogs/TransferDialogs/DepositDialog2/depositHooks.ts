@@ -1,3 +1,4 @@
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
@@ -181,6 +182,11 @@ export function useDepositSteps({
       executeStep: async (_: unknown, updatedSkipClient: SkipClient) => {
         const depositId = `deposit-${crypto.randomUUID()}`;
 
+        logBonsaiInfo('depositHooks', 'deposit initiated', {
+          depositId,
+          depositRoute,
+        });
+
         try {
           await updatedSkipClient.executeRoute({
             route: depositRoute,
@@ -189,6 +195,13 @@ export function useDepositSteps({
             bypassApprovalCheck: true,
             // TODO(deposit2.0): add custom slippage tolerance here
             onTransactionBroadcast: async ({ txHash, chainID }) => {
+              logBonsaiInfo('depositHooks', 'deposit tx submitted', {
+                depositId,
+                txHash,
+                chainID,
+                depositRoute,
+              });
+
               const baseDeposit = {
                 id: depositId,
                 type: 'deposit' as const,
@@ -204,6 +217,7 @@ export function useDepositSteps({
                   ...baseDeposit,
                   tokenInChainId: depositToken.chainId,
                   tokenInDenom: depositToken.denom,
+                  userAddresses,
                 })
               );
               onDeposit({ ...baseDeposit, token: depositToken });
@@ -211,6 +225,11 @@ export function useDepositSteps({
           });
           return { success: true };
         } catch (e) {
+          logBonsaiError('depositHooks', 'error executing Skip Go Deposit Route', {
+            error: e,
+            route: depositRoute,
+          });
+
           return {
             success: false,
             errorMessage: stringGetter({ key: parseError(e, STRING_KEYS.YOUR_DEPOSIT_FAILED) }),

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { calculateVaultPositions, calculateVaultSummary } from '@/bonsai/public-calculators/vault';
 import { calculateUserVaultInfo } from '@/bonsai/public-calculators/vaultAccount';
 import {
@@ -61,7 +62,7 @@ export const useLoadedVaultDetails = () => {
 
   const vaultDetailsResult = useQuery({
     queryKey: ['vaultDetails'],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       const [dailyResult, hourlyResult] = await Promise.all([
         getMegavaultHistoricalPnl(PnlTickInterval.day),
         getMegavaultHistoricalPnl(PnlTickInterval.HOUR),
@@ -74,7 +75,7 @@ export const useLoadedVaultDetails = () => {
             : 0
         )
       );
-    },
+    }, 'vaultDetails'),
     ...vaultQueryOptions,
   });
   return mapNullableQueryResult(vaultDetailsResult);
@@ -149,17 +150,17 @@ export const useLoadedVaultPositions = () => {
 
   const { data: subvaultHistories } = useQuery({
     queryKey: ['subvaultHistories'],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       return wrapNullable(await getVaultsHistoricalPnl());
-    },
+    }, 'subvaultHistories'),
     ...vaultQueryOptions,
   });
 
   const { data: vaultPositions } = useQuery({
     queryKey: ['vaultPositions'],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       return wrapNullable(await getMegavaultPositions());
-    },
+    }, 'vaultPositions'),
     ...vaultQueryOptions,
   });
 
@@ -201,7 +202,7 @@ export const useLoadedVaultAccount = () => {
 
   const accountVaultQueryResult = useQuery({
     queryKey: ['vaultAccount', dydxAddress, compositeClient != null],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       if (dydxAddress == null || compositeClient == null) {
         return wrapNullable(undefined);
       }
@@ -218,7 +219,7 @@ export const useLoadedVaultAccount = () => {
         return wrapNullable(undefined);
       }
       return wrapNullable(calculateUserVaultInfo(account, transfers));
-    },
+    }, 'vaultAccount'),
     ...vaultQueryOptions,
   });
   return mapNullableQueryResult(accountVaultQueryResult);
@@ -266,7 +267,7 @@ export const useVaultFormSlippage = () => {
       vaultBalance?.balanceShares,
       compositeClient != null,
     ],
-    queryFn: async () => {
+    queryFn: wrapAndLogBonsaiError(async () => {
       if (operation === 'DEPOSIT' || amount.trim() === '') {
         return wrapNullable(undefined);
       }
@@ -277,7 +278,7 @@ export const useVaultFormSlippage = () => {
       const slippage = await getVaultWithdrawInfo(sharesToWithdraw);
 
       return wrapNullable(slippage);
-    },
+    }, 'vaultSlippage'),
     ...vaultQueryOptions,
   });
   return mapNullableQueryResult(slippageQueryResult);

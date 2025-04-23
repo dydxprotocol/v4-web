@@ -1,16 +1,17 @@
 import { getSimpleOrderStatus } from '@/bonsai/calculators/orders';
+import { calculateChildSubaccountSummaries } from '@/bonsai/calculators/subaccount';
 import {
   ErrorFormat,
   ErrorType,
   simpleValidationError,
   ValidationError,
 } from '@/bonsai/lib/validationErrors';
-import { MarketInfo, OrderStatus } from '@/bonsai/types/summaryTypes';
+import { MarketInfo, OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { calc } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -19,6 +20,7 @@ import {
   TriggerOrderDetails,
   TriggerOrderInputData,
   TriggerOrdersFormState,
+  TriggerOrdersPayload,
   TriggerOrderState,
 } from './types';
 
@@ -108,6 +110,10 @@ export function getErrors(
       summary.payload.placeOrderPayloads.length === 0)
   ) {
     validationErrors.push(errors.noPayload());
+  }
+
+  if (summary.payload != null) {
+    validationErrors.push(...validateTriggerOrderPayloadForEquityTiers(summary.payload, inputData));
   }
 
   return validationErrors;
@@ -283,6 +289,56 @@ function validateCustomSize(size: string, inputData: TriggerOrderInputData): Val
   return [];
 }
 
+function validateTriggerOrderPayloadForEquityTiers(
+  payload: TriggerOrdersPayload,
+  inputData: TriggerOrderInputData
+) {
+  const deletedOrderIds = new Set(payload.cancelOrderPayloads.map((c) => c.orderId));
+  const subaccountToUse = payload.placeOrderPayloads[0]?.subaccountNumber;
+  if (subaccountToUse == null) {
+    return [];
+  }
+  if (inputData.allOpenOrders == null || inputData.equityTiers == null) {
+    return [errors.cantCalculateEquityTier()];
+  }
+  const relevantOpenOrders = inputData.allOpenOrders.filter(
+    (o) =>
+      o.subaccountNumber === subaccountToUse &&
+      !deletedOrderIds.has(o.id) &&
+      o.orderFlags !== OrderFlags.SHORT_TERM
+  );
+  const subaccountEquity = mapIfPresent(
+    inputData.rawParentSubaccountData,
+    inputData.rawRelevantMarkets,
+    (subaccountData, markets) =>
+      calculateChildSubaccountSummaries(subaccountData, markets)[
+        `${subaccountToUse}`
+      ]?.equity.toNumber()
+  );
+  if (subaccountEquity == null) {
+    return [errors.cantCalculateEquityTier()];
+  }
+  const myEquityTierLimit = inputData.equityTiers.statefulOrderEquityTiers.find(
+    (t) =>
+      subaccountEquity >= t.requiredTotalNetCollateralUSD &&
+      subaccountEquity < (t.nextLevelRequiredTotalNetCollateralUSD ?? Number.MAX_SAFE_INTEGER)
+  );
+  if (myEquityTierLimit == null) {
+    return [errors.cantCalculateEquityTier()];
+  }
+
+  if (relevantOpenOrders.length + payload.placeOrderPayloads.length > myEquityTierLimit.maxOrders) {
+    return [
+      errors.equityTierError(
+        subaccountEquity,
+        myEquityTierLimit.nextLevelRequiredTotalNetCollateralUSD ?? Number.MAX_SAFE_INTEGER,
+        myEquityTierLimit.maxOrders
+      ),
+    ];
+  }
+  return [];
+}
+
 class TriggerOrderFormValidationErrors {
   // Basic validation errors
   positionNotFound(): ValidationError {
@@ -298,6 +354,43 @@ class TriggerOrderFormValidationErrors {
       code: 'NO_ORDER_MATCHING_ORDER_ID',
       type: ErrorType.error,
       titleKey: STRING_KEYS.UNKNOWN_ERROR,
+    });
+  }
+
+  cantCalculateEquityTier(): ValidationError {
+    return simpleValidationError({
+      code: 'MISSING_DATA_FOR_EQUITY_TIER',
+      type: ErrorType.error,
+    });
+  }
+
+  equityTierError(
+    currentEquity: number,
+    nextTierEquity: number,
+    maxOrders: number
+  ): ValidationError {
+    return simpleValidationError({
+      code: 'OPEN_ORDERS_EXCEEDS_EQUITY_TIER_LIMIT',
+      type: ErrorType.error,
+      learnMoreUrlKey: 'equityTiersLearnMore',
+      textKey: STRING_KEYS.TRIGGERS_EQUITY_TIER_ERROR,
+      textParams: {
+        CURRENT_EQUITY: {
+          value: currentEquity,
+          format: ErrorFormat.Price,
+          decimals: 0,
+        },
+        NEXT_TIER_EQUITY: {
+          value: nextTierEquity,
+          format: ErrorFormat.Price,
+          decimals: 0,
+        },
+        MAX_ORDERS: {
+          value: `${Math.round(maxOrders)}`,
+          format: ErrorFormat.String,
+          decimals: 0,
+        },
+      },
     });
   }
 

@@ -1,11 +1,12 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ApiState, ApiStatus } from '@/bonsai/types/summaryTypes';
 
-import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { getInitializationError } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
+
+import { Nullable } from '@/lib/typeUtils';
 
 import { useStringGetter } from './useStringGetter';
 
@@ -76,13 +77,15 @@ export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useAppSelector(BonsaiCore.network.apiState);
   const initializationError = useAppSelector(getInitializationError);
+  const bonsaiInitializationError = useAppSelector(BonsaiCore.network.clientInitializationError);
   const validatorHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
   const indexerHeight = useAppSelector(BonsaiCore.network.validatorHeight.data);
 
   const { haltedBlock, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({
     apiState,
-    initializationError,
+    initializationError:
+      initializationError ?? bonsaiInitializationError ? 'Unknown error' : undefined,
   });
   const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
 

@@ -1,5 +1,5 @@
 import { createPublicClient, http } from 'viem';
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { ChainId, getAlchemyRPCUrlForChainId } from './wagmi';
 
@@ -24,6 +24,10 @@ export const VIEM_PUBLIC_CLIENTS = {
     chain: polygon,
     transport: http(getAlchemyRPCUrlForChainId(ChainId.POLYGON_MAINNET)),
   }),
+  [avalanche.id]: createPublicClient({
+    chain: avalanche,
+    transport: http(getAlchemyRPCUrlForChainId(ChainId.AVALANCHE_MAINNET)),
+  }),
 } as const;
 
 export const CHAIN_ID_TO_INFO = {
@@ -32,6 +36,7 @@ export const CHAIN_ID_TO_INFO = {
   [arbitrum.id]: arbitrum,
   [optimism.id]: optimism,
   [polygon.id]: polygon,
+  [avalanche.id]: avalanche,
 };
 
 export type EvmDepositChainId = keyof typeof VIEM_PUBLIC_CLIENTS;

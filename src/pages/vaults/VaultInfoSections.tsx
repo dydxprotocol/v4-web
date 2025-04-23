@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
+import { tooltipStrings } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
@@ -169,12 +170,17 @@ export const VaultHeader = ({ className }: { className?: string }) => {
 
   const { totalValue } = orEmptyObj(useLoadedVaultDetails().data);
 
-  const detailItems = [
+  const detailItems: {
+    key: string;
+    label: string;
+    tooltip?: keyof typeof tooltipStrings;
+    value: ReactNode;
+  }[] = [
     {
       key: '30d-apr',
       label: stringGetter({ key: STRING_KEYS.EST_APR_PLAIN }),
-      tooltip: 'vault-apr' as const,
-      value: <MegaVaultYieldOutput />,
+      tooltip: 'vault-apr-90d' as const,
+      value: <MegaVaultYieldOutput yieldType="ninetyDay" />,
     },
     {
       key: 'balance',

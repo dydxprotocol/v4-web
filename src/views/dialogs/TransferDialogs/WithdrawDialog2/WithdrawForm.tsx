@@ -28,6 +28,7 @@ import { log } from '@/lib/telemetry';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TransferRouteOptions } from '../RouteOptions';
+import { isValidWithdrawalAddress } from '../utils';
 import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
@@ -104,6 +105,7 @@ export const WithdrawForm = ({
 
   const validationError = useProtocolWithdrawalValidation({
     freeCollateral,
+    updatedMarginUsage,
     withdrawAmount: debouncedAmount,
     selectedRoute,
   });
@@ -115,7 +117,8 @@ export const WithdrawForm = ({
     destinationAddress === '' ||
     amount === '' ||
     !!validationError ||
-    !isDebouncedAmountSame;
+    !isDebouncedAmountSame ||
+    !isValidWithdrawalAddress(destinationAddress, destinationChain);
 
   const buttonInner = error ? (
     <div tw="row gap-0.5">

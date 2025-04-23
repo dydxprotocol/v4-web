@@ -1,13 +1,13 @@
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
-import type { Nullable } from '@/constants/abacus';
 import { NumberSign } from '@/constants/numbers';
 
 import { DiffOutput } from '@/components/DiffOutput';
 import { type OutputType } from '@/components/Output';
 
 import { MaybeBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   hasError?: boolean | null;

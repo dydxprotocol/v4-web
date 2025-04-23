@@ -3,7 +3,6 @@ import { Key, memo, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
 import { ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
@@ -40,6 +39,7 @@ import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 
 import { MarketFilter } from './MarketFilter';
 import { FavoriteButton } from './tables/MarketsTable/FavoriteButton';

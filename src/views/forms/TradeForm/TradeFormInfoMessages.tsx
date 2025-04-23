@@ -1,4 +1,3 @@
-import { type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,6 +11,8 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Link } from '@/components/Link';
+
+import { Nullable } from '@/lib/typeUtils';
 
 export const TradeFormInfoMessages = ({ marketId }: { marketId: Nullable<string> }) => {
   const stringGetter = useStringGetter();

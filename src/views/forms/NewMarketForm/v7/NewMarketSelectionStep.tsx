@@ -88,7 +88,7 @@ export const NewMarketSelectionStep = ({
           {stringGetter({
             key: STRING_KEYS.MARKET_LAUNCH_DETAILS_4,
             params: {
-              APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
+              APR_PERCENTAGE: <MegaVaultYieldOutput yieldType="ninetyDay" tw="inline-block" />,
               DEPOSIT_AMOUNT: (
                 <Output
                   useGrouping
@@ -97,7 +97,7 @@ export const NewMarketSelectionStep = ({
                   value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 />
               ),
-              NUM_DAYS: 30,
+              NUM_DAYS: 90,
               MEGAVAULT_LINK: (
                 <NavLink
                   tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"

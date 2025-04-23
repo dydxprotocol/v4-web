@@ -396,7 +396,7 @@ export const useDrawOrderbook = ({
   useEffect(() => {
     const ctx = canvas?.getContext('2d');
 
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx) return undefined;
 
     // Clear canvas before redraw
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -414,12 +414,16 @@ export const useDrawOrderbook = ({
       drawOrderbookRow({ ctx, idx, rowToRender: row, animationType });
     });
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       data.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
     }, ORDERBOOK_ANIMATION_DURATION);
 
     prevData.current = data;
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [
     fontFlag,
     canvasHeight,

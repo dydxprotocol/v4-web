@@ -1,6 +1,6 @@
 import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
 import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
-import { logBonsaiInfo } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { StargateClient } from '@cosmjs/stargate';
 import {
   CompositeClient,
@@ -11,7 +11,7 @@ import {
   ValidatorConfig,
 } from '@dydxprotocol/v4-client-js';
 
-import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
+import { AnalyticsUserProperties, DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import {
   DydxChainId,
   DydxNetwork,
@@ -23,7 +23,8 @@ import { type AppDispatch, type RootStore } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
-import { getStatsigConfigAsync } from '@/lib/statsig';
+import { identify } from '@/lib/analytics/analytics';
+import { browserTimeOffsetPromise } from '@/lib/timeOffset';
 
 type CompositeClientWrapper = {
   dead?: boolean;
@@ -55,7 +56,7 @@ function makeCompositeClient({
     throw new Error(`Unknown chain id: ${chainId}`);
   }
 
-  const { clientWrapper, setCompositeClient, setIndexerClient, setNobleClient } =
+  const { clientWrapper, setCompositeClient, setIndexerClient, setNobleClient, setErrorAndReject } =
     initializeClientWrapper(dispatch, network);
 
   (async () => {
@@ -63,57 +64,62 @@ function makeCompositeClient({
     if (indexerUrl == null) {
       throw new Error('No indexer urls found');
     }
-
-    const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
-
-    if (clientWrapper.dead) {
-      return;
-    }
     const indexerConfig = new IndexerConfig(indexerUrl.api, indexerUrl.socket);
     setIndexerClient(new IndexerClient(indexerConfig));
 
-    const statsigFlags = await getStatsigConfigAsync();
-    const compositeClient = await CompositeClient.connect(
-      new Network(
-        chainId,
-        indexerConfig,
-        new ValidatorConfig(
-          validatorUrl,
+    try {
+      const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
+
+      if (clientWrapper.dead) {
+        return;
+      }
+
+      const compositeClient = await CompositeClient.connect(
+        new Network(
           chainId,
-          {
-            USDC_DENOM: tokens.usdc.denom,
-            USDC_DECIMALS: tokens.usdc.decimals,
-            USDC_GAS_DENOM: tokens.usdc.gasDenom,
-            CHAINTOKEN_DENOM: tokens.chain.denom,
-            CHAINTOKEN_DECIMALS: tokens.chain.decimals,
-          },
-          {
-            broadcastPollIntervalMs: 3_000,
-            broadcastTimeoutMs: 60_000,
-          },
-          DEFAULT_TRANSACTION_MEMO,
-          statsigFlags.ff_enable_timestamp_nonce
+          indexerConfig,
+          new ValidatorConfig(
+            validatorUrl,
+            chainId,
+            {
+              USDC_DENOM: tokens.usdc.denom,
+              USDC_DECIMALS: tokens.usdc.decimals,
+              USDC_GAS_DENOM: tokens.usdc.gasDenom,
+              CHAINTOKEN_DENOM: tokens.chain.denom,
+              CHAINTOKEN_DECIMALS: tokens.chain.decimals,
+            },
+            {
+              broadcastPollIntervalMs: 3_000,
+              broadcastTimeoutMs: 60_000,
+            },
+            DEFAULT_TRANSACTION_MEMO,
+            true,
+            (await browserTimeOffsetPromise).offset
+          )
         )
-      )
-    );
+      );
 
-    // this shouldn't be necessary - can actually be false
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (clientWrapper.dead) {
-      return;
+      // this shouldn't be necessary - can actually be false
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (clientWrapper.dead) {
+        return;
+      }
+
+      setCompositeClient(compositeClient);
+
+      const nobleClient = await StargateClient.connect(networkConfig.endpoints.nobleValidator);
+
+      // this shouldn't be necessary - can actually be false
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (clientWrapper.dead) {
+        return;
+      }
+
+      setNobleClient(nobleClient);
+    } catch (e) {
+      logBonsaiError('CompositeClientManager', 'error initializing composite client', { error: e });
+      setErrorAndReject('error initializing clients');
     }
-
-    setCompositeClient(compositeClient);
-
-    const nobleClient = await StargateClient.connect(networkConfig.endpoints.nobleValidator);
-
-    // this shouldn't be necessary - can actually be false
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (clientWrapper.dead) {
-      return;
-    }
-
-    setNobleClient(nobleClient);
   })();
   return clientWrapper;
 }
@@ -145,6 +151,7 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
   const validatorUrl = await networkOptimizer.findOptimalNode(validatorEndpoints, chainId);
   const t1 = performance.now();
 
+  identify(AnalyticsUserProperties.BonsaiValidatorUrl(validatorUrl));
   logBonsaiInfo('CompositeClientManager', 'findOptimalNode', {
     validatorUrl,
     validatorList: validatorEndpoints,
@@ -210,6 +217,22 @@ function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
       })
     );
   };
+  const setErrorAndReject = (msg: string) => {
+    if (clientWrapper.compositeClient == null) {
+      compositeClientDeferred.reject(new Error(msg));
+    }
+
+    if (clientWrapper.nobleClient == null) {
+      nobleClientDeferred.reject(new Error(msg));
+    }
+
+    dispatch(
+      setNetworkStateRaw({
+        networkId: network,
+        stateToMerge: { errorInitializing: true },
+      })
+    );
+  };
   dispatch(
     setNetworkStateRaw({
       networkId: network,
@@ -225,6 +248,7 @@ function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
     setIndexerClient,
     setCompositeClient,
     setNobleClient,
+    setErrorAndReject,
   };
 }
 

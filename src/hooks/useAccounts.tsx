@@ -74,7 +74,7 @@ const useAccountsContext = () => {
   const { ready, authenticated } = usePrivy();
 
   const blockedGeo = useMemo(() => {
-    return geo && isBlockedGeo(geo) && checkForGeo;
+    return geo != null && isBlockedGeo(geo) && checkForGeo;
   }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
@@ -216,7 +216,7 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
-          } else if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
+          } else if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
 
@@ -234,7 +234,7 @@ const useAccountsContext = () => {
         if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
-          if (sourceAccount.encryptedSignature && geo && !blockedGeo) {
+          if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
               await setWalletFromSignature(signature);

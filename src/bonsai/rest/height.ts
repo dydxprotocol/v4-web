@@ -79,6 +79,7 @@ const collapseLoadables = <T extends { requestTime: string; receivedTime: string
 
 export function setUpIndexerHeightQuery(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
+    name: 'indexerHeight',
     selector: () => true,
     getQueryFn: (indexerClient) => {
       return () => doIndexerHeightQuery(indexerClient);
@@ -123,6 +124,7 @@ const doValidatorHeightQuery = async (
 
 export function setUpValidatorHeightQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
+    name: 'validatorHeight',
     selector: () => true,
     getQueryFn: (compositeClient) => {
       return () => doValidatorHeightQuery(compositeClient);

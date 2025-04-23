@@ -1,14 +1,16 @@
 import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
 import { keyBy } from 'lodash';
 
+import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
 import { stringifyTransactionError } from '@/lib/errors';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
+import { sleep } from '@/lib/timeUtils';
 
 import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
@@ -18,6 +20,9 @@ import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect'
 import { selectParentSubaccountOpenPositions } from '../selectors/account';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
 import { OrderFlags, OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+
+// Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
+const SLEEP_TIME = timeUnits.second * 10;
 
 /**
  * @description This lifecycle is used to cancel trigger orders when a position is closed or side is flipped.
@@ -29,8 +34,8 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
       BonsaiCore.account.openOrders.data,
       selectParentSubaccountOpenPositions,
     ],
-    (authorizedAccount, orders, positions) => {
-      if (!authorizedAccount || orders.length === 0) {
+    (txAuthorizedAccount, orders, positions) => {
+      if (!txAuthorizedAccount || orders.length === 0) {
         return undefined;
       }
 
@@ -54,8 +59,12 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         return isOrphan || hasInvalidReduceOnlyOrder;
       });
 
+      const { localDydxWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
+
       return {
-        ...authorizedAccount,
+        localDydxWallet,
+        sourceAccount,
+        parentSubaccountInfo,
         ordersToCancel,
       };
     }
@@ -121,6 +130,8 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         error,
       });
       return wrapOperationFailure(parsed);
+    } finally {
+      await sleep(SLEEP_TIME);
     }
   }
 

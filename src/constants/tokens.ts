@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from './graz';
 import { SOLANA_MAINNET_ID } from './solana';
@@ -12,6 +12,7 @@ export const USDC_ADDRESSES = {
   [optimism.id]: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
   [arbitrum.id]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
   [polygon.id]: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+  [avalanche.id]: '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e',
   [SOLANA_MAINNET_ID]: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
   [CosmosChainId.Noble]: 'uusdc',
   [CosmosChainId.Osmosis]: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
@@ -41,6 +42,11 @@ export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   { chainId: base.id.toString(), denom: USDC_ADDRESSES[base.id], decimals: USDC_DECIMALS },
   { chainId: optimism.id.toString(), denom: USDC_ADDRESSES[optimism.id], decimals: USDC_DECIMALS },
   { chainId: polygon.id.toString(), denom: USDC_ADDRESSES[polygon.id], decimals: USDC_DECIMALS },
+  {
+    chainId: avalanche.id.toString(),
+    denom: USDC_ADDRESSES[avalanche.id],
+    decimals: USDC_DECIMALS,
+  },
   { chainId: SOLANA_MAINNET_ID, denom: USDC_ADDRESSES[SOLANA_MAINNET_ID], decimals: USDC_DECIMALS },
   {
     chainId: CosmosChainId.Neutron,
