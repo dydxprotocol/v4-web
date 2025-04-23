@@ -10,7 +10,6 @@ import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
 
-import type { HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
@@ -261,34 +260,45 @@ export const AnalyticsEvents = unionize(
       entryPoint?: string;
       assetId: string;
     }>(),
+
     TradePlaceOrderClick: ofType<
       PlaceOrderPayload & {
         isClosePosition: boolean;
       }
     >(),
-    TradePlaceOrder: ofType<
+    TradePlaceOrder: ofType<PlaceOrderPayload>(),
+    TradePlaceOrderSubmissionConfirmed: ofType<PlaceOrderPayload & { durationMs: number }>(),
+    TradePlaceOrderSubmissionFailed: ofType<
+      PlaceOrderPayload & { error: string; durationMs: number }
+    >(),
+    TradePlaceOrderConfirmed: ofType<
       PlaceOrderPayload & {
-        isClosePosition: boolean;
+        roundtripMs: number;
+        sinceSubmissionMs: number | undefined;
       }
     >(),
-    TradePlaceOrderConfirmed: ofType<{
-      /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-      roundtripMs: number;
-      /** URL/IP of node the order was sent to */
-      validatorUrl: string;
+
+    TradeCancelOrderClick: ofType<{ orderId: string }>(),
+    TradeCancelOrder: ofType<{ orderId: string }>(),
+    TradeCancelOrderSubmissionConfirmed: ofType<{ orderId: string; durationMs: number }>(),
+    TradeCancelOrderSubmissionFailed: ofType<{
+      orderId: string;
+      error: string;
+      durationMs: number;
     }>(),
-    TradeCancelOrder: ofType<{}>(),
     TradeCancelOrderConfirmed: ofType<{
-      /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
       roundtripMs: number;
-      /** URL/IP of node the order was sent to */
-      validatorUrl: string;
+      sinceSubmissionMs: number | undefined;
+      orderId: string;
     }>(),
-    TriggerOrderClick: ofType<{ marketId: string }>(),
+
+    TriggerOrderClick: ofType<{ marketId: string | undefined }>(),
+    TradeCancelAllOrdersClick: ofType<{ marketId?: string }>(),
+    TradeCloseAllPositionsClick: ofType<{}>(),
 
     // TradingView actions
     TradingViewOrderModificationSubmitted: ofType<
-      HumanReadablePlaceOrderPayload & {
+      PlaceOrderPayload & {
         previousOrderClientId: string;
         previousOrderPrice: string;
       }

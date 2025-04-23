@@ -8,6 +8,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -42,6 +43,7 @@ import {
   getTradeFormSummary,
 } from '@/state/tradeFormSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
@@ -196,6 +198,7 @@ export const TradeForm = ({
     if (payload == null) {
       return;
     }
+    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
       setUnIndexedClientId(payload.clientId.toString());

@@ -22,7 +22,7 @@ import {
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
-import { DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
@@ -41,6 +41,7 @@ import {
 } from '@/state/localOrders';
 import { getLocalWalletNonce } from '@/state/walletSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { calc } from '@/lib/do';
 import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpers';
 import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
@@ -48,6 +49,7 @@ import { localWalletManager } from '@/lib/hdKeyManager';
 import { AttemptBigNumber, AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { parseToPrimitives, ToPrimitives } from '@/lib/parseToPrimitives';
 import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { createTimer, startTimer } from '@/lib/simpleTimer';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -146,18 +148,18 @@ export class AccountTransactionSupervisor {
   ): () => Promise<OperationResult<ToPrimitives<T>>> {
     return async () => {
       try {
-        const startTime = Date.now();
+        const startTime = startTimer();
         logBonsaiInfo(nameForLogging, 'Attempting operation', { payload });
 
         const tx = await fn(payload);
 
         const parsedTx = parseToPrimitives(tx);
 
-        const submittedTime = Date.now();
+        const submittedTime = startTimer();
         logBonsaiInfo(nameForLogging, 'Successful operation', {
           payload,
           parsedTx,
-          timeToSubmit: submittedTime - startTime,
+          timeToSubmit: startTime.elapsed(),
           source: nameForLogging,
         });
 
@@ -166,14 +168,18 @@ export class AccountTransactionSupervisor {
             tracking.selector,
             tracking.validator,
             (resultOrNull) => {
-              const confirmedTime = Date.now();
+              try {
+                tracking.onTrigger?.(resultOrNull != null);
+              } catch (e) {
+                // do nothing
+              }
               if (resultOrNull != null) {
                 logBonsaiInfo(nameForLogging, 'Successfully confirmed operation', {
                   payload,
                   parsedTx,
                   result: purgeBigNumbers(resultOrNull),
-                  totalTimeToConfirm: confirmedTime - startTime,
-                  timeToConfirmAfterSubmitted: confirmedTime - submittedTime,
+                  totalTimeToConfirm: startTime.elapsed(),
+                  timeToConfirmAfterSubmitted: submittedTime.elapsed(),
                   source: nameForLogging,
                 });
               } else {
@@ -273,7 +279,7 @@ export class AccountTransactionSupervisor {
     };
   }
 
-  private async executeCancelOrder(orderId: string) {
+  private async executeCancelOrder(orderId: string, onConfirmed?: () => void) {
     const cancelPayload = this.createCancelOrderPayload(orderId);
 
     if (cancelPayload == null) {
@@ -311,6 +317,11 @@ export class AccountTransactionSupervisor {
             return order;
           }
           return undefined;
+        },
+        onTrigger: (success) => {
+          if (success) {
+            onConfirmed?.();
+          }
         },
       }
     )();
@@ -607,6 +618,10 @@ export class AccountTransactionSupervisor {
       })
     );
 
+    track(AnalyticsEvents.TradePlaceOrder({ ...payload }));
+    const startTime = startTimer();
+    const submitTime = createTimer();
+
     const overallResult = await this.wrapOperation(
       'AccountTransactionSupervisor/placeOrderWrapper',
       payload,
@@ -636,6 +651,7 @@ export class AccountTransactionSupervisor {
         if (isOperationFailure(placeOrderResult)) {
           throw new Error(placeOrderResult.errorString);
         }
+        submitTime.start();
         return placeOrderResult.payload;
       },
       {
@@ -647,14 +663,39 @@ export class AccountTransactionSupervisor {
           }
           return undefined;
         },
+        onTrigger: (success) => {
+          if (success) {
+            track(
+              AnalyticsEvents.TradePlaceOrderConfirmed({
+                ...payload,
+                roundtripMs: startTime.elapsed(),
+                sinceSubmissionMs: submitTime.elapsed(),
+              })
+            );
+          }
+        },
       }
     )();
 
     if (isOperationFailure(overallResult)) {
+      track(
+        AnalyticsEvents.TradePlaceOrderSubmissionFailed({
+          ...payload,
+          error: overallResult.errorString,
+          durationMs: startTime.elapsed(),
+        })
+      );
       this.store.dispatch(
         placeOrderFailed({
           clientId: `${payload.clientId}`,
           errorParams: operationFailureToErrorParams(overallResult),
+        })
+      );
+    } else if (isOperationSuccess(overallResult)) {
+      track(
+        AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
+          ...payload,
+          durationMs: startTime.elapsed(),
         })
       );
     }
@@ -662,6 +703,8 @@ export class AccountTransactionSupervisor {
   }
 
   public async closeAllPositions() {
+    track(AnalyticsEvents.TradeCloseAllPositionsClick({}));
+
     const maybeErr = this.maybeNoLocalWalletError('closeAllPositions');
     if (maybeErr) {
       return maybeErr;
@@ -721,15 +764,43 @@ export class AccountTransactionSupervisor {
       );
     }
     this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
+    track(AnalyticsEvents.TradeCancelOrder({ orderId }));
+
+    const startTime = startTimer();
+    const submitTime = createTimer();
 
     // Queue the cancellation to avoid race conditions
-    const result = await this.executeCancelOrder(orderId);
+    const result = await this.executeCancelOrder(orderId, () => {
+      track(
+        AnalyticsEvents.TradeCancelOrderConfirmed({
+          orderId,
+          roundtripMs: startTime.elapsed(),
+          sinceSubmissionMs: submitTime.elapsed(),
+        })
+      );
+    });
+
+    submitTime.start();
 
     if (isOperationFailure(result)) {
+      track(
+        AnalyticsEvents.TradeCancelOrderSubmissionFailed({
+          orderId,
+          error: result.errorString,
+          durationMs: startTime.elapsed(),
+        })
+      );
       this.store.dispatch(
         cancelOrderFailed({
           uuid,
           errorParams: operationFailureToErrorParams(result),
+        })
+      );
+    } else {
+      track(
+        AnalyticsEvents.TradeCancelOrderSubmissionConfirmed({
+          orderId,
+          durationMs: startTime.elapsed(),
         })
       );
     }
@@ -738,6 +809,7 @@ export class AccountTransactionSupervisor {
   }
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
+    track(AnalyticsEvents.TradeCancelAllOrdersClick({ marketId }));
     const maybeErr = this.maybeNoLocalWalletError('cancelAllOrders');
     if (maybeErr) {
       return maybeErr;
@@ -813,6 +885,7 @@ type NotificationCallback<Result> = (result: Result | null) => void;
 interface Tracker<Selected, Result> {
   selector: SelectorFn<Selected>;
   validator: ValidationFn<NoInfer<Selected>, Result>;
+  onTrigger?: (success: boolean) => void;
 }
 
 interface TrackedCondition<Selected, Result> {

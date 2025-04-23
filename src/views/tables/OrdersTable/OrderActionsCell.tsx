@@ -5,6 +5,7 @@ import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -17,6 +18,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { accountTransactionManager } from '@/state/_store';
 
+import { track } from '@/lib/analytics/analytics';
 import { isNewOrderStatusClearable } from '@/lib/orders';
 import { Nullable } from '@/lib/typeUtils';
 
@@ -34,6 +36,7 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 
   const onCancel = useCallback(async () => {
     setIsCanceling(true);
+    track(AnalyticsEvents.TradeCancelOrderClick({ orderId }));
     const res = await accountTransactionManager.cancelOrder({ orderId });
     if (isOperationFailure(res)) {
       // we only re-enable if it failed

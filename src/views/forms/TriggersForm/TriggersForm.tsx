@@ -10,6 +10,7 @@ import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -32,6 +33,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics/analytics';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -103,6 +105,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
     if (summary.payload == null) {
       return;
     }
+    track(AnalyticsEvents.TriggerOrderClick({ marketId: market }));
     placeTriggerOrders(summary.payload);
     dispatch(closeDialog());
   };

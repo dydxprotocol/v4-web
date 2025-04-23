@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
@@ -34,6 +35,7 @@ import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
 import { Nullable } from '@/lib/typeUtils';
 
@@ -200,6 +202,7 @@ export const OrderDetailsDialog = ({
   ).filter((item) => Boolean(item.value));
 
   const onCancelClick = () => {
+    track(AnalyticsEvents.TradeCancelOrderClick({ orderId }));
     accountTransactionManager.cancelOrder({ orderId });
   };
 

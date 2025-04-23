@@ -8,6 +8,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -51,6 +52,7 @@ import {
   getClosePositionFormValues,
 } from '@/state/tradeFormSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
@@ -199,6 +201,8 @@ export const ClosePositionForm = ({
       return;
     }
     onClearInputs();
+    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: true }));
+
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
       setUnIndexedClientId(payload.clientId.toString());
