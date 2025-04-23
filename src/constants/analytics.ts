@@ -1,4 +1,5 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
@@ -8,7 +9,7 @@ import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
 
-import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
+import type { HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
@@ -116,7 +117,7 @@ export const AnalyticsEvents = unionize(
     // App
     AppStart: ofType<{}>(),
     NetworkStatus: ofType<{
-      status: (typeof AbacusApiStatus)['name'];
+      status: ApiStatus;
       /** Last time indexer node was queried successfully */
       lastSuccessfulIndexerRpcQuery?: number;
       /** Time elapsed since indexer node was queried successfully */
