@@ -4,19 +4,20 @@ import { IndexerHistoricalBlockTradingReward } from '@/types/indexer/indexerApiG
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { Loadable } from '../lib/loadable';
-import { mapLoadableData } from '../lib/mapLoadable';
 import { mergeObjects } from '../lib/mergeObjects';
 
 export function calculateBlockRewards(
-  liveBlockRewards: Loadable<IndexerHistoricalBlockTradingReward[]>,
-  restBlockRewards: Loadable<IndexerHistoricalBlockTradingReward[]>
+  liveBlockRewards: IndexerHistoricalBlockTradingReward[] | undefined,
+  restBlockRewards: IndexerHistoricalBlockTradingReward[] | undefined
 ) {
-  const getRewardsById = (data: Loadable<IndexerHistoricalBlockTradingReward[]>) =>
-    mapLoadableData(data, (d) => keyBy(d, (reward) => reward.createdAtHeight));
-  return mergeObjects(
-    getRewardsById(liveBlockRewards).data ?? {},
-    getRewardsById(restBlockRewards).data ?? {},
-    (first, second) => maxBy([first, second], (f) => MustBigNumber(f.createdAtHeight).toNumber())!
+  const getRewardsById = (data: IndexerHistoricalBlockTradingReward[] | undefined) =>
+    data != null ? keyBy(data, (reward) => reward.createdAtHeight) : undefined;
+
+  return Object.values(
+    mergeObjects(
+      getRewardsById(liveBlockRewards) ?? {},
+      getRewardsById(restBlockRewards) ?? {},
+      (first, second) => maxBy([first, second], (f) => MustBigNumber(f.createdAtHeight).toNumber())!
+    )
   );
 }

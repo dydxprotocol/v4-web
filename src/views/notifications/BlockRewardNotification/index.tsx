@@ -11,23 +11,19 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 
 type ElementProps = {
-  data: {
-    BLOCK_REWARD_AMOUNT: string;
-    BLOCK_REWARD_HEIGHT: string;
-    BLOCK_REWARD_TIME_MILLISECONDS: string;
-    TOKEN_NAME: string;
-  };
+  amount: string;
+  tokenName: string;
 };
 
 export type BlockRewardNotificationProps = NotificationProps & ElementProps;
 
 export const BlockRewardNotification = ({
   isToast,
-  data,
+  amount,
+  tokenName,
   notification,
 }: BlockRewardNotificationProps) => {
   const stringGetter = useStringGetter();
-  const { BLOCK_REWARD_AMOUNT, TOKEN_NAME } = data;
 
   return (
     <Notification
@@ -41,9 +37,7 @@ export const BlockRewardNotification = ({
             {
               key: 'block_reward',
               label: stringGetter({ key: STRING_KEYS.BLOCK_REWARD }),
-              value: (
-                <$Output type={OutputType.Asset} value={BLOCK_REWARD_AMOUNT} tag={TOKEN_NAME} />
-              ),
+              value: <$Output type={OutputType.Asset} value={amount} tag={tokenName} />,
             },
           ]}
         />
