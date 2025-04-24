@@ -44,7 +44,7 @@ const DEFAULT_MAX_REQUESTS = 20;
 const useDydxClientContext = () => {
   // ------ Client Initialization ------ //
 
-  const { compositeClient, key: compositeClientKey } = useCompositeClient();
+  const { compositeClient } = useCompositeClient();
 
   const { indexer: indexerEndpoints, faucet: faucetUrl } = useEndpointsConfig();
 
