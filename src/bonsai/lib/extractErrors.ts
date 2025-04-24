@@ -4,7 +4,7 @@ import { calc } from '@/lib/do';
 
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 
-interface ParsingError {
+export interface ParsingError {
   message: string;
   stringKey?: string | null;
 }
@@ -157,11 +157,13 @@ export const parseTransactionError = (
   });
   if (
     attemptedParseJson?.stringKey == null ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     STRING_KEY_VALUES[attemptedParseJson?.stringKey] == null
   ) {
     logBonsaiError('parseTransactionError', `Failed to parse a ${operationNameForLogging} error`, {
       input: response,
       output: attemptedParseJson,
+      stringKey: attemptedParseJson?.stringKey,
     });
     return {
       message: attemptedParseJson?.message ?? response,

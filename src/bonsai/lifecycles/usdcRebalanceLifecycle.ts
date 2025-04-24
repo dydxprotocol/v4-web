@@ -20,7 +20,6 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectChildSubaccountSummaries } from '../selectors/account';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
@@ -35,7 +34,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
     [
       selectTxAuthorizedAccount,
       BonsaiCore.account.balances.data,
-      selectChildSubaccountSummaries,
+      BonsaiCore.account.childSubaccountSummaries.data,
       selectHasNonExpiredPendingWithdraws,
     ],
     (txAuthorizedAccount, balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {

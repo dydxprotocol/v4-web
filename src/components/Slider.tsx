@@ -1,5 +1,5 @@
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type ElementProps = {
   value: number;
@@ -9,6 +9,7 @@ type ElementProps = {
   min?: number;
   max?: number;
   step?: number;
+  midPercent?: number;
 };
 
 type StyleProps = { className?: string };
@@ -21,6 +22,7 @@ export const Slider = ({
   onValueCommit,
   min,
   max,
+  midPercent,
   step = 0.1,
 }: ElementProps & StyleProps) => (
   <$Root
@@ -33,7 +35,7 @@ export const Slider = ({
     onValueChange={onSliderDrag}
     onValueCommit={onValueCommit}
   >
-    <$Track />
+    <$Track $midpoint={midPercent} />
     <$Thumb />
   </$Root>
 );
@@ -53,7 +55,7 @@ const $Root = styled(Root)`
   height: 100%;
 `;
 
-const $Track = styled(Track)`
+const $Track = styled(Track)<{ $midpoint?: number }>`
   position: relative;
 
   display: flex;
@@ -83,6 +85,24 @@ const $Track = styled(Track)`
       )
       0 0 / 0.6rem;
   }
+
+  ${({ $midpoint }) =>
+    $midpoint == null
+      ? ''
+      : css`
+          &:after {
+            content: '';
+            position: absolute;
+            left: ${$midpoint}%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 14px;
+            background-color: white;
+            border-radius: 1px;
+            pointer-events: none;
+          }
+        `}
 `;
 
 const $Thumb = styled(Thumb)`

@@ -68,6 +68,7 @@ export const AMOUNT_RESERVED_FOR_GAS_NOBLE = 0.1;
  * @description The number of parentSubaccounts: 0 - 127, 128 is the first childSubaccount
  */
 export const NUM_PARENT_SUBACCOUNTS = 128;
+export const MAX_SUBACCOUNT_NUMBER = 128000;
 
 export type RawSubaccountFill = {
   clientMetadata: string;

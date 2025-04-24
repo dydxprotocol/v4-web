@@ -1,8 +1,7 @@
+import { MarginMode } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -14,10 +13,9 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeMarginMode, useTradeFormData } from '@/state/inputsSelectors';
-
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 export const MarginModeSelector = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
@@ -25,15 +23,13 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
   const currentAssetId = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  const marginMode =
-    useAppSelector(getInputTradeMarginMode, shallowEqual) ?? AbacusMarginMode.Cross;
-  const { needsMarginMode } = useTradeFormData();
+  const marginMode = useAppSelector(getTradeFormValues).marginMode ?? MarginMode.CROSS;
+  const dispatch = useAppDispatch();
 
-  const setMarginMode = (value: string) => {
-    abacusStateManager.setTradeValue({
-      value,
-      field: TradeInputField.marginMode,
-    });
+  const needsMarginMode = useAppSelector(getTradeFormSummary).summary.options.showMarginMode;
+
+  const setMarginMode = (mode: string) => {
+    dispatch(tradeFormActions.setMarginMode(mode as MarginMode));
   };
 
   const warningTooltip = (
@@ -61,10 +57,10 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
         truncateLabel={false}
         items={[
           {
-            value: AbacusMarginMode.Cross.rawValue,
+            value: MarginMode.CROSS,
             label: showMarginModeUnToggleableTooltip ? (
               stringGetter({
-                key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue]!,
+                key: STRING_KEYS.CROSS,
               })
             ) : (
               <WithTooltip
@@ -72,17 +68,17 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
                 tooltipString={stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
               >
                 {stringGetter({
-                  key: MARGIN_MODE_STRINGS[AbacusMarginMode.Cross.rawValue]!,
+                  key: STRING_KEYS.CROSS,
                 })}
               </WithTooltip>
             ),
-            disabled: !needsMarginMode && marginMode !== AbacusMarginMode.Cross,
+            disabled: !needsMarginMode && marginMode !== MarginMode.CROSS,
           },
           {
-            value: AbacusMarginMode.Isolated.rawValue,
+            value: MarginMode.ISOLATED,
             label: showMarginModeUnToggleableTooltip ? (
               stringGetter({
-                key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue]!,
+                key: STRING_KEYS.ISOLATED,
               })
             ) : (
               <WithTooltip
@@ -90,14 +86,14 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
                 tooltipString={stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
               >
                 {stringGetter({
-                  key: MARGIN_MODE_STRINGS[AbacusMarginMode.Isolated.rawValue]!,
+                  key: STRING_KEYS.ISOLATED,
                 })}
               </WithTooltip>
             ),
-            disabled: !needsMarginMode && marginMode !== AbacusMarginMode.Isolated,
+            disabled: !needsMarginMode && marginMode !== MarginMode.ISOLATED,
           },
         ]}
-        value={marginMode.rawValue}
+        value={marginMode}
         onValueChange={setMarginMode}
       />
     </$MarginModeSelector>

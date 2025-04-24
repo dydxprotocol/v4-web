@@ -24,7 +24,6 @@ import {
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics/analytics';
-import { isAbacusNotificationSingleSession } from '@/lib/notifications';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -58,6 +57,11 @@ const useNotificationsContext = () => {
     defaultValue: Date.now(),
   });
 
+  const [appInitializationTime] = useLocalStorage<number>({
+    key: LocalStorageKey.AppInitialized,
+    defaultValue: Date.now(),
+  });
+
   const [notificationPreferences, setNotificationPreferences] =
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
@@ -78,10 +82,7 @@ const useNotificationsContext = () => {
     // save notifications to localstorage, but filter out single session notifications
     const originalEntries = Object.entries(notifications);
     const filteredEntries = originalEntries.filter(
-      ([, value]) =>
-        !SingleSessionNotificationTypes.includes(value.type) ||
-        (value.type === NotificationType.AbacusGenerated &&
-          !isAbacusNotificationSingleSession(value.id))
+      ([, value]) => !SingleSessionNotificationTypes.includes(value.type)
     );
 
     const newNotifications = Object.fromEntries(filteredEntries);
@@ -222,6 +223,8 @@ const useNotificationsContext = () => {
       hideNotification,
 
       lastUpdated: notificationsLastUpdated,
+
+      appInitializedTime: appInitializationTime,
     });
   }
 

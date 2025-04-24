@@ -1,5 +1,6 @@
-import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+
+import { Nullable } from '@/lib/typeUtils';
 
 export const TOGGLE_ACTIVE_CLASS_NAME = 'toggle-active';
 

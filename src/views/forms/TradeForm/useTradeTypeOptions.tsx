@@ -1,45 +1,42 @@
 import { useMemo } from 'react';
 
+import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { MenuItem } from '@/constants/menus';
 import { EMPTY_ARR } from '@/constants/objects';
-import { TradeTypes } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { getSelectedTradeType } from '@/lib/tradeData';
 
 export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: boolean }) => {
   const { showAll, showAssetIcon } = opts ?? {};
   const stringGetter = useStringGetter();
 
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const currentTradeData = useAppSelector(getTradeFormValues);
   const currentAssetId = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
 
-  const { type: tradeType } = currentTradeData ?? {};
+  const { type: selectedTradeType } = currentTradeData;
 
-  const selectedTradeType = getSelectedTradeType(tradeType);
+  const typeOptions = useAppSelector(
+    (s) => getTradeFormSummary(s).summary.options.orderTypeOptions,
+    shallowEqual
+  );
 
-  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
-
-  const allTradeTypeItems = useMemo((): Array<MenuItem<TradeTypes>> | undefined => {
-    const allItems = typeOptions?.toArray().map(({ type, stringKey }) => ({
-      value: type as TradeTypes,
+  const allTradeTypeItems = useMemo((): Array<MenuItem<TradeFormType>> | undefined => {
+    const allItems = typeOptions.map(({ value, stringKey }) => ({
+      value,
       label: stringGetter({
-        key:
-          type === TradeTypes.TAKE_PROFIT
-            ? STRING_KEYS.TAKE_PROFIT_LIMIT
-            : ((stringKey ?? '') as StringKey),
+        key: stringKey,
       }),
       slotBefore: showAssetIcon ? (
         <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
@@ -48,7 +45,7 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
     return allItems;
   }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions]);
 
-  const asSubItems = useMemo((): Array<MenuItem<TradeTypes>> => {
+  const asSubItems = useMemo((): Array<MenuItem<TradeFormType>> => {
     if (allTradeTypeItems == null || allTradeTypeItems.length === 0) {
       return EMPTY_ARR;
     }
@@ -59,16 +56,19 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
       allTradeTypeItems.length > 2
         ? {
             label:
-              selectedTradeType === TradeTypes.TAKE_PROFIT ||
-              selectedTradeType === TradeTypes.TAKE_PROFIT_MARKET
+              selectedTradeType === TradeFormType.TAKE_PROFIT_LIMIT ||
+              selectedTradeType === TradeFormType.TAKE_PROFIT_MARKET
                 ? stringGetter({ key: STRING_KEYS.TAKE_PROFIT })
-                : stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
-            value: '' as TradeTypes,
+                : selectedTradeType === TradeFormType.STOP_LIMIT ||
+                    selectedTradeType === TradeFormType.STOP_MARKET
+                  ? stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT })
+                  : stringGetter({ key: STRING_KEYS.ADVANCED }),
+            value: '' as TradeFormType,
             subitems: allTradeTypeItems.slice(2),
           }
         : undefined,
     ].filter(isTruthy);
-  }, [allTradeTypeItems, stringGetter]);
+  }, [allTradeTypeItems, selectedTradeType, stringGetter]);
 
   return {
     selectedTradeType,

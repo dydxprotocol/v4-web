@@ -79,6 +79,7 @@ class LocalWalletManager {
     this.localWalletNonce = undefined;
     this.localWallet = undefined;
     this.localNobleWallet = undefined;
+    this.store?.dispatch(setLocalWalletNonce(undefined));
   }
 }
 

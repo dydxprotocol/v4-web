@@ -1,24 +1,22 @@
+import { PlaceOrderMarketInfo, PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
-import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
-import { OrderExecution } from '@dydxprotocol/v4-client-js';
+import { OrderExecution, OrderSide, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
 import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
-import {
-  AbacusOrderSide,
-  AbacusOrderType,
-  HumanReadableCancelOrderPayload,
-  ParsingError,
-  PlaceOrderMarketInfo,
-} from '@/constants/abacus';
+import { TransactionMemo } from '@/constants/analytics';
 import {
   IndexerAPITimeInForce,
   IndexerOrderSide,
   IndexerOrderType,
 } from '@/types/indexer/indexerApiGen';
 
-import abacusStateManager from './abacus';
+import { store } from '@/state/_store';
+
 import { assertNever } from './assertNever';
+import { calc } from './do';
+import { AttemptNumber } from './numbers';
 import {
   isLimitOrderTypeNew,
   isMarketOrderTypeNew,
@@ -44,26 +42,30 @@ const calculateGoodTilTimeInSeconds = (goodTilBlockTimeSeconds: number) => {
   return Math.round(goodTilBlockTimeSeconds - nowSeconds);
 };
 
-const getMarketInfo = (marketId: string) => {
-  const market = abacusStateManager.stateManager.state?.market(marketId);
-  const v4Config = market?.configs?.v4;
-
-  if (!v4Config) return null;
-
-  return new PlaceOrderMarketInfo(
-    v4Config.clobPairId,
-    v4Config.atomicResolution,
-    v4Config.stepBaseQuantums,
-    v4Config.quantumConversionExponent,
-    v4Config.subticksPerTick
-  );
+const getMarketInfo = (marketId: string): PlaceOrderMarketInfo | null => {
+  const market = BonsaiHelpers.markets.createSelectMarketSummaryById()(store.getState(), marketId);
+  if (market == null) {
+    return null;
+  }
+  const clobPairId = AttemptNumber(market.clobPairId);
+  if (clobPairId == null) {
+    return null;
+  }
+  const marketInfo: PlaceOrderMarketInfo = {
+    clobPairId,
+    atomicResolution: market.atomicResolution,
+    stepBaseQuantums: market.stepBaseQuantums,
+    quantumConversionExponent: market.quantumConversionExponent,
+    subticksPerTick: market.subticksPerTick,
+  };
+  return marketInfo;
 };
 
 /* Copies an existing order into a PlaceOrder object */
 export const createPlaceOrderPayloadFromExistingOrder = (
   order: SubaccountOrderNew,
   newPrice: number
-) => {
+): PlaceOrderPayload | undefined => {
   const {
     subaccountNumber,
     marketId,
@@ -79,8 +81,12 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     triggerPrice,
   } = order;
 
-  // subaccountNumber can be 0 -.-
-  if (subaccountNumber === undefined || subaccountNumber === null) {
+  if (subaccountNumber == null || subaccountNumber == null) {
+    return undefined;
+  }
+
+  const marketInfo = getMarketInfo(marketId);
+  if (marketInfo == null) {
     return undefined;
   }
 
@@ -88,94 +94,70 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     ? [newPrice, triggerPrice?.toNumber()]
     : [price.toNumber(), newPrice];
 
-  return new Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload(
+  return {
     subaccountNumber,
     marketId,
-    generateRandomClientId().toString(),
-    indexerToAbacusOrderType(type).rawValue,
-    indexerToAbacusOrderSide(side).rawValue,
-    orderPrice,
-    orderTriggerPrice,
-    size.toNumber(),
-    null,
+    clientId: generateRandomClientId(),
+    type: calc(() => {
+      switch (type) {
+        case IndexerOrderType.MARKET:
+          return OrderType.MARKET;
+        case IndexerOrderType.LIMIT:
+          return OrderType.LIMIT;
+        case IndexerOrderType.STOPLIMIT:
+          return OrderType.STOP_LIMIT;
+        case IndexerOrderType.STOPMARKET:
+          return OrderType.STOP_MARKET;
+        case IndexerOrderType.TAKEPROFIT:
+          return OrderType.TAKE_PROFIT_LIMIT;
+        case IndexerOrderType.TAKEPROFITMARKET:
+          return OrderType.TAKE_PROFIT_MARKET;
+        case IndexerOrderType.TRAILINGSTOP:
+          // we don't support this anymore
+          return OrderType.MARKET;
+        default:
+          assertNever(type);
+          return OrderType.MARKET;
+      }
+    }),
+    side: side === IndexerOrderSide.BUY ? OrderSide.BUY : OrderSide.SELL,
+    price: orderPrice,
+    triggerPrice: orderTriggerPrice,
+    size: size.toNumber(),
     reduceOnly,
     postOnly,
-    timeInForce != null ? indexerToAbacusTimeInForce(timeInForce).rawValue : undefined,
-    // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
-    isMarketOrderTypeNew(type) ? OrderExecution.IOC : null,
-    // todo bonsai broke the goodtilblocktime by making it milliseconds
-    goodTilBlockTimeSeconds && calculateGoodTilTimeInSeconds(goodTilBlockTimeSeconds),
-    goodTilBlock,
-    getMarketInfo(marketId)
-  );
-};
+    timeInForce: calc(() => {
+      // Return undefined if timeInForce is null
+      if (timeInForce == null) {
+        return undefined;
+      }
+      // Convert based on timeInForce value
+      if (timeInForce === IndexerAPITimeInForce.GTT) {
+        return OrderTimeInForce.GTT;
+      }
+      if (timeInForce === IndexerAPITimeInForce.IOC) {
+        return OrderTimeInForce.IOC;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (timeInForce === IndexerAPITimeInForce.FOK) {
+        // not supported anymore
+        return undefined;
+      }
 
-export function indexerToAbacusOrderType(
-  orderType: IndexerOrderType
-): Abacus.exchange.dydx.abacus.output.input.OrderType {
-  switch (orderType) {
-    case IndexerOrderType.MARKET:
-      return AbacusOrderType.Market;
-    case IndexerOrderType.LIMIT:
-      return AbacusOrderType.Limit;
-    case IndexerOrderType.STOPMARKET:
-      return AbacusOrderType.StopMarket;
-    case IndexerOrderType.STOPLIMIT:
-      return AbacusOrderType.StopLimit;
-    case IndexerOrderType.TRAILINGSTOP:
-      return AbacusOrderType.TrailingStop;
-    case IndexerOrderType.TAKEPROFIT:
-      return AbacusOrderType.TakeProfitLimit;
-    case IndexerOrderType.TAKEPROFITMARKET:
-      return AbacusOrderType.TakeProfitMarket;
-    default:
-      assertNever(orderType);
-      return AbacusOrderType.Market;
-  }
-}
-
-export function indexerToAbacusOrderSide(
-  side: IndexerOrderSide
-): Abacus.exchange.dydx.abacus.output.input.OrderSide {
-  switch (side) {
-    case IndexerOrderSide.BUY:
-      return AbacusOrderSide.Buy;
-    case IndexerOrderSide.SELL:
-      return AbacusOrderSide.Sell;
-    default:
-      assertNever(side);
-      return AbacusOrderSide.Sell;
-  }
-}
-
-export function indexerToAbacusTimeInForce(
-  timeInForce: IndexerAPITimeInForce
-): Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce {
-  switch (timeInForce) {
-    case IndexerAPITimeInForce.GTT:
-      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.GTT;
-    case IndexerAPITimeInForce.IOC:
-      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
-    case IndexerAPITimeInForce.FOK:
-      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
-    default:
       assertNever(timeInForce);
-      return Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce.IOC;
-  }
-}
-
-export const cancelOrderAsync = (
-  orderId: string
-): Promise<{
-  success: boolean;
-  parsingError: Nullable<ParsingError>;
-  data: Nullable<HumanReadableCancelOrderPayload>;
-}> => {
-  return new Promise((resolve) => {
-    abacusStateManager.cancelOrder(orderId, (success, parsingError, data) => {
-      resolve({ success, parsingError, data });
-    });
-  });
+      return undefined;
+    }),
+    // TODO(tinaszheng) pass through `execution` once indexer field makes this available and we want to support TP Limit and Stop Limit orders
+    execution: isMarketOrderTypeNew(type) ? OrderExecution.IOC : undefined,
+    // todo bonsai broke the goodtilblocktime by making it milliseconds
+    goodTilTimeInSeconds:
+      goodTilBlockTimeSeconds && calculateGoodTilTimeInSeconds(goodTilBlockTimeSeconds),
+    goodTilBlock,
+    marketInfo,
+    currentHeight: undefined,
+    memo: TransactionMemo.placeOrder,
+    transferToSubaccountAmount: undefined,
+  };
 };
 
 export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPrice: number) => {
@@ -187,9 +169,7 @@ export const getOrderModificationError = (
   order: SubaccountOrderNew,
   newPrice: number
 ): { title: string; body?: string } | null => {
-  const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
-    order.marketId
-  )?.midPrice;
+  const bookPrice = BonsaiHelpers.currentMarket.midPrice.data(store.getState())?.toNumber();
   if (!bookPrice) return null;
 
   const oldPrice = order.triggerPrice ?? order.price;

@@ -15,6 +15,7 @@ export enum LocalStorageKey {
   // Notifications
   Notifications = 'dydx.Notifications',
   NotificationsLastUpdated = 'dydx.NotificationsLastUpdated',
+  AppInitialized = 'dydx.AppInitialized',
   PushNotificationsEnabled = 'dydx.PushNotificationsEnabled',
   PushNotificationsLastUpdated = 'dydx.PushNotificationsLastUpdated',
   TransferNotifications = 'dydx.TransferNotifications',

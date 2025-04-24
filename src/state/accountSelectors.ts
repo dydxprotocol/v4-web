@@ -28,8 +28,6 @@ import { getCurrentMarketId } from './currentMarketSelectors';
  */
 export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
-export const getSubaccountForPostOrder = (s: RootState) => s.account.subaccountForPostOrders;
-
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
@@ -52,12 +50,6 @@ export const getOpenPositionFromId = () =>
       allOpenPositions?.find(({ uniqueId }) => uniqueId === positionId)
   );
 
-export const getOpenPositionFromIdForPostOrder = () =>
-  createAppSelector(
-    [(s) => s.account.subaccountForPostOrders?.openPositions, (s, marketId: string) => marketId],
-    (allOpenPositions, marketId) => allOpenPositions?.toArray().find(({ id }) => id === marketId)
-  );
-
 /**
  * @param state
  * @returns AccountPositions of the current market
@@ -66,17 +58,6 @@ export const getCurrentMarketPositionData = createAppSelector(
   [getCurrentMarketId, getOpenPositions],
   (marketId, positions) => {
     return positions?.find((p) => p.market === marketId);
-  }
-);
-
-/**
- * @param state
- * @returns AccountPositions of the current market
- */
-export const getCurrentMarketPositionDataForPostTrade = createAppSelector(
-  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.openPositions],
-  (marketId, positions) => {
-    return positions?.toArray().find((p) => p.id === marketId);
   }
 );
 
@@ -105,14 +86,6 @@ export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
     !currentMarketId ? EMPTY_ARR : marketOrders[currentMarketId] ?? EMPTY_ARR
-);
-
-export const getCurrentMarketOrdersForPostOrder = createAppSelector(
-  [getCurrentMarketId, (s) => s.account.subaccountForPostOrders?.orders],
-  (currentMarketId, marketOrders) =>
-    !currentMarketId
-      ? EMPTY_ARR
-      : marketOrders?.toArray().filter((o) => o.marketId === currentMarketId) ?? EMPTY_ARR
 );
 
 /**
@@ -259,9 +232,10 @@ export const getFillDetails = () =>
     }
   );
 
-const getFillsForOrderId = () =>
-  createAppSelector([(s, orderId) => orderId, getSubaccountFills], (orderId, fills) =>
-    orderId ? groupBy(fills, 'orderId')[orderId] ?? [] : []
+export const getFillsForOrderId = () =>
+  createAppSelector(
+    [(s, orderId: string | undefined) => orderId, getSubaccountFills],
+    (orderId, fills) => (orderId ? fills.filter((f) => f.orderId === orderId) : [])
   );
 
 /**

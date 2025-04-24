@@ -1,19 +1,19 @@
 import { css } from 'styled-components';
 
-import { type RiskLevels } from '@/constants/abacus';
+import { RiskLevel } from './risk';
 
-export const UsageColorFromRiskLevel = (riskLevel: RiskLevels) =>
+export const usageColorFromRiskLevel = (riskLevel: RiskLevel) =>
   ({
-    low: css`
+    [RiskLevel.LOW]: css`
       color: var(--color-risk-low);
     `,
-    medium: css`
+    [RiskLevel.MEDIUM]: css`
       color: var(--color-risk-medium);
     `,
-    high: css`
+    [RiskLevel.HIGH]: css`
       color: var(--color-risk-high);
     `,
-  })[riskLevel.name];
+  })[riskLevel];
 
 export const generateFadedColorVariant = (colorHex: string, opacityHex: string) => {
   return `${colorHex}${opacityHex}`;

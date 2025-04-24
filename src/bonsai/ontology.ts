@@ -2,11 +2,16 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
-import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerHistoricalBlockTradingReward,
+  IndexerHistoricalTradingRewardAggregation,
+} from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+
+import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
 import { Loadable, LoadableStatus } from './lib/loadable';
@@ -28,12 +33,16 @@ import {
 } from './rest/staking';
 import {
   getCurrentMarketAccountFills,
+  selectAccountBlockRewardsLoading,
+  selectAccountBlockTradingRewards,
   selectAccountFills,
   selectAccountFillsLoading,
   selectAccountOrders,
   selectAccountOrdersLoading,
   selectAccountTransfers,
   selectAccountTransfersLoading,
+  selectChildSubaccountSummaries,
+  selectCurrentMarketInfoRaw,
   selectCurrentMarketOpenOrders,
   selectCurrentMarketOrderHistory,
   selectOpenOrders,
@@ -75,6 +84,7 @@ import {
   selectCurrentMarketDepthChart,
   selectCurrentMarketMidPrice,
 } from './selectors/orderbook';
+import { selectRewardsSummary } from './selectors/rewards';
 import {
   createSelectMarketSummaryById,
   selectAllMarketSummaries,
@@ -97,6 +107,7 @@ import {
   AllAssetData,
   ApiState,
   AssetData,
+  ChildSubaccountSummaries,
   Compliance,
   EquityTiersSummary,
   FeeTierSummary,
@@ -104,6 +115,7 @@ import {
   PendingIsolatedPosition,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
+  RewardParamsSummary,
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
@@ -130,6 +142,10 @@ interface BonsaiCoreShape {
       data: BasicSelector<SubaccountPosition[] | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
+    childSubaccountSummaries: {
+      data: BasicSelector<ChildSubaccountSummaries | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
     openOrders: {
       data: BasicSelector<SubaccountOrder[]>;
       loading: BasicSelector<LoadableStatus>;
@@ -148,6 +164,10 @@ interface BonsaiCoreShape {
     };
     transfers: {
       data: BasicSelector<SubaccountTransfer[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    blockTradingRewards: {
+      data: BasicSelector<IndexerHistoricalBlockTradingReward[]>;
       loading: BasicSelector<LoadableStatus>;
     };
     stats: {
@@ -188,6 +208,7 @@ interface BonsaiCoreShape {
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
+  rewardParams: { data: BasicSelector<RewardParamsSummary> };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -199,6 +220,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     parentSubaccountPositions: {
       data: selectParentSubaccountOpenPositions,
       loading: selectParentSubaccountOpenPositionsLoading,
+    },
+    childSubaccountSummaries: {
+      data: selectChildSubaccountSummaries,
+      loading: selectParentSubaccountSummaryLoading,
     },
     allOrders: {
       data: selectAccountOrders,
@@ -219,6 +244,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     transfers: {
       data: selectAccountTransfers,
       loading: selectAccountTransfersLoading,
+    },
+    blockTradingRewards: {
+      data: selectAccountBlockTradingRewards,
+      loading: selectAccountBlockRewardsLoading,
     },
     stats: {
       data: selectUserStats,
@@ -258,6 +287,7 @@ export const BonsaiCore: BonsaiCoreShape = {
     feeTiers: selectFeeTiers,
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
+  rewardParams: { data: selectRewardsSummary },
 };
 
 interface BonsaiRawShape {
@@ -265,6 +295,7 @@ interface BonsaiRawShape {
   // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
   // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  currentMarket: BasicSelector<RecordValueType<MarketsData> | undefined>;
   // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
 }
@@ -272,6 +303,7 @@ interface BonsaiRawShape {
 export const BonsaiRaw: BonsaiRawShape = {
   parentSubaccountBase: selectRawParentSubaccountData,
   parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  currentMarket: selectCurrentMarketInfoRaw,
   allMarkets: selectRawMarketsData,
 };
 

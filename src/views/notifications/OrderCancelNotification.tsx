@@ -1,9 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
 
-import { AbacusOrderStatus, TRADE_TYPES_NEW } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
+import { CancelOrderStatuses, LocalCancelOrderData } from '@/constants/trade';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -18,7 +17,8 @@ import { getOrderById } from '@/state/accountSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { OrderStatusIcon } from '../OrderStatusIcon';
+import { OrderStatusIconNew } from '../OrderStatusIcon';
+import { getIndexerOrderTypeStringKey } from '../tables/enumToStringKeyHelpers';
 
 type ElementProps = {
   localCancel: LocalCancelOrderData;
@@ -30,14 +30,18 @@ export const OrderCancelNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useParameterizedSelector(getOrderById, localCancel.orderId)!;
+  const order = useParameterizedSelector(getOrderById, localCancel.orderId);
   const { assetId, logo: logoUrl } = orEmptyObj(
-    useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, order.marketId)
+    useParameterizedSelector(
+      BonsaiHelpers.markets.createSelectMarketSummaryById,
+      localCancel.cachedData.marketId
+    )
   );
 
-  const tradeType = TRADE_TYPES_NEW[order.type] ?? undefined;
-  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
-  const indexedOrderStatus = order.status;
+  const orderTypeKey = getIndexerOrderTypeStringKey(
+    order?.type ?? localCancel.cachedData.orderType
+  );
+  const indexedOrderStatus = order?.status;
   const cancelStatus = localCancel.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.CANCELING;
@@ -45,7 +49,7 @@ export const OrderCancelNotification = ({
   let customContent = null;
 
   // show Canceled if either canceled confirmation happens (node / indexer)
-  // note: indexer status is further processed by abacus, but PartiallyCanceled = CANCELED
+  // note: indexer status is further processed by bonsai, but PartiallyCanceled = CANCELED
   const isPartiallyCanceled = indexedOrderStatus === OrderStatus.PartiallyCanceled;
   const isCancelFinalized = indexedOrderStatus === OrderStatus.Canceled || isPartiallyCanceled;
 
@@ -53,12 +57,7 @@ export const OrderCancelNotification = ({
     orderStatusStringKey = isPartiallyCanceled
       ? STRING_KEYS.PARTIALLY_FILLED
       : STRING_KEYS.CANCELED;
-    orderStatusIcon = (
-      <OrderStatusIcon
-        status={AbacusOrderStatus.Canceled.rawValue}
-        tw="h-[0.9375rem] w-[0.9375rem]"
-      />
-    );
+    orderStatusIcon = <OrderStatusIconNew status={OrderStatus.Canceled} tw="size-[0.9375rem]" />;
   }
 
   if (localCancel.errorParams) {
