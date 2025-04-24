@@ -1,25 +1,11 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { MarginMode } from '@/bonsai/forms/trade/types';
 
-import {
-  AbacusMarginMode,
-  AbacusOrderSide,
-  AbacusOrderTypes,
-  type AbacusOrderSides,
-} from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { PositionSide, TradeTypes } from '@/constants/trade';
+import { PositionSide } from '@/constants/trade';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { Nullable } from '@/lib/typeUtils';
-
-export const getSelectedTradeType = (type: Nullable<AbacusOrderTypes>) => {
-  return type ? (type.rawValue as TradeTypes) : TradeTypes.LIMIT;
-};
-
-export const getSelectedOrderSide = (side: Nullable<AbacusOrderSides>) => {
-  return side === AbacusOrderSide.Sell ? OrderSide.SELL : OrderSide.BUY;
-};
 
 export const hasPositionSideChanged = ({
   currentSize,
@@ -68,11 +54,9 @@ export const calculateCrossPositionMargin = ({
  * @note v4-web is assuming that subaccountNumber >= 128 is used as childSubaccounts. API Traders may utilize these subaccounts differently.
  */
 export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<number>) => {
-  if (!subaccountNumber) return AbacusMarginMode.Cross;
+  if (!subaccountNumber) return MarginMode.CROSS;
 
-  return subaccountNumber >= NUM_PARENT_SUBACCOUNTS
-    ? AbacusMarginMode.Isolated
-    : AbacusMarginMode.Cross;
+  return subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? MarginMode.ISOLATED : MarginMode.CROSS;
 };
 
 export const getDoubleValuesHasDiff = (current: Nullable<number>, post: Nullable<number>) => {

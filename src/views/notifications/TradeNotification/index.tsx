@@ -2,9 +2,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { TRADE_TYPES_NEW } from '@/constants/abacus';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -14,7 +12,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
-import { getOrderStatusStringKey } from '@/views/tables/enumToStringKeyHelpers';
+import {
+  getIndexerOrderTypeStringKey,
+  getOrderStatusStringKey,
+} from '@/views/tables/enumToStringKeyHelpers';
 
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -42,9 +43,7 @@ export const TradeNotification = ({
   const { assetId } = orEmptyObj(marketData);
   const assetImgUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
 
-  const orderType = order.type;
-  const tradeType = TRADE_TYPES_NEW[orderType] ?? undefined;
-  const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
+  const titleKey = getIndexerOrderTypeStringKey(order.type);
   const orderStatus = order.status;
 
   return (
@@ -56,7 +55,10 @@ export const TradeNotification = ({
       slotTitleRight={
         <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">
           {stringGetter({ key: getOrderStatusStringKey(orderStatus) })}
-          <OrderStatusIconNew status={orderStatus ?? OrderStatus.Open} tw="size-[0.9375rem]" />
+          <OrderStatusIconNew
+            status={orderStatus ?? OrderStatus.Open}
+            tw="h-[0.9375rem] w-[0.9375rem]"
+          />
         </span>
       }
       slotCustomContent={
