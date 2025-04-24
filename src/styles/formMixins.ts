@@ -5,8 +5,8 @@ import { layoutMixins } from './layoutMixins';
 
 const inputInnerButton = css`
   --button-textColor: var(--color-text-1);
-  --button-backgroundColor: var(--color-layer-5);
-  --button-border: var(--border-width) solid var(--color-layer-6);
+  --button-backgroundColor: var(--color-layer-6);
+  --button-border: none;
 `;
 
 const inputsColumn = css`
@@ -22,7 +22,6 @@ export const formMixins = {
     --input-height: var(--form-input-height);
     --input-width: 100%;
     --input-backgroundColor: ${({ theme }) => theme.inputBackground};
-    --input-borderColor: var(--color-layer-6);
 
     ${layoutMixins.row}
     justify-content: space-between;
@@ -52,12 +51,12 @@ export const formMixins = {
   inputInnerToggleButton: css`
     ${() => inputInnerButton}
 
-    --button-toggle-off-backgroundColor: var(--color-layer-5);
+    --button-toggle-off-backgroundColor: var(--color-layer-6);
     --button-toggle-off-textColor: var(--color-text-1);
-    --button-toggle-off-border: var(--border-width) solid var(--color-layer-6);
-    --button-toggle-on-backgroundColor: var(--color-layer-5);
+    --button-toggle-off-border: none;
+    --button-toggle-on-backgroundColor: var(--color-layer-6);
     --button-toggle-on-textColor: var(--color-text-1);
-    --button-toggle-on-border: var(--border-width) solid var(--color-layer-6);
+    --button-toggle-on-border: none;
 
     svg {
       color: var(--color-text-0);
@@ -69,12 +68,12 @@ export const formMixins = {
     --trigger-textColor: var(--color-text-2);
     --trigger-backgroundColor: var(--color-layer-4);
     --trigger-open-backgroundColor: var(--color-layer-4);
-    --trigger-border: solid var(--border-width) var(--color-layer-6);
+    --trigger-border: none;
     --trigger-padding: var(--form-input-paddingY) var(--form-input-paddingX);
     --trigger-height: var(--form-input-height);
 
     --popover-backgroundColor: var(--color-layer-5);
-    --popover-border: var(--border-width) solid var(--color-layer-6);
+    --popover-border: none;
 
     font: var(--font-base-book);
 
@@ -91,14 +90,14 @@ export const formMixins = {
 
   inputInnerSelectMenu: css`
     --trigger-textColor: var(--color-text-1);
-    --trigger-backgroundColor: var(--color-layer-5);
-    --trigger-open-backgroundColor: var(--color-layer-5);
-    --trigger-border: solid var(--border-width) var(--color-layer-6);
+    --trigger-backgroundColor: var(--color-layer-6);
+    --trigger-open-backgroundColor: var(--color-layer-6);
+    --trigger-border: none;
     --trigger-padding: 0 0.33rem;
     --trigger-height: 1.875rem;
 
     --popover-backgroundColor: var(--color-layer-5);
-    --popover-border: solid var(--border-width) var(--color-layer-6);
+    --popover-border: none;
 
     font: var(--font-small-book);
   `,

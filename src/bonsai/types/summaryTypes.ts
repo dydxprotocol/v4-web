@@ -1,4 +1,10 @@
-import { ClobModule, ComplianceReason, FeeTierModule } from '@dydxprotocol/v4-client-js';
+import {
+  ClobModule,
+  ComplianceReason,
+  FeeTierModule,
+  PricesModule,
+  RewardsModule,
+} from '@dydxprotocol/v4-client-js';
 import { type BigNumber } from 'bignumber.js';
 
 import {
@@ -58,7 +64,11 @@ export type SubaccountSummaryDerived = {
 };
 
 export type SubaccountSummary = SubaccountSummaryCore & SubaccountSummaryDerived;
-export type GroupedSubaccountSummary = SubaccountSummaryDerived;
+export type GroupedSubaccountSummary = SubaccountSummaryDerived & {
+  parentSubaccountEquity: BigNumber;
+};
+// includes parent but it's the basic summary, not aggregated in any way
+export type ChildSubaccountSummaries = Record<string, SubaccountSummaryDerived>;
 
 export type SubaccountPositionBase = ConvertStringToBigNumber<
   IndexerPerpetualPositionResponseObject,
@@ -265,6 +275,11 @@ export type ConfigTiers = {
   equityTiers: EquityTiers | undefined;
 };
 
+export type RewardsParams = NonNullable<ToPrimitives<RewardsModule.QueryParamsResponse['params']>>;
+export type TokenPriceResponse = NonNullable<
+  ToPrimitives<PricesModule.QueryMarketPriceResponse['marketPrice']>
+>;
+
 export interface FeeTierSummary {
   id: string;
   tier: string;
@@ -322,3 +337,8 @@ export interface ComplianceResponse {
   updatedAt?: string;
 }
 export type Compliance = ComplianceResponse & { geo?: string };
+
+export type RewardParamsSummary = {
+  feeMultiplier: number | undefined;
+  tokenPrice: number | undefined;
+};

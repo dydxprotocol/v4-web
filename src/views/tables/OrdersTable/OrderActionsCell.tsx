@@ -1,22 +1,26 @@
 import { useCallback, useState } from 'react';
 
+import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
-import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonShape, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { accountTransactionManager } from '@/state/_store';
+
+import { track } from '@/lib/analytics/analytics';
 import { isNewOrderStatusClearable } from '@/lib/orders';
+import { Nullable } from '@/lib/typeUtils';
 
 type ElementProps = {
   orderId: string;
@@ -30,12 +34,15 @@ export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: El
 
   const [isCanceling, setIsCanceling] = useState(false);
 
-  const { cancelOrder } = useSubaccount();
-
   const onCancel = useCallback(async () => {
     setIsCanceling(true);
-    cancelOrder({ orderId, onError: () => setIsCanceling(false) });
-  }, []);
+    track(AnalyticsEvents.TradeCancelOrderClick({ orderId }));
+    const res = await accountTransactionManager.cancelOrder({ orderId });
+    if (isOperationFailure(res)) {
+      // we only re-enable if it failed
+      setIsCanceling(false);
+    }
+  }, [orderId]);
 
   // CT831: if order is stateful and is initially best effort canceled, it's a stuck order that
   // traders should be able to submit another cancel

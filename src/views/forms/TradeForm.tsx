@@ -1,32 +1,24 @@
-import { useCallback, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { isOperationSuccess } from '@/bonsai/lib/operationResult';
+import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import {
-  AbacusInputTypes,
-  ErrorType,
-  TradeInputErrorAction,
-  TradeInputField,
-  ValidationError,
-  type HumanReadablePlaceOrderPayload,
-} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
-import { ErrorParams } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -35,26 +27,26 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import {
-  getCurrentInput,
-  getInputTradeData,
-  getTradeFormInputs,
-  useTradeFormData,
-} from '@/state/inputsSelectors';
+import { accountTransactionManager } from '@/state/_store';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
+import { tradeFormActions } from '@/state/tradeForm';
+import {
+  getCurrentTradePageForm,
+  getTradeFormRawState,
+  getTradeFormSummary,
+} from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics/analytics';
+import { useDisappearingValue } from '@/lib/disappearingValue';
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
-import { log } from '@/lib/telemetry';
-import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
-import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -62,7 +54,6 @@ import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
-import { TradeFormInfoMessages } from './TradeForm/TradeFormInfoMessages';
 import { TradeFormInputs } from './TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
@@ -83,113 +74,85 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [placeOrderError, setPlaceOrderError] = useState<string>();
+  const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
   const stringGetter = useStringGetter();
-  const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
 
-  const { price, size, summary, tradeErrors } = useTradeFormData();
+  const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
 
-  const currentInput = useAppSelector(getCurrentInput);
-  const { tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
+  const currentInput = useAppSelector(getCurrentTradePageForm);
 
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
-  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
+  const dispatch = useAppDispatch();
 
-  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
+  useEffect(() => {
+    dispatch(tradeFormActions.setMarketId(currentMarketId));
+  }, [currentMarketId, dispatch]);
 
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const tradeFormInputValues = summary.effectiveTrade;
 
-  const { marketId, side } = currentTradeData ?? {};
-
-  const selectedOrderSide = getSelectedOrderSide(side);
+  const { marketId, side } = tradeFormInputValues;
+  const selectedOrderSide = side ?? OrderSide.BUY;
 
   const { selectedTradeType, tradeTypeItems: allTradeTypeItems } = useTradeTypeOptions({
     showAll: true,
     showAssetIcon: true,
   });
 
-  const onTradeTypeChange = (tradeType: TradeTypes) => {
-    abacusStateManager.clearTradeInputValues();
-    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
+  const onTradeTypeChange = (tradeType: TradeFormType) => {
+    dispatch(tradeFormActions.reset());
+    dispatch(tradeFormActions.setOrderType(tradeType));
   };
 
+  const rawInput = useAppSelector(getTradeFormRawState);
   const isInputFilled =
-    Object.values(tradeFormInputValues).some((val) => val !== '') ||
-    Object.values(price ?? {}).some((val) => !!val) ||
-    [size?.size, size?.usdcSize, size?.leverage].some((val) => val != null);
+    [
+      rawInput.triggerPrice,
+      rawInput.targetLeverage,
+      rawInput.reduceOnly,
+      rawInput.goodTil,
+      rawInput.execution,
+      rawInput.postOnly,
+      rawInput.timeInForce,
+    ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
 
   const hasInputErrors =
-    !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
-    currentInput !== AbacusInputTypes.Trade;
+    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
 
   const { getNotificationPreferenceForType } = useNotifications();
 
-  const {
-    inputAlert,
-    alertContent,
-    shortAlertContent,
-    alertType,
-    shouldPromptUserToPlaceLimitOrder,
-  } = useMemo(() => {
-    let alertContentInner;
-    let alertTypeInner = AlertType.Error;
-
-    let alertContentLink;
-    let alertContentLinkText;
-
-    const inputAlertInner = getTradeInputAlert({
-      abacusInputErrors: tradeErrors ?? [],
-      stringGetter,
-      stepSizeDecimals,
-      tickSizeDecimals,
-    });
+  const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
+    const primaryAlert = getHighestPriorityAlert(tradeErrors);
 
     const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
       NotificationType.OrderStatus
     );
 
-    if (placeOrderError && !isErrorShownInOrderStatusToast) {
-      alertContentInner = placeOrderError;
-    } else if (inputAlertInner) {
-      alertContentInner = inputAlertInner.alertString;
-      alertTypeInner = inputAlertInner.type;
-      alertContentLink = inputAlertInner.link;
-      alertContentLinkText = inputAlertInner.linkText;
-    }
+    const shouldPromptUserToPlaceLimitOrderInner =
+      primaryAlert?.code === 'MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE';
 
-    const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
-      (errorCode) => inputAlertInner?.code === errorCode
-    );
     return {
-      shortAlertContent: alertContentInner,
-      alertContent: alertContentInner && (
-        <div tw="inline-block">
-          {alertContentInner}{' '}
-          {alertContentLinkText && alertContentLink && (
-            <Link isInline href={alertContentLink}>
-              {alertContentLinkText}
-            </Link>
-          )}
-        </div>
-      ),
-      alertType: alertTypeInner,
+      shortAlertKey: primaryAlert?.resources.title?.stringKey,
+      alertContent:
+        placeOrderError != null && !isErrorShownInOrderStatusToast ? (
+          <AlertMessage type={AlertType.Error}>
+            <div tw="inline-block">{placeOrderError}</div>
+          </AlertMessage>
+        ) : primaryAlert != null && primaryAlert.resources.text?.stringKey != null ? (
+          <ValidationAlertMessage error={primaryAlert} />
+        ) : undefined,
+      alertType:
+        placeOrderError != null && !isErrorShownInOrderStatusToast
+          ? ErrorType.error
+          : primaryAlert?.type,
       shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
-      inputAlert: inputAlertInner,
+      inputAlert: primaryAlert,
     };
-  }, [
-    getNotificationPreferenceForType,
-    placeOrderError,
-    stepSizeDecimals,
-    stringGetter,
-    tickSizeDecimals,
-    tradeErrors,
-  ]);
+  }, [getNotificationPreferenceForType, placeOrderError, tradeErrors]);
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -225,30 +188,30 @@ export const TradeForm = ({
     }
   }, [currentStep, setCurrentStep]);
 
-  const { setUnIndexedClientId } = useOnLastOrderIndexed({
-    callback: onLastOrderIndexed,
-  });
+  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
 
-  const onPlaceOrder = () => {
+  const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
+    dispatch(tradeFormActions.reset());
 
-    placeOrder({
-      onError: (errorParams: ErrorParams) => {
-        log('TradeForm/onPlaceOrder', new Error(errorParams.errorMessage), { errorParams });
-        setPlaceOrderError(
-          stringGetter({
-            key: errorParams.errorStringKey,
-            fallback: errorParams.errorMessage ?? '',
-          })
-        );
-        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
-      },
-      onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
-        setUnIndexedClientId(placeOrderPayload?.clientId);
-      },
-    });
-
-    abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
+    const payload = summary.tradePayload;
+    if (payload == null) {
+      return;
+    }
+    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
+    const result = await accountTransactionManager.placeOrder(payload);
+    if (isOperationSuccess(result)) {
+      setUnIndexedClientId(payload.clientId.toString());
+    } else {
+      const errorParams = operationFailureToErrorParams(result);
+      setPlaceOrderError(
+        stringGetter({
+          key: errorParams.errorStringKey,
+          fallback: errorParams.errorMessage ?? '',
+        })
+      );
+      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
+    }
   };
 
   const tabletActionsRow = isTablet && (
@@ -273,30 +236,23 @@ export const TradeForm = ({
 
   const tradeFormMessages = (
     <>
-      <TradeFormInfoMessages marketId={marketId} />
-
       {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
         <AlertMessage type={AlertType.Error}>
           <span>{complianceMessage}</span>
         </AlertMessage>
       )}
 
-      {alertContent && (
-        <AlertMessage type={alertType}>
-          <div tw="row gap-0.75">
-            {alertContent}
-            {shouldPromptUserToPlaceLimitOrder && (
-              <$IconButton
-                iconName={IconName.Arrow}
-                shape={ButtonShape.Circle}
-                action={ButtonAction.Navigation}
-                size={ButtonSize.XSmall}
-                iconSize="1.25em"
-                onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
-              />
-            )}
-          </div>
-        </AlertMessage>
+      {alertContent}
+
+      {shouldPromptUserToPlaceLimitOrder && (
+        <$IconButton
+          iconName={IconName.Arrow}
+          shape={ButtonShape.Circle}
+          action={ButtonAction.Navigation}
+          size={ButtonSize.XSmall}
+          iconSize="1.25em"
+          onClick={() => onTradeTypeChange(TradeFormType.LIMIT)}
+        />
       )}
     </>
   );
@@ -319,12 +275,11 @@ export const TradeForm = ({
     <PlaceOrderButtonAndReceipt
       hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
-      onClearInputs={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
-      actionStringKey={inputAlert?.actionStringKey}
-      validationErrorString={shortAlertContent}
-      summary={summary ?? undefined}
+      onClearInputs={() => dispatch(tradeFormActions.reset())}
+      actionStringKey={shortAlertKey}
+      summary={summary}
       currentStep={currentStep}
-      showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+      showDeposit={false}
       confirmButtonConfig={{
         stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
         buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
@@ -333,7 +288,7 @@ export const TradeForm = ({
     />
   );
 
-  // prevent real trading if null/zero oracle price or we are out of sync with abacus somehow
+  // prevent real trading if null/zero oracle price or we are out of sync with form state
   if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
     return <LoadingSpace />;
   }
@@ -343,9 +298,10 @@ export const TradeForm = ({
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <>
           <PositionPreview />
-          {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
+          {alertContent}
         </>
-      ) : currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
+      ) : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
         <TradeSideTabs
           tw="overflow-visible"
           sharedContent={

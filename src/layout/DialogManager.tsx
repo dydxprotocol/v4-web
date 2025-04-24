@@ -35,7 +35,6 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
-import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
@@ -108,7 +107,6 @@ export const DialogManager = React.memo(() => {
     Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
-    SelectMarginMode: (args) => <SelectMarginModeDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
     Stake: (args) => <StakeDialog {...args} {...modalProps} />,

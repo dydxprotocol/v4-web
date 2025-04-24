@@ -3,6 +3,7 @@ import { MarketInfo, SubaccountOrder, SubaccountPosition } from '@/bonsai/types/
 import { OrderExecution, OrderFlags, OrderSide, OrderType } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
+import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { IndexerOrderType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
@@ -332,6 +333,10 @@ function createPlaceOrderPayload(
     clientId,
     // TP/SL orders always have null timeInForce. IOC/PostOnly/GTD is distinguished by execution
     timeInForce: undefined,
+    currentHeight: undefined,
+    goodTilBlock: undefined,
+    transferToSubaccountAmount: undefined,
+    memo: TransactionMemo.placeOrder,
     execution:
       orderType === OrderType.STOP_MARKET || orderType === OrderType.TAKE_PROFIT_MARKET
         ? OrderExecution.IOC

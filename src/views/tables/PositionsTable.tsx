@@ -397,7 +397,7 @@ const getPositionsTableColumnDef = ({
           leverage,
           side,
           entryPrice,
-          unrealizedPnl,
+          updatedUnrealizedPnl: unrealizedPnl,
         }) => (
           <PositionsActionsCell
             marketId={market}

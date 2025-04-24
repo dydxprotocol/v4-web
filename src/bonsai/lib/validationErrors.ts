@@ -61,9 +61,16 @@ export function getFormDisabledButtonStringKey(errors: ValidationError[]) {
     ?.resources.title?.stringKey;
 }
 
+export function getHighestPriorityAlert(errors: ValidationError[]) {
+  return (
+    errors.find((e) => e.type === ErrorType.error) ??
+    errors.find((e) => e.type === ErrorType.warning)
+  );
+}
+
 interface SimpleValidationErrorParams {
   code: string;
-  type: ErrorType;
+  type?: ErrorType;
   fields?: string[];
   titleKey?: string;
   textKey?: string;
@@ -74,7 +81,7 @@ interface SimpleValidationErrorParams {
 
 export function simpleValidationError({
   code,
-  type,
+  type = ErrorType.error,
   fields,
   titleKey,
   textKey,
@@ -105,5 +112,13 @@ export function simpleValidationError({
         : undefined,
       action: null,
     },
+  };
+}
+
+export function createMinimalError(): ValidationError {
+  return {
+    code: 'ERROR',
+    type: ErrorType.error,
+    resources: {},
   };
 }

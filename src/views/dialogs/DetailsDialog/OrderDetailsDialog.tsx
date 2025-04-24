@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
@@ -13,7 +14,6 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -29,11 +29,13 @@ import {
   getOrderTimeInForceStringKey,
 } from '@/views/tables/enumToStringKeyHelpers';
 
+import { accountTransactionManager } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
 import { Nullable } from '@/lib/typeUtils';
 
@@ -44,12 +46,11 @@ export const OrderDetailsDialog = ({
   const stringGetter = useStringGetter();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
-  const { cancelOrder } = useSubaccount();
-
   const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
-  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
   const isOrderCanceling =
-    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
+    Object.values(localCancelOrders).find(
+      (order) => order.orderId === orderId && order.submissionStatus < CancelOrderStatuses.Canceled
+    ) != null;
 
   const {
     displayId,
@@ -201,11 +202,12 @@ export const OrderDetailsDialog = ({
   ).filter((item) => Boolean(item.value));
 
   const onCancelClick = () => {
-    cancelOrder({ orderId });
+    track(AnalyticsEvents.TradeCancelOrderClick({ orderId }));
+    accountTransactionManager.cancelOrder({ orderId });
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  // we update short term orders to pending status when they are best effort canceled in Abacus
+  // we update short term orders to pending status when they are best effort canceled
   const isBestEffortCanceled =
     (status === OrderStatus.Pending && removalReason != null) || status === OrderStatus.Canceling;
 

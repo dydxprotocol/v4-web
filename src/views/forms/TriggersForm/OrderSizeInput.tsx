@@ -58,13 +58,13 @@ export const OrderSizeInput = ({
     }
   };
 
-  const setAbacusSize = (newSize: string) => {
+  const setSize = (newSize: string) => {
     dispatch(triggersFormActions.setSize(newSize));
   };
 
   const onSizeInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
     setLocalSize(formattedValue);
-    setAbacusSize(formattedValue);
+    setSize(formattedValue);
   };
 
   return (
@@ -88,8 +88,8 @@ export const OrderSizeInput = ({
     >
       <div tw="flex items-center gap-0.25">
         <OrderSizeSlider
-          setAbacusSize={(sizeString: string) => setAbacusSize(sizeString)}
-          setOrderSizeInput={(sizeString: string) => setLocalSize(sizeString)}
+          setSize={(sizeString: string) => setSize(sizeString)}
+          setLocalSize={(sizeString: string) => setLocalSize(sizeString)}
           size={AttemptNumber(localSize) ?? null}
           positionSize={positionSize ?? undefined}
           stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}

@@ -131,7 +131,6 @@ export const DialogTypes = unionize(
     Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
-    SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
     Stake: ofType<StakeDialogProps>(),
@@ -156,7 +155,6 @@ export type SelectMarginModeFormProps = {};
 export const TradeBoxDialogTypes = unionize(
   {
     ClosePosition: ofType<ClosePositionFormProps>(),
-    SelectMarginMode: ofType<SelectMarginModeFormProps>(),
   },
   { tag: 'type' as const, value: 'props' as const }
 );

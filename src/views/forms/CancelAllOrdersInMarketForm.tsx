@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { zipObject } from 'lodash';
 
@@ -11,15 +12,16 @@ import { EMPTY_ARR } from '@/constants/objects';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { accountTransactionManager } from '@/state/_store';
 import { useAppSelector } from '@/state/appTypes';
 
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 type CancelAllOrdersInMarketFormProps = {
@@ -54,7 +56,6 @@ export const CancelAllOrdersInMarketForm = ({
     () => Object.values(cancellingStatus).some((s) => s.type === 'pending'),
     [cancellingStatus]
   );
-  const { cancelOrder } = useSubaccount();
   const { freeCollateral: crossFreeCollateral } =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data) ?? {};
 
@@ -68,21 +69,18 @@ export const CancelAllOrdersInMarketForm = ({
         pendingPositionOrders.map(() => ({ type: 'pending' }))
       )
     );
-    pendingPositionOrders.forEach((p) =>
-      cancelOrder({
-        orderId: p.id,
-        onSuccess: () => {
-          setCancellingStatus((old) => ({ ...old, [p.id]: { type: 'success' } }));
-        },
-        onError: (errorParams) => {
-          setCancellingStatus((old) => ({
-            ...old,
-            [p.id]: { type: 'error', errorParams },
-          }));
-        },
-      })
-    );
-  }, [cancelOrder, isCancelling, pendingPositionOrders]);
+    pendingPositionOrders.forEach(async (p) => {
+      const result = await accountTransactionManager.cancelOrder({ orderId: p.id });
+      if (isOperationSuccess(result)) {
+        setCancellingStatus((old) => ({ ...old, [p.id]: { type: 'success' } }));
+      } else if (isOperationFailure(result)) {
+        setCancellingStatus((old) => ({
+          ...old,
+          [p.id]: { type: 'error', errorParams: operationFailureToErrorParams(result) },
+        }));
+      }
+    });
+  }, [isCancelling, pendingPositionOrders]);
 
   useEffect(() => {
     const allResults = Object.values(cancellingStatus);
