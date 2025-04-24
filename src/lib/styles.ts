@@ -1,5 +1,7 @@
 import { css } from 'styled-components';
 
+import { RiskLevel } from './risk';
+
 export const usageColorFromRiskLevel = (riskLevel: RiskLevel) =>
   ({
     [RiskLevel.LOW]: css`
