@@ -10,6 +10,7 @@ import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 
+import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
 import {
   calculateAllOrders,
@@ -29,6 +30,9 @@ import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
+  selectRawBlockTradingRewardsLiveData,
+  selectRawBlockTradingRewardsRest,
+  selectRawBlockTradingRewardsRestData,
   selectRawFillsLiveData,
   selectRawFillsRest,
   selectRawFillsRestData,
@@ -183,6 +187,13 @@ export const selectAccountFills = createAppSelector(
   }
 );
 
+export const selectAccountBlockTradingRewards = createAppSelector(
+  [selectRawBlockTradingRewardsRestData, selectRawBlockTradingRewardsLiveData],
+  (rest, live) => {
+    return calculateBlockRewards(rest?.rewards, live);
+  }
+);
+
 export const getCurrentMarketAccountFills = createAppSelector(
   [getCurrentMarketIdIfTradeable, selectAccountFills],
   (currentMarketId, fills) =>
@@ -191,6 +202,11 @@ export const getCurrentMarketAccountFills = createAppSelector(
 
 export const selectAccountFillsLoading = createAppSelector(
   [selectRawFillsRest, selectRawParentSubaccount],
+  mergeLoadableStatus
+);
+
+export const selectAccountBlockRewardsLoading = createAppSelector(
+  [selectRawBlockTradingRewardsRest, selectRawParentSubaccount],
   mergeLoadableStatus
 );
 

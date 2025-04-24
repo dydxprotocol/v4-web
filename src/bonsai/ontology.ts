@@ -2,7 +2,10 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
-import { IndexerHistoricalTradingRewardAggregation } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerHistoricalBlockTradingReward,
+  IndexerHistoricalTradingRewardAggregation,
+} from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
 import { type RootState } from '@/state/_store';
@@ -30,6 +33,8 @@ import {
 } from './rest/staking';
 import {
   getCurrentMarketAccountFills,
+  selectAccountBlockRewardsLoading,
+  selectAccountBlockTradingRewards,
   selectAccountFills,
   selectAccountFillsLoading,
   selectAccountOrders,
@@ -161,6 +166,10 @@ interface BonsaiCoreShape {
       data: BasicSelector<SubaccountTransfer[]>;
       loading: BasicSelector<LoadableStatus>;
     };
+    blockTradingRewards: {
+      data: BasicSelector<IndexerHistoricalBlockTradingReward[]>;
+      loading: BasicSelector<LoadableStatus>;
+    };
     stats: {
       data: BasicSelector<UserStats>;
     };
@@ -235,6 +244,10 @@ export const BonsaiCore: BonsaiCoreShape = {
     transfers: {
       data: selectAccountTransfers,
       loading: selectAccountTransfersLoading,
+    },
+    blockTradingRewards: {
+      data: selectAccountBlockTradingRewards,
+      loading: selectAccountBlockRewardsLoading,
     },
     stats: {
       data: selectUserStats,
