@@ -335,7 +335,7 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.MarginType]: {
         columnKey: 'marginType',
         label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber),
         renderCell({ marginMode }): ReactNode {
           const marginModeLabel =
             marginMode === 'CROSS'

@@ -12,13 +12,11 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -37,7 +35,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -59,10 +56,6 @@ const PortfolioPage = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-  const showNewWithdrawFlow =
-    useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const initialPageSize = 20;
 
@@ -256,13 +249,7 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() =>
-                      dispatch(
-                        openDialog(
-                          showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-                        )
-                      )
-                    }
+                    onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>
@@ -270,13 +257,7 @@ const PortfolioPage = () => {
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() =>
-                      dispatch(
-                        openDialog(
-                          showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw()
-                        )
-                      )
-                    }
+                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
                   >
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>

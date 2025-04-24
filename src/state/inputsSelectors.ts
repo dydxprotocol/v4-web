@@ -12,12 +12,6 @@ import {
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 
-/**
- * @param state
- * @returns TransferInputs
- */
-export const getTransferInputs = (state: RootState) => state.inputs.transferInputs;
-
 export const getTriggersFormState = (state: RootState) => state.triggersForm;
 
 const myPositionSelector = getSubaccountPositionByUniqueId();

@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 
-import { type RiskLevels } from '@/constants/abacus';
-
-import { abacusHelper } from '@/lib/abacus';
-import { UsageColorFromRiskLevel } from '@/lib/styles';
+import { leverageRiskLevel, RiskLevel, UsageColorFromRiskLevel } from '@/lib/styles';
 
 type ElementProps = {
   value: number;
@@ -14,7 +11,7 @@ type StyleProps = {
 };
 
 export const UsageBars = ({ value, className }: ElementProps & StyleProps) => (
-  <$UsageBars className={className} riskLevel={abacusHelper.leverageRiskLevel(value ?? 0)}>
+  <$UsageBars className={className} riskLevel={leverageRiskLevel(value)}>
     {Array.from({ length: 3 }, (_, i) => (
       <$Bar
         key={i}
@@ -22,12 +19,12 @@ export const UsageBars = ({ value, className }: ElementProps & StyleProps) => (
           '--i': i,
           '--l': 3,
         }}
-        active={i <= abacusHelper.leverageRiskLevel(value ?? 0).ordinal}
+        active={i <= leverageRiskLevel(value)}
       />
     ))}
   </$UsageBars>
 );
-const $UsageBars = styled.div<{ riskLevel: RiskLevels }>`
+const $UsageBars = styled.div<{ riskLevel: RiskLevel }>`
   ${({ riskLevel }) => UsageColorFromRiskLevel(riskLevel)}
 
   width: 0.875rem;

@@ -10,25 +10,19 @@ import tw from 'twin.macro';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
-import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
   NotificationDisplayData,
   NotificationType,
-  TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
 import { PlaceOrderStatuses } from '@/constants/trade';
-import { DydxChainAsset } from '@/constants/wallets';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
-import { useLocalNotifications } from '@/hooks/useLocalNotifications';
-
-import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
@@ -42,13 +36,11 @@ import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNo
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
-import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/views/tables/enumToStringKeyHelpers';
 
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getFunkitDeposits } from '@/state/funkitDepositsSelector';
@@ -66,7 +58,6 @@ import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { formatSeconds } from '@/lib/timeUtils';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -447,89 +438,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       };
     },
   },
-  {
-    type: NotificationType.SkipTransfer,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const { transferNotifications } = useLocalNotifications();
-      const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-      const { usdcImage } = useTokenConfigs();
 
-      useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const transfer of transferNotifications) {
-          const { id, fromChainId, toChainId, status, txHash, toAmount, type, isExchange } =
-            transfer;
-          const transferType =
-            type ??
-            (fromChainId === selectedDydxChainId
-              ? TransferNotificationTypes.Withdrawal
-              : TransferNotificationTypes.Deposit);
-
-          const isCosmosDeposit =
-            SUPPORTED_COSMOS_CHAINS.includes(fromChainId ?? '') &&
-            fromChainId !== selectedDydxChainId &&
-            toChainId === selectedDydxChainId;
-
-          const isFinished =
-            (Boolean(status) && status?.latestRouteStatusSummary !== 'ongoing') || isExchange;
-          const icon = isCosmosDeposit ? (
-            <AssetIcon tw="[--asset-icon-size: 1.5rem]" logoUrl={usdcImage} symbol="USDC" />
-          ) : (
-            <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />
-          );
-
-          const title = isCosmosDeposit
-            ? stringGetter({ key: STRING_KEYS.CONFIRM_PENDING_DEPOSIT })
-            : stringGetter({
-                key: {
-                  deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
-                  withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-                }[transferType],
-              });
-
-          const toChainEta = status?.toChain?.chainData.estimatedRouteDuration ?? 0;
-          // TODO: remove typeguards once skip implements estimatedrouteduration
-          // https://linear.app/dydx/issue/OTE-475/[web]-migration-followup-estimatedrouteduration
-          const estimatedDuration =
-            typeof toChainEta === 'string' ? toChainEta : formatSeconds(Math.max(toChainEta, 0));
-          const body = stringGetter({
-            key: STRING_KEYS.DEPOSIT_STATUS,
-            params: {
-              AMOUNT_USD: `${toAmount} ${DydxChainAsset.USDC.toUpperCase()}`,
-              ESTIMATED_DURATION: estimatedDuration,
-            },
-          });
-
-          trigger(
-            id ?? txHash,
-            {
-              icon,
-              title,
-              body,
-              renderCustomBody: ({ isToast, notification }) => (
-                <TransferStatusNotification
-                  isToast={isToast}
-                  slotIcon={icon}
-                  slotTitle={title}
-                  transfer={transfer}
-                  type={transferType}
-                  triggeredAt={transfer.triggeredAt}
-                  notification={notification}
-                />
-              ),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.SkipTransfer,
-            },
-            [isFinished]
-          );
-        }
-      }, [transferNotifications, stringGetter, selectedDydxChainId, usdcImage]);
-    },
-    useNotificationAction: () => {
-      return () => {};
-    },
-  },
   {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger: _trigger }) => {},
