@@ -24,7 +24,6 @@ import { closePositionFormSlice } from './closePositionForm';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
 import { funkitDepositsSlice } from './funkitDeposits';
-import { inputsSlice } from './inputs';
 import { getTriggersFormSummary } from './inputsSelectors';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
@@ -51,7 +50,6 @@ const reducers = {
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
   funkitDeposits: funkitDepositsSlice.reducer,
-  inputs: inputsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
   closePositionForm: closePositionFormSlice.reducer,

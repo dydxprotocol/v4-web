@@ -1,11 +1,7 @@
 // eslint-disable-next-line import/no-cycle
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
-import type {
-  AbacusStateNotificationProtocol,
-  ParsingError,
-  TransferInputFields,
-} from '@/constants/abacus';
+import type { AbacusStateNotificationProtocol, ParsingError } from '@/constants/abacus';
 import {
   AbacusAppConfig,
   AbacusHelper,
@@ -14,8 +10,6 @@ import {
   CoroutineTimer,
   IOImplementations,
   StatsigConfig,
-  TransferInputField,
-  TransferType,
   UIImplementations,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
@@ -25,11 +19,9 @@ import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
-import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { Nullable } from '@/lib/typeUtils';
 
-import { assertNever } from '../assertNever';
 import { LocaleSeparators } from '../numbers';
 import AbacusAnalytics from './analytics';
 import AbacusChainTransaction from './dydxChainTransactions';
@@ -41,24 +33,6 @@ import AbacusRest from './rest';
 import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
 import AbacusWebsocket from './websocket';
-
-type AbacusInputValue = string | number | boolean | null | undefined;
-function abacusValueToString(val: AbacusInputValue): Nullable<string> {
-  if (val == null) {
-    return val;
-  }
-  if (typeof val === 'number') {
-    return val.toString();
-  }
-  if (typeof val === 'string') {
-    return val;
-  }
-  if (typeof val === 'boolean') {
-    return val ? 'true' : 'false';
-  }
-  assertNever(val);
-  return val?.toString() ?? '';
-}
 
 class AbacusStateManager {
   private store: RootStore | undefined;
@@ -140,27 +114,7 @@ class AbacusStateManager {
   };
 
   attemptDisconnectAccount = () => {
-    const state = this.store?.getState();
-    const { type: transferType } = (state && getTransferInputs(state)) ?? {};
-    // we don't want to disconnect the account if we switch network during the deposit form
-    if (transferType?.rawValue !== TransferType.deposit.rawValue) {
-      this.disconnectAccount();
-    }
-  };
-
-  clearTransferInputValues = () => {
-    this.setTransferValue({ value: null, field: TransferInputField.address });
-    this.setTransferValue({ value: null, field: TransferInputField.size });
-    this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
-    this.setTransferValue({ value: null, field: TransferInputField.MEMO });
-  };
-
-  resetInputState = () => {
-    this.clearTransferInputValues();
-    this.setTransferValue({
-      field: TransferInputField.type,
-      value: null,
-    });
+    this.disconnectAccount();
   };
 
   // ------ Set Data ------ //
@@ -190,10 +144,6 @@ class AbacusStateManager {
     }
   };
 
-  setTransfersSourceAddress = (evmAddress: string) => {
-    this.stateManager.sourceAddress = evmAddress;
-  };
-
   setSubaccountNumber = (subaccountNumber: number) =>
     (this.stateManager.subaccountNumber = subaccountNumber);
 
@@ -204,16 +154,6 @@ class AbacusStateManager {
 
   setSelectedGasDenom = (denom: SelectedGasDenom) => {
     this.chainTransactions.setSelectedGasDenom(denom);
-  };
-
-  setTransferValue = ({
-    value,
-    field,
-  }: {
-    value: AbacusInputValue;
-    field: TransferInputFields;
-  }) => {
-    this.stateManager.transfer(abacusValueToString(value), field);
   };
 
   switchNetwork = (network: DydxNetwork) => {
