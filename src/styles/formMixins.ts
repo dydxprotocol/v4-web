@@ -22,7 +22,6 @@ export const formMixins = {
     --input-height: var(--form-input-height);
     --input-width: 100%;
     --input-backgroundColor: ${({ theme }) => theme.inputBackground};
-    /* --input-borderColor: var(--color-layer-6); */
 
     ${layoutMixins.row}
     justify-content: space-between;

@@ -20,7 +20,6 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 type DepositFormProps = {
@@ -45,12 +44,6 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
       getSubaccounts({ dydxAddress });
     }
   }, [subAccount]);
-
-  useEffect(() => {
-    return () => {
-      abacusStateManager.resetInputState();
-    };
-  }, []);
 
   return (
     <$Form

@@ -8,13 +8,11 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -42,7 +40,6 @@ import { getCurrentTradePageForm, getTradeFormValues } from '@/state/tradeFormSe
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { calculateCrossPositionMargin, getDoubleValuesHasDiff } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -86,9 +83,6 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
 
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -123,8 +117,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
-  const { tradeInfo, tradePayload } = summary ?? {};
-  const { fee, inputSummary, reward } = tradeInfo ?? {};
+  const { tradeInfo, tradePayload } = orEmptyObj(summary);
+  const { fee, inputSummary, reward } = orEmptyObj(tradeInfo);
   const expectedPrice = inputSummary?.averageFillPrice;
 
   // approximation for whether inputs are filled by whether summary has been calculated
@@ -343,11 +337,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const depositButton = (
     <Button
       action={ButtonAction.Primary}
-      onClick={() =>
-        dispatch(
-          openDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
-        )
-      }
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
     </Button>

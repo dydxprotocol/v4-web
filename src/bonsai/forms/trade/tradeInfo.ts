@@ -11,6 +11,7 @@ import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
 import { MAX_SUBACCOUNT_NUMBER, NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
+import { MAJOR_MARKETS } from '@/constants/markets';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
@@ -41,7 +42,6 @@ import {
 } from './types';
 
 const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
-const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
@@ -60,7 +60,7 @@ export function calculateTradeInfo(
   const subaccountToUse = calculateSubaccountToUseForTrade(
     trade.marginMode,
     baseAccount?.position?.subaccountNumber,
-    accountData.currentTradeMarketOpenOrders?.[0]?.subaccountNumber,
+    accountData.currentTradeMarketOpenOrders[0]?.subaccountNumber,
     accountData.allOpenOrders,
     accountData.rawParentSubaccountData
   );
@@ -102,7 +102,6 @@ export function calculateTradeInfo(
               leverageLimits,
               calculatedMaxLeverage
             ).toNumber(),
-            // leverageLimits.maxLeverage.toNumber(),
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice

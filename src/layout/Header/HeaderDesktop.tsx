@@ -40,7 +40,6 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -55,8 +54,6 @@ export const HeaderDesktop = () => {
   const { freeCollateral: availableBalance } = subAccount ?? {};
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -197,11 +194,7 @@ export const HeaderDesktop = () => {
                     : ButtonAction.Primary
                 }
                 onClick={() => {
-                  dispatch(
-                    openDialog(
-                      showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-                    )
-                  );
+                  dispatch(openDialog(DialogTypes.Deposit2({})));
                 }}
                 state={{ isDisabled: !dydxAccounts }}
               >

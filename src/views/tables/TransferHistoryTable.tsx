@@ -7,9 +7,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -30,7 +28,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { MustNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 import { getTransferTypeStringKey } from './enumToStringKeyHelpers';
@@ -147,8 +144,6 @@ export const TransferHistoryTable = ({
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
@@ -172,13 +167,7 @@ export const TransferHistoryTable = ({
           {canAccountTrade ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() =>
-                dispatch(
-                  openDialog(
-                    showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-                  )
-                )
-              }
+              onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
             </Button>

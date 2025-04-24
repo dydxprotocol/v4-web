@@ -9,10 +9,8 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -29,7 +27,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 type StakeButtonWarning = {
   type: AlertType.Warning | AlertType.Info;
@@ -80,14 +77,9 @@ export const StakeRewardButtonAndReceipt = ({
   const { usdcBalance, nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const [errorToDisplay, setErrorToDisplay] = useState(alert);
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const depositFunds = useCallback(
-    () =>
-      dispatch(
-        forceOpenDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
-      ),
+    () => dispatch(forceOpenDialog(DialogTypes.Deposit2({}))),
     [dispatch]
   );
 
