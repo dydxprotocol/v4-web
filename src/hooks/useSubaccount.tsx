@@ -27,7 +27,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { clearLocalOrders } from '@/state/localOrders';
 
-import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
 import { stringifyTransactionError } from '@/lib/errors';
@@ -35,7 +34,6 @@ import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
-import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
@@ -82,7 +80,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [faucetClient]
   );
 
-  const { depositToSubaccount, withdrawFromSubaccount, sendSkipWithdrawFromSubaccount } = useMemo(
+  const { depositToSubaccount, withdrawFromSubaccount } = useMemo(
     () => ({
       depositToSubaccount: async ({
         subaccountClient,
@@ -174,10 +172,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const [subaccountNumber] = useState(0);
 
-  useEffect(() => {
-    abacusStateManager.setSubaccountNumber(subaccountNumber);
-  }, [subaccountNumber]);
-
   const subaccountClient = useMemo(
     () => (localDydxWallet ? new SubaccountClient(localDydxWallet, subaccountNumber) : undefined),
     [localDydxWallet, subaccountNumber]
@@ -254,49 +248,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   // ------ Transfer Methods ------ //
-
-  const sendSkipWithdraw = useCallback(
-    async (amount: number, payload: string, isCctp?: boolean) => {
-      const cctpWithdraw = () => {
-        return new Promise<string>((resolve, reject) => {
-          abacusStateManager.cctpWithdraw((success, error, data) => {
-            const parsedData = JSON.parse(data);
-            // eslint-disable-next-line eqeqeq
-            if (success && parsedData?.code == 0) {
-              resolve(parsedData?.transactionHash);
-            } else {
-              reject(error);
-            }
-          });
-        });
-      };
-      if (isCctp) {
-        return cctpWithdraw();
-      }
-
-      if (!subaccountClient) {
-        return undefined;
-      }
-
-      // If the dYdX USDC balance is less than the amount to IBC transfer, the signature cannot be made,
-      // so disable the balance check only for this tx.
-      if (isKeplr && window.keplr) {
-        window.keplr.defaultOptions = {
-          sign: {
-            disableBalanceCheck: true,
-          },
-        };
-      }
-      const tx = await sendSkipWithdrawFromSubaccount({ subaccountClient, amount, payload });
-
-      // Reset the default options after the tx is sent.
-      if (isKeplr && window.keplr) {
-        window.keplr.defaultOptions = {};
-      }
-      return hashFromTx(tx.hash);
-    },
-    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
-  );
 
   // ------ Faucet Methods ------ //
   const requestFaucetFunds = useCallback(async () => {
@@ -848,7 +799,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     simulateTransfer,
-    sendSkipWithdraw,
     depositCurrentBalance,
     transferBetweenSubaccounts,
 

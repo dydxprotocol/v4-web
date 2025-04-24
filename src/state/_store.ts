@@ -9,7 +9,6 @@ import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import abacusStateManager from '@/lib/abacus';
 import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { transformOntologyObject } from '@/lib/transformOntology';
@@ -131,7 +130,6 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 // Set store so (Abacus & localWalletManager) classes can getState and dispatch
-abacusStateManager.setStore(store);
 localWalletManager.setStore(store);
 
 export const accountTransactionManager = createAccountTransactionSupervisor(

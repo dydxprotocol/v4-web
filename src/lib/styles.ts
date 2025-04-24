@@ -1,20 +1,44 @@
 import { css } from 'styled-components';
 
-import { type RiskLevels } from '@/constants/abacus';
+export enum RiskLevel {
+  LOW = 0,
+  MEDIUM = 1,
+  HIGH = 2,
+}
 
-export const UsageColorFromRiskLevel = (riskLevel: RiskLevels) =>
+export const UsageColorFromRiskLevel = (riskLevel: RiskLevel) =>
   ({
-    low: css`
+    [RiskLevel.LOW]: css`
       color: var(--color-risk-low);
     `,
-    medium: css`
+    [RiskLevel.MEDIUM]: css`
       color: var(--color-risk-medium);
     `,
-    high: css`
+    [RiskLevel.HIGH]: css`
       color: var(--color-risk-high);
     `,
-  })[riskLevel.name];
+  })[riskLevel];
 
 export const generateFadedColorVariant = (colorHex: string, opacityHex: string) => {
   return `${colorHex}${opacityHex}`;
 };
+
+export function marginRiskLevel(marginUsage: number): RiskLevel {
+  if (marginUsage < 0.2) {
+    return RiskLevel.LOW;
+  }
+  if (marginUsage < 0.4) {
+    return RiskLevel.MEDIUM;
+  }
+  return RiskLevel.HIGH;
+}
+
+export function leverageRiskLevel(leverage: number): RiskLevel {
+  if (leverage <= 2) {
+    return RiskLevel.LOW;
+  }
+  if (leverage <= 5) {
+    return RiskLevel.MEDIUM;
+  }
+  return RiskLevel.HIGH;
+}
