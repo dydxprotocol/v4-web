@@ -56,10 +56,7 @@ export const TradeNotification = ({
       slotTitleRight={
         <span tw="row gap-[0.5ch] text-color-text-0 font-small-book">
           {stringGetter({ key: getOrderStatusStringKey(orderStatus) })}
-          <OrderStatusIconNew
-            status={orderStatus ?? OrderStatus.Open}
-            tw="h-[0.9375rem] w-[0.9375rem]"
-          />
+          <OrderStatusIconNew status={orderStatus ?? OrderStatus.Open} tw="size-[0.9375rem]" />
         </span>
       }
       slotCustomContent={
