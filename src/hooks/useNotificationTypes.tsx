@@ -1,23 +1,17 @@
 import { useEffect } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
+import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
-import { groupBy, isEqual, pick } from 'lodash';
+import { groupBy, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { ErrorStatuses } from '@/constants/funkit';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
-import {
-  STRING_KEY_VALUES,
-  STRING_KEYS,
-  type StringGetterFunction,
-  type StringKey,
-} from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
@@ -26,10 +20,11 @@ import {
   TransferNotificationTypes,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
-import { AppRoute } from '@/constants/routes';
+import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { DydxChainAsset } from '@/constants/wallets';
+import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
@@ -48,8 +43,11 @@ import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotifi
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
+import {
+  getIndexerOrderSideStringKey,
+  getIndexerOrderTypeStringKey,
+} from '@/views/tables/enumToStringKeyHelpers';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
@@ -61,11 +59,15 @@ import {
   getLocalPlaceOrders,
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getAbacusNotifications, getCustomNotifications } from '@/state/notificationsSelectors';
-import { getMarketIds } from '@/state/perpetualsSelectors';
+import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
+import { assertNever } from '@/lib/assertNever';
+import { calc } from '@/lib/do';
+import { MustBigNumber } from '@/lib/numbers';
+import { getAverageFillPrice } from '@/lib/orders';
 import { formatSeconds } from '@/lib/timeUtils';
+import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -77,143 +79,248 @@ import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
 
-const parseStringParamsForNotification = ({
-  stringGetter,
-  value,
-}: {
-  stringGetter: StringGetterFunction;
-  value: unknown;
-}) => {
-  if (STRING_KEY_VALUES[value as StringKey]) {
-    return stringGetter({ key: value as string });
-  }
-
-  return value as string;
-};
-
 export const notificationTypes: NotificationTypeConfig[] = [
   {
-    type: NotificationType.AbacusGenerated,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const abacusNotifications = useAppSelector(getAbacusNotifications, isEqual);
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual);
-      const ordersById = groupBy(orders, 'id');
+    type: NotificationType.Order,
+    useTrigger: ({ trigger, appInitializedTime }) => {
+      const fills = useAppSelector(BonsaiCore.account.fills.data);
+      const orders = useAppSelector(BonsaiCore.account.allOrders.data);
       const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
       const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
+      const allMarkets = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+
+      const stringGetter = useStringGetter();
+      useEffect(() => {
+        const fillsByOrderId = groupBy(
+          fills.filter((f) => f.orderId != null),
+          (f) => f.orderId
+        );
+        orders.forEach((order) => {
+          const relevantFills = fillsByOrderId[order.id] ?? EMPTY_ARR;
+          const relevantPlaceOrder =
+            order.clientId != null ? localPlaceOrders[order.clientId] : undefined;
+          const relevantLocalCancels = Object.values(localCancelOrders).filter(
+            (c) => c.orderId === order.id
+          );
+          if (relevantPlaceOrder != null || relevantLocalCancels.length > 0) {
+            // locally placed orders have a different notification lifecycle - OrderStatus
+            // and local cancels shouldn't cause the original order to re-trigger so we ignore
+            return;
+          }
+          const marketInfo = allMarkets[order.marketId];
+          const orderTypeKey = getIndexerOrderTypeStringKey(order.type);
+          const latestUpdateMs = max([
+            ...relevantFills.map((f) =>
+              f.createdAt == null ? 0 : new Date(f.createdAt).getTime()
+            ),
+            order.updatedAtMilliseconds,
+          ]);
+          if (latestUpdateMs == null || latestUpdateMs <= appInitializedTime) {
+            return;
+          }
+
+          const [titleKey, textKey] = calc((): [string, string | undefined] => {
+            const status = order.status;
+            if (status == null) {
+              return [STRING_KEYS.ORDER_STATUS, undefined];
+            }
+            switch (status) {
+              case OrderStatus.Open:
+              case OrderStatus.Pending:
+              case OrderStatus.Untriggered:
+              case OrderStatus.Canceling:
+                if (
+                  [
+                    IndexerOrderType.STOPLIMIT,
+                    IndexerOrderType.STOPMARKET,
+                    IndexerOrderType.TAKEPROFIT,
+                    IndexerOrderType.TAKEPROFITMARKET,
+                  ].indexOf(order.type) >= 0
+                ) {
+                  return [STRING_KEYS.ORDER_TRIGGERED_TITLE, STRING_KEYS.ORDER_TRIGGERED_BODY];
+                }
+                return [STRING_KEYS.ORDER_STATUS, undefined];
+              case OrderStatus.Canceled:
+                return [STRING_KEYS.ORDER_CANCEL_TITLE, STRING_KEYS.ORDER_CANCEL_BODY];
+              case OrderStatus.PartiallyCanceled:
+                return [
+                  STRING_KEYS.ORDER_CANCEL_WITH_PARTIAL_FILL_TITLE,
+                  STRING_KEYS.ORDER_CANCEL_WITH_PARTIAL_FILL_BODY,
+                ];
+              case OrderStatus.PartiallyFilled:
+                return [STRING_KEYS.ORDER_PARTIAL_FILL_TITLE, STRING_KEYS.ORDER_PARTIAL_FILL_BODY];
+              case OrderStatus.Filled:
+                return [STRING_KEYS.ORDER_FILL_TITLE, STRING_KEYS.ORDER_FILL_BODY];
+              default:
+                assertNever(status);
+                return [STRING_KEYS.ORDER_STATUS, undefined];
+            }
+          });
+
+          trigger(
+            `order:${order.id}`,
+            {
+              icon: marketInfo != null ? <$Icon src={marketInfo.logo} /> : undefined,
+              title: stringGetter({ key: titleKey }),
+              body:
+                textKey != null
+                  ? stringGetter({
+                      key: textKey,
+                      params: {
+                        SIDE: getIndexerOrderSideStringKey(order.side),
+                        AMOUNT: order.size.toString(10),
+                        MARKET: marketInfo?.displayableAsset ?? '',
+                        FILLED_AMOUNT: order.totalFilled?.toString(10) ?? '0',
+                        TOTAL_FILLED: order.totalFilled?.toString(10) ?? '0',
+                        AVERAGE_PRICE: getAverageFillPrice(relevantFills)?.toString(10) ?? '',
+                      },
+                    })
+                  : undefined,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              toastSensitivity: 'foreground',
+              groupKey: `orders`,
+              searchableContent: `${marketInfo?.displayableAsset}|${marketInfo?.displayableTicker}|${stringGetter({ key: orderTypeKey })}`,
+              renderCustomBody: ({ isToast, notification }) => (
+                <TradeNotification
+                  isToast={isToast}
+                  notification={notification}
+                  fills={relevantFills}
+                  order={order}
+                />
+              ),
+            },
+            [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
+            true
+          );
+        });
+      }, [
+        trigger,
+        appInitializedTime,
+        stringGetter,
+        fills,
+        orders,
+        localPlaceOrders,
+        localCancelOrders,
+        allMarkets,
+      ]);
+    },
+  },
+  {
+    type: NotificationType.FillWithNoOrder,
+    useTrigger: ({ trigger, appInitializedTime }) => {
+      const fills = useAppSelector(BonsaiCore.account.fills.data);
+      const allMarkets = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+      const stringGetter = useStringGetter();
 
       useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const abacusNotif of abacusNotifications) {
-          const [abacusNotificationType = '', id = ''] = abacusNotif.id.split(':');
-          const parsedData = abacusNotif.data ? JSON.parse(abacusNotif.data) : {};
-
-          const params = Object.fromEntries(
-            Object.entries(parsedData).map(([key, value]) => {
-              return [key, parseStringParamsForNotification({ stringGetter, value })];
-            })
-          );
-
-          switch (abacusNotificationType) {
-            case 'order': {
-              const order = ordersById[id]?.[0];
-              const clientId: string | undefined = order?.clientId ?? undefined;
-              const localOrderExists =
-                clientId != null &&
-                order?.id != null &&
-                clientId.length > 0 &&
-                (localPlaceOrders[clientId] != null ||
-                  Object.values(localCancelOrders).find((c) => c.orderId === order.id) != null);
-
-              if (localOrderExists) return; // already handled by OrderStatusNotification
-
-              trigger(
-                abacusNotif.id,
-                {
-                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
-                  title: stringGetter({ key: abacusNotif.title }),
-                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
-                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                  toastSensitivity: 'foreground',
-                  groupKey: abacusNotificationType,
-                  searchableContent: `${parsedData?.ASSET}|${parsedData?.MARKET}}|${parsedData?.ORDER_TYPE_TEXT}`,
-                  renderCustomBody: ({ isToast, notification }) => (
-                    <TradeNotification
-                      isToast={isToast}
-                      data={parsedData}
-                      notification={notification}
-                    />
-                  ),
-                },
-                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
-                true
-              );
-              break;
+        fills
+          .filter((f) => f.orderId == null)
+          .forEach((fill) => {
+            if (
+              fill.createdAt == null ||
+              new Date(fill.createdAt).getTime() <= appInitializedTime
+            ) {
+              return;
             }
-            case 'blockReward': {
-              trigger(
-                abacusNotif.id,
-                {
-                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
-                  title: stringGetter({ key: abacusNotif.title }),
-                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
-                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                  toastSensitivity: 'foreground',
-                  groupKey: abacusNotificationType,
-                  renderCustomBody: ({ isToast, notification }) => (
-                    <BlockRewardNotification
-                      isToast={isToast}
-                      data={parsedData}
-                      notification={notification}
-                    />
-                  ),
-                },
-                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
-                true
-              );
-              break;
+            const type = fill.type;
+            if (
+              type == null ||
+              type === SubaccountFillType.LIMIT ||
+              type === SubaccountFillType.MARKET
+            ) {
+              return;
             }
-            default:
-              trigger(
-                abacusNotif.id,
-                {
-                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
-                  title: stringGetter({ key: abacusNotif.title }),
-                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
-                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                  toastSensitivity: 'foreground',
-                  groupKey: abacusNotificationType,
-                },
-                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
-              );
-              break;
-          }
-        }
-      }, [abacusNotifications, stringGetter]);
-    },
-    useNotificationAction: () => {
-      const dispatch = useAppDispatch();
-      const orders = useAppSelector(getSubaccountOrders, shallowEqual);
-      const ordersById = groupBy(orders, 'id');
-      const fills = useAppSelector(getSubaccountFills, shallowEqual);
-      const fillsById = groupBy(fills, 'id');
-      const marketIds = useAppSelector(getMarketIds, shallowEqual);
-      const navigate = useNavigate();
-
-      return (notificationId: string) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [abacusNotificationType, id = ''] = notificationId.split(':');
-
-        if (ordersById[id]) {
-          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: id })));
-        } else if (fillsById[id]) {
-          dispatch(openDialog(DialogTypes.FillDetails({ fillId: id })));
-        } else if (marketIds.includes(id)) {
-          navigate(`${AppRoute.Trade}/${id}`, {
-            replace: true,
+            const titleKey = calc(() => {
+              if (type === SubaccountFillType.DELEVERAGED) {
+                return STRING_KEYS.DELEVERAGED_TITLE;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              if (type === SubaccountFillType.LIQUIDATED) {
+                return STRING_KEYS.LIQUIDATION_TITLE;
+              }
+              assertNever(type);
+              return STRING_KEYS.LIQUIDATION_TITLE;
+            });
+            const bodyKey = calc(() => {
+              if (type === SubaccountFillType.DELEVERAGED) {
+                return STRING_KEYS.DELEVERAGED_BODY;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              if (type === SubaccountFillType.LIQUIDATED) {
+                return STRING_KEYS.LIQUIDATION_BODY;
+              }
+              assertNever(type);
+              return STRING_KEYS.DELEVERAGED_BODY;
+            });
+            const marketInfo = fill.market != null ? allMarkets[fill.market] : undefined;
+            // opposite because these notifications are all about positions, not the fill that triggered the notif.
+            const side =
+              fill.side === IndexerOrderSide.BUY ? IndexerOrderSide.SELL : IndexerOrderSide.BUY;
+            trigger(
+              `fill:${fill.id ?? ''}`,
+              {
+                icon: <$Icon src={marketInfo?.logo} alt="" />,
+                title: stringGetter({ key: titleKey }),
+                body: stringGetter({
+                  key: bodyKey,
+                  params: {
+                    SIDE:
+                      side === IndexerOrderSide.BUY
+                        ? stringGetter({ key: STRING_KEYS.BUY })
+                        : stringGetter({ key: STRING_KEYS.SELL }),
+                    MARKET: marketInfo?.displayableAsset ?? fill.market ?? '',
+                  },
+                }),
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                toastSensitivity: 'foreground',
+                groupKey: 'fill',
+              },
+              [fill, marketInfo?.displayableAsset, marketInfo?.logo]
+            );
           });
-        }
-      };
+      }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
+    },
+  },
+  {
+    type: NotificationType.BlockTradingReward,
+    useTrigger: ({ trigger, appInitializedTime }) => {
+      const blockTradingRewards = useAppSelector(BonsaiCore.account.blockTradingRewards.data);
+      const stringGetter = useStringGetter();
+      const tokenName = useTokenConfigs().chainTokenLabel;
+      useEffect(() => {
+        blockTradingRewards.forEach((reward) => {
+          if (new Date(reward.createdAt).getTime() <= appInitializedTime) {
+            return;
+          }
+          const amount = MustBigNumber(reward.tradingReward).toString(10);
+          trigger(
+            `blockReward:${reward.createdAtHeight}`,
+            {
+              title: stringGetter({ key: STRING_KEYS.BLOCK_REWARD_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.BLOCK_REWARD_BODY,
+                params: {
+                  BLOCK_REWARD_AMOUNT: amount,
+                  TOKEN_NAME: tokenName,
+                },
+              }),
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              toastSensitivity: 'foreground',
+              groupKey: 'blockReward',
+              renderCustomBody: ({ isToast, notification }) => (
+                <BlockRewardNotification
+                  isToast={isToast}
+                  amount={amount}
+                  tokenName={tokenName}
+                  notification={notification}
+                />
+              ),
+            },
+            [reward.createdAtHeight, reward.tradingReward],
+            true
+          );
+        });
+      }, [trigger, blockTradingRewards, appInitializedTime, stringGetter, tokenName]);
     },
   },
   {
