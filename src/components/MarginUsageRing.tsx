@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 import { Ring } from '@/components/Ring';
 
-import { marginRiskLevel, RiskLevel, UsageColorFromRiskLevel } from '@/lib/styles';
+import { marginRiskLevel, RiskLevel } from '@/lib/risk';
+import { usageColorFromRiskLevel } from '@/lib/styles';
 
 type ElementProps = {
   value: number;
@@ -16,7 +17,7 @@ export const MarginUsageRing = ({ className, value }: ElementProps & StyleProps)
   <$MarginUsageRing className={className} value={value} riskLevel={marginRiskLevel(value)} />
 );
 const $MarginUsageRing = styled(Ring)<{ riskLevel: RiskLevel }>`
-  ${({ riskLevel }) => UsageColorFromRiskLevel(riskLevel)}
+  ${({ riskLevel }) => usageColorFromRiskLevel(riskLevel)}
   width: 1rem;
   height: 1rem;
 `;

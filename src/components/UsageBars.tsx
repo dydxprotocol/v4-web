@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
-import { leverageRiskLevel, RiskLevel, UsageColorFromRiskLevel } from '@/lib/styles';
+import { leverageRiskLevel, RiskLevel } from '@/lib/risk';
+import { usageColorFromRiskLevel } from '@/lib/styles';
 
 type ElementProps = {
   value: number;
@@ -24,8 +25,9 @@ export const UsageBars = ({ value, className }: ElementProps & StyleProps) => (
     ))}
   </$UsageBars>
 );
+
 const $UsageBars = styled.div<{ riskLevel: RiskLevel }>`
-  ${({ riskLevel }) => UsageColorFromRiskLevel(riskLevel)}
+  ${({ riskLevel }) => usageColorFromRiskLevel(riskLevel)}
 
   width: 0.875rem;
   height: 0.875rem;

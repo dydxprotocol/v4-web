@@ -57,9 +57,7 @@ export const OrderCancelNotification = ({
     orderStatusStringKey = isPartiallyCanceled
       ? STRING_KEYS.PARTIALLY_FILLED
       : STRING_KEYS.CANCELED;
-    orderStatusIcon = (
-      <OrderStatusIconNew status={OrderStatus.Canceled} tw="h-[0.9375rem] w-[0.9375rem]" />
-    );
+    orderStatusIcon = <OrderStatusIconNew status={OrderStatus.Canceled} tw="size-[0.9375rem]" />;
   }
 
   if (localCancel.errorParams) {
