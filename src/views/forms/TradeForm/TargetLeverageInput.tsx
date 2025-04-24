@@ -122,6 +122,7 @@ export const TargetLeverageInput = () => {
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
+  --input-backgroundColor: none;
 
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
 

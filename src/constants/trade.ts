@@ -36,6 +36,9 @@ export enum PositionSide {
 }
 
 export const UNCOMMITTED_ORDER_TIMEOUT_MS = 10_000;
+export const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
+export const SHORT_TERM_ORDER_DURATION = 20;
+export const POST_TRANSFER_PLACE_ORDER_DELAY = 250;
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,

@@ -117,8 +117,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
-  const { tradeInfo, tradePayload } = summary ?? {};
-  const { fee, inputSummary, reward } = tradeInfo ?? {};
+  const { tradeInfo, tradePayload } = orEmptyObj(summary);
+  const { fee, inputSummary, reward } = orEmptyObj(tradeInfo);
   const expectedPrice = inputSummary?.averageFillPrice;
 
   // approximation for whether inputs are filled by whether summary has been calculated

@@ -151,7 +151,7 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   layer1: ColorToken.LightGray5,
   layer2: ColorToken.White,
   layer3: ColorToken.LightGray1,
-  layer4: ColorToken.White,
+  layer4: ColorToken.LightGray3,
   layer5: ColorToken.LightGray4,
   layer6: ColorToken.LightGray10,
   layer7: ColorToken.MediumGray1,
@@ -195,7 +195,7 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   profileYellow: ColorToken.Yellow1,
   profileRed: ColorToken.Red2,
 
-  inputBackground: ColorToken.White,
+  inputBackground: ColorToken.LightGray3,
   popoverBackground: ColorToken.LightGray9,
   toggleBackground: ColorToken.LightGray4,
   tooltipBackground: ColorToken.LightGray8,

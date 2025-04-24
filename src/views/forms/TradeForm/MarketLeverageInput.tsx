@@ -21,6 +21,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { clamp } from '@/lib/math';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { LeverageSlider } from './LeverageSlider';
 
@@ -39,8 +40,9 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { leverage: currentLeverage } =
-    useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
+  const { leverage: currentLeverage } = orEmptyObj(
+    useAppSelector(getCurrentMarketPositionData, shallowEqual)
+  );
 
   const minLeverage = Math.min(leftLeverage, rightLeverage);
   const maxLeverage = Math.max(leftLeverage, rightLeverage);

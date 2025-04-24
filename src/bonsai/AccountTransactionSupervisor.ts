@@ -24,7 +24,12 @@ import {
 
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
+import {
+  MARKET_ORDER_MAX_SLIPPAGE,
+  POST_TRANSFER_PLACE_ORDER_DELAY,
+  SHORT_TERM_ORDER_DURATION,
+  UNCOMMITTED_ORDER_TIMEOUT_MS,
+} from '@/constants/trade';
 
 import { type RootState, type RootStore } from '@/state/_store';
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
@@ -56,10 +61,6 @@ import { isPresent } from '@/lib/typeUtils';
 import { getSimpleOrderStatus } from './calculators/orders';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
-
-const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
-const SHORT_TERM_ORDER_DURATION = 20;
-const POST_TRANSFER_PLACE_ORDER_DELAY = 250;
 
 interface ClientWalletPair {
   compositeClient: CompositeClient;
