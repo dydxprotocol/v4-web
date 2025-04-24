@@ -1,9 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
 
-import { TRADE_TYPES_NEW } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
+import { CancelOrderStatuses, LocalCancelOrderData } from '@/constants/trade';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,6 +18,7 @@ import { getOrderById } from '@/state/accountSelectors';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIconNew } from '../OrderStatusIcon';
+import { getIndexerOrderTypeStringKey } from '../tables/enumToStringKeyHelpers';
 
 type ElementProps = {
   localCancel: LocalCancelOrderData;
@@ -38,8 +38,9 @@ export const OrderCancelNotification = ({
     )
   );
 
-  const tradeType = TRADE_TYPES_NEW[order?.type ?? localCancel.cachedData.orderType] ?? undefined;
-  const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType].orderTypeKey;
+  const orderTypeKey = getIndexerOrderTypeStringKey(
+    order?.type ?? localCancel.cachedData.orderType
+  );
   const indexedOrderStatus = order?.status;
   const cancelStatus = localCancel.submissionStatus;
 
@@ -56,9 +57,7 @@ export const OrderCancelNotification = ({
     orderStatusStringKey = isPartiallyCanceled
       ? STRING_KEYS.PARTIALLY_FILLED
       : STRING_KEYS.CANCELED;
-    orderStatusIcon = (
-      <OrderStatusIconNew status={OrderStatus.Canceled} tw="h-[0.9375rem] w-[0.9375rem]" />
-    );
+    orderStatusIcon = <OrderStatusIconNew status={OrderStatus.Canceled} tw="size-[0.9375rem]" />;
   }
 
   if (localCancel.errorParams) {

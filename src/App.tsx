@@ -18,7 +18,6 @@ import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { DydxProvider } from '@/hooks/useDydxClient';
-import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
@@ -211,7 +210,6 @@ const providers = [
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(SkipProvider),
-  wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),

@@ -14,7 +14,6 @@ import {
 
 import { store } from '@/state/_store';
 
-import abacusStateManager from './abacus';
 import { assertNever } from './assertNever';
 import { calc } from './do';
 import { AttemptNumber } from './numbers';
@@ -170,9 +169,7 @@ export const getOrderModificationError = (
   order: SubaccountOrderNew,
   newPrice: number
 ): { title: string; body?: string } | null => {
-  const bookPrice = abacusStateManager.stateManager.state?.marketOrderbook(
-    order.marketId
-  )?.midPrice;
+  const bookPrice = BonsaiHelpers.currentMarket.midPrice.data(store.getState())?.toNumber();
   if (!bookPrice) return null;
 
   const oldPrice = order.triggerPrice ?? order.price;

@@ -28,7 +28,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { log } from '@/lib/telemetry';
@@ -250,13 +249,6 @@ const useAccountsContext = () => {
     })();
   }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
-  // abacus
-  useEffect(() => {
-    if (dydxAddress) {
-      abacusStateManager.setAccount(localDydxWallet, hdKey, sourceAccount.walletInfo);
-    } else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey, dydxAddress, sourceAccount.walletInfo]);
-
   useEffect(() => {
     const setCosmosWallets = async () => {
       let nobleWallet: LocalWallet | undefined;
@@ -283,7 +275,6 @@ const useAccountsContext = () => {
         }
 
         if (nobleWallet !== undefined) {
-          abacusStateManager.setNobleWallet(nobleWallet);
           setLocalNobleWallet(nobleWallet);
         }
         if (osmosisWallet !== undefined) {

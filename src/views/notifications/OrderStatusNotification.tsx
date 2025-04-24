@@ -81,9 +81,7 @@ export const OrderStatusNotification = ({
         if (indexedOrderStatus === OrderStatus.Pending) break;
 
         orderStatusStringKey = getOrderStatusStringKey(indexedOrderStatus);
-        orderStatusIcon = (
-          <OrderStatusIconNew status={indexedOrderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
-        );
+        orderStatusIcon = <OrderStatusIconNew status={indexedOrderStatus} tw="size-[0.9375rem]" />;
 
         if (fills.length > 0) {
           customContent = (
