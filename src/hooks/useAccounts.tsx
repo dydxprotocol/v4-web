@@ -79,15 +79,11 @@ const useAccountsContext = () => {
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
   useEffect(() => {
-    const { address, chain } = sourceAccount;
+    const { address } = sourceAccount;
     // wallet accounts switched
     if (previousAddress && address !== previousAddress) {
       // Disconnect local wallet
       disconnectLocalDydxWallet();
-    }
-
-    if (address && (chain === WalletNetworkType.Evm || chain === WalletNetworkType.Solana)) {
-      abacusStateManager.setTransfersSourceAddress(address);
     }
 
     setPreviousAddress(address);

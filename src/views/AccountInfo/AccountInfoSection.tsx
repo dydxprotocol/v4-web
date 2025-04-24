@@ -7,12 +7,10 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -31,7 +29,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
@@ -63,10 +60,6 @@ export const AccountInfoSection = () => {
   const isLoadingData =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
   const isLoading = !!isLoadingGuards || isLoadingData;
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-  const showNewWithdrawFlow =
-    useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const { freeCollateral: availableBalance, marginUsage, equity: portfolioValue } = subAccount;
   const {
@@ -82,11 +75,7 @@ export const AccountInfoSection = () => {
   const withdrawButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() =>
-        dispatch(
-          openDialog(showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw())
-        )
-      }
+      onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
       buttonStyle={ButtonStyle.WithoutBackground}
@@ -99,11 +88,7 @@ export const AccountInfoSection = () => {
   const depositButton = (
     <$Button
       state={{ isDisabled: !dydxAccounts }}
-      onClick={() =>
-        dispatch(
-          openDialog(showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}))
-        )
-      }
+      onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
       buttonStyle={ButtonStyle.WithoutBackground}

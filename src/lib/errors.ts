@@ -22,26 +22,6 @@ export class StatefulOrderError extends Error {
   }
 }
 
-type RouteErrorCodes = 5;
-
-const routeErrorCodesToMessageOverride = {
-  5: 'This route will be supported soon. In the meantime please try another asset/chain.',
-};
-
-export const getRouteErrorMessageOverride = (
-  routeErrors: string,
-  routeErrorMessage: string | null | undefined
-) => {
-  try {
-    const routeErrorsObj = JSON.parse(routeErrors);
-    const routeErrorCode = routeErrorsObj?.[0]?.code as RouteErrorCodes;
-    return routeErrorCodesToMessageOverride[routeErrorCode] ?? routeErrorMessage;
-  } catch (err) {
-    log('getRouteErrorMessageOverride', err);
-    return routeErrorMessage;
-  }
-};
-
 const getUntranslatedErrorMessageOrDefaultErrorParams = (errorMessage?: string): ErrorParams => {
   if (errorMessage && errorMessage !== '') return { errorMessage };
   return DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS;

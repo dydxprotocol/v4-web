@@ -56,7 +56,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { truncateAddress } from '@/lib/wallet';
 
 import { MobileDownloadLinks } from '../MobileDownloadLinks';
@@ -316,6 +315,7 @@ export const AccountMenu = () => {
                 icon: <Icon iconName={IconName.Gear} />,
                 label: 'Register Affiliate',
                 onSelect: () => {
+                  // eslint-disable-next-line no-alert
                   const affiliate = window.prompt('Enter affiliate address');
                   if (affiliate) {
                     registerAffiliate(affiliate);
@@ -457,10 +457,6 @@ const AssetActions = memo(
     stringGetter: StringGetterFunction;
   }) => {
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-    const showNewDepositFlow =
-      useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-    const showNewWithdrawFlow =
-      useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
     return (
       <div tw="inlineRow">
@@ -468,14 +464,14 @@ const AssetActions = memo(
           withOnboarding &&
             complianceState === ComplianceStates.FULL_ACCESS &&
             !isAccountViewOnly && {
-              dialog: showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({}),
+              dialog: DialogTypes.Deposit2({}),
               iconName: IconName.Deposit,
               tooltipStringKey: STRING_KEYS.DEPOSIT,
             },
           withOnboarding &&
             hasBalance &&
             !isAccountViewOnly && {
-              dialog: showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw({}),
+              dialog: DialogTypes.Withdraw2({}),
               iconName: IconName.Withdraw,
               tooltipStringKey: STRING_KEYS.WITHDRAW,
             },
