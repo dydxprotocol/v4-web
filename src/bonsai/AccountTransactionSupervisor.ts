@@ -802,12 +802,15 @@ export class AccountTransactionSupervisor {
           durationMs: startTime.elapsed(),
         })
       );
-      this.store.dispatch(
-        cancelOrderFailed({
-          uuid,
-          errorParams: operationFailureToErrorParams(result),
-        })
-      );
+
+      if (withNotification) {
+        this.store.dispatch(
+          cancelOrderFailed({
+            uuid,
+            errorParams: operationFailureToErrorParams(result),
+          })
+        );
+      }
     } else {
       track(
         AnalyticsEvents.TradeCancelOrderSubmissionConfirmed({

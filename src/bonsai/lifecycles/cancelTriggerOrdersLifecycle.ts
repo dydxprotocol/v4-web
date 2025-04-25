@@ -8,8 +8,10 @@ import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
 import { sleep } from '@/lib/timeUtils';
+import { isPresent } from '@/lib/typeUtils';
 
 import { accountTransactionManager } from '../AccountTransactionSupervisor';
+import { isOperationFailure } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
@@ -90,7 +92,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
           }
         );
 
-        await Promise.all(
+        const results = await Promise.all(
           ordersToCancel.map((o) =>
             accountTransactionManager.cancelOrder({
               orderId: o.id,
@@ -98,6 +100,29 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             })
           )
         );
+
+        const failed = results
+          .map((r, idx) => {
+            if (isOperationFailure(r)) {
+              return {
+                ...ordersToCancel[idx],
+                error: r.errorString,
+              };
+            }
+            return null;
+          })
+          .filter(isPresent);
+
+        if (failed.length > 0) {
+          logBonsaiError(
+            'cancelTriggerOrdersWithClosedOrFlippedPositions',
+            `Failed to cancel ${failed.length}/${ordersToCancel.length} trigger orders`,
+            {
+              failedOperations: failed,
+            }
+          );
+        }
+
         await sleep(SLEEP_TIME);
       }
 
@@ -112,13 +137,9 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             return;
           }
 
-          logBonsaiError(
-            'cancelOrphanedTriggerOrdersLifecycle',
-            'Failed to cancel trigger orders',
-            {
-              error,
-            }
-          );
+          logBonsaiError('cancelOrphanedTriggerOrdersLifecycle', 'lifecycle error', {
+            error,
+          });
         });
 
       return undefined;
