@@ -7,15 +7,15 @@ import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { WalletNetworkType } from '@/constants/wallets';
-import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalPlaceOrders } from '@/state/localOrdersSelectors';
 
 import { stringifyTransactionError } from '@/lib/errors';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import { objectEntries, objectFromEntries } from '@/lib/objectHelpers';
+import { BIG_NUMBERS } from '@/lib/numbers';
+import { objectEntries } from '@/lib/objectHelpers';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
@@ -24,7 +24,7 @@ import { isParentSubaccount } from '../calculators/subaccount';
 import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
-import { BonsaiCore, BonsaiRaw } from '../ontology';
+import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
 
@@ -36,64 +36,68 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       selectTxAuthorizedAccount,
       BonsaiCore.account.openOrders.data,
       getLocalPlaceOrders,
-      BonsaiRaw.parentSubaccountBase,
+      BonsaiCore.account.childSubaccountSummaries.data,
+      BonsaiCore.account.parentSubaccountPositions.data,
     ],
-    (authorizedAccount, openOrders, localPlaceOrders, parentSubaccountBase) => {
-      if (!authorizedAccount || parentSubaccountBase == null) {
+    (
+      authorizedAccount,
+      openOrders,
+      localPlaceOrders,
+      childSubaccountSummaries,
+      parentSubaccountPositions
+    ) => {
+      if (
+        !authorizedAccount ||
+        childSubaccountSummaries == null ||
+        parentSubaccountPositions == null
+      ) {
         return undefined;
       }
 
-      const groupedPositions = objectFromEntries(
-        objectEntries(parentSubaccountBase.childSubaccounts).map(
-          ([childSubaccountNumber, childSubaccount]) => [
-            childSubaccountNumber,
-            {
-              marketPositions: objectEntries(childSubaccount?.openPerpetualPositions ?? {})
-                .map(([marketId, position]) =>
-                  position.status === IndexerPerpetualPositionStatus.OPEN ? marketId : undefined
-                )
-                .filter(isPresent),
-              usdcBalance:
-                childSubaccount?.assetPositions.USDC?.side === IndexerPositionSide.LONG
-                  ? MustBigNumber(childSubaccount.assetPositions.USDC.size)
-                  : BIG_NUMBERS.ZERO,
-            },
-          ]
-        )
+      const openPositions = parentSubaccountPositions.filter(
+        (position) =>
+          !isParentSubaccount(position.subaccountNumber) &&
+          position.status === IndexerPerpetualPositionStatus.OPEN
       );
 
+      const groupedPositions = groupBy(openPositions, (p) => p.subaccountNumber);
       const groupedOrders = groupBy(openOrders, (o) => o.subaccountNumber);
 
-      const reclaimableChildSubaccounts: Array<{
-        subaccountNumber: string;
-        usdcBalance: BigNumber;
-      }> = objectEntries(groupedPositions)
-        .map(([subaccountNumber, subaccount]) => {
-          const subaccountNumberInt = parseInt(subaccountNumber, 10);
-          const isChildSubaccount = !isParentSubaccount(subaccountNumber);
-          const hasUsdc = subaccount.usdcBalance.gt(0);
-          const hasNoPositions = subaccount.marketPositions.length === 0;
-          const hasNoOrders = (groupedOrders[subaccountNumber]?.length ?? 0) === 0;
-
-          const hasLocalPlaceOrders = Object.values(localPlaceOrders).some(
-            ({ cachedData, submissionStatus }) =>
-              cachedData.subaccountNumber === subaccountNumberInt &&
-              submissionStatus === PlaceOrderStatuses.Submitted
-          );
-
-          if (
-            !hasUsdc ||
-            !isChildSubaccount ||
-            !hasNoPositions ||
-            !hasNoOrders ||
-            hasLocalPlaceOrders
-          ) {
+      const summaries = objectEntries(childSubaccountSummaries)
+        .map(([subaccountNumberStr, summary]) => {
+          const subaccountNumber = parseInt(subaccountNumberStr, 10);
+          if (isParentSubaccount(subaccountNumber) || groupedPositions[subaccountNumber] != null) {
             return undefined;
           }
 
           return {
             subaccountNumber,
-            usdcBalance: subaccount.usdcBalance,
+            equity: summary?.equity ?? BIG_NUMBERS.ZERO,
+          };
+        })
+        .filter(isPresent);
+
+      const reclaimableChildSubaccounts: Array<{
+        subaccountNumber: number;
+        usdcBalance: BigNumber;
+      }> = summaries
+        .map(({ subaccountNumber, equity }) => {
+          const hasUsdc = equity.gt(0);
+          const hasNoOrders = (groupedOrders[subaccountNumber]?.length ?? 0) === 0;
+
+          const hasLocalPlaceOrders = Object.values(localPlaceOrders).some(
+            ({ cachedData, submissionStatus }) =>
+              cachedData.subaccountNumber === subaccountNumber &&
+              submissionStatus === PlaceOrderStatuses.Submitted
+          );
+
+          if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders) {
+            return undefined;
+          }
+
+          return {
+            subaccountNumber,
+            usdcBalance: equity,
           };
         })
         .filter(isPresent);
@@ -115,7 +119,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       subaccount: number;
     },
     childSubaccountFunds: {
-      subaccountNumber: string;
+      subaccountNumber: number;
       usdcBalance: BigNumber;
     }
   ) {
@@ -126,12 +130,12 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
       const subaccountClient = new SubaccountClient(
         localDydxWallet!,
-        parseInt(childSubaccountFunds.subaccountNumber, 10)
+        childSubaccountFunds.subaccountNumber
       );
 
       logBonsaiInfo(
         'reclaimChildSubaccountBalancesLifecycle',
-        'attempting to reclaim funds from child subaccount',
+        `attempting to reclaim funds from child subaccount (${childSubaccountFunds.subaccountNumber})`,
         {
           subaccountNumber: childSubaccountFunds.subaccountNumber,
           usdcBalance: childSubaccountFunds.usdcBalance.toString(),
