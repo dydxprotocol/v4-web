@@ -101,6 +101,10 @@ export type NotificationTypeConfig<
        */
       shouldUnhide?: boolean,
 
+      /**
+       * If this trigger has a new update key and the notiification status is CLEARED, leave it CLEARED
+       * rather than updating it - keep it hidden.
+       */
       keepCleared?: boolean
     ) => void;
 
