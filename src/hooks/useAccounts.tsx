@@ -90,7 +90,7 @@ const useAccountsContext = () => {
     // OR when our connection state changes.
     // The address can be cached via local storage, so it won't change when we reconnect
     // But the hasSubAccount value will become true once you reconnect
-    // This allows us to trigger a state update and make sure abacus knows the source address
+    // This allows us to trigger a state update
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 

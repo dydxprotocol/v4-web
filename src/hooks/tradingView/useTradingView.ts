@@ -79,13 +79,13 @@ export const useTradingView = ({
   const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
     [marketId: string]: number | undefined;
   }>({});
-  const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
+  const { tickSizeDecimals: tickSizeDecimalsBonsai } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
   const tickSizeDecimals =
     (marketId
-      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
-      : tickSizeDecimalsAbacus) ?? undefined;
+      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsBonsai
+      : tickSizeDecimalsBonsai) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -116,7 +116,7 @@ export const useTradingView = ({
 
   useEffect(() => {
     // we only need tick size from current market for the price scale settings
-    // if markets haven't been loaded via abacus, get the current market info from indexer
+    // if markets haven't been loaded, get the current market info from indexer
     (async () => {
       if (marketId && tickSizeDecimals === undefined) {
         const marketTickSize = await getMarketTickSize(marketId);

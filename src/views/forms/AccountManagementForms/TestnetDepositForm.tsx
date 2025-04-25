@@ -37,7 +37,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // call getSubaccounts once the subaccount detected via ws from abacus
+  // call getSubaccounts once the subaccount detected via ws from bonsai
   useEffect(() => {
     if (dydxAddress && isLoading && subAccount) {
       setIsLoading(false);

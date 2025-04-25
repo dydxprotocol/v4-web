@@ -15,7 +15,7 @@ export class StatefulOrderError extends Error {
 }
 
 /**
- * Abacus parses the stringified error and returns a ParseError.
+ * Parse the stringified error and returns a ParseError.
  * BroadcastError is parsed with `code`, `codespace`, and `message`, and defaults to show the original error message if untranslated.
  * Failed Query results (i.e., those starting with "Query failed") are matched via the error message, defaulting to "Unknown query result error".
  * Unmatched errors will display the actual error message.

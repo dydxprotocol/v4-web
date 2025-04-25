@@ -9,8 +9,6 @@ declare global {
     'dydx:log': CustomEvent;
     'dydx:track': CustomEvent;
     'dydx:identify': CustomEvent;
-
-    'abacus:connectNetwork': CustomEvent;
   }
 
   var Intercom: any;

@@ -12,7 +12,6 @@ export const isTestnet = CURRENT_MODE === 'TESTNET';
 export const isDev = CURRENT_MODE === 'DEV';
 
 export const AVAILABLE_ENVIRONMENTS = environments.deployments[CURRENT_MODE];
-export const CURRENT_ABACUS_DEPLOYMENT = CURRENT_MODE;
 export const ENVIRONMENT_CONFIG_MAP = environments.environments;
 export const TOKEN_CONFIG_MAP = environments.tokens;
 export const LINKS_CONFIG_MAP = environments.links;
