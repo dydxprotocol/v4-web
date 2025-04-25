@@ -77,7 +77,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
           return {
             subaccountNumber,
-            equity: summary?.equity ?? BIG_NUMBERS.ZERO,
+            equity: summary.equity ?? BIG_NUMBERS.ZERO,
           };
         })
         .filter(isPresent);
