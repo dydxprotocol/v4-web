@@ -93,11 +93,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const relevantLocalCancels = Object.values(localCancelOrders).filter(
             (c) => c.orderId === order.id
           );
-          if (relevantPlaceOrder != null || relevantLocalCancels.length > 0) {
-            // locally placed orders have a different notification lifecycle - OrderStatus
-            // and local cancels shouldn't cause the original order to re-trigger so we ignore
-            return;
-          }
+
           const marketInfo = allMarkets[order.marketId];
           const orderTypeKey = getIndexerOrderTypeStringKey(order.type);
           const latestUpdateMs = max([
@@ -181,6 +177,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ),
             },
             [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
+            !(relevantPlaceOrder != null || relevantLocalCancels.length > 0),
+            false,
             true
           );
         });

@@ -57,10 +57,6 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
-  // todo see if this works
-  // NotificationType.BlockTradingReward,
-  // NotificationType.Order,
-  // NotificationType.FillWithNoOrder,
   NotificationType.Custom,
 ];
 
@@ -103,7 +99,13 @@ export type NotificationTypeConfig<
        * @param false (default): Notification should not be retriggered if it's been seen/cleared/hidden
        * @param true:  Notification should be retriggered if status was NotificationStatus.Hidden
        */
-      shouldUnhide?: boolean
+      shouldUnhide?: boolean,
+
+      /**
+       * If this trigger has a new update key and the notiification status is CLEARED, leave it CLEARED
+       * rather than updating it - keep it hidden.
+       */
+      keepCleared?: boolean
     ) => void;
 
     /**
