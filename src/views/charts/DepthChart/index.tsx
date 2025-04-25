@@ -322,7 +322,7 @@ export const DepthChart = ({
                   value={
                     isEditingOrder && chartPointAtPointer
                       ? chartPointAtPointer.price
-                      : tooltipData!.nearestDatum?.datum?.price
+                      : tooltipData!.nearestDatum?.datum.price
                   }
                   useGrouping={false}
                   accentColor={

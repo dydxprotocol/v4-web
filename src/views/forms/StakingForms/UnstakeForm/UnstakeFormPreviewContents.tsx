@@ -38,10 +38,9 @@ export const UnstakeFormPreviewContents = ({
   const { chainTokenLabel, chainTokenImage } = useTokenConfigs();
   const { stakingValidators, currentDelegations } = useStakingValidator();
 
-  const delegationsToUnstake =
-    currentDelegations?.filter((delegation) =>
-      MustBigNumber(amounts[delegation.validator]).gt(0)
-    ) ?? [];
+  const delegationsToUnstake = currentDelegations.filter((delegation) =>
+    MustBigNumber(amounts[delegation.validator]).gt(0)
+  );
   const unstakingValidators = stakingValidators
     ? delegationsToUnstake
         .map((delegation) => stakingValidators[delegation.validator]?.[0])
