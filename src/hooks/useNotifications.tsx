@@ -181,7 +181,7 @@ const useNotificationsContext = () => {
     useTrigger({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       trigger: useCallback(
-        (id, displayData, updateKey, isNew = true, shouldUnhide = false) => {
+        (id, displayData, updateKey, isNew = true, shouldUnhide = false, keepCleared = false) => {
           const key = getKey({ type, id });
 
           const notification = notifications[key];
@@ -204,7 +204,11 @@ const useNotificationsContext = () => {
               const thisNotification = notifications[key]!;
 
               thisNotification.updateKey = updateKey;
-              updateStatus(thisNotification, NotificationStatus.Updated);
+              const nextStatus =
+                keepCleared && thisNotification.status === NotificationStatus.Cleared
+                  ? NotificationStatus.Cleared
+                  : NotificationStatus.Updated;
+              updateStatus(thisNotification, nextStatus);
             } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
               const thisNotification = notifications[key]!;
               updateStatus(thisNotification, NotificationStatus.Updated);
