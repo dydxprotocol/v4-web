@@ -1,3 +1,4 @@
+import { setUpCancelOrphanedTriggerOrdersLifecycle } from './lifecycles/cancelTriggerOrdersLifecycle';
 import { setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
 import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
@@ -52,4 +53,5 @@ export const storeLifecycles = [
   setUpNobleBalanceSweepLifecycle,
   setUpRewardsParamsQuery,
   setUpRewardsTokenPriceQuery,
+  setUpCancelOrphanedTriggerOrdersLifecycle,
 ] as const;

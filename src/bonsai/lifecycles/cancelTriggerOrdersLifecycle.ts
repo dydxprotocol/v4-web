@@ -10,7 +10,7 @@ import { createAppSelector } from '@/state/appTypes';
 import { sleep } from '@/lib/timeUtils';
 
 import { createSemaphore, SupersededError } from '../lib/semaphore';
-import { logBonsaiError } from '../logs';
+import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectParentSubaccountOpenPositions } from '../selectors/account';
@@ -77,6 +77,18 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
 
       async function cancelTriggerOrdersWithClosedOrFlippedPositions() {
         const { ordersToCancel } = data!;
+        if (ordersToCancel.length === 0) {
+          return;
+        }
+
+        logBonsaiInfo(
+          'cancelTriggerOrdersWithClosedOrFlippedPositions',
+          `Cancelling ${ordersToCancel.length} trigger orders`,
+          {
+            ordersToCancel,
+          }
+        );
+
         await Promise.all(
           ordersToCancel.map((o) =>
             accountTransactionManager.cancelOrder({
