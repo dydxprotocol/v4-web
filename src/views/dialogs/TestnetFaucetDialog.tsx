@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { DepositDialogProps, DialogProps } from '@/constants/dialogs';
+import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -15,7 +15,7 @@ import { track } from '@/lib/analytics/analytics';
 
 import { TestnetDepositForm } from '../forms/AccountManagementForms/TestnetDepositForm';
 
-export const TestnetFaucetDialog = ({ setIsOpen }: DialogProps<DepositDialogProps>) => {
+export const TestnetFaucetDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 

@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
+import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -18,27 +18,40 @@ import { Slider } from '@/components/Slider';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
+import { mapIfPresent } from '@/lib/do';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
-import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const TargetLeverageInput = () => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
-  const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
+  const { targetLeverage } = useAppSelector(getTradeFormValues);
   const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
+  const setLeverageSlow = useCallback(
+    (newLeverageString: string | undefined) => {
+      dispatch(tradeFormActions.setTargetLeverage(newLeverageString ?? ''));
+    },
+    [dispatch]
+  );
 
-  useEffect(() => {
-    setLeverage(targetLeverage?.toString() ?? '');
-  }, [targetLeverage]);
+  const {
+    value: leverage,
+    setValue: setLeverage,
+    commitValue: commitLeverageState,
+  } = useQuickUpdatingState<string | undefined>({
+    setValueSlow: setLeverageSlow,
+    slowValue: targetLeverage ?? '',
+    debounceMs: 100,
+  });
 
   const maxLeverage = useMemo(() => {
     return calculateMarketMaxLeverage({
@@ -48,22 +61,21 @@ export const TargetLeverageInput = () => {
   }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   const onSliderDrag = ([newLeverage]: number[]) => {
-    setLeverage(newLeverage!.toString());
+    const newLeverageString = mapIfPresent(newLeverage, (lev) =>
+      MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
+    );
+    setLeverage(newLeverageString);
   };
 
-  const commitLeverage = (newLeverage: number | undefined) => {
-    if (newLeverage != null) {
-      setLeverage(newLeverage.toString());
-    }
-
-    abacusStateManager.setTradeValue({
-      value: newLeverage,
-      field: TradeInputField.targetLeverage,
-    });
+  const commitLeverage = (newLeverage: string) => {
+    commitLeverageState(newLeverage);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
-    commitLeverage(newLeverage);
+    const newLeverageString = mapIfPresent(newLeverage, (lev) =>
+      MustBigNumber(lev).toFixed(LEVERAGE_DECIMALS)
+    );
+    commitLeverage(newLeverageString ?? '');
   };
 
   return (
@@ -74,7 +86,7 @@ export const TargetLeverageInput = () => {
             <WithTooltip
               tooltip="target-leverage"
               stringParams={{
-                TARGET_LEVERAGE: targetLeverage?.toFixed(LEVERAGE_DECIMALS),
+                TARGET_LEVERAGE: AttemptBigNumber(targetLeverage)?.toFixed(LEVERAGE_DECIMALS),
               }}
               side="right"
             >
@@ -96,10 +108,10 @@ export const TargetLeverageInput = () => {
         <Input
           placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
           type={InputType.Leverage}
-          value={leverage}
+          value={targetLeverage ?? ''}
           max={maxLeverage}
-          onChange={({ floatValue }: NumberFormatValues) => {
-            commitLeverage(floatValue);
+          onChange={({ value }: NumberFormatValues) => {
+            commitLeverage(value);
           }}
         />
       </$InnerInputContainer>
@@ -110,6 +122,7 @@ export const TargetLeverageInput = () => {
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
+  --input-backgroundColor: none;
 
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
 
@@ -125,7 +138,7 @@ const $WithLabel = styled(WithLabel)`
 const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-backgroundColor: var(--color-layer-5);
-  --input-borderColor: var(--color-layer-7);
+  --input-borderColor: none;
   --input-height: 2.25rem;
   --input-width: 5rem;
 

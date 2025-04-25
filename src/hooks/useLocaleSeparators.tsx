@@ -5,7 +5,6 @@ import { SUPPORTED_LOCALES } from '@/constants/localization';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getSeparator } from '@/lib/numbers';
 
 type LocaleContextType = ReturnType<typeof useLocaleContext>;
@@ -42,10 +41,6 @@ const useLocaleContext = () => {
       decimal: getSeparator({ browserLanguage, separatorType: 'decimal' }),
     };
   }, [browserLanguage]);
-
-  useEffect(() => {
-    abacusStateManager.setLocaleSeparators(separators);
-  }, [separators]);
 
   return separators;
 };

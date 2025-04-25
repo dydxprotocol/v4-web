@@ -2,11 +2,11 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { AbacusPositionSide } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -21,15 +21,13 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
-import {
-  getCurrentMarketPositionData,
-  getCurrentMarketPositionDataForPostTrade,
-} from '@/state/accountSelectors';
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
+import { getCurrentSelectedFormPositionSummary } from '@/state/tradeFormSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { BIG_NUMBERS, isNumber, MustBigNumber } from '@/lib/numbers';
 import { hasPositionSideChanged } from '@/lib/tradeData';
@@ -76,7 +74,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = orEmptyObj(useAppSelector(getCurrentMarketPositionData));
   const currentMarketPositionPostTrade = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionDataForPostTrade)
+    useAppSelector(getCurrentSelectedFormPositionSummary)
   );
   const isLoading = useAppSelector(calculateIsAccountLoading);
 
@@ -128,34 +126,33 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   ];
 
   const currentSize = size;
-  const postOrderSize = currentMarketPositionPostTrade.size?.postOrder;
+  const postOrderSize = currentMarketPositionPostTrade.signedSize;
   const leverageBN = MustBigNumber(leverage);
-  const newLeverageBN = MustBigNumber(currentMarketPositionPostTrade.leverage?.postOrder);
+  const newLeverageBN = MustBigNumber(currentMarketPositionPostTrade.leverage);
   const maxLeverage = BIG_NUMBERS.ONE.div(
-    MustBigNumber(currentMarketPositionPostTrade.adjustedImf?.postOrder)
+    MustBigNumber(currentMarketPositionPostTrade.adjustedImf)
   );
   const newPositionIsClosed = MustBigNumber(postOrderSize).isZero();
   const hasNoPositionInMarket = MustBigNumber(currentSize).isZero();
 
   const newLeverageIsInvalid =
-    !!currentMarketPositionPostTrade.leverage?.postOrder &&
+    !!currentMarketPositionPostTrade.leverage &&
     (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
-    !leverage ||
-    (currentMarketPositionPostTrade.leverage?.postOrder && newLeverageBN.gt(leverageBN));
+    !leverage || (currentMarketPositionPostTrade.leverage && newLeverageBN.gt(leverageBN));
 
   let liquidationArrowSign = NumberSign.Neutral;
   const newLiquidationPriceIsLarger = MustBigNumber(
-    currentMarketPositionPostTrade.liquidationPrice?.postOrder
+    currentMarketPositionPostTrade.liquidationPrice
   ).gt(MustBigNumber(liquidationPrice));
 
   const positionSideHasChanged = hasPositionSideChanged({
     currentSize: currentSize?.toNumber(),
-    postOrderSize,
+    postOrderSize: postOrderSize?.toNumber(),
   }).positionSideHasChanged;
 
-  if (currentMarketPositionPostTrade.leverage?.postOrder) {
+  if (currentMarketPositionPostTrade.leverage) {
     if (newLeverageIsInvalid) {
       liquidationArrowSign = NumberSign.Negative;
     } else if (newPositionIsClosed) {
@@ -193,8 +190,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
             : NumberSign.Neutral,
       useDiffOutput: true,
       showSign: ShowSign.None,
-      value: leverage,
-      newValue: currentMarketPositionPostTrade.leverage?.postOrder,
+      value: leverage?.toNumber(),
+      newValue: currentMarketPositionPostTrade.leverage?.toNumber(),
       withBaseFont: true,
     },
     {
@@ -202,7 +199,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       type: OutputType.Fiat,
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip:
-        currentMarketPositionPostTrade.side?.postOrder === AbacusPositionSide.SHORT
+        currentMarketPositionPostTrade.side === IndexerPositionSide.SHORT
           ? 'liquidation-price-short'
           : 'liquidation-price-long',
       tooltipParams: {
@@ -212,8 +209,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
       sign: liquidationArrowSign,
       useDiffOutput: true,
-      value: liquidationPrice,
-      newValue: currentMarketPositionPostTrade.liquidationPrice?.postOrder,
+      value: liquidationPrice?.toNumber(),
+      newValue: currentMarketPositionPostTrade.liquidationPrice?.toNumber(),
       withBaseFont: true,
     },
     {
@@ -325,8 +322,9 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
                 : closeDialogInTradeBox()
             );
 
-            if (!isPressed)
-              abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+            if (!isPressed) {
+              dispatch(closePositionFormActions.reset());
+            }
           }}
         >
           {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
@@ -343,7 +341,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
             assetImgUrl={imageUrl}
             currentSize={size?.toNumber()}
             notionalTotal={notionalTotal?.toNumber()}
-            postOrderSize={currentMarketPositionPostTrade.size?.postOrder}
+            postOrderSize={currentMarketPositionPostTrade.signedSize?.toNumber()}
             stepSizeDecimals={stepSizeDecimals}
             symbol={id ?? undefined}
             tickSizeDecimals={tickSizeDecimals}
@@ -388,7 +386,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           assetImgUrl={imageUrl}
           currentSize={size?.toNumber()}
           notionalTotal={notionalTotal?.toNumber()}
-          postOrderSize={currentMarketPositionPostTrade.size?.postOrder}
+          postOrderSize={currentMarketPositionPostTrade.signedSize?.toNumber()}
           stepSizeDecimals={stepSizeDecimals}
           symbol={id ?? undefined}
           tickSizeDecimals={tickSizeDecimals}

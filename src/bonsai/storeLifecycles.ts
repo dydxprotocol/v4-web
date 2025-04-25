@@ -1,4 +1,5 @@
-import { setUpLocalOrdersFillsSync, setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
+import { setUpCancelOrphanedTriggerOrdersLifecycle } from './lifecycles/cancelTriggerOrdersLifecycle';
+import { setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
 import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
 import { setUpAssetsQuery } from './rest/assets';
@@ -14,6 +15,7 @@ import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/heigh
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
+import { setUpRewardsParamsQuery, setUpRewardsTokenPriceQuery } from './rest/rewards';
 import { setUpSparklinesQuery } from './rest/sparklines';
 import { setUpTransfersQuery } from './rest/transfers';
 import {
@@ -42,7 +44,6 @@ export const storeLifecycles = [
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpConfigTiersQuery,
-  setUpLocalOrdersFillsSync,
   setUpLocalOrdersOrdersSync,
   setUpGeoQuery,
   setUpIndexerSourceAddressScreenV2Query,
@@ -50,4 +51,7 @@ export const storeLifecycles = [
   setUpUsdcRebalanceLifecycle,
   setUpNobleBalanceQuery,
   setUpNobleBalanceSweepLifecycle,
+  setUpRewardsParamsQuery,
+  setUpRewardsTokenPriceQuery,
+  setUpCancelOrphanedTriggerOrdersLifecycle,
 ] as const;

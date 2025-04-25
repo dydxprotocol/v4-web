@@ -28,6 +28,7 @@ import { isPresent } from '@/lib/typeUtils';
 
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 import {
+  ChildSubaccountSummaries,
   GroupedSubaccountSummary,
   PendingIsolatedPosition,
   SubaccountOrder,
@@ -80,6 +81,7 @@ export function calculateParentSubaccountSummary(
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,
+    parentSubaccountEquity: parentSummary.equity,
     equity: Object.values(summaries)
       .filter(isPresent)
       .map((s) => s.equity)
@@ -93,7 +95,7 @@ export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountData
   );
 }
 
-const calculateSubaccountSummary = weakMapMemoize(
+export const calculateSubaccountSummary = weakMapMemoize(
   (subaccountData: ChildSubaccountData, markets: MarketsData): SubaccountSummary => {
     const core = calculateSubaccountSummaryCore(subaccountData, markets);
     return {
@@ -309,7 +311,7 @@ function calculatePositionDerivedExtra(
 export function calculateChildSubaccountSummaries(
   parent: ParentSubaccountDataBase,
   markets: MarketsData
-): Record<string, SubaccountSummary> {
+): ChildSubaccountSummaries {
   return pickBy(
     mapValues(
       parent.childSubaccounts,
@@ -327,7 +329,7 @@ export function calculateChildSubaccountSummaries(
  * - childSubaccount has equity
  */
 export function calculateUnopenedIsolatedPositions(
-  childSubaccounts: Record<string, SubaccountSummary>,
+  childSubaccounts: ChildSubaccountSummaries,
   orders: SubaccountOrder[],
   positions: SubaccountPosition[]
 ): PendingIsolatedPosition[] {

@@ -57,7 +57,7 @@ export function useFunkitBuyNobleUsdc() {
             dispatch(updateFunkitDeposit({ checkoutId, timestamp: Date.now() }));
           },
           onDydxSwitch: () => {
-            dispatch(openDialog(DialogTypes.Deposit({ depositType: 'standard' })));
+            dispatch(openDialog(DialogTypes.Deposit2({})));
           },
         };
   }, [dispatch, enableFunWithNewDepositFlow]);

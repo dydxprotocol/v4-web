@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
+import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
+import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { IOrderLineAdapter } from 'public/tradingview/charting_library';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
-import { HumanReadablePlaceOrderPayload } from '@/constants/abacus';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
-import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS } from '@/constants/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
@@ -19,26 +20,18 @@ import { Icon, IconName } from '@/components/Icon';
 
 import {
   getCurrentMarketOrders,
-  getCurrentMarketOrdersForPostOrder,
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import {
-  cancelOrderFailed,
-  cancelOrderSubmitted,
-  placeOrderFailed,
-  placeOrderSubmitted,
-  setLatestOrder,
-} from '@/state/localOrders';
+import { placeOrderFailed } from '@/state/localOrders';
 
-import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
+import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import {
-  cancelOrderAsync,
   canModifyOrderTypeFromChart,
   createPlaceOrderPayloadFromExistingOrder,
   getOrderModificationError,
@@ -81,10 +74,6 @@ export const useChartLines = ({
   const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useAppSelector(
     getCurrentMarketOrders,
-    shallowEqual
-  );
-  const currentMarketOrdersAbacus = useAppSelector(
-    getCurrentMarketOrdersForPostOrder,
     shallowEqual
   );
 
@@ -220,7 +209,7 @@ export const useChartLines = ({
 
   // Cache for order modification that stores the new orders that are submitted but not yet placed
   const pendingOrderAdjustmentsRef = useRef<{
-    [clientId: string]: { orderPayload: HumanReadablePlaceOrderPayload; oldOrderId: string };
+    [clientId: string]: { orderPayload: PlaceOrderPayload; oldOrderId: string };
   }>({});
 
   const removePendingOrderAdjustment = (clientId: string) => {
@@ -229,10 +218,7 @@ export const useChartLines = ({
     pendingOrderAdjustmentsRef.current = withoutOrderId;
   };
 
-  const addPendingOrderAdjustment = (
-    orderPayload: HumanReadablePlaceOrderPayload,
-    oldOrderId: string
-  ) => {
+  const addPendingOrderAdjustment = (orderPayload: PlaceOrderPayload, oldOrderId: string) => {
     pendingOrderAdjustmentsRef.current = {
       ...pendingOrderAdjustmentsRef.current,
       [orderPayload.clientId]: { orderPayload, oldOrderId },
@@ -274,46 +260,25 @@ export const useChartLines = ({
 
       addPendingOrderAdjustment(orderPayload, order.id);
 
-      // Dispatch both actions here so that the user sees both cancel + submitting notifications together
-      dispatch(cancelOrderSubmitted(order.id));
-      dispatch(
-        placeOrderSubmitted({
-          marketId: orderPayload.marketId,
-          clientId: orderPayload.clientId,
-          orderType: orderPayload.type as TradeTypes,
-        })
-      );
-
-      const { success: cancelSuccess } = await cancelOrderAsync(order.id);
-      if (!cancelSuccess) {
-        dispatch(
-          cancelOrderFailed({
-            orderId: order.id,
-            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-          })
-        );
+      const cancelResult = await accountTransactionManager.cancelOrder({
+        orderId: order.id,
+      });
+      if (isOperationFailure(cancelResult)) {
         dispatch(
           placeOrderFailed({
-            clientId: orderPayload.clientId,
-            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
+            clientId: orderPayload.clientId.toString(),
+            errorParams: operationFailureToErrorParams(cancelResult),
           })
         );
         orderLine.setPrice(oldPrice);
-        removePendingOrderAdjustment(orderPayload.clientId);
+        removePendingOrderAdjustment(orderPayload.clientId.toString());
         return;
       }
 
-      const res = await abacusStateManager.chainTransactions.placeOrderTransaction(orderPayload);
-      const { error } = JSON.parse(res);
-      if (error) {
+      const res = await accountTransactionManager.placeOrder(orderPayload);
+      if (isOperationFailure(res)) {
         orderLine.remove();
-        removePendingOrderAdjustment(orderPayload.clientId);
-        dispatch(
-          placeOrderFailed({
-            clientId: orderPayload.clientId,
-            errorParams: DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-          })
-        );
+        removePendingOrderAdjustment(orderPayload.clientId.toString());
       }
     },
     [dispatch, stringGetter, notify]
@@ -403,7 +368,6 @@ export const useChartLines = ({
               AnalyticsEvents.TradingViewOrderModificationSuccess({ clientId: order.clientId })
             );
             removePendingOrderAdjustment(order.clientId);
-            dispatch(setLatestOrder(currentMarketOrdersAbacus.find((o) => o.id === order.id)));
           }
         }
       }
@@ -417,15 +381,7 @@ export const useChartLines = ({
         line.line.remove();
         delete chartLinesRef.current[key];
       });
-  }, [
-    currentMarketOrders,
-    currentMarketOrdersAbacus,
-    stringGetter,
-    tvWidget,
-    setLineColorsAndFont,
-    onMoveOrderLine,
-    dispatch,
-  ]);
+  }, [currentMarketOrders, stringGetter, tvWidget, setLineColorsAndFont, onMoveOrderLine]);
 
   const clearChartLines = useCallback(() => {
     Object.values(chartLinesRef.current).forEach(({ line }) => {

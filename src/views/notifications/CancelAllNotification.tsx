@@ -2,7 +2,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { CANCEL_ALL_ORDERS_KEY, LocalCancelAllData } from '@/constants/trade';
+import { CANCEL_ALL_ORDERS_KEY, CancelOrderStatuses, LocalCancelAllData } from '@/constants/trade';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -13,7 +13,9 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
-import { orEmptyObj } from '@/lib/typeUtils';
+import { useAppSelector } from '@/state/appTypes';
+
+import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   localCancelAll: LocalCancelAllData;
@@ -25,16 +27,24 @@ export const CancelAllNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const isCancelForSingleMarket = localCancelAll.key !== CANCEL_ALL_ORDERS_KEY;
+  const isCancelForSingleMarket = localCancelAll.filterKey !== CANCEL_ALL_ORDERS_KEY;
   const { assetId, logo: logoUrl } = orEmptyObj(
     useParameterizedSelector(
       BonsaiHelpers.markets.createSelectMarketSummaryById,
-      isCancelForSingleMarket ? localCancelAll.key : undefined
+      isCancelForSingleMarket ? localCancelAll.filterKey : undefined
     )
   );
-  const numOrders = localCancelAll.orderIds.length;
-  const numCanceled = localCancelAll.canceledOrderIds?.length ?? 0;
-  const numFailed = localCancelAll.failedOrderIds?.length ?? 0;
+  const localCancels = useAppSelector((s) => s.localOrders.localCancelOrders);
+  const cancelStatuses = localCancelAll.cancelOrderOperationUuids
+    .map((uuid) => localCancels[uuid])
+    .filter(isPresent);
+  const numOrders = cancelStatuses.length;
+  const numCanceled = cancelStatuses.filter(
+    (c) => c.submissionStatus === CancelOrderStatuses.Canceled
+  ).length;
+  const numFailed = cancelStatuses.filter(
+    (c) => c.submissionStatus === CancelOrderStatuses.Failed
+  ).length;
 
   // Check if all orders have been confirmed canceled or failed
   const isCancellationConfirmed = numCanceled + numFailed >= numOrders;
@@ -69,7 +79,7 @@ export const CancelAllNotification = ({
         key: isCancelForSingleMarket
           ? STRING_KEYS.CANCELING_ALL_ORDERS_IN_MARKET
           : STRING_KEYS.CANCELING_ALL_ORDERS,
-        params: { MARKET_ID: localCancelAll.key },
+        params: { MARKET_ID: localCancelAll.filterKey },
       })}
       slotTitleRight={orderStatusIcon}
       slotCustomContent={customContent}

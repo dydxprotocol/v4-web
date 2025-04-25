@@ -2,7 +2,6 @@ import { SkipStatusResponse } from './skip';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
-  AbacusGenerated = 'AbacusGenerated',
   // Until we have migrations enabled, we need to keep underlying values the same
   // So the notifications don't get retriggered
   // It's pretty scary getting a bunch of unexpected withdrawal notifications
@@ -19,6 +18,9 @@ export enum NotificationType {
   FeedbackRequest = 'FeedbackRequest',
   PredictionMarketConcluded = 'PredictionMarketConcluded',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
+  BlockTradingReward = 'BlockTradingReward',
+  FillWithNoOrder = 'FillWithNoOrder',
+  Order = 'Order',
 }
 
 export enum NotificationCategoryPreferences {
@@ -37,7 +39,9 @@ export const NotificationTypeCategory: {
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
-  [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
+  [NotificationType.BlockTradingReward]: NotificationCategoryPreferences.Trading,
+  [NotificationType.FillWithNoOrder]: NotificationCategoryPreferences.Trading,
+  [NotificationType.Order]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
@@ -50,14 +54,15 @@ export const NotificationTypeCategory: {
 };
 
 export const SingleSessionNotificationTypes = [
-  NotificationType.AbacusGenerated,
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
+  // todo see if this works
+  // NotificationType.BlockTradingReward,
+  // NotificationType.Order,
+  // NotificationType.FillWithNoOrder,
   NotificationType.Custom,
 ];
-
-export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
 
 export type NotificationId = string | number;
 
@@ -107,6 +112,9 @@ export type NotificationTypeConfig<
     hideNotification: ({ type, id }: NotificationParams) => void;
 
     lastUpdated: number;
+
+    // timestamp of when app was first ever started
+    appInitializedTime: number;
   }) => void;
 
   /** Callback for notification action (Toast action button click, NotificationsMenu item click, or native push notification interaction) */

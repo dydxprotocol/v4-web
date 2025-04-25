@@ -1,27 +1,26 @@
-import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
 import { keyBy } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
-import { stringifyTransactionError } from '@/lib/errors';
-import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { sleep } from '@/lib/timeUtils';
+import { isPresent } from '@/lib/typeUtils';
 
-import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
+import { accountTransactionManager } from '../AccountTransactionSupervisor';
+import { isOperationFailure } from '../lib/operationResult';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectParentSubaccountOpenPositions } from '../selectors/account';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
-import { OrderFlags, OrderStatus, SubaccountOrder } from '../types/summaryTypes';
+import { OrderFlags, OrderStatus } from '../types/summaryTypes';
 
-// Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
+// Sleep time between cancelling trigger orders to ensure that the subaccount has time to process the previous cancels
 const SLEEP_TIME = timeUnits.second * 10;
 
 /**
@@ -71,69 +70,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   );
 
   const activeOrderCancellations = createSemaphore();
-  let canceledOrderIds = new Set<string>();
-
-  async function doCancelOrder(
-    client: CompositeClient,
-    localDydxWallet: LocalWallet,
-    order: SubaccountOrder
-  ) {
-    try {
-      const {
-        id,
-        clientId,
-        subaccountNumber,
-        orderFlags,
-        clobPairId,
-        goodTilBlock,
-        goodTilBlockTimeSeconds,
-      } = order;
-
-      if (clientId == null || orderFlags == null || clobPairId == null) {
-        throw new Error('missing required fields');
-      }
-
-      canceledOrderIds.add(id);
-      const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
-      const clientIdInt = parseInt(clientId, 10);
-      const orderFlagsInt = parseInt(orderFlags, 10);
-
-      const tx = await client.cancelRawOrder(
-        subaccountClient,
-        clientIdInt,
-        orderFlagsInt,
-        clobPairId,
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        goodTilBlock || undefined, // goodTilBlock of 0 will be submitted as undefined
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        goodTilBlockTimeSeconds || undefined // goodTilBlockTimeSeconds of 0 will be submitted as undefined
-      );
-
-      const parsedTx = parseToPrimitives(tx);
-
-      logBonsaiInfo(
-        'cancelOrphanedTriggerOrdersLifecycle',
-        'successfully cancelled trigger order',
-        {
-          id,
-          clientIdInt,
-          orderFlagsInt,
-          clobPairId,
-          goodTilBlock,
-        }
-      );
-
-      return wrapOperationSuccess(parsedTx);
-    } catch (error) {
-      const parsed = stringifyTransactionError(error);
-      logBonsaiError('cancelOrphanedTriggerOrdersLifecycle', 'Failed to cancel trigger orders', {
-        error,
-      });
-      return wrapOperationFailure(parsed);
-    } finally {
-      await sleep(SLEEP_TIME);
-    }
-  }
 
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector,
@@ -143,19 +79,51 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
       }
 
       async function cancelTriggerOrdersWithClosedOrFlippedPositions() {
-        const { ordersToCancel, localDydxWallet } = data!;
+        const { ordersToCancel } = data!;
+        if (ordersToCancel.length === 0) {
+          return;
+        }
 
-        await Promise.all(
-          ordersToCancel.map(async (o) => {
-            if (canceledOrderIds.has(o.id)) {
-              return null;
-            }
-
-            canceledOrderIds.add(o.id);
-
-            return doCancelOrder(compositeClient, localDydxWallet!, o);
-          })
+        logBonsaiInfo(
+          'cancelTriggerOrdersWithClosedOrFlippedPositions',
+          `Cancelling ${ordersToCancel.length} trigger orders`,
+          {
+            ordersToCancel,
+          }
         );
+
+        const results = await Promise.all(
+          ordersToCancel.map((o) =>
+            accountTransactionManager.cancelOrder({
+              orderId: o.id,
+              withNotification: false,
+            })
+          )
+        );
+
+        const failed = results
+          .map((r, idx) => {
+            if (isOperationFailure(r)) {
+              return {
+                ...ordersToCancel[idx],
+                error: r.errorString,
+              };
+            }
+            return null;
+          })
+          .filter(isPresent);
+
+        if (failed.length > 0) {
+          logBonsaiError(
+            'cancelTriggerOrdersWithClosedOrFlippedPositions',
+            `Failed to cancel ${failed.length}/${ordersToCancel.length} trigger orders`,
+            {
+              failedOperations: failed,
+            }
+          );
+        }
+
+        await sleep(SLEEP_TIME);
       }
 
       if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
@@ -169,13 +137,9 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
             return;
           }
 
-          logBonsaiError(
-            'cancelOrphanedTriggerOrdersLifecycle',
-            'Failed to cancel trigger orders',
-            {
-              error,
-            }
-          );
+          logBonsaiError('cancelOrphanedTriggerOrdersLifecycle', 'lifecycle error', {
+            error,
+          });
         });
 
       return undefined;
@@ -184,7 +148,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   });
 
   return () => {
-    canceledOrderIds = new Set<string>();
     activeOrderCancellations.clear();
     noopCleanupEffect();
   };

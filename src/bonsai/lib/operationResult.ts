@@ -1,14 +1,17 @@
-type OperationSuccess<T> = {
+import { ParsingError } from './extractErrors';
+
+export type OperationSuccess<T> = {
   type: 'success';
   payload: T;
 };
 
-type OperationFailure = {
+export type OperationFailure = {
   type: 'failure';
   errorString: string;
+  displayInfo?: ParsingError;
 };
 
-type OperationResult<T> = OperationSuccess<T> | OperationFailure;
+export type OperationResult<T> = OperationSuccess<T> | OperationFailure;
 
 export function wrapOperationSuccess<T>(payload: T): OperationSuccess<T> {
   return {
@@ -17,10 +20,14 @@ export function wrapOperationSuccess<T>(payload: T): OperationSuccess<T> {
   };
 }
 
-export function wrapOperationFailure(errorString: string): OperationFailure {
+export function wrapOperationFailure(
+  errorString: string,
+  displayInfo?: ParsingError
+): OperationFailure {
   return {
     type: 'failure',
     errorString,
+    displayInfo,
   };
 }
 
