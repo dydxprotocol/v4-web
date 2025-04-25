@@ -749,7 +749,13 @@ export class AccountTransactionSupervisor {
     return results.find(isOperationFailure)!;
   }
 
-  public async cancelOrder({ orderId }: { orderId: string }) {
+  public async cancelOrder({
+    orderId,
+    withNotification = true,
+  }: {
+    orderId: string;
+    withNotification?: boolean;
+  }) {
     const maybeErr = this.maybeNoLocalWalletError('cancelOrder');
     if (maybeErr) {
       return maybeErr;
@@ -764,7 +770,11 @@ export class AccountTransactionSupervisor {
         'invalid or missing order id'
       );
     }
-    this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
+
+    if (withNotification) {
+      this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
+    }
+
     track(AnalyticsEvents.TradeCancelOrder({ orderId }));
 
     const startTime = startTimer();
