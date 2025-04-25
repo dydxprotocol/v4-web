@@ -8,11 +8,7 @@ import {
 
 import { log } from '@/lib/telemetry';
 
-/**
- * MetadataServiceClient
- * @description client to fetch metadata info, prices, and candles
- */
-class MetadataServiceClient {
+export class MetadataServiceClient {
   private host: string;
 
   constructor(host: string) {
@@ -66,7 +62,3 @@ class MetadataServiceClient {
     });
   }
 }
-
-const METADATA_URI: string = import.meta.env.VITE_METADATA_SERVICE_URI ?? '';
-const metadataClient = new MetadataServiceClient(METADATA_URI);
-export default metadataClient;

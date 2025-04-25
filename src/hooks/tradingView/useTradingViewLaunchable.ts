@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
   LanguageCode,
@@ -13,6 +14,7 @@ import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { SUPPORTED_LOCALE_MAP } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
+import { getMetadataEndpoint } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -21,8 +23,6 @@ import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
 import { getLaunchableMarketDatafeed } from '@/lib/tradingView/launchableMarketFeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
-
-import { useMetadataService } from '../useMetadataService';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -43,13 +43,15 @@ export const useTradingViewLaunchable = ({
   const selectedLocale = useAppSelector(getSelectedLocale);
 
   const savedTvChartConfig = useAppSelector((s) => getTvChartConfig(s, true));
+  const metadataEndpoint = useAppSelector(getMetadataEndpoint);
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig }) ?? undefined;
 
-  const { data: metadataServiceData, isLoading: isDataLoading } = useMetadataService();
+  const assetData = useAppSelector(BonsaiCore.markets.assets.data);
+  const assetDataLoading = assetData == null;
 
   useEffect(() => {
-    if (marketId && !isDataLoading && !tvWidget) {
+    if (marketId && !assetDataLoading && !tvWidget) {
       const widgetOptions = getWidgetOptions(true);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
@@ -57,7 +59,7 @@ export const useTradingViewLaunchable = ({
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getLaunchableMarketDatafeed(metadataServiceData),
+        datafeed: getLaunchableMarketDatafeed(assetData, metadataEndpoint),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
         symbol: marketId,
@@ -81,5 +83,5 @@ export const useTradingViewLaunchable = ({
     return () => {
       tvWidget?.remove();
     };
-  }, [dispatch, !!marketId, selectedLocale, isDataLoading, tvWidget, setTvWidget]);
+  }, [dispatch, !!marketId, selectedLocale, assetDataLoading, tvWidget, setTvWidget]);
 };
