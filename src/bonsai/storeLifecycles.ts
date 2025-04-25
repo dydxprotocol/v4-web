@@ -1,6 +1,7 @@
 import { setUpCancelOrphanedTriggerOrdersLifecycle } from './lifecycles/cancelTriggerOrdersLifecycle';
 import { setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
+import { setUpReclaimChildSubaccountBalancesLifecycle } from './lifecycles/reclaimChildSubaccountBalancesLifecycle';
 import { setUpUsdcRebalanceLifecycle } from './lifecycles/usdcRebalanceLifecycle';
 import { setUpAssetsQuery } from './rest/assets';
 import { setUpBlockTradingRewardsQuery } from './rest/blockTradingRewards';
@@ -54,4 +55,5 @@ export const storeLifecycles = [
   setUpRewardsParamsQuery,
   setUpRewardsTokenPriceQuery,
   setUpCancelOrphanedTriggerOrdersLifecycle,
+  setUpReclaimChildSubaccountBalancesLifecycle,
 ] as const;
