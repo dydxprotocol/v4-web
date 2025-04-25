@@ -3,6 +3,7 @@ import { Secp256k1, sha256 } from '@cosmjs/crypto';
 import { Hdkey } from '@/constants/account';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
+import { isMainnet } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
@@ -128,5 +129,7 @@ export const signCompliancePayload = async (
 };
 
 export const isBlockedGeo = (geo: string): boolean => {
-  return [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes);
+  return isMainnet
+    ? [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
+    : false;
 };

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
@@ -41,7 +42,6 @@ import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
-import { accountTransactionManager } from '@/state/_store';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';

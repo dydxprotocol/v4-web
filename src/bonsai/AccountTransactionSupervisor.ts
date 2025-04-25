@@ -31,7 +31,8 @@ import {
   UNCOMMITTED_ORDER_TIMEOUT_MS,
 } from '@/constants/trade';
 
-import { type RootState, type RootStore } from '@/state/_store';
+import type { RootState, RootStore } from '@/state/_store';
+import { store as reduxStore } from '@/state/_store';
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
@@ -749,7 +750,13 @@ export class AccountTransactionSupervisor {
     return results.find(isOperationFailure)!;
   }
 
-  public async cancelOrder({ orderId }: { orderId: string }) {
+  public async cancelOrder({
+    orderId,
+    withNotification = true,
+  }: {
+    orderId: string;
+    withNotification?: boolean;
+  }) {
     const maybeErr = this.maybeNoLocalWalletError('cancelOrder');
     if (maybeErr) {
       return maybeErr;
@@ -764,7 +771,11 @@ export class AccountTransactionSupervisor {
         'invalid or missing order id'
       );
     }
-    this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
+
+    if (withNotification) {
+      this.store.dispatch(cancelOrderSubmitted({ order, orderId: order.id, uuid }));
+    }
+
     track(AnalyticsEvents.TradeCancelOrder({ orderId }));
 
     const startTime = startTimer();
@@ -791,12 +802,15 @@ export class AccountTransactionSupervisor {
           durationMs: startTime.elapsed(),
         })
       );
-      this.store.dispatch(
-        cancelOrderFailed({
-          uuid,
-          errorParams: operationFailureToErrorParams(result),
-        })
-      );
+
+      if (withNotification) {
+        this.store.dispatch(
+          cancelOrderFailed({
+            uuid,
+            errorParams: operationFailureToErrorParams(result),
+          })
+        );
+      }
     } else {
       track(
         AnalyticsEvents.TradeCancelOrderSubmissionConfirmed({
@@ -999,3 +1013,8 @@ class StateConditionNotifier {
     this.unsubscribeStore = null;
   }
 }
+
+export const accountTransactionManager = createAccountTransactionSupervisor(
+  reduxStore,
+  CompositeClientManager
+);

@@ -1,15 +1,11 @@
-import { createAccountTransactionSupervisor } from '@/bonsai/AccountTransactionSupervisor';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
-import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
-import { storeLifecycles } from '@/bonsai/storeLifecycles';
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { isFunction } from 'lodash';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { transformOntologyObject } from '@/lib/transformOntology';
 
@@ -129,18 +125,8 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Set store so (Abacus & localWalletManager) classes can getState and dispatch
+// Set store so localWalletManager classes can getState and dispatch
 localWalletManager.setStore(store);
-
-export const accountTransactionManager = createAccountTransactionSupervisor(
-  store,
-  CompositeClientManager
-);
-
-runFn(async () => {
-  // we ignore the cleanups for now since we want these running forever
-  storeLifecycles.forEach((fn) => fn(store));
-});
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
@@ -32,7 +33,6 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
-import { accountTransactionManager } from '@/state/_store';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';

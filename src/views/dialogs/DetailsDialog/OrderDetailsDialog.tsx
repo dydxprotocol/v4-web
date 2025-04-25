@@ -1,3 +1,4 @@
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
@@ -29,7 +30,6 @@ import {
   getOrderTimeInForceStringKey,
 } from '@/views/tables/enumToStringKeyHelpers';
 
-import { accountTransactionManager } from '@/state/_store';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';

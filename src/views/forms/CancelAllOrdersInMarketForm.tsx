@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { zipObject } from 'lodash';
@@ -18,7 +19,6 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { accountTransactionManager } from '@/state/_store';
 import { useAppSelector } from '@/state/appTypes';
 
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';

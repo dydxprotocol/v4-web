@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
+
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { CloseAllPositionsConfirmationDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -8,8 +10,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
-
-import { accountTransactionManager } from '@/state/_store';
 
 export const CloseAllPositionsConfirmationDialog = ({
   setIsOpen,
