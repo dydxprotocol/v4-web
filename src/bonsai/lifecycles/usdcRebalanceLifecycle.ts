@@ -1,11 +1,7 @@
 import { SubaccountClient } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
-import {
-  AMOUNT_RESERVED_FOR_GAS_USDC,
-  AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC,
-  AMOUNT_USDC_BEFORE_REBALANCE,
-} from '@/constants/account';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
@@ -24,7 +20,10 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
+import {
+  selectTxAuthorizedAccount,
+  selectUserHasUsdcGasForTransaction,
+} from '../selectors/accountTransaction';
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
 const SLEEP_TIME = timeUnits.second * 10;
@@ -40,8 +39,15 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
       BonsaiCore.account.balances.data,
       BonsaiCore.account.childSubaccountSummaries.data,
       selectHasNonExpiredPendingWithdraws,
+      selectUserHasUsdcGasForTransaction,
     ],
-    (txAuthorizedAccount, balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
+    (
+      txAuthorizedAccount,
+      balances,
+      childSubaccountSummaries,
+      hasNonExpiredPendingWithdraws,
+      userHasUsdcGasForTransaction
+    ) => {
       if (!txAuthorizedAccount || childSubaccountSummaries == null) {
         return undefined;
       }
@@ -55,6 +61,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         balances,
         childSubaccountSummaries,
         hasNonExpiredPendingWithdraws,
+        userHasUsdcGasForTransaction,
       };
     }
   );
@@ -64,7 +71,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector: balanceAndTransfersSelector,
     handle: (_clientId, compositeClient, data) => {
-      if (data == null) {
+      if (data == null || !data.userHasUsdcGasForTransaction) {
         return undefined;
       }
 
@@ -82,11 +89,6 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
           const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
           const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
-          const hasEnoughGas = usdcBalanceBN.gte(AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC);
-
-          if (!hasEnoughGas) {
-            return;
-          }
 
           if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
             const amountToDeposit = usdcBalanceBN

@@ -1,9 +1,12 @@
+import { AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC } from '@/constants/account';
+
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 import { localWalletManager } from '@/lib/hdKeyManager';
+import { MaybeBigNumber } from '@/lib/numbers';
 
 import { BonsaiCore } from '../ontology';
 import { selectParentSubaccountInfo } from '../socketSelectors';
@@ -43,5 +46,22 @@ export const selectTxAuthorizedAccount = createAppSelector(
       sourceAccount,
       parentSubaccountInfo,
     };
+  }
+);
+
+/**
+ * @description Returns true if the user's wallet has enough USDC to pay gas for a transaction
+ */
+export const selectUserHasUsdcGasForTransaction = createAppSelector(
+  [BonsaiCore.account.balances.data],
+  (balances) => {
+    const usdcBalance = balances.usdcAmount;
+    const usdcBalanceBN = MaybeBigNumber(usdcBalance);
+
+    if (usdcBalanceBN == null) {
+      return false;
+    }
+
+    return usdcBalanceBN.gte(AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC);
   }
 );

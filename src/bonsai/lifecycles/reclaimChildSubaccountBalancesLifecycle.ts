@@ -26,7 +26,10 @@ import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResu
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
+import {
+  selectTxAuthorizedAccount,
+  selectUserHasUsdcGasForTransaction,
+} from '../selectors/accountTransaction';
 
 const SLEEP_TIME = timeUnits.second * 10;
 
@@ -38,13 +41,15 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       getLocalPlaceOrders,
       BonsaiCore.account.childSubaccountSummaries.data,
       BonsaiCore.account.parentSubaccountPositions.data,
+      selectUserHasUsdcGasForTransaction,
     ],
     (
       authorizedAccount,
       openOrders,
       localPlaceOrders,
       childSubaccountSummaries,
-      parentSubaccountPositions
+      parentSubaccountPositions,
+      userHasUsdcGasForTransaction
     ) => {
       if (
         !authorizedAccount ||
@@ -105,6 +110,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       return {
         ...authorizedAccount,
         reclaimableChildSubaccounts,
+        userHasUsdcGasForTransaction,
       };
     }
   );
@@ -181,7 +187,12 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector,
     handle: (_clientId, compositeClient, data) => {
-      if (data == null || !data.localDydxWallet || !data.parentSubaccountInfo.wallet) {
+      if (
+        data == null ||
+        !data.localDydxWallet ||
+        !data.parentSubaccountInfo.wallet ||
+        !data.userHasUsdcGasForTransaction
+      ) {
         return undefined;
       }
 
