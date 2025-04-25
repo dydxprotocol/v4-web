@@ -198,7 +198,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
           } = data!;
 
           const reclaimableChildSubaccounts = reclaimableRaw.filter(
-            (r) => !activeReclaims.has(`${r.subaccountNumber}`)
+            (r) => !activeReclaims.has(r.subaccountNumber.toFixed(0))
           );
           if (reclaimableChildSubaccounts.length === 0) {
             return;
@@ -206,7 +206,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
           Promise.all(
             reclaimableChildSubaccounts.map(async (childSubaccountFunds) => {
-              const subaccountString = `${childSubaccountFunds.subaccountNumber}`;
+              const subaccountString = childSubaccountFunds.subaccountNumber.toFixed(0);
               activeReclaims.add(subaccountString);
               await doUsdcTransfer(
                 compositeClient,
@@ -234,7 +234,6 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   });
 
   return () => {
-    activeReclaims.clear();
     noopCleanupEffect();
   };
 }
