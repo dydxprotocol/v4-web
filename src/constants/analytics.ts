@@ -84,7 +84,6 @@ export const AnalyticsUserProperties = unionize(
 
     // validators
     BonsaiValidatorUrl: ofType<string | null>(),
-    AbacusValidatorUrl: ofType<string | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -104,7 +103,6 @@ export const AnalyticsUserPropertyLoggableTypes = {
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
-  AbacusValidatorUrl: 'abacusValidator',
   BonsaiValidatorUrl: 'bonsaiValidator',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 

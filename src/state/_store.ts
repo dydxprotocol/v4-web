@@ -129,7 +129,7 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Set store so (Abacus & localWalletManager) classes can getState and dispatch
+// Set store so localWalletManager classes can getState and dispatch
 localWalletManager.setStore(store);
 
 export const accountTransactionManager = createAccountTransactionSupervisor(

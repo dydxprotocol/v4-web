@@ -41,7 +41,7 @@ export const useInitializePage = () => {
         if (hiddenTimeRef.current) {
           const hiddenDuration = Date.now() - hiddenTimeRef.current;
           if (hiddenDuration >= RECONNECT_AFTER_HIDDEN_THRESHOLD) {
-            // reconnect abacus (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
+            // reconnect (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
             logBonsaiInfo('useInitializePage', 'restarting because visibility change');
           }

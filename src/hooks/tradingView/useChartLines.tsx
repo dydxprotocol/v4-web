@@ -244,7 +244,6 @@ export const useChartLines = ({
         return;
       }
 
-      // Don't go through abacus for limit order modifications to avoid having to override any trade inputs in the Trade Form
       const orderPayload = createPlaceOrderPayloadFromExistingOrder(order, newPrice);
       if (!orderPayload) return;
 
