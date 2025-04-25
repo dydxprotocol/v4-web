@@ -1,3 +1,4 @@
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
@@ -13,7 +14,6 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
-import { accountTransactionManager } from '@/state/_store';
 import { useAppSelector } from '@/state/appTypes';
 
 import { isPresent } from '@/lib/typeUtils';

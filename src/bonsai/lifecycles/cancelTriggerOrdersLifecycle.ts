@@ -4,11 +4,12 @@ import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { accountTransactionManager, type RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
 import { sleep } from '@/lib/timeUtils';
 
+import { accountTransactionManager } from '../AccountTransactionSupervisor';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';

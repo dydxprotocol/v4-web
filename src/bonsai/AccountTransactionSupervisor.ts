@@ -31,7 +31,8 @@ import {
   UNCOMMITTED_ORDER_TIMEOUT_MS,
 } from '@/constants/trade';
 
-import { type RootState, type RootStore } from '@/state/_store';
+import type { RootState, RootStore } from '@/state/_store';
+import { store as reduxStore } from '@/state/_store';
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
@@ -1009,3 +1010,8 @@ class StateConditionNotifier {
     this.unsubscribeStore = null;
   }
 }
+
+export const accountTransactionManager = createAccountTransactionSupervisor(
+  reduxStore,
+  CompositeClientManager
+);

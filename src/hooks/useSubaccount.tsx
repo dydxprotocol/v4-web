@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
@@ -20,7 +21,6 @@ import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
-import { accountTransactionManager } from '@/state/_store';
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';

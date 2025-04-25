@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
@@ -17,7 +18,6 @@ import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { Icon, IconName } from '@/components/Icon';
 
-import { accountTransactionManager } from '@/state/_store';
 import {
   getCurrentMarketOrders,
   getCurrentMarketPositionData,
