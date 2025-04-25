@@ -1,7 +1,11 @@
 import { SubaccountClient } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
-import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC,
+  AMOUNT_USDC_BEFORE_REBALANCE,
+} from '@/constants/account';
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
@@ -78,6 +82,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
           const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
           const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
+          const hasEnoughGas = usdcBalanceBN.gte(AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC);
+
+          if (!hasEnoughGas) {
+            return;
+          }
 
           if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
             const amountToDeposit = usdcBalanceBN
