@@ -7,12 +7,12 @@ import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerAp
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
-import { sleep } from '@/lib/timeUtils';
+import { runFn } from '@/lib/do';
+import { TimeEjectingSet } from '@/lib/timeEjectingSet';
 import { isPresent } from '@/lib/typeUtils';
 
 import { accountTransactionManager } from '../AccountTransactionSupervisor';
 import { isOperationFailure } from '../lib/operationResult';
-import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
@@ -69,7 +69,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
     }
   );
 
-  const activeOrderCancellations = createSemaphore();
+  const cancelingOrderIds = new TimeEjectingSet(timeUnits.minute);
 
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector,
@@ -78,69 +78,69 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         return undefined;
       }
 
-      async function cancelTriggerOrdersWithClosedOrFlippedPositions() {
-        const { ordersToCancel } = data!;
-        if (ordersToCancel.length === 0) {
-          return;
-        }
-
-        logBonsaiInfo(
-          'cancelTriggerOrdersWithClosedOrFlippedPositions',
-          `Cancelling ${ordersToCancel.length} trigger orders`,
-          {
-            ordersToCancel,
-          }
-        );
-
-        const results = await Promise.all(
-          ordersToCancel.map((o) =>
-            accountTransactionManager.cancelOrder({
-              orderId: o.id,
-              withNotification: false,
-            })
-          )
-        );
-
-        const failed = results
-          .map((r, idx) => {
-            if (isOperationFailure(r)) {
-              return {
-                ...ordersToCancel[idx],
-                error: r.errorString,
-              };
-            }
-            return null;
-          })
-          .filter(isPresent);
-
-        if (failed.length > 0) {
-          logBonsaiError(
-            'cancelTriggerOrdersWithClosedOrFlippedPositions',
-            `Failed to cancel ${failed.length}/${ordersToCancel.length} trigger orders`,
-            {
-              failedOperations: failed,
-            }
-          );
-        }
-
-        await sleep(SLEEP_TIME);
-      }
-
       if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
         return undefined;
       }
 
-      activeOrderCancellations
-        .run(() => cancelTriggerOrdersWithClosedOrFlippedPositions())
-        .catch((error) => {
-          if (error instanceof SupersededError) {
-            return;
+      runFn(async () => {
+        try {
+          const { ordersToCancel: ordersToCancelRaw } = data;
+
+          const ordersToCancel = ordersToCancelRaw.filter((o) => !cancelingOrderIds.has(o.id));
+          if (ordersToCancel.length === 0) {
+            return undefined;
           }
 
+          logBonsaiInfo(
+            'cancelTriggerOrdersWithClosedOrFlippedPositions',
+            `Cancelling ${ordersToCancel.length} trigger orders`,
+            {
+              ordersToCancel,
+            }
+          );
+
+          const results = await Promise.all(
+            ordersToCancel.map(async (o) => {
+              // acquire a lock on this id for 60 seconds
+              cancelingOrderIds.add(o.id);
+              const result = await accountTransactionManager.cancelOrder({
+                orderId: o.id,
+                withNotification: false,
+              });
+              // set lock to 10 more seconds
+              cancelingOrderIds.add(o.id, SLEEP_TIME);
+              return result;
+            })
+          );
+
+          const failed = results
+            .map((r, idx) => {
+              if (isOperationFailure(r)) {
+                return {
+                  ...ordersToCancel[idx],
+                  error: r.errorString,
+                };
+              }
+              return null;
+            })
+            .filter(isPresent);
+
+          if (failed.length > 0) {
+            logBonsaiError(
+              'cancelTriggerOrdersWithClosedOrFlippedPositions',
+              `Failed to cancel ${failed.length}/${ordersToCancel.length} trigger orders`,
+              {
+                failedOperations: failed,
+              }
+            );
+          }
+        } catch (error) {
           logBonsaiError('cancelOrphanedTriggerOrdersLifecycle', 'lifecycle error', {
             error,
           });
-        });
+        }
+        return undefined;
+      });
 
       return undefined;
     },
@@ -148,7 +148,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   });
 
   return () => {
-    activeOrderCancellations.clear();
     noopCleanupEffect();
   };
 }
