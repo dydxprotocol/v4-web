@@ -13,16 +13,16 @@ import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalPlaceOrders } from '@/state/localOrdersSelectors';
 
+import { runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
-import { sleep } from '@/lib/timeUtils';
+import { TimeEjectingSet } from '@/lib/timeEjectingSet';
 import { isPresent } from '@/lib/typeUtils';
 
 import { isParentSubaccount } from '../calculators/subaccount';
 import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
-import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
@@ -109,7 +109,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
     }
   );
 
-  const activeReclaims = createSemaphore();
+  const activeReclaims = new TimeEjectingSet(timeUnits.minute);
 
   async function doUsdcTransfer(
     client: CompositeClient,
@@ -185,39 +185,39 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
         return undefined;
       }
 
-      async function reclaimChildSubaccountBalances() {
-        const { reclaimableChildSubaccounts, localDydxWallet, parentSubaccountInfo } = data!;
-
-        if (reclaimableChildSubaccounts.length === 0) {
-          return;
-        }
-
-        await Promise.all(
-          reclaimableChildSubaccounts.map((childSubaccountFunds) => {
-            return doUsdcTransfer(
-              compositeClient,
-              localDydxWallet!,
-              parentSubaccountInfo,
-              childSubaccountFunds
-            );
-          })
-        );
-      }
-
       if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
         return undefined;
       }
 
-      activeReclaims
-        .run(async () => {
-          reclaimChildSubaccountBalances();
-          await sleep(SLEEP_TIME);
-        })
-        .catch((error) => {
-          if (error instanceof SupersededError) {
+      runFn(async () => {
+        try {
+          const {
+            reclaimableChildSubaccounts: reclaimableRaw,
+            localDydxWallet,
+            parentSubaccountInfo,
+          } = data!;
+
+          const reclaimableChildSubaccounts = reclaimableRaw.filter(
+            (r) => !activeReclaims.has(`${r.subaccountNumber}`)
+          );
+          if (reclaimableChildSubaccounts.length === 0) {
             return;
           }
 
+          Promise.all(
+            reclaimableChildSubaccounts.map(async (childSubaccountFunds) => {
+              const subaccountString = `${childSubaccountFunds.subaccountNumber}`;
+              activeReclaims.add(subaccountString);
+              await doUsdcTransfer(
+                compositeClient,
+                localDydxWallet!,
+                parentSubaccountInfo,
+                childSubaccountFunds
+              );
+              activeReclaims.add(subaccountString, SLEEP_TIME);
+            })
+          );
+        } catch (error) {
           logBonsaiError(
             'reclaimChildSubaccountBalancesLifecycle',
             'Failed to reclaim child subaccount funds',
@@ -225,7 +225,8 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
               error,
             }
           );
-        });
+        }
+      });
 
       return undefined;
     },
