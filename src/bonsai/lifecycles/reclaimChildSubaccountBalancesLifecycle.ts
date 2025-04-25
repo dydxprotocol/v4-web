@@ -5,11 +5,13 @@ import { groupBy } from 'lodash';
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
+import { PlaceOrderStatuses } from '@/constants/trade';
 import { WalletNetworkType } from '@/constants/wallets';
 import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import type { RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
+import { getLocalPlaceOrders } from '@/state/localOrdersSelectors';
 
 import { stringifyTransactionError } from '@/lib/errors';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
@@ -30,11 +32,17 @@ const SLEEP_TIME = timeUnits.second * 10;
 
 export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   const selector = createAppSelector(
-    [selectTxAuthorizedAccount, BonsaiCore.account.openOrders.data, BonsaiRaw.parentSubaccountBase],
-    (authorizedAccount, openOrders, parentSubaccountBase) => {
+    [
+      selectTxAuthorizedAccount,
+      BonsaiCore.account.openOrders.data,
+      getLocalPlaceOrders,
+      BonsaiRaw.parentSubaccountBase,
+    ],
+    (authorizedAccount, openOrders, localPlaceOrders, parentSubaccountBase) => {
       if (!authorizedAccount || parentSubaccountBase == null) {
         return undefined;
       }
+
       const groupedPositions = objectFromEntries(
         objectEntries(parentSubaccountBase.childSubaccounts).map(
           ([childSubaccountNumber, childSubaccount]) => [
@@ -61,14 +69,25 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
         usdcBalance: BigNumber;
       }> = objectEntries(groupedPositions)
         .map(([subaccountNumber, subaccount]) => {
+          const subaccountNumberInt = parseInt(subaccountNumber, 10);
           const isChildSubaccount = !isParentSubaccount(subaccountNumber);
           const hasUsdc = subaccount.usdcBalance.gt(0);
           const hasNoPositions = subaccount.marketPositions.length === 0;
           const hasNoOrders = (groupedOrders[subaccountNumber]?.length ?? 0) === 0;
 
-          // TODO: Add a check to block reclaiming if the childSubaccount has an outgoing Isolated Margin Order.
+          const hasLocalPlaceOrders = Object.values(localPlaceOrders).some(
+            ({ cachedData, submissionStatus }) =>
+              cachedData.subaccountNumber === subaccountNumberInt &&
+              submissionStatus === PlaceOrderStatuses.Submitted
+          );
 
-          if (!hasUsdc || !isChildSubaccount || !hasNoPositions || !hasNoOrders) {
+          if (
+            !hasUsdc ||
+            !isChildSubaccount ||
+            !hasNoPositions ||
+            !hasNoOrders ||
+            hasLocalPlaceOrders
+          ) {
             return undefined;
           }
 
@@ -131,7 +150,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
       logBonsaiInfo(
         'reclaimChildSubaccountBalancesLifecycle',
-        'successfully reclaimed child subaccount funds',
+        `successfully reclaimed child subaccount (${childSubaccountFunds.subaccountNumber}) funds`,
         {
           subaccountNumber: childSubaccountFunds.subaccountNumber,
           usdcBalance: childSubaccountFunds.usdcBalance.toString(),
@@ -145,15 +164,13 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
       logBonsaiError(
         'reclaimChildSubaccountBalancesLifecycle',
-        'Failed to reclaim child subaccount funds',
+        `Failed to reclaim child subaccount (${childSubaccountFunds.subaccountNumber}) funds`,
         {
           error,
         }
       );
 
       return wrapOperationFailure(parsed);
-    } finally {
-      await sleep(SLEEP_TIME);
     }
   }
 
@@ -166,6 +183,10 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
 
       async function reclaimChildSubaccountBalances() {
         const { reclaimableChildSubaccounts, localDydxWallet, parentSubaccountInfo } = data!;
+
+        if (reclaimableChildSubaccounts.length === 0) {
+          return;
+        }
 
         await Promise.all(
           reclaimableChildSubaccounts.map((childSubaccountFunds) => {
@@ -186,6 +207,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       activeReclaims
         .run(async () => {
           reclaimChildSubaccountBalances();
+          await sleep(SLEEP_TIME);
         })
         .catch((error) => {
           if (error instanceof SupersededError) {
