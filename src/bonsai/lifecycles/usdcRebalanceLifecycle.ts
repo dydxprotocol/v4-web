@@ -93,11 +93,16 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
               .toFixed(USDC_DECIMALS);
 
-            logBonsaiInfo('usdcRebalanceLifecycle', 'depositing excess USDC into subaccount 0', {
-              balance: usdcBalance,
-              amountToDeposit,
-              targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-            });
+            logBonsaiInfo(
+              'usdcRebalanceLifecycle',
+              `depositing excess USDC into parent subaccount ${parentSubaccountInfo.subaccount}`,
+              {
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                amountToDeposit,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+              }
+            );
 
             const subaccountClient = new SubaccountClient(
               localDydxWallet!,
@@ -142,12 +147,16 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             const subaccountNumber = Number(maybeSubaccountNumber);
             const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
 
-            logBonsaiInfo('usdcRebalanceLifecycle', 'withdrawing funds for gas', {
-              balance: usdcBalance,
-              amountToWithdraw,
-              targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-              subaccountNumber,
-            });
+            logBonsaiInfo(
+              'usdcRebalanceLifecycle',
+              `withdrawing funds from subaccount (${subaccountNumber}) for gas reserve`,
+              {
+                balance: usdcBalance,
+                amountToWithdraw,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+                subaccountNumber,
+              }
+            );
 
             try {
               await compositeClient.withdrawFromSubaccount(
