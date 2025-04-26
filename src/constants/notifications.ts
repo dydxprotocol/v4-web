@@ -1,3 +1,5 @@
+import { SkipStatusResponse } from './skip';
+
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   // Until we have migrations enabled, we need to keep underlying values the same
@@ -216,6 +218,72 @@ export type CustomNotification = {
   id: string;
   displayData: NotificationDisplayData;
 };
+
+export enum TransferNotificationTypes {
+  Withdrawal = 'withdrawal',
+  Deposit = 'deposit',
+}
+
+// TODO: fix typo
+export type TransferNotifcation = {
+  id?: string;
+  txHash: string;
+  type?: TransferNotificationTypes;
+  toChainId?: string;
+  fromChainId?: string;
+  toAmount?: number;
+  triggeredAt?: number;
+  isCctp?: boolean;
+  errorCount?: number;
+  status?: SkipStatusResponse;
+  isExchange?: boolean;
+  requestId?: string;
+  tracked?: boolean;
+  isDummy?: boolean;
+  isSubaccountDepositCompleted?: boolean;
+};
+
+export enum ReleaseUpdateNotificationIds {
+  DiscoveryProgram = 'discovery-program', // Deprecated
+  Twitter200BVolume = 'twitter-200b-volume', // Deprecated
+  IncentivesS6Ended = 'incentives-s6-ended', // Deprecated
+  KeplrSupport = 'keplr-support', // Deprecated
+  PhantomSupport = 'phantom-support', // Deprecated
+  SimpleIosExperience = 'simple-ios-experience', // Deprecated
+}
+
+// Incentives Season
+export enum IncentivesDistributedNotificationIds {
+  IncentivesDistributedS6 = 'incentives-distributed-s6',
+}
+
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS6Ended;
+
+export function getSeasonRewardDistributionNumber(seasonId: IncentivesDistributedNotificationIds) {
+  switch (seasonId) {
+    case IncentivesDistributedNotificationIds.IncentivesDistributedS6:
+      return 6;
+    default:
+      return 5;
+  }
+}
+
+export enum MarketLaunchNotificationIds {
+  TrumpWin = 'market-launch-trumpwin', // Deprecated
+}
+
+export enum MarketWindDownNotificationIds {
+  MarketWindDownFetAgix = 'market-wind-down-fet-agix', // Deprecated
+  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix', // Deprecated
+  MarketUpdateProposalRndr = 'market-update-proposal-rndr', // Deprecated
+  MarketWindDownMatic = 'market-wind-down-matic', // Deprecated
+  MarketWindDownProposalMatic = 'market-wind-down-proposal-matic', // Deprecated
+}
+
+export enum MarketUpdateNotificationIds {
+  MarketUpdateSolLiquidityTier = 'market-update-sol-liquidity-tier', // Deprecated
+  MarketUpdateProposal226 = 'market-update-proposal-226', // Deprecated
+}
 
 export enum FeedbackRequestNotificationIds {
   Top100UserSupport = 'top-100-user-support',
