@@ -153,10 +153,10 @@ const useAccountsContext = () => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature,
       });
-      setLocalDydxWallet(wallet);
       const key = { mnemonic, privateKey, publicKey };
-      setHdKey(key);
       hdKeyManager.setHdkey(wallet.address, key);
+      setLocalDydxWallet(wallet);
+      setHdKey(key);
     },
     [getWalletFromSignature]
   );
