@@ -4,7 +4,6 @@ import { BonsaiHooks } from '@/bonsai/ontology';
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { NORMAL_DEBOUNCE_MS } from '@/constants/debounce';
@@ -19,7 +18,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { getSubaccountId } from '@/state/accountInfoSelectors';
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
@@ -77,14 +76,14 @@ export const PnlChart = ({
   slotEmpty,
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
-  const { equity: equityBn } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const equity = useAppSelector(getSubaccountEquity);
   const now = useNow({ intervalMs: timeUnits.minute });
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   // Chart data
   const { data: pnlData } = BonsaiHooks.useParentSubaccountHistoricalPnls();
-  const subaccountId = useAppSelector(getSubaccountId, shallowEqual);
+  const subaccountId = useAppSelector(getSubaccountId);
 
   const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriod[]>([
     HistoricalPnlPeriod.Period1d,
@@ -98,7 +97,6 @@ export const PnlChart = ({
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
-  const equity = equityBn?.toNumber();
   const data = useMemo(
     () =>
       lastPnlTick
@@ -117,7 +115,7 @@ export const PnlChart = ({
                 subaccountId: subaccountId ?? 0,
                 equity: Number(datum.equity),
                 totalPnl: Number(datum.totalPnl),
-                createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
+                createdAt: new Date(datum.createdAtMilliseconds).getTime(),
                 side: {
                   [-1]: PnlSide.Loss,
                   0: PnlSide.Flat,

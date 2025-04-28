@@ -1,5 +1,3 @@
-import { shallowEqual } from 'react-redux';
-
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -23,7 +21,7 @@ export const TriggerOrdersInputs = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const triggerFormInputValues = useAppSelector(getTriggersFormState);
-  const triggerFormSummary = useAppSelector(getTriggersFormSummary, shallowEqual);
+  const triggerFormSummary = useAppSelector(getTriggersFormSummary);
 
   return (
     <>

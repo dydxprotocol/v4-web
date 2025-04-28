@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -30,7 +29,7 @@ import { WithSidebar } from '@/components/WithSidebar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -60,7 +59,7 @@ const PortfolioPage = () => {
   const initialPageSize = 20;
 
   const onboardingState = useAppSelector(getOnboardingState);
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const { nativeTokenBalance } = useAccountBalance();
 
   const numTotalOpenOrders = useAppSelector(BonsaiCore.account.openOrders.data).length;
@@ -71,7 +70,7 @@ const PortfolioPage = () => {
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
-  const usdcBalance = freeCollateral?.toNumber() ?? 0;
+  const usdcBalance = freeCollateral ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 

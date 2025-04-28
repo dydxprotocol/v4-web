@@ -1,4 +1,3 @@
-import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -34,7 +33,7 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -50,8 +49,7 @@ export const HeaderDesktop = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
-  const subAccount = useAppSelector(getSubaccount, shallowEqual);
-  const { freeCollateral: availableBalance } = subAccount ?? {};
+  const availableBalance = useAppSelector(getSubaccountFreeCollateral);
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
 
@@ -189,7 +187,7 @@ export const HeaderDesktop = () => {
                 shape={ButtonShape.Pill}
                 size={ButtonSize.XSmall}
                 action={
-                  !availableBalance || availableBalance.gt(0)
+                  !availableBalance || availableBalance > 0
                     ? ButtonAction.Secondary
                     : ButtonAction.Primary
                 }

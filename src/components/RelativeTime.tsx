@@ -24,12 +24,12 @@ export const RelativeTime = ({
     return () => clearInterval(i);
   }, []);
 
-  return timestamp && new Date(timestamp).valueOf() ? (
+  return timestamp && new Date(timestamp).getTime() ? (
     <time
       dateTime={new Date(timestamp).toISOString()}
       title={new Date(timestamp).toLocaleString(locale)}
     >
-      {formatRelativeTime(new Date(timestamp).valueOf(), { locale, format, resolution })}
+      {formatRelativeTime(new Date(timestamp).getTime(), { locale, format, resolution })}
     </time>
   ) : null;
 };
