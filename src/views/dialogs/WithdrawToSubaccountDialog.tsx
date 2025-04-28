@@ -5,8 +5,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
-import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
-import { AlertType } from '@/constants/alerts';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, WithdrawToSubaccountDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -20,10 +19,12 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
+import { GreenCheckCircle } from '@/components/GreenCheckCircle';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { SuccessTag, WarningTag } from '@/components/Tag';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -89,10 +90,11 @@ export const WithdrawToSubaccountDialog = ({
       logBonsaiInfo('WithdrawToSubaccountDialog', 'Withdrawing from subaccount', {
         usdcBalance,
       });
+
       const tx = await withdraw(amountToWithdraw, subaccountNumber);
+
       if (tx && dydxAddress) {
         await refetchQuery();
-
         setIsOpen(false);
       }
     } catch (error) {
@@ -103,46 +105,72 @@ export const WithdrawToSubaccountDialog = ({
 
   const isDisabled = subaccountNumberToWithdraw == null || amountToWithdraw <= 0;
 
-  const alertMessage = useMemo(() => {
-    if (isDisabled) {
-      if (amountToWithdraw <= 0) {
-        return {
-          type: AlertType.Success,
-          message: 'Your wallet has the recommended USDC balance for gas.',
-        };
-      }
+  const buttonText = isDisabled
+    ? subaccountNumberToWithdraw == null
+      ? stringGetter({ key: STRING_KEYS.INSUFFICIENT_FREE_COLLATERAL })
+      : stringGetter({ key: STRING_KEYS.SUFFICIENT_GAS_BALANCE })
+    : stringGetter({ key: STRING_KEYS.WITHDRAW });
 
-      if (subaccountNumberToWithdraw == null) {
-        return {
-          type: AlertType.Error,
-          message: 'Your trading account has no free collateral to withdraw from.',
-        };
-      }
-    }
-
-    return undefined;
-  }, [isDisabled, amountToWithdraw, subaccountNumberToWithdraw]);
+  const gasBalanceTag = usdcBalance ? (
+    amountToWithdraw > 0 ? (
+      <WarningTag tw="row gap-0.25 border-none bg-color-gradient-warning">
+        {stringGetter({ key: STRING_KEYS.BELOW_RECOMMENDED_GAS_BALANCE })}
+      </WarningTag>
+    ) : (
+      <SuccessTag tw="row gap-0.25 border-none bg-color-gradient-positive">
+        <GreenCheckCircle css={{ '--icon-size': '0.75rem' }} />
+        {stringGetter({ key: STRING_KEYS.SUFFICIENT_GAS_BALANCE })}
+      </SuccessTag>
+    )
+  ) : null;
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title="Withdraw to wallet">
+    <Dialog
+      isOpen
+      hasHeaderBorder
+      setIsOpen={setIsOpen}
+      title={stringGetter({ key: STRING_KEYS.WITHDRAW_TO_WALLET })}
+    >
       <$Container>
         <$Description>
-          Add gas funds to your wallet by withdrawing from your trading account
+          {stringGetter({
+            key: STRING_KEYS.WITHDRAW_TO_WALLET_RECOMMENDATION,
+            params: {
+              MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
+              MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
+            },
+          })}
         </$Description>
         <$AmountContainer>
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label>{stringGetter({ key: STRING_KEYS.AMOUNT })}</label>
           <$Output useGrouping withBaseFont type={OutputType.Fiat} value={amountToWithdraw} />
         </$AmountContainer>
-        {alertMessage && (
-          <AlertMessage type={alertMessage.type}>{alertMessage.message}</AlertMessage>
-        )}
+
+        <div tw="row justify-between">
+          <span tw="row gap-0.25 text-color-text-0 font-small-medium">
+            <Icon
+              tw="rounded-[50%] bg-color-text-0 p-0.125 text-color-layer-2"
+              iconName={IconName.CurrencySign}
+            />
+            <span>{stringGetter({ key: STRING_KEYS.WALLET_BALANCE })}</span>
+            <$Output
+              tw="text-color-text-1 font-small-medium"
+              useGrouping
+              withBaseFont
+              type={OutputType.Fiat}
+              value={usdcBalance}
+            />
+          </span>
+          {gasBalanceTag}
+        </div>
+
         <Button
           state={{ isLoading, isDisabled }}
           action={ButtonAction.Primary}
           onClick={handleWithdrawToSubaccount}
         >
-          {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+          {buttonText}
         </Button>
       </$Container>
     </Dialog>
@@ -151,7 +179,8 @@ export const WithdrawToSubaccountDialog = ({
 
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
-  gap: 1rem;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
 `;
 
 const $Description = styled(Description)`
