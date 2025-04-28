@@ -42,7 +42,7 @@ export const useCurrentMarketId = () => {
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const hasLoadedLaunchableMarkets = launchableMarkets.data.length > 0;
   const hasSeenPredictionMarketIntroDialog = useAppSelector(getHasSeenPredictionMarketIntroDialog);
-  const launchedMarketIds = useAppSelector(getLaunchedMarketIds, shallowEqual);
+  const launchedMarketIds = useAppSelector(getLaunchedMarketIds);
 
   const { filteredMarkets: predictionMarkets } = useMarketsData({
     filter: MarketFilters.PREDICTION_MARKET,

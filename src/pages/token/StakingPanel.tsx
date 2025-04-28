@@ -1,4 +1,3 @@
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -37,7 +36,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const stakingApr = useStakingAPR();
 
   const { complianceState } = useComplianceState();

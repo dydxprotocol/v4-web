@@ -7,3 +7,6 @@ export const getInitializationError = (state: RootState) => state.app.initializa
 
 export const getSelectedDydxChainId = (state: RootState) =>
   ENVIRONMENT_CONFIG_MAP[state.app.selectedNetwork].dydxChainId as DydxChainId;
+
+export const getMetadataEndpoint = (state: RootState) =>
+  ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].endpoints.metadataService;

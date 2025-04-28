@@ -112,7 +112,7 @@ const useAccountsContext = () => {
 
   const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
     try {
-      const response = await indexerClient.account.getSubaccounts(dydxAddress);
+      const response = await indexerClient?.account.getSubaccounts(dydxAddress);
       setDydxSubaccounts(response?.subaccounts);
       return response?.subaccounts ?? [];
     } catch (error) {
@@ -153,10 +153,10 @@ const useAccountsContext = () => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature,
       });
-      setLocalDydxWallet(wallet);
       const key = { mnemonic, privateKey, publicKey };
-      setHdKey(key);
       hdKeyManager.setHdkey(wallet.address, key);
+      setLocalDydxWallet(wallet);
+      setHdKey(key);
     },
     [getWalletFromSignature]
   );

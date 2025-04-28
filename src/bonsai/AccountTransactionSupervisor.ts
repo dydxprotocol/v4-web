@@ -886,7 +886,7 @@ export class AccountTransactionSupervisor {
   }
 }
 
-export const createAccountTransactionSupervisor = (
+const createAccountTransactionSupervisor = (
   store: RootStore,
   compositeClientManager: typeof CompositeClientManager
 ): AccountTransactionSupervisor => {

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { loadableLoaded } from '@/bonsai/lib/loadable';
 import { ComplianceResponse, ComplianceStatus } from '@/bonsai/types/summaryTypes';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -36,8 +35,8 @@ const setGeo = (payload: string) => setComplianceGeoRaw(loadableLoaded(payload))
 const usePreferenceMenu = () => {
   const dispatch = useAppDispatch();
 
-  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
-  const geo = useAppSelector(getGeo, shallowEqual);
+  const complianceStatus = useAppSelector(getComplianceStatus);
+  const geo = useAppSelector(getGeo);
   const geoRestricted = Boolean(
     geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
   );
@@ -86,7 +85,7 @@ const usePreferenceMenu = () => {
 
 export const ComplianceConfigDialog = ({ setIsOpen }: DialogProps<ComplianceConfigDialogProps>) => {
   const preferenceItems = usePreferenceMenu();
-  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
+  const complianceStatus = useAppSelector(getComplianceStatus);
 
   const { dydxAddress } = useAccounts();
   const { compositeClient } = useDydxClient();

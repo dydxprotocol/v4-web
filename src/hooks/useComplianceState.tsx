@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
-import { shallowEqual } from 'react-redux';
 
 import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
@@ -29,7 +28,7 @@ import { useURLConfigs } from './useURLConfigs';
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
   const { help } = useURLConfigs();
-  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
+  const complianceStatus = useAppSelector(getComplianceStatus);
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
   const selectedLocale = useAppSelector(getSelectedLocale);
@@ -67,7 +66,7 @@ export const useComplianceState = () => {
         key: STRING_KEYS.CLOSE_ONLY_MESSAGE_WITH_HELP,
         params: {
           DATE: updatedAtDate
-            ? formatDateOutput(updatedAtDate.valueOf(), OutputType.DateTime, {
+            ? formatDateOutput(updatedAtDate.getTime(), OutputType.DateTime, {
                 dateFormat: 'medium',
                 selectedLocale,
               })

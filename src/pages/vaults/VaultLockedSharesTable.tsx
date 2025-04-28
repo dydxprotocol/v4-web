@@ -80,7 +80,7 @@ const VaultLockedSharesTable = ({
               unlockBlockHeight,
               height,
               // add a day so users don't get confused about why their money isn't unlocked when the day arrives
-              (unblock, actual) => new Date().valueOf() + (unblock - actual) * 1000 + timeUnits.day
+              (unblock, actual) => new Date().getTime() + (unblock - actual) * 1000 + timeUnits.day
             );
             return (
               <Output

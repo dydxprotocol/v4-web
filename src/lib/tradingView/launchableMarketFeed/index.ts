@@ -1,3 +1,4 @@
+import { AssetData } from '@/bonsai/types/summaryTypes';
 import { DateTime } from 'luxon';
 import type {
   DatafeedConfiguration,
@@ -15,11 +16,11 @@ import type {
   Timezone,
 } from 'public/tradingview/charting_library';
 
-import { MetadataServiceAsset, MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
+import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
-import metadataClient from '@/clients/metadataService';
+import { MetadataServiceClient } from '@/clients/metadataService';
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 import { objectKeys } from '@/lib/objectHelpers';
@@ -50,7 +51,8 @@ const configurationData: DatafeedConfiguration = {
 };
 
 export const getLaunchableMarketDatafeed = (
-  metadataServiceData: Record<string, MetadataServiceAsset>
+  metadataServiceData: Record<string, AssetData>,
+  metadataEndpoint: string
 ): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
@@ -134,7 +136,7 @@ export const getLaunchableMarketDatafeed = (
         let bars: TradingViewBar[] = [];
 
         if (!cachedBars.length) {
-          const candlesResponse = await metadataClient.getCandles({
+          const candlesResponse = await new MetadataServiceClient(metadataEndpoint).getCandles({
             asset,
             timeframe: RESOLUTION_TO_TIMEFRAME_MAP[resolution]!,
           });

@@ -160,7 +160,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
   };
 };
 
-export const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPrice: number) => {
+const isNewOrderPriceValid = (bookPrice: number, oldPrice: number, newPrice: number) => {
   // Ensure newPrice makes the order remain on the same side of the book
   return newPrice !== bookPrice && oldPrice - bookPrice > 0 === newPrice - bookPrice > 0;
 };

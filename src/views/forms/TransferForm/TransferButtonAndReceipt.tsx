@@ -1,5 +1,4 @@
 import { TransferSummaryData, TransferToken } from '@/bonsai/forms/transfers';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -40,7 +39,7 @@ export const TransferButtonAndReceipt = ({
   slotLeft,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const { tokensConfigs } = useTokenConfigs();
 

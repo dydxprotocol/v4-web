@@ -15,7 +15,6 @@ import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useCustomNotification } from '@/hooks/useCustomNotification';
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useNow } from '@/hooks/useNow';
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -41,7 +40,11 @@ import { selectSubaccountStateForVaults } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLaunchMarketIds } from '@/state/perpetuals';
 
-import { getDisplayableAssetFromTicker, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import {
+  getAssetFromMarketId,
+  getDisplayableAssetFromTicker,
+  getDisplayableTickerFromMarket,
+} from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -66,7 +69,10 @@ export const NewMarketPreviewStep = ({
   const { launchMarketTos } = useURLConfigs();
   const [isLoading, setIsLoading] = useState(false);
   const baseAsset = getDisplayableAssetFromTicker(ticker);
-  const launchableAsset = useMetadataServiceAssetFromId(ticker);
+  const launchableAsset = useParameterizedSelector(
+    BonsaiHelpers.assets.createSelectAssetInfo,
+    getAssetFromMarketId(ticker)
+  );
   const { createPermissionlessMarket } = useSubaccount();
   const { usdcImage } = useTokenConfigs();
   const { freeCollateral } = useAppSelector(selectSubaccountStateForVaults);

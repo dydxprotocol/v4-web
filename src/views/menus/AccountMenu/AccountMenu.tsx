@@ -1,7 +1,6 @@
 import { ElementType } from 'react';
 
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -41,7 +40,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
@@ -65,7 +64,7 @@ export const AccountMenu = () => {
 
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 

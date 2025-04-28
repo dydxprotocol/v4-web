@@ -177,7 +177,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, subaccountNumber]
   );
 
-  const dydxAddress = localDydxWallet?.address as DydxAddress;
+  const dydxAddress = localDydxWallet?.address as DydxAddress | undefined;
 
   useEffect(() => {
     dispatch(clearLocalOrders());
@@ -577,6 +577,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     if (!compositeClient?.validatorClient) {
       throw new Error('client not initialized');
     }
+    if (!dydxAddress) throw new Error('dydxAddress is not connected');
     const result = await compositeClient.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
     if (result == null) {
       return result;

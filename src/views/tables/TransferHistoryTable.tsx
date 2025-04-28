@@ -1,7 +1,6 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountTransfer } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -143,7 +142,7 @@ export const TransferHistoryTable = ({
   const dispatch = useAppDispatch();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
 
