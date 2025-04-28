@@ -5,7 +5,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { AdjustIsolatedMarginDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -20,9 +20,9 @@ export const AdjustIsolatedMarginDialog = ({
   setIsOpen,
 }: DialogProps<AdjustIsolatedMarginDialogProps>) => {
   const stringGetter = useStringGetter();
-  const subaccountPosition = useParameterizedSelector(getOpenPositionFromId, positionId);
-  const logoUrl = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetLogo,
+  const subaccountPosition = useAppSelectorWithArgs(getOpenPositionFromId, positionId);
+  const logoUrl = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetLogo,
     subaccountPosition?.assetId
   );
 

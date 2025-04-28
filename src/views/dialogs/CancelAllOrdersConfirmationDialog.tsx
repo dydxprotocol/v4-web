@@ -7,7 +7,7 @@ import { CancelAllOrdersConfirmationDialogProps, DialogProps } from '@/constants
 import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY } from '@/constants/trade';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -33,7 +33,7 @@ export const CancelAllOrdersConfirmationDialog = ({
   const hasCancelableOrdersInOtherMarkets = useAppSelector(
     calculateHasCancelableOrdersInOtherMarkets
   );
-  const hasCancelableOrdersInCurrentMarket = useParameterizedSelector(
+  const hasCancelableOrdersInCurrentMarket = useAppSelectorWithArgs(
     calculateHasCancelableOrders,
     currentMarketId
   );

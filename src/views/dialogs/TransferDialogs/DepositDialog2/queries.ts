@@ -15,7 +15,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
 
@@ -176,8 +176,8 @@ export function useDepositDeltas({ depositAmount }: { depositAmount?: string }) 
     [depositAmount]
   );
 
-  const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.forms.deposit.createSelectParentSubaccountSummary,
+  const modifiedParentSubaccount = useAppSelectorWithArgs(
+    BonsaiHelpers.forms.deposit.selectParentSubaccountSummary,
     depositInput
   );
 

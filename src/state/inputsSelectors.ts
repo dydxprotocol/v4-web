@@ -14,25 +14,26 @@ import { createAppSelector } from './appTypes';
 
 export const getTriggersFormState = (state: RootState) => state.triggersForm;
 
-const myPositionSelector = getSubaccountPositionByUniqueId();
 export const getTriggersFormPosition = createAppSelector(
   [(s) => s, (s) => getTriggersFormState(s).positionId],
-  (state, positionId) => (positionId != null ? myPositionSelector(state, positionId) : undefined)
+  (state, positionId) =>
+    positionId != null ? getSubaccountPositionByUniqueId(state, positionId) : undefined
 );
 
-const myMarketSelector = BonsaiHelpers.markets.createSelectMarketSummaryById();
 const getTriggersFormMarket = createAppSelector(
   [(s) => s, getTriggersFormPosition],
-  (state, position) => (position != null ? myMarketSelector(state, position.market) : undefined)
+  (state, position) =>
+    position != null
+      ? BonsaiHelpers.markets.selectMarketSummaryById(state, position.market)
+      : undefined
 );
 
-const myConditionalOrdersSelector = getSubaccountConditionalOrders();
 const getSubaccountConditionalOrdersForTriggersBase = createAppSelector(
   [(s) => s, getSelectedNetwork],
   (state, selectedNetwork) => {
     const isSlTpLimitOrdersEnabled =
       ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags.isSlTpLimitOrdersEnabled;
-    return myConditionalOrdersSelector(state, isSlTpLimitOrdersEnabled);
+    return getSubaccountConditionalOrders(state, isSlTpLimitOrdersEnabled);
   }
 );
 

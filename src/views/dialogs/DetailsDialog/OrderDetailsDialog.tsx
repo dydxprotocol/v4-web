@@ -13,7 +13,7 @@ import { AppRoute } from '@/constants/routes';
 import { CancelOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -75,7 +75,7 @@ export const OrderDetailsDialog = ({
     marketSummary,
 
     removalReason,
-  } = useParameterizedSelector(getOrderDetails, orderId) ?? {};
+  } = useAppSelectorWithArgs(getOrderDetails, orderId) ?? {};
 
   const marginModeLabel = stringGetter({ key: getMarginModeStringKey(marginMode ?? 'CROSS') });
 

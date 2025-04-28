@@ -56,14 +56,12 @@ export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favo
 export const getHorizontalPanelHeightPx = (state: RootState) =>
   state.appUiConfigs.horizontalPanelHeightPx;
 
-export const getIsMarketFavorited = () =>
-  createAppSelector(
-    [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],
-    (favoritedMarkets, marketId) => favoritedMarkets.includes(marketId)
-  );
+export const getIsMarketFavorited = createAppSelector(
+  [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],
+  (favoritedMarkets, marketId) => favoritedMarkets.includes(marketId)
+);
 
-export const getSavedTablePageSize = () =>
-  createAppSelector(
-    [(state) => state.appUiConfigs.tablePageSizes, (_s, id: string) => id],
-    (pageSizes, id) => pageSizes[id]
-  );
+export const getSavedTablePageSize = createAppSelector(
+  [(state) => state.appUiConfigs.tablePageSizes, (_s, id: string) => id],
+  (pageSizes, id) => pageSizes[id]
+);

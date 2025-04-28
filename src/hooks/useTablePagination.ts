@@ -11,7 +11,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { setTablePageSize } from '@/state/appUiConfigs';
 import { getSavedTablePageSize } from '@/state/appUiConfigsSelectors';
 
-import { useParameterizedSelector } from './useParameterizedSelector';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
 const MAX_NUM_PAGE_BUTTONS = 7;
 const PAGE_TOGGLE_PLACEHOLDER = '...';
@@ -37,7 +37,7 @@ export const useTablePagination = ({
   shouldResetOnTotalRowsChange?: boolean;
   tableId: string;
 }) => {
-  const savedPageSize = useParameterizedSelector(getSavedTablePageSize, tableId);
+  const savedPageSize = useAppSelectorWithArgs(getSavedTablePageSize, tableId);
   const [pageSize, setPageSizeState] = useState(
     validPageSizeOrUndefined(savedPageSize) ?? initialPageSize
   );

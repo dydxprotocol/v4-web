@@ -13,7 +13,7 @@ import { StatsigFlags } from '@/constants/statsig';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -313,7 +313,7 @@ export const MarketsDropdown = memo(
       };
     }, []);
 
-    const isFavoritedMarket = useParameterizedSelector(getIsMarketFavorited, currentMarketId ?? '');
+    const isFavoritedMarket = useAppSelectorWithArgs(getIsMarketFavorited, currentMarketId ?? '');
 
     return (
       <$Popover

@@ -4,7 +4,7 @@ import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import { STRING_KEYS } from '@/constants/localization';
 import { CancelOrderStatuses, LocalCancelOrderData } from '@/constants/trade';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -30,10 +30,10 @@ export const OrderCancelNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useParameterizedSelector(getOrderById, localCancel.orderId);
+  const order = useAppSelectorWithArgs(getOrderById, localCancel.orderId);
   const { assetId, logo: logoUrl } = orEmptyObj(
-    useParameterizedSelector(
-      BonsaiHelpers.markets.createSelectMarketSummaryById,
+    useAppSelectorWithArgs(
+      BonsaiHelpers.markets.selectMarketSummaryById,
       localCancel.cachedData.marketId
     )
   );

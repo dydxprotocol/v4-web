@@ -86,7 +86,7 @@ export const getDydxDatafeed = (
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
     const { tickSizeDecimals } = orEmptyObj(
-      BonsaiHelpers.markets.createSelectMarketSummaryById()(store.getState(), symbolItem.symbol)
+      BonsaiHelpers.markets.selectMarketSummaryById(store.getState(), symbolItem.symbol)
     );
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
@@ -126,7 +126,7 @@ export const getDydxDatafeed = (
     const colorMode = getAppColorMode(store.getState());
 
     const [fromMs, toMs] = [fromSeconds * 1000, toSeconds * 1000];
-    const market = BonsaiHelpers.markets.createSelectMarketSummaryById()(
+    const market = BonsaiHelpers.markets.selectMarketSummaryById(
       store.getState(),
       symbolInfo.ticker!
     );

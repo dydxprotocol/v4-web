@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY, CancelOrderStatuses, LocalCancelAllData } from '@/constants/trade';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -29,8 +29,8 @@ export const CancelAllNotification = ({
   const stringGetter = useStringGetter();
   const isCancelForSingleMarket = localCancelAll.filterKey !== CANCEL_ALL_ORDERS_KEY;
   const { assetId, logo: logoUrl } = orEmptyObj(
-    useParameterizedSelector(
-      BonsaiHelpers.markets.createSelectMarketSummaryById,
+    useAppSelectorWithArgs(
+      BonsaiHelpers.markets.selectMarketSummaryById,
       isCancelForSingleMarket ? localCancelAll.filterKey : undefined
     )
   );
