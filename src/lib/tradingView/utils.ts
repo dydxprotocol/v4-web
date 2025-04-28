@@ -107,23 +107,6 @@ export const mapCandle = ({
   };
 };
 
-const mapTradingViewChartBar = ({ bar }: { bar: TradingViewChartBar }): TradingViewChartBar => {
-  const { trades, orderbookOpen, orderbookClose, tradeOpen, tradeClose, tradeLow, tradeHigh } = bar;
-
-  return {
-    ...bar,
-    ...getOhlcValues({
-      trades,
-      tradeOpen,
-      tradeClose,
-      tradeLow,
-      tradeHigh,
-      orderbookOpen,
-      orderbookClose,
-    }),
-  };
-};
-
 export const getSymbol = (marketId: string): TradingViewSymbol => ({
   description: marketId,
   exchange: 'dYdX',
@@ -131,24 +114,6 @@ export const getSymbol = (marketId: string): TradingViewSymbol => ({
   symbol: marketId,
   type: 'crypto',
 });
-
-export const getHistorySlice = ({
-  bars,
-  fromMs,
-  toMs,
-  firstDataRequest,
-}: {
-  bars?: TradingViewChartBar[];
-  fromMs: number;
-  toMs: number;
-  firstDataRequest: boolean;
-}): TradingViewChartBar[] => {
-  if (!bars || (!firstDataRequest && bars.length > 0 && toMs < bars[0]!.time)) {
-    return [];
-  }
-
-  return bars.map((bar) => mapTradingViewChartBar({ bar })).filter(({ time }) => time >= fromMs);
-};
 
 export const getChartLineColors = ({
   appTheme,

@@ -28,6 +28,12 @@ import { getCurrentMarketId } from './currentMarketSelectors';
  */
 export const getSubaccount = BonsaiCore.account.parentSubaccountSummary.data;
 
+export const getSubaccountEquity = createAppSelector([getSubaccount], (s) => s?.equity.toNumber());
+
+export const getSubaccountFreeCollateral = createAppSelector([getSubaccount], (s) =>
+  s?.freeCollateral.toNumber()
+);
+
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
@@ -115,15 +121,6 @@ export const getOrderById = createAppSelector(
 export const getOrderByClientId = createAppSelector(
   [getSubaccountOrders, (s, orderClientId: string) => orderClientId],
   (orders, orderClientId) => orders.find((order) => order.clientId === orderClientId)
-);
-
-/**
- * @param state
- * @returns first matching fill with the specified order client id
- */
-export const getFillByClientId = createAppSelector(
-  [getSubaccountFills, getOrderByClientId],
-  (fills, order) => fills.find((fill) => fill.orderId === order?.id)
 );
 
 /**

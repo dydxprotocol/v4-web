@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { PositionUniqueId, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-import { shallowEqual, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getTriggersFormPosition, getTriggersFormSummary } from '@/state/inputsSelectors';
@@ -19,7 +19,7 @@ export const useTriggerOrdersFormInputs = ({
   takeProfitOrder?: SubaccountOrder;
 }) => {
   const dispatch = useDispatch();
-  const { errors, summary } = useAppSelector(getTriggersFormSummary, shallowEqual);
+  const { errors, summary } = useAppSelector(getTriggersFormSummary);
 
   const position = useAppSelector(getTriggersFormPosition);
   const stopLossOrderSize = stopLossOrder?.size.toNumber();

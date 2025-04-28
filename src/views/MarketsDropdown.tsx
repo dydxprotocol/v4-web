@@ -1,5 +1,6 @@
 import { Key, memo, useEffect, useMemo, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -12,7 +13,6 @@ import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -35,6 +35,8 @@ import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
+import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
 import { elementIsTextInput } from '@/lib/domUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
@@ -289,7 +291,10 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
-    const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+    const launchableAsset = useParameterizedSelector(
+      BonsaiHelpers.assets.createSelectAssetInfo,
+      mapIfPresent(launchableMarketId, getAssetFromMarketId)
+    );
 
     const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
 

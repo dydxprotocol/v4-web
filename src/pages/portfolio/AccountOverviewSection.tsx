@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -20,7 +19,7 @@ import { Tag, TagSign, TagType } from '@/components/Tag';
 import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { getSubaccount } from '@/state/accountSelectors';
+import { getSubaccountEquity, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -67,9 +66,11 @@ export const AccountOverviewSection = () => {
   const navigate = useNavigate();
   const stringGetter = useStringGetter();
 
-  const { equity, freeCollateral } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const equity = useAppSelector(getSubaccountEquity);
+  const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
+
   const { balanceUsdc: vaultBalance } = orEmptyObj(useLoadedVaultAccount().data);
-  const totalValue = mapIfPresent(equity?.toNumber(), (e) => e + (vaultBalance ?? 0));
+  const totalValue = mapIfPresent(equity, (e) => e + (vaultBalance ?? 0));
 
   const handleViewVault = useCallback(() => {
     track(AnalyticsEvents.ClickViewVaultFromOverview());
@@ -84,15 +85,13 @@ export const AccountOverviewSection = () => {
     {
       id: 'free-collateral',
       label: stringGetter({ key: STRING_KEYS.FREE_COLLATERAL }),
-      amount: mapIfPresent(freeCollateral?.toNumber(), (fc) => Math.max(fc, 0.0)),
+      amount: mapIfPresent(freeCollateral, (fc) => Math.max(fc, 0.0)),
       color: ColorToken.GrayPurple2,
     },
     {
       id: 'open-positions',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-      amount: mapIfPresent(equity?.toNumber(), freeCollateral?.toNumber(), (e, f) =>
-        Math.max(e - Math.max(f, 0), 0)
-      ),
+      amount: mapIfPresent(equity, freeCollateral, (e, f) => Math.max(e - Math.max(f, 0), 0)),
       color: ColorToken.Yellow1,
     },
     {

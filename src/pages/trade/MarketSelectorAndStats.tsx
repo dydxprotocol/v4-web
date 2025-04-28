@@ -1,6 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { VerticalSeparator } from '@/components/Separator';
@@ -11,7 +13,8 @@ import { MarketsDropdown } from '@/views/MarketsDropdown';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { getAssetFromMarketId, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
 
 export const MarketSelectorAndStats = ({
   className,
@@ -20,7 +23,10 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+  const imageUrl = useParameterizedSelector(
+    BonsaiHelpers.assets.createSelectAssetLogo,
+    mapIfPresent(launchableMarketId, getAssetFromMarketId)
+  );
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   const displayableId = launchableMarketId

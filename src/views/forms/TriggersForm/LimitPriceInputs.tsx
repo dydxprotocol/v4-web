@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -43,7 +43,7 @@ export const LimitPriceInputs = ({
   const stringGetter = useStringGetter();
 
   const triggerFormInputValues = useAppSelector(getTriggersFormState);
-  const triggerFormSummary = useAppSelector(getTriggersFormSummary, shallowEqual);
+  const triggerFormSummary = useAppSelector(getTriggersFormSummary);
 
   const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(existsLimitOrder);
 

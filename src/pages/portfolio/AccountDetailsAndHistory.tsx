@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -98,7 +97,7 @@ export const AccountDetailsAndHistory = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
 
-  const { equity, leverage, marginUsage } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const { equity, leverage, marginUsage } = orEmptyObj(useAppSelector(getSubaccount));
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 

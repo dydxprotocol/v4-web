@@ -1,12 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
-import { useCompositeClient } from '@/bonsai/rest/lib/useIndexer';
+import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndexer';
 import {
   BECH32_PREFIX,
   FaucetClient,
-  IndexerClient,
-  IndexerConfig,
   LocalWallet,
   PnlTickInterval,
   SelectedGasDenom,
@@ -45,8 +43,9 @@ const useDydxClientContext = () => {
   // ------ Client Initialization ------ //
 
   const { compositeClient } = useCompositeClient();
+  const { indexerClient } = useIndexerClient();
 
-  const { indexer: indexerEndpoints, faucet: faucetUrl } = useEndpointsConfig();
+  const { faucet: faucetUrl } = useEndpointsConfig();
 
   const faucetClient = useMemo(() => {
     if (faucetUrl == null) {
@@ -54,11 +53,6 @@ const useDydxClientContext = () => {
     }
     return new FaucetClient(faucetUrl);
   }, [faucetUrl]);
-
-  const indexerClient = useMemo(() => {
-    const config = new IndexerConfig(indexerEndpoints.api, indexerEndpoints.socket);
-    return new IndexerClient(config);
-  }, [indexerEndpoints]);
 
   // ------ Gas Denom ------ //
 
@@ -101,7 +95,7 @@ const useDydxClientContext = () => {
   // ------ Public Methods ------ //
   const requestAllPerpetualMarkets = async () => {
     try {
-      const { markets } = (await indexerClient.markets.getPerpetualMarkets()) ?? {};
+      const { markets } = (await indexerClient?.markets.getPerpetualMarkets()) ?? {};
       return markets || [];
     } catch (error) {
       log('useDydxClient/getPerpetualMarkets', error);
@@ -112,32 +106,32 @@ const useDydxClientContext = () => {
   const getMegavaultHistoricalPnl = useCallback(
     async (resolution: PnlTickInterval = PnlTickInterval.day) => {
       try {
-        return await indexerClient.vault.getMegavaultHistoricalPnl(resolution);
+        return await indexerClient?.vault.getMegavaultHistoricalPnl(resolution);
       } catch (error) {
         log('useDydxClient/getMegavaultHistoricalPnl', error);
         return undefined;
       }
     },
-    [indexerClient.vault]
+    [indexerClient]
   );
 
   const getMegavaultPositions = useCallback(async () => {
     try {
-      return await indexerClient.vault.getMegavaultPositions();
+      return await indexerClient?.vault.getMegavaultPositions();
     } catch (error) {
       log('useDydxClient/getMegavaultPositions', error);
       return undefined;
     }
-  }, [indexerClient.vault]);
+  }, [indexerClient]);
 
   const getVaultsHistoricalPnl = useCallback(async () => {
     try {
-      return await indexerClient.vault.getVaultsHistoricalPnl();
+      return await indexerClient?.vault.getVaultsHistoricalPnl();
     } catch (error) {
       log('useDydxClient/getVaultsHistoricalPnl', error);
       return undefined;
     }
-  }, [indexerClient.vault]);
+  }, [indexerClient]);
 
   const getAllAccountTransfersBetween = useCallback(
     async (
@@ -147,7 +141,7 @@ const useDydxClientContext = () => {
       recipientSubaccountNumber: string
     ) => {
       try {
-        return await indexerClient.account.getTransfersBetween(
+        return await indexerClient?.account.getTransfersBetween(
           sourceAddress,
           sourceSubaccountNumber,
           recipientAddress,
@@ -158,7 +152,7 @@ const useDydxClientContext = () => {
         return undefined;
       }
     },
-    [indexerClient.account]
+    [indexerClient]
   );
 
   const getVaultWithdrawInfo = useCallback(
@@ -181,6 +175,11 @@ const useDydxClientContext = () => {
 
   const requestAllAccountFills = async (address: string, subaccountNumber: number) => {
     try {
+      if (indexerClient == null) {
+        throw new Error(
+          'Attempted to make requestAllAccountFills call while indexerClient is undefined'
+        );
+      }
       const {
         fills = [],
         totalResults,
@@ -206,7 +205,7 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient.account.getParentSubaccountNumberFills(
+          indexerClient?.account.getParentSubaccountNumberFills(
             address,
             subaccountNumber,
             undefined,
@@ -233,6 +232,11 @@ const useDydxClientContext = () => {
 
   const requestAllAccountTransfers = async (address: string, subaccountNumber: number) => {
     try {
+      if (indexerClient == null) {
+        throw new Error(
+          'Attempted to make requestAllAccountTransfers call while indexerClient is undefined'
+        );
+      }
       const {
         transfers = [],
         totalResults,
@@ -256,7 +260,7 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient.account.getParentSubaccountNumberTransfers(
+          indexerClient?.account.getParentSubaccountNumberTransfers(
             address,
             subaccountNumber,
             pageSize,
@@ -284,7 +288,7 @@ const useDydxClientContext = () => {
 
   const getMarketTickSize = async (marketId: string) => {
     try {
-      const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) ?? {};
+      const { markets } = (await indexerClient?.markets.getPerpetualMarkets(marketId)) ?? {};
       return markets?.[marketId]?.tickSize;
     } catch (error) {
       log('useDydxClient/getMarketTickSize', error);
@@ -325,7 +329,7 @@ const useDydxClientContext = () => {
   }): Promise<Candle[]> => {
     try {
       const { candles } =
-        (await indexerClient.markets.getPerpetualMarketCandles(
+        (await indexerClient?.markets.getPerpetualMarketCandles(
           marketId,
           RESOLUTION_MAP[resolution]!,
           fromIso,
@@ -392,7 +396,7 @@ const useDydxClientContext = () => {
   const { updateSanctionedAddresses } = useRestrictions();
 
   const screenAddresses = async ({ addresses }: { addresses: string[] }) => {
-    const promises = addresses.map((address) => indexerClient.utility.screen(address));
+    const promises = addresses.map((address) => indexerClient?.utility.screen(address));
 
     const results = await Promise.all(promises);
 
@@ -408,7 +412,7 @@ const useDydxClientContext = () => {
     period = 'SEVEN_DAYS',
   }: {
     period?: 'ONE_DAY' | 'SEVEN_DAYS';
-  }) => indexerClient.markets.getPerpetualMarketSparklines(period);
+  }) => indexerClient?.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
     // The perpetualId is 0 (parent subaccount number)
@@ -475,12 +479,12 @@ const useDydxClientContext = () => {
     getCandlesForDatafeed,
     getCandles: requestCandles,
     getMarketTickSize,
+    getAccountBalance,
     getPerpetualMarketSparklines,
     screenAddresses,
     getWithdrawalAndTransferGatingStatus,
     getWithdrawalCapacityByDenom,
     getValidators,
-    getAccountBalance,
     getAffiliateInfo,
     getAllAffiliateTiers,
     getReferredBy,

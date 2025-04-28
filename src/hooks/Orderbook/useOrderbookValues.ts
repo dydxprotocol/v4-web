@@ -4,8 +4,6 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import { GROUPING_MULTIPLIER_LIST, GroupingMultiplier } from '@/constants/orderbook';
 
-import { safeAssign } from '@/lib/objectHelpers';
-
 import { useAppSelectorWithArgs } from '../useParameterizedSelector';
 
 export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number }) => {
@@ -36,27 +34,17 @@ export const useCalculateOrderbookData = ({ rowsPerSide }: { rowsPerSide: number
 
   return useMemo(() => {
     const asks = (orderbook?.asks ?? [])
-      .map((row, idx: number) =>
-        safeAssign(
-          {},
-          {
-            key: `ask-${idx}`,
-          },
-          row
-        )
-      )
+      .map((row, idx: number) => ({
+        key: `ask-${idx}`,
+        ...row,
+      }))
       .slice(0, rowsPerSide);
 
     const bids = (orderbook?.bids ?? [])
-      .map((row, idx: number) =>
-        safeAssign(
-          {},
-          {
-            key: `bid-${idx}`,
-          },
-          row
-        )
-      )
+      .map((row, idx: number) => ({
+        key: `bid-${idx}`,
+        ...row,
+      }))
       .slice(0, rowsPerSide);
 
     const spread = orderbook?.spread;

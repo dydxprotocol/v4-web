@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
-import { shallowEqual } from 'react-redux';
 
 import { DialogProps, DialogTypes, ExchangeOfflineDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -26,7 +25,7 @@ export const ExchangeOfflineDialog = ({
   const stringGetter = useStringGetter();
   const { status, statusErrorMessage } = useApiState();
   const selectedNetwork = useAppSelector(getSelectedNetwork);
-  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
+  const activeDialog = useAppSelector(getActiveDialog);
 
   useEffect(() => {
     if (
@@ -36,7 +35,7 @@ export const ExchangeOfflineDialog = ({
     ) {
       dispatch(closeDialog());
     }
-  }, [status, selectedNetwork]);
+  }, [status, selectedNetwork, activeDialog, dispatch]);
 
   return (
     <Dialog

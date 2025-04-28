@@ -1,7 +1,6 @@
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -46,7 +45,7 @@ export const OrderDetailsDialog = ({
   const stringGetter = useStringGetter();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
-  const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
+  const localCancelOrders = useAppSelector(getLocalCancelOrders);
   const isOrderCanceling =
     Object.values(localCancelOrders).find(
       (order) => order.orderId === orderId && order.submissionStatus < CancelOrderStatuses.Canceled

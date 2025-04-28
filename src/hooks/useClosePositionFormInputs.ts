@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
@@ -28,10 +28,7 @@ export const useClosePositionFormInputs = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const midMarketPrice = useAppSelector(
-    BonsaiHelpers.currentMarket.midPrice.data,
-    shallowEqual
-  )?.toNumber();
+  const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data)?.toNumber();
 
   const onAmountInput = useCallback(
     ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {

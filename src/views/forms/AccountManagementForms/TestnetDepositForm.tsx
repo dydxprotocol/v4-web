@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -31,8 +30,8 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const stringGetter = useStringGetter();
   const { dydxAddress, getSubaccounts } = useAccounts();
   const { requestFaucetFunds } = useSubaccount();
-  const subAccount = useAppSelector(getSubaccount, shallowEqual);
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const dydxChainId = useEnvConfig('dydxChainId');
 
   const [isLoading, setIsLoading] = useState(false);

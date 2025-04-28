@@ -1,5 +1,4 @@
 import { minBy } from 'lodash';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -40,9 +39,7 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { leverage: currentLeverage } = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionData, shallowEqual)
-  );
+  const { leverage: currentLeverage } = orEmptyObj(useAppSelector(getCurrentMarketPositionData));
 
   const minLeverage = Math.min(leftLeverage, rightLeverage);
   const maxLeverage = Math.max(leftLeverage, rightLeverage);
