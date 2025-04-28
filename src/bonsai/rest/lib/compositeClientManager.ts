@@ -162,7 +162,7 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
 
 function makeClientManager<ClientType>(args: {
   load: () => Promise<ClientType>;
-  onSuccess: () => void;
+  onSuccess: (version: number, result: ClientType) => void;
   onError: (e?: any) => void;
 }): {
   clientState: ClientState<ClientType>;
@@ -202,7 +202,7 @@ function makeClientManager<ClientType>(args: {
       }
       clientState.client = client;
       clientState.deferred.resolve(client);
-      args.onSuccess();
+      args.onSuccess(myId, client);
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (clientState.dead || clientState.currentOperationId !== myId) {
@@ -249,11 +249,14 @@ function initializeClientWrapper(
 
   const compositeClient = makeClientManager({
     load: loads.compositeClient,
-    onSuccess: () =>
+    onSuccess: (_v, client) =>
       dispatch(
         setNetworkStateRaw({
           networkId: network,
-          stateToMerge: { compositeClientReady: true },
+          stateToMerge: {
+            compositeClientReady: true,
+            compositeClientUrl: client.validatorClient.config.restEndpoint,
+          },
         })
       ),
     onError: (e) => {
@@ -328,7 +331,8 @@ function initializeClientWrapper(
       );
     },
     refreshConnections: () => {
-      clients.forEach((c) => c.load());
+      // only composite client can meaningfully update - since it might select a new node
+      compositeClient.load();
     },
   };
   clients.forEach((c) => c.load());

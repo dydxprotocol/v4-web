@@ -1,6 +1,7 @@
 import { logBonsaiError, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import {
   selectCompositeClientReady,
+  selectCompositeClientUrl,
   selectIndexerReady,
   selectNobleClientReady,
 } from '@/bonsai/socketSelectors';
@@ -154,9 +155,9 @@ export function createValidatorStoreEffect<T>(
   config: InfraSetupConfig<CompositeClient, T>
 ) {
   const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectCompositeClientReady, config.selector],
-    (network, compositeClientReady, selectorResult) => ({
-      infrastructure: { network, compositeClientReady },
+    [getSelectedNetwork, selectCompositeClientReady, selectCompositeClientUrl, config.selector],
+    (network, compositeClientReady, compositeClientUrl, selectorResult) => ({
+      infrastructure: { network, compositeClientReady, compositeClientUrl },
       selectorResult,
     })
   );
@@ -175,7 +176,8 @@ export function createValidatorStoreEffect<T>(
     const compositeClient = CompositeClientManager.use(clientConfig).compositeClient.client!;
 
     const unsubscribe = config.handle(
-      `${infrastructure.network}-${infrastructure.compositeClientReady}`,
+      // we want to trigger refreshes when we switch validator url too
+      `${infrastructure.network}-${infrastructure.compositeClientReady}-${infrastructure.compositeClientUrl}`,
       compositeClient,
       selectorResult
     );

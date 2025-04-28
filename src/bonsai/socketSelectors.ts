@@ -41,6 +41,13 @@ export const selectCompositeClientReady = createAppSelector(
   }
 );
 
+export const selectCompositeClientUrl = createAppSelector(
+  [getSelectedNetwork, (state: RootState) => state.raw.network],
+  (network, networks) => {
+    return networks[network]?.compositeClientUrl;
+  }
+);
+
 export const selectNobleClientReady = createAppSelector(
   [getSelectedNetwork, (state: RootState) => state.raw.network],
   (network, networks) => {
