@@ -139,7 +139,7 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     if (status) {
-      const websocketEndpoint = indexerClient.config.websocketEndpoint;
+      const websocketEndpoint = indexerClient?.config.websocketEndpoint;
 
       const lastSuccessfulIndexerRpcQuery =
         (websocketEndpoint &&
