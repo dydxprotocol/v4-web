@@ -9,25 +9,7 @@ import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { ErrorParams } from './errors';
 
-export enum TradeTypes {
-  MARKET = 'MARKET',
-  LIMIT = 'LIMIT',
-  STOP_LIMIT = 'STOP_LIMIT',
-  STOP_MARKET = 'STOP_MARKET',
-  TAKE_PROFIT = 'TAKE_PROFIT',
-  TAKE_PROFIT_MARKET = 'TAKE_PROFIT_MARKET',
-  TRAILING_STOP = 'TRAILING_STOP',
-}
-
-enum ClosingTradeTypes {
-  LIQUIDATED = 'LIQUIDATED',
-  LIQUIDATION = 'LIQUIDATION',
-  OFFSETTING = 'OFFSETTING',
-  DELEVERAGED = 'DELEVERAGED',
-  FINAL_SETTLEMENT = 'FINAL_SETTLEMENT',
-}
-
-export type OrderType = ClosingTradeTypes | TradeFormType | IndexerOrderType;
+export type OrderType = TradeFormType | IndexerOrderType;
 
 export enum PositionSide {
   None = 'NONE',
@@ -95,32 +77,6 @@ export const ORDER_TYPE_STRINGS: Record<
     orderTypeKey: STRING_KEYS.TRAILING_STOP,
     descriptionKey: STRING_KEYS.TRAILING_STOP_DESCRIPTION,
   },
-
-  [ClosingTradeTypes.LIQUIDATED]: {
-    orderTypeKeyShort: STRING_KEYS.LIQUIDATED,
-    orderTypeKey: STRING_KEYS.LIQUIDATED,
-    descriptionKey: null,
-  },
-  [ClosingTradeTypes.LIQUIDATION]: {
-    orderTypeKeyShort: STRING_KEYS.LIQUIDATION,
-    orderTypeKey: STRING_KEYS.LIQUIDATION,
-    descriptionKey: null,
-  },
-  [ClosingTradeTypes.OFFSETTING]: {
-    orderTypeKeyShort: STRING_KEYS.OFFSETTING,
-    orderTypeKey: STRING_KEYS.OFFSETTING,
-    descriptionKey: null,
-  },
-  [ClosingTradeTypes.DELEVERAGED]: {
-    orderTypeKeyShort: STRING_KEYS.DELEVERAGED,
-    orderTypeKey: STRING_KEYS.DELEVERAGED,
-    descriptionKey: null,
-  },
-  [ClosingTradeTypes.FINAL_SETTLEMENT]: {
-    orderTypeKeyShort: STRING_KEYS.FINAL_SETTLEMENT,
-    orderTypeKey: STRING_KEYS.FINAL_SETTLEMENT,
-    descriptionKey: null,
-  },
 };
 
 export const GOOD_TIL_TIME_TIMESCALE_STRINGS: Record<TimeUnitShort, string> = {
@@ -129,15 +85,6 @@ export const GOOD_TIL_TIME_TIMESCALE_STRINGS: Record<TimeUnitShort, string> = {
   [TimeUnitShort.Days]: STRING_KEYS.DAYS,
   [TimeUnitShort.Weeks]: STRING_KEYS.WEEKS,
 };
-
-export enum TradeSizeInput {
-  BalancePercent = 'size.balancePercent',
-  Leverage = 'size.leverage',
-  Size = 'size.size',
-  Usdc = 'size.usdcSize',
-}
-
-export type TradeToggleSizeInput = TradeSizeInput.Size | TradeSizeInput.Usdc;
 
 export enum TradeBoxKeys {
   LimitPrice = 'price.limitPrice',

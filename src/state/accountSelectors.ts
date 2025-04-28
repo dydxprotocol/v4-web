@@ -115,15 +115,6 @@ export const getOrderByClientId = () =>
 
 /**
  * @param state
- * @returns first matching fill with the specified order client id
- */
-export const getFillByClientId = () =>
-  createAppSelector([getSubaccountFills, getOrderByClientId()], (fills, order) =>
-    fills.find((fill) => fill.orderId === order?.id)
-  );
-
-/**
- * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
 export const getSubaccountConditionalOrders = () =>

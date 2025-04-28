@@ -14,7 +14,6 @@ import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
-import { TransferNotificationTypes } from './notifications';
 import { DisplayUnit } from './trade';
 import type { DydxAddress } from './wallets';
 
@@ -239,14 +238,6 @@ export const AnalyticsEvents = unionize(
       estimatedRouteDuration?: number;
       toAmount?: number;
       toAmountMin?: number;
-    }>(),
-    TransferNotification: ofType<{
-      type: TransferNotificationTypes | undefined;
-      toAmount: number | undefined;
-      timeSpent: Record<string, number> | number | undefined;
-      txHash: string;
-      status: 'new' | 'success' | 'error';
-      triggeredAt: number | undefined;
     }>(),
 
     // Trading
