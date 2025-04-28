@@ -23,7 +23,7 @@ export function useIndexerClient() {
       network: selectedNetwork,
       dispatch,
     };
-    setClient(CompositeClientManager.use(clientConfig).indexer!);
+    setClient(CompositeClientManager.use(clientConfig).indexer.client!);
     return () => {
       setClient(undefined);
       CompositeClientManager.markDone(clientConfig);
@@ -48,7 +48,7 @@ export function useCompositeClient() {
       network: selectedNetwork,
       dispatch,
     };
-    setClient(CompositeClientManager.use(clientConfig).compositeClient!);
+    setClient(CompositeClientManager.use(clientConfig).compositeClient.client!);
     return () => {
       setClient(undefined);
       CompositeClientManager.markDone(clientConfig);

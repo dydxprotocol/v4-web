@@ -83,7 +83,7 @@ export function createIndexerStoreEffect<T>(
       network: infrastructure.network,
       dispatch: store.dispatch,
     };
-    const indexerClient = CompositeClientManager.use(clientConfig).indexer!;
+    const indexerClient = CompositeClientManager.use(clientConfig).indexer.client!;
 
     const unsubscribe = config.handle(
       `${infrastructure.network}-${infrastructure.indexerReady}`,
@@ -172,7 +172,7 @@ export function createValidatorStoreEffect<T>(
       network: infrastructure.network,
       dispatch: store.dispatch,
     };
-    const compositeClient = CompositeClientManager.use(clientConfig).compositeClient!;
+    const compositeClient = CompositeClientManager.use(clientConfig).compositeClient.client!;
 
     const unsubscribe = config.handle(
       `${infrastructure.network}-${infrastructure.compositeClientReady}`,
@@ -262,7 +262,7 @@ export function createNobleQueryStoreEffect<T, R>(
       dispatch: store.dispatch,
     };
 
-    const nobleClient = CompositeClientManager.use(clientConfig).nobleClient!;
+    const nobleClient = CompositeClientManager.use(clientConfig).nobleClient.client!;
 
     const queryFn = config.getQueryFn(nobleClient, queryData);
     if (!queryFn) {

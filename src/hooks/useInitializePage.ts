@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { logBonsaiInfo } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
+import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
+// eslint-disable-next-line no-restricted-imports
 import { IndexerWebsocketManager } from '@/bonsai/websocket/lib/indexerWebsocketManager';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -43,6 +45,7 @@ export const useInitializePage = () => {
           if (hiddenDuration >= RECONNECT_AFTER_HIDDEN_THRESHOLD) {
             // reconnect (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+            CompositeClientManager.getActiveResources().forEach((r) => r.refreshConnections());
             logBonsaiInfo('useInitializePage', 'restarting because visibility change');
           }
           hiddenTimeRef.current = null;
@@ -59,6 +62,7 @@ export const useInitializePage = () => {
   useEffect(() => {
     const handleOnline = () => {
       IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+      CompositeClientManager.getActiveResources().forEach((r) => r.refreshConnections());
       logBonsaiInfo('useInitializePage', 'restarting because network status change');
     };
     window.addEventListener('online', handleOnline);
