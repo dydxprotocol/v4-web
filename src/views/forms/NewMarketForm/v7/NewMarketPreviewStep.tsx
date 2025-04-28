@@ -69,8 +69,8 @@ export const NewMarketPreviewStep = ({
   const { launchMarketTos } = useURLConfigs();
   const [isLoading, setIsLoading] = useState(false);
   const baseAsset = getDisplayableAssetFromTicker(ticker);
-  const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetInfo,
+  const launchableAsset = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetInfo,
     getAssetFromMarketId(ticker)
   );
   const { createPermissionlessMarket } = useSubaccount();

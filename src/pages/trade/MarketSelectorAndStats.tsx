@@ -1,7 +1,7 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -23,8 +23,8 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const imageUrl = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetLogo,
+  const imageUrl = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetLogo,
     mapIfPresent(launchableMarketId, getAssetFromMarketId)
   );
   const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';

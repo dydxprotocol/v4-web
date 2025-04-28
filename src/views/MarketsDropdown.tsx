@@ -291,8 +291,8 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
-    const launchableAsset = useParameterizedSelector(
-      BonsaiHelpers.assets.createSelectAssetInfo,
+    const launchableAsset = useAppSelectorWithArgs(
+      BonsaiHelpers.assets.selectAssetInfo,
       mapIfPresent(launchableMarketId, getAssetFromMarketId)
     );
 
