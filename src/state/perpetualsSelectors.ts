@@ -75,13 +75,15 @@ export const getCurrentMarketNextFundingRate = createAppSelector(
 /**
  * @returns Specified market's max leverage
  */
-export const getMarketMaxLeverage = () =>
-  createAppSelector([BonsaiHelpers.markets.createSelectMarketSummaryById()], (marketConfig) => {
+export const getMarketMaxLeverage = createAppSelector(
+  [BonsaiHelpers.markets.selectMarketSummaryById],
+  (marketConfig) => {
     const { effectiveInitialMarginFraction, initialMarginFraction: initialMarginFractionStr } =
       orEmptyObj(marketConfig);
     const initialMarginFraction = MaybeBigNumber(initialMarginFractionStr)?.toNumber();
     return calculateMarketMaxLeverage({ effectiveInitialMarginFraction, initialMarginFraction });
-  });
+  }
+);
 
 // Returns list of markets that user has launched to handle loading/navigation state
 export const getLaunchedMarketIds = (state: RootState) => {

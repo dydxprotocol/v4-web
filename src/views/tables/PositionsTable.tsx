@@ -19,7 +19,7 @@ import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -471,7 +471,7 @@ export const PositionsTable = forwardRef(
       });
     }, [currentMarket, marketTypeFilter, openPositions]);
 
-    const tpslOrdersByPositionUniqueId = useParameterizedSelector(
+    const tpslOrdersByPositionUniqueId = useAppSelectorWithArgs(
       getSubaccountConditionalOrders,
       isSlTpLimitOrdersEnabled
     );

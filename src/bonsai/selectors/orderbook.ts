@@ -18,7 +18,7 @@ import {
 } from '../calculators/orderbook';
 import { CanvasOrderbookLine } from '../types/orderbookTypes';
 import { selectCurrentMarketOpenOrders } from './account';
-import { selectCurrentMarketOrderbook } from './markets';
+import { selectCurrentMarketOrderbook as selectCurrentMarketBaseOrderbook } from './markets';
 import { selectCurrentMarketInfoStable } from './summary';
 
 const DEPTH_CHART_OPTIONS = {
@@ -33,7 +33,7 @@ const getCanvasOrderbookOptions = weakMapMemoize((groupingMultiplier?: GroupingM
 }));
 
 export const selectCurrentMarketMidPrice = createAppSelector(
-  [selectCurrentMarketOrderbook],
+  [selectCurrentMarketBaseOrderbook],
   (orderbook) => {
     if (orderbook == null) {
       return undefined;
@@ -43,79 +43,78 @@ export const selectCurrentMarketMidPrice = createAppSelector(
   }
 );
 
-export const createSelectCurrentMarketOrderbook = () =>
-  createAppSelector(
-    [
-      selectCurrentMarketOrderbook,
-      selectCurrentMarketInfoStable,
-      selectCurrentMarketOpenOrders,
-      (_s, groupingMultiplier?: GroupingMultiplier) => groupingMultiplier,
-    ],
-    (orderbook, stableInfo, openOrders, groupingMultiplier) => {
-      if (orderbook == null || stableInfo == null) {
-        return undefined;
-      }
-
-      const orderbookBN = calculateOrderbook(orderbook.data);
-      const { groupingTickSize, groupingTickSizeDecimals } = getGroupingTickSize(
-        stableInfo.tickSize,
-        groupingMultiplier ?? GroupingMultiplier.ONE
-      );
-
-      const subaccountOpenOrdersPriceMap = getSubaccountOpenOrdersPriceMap(
-        openOrders,
-        groupingTickSize,
-        groupingTickSizeDecimals
-      );
-
-      const formattedOrderbook = formatOrderbook(
-        orderbookBN,
-        stableInfo.tickSize,
-        getCanvasOrderbookOptions(groupingMultiplier)
-      );
-
-      const bids: CanvasOrderbookLine[] =
-        formattedOrderbook?.bids.map((line) => ({
-          ...line,
-          side: 'bid',
-          mine: findMine({
-            price: line.price,
-            side: IndexerOrderSide.BUY,
-            orderMap: subaccountOpenOrdersPriceMap,
-            groupingTickSize,
-            groupingTickSizeDecimals,
-          }),
-        })) ?? EMPTY_ARR;
-
-      const asks: CanvasOrderbookLine[] =
-        formattedOrderbook?.asks.map((line) => ({
-          ...line,
-          side: 'ask',
-          mine: findMine({
-            price: line.price,
-            side: IndexerOrderSide.SELL,
-            orderMap: subaccountOpenOrdersPriceMap,
-            groupingTickSize,
-            groupingTickSizeDecimals,
-          }),
-        })) ?? EMPTY_ARR;
-
-      const { midPrice, spread, spreadPercent } = orEmptyObj(formattedOrderbook);
-
-      return {
-        bids,
-        asks,
-        midPrice,
-        spread,
-        spreadPercent,
-        groupingTickSize,
-        groupingTickSizeDecimals,
-      };
+export const selectCurrentMarketOrderbook = createAppSelector(
+  [
+    selectCurrentMarketBaseOrderbook,
+    selectCurrentMarketInfoStable,
+    selectCurrentMarketOpenOrders,
+    (_s, groupingMultiplier?: GroupingMultiplier) => groupingMultiplier,
+  ],
+  (orderbook, stableInfo, openOrders, groupingMultiplier) => {
+    if (orderbook == null || stableInfo == null) {
+      return undefined;
     }
-  );
+
+    const orderbookBN = calculateOrderbook(orderbook.data);
+    const { groupingTickSize, groupingTickSizeDecimals } = getGroupingTickSize(
+      stableInfo.tickSize,
+      groupingMultiplier ?? GroupingMultiplier.ONE
+    );
+
+    const subaccountOpenOrdersPriceMap = getSubaccountOpenOrdersPriceMap(
+      openOrders,
+      groupingTickSize,
+      groupingTickSizeDecimals
+    );
+
+    const formattedOrderbook = formatOrderbook(
+      orderbookBN,
+      stableInfo.tickSize,
+      getCanvasOrderbookOptions(groupingMultiplier)
+    );
+
+    const bids: CanvasOrderbookLine[] =
+      formattedOrderbook?.bids.map((line) => ({
+        ...line,
+        side: 'bid',
+        mine: findMine({
+          price: line.price,
+          side: IndexerOrderSide.BUY,
+          orderMap: subaccountOpenOrdersPriceMap,
+          groupingTickSize,
+          groupingTickSizeDecimals,
+        }),
+      })) ?? EMPTY_ARR;
+
+    const asks: CanvasOrderbookLine[] =
+      formattedOrderbook?.asks.map((line) => ({
+        ...line,
+        side: 'ask',
+        mine: findMine({
+          price: line.price,
+          side: IndexerOrderSide.SELL,
+          orderMap: subaccountOpenOrdersPriceMap,
+          groupingTickSize,
+          groupingTickSizeDecimals,
+        }),
+      })) ?? EMPTY_ARR;
+
+    const { midPrice, spread, spreadPercent } = orEmptyObj(formattedOrderbook);
+
+    return {
+      bids,
+      asks,
+      midPrice,
+      spread,
+      spreadPercent,
+      groupingTickSize,
+      groupingTickSizeDecimals,
+    };
+  }
+);
 
 export const selectCurrentMarketDepthChart = createAppSelector(
-  [selectCurrentMarketOrderbook, selectCurrentMarketInfoStable],
+  [selectCurrentMarketBaseOrderbook, selectCurrentMarketInfoStable],
   (orderbook, stableInfo) => {
     if (orderbook == null || stableInfo == null) {
       return undefined;

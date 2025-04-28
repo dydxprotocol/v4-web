@@ -18,14 +18,14 @@ import { log } from '@/lib/telemetry';
 
 import { useSkipClient } from './transfers/skipClient';
 import { useAccounts } from './useAccounts';
-import { useParameterizedSelector } from './useParameterizedSelector';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
 export function useUpdateTransfers() {
   const { dydxAddress } = useAccounts();
   const dispatch = useAppDispatch();
   const { skipClient } = useSkipClient();
 
-  const pendingTransfers = useParameterizedSelector(selectPendingTransfers, dydxAddress);
+  const pendingTransfers = useAppSelectorWithArgs(selectPendingTransfers, dydxAddress);
   // keep track of the transactions for which we've already started querying for statuses
   const transactionToCallback = useRef<{ [key: string]: boolean }>({});
 

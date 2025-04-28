@@ -105,7 +105,7 @@ export const store = configureStore({
                 const result = a(state);
                 if (isFunction(result)) {
                   // this parameterized selector requires no arguments and is important
-                  if (path === '.currentMarket.orderbook.createSelectGroupedData') {
+                  if (path === '.currentMarket.orderbook.selectGroupedData') {
                     return result(state);
                   }
                   return undefined;

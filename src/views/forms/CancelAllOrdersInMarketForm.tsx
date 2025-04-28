@@ -11,7 +11,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -39,8 +39,8 @@ export const CancelAllOrdersInMarketForm = ({
   onCancelComplete,
 }: CancelAllOrdersInMarketFormProps) => {
   const stringGetter = useStringGetter();
-  const marketSummaryForThisMarket = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
+  const marketSummaryForThisMarket = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
     marketId
   );
 

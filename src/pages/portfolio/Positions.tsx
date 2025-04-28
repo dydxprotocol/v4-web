@@ -8,7 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -32,9 +32,7 @@ export const Positions = () => {
   const navigate = useNavigate();
 
   const shouldRenderTriggers = useShouldShowTriggers();
-  const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable
-  );
+  const shouldRenderActions = useAppSelectorWithArgs(calculateShouldRenderActionsInPositionsTable);
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {

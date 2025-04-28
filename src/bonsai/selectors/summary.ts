@@ -88,13 +88,12 @@ export const selectCurrentMarketAssetLogoUrl = createAppSelector(
   }
 );
 
-export const createSelectMarketSummaryById = () =>
-  createAppSelector(
-    [selectAllMarketSummaries, (_s, marketId: string | undefined) => marketId],
-    (allSummaries, marketId) => {
-      if (marketId == null) {
-        return undefined;
-      }
-      return allSummaries?.[marketId];
+export const selectMarketSummaryById = createAppSelector(
+  [selectAllMarketSummaries, (_s, marketId: string | undefined) => marketId],
+  (allSummaries, marketId) => {
+    if (marketId == null) {
+      return undefined;
     }
-  );
+    return allSummaries?.[marketId];
+  }
+);

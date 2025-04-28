@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonStyle } from '@/constants/buttons';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -22,7 +22,7 @@ export const FavoriteButton = ({
   marketId: string;
 }) => {
   const dispatch = useDispatch();
-  const isMarketFavorited = useParameterizedSelector(getIsMarketFavorited, marketId);
+  const isMarketFavorited = useAppSelectorWithArgs(getIsMarketFavorited, marketId);
 
   const onToggle = (newIsFavorited: boolean) => {
     if (newIsFavorited) {

@@ -8,7 +8,7 @@ import { USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -55,10 +55,7 @@ export const LaunchableMarketStatsDetails = ({
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetInfo,
-    assetId
-  );
+  const launchableAsset = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetInfo, assetId);
 
   const {
     marketCap,

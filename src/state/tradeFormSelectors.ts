@@ -19,9 +19,9 @@ import { getActiveDialog, getActiveTradeBoxDialog } from './dialogsSelectors';
 export const getTradeFormRawState = (state: RootState) => state.tradeForm;
 
 // type shenanigans to force the groupingMultiplier to be optional
-const selectRawOrderbook = BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData() as (
+const selectRawOrderbook = BonsaiHelpers.currentMarket.orderbook.selectGroupedData as (
   state: RootState
-) => ReturnType<ReturnType<typeof BonsaiHelpers.currentMarket.orderbook.createSelectGroupedData>>;
+) => ReturnType<typeof BonsaiHelpers.currentMarket.orderbook.selectGroupedData>;
 
 const getTradeFormInputData = createAppSelector(
   [

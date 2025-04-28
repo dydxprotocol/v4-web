@@ -9,7 +9,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -76,23 +76,21 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const shouldRenderTriggers = useShouldShowTriggers();
-  const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable
-  );
+  const shouldRenderActions = useAppSelectorWithArgs(calculateShouldRenderActionsInPositionsTable);
   const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
   const areOrdersLoading = useAppSelector(BonsaiCore.account.openOrders.loading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
-  const numUnseenOrderHistory = useParameterizedSelector(
+  const numUnseenOrderHistory = useAppSelectorWithArgs(
     createGetUnseenOrderHistoryCount,
     showCurrentMarket ? currentMarketId : undefined
   );
   const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
 
-  const openOrdersCount = useParameterizedSelector(
+  const openOrdersCount = useAppSelectorWithArgs(
     createGetOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
-  const unseenOpenOrdersCount = useParameterizedSelector(
+  const unseenOpenOrdersCount = useAppSelectorWithArgs(
     createGetUnseenOpenOrdersCount,
     showCurrentMarket ? currentMarketId : undefined
   );
@@ -102,7 +100,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
   ).length;
 
-  const numUnseenFills = useParameterizedSelector(
+  const numUnseenFills = useAppSelectorWithArgs(
     createGetUnseenFillsCount,
     showCurrentMarket ? currentMarketId : undefined
   );

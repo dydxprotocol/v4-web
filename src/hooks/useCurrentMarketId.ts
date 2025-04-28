@@ -22,7 +22,7 @@ import { setCurrentMarketId, setCurrentMarketIdIfTradeable } from '@/state/perpe
 import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors';
 
 import { useMarketsData } from './useMarketsData';
-import { useParameterizedSelector } from './useParameterizedSelector';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
@@ -33,8 +33,8 @@ export const useCurrentMarketId = () => {
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const currentMarketOraclePrice = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
+  const currentMarketOraclePrice = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
     marketId
   )?.oraclePrice;
   const hasMarketOraclePrice = currentMarketOraclePrice != null;

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -25,7 +25,7 @@ type WithdrawStatusProps = {
 
 export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
   const stringGetter = useStringGetter();
-  const withdraw = useParameterizedSelector(selectWithdraw, id);
+  const withdraw = useAppSelectorWithArgs(selectWithdraw, id);
 
   const transferSuccess = withdraw?.status === 'success';
   const transferError = withdraw?.status === 'error';
