@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -15,7 +15,8 @@ import { MidMarketPrice } from '@/views/MidMarketPrice';
 
 import { useAppSelector } from '@/state/appTypes';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { getAssetFromMarketId, getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -30,7 +31,10 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
     useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
   );
 
-  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const launchableAsset = useParameterizedSelector(
+    BonsaiHelpers.assets.createSelectAssetInfo,
+    mapIfPresent(launchableMarketId, getAssetFromMarketId)
+  );
 
   const assetRow = launchableAsset ? (
     <div tw="inlineRow gap-[1ch]">
@@ -41,7 +45,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
       />
       <$Name>
         <h3>{launchableAsset.name}</h3>
-        <span>{getDisplayableAssetFromBaseAsset(launchableAsset.id)}</span>
+        <span>{getDisplayableAssetFromBaseAsset(launchableAsset.assetId)}</span>
       </$Name>
     </div>
   ) : (
