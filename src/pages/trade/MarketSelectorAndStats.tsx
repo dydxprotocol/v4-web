@@ -23,22 +23,21 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const imageUrl = useAppSelectorWithArgs(
+  const launchableImageUrl = useAppSelectorWithArgs(
     BonsaiHelpers.assets.selectAssetLogo,
     mapIfPresent(launchableMarketId, getAssetFromMarketId)
   );
-  const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
+  const launchableId = mapIfPresent(launchableMarketId, getDisplayableTickerFromMarket);
 
-  const displayableId = launchableMarketId
-    ? getDisplayableTickerFromMarket(launchableMarketId)
-    : launchableMarketId;
+  const tradeableImageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+  const tradeableMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   return (
     <$Container className={className}>
       <MarketsDropdown
         launchableMarketId={launchableMarketId}
-        currentMarketId={displayableId ?? currentMarketId}
-        logoUrl={imageUrl}
+        currentMarketId={launchableId ?? tradeableMarketId}
+        logoUrl={launchableImageUrl ?? tradeableImageUrl}
       />
 
       <VerticalSeparator fullHeight />
