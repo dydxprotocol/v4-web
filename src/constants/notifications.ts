@@ -1,5 +1,3 @@
-import { SkipStatusResponse } from './skip';
-
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   // Until we have migrations enabled, we need to keep underlying values the same
@@ -223,25 +221,6 @@ export enum TransferNotificationTypes {
   Withdrawal = 'withdrawal',
   Deposit = 'deposit',
 }
-
-// TODO: fix typo
-export type TransferNotifcation = {
-  id?: string;
-  txHash: string;
-  type?: TransferNotificationTypes;
-  toChainId?: string;
-  fromChainId?: string;
-  toAmount?: number;
-  triggeredAt?: number;
-  isCctp?: boolean;
-  errorCount?: number;
-  status?: SkipStatusResponse;
-  isExchange?: boolean;
-  requestId?: string;
-  tracked?: boolean;
-  isDummy?: boolean;
-  isSubaccountDepositCompleted?: boolean;
-};
 
 export enum ReleaseUpdateNotificationIds {
   DiscoveryProgram = 'discovery-program', // Deprecated
