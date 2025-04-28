@@ -12,8 +12,3 @@ export const objectFromEntries = <const T extends ReadonlyArray<readonly [Proper
 // Object.keys() with key types preserved - NOT SAFE for mutable variables, only readonly/consts that are never modified
 // since typescript is structurally typed and objects can contain extra keys and still be valid objects of type T
 export const objectKeys = <T extends object>(t: T) => Object.keys(t) as Array<keyof T>;
-
-// An alias for Object.assign. Our Kotlin-generated types contian properties as getter functions which typescript can't be sure
-// can be safely splatted like {...someObject}. Object.assign is slightly slower but guarantees all the properties will get copied
-// and the result is typed correctly by the type system
-export const safeAssign = Object.assign;

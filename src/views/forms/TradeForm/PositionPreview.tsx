@@ -1,5 +1,4 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -31,7 +30,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
     logo: imageUrl,
   } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
   const { signedSize: positionSize, notional: notionalTotal } = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionData, shallowEqual)
+    useAppSelector(getCurrentMarketPositionData)
   );
   const { signedSize: positionSizePostOrder } = orEmptyObj(
     useAppSelector(getCurrentSelectedFormPositionSummary)

@@ -71,7 +71,7 @@ export const useChartLines = ({
   const isAccountConnected = useAppSelector(getIsAccountConnected);
 
   const currentMarketId = useAppSelector(getCurrentMarketId);
-  const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData);
   const currentMarketOrders: SubaccountOrder[] = useAppSelector(
     getCurrentMarketOrders,
     shallowEqual

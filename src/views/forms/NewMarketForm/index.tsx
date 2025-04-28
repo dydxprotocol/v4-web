@@ -7,8 +7,6 @@ import {
   useState,
 } from 'react';
 
-import { shallowEqual } from 'react-redux';
-
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
@@ -56,7 +54,7 @@ export const NewMarketForm = ({
   const { mintscan: mintscanTxUrl } = useURLConfigs();
   const stringGetter = useStringGetter();
 
-  const subAccount = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
+  const subAccount = orEmptyObj(useAppSelector(getSubaccount));
   const { freeCollateral, marginUsage } = subAccount;
   const currentFreeCollateral = freeCollateral?.toNumber() ?? 0;
 

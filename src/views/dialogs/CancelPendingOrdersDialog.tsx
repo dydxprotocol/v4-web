@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 
 import { CancelPendingOrdersDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,7 +21,7 @@ export const CancelPendingOrdersDialog = ({
   marketId,
 }: DialogProps<CancelPendingOrdersDialogProps>) => {
   const stringGetter = useStringGetter();
-  const allPending = useAppSelector(getNonZeroPendingPositions, shallowEqual);
+  const allPending = useAppSelector(getNonZeroPendingPositions);
   const pendingPosition = useMemo(
     () => allPending?.find((p) => p.marketId === marketId),
     [allPending, marketId]

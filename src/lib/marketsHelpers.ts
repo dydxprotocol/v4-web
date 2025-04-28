@@ -8,7 +8,6 @@ import {
   getMarketIdFromAsset,
 } from './assetUtils';
 import { BIG_NUMBERS, MustBigNumber } from './numbers';
-import { safeAssign } from './objectHelpers';
 
 export const FALLBACK_MARKET_LEVERAGE = 5;
 
@@ -104,7 +103,7 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
   const displayId = getDisplayableTickerFromMarket(ticker);
   const displayableAsset = getDisplayableAssetFromTicker(ticker);
 
-  return safeAssign({}, {
+  return {
     id: ticker,
     assetId,
     displayId,
@@ -133,5 +132,5 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
     marketCap: marketCap ?? reportedMarketCap,
     sectorTags: sectorTags ?? [],
     isFavorite: favoritedMarkets.includes(ticker),
-  } satisfies MarketData);
+  } satisfies MarketData;
 }

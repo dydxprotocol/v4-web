@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -73,7 +72,7 @@ export const StakeRewardButtonAndReceipt = ({
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const { usdcBalance, nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const [errorToDisplay, setErrorToDisplay] = useState(alert);

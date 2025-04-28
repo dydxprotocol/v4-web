@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
 
-import { shallowEqual } from 'react-redux';
-
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { StakeFormSteps } from '@/constants/stakingForms';
@@ -26,7 +24,7 @@ export const StakeConfirmationButtonRow = ({
   submitText,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   return canAccountTrade ? (
     <div tw="inlineRow w-full gap-1">

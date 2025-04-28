@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import {
@@ -254,7 +253,7 @@ export const useAnalytics = () => {
   }, [previousSelectedWallet, selectedWallet]);
 
   // AnalyticsEvent.TradeOrderTypeSelected
-  const { type: selectedOrderType } = useAppSelector(getTradeFormValues, shallowEqual);
+  const { type: selectedOrderType } = useAppSelector(getTradeFormValues);
   const [hasSelectedOrderTypeChanged, setHasSelectedOrderTypeChanged] = useState(false);
 
   useEffect(() => {

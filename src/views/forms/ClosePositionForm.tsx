@@ -5,7 +5,6 @@ import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -111,7 +110,7 @@ export const ClosePositionForm = ({
     onLimitPriceInput,
   } = useClosePositionFormInputs();
 
-  const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const currentPositionData = useAppSelector(getCurrentMarketPositionData);
   const { signedSize: currentPositionSize } = currentPositionData ?? {};
   const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
