@@ -48,6 +48,7 @@ import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
+import { WithdrawToSubaccountDialog } from '@/views/dialogs/WithdrawToSubaccountDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -119,6 +120,7 @@ export const DialogManager = React.memo(() => {
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw2: (args) => <WithdrawDialog2 {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
+    WithdrawToSubaccount: (args) => <WithdrawToSubaccountDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
 });

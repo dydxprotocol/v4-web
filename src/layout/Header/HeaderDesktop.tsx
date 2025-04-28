@@ -29,7 +29,7 @@ import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
-import { AccountMenu } from '@/views/menus/AccountMenu';
+import { AccountMenu } from '@/views/menus/AccountMenu/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';

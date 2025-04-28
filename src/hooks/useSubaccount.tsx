@@ -237,14 +237,18 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   }, [usdcDecimals, compositeClient, dydxAddress, usdcDenom, deposit]);
 
   const withdraw = useCallback(
-    async (amount: number) => {
-      if (!subaccountClient) {
+    async (amount: number, fromSubaccountNumber: number) => {
+      if (!localDydxWallet) {
         return undefined;
       }
+      const subaccountClientForWithdraw = new SubaccountClient(
+        localDydxWallet,
+        fromSubaccountNumber
+      );
 
-      return withdrawFromSubaccount({ subaccountClient, amount });
+      return withdrawFromSubaccount({ subaccountClient: subaccountClientForWithdraw, amount });
     },
-    [subaccountClient, withdrawFromSubaccount]
+    [localDydxWallet, withdrawFromSubaccount]
   );
 
   // ------ Transfer Methods ------ //

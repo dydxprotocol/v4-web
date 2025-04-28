@@ -1,21 +1,14 @@
-import { ElementType, memo } from 'react';
+import { ElementType } from 'react';
 
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
-import { Item } from '@radix-ui/react-dropdown-menu';
-import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
-import {
-  STRING_KEYS,
-  TOOLTIP_STRING_KEYS,
-  type StringGetterFunction,
-} from '@/constants/localization';
+import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
@@ -45,9 +38,9 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
@@ -58,7 +51,8 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
-import { MobileDownloadLinks } from '../MobileDownloadLinks';
+import { SubaccountActions } from './SubaccountActions';
+import { WalletActions } from './WalletActions';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -66,6 +60,8 @@ export const AccountMenu = () => {
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const { sourceAccount } = useAccounts();
+  const isKeplr = sourceAccount.walletInfo?.name === WalletType.Keplr;
 
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
@@ -190,7 +186,7 @@ export const AccountMenu = () => {
                   </$label>
                   <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <AssetActions
+                <SubaccountActions
                   asset={DydxChainAsset.CHAINTOKEN}
                   complianceState={complianceState}
                   dispatch={dispatch}
@@ -198,7 +194,7 @@ export const AccountMenu = () => {
                   stringGetter={stringGetter}
                 />
               </div>
-              {isDev && (
+              {(isDev || isKeplr) && (
                 <div>
                   <div>
                     <$label>
@@ -214,6 +210,11 @@ export const AccountMenu = () => {
                       fractionDigits={SMALL_USD_DECIMALS}
                     />
                   </div>
+                  <WalletActions
+                    complianceState={complianceState}
+                    dispatch={dispatch}
+                    stringGetter={stringGetter}
+                  />
                 </div>
               )}
               <div>
@@ -231,7 +232,7 @@ export const AccountMenu = () => {
                     fractionDigits={USD_DECIMALS}
                   />
                 </div>
-                <AssetActions
+                <SubaccountActions
                   asset={DydxChainAsset.USDC}
                   complianceState={complianceState}
                   dispatch={dispatch}
@@ -439,75 +440,6 @@ const DydxDerivedAddress = ({
     </WithTooltip>
   );
 };
-
-const AssetActions = memo(
-  ({
-    asset,
-    dispatch,
-    complianceState,
-    withOnboarding,
-    hasBalance,
-    stringGetter,
-  }: {
-    asset: DydxChainAsset;
-    dispatch: Dispatch;
-    complianceState: ComplianceStates;
-    withOnboarding?: boolean;
-    hasBalance?: boolean;
-    stringGetter: StringGetterFunction;
-  }) => {
-    const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
-
-    return (
-      <div tw="inlineRow">
-        {[
-          withOnboarding &&
-            complianceState === ComplianceStates.FULL_ACCESS &&
-            !isAccountViewOnly && {
-              dialog: DialogTypes.Deposit2({}),
-              iconName: IconName.Deposit,
-              tooltipStringKey: STRING_KEYS.DEPOSIT,
-            },
-          withOnboarding &&
-            hasBalance &&
-            !isAccountViewOnly && {
-              dialog: DialogTypes.Withdraw2({}),
-              iconName: IconName.Withdraw,
-              tooltipStringKey: STRING_KEYS.WITHDRAW,
-            },
-          hasBalance &&
-            complianceState === ComplianceStates.FULL_ACCESS &&
-            !isAccountViewOnly && {
-              dialog: DialogTypes.Transfer({ selectedAsset: asset }),
-              iconName: IconName.Send,
-              tooltipStringKey: STRING_KEYS.TRANSFER,
-            },
-        ]
-          .filter(isTruthy)
-          .map(({ iconName, tooltipStringKey, dialog }) => (
-            <Item key={tooltipStringKey}>
-              {/* Need to wrap in Item to enable 'dismiss dropdown on click' functionality
-          In general, any CTA in a dropdown should be wrapped in an Item tag
-       */}
-              <WithTooltip
-                key={tooltipStringKey}
-                tooltipString={stringGetter({ key: tooltipStringKey })}
-                tw="[--tooltip-backgroundColor:--color-layer-5]"
-              >
-                <$IconButton
-                  key={dialog.type}
-                  action={ButtonAction.Base}
-                  shape={ButtonShape.Square}
-                  iconName={iconName}
-                  onClick={() => dispatch(openDialog(dialog))}
-                />
-              </WithTooltip>
-            </Item>
-          ))}
-      </div>
-    );
-  }
-);
 
 const $Column = styled.div`
   ${layoutMixins.column}
