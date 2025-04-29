@@ -101,6 +101,7 @@ export const calculateSubaccountSummary = weakMapMemoize(
     return {
       ...core,
       ...calculateSubaccountSummaryDerived(core),
+      subaccountNumber: subaccountData.subaccountNumber,
     };
   }
 );

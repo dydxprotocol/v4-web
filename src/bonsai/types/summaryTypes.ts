@@ -63,7 +63,11 @@ export type SubaccountSummaryDerived = {
   marginUsage: BigNumber | null;
 };
 
-export type SubaccountSummary = SubaccountSummaryCore & SubaccountSummaryDerived;
+export type SubaccountSummary = SubaccountSummaryCore &
+  SubaccountSummaryDerived & {
+    subaccountNumber: number;
+  };
+
 export type GroupedSubaccountSummary = SubaccountSummaryDerived & {
   parentSubaccountEquity: BigNumber;
 };
