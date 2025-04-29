@@ -7,7 +7,7 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -22,7 +22,7 @@ type ElementProps = {
 export const CancelAllOrdersButton = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const hasCancelableOrders = useParameterizedSelector(calculateHasCancelableOrders, marketId);
+  const hasCancelableOrders = useAppSelectorWithArgs(calculateHasCancelableOrders, marketId);
 
   const onCancelAll = useCallback(() => {
     if (hasCancelableOrders) {

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -31,8 +31,8 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
     useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
   );
 
-  const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetInfo,
+  const launchableAsset = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetInfo,
     mapIfPresent(launchableMarketId, getAssetFromMarketId)
   );
 

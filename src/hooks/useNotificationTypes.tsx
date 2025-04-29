@@ -64,7 +64,7 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useLocaleSeparators } from './useLocaleSeparators';
-import { useParameterizedSelector } from './useParameterizedSelector';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -366,7 +366,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { dydxAddress } = useAccounts();
-      const userTransfers = useParameterizedSelector(selectTransfersByAddress, dydxAddress);
+      const userTransfers = useAppSelectorWithArgs(selectTransfersByAddress, dydxAddress);
       const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
       const selectedLocale = useAppSelector(getSelectedLocale);
 

@@ -9,42 +9,38 @@ import { DepositUsdcProps, SubaccountOperations, WithdrawUsdcProps } from '../ty
 import { selectRelevantMarketsData } from './account';
 import { selectRawParentSubaccountData } from './base';
 
-export const createSelectParentSubaccountSummaryDeposit = () =>
-  createAppSelector(
-    [
-      selectRawParentSubaccountData,
-      selectRelevantMarketsData,
-      (_s, input: DepositUsdcProps) => input,
-    ],
-    (parentSubaccount, markets, depositInputs) => {
-      if (parentSubaccount == null || markets == null) {
-        return undefined;
-      }
-
-      const operations = createBatchedOperations(SubaccountOperations.DepositUsdc(depositInputs));
-      const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
-      const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
-      return result;
+export const selectParentSubaccountSummaryDeposit = createAppSelector(
+  [
+    selectRawParentSubaccountData,
+    selectRelevantMarketsData,
+    (_s, input: DepositUsdcProps) => input,
+  ],
+  (parentSubaccount, markets, depositInputs) => {
+    if (parentSubaccount == null || markets == null) {
+      return undefined;
     }
-  );
 
-export const createSelectParentSubaccountSummaryWithdrawal = () =>
-  createAppSelector(
-    [
-      selectRawParentSubaccountData,
-      selectRelevantMarketsData,
-      (_s, input: WithdrawUsdcProps) => input,
-    ],
-    (parentSubaccount, markets, withdrawalInputs) => {
-      if (parentSubaccount == null || markets == null) {
-        return undefined;
-      }
+    const operations = createBatchedOperations(SubaccountOperations.DepositUsdc(depositInputs));
+    const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
+    const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
+    return result;
+  }
+);
 
-      const operations = createBatchedOperations(
-        SubaccountOperations.WithdrawUsdc(withdrawalInputs)
-      );
-      const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
-      const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
-      return result;
+export const selectParentSubaccountSummaryWithdrawal = createAppSelector(
+  [
+    selectRawParentSubaccountData,
+    selectRelevantMarketsData,
+    (_s, input: WithdrawUsdcProps) => input,
+  ],
+  (parentSubaccount, markets, withdrawalInputs) => {
+    if (parentSubaccount == null || markets == null) {
+      return undefined;
     }
-  );
+
+    const operations = createBatchedOperations(SubaccountOperations.WithdrawUsdc(withdrawalInputs));
+    const modifiedParentSubaccount = applyOperationsToSubaccount(parentSubaccount, operations);
+    const result = calculateParentSubaccountSummary(modifiedParentSubaccount, markets);
+    return result;
+  }
+);

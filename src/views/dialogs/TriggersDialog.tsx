@@ -3,7 +3,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { DialogProps, TriggersDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -22,7 +22,7 @@ export const TriggersDialog = ({
 }: DialogProps<TriggersDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
+  const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
 
   return (
     <Dialog

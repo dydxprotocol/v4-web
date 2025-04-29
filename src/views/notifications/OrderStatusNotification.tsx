@@ -12,7 +12,7 @@ import {
 } from '@/constants/trade';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -47,19 +47,19 @@ export const OrderStatusNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
-  const fills = useParameterizedSelector(getFillsForOrderId, order?.id ?? localOrder.orderId);
-  const marketData = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
+  const order = useAppSelectorWithArgs(getOrderByClientId, localOrder.clientId);
+  const fills = useAppSelectorWithArgs(getFillsForOrderId, order?.id ?? localOrder.orderId);
+  const marketData = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
     localOrder.cachedData.marketId
   );
-  const averageFillPrice = useParameterizedSelector(
+  const averageFillPrice = useAppSelectorWithArgs(
     getAverageFillPriceForOrder,
     order?.id ?? localOrder.orderId
   );
 
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
+  const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
   const { equityTiersLearnMore } = useURLConfigs();
 
   // force allow the ?. just in case it's not in the map

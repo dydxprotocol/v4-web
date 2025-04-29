@@ -13,7 +13,7 @@ import { StatsigFlags } from '@/constants/statsig';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useAllStatsigGateValues } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -291,8 +291,8 @@ export const MarketsDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
-    const launchableAsset = useParameterizedSelector(
-      BonsaiHelpers.assets.createSelectAssetInfo,
+    const launchableAsset = useAppSelectorWithArgs(
+      BonsaiHelpers.assets.selectAssetInfo,
       mapIfPresent(launchableMarketId, getAssetFromMarketId)
     );
 
@@ -318,7 +318,7 @@ export const MarketsDropdown = memo(
       };
     }, []);
 
-    const isFavoritedMarket = useParameterizedSelector(getIsMarketFavorited, currentMarketId ?? '');
+    const isFavoritedMarket = useAppSelectorWithArgs(getIsMarketFavorited, currentMarketId ?? '');
 
     return (
       <$Popover

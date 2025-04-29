@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { DialogProps, TransferStatusDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -20,7 +20,7 @@ export const TransferStatusDialog = ({
 }: DialogProps<TransferStatusDialogProps>) => {
   const stringGetter = useStringGetter();
 
-  const transfer = useParameterizedSelector(selectTransfer, transferId);
+  const transfer = useAppSelectorWithArgs(selectTransfer, transferId);
 
   const title = transfer
     ? isDeposit(transfer)

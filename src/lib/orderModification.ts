@@ -43,7 +43,7 @@ const calculateGoodTilTimeInSeconds = (goodTilBlockTimeSeconds: number) => {
 };
 
 const getMarketInfo = (marketId: string): PlaceOrderMarketInfo | null => {
-  const market = BonsaiHelpers.markets.createSelectMarketSummaryById()(store.getState(), marketId);
+  const market = BonsaiHelpers.markets.selectMarketSummaryById(store.getState(), marketId);
   if (market == null) {
     return null;
   }

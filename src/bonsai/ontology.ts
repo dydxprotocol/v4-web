@@ -55,8 +55,8 @@ import {
   selectUnopenedIsolatedPositions,
 } from './selectors/account';
 import {
-  createSelectParentSubaccountSummaryDeposit,
-  createSelectParentSubaccountSummaryWithdrawal,
+  selectParentSubaccountSummaryDeposit,
+  selectParentSubaccountSummaryWithdrawal,
 } from './selectors/accountActions';
 import {
   selectApiState,
@@ -64,10 +64,10 @@ import {
   selectLatestValidatorHeight,
 } from './selectors/apiStatus';
 import {
-  createSelectAssetInfo,
-  createSelectAssetLogo,
   selectAllAssetsInfo,
   selectAllAssetsInfoLoading,
+  selectAssetInfo,
+  selectAssetLogo,
 } from './selectors/assets';
 import { selectAccountBalances, selectAccountNobleUsdcBalance } from './selectors/balances';
 import {
@@ -80,13 +80,12 @@ import { selectCompliance, selectComplianceLoading } from './selectors/complianc
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
-  createSelectCurrentMarketOrderbook,
   selectCurrentMarketDepthChart,
   selectCurrentMarketMidPrice,
+  selectCurrentMarketOrderbook,
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
-  createSelectMarketSummaryById,
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketAssetId,
@@ -94,6 +93,7 @@ import {
   selectCurrentMarketAssetName,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
+  selectMarketSummaryById,
   StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
@@ -124,11 +124,7 @@ import {
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
-type BasicSelector<Result> = (state: RootState) => Result;
-type ParameterizedSelector<Result, Args extends any[]> = () => (
-  state: RootState,
-  ...args: Args
-) => Result;
+type BasicSelector<Result, Args extends any[] = []> = (state: RootState, ...args: Args) => Result;
 
 // all data should be accessed via selectors in this file
 // no files outside bonsai should access anything within bonsai except this file
@@ -324,7 +320,7 @@ interface BonsaiHelpersShape {
       fills: BasicSelector<SubaccountFill[]>;
     };
     orderbook: {
-      createSelectGroupedData: ParameterizedSelector<
+      selectGroupedData: BasicSelector<
         OrderbookProcessedData | undefined,
         [GroupingMultiplier | undefined]
       >;
@@ -340,24 +336,24 @@ interface BonsaiHelpersShape {
     };
   };
   assets: {
-    createSelectAssetInfo: ParameterizedSelector<AssetData | undefined, [string | undefined]>;
-    createSelectAssetLogo: ParameterizedSelector<string | undefined, [string | undefined]>;
+    selectAssetInfo: BasicSelector<AssetData | undefined, [string | undefined]>;
+    selectAssetLogo: BasicSelector<string | undefined, [string | undefined]>;
   };
   markets: {
-    createSelectMarketSummaryById: ParameterizedSelector<
+    selectMarketSummaryById: BasicSelector<
       PerpetualMarketSummary | undefined,
       [string | undefined]
     >;
   };
   forms: {
     deposit: {
-      createSelectParentSubaccountSummary: ParameterizedSelector<
+      selectParentSubaccountSummary: BasicSelector<
         GroupedSubaccountSummary | undefined,
         [DepositUsdcProps]
       >;
     };
     withdraw: {
-      createSelectParentSubaccountSummary: ParameterizedSelector<
+      selectParentSubaccountSummary: BasicSelector<
         GroupedSubaccountSummary | undefined,
         [WithdrawUsdcProps]
       >;
@@ -374,7 +370,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     assetLogo: selectCurrentMarketAssetLogoUrl,
     assetName: selectCurrentMarketAssetName,
     orderbook: {
-      createSelectGroupedData: createSelectCurrentMarketOrderbook,
+      selectGroupedData: selectCurrentMarketOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
     },
     midPrice: {
@@ -393,18 +389,18 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   },
   assets: {
     // only use this for launchable assets, otherwise use market info
-    createSelectAssetInfo,
-    createSelectAssetLogo,
+    selectAssetInfo,
+    selectAssetLogo,
   },
   markets: {
-    createSelectMarketSummaryById,
+    selectMarketSummaryById,
   },
   forms: {
     deposit: {
-      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryDeposit,
+      selectParentSubaccountSummary: selectParentSubaccountSummaryDeposit,
     },
     withdraw: {
-      createSelectParentSubaccountSummary: createSelectParentSubaccountSummaryWithdrawal,
+      selectParentSubaccountSummary: selectParentSubaccountSummaryWithdrawal,
     },
   },
   unopenedIsolatedPositions: selectUnopenedIsolatedPositions,

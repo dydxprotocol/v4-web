@@ -1,7 +1,7 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -23,22 +23,21 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const imageUrl = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetLogo,
+  const launchableImageUrl = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetLogo,
     mapIfPresent(launchableMarketId, getAssetFromMarketId)
   );
-  const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
+  const launchableId = mapIfPresent(launchableMarketId, getDisplayableTickerFromMarket);
 
-  const displayableId = launchableMarketId
-    ? getDisplayableTickerFromMarket(launchableMarketId)
-    : launchableMarketId;
+  const tradeableImageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+  const tradeableMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   return (
     <$Container className={className}>
       <MarketsDropdown
         launchableMarketId={launchableMarketId}
-        currentMarketId={displayableId ?? currentMarketId}
-        logoUrl={imageUrl}
+        currentMarketId={launchableId ?? tradeableMarketId}
+        logoUrl={launchableImageUrl ?? tradeableImageUrl}
       />
 
       <VerticalSeparator fullHeight />

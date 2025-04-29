@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -24,8 +24,8 @@ export const MarketLinks = ({ launchableMarketId }: { launchableMarketId?: strin
     technicalDoc: whitepaperLink,
   } = orEmptyObj(marketUrls);
 
-  const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetInfo,
+  const launchableAsset = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetInfo,
     mapIfPresent(launchableMarketId, getAssetFromMarketId)
   );
   const { urls } = orEmptyObj(launchableAsset);

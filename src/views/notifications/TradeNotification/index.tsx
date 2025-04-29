@@ -5,7 +5,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -36,12 +36,12 @@ export const TradeNotification = ({
   fills,
 }: TradeNotificationProps) => {
   const stringGetter = useStringGetter();
-  const marketData = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
+  const marketData = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
     order.marketId
   );
   const { assetId } = orEmptyObj(marketData);
-  const assetImgUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
+  const assetImgUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
 
   const titleKey = getIndexerOrderTypeStringKey(order.type);
   const orderStatus = order.status;

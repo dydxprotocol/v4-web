@@ -15,7 +15,7 @@ import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
@@ -52,17 +52,17 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const { stopLossOrders, takeProfitOrders } = orEmptyObj(
-    useParameterizedSelector(getSubaccountConditionalOrders, isSlTpLimitOrdersEnabled)[
+    useAppSelectorWithArgs(getSubaccountConditionalOrders, isSlTpLimitOrdersEnabled)[
       positionUniqueId
     ]
   );
 
   const { entryPrice, signedSize, market } = orEmptyObj(
-    useParameterizedSelector(getSubaccountPositionByUniqueId, positionUniqueId)
+    useAppSelectorWithArgs(getSubaccountPositionByUniqueId, positionUniqueId)
   );
 
   const { oraclePrice, assetId, tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
-    useParameterizedSelector(BonsaiHelpers.markets.createSelectMarketSummaryById, market)
+    useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market)
   );
 
   const {
