@@ -21,7 +21,6 @@ import { IndexerPerpetualMarketType, IndexerPositionSide } from '@/types/indexer
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
-import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -86,8 +85,7 @@ export function calculateTradeSummary(
   const fieldStates = getTradeFormFieldStates(
     state,
     existingPositionOrOpenOrderMarginMode,
-    baseAccount?.position?.leverage?.toNumber(),
-    baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE,
+    baseAccount?.position,
     accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
   );
 
@@ -444,8 +442,10 @@ function calculateTradeFormOptions(
     showReduceOnly: isFieldStateEnabled(fields.reduceOnly),
     showPostOnly: isFieldStateEnabled(fields.postOnly),
 
-    showPostOnlyTooltip: fields.postOnly.state === 'disabled',
-    showReduceOnlyTooltip: fields.reduceOnly.state === 'disabled',
+    showPostOnlyTooltip:
+      fields.type.effectiveValue !== TradeFormType.MARKET && fields.postOnly.state === 'disabled',
+    showReduceOnlyTooltip:
+      fields.type.effectiveValue !== TradeFormType.MARKET && fields.reduceOnly.state === 'disabled',
   };
   return options;
 }
