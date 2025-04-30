@@ -1,6 +1,6 @@
 import { timeUnits } from '@/constants/time';
 
-import { log, logInfo } from '@/lib/telemetry';
+import { getDurationSinceLastLogMs, log, logInfo } from '@/lib/telemetry';
 
 export function logBonsaiError(source: string, message: string, ...args: any[]) {
   log(`bonsai: ${source}: ${message}`, args[0]?.error, { context: args });
@@ -10,16 +10,26 @@ export function logBonsaiInfo(source: string, message: string, ...args: any[]) {
   logInfo(`bonsai: ${source}: ${message}`, { context: args });
 }
 
-export const LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 10;
+export const LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 5;
 // if requests take longer than 60 seconds it's almost certainly because the browser
 // limited our resources so we couldn't handle the request completing
 export const OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 60;
+
+// if we are making requests then we should make sure we are logging at least once every few minutes
+// so that statistical analysis of the logs using 5m buckets or larger are valid
+// otherwise we can imagine a situation where we are only logging errors and we have no idea
+// what the actual frequency of the errors is since we don't know how many sessions are actively making
+// requests that could fail
+export const EFFECTIVE_HEARTBEAT_LOG_LIFETIME_MS = timeUnits.minute * 5;
 
 export function wrapAndLogBonsaiError<T, Args extends any[]>(
   fn: (...args: Args) => Promise<T> | T,
   logId: string
 ): (...args: Args) => Promise<T> {
   return async (...args) => {
+    if (getDurationSinceLastLogMs() > EFFECTIVE_HEARTBEAT_LOG_LIFETIME_MS) {
+      logBonsaiInfo('wrapAndLogBonsaiError', 'Session activity heartbeat');
+    }
     const start = Date.now();
     try {
       const result = await Promise.resolve(fn(...args));
