@@ -4,7 +4,14 @@ import { isDev } from '@/constants/networks';
 import { track } from './analytics/analytics';
 import { dd } from './analytics/datadog';
 
+let lastLogTime = Date.now();
+
+export function getDurationSinceLastLogMs() {
+  return Date.now() - lastLogTime;
+}
+
 export const log = (location: string, error?: Error, metadata?: object) => {
+  lastLogTime = Date.now();
   if (isDev) {
     // eslint-disable-next-line no-console
     console.warn('telemetry/log:', { location, error, metadata });
@@ -32,6 +39,8 @@ export const log = (location: string, error?: Error, metadata?: object) => {
 };
 
 export const logInfo = (location: string, metadata?: object) => {
+  lastLogTime = Date.now();
+
   if (isDev) {
     // eslint-disable-next-line no-console
     console.log('telemetry/logInfo:', { location, metadata });
