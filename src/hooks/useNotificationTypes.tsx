@@ -51,7 +51,7 @@ import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
 import { assertNever } from '@/lib/assertNever';
-import { calc } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
@@ -140,11 +140,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
             }
           });
 
-          trigger(
-            `order:${order.id}`,
-            {
+          trigger({
+            id: `order:${order.id}`,
+            displayData: {
               icon: marketInfo != null ? <$Icon src={marketInfo.logo} /> : undefined,
               title: stringGetter({ key: titleKey }),
+              updatedTime: latestUpdateMs,
               body:
                 textKey != null
                   ? stringGetter({
@@ -172,11 +173,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
-            !(relevantPlaceOrder != null || relevantLocalCancels.length > 0),
-            false,
-            true
-          );
+            updateKey: [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
+            isNew: !(relevantPlaceOrder != null || relevantLocalCancels.length > 0),
+            keepCleared: true,
+          });
         });
       }, [
         trigger,
@@ -201,10 +201,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
         fills
           .filter((f) => f.orderId == null)
           .forEach((fill) => {
-            if (
-              fill.createdAt == null ||
-              new Date(fill.createdAt).getTime() <= appInitializedTime
-            ) {
+            const createdAt = mapIfPresent(fill.createdAt, (c) => new Date(c).getTime());
+            if (createdAt == null || createdAt <= appInitializedTime) {
               return;
             }
             const type = fill.type;
@@ -241,11 +239,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
             // opposite because these notifications are all about positions, not the fill that triggered the notif.
             const side =
               fill.side === IndexerOrderSide.BUY ? IndexerOrderSide.SELL : IndexerOrderSide.BUY;
-            trigger(
-              `fill:${fill.id ?? ''}`,
-              {
+            trigger({
+              id: `fill:${fill.id ?? ''}`,
+              displayData: {
                 icon: <$Icon src={marketInfo?.logo} alt="" />,
                 title: stringGetter({ key: titleKey }),
+                updatedTime: createdAt,
                 body: stringGetter({
                   key: bodyKey,
                   params: {
@@ -260,8 +259,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 toastSensitivity: 'foreground',
                 groupKey: 'fill',
               },
-              [fill, marketInfo?.displayableAsset, marketInfo?.logo]
-            );
+              updateKey: [fill.id, marketInfo?.displayableAsset, marketInfo?.logo],
+            });
           });
       }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
     },
@@ -274,14 +273,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const tokenName = useTokenConfigs().chainTokenLabel;
       useEffect(() => {
         blockTradingRewards.forEach((reward) => {
-          if (new Date(reward.createdAt).getTime() <= appInitializedTime) {
+          const createdAt = new Date(reward.createdAt).getTime();
+          if (createdAt <= appInitializedTime) {
             return;
           }
           const amount = MustBigNumber(reward.tradingReward).toString(10);
-          trigger(
-            `blockReward:${reward.createdAtHeight}`,
-            {
+          trigger({
+            id: `blockReward:${reward.createdAtHeight}`,
+            displayData: {
               title: stringGetter({ key: STRING_KEYS.BLOCK_REWARD_TITLE }),
+              updatedTime: createdAt,
               body: stringGetter({
                 key: STRING_KEYS.BLOCK_REWARD_BODY,
                 params: {
@@ -301,9 +302,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [reward.createdAtHeight, reward.tradingReward],
-            true
-          );
+            updateKey: [reward.createdAtHeight],
+          });
         });
       }, [trigger, blockTradingRewards, appInitializedTime, stringGetter, tokenName]);
     },
@@ -361,19 +361,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 });
           }
 
-          trigger(
+          trigger({
             id,
-            {
+            displayData: {
               title,
               icon: <Icon iconName={isSuccess ? IconName.Transfer : IconName.Clock} />,
               body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.SkipTransfer,
             },
-            [isSuccess]
-          );
+            updateKey: [isSuccess],
+          });
         }
-      }, [decimalSeparator, groupSeparator, selectedLocale, stringGetter, userTransfers]);
+      }, [decimalSeparator, groupSeparator, selectedLocale, stringGetter, trigger, userTransfers]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
@@ -411,12 +411,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const { statusErrorMessage } = useApiState();
       const { statusPage } = useURLConfigs();
+      const hasErrorMesage = !!statusErrorMessage;
 
       useEffect(() => {
-        if (statusErrorMessage) {
-          trigger(
-            NotificationType.ApiError,
-            {
+        if (hasErrorMesage) {
+          trigger({
+            id: NotificationType.ApiError,
+            displayData: {
               icon: <$WarningIcon iconName={IconName.Warning} />,
               title: statusErrorMessage.title,
               body: statusErrorMessage.body,
@@ -428,10 +429,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
               ),
             },
-            [],
-            true,
-            true // unhide on new error (i.e. normal -> not normal api status)
-          );
+            updateKey: [],
+            shouldUnhide: true, // unhide on new error (i.e. normal -> not normal api status)
+          });
         } else {
           // hide/expire existing notification if no error
           hideNotification({
@@ -439,7 +439,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
             id: NotificationType.ApiError,
           });
         }
-      }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title, hideNotification]);
+      }, [
+        stringGetter,
+        statusErrorMessage?.body,
+        statusErrorMessage?.title,
+        hasErrorMesage,
+        hideNotification,
+        trigger,
+        statusPage,
+      ]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -468,9 +476,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
             withClose: false,
           };
 
-          trigger(`${NotificationType.ComplianceAlert}-${complianceStatus}`, displayData, []);
+          trigger({
+            id: `${NotificationType.ComplianceAlert}-${complianceStatus}`,
+            displayData,
+            updateKey: [],
+          });
         }
-      }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
+      }, [stringGetter, complianceMessage, complianceState, complianceStatus, trigger]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
@@ -509,9 +521,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
           ) {
             return;
           }
-          trigger(
-            key,
-            {
+          trigger({
+            id: key,
+            displayData: {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
               toastSensitivity: 'background',
@@ -526,11 +538,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localPlace.submissionStatus, localPlace.errorParams],
-            true
-          );
+            updateKey: [localPlace.submissionStatus, localPlace.errorParams],
+          });
         });
-      }, [localPlaceOrders]);
+      }, [localCancelOrders, localPlaceOrders, stringGetter, trigger]);
 
       useEffect(() => {
         Object.values(localCancelOrders).forEach((localCancel) => {
@@ -541,9 +552,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const existingOrder = allOrders.find((order) => order.id === localCancel.orderId);
 
           const key = localCancel.operationUuid;
-          trigger(
-            key,
-            {
+          trigger({
+            id: key,
+            displayData: {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
               toastSensitivity: 'background',
@@ -558,17 +569,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localCancel.submissionStatus, localCancel.errorParams],
-            true
-          );
+            updateKey: [localCancel.submissionStatus, localCancel.errorParams],
+          });
         });
-      }, [localCancelOrders]);
+      }, [allOrders, localCancelOrders, stringGetter, trigger]);
 
       useEffect(() => {
         Object.values(localCancelAlls).forEach((cancelAll) => {
-          trigger(
-            cancelAll.operationUuid,
-            {
+          trigger({
+            id: cancelAll.operationUuid,
+            displayData: {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.CANCEL_ALL_ORDERS }),
               toastSensitivity: 'background',
@@ -582,19 +592,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [cancelAll, pick(localCancelOrders, cancelAll.cancelOrderOperationUuids)],
-            true
-          );
+            updateKey: [cancelAll, pick(localCancelOrders, cancelAll.cancelOrderOperationUuids)],
+          });
         });
-      }, [localCancelAlls, localCancelOrders, stringGetter]);
+      }, [localCancelAlls, localCancelOrders, stringGetter, trigger]);
 
       useEffect(() => {
         Object.values(localCloseAllPositions).forEach((localCloseAll) => {
           const localCloseAllKey = localCloseAll.operationUuid;
           const clientIds = localCloseAll.clientIds;
-          trigger(
-            localCloseAllKey,
-            {
+          trigger({
+            id: localCloseAllKey,
+            displayData: {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.CLOSE_ALL_POSITIONS }),
               toastSensitivity: 'background',
@@ -608,11 +617,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localCloseAll, pick(localPlaceOrders, clientIds)],
-            true
-          );
+            updateKey: [localCloseAll, pick(localPlaceOrders, clientIds)],
+          });
         });
-      }, [localCloseAllPositions, localPlaceOrders, stringGetter]);
+      }, [localCloseAllPositions, localPlaceOrders, stringGetter, trigger]);
     },
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
@@ -639,24 +647,28 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         if (dydxAddress && feedbackRequestWalletAddresses?.includes(dydxAddress) && getInTouch) {
-          trigger(FeedbackRequestNotificationIds.Top100UserSupport, {
-            icon: <Icon iconName={IconName.SpeechBubble} />,
-            title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
-            body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
-            toastSensitivity: 'foreground',
-            groupKey: NotificationType.FeedbackRequest,
-            toastDuration: Infinity,
-            withClose: false,
-            // our generate script only knows to generate string keys for title and body
-            actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
-            renderActionSlot: () => (
-              <Link href={getInTouch} isAccent>
-                {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
-              </Link>
-            ),
+          trigger({
+            id: FeedbackRequestNotificationIds.Top100UserSupport,
+            displayData: {
+              icon: <Icon iconName={IconName.SpeechBubble} />,
+              title: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_TITLE }),
+              body: stringGetter({ key: STRING_KEYS.TOP_100_WALLET_ADDRESSES_BODY }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.FeedbackRequest,
+              toastDuration: Infinity,
+              withClose: false,
+              // our generate script only knows to generate string keys for title and body
+              actionAltText: stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' }),
+              renderActionSlot: () => (
+                <Link href={getInTouch} isAccent>
+                  {stringGetter({ key: 'NOTIFICATIONS.TOP_100_WALLET_ADDRESSES.ACTION' })}
+                </Link>
+              ),
+            },
+            updateKey: ['feedback'],
           });
         }
-      }, [dydxAddress]);
+      }, [dydxAddress, feedbackRequestWalletAddresses, getInTouch, stringGetter, trigger]);
     },
 
     useNotificationAction: () => {
@@ -672,7 +684,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const customNotifications = useAppSelector(getCustomNotifications);
       useEffect(() => {
         customNotifications.forEach((notification) => {
-          trigger(notification.id, notification.displayData);
+          trigger({ id: notification.id, displayData: notification.displayData });
         });
       }, [customNotifications, trigger]);
     },
