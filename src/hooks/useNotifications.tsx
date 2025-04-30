@@ -62,6 +62,8 @@ const useNotificationsContext = () => {
     defaultValue: Date.now(),
   });
 
+  const sessionStartTime = useMemo(() => Date.now(), []);
+
   const [notificationPreferences, setNotificationPreferences] =
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
@@ -235,6 +237,8 @@ const useNotificationsContext = () => {
       lastUpdated: notificationsLastUpdated,
 
       appInitializedTime: appInitializationTime,
+
+      sessionStartTime,
     });
   }
 

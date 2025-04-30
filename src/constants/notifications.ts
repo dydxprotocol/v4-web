@@ -56,6 +56,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
   NotificationType.Custom,
+  NotificationType.BlockTradingReward,
 ];
 
 export type NotificationId = string | number;
@@ -115,6 +116,9 @@ export type NotificationTypeConfig<
 
     // timestamp of when app was first ever started
     appInitializedTime: number;
+
+    // timestamp of when this browser session started
+    sessionStartTime: number;
   }) => void;
 
   /** Callback for notification action (Toast action button click, NotificationsMenu item click, or native push notification interaction) */
