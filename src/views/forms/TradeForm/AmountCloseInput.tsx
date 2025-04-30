@@ -90,7 +90,7 @@ const $WithLabel = styled(WithLabel)`
 
 const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
-  --input-backgroundColor: var(--color-layer-5);
+  --input-backgroundColor: var(--color-layer-4);
   --input-borderColor: none;
   --input-height: 2.25rem;
   --input-width: 5rem;

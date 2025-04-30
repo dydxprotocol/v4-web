@@ -1,8 +1,12 @@
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+
 import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
+import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 
 import {
   ExecutionType,
@@ -28,11 +32,14 @@ const DEFAULT_ISOLATED_TARGET_LEVERAGE = 2.0;
 export function getTradeFormFieldStates(
   form: TradeForm,
   existingPositionOrOpenOrderMarginMode: MarginMode | undefined,
-  existingPositionLeverage: number | undefined,
-  maxMarketLeverage: number,
+  existingPosition: SubaccountPosition | undefined,
   marketIsIsolatedOnly: boolean | undefined
 ): TradeFormFieldStates {
   const { type } = form;
+
+  const existingPositionLeverage = existingPosition?.leverage?.toNumber();
+  const maxMarketLeverage = existingPosition?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE;
+  const existingPositionSide = existingPosition?.side;
 
   const defaultTargetLeverage = calc(() => {
     if (
@@ -105,6 +112,23 @@ export function getTradeFormFieldStates(
     }
   }
 
+  function disableReduceOnlyIfIncreasingMarketOrder(states: TradeFormFieldStates) {
+    if (
+      // market order
+      states.type.effectiveValue === TradeFormType.MARKET &&
+      // reduce only is undefined or false
+      !states.reduceOnly.effectiveValue &&
+      // no existing position or same side
+      (existingPositionSide == null ||
+        (existingPositionSide === IndexerPositionSide.LONG &&
+          states.side.effectiveValue === OrderSide.BUY) ||
+        (existingPositionSide === IndexerPositionSide.SHORT &&
+          states.side.effectiveValue === OrderSide.SELL))
+    ) {
+      forceValueAndDisable(states.reduceOnly, false);
+    }
+  }
+
   return calc(() => {
     const result = { ...baseResult };
     makeVisible(result, ['type']);
@@ -113,6 +137,7 @@ export function getTradeFormFieldStates(
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
         setMarginMode(result);
         targetLeverageVisibleIfIsolated(result);
+        disableReduceOnlyIfIncreasingMarketOrder(result);
 
         return result;
       case TradeFormType.LIMIT:
