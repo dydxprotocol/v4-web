@@ -5,6 +5,7 @@ import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -265,7 +266,7 @@ export const ClosePositionForm = ({
             )
         )
           ?.times(100)
-          .toFixed(0)}
+          .toFixed(0, BigNumber.ROUND_FLOOR)}
         setAmountCloseInput={(value: string | undefined) => {
           dispatch(
             closePositionFormActions.setSizeAvailablePercent(
