@@ -303,7 +303,7 @@ function initializeClientWrapper(
       dispatch(
         setNetworkStateRaw({
           networkId: network,
-          stateToMerge: { nobleClientReady: true, errorInitializing: true },
+          stateToMerge: { nobleClientReady: false, errorInitializing: true },
         })
       );
     },
