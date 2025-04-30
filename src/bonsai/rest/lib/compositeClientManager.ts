@@ -280,7 +280,7 @@ function initializeClientWrapper(
         })
       ),
     onError: (e) => {
-      logBonsaiError('CompositeClientManager', 'error iializing indexer client', { error: e });
+      logBonsaiError('CompositeClientManager', 'error initializing indexer client', { error: e });
       dispatch(
         setNetworkStateRaw({
           networkId: network,
