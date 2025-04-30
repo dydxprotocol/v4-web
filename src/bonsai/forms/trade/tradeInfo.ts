@@ -23,6 +23,7 @@ import {
   clampBn,
   MustBigNumber,
   MustNumber,
+  toStepSize,
 } from '@/lib/numbers';
 
 import {
@@ -282,6 +283,7 @@ export function calculateTradeInfo(
           const inputSummary = calculateLimitOrderInputSummary(
             trade.size,
             trade.limitPrice,
+            AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
             baseAccount
           );
 
@@ -473,13 +475,6 @@ function simulateMarketOrder(
   reduceOnly: boolean,
   existingPosition: SubaccountPosition | undefined
 ): TradeInputMarketOrder | undefined {
-  const toStepSize = (val: BigNumber) =>
-    val
-      .div(marketStepSize)
-      .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
-      .times(marketStepSize)
-      .toNumber();
-
   const operationMultipler = side === OrderSide.BUY ? 1 : -1;
 
   let totalSize = 0;
@@ -611,7 +606,8 @@ function simulateMarketOrder(
 
     // make sure size we take is between 0 and rowSize, then round to clean multiple of stepSize
     sizeToTake = toStepSize(
-      clampBn(MustBigNumber(sizeToTake), BIG_NUMBERS.ZERO, MustBigNumber(rowSize))
+      clampBn(MustBigNumber(sizeToTake), BIG_NUMBERS.ZERO, MustBigNumber(rowSize)),
+      marketStepSize
     );
 
     if (sizeToTake <= 0) {
@@ -641,7 +637,7 @@ function simulateMarketOrder(
     // we may have accumulated rounding errors, so round to clean multiple of step size
     // this is still wrong since the clean multiple of step size might not be perfectly representable as double
     // correct fix here is to do all calculations in bignumber and return a string size
-    size: toStepSize(MustBigNumber(totalSize)),
+    size: toStepSize(totalSize, marketStepSize),
     usdcSize: totalCostWithoutFees,
 
     totalFees: totalCost - totalCostWithoutFees,
@@ -856,11 +852,12 @@ function calculateEffectiveSizeTarget(
 function calculateLimitOrderInputSummary(
   size: OrderSizeInput | undefined,
   limitPrice: string | undefined,
+  marketStepSize: number | undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   baseAccount: TradeAccountDetails | undefined
 ): TradeInputSummary {
   const price = MustNumber(limitPrice);
-  const effectiveSize =
+  const effectiveSize = toStepSize(
     size != null
       ? OrderSizeInputs.match(size, {
           // not supported
@@ -870,7 +867,9 @@ function calculateLimitOrderInputSummary(
           SIZE: ({ value }) => AttemptNumber(value) ?? 0.0,
           USDC_SIZE: ({ value }) => divideIfNonZeroElse(MustNumber(value), price, 0),
         })
-      : 0.0;
+      : 0.0,
+    marketStepSize ?? 1
+  );
 
   return {
     averageFillPrice: price,

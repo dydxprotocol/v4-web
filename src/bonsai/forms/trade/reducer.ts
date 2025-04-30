@@ -70,7 +70,12 @@ export const tradeFormReducer = createVanillaReducer({
     setSide: (state, side: OrderSide) => ({
       ...state,
       side,
-      size: undefined,
+      size:
+        state.size != null &&
+        // if it's a normal text input, it's safe to keep
+        (OrderSizeInputs.is.SIZE(state.size) || OrderSizeInputs.is.USDC_SIZE(state.size))
+          ? state.size
+          : undefined,
     }),
 
     setMarginMode: (state, marginMode: MarginMode) => ({

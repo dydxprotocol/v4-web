@@ -112,6 +112,7 @@ export const TradeForm = ({
   const isInputFilled =
     [
       rawInput.triggerPrice,
+      rawInput.limitPrice,
       rawInput.targetLeverage,
       rawInput.reduceOnly,
       rawInput.goodTil,
