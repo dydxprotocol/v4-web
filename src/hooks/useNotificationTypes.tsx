@@ -2,14 +2,12 @@ import { useEffect } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
-import { SelectedHomeTab, useAccountModal } from '@funkit/connect';
 import { groupBy, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
-import { ErrorStatuses } from '@/constants/funkit';
 import { STRING_KEYS } from '@/constants/localization';
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -32,7 +30,6 @@ import { formatNumberOutput, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
-import { FunkitDepositNotification } from '@/views/notifications/FunkitDepositNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
@@ -43,7 +40,6 @@ import {
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getFunkitDeposits } from '@/state/funkitDepositsSelector';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -310,55 +306,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         });
       }, [trigger, blockTradingRewards, appInitializedTime, stringGetter, tokenName]);
-    },
-  },
-  {
-    type: NotificationType.FunkitDeposit,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const funkitDeposits = useAppSelector(getFunkitDeposits, shallowEqual);
-      const { openAccountModal } = useAccountModal();
-
-      useEffect(() => {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const deposit of Object.values(funkitDeposits)) {
-          const { checkoutId, status } = deposit;
-          trigger(
-            checkoutId,
-            {
-              icon: <Icon iconName={IconName.FunkitInstant} tw="text-color-accent" />,
-              title:
-                status === 'COMPLETED' || !ErrorStatuses.includes(status ?? '')
-                  ? stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT })
-                  : stringGetter({ key: STRING_KEYS.INSTANT_DEPOSIT_IN_PROGRESS }),
-              body:
-                status === 'COMPLETED'
-                  ? stringGetter({ key: STRING_KEYS.DEPOSIT_COMPLETED })
-                  : ErrorStatuses.includes(status ?? '')
-                    ? stringGetter({ key: STRING_KEYS.DEPOSIT_FAILD })
-                    : stringGetter({ key: STRING_KEYS.DEPOSIT_SHORTLY }),
-              toastSensitivity: 'foreground',
-              renderCustomBody:
-                status !== 'COMPLETED' && !ErrorStatuses.includes(status ?? '')
-                  ? ({ isToast, notification }) => (
-                      <FunkitDepositNotification
-                        isToast={isToast}
-                        notification={notification}
-                        deposit={deposit}
-                      />
-                    )
-                  : undefined,
-              groupKey: NotificationType.FunkitDeposit,
-              renderActionSlot: () => (
-                <Link onClick={() => openAccountModal?.(SelectedHomeTab.CHECKOUTS)} isAccent>
-                  {stringGetter({ key: STRING_KEYS.VIEW_INSTANT_DEPOSIT_HISTORY })} →
-                </Link>
-              ),
-            },
-            []
-          );
-        }
-      }, [funkitDeposits, stringGetter, trigger, openAccountModal]);
     },
   },
   {
