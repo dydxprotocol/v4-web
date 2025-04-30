@@ -55,7 +55,7 @@ import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
 import { assertNever } from '@/lib/assertNever';
-import { calc } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
@@ -149,6 +149,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: marketInfo != null ? <$Icon src={marketInfo.logo} /> : undefined,
               title: stringGetter({ key: titleKey }),
+              updatedTime: latestUpdateMs,
               body:
                 textKey != null
                   ? stringGetter({
@@ -204,10 +205,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
         fills
           .filter((f) => f.orderId == null)
           .forEach((fill) => {
-            if (
-              fill.createdAt == null ||
-              new Date(fill.createdAt).getTime() <= appInitializedTime
-            ) {
+            const createdAt = mapIfPresent(fill.createdAt, (c) => new Date(c).getTime());
+            if (createdAt == null || createdAt <= appInitializedTime) {
               return;
             }
             const type = fill.type;
@@ -249,6 +248,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               displayData: {
                 icon: <$Icon src={marketInfo?.logo} alt="" />,
                 title: stringGetter({ key: titleKey }),
+                updatedTime: createdAt,
                 body: stringGetter({
                   key: bodyKey,
                   params: {
@@ -277,7 +277,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const tokenName = useTokenConfigs().chainTokenLabel;
       useEffect(() => {
         blockTradingRewards.forEach((reward) => {
-          if (new Date(reward.createdAt).getTime() <= appInitializedTime) {
+          const createdAt = new Date(reward.createdAt).getTime();
+          if (createdAt <= appInitializedTime) {
             return;
           }
           const amount = MustBigNumber(reward.tradingReward).toString(10);
@@ -285,6 +286,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             id: `blockReward:${reward.createdAtHeight}`,
             displayData: {
               title: stringGetter({ key: STRING_KEYS.BLOCK_REWARD_TITLE }),
+              updatedTime: createdAt,
               body: stringGetter({
                 key: STRING_KEYS.BLOCK_REWARD_BODY,
                 params: {
@@ -304,7 +306,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            updateKey: [reward.createdAtHeight, reward.tradingReward],
+            updateKey: [reward.createdAtHeight],
           });
         });
       }, [trigger, blockTradingRewards, appInitializedTime, stringGetter, tokenName]);

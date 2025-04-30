@@ -210,6 +210,8 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 
   withClose?: boolean; // Show close button for Notification
+
+  updatedTime?: number;
 };
 
 export type CustomNotification = {
