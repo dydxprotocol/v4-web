@@ -17,7 +17,11 @@ import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { IndexerPerpetualMarketType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerPerpetualMarketType,
+  IndexerPerpetualPositionStatus,
+  IndexerPositionSide,
+} from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -477,7 +481,13 @@ function getPositionIdToUseForTrade(
   const allPositions = Object.values(rawParentSubaccountData?.childSubaccounts ?? {}).flatMap(
     (o) => (o != null ? o.openPerpetualPositions[marketId] ?? [] : [])
   );
-  const positionToUse = orderBy(allPositions, [(p) => p.subaccountNumber], ['asc'])[0];
+  const positionToUse = orderBy(
+    allPositions.filter(
+      (p) => p.status === IndexerPerpetualPositionStatus.OPEN && !MustBigNumber(p.size).isZero()
+    ),
+    [(p) => p.subaccountNumber],
+    ['asc']
+  )[0];
   return positionToUse != null
     ? getPositionUniqueId(positionToUse.market, positionToUse.subaccountNumber)
     : undefined;
