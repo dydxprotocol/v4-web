@@ -25,16 +25,26 @@ import { setNetworkStateRaw } from '@/state/raw';
 
 import { identify } from '@/lib/analytics/analytics';
 import { browserTimeOffsetPromise } from '@/lib/timeOffset';
+import { sleep } from '@/lib/timeUtils';
+
+type ClientState<ClientType> = {
+  dead: boolean;
+  client: ClientType | undefined;
+  // contains awaitable promise
+  deferred: Deferred<ClientType>;
+  currentOperationId: number;
+};
 
 type CompositeClientWrapper = {
   dead?: boolean;
-  compositeClient?: CompositeClient;
-  indexer?: IndexerClient;
-  nobleClient?: StargateClient;
+  // makes dead
   tearDown: () => void;
-  compositeClientPromise: Promise<CompositeClient>;
-  indexerPromise: Promise<IndexerClient>;
-  nobleClientPromise: Promise<StargateClient>;
+  // only really refreshes the composite and noble clients
+  refreshConnections: () => void;
+
+  compositeClient: ClientState<CompositeClient>;
+  indexer: ClientState<IndexerClient>;
+  nobleClient: ClientState<StargateClient>;
 };
 
 function makeCompositeClient({
@@ -56,71 +66,59 @@ function makeCompositeClient({
     throw new Error(`Unknown chain id: ${chainId}`);
   }
 
-  const { clientWrapper, setCompositeClient, setIndexerClient, setNobleClient, setErrorAndReject } =
-    initializeClientWrapper(dispatch, network);
-
-  (async () => {
+  function getIndexerConfig() {
     const indexerUrl = networkConfig.endpoints.indexers[0];
     if (indexerUrl == null) {
       throw new Error('No indexer urls found');
     }
-    const indexerConfig = new IndexerConfig(indexerUrl.api, indexerUrl.socket);
-    setIndexerClient(new IndexerClient(indexerConfig));
+    return new IndexerConfig(indexerUrl.api, indexerUrl.socket);
+  }
 
-    try {
-      const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
+  async function initializeCompositeClient() {
+    const indexerConfig = getIndexerConfig();
+    const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
 
-      if (clientWrapper.dead) {
-        return;
-      }
-
-      const compositeClient = await CompositeClient.connect(
-        new Network(
+    const compositeClient = await CompositeClient.connect(
+      new Network(
+        chainId,
+        indexerConfig,
+        new ValidatorConfig(
+          validatorUrl,
           chainId,
-          indexerConfig,
-          new ValidatorConfig(
-            validatorUrl,
-            chainId,
-            {
-              USDC_DENOM: tokens.usdc.denom,
-              USDC_DECIMALS: tokens.usdc.decimals,
-              USDC_GAS_DENOM: tokens.usdc.gasDenom,
-              CHAINTOKEN_DENOM: tokens.chain.denom,
-              CHAINTOKEN_DECIMALS: tokens.chain.decimals,
-            },
-            {
-              broadcastPollIntervalMs: 3_000,
-              broadcastTimeoutMs: 60_000,
-            },
-            DEFAULT_TRANSACTION_MEMO,
-            true,
-            (await browserTimeOffsetPromise).offset
-          )
+          {
+            USDC_DENOM: tokens.usdc.denom,
+            USDC_DECIMALS: tokens.usdc.decimals,
+            USDC_GAS_DENOM: tokens.usdc.gasDenom,
+            CHAINTOKEN_DENOM: tokens.chain.denom,
+            CHAINTOKEN_DECIMALS: tokens.chain.decimals,
+          },
+          {
+            broadcastPollIntervalMs: 3000,
+            broadcastTimeoutMs: 60000,
+          },
+          DEFAULT_TRANSACTION_MEMO,
+          true,
+          (await browserTimeOffsetPromise).offset
         )
-      );
+      )
+    );
+    return compositeClient;
+  }
 
-      // this shouldn't be necessary - can actually be false
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (clientWrapper.dead) {
-        return;
-      }
+  async function initializeNobleClient() {
+    return StargateClient.connect(networkConfig.endpoints.nobleValidator);
+  }
 
-      setCompositeClient(compositeClient);
+  async function initializeIndexerClient() {
+    return new IndexerClient(getIndexerConfig());
+  }
 
-      const nobleClient = await StargateClient.connect(networkConfig.endpoints.nobleValidator);
+  const clientWrapper = initializeClientWrapper(dispatch, network, {
+    compositeClient: initializeCompositeClient,
+    indexer: initializeIndexerClient,
+    nobleClient: initializeNobleClient,
+  });
 
-      // this shouldn't be necessary - can actually be false
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (clientWrapper.dead) {
-        return;
-      }
-
-      setNobleClient(nobleClient);
-    } catch (e) {
-      logBonsaiError('CompositeClientManager', 'error initializing composite client', { error: e });
-      setErrorAndReject('error initializing clients');
-    }
-  })();
   return clientWrapper;
 }
 
@@ -162,19 +160,165 @@ async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: strin
   return validatorUrl;
 }
 
-function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
-  const indexerDeferred = createDeferred<IndexerClient>();
-  const compositeClientDeferred = createDeferred<CompositeClient>();
-  const nobleClientDeferred = createDeferred<StargateClient>();
+function makeClientManager<ClientType>(args: {
+  load: () => Promise<ClientType>;
+  onSuccess: (version: number, result: ClientType) => void;
+  onError: (e?: any) => void;
+}): {
+  clientState: ClientState<ClientType>;
+  load: () => void;
+  tearDown: () => void;
+} {
+  // mutable, stable reference
+  const clientState: ClientState<ClientType> = {
+    dead: false,
+    client: undefined,
+    currentOperationId: 0,
+    deferred: createDeferred<ClientType>(),
+  };
+
+  const load = async () => {
+    if (clientState.dead) {
+      return;
+    }
+
+    clientState.currentOperationId += 1;
+    const myId = clientState.currentOperationId;
+
+    if (clientState.deferred.state.settled) {
+      clientState.deferred = createDeferred<ClientType>();
+    }
+
+    try {
+      const client = await withRetry(() => {
+        if (clientState.dead || clientState.currentOperationId !== myId) {
+          throw new Error('Client dead or operation preempted');
+        }
+        return args.load();
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (clientState.dead || clientState.currentOperationId !== myId) {
+        return;
+      }
+      clientState.client = client;
+      clientState.deferred.resolve(client);
+      args.onSuccess(myId, client);
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (clientState.dead || clientState.currentOperationId !== myId) {
+        return;
+      }
+      clientState.client = undefined;
+      clientState.deferred.reject(e);
+      args.onError(e);
+    }
+  };
+
+  return {
+    clientState,
+    load,
+    tearDown: () => {
+      clientState.dead = true;
+      const tearDownError = new Error('client tear down');
+      clientState.deferred.reject(tearDownError);
+      // we assume wrapper will manage this
+      // args.onError(tearDownError);
+    },
+  };
+}
+
+function initializeClientWrapper(
+  dispatch: AppDispatch,
+  network: DydxNetwork,
+  loads: {
+    compositeClient: () => Promise<CompositeClient>;
+    indexer: () => Promise<IndexerClient>;
+    nobleClient: () => Promise<StargateClient>;
+  }
+) {
+  dispatch(
+    setNetworkStateRaw({
+      networkId: network,
+      stateToMerge: {
+        compositeClientReady: false,
+        indexerClientReady: false,
+        nobleClientReady: false,
+      },
+    })
+  );
+
+  const compositeClient = makeClientManager({
+    load: loads.compositeClient,
+    onSuccess: (_v, client) =>
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: {
+            compositeClientReady: true,
+            compositeClientUrl: client.validatorClient.config.restEndpoint,
+          },
+        })
+      ),
+    onError: (e) => {
+      logBonsaiError('CompositeClientManager', 'error initializing composite client', { error: e });
+
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { compositeClientReady: false, errorInitializing: true },
+        })
+      );
+    },
+  });
+  const indexer = makeClientManager({
+    load: loads.indexer,
+    onSuccess: () =>
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { indexerClientReady: true },
+        })
+      ),
+    onError: (e) => {
+      logBonsaiError('CompositeClientManager', 'error initializing indexer client', { error: e });
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { indexerClientReady: false, errorInitializing: true },
+        })
+      );
+    },
+  });
+  const nobleClient = makeClientManager({
+    load: loads.nobleClient,
+    onSuccess: () =>
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { nobleClientReady: true },
+        })
+      ),
+    onError: (e) => {
+      logBonsaiError('CompositeClientManager', 'error initializing noble client', { error: e });
+      dispatch(
+        setNetworkStateRaw({
+          networkId: network,
+          stateToMerge: { nobleClientReady: false, errorInitializing: true },
+        })
+      );
+    },
+  });
+
+  const clients = [compositeClient, indexer, nobleClient];
+
   const clientWrapper: CompositeClientWrapper = {
-    compositeClientPromise: compositeClientDeferred.promise,
-    indexerPromise: indexerDeferred.promise,
-    nobleClientPromise: nobleClientDeferred.promise,
+    dead: false,
+    compositeClient: compositeClient.clientState,
+    indexer: indexer.clientState,
+    nobleClient: nobleClient.clientState,
     tearDown: () => {
       clientWrapper.dead = true;
-      indexerDeferred.reject();
-      compositeClientDeferred.reject();
-      nobleClientDeferred.reject();
+      clients.forEach((c) => c.tearDown());
       dispatch(
         setNetworkStateRaw({
           networkId: network,
@@ -186,86 +330,58 @@ function initializeClientWrapper(dispatch: AppDispatch, network: DydxNetwork) {
         })
       );
     },
+    refreshConnections: () => {
+      // only composite client can meaningfully update - since it might select a new node
+      compositeClient.load();
+    },
   };
-  const setIndexerClient = (c: IndexerClient) => {
-    clientWrapper.indexer = c;
-    indexerDeferred.resolve(c);
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { indexerClientReady: true },
-      })
-    );
-  };
-  const setCompositeClient = (c: CompositeClient) => {
-    clientWrapper.compositeClient = c;
-    compositeClientDeferred.resolve(c);
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { compositeClientReady: true },
-      })
-    );
-  };
-  const setNobleClient = (c: StargateClient) => {
-    clientWrapper.nobleClient = c;
-    nobleClientDeferred.resolve(c);
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { nobleClientReady: true },
-      })
-    );
-  };
-  const setErrorAndReject = (msg: string) => {
-    if (clientWrapper.compositeClient == null) {
-      compositeClientDeferred.reject(new Error(msg));
-    }
-
-    if (clientWrapper.nobleClient == null) {
-      nobleClientDeferred.reject(new Error(msg));
-    }
-
-    dispatch(
-      setNetworkStateRaw({
-        networkId: network,
-        stateToMerge: { errorInitializing: true },
-      })
-    );
-  };
-  dispatch(
-    setNetworkStateRaw({
-      networkId: network,
-      stateToMerge: {
-        compositeClientReady: false,
-        indexerClientReady: false,
-        nobleClientReady: false,
-      },
-    })
-  );
-  return {
-    clientWrapper,
-    setIndexerClient,
-    setCompositeClient,
-    setNobleClient,
-    setErrorAndReject,
-  };
+  clients.forEach((c) => c.load());
+  return clientWrapper;
 }
 
 interface Deferred<T> {
   promise: Promise<T>;
   resolve: (value: T) => void;
   reject: (error?: Error) => void;
+  state: { settled: boolean };
 }
 
 function createDeferred<T>(): Deferred<T> {
   let resolve!: (value: T) => void;
   let reject!: (error?: Error) => void;
+  const state = { settled: false };
 
   const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
+    resolve = (value: T) => {
+      state.settled = true;
+      res(value);
+    };
+    reject = (error?: Error) => {
+      state.settled = true;
+      rej(error);
+    };
   });
 
-  return { promise, resolve, reject };
+  return { promise, resolve, reject, state };
+}
+
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  options = { maxRetries: 3, initialDelay: 1000 }
+): Promise<T> {
+  for (let attempt = 0; attempt <= options.maxRetries; attempt += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      return await operation();
+    } catch (error) {
+      if (attempt < options.maxRetries) {
+        const delay = options.initialDelay * 2 ** attempt;
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(delay);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Failed to complete operation - this should be unreachable');
 }

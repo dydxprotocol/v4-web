@@ -131,7 +131,7 @@ export class AccountTransactionSupervisor {
         }
 
         // Wait for the composite client to be available
-        const compositeClient = await clientWrapper.compositeClientPromise;
+        const compositeClient = await clientWrapper.compositeClient.deferred.promise;
 
         // Execute the function with the client wallet pair
         return await fn({ compositeClient, localWallet }, ...args);
