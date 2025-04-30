@@ -58,7 +58,6 @@ export type SubaccountSummaryCore = {
 export type SubaccountSummaryDerived = {
   freeCollateral: BigNumber;
   equity: BigNumber;
-
   leverage: BigNumber | null;
   marginUsage: BigNumber | null;
 };
@@ -72,7 +71,7 @@ export type GroupedSubaccountSummary = SubaccountSummaryDerived & {
   parentSubaccountEquity: BigNumber;
 };
 // includes parent but it's the basic summary, not aggregated in any way
-export type ChildSubaccountSummaries = Record<string, SubaccountSummaryDerived>;
+export type ChildSubaccountSummaries = Record<string, SubaccountSummary>;
 
 export type SubaccountPositionBase = ConvertStringToBigNumber<
   IndexerPerpetualPositionResponseObject,

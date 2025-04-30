@@ -45,6 +45,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
+import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
@@ -59,12 +60,10 @@ export const AccountMenu = () => {
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const { sourceAccount } = useAccounts();
-  const isKeplr = sourceAccount.walletInfo?.name === WalletType.Keplr;
-
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
+  const isKeplr = useAppSelector(selectIsKeplrConnected);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 

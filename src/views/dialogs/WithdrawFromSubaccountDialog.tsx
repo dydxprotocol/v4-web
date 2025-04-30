@@ -7,14 +7,14 @@ import styled from 'styled-components';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
-import { DialogProps, WithdrawToSubaccountDialogProps } from '@/constants/dialogs';
+import { DialogProps, WithdrawFromSubaccountDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -26,32 +26,27 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { SuccessTag, WarningTag } from '@/components/Tag';
 
-import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { objectEntries } from '@/lib/objectHelpers';
+import { sleep } from '@/lib/timeUtils';
 
-export const WithdrawToSubaccountDialog = ({
+const INVALIDATION_SLEEP_TIME = timeUnits.second * 2;
+
+export const WithdrawFromSubaccountDialog = ({
   setIsOpen,
-}: DialogProps<WithdrawToSubaccountDialogProps>) => {
+}: DialogProps<WithdrawFromSubaccountDialogProps>) => {
   const [isLoading, setIsLoading] = useState(false);
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { dydxAddress } = useAccounts();
   const childSubaccountSummaries = useAppSelector(BonsaiCore.account.childSubaccountSummaries.data);
   const usdcBalance = useAppSelector(BonsaiCore.account.balances.data).usdcAmount;
   const usdcBalanceBN = MustBigNumber(usdcBalance);
+  const notify = useCustomNotification();
 
   const stringGetter = useStringGetter();
 
   const { withdraw } = useSubaccount();
-  const { usdcDenom } = useTokenConfigs();
-
-  const { refetchQuery } = useAccountBalance({
-    chainId: selectedDydxChainId,
-    isCosmosChain: true,
-    addressOrDenom: usdcDenom,
-  });
 
   const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
     .minus(usdcBalanceBN)
@@ -62,43 +57,56 @@ export const WithdrawToSubaccountDialog = ({
       return undefined;
     }
 
-    const maybeSubaccountNumber = objectEntries(childSubaccountSummaries).find(([_, summary]) => {
+    const maybeSubaccountNumber = Object.values(childSubaccountSummaries).find((summary) => {
       if (summary.freeCollateral.gt(amountToWithdraw)) {
         return true;
       }
 
       return false;
-    })?.[0];
+    })?.subaccountNumber;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (maybeSubaccountNumber == null) {
-      return undefined;
-    }
-
-    return parseInt(maybeSubaccountNumber, 10);
+    return maybeSubaccountNumber;
   }, [childSubaccountSummaries, amountToWithdraw]);
 
-  const handleWithdrawToSubaccount = async () => {
+  const handleWithdrawFromSubaccount = async () => {
     setIsLoading(true);
     try {
-      if (childSubaccountSummaries == null || usdcBalance == null) {
+      if (
+        childSubaccountSummaries == null ||
+        usdcBalance == null ||
+        subaccountNumberToWithdraw == null
+      ) {
         return;
       }
 
-      const subaccountNumber = Number(subaccountNumberToWithdraw);
-
-      logBonsaiInfo('WithdrawToSubaccountDialog', 'Withdrawing from subaccount', {
+      logBonsaiInfo('WithdrawFromSubaccountDialog', 'Withdrawing from subaccount', {
         usdcBalance,
       });
 
-      const tx = await withdraw(amountToWithdraw, subaccountNumber);
+      const tx = await withdraw(amountToWithdraw, subaccountNumberToWithdraw);
 
-      if (tx && dydxAddress) {
-        await refetchQuery();
+      if (tx) {
+        appQueryClient.invalidateQueries({
+          queryKey: ['validator', 'accountBalances', dydxAddress],
+        });
+
+        await sleep(INVALIDATION_SLEEP_TIME);
+
+        notify({
+          title: stringGetter({ key: STRING_KEYS.TRANSFER_OUT }),
+          body: stringGetter({
+            key: STRING_KEYS.WITHDRAW_COMPLETE,
+            params: { AMOUNT_USD: `${amountToWithdraw} USDC` },
+          }),
+          icon: <Icon iconName={IconName.CurrencySign} />,
+        });
+
         setIsOpen(false);
       }
     } catch (error) {
-      logBonsaiError('WithdrawToSubaccountDialog', 'Error withdrawing from subaccount', { error });
+      logBonsaiError('WithdrawFromSubaccountDialog', 'Error withdrawing from subaccount', {
+        error,
+      });
     }
     setIsLoading(false);
   };
@@ -131,8 +139,8 @@ export const WithdrawToSubaccountDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.WITHDRAW_TO_WALLET })}
     >
-      <$Container>
-        <$Description>
+      <div tw="flexColumn mt-1.25 gap-1.25">
+        <Description tw="text-color-text-0 font-base-book">
           {stringGetter({
             key: STRING_KEYS.WITHDRAW_TO_WALLET_RECOMMENDATION,
             params: {
@@ -140,11 +148,18 @@ export const WithdrawToSubaccountDialog = ({
               MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
             },
           })}
-        </$Description>
+        </Description>
         <$AmountContainer>
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label>{stringGetter({ key: STRING_KEYS.AMOUNT })}</label>
-          <$Output useGrouping withBaseFont type={OutputType.Fiat} value={amountToWithdraw} />
+          <span tw="text-color-text-0 font-small-medium">
+            {stringGetter({ key: STRING_KEYS.AMOUNT })}
+          </span>
+          <Output
+            tw="text-color-text-1 font-medium-medium"
+            useGrouping
+            withBaseFont
+            type={OutputType.Fiat}
+            value={amountToWithdraw}
+          />
         </$AmountContainer>
 
         <div tw="row justify-between">
@@ -168,25 +183,15 @@ export const WithdrawToSubaccountDialog = ({
         <Button
           state={{ isLoading, isDisabled }}
           action={ButtonAction.Primary}
-          onClick={handleWithdrawToSubaccount}
+          onClick={handleWithdrawFromSubaccount}
         >
           {buttonText}
         </Button>
-      </$Container>
+      </div>
     </Dialog>
   );
 };
 
-const $Container = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-  margin-top: 1.25rem;
-`;
-
-const $Description = styled(Description)`
-  color: var(--color-text-0);
-  font: var(--font-base-book);
-`;
 const $AmountContainer = styled.div`
   ${layoutMixins.flexColumn}
   flex: 1;
@@ -198,17 +203,8 @@ const $AmountContainer = styled.div`
 
   gap: 0.25rem;
   padding: 1rem;
-
-  label {
-    color: var(--color-text-0);
-    font: var(--font-small-medium);
-  }
-
-  output {
-    color: var(--color-text-1);
-    font: var(--font-medium-medium);
-  }
 `;
+
 const $Output = styled(Output)`
   font: var(--font-extra-book);
   color: var(--color-text-2);

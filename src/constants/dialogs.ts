@@ -87,7 +87,7 @@ export type WithdrawalGatedDialogProps = {
   transferType: 'withdrawal' | 'transfer';
   estimatedUnblockTime?: string | null;
 };
-export type WithdrawToSubaccountDialogProps = {};
+export type WithdrawFromSubaccountDialogProps = {};
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: bigint;
@@ -144,7 +144,7 @@ export const DialogTypes = unionize(
     VaultDepositWithdraw: ofType<VaultDepositWithdrawDialogProps>(),
     Withdraw2: ofType<WithdrawDialog2Props>(),
     WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
-    WithdrawToSubaccount: ofType<WithdrawToSubaccountDialogProps>(),
+    WithdrawFromSubaccount: ofType<WithdrawFromSubaccountDialogProps>(),
   },
   { tag: 'type' as const, value: 'props' as const }
 );

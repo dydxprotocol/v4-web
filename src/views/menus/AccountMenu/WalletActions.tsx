@@ -36,7 +36,7 @@ export const WalletActions = memo(
         {[
           complianceState === ComplianceStates.FULL_ACCESS &&
             !isAccountViewOnly && {
-              dialog: DialogTypes.WithdrawToSubaccount(),
+              dialog: DialogTypes.WithdrawFromSubaccount(),
               iconName: IconName.Withdraw,
               tooltipStringKey: STRING_KEYS.WITHDRAW,
             },
