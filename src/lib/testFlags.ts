@@ -52,10 +52,6 @@ class TestFlags {
     return this.queryParams.ref;
   }
 
-  get showInstantDepositToggle() {
-    return !!this.queryParams.funkit_toggle;
-  }
-
   get showNewDepositFlow() {
     return !!this.queryParams.deposit_rewrite;
   }

@@ -18,7 +18,6 @@ import { appUiConfigsSlice } from './appUiConfigs';
 import { closePositionFormSlice } from './closePositionForm';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
-import { funkitDepositsSlice } from './funkitDeposits';
 import { getTriggersFormSummary } from './inputsSelectors';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
@@ -44,7 +43,6 @@ const reducers = {
   accountUiMemory: accountUiMemorySlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
-  funkitDeposits: funkitDepositsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
   closePositionForm: closePositionFormSlice.reducer,
@@ -74,7 +72,6 @@ const persistConfig = {
     'wallet',
     'appUiConfigs',
     'accountUiMemory',
-    'funkitDeposits',
   ],
   stateReconciler: autoMergeLevel2,
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
