@@ -1,4 +1,3 @@
-import { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
 import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
@@ -63,8 +62,8 @@ export const AmountCloseInput = ({
           type={InputType.Percent}
           value={amountClosePercentInput}
           max={100}
-          onChange={({ value }: NumberFormatValues) => {
-            commitValue(value);
+          onInput={({ formattedValue }: { formattedValue: string }) => {
+            commitValue(formattedValue);
           }}
         />
       </$InnerInputContainer>
