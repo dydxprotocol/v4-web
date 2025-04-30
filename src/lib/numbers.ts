@@ -158,3 +158,11 @@ export const getNumberSign = (
       : NumberSign.Neutral;
 
 export const nullIfZero = (n?: number | string | null) => (MustBigNumber(n).eq(0) ? null : n);
+
+export function toStepSize(val: number | BigNumber, marketStepSize: number) {
+  return MustBigNumber(val)
+    .div(marketStepSize)
+    .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+    .times(marketStepSize)
+    .toNumber();
+}

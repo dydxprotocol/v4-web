@@ -168,6 +168,31 @@ function validateFieldsBasic(
 
   if (options.needsSize) {
     const sizeValue = AttemptNumber(info.inputSummary.size?.size) ?? 0;
+    const sizeIsTyped = (state.size?.value.value.length ?? 0) > 0;
+    const marketMinSize = AttemptNumber(inputData.currentTradeMarketSummary?.stepSize);
+    if (sizeIsTyped && marketMinSize != null && sizeValue < marketMinSize) {
+      errors.push(
+        simpleValidationError({
+          code: 'ORDER_SIZE_BELOW_MIN_SIZE',
+          type: ErrorType.error,
+          fields: ['size'],
+          titleKey: STRING_KEYS.MODIFY_SIZE_FIELD,
+          textKey: STRING_KEYS.ORDER_SIZE_BELOW_MIN_SIZE,
+          titleParams: {
+            MIN_SIZE: {
+              value: marketMinSize,
+              format: ErrorFormat.Size,
+              decimals: inputData.currentTradeMarketSummary?.stepSizeDecimals ?? 0,
+            },
+            SYMBOL: {
+              value: inputData.currentTradeMarketSummary?.displayableAsset ?? '',
+              format: ErrorFormat.String,
+            },
+          },
+        })
+      );
+    }
+
     if (sizeValue <= 0) {
       errors.push(
         simpleValidationError({
@@ -175,29 +200,6 @@ function validateFieldsBasic(
           type: ErrorType.error,
           fields: ['size'],
           titleKey: STRING_KEYS.ENTER_AMOUNT,
-        })
-      );
-    }
-
-    const marketMinSize = AttemptNumber(inputData.currentTradeMarketSummary?.stepSize);
-    if (marketMinSize != null && sizeValue < marketMinSize) {
-      errors.push(
-        simpleValidationError({
-          code: 'ORDER_SIZE_BELOW_MIN_SIZE',
-          type: ErrorType.error,
-          fields: ['size'],
-          titleKey: STRING_KEYS.ORDER_SIZE_BELOW_MIN_SIZE,
-          textKey: STRING_KEYS.ORDER_SIZE_BELOW_MIN_SIZE,
-          titleParams: {
-            MIN_SIZE: {
-              value: marketMinSize,
-              format: ErrorFormat.Size,
-            },
-            SYMBOL: {
-              value: inputData.currentTradeMarketSummary?.displayableAsset ?? '',
-              format: ErrorFormat.String,
-            },
-          },
         })
       );
     }
@@ -245,7 +247,7 @@ function validateFieldsBasic(
     if (
       goodTilInSeconds == null ||
       goodTilInSeconds <= 0 ||
-      goodTilInSeconds > 90 * timeUnits.day
+      goodTilInSeconds > (90 * timeUnits.day) / timeUnits.second
     ) {
       errors.push(
         simpleValidationError({
@@ -254,7 +256,7 @@ function validateFieldsBasic(
           fields: ['goodTil'],
           titleKey: STRING_KEYS.MODIFY_GOOD_TIL,
           textKey:
-            (goodTilInSeconds ?? 0) > 90 * timeUnits.day
+            (goodTilInSeconds ?? 0) > (90 * timeUnits.day) / timeUnits.second
               ? STRING_KEYS.INVALID_GOOD_TIL_MAX_90_DAYS
               : STRING_KEYS.MODIFY_GOOD_TIL,
         })
