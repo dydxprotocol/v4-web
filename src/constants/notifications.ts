@@ -73,38 +73,38 @@ export type NotificationTypeConfig<
 
   /** React hook to trigger notifications based on app state */
   useTrigger: (_: {
-    trigger: (
+    trigger: (triggerArgs: {
       /** Unique ID for the triggered notification */
-      id: NotificationIdType,
+      id: NotificationIdType;
 
       /** Display data for the triggered notification */
-      displayData: NotificationDisplayData,
+      displayData: NotificationDisplayData;
 
       /**
        * JSON-serializable key.
        * Re-triggers the notification if passed a different value from the last trigger() call (even from a previous browser session).
        * Suggested usage: data dependency array
        */
-      updateKey?: NotificationUpdateKey,
+      updateKey?: NotificationUpdateKey;
 
       /**
        * @param true (default): Notification initialized with status NotificationStatus.Triggered
        * @param false: Notification initialized with status NotificationStatus.Cleared
        */
-      isNew?: boolean,
+      isNew?: boolean;
 
       /**
        * @param false (default): Notification should not be retriggered if it's been seen/cleared/hidden
        * @param true:  Notification should be retriggered if status was NotificationStatus.Hidden
        */
-      shouldUnhide?: boolean,
+      shouldUnhide?: boolean;
 
       /**
        * If this trigger has a new update key and the notiification status is CLEARED, leave it CLEARED
        * rather than updating it - keep it hidden.
        */
-      keepCleared?: boolean
-    ) => void;
+      keepCleared?: boolean;
+    }) => void;
 
     /**
      * Hide (mark clear) a notification based on condition other than user action
@@ -153,7 +153,7 @@ export type Notification<
   updateKey: NotificationUpdateKey;
 };
 
-export type Notifications = Record<NotificationId, Notification<any>>;
+export type Notifications = Record<NotificationId, Notification<string, any>>;
 
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
