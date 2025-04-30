@@ -331,7 +331,11 @@ export function applyOperationsToSubaccount(
             );
             return currentParentSubaccount;
           }
-          if (Object.values(sourceAccount.openPerpetualPositions).length > 0) {
+          if (
+            Object.values(sourceAccount.openPerpetualPositions).filter(
+              (p) => !MustBigNumber(p.size).isZero()
+            ).length > 0
+          ) {
             // eslint-disable-next-line no-console
             console.error(
               "applyOperationsToSubaccount: can't empty subaccount because there are open perpetual positions"

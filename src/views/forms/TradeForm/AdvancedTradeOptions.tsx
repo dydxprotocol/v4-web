@@ -57,7 +57,10 @@ export const AdvancedTradeOptions = () => {
   const shouldShowPostOnly = showPostOnly || showPostOnlyTooltip;
   const shouldShowReduceOnly = showReduceOnly || showReduceOnlyTooltip;
 
-  const needsExecution = executionOptions.length > 0 || showPostOnly || showReduceOnly;
+  const needsExecution =
+    (executionOptions.length > 0 && execution != null) ||
+    shouldShowPostOnly ||
+    shouldShowReduceOnly;
   const hasTimeInForce = timeInForceOptions.length > 0;
   const needsTimeRow = showGoodTil || (hasTimeInForce && timeInForce != null);
 

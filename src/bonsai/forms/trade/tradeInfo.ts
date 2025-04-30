@@ -473,6 +473,13 @@ function simulateMarketOrder(
   reduceOnly: boolean,
   existingPosition: SubaccountPosition | undefined
 ): TradeInputMarketOrder | undefined {
+  const toStepSize = (val: BigNumber) =>
+    val
+      .div(marketStepSize)
+      .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+      .times(marketStepSize)
+      .toNumber();
+
   const operationMultipler = side === OrderSide.BUY ? 1 : -1;
 
   let totalSize = 0;
@@ -602,11 +609,10 @@ function simulateMarketOrder(
       assertNever(effectiveSizeTarget.type);
     }
 
-    sizeToTake = clampBn(MustBigNumber(sizeToTake), BIG_NUMBERS.ZERO, MustBigNumber(rowSize))
-      .div(marketStepSize)
-      .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
-      .times(marketStepSize)
-      .toNumber();
+    // make sure size we take is between 0 and rowSize, then round to clean multiple of stepSize
+    sizeToTake = toStepSize(
+      clampBn(MustBigNumber(sizeToTake), BIG_NUMBERS.ZERO, MustBigNumber(rowSize))
+    );
 
     if (sizeToTake <= 0) {
       // can't take any from here, so we're done
@@ -632,7 +638,10 @@ function simulateMarketOrder(
     orderbook: orderbookRows,
     averagePrice: totalSize <= 0 ? undefined : totalCostWithoutFees / totalSize,
 
-    size: totalSize,
+    // we may have accumulated rounding errors, so round to clean multiple of step size
+    // this is still wrong since the clean multiple of step size might not be perfectly representable as double
+    // correct fix here is to do all calculations in bignumber and return a string size
+    size: toStepSize(MustBigNumber(totalSize)),
     usdcSize: totalCostWithoutFees,
 
     totalFees: totalCost - totalCostWithoutFees,
