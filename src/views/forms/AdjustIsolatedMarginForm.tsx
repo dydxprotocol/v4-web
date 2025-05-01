@@ -328,7 +328,6 @@ export const AdjustIsolatedMarginForm = ({
           <DiffOutput
             withSubscript
             withDiff={
-              !!liquidationPriceUpdated &&
               liquidationPrice !== liquidationPriceUpdated &&
               MustBigNumber(summary.inputs.amount).gt(0)
             }
