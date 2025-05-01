@@ -205,6 +205,7 @@ export type TradeSummary = {
   // if this trade is effectively closing the position, for simulation purposes
   isPositionClosed: boolean;
 
+  // only for market orders
   indexSlippage: number | undefined;
   feeRate: number | undefined;
 };
