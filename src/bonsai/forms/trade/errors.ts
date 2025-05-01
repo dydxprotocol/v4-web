@@ -432,9 +432,8 @@ function validateIsolatedMarginMinSize(summary: TradeFormSummary): ValidationErr
     return undefined;
   }
 
-  const subaccountNumber = summary.tradeInfo.subaccountNumber;
-  const subaccountBefore = summary.accountDetailsBefore?.subaccountSummaries?.[subaccountNumber];
-  const subaccountAfter = summary.accountDetailsAfter?.subaccountSummaries?.[subaccountNumber];
+  const subaccountBefore = summary.accountDetailsBefore?.account;
+  const subaccountAfter = summary.accountDetailsAfter?.account;
 
   if (!subaccountBefore || !subaccountAfter) {
     return undefined;
