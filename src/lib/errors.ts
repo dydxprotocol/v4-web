@@ -24,7 +24,7 @@ export const stringifyTransactionError = (error: any): string => {
   // Check if the error is a broadcast error (i.e., from execution)
   if (error?.name === 'BroadcastError') {
     // Return the error as a JSON string
-    return JSON.stringify({ error });
+    return JSON.stringify({ error }, replaceFnThatHandlesBigInt);
   }
 
   // Handle a normal Error (i.e., from query/simulation or other errors)
@@ -33,5 +33,8 @@ export const stringifyTransactionError = (error: any): string => {
     message: error.message, // Extract the error message
   };
 
-  return JSON.stringify({ error: serializedError });
+  return JSON.stringify({ error: serializedError }, replaceFnThatHandlesBigInt);
 };
+
+const replaceFnThatHandlesBigInt = (key: string, v: any) =>
+  typeof v === 'bigint' ? v.toString() : v;
