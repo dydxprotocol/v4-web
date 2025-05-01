@@ -267,14 +267,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
   {
     type: NotificationType.BlockTradingReward,
-    useTrigger: ({ trigger, appInitializedTime }) => {
+    useTrigger: ({ trigger, sessionStartTime }) => {
       const blockTradingRewards = useAppSelector(BonsaiCore.account.blockTradingRewards.data);
       const stringGetter = useStringGetter();
       const tokenName = useTokenConfigs().chainTokenLabel;
       useEffect(() => {
         blockTradingRewards.forEach((reward) => {
           const createdAt = new Date(reward.createdAt).getTime();
-          if (createdAt <= appInitializedTime) {
+          if (createdAt <= sessionStartTime) {
             return;
           }
           const amount = MustBigNumber(reward.tradingReward).toString(10);
@@ -305,7 +305,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [reward.createdAtHeight],
           });
         });
-      }, [trigger, blockTradingRewards, appInitializedTime, stringGetter, tokenName]);
+      }, [trigger, blockTradingRewards, stringGetter, tokenName, sessionStartTime]);
     },
   },
   {
