@@ -3,11 +3,9 @@ import styled from 'styled-components';
 
 import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
 
-import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Slider } from '@/components/Slider';
-import { WithLabel } from '@/components/WithLabel';
 
 import { mapIfPresent } from '@/lib/do';
 import { clamp } from '@/lib/math';
@@ -70,36 +68,28 @@ export const TradeSizeSlider = ({
 
   return (
     <$InputContainer>
-      <$WithLabel label={<div tw="mb-0.25 flex">Order Size</div>}>
-        <$TradeSizeSlider
-          label="Order Size"
-          min={0}
-          max={100}
-          step={0.1}
-          value={toNormalized(fromString(tradeSize ?? ''))}
-          onSliderDrag={onSliderDrag}
-          onValueCommit={onValueCommit}
-          $short={short}
-        />
-      </$WithLabel>
+      <$TradeSizeSlider
+        tw="w-full"
+        label="Order Size"
+        min={0}
+        max={100}
+        step={0.1}
+        value={toNormalized(fromString(tradeSize ?? ''))}
+        onSliderDrag={onSliderDrag}
+        onValueCommit={onValueCommit}
+        $short={short}
+      />
     </$InputContainer>
   );
 };
 
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
-  --input-height: 3.5rem;
+  --input-height: 2.7rem;
   --input-backgroundColor: none;
 
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
-
-  @media ${breakpoints.tablet} {
-    --input-height: 4rem;
-  }
-`;
-
-const $WithLabel = styled(WithLabel)`
-  ${formMixins.inputLabel}
+  padding-top: 0;
 `;
 
 const $TradeSizeSlider = styled(Slider)<{ $short: boolean }>`

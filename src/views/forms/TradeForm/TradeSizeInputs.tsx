@@ -196,7 +196,20 @@ export const TradeSizeInputs = () => {
 
   return (
     <div tw="flexColumn gap-[--form-input-gap]">
-      {sizeInput}
+      <div>
+        {sizeInput}
+        {showTradeSizeSlider && (
+          <TradeSizeSlider
+            tradeSizeInput={tradeSizeAssetValue}
+            setTradeSizeInput={(newSize: string | undefined) => {
+              onSizeInput({ formattedValue: newSize ?? '' });
+            }}
+            stepSizeDecimals={stepSizeDecimals ?? 0}
+            maxTradeSize={tradeSummary.tradeInfo.maximumTradeSize ?? 0}
+            short={tradeSummary.effectiveTrade.side === OrderSide.SELL}
+          />
+        )}
+      </div>
       {showLeverage && (
         <MarketLeverageInput
           leftLeverage={tradeSummary.tradeInfo.minimumSignedLeverage}
@@ -212,17 +225,6 @@ export const TradeSizeInputs = () => {
           setLeverageInputValue={(value: string) => {
             dispatch(tradeFormActions.setSizeLeverageSigned(value));
           }}
-        />
-      )}
-      {showTradeSizeSlider && (
-        <TradeSizeSlider
-          tradeSizeInput={tradeSizeAssetValue}
-          setTradeSizeInput={(newSize: string | undefined) => {
-            onSizeInput({ formattedValue: newSize ?? '' });
-          }}
-          stepSizeDecimals={stepSizeDecimals ?? 0}
-          maxTradeSize={tradeSummary.tradeInfo.maximumTradeSize ?? 0}
-          short={tradeSummary.effectiveTrade.side === OrderSide.SELL}
         />
       )}
       {showTargetLeverage && <TargetLeverageInput />}
