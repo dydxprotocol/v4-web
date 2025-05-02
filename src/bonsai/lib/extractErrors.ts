@@ -22,6 +22,13 @@ const FAILED_SUBACCOUNT_UPDATE_RESULT_PATTERN =
   /Subaccount with id \{[^}]+\} failed with UpdateResult:\s*([A-Za-z]+):/;
 
 const parseSubaccountUpdateError = (message: string): ParsingError | null => {
+  if (message.indexOf('not within valid time window: incorrect account sequence') >= 0) {
+    return {
+      message: 'Invalid timestamp nonce',
+      stringKey: STRING_KEYS.BROADCAST_ERROR_SDK_32,
+    };
+  }
+
   const matchResult = message.match(FAILED_SUBACCOUNT_UPDATE_RESULT_PATTERN);
   if (!matchResult?.[1]) return null;
 
@@ -40,10 +47,10 @@ const parseSubaccountUpdateError = (message: string): ParsingError | null => {
       stringKey: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
     };
   }
-  if (message.indexOf('not within valid time window: incorrect account sequence') >= 0) {
+  if (message.indexOf(': insufficent funds') >= 0) {
     return {
-      message: 'Invalid timestamp nonce',
-      stringKey: STRING_KEYS.BROADCAST_ERROR_SDK_32,
+      message: 'Insufficient funds',
+      stringKey: STRING_KEYS.INSUFFICIENT_BALANCE,
     };
   }
   return null;
