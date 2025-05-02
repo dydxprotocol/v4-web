@@ -204,6 +204,7 @@ export class AccountTransactionSupervisor {
           payload,
           parsed,
           errorString,
+          error,
           source: nameForLogging,
         });
 

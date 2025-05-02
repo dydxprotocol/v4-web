@@ -31,6 +31,9 @@ export const stringifyTransactionError = (error: any): string => {
   // An Error object is not fully serializable, so we need to extract the message and stack
   const serializedError: { [key: string]: any } = {
     message: error.message, // Extract the error message
+    // in case this is a StatefulOrderError
+    response: error.response,
+    code: error.code,
   };
 
   return JSON.stringify({ error: serializedError });
