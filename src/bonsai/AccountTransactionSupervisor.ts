@@ -3,9 +3,11 @@ import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import {
   isOperationFailure,
   isOperationSuccess,
+  isWrappedOperationFailureError,
   OperationResult,
   wrapOperationFailure,
   wrapOperationSuccess,
+  WrappedOperationFailureError,
 } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -198,6 +200,9 @@ export class AccountTransactionSupervisor {
 
         return wrapOperationSuccess(parsedTx);
       } catch (error) {
+        if (isWrappedOperationFailureError(error)) {
+          return error.getFailure();
+        }
         const errorString = stringifyTransactionError(error);
         const parsed = parseTransactionError(nameForLogging, errorString);
         logBonsaiError(nameForLogging, 'Failed operation', {
@@ -207,7 +212,6 @@ export class AccountTransactionSupervisor {
           error,
           source: nameForLogging,
         });
-
         return wrapOperationFailure(errorString, parsed);
       }
     };
@@ -648,11 +652,11 @@ export class AccountTransactionSupervisor {
         });
 
         if (isOperationFailure(subaccountTransferResult)) {
-          throw new Error(subaccountTransferResult.errorString);
+          throw new WrappedOperationFailureError(subaccountTransferResult);
         }
         const placeOrderResult = await this.executePlaceOrder(payload);
         if (isOperationFailure(placeOrderResult)) {
-          throw new Error(placeOrderResult.errorString);
+          throw new WrappedOperationFailureError(placeOrderResult);
         }
         submitTime.start();
         return placeOrderResult.payload;

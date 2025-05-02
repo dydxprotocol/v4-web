@@ -39,3 +39,35 @@ export function isOperationSuccess<T>(result: OperationResult<T>): result is Ope
 export function isOperationFailure<T>(result: OperationResult<T>): result is OperationFailure {
   return result.type === 'failure';
 }
+
+export class WrappedOperationFailureError extends Error {
+  public readonly failure: OperationFailure;
+
+  constructor(failure: OperationFailure) {
+    super(failure.errorString);
+    this.name = 'WrappedOperationFailureError';
+    this.failure = failure;
+  }
+
+  // Get the failure object directly
+  public getFailure(): OperationFailure {
+    return this.failure;
+  }
+}
+
+export function isWrappedOperationFailureError(
+  error: unknown
+): error is WrappedOperationFailureError {
+  return (
+    error instanceof WrappedOperationFailureError ||
+    (error != null &&
+      typeof error === 'object' &&
+      'name' in error &&
+      error.name === 'WrappedOperationFailureError' &&
+      'failure' in error &&
+      error.failure != null &&
+      typeof error.failure === 'object' &&
+      'type' in error.failure &&
+      error.failure.type === 'failure')
+  );
+}

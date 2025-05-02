@@ -1,3 +1,8 @@
+import BigNumber from 'bignumber.js';
+import Long from 'long';
+
+import { bytesToBigInt } from './numbers';
+
 /**
  * Error thrown if StatefulOrder includes an error code in it's response.
  */
@@ -24,7 +29,7 @@ export const stringifyTransactionError = (error: any): string => {
   // Check if the error is a broadcast error (i.e., from execution)
   if (error?.name === 'BroadcastError') {
     // Return the error as a JSON string
-    return JSON.stringify({ error });
+    return JSON.stringify({ error }, replaceFnThatHandlesBigInt);
   }
 
   // Handle a normal Error (i.e., from query/simulation or other errors)
@@ -36,5 +41,30 @@ export const stringifyTransactionError = (error: any): string => {
     code: error.code,
   };
 
-  return JSON.stringify({ error: serializedError });
+  return JSON.stringify({ error: serializedError }, replaceFnThatHandlesBigInt);
+};
+
+const replaceFnThatHandlesBigInt = (key: string, x: any) => {
+  if (Long.isLong(x) || x instanceof Long) {
+    return x.toString() as any;
+  }
+
+  if (x instanceof BigNumber) {
+    return x.toString() as any;
+  }
+
+  if (typeof x === 'bigint') {
+    return x.toString() as any;
+  }
+
+  const buffer = (x as any).buffer;
+  if (buffer instanceof Uint8Array) {
+    return bytesToBigInt(buffer).toString() as any;
+  }
+
+  if (x instanceof Uint8Array) {
+    return bytesToBigInt(x).toString() as any;
+  }
+
+  return x;
 };
