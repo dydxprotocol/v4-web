@@ -66,7 +66,6 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const [formState, setFormState] = useState<'form' | 'token-select'>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
 
-  // TODO(deposit2): localization
   const dialogTitle =
     formState === 'form'
       ? stringGetter({ key: STRING_KEYS.DEPOSIT })

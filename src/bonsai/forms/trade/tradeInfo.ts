@@ -78,12 +78,13 @@ export function calculateTradeInfo(
         return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData, subaccountToUse);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
-          const calculatedMaxLeverage = getMaxCrossMarketOrderSizeSummary(
+          const calculatedMaxSize = getMaxCrossMarketOrderSizeSummary(
             trade,
             baseAccount,
             accountData,
             subaccountToUse
-          )?.leverageSigned;
+          );
+          const calculatedMaxLeverage = calculatedMaxSize?.leverageSigned;
 
           return {
             inputSummary: calculated.summary ?? {
@@ -103,6 +104,22 @@ export function calculateTradeInfo(
               leverageLimits,
               calculatedMaxLeverage
             ).toNumber(),
+            maximumTradeSize: calc(() => {
+              if (
+                trade.marginMode !== MarginMode.ISOLATED ||
+                !!trade.reduceOnly ||
+                trade.type !== TradeFormType.MARKET
+              ) {
+                return undefined;
+              }
+              const maxSize = getMaxIsolatedMarketOrderSizeSummary(
+                trade,
+                baseAccount,
+                accountData,
+                subaccountToUse
+              )?.size;
+              return maxSize ?? 0;
+            }),
             slippage: calculateMarketOrderSlippage(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
@@ -240,6 +257,7 @@ export function calculateTradeInfo(
             indexSlippage: 0,
             minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
             maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            maximumTradeSize: undefined,
             subaccountNumber: subaccountToUse,
             feeRate,
             filled: calculated.marketOrder?.filled ?? false,
@@ -297,6 +315,7 @@ export function calculateTradeInfo(
             subaccountNumber: subaccountToUse,
             minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
             maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            maximumTradeSize: undefined,
             slippage: 0,
             indexSlippage: 0,
             filled: true,
@@ -391,14 +410,31 @@ type SizeTarget = {
   type: 'size' | 'usdc' | 'leverage' | 'maximum';
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getMaxCrossMarketOrderSizeSummary(
   trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
   accountData: TradeFormInputData,
   subaccountNumber: number
 ) {
-  const result = createMarketOrder(trade, baseAccount, accountData, subaccountNumber, true);
+  const result = createMarketOrder(trade, baseAccount, accountData, subaccountNumber, {
+    target: BIG_NUMBERS.ZERO,
+    type: 'maximum' as const,
+  });
+  return result;
+}
+
+function getMaxIsolatedMarketOrderSizeSummary(
+  trade: TradeForm,
+  baseAccount: TradeAccountDetails | undefined,
+  accountData: TradeFormInputData,
+  subaccountNumber: number
+) {
+  const result = createMarketOrder(trade, baseAccount, accountData, subaccountNumber, {
+    type: 'usdc',
+    target: (baseAccount?.account?.freeCollateral ?? BIG_NUMBERS.ZERO).times(
+      AttemptNumber(trade.targetLeverage) ?? DEFAULT_TARGET_LEVERAGE
+    ),
+  });
   return result;
 }
 
@@ -407,7 +443,7 @@ function createMarketOrder(
   baseAccount: TradeAccountDetails | undefined,
   accountData: TradeFormInputData,
   subaccountNumber: number,
-  overrideToMaximumSize?: boolean
+  target?: SizeTarget | undefined
 ): TradeInputMarketOrder | undefined {
   const orderbookBase = accountData.currentTradeMarketOrderbook;
   const orderbook =
@@ -421,11 +457,11 @@ function createMarketOrder(
     return undefined;
   }
 
-  const effectiveSizeTarget = overrideToMaximumSize
-    ? { target: BIG_NUMBERS.ZERO, type: 'maximum' as const }
-    : trade.size != null
+  const effectiveSizeTarget =
+    target ??
+    (trade.size != null
       ? calculateEffectiveSizeTarget(trade.size, trade, baseAccount, accountData)
-      : undefined;
+      : undefined);
 
   if (effectiveSizeTarget == null) {
     return undefined;

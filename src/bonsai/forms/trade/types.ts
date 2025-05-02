@@ -141,8 +141,12 @@ export type TradeFormOptions = {
   timeInForceOptions: SelectionOption<TimeInForce>[];
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
 
+  // for cross market orders, not reduce only
   showLeverage: boolean;
+  // for reduce only orders
   showAmountClose: boolean;
+  // for isolated market orders, not reduce only
+  showTradeSizeSlider: boolean;
 
   // these mean the field is relevant to the trade and trade payload in any way (potentially)
   needsSize: boolean;
@@ -195,6 +199,9 @@ export type TradeSummary = {
   minimumSignedLeverage: number;
   // maximum is how far the current order side can push leverage
   maximumSignedLeverage: number;
+
+  // only defined when showTradeSizeSlider is true (isolated market orders)
+  maximumTradeSize: number | undefined;
 
   slippage: number | undefined;
   fee: number | undefined;

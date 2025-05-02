@@ -285,6 +285,7 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       goodTilUnitOptions: [],
       showLeverage: false,
       showAmountClose: false,
+      showTradeSizeSlider: false,
 
       needsMarginMode: false,
       needsSize: false,
@@ -324,6 +325,7 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       payloadPrice: undefined,
       minimumSignedLeverage: 0,
       maximumSignedLeverage: 0,
+      maximumTradeSize: undefined,
       slippage: undefined,
       fee: undefined,
       total: undefined,
@@ -430,6 +432,8 @@ function calculateTradeFormOptions(
     needsExecution: isFieldStateRelevant(fields.execution),
 
     showLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
+    showTradeSizeSlider:
+      orderType === TradeFormType.MARKET && !isCross && (!reduceOnly || !isDecreasing),
     showAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
 
     showTargetLeverage:

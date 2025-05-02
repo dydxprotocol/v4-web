@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
+import { OrderSide, OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
@@ -43,6 +43,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { AmountCloseInput } from './AmountCloseInput';
 import { MarketLeverageInput } from './MarketLeverageInput';
 import { TargetLeverageInput } from './TargetLeverageInput';
+import { TradeSizeSlider } from './TradeSizeSlider';
 
 export const TradeSizeInputs = () => {
   const dispatch = useAppDispatch();
@@ -59,7 +60,8 @@ export const TradeSizeInputs = () => {
 
   const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
 
-  const { showLeverage, showTargetLeverage, showAmountClose } = tradeSummary.options;
+  const { showLeverage, showTargetLeverage, showAmountClose, showTradeSizeSlider } =
+    tradeSummary.options;
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -141,18 +143,19 @@ export const TradeSizeInputs = () => {
     );
   };
 
+  const tradeSizeAssetValue =
+    tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
+      ? tradeValues.size.value.value
+      : tradeValues.size == null || tradeValues.size.value.value === ''
+        ? ''
+        : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '';
   const inputConfig = {
     [DisplayUnit.Asset]: {
       onInput: onSizeInput,
       type: InputType.Number,
       tooltipId: 'order-amount',
       decimals,
-      value:
-        tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
-          ? tradeValues.size.value.value
-          : tradeValues.size == null || tradeValues.size.value.value === ''
-            ? ''
-            : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
+      value: tradeSizeAssetValue,
     },
     [DisplayUnit.Fiat]: {
       onInput: onUSDCInput,
@@ -209,6 +212,17 @@ export const TradeSizeInputs = () => {
           setLeverageInputValue={(value: string) => {
             dispatch(tradeFormActions.setSizeLeverageSigned(value));
           }}
+        />
+      )}
+      {showTradeSizeSlider && (
+        <TradeSizeSlider
+          tradeSizeInput={tradeSizeAssetValue}
+          setTradeSizeInput={(newSize: string | undefined) => {
+            onSizeInput({ formattedValue: newSize ?? '' });
+          }}
+          stepSizeDecimals={stepSizeDecimals ?? 0}
+          maxTradeSize={tradeSummary.tradeInfo.maximumTradeSize ?? 0}
+          short={tradeSummary.effectiveTrade.side === OrderSide.SELL}
         />
       )}
       {showTargetLeverage && <TargetLeverageInput />}

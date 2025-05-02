@@ -455,7 +455,6 @@ export const PositionsTable = forwardRef(
     const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
     const { isTablet } = useBreakpoints();
 
-    // todo this uses the old subaccount id for now
     const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 

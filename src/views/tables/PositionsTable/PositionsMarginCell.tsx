@@ -35,7 +35,6 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
               shape={ButtonShape.Square}
               size={ButtonSize.XSmall}
               onClick={() =>
-                // todo this handoff should be using uniqueid
                 dispatch(
                   openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.uniqueId }))
                 )
