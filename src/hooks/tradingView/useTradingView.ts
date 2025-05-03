@@ -1,7 +1,6 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
   LanguageCode,
@@ -37,7 +36,6 @@ import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingView = ({
-  tvWidget,
   setTvWidget,
   orderLineToggleRef,
   orderLinesToggleOn,
@@ -46,7 +44,6 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
 }: {
-  tvWidget?: TvWidget;
   setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
@@ -67,7 +64,7 @@ export const useTradingView = ({
   const selectedLocale = useAppSelector(getSelectedLocale);
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
-  const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
+  const { getCandlesForDatafeed } = useDydxClient();
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
 
@@ -76,16 +73,9 @@ export const useTradingView = ({
     [savedTvChartConfig]
   );
 
-  const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
-    [marketId: string]: number | undefined;
-  }>({});
-  const { tickSizeDecimals: tickSizeDecimalsBonsai } = orEmptyObj(
+  const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const tickSizeDecimals =
-    (marketId
-      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsBonsai
-      : tickSizeDecimalsBonsai) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -114,109 +104,87 @@ export const useTradingView = ({
     []
   );
 
-  useEffect(() => {
-    // we only need tick size from current market for the price scale settings
-    // if markets haven't been loaded, get the current market info from indexer
-    (async () => {
-      if (marketId && tickSizeDecimals === undefined) {
-        const marketTickSize = await getMarketTickSize(marketId);
-        setTickSizeDecimalsIndexer((prev) => ({
-          ...prev,
-          [marketId]: BigNumber(marketTickSize).decimalPlaces() ?? undefined,
-        }));
-      }
-    })();
-  }, [marketId, tickSizeDecimals, getMarketTickSize]);
-
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && tickSizeDecimals !== undefined && !tvWidget) {
-      const widgetOptions = getWidgetOptions();
-      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-      const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
+    const widgetOptions = getWidgetOptions();
+    const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+    const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-      const initialPriceScale = BigNumber(10).exponentiatedBy(tickSizeDecimals).toNumber();
-      const options: TradingTerminalWidgetOptions = {
-        ...widgetOptions,
-        ...widgetOverrides,
-        datafeed: getDydxDatafeed(
-          store,
-          getCandlesForDatafeed,
-          initialPriceScale,
-          { decimal, group },
-          selectedLocale,
-          stringGetter
-        ),
-        interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
-        locale: languageCode as LanguageCode,
-        symbol: marketId,
-        saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
-        auto_save_delay: 1,
-      };
+    const options: TradingTerminalWidgetOptions = {
+      ...widgetOptions,
+      ...widgetOverrides,
+      datafeed: getDydxDatafeed(
+        store,
+        getCandlesForDatafeed,
+        { decimal, group },
+        selectedLocale,
+        stringGetter
+      ),
+      interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
+      locale: languageCode as LanguageCode,
+      symbol: marketId,
+      saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+      auto_save_delay: 1,
+    };
 
-      const tvChartWidget = new Widget(options);
-      setTvWidget(tvChartWidget);
+    const tvChartWidget = new Widget(options);
+    setTvWidget(tvChartWidget);
 
-      tvChartWidget.onChartReady(() => {
-        // Initialize additional right-click-menu options
-        tvChartWidget.onContextMenu(tradingViewLimitOrder);
+    tvChartWidget.onChartReady(() => {
+      // Initialize additional right-click-menu options
+      tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
-        tvChartWidget.headerReady().then(() => {
-          // Order Lines
-          initializeToggle({
-            toggleRef: orderLineToggleRef,
-            widget: tvChartWidget,
-            isOn: orderLinesToggleOn,
-            setToggleOn: setOrderLinesToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-            }),
-          });
-
-          // Buy/Sell Marks
-          initializeToggle({
-            toggleRef: buySellMarksToggleRef,
-            widget: tvChartWidget,
-            isOn: buySellMarksToggleOn,
-            setToggleOn: setBuySellMarksToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-            }),
-          });
+      tvChartWidget!.headerReady().then(() => {
+        // Order Lines
+        initializeToggle({
+          toggleRef: orderLineToggleRef,
+          widget: tvChartWidget!,
+          isOn: orderLinesToggleOn,
+          setToggleOn: setOrderLinesToggleOn,
+          label: stringGetter({
+            key: STRING_KEYS.ORDER_LINES,
+          }),
+          tooltip: stringGetter({
+            key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+          }),
         });
 
-        tvChartWidget.subscribe('onAutoSaveNeeded', () =>
-          tvChartWidget.save((chartConfig: object) => {
-            dispatch(updateChartConfig(chartConfig));
-          })
-        );
+        // Buy/Sell Marks
+        initializeToggle({
+          toggleRef: buySellMarksToggleRef,
+          widget: tvChartWidget!,
+          isOn: buySellMarksToggleOn,
+          setToggleOn: setBuySellMarksToggleOn,
+          label: stringGetter({
+            key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+          }),
+          tooltip: stringGetter({
+            key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+          }),
+        });
       });
-    }
 
+      tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
+        tvChartWidget!.save((chartConfig: object) => {
+          dispatch(updateChartConfig(chartConfig));
+        })
+      );
+    });
     return () => {
       orderLineToggleRef.current?.remove();
       orderLineToggleRef.current = null;
       buySellMarksToggleRef.current?.remove();
       buySellMarksToggleRef.current = null;
-      tvWidget?.remove();
+      tvChartWidget.remove();
     };
   }, [
     selectedLocale,
     selectedNetwork,
-    !!marketId,
-    tickSizeDecimals !== undefined,
     orderLineToggleRef,
     buySellMarksToggleRef,
     setBuySellMarksToggleOn,
     setOrderLinesToggleOn,
-    tvWidget,
     setTvWidget,
   ]);
 };
