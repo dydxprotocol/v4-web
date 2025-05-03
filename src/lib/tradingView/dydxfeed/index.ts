@@ -6,7 +6,7 @@ import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 import type {
   DatafeedConfiguration,
-  ErrorCallback,
+  DatafeedErrorCallback,
   GetMarksCallback,
   HistoryCallback,
   IBasicDataFeed,
@@ -166,7 +166,7 @@ export const getDydxDatafeed = (
       firstDataRequest: boolean;
     },
     onHistoryCallback: HistoryCallback,
-    onErrorCallback: ErrorCallback
+    onErrorCallback: DatafeedErrorCallback
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!symbolInfo) return;
