@@ -107,77 +107,80 @@ export const useTradingView = ({
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    const widgetOptions = getWidgetOptions();
-    const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-    const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
+    if (marketId) {
+      const widgetOptions = getWidgetOptions();
+      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+      const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-    const options: TradingTerminalWidgetOptions = {
-      ...widgetOptions,
-      ...widgetOverrides,
-      datafeed: getDydxDatafeed(
-        store,
-        getCandlesForDatafeed,
-        { decimal, group },
-        selectedLocale,
-        stringGetter
-      ),
-      interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
-      locale: languageCode as LanguageCode,
-      symbol: marketId,
-      saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
-      auto_save_delay: 1,
-    };
+      const options: TradingTerminalWidgetOptions = {
+        ...widgetOptions,
+        ...widgetOverrides,
+        datafeed: getDydxDatafeed(
+          store,
+          getCandlesForDatafeed,
+          { decimal, group },
+          selectedLocale,
+          stringGetter
+        ),
+        interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
+        locale: languageCode as LanguageCode,
+        symbol: marketId,
+        saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+        auto_save_delay: 1,
+      };
 
-    const tvChartWidget = new Widget(options);
-    setTvWidget(tvChartWidget);
+      const tvChartWidget = new Widget(options);
+      setTvWidget(tvChartWidget);
 
-    tvChartWidget.onChartReady(() => {
-      // Initialize additional right-click-menu options
-      tvChartWidget!.onContextMenu(tradingViewLimitOrder);
+      tvChartWidget.onChartReady(() => {
+        // Initialize additional right-click-menu options
+        tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
-      tvChartWidget!.headerReady().then(() => {
-        // Order Lines
-        initializeToggle({
-          toggleRef: orderLineToggleRef,
-          widget: tvChartWidget!,
-          isOn: orderLinesToggleOn,
-          setToggleOn: setOrderLinesToggleOn,
-          label: stringGetter({
-            key: STRING_KEYS.ORDER_LINES,
-          }),
-          tooltip: stringGetter({
-            key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-          }),
+        tvChartWidget!.headerReady().then(() => {
+          // Order Lines
+          initializeToggle({
+            toggleRef: orderLineToggleRef,
+            widget: tvChartWidget!,
+            isOn: orderLinesToggleOn,
+            setToggleOn: setOrderLinesToggleOn,
+            label: stringGetter({
+              key: STRING_KEYS.ORDER_LINES,
+            }),
+            tooltip: stringGetter({
+              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+            }),
+          });
+
+          // Buy/Sell Marks
+          initializeToggle({
+            toggleRef: buySellMarksToggleRef,
+            widget: tvChartWidget!,
+            isOn: buySellMarksToggleOn,
+            setToggleOn: setBuySellMarksToggleOn,
+            label: stringGetter({
+              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+            }),
+            tooltip: stringGetter({
+              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+            }),
+          });
         });
 
-        // Buy/Sell Marks
-        initializeToggle({
-          toggleRef: buySellMarksToggleRef,
-          widget: tvChartWidget!,
-          isOn: buySellMarksToggleOn,
-          setToggleOn: setBuySellMarksToggleOn,
-          label: stringGetter({
-            key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-          }),
-          tooltip: stringGetter({
-            key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-          }),
-        });
+        tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
+          tvChartWidget!.save((chartConfig: object) => {
+            dispatch(updateChartConfig(chartConfig));
+          })
+        );
       });
-
-      tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
-        tvChartWidget!.save((chartConfig: object) => {
-          dispatch(updateChartConfig(chartConfig));
-        })
-      );
-    });
-    return () => {
-      orderLineToggleRef.current?.remove();
-      orderLineToggleRef.current = null;
-      buySellMarksToggleRef.current?.remove();
-      buySellMarksToggleRef.current = null;
-      tvChartWidget.remove();
-    };
+      return () => {
+        orderLineToggleRef.current?.remove();
+        orderLineToggleRef.current = null;
+        buySellMarksToggleRef.current?.remove();
+        buySellMarksToggleRef.current = null;
+        tvChartWidget.remove();
+      };
+    }
+    return () => {};
   }, [
     selectedLocale,
     selectedNetwork,
@@ -186,5 +189,6 @@ export const useTradingView = ({
     setBuySellMarksToggleOn,
     setOrderLinesToggleOn,
     setTvWidget,
+    !!marketId,
   ]);
 };
