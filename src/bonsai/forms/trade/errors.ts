@@ -567,7 +567,7 @@ function validateTriggerPrices(
           type: ErrorType.error,
           fields: ['triggerPrice'],
           titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
-          textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
+          textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
           textParams: {
             INDEX_PRICE: {
               value: oraclePrice,
@@ -584,7 +584,7 @@ function validateTriggerPrices(
           type: ErrorType.error,
           fields: ['triggerPrice'],
           titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
-          textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
+          textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
           textParams: {
             INDEX_PRICE: {
               value: oraclePrice,
