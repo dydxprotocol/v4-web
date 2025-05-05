@@ -58,12 +58,8 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
           const position = groupedPositions[o.positionUniqueId];
           const isOrphan = position == null;
           const hasInvalidReduceOnlyOrder =
-            (position?.side === IndexerPositionSide.LONG &&
-              o.side === IndexerOrderSide.BUY &&
-              o.reduceOnly) ||
-            (position?.side === IndexerPositionSide.SHORT &&
-              o.side === IndexerOrderSide.SELL &&
-              o.reduceOnly);
+            (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
+            (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
 
           return isOrphan || hasInvalidReduceOnlyOrder;
         });
