@@ -17,11 +17,14 @@ import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { IndexerPerpetualMarketType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerPerpetualMarketType,
+  IndexerPerpetualPositionStatus,
+  IndexerPositionSide,
+} from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
-import { FALLBACK_MARKET_LEVERAGE } from '@/lib/marketsHelpers';
 import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -86,8 +89,7 @@ export function calculateTradeSummary(
   const fieldStates = getTradeFormFieldStates(
     state,
     existingPositionOrOpenOrderMarginMode,
-    baseAccount?.position?.leverage?.toNumber(),
-    baseAccount?.position?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE,
+    baseAccount?.position,
     accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
   );
 
@@ -444,8 +446,10 @@ function calculateTradeFormOptions(
     showReduceOnly: isFieldStateEnabled(fields.reduceOnly),
     showPostOnly: isFieldStateEnabled(fields.postOnly),
 
-    showPostOnlyTooltip: fields.postOnly.state === 'disabled',
-    showReduceOnlyTooltip: fields.reduceOnly.state === 'disabled',
+    showPostOnlyTooltip:
+      fields.type.effectiveValue !== TradeFormType.MARKET && fields.postOnly.state === 'disabled',
+    showReduceOnlyTooltip:
+      fields.type.effectiveValue !== TradeFormType.MARKET && fields.reduceOnly.state === 'disabled',
   };
   return options;
 }
@@ -477,7 +481,13 @@ function getPositionIdToUseForTrade(
   const allPositions = Object.values(rawParentSubaccountData?.childSubaccounts ?? {}).flatMap(
     (o) => (o != null ? o.openPerpetualPositions[marketId] ?? [] : [])
   );
-  const positionToUse = orderBy(allPositions, [(p) => p.subaccountNumber], ['asc'])[0];
+  const positionToUse = orderBy(
+    allPositions.filter(
+      (p) => p.status === IndexerPerpetualPositionStatus.OPEN && !MustBigNumber(p.size).isZero()
+    ),
+    [(p) => p.subaccountNumber],
+    ['asc']
+  )[0];
   return positionToUse != null
     ? getPositionUniqueId(positionToUse.market, positionToUse.subaccountNumber)
     : undefined;

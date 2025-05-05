@@ -1,4 +1,3 @@
-import { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
 import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
@@ -46,7 +45,7 @@ export const AmountCloseInput = ({
   return (
     <$InputContainer>
       {/* TODO: localize */}
-      <$WithLabel label={<div tw="flex">Amount Close</div>}>
+      <$WithLabel label={<div tw="mb-0.25 flex">Amount Close</div>}>
         <$AmountCloseSlider
           label="AmountClose"
           min={0}
@@ -63,8 +62,8 @@ export const AmountCloseInput = ({
           type={InputType.Percent}
           value={amountClosePercentInput}
           max={100}
-          onChange={({ value }: NumberFormatValues) => {
-            commitValue(value);
+          onInput={({ formattedValue }: { formattedValue: string }) => {
+            commitValue(formattedValue);
           }}
         />
       </$InnerInputContainer>
@@ -90,7 +89,7 @@ const $WithLabel = styled(WithLabel)`
 
 const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
-  --input-backgroundColor: var(--color-layer-5);
+  --input-backgroundColor: var(--color-layer-4);
   --input-borderColor: none;
   --input-height: 2.25rem;
   --input-width: 5rem;

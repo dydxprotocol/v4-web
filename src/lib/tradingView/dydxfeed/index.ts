@@ -32,6 +32,7 @@ import { type RootStore } from '@/state/_store';
 import { getMarketFills } from '@/state/accountSelectors';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 
+import { waitForSelector } from '@/lib/asyncUtils';
 import { objectKeys } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -62,7 +63,6 @@ const configurationData: DatafeedConfiguration = {
 export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
-  initialPriceScale: number | null,
   localeSeparators: {
     group?: string;
     decimal?: string;
@@ -86,10 +86,12 @@ export const getDydxDatafeed = (
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
     const { tickSizeDecimals } = orEmptyObj(
-      BonsaiHelpers.markets.selectMarketSummaryById(store.getState(), symbolItem.symbol)
+      await waitForSelector(store, (s) =>
+        BonsaiHelpers.markets.selectMarketSummaryById(s, symbolItem.symbol)
+      ).catch(() => undefined)
     );
 
-    const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
+    const pricescale = tickSizeDecimals != null ? 10 ** tickSizeDecimals : 100;
 
     const symbolInfo: LibrarySymbolInfo = {
       ticker: symbolItem.symbol,
