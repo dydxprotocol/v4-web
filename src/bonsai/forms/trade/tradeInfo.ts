@@ -391,7 +391,6 @@ type SizeTarget = {
   type: 'size' | 'usdc' | 'leverage' | 'maximum';
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getMaxCrossMarketOrderSizeSummary(
   trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
@@ -1016,10 +1015,27 @@ function calculateIsolatedMarginTransferAmount(
 
   const positionSizeDifference = getPositionSizeDifference(trade, tradeSize, existingPosition);
 
+  const estOraclePriceAtExecution = calc(() => {
+    switch (trade.type) {
+      case TradeFormType.MARKET:
+        return oraclePrice;
+      case TradeFormType.LIMIT:
+      case TradeFormType.STOP_LIMIT:
+      case TradeFormType.TAKE_PROFIT_LIMIT:
+        return tradePrice;
+      case TradeFormType.STOP_MARKET:
+      case TradeFormType.TAKE_PROFIT_MARKET:
+        return MustNumber(trade.triggerPrice);
+      default:
+        assertNever(trade.type);
+        return 0;
+    }
+  });
+
   return calculateIsolatedMarginTransferAmountFromValues(
     targetLeverage,
     side,
-    oraclePrice,
+    estOraclePriceAtExecution,
     tradePrice,
     marketMaxLeverage,
     positionSizeDifference
@@ -1045,7 +1061,7 @@ function getPositionSizeDifference(
 function calculateIsolatedMarginTransferAmountFromValues(
   targetLeverage: number,
   side: OrderSide,
-  oraclePrice: number,
+  estOraclePriceAtExecution: number,
   price: number,
   maxMarketLeverage: number,
   positionSizeDifference: number
@@ -1061,7 +1077,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
 
   const amount = getTransferAmountFromTargetLeverage(
     price,
-    oraclePrice,
+    estOraclePriceAtExecution,
     side,
     positionSizeDifference,
     adjustedTargetLeverage
@@ -1074,7 +1090,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
 
 function getTransferAmountFromTargetLeverage(
   price: number,
-  oraclePrice: number,
+  estOraclePriceAtExecution: number,
   side: OrderSide,
   size: number,
   targetLeverage: number
@@ -1086,8 +1102,12 @@ function getTransferAmountFromTargetLeverage(
   const naiveTransferAmount = (price * size) / targetLeverage;
 
   // Calculate price difference for immediate PnL impact
-  const priceDiff = side === OrderSide.BUY ? price - oraclePrice : oraclePrice - price;
+  const priceDiff =
+    side === OrderSide.BUY ? price - estOraclePriceAtExecution : estOraclePriceAtExecution - price;
 
   // Return the maximum of the naive transfer and the adjusted transfer amount
-  return Math.max((oraclePrice * size) / targetLeverage + priceDiff * size, naiveTransferAmount);
+  return Math.max(
+    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size,
+    naiveTransferAmount
+  );
 }

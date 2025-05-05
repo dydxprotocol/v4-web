@@ -45,7 +45,7 @@ export const AmountCloseInput = ({
   return (
     <$InputContainer>
       {/* TODO: localize */}
-      <$WithLabel label={<div tw="flex">Amount Close</div>}>
+      <$WithLabel label={<div tw="mb-0.25 flex">Amount Close</div>}>
         <$AmountCloseSlider
           label="AmountClose"
           min={0}
