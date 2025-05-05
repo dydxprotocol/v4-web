@@ -1,4 +1,4 @@
-import { isParentSubaccount } from '@/bonsai/calculators/subaccount';
+import { isParentSubaccount } from '@/bonsai/lib/subaccountUtils';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import {
   OrderFlags,
