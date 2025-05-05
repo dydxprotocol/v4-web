@@ -190,11 +190,21 @@ export function calculateTradeSummary(
 
         const clientId = Math.floor(Math.random() * MAX_INT_ROUGHLY);
 
+        const tradeType = tradeFormTypeToOrderType(
+          type,
+          AttemptNumber(market.oraclePrice),
+          triggerPrice,
+          side
+        );
+        if (tradeType == null) {
+          return undefined;
+        }
+
         return {
           subaccountNumber: tradeInfo.subaccountNumber,
           transferToSubaccountAmount: tradeInfo.transferToSubaccountAmount,
           marketId,
-          type: tradeFormTypeToOrderType(type),
+          type: tradeType,
           side,
           price,
           size,
@@ -344,10 +354,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
 const orderTypeOptions: SelectionOption<TradeFormType>[] = [
   { value: TradeFormType.LIMIT, stringKey: 'APP.TRADE.LIMIT_ORDER_SHORT' },
   { value: TradeFormType.MARKET, stringKey: 'APP.TRADE.MARKET_ORDER_SHORT' },
-  { value: TradeFormType.STOP_LIMIT, stringKey: 'APP.TRADE.STOP_LIMIT' },
-  { value: TradeFormType.STOP_MARKET, stringKey: 'APP.TRADE.STOP_MARKET' },
-  { value: TradeFormType.TAKE_PROFIT_LIMIT, stringKey: 'APP.TRADE.TAKE_PROFIT' },
-  { value: TradeFormType.TAKE_PROFIT_MARKET, stringKey: 'APP.TRADE.TAKE_PROFIT_MARKET' },
+  { value: TradeFormType.TRIGGER_LIMIT, stringKey: 'APP.TRADE.STOP_LIMIT' },
+  { value: TradeFormType.TRIGGER_MARKET, stringKey: 'APP.TRADE.STOP_MARKET' },
 ];
 
 const goodTilUnitOptions: SelectionOption<TimeUnit>[] = [
@@ -398,12 +406,10 @@ function calculateTradeFormOptions(
   const executionOptions: SelectionOption<ExecutionType>[] = orderType
     ? matchOrderType(orderType, {
         [TradeFormType.LIMIT]: () => allExecutionOptions,
-        [TradeFormType.STOP_LIMIT]: () => allExecutionOptions,
-        [TradeFormType.TAKE_PROFIT_LIMIT]: () => allExecutionOptions,
+        [TradeFormType.TRIGGER_LIMIT]: () => allExecutionOptions,
 
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
-        [TradeFormType.STOP_MARKET]: () => iocOnlyExecutionOptions,
-        [TradeFormType.TAKE_PROFIT_MARKET]: () => iocOnlyExecutionOptions,
+        [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
       })
     : emptyExecutionOptions;
 
@@ -548,21 +554,45 @@ function calculateTradeOperationsForSimulation(
   };
 }
 
-export function tradeFormTypeToOrderType(tradeFormType: TradeFormType): OrderType {
+export function tradeFormTypeToOrderType(
+  tradeFormType: TradeFormType,
+  oraclePrice: number | undefined,
+  triggerPrice: number | undefined,
+  tradeSide: OrderSide
+): OrderType | undefined {
   switch (tradeFormType) {
     case TradeFormType.MARKET:
       return OrderType.MARKET;
     case TradeFormType.LIMIT:
       return OrderType.LIMIT;
-    case TradeFormType.STOP_MARKET:
+    case TradeFormType.TRIGGER_MARKET:
+      if (oraclePrice == null || triggerPrice == null) {
+        return undefined;
+      }
+      if (tradeSide === OrderSide.BUY) {
+        if (triggerPrice > oraclePrice) {
+          return OrderType.STOP_MARKET;
+        }
+        return OrderType.TAKE_PROFIT_MARKET;
+      }
+      if (triggerPrice > oraclePrice) {
+        return OrderType.TAKE_PROFIT_MARKET;
+      }
       return OrderType.STOP_MARKET;
-    case TradeFormType.STOP_LIMIT:
+    case TradeFormType.TRIGGER_LIMIT:
+      if (oraclePrice == null || triggerPrice == null) {
+        return undefined;
+      }
+      if (tradeSide === OrderSide.BUY) {
+        if (triggerPrice > oraclePrice) {
+          return OrderType.STOP_LIMIT;
+        }
+        return OrderType.TAKE_PROFIT_LIMIT;
+      }
+      if (triggerPrice > oraclePrice) {
+        return OrderType.TAKE_PROFIT_LIMIT;
+      }
       return OrderType.STOP_LIMIT;
-    case TradeFormType.TAKE_PROFIT_MARKET:
-      return OrderType.TAKE_PROFIT_MARKET;
-    case TradeFormType.TAKE_PROFIT_LIMIT:
-      // Note: There's a naming difference here - TAKE_PROFIT_LIMIT maps to TAKE_PROFIT
-      return OrderType.TAKE_PROFIT_LIMIT;
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;

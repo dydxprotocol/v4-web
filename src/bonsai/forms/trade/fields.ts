@@ -166,8 +166,7 @@ export function getTradeFormFieldStates(
         }
 
         return result;
-      case TradeFormType.STOP_LIMIT:
-      case TradeFormType.TAKE_PROFIT_LIMIT:
+      case TradeFormType.TRIGGER_LIMIT:
         makeVisible(result, [
           'marketId',
           'side',
@@ -188,8 +187,7 @@ export function getTradeFormFieldStates(
           forceValueAndDisable(result.reduceOnly, false);
         }
         return result;
-      case TradeFormType.STOP_MARKET:
-      case TradeFormType.TAKE_PROFIT_MARKET:
+      case TradeFormType.TRIGGER_MARKET:
         makeVisible(result, [
           'marketId',
           'side',
