@@ -12,6 +12,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { calc, mapIfPresent } from '@/lib/do';
+import { isTruthy } from '@/lib/isTruthy';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -104,11 +105,7 @@ export function getErrors(
     validationErrors.push(...validateCustomSize(state.size.size, inputData));
   }
 
-  if (
-    summary.payload == null ||
-    (summary.payload.cancelOrderPayloads.length === 0 &&
-      summary.payload.placeOrderPayloads.length === 0)
-  ) {
+  if (summary.payload == null || summary.payload.payloads.length === 0) {
     validationErrors.push(errors.noPayload());
   }
 
@@ -293,9 +290,12 @@ function validateTriggerOrderPayloadForEquityTiers(
   payload: TriggerOrdersPayload,
   inputData: TriggerOrderInputData
 ) {
-  const deletedOrderIds = new Set(payload.cancelOrderPayloads.map((c) => c.orderId));
-  const subaccountToUse = payload.placeOrderPayloads[0]?.subaccountNumber;
-  if (subaccountToUse == null) {
+  const deletedOrderIds = new Set(
+    payload.payloads.map((c) => c.cancelPayload?.orderId).filter(isTruthy)
+  );
+  const placeOrders = payload.payloads.map((p) => p.placePayload).filter(isPresent);
+  const subaccountToUse = placeOrders[0]?.subaccountNumber;
+  if (placeOrders.length === 0 || subaccountToUse == null) {
     return [];
   }
   if (inputData.allOpenOrders == null || inputData.equityTiers == null) {
@@ -327,7 +327,7 @@ function validateTriggerOrderPayloadForEquityTiers(
     return [errors.cantCalculateEquityTier()];
   }
 
-  if (relevantOpenOrders.length + payload.placeOrderPayloads.length > myEquityTierLimit.maxOrders) {
+  if (relevantOpenOrders.length + placeOrders.length > myEquityTierLimit.maxOrders) {
     return [
       errors.equityTierError(
         subaccountEquity,

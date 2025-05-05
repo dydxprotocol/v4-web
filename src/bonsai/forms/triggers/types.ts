@@ -59,9 +59,13 @@ export interface TriggerOrderInputData {
   allOpenOrders?: SubaccountOrder[];
 }
 
+export interface TriggerOrderActions {
+  cancelPayload?: CancelOrderPayload;
+  placePayload?: PlaceOrderPayload;
+}
+
 export interface TriggerOrdersPayload {
-  placeOrderPayloads: PlaceOrderPayload[];
-  cancelOrderPayloads: CancelOrderPayload[];
+  payloads: TriggerOrderActions[];
 }
 
 export interface TriggerOrderDetails {

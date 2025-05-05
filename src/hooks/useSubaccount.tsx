@@ -4,7 +4,12 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
-import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
+import {
+  isOperationFailure,
+  wrapOperationFailure,
+  wrapOperationSuccess,
+  WrappedOperationFailureError,
+} from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
@@ -32,7 +37,6 @@ import { assertNever } from '@/lib/assertNever';
 import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
-import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
@@ -53,8 +57,6 @@ export const SubaccountProvider = ({ ...props }) => {
 };
 
 export const useSubaccount = () => useContext(SubaccountContext);
-
-const chainTxExecutor = new SerialTaskExecutor();
 
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
@@ -270,25 +272,24 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(async (payload: TriggerOrdersPayload) => {
-    const { placeOrderPayloads, cancelOrderPayloads } = payload;
-
-    const cancels = cancelOrderPayloads.map(async (cancelOrderPayload) => {
-      const res = await chainTxExecutor.enqueue(() =>
-        accountTransactionManager.cancelOrder({ orderId: cancelOrderPayload.orderId })
-      );
-      return res;
+    // can assume promise fulfills if all operations are successful, otherwise throws
+    const operations = payload.payloads.map(async (operationPayload) => {
+      if (operationPayload.cancelPayload?.orderId) {
+        const res = await accountTransactionManager.cancelOrder({
+          orderId: operationPayload.cancelPayload.orderId,
+        });
+        if (isOperationFailure(res)) {
+          throw new WrappedOperationFailureError(res);
+        }
+      }
+      if (operationPayload.placePayload != null) {
+        const res = await accountTransactionManager.placeOrder(operationPayload.placePayload);
+        if (isOperationFailure(res)) {
+          throw new WrappedOperationFailureError(res);
+        }
+      }
     });
-
-    const places = placeOrderPayloads.map(async (placeOrderPayload) => {
-      const res = await chainTxExecutor.enqueue(() =>
-        accountTransactionManager.placeOrder(placeOrderPayload)
-      );
-      return res;
-    });
-    // return promises should only resolve when all are done
-    const cancelResults = await Promise.all([...cancels, ...places]);
-    const placeResults = await Promise.all([...cancels, ...places]);
-    return { cancelResults, placeResults };
+    return operations;
   }, []);
 
   // ------ Listing Method ------ //

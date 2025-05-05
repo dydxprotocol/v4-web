@@ -1,6 +1,5 @@
 import { isParentSubaccount } from '@/bonsai/calculators/subaccount';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { selectParentSubaccountOpenPositions } from '@/bonsai/selectors/account';
 import {
   OrderFlags,
   OrderStatus,
@@ -20,7 +19,7 @@ import {
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
 
-import { mapIfPresent } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import {
@@ -404,8 +403,15 @@ export const selectReclaimableChildSubaccountFunds = createAppSelector(
     BonsaiCore.account.parentSubaccountPositions.data,
     BonsaiCore.account.openOrders.data,
     getLocalPlaceOrders,
+    BonsaiCore.account.openOrders.loading,
   ],
-  (childSubaccountSummaries, parentSubaccountPositions, openOrders, localPlaceOrders) => {
+  (
+    childSubaccountSummaries,
+    parentSubaccountPositions,
+    openOrders,
+    localPlaceOrders,
+    ordersLoading
+  ) => {
     if (childSubaccountSummaries == null || parentSubaccountPositions == null) {
       return undefined;
     }
@@ -447,7 +453,7 @@ export const selectReclaimableChildSubaccountFunds = createAppSelector(
             submissionStatus === PlaceOrderStatuses.Submitted
         );
 
-        if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders) {
+        if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders || ordersLoading !== 'success') {
           return undefined;
         }
 
@@ -463,30 +469,42 @@ export const selectReclaimableChildSubaccountFunds = createAppSelector(
 );
 
 export const selectOrphanedTriggerOrders = createAppSelector(
-  [BonsaiCore.account.openOrders.data, selectParentSubaccountOpenPositions],
-  (openOrders, openPositions) => {
+  [
+    BonsaiCore.account.openOrders.data,
+    BonsaiCore.account.parentSubaccountPositions.data,
+    BonsaiCore.account.openOrders.loading,
+    BonsaiCore.account.parentSubaccountPositions.loading,
+  ],
+  (openOrders, openPositions, ordersLoading, positionsLoading) => {
     if (openOrders.length === 0) {
       return undefined;
     }
 
-    const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
+    const ordersToCancel = calc(() => {
+      if (ordersLoading !== 'success' || positionsLoading !== 'success') {
+        return [];
+      }
+      const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
 
-    const filteredOrders = openOrders.filter((o) => {
-      const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
-      const isReduceOnly = o.reduceOnly;
-      const isActiveOrder = o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
-      return isConditionalOrder && isReduceOnly && isActiveOrder;
-    });
+      const filteredOrders = openOrders.filter((o) => {
+        const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
+        const isReduceOnly = o.reduceOnly;
+        const isActiveOrder = o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
+        return isConditionalOrder && isReduceOnly && isActiveOrder;
+      });
 
-    // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
-    const ordersToCancel = filteredOrders.filter((o) => {
-      const position = groupedPositions[o.positionUniqueId];
-      const isOrphan = position == null;
-      const hasInvalidReduceOnlyOrder =
-        (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
-        (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
+      // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
+      const cancelOrders = filteredOrders.filter((o) => {
+        const position = groupedPositions[o.positionUniqueId];
+        const isOrphan = position == null;
+        const hasInvalidReduceOnlyOrder =
+          (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
+          (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
 
-      return isOrphan || hasInvalidReduceOnlyOrder;
+        return isOrphan || hasInvalidReduceOnlyOrder;
+      });
+
+      return cancelOrders;
     });
 
     return ordersToCancel;

@@ -29,7 +29,12 @@ import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
-import { getTradeFormFieldStates, isFieldStateEnabled, isFieldStateRelevant } from './fields';
+import {
+  DEFAULT_TRADE_TYPE,
+  getTradeFormFieldStates,
+  isFieldStateEnabled,
+  isFieldStateRelevant,
+} from './fields';
 import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
@@ -264,7 +269,7 @@ export function calculateTradeSummary(
 export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSummary {
   return {
     effectiveTrade: {
-      type: TradeFormType.LIMIT,
+      type: DEFAULT_TRADE_TYPE,
       marketId,
       side: undefined,
       size: undefined,
@@ -561,27 +566,6 @@ export function tradeFormTypeToOrderType(tradeFormType: TradeFormType): OrderTyp
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;
-  }
-}
-
-export function orderTypeToTradeFormType(orderType: OrderType): TradeFormType {
-  switch (orderType) {
-    case OrderType.MARKET:
-      return TradeFormType.MARKET;
-    case OrderType.LIMIT:
-      return TradeFormType.LIMIT;
-    case OrderType.STOP_MARKET:
-      return TradeFormType.STOP_MARKET;
-    case OrderType.STOP_LIMIT:
-      return TradeFormType.STOP_LIMIT;
-    case OrderType.TAKE_PROFIT_MARKET:
-      return TradeFormType.TAKE_PROFIT_MARKET;
-    case OrderType.TAKE_PROFIT_LIMIT:
-      // Note: Handling the naming difference in reverse
-      return TradeFormType.TAKE_PROFIT_LIMIT;
-    default:
-      assertNever(orderType);
-      return TradeFormType.MARKET;
   }
 }
 
