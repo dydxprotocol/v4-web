@@ -22,6 +22,8 @@ import {
   TradeFormType,
 } from './types';
 
+export const DEFAULT_TRADE_TYPE = TradeFormType.MARKET;
+
 const DEFAULT_GOOD_TIL_TIME: GoodUntilTime = {
   duration: '28',
   unit: TimeUnit.DAY,
@@ -52,7 +54,7 @@ export function getTradeFormFieldStates(
   });
 
   const defaults: Required<TradeForm> = {
-    type: TradeFormType.MARKET,
+    type: DEFAULT_TRADE_TYPE,
     marketId: '',
     side: OrderSide.BUY,
     size: OrderSizeInputs.SIZE({ value: '' }),

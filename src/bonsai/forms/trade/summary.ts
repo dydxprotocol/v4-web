@@ -29,7 +29,12 @@ import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
-import { getTradeFormFieldStates, isFieldStateEnabled, isFieldStateRelevant } from './fields';
+import {
+  DEFAULT_TRADE_TYPE,
+  getTradeFormFieldStates,
+  isFieldStateEnabled,
+  isFieldStateRelevant,
+} from './fields';
 import { calculateTradeInfo } from './tradeInfo';
 import {
   ExecutionType,
@@ -264,7 +269,7 @@ export function calculateTradeSummary(
 export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSummary {
   return {
     effectiveTrade: {
-      type: TradeFormType.MARKET,
+      type: DEFAULT_TRADE_TYPE,
       marketId,
       side: undefined,
       size: undefined,
