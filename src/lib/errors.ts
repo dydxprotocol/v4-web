@@ -45,25 +45,29 @@ export const stringifyTransactionError = (error: any): string => {
 };
 
 const replaceFnThatHandlesBigInt = (key: string, x: any) => {
+  if (x == null) {
+    return x;
+  }
+
   if (Long.isLong(x) || x instanceof Long) {
-    return x.toString() as any;
+    return x.toString();
   }
 
   if (x instanceof BigNumber) {
-    return x.toString() as any;
+    return x.toString();
   }
 
   if (typeof x === 'bigint') {
-    return x.toString() as any;
+    return x.toString();
   }
 
   const buffer = (x as any).buffer;
   if (buffer instanceof Uint8Array) {
-    return bytesToBigInt(buffer).toString() as any;
+    return bytesToBigInt(buffer).toString();
   }
 
   if (x instanceof Uint8Array) {
-    return bytesToBigInt(x).toString() as any;
+    return bytesToBigInt(x).toString();
   }
 
   return x;
