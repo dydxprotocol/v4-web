@@ -322,9 +322,7 @@ function validateLimitPriceForConditionalLimitOrders(summary: TradeFormSummary):
   }
 
   // Only validate for IOC execution
-  if (state.execution !== ExecutionType.IOC) {
-    return errors;
-  }
+  const isError = state.execution === ExecutionType.IOC;
 
   // Need both side, limitPrice and triggerPrice to validate
   if (!state.side || !state.limitPrice || !state.triggerPrice) {
@@ -343,7 +341,7 @@ function validateLimitPriceForConditionalLimitOrders(summary: TradeFormSummary):
     errors.push(
       simpleValidationError({
         code: 'LIMIT_MUST_ABOVE_TRIGGER_PRICE',
-        type: ErrorType.error,
+        type: isError ? ErrorType.error : ErrorType.warning,
         fields: ['price.triggerPrice'],
         titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
         textKey: STRING_KEYS.LIMIT_MUST_ABOVE_TRIGGER_PRICE,
@@ -354,7 +352,7 @@ function validateLimitPriceForConditionalLimitOrders(summary: TradeFormSummary):
     errors.push(
       simpleValidationError({
         code: 'LIMIT_MUST_BELOW_TRIGGER_PRICE',
-        type: ErrorType.error,
+        type: isError ? ErrorType.error : ErrorType.warning,
         fields: ['price.triggerPrice'],
         titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
         textKey: STRING_KEYS.LIMIT_MUST_BELOW_TRIGGER_PRICE,
