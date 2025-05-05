@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { TransactionMemo } from '@/constants/analytics';
+import { CosmosWalletNotificationTypes } from '@/constants/notifications';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -10,6 +11,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 import type { RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
+import { addCosmosWalletNotification, removeCosmosWalletNotification } from '@/state/notifications';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
@@ -82,6 +84,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
           childSubaccountSummaries,
           hasNonExpiredPendingWithdraws,
           parentSubaccountInfo,
+          sourceAccount,
         } = data!;
         const usdcBalance = balances.usdcAmount;
         const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
@@ -91,6 +94,10 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
           const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
 
           if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
+            if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+              return;
+            }
+
             const amountToDeposit = usdcBalanceBN
               .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
               .toFixed(USDC_DECIMALS);
@@ -149,6 +156,21 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             const subaccountNumber = Number(maybeSubaccountNumber);
             const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
 
+            if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+              logBonsaiInfo('usdcRebalanceLifecycle', `cosmos: add gas rebalance notification`, {
+                balance: usdcBalance,
+                amountToWithdraw,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+                subaccountNumber,
+              });
+
+              store.dispatch(
+                addCosmosWalletNotification(CosmosWalletNotificationTypes.GasRebalance)
+              );
+
+              return;
+            }
+
             logBonsaiInfo(
               'usdcRebalanceLifecycle',
               `withdrawing funds from subaccount (${subaccountNumber}) for gas reserve`,
@@ -177,14 +199,25 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
 
               await sleep(INVALIDATION_SLEEP_TIME);
             }
+          } else {
+            if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+              const cosmosNotif =
+                store.getState().notifications.cosmosWalletNotifications[
+                  CosmosWalletNotificationTypes.GasRebalance
+                ];
+              if (cosmosNotif) {
+                logBonsaiInfo(
+                  'usdcRebalanceLifecycle',
+                  `cosmos: remove gas rebalance notification`
+                );
+
+                store.dispatch(
+                  removeCosmosWalletNotification(CosmosWalletNotificationTypes.GasRebalance)
+                );
+              }
+            }
           }
         }
-      }
-
-      // Don't auto-rebalance on Cosmos
-      // TODO: Add notification to prompt user to rebalance manually
-      if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        return undefined;
       }
 
       activeRebalance

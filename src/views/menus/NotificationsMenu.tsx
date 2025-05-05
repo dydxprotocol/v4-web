@@ -127,7 +127,7 @@ export const NotificationsMenu = ({
             })),
         }))
         .filter(({ items: allItems }) => allItems.length),
-    [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
+    [notificationsByStatus, getDisplayData, getKey, onNotificationAction, markSeen, stringGetter]
   );
 
   const activeDialog = useAppSelector(getActiveDialog);

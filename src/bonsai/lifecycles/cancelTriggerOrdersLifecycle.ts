@@ -1,11 +1,11 @@
-import { keyBy } from 'lodash';
-
+import { CosmosWalletNotificationTypes } from '@/constants/notifications';
 import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
-import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { type RootStore } from '@/state/_store';
+import { selectOrphanedTriggerOrders } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
+import { addCosmosWalletNotification, removeCosmosWalletNotification } from '@/state/notifications';
 
 import { runFn } from '@/lib/do';
 import { TimeEjectingSet } from '@/lib/timeEjectingSet';
@@ -14,11 +14,8 @@ import { isPresent } from '@/lib/typeUtils';
 import { accountTransactionManager } from '../AccountTransactionSupervisor';
 import { isOperationFailure } from '../lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
-import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectParentSubaccountOpenPositions } from '../selectors/account';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
-import { OrderFlags, OrderStatus } from '../types/summaryTypes';
 
 // Sleep time between cancelling trigger orders to ensure that the subaccount has time to process the previous cancels
 const SLEEP_TIME = timeUnits.second * 10;
@@ -28,35 +25,11 @@ const SLEEP_TIME = timeUnits.second * 10;
  */
 export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   const selector = createAppSelector(
-    [
-      selectTxAuthorizedAccount,
-      BonsaiCore.account.openOrders.data,
-      selectParentSubaccountOpenPositions,
-    ],
-    (txAuthorizedAccount, orders, positions) => {
-      if (!txAuthorizedAccount || orders.length === 0) {
+    [selectTxAuthorizedAccount, selectOrphanedTriggerOrders],
+    (txAuthorizedAccount, orphanedTriggerOrders) => {
+      if (!txAuthorizedAccount || orphanedTriggerOrders == null) {
         return undefined;
       }
-
-      const groupedPositions = keyBy(positions, (o) => o.uniqueId);
-
-      const filteredOrders = orders.filter((o) => {
-        const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
-        const isReduceOnly = o.reduceOnly;
-        const isActiveOrder = o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
-        return isConditionalOrder && isReduceOnly && isActiveOrder;
-      });
-
-      // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
-      const ordersToCancel = filteredOrders.filter((o) => {
-        const position = groupedPositions[o.positionUniqueId];
-        const isOrphan = position == null;
-        const hasInvalidReduceOnlyOrder =
-          (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
-          (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
-
-        return isOrphan || hasInvalidReduceOnlyOrder;
-      });
 
       const { localDydxWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;
 
@@ -64,7 +37,7 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         localDydxWallet,
         sourceAccount,
         parentSubaccountInfo,
-        ordersToCancel,
+        ordersToCancel: orphanedTriggerOrders,
       };
     }
   );
@@ -78,16 +51,51 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         return undefined;
       }
 
-      if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        return undefined;
-      }
-
       runFn(async () => {
         try {
           const { ordersToCancel: ordersToCancelRaw } = data;
 
           const ordersToCancel = ordersToCancelRaw.filter((o) => !cancelingOrderIds.has(o.id));
           if (ordersToCancel.length === 0) {
+            if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
+              const cosmosNotif =
+                store.getState().notifications.cosmosWalletNotifications[
+                  CosmosWalletNotificationTypes.CancelOrphanedTriggers
+                ];
+
+              if (cosmosNotif) {
+                logBonsaiInfo(
+                  'cancelTriggerOrdersWithClosedOrFlippedPositions',
+                  `cosmos: remove cancel old trigger orders notification`,
+                  {
+                    ordersToCancel,
+                  }
+                );
+
+                store.dispatch(
+                  removeCosmosWalletNotification(
+                    CosmosWalletNotificationTypes.CancelOrphanedTriggers
+                  )
+                );
+              }
+            }
+
+            return undefined;
+          }
+
+          if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
+            logBonsaiInfo(
+              'cancelTriggerOrdersWithClosedOrFlippedPositions',
+              `cosmos: add cancel old trigger orders notification`,
+              {
+                ordersToCancel,
+              }
+            );
+
+            store.dispatch(
+              addCosmosWalletNotification(CosmosWalletNotificationTypes.CancelOrphanedTriggers)
+            );
+
             return undefined;
           }
 
