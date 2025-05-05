@@ -52,7 +52,7 @@ export function getTradeFormFieldStates(
   });
 
   const defaults: Required<TradeForm> = {
-    type: TradeFormType.LIMIT,
+    type: TradeFormType.MARKET,
     marketId: '',
     side: OrderSide.BUY,
     size: OrderSizeInputs.SIZE({ value: '' }),

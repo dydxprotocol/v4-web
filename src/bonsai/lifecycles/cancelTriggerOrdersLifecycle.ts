@@ -7,7 +7,7 @@ import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerAp
 import { type RootStore } from '@/state/_store';
 import { createAppSelector } from '@/state/appTypes';
 
-import { runFn } from '@/lib/do';
+import { calc, runFn } from '@/lib/do';
 import { TimeEjectingSet } from '@/lib/timeEjectingSet';
 import { isPresent } from '@/lib/typeUtils';
 
@@ -16,7 +16,6 @@ import { isOperationFailure } from '../lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectParentSubaccountOpenPositions } from '../selectors/account';
 import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
 import { OrderFlags, OrderStatus } from '../types/summaryTypes';
 
@@ -31,31 +30,45 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
     [
       selectTxAuthorizedAccount,
       BonsaiCore.account.openOrders.data,
-      selectParentSubaccountOpenPositions,
+      BonsaiCore.account.parentSubaccountPositions.data,
+      BonsaiCore.account.openOrders.loading,
+      BonsaiCore.account.parentSubaccountPositions.loading,
     ],
-    (txAuthorizedAccount, orders, positions) => {
+    (txAuthorizedAccount, orders, positions, ordersLoading, positionsLoading) => {
       if (!txAuthorizedAccount || orders.length === 0) {
         return undefined;
       }
 
-      const groupedPositions = keyBy(positions, (o) => o.uniqueId);
+      const ordersToCancel = calc(() => {
+        if (ordersLoading !== 'success' || positionsLoading !== 'success') {
+          return [];
+        }
+        const groupedPositions = keyBy(positions, (o) => o.uniqueId);
 
-      const filteredOrders = orders.filter((o) => {
-        const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
-        const isReduceOnly = o.reduceOnly;
-        const isActiveOrder = o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
-        return isConditionalOrder && isReduceOnly && isActiveOrder;
-      });
+        const filteredOrders = orders.filter((o) => {
+          const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
+          const isReduceOnly = o.reduceOnly;
+          const isActiveOrder =
+            o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
+          return isConditionalOrder && isReduceOnly && isActiveOrder;
+        });
 
-      // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
-      const ordersToCancel = filteredOrders.filter((o) => {
-        const position = groupedPositions[o.positionUniqueId];
-        const isOrphan = position == null;
-        const hasInvalidReduceOnlyOrder =
-          (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
-          (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
+        // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
+        const cancelOrders = filteredOrders.filter((o) => {
+          const position = groupedPositions[o.positionUniqueId];
+          const isOrphan = position == null;
+          const hasInvalidReduceOnlyOrder =
+            (position?.side === IndexerPositionSide.LONG &&
+              o.side === IndexerOrderSide.BUY &&
+              o.reduceOnly) ||
+            (position?.side === IndexerPositionSide.SHORT &&
+              o.side === IndexerOrderSide.SELL &&
+              o.reduceOnly);
 
-        return isOrphan || hasInvalidReduceOnlyOrder;
+          return isOrphan || hasInvalidReduceOnlyOrder;
+        });
+
+        return cancelOrders;
       });
 
       const { localDydxWallet, sourceAccount, parentSubaccountInfo } = txAuthorizedAccount;

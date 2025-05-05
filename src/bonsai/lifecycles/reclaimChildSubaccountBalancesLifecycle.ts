@@ -42,6 +42,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       BonsaiCore.account.childSubaccountSummaries.data,
       BonsaiCore.account.parentSubaccountPositions.data,
       selectUserHasUsdcGasForTransaction,
+      BonsaiCore.account.openOrders.loading,
     ],
     (
       authorizedAccount,
@@ -49,7 +50,8 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
       localPlaceOrders,
       childSubaccountSummaries,
       parentSubaccountPositions,
-      userHasUsdcGasForTransaction
+      userHasUsdcGasForTransaction,
+      ordersLoading
     ) => {
       if (
         !authorizedAccount ||
@@ -96,7 +98,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
               submissionStatus === PlaceOrderStatuses.Submitted
           );
 
-          if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders) {
+          if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders || ordersLoading !== 'success') {
             return undefined;
           }
 

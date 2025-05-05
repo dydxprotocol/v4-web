@@ -10,8 +10,10 @@ import {
   TradeFormType,
 } from './types';
 
+const DEFAULT_TRADE_TYPE = TradeFormType.MARKET;
+
 const getMinimumRequiredFields = (
-  type: TradeFormType = TradeFormType.LIMIT,
+  type: TradeFormType = DEFAULT_TRADE_TYPE,
   marketId?: string
 ): TradeForm => {
   // Base form only includes type
