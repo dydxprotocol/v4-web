@@ -44,9 +44,7 @@ import {
 
 const MARKET_ORDER_MAX_SLIPPAGE = 0.05;
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
-const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET = 0.05;
 const STOP_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
-const TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER = 0.1;
 const MAX_TARGET_LEVERAGE_BUFFER_PERCENT = 0.98;
 const MAX_LEVERAGE_BUFFER_PERCENT = 0.98;
 const DEFAULT_TARGET_LEVERAGE = 2.0;
@@ -155,8 +153,7 @@ export function calculateTradeInfo(
             ),
           };
         });
-      case TradeFormType.STOP_MARKET:
-      case TradeFormType.TAKE_PROFIT_MARKET:
+      case TradeFormType.TRIGGER_MARKET:
         return calc((): TradeSummary => {
           const calculated = calculateMarketOrder(trade, baseAccount, accountData, subaccountToUse);
           const orderbookBase = accountData.currentTradeMarketOrderbook;
@@ -176,13 +173,9 @@ export function calculateTradeInfo(
               const isMajorMarket = MAJOR_MARKETS.has(marketId);
               const additionalBuffer = calc(() => {
                 if (isMajorMarket) {
-                  return trade.type === TradeFormType.STOP_MARKET
-                    ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET
-                    : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET;
+                  return STOP_MARKET_ORDER_SLIPPAGE_BUFFER_MAJOR_MARKET;
                 }
-                return trade.type === TradeFormType.STOP_MARKET
-                  ? STOP_MARKET_ORDER_SLIPPAGE_BUFFER
-                  : TAKE_PROFIT_MARKET_ORDER_SLIPPAGE_BUFFER;
+                return STOP_MARKET_ORDER_SLIPPAGE_BUFFER;
               });
 
               return slippage + additionalBuffer;
@@ -267,8 +260,7 @@ export function calculateTradeInfo(
           };
         });
       case TradeFormType.LIMIT:
-      case TradeFormType.STOP_LIMIT:
-      case TradeFormType.TAKE_PROFIT_LIMIT:
+      case TradeFormType.TRIGGER_LIMIT:
         return calc((): TradeSummary => {
           const timeInForce = trade.timeInForce;
           const execution = trade.execution;
@@ -1020,11 +1012,9 @@ function calculateIsolatedMarginTransferAmount(
       case TradeFormType.MARKET:
         return oraclePrice;
       case TradeFormType.LIMIT:
-      case TradeFormType.STOP_LIMIT:
-      case TradeFormType.TAKE_PROFIT_LIMIT:
+      case TradeFormType.TRIGGER_LIMIT:
         return tradePrice;
-      case TradeFormType.STOP_MARKET:
-      case TradeFormType.TAKE_PROFIT_MARKET:
+      case TradeFormType.TRIGGER_MARKET:
         return MustNumber(trade.triggerPrice);
       default:
         assertNever(trade.type);

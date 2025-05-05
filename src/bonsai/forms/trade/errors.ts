@@ -16,6 +16,7 @@ import {
   IndexerPositionSide,
 } from '@/types/indexer/indexerApiGen';
 
+import { assertNever } from '@/lib/assertNever';
 import { mapIfPresent } from '@/lib/do';
 import { AttemptNumber } from '@/lib/numbers';
 
@@ -125,9 +126,7 @@ function validateNonMarketInputData(
   const state = summary.effectiveTrade;
   if (
     inputData.currentTradeMarketOrderbook == null &&
-    (state.type === TradeFormType.MARKET ||
-      state.type === TradeFormType.TAKE_PROFIT_MARKET ||
-      state.type === TradeFormType.STOP_MARKET)
+    (state.type === TradeFormType.MARKET || state.type === TradeFormType.TRIGGER_MARKET)
   ) {
     errors.push(
       simpleValidationError({
@@ -317,7 +316,7 @@ function validateLimitPriceForConditionalLimitOrders(summary: TradeFormSummary):
   const state = summary.effectiveTrade;
 
   // Only validate for StopLimit and TakeProfitLimit orders
-  if (state.type !== TradeFormType.STOP_LIMIT && state.type !== TradeFormType.TAKE_PROFIT_LIMIT) {
+  if (state.type !== TradeFormType.TRIGGER_LIMIT && state.type !== TradeFormType.TRIGGER_MARKET) {
     return errors;
   }
 
@@ -385,14 +384,17 @@ function validateAdvancedTradeConditions(
     // For limit orders, validate isolated margin requirements
   } else if (
     state.type === TradeFormType.LIMIT ||
-    state.type === TradeFormType.STOP_LIMIT ||
-    state.type === TradeFormType.TAKE_PROFIT_LIMIT
+    state.type === TradeFormType.TRIGGER_LIMIT ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    state.type === TradeFormType.TRIGGER_MARKET
   ) {
     // todo this should probably check for limit order if the execution is IOC
     const isolatedMarginError = validateIsolatedMarginMinSize(summary);
     if (isolatedMarginError) {
       errors.push(isolatedMarginError);
     }
+  } else {
+    assertNever(state.type);
   }
 
   return errors;
@@ -553,51 +555,12 @@ function validateTriggerPrices(
     return errors;
   }
 
-  // Determine the required relationship between trigger price and index price
-  const triggerToIndex = requiredTriggerToIndexPrice(type, side);
-
-  // Validate trigger price against oracle price
-  if (triggerToIndex != null) {
-    if (triggerToIndex === RelativeToPrice.ABOVE && triggerPrice <= oraclePrice) {
-      errors.push(
-        simpleValidationError({
-          code: 'STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE',
-          type: ErrorType.error,
-          fields: ['triggerPrice'],
-          titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
-          textKey: STRING_KEYS.TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE,
-          textParams: {
-            INDEX_PRICE: {
-              value: oraclePrice,
-              format: ErrorFormat.Price,
-              decimals: market.tickSizeDecimals,
-            },
-          },
-        })
-      );
-    } else if (triggerToIndex === RelativeToPrice.BELOW && triggerPrice >= oraclePrice) {
-      errors.push(
-        simpleValidationError({
-          code: 'TAKE_PROFIT_TRIGGER_MUST_ABOVE_INDEX_PRICE',
-          type: ErrorType.error,
-          fields: ['triggerPrice'],
-          titleKey: STRING_KEYS.MODIFY_TRIGGER_PRICE,
-          textKey: STRING_KEYS.STOP_LOSS_TRIGGER_MUST_BELOW_INDEX_PRICE,
-          textParams: {
-            INDEX_PRICE: {
-              value: oraclePrice,
-              format: ErrorFormat.Price,
-              decimals: market.tickSizeDecimals,
-            },
-          },
-        })
-      );
-    }
-  }
-
   // Validate against liquidation price for stop market orders
   const position = summary.accountDetailsBefore?.position;
-  if (position != null && type === TradeFormType.STOP_MARKET) {
+  if (
+    position != null &&
+    (type === TradeFormType.TRIGGER_LIMIT || type === TradeFormType.TRIGGER_MARKET)
+  ) {
     const isLong = position.side === IndexerPositionSide.LONG;
     const liquidationPrice = position.liquidationPrice?.toNumber();
 
@@ -644,30 +607,6 @@ function validateTriggerPrices(
   }
 
   return errors;
-}
-
-function requiredTriggerToIndexPrice(
-  type: TradeFormType,
-  side: OrderSide
-): RelativeToPrice | undefined {
-  switch (type) {
-    case TradeFormType.STOP_LIMIT:
-    case TradeFormType.STOP_MARKET:
-      return side === OrderSide.BUY ? RelativeToPrice.ABOVE : RelativeToPrice.BELOW;
-
-    case TradeFormType.TAKE_PROFIT_LIMIT:
-    case TradeFormType.TAKE_PROFIT_MARKET:
-      return side === OrderSide.BUY ? RelativeToPrice.BELOW : RelativeToPrice.ABOVE;
-
-    default:
-      return undefined;
-  }
-}
-
-// Enum for describing the relationship between prices
-enum RelativeToPrice {
-  ABOVE = 'ABOVE',
-  BELOW = 'BELOW',
 }
 
 function validatePositionState(summary: TradeFormSummary): ValidationError[] {
@@ -848,12 +787,7 @@ function fillsExistingOrder(inputData: TradeFormInputData, summary: TradeFormSum
 }
 
 function isTriggerOrder(type: TradeFormType): boolean {
-  return [
-    TradeFormType.STOP_MARKET,
-    TradeFormType.STOP_LIMIT,
-    TradeFormType.TAKE_PROFIT_MARKET,
-    TradeFormType.TAKE_PROFIT_LIMIT,
-  ].includes(type);
+  return [TradeFormType.TRIGGER_MARKET, TradeFormType.TRIGGER_LIMIT].includes(type);
 }
 
 /**

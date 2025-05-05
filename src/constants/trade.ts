@@ -46,22 +46,27 @@ export const ORDER_TYPE_STRINGS: Record<
     orderTypeKey: STRING_KEYS.MARKET_ORDER,
     descriptionKey: STRING_KEYS.MARKET_ORDER_DESCRIPTION,
   },
-  [TradeFormType.STOP_LIMIT]: {
+  [TradeFormType.TRIGGER_LIMIT]: {
     orderTypeKeyShort: STRING_KEYS.STOP_LIMIT,
     orderTypeKey: STRING_KEYS.STOP_LIMIT,
     descriptionKey: STRING_KEYS.STOP_LIMIT_DESCRIPTION,
   },
-  [TradeFormType.STOP_MARKET]: {
+  [TradeFormType.TRIGGER_MARKET]: {
     orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
     orderTypeKey: STRING_KEYS.STOP_MARKET,
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
-  [TradeFormType.TAKE_PROFIT_LIMIT]: {
-    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT,
-    orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
-    descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
+  [IndexerOrderType.STOPMARKET]: {
+    orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
+    orderTypeKey: STRING_KEYS.STOP_MARKET,
+    descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
-  [TradeFormType.TAKE_PROFIT_MARKET]: {
+  [IndexerOrderType.STOPLIMIT]: {
+    orderTypeKeyShort: STRING_KEYS.STOP_LIMIT,
+    orderTypeKey: STRING_KEYS.STOP_LIMIT,
+    descriptionKey: STRING_KEYS.STOP_LIMIT_DESCRIPTION,
+  },
+  [IndexerOrderType.TAKEPROFITMARKET]: {
     orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_MARKET_DESCRIPTION,
