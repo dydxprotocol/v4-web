@@ -1,4 +1,5 @@
 import { createVanillaReducer } from '../../lib/forms';
+import { DEFAULT_TRADE_TYPE } from './fields';
 import {
   ExecutionType,
   MarginMode,
@@ -11,7 +12,7 @@ import {
 } from './types';
 
 const getMinimumRequiredFields = (
-  type: TradeFormType = TradeFormType.LIMIT,
+  type: TradeFormType = DEFAULT_TRADE_TYPE,
   marketId?: string
 ): TradeForm => {
   // Base form only includes type
