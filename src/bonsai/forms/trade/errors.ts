@@ -439,6 +439,12 @@ function validateIsolatedMarginMinSize(summary: TradeFormSummary): ValidationErr
     return undefined;
   }
 
+  if (
+    summary.accountDetailsBefore?.position?.marginValueInitial.gte(isolatedLimitOrderMinimumEquity)
+  ) {
+    return undefined;
+  }
+
   const currentFreeCollateral = subaccountBefore.freeCollateral.toNumber();
   const postFreeCollateral = subaccountAfter.freeCollateral.toNumber();
   const orderEquity = currentFreeCollateral - postFreeCollateral;

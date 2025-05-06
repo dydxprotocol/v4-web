@@ -151,8 +151,8 @@ export class AccountTransactionSupervisor {
     tracking?: Tracker<P, Q>
   ): () => Promise<OperationResult<ToPrimitives<T>>> {
     return async () => {
+      const startTime = startTimer();
       try {
-        const startTime = startTimer();
         logBonsaiInfo(nameForLogging, 'Attempting operation', { payload });
 
         const tx = await fn(payload);
@@ -211,6 +211,7 @@ export class AccountTransactionSupervisor {
           errorString,
           error,
           source: nameForLogging,
+          timeToSubmit: startTime.elapsed(),
         });
         return wrapOperationFailure(errorString, parsed);
       }

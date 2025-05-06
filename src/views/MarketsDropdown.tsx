@@ -323,6 +323,7 @@ export const MarketsDropdown = memo(
     return (
       <$Popover
         open={isOpen}
+        noBlur
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
