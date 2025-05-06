@@ -161,17 +161,13 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
 
             if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-              if (gasRebalanceNotification) return;
-
-              logBonsaiInfo('usdcRebalanceLifecycle', `cosmos: add gas rebalance notification`, {
-                balance: usdcBalance,
-                amountToWithdraw,
-                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-                subaccountNumber,
-              });
-
               store.dispatch(
-                addCosmosWalletNotification(CosmosWalletNotificationTypes.GasRebalance)
+                addCosmosWalletNotification({
+                  type: CosmosWalletNotificationTypes.GasRebalance,
+                  data: {
+                    amount: amountToWithdraw,
+                  },
+                })
               );
 
               return;

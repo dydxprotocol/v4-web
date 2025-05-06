@@ -1,11 +1,18 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { CosmosWalletNotificationTypes, CustomNotification } from '@/constants/notifications';
+import {
+  CosmosWalletNotification,
+  CosmosWalletNotificationTypes,
+  CustomNotification,
+} from '@/constants/notifications';
 
 export interface NotificationsState {
   customNotifications: CustomNotification[];
-  cosmosWalletNotifications: Record<CosmosWalletNotificationTypes, boolean | undefined>;
+  cosmosWalletNotifications: Record<
+    CosmosWalletNotificationTypes,
+    CosmosWalletNotification | undefined
+  >;
 }
 
 const initialState: NotificationsState = {
@@ -25,8 +32,9 @@ export const notificationsSlice = createSlice({
       const newNotification = action.payload;
       state.customNotifications = [...state.customNotifications, newNotification];
     },
-    addCosmosWalletNotification: (state, action: PayloadAction<CosmosWalletNotificationTypes>) => {
-      state.cosmosWalletNotifications[action.payload] = true;
+    addCosmosWalletNotification: (state, action: PayloadAction<CosmosWalletNotification>) => {
+      const { type } = action.payload;
+      state.cosmosWalletNotifications[type] = action.payload;
     },
     removeCosmosWalletNotification: (
       state,

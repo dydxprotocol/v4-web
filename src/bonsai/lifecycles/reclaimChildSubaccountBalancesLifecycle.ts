@@ -168,18 +168,15 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
           }
 
           if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-            if (reclaimNotification) return;
-
-            logBonsaiInfo(
-              'reclaimChildSubaccountBalancesLifecycle',
-              `cosmos: add reclaim child subaccount funds notification`,
-              {
-                reclaimableChildSubaccounts,
-              }
-            );
-
             store.dispatch(
-              addCosmosWalletNotification(CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds)
+              addCosmosWalletNotification({
+                type: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
+                data: {
+                  amount: reclaimableChildSubaccounts
+                    .reduce((acc, curr) => acc.plus(curr.usdcBalance), new BigNumber(0))
+                    .toString(),
+                },
+              })
             );
 
             return;

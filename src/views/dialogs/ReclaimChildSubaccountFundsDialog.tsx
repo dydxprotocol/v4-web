@@ -32,12 +32,9 @@ export const ReclaimChildSubaccountFundsDialog = ({
 }: DialogProps<WithdrawFromSubaccountDialogProps>) => {
   const [isLoading, setIsLoading] = useState(false);
   const { dydxAddress } = useAccounts();
-
   const notify = useCustomNotification();
   const stringGetter = useStringGetter();
-
   const { transferBetweenSubaccounts } = useSubaccount();
-
   const reclaimableChildSubaccounts = useAppSelector(selectReclaimableChildSubaccountFunds);
 
   const reclaimableAmount = (reclaimableChildSubaccounts ?? EMPTY_ARR).reduce((acc, subaccount) => {
@@ -96,25 +93,30 @@ export const ReclaimChildSubaccountFundsDialog = ({
     setIsLoading(false);
   };
 
-  const buttonText = stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS });
+  const reclaimableContent = (
+    <$AmountContainer>
+      <span tw="text-color-text-0 font-small-medium">
+        {stringGetter({ key: STRING_KEYS.AVAILABLE })}
+      </span>
+      <Output
+        tw="text-color-text-1 font-medium-medium"
+        useGrouping
+        withBaseFont
+        type={OutputType.Fiat}
+        value={reclaimableAmount}
+      />
+    </$AmountContainer>
+  );
 
-  const reclaimableContent =
-    reclaimableChildSubaccounts && reclaimableAmount.gt(0) ? (
-      <$AmountContainer>
-        <span tw="text-color-text-0 font-small-medium">
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })}
-        </span>
-        <Output
-          tw="text-color-text-1 font-medium-medium"
-          useGrouping
-          withBaseFont
-          type={OutputType.Fiat}
-          value={reclaimableAmount}
-        />
-      </$AmountContainer>
-    ) : (
-      <div>No reclaimable child subaccounts</div>
-    );
+  const description =
+    reclaimableChildSubaccounts && reclaimableChildSubaccounts.length > 0
+      ? stringGetter({
+          key: STRING_KEYS.RECLAIM_FUNDS_SIGNING,
+          params: {
+            NUM_TRANSACTIONS: reclaimableChildSubaccounts.length,
+          },
+        })
+      : stringGetter({ key: STRING_KEYS.NO_FUNDS_TO_RECLAIM });
 
   return (
     <Dialog
@@ -124,10 +126,7 @@ export const ReclaimChildSubaccountFundsDialog = ({
       title={stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })}
     >
       <div tw="flexColumn mt-1.25 gap-1.25">
-        <Description tw="text-color-text-0 font-base-book">
-          Upon reclaiming, you will be prompted to sign a transaction to transfer funds that were
-          previously used as collateral for isolated margin orders.
-        </Description>
+        <Description tw="text-color-text-0 font-base-book">{description}</Description>
 
         {reclaimableContent}
 
@@ -136,7 +135,7 @@ export const ReclaimChildSubaccountFundsDialog = ({
           action={ButtonAction.Primary}
           onClick={handleReclaim}
         >
-          {buttonText}
+          {stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })}
         </Button>
       </div>
     </Dialog>

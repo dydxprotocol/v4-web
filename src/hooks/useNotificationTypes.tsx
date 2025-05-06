@@ -18,6 +18,7 @@ import {
   NotificationType,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
 import { PlaceOrderStatuses } from '@/constants/trade';
@@ -710,118 +711,103 @@ export const notificationTypes: NotificationTypeConfig[] = [
             CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
             CosmosWalletNotificationTypes.CancelOrphanedTriggers,
           ].forEach((notificationId: CosmosWalletNotificationTypes) => {
-            const cosmosNotif = cosmosWalletNotifications[notificationId];
+            const maybeCosmosNotif = cosmosWalletNotifications[notificationId];
 
-            switch (notificationId) {
-              case CosmosWalletNotificationTypes.GasRebalance:
-                if (cosmosNotif) {
-                  trigger({
-                    id: notificationId,
-                    displayData: {
-                      icon: <Icon iconName={IconName.Lightning} />,
-                      title: stringGetter({ key: STRING_KEYS.LOW_ON_GAS_TITLE }),
-                      body: stringGetter({
-                        key: STRING_KEYS.LOW_ON_GAS_BODY,
-                        params: {
-                          MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
-                          MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
-                        },
-                      }),
-                      toastSensitivity: 'background',
-                      groupKey: notificationId,
-                      toastDuration: Infinity,
-                      renderActionSlot: () => (
-                        <Link
-                          isAccent
-                          onClick={(e) => {
-                            e.preventDefault();
-                            dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
-                          }}
-                        >
-                          {stringGetter({ key: STRING_KEYS.TRANSFER })} →
-                        </Link>
+            if (maybeCosmosNotif?.type === CosmosWalletNotificationTypes.GasRebalance) {
+              trigger({
+                id: notificationId,
+                updateKey: [maybeCosmosNotif.data.amount],
+                displayData: {
+                  icon: <Icon iconName={IconName.Lightning} />,
+                  title: stringGetter({ key: STRING_KEYS.LOW_ON_GAS_TITLE }),
+                  body: stringGetter({
+                    key: STRING_KEYS.LOW_ON_GAS_BODY,
+                    params: {
+                      MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
+                      MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
+                    },
+                  }),
+                  toastSensitivity: 'background',
+                  groupKey: notificationId,
+                  toastDuration: Infinity,
+                  renderActionSlot: () => (
+                    <Link
+                      isAccent
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
+                      }}
+                    >
+                      {stringGetter({ key: STRING_KEYS.TRANSFER })} →
+                    </Link>
+                  ),
+                },
+              });
+            } else if (
+              maybeCosmosNotif?.type === CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds
+            ) {
+              trigger({
+                id: notificationId,
+                updateKey: [maybeCosmosNotif.data.amount],
+                displayData: {
+                  icon: <Icon iconName={IconName.CurrencySign} />,
+                  title: stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS }),
+                  body: stringGetter({
+                    key: STRING_KEYS.RECLAIM_FUNDS_DESCRIPTION,
+                    params: {
+                      RECLAIM_AMOUNT: MustBigNumber(maybeCosmosNotif.data.amount).toFixed(
+                        USD_DECIMALS
                       ),
                     },
-                  });
-                } else {
-                  hideNotification({
-                    type: NotificationType.CosmosWalletLifecycle,
-                    id: notificationId,
-                  });
-                }
-                break;
-
-              case CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds:
-                if (cosmosNotif) {
-                  trigger({
-                    id: notificationId,
-                    displayData: {
-                      icon: <Icon iconName={IconName.CurrencySign} />,
-                      title: stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS }),
-                      body: stringGetter({
-                        key: STRING_KEYS.RECLAIM_FUNDS_DESCRIPTION,
-                        params: {
-                          RECLAIM_AMOUNT: AMOUNT_USDC_BEFORE_REBALANCE,
-                        },
-                      }),
-                      toastSensitivity: 'background',
-                      groupKey: notificationId,
-                      toastDuration: Infinity,
-                      renderActionSlot: () => (
-                        <Link
-                          isAccent
-                          onClick={(e) => {
-                            e.preventDefault();
-                            dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
-                          }}
-                        >
-                          {stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })} →
-                        </Link>
-                      ),
-                    },
-                  });
-                } else {
-                  hideNotification({
-                    type: NotificationType.CosmosWalletLifecycle,
-                    id: notificationId,
-                  });
-                }
-                break;
-
-              case CosmosWalletNotificationTypes.CancelOrphanedTriggers:
-                if (cosmosNotif) {
-                  trigger({
-                    id: notificationId,
-                    displayData: {
-                      icon: <Icon iconName={IconName.Viewfinder} />,
-                      title: stringGetter({ key: STRING_KEYS.CANCEL_OLD_TRIGGERS }),
-                      body: stringGetter({
-                        key: STRING_KEYS.CANCEL_OLD_TRIGGERS_BODY,
-                      }),
-                      toastSensitivity: 'background',
-                      groupKey: notificationId,
-                      toastDuration: Infinity,
-                      renderActionSlot: () => (
-                        <Link
-                          isAccent
-                          onClick={(e) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          {stringGetter({ key: STRING_KEYS.CANCEL_EXTRA_ORDERS })} →
-                        </Link>
-                      ),
-                    },
-                  });
-                } else {
-                  hideNotification({
-                    type: NotificationType.CosmosWalletLifecycle,
-                    id: notificationId,
-                  });
-                }
-                break;
-              default:
-                assertNever(notificationId);
+                  }),
+                  toastSensitivity: 'background',
+                  groupKey: notificationId,
+                  toastDuration: Infinity,
+                  renderActionSlot: () => (
+                    <Link
+                      isAccent
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
+                      }}
+                    >
+                      {stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })} →
+                    </Link>
+                  ),
+                },
+              });
+            } else if (
+              maybeCosmosNotif?.type === CosmosWalletNotificationTypes.CancelOrphanedTriggers
+            ) {
+              trigger({
+                id: notificationId,
+                updateKey: [maybeCosmosNotif.data.orders],
+                displayData: {
+                  icon: <Icon iconName={IconName.Viewfinder} />,
+                  title: stringGetter({ key: STRING_KEYS.CANCEL_OLD_TRIGGERS }),
+                  body: stringGetter({
+                    key: STRING_KEYS.CANCEL_OLD_TRIGGERS_BODY,
+                  }),
+                  toastSensitivity: 'background',
+                  groupKey: notificationId,
+                  toastDuration: Infinity,
+                  renderActionSlot: () => (
+                    <Link
+                      isAccent
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
+                      {stringGetter({ key: STRING_KEYS.CANCEL_EXTRA_ORDERS })} →
+                    </Link>
+                  ),
+                },
+              });
+            } else {
+              hideNotification({
+                type: NotificationType.CosmosWalletLifecycle,
+                id: notificationId,
+              });
             }
           });
         }
@@ -830,20 +816,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useNotificationAction: () => {
       const dispatch = useAppDispatch();
       return (id: string) => {
-        const notificationId = id as CosmosWalletNotificationTypes;
+        const notificationId = id; // CosmosWalletNotificationType
 
-        switch (notificationId) {
-          case CosmosWalletNotificationTypes.GasRebalance:
-            dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
-            break;
-          case CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds:
-            dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
-            break;
-          case CosmosWalletNotificationTypes.CancelOrphanedTriggers:
-            dispatch(openDialog(DialogTypes.CancelOrphanedTriggers()));
-            break;
-          default:
-            assertNever(notificationId);
+        if (notificationId === CosmosWalletNotificationTypes.GasRebalance) {
+          dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
+        }
+
+        if (notificationId === CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds) {
+          dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
+        }
+
+        if (notificationId === CosmosWalletNotificationTypes.CancelOrphanedTriggers) {
+          dispatch(openDialog(DialogTypes.CancelOrphanedTriggers()));
         }
       };
     },

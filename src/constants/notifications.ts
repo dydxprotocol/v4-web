@@ -1,3 +1,5 @@
+import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
+
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   // Until we have migrations enabled, we need to keep underlying values the same
@@ -236,6 +238,26 @@ export enum CosmosWalletNotificationTypes {
   CancelOrphanedTriggers = 'cancel-orphaned-triggers',
   ReclaimChildSubaccountFunds = 'reclaim-child-subaccount-funds',
 }
+
+export type CosmosWalletNotification =
+  | {
+      type: CosmosWalletNotificationTypes.CancelOrphanedTriggers;
+      data: {
+        orders?: SubaccountOrder[];
+      };
+    }
+  | {
+      type: CosmosWalletNotificationTypes.GasRebalance;
+      data: {
+        amount: string;
+      };
+    }
+  | {
+      type: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds;
+      data: {
+        amount: string;
+      };
+    };
 
 export enum ReleaseUpdateNotificationIds {
   DiscoveryProgram = 'discovery-program', // Deprecated
