@@ -442,7 +442,7 @@ function validateIsolatedMarginMinSize(summary: TradeFormSummary): ValidationErr
   const currentFreeCollateral = subaccountBefore.freeCollateral.toNumber();
   const postFreeCollateral = subaccountAfter.freeCollateral.toNumber();
   const orderEquity = currentFreeCollateral - postFreeCollateral;
-  const isReducingPosition = orderEquity < 0;
+  const isReducingPosition = orderEquity <= 0;
 
   // Check if the order meets minimum equity requirements
   if (
