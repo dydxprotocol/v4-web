@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { zipObject } from 'lodash';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { Description } from '@radix-ui/react-dialog';
+import { groupBy, zipObject } from 'lodash';
 
 import { ButtonAction } from '@/constants/buttons';
 import { CancelOrphanedTriggersDialogProps, DialogProps } from '@/constants/dialogs';
@@ -11,12 +13,14 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 
 import { selectOrphanedTriggerOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 
 type OrderCancelStatus =
@@ -30,6 +34,7 @@ export const CancelOrphanedTriggerOrdersDialog = ({
   const stringGetter = useStringGetter();
   const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
   const [cancellingStatus, setCancellingStatus] = useState<Record<string, OrderCancelStatus>>({});
+  const assets = useAppSelector(BonsaiCore.markets.assets.data);
 
   const isCancelling = useMemo(
     () => Object.values(cancellingStatus).some((s) => s.type === 'pending'),
@@ -72,7 +77,7 @@ export const CancelOrphanedTriggerOrdersDialog = ({
     });
   }, [isCancelling, ordersToCancel]);
 
-  const submitButtonWithReceipt = (
+  const submitButton = (
     <Button
       action={ButtonAction.Destroy}
       onClick={onCancel}
@@ -90,15 +95,26 @@ export const CancelOrphanedTriggerOrdersDialog = ({
     </Button>
   );
 
+  // array of markets to number of orders to cancel
+  const markets = useMemo(() => {
+    return groupBy(ordersToCancel, (o) => o.marketId);
+  }, [ordersToCancel]);
+
   const dialogBody =
     ordersToCancel == null || ordersToCancel.length === 0 ? (
       <p>No remaining trigger orders to cancel.</p>
     ) : (
-      <p>
-        {stringGetter({
-          key: STRING_KEYS.CANCEL_OLD_TRIGGERS,
-        })}
-      </p>
+      <div>
+        {Object.entries(markets).map(([market, orders]) => (
+          <div key={market} tw="row justify-between">
+            <div tw="row gap-0.5">
+              <AssetIcon logoUrl={assets?.[getAssetFromMarketId(market)]?.logo} />
+              <span>{market}</span>
+            </div>
+            <p>{orders.length}</p>
+          </div>
+        ))}
+      </div>
     );
 
   return (
@@ -108,9 +124,12 @@ export const CancelOrphanedTriggerOrdersDialog = ({
       title={stringGetter({
         key: STRING_KEYS.CANCEL_OLD_TRIGGERS,
       })}
+      hasHeaderBorder
     >
-      <div tw="mb-1">{dialogBody}</div>
-      {submitButtonWithReceipt}
+      <div tw="flexColumn mt-1.25 gap-1.25">
+        <Description>{dialogBody}</Description>
+        {submitButton}
+      </div>
     </Dialog>
   );
 };

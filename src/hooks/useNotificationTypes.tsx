@@ -715,30 +715,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
             switch (notificationId) {
               case CosmosWalletNotificationTypes.GasRebalance:
                 if (cosmosNotif) {
-                  trigger(notificationId, {
-                    icon: <Icon iconName={IconName.Lightning} />,
-                    title: stringGetter({ key: STRING_KEYS.LOW_ON_GAS_TITLE }),
-                    body: stringGetter({
-                      key: STRING_KEYS.LOW_ON_GAS_BODY,
-                      params: {
-                        MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
-                        MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
-                      },
-                    }),
-                    toastSensitivity: 'background',
-                    groupKey: notificationId,
-                    toastDuration: Infinity,
-                    renderActionSlot: () => (
-                      <Link
-                        isAccent
-                        onClick={(e) => {
-                          e.preventDefault();
-                          dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
-                        }}
-                      >
-                        {stringGetter({ key: STRING_KEYS.TRANSFER })} →
-                      </Link>
-                    ),
+                  trigger({
+                    id: notificationId,
+                    displayData: {
+                      icon: <Icon iconName={IconName.Lightning} />,
+                      title: stringGetter({ key: STRING_KEYS.LOW_ON_GAS_TITLE }),
+                      body: stringGetter({
+                        key: STRING_KEYS.LOW_ON_GAS_BODY,
+                        params: {
+                          MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
+                          MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
+                        },
+                      }),
+                      toastSensitivity: 'background',
+                      groupKey: notificationId,
+                      toastDuration: Infinity,
+                      renderActionSlot: () => (
+                        <Link
+                          isAccent
+                          onClick={(e) => {
+                            e.preventDefault();
+                            dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
+                          }}
+                        >
+                          {stringGetter({ key: STRING_KEYS.TRANSFER })} →
+                        </Link>
+                      ),
+                    },
                   });
                 } else {
                   hideNotification({
@@ -750,29 +753,32 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
               case CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds:
                 if (cosmosNotif) {
-                  trigger(notificationId, {
-                    icon: <Icon iconName={IconName.CurrencySign} />,
-                    title: stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS }),
-                    body: stringGetter({
-                      key: STRING_KEYS.RECLAIM_FUNDS_DESCRIPTION,
-                      params: {
-                        RECLAIM_AMOUNT: AMOUNT_USDC_BEFORE_REBALANCE,
-                      },
-                    }),
-                    toastSensitivity: 'background',
-                    groupKey: notificationId,
-                    toastDuration: Infinity,
-                    renderActionSlot: () => (
-                      <Link
-                        isAccent
-                        onClick={(e) => {
-                          e.preventDefault();
-                          dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
-                        }}
-                      >
-                        {stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })} →
-                      </Link>
-                    ),
+                  trigger({
+                    id: notificationId,
+                    displayData: {
+                      icon: <Icon iconName={IconName.CurrencySign} />,
+                      title: stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS }),
+                      body: stringGetter({
+                        key: STRING_KEYS.RECLAIM_FUNDS_DESCRIPTION,
+                        params: {
+                          RECLAIM_AMOUNT: AMOUNT_USDC_BEFORE_REBALANCE,
+                        },
+                      }),
+                      toastSensitivity: 'background',
+                      groupKey: notificationId,
+                      toastDuration: Infinity,
+                      renderActionSlot: () => (
+                        <Link
+                          isAccent
+                          onClick={(e) => {
+                            e.preventDefault();
+                            dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
+                          }}
+                        >
+                          {stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS })} →
+                        </Link>
+                      ),
+                    },
                   });
                 } else {
                   hideNotification({
@@ -784,25 +790,28 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
               case CosmosWalletNotificationTypes.CancelOrphanedTriggers:
                 if (cosmosNotif) {
-                  trigger(notificationId, {
-                    icon: <Icon iconName={IconName.Viewfinder} />,
-                    title: stringGetter({ key: STRING_KEYS.CANCEL_OLD_TRIGGERS }),
-                    body: stringGetter({
-                      key: STRING_KEYS.CANCEL_OLD_TRIGGERS_BODY,
-                    }),
-                    toastSensitivity: 'background',
-                    groupKey: notificationId,
-                    toastDuration: Infinity,
-                    renderActionSlot: () => (
-                      <Link
-                        isAccent
-                        onClick={(e) => {
-                          e.preventDefault();
-                        }}
-                      >
-                        {stringGetter({ key: STRING_KEYS.CANCEL_EXTRA_ORDERS })} →
-                      </Link>
-                    ),
+                  trigger({
+                    id: notificationId,
+                    displayData: {
+                      icon: <Icon iconName={IconName.Viewfinder} />,
+                      title: stringGetter({ key: STRING_KEYS.CANCEL_OLD_TRIGGERS }),
+                      body: stringGetter({
+                        key: STRING_KEYS.CANCEL_OLD_TRIGGERS_BODY,
+                      }),
+                      toastSensitivity: 'background',
+                      groupKey: notificationId,
+                      toastDuration: Infinity,
+                      renderActionSlot: () => (
+                        <Link
+                          isAccent
+                          onClick={(e) => {
+                            e.preventDefault();
+                          }}
+                        >
+                          {stringGetter({ key: STRING_KEYS.CANCEL_EXTRA_ORDERS })} →
+                        </Link>
+                      ),
+                    },
                   });
                 } else {
                   hideNotification({

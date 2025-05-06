@@ -6,6 +6,7 @@ import { type RootStore } from '@/state/_store';
 import { selectOrphanedTriggerOrders } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import { addCosmosWalletNotification, removeCosmosWalletNotification } from '@/state/notifications';
+import { getCosmosWalletNotifications } from '@/state/notificationsSelectors';
 
 import { runFn } from '@/lib/do';
 import { TimeEjectingSet } from '@/lib/timeEjectingSet';
@@ -56,34 +57,34 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
           const { ordersToCancel: ordersToCancelRaw } = data;
 
           const ordersToCancel = ordersToCancelRaw.filter((o) => !cancelingOrderIds.has(o.id));
+          const state = store.getState();
+          const cancelOrphanedTriggerOrdersNotification =
+            getCosmosWalletNotifications(state)[
+              CosmosWalletNotificationTypes.CancelOrphanedTriggers
+            ];
+
           if (ordersToCancel.length === 0) {
             if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-              const cosmosNotif =
-                store.getState().notifications.cosmosWalletNotifications[
-                  CosmosWalletNotificationTypes.CancelOrphanedTriggers
-                ];
+              if (!cancelOrphanedTriggerOrdersNotification) return undefined;
+              logBonsaiInfo(
+                'cancelTriggerOrdersWithClosedOrFlippedPositions',
+                `cosmos: remove cancel old trigger orders notification`,
+                {
+                  ordersToCancel,
+                }
+              );
 
-              if (cosmosNotif) {
-                logBonsaiInfo(
-                  'cancelTriggerOrdersWithClosedOrFlippedPositions',
-                  `cosmos: remove cancel old trigger orders notification`,
-                  {
-                    ordersToCancel,
-                  }
-                );
-
-                store.dispatch(
-                  removeCosmosWalletNotification(
-                    CosmosWalletNotificationTypes.CancelOrphanedTriggers
-                  )
-                );
-              }
+              store.dispatch(
+                removeCosmosWalletNotification(CosmosWalletNotificationTypes.CancelOrphanedTriggers)
+              );
             }
 
             return undefined;
           }
 
           if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
+            if (cancelOrphanedTriggerOrdersNotification) return undefined;
+
             logBonsaiInfo(
               'cancelTriggerOrdersWithClosedOrFlippedPositions',
               `cosmos: add cancel old trigger orders notification`,

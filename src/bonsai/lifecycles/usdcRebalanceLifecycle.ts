@@ -12,6 +12,7 @@ import type { RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 import { addCosmosWalletNotification, removeCosmosWalletNotification } from '@/state/notifications';
+import { getCosmosWalletNotifications } from '@/state/notificationsSelectors';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
@@ -88,6 +89,9 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         } = data!;
         const usdcBalance = balances.usdcAmount;
         const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+        const state = store.getState();
+        const gasRebalanceNotification =
+          getCosmosWalletNotifications(state)[CosmosWalletNotificationTypes.GasRebalance];
 
         if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
           const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
@@ -157,6 +161,8 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
 
             if (sourceAccount.chain === WalletNetworkType.Cosmos) {
+              if (gasRebalanceNotification) return;
+
               logBonsaiInfo('usdcRebalanceLifecycle', `cosmos: add gas rebalance notification`, {
                 balance: usdcBalance,
                 amountToWithdraw,
@@ -201,20 +207,12 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             }
           } else {
             if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-              const cosmosNotif =
-                store.getState().notifications.cosmosWalletNotifications[
-                  CosmosWalletNotificationTypes.GasRebalance
-                ];
-              if (cosmosNotif) {
-                logBonsaiInfo(
-                  'usdcRebalanceLifecycle',
-                  `cosmos: remove gas rebalance notification`
-                );
+              if (!gasRebalanceNotification) return;
+              logBonsaiInfo('usdcRebalanceLifecycle', `cosmos: remove gas rebalance notification`);
 
-                store.dispatch(
-                  removeCosmosWalletNotification(CosmosWalletNotificationTypes.GasRebalance)
-                );
-              }
+              store.dispatch(
+                removeCosmosWalletNotification(CosmosWalletNotificationTypes.GasRebalance)
+              );
             }
           }
         }

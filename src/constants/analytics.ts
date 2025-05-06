@@ -466,14 +466,16 @@ export type AnalyticsEventTypes = TagsOf<typeof AnalyticsEvents>;
 export type AnalyticsEventPayloads = RecordOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
+
 export enum TransactionMemo {
-  depositToSubaccount = `${DEFAULT_TRANSACTION_MEMO} | deposit from wallet to subaccount`,
-  withdrawFromSubaccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from subaccount to wallet`,
-  withdrawFromAccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from account`,
+  depositToSubaccount = `${DEFAULT_TRANSACTION_MEMO} | Deposit from wallet to subaccount`,
+  withdrawFromSubaccount = `${DEFAULT_TRANSACTION_MEMO} | Withdraw from subaccount to wallet`,
+  withdrawFromAccount = `${DEFAULT_TRANSACTION_MEMO} | Withdraw from account`,
   placeOrder = `${DEFAULT_TRANSACTION_MEMO} | Place Order`,
-  cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
+  cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order transfer`,
   reclaimIsolatedMarginFunds = `${DEFAULT_TRANSACTION_MEMO} | Reclaim Isolated Margin Funds`,
   launchMarket = `${DEFAULT_TRANSACTION_MEMO} | Launch Market`,
+  transferForIsolatedMarginOrder = `${DEFAULT_TRANSACTION_MEMO} | Transfer for Isolated Margin Order`,
 }
 
 export enum AffiliateRemovalReason {

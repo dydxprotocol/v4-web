@@ -5,6 +5,7 @@ import { Description } from '@radix-ui/react-dialog';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
+import { TransactionMemo } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, WithdrawFromSubaccountDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -60,13 +61,16 @@ export const ReclaimChildSubaccountFundsDialog = ({
 
       await Promise.all(
         reclaimableChildSubaccounts.map(({ subaccountNumber, usdcBalance }) =>
-          transferBetweenSubaccounts({
-            senderAddress: dydxAddress,
-            subaccountNumber,
-            destinationSubaccountNumber: 0,
-            amount: usdcBalance.toString(),
-            destinationAddress: dydxAddress,
-          })
+          transferBetweenSubaccounts(
+            {
+              senderAddress: dydxAddress,
+              subaccountNumber,
+              destinationSubaccountNumber: 0,
+              amount: usdcBalance.toString(),
+              destinationAddress: dydxAddress,
+            },
+            TransactionMemo.reclaimIsolatedMarginFunds
+          )
         )
       );
 
@@ -94,7 +98,7 @@ export const ReclaimChildSubaccountFundsDialog = ({
 
   const buttonText = stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS });
 
-  const reclaimableList =
+  const reclaimableContent =
     reclaimableChildSubaccounts && reclaimableAmount.gt(0) ? (
       <$AmountContainer>
         <span tw="text-color-text-0 font-small-medium">
@@ -125,7 +129,7 @@ export const ReclaimChildSubaccountFundsDialog = ({
           previously used as collateral for isolated margin orders.
         </Description>
 
-        {reclaimableList}
+        {reclaimableContent}
 
         <Button
           state={{ isLoading, isDisabled }}
