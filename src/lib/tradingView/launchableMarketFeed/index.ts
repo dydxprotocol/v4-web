@@ -2,7 +2,7 @@ import { AssetData } from '@/bonsai/types/summaryTypes';
 import { DateTime } from 'luxon';
 import type {
   DatafeedConfiguration,
-  ErrorCallback,
+  DatafeedErrorCallback,
   GetMarksCallback,
   HistoryCallback,
   IBasicDataFeed,
@@ -119,7 +119,7 @@ export const getLaunchableMarketDatafeed = (
       firstDataRequest: boolean;
     },
     onHistoryCallback: HistoryCallback,
-    onErrorCallback: ErrorCallback
+    onErrorCallback: DatafeedErrorCallback
   ) => {
     if (!symbolInfo) return;
 
