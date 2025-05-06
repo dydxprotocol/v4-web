@@ -2,7 +2,6 @@ import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4
 import BigNumber from 'bignumber.js';
 
 import { TransactionMemo } from '@/constants/analytics';
-import { CosmosWalletNotificationTypes } from '@/constants/notifications';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -10,8 +9,6 @@ import { WalletNetworkType } from '@/constants/wallets';
 import type { RootStore } from '@/state/_store';
 import { selectReclaimableChildSubaccountFunds } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { addCosmosWalletNotification, removeCosmosWalletNotification } from '@/state/notifications';
-import { getCosmosWalletNotifications } from '@/state/notificationsSelectors';
 
 import { runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
@@ -141,44 +138,12 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
             (r) => !activeReclaims.has(r.subaccountNumber.toFixed(0))
           );
 
-          const state = store.getState();
-
-          const reclaimNotification =
-            getCosmosWalletNotifications(state)[
-              CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds
-            ];
-
           if (reclaimableChildSubaccounts.length === 0) {
-            if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-              if (!reclaimNotification) return;
-
-              logBonsaiInfo(
-                'reclaimChildSubaccountBalancesLifecycle',
-                `cosmos: remove reclaim child subaccount funds notification`
-              );
-
-              store.dispatch(
-                removeCosmosWalletNotification(
-                  CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds
-                )
-              );
-            }
-
             return;
           }
 
+          // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
           if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-            store.dispatch(
-              addCosmosWalletNotification({
-                type: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
-                data: {
-                  amount: reclaimableChildSubaccounts
-                    .reduce((acc, curr) => acc.plus(curr.usdcBalance), new BigNumber(0))
-                    .toString(),
-                },
-              })
-            );
-
             return;
           }
 

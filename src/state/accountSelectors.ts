@@ -10,8 +10,13 @@ import {
 import BigNumber from 'bignumber.js';
 import { groupBy, keyBy, mapValues } from 'lodash';
 
-import { OnboardingState } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  AMOUNT_USDC_BEFORE_REBALANCE,
+  OnboardingState,
+} from '@/constants/account';
 import { EMPTY_ARR } from '@/constants/objects';
+import { USDC_DECIMALS } from '@/constants/tokens';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import {
   IndexerOrderSide,
@@ -20,7 +25,7 @@ import {
 } from '@/types/indexer/indexerApiGen';
 
 import { calc, mapIfPresent } from '@/lib/do';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import {
   getAverageFillPrice,
@@ -38,6 +43,7 @@ import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getLocalPlaceOrders } from './localOrdersSelectors';
+import { selectHasNonExpiredPendingWithdraws } from './transfersSelectors';
 
 /**
  * @param state
@@ -508,5 +514,67 @@ export const selectOrphanedTriggerOrders = createAppSelector(
     });
 
     return ordersToCancel;
+  }
+);
+
+export const selectShouldAccountRebalanceUsdc = createAppSelector(
+  [
+    BonsaiCore.account.balances.data,
+    BonsaiCore.account.childSubaccountSummaries.data,
+    selectHasNonExpiredPendingWithdraws,
+  ],
+  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
+    if (childSubaccountSummaries == null) {
+      return undefined;
+    }
+
+    const usdcBalance = balances.usdcAmount;
+    const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+
+    if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
+      const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
+      const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
+
+      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
+        const amountToDeposit = usdcBalanceBN
+          .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
+          .toFixed(USDC_DECIMALS);
+
+        return {
+          requiredAction: 'deposit' as const,
+          amountToDeposit,
+          usdcBalance,
+          targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+        };
+      }
+
+      if (shouldWithdraw) {
+        const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
+          .minus(usdcBalanceBN)
+          .toFixed(USDC_DECIMALS);
+
+        const maybeSubaccountNumber = objectEntries(childSubaccountSummaries).find(
+          ([_, summary]) => {
+            return summary.freeCollateral.gt(amountToWithdraw);
+          }
+        )?.[0];
+
+        if (maybeSubaccountNumber == null) {
+          return undefined;
+        }
+
+        const subaccountNumber = Number(maybeSubaccountNumber);
+
+        return {
+          requiredAction: 'withdraw' as const,
+          amountToWithdraw,
+          fromSubaccountNumber: subaccountNumber,
+          usdcBalance,
+          targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+        };
+      }
+    }
+
+    return undefined;
   }
 );

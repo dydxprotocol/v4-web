@@ -29,21 +29,19 @@ export const CancelOrphanedTriggerOrdersDialog = ({
   }, [ordersToCancel]);
 
   const onCancelAll = useCallback(() => {
-    const marketIds = Object.keys(markets);
-
-    if (marketIds.length === 0) {
+    if (ordersToCancel == null || ordersToCancel.length === 0) {
       return;
     }
 
     setIsLoading(true);
 
-    marketIds.forEach((marketId: string) => {
-      accountTransactionManager.cancelAllOrders({ marketId });
+    ordersToCancel.forEach(({ id }) => {
+      accountTransactionManager.cancelOrder({ orderId: id });
     });
 
     setIsLoading(false);
     setIsOpen(false);
-  }, [markets, setIsOpen]);
+  }, [ordersToCancel, setIsOpen]);
 
   const submitButton = (
     <Button
