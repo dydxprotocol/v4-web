@@ -20,9 +20,12 @@ export function useCompositeClientManager() {
     [selectedNetwork, dispatch]
   );
 
+  // we use a ref with initial value so that it is valid on first render
   const managerRef = useRef<CompositeClientWrapper | null>(CompositeClientManager.use(config));
 
+  // we have to use useEffect to ensure we have cleanup on unmount
   useEffect(() => {
+    // this is to clean up the useRef initialization
     if (managerRef.current != null) {
       CompositeClientManager.markDone(config);
       managerRef.current = null;
