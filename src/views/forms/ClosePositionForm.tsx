@@ -4,6 +4,7 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
+import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
@@ -57,6 +58,7 @@ import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -99,7 +101,8 @@ export const ClosePositionForm = ({
 
   const tradeValues = useAppSelector(getClosePositionFormValues);
   const { type } = tradeValues;
-  const { summary, errors } = useAppSelector(getClosePositionFormSummary);
+  const fullSummary = useAppSelector(getClosePositionFormSummary);
+  const { summary, errors } = fullSummary;
   const useLimit = type === TradeFormType.LIMIT;
   const effectiveSizes = summary.tradeInfo.inputSummary.size;
 
@@ -202,6 +205,13 @@ export const ClosePositionForm = ({
     }
     onClearInputs();
     track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: true }));
+    try {
+      logBonsaiInfo('ClosePositionForm', 'attempting close position', {
+        fullTradeFormState: purgeBigNumbers(fullSummary),
+      });
+    } catch (e) {
+      // swallow log error
+    }
 
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
