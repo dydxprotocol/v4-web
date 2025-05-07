@@ -4,7 +4,7 @@ import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -18,8 +18,8 @@ const PositionRow = ({
   position: SubaccountPosition;
 }) => {
   const stringGetter = useStringGetter();
-  const market = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
+  const market = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
     position.market
   );
 
