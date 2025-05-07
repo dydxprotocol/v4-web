@@ -52,7 +52,7 @@ export const Notification = ({
   slotAction,
   withClose = !isToast,
 }: NotificationProps) => {
-  const { markCleared, markSeen } = useNotifications();
+  const { markCleared, markSeen, getDisplayData } = useNotifications();
   const slotContentOrDescription = slotCustomContent ?? slotDescription;
 
   return (
@@ -67,7 +67,10 @@ export const Notification = ({
           <$ActionItems>
             <Output
               type={OutputType.RelativeTime}
-              value={notification.timestamps[NotificationStatus.Triggered]}
+              value={
+                getDisplayData(notification)?.updatedTime ??
+                notification.timestamps[NotificationStatus.Triggered]
+              }
               tw="text-color-text-0"
             />
 

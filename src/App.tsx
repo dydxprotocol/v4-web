@@ -1,8 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
-import { FunkitProvider } from '@funkit/connect';
-import '@funkit/connect/styles.css';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -18,7 +16,6 @@ import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { DydxProvider } from '@/hooks/useDydxClient';
-import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
@@ -43,7 +40,6 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
-import { funkitConfig, funkitTheme } from './constants/funkit';
 import { LocalStorageKey } from './constants/localStorage';
 import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -225,18 +221,11 @@ const providers = [
   wrapProvider(GrazProvider, { grazOptions: grazConfig }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
-  import.meta.env.VITE_FUNKIT_API_KEY &&
-    wrapProvider(FunkitProvider, {
-      funkitConfig: funkitConfig(),
-      theme: funkitTheme,
-      initialChain: config.chains[0].id,
-    }),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(SkipProvider),
-  wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),

@@ -10,7 +10,7 @@ import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { isValidWithdrawalAddress } from '../utils';
 
@@ -76,8 +76,8 @@ export function useWithdrawalDeltas({ withdrawAmount }: { withdrawAmount: string
     [withdrawAmount]
   );
 
-  const modifiedParentSubaccount = useParameterizedSelector(
-    BonsaiHelpers.forms.withdraw.createSelectParentSubaccountSummary,
+  const modifiedParentSubaccount = useAppSelectorWithArgs(
+    BonsaiHelpers.forms.withdraw.selectParentSubaccountSummary,
     withdrawInput
   );
 

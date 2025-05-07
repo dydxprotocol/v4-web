@@ -14,7 +14,6 @@ import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { CoinbaseDepositDialog } from '@/views/dialogs/CoinbaseDepositDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { ConfirmPendingDepositDialog } from '@/views/dialogs/ConfirmPendingDepositDialog';
-import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
@@ -26,7 +25,6 @@ import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
-import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
@@ -37,7 +35,6 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
-import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
@@ -51,7 +48,7 @@ import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
-import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
+import { WithdrawFromSubaccountDialog } from '@/views/dialogs/WithdrawFromSubaccountDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -84,7 +81,6 @@ export const DialogManager = React.memo(() => {
     CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
-    Deposit: (args) => <DepositDialog {...args} {...modalProps} />,
     Deposit2: (args) =>
       isMainnet ? (
         <DepositDialog2 {...args} {...modalProps} />
@@ -101,7 +97,6 @@ export const DialogManager = React.memo(() => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
-    ManageFunds: (args) => <ManageFundsDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
     MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,
@@ -113,7 +108,6 @@ export const DialogManager = React.memo(() => {
     Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
-    SelectMarginMode: (args) => <SelectMarginModeDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
     Stake: (args) => <StakeDialog {...args} {...modalProps} />,
@@ -124,9 +118,9 @@ export const DialogManager = React.memo(() => {
     TransferStatus: (args) => <TransferStatusDialog {...args} {...modalProps} />,
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
-    Withdraw: (args) => <WithdrawDialog {...args} {...modalProps} />,
     Withdraw2: (args) => <WithdrawDialog2 {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,
+    WithdrawFromSubaccount: (args) => <WithdrawFromSubaccountDialog {...args} {...modalProps} />,
     Criteria: (args) => <CriteriaDialog {...args} {...modalProps} />,
   });
 });

@@ -25,7 +25,6 @@ import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { safeAssign } from '@/lib/objectHelpers';
 
 type VaultPnlChartProps = { className?: string };
 
@@ -53,7 +52,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const [hoveredTime, setHoveredTime] = useState<number | undefined>(undefined);
 
   const data = useMemo(
-    () => vaultPnl.map((v, index) => safeAssign({}, v, { index })),
+    () => vaultPnl.map((v, index) => ({ ...v, index })),
     // need to churn reference so chart updates axes
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [vaultPnl, selectedChart]
@@ -212,7 +211,7 @@ export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
                 dateOptions={{ format: 'medium' }}
               />
             ) : (
-              <Output value={new Date().valueOf()} type={OutputType.Date} />
+              <Output value={new Date().getTime()} type={OutputType.Date} />
             )}
           </div>
           <div tw="row gap-0.5 font-base-medium">

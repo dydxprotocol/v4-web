@@ -9,60 +9,10 @@ import {
 } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 
-import { AbacusOrderStatus } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
 import { IconName } from '@/components/Icon';
-
-export const getOrderStatusInfo = ({ status }: { status: string }) => {
-  switch (status) {
-    case AbacusOrderStatus.Open.rawValue: {
-      return {
-        statusIcon: IconName.OrderOpen,
-        statusIconColor: `var(--color-text-2)`,
-      };
-    }
-    case AbacusOrderStatus.PartiallyFilled.rawValue:
-    case AbacusOrderStatus.PartiallyCanceled.rawValue: {
-      return {
-        statusIcon: IconName.OrderPartiallyFilled,
-        statusIconColor: `var(--color-warning)`,
-      };
-    }
-    case AbacusOrderStatus.Filled.rawValue: {
-      return {
-        statusIcon: IconName.OrderFilled,
-        statusIconColor: `var(--color-success)`,
-      };
-    }
-    case AbacusOrderStatus.Canceled.rawValue: {
-      return {
-        statusIcon: IconName.OrderCanceled,
-        statusIconColor: `var(--color-error)`,
-      };
-    }
-    case AbacusOrderStatus.Canceling.rawValue: {
-      return {
-        statusIcon: IconName.OrderPending,
-        statusIconColor: `var(--color-error)`,
-      };
-    }
-    case AbacusOrderStatus.Untriggered.rawValue: {
-      return {
-        statusIcon: IconName.OrderUntriggered,
-        statusIconColor: `var(--color-text-2)`,
-      };
-    }
-    case AbacusOrderStatus.Pending.rawValue:
-    default: {
-      return {
-        statusIcon: IconName.OrderPending,
-        statusIconColor: `var(--color-text-2)`,
-      };
-    }
-  }
-};
 
 export const getOrderStatusInfoNew = ({ status }: { status: OrderStatusNew }) => {
   switch (status) {

@@ -91,28 +91,26 @@ export const calculateShouldRenderTriggersInPositionsTable = createAppSelector(
 /**
  * @description calculate whether positions table should render actions column
  */
-export const calculateShouldRenderActionsInPositionsTable = () =>
-  createAppSelector(
-    [calculateIsAccountViewOnly, (s, isCloseActionShown: boolean = true) => isCloseActionShown],
-    (isAccountViewOnly: boolean, isCloseActionShown) => {
-      const hasActionsInColumn = isCloseActionShown;
-      return !isAccountViewOnly && hasActionsInColumn;
-    }
-  );
+export const calculateShouldRenderActionsInPositionsTable = createAppSelector(
+  [calculateIsAccountViewOnly, (s, isCloseActionShown: boolean = true) => isCloseActionShown],
+  (isAccountViewOnly: boolean, isCloseActionShown) => {
+    const hasActionsInColumn = isCloseActionShown;
+    return !isAccountViewOnly && hasActionsInColumn;
+  }
+);
 
-export const calculateHasCancelableOrders = () =>
-  createAppSelector(
-    [getSubaccountOpenOrders, (s, marketId?: string) => marketId],
-    (openOrders, marketId) => {
-      // the extra isOrderStatusOpen check filter the order to also not be canceling / best effort canceled
-      return openOrders.some(
-        (order) =>
-          (!marketId || order.marketId === marketId) &&
-          order.status != null &&
-          isNewOrderStatusOpen(order.status)
-      );
-    }
-  );
+export const calculateHasCancelableOrders = createAppSelector(
+  [getSubaccountOpenOrders, (s, marketId?: string) => marketId],
+  (openOrders, marketId) => {
+    // the extra isOrderStatusOpen check filter the order to also not be canceling / best effort canceled
+    return openOrders.some(
+      (order) =>
+        (!marketId || order.marketId === marketId) &&
+        order.status != null &&
+        isNewOrderStatusOpen(order.status)
+    );
+  }
+);
 
 export const calculateHasCancelableOrdersInOtherMarkets = createAppSelector(
   [getSubaccountOpenOrders, getCurrentMarketId],

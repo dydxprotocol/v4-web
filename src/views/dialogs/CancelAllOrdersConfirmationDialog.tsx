@@ -1,13 +1,14 @@
 import { useCallback, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
+
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { CancelAllOrdersConfirmationDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { CANCEL_ALL_ORDERS_KEY } from '@/constants/trade';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -25,7 +26,6 @@ export const CancelAllOrdersConfirmationDialog = ({
   marketId,
 }: DialogProps<CancelAllOrdersConfirmationDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { cancelAllOrders } = useSubaccount();
   const [cancelOption, setCancelOption] = useState(marketId ?? CANCEL_ALL_ORDERS_KEY);
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const marketIdOption = marketId ?? currentMarketId;
@@ -33,7 +33,7 @@ export const CancelAllOrdersConfirmationDialog = ({
   const hasCancelableOrdersInOtherMarkets = useAppSelector(
     calculateHasCancelableOrdersInOtherMarkets
   );
-  const hasCancelableOrdersInCurrentMarket = useParameterizedSelector(
+  const hasCancelableOrdersInCurrentMarket = useAppSelectorWithArgs(
     calculateHasCancelableOrders,
     currentMarketId
   );
@@ -43,9 +43,11 @@ export const CancelAllOrdersConfirmationDialog = ({
   const shouldCancelAllOrders = cancelOption === CANCEL_ALL_ORDERS_KEY || !shouldShowOptions;
 
   const onSubmit = useCallback(() => {
-    cancelAllOrders(shouldCancelAllOrders ? undefined : marketIdOption);
+    accountTransactionManager.cancelAllOrders({
+      marketId: shouldCancelAllOrders ? undefined : marketIdOption,
+    });
     setIsOpen(false);
-  }, [cancelAllOrders, marketIdOption, setIsOpen, shouldCancelAllOrders]);
+  }, [marketIdOption, setIsOpen, shouldCancelAllOrders]);
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.CONFIRM })}>

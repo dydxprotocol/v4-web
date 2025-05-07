@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import {
@@ -16,11 +15,10 @@ import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { getGeo, getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getActiveDialog } from '@/state/dialogsSelectors';
-import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
-import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -140,7 +138,7 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     if (status) {
-      const websocketEndpoint = indexerClient.config.websocketEndpoint;
+      const websocketEndpoint = indexerClient?.config.websocketEndpoint;
 
       const lastSuccessfulIndexerRpcQuery =
         (websocketEndpoint &&
@@ -255,7 +253,7 @@ export const useAnalytics = () => {
   }, [previousSelectedWallet, selectedWallet]);
 
   // AnalyticsEvent.TradeOrderTypeSelected
-  const { type: selectedOrderType } = useAppSelector(getInputTradeData, shallowEqual) ?? {};
+  const { type: selectedOrderType } = useAppSelector(getTradeFormValues);
   const [hasSelectedOrderTypeChanged, setHasSelectedOrderTypeChanged] = useState(false);
 
   useEffect(() => {
@@ -263,7 +261,7 @@ export const useAnalytics = () => {
       if (selectedOrderType)
         track(
           AnalyticsEvents.TradeOrderTypeSelected({
-            type: getSelectedTradeType(selectedOrderType),
+            type: selectedOrderType,
           })
         );
     } else {

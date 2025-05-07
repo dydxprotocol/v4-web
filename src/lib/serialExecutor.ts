@@ -23,6 +23,11 @@ export class SerialTaskExecutor {
     });
   }
 
+  public clear() {
+    this.queue = [];
+    this.running = false;
+  }
+
   private executeNext(): void {
     if (this.queue.length === 0) {
       this.running = false;

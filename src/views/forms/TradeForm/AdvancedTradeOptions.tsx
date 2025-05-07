@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 
+import { ExecutionType, TimeInForce, TimeUnit } from '@/bonsai/forms/trade/types';
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
@@ -25,48 +24,51 @@ import { InputType } from '@/components/Input';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
-
-import abacusStateManager from '@/lib/abacus';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { tradeFormActions } from '@/state/tradeForm';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
-  const currentTradeFormConfig = useAppSelector(getInputTradeOptions, shallowEqual);
-  const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
+  const currentTradeFormConfig = currentTradeFormSummary.options;
+  const inputTradeData = useAppSelector(getTradeFormValues);
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData ?? {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData;
 
   const {
     executionOptions,
-    needsGoodUntil,
-    needsPostOnly,
-    needsReduceOnly,
-    postOnlyTooltip,
-    reduceOnlyTooltip,
     timeInForceOptions,
-  } = currentTradeFormConfig ?? {};
+
+    showReduceOnly,
+    showPostOnly,
+    showGoodTil,
+
+    showPostOnlyTooltip,
+    showReduceOnlyTooltip,
+  } = currentTradeFormConfig;
 
   const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = !!needsPostOnly || !!postOnlyTooltip;
-  const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
+  const shouldShowPostOnly = showPostOnly || showPostOnlyTooltip;
+  const shouldShowReduceOnly = showReduceOnly || showReduceOnlyTooltip;
 
-  const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
-  const hasTimeInForce = !!timeInForceOptions?.toArray().length;
-  const needsTimeRow = !!needsGoodUntil || hasTimeInForce;
+  const needsExecution =
+    (executionOptions.length > 0 && execution != null) ||
+    shouldShowPostOnly ||
+    shouldShowReduceOnly;
+  const hasTimeInForce = timeInForceOptions.length > 0;
+  const needsTimeRow = showGoodTil || (hasTimeInForce && timeInForce != null);
 
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {
-      abacusStateManager.setTradeValue({
-        value: true,
-        field: TradeInputField.reduceOnly,
-      });
+      dispatch(tradeFormActions.setReduceOnly(true));
     }
-  }, [complianceState]);
+  }, [complianceState, dispatch]);
 
   const necessary = needsTimeRow || needsExecution;
   if (!necessary) {
@@ -86,24 +88,26 @@ export const AdvancedTradeOptions = () => {
             {hasTimeInForce && timeInForce != null && (
               <$SelectMenu
                 value={timeInForce}
-                onValueChange={(selectedTimeInForceOption: string) =>
-                  abacusStateManager.setTradeValue({
-                    value: selectedTimeInForceOption,
-                    field: TradeInputField.timeInForceType,
-                  })
-                }
+                onValueChange={(selectedTimeInForceOption: string) => {
+                  if (!selectedTimeInForceOption) {
+                    return;
+                  }
+                  dispatch(
+                    tradeFormActions.setTimeInForce(selectedTimeInForceOption as TimeInForce)
+                  );
+                }}
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
-                {timeInForceOptions.toArray().map(({ type, stringKey }) => (
+                {timeInForceOptions.map(({ value, stringKey }) => (
                   <$SelectItem
-                    key={type}
-                    value={type}
+                    key={value}
+                    value={value}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
               </$SelectMenu>
             )}
-            {needsGoodUntil && (
+            {showGoodTil && (
               <$FormInput
                 id="trade-good-til-time"
                 type={InputType.Number}
@@ -112,10 +116,9 @@ export const AdvancedTradeOptions = () => {
                   key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
                 })}
                 onChange={({ value }: NumberFormatValues) => {
-                  abacusStateManager.setTradeValue({
-                    value: Number(value),
-                    field: TradeInputField.goodTilDuration,
-                  });
+                  dispatch(
+                    tradeFormActions.setGoodTilTime({ duration: value, unit: unit ?? TimeUnit.DAY })
+                  );
                 }}
                 value={duration ?? ''}
                 slotRight={
@@ -123,10 +126,15 @@ export const AdvancedTradeOptions = () => {
                     <$InnerSelectMenu
                       value={unit}
                       onValueChange={(goodTilTimeTimescale: string) => {
-                        abacusStateManager.setTradeValue({
-                          value: goodTilTimeTimescale,
-                          field: TradeInputField.goodTilUnit,
-                        });
+                        if (!goodTilTimeTimescale) {
+                          return;
+                        }
+                        dispatch(
+                          tradeFormActions.setGoodTilTime({
+                            duration: duration ?? '',
+                            unit: goodTilTimeTimescale as TimeUnit,
+                          })
+                        );
                       }}
                     >
                       {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
@@ -147,50 +155,35 @@ export const AdvancedTradeOptions = () => {
         )}
         {needsExecution && (
           <>
-            {executionOptions && execution != null && (
+            {executionOptions.length > 0 && execution != null && (
               <$SelectMenu
                 value={execution}
                 label={stringGetter({ key: STRING_KEYS.EXECUTION })}
-                onValueChange={(selectedTimeInForceOption: string) =>
-                  abacusStateManager.setTradeValue({
-                    value: selectedTimeInForceOption,
-                    field: TradeInputField.execution,
-                  })
-                }
+                onValueChange={(selectedExecution: string) => {
+                  if (!selectedExecution) {
+                    return;
+                  }
+                  dispatch(tradeFormActions.setExecution(selectedExecution as ExecutionType));
+                }}
               >
-                {executionOptions.toArray().map(({ type, stringKey }) => (
+                {executionOptions.map(({ value, stringKey }) => (
                   <$SelectItem
-                    key={type}
-                    value={type}
+                    key={value}
+                    value={value}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
               </$SelectMenu>
             )}
-            {showReduceOnly && (
+            {shouldShowReduceOnly && (
               <Checkbox
-                checked={
-                  (!!reduceOnly && !reduceOnlyTooltip) ||
-                  complianceState === ComplianceStates.CLOSE_ONLY ||
-                  false
-                }
-                disabled={!!reduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
-                onCheckedChange={(checked) =>
-                  abacusStateManager.setTradeValue({
-                    value: checked,
-                    field: TradeInputField.reduceOnly,
-                  })
-                }
+                checked={!!reduceOnly}
+                disabled={showReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
+                onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
                 id="reduce-only"
                 label={
                   <WithTooltip
-                    tooltip={
-                      needsReduceOnly
-                        ? 'reduce-only'
-                        : reduceOnlyTooltip?.titleStringKey.includes('REDUCE_ONLY_EXECUTION_IOC')
-                          ? 'reduce-only-execution-ioc'
-                          : 'reduce-only-timeinforce-ioc'
-                    }
+                    tooltip={showReduceOnly ? 'reduce-only' : 'reduce-only-timeinforce-ioc'}
                     side="right"
                   >
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
@@ -198,20 +191,15 @@ export const AdvancedTradeOptions = () => {
                 }
               />
             )}
-            {showPostOnly && (
+            {shouldShowPostOnly && (
               <Checkbox
-                checked={!!postOnly && !postOnlyTooltip}
-                disabled={!!postOnlyTooltip}
-                onCheckedChange={(checked) =>
-                  abacusStateManager.setTradeValue({
-                    value: checked,
-                    field: TradeInputField.postOnly,
-                  })
-                }
+                checked={!!postOnly}
+                disabled={showPostOnlyTooltip}
+                onCheckedChange={(checked) => dispatch(tradeFormActions.setPostOnly(checked))}
                 id="post-only"
                 label={
                   <WithTooltip
-                    tooltip={needsPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
+                    tooltip={showPostOnly ? 'post-only' : 'post-only-timeinforce-gtt'}
                     side="right"
                   >
                     {stringGetter({ key: STRING_KEYS.POST_ONLY })}

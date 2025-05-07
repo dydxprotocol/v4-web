@@ -6,15 +6,12 @@ import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
 
-import { autoBatchAllReducers } from './autoBatchHelpers';
-
 export interface PerpetualsState {
   currentMarketId?: string;
   // if user is viewing is a live, tradeable market: its id; otherwise: undefined
   currentMarketIdIfTradeable?: string;
   marketFilter: MarketFilters;
   launchMarketIds: string[];
-  abacusHasMarkets: boolean;
 }
 
 const initialState: PerpetualsState = {
@@ -22,7 +19,6 @@ const initialState: PerpetualsState = {
   currentMarketIdIfTradeable: undefined,
   marketFilter: MarketFilters.ALL,
   launchMarketIds: [],
-  abacusHasMarkets: false,
 };
 
 export const perpetualsSlice = createSlice({
@@ -41,11 +37,6 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.currentMarketIdIfTradeable = action.payload;
     },
-    ...autoBatchAllReducers<PerpetualsState>()({
-      setAbacusHasMarkets: (state: PerpetualsState, action: PayloadAction<boolean>) => {
-        state.abacusHasMarkets = action.payload;
-      },
-    }),
     resetPerpetualsState: () =>
       ({
         ...initialState,
@@ -72,5 +63,4 @@ export const {
   resetPerpetualsState,
   setMarketFilter,
   setLaunchMarketIds,
-  setAbacusHasMarkets,
 } = perpetualsSlice.actions;

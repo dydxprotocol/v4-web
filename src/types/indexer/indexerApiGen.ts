@@ -1260,6 +1260,12 @@ export interface IndexerPerpetualMarketResponseObject {
    * @memberof PerpetualMarketResponseObject
    */
   baseOpenInterest: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PerpetualMarketResponseObject
+   */
+  defaultFundingRate1H?: string | null;
 }
 /**
  *
@@ -1424,18 +1430,6 @@ export enum IndexerPnlTickInterval {
  * @interface PnlTicksResponseObject
  */
 export interface IndexerPnlTicksResponseObject {
-  /**
-   *
-   * @type {string}
-   * @memberof PnlTicksResponseObject
-   */
-  id: string;
-  /**
-   *
-   * @type {string}
-   * @memberof PnlTicksResponseObject
-   */
-  subaccountId: string;
   /**
    *
    * @type {string}

@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -20,7 +19,6 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 type DepositFormProps = {
@@ -32,25 +30,19 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const stringGetter = useStringGetter();
   const { dydxAddress, getSubaccounts } = useAccounts();
   const { requestFaucetFunds } = useSubaccount();
-  const subAccount = useAppSelector(getSubaccount, shallowEqual);
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const dydxChainId = useEnvConfig('dydxChainId');
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // call getSubaccounts once the subaccount detected via ws from abacus
+  // call getSubaccounts once the subaccount detected via ws from bonsai
   useEffect(() => {
     if (dydxAddress && isLoading && subAccount) {
       setIsLoading(false);
       getSubaccounts({ dydxAddress });
     }
   }, [subAccount]);
-
-  useEffect(() => {
-    return () => {
-      abacusStateManager.resetInputState();
-    };
-  }, []);
 
   return (
     <$Form

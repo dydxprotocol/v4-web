@@ -44,7 +44,7 @@ import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 import { OrderStatusIconNew } from '../OrderStatusIcon';
-import { CancelOrClearAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
+import { CancelAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 import {
   getIndexerOrderSideStringKey,
@@ -248,7 +248,7 @@ const getOrdersTableColumnDef = ({
       },
       [OrdersTableColumnKey.Actions]: {
         columnKey: 'cancelOrClear',
-        label: <CancelOrClearAllOrdersButton marketId={currentMarket} />,
+        label: <CancelAllOrdersButton marketId={currentMarket} />,
         isActionable: true,
         allowsSorting: false,
         renderCell: ({ id, status, orderFlags }) => (
@@ -335,7 +335,7 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.MarginType]: {
         columnKey: 'marginType',
         label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber),
         renderCell({ marginMode }): ReactNode {
           const marginModeLabel =
             marginMode === 'CROSS'

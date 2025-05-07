@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -27,7 +27,7 @@ type DepositStatusProps = {
 
 export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) => {
   const stringGetter = useStringGetter();
-  const deposit = useParameterizedSelector(selectDeposit, txHash, chainId);
+  const deposit = useAppSelectorWithArgs(selectDeposit, txHash, chainId);
 
   const depositSuccess = deposit?.status === 'success';
 

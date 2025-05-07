@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -16,8 +15,8 @@ export const GuardedMobileRoute = () => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
-  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const activeDialog = useAppSelector(getActiveDialog);
   const prevActiveDialog = useRef(activeDialog);
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export const GuardedMobileRoute = () => {
       navigate('/');
     }
     prevActiveDialog.current = activeDialog;
-  }, [activeDialog, canAccountTrade, isTablet]);
+  }, [activeDialog, canAccountTrade, isTablet, navigate]);
 
   return <Outlet />;
 };

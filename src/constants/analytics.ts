@@ -1,3 +1,6 @@
+import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
+import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import { SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
@@ -7,13 +10,10 @@ import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
 
-import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
 import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
-import { TransferNotificationTypes } from './notifications';
-import type { TradeTypes } from './trade';
 import { DisplayUnit } from './trade';
 import type { DydxAddress } from './wallets';
 
@@ -83,7 +83,6 @@ export const AnalyticsUserProperties = unionize(
 
     // validators
     BonsaiValidatorUrl: ofType<string | null>(),
-    AbacusValidatorUrl: ofType<string | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -103,7 +102,6 @@ export const AnalyticsUserPropertyLoggableTypes = {
   DydxAddress: 'dydxAddress',
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
-  AbacusValidatorUrl: 'abacusValidator',
   BonsaiValidatorUrl: 'bonsaiValidator',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
@@ -116,7 +114,7 @@ export const AnalyticsEvents = unionize(
     // App
     AppStart: ofType<{}>(),
     NetworkStatus: ofType<{
-      status: (typeof AbacusApiStatus)['name'];
+      status: ApiStatus;
       /** Last time indexer node was queried successfully */
       lastSuccessfulIndexerRpcQuery?: number;
       /** Time elapsed since indexer node was queried successfully */
@@ -241,46 +239,55 @@ export const AnalyticsEvents = unionize(
       toAmount?: number;
       toAmountMin?: number;
     }>(),
-    TransferNotification: ofType<{
-      type: TransferNotificationTypes | undefined;
-      toAmount: number | undefined;
-      timeSpent: Record<string, number> | number | undefined;
-      txHash: string;
-      status: 'new' | 'success' | 'error';
-      triggeredAt: number | undefined;
-    }>(),
 
     // Trading
     TradeOrderTypeSelected: ofType<{
-      type: TradeTypes;
+      type: TradeFormType;
     }>(),
     DisplayUnitToggled: ofType<{
       newDisplayUnit: DisplayUnit;
       entryPoint?: string;
       assetId: string;
     }>(),
-    TradePlaceOrder: ofType<
-      HumanReadablePlaceOrderPayload & {
+
+    TradePlaceOrderClick: ofType<
+      PlaceOrderPayload & {
         isClosePosition: boolean;
       }
     >(),
-    TradePlaceOrderConfirmed: ofType<{
-      /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-      roundtripMs: number;
-      /** URL/IP of node the order was sent to */
-      validatorUrl: string;
+    TradePlaceOrder: ofType<PlaceOrderPayload>(),
+    TradePlaceOrderSubmissionConfirmed: ofType<PlaceOrderPayload & { durationMs: number }>(),
+    TradePlaceOrderSubmissionFailed: ofType<
+      PlaceOrderPayload & { error: string; durationMs: number }
+    >(),
+    TradePlaceOrderConfirmed: ofType<
+      PlaceOrderPayload & {
+        roundtripMs: number;
+        sinceSubmissionMs: number | undefined;
+      }
+    >(),
+
+    TradeCancelOrderClick: ofType<{ orderId: string }>(),
+    TradeCancelOrder: ofType<{ orderId: string }>(),
+    TradeCancelOrderSubmissionConfirmed: ofType<{ orderId: string; durationMs: number }>(),
+    TradeCancelOrderSubmissionFailed: ofType<{
+      orderId: string;
+      error: string;
+      durationMs: number;
     }>(),
-    TradeCancelOrder: ofType<{}>(),
     TradeCancelOrderConfirmed: ofType<{
-      /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
       roundtripMs: number;
-      /** URL/IP of node the order was sent to */
-      validatorUrl: string;
+      sinceSubmissionMs: number | undefined;
+      orderId: string;
     }>(),
+
+    TriggerOrderClick: ofType<{ marketId: string | undefined }>(),
+    TradeCancelAllOrdersClick: ofType<{ marketId?: string }>(),
+    TradeCloseAllPositionsClick: ofType<{}>(),
 
     // TradingView actions
     TradingViewOrderModificationSubmitted: ofType<
-      HumanReadablePlaceOrderPayload & {
+      PlaceOrderPayload & {
         previousOrderClientId: string;
         previousOrderPrice: string;
       }
@@ -463,10 +470,9 @@ export enum TransactionMemo {
   depositToSubaccount = `${DEFAULT_TRANSACTION_MEMO} | deposit from wallet to subaccount`,
   withdrawFromSubaccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from subaccount to wallet`,
   withdrawFromAccount = `${DEFAULT_TRANSACTION_MEMO} | withdraw from account`,
-
   placeOrder = `${DEFAULT_TRANSACTION_MEMO} | Place Order`,
   cancelOrderTransfer = `${DEFAULT_TRANSACTION_MEMO} | Cancel Order`,
-
+  reclaimIsolatedMarginFunds = `${DEFAULT_TRANSACTION_MEMO} | Reclaim Isolated Margin Funds`,
   launchMarket = `${DEFAULT_TRANSACTION_MEMO} | Launch Market`,
 }
 

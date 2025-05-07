@@ -1,5 +1,4 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -11,11 +10,9 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { PositionTile } from '@/views/PositionTile';
 
-import {
-  getCurrentMarketPositionData,
-  getCurrentMarketPositionDataForPostTrade,
-} from '@/state/accountSelectors';
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentSelectedFormPositionSummary } from '@/state/tradeFormSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -33,10 +30,10 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
     logo: imageUrl,
   } = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
   const { signedSize: positionSize, notional: notionalTotal } = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionData, shallowEqual)
+    useAppSelector(getCurrentMarketPositionData)
   );
-  const { size: positionSizePostOrder } = orEmptyObj(
-    useAppSelector(getCurrentMarketPositionDataForPostTrade)
+  const { signedSize: positionSizePostOrder } = orEmptyObj(
+    useAppSelector(getCurrentSelectedFormPositionSummary)
   );
 
   return (
@@ -56,7 +53,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         assetImgUrl={imageUrl}
         currentSize={positionSize?.toNumber()}
         notionalTotal={notionalTotal?.toNumber()}
-        postOrderSize={positionSizePostOrder?.postOrder}
+        postOrderSize={positionSizePostOrder?.toNumber()}
         stepSizeDecimals={stepSizeDecimals}
         symbol={id}
         tickSizeDecimals={tickSizeDecimals}

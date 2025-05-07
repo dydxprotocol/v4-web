@@ -1,7 +1,5 @@
 import { useCallback, useEffect } from 'react';
 
-import { shallowEqual } from 'react-redux';
-
 import { DialogTypes } from '@/constants/dialogs';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -10,7 +8,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const useCommandMenu = () => {
   const dispatch = useAppDispatch();
-  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
+  const activeDialog = useAppSelector(getActiveDialog);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

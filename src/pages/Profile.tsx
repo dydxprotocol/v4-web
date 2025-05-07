@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 import { useEnsName } from 'wagmi';
 
-import { TransferType } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -83,13 +82,7 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       icon: { iconName: IconName.Deposit },
       onClick: () => {
-        dispatch(
-          openDialog(
-            DialogTypes.ManageFunds({
-              selectedTransferType: TransferType.deposit.rawValue,
-            })
-          )
-        );
+        dispatch(openDialog(DialogTypes.Deposit2({})));
       },
     },
     {
@@ -97,13 +90,7 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.WITHDRAW }),
       icon: { iconName: IconName.Withdraw },
       onClick: () => {
-        dispatch(
-          openDialog(
-            DialogTypes.ManageFunds({
-              selectedTransferType: TransferType.withdrawal.rawValue,
-            })
-          )
-        );
+        dispatch(openDialog(DialogTypes.Withdraw2({})));
       },
     },
     {
@@ -111,13 +98,7 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.TRANSFER }),
       icon: { iconName: IconName.Send },
       onClick: () => {
-        dispatch(
-          openDialog(
-            DialogTypes.ManageFunds({
-              selectedTransferType: TransferType.transferOut.rawValue,
-            })
-          )
-        );
+        dispatch(openDialog(DialogTypes.Transfer({})));
       },
     },
     isConnected

@@ -1,6 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { VerticalSeparator } from '@/components/Separator';
@@ -11,7 +13,8 @@ import { MarketsDropdown } from '@/views/MarketsDropdown';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketDisplayId } from '@/state/perpetualsSelectors';
 
-import { getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { getAssetFromMarketId, getDisplayableTickerFromMarket } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
 
 export const MarketSelectorAndStats = ({
   className,
@@ -20,19 +23,21 @@ export const MarketSelectorAndStats = ({
   className?: string;
   launchableMarketId?: string;
 }) => {
-  const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
-  const currentMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
+  const launchableImageUrl = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetLogo,
+    mapIfPresent(launchableMarketId, getAssetFromMarketId)
+  );
+  const launchableId = mapIfPresent(launchableMarketId, getDisplayableTickerFromMarket);
 
-  const displayableId = launchableMarketId
-    ? getDisplayableTickerFromMarket(launchableMarketId)
-    : launchableMarketId;
+  const tradeableImageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+  const tradeableMarketId = useAppSelector(getCurrentMarketDisplayId) ?? '';
 
   return (
     <$Container className={className}>
       <MarketsDropdown
         launchableMarketId={launchableMarketId}
-        currentMarketId={displayableId ?? currentMarketId}
-        logoUrl={imageUrl}
+        currentMarketId={launchableId ?? tradeableMarketId}
+        logoUrl={launchableImageUrl ?? tradeableImageUrl}
       />
 
       <VerticalSeparator fullHeight />

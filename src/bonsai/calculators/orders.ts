@@ -49,8 +49,8 @@ function calculateSubaccountOrder(
     marketId: base.ticker,
     status: calculateBaseOrderStatus(base, protocolHeight),
     displayId: getDisplayableTickerFromMarket(base.ticker),
-    expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
-    updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).valueOf()),
+    expiresAtMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).getTime()),
+    updatedAtMilliseconds: mapIfPresent(base.updatedAt, (u) => new Date(u).getTime()),
     updatedAtHeight: MaybeBigNumber(base.updatedAtHeight)?.toNumber(),
     marginMode: base.subaccountNumber >= NUM_PARENT_SUBACCOUNTS ? 'ISOLATED' : 'CROSS',
     subaccountNumber: base.subaccountNumber,
@@ -67,9 +67,9 @@ function calculateSubaccountOrder(
     size: MustBigNumber(base.size),
     totalFilled: MustBigNumber(base.totalFilled),
     goodTilBlock: MaybeBigNumber(base.goodTilBlock)?.toNumber(),
-    goodTilBlockTimeMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).valueOf()),
+    goodTilBlockTimeMilliseconds: mapIfPresent(base.goodTilBlockTime, (u) => new Date(u).getTime()),
     goodTilBlockTimeSeconds: mapIfPresent(base.goodTilBlockTime, (u) =>
-      Math.floor(new Date(u).valueOf() / 1000)
+      Math.floor(new Date(u).getTime() / 1000)
     ),
     createdAtHeight: MaybeBigNumber(base.createdAtHeight)?.toNumber(),
     postOnly: !!base.postOnly,
@@ -151,7 +151,7 @@ function maybeUpdateOrderIfExpired(
     return {
       ...order,
       status,
-      updatedAtMilliseconds: new Date(height.time).valueOf(),
+      updatedAtMilliseconds: new Date(height.time).getTime(),
       updatedAtHeight: height.height,
     };
   }

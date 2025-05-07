@@ -37,7 +37,7 @@ export const UnstakeDialog = ({ setIsOpen }: DialogProps<UnstakeDialogProps>) =>
       title: stringGetter({ key: STRING_KEYS.UNSTAKE }),
       description: (
         <div tw="inlineRow">
-          {currentDelegations?.length === 1
+          {currentDelegations.length === 1
             ? stringGetter({
                 key: STRING_KEYS.CURRENTLY_STAKING_WITH,
                 params: {

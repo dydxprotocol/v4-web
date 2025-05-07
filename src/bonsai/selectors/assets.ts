@@ -12,16 +12,14 @@ export const selectAllAssetsInfoLoading = createAppSelector(
   (assets) => assets.status
 );
 
-export const createSelectAssetInfo = () =>
-  createAppSelector(
-    [selectAllAssetsInfo, (_s, assetId: string | undefined) => assetId],
-    (assets, assetId) => {
-      if (assetId == null) {
-        return undefined;
-      }
-      return assets?.[assetId];
+export const selectAssetInfo = createAppSelector(
+  [selectAllAssetsInfo, (_s, assetId: string | undefined) => assetId],
+  (assets, assetId) => {
+    if (assetId == null) {
+      return undefined;
     }
-  );
+    return assets?.[assetId];
+  }
+);
 
-export const createSelectAssetLogo = () =>
-  createAppSelector([createSelectAssetInfo()], (asset) => asset?.logo);
+export const selectAssetLogo = createAppSelector([selectAssetInfo], (asset) => asset?.logo);

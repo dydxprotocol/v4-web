@@ -63,11 +63,13 @@ export const AMOUNT_RESERVED_FOR_GAS_USDC = 1.25;
 export const AMOUNT_USDC_BEFORE_REBALANCE = 1.0;
 export const AMOUNT_RESERVED_FOR_GAS_DYDX = 0.1;
 export const AMOUNT_RESERVED_FOR_GAS_NOBLE = 0.1;
+export const AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC = 0.005;
 
 /**
  * @description The number of parentSubaccounts: 0 - 127, 128 is the first childSubaccount
  */
 export const NUM_PARENT_SUBACCOUNTS = 128;
+export const MAX_SUBACCOUNT_NUMBER = 128000;
 
 export type RawSubaccountFill = {
   clientMetadata: string;

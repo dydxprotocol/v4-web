@@ -72,7 +72,7 @@ export const getMarkForOrderFills = (
     }
   );
   const fill = orderFills[0]!;
-  const fillDetails = getFillDetails()(store.getState(), fill.id ?? '');
+  const fillDetails = getFillDetails(store.getState(), fill.id ?? '');
 
   const textParams = {
     ASSET_SIZE: formattedSize,
