@@ -3,6 +3,7 @@ import { MarketInfo, SubaccountOrder, SubaccountPosition } from '@/bonsai/types/
 import { OrderExecution, OrderFlags, OrderSide, OrderType } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
+import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { IndexerOrderType, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
@@ -15,6 +16,7 @@ import {
   PlaceOrderMarketInfo,
   PlaceOrderPayload,
   SummaryData,
+  TriggerOrderActions,
   TriggerOrderDetails,
   TriggerOrderInputData,
   TriggerOrdersFormState,
@@ -56,9 +58,7 @@ function calculateTriggerOrderPayload(
     return undefined;
   }
 
-  const placeOrderPayloads: PlaceOrderPayload[] = [];
-  const cancelOrderPayloads: CancelOrderPayload[] = [];
-
+  const payloads: TriggerOrdersPayload['payloads'] = [];
   if (
     state.stopLossOrder.orderId != null ||
     state.stopLossOrder.priceInput != null ||
@@ -78,9 +78,9 @@ function calculateTriggerOrderPayload(
     if (actions === undefined) {
       return undefined;
     }
-
-    if (actions.cancelPayload) cancelOrderPayloads.push(actions.cancelPayload);
-    if (actions.placePayload) placeOrderPayloads.push(actions.placePayload);
+    if (actions.cancelPayload != null || actions.placePayload != null) {
+      payloads.push(actions);
+    }
   }
 
   if (
@@ -102,25 +102,19 @@ function calculateTriggerOrderPayload(
     if (actions === undefined) {
       return undefined;
     }
-
-    if (actions.cancelPayload) cancelOrderPayloads.push(actions.cancelPayload);
-    if (actions.placePayload) placeOrderPayloads.push(actions.placePayload);
+    if (actions.cancelPayload != null || actions.placePayload != null) {
+      payloads.push(actions);
+    }
   }
 
   // Only return a payload if there's at least one action to take
-  if (placeOrderPayloads.length === 0 && cancelOrderPayloads.length === 0) {
+  if (payloads.length === 0) {
     return undefined;
   }
 
   return {
-    placeOrderPayloads,
-    cancelOrderPayloads,
+    payloads,
   };
-}
-
-interface TriggerOrderActions {
-  cancelPayload?: CancelOrderPayload;
-  placePayload?: PlaceOrderPayload;
 }
 
 function getTriggerOrderActions(
@@ -332,6 +326,10 @@ function createPlaceOrderPayload(
     clientId,
     // TP/SL orders always have null timeInForce. IOC/PostOnly/GTD is distinguished by execution
     timeInForce: undefined,
+    currentHeight: undefined,
+    goodTilBlock: undefined,
+    transferToSubaccountAmount: undefined,
+    memo: TransactionMemo.placeOrder,
     execution:
       orderType === OrderType.STOP_MARKET || orderType === OrderType.TAKE_PROFIT_MARKET
         ? OrderExecution.IOC

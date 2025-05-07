@@ -3,19 +3,10 @@ import styled from 'styled-components';
 
 import { Icon } from '@/components/Icon';
 
-import { getOrderStatusInfo, getOrderStatusInfoNew } from '@/lib/orders';
-
-type ElementProps = {
-  status: string;
-};
+import { getOrderStatusInfoNew } from '@/lib/orders';
 
 type StyleProps = {
   className?: string;
-};
-
-export const OrderStatusIcon = ({ className, status }: ElementProps & StyleProps) => {
-  const { statusIcon, statusIconColor } = getOrderStatusInfo({ status });
-  return <$Icon className={className} iconName={statusIcon} color={statusIconColor} />;
 };
 
 type ElementPropsNew = {

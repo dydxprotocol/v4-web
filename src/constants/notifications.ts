@@ -1,8 +1,5 @@
-import { SkipStatusResponse } from './skip';
-
 /** implemented in useNotificationTypes */
 export enum NotificationType {
-  AbacusGenerated = 'AbacusGenerated',
   // Until we have migrations enabled, we need to keep underlying values the same
   // So the notifications don't get retriggered
   // It's pretty scary getting a bunch of unexpected withdrawal notifications
@@ -19,6 +16,9 @@ export enum NotificationType {
   FeedbackRequest = 'FeedbackRequest',
   PredictionMarketConcluded = 'PredictionMarketConcluded',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
+  BlockTradingReward = 'BlockTradingReward',
+  FillWithNoOrder = 'FillWithNoOrder',
+  Order = 'Order',
 }
 
 export enum NotificationCategoryPreferences {
@@ -37,7 +37,9 @@ export const NotificationTypeCategory: {
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
-  [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
+  [NotificationType.BlockTradingReward]: NotificationCategoryPreferences.Trading,
+  [NotificationType.FillWithNoOrder]: NotificationCategoryPreferences.Trading,
+  [NotificationType.Order]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
@@ -50,14 +52,12 @@ export const NotificationTypeCategory: {
 };
 
 export const SingleSessionNotificationTypes = [
-  NotificationType.AbacusGenerated,
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
   NotificationType.Custom,
+  NotificationType.BlockTradingReward,
 ];
-
-export const SingleSessionAbacusNotificationTypes = ['order', 'blockReward'];
 
 export type NotificationId = string | number;
 
@@ -74,32 +74,38 @@ export type NotificationTypeConfig<
 
   /** React hook to trigger notifications based on app state */
   useTrigger: (_: {
-    trigger: (
+    trigger: (triggerArgs: {
       /** Unique ID for the triggered notification */
-      id: NotificationIdType,
+      id: NotificationIdType;
 
       /** Display data for the triggered notification */
-      displayData: NotificationDisplayData,
+      displayData: NotificationDisplayData;
 
       /**
        * JSON-serializable key.
        * Re-triggers the notification if passed a different value from the last trigger() call (even from a previous browser session).
        * Suggested usage: data dependency array
        */
-      updateKey?: NotificationUpdateKey,
+      updateKey?: NotificationUpdateKey;
 
       /**
        * @param true (default): Notification initialized with status NotificationStatus.Triggered
        * @param false: Notification initialized with status NotificationStatus.Cleared
        */
-      isNew?: boolean,
+      isNew?: boolean;
 
       /**
        * @param false (default): Notification should not be retriggered if it's been seen/cleared/hidden
        * @param true:  Notification should be retriggered if status was NotificationStatus.Hidden
        */
-      shouldUnhide?: boolean
-    ) => void;
+      shouldUnhide?: boolean;
+
+      /**
+       * If this trigger has a new update key and the notiification status is CLEARED, leave it CLEARED
+       * rather than updating it - keep it hidden.
+       */
+      keepCleared?: boolean;
+    }) => void;
 
     /**
      * Hide (mark clear) a notification based on condition other than user action
@@ -107,6 +113,12 @@ export type NotificationTypeConfig<
     hideNotification: ({ type, id }: NotificationParams) => void;
 
     lastUpdated: number;
+
+    // timestamp of when app was first ever started
+    appInitializedTime: number;
+
+    // timestamp of when this browser session started
+    sessionStartTime: number;
   }) => void;
 
   /** Callback for notification action (Toast action button click, NotificationsMenu item click, or native push notification interaction) */
@@ -145,7 +157,7 @@ export type Notification<
   updateKey: NotificationUpdateKey;
 };
 
-export type Notifications = Record<NotificationId, Notification<any>>;
+export type Notifications = Record<NotificationId, Notification<string, any>>;
 
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
@@ -202,6 +214,8 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 
   withClose?: boolean; // Show close button for Notification
+
+  updatedTime?: number;
 };
 
 export type CustomNotification = {
@@ -213,25 +227,6 @@ export enum TransferNotificationTypes {
   Withdrawal = 'withdrawal',
   Deposit = 'deposit',
 }
-
-// TODO: fix typo
-export type TransferNotifcation = {
-  id?: string;
-  txHash: string;
-  type?: TransferNotificationTypes;
-  toChainId?: string;
-  fromChainId?: string;
-  toAmount?: number;
-  triggeredAt?: number;
-  isCctp?: boolean;
-  errorCount?: number;
-  status?: SkipStatusResponse;
-  isExchange?: boolean;
-  requestId?: string;
-  tracked?: boolean;
-  isDummy?: boolean;
-  isSubaccountDepositCompleted?: boolean;
-};
 
 export enum ReleaseUpdateNotificationIds {
   DiscoveryProgram = 'discovery-program', // Deprecated

@@ -6,10 +6,11 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { createAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 
+import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
 import {
   calculateAllOrders,
@@ -29,6 +30,9 @@ import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
+  selectRawBlockTradingRewardsLiveData,
+  selectRawBlockTradingRewardsRest,
+  selectRawBlockTradingRewardsRestData,
   selectRawFillsLiveData,
   selectRawFillsRest,
   selectRawFillsRestData,
@@ -70,6 +74,11 @@ export const selectRelevantMarketsData = createAppSelector(
     // use shallow equal for result so that we only update when these specific keys differ
     memoizeOptions: { resultEqualityCheck: shallowEqual },
   }
+);
+
+export const selectCurrentMarketInfoRaw = createAppSelector(
+  [selectRawMarketsData, getCurrentMarketIdIfTradeable],
+  (markets, currentMarketId) => (currentMarketId ? markets?.[currentMarketId] : undefined)
 );
 
 export const selectParentSubaccountSummary = createAppSelector(
@@ -128,13 +137,13 @@ export const selectOrderHistory = createAppSelector([selectAccountOrders], (orde
 });
 
 export const selectCurrentMarketOpenOrders = createAppSelector(
-  [getCurrentMarketId, selectOpenOrders],
+  [getCurrentMarketIdIfTradeable, selectOpenOrders],
   (currentMarketId, orders) =>
     !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
 );
 
 export const selectCurrentMarketOrderHistory = createAppSelector(
-  [getCurrentMarketId, selectOrderHistory],
+  [getCurrentMarketIdIfTradeable, selectOrderHistory],
   (currentMarketId, orders) =>
     !currentMarketId ? EMPTY_ARR : orders.filter((o) => o.marketId === currentMarketId)
 );
@@ -178,14 +187,26 @@ export const selectAccountFills = createAppSelector(
   }
 );
 
+export const selectAccountBlockTradingRewards = createAppSelector(
+  [selectRawBlockTradingRewardsRestData, selectRawBlockTradingRewardsLiveData],
+  (rest, live) => {
+    return calculateBlockRewards(rest?.rewards, live);
+  }
+);
+
 export const getCurrentMarketAccountFills = createAppSelector(
-  [getCurrentMarketId, selectAccountFills],
+  [getCurrentMarketIdIfTradeable, selectAccountFills],
   (currentMarketId, fills) =>
     !currentMarketId ? EMPTY_ARR : fills.filter((f) => f.market === currentMarketId)
 );
 
 export const selectAccountFillsLoading = createAppSelector(
   [selectRawFillsRest, selectRawParentSubaccount],
+  mergeLoadableStatus
+);
+
+export const selectAccountBlockRewardsLoading = createAppSelector(
+  [selectRawBlockTradingRewardsRest, selectRawParentSubaccount],
   mergeLoadableStatus
 );
 

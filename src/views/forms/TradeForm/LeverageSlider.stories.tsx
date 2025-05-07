@@ -1,10 +1,7 @@
 import { useState } from 'react';
 
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
-
-import { PositionSide } from '@/constants/trade';
 
 import breakpoints from '@/styles/breakpoints';
 
@@ -17,11 +14,7 @@ export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>[0]> = 
   return (
     <StoryWrapper>
       <$PositionInfoContainer>
-        <LeverageSlider
-          {...args}
-          leverageInputValue={leverage}
-          setLeverageInputValue={setLeverage}
-        />
+        <LeverageSlider {...args} leverageInput={leverage} setLeverageInputValue={setLeverage} />
       </$PositionInfoContainer>
     </StoryWrapper>
   );
@@ -42,19 +35,6 @@ const $PositionInfoContainer = styled.div`
 `;
 
 LeverageSliderStory.args = {
-  leverage: 1,
-  maxLeverage: 10,
-};
-
-LeverageSliderStory.argTypes = {
-  positionSide: {
-    options: Object.values(PositionSide),
-    control: { type: 'select' },
-    defaultValue: PositionSide.Long,
-  },
-  orderSide: {
-    options: Object.values(OrderSide),
-    control: { type: 'select' },
-    defaultValue: OrderSide.BUY,
-  },
+  leftLeverageSigned: 0,
+  rightLeverageSigned: 10,
 };

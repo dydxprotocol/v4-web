@@ -1,69 +1,43 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
+import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
 import {
-  CancelOrderPayload,
-  PlaceOrderPayload,
-  TriggerOrdersPayload,
-} from '@/bonsai/forms/triggers/types';
-import { parseTransactionError } from '@/bonsai/lib/extractErrors';
-import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
+  isOperationFailure,
+  wrapOperationFailure,
+  wrapOperationSuccess,
+  WrappedOperationFailureError,
+} from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
-import { IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
 
-import type {
-  HumanReadableCancelOrderPayload,
-  HumanReadablePlaceOrderPayload,
-  ParsingError,
-} from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
-import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { TradeTypes, UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
-import { clearSubaccountState } from '@/state/account';
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import {
-  cancelAllOrderFailed,
-  cancelAllSubmitted,
-  cancelOrderFailed,
-  cancelOrderSubmitted,
-  clearLocalOrders,
-  closeAllPositionsSubmitted,
-  placeOrderFailed,
-  placeOrderSubmitted,
-  placeOrderTimeout,
-} from '@/state/localOrders';
+import { clearLocalOrders } from '@/state/localOrders';
 
-import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
-import {
-  getValidErrorParamsFromParsingError,
-  StatefulOrderError,
-  stringifyTransactionError,
-} from '@/lib/errors';
+import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
-import { SerialTaskExecutor } from '@/lib/serialExecutor';
 import { log } from '@/lib/telemetry';
-import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
@@ -83,8 +57,6 @@ export const SubaccountProvider = ({ ...props }) => {
 };
 
 export const useSubaccount = () => useContext(SubaccountContext);
-
-const chainTxExecutor = new SerialTaskExecutor();
 
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
@@ -110,7 +82,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [faucetClient]
   );
 
-  const { depositToSubaccount, withdrawFromSubaccount, sendSkipWithdrawFromSubaccount } = useMemo(
+  const { depositToSubaccount, withdrawFromSubaccount } = useMemo(
     () => ({
       depositToSubaccount: async ({
         subaccountClient,
@@ -202,19 +174,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const [subaccountNumber] = useState(0);
 
-  useEffect(() => {
-    abacusStateManager.setSubaccountNumber(subaccountNumber);
-  }, [subaccountNumber]);
-
   const subaccountClient = useMemo(
     () => (localDydxWallet ? new SubaccountClient(localDydxWallet, subaccountNumber) : undefined),
     [localDydxWallet, subaccountNumber]
   );
 
-  const dydxAddress = localDydxWallet?.address as DydxAddress;
+  const dydxAddress = localDydxWallet?.address as DydxAddress | undefined;
 
   useEffect(() => {
-    dispatch(clearSubaccountState());
     dispatch(clearLocalOrders());
   }, [dispatch, dydxAddress]);
 
@@ -272,60 +239,21 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   }, [usdcDecimals, compositeClient, dydxAddress, usdcDenom, deposit]);
 
   const withdraw = useCallback(
-    async (amount: number) => {
-      if (!subaccountClient) {
+    async (amount: number, fromSubaccountNumber: number) => {
+      if (!localDydxWallet) {
         return undefined;
       }
+      const subaccountClientForWithdraw = new SubaccountClient(
+        localDydxWallet,
+        fromSubaccountNumber
+      );
 
-      return withdrawFromSubaccount({ subaccountClient, amount });
+      return withdrawFromSubaccount({ subaccountClient: subaccountClientForWithdraw, amount });
     },
-    [subaccountClient, withdrawFromSubaccount]
+    [localDydxWallet, withdrawFromSubaccount]
   );
 
   // ------ Transfer Methods ------ //
-
-  const sendSkipWithdraw = useCallback(
-    async (amount: number, payload: string, isCctp?: boolean) => {
-      const cctpWithdraw = () => {
-        return new Promise<string>((resolve, reject) => {
-          abacusStateManager.cctpWithdraw((success, error, data) => {
-            const parsedData = JSON.parse(data);
-            // eslint-disable-next-line eqeqeq
-            if (success && parsedData?.code == 0) {
-              resolve(parsedData?.transactionHash);
-            } else {
-              reject(error);
-            }
-          });
-        });
-      };
-      if (isCctp) {
-        return cctpWithdraw();
-      }
-
-      if (!subaccountClient) {
-        return undefined;
-      }
-
-      // If the dYdX USDC balance is less than the amount to IBC transfer, the signature cannot be made,
-      // so disable the balance check only for this tx.
-      if (isKeplr && window.keplr) {
-        window.keplr.defaultOptions = {
-          sign: {
-            disableBalanceCheck: true,
-          },
-        };
-      }
-      const tx = await sendSkipWithdrawFromSubaccount({ subaccountClient, amount, payload });
-
-      // Reset the default options after the tx is sent.
-      if (isKeplr && window.keplr) {
-        window.keplr.defaultOptions = {};
-      }
-      return hashFromTx(tx.hash);
-    },
-    [subaccountClient, sendSkipWithdrawFromSubaccount, isKeplr]
-  );
 
   // ------ Faucet Methods ------ //
   const requestFaucetFunds = useCallback(async () => {
@@ -342,358 +270,27 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     }
   }, [dydxAddress, getFaucetFunds, getNativeTokens, subaccountNumber]);
 
-  // ------ Trading Methods ------ //
-  const placeOrder = useCallback(
-    ({
-      isClosePosition = false,
-      onError,
-      onSuccess,
-    }: {
-      isClosePosition?: boolean;
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => {
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadablePlaceOrderPayload>
-      ) => {
-        if (success) {
-          onSuccess?.(data);
-        } else {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          onError?.(errorParams);
-
-          if (data?.clientId !== undefined) {
-            dispatch(
-              placeOrderFailed({
-                clientId: data.clientId,
-                errorParams,
-              })
-            );
-          }
-        }
-      };
-
-      let placeOrderParams;
-
-      if (isClosePosition) {
-        placeOrderParams = abacusStateManager.closePosition(callback);
-      } else {
-        placeOrderParams = abacusStateManager.placeOrder(callback);
-      }
-
-      if (placeOrderParams?.clientId) {
-        dispatch(
-          placeOrderSubmitted({
-            marketId: placeOrderParams.marketId,
-            clientId: placeOrderParams.clientId,
-            orderType: placeOrderParams.type as TradeTypes,
-          })
-        );
-      }
-
-      return placeOrderParams;
-    },
-    [dispatch]
-  );
-
-  const closePosition = useCallback(
-    ({
-      onError,
-      onSuccess,
-    }: {
-      onError: (onErrorParams: ErrorParams) => void;
-      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
-    [placeOrder]
-  );
-
-  const cancelOrder = useCallback(
-    ({
-      orderId,
-      onError,
-      onSuccess,
-    }: {
-      orderId: string;
-      onError?: (onErrorParams: ErrorParams) => void;
-      onSuccess?: () => void;
-    }) => {
-      const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
-        if (success) {
-          onSuccess?.();
-        } else {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          dispatch(
-            cancelOrderFailed({
-              orderId,
-              errorParams,
-            })
-          );
-          onError?.(errorParams);
-        }
-      };
-
-      dispatch(cancelOrderSubmitted(orderId));
-      abacusStateManager.cancelOrder(orderId, callback);
-    },
-    [dispatch]
-  );
-
-  const openOrders = useAppSelector(BonsaiCore.account.openOrders.data);
-
-  // when marketId is provided, only cancel orders for that market, otherwise cancel globally
-  const cancelAllOrders = useCallback(
-    (marketId?: string) => {
-      // this is for each single cancel transaction
-      const callback = (
-        success: boolean,
-        parsingError?: Nullable<ParsingError>,
-        data?: Nullable<HumanReadableCancelOrderPayload>
-      ) => {
-        const matchedOrder = openOrders.find((order) => order.id === data?.orderId);
-        // ##OrderOnlyConfirmedCancelViaIndexer: success here does not necessarily mean orders are successfully canceled,
-        // we use indexer response as source of truth on whether the order is actually canceled
-        if (!success) {
-          const errorParams = getValidErrorParamsFromParsingError(parsingError);
-          if (matchedOrder) {
-            dispatch(
-              cancelAllOrderFailed({
-                order: matchedOrder,
-                errorParams,
-              })
-            );
-          }
-        }
-      };
-
-      const orderIds = abacusStateManager.getCancelableOrderIds(marketId);
-      dispatch(cancelAllSubmitted({ marketId, orderIds }));
-      abacusStateManager.cancelAllOrders(marketId, callback);
-    },
-    [dispatch, openOrders]
-  );
-
-  const closeAllPositions = useCallback(() => {
-    // this is for each single close position / place order transaction
-    const callback = (
-      success: boolean,
-      parsingError?: Nullable<ParsingError>,
-      data?: Nullable<HumanReadablePlaceOrderPayload>
-    ) => {
-      if (!success) {
-        const errorParams = getValidErrorParamsFromParsingError(parsingError);
-        if (data?.clientId !== undefined) {
-          dispatch(
-            placeOrderFailed({
-              clientId: data.clientId,
-              errorParams,
-            })
-          );
-        }
-      }
-    };
-
-    const payload = abacusStateManager.closeAllPositions(callback);
-    if (payload) {
-      dispatch(
-        closeAllPositionsSubmitted(
-          payload.payloads.toArray().map((orderPayload) => orderPayload.clientId)
-        )
-      );
-    }
-  }, [dispatch]);
-
-  const doCancelOrder = useCallback(
-    async (payload: CancelOrderPayload) => {
-      try {
-        if (!compositeClient) {
-          throw new Error('client not initialized');
-        }
-        if (!localDydxWallet) {
-          throw new Error('wallet not initialized');
-        }
-
-        const {
-          subaccountNumber: subaccountNumberToUse,
-          clientId,
-          orderFlags,
-          clobPairId,
-          goodTilBlock,
-          goodTilBlockTime,
-        } = payload;
-
-        const subaccountClientToUse = new SubaccountClient(localDydxWallet, subaccountNumberToUse);
-
-        const tx = await compositeClient.cancelRawOrder(
-          subaccountClientToUse,
-          clientId,
-          orderFlags,
-          clobPairId,
-          goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,
-          goodTilBlockTime === 0 ? undefined : goodTilBlockTime ?? undefined
-        );
-
-        const parsedTx = parseToPrimitives(tx);
-        logBonsaiInfo('useSubaccount/doCancelOrder', 'Successfully canceled order', {
-          payload,
-          parsedTx,
-        });
-        return wrapOperationSuccess(parsedTx);
-      } catch (error) {
-        const parsed = stringifyTransactionError(error);
-        logBonsaiError('useSubaccount/doCancelOrder', 'Failed to cancel order', {
-          payload,
-          parsed,
-        });
-        return wrapOperationFailure(parsed);
-      }
-    },
-    [compositeClient, localDydxWallet]
-  );
-
-  const doPlaceOrder = useCallback(
-    async (params: PlaceOrderPayload) => {
-      try {
-        track(AnalyticsEvents.TradePlaceOrder(params as any)); // type is close enough but it's annoying to fully convert
-
-        if (!compositeClient) {
-          throw new Error('client not initialized');
-        }
-        if (!localDydxWallet) {
-          throw new Error('wallet not initialized');
-        }
-
-        const {
-          subaccountNumber: subaccountNumberToUse,
-          marketId,
-          type,
-          side,
-          price,
-          size,
-          clientId,
-          timeInForce,
-          goodTilTimeInSeconds,
-          goodTilBlock,
-          execution,
-          postOnly,
-          reduceOnly,
-          triggerPrice,
-          marketInfo,
-          currentHeight,
-        } = params;
-
-        // Set timeout for order to be considered failed if not committed
-        setTimeout(() => {
-          dispatch(placeOrderTimeout(clientId.toString()));
-        }, UNCOMMITTED_ORDER_TIMEOUT_MS);
-
-        const subaccountClientToUse = new SubaccountClient(localDydxWallet, subaccountNumberToUse);
-
-        // Place order
-        const tx = await compositeClient.placeOrder(
-          subaccountClientToUse,
-          marketId,
-          type,
-          side,
-          price,
-          size,
-          clientId,
-          timeInForce,
-          goodTilTimeInSeconds ?? 0,
-          execution,
-          postOnly ?? undefined,
-          reduceOnly ?? undefined,
-          triggerPrice ?? undefined,
-          marketInfo ?? undefined,
-          currentHeight ?? undefined,
-          goodTilBlock ?? undefined,
-          TransactionMemo.placeOrder
-        );
-
-        // Handle stateful orders
-        if ((tx as IndexedTx | undefined)?.code !== 0) {
-          throw new StatefulOrderError('Stateful order has failed to commit.', tx);
-        }
-
-        const parsedTx = parseToPrimitives(tx);
-
-        logBonsaiInfo('useSubaccount/doPlaceOrder', 'Successfully placed order', {
-          params,
-          parsedTx,
-        });
-
-        return wrapOperationSuccess(parsedTx);
-      } catch (error) {
-        const parsed = stringifyTransactionError(error);
-        // Don't log broadcast errors which are expected in some cases
-        logBonsaiError('useSubaccount/doPlaceOrder', 'Failed to place order', {
-          params,
-          parsed,
-        });
-
-        return wrapOperationFailure(parsed);
-      }
-    },
-    [compositeClient, localDydxWallet, dispatch]
-  );
-
   // ------ Trigger Orders Methods ------ //
-  const placeTriggerOrders = useCallback(
-    async (payload: TriggerOrdersPayload) => {
-      const { placeOrderPayloads, cancelOrderPayloads } = payload;
-
-      const cancels = cancelOrderPayloads.map(async (cancelOrderPayload) => {
-        dispatch(cancelOrderSubmitted(cancelOrderPayload.orderId));
-
-        const res = await chainTxExecutor.enqueue(() => doCancelOrder(cancelOrderPayload));
-
-        if (res.type === 'failure') {
-          const parsed = parseTransactionError('placeTriggerOrders/cancelOrder', res.errorString);
-          dispatch(
-            cancelOrderFailed({
-              orderId: cancelOrderPayload.orderId,
-              errorParams:
-                parsed != null
-                  ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }
-                  : DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-            })
-          );
+  const placeTriggerOrders = useCallback(async (payload: TriggerOrdersPayload) => {
+    // can assume promise fulfills if all operations are successful, otherwise throws
+    const operations = payload.payloads.map(async (operationPayload) => {
+      if (operationPayload.cancelPayload?.orderId) {
+        const res = await accountTransactionManager.cancelOrder({
+          orderId: operationPayload.cancelPayload.orderId,
+        });
+        if (isOperationFailure(res)) {
+          throw new WrappedOperationFailureError(res);
         }
-        return res;
-      });
-
-      const places = placeOrderPayloads.map(async (placeOrderPayload) => {
-        dispatch(
-          placeOrderSubmitted({
-            marketId: placeOrderPayload.marketId,
-            clientId: placeOrderPayload.clientId.toString(),
-            orderType: placeOrderPayload.type as unknown as TradeTypes,
-          })
-        );
-
-        const res = await chainTxExecutor.enqueue(() => doPlaceOrder(placeOrderPayload));
-
-        if (res.type === 'failure') {
-          const parsed = parseTransactionError('placeTriggerOrders/placeOrder', res.errorString);
-          dispatch(
-            placeOrderFailed({
-              clientId: placeOrderPayload.clientId.toString(),
-              errorParams:
-                parsed != null
-                  ? { errorMessage: parsed.message, errorStringKey: parsed.stringKey ?? undefined }
-                  : DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS,
-            })
-          );
+      }
+      if (operationPayload.placePayload != null) {
+        const res = await accountTransactionManager.placeOrder(operationPayload.placePayload);
+        if (isOperationFailure(res)) {
+          throw new WrappedOperationFailureError(res);
         }
-        return res;
-      });
-      const cancelResults = await Promise.all([...cancels, ...places]);
-      const placeResults = await Promise.all([...cancels, ...places]);
-      return { cancelResults, placeResults };
-    },
-    [dispatch, doCancelOrder, doPlaceOrder]
-  );
+      }
+    });
+    return operations;
+  }, []);
 
   // ------ Listing Method ------ //
   const createPermissionlessMarket = useCallback(
@@ -981,6 +578,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     if (!compositeClient?.validatorClient) {
       throw new Error('client not initialized');
     }
+    if (!dydxAddress) throw new Error('dydxAddress is not connected');
     const result = await compositeClient.validatorClient.get.getMegavaultOwnerShares(dydxAddress);
     if (result == null) {
       return result;
@@ -1207,16 +805,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     simulateTransfer,
-    sendSkipWithdraw,
     depositCurrentBalance,
     transferBetweenSubaccounts,
 
     // Trading Methods
-    placeOrder,
-    closePosition,
-    closeAllPositions,
-    cancelOrder,
-    cancelAllOrders,
     placeTriggerOrders,
 
     // Listing Methods

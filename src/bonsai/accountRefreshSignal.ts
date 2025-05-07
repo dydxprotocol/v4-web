@@ -21,7 +21,7 @@ export function refreshIndexerQueryOnAccountSocketRefresh(key: any[]) {
         .findAll({ queryKey: ['indexer', ...key], exact: false })
         .map((q) => q.state.dataUpdatedAt)
     );
-    if ((minTime ?? 0) < new Date().valueOf() - BUFFER_REFRESH_TIME) {
+    if ((minTime ?? 0) < new Date().getTime() - BUFFER_REFRESH_TIME) {
       appQueryClient.invalidateQueries({ queryKey: ['indexer', ...key], exact: false });
     }
   });

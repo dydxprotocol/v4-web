@@ -4,6 +4,8 @@ import { IconName } from '@/components/Icon';
 
 import { Nullable } from '@/lib/typeUtils';
 
+export const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
+
 /**
  * @description MarketData used for MarketTable and List components
  */

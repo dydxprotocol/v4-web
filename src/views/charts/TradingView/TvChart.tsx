@@ -34,7 +34,6 @@ export const TvChart = () => {
   } = useTradingViewToggles();
 
   useTradingView({
-    tvWidget,
     setTvWidget,
     orderLineToggleRef,
     orderLinesToggleOn,

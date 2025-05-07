@@ -28,7 +28,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { log } from '@/lib/telemetry';
@@ -79,15 +78,11 @@ const useAccountsContext = () => {
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
   useEffect(() => {
-    const { address, chain } = sourceAccount;
+    const { address } = sourceAccount;
     // wallet accounts switched
     if (previousAddress && address !== previousAddress) {
       // Disconnect local wallet
       disconnectLocalDydxWallet();
-    }
-
-    if (address && (chain === WalletNetworkType.Evm || chain === WalletNetworkType.Solana)) {
-      abacusStateManager.setTransfersSourceAddress(address);
     }
 
     setPreviousAddress(address);
@@ -95,7 +90,7 @@ const useAccountsContext = () => {
     // OR when our connection state changes.
     // The address can be cached via local storage, so it won't change when we reconnect
     // But the hasSubAccount value will become true once you reconnect
-    // This allows us to trigger a state update and make sure abacus knows the source address
+    // This allows us to trigger a state update
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 
@@ -117,7 +112,7 @@ const useAccountsContext = () => {
 
   const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
     try {
-      const response = await indexerClient.account.getSubaccounts(dydxAddress);
+      const response = await indexerClient?.account.getSubaccounts(dydxAddress);
       setDydxSubaccounts(response?.subaccounts);
       return response?.subaccounts ?? [];
     } catch (error) {
@@ -158,10 +153,10 @@ const useAccountsContext = () => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature,
       });
-      setLocalDydxWallet(wallet);
       const key = { mnemonic, privateKey, publicKey };
-      setHdKey(key);
       hdKeyManager.setHdkey(wallet.address, key);
+      setLocalDydxWallet(wallet);
+      setHdKey(key);
     },
     [getWalletFromSignature]
   );
@@ -254,13 +249,6 @@ const useAccountsContext = () => {
     })();
   }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
-  // abacus
-  useEffect(() => {
-    if (dydxAddress) {
-      abacusStateManager.setAccount(localDydxWallet, hdKey, sourceAccount.walletInfo);
-    } else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey, dydxAddress, sourceAccount.walletInfo]);
-
   useEffect(() => {
     const setCosmosWallets = async () => {
       let nobleWallet: LocalWallet | undefined;
@@ -287,7 +275,6 @@ const useAccountsContext = () => {
         }
 
         if (nobleWallet !== undefined) {
-          abacusStateManager.setNobleWallet(nobleWallet);
           setLocalNobleWallet(nobleWallet);
         }
         if (osmosisWallet !== undefined) {

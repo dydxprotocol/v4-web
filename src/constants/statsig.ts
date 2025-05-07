@@ -1,10 +1,5 @@
 export type StatsigConfigType = Record<StatsigFlags, boolean>;
 
-/**
- * !README!:
- * If you are using a flag in abacus, you must add it to the abacus
- * StatsigConfig object first! Otherwise it won't be set in the StatsigConfig object
- */
 export enum StatsigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
   ffEnableKeplr = 'ff_enable_keplr',

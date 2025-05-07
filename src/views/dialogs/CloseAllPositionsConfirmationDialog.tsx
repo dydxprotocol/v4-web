@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
 
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
+
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { CloseAllPositionsConfirmationDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -14,12 +15,11 @@ export const CloseAllPositionsConfirmationDialog = ({
   setIsOpen,
 }: DialogProps<CloseAllPositionsConfirmationDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { closeAllPositions } = useSubaccount();
 
   const onSubmit = useCallback(() => {
-    closeAllPositions();
+    accountTransactionManager.closeAllPositions();
     setIsOpen(false);
-  }, [closeAllPositions, setIsOpen]);
+  }, [setIsOpen]);
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.CONFIRM })}>

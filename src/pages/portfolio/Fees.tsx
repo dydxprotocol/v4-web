@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { FeeTierSummary } from '@/bonsai/types/summaryTypes';
-import { Nullable } from '@dydxprotocol/v4-abacus';
 import { DoubleArrowUpIcon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -30,6 +29,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { Nullable } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
 const MARKET_SHARE_PERCENTAGE_FRACTION_DIGITS = 1;

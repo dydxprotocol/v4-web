@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonStyle, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useMetadataServiceAssetFromId } from '@/hooks/useMetadataService';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -13,6 +13,8 @@ import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { getAssetFromMarketId } from '@/lib/assetUtils';
+import { mapIfPresent } from '@/lib/do';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const MarketLinks = ({
@@ -34,7 +36,10 @@ export const MarketLinks = ({
     technicalDoc: whitepaperLink,
   } = orEmptyObj(marketUrls);
 
-  const launchableAsset = useMetadataServiceAssetFromId(launchableMarketId);
+  const launchableAsset = useAppSelectorWithArgs(
+    BonsaiHelpers.assets.selectAssetInfo,
+    mapIfPresent(launchableMarketId, getAssetFromMarketId)
+  );
   const { urls } = orEmptyObj(launchableAsset);
 
   const linkItems = [

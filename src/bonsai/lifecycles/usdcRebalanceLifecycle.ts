@@ -8,14 +8,10 @@ import { USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
-import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
-import { isBlockedGeo } from '@/lib/compliance';
-import { localWalletManager } from '@/lib/hdKeyManager';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { objectEntries } from '@/lib/objectHelpers';
 import { sleep } from '@/lib/timeUtils';
@@ -24,46 +20,10 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectChildSubaccountSummaries } from '../selectors/account';
-import { selectParentSubaccountInfo } from '../socketSelectors';
-import { ComplianceStatus } from '../types/summaryTypes';
-
-const selectTxAuthorizedAccount = createAppSelector(
-  [
-    selectParentSubaccountInfo,
-    getSourceAccount,
-    calculateIsAccountViewOnly,
-    BonsaiCore.compliance.data,
-    getLocalWalletNonce,
-  ],
-  (parentSubaccountInfo, sourceAccount, isAccountViewOnly, complianceData, localWalletNonce) => {
-    const isAccountRestrictionFree =
-      !isAccountViewOnly &&
-      ![
-        ComplianceStatus.BLOCKED,
-        ComplianceStatus.CLOSE_ONLY,
-        ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
-      ].includes(complianceData.status) &&
-      complianceData.geo &&
-      !isBlockedGeo(complianceData.geo);
-
-    if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
-      return undefined;
-    }
-
-    const localDydxWallet = localWalletManager.getLocalWallet(localWalletNonce);
-    const isCorrectWallet = localDydxWallet?.address === parentSubaccountInfo.wallet;
-    const canWalletTransact = Boolean(localDydxWallet && isCorrectWallet);
-
-    if (!canWalletTransact) return undefined;
-
-    return {
-      localDydxWallet,
-      sourceAccount,
-      parentSubaccountInfo,
-    };
-  }
-);
+import {
+  selectTxAuthorizedAccount,
+  selectUserHasUsdcGasForTransaction,
+} from '../selectors/accountTransaction';
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
 const SLEEP_TIME = timeUnits.second * 10;
@@ -77,10 +37,17 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
     [
       selectTxAuthorizedAccount,
       BonsaiCore.account.balances.data,
-      selectChildSubaccountSummaries,
+      BonsaiCore.account.childSubaccountSummaries.data,
       selectHasNonExpiredPendingWithdraws,
+      selectUserHasUsdcGasForTransaction,
     ],
-    (txAuthorizedAccount, balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
+    (
+      txAuthorizedAccount,
+      balances,
+      childSubaccountSummaries,
+      hasNonExpiredPendingWithdraws,
+      userHasUsdcGasForTransaction
+    ) => {
       if (!txAuthorizedAccount || childSubaccountSummaries == null) {
         return undefined;
       }
@@ -94,6 +61,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         balances,
         childSubaccountSummaries,
         hasNonExpiredPendingWithdraws,
+        userHasUsdcGasForTransaction,
       };
     }
   );
@@ -103,7 +71,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const noopCleanupEffect = createValidatorStoreEffect(store, {
     selector: balanceAndTransfersSelector,
     handle: (_clientId, compositeClient, data) => {
-      if (data == null) {
+      if (data == null || !data.userHasUsdcGasForTransaction) {
         return undefined;
       }
 
@@ -127,11 +95,16 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
               .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
               .toFixed(USDC_DECIMALS);
 
-            logBonsaiInfo('usdcRebalanceLifecycle', 'depositing excess USDC into subaccount 0', {
-              balance: usdcBalance,
-              amountToDeposit,
-              targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-            });
+            logBonsaiInfo(
+              'usdcRebalanceLifecycle',
+              `depositing excess USDC into parent subaccount ${parentSubaccountInfo.subaccount}`,
+              {
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                amountToDeposit,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+              }
+            );
 
             const subaccountClient = new SubaccountClient(
               localDydxWallet!,
@@ -176,12 +149,16 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             const subaccountNumber = Number(maybeSubaccountNumber);
             const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
 
-            logBonsaiInfo('usdcRebalanceLifecycle', 'withdrawing funds for gas', {
-              balance: usdcBalance,
-              amountToWithdraw,
-              targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-              subaccountNumber,
-            });
+            logBonsaiInfo(
+              'usdcRebalanceLifecycle',
+              `withdrawing funds from subaccount (${subaccountNumber}) for gas reserve`,
+              {
+                balance: usdcBalance,
+                amountToWithdraw,
+                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+                subaccountNumber,
+              }
+            );
 
             try {
               await compositeClient.withdrawFromSubaccount(

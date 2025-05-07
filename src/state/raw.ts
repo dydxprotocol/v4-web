@@ -11,6 +11,8 @@ import {
   AccountStats,
   ComplianceResponse,
   ConfigTiers,
+  RewardsParams,
+  TokenPriceResponse,
   UserFeeTier,
 } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
@@ -35,6 +37,7 @@ import { autoBatchAllReducers } from './autoBatchHelpers';
 interface NetworkState {
   indexerClientReady: boolean;
   compositeClientReady: boolean;
+  compositeClientUrl: string | undefined;
   nobleClientReady: boolean;
   errorInitializing: boolean;
 }
@@ -91,6 +94,10 @@ export interface RawDataState {
   };
   configs: Loadable<ConfigTiers>;
   compliance: ComplianceState;
+  rewards: {
+    data: Loadable<RewardsParams | undefined>;
+    price: Loadable<TokenPriceResponse | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -121,6 +128,10 @@ const initialState: RawDataState = {
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
+  },
+  rewards: {
+    data: loadableIdle(),
+    price: loadableIdle(),
   },
 };
 
@@ -194,6 +205,7 @@ export const rawSlice = createSlice({
       state.network[networkId] = {
         ...(state.network[networkId] ?? {
           compositeClientReady: false,
+          compositeClientUrl: undefined,
           indexerClientReady: false,
           nobleClientReady: false,
           errorInitializing: false,
@@ -221,6 +233,15 @@ export const rawSlice = createSlice({
       action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
     ) => {
       state.compliance.sourceAddressScreenV2 = action.payload;
+    },
+    setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
+      state.rewards.data = action.payload;
+    },
+    setRewardsTokenPrice: (
+      state,
+      action: PayloadAction<Loadable<TokenPriceResponse | undefined>>
+    ) => {
+      state.rewards.price = action.payload;
     },
   }),
 });
@@ -270,4 +291,6 @@ export const {
   setComplianceGeoRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
+  setRewardsParams,
+  setRewardsTokenPrice,
 } = rawSlice.actions;

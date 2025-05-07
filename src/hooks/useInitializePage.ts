@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { logBonsaiInfo } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
+import { CompositeClientManager } from '@/bonsai/rest/lib/compositeClientManager';
+// eslint-disable-next-line no-restricted-imports
 import { IndexerWebsocketManager } from '@/bonsai/websocket/lib/indexerWebsocketManager';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -11,9 +13,7 @@ import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks'
 import { initializeLocalization } from '@/state/app';
 import { useAppDispatch } from '@/state/appTypes';
 
-import abacusStateManager from '@/lib/abacus';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
-import { getStatsigConfigAsync } from '@/lib/statsig';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -32,12 +32,6 @@ export const useInitializePage = () => {
 
   useEffect(() => {
     dispatch(initializeLocalization());
-    const start = async () => {
-      const statsigConfig = await getStatsigConfigAsync();
-      abacusStateManager.setStatsigConfigs(statsigConfig);
-      abacusStateManager.start({ network: localStorageNetwork });
-    };
-    start();
   }, []);
 
   useEffect(() => {
@@ -49,9 +43,9 @@ export const useInitializePage = () => {
         if (hiddenTimeRef.current) {
           const hiddenDuration = Date.now() - hiddenTimeRef.current;
           if (hiddenDuration >= RECONNECT_AFTER_HIDDEN_THRESHOLD) {
-            // reconnect abacus (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
-            abacusStateManager.restart({ network: localStorageNetwork });
+            // reconnect (reestablish connections to indexer, validator etc.) if app was hidden for more than 10 seconds
             IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+            CompositeClientManager.getActiveResources().forEach((r) => r.refreshConnections());
             logBonsaiInfo('useInitializePage', 'restarting because visibility change');
           }
           hiddenTimeRef.current = null;
@@ -67,8 +61,8 @@ export const useInitializePage = () => {
   // restart on network online
   useEffect(() => {
     const handleOnline = () => {
-      abacusStateManager.restart({ network: localStorageNetwork });
       IndexerWebsocketManager.getActiveResources().forEach((r) => r.restart());
+      CompositeClientManager.getActiveResources().forEach((r) => r.refreshConnections());
       logBonsaiInfo('useInitializePage', 'restarting because network status change');
     };
     window.addEventListener('online', handleOnline);

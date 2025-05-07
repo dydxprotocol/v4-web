@@ -10,6 +10,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -33,6 +34,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
     isPrivy ? '' : sourceAccount.address ?? ''
   );
 
+  const { isMobile } = useBreakpoints();
   const [destinationChain, setDestinationChain] = useState(
     sourceAccount.chain === WalletNetworkType.Evm
       ? mainnet.id.toString()
@@ -83,7 +85,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
       setIsOpen={setIsOpen}
       onBack={formState !== 'form' ? onShowForm : undefined}
       title={dialogTitle}
-      placement={DialogPlacement.Default}
+      placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       {currentWithdrawId && (
         <WithdrawStatus id={currentWithdrawId} onClose={() => setIsOpen(false)} />

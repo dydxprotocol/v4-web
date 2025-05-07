@@ -24,7 +24,6 @@ import {
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics/analytics';
-import { isAbacusNotificationSingleSession } from '@/lib/notifications';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -58,6 +57,13 @@ const useNotificationsContext = () => {
     defaultValue: Date.now(),
   });
 
+  const [appInitializationTime] = useLocalStorage<number>({
+    key: LocalStorageKey.AppInitialized,
+    defaultValue: Date.now(),
+  });
+
+  const sessionStartTime = useMemo(() => Date.now(), []);
+
   const [notificationPreferences, setNotificationPreferences] =
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
@@ -78,10 +84,7 @@ const useNotificationsContext = () => {
     // save notifications to localstorage, but filter out single session notifications
     const originalEntries = Object.entries(notifications);
     const filteredEntries = originalEntries.filter(
-      ([, value]) =>
-        !SingleSessionNotificationTypes.includes(value.type) ||
-        (value.type === NotificationType.AbacusGenerated &&
-          !isAbacusNotificationSingleSession(value.id))
+      ([, value]) => !SingleSessionNotificationTypes.includes(value.type)
     );
 
     const newNotifications = Object.fromEntries(filteredEntries);
@@ -180,41 +183,51 @@ const useNotificationsContext = () => {
     useTrigger({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       trigger: useCallback(
-        (id, displayData, updateKey, isNew = true, shouldUnhide = false) => {
+        ({
+          id,
+          displayData,
+          updateKey,
+          isNew = true,
+          shouldUnhide = false,
+          keepCleared = false,
+        }) => {
           const key = getKey({ type, id });
 
           const notification = notifications[key];
 
-          // Filter out notifications that are not enabled
-          if (notificationPreferences[notificationCategory] !== false) {
-            // New unique key - create new notification
-            if (!notification) {
-              const newStatus = isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared;
-              const thisNotification: Notification = (notifications[key] = {
-                id,
-                type,
-                timestamps: {},
-                status: newStatus,
-                updateKey,
-              });
-              updateStatus(thisNotification, newStatus);
-            } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
-              // updateKey changed - update existing notification
-              const thisNotification = notifications[key]!;
-
-              thisNotification.updateKey = updateKey;
-              updateStatus(thisNotification, NotificationStatus.Updated);
-            } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
-              const thisNotification = notifications[key]!;
-              updateStatus(thisNotification, NotificationStatus.Updated);
-            }
-          } else {
-            // Notification is disabled - remove it
-            delete notifications[key];
+          const forceHide = notificationPreferences[notificationCategory] === false;
+          // New unique key - create new notification
+          if (!notification) {
+            const newStatus = forceHide
+              ? NotificationStatus.Cleared
+              : isNew
+                ? NotificationStatus.Triggered
+                : NotificationStatus.Cleared;
+            const thisNotification: Notification = (notifications[key] = {
+              id,
+              type,
+              timestamps: {},
+              status: newStatus,
+              updateKey,
+            });
+            updateStatus(thisNotification, newStatus);
+          } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
+            // updateKey changed - update existing notification
+            notification.updateKey = updateKey;
+            const nextStatus = forceHide
+              ? NotificationStatus.Cleared
+              : keepCleared && notification.status === NotificationStatus.Cleared
+                ? NotificationStatus.Cleared
+                : NotificationStatus.Updated;
+            updateStatus(notification, nextStatus);
+          } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
+            const nextStatus = forceHide ? NotificationStatus.Cleared : NotificationStatus.Updated;
+            updateStatus(notification, nextStatus);
+          } else if (forceHide && notification.status !== NotificationStatus.Cleared) {
+            updateStatus(notification, NotificationStatus.Cleared);
           }
 
-          notificationsDisplayData[key] = displayData;
-          setNotificationsDisplayData({ ...notificationsDisplayData });
+          setNotificationsDisplayData((old) => ({ ...old, [key]: displayData }));
         },
         [notifications, updateStatus, notificationPreferences[notificationCategory]]
       ),
@@ -222,6 +235,10 @@ const useNotificationsContext = () => {
       hideNotification,
 
       lastUpdated: notificationsLastUpdated,
+
+      appInitializedTime: appInitializationTime,
+
+      sessionStartTime,
     });
   }
 

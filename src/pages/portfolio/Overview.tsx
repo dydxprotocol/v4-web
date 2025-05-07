@@ -9,7 +9,7 @@ import { StatsigDynamicConfigs, StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useShouldShowTriggers } from '@/hooks/useShouldShowTriggers';
 import { useAllStatsigDynamicConfigValues, useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -51,9 +51,7 @@ export const Overview = () => {
   }, [navigate]);
 
   const shouldRenderTriggers = useShouldShowTriggers();
-  const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable
-  );
+  const shouldRenderActions = useAppSelectorWithArgs(calculateShouldRenderActionsInPositionsTable);
 
   return (
     <div>

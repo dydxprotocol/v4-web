@@ -22,15 +22,16 @@ import { VerticalSeparator } from '@/components/Separator';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { closePositionFormActions } from '@/state/closePositionForm';
 
-import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDialogProps>) => {
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
   const imageUrl = useAppSelector(BonsaiHelpers.currentMarket.assetLogo);
+  const dispatch = useAppDispatch();
 
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -81,8 +82,7 @@ export const ClosePositionDialog = ({ setIsOpen }: DialogProps<ClosePositionDial
       isOpen={isTablet}
       setIsOpen={(isOpen: boolean) => {
         setIsOpen(isOpen);
-        if (!isOpen)
-          abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+        if (!isOpen) dispatch(closePositionFormActions.reset());
       }}
       slotIcon={dialogProps[currentStep].slotIcon}
       title={dialogProps[currentStep].title}

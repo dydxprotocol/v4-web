@@ -7,7 +7,7 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -19,25 +19,28 @@ type ElementProps = {
   marketId?: string;
 };
 
-export const CancelOrClearAllOrdersButton = ({ marketId }: ElementProps) => {
+export const CancelAllOrdersButton = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const hasCancelableOrders = useParameterizedSelector(calculateHasCancelableOrders, marketId);
+  const hasCancelableOrders = useAppSelectorWithArgs(calculateHasCancelableOrders, marketId);
 
-  const onClearOrCancelAll = useCallback(() => {
+  const onCancelAll = useCallback(() => {
     if (hasCancelableOrders) {
       dispatch(openDialog(DialogTypes.CancelAllOrdersConfirmation({ marketId })));
     }
   }, [dispatch, hasCancelableOrders, marketId]);
 
+  if (!hasCancelableOrders) {
+    return null;
+  }
   return (
     <$ActionTextButton
       action={ButtonAction.Primary}
       size={ButtonSize.XSmall}
-      onClick={onClearOrCancelAll}
+      onClick={onCancelAll}
       isHighlighted={hasCancelableOrders}
     >
-      {stringGetter({ key: hasCancelableOrders ? STRING_KEYS.CANCEL_ALL : STRING_KEYS.CLEAR_ALL })}
+      {stringGetter({ key: STRING_KEYS.CANCEL_ALL })}
     </$ActionTextButton>
   );
 };

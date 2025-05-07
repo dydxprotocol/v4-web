@@ -19,7 +19,7 @@ import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -40,7 +40,6 @@ import { getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getNumberSign, MaybeBigNumber, MaybeNumber, MustBigNumber } from '@/lib/numbers';
-import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
 import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
@@ -397,7 +396,7 @@ const getPositionsTableColumnDef = ({
           leverage,
           side,
           entryPrice,
-          unrealizedPnl,
+          updatedUnrealizedPnl: unrealizedPnl,
         }) => (
           <PositionsActionsCell
             marketId={market}
@@ -472,7 +471,7 @@ export const PositionsTable = forwardRef(
       });
     }, [currentMarket, marketTypeFilter, openPositions]);
 
-    const tpslOrdersByPositionUniqueId = useParameterizedSelector(
+    const tpslOrdersByPositionUniqueId = useAppSelectorWithArgs(
       getSubaccountConditionalOrders,
       isSlTpLimitOrdersEnabled
     );
@@ -481,20 +480,17 @@ export const PositionsTable = forwardRef(
       () =>
         positions.map((position: SubaccountPosition): PositionTableRow => {
           const marketSummary = marketSummaries[position.market];
-          return safeAssign(
-            {},
-            {
-              marketSummary,
-              stopLossOrders:
-                tpslOrdersByPositionUniqueId[position.uniqueId]?.stopLossOrders ?? EMPTY_ARR,
-              takeProfitOrders:
-                tpslOrdersByPositionUniqueId[position.uniqueId]?.takeProfitOrders ?? EMPTY_ARR,
-              stepSizeDecimals: marketSummary?.stepSizeDecimals ?? TOKEN_DECIMALS,
-              tickSizeDecimals: marketSummary?.tickSizeDecimals ?? USD_DECIMALS,
-              oraclePrice: MaybeNumber(marketSummary?.oraclePrice) ?? undefined,
-            },
-            position
-          );
+          return {
+            marketSummary,
+            stopLossOrders:
+              tpslOrdersByPositionUniqueId[position.uniqueId]?.stopLossOrders ?? EMPTY_ARR,
+            takeProfitOrders:
+              tpslOrdersByPositionUniqueId[position.uniqueId]?.takeProfitOrders ?? EMPTY_ARR,
+            stepSizeDecimals: marketSummary?.stepSizeDecimals ?? TOKEN_DECIMALS,
+            tickSizeDecimals: marketSummary?.tickSizeDecimals ?? USD_DECIMALS,
+            oraclePrice: MaybeNumber(marketSummary?.oraclePrice) ?? undefined,
+            ...position,
+          };
         }),
       [positions, tpslOrdersByPositionUniqueId, marketSummaries]
     );

@@ -1,7 +1,6 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import {
   LanguageCode,
@@ -37,7 +36,6 @@ import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
  * @description Hook to initialize TradingView Chart
  */
 export const useTradingView = ({
-  tvWidget,
   setTvWidget,
   orderLineToggleRef,
   orderLinesToggleOn,
@@ -46,7 +44,6 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
 }: {
-  tvWidget?: TvWidget;
   setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
@@ -67,7 +64,7 @@ export const useTradingView = ({
   const selectedLocale = useAppSelector(getSelectedLocale);
   const selectedNetwork = useAppSelector(getSelectedNetwork);
 
-  const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
+  const { getCandlesForDatafeed } = useDydxClient();
 
   const savedTvChartConfig = useAppSelector(getTvChartConfig);
 
@@ -76,16 +73,9 @@ export const useTradingView = ({
     [savedTvChartConfig]
   );
 
-  const [tickSizeDecimalsIndexer, setTickSizeDecimalsIndexer] = useState<{
-    [marketId: string]: number | undefined;
-  }>({});
-  const { tickSizeDecimals: tickSizeDecimalsAbacus } = orEmptyObj(
+  const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const tickSizeDecimals =
-    (marketId
-      ? tickSizeDecimalsIndexer[marketId] ?? tickSizeDecimalsAbacus
-      : tickSizeDecimalsAbacus) ?? undefined;
 
   const initializeToggle = useCallback(
     ({
@@ -114,36 +104,20 @@ export const useTradingView = ({
     []
   );
 
-  useEffect(() => {
-    // we only need tick size from current market for the price scale settings
-    // if markets haven't been loaded via abacus, get the current market info from indexer
-    (async () => {
-      if (marketId && tickSizeDecimals === undefined) {
-        const marketTickSize = await getMarketTickSize(marketId);
-        setTickSizeDecimalsIndexer((prev) => ({
-          ...prev,
-          [marketId]: BigNumber(marketTickSize).decimalPlaces() ?? undefined,
-        }));
-      }
-    })();
-  }, [marketId, tickSizeDecimals, getMarketTickSize]);
-
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    if (marketId && tickSizeDecimals !== undefined && !tvWidget) {
+    if (marketId) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-      const initialPriceScale = BigNumber(10).exponentiatedBy(tickSizeDecimals).toNumber();
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(
           store,
           getCandlesForDatafeed,
-          initialPriceScale,
           { decimal, group },
           selectedLocale,
           stringGetter
@@ -160,13 +134,13 @@ export const useTradingView = ({
 
       tvChartWidget.onChartReady(() => {
         // Initialize additional right-click-menu options
-        tvChartWidget.onContextMenu(tradingViewLimitOrder);
+        tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
-        tvChartWidget.headerReady().then(() => {
+        tvChartWidget!.headerReady().then(() => {
           // Order Lines
           initializeToggle({
             toggleRef: orderLineToggleRef,
-            widget: tvChartWidget,
+            widget: tvChartWidget!,
             isOn: orderLinesToggleOn,
             setToggleOn: setOrderLinesToggleOn,
             label: stringGetter({
@@ -180,7 +154,7 @@ export const useTradingView = ({
           // Buy/Sell Marks
           initializeToggle({
             toggleRef: buySellMarksToggleRef,
-            widget: tvChartWidget,
+            widget: tvChartWidget!,
             isOn: buySellMarksToggleOn,
             setToggleOn: setBuySellMarksToggleOn,
             label: stringGetter({
@@ -192,31 +166,29 @@ export const useTradingView = ({
           });
         });
 
-        tvChartWidget.subscribe('onAutoSaveNeeded', () =>
-          tvChartWidget.save((chartConfig: object) => {
+        tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
+          tvChartWidget!.save((chartConfig: object) => {
             dispatch(updateChartConfig(chartConfig));
           })
         );
       });
+      return () => {
+        orderLineToggleRef.current?.remove();
+        orderLineToggleRef.current = null;
+        buySellMarksToggleRef.current?.remove();
+        buySellMarksToggleRef.current = null;
+        tvChartWidget.remove();
+      };
     }
-
-    return () => {
-      orderLineToggleRef.current?.remove();
-      orderLineToggleRef.current = null;
-      buySellMarksToggleRef.current?.remove();
-      buySellMarksToggleRef.current = null;
-      tvWidget?.remove();
-    };
+    return () => {};
   }, [
     selectedLocale,
     selectedNetwork,
-    !!marketId,
-    tickSizeDecimals !== undefined,
     orderLineToggleRef,
     buySellMarksToggleRef,
     setBuySellMarksToggleOn,
     setOrderLinesToggleOn,
-    tvWidget,
     setTvWidget,
+    !!marketId,
   ]);
 };

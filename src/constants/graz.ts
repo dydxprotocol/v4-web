@@ -19,10 +19,6 @@ export enum CosmosChainId {
 export const OSMO_BECH32_PREFIX = 'osmo';
 export const NEUTRON_BECH32_PREFIX = 'neutron';
 
-export const NOBLE_GAS_PRICE = '0.1uusdc';
-export const OSMO_GAS_PRICE = '0.025uosmo';
-export const NEUTRON_GAS_PRICE = '0.0053untrn';
-
 const selectedNetwork = getLocalStorage({
   key: LocalStorageKey.SelectedNetwork,
   defaultValue: DEFAULT_APP_ENVIRONMENT,
@@ -40,10 +36,6 @@ export const getOsmosisChainId = () => {
 
 export const getNeutronChainId = () => {
   return isMainnet ? CosmosChainId.Neutron : CosmosChainId.NeutronTestnet;
-};
-
-export const getSolanaChainId = () => {
-  return isMainnet ? 'solana' : 'solana-devnet';
 };
 
 const osmosisChainId = getOsmosisChainId();

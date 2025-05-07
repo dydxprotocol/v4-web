@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -12,13 +11,11 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,12 +29,11 @@ import { WithSidebar } from '@/components/WithSidebar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -59,15 +55,11 @@ const PortfolioPage = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
-  const showNewDepositFlow =
-    useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-  const showNewWithdrawFlow =
-    useStatsigGateValue(StatsigFlags.ffWithdrawRewrite) || testFlags.showNewWithdrawFlow;
 
   const initialPageSize = 20;
 
   const onboardingState = useAppSelector(getOnboardingState);
-  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const { nativeTokenBalance } = useAccountBalance();
 
   const numTotalOpenOrders = useAppSelector(BonsaiCore.account.openOrders.data).length;
@@ -78,7 +70,7 @@ const PortfolioPage = () => {
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
-  const usdcBalance = freeCollateral?.toNumber() ?? 0;
+  const usdcBalance = freeCollateral ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
@@ -256,13 +248,7 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() =>
-                      dispatch(
-                        openDialog(
-                          showNewDepositFlow ? DialogTypes.Deposit2({}) : DialogTypes.Deposit({})
-                        )
-                      )
-                    }
+                    onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>
@@ -270,13 +256,7 @@ const PortfolioPage = () => {
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() =>
-                      dispatch(
-                        openDialog(
-                          showNewWithdrawFlow ? DialogTypes.Withdraw2({}) : DialogTypes.Withdraw()
-                        )
-                      )
-                    }
+                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
                   >
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>

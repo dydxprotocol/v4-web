@@ -1,8 +1,9 @@
+import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
-import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
@@ -11,9 +12,8 @@ import { AppRoute } from '@/constants/routes';
 import { CancelOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -34,6 +34,7 @@ import { getOrderDetails } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
 import { Nullable } from '@/lib/typeUtils';
 
@@ -44,12 +45,11 @@ export const OrderDetailsDialog = ({
   const stringGetter = useStringGetter();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
-  const { cancelOrder } = useSubaccount();
-
-  const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
-  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
+  const localCancelOrders = useAppSelector(getLocalCancelOrders);
   const isOrderCanceling =
-    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
+    Object.values(localCancelOrders).find(
+      (order) => order.orderId === orderId && order.submissionStatus < CancelOrderStatuses.Canceled
+    ) != null;
 
   const {
     displayId,
@@ -74,7 +74,7 @@ export const OrderDetailsDialog = ({
     marketSummary,
 
     removalReason,
-  } = useParameterizedSelector(getOrderDetails, orderId) ?? {};
+  } = useAppSelectorWithArgs(getOrderDetails, orderId) ?? {};
 
   const marginModeLabel = stringGetter({ key: getMarginModeStringKey(marginMode ?? 'CROSS') });
 
@@ -201,11 +201,12 @@ export const OrderDetailsDialog = ({
   ).filter((item) => Boolean(item.value));
 
   const onCancelClick = () => {
-    cancelOrder({ orderId });
+    track(AnalyticsEvents.TradeCancelOrderClick({ orderId }));
+    accountTransactionManager.cancelOrder({ orderId });
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  // we update short term orders to pending status when they are best effort canceled in Abacus
+  // we update short term orders to pending status when they are best effort canceled
   const isBestEffortCanceled =
     (status === OrderStatus.Pending && removalReason != null) || status === OrderStatus.Canceling;
 

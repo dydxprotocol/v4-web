@@ -8,7 +8,8 @@ import {
   getMarketIdFromAsset,
 } from './assetUtils';
 import { BIG_NUMBERS, MustBigNumber } from './numbers';
-import { safeAssign } from './objectHelpers';
+
+export const FALLBACK_MARKET_LEVERAGE = 5;
 
 export function calculateMarketMaxLeverage({
   effectiveInitialMarginFraction,
@@ -22,7 +23,7 @@ export function calculateMarketMaxLeverage({
     return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
   }
 
-  return 10; // default
+  return FALLBACK_MARKET_LEVERAGE; // default
 }
 
 export function getMarketDataFromPerpetualMarketSummary(
@@ -102,7 +103,7 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
   const displayId = getDisplayableTickerFromMarket(ticker);
   const displayableAsset = getDisplayableAssetFromTicker(ticker);
 
-  return safeAssign({}, {
+  return {
     id: ticker,
     assetId,
     displayId,
@@ -131,5 +132,5 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
     marketCap: marketCap ?? reportedMarketCap,
     sectorTags: sectorTags ?? [],
     isFavorite: favoritedMarkets.includes(ticker),
-  } satisfies MarketData);
+  } satisfies MarketData;
 }

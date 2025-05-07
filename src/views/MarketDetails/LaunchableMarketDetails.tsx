@@ -4,7 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DetailsItem } from '@/components/Details';
@@ -19,10 +19,7 @@ import { MarketDetails } from './MarketDetails';
 export const LaunchableMarketDetails = ({ launchableMarketId }: { launchableMarketId: string }) => {
   const stringGetter = useStringGetter();
   const assetId = getAssetFromMarketId(launchableMarketId);
-  const launchableAsset = useParameterizedSelector(
-    BonsaiHelpers.assets.createSelectAssetInfo,
-    assetId
-  );
+  const launchableAsset = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetInfo, assetId);
 
   if (!launchableAsset) return null;
 

@@ -4,6 +4,7 @@ import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
+export const MAX_INT_ROUGHLY = 2e9;
 
 export const BIG_NUMBERS = {
   ZERO: new BigNumber(0),
@@ -17,11 +18,24 @@ export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
   new BigNumber(amount || 0);
 
 // undefined if falsey otherwise a valid bignumber
-export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined =>
-  amount ? MustBigNumber(amount) : undefined;
+export const MaybeBigNumber = (amount?: BigNumberish | null): BigNumber | undefined => {
+  if (amount == null) {
+    return undefined;
+  }
+  if (amount === '') {
+    return undefined;
+  }
+  if (typeof amount === 'number' && Number.isNaN(amount)) {
+    return undefined;
+  }
+  if (BigNumber.isBigNumber(amount) && !amount.isFinite()) {
+    return undefined;
+  }
+  return MustBigNumber(amount);
+};
 
 export const MaybeNumber = (amount?: BigNumberish | null): number | undefined =>
-  amount ? MustBigNumber(amount).toNumber() : undefined;
+  MaybeBigNumber(amount)?.toNumber();
 
 export const MustNumber = (amount?: BigNumberish | null): number =>
   MustBigNumber(amount).toNumber();
@@ -37,7 +51,9 @@ export const ToNumber = (amount: string): number => {
 };
 
 // returns undefined if it's not parseable, otherwise a valid bignumber
-export const AttemptBigNumber = (amount: string | undefined | null): BigNumber | undefined => {
+export const AttemptBigNumber = (
+  amount: string | number | undefined | null
+): BigNumber | undefined => {
   if (amount == null) {
     return undefined;
   }
@@ -48,7 +64,7 @@ export const AttemptBigNumber = (amount: string | undefined | null): BigNumber |
   return bn;
 };
 
-export const AttemptNumber = (amount: string | undefined | null): number | undefined => {
+export const AttemptNumber = (amount: string | number | undefined | null): number | undefined => {
   return AttemptBigNumber(amount)?.toNumber();
 };
 
@@ -142,3 +158,11 @@ export const getNumberSign = (
       : NumberSign.Neutral;
 
 export const nullIfZero = (n?: number | string | null) => (MustBigNumber(n).eq(0) ? null : n);
+
+export function toStepSize(val: number | BigNumber, marketStepSize: number) {
+  return MustBigNumber(val)
+    .div(marketStepSize)
+    .decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+    .times(marketStepSize)
+    .toNumber();
+}

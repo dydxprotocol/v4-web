@@ -67,7 +67,6 @@ import { dd } from '@/lib/analytics/datadog';
 import { assertNever } from '@/lib/assertNever';
 import { mapIfPresent, runFn } from '@/lib/do';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { safeAssign } from '@/lib/objectHelpers';
 import { sleep } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -162,7 +161,7 @@ export const VaultDepositWithdrawForm = ({
           }
           return { long, short };
         });
-        return safeAssign({}, error, errorStrings);
+        return { ...error, ...errorStrings };
       }),
     [slippagePercent, stringGetter, validationResponse.errors, vaultLearnMore]
   );
@@ -228,11 +227,11 @@ export const VaultDepositWithdrawForm = ({
           return;
         }
 
-        const startTime = new Date().valueOf();
+        const startTime = new Date().getTime();
         await depositToMegavault(cachedAmount);
-        const intermediateTime = new Date().valueOf();
+        const intermediateTime = new Date().getTime();
         await sleep(INDEXER_LAG_ALLOWANCE);
-        const finalTime = new Date().valueOf();
+        const finalTime = new Date().getTime();
 
         track(
           AnalyticsEvents.SuccessfulVaultOperation({
@@ -286,14 +285,14 @@ export const VaultDepositWithdrawForm = ({
 
         const preEstimate = validationResponse.summaryData.estimatedAmountReceived;
 
-        const startTime = new Date().valueOf();
+        const startTime = new Date().getTime();
         const result = await withdrawFromMegavault(
           submissionData.withdraw.shares,
           submissionData.withdraw.minAmount
         );
-        const intermediateTime = new Date().valueOf();
+        const intermediateTime = new Date().getTime();
         await sleep(INDEXER_LAG_ALLOWANCE);
-        const finalTime = new Date().valueOf();
+        const finalTime = new Date().getTime();
 
         const events = (result as IndexedTx | undefined)?.events;
         const actualAmount = events

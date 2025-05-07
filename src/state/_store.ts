@@ -1,14 +1,11 @@
-// eslint-disable-next-line no-restricted-imports
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { storeLifecycles } from '@/bonsai/storeLifecycles';
+// eslint-disable-next-line no-restricted-imports
 import { Middleware, combineReducers, configureStore } from '@reduxjs/toolkit';
 import { isFunction } from 'lodash';
 import { persistReducer, persistStore } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 
-import abacusStateManager from '@/lib/abacus';
-import { runFn } from '@/lib/do';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { transformOntologyObject } from '@/lib/transformOntology';
 
@@ -18,10 +15,10 @@ import { affiliatesSlice } from './affiliates';
 import { appSlice } from './app';
 import appMiddleware from './appMiddleware';
 import { appUiConfigsSlice } from './appUiConfigs';
+import { closePositionFormSlice } from './closePositionForm';
 import { dialogsSlice } from './dialogs';
 import { dismissableSlice } from './dismissable';
-import { funkitDepositsSlice } from './funkitDeposits';
-import { inputsSlice } from './inputs';
+import { getTriggersFormSummary } from './inputsSelectors';
 import { layoutSlice } from './layout';
 import { localOrdersSlice } from './localOrders';
 import { localizationSlice } from './localization';
@@ -30,6 +27,8 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { tradeFormSlice } from './tradeForm';
+import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
 import { tradingViewSlice } from './tradingView';
 import { transfersSlice } from './transfers';
 import { triggersFormSlice } from './triggersForm';
@@ -44,9 +43,9 @@ const reducers = {
   accountUiMemory: accountUiMemorySlice.reducer,
   dialogs: dialogsSlice.reducer,
   dismissable: dismissableSlice.reducer,
-  funkitDeposits: funkitDepositsSlice.reducer,
-  inputs: inputsSlice.reducer,
   triggersForm: triggersFormSlice.reducer,
+  tradeForm: tradeFormSlice.reducer,
+  closePositionForm: closePositionFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,
@@ -73,7 +72,6 @@ const persistConfig = {
     'wallet',
     'appUiConfigs',
     'accountUiMemory',
-    'funkitDeposits',
   ],
   stateReconciler: autoMergeLevel2,
   migrate: customCreateMigrate({ debug: process.env.NODE_ENV !== 'production' }),
@@ -94,7 +92,7 @@ export const store = configureStore({
   devTools:
     process.env.NODE_ENV !== 'production'
       ? {
-          stateSanitizer: (state: any) => ({
+          stateSanitizer: (state: any): any => ({
             ...state,
             tradingView: '<LONG BLOB>',
             localization: { ...state.localization, localeData: '<LONG BLOB>' },
@@ -104,13 +102,18 @@ export const store = configureStore({
                 const result = a(state);
                 if (isFunction(result)) {
                   // this parameterized selector requires no arguments and is important
-                  if (path === '.currentMarket.orderbook.createSelectGroupedData') {
+                  if (path === '.currentMarket.orderbook.selectGroupedData') {
                     return result(state);
                   }
                   return undefined;
                 }
                 return result;
               }),
+              forms: {
+                trade: getTradeFormSummary(state),
+                closePosition: getClosePositionFormSummary(state),
+                triggers: getTriggersFormSummary(state),
+              },
             },
           }),
         }
@@ -119,14 +122,8 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Set store so (Abacus & localWalletManager) classes can getState and dispatch
-abacusStateManager.setStore(store);
+// Set store so localWalletManager classes can getState and dispatch
 localWalletManager.setStore(store);
-
-runFn(async () => {
-  // we ignore the cleanups for now since we want these running forever
-  storeLifecycles.forEach((fn) => fn(store));
-});
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;

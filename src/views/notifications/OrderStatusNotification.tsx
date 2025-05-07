@@ -1,7 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { OrderStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { sum } from 'lodash';
 
-import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@/constants/trade';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
-import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -24,14 +25,15 @@ import { Notification, NotificationProps } from '@/components/Notification';
 
 import {
   getAverageFillPriceForOrder,
-  getFillByClientId,
+  getFillsForOrderId,
   getOrderByClientId,
 } from '@/state/accountSelectors';
 
 import { assertNever } from '@/lib/assertNever';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { AttemptNumber } from '@/lib/numbers';
+import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
-import { OrderStatusIcon } from '../OrderStatusIcon';
+import { OrderStatusIconNew } from '../OrderStatusIcon';
 import { getOrderStatusStringKey } from '../tables/enumToStringKeyHelpers';
 import { FillDetails } from './TradeNotification/FillDetails';
 
@@ -45,25 +47,25 @@ export const OrderStatusNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
-  const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
-  const marketData = useParameterizedSelector(
-    BonsaiHelpers.markets.createSelectMarketSummaryById,
-    localOrder.marketId
+  const order = useAppSelectorWithArgs(getOrderByClientId, localOrder.clientId);
+  const fills = useAppSelectorWithArgs(getFillsForOrderId, order?.id ?? localOrder.orderId);
+  const marketData = useAppSelectorWithArgs(
+    BonsaiHelpers.markets.selectMarketSummaryById,
+    localOrder.cachedData.marketId
   );
-  const averageFillPrice = useParameterizedSelector(
+  const averageFillPrice = useAppSelectorWithArgs(
     getAverageFillPriceForOrder,
-    localOrder.orderId
+    order?.id ?? localOrder.orderId
   );
 
   const { assetId } = orEmptyObj(marketData);
-  const logoUrl = useParameterizedSelector(BonsaiHelpers.assets.createSelectAssetLogo, assetId);
+  const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
   const { equityTiersLearnMore } = useURLConfigs();
 
   // force allow the ?. just in case it's not in the map
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
-  const indexedOrderStatus = order?.status;
+  const titleKey = ORDER_TYPE_STRINGS[localOrder.cachedData.orderType]?.orderTypeKey;
+  const indexedOrderStatus = order?.status ?? localOrder.cachedData.status;
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
@@ -76,27 +78,24 @@ export const OrderStatusNotification = ({
     case PlaceOrderStatuses.Canceled:
       if (indexedOrderStatus) {
         // skip pending / best effort open state -> still show as submitted (loading)
-        if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
+        if (indexedOrderStatus === OrderStatus.Pending) break;
 
         orderStatusStringKey = getOrderStatusStringKey(indexedOrderStatus);
-        orderStatusIcon = (
-          <OrderStatusIcon status={indexedOrderStatus} tw="h-[0.9375rem] w-[0.9375rem]" />
-        );
+        orderStatusIcon = <OrderStatusIconNew status={indexedOrderStatus} tw="size-[0.9375rem]" />;
 
-        if (fill) {
+        if (fills.length > 0) {
           customContent = (
             <FillDetails
-              orderSide={order.side === IndexerOrderSide.BUY ? OrderSide.BUY : OrderSide.SELL}
-              filledAmount={order.totalFilled}
+              orderSide={fills[0]?.side === IndexerOrderSide.BUY ? OrderSide.BUY : OrderSide.SELL}
+              filledAmount={
+                order?.totalFilled ?? sum(fills.map((f) => AttemptNumber(f.size)).filter(isPresent))
+              }
               assetId={assetId}
-              averagePrice={averageFillPrice ?? order.price}
+              averagePrice={averageFillPrice ?? order?.price}
               tickSizeDecimals={marketData?.tickSizeDecimals ?? USD_DECIMALS}
             />
           );
-        } else if (
-          indexedOrderStatus === AbacusOrderStatus.Canceled.rawValue &&
-          order.removalReason
-        ) {
+        } else if (indexedOrderStatus === OrderStatus.Canceled && order?.removalReason) {
           // when there's no fill and has a cancel reason, i.e. just plain canceled
           const cancelReason = order.removalReason as keyof typeof STRING_KEYS;
           customContent = <span>{stringGetter({ key: STRING_KEYS[cancelReason] })}</span>;
@@ -104,6 +103,8 @@ export const OrderStatusNotification = ({
       }
       break;
     case PlaceOrderStatuses.Submitted:
+      break;
+    case PlaceOrderStatuses.FailedSubmission:
       if (localOrder.errorParams) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <Icon iconName={IconName.Warning} tw="text-color-warning" />;
