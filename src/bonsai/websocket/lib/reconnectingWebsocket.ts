@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
+import { BONSAI_DETAILED_LOGS, logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
 interface ReconnectingWebSocketConfig {
   url: string;
