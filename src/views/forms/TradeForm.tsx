@@ -202,13 +202,9 @@ export const TradeForm = ({
     }
     dispatch(tradeFormActions.reset());
 
-    try {
-      logBonsaiInfo('TradeForm', 'attempting place order', {
-        fullTradeFormState: purgeBigNumbers(fullTradeFormState),
-      });
-    } catch (e) {
-      // swallow log error
-    }
+    logBonsaiInfo('TradeForm', 'attempting place order', {
+      fullTradeFormState: purgeBigNumbers(fullTradeFormState),
+    });
     track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {

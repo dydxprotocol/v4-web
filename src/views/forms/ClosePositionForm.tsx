@@ -200,18 +200,14 @@ export const ClosePositionForm = ({
     setClosePositionError(undefined);
 
     const payload = summary.tradePayload;
-    if (payload == null) {
+    if (payload == null || hasInputErrors) {
       return;
     }
     onClearInputs();
     track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: true }));
-    try {
-      logBonsaiInfo('ClosePositionForm', 'attempting close position', {
-        fullTradeFormState: purgeBigNumbers(fullSummary),
-      });
-    } catch (e) {
-      // swallow log error
-    }
+    logBonsaiInfo('ClosePositionForm', 'attempting close position', {
+      fullTradeFormState: purgeBigNumbers(fullSummary),
+    });
 
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
