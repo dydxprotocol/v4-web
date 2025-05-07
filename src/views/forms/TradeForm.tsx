@@ -4,6 +4,7 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
+import { logBonsaiInfo } from '@/bonsai/logs';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
@@ -47,6 +48,7 @@ import { track } from '@/lib/analytics/analytics';
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
+import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -81,7 +83,8 @@ export const TradeForm = ({
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
 
-  const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
+  const fullTradeFormState = useAppSelector(getTradeFormSummary);
+  const { errors: tradeErrors, summary } = fullTradeFormState;
 
   const currentInput = useAppSelector(getCurrentTradePageForm);
 
@@ -193,11 +196,18 @@ export const TradeForm = ({
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
+    const payload = summary.tradePayload;
+    if (payload == null || hasInputErrors) {
+      return;
+    }
     dispatch(tradeFormActions.reset());
 
-    const payload = summary.tradePayload;
-    if (payload == null) {
-      return;
+    try {
+      logBonsaiInfo('TradeForm', 'attempting place order', {
+        fullTradeFormState: purgeBigNumbers(fullTradeFormState),
+      });
+    } catch (e) {
+      // swallow log error
     }
     track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
     const result = await accountTransactionManager.placeOrder(payload);
