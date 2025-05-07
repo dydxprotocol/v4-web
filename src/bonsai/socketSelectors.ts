@@ -61,3 +61,13 @@ export const selectClientInitializationError = createAppSelector(
     return !!networks[network]?.errorInitializing;
   }
 );
+
+export const selectCompositeClientKey = createAppSelector(
+  [getSelectedNetwork, selectCompositeClientReady, selectCompositeClientUrl],
+  (network, ready, url) => `${network}-${ready}-${url}`
+);
+
+export const selectIndexerClientKey = createAppSelector(
+  [getSelectedNetwork, selectIndexerReady],
+  (network, ready) => `${network}-${ready}`
+);
