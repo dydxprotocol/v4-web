@@ -328,7 +328,6 @@ const useDydxClientContext = () => {
     limit?: number;
   }): Promise<Candle[]> => {
     try {
-      console.log('try candles', indexerClient != null);
       const { candles } =
         (await indexerClient?.markets.getPerpetualMarketCandles(
           marketId,
@@ -337,10 +336,8 @@ const useDydxClientContext = () => {
           toIso,
           limit
         )) || {};
-      console.log('got candles', candles);
       return candles || [];
     } catch (error) {
-      console.log('err candles', error);
       log('useDydxClient/getPerpetualMarketCandles', error);
       return [];
     }

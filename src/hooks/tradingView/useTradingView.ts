@@ -108,7 +108,6 @@ export const useTradingView = ({
 
   useEffect(() => {
     if (marketId) {
-      console.log('init', marketId);
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
@@ -174,7 +173,6 @@ export const useTradingView = ({
         );
       });
       return () => {
-        console.log('teardown', marketId);
         orderLineToggleRef.current?.remove();
         orderLineToggleRef.current = null;
         buySellMarksToggleRef.current?.remove();
@@ -182,7 +180,6 @@ export const useTradingView = ({
         tvChartWidget.remove();
       };
     }
-    console.log('do nothing');
     return () => {};
   }, [
     selectedLocale,
