@@ -92,6 +92,7 @@ export { default as TransferIcon } from './transfer.svg';
 export { default as TranslateIcon } from './translate.svg';
 export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
+export { default as ViewfinderIcon } from './viewfinder.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
 

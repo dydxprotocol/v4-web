@@ -1,12 +1,32 @@
+import { isParentSubaccount } from '@/bonsai/lib/subaccountUtils';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { PositionUniqueId, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+import {
+  OrderFlags,
+  OrderStatus,
+  PositionUniqueId,
+  SubaccountFill,
+  SubaccountOrder,
+} from '@/bonsai/types/summaryTypes';
+import BigNumber from 'bignumber.js';
 import { groupBy, keyBy, mapValues } from 'lodash';
 
-import { OnboardingState } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  AMOUNT_USDC_BEFORE_REBALANCE,
+  OnboardingState,
+} from '@/constants/account';
 import { EMPTY_ARR } from '@/constants/objects';
-import { IndexerOrderSide, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { USDC_DECIMALS } from '@/constants/tokens';
+import { PlaceOrderStatuses } from '@/constants/trade';
+import {
+  IndexerOrderSide,
+  IndexerPerpetualPositionStatus,
+  IndexerPositionSide,
+} from '@/types/indexer/indexerApiGen';
 
-import { mapIfPresent } from '@/lib/do';
+import { calc, mapIfPresent } from '@/lib/do';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { objectEntries } from '@/lib/objectHelpers';
 import {
   getAverageFillPrice,
   getHydratedFill,
@@ -14,6 +34,7 @@ import {
   isStopLossOrderNew,
   isTakeProfitOrderNew,
 } from '@/lib/orders';
+import { isPresent } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { getUserWalletAddress } from './accountInfoSelectors';
@@ -21,6 +42,8 @@ import { ALL_MARKETS_STRING } from './accountUiMemory';
 import { getSelectedNetwork } from './appSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentMarketId } from './currentMarketSelectors';
+import { getLocalPlaceOrders } from './localOrdersSelectors';
+import { selectHasNonExpiredPendingWithdraws } from './transfersSelectors';
 
 /**
  * @param state
@@ -377,5 +400,181 @@ export const createGetUnseenFillsCount = createAppSelector(
         ) ?? 0)
     );
     return unseen.length;
+  }
+);
+
+export const selectReclaimableChildSubaccountFunds = createAppSelector(
+  [
+    BonsaiCore.account.childSubaccountSummaries.data,
+    BonsaiCore.account.parentSubaccountPositions.data,
+    BonsaiCore.account.openOrders.data,
+    getLocalPlaceOrders,
+    BonsaiCore.account.openOrders.loading,
+  ],
+  (
+    childSubaccountSummaries,
+    parentSubaccountPositions,
+    openOrders,
+    localPlaceOrders,
+    ordersLoading
+  ) => {
+    if (childSubaccountSummaries == null || parentSubaccountPositions == null) {
+      return undefined;
+    }
+
+    const openPositions = parentSubaccountPositions.filter(
+      (position) =>
+        !isParentSubaccount(position.subaccountNumber) &&
+        position.status === IndexerPerpetualPositionStatus.OPEN
+    );
+
+    const groupedPositions = groupBy(openPositions, (p) => p.subaccountNumber);
+    const groupedOrders = groupBy(openOrders, (o) => o.subaccountNumber);
+
+    const summaries = objectEntries(childSubaccountSummaries)
+      .map(([subaccountNumberStr, summary]) => {
+        const subaccountNumber = parseInt(subaccountNumberStr, 10);
+        if (isParentSubaccount(subaccountNumber) || groupedPositions[subaccountNumber] != null) {
+          return undefined;
+        }
+
+        return {
+          subaccountNumber,
+          equity: summary.equity ?? BIG_NUMBERS.ZERO,
+        };
+      })
+      .filter(isPresent);
+
+    const reclaimableChildSubaccounts: Array<{
+      subaccountNumber: number;
+      usdcBalance: BigNumber;
+    }> = summaries
+      .map(({ subaccountNumber, equity }) => {
+        const hasUsdc = equity.gt(0);
+        const hasNoOrders = (groupedOrders[subaccountNumber]?.length ?? 0) === 0;
+
+        const hasLocalPlaceOrders = Object.values(localPlaceOrders).some(
+          ({ cachedData, submissionStatus }) =>
+            cachedData.subaccountNumber === subaccountNumber &&
+            submissionStatus === PlaceOrderStatuses.Submitted
+        );
+
+        if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders || ordersLoading !== 'success') {
+          return undefined;
+        }
+
+        return {
+          subaccountNumber,
+          usdcBalance: equity,
+        };
+      })
+      .filter(isPresent);
+
+    return reclaimableChildSubaccounts;
+  }
+);
+
+export const selectOrphanedTriggerOrders = createAppSelector(
+  [
+    BonsaiCore.account.openOrders.data,
+    BonsaiCore.account.parentSubaccountPositions.data,
+    BonsaiCore.account.openOrders.loading,
+    BonsaiCore.account.parentSubaccountPositions.loading,
+  ],
+  (openOrders, openPositions, ordersLoading, positionsLoading) => {
+    if (openOrders.length === 0) {
+      return undefined;
+    }
+
+    const ordersToCancel = calc(() => {
+      if (ordersLoading !== 'success' || positionsLoading !== 'success') {
+        return [];
+      }
+      const groupedPositions = keyBy(openPositions, (o) => o.uniqueId);
+
+      const filteredOrders = openOrders.filter((o) => {
+        const isConditionalOrder = o.orderFlags === OrderFlags.CONDITIONAL;
+        const isReduceOnly = o.reduceOnly;
+        const isActiveOrder = o.status === OrderStatus.Open || o.status === OrderStatus.Untriggered;
+        return isConditionalOrder && isReduceOnly && isActiveOrder;
+      });
+
+      // Add orders to cancel if they are orphaned, or if the reduce-only order would increase the position
+      const cancelOrders = filteredOrders.filter((o) => {
+        const position = groupedPositions[o.positionUniqueId];
+        const isOrphan = position == null;
+        const hasInvalidReduceOnlyOrder =
+          (position?.side === IndexerPositionSide.LONG && o.side === IndexerOrderSide.BUY) ||
+          (position?.side === IndexerPositionSide.SHORT && o.side === IndexerOrderSide.SELL);
+
+        return isOrphan || hasInvalidReduceOnlyOrder;
+      });
+
+      return cancelOrders;
+    });
+
+    return ordersToCancel;
+  }
+);
+
+export const selectShouldAccountRebalanceUsdc = createAppSelector(
+  [
+    BonsaiCore.account.balances.data,
+    BonsaiCore.account.childSubaccountSummaries.data,
+    selectHasNonExpiredPendingWithdraws,
+  ],
+  (balances, childSubaccountSummaries, hasNonExpiredPendingWithdraws) => {
+    if (childSubaccountSummaries == null) {
+      return undefined;
+    }
+
+    const usdcBalance = balances.usdcAmount;
+    const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+
+    if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
+      const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
+      const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
+
+      if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
+        const amountToDeposit = usdcBalanceBN
+          .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
+          .toFixed(USDC_DECIMALS);
+
+        return {
+          requiredAction: 'deposit' as const,
+          amountToDeposit,
+          usdcBalance,
+          targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+        };
+      }
+
+      if (shouldWithdraw) {
+        const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
+          .minus(usdcBalanceBN)
+          .toFixed(USDC_DECIMALS);
+
+        const maybeSubaccountNumber = objectEntries(childSubaccountSummaries).find(
+          ([_, summary]) => {
+            return summary.freeCollateral.gt(amountToWithdraw);
+          }
+        )?.[0];
+
+        if (maybeSubaccountNumber == null) {
+          return undefined;
+        }
+
+        const subaccountNumber = Number(maybeSubaccountNumber);
+
+        return {
+          requiredAction: 'withdraw' as const,
+          amountToWithdraw,
+          fromSubaccountNumber: subaccountNumber,
+          usdcBalance,
+          targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
+        };
+      }
+    }
+
+    return undefined;
   }
 );

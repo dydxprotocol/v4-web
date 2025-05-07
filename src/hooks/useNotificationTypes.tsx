@@ -6,16 +6,19 @@ import { groupBy, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
+import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
+  CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
   NotificationDisplayData,
   NotificationType,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
 import { PlaceOrderStatuses } from '@/constants/trade';
@@ -38,6 +41,11 @@ import {
   getIndexerOrderTypeStringKey,
 } from '@/views/tables/enumToStringKeyHelpers';
 
+import {
+  selectOrphanedTriggerOrders,
+  selectReclaimableChildSubaccountFunds,
+  selectShouldAccountRebalanceUsdc,
+} from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import {
@@ -49,10 +57,11 @@ import {
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
+import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
@@ -687,6 +696,155 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({ id: notification.id, displayData: notification.displayData });
         });
       }, [customNotifications, trigger]);
+    },
+  },
+  {
+    type: NotificationType.CosmosWalletLifecycle,
+    useTrigger: ({ trigger, hideNotification }) => {
+      const dispatch = useAppDispatch();
+      const stringGetter = useStringGetter();
+      const isKeplr = useAppSelector(selectIsKeplrConnected);
+      const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
+      const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
+      const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
+
+      useEffect(() => {
+        if (!isKeplr) return;
+
+        if (reclaimableChildSubaccountFunds && reclaimableChildSubaccountFunds.length > 0) {
+          const amountBN = reclaimableChildSubaccountFunds.reduce(
+            (acc, curr) => acc.plus(curr.usdcBalance),
+            BIG_NUMBERS.ZERO
+          );
+
+          const amountUsdc = amountBN.toFixed(USD_DECIMALS);
+
+          trigger({
+            id: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
+            updateKey: [amountUsdc],
+            displayData: {
+              icon: <Icon iconName={IconName.CurrencySign} />,
+              title: stringGetter({ key: STRING_KEYS.RECLAIM_FUNDS }),
+              body: stringGetter({
+                key: STRING_KEYS.RECLAIM_FUNDS_DESCRIPTION,
+                params: {
+                  RECLAIM_AMOUNT: amountUsdc,
+                },
+              }),
+              toastSensitivity: 'background',
+              groupKey: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
+              toastDuration: Infinity,
+            },
+          });
+        } else {
+          hideNotification({
+            type: NotificationType.CosmosWalletLifecycle,
+            id: CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds,
+          });
+        }
+      }, [
+        isKeplr,
+        dispatch,
+        trigger,
+        hideNotification,
+        stringGetter,
+        reclaimableChildSubaccountFunds,
+      ]);
+
+      useEffect(() => {
+        if (!isKeplr) return;
+
+        if (ordersToCancel && ordersToCancel.length > 0) {
+          trigger({
+            id: CosmosWalletNotificationTypes.CancelOrphanedTriggers,
+            updateKey: [ordersToCancel],
+            displayData: {
+              icon: <Icon iconName={IconName.Viewfinder} />,
+              title: stringGetter({ key: STRING_KEYS.CANCEL_OLD_TRIGGERS }),
+              body: stringGetter({
+                key: STRING_KEYS.CANCEL_OLD_TRIGGERS_BODY,
+              }),
+              toastSensitivity: 'background',
+              groupKey: CosmosWalletNotificationTypes.CancelOrphanedTriggers,
+              toastDuration: Infinity,
+              renderActionSlot: () => (
+                <Link
+                  isAccent
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  {stringGetter({ key: STRING_KEYS.CANCEL_EXTRA_ORDERS })} →
+                </Link>
+              ),
+            },
+          });
+        } else {
+          hideNotification({
+            type: NotificationType.CosmosWalletLifecycle,
+            id: CosmosWalletNotificationTypes.CancelOrphanedTriggers,
+          });
+        }
+      }, [ordersToCancel, isKeplr, dispatch, trigger, hideNotification, stringGetter]);
+
+      useEffect(() => {
+        if (!isKeplr) return;
+
+        if (maybeRebalanceAction?.requiredAction === 'withdraw') {
+          trigger({
+            id: CosmosWalletNotificationTypes.GasRebalance,
+            updateKey: [maybeRebalanceAction.amountToWithdraw],
+            displayData: {
+              icon: <Icon iconName={IconName.Lightning} />,
+              title: stringGetter({ key: STRING_KEYS.LOW_ON_GAS_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.LOW_ON_GAS_BODY,
+                params: {
+                  MIN_RANGE: AMOUNT_USDC_BEFORE_REBALANCE,
+                  MAX_RANGE: AMOUNT_RESERVED_FOR_GAS_USDC,
+                },
+              }),
+              toastSensitivity: 'background',
+              groupKey: CosmosWalletNotificationTypes.GasRebalance,
+              toastDuration: Infinity,
+              renderActionSlot: () => (
+                <Link
+                  isAccent
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
+                  }}
+                >
+                  {stringGetter({ key: STRING_KEYS.TRANSFER })} →
+                </Link>
+              ),
+            },
+          });
+        } else {
+          hideNotification({
+            type: NotificationType.CosmosWalletLifecycle,
+            id: CosmosWalletNotificationTypes.GasRebalance,
+          });
+        }
+      }, [isKeplr, dispatch, trigger, hideNotification, stringGetter, maybeRebalanceAction]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+      return (id: string) => {
+        const notificationId = id; // CosmosWalletNotificationType
+
+        if (notificationId === CosmosWalletNotificationTypes.GasRebalance) {
+          dispatch(openDialog(DialogTypes.WithdrawFromSubaccount()));
+        }
+
+        if (notificationId === CosmosWalletNotificationTypes.ReclaimChildSubaccountFunds) {
+          dispatch(openDialog(DialogTypes.ReclaimChildSubaccountFunds()));
+        }
+
+        if (notificationId === CosmosWalletNotificationTypes.CancelOrphanedTriggers) {
+          dispatch(openDialog(DialogTypes.CancelOrphanedTriggers()));
+        }
+      };
     },
   },
 ];

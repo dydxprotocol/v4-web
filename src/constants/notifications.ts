@@ -19,6 +19,7 @@ export enum NotificationType {
   BlockTradingReward = 'BlockTradingReward',
   FillWithNoOrder = 'FillWithNoOrder',
   Order = 'Order',
+  CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
 }
 
 export enum NotificationCategoryPreferences {
@@ -49,6 +50,7 @@ export const NotificationTypeCategory: {
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
   [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -56,6 +58,7 @@ export const SingleSessionNotificationTypes = [
   NotificationType.ComplianceAlert,
   NotificationType.OrderStatus,
   NotificationType.Custom,
+  NotificationType.CosmosWalletLifecycle,
   NotificationType.BlockTradingReward,
 ];
 
@@ -226,6 +229,12 @@ export type CustomNotification = {
 export enum TransferNotificationTypes {
   Withdrawal = 'withdrawal',
   Deposit = 'deposit',
+}
+
+export enum CosmosWalletNotificationTypes {
+  GasRebalance = 'gas-rebalance',
+  CancelOrphanedTriggers = 'cancel-orphaned-triggers',
+  ReclaimChildSubaccountFunds = 'reclaim-child-subaccount-funds',
 }
 
 export enum ReleaseUpdateNotificationIds {

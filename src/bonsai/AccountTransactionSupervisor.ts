@@ -24,7 +24,7 @@ import {
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
-import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
+import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
@@ -477,7 +477,9 @@ export class AccountTransactionSupervisor {
           payload.targetAddress,
           payload.toSubaccountNumber,
           MustBigNumber(payload.amount).toFixed(6),
-          isIsolatedCancel ? TransactionMemo.cancelOrderTransfer : DEFAULT_TRANSACTION_MEMO
+          isIsolatedCancel
+            ? TransactionMemo.cancelOrderTransfer
+            : TransactionMemo.transferForIsolatedMarginOrder
         );
 
         return tx;

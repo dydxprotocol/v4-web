@@ -1,24 +1,18 @@
 import { SubaccountClient } from '@dydxprotocol/v4-client-js';
-import BigNumber from 'bignumber.js';
 
-import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { USDC_DECIMALS } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
+import { selectShouldAccountRebalanceUsdc } from '@/state/accountSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
-import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors';
 
-import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
-import { objectEntries } from '@/lib/objectHelpers';
 import { sleep } from '@/lib/timeUtils';
 
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
-import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
   selectTxAuthorizedAccount,
@@ -36,19 +30,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const balanceAndTransfersSelector = createAppSelector(
     [
       selectTxAuthorizedAccount,
-      BonsaiCore.account.balances.data,
-      BonsaiCore.account.childSubaccountSummaries.data,
-      selectHasNonExpiredPendingWithdraws,
       selectUserHasUsdcGasForTransaction,
+      selectShouldAccountRebalanceUsdc,
     ],
-    (
-      txAuthorizedAccount,
-      balances,
-      childSubaccountSummaries,
-      hasNonExpiredPendingWithdraws,
-      userHasUsdcGasForTransaction
-    ) => {
-      if (!txAuthorizedAccount || childSubaccountSummaries == null) {
+    (txAuthorizedAccount, userHasUsdcGasForTransaction, rebalanceAction) => {
+      if (!txAuthorizedAccount) {
         return undefined;
       }
 
@@ -58,10 +44,8 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         localDydxWallet,
         parentSubaccountInfo,
         sourceAccount,
-        balances,
-        childSubaccountSummaries,
-        hasNonExpiredPendingWithdraws,
         userHasUsdcGasForTransaction,
+        rebalanceAction,
       };
     }
   );
@@ -76,115 +60,85 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
       }
 
       async function rebalanceWalletFunds() {
-        const {
-          localDydxWallet,
-          balances,
-          childSubaccountSummaries,
-          hasNonExpiredPendingWithdraws,
-          parentSubaccountInfo,
-        } = data!;
-        const usdcBalance = balances.usdcAmount;
-        const usdcBalanceBN: BigNumber | undefined = MaybeBigNumber(usdcBalance);
+        const { localDydxWallet, parentSubaccountInfo, sourceAccount, rebalanceAction } = data!;
 
-        if (usdcBalanceBN != null && usdcBalanceBN.gte(0)) {
-          const shouldDeposit = usdcBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC);
-          const shouldWithdraw = usdcBalanceBN.lte(AMOUNT_USDC_BEFORE_REBALANCE);
+        // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
+        if (rebalanceAction == null || sourceAccount.chain === WalletNetworkType.Cosmos) {
+          return;
+        }
 
-          if (shouldDeposit && !shouldWithdraw && !hasNonExpiredPendingWithdraws) {
-            const amountToDeposit = usdcBalanceBN
-              .minus(AMOUNT_RESERVED_FOR_GAS_USDC)
-              .toFixed(USDC_DECIMALS);
+        if (rebalanceAction.requiredAction === 'deposit') {
+          const { amountToDeposit, usdcBalance, targetAmount } = rebalanceAction;
 
-            logBonsaiInfo(
-              'usdcRebalanceLifecycle',
-              `depositing excess USDC into parent subaccount ${parentSubaccountInfo.subaccount}`,
-              {
-                subaccountNumber: parentSubaccountInfo.subaccount,
-                balance: usdcBalance,
-                amountToDeposit,
-                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-              }
-            );
-
-            const subaccountClient = new SubaccountClient(
-              localDydxWallet!,
-              parentSubaccountInfo.subaccount
-            );
-
-            try {
-              await compositeClient.depositToSubaccount(
-                subaccountClient,
-                amountToDeposit,
-                TransactionMemo.depositToSubaccount
-              );
-            } finally {
-              await sleep(SLEEP_TIME);
-
-              appQueryClient.invalidateQueries({
-                queryKey: ['validator', 'accountBalances'],
-                exact: false,
-              });
-
-              await sleep(INVALIDATION_SLEEP_TIME);
+          logBonsaiInfo(
+            'usdcRebalanceLifecycle',
+            `depositing excess USDC into parent subaccount ${parentSubaccountInfo.subaccount}`,
+            {
+              subaccountNumber: parentSubaccountInfo.subaccount,
+              balance: usdcBalance,
+              amountToDeposit,
+              targetAmount,
             }
-          } else if (shouldWithdraw) {
-            const amountToWithdraw = MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC)
-              .minus(usdcBalanceBN)
-              .toFixed(USDC_DECIMALS);
+          );
 
-            const maybeSubaccountNumber = objectEntries(childSubaccountSummaries).find(
-              ([_, summary]) => {
-                if (summary.freeCollateral.gt(amountToWithdraw)) {
-                  return true;
-                }
+          const subaccountClient = new SubaccountClient(
+            localDydxWallet!,
+            parentSubaccountInfo.subaccount
+          );
 
-                return false;
-              }
-            )?.[0];
-
-            if (maybeSubaccountNumber == null) {
-              return;
-            }
-
-            const subaccountNumber = Number(maybeSubaccountNumber);
-            const subaccountClient = new SubaccountClient(localDydxWallet!, subaccountNumber);
-
-            logBonsaiInfo(
-              'usdcRebalanceLifecycle',
-              `withdrawing funds from subaccount (${subaccountNumber}) for gas reserve`,
-              {
-                balance: usdcBalance,
-                amountToWithdraw,
-                targetAmount: AMOUNT_RESERVED_FOR_GAS_USDC,
-                subaccountNumber,
-              }
+          try {
+            await compositeClient.depositToSubaccount(
+              subaccountClient,
+              amountToDeposit,
+              TransactionMemo.depositToSubaccount
             );
+          } finally {
+            await sleep(SLEEP_TIME);
 
-            try {
-              await compositeClient.withdrawFromSubaccount(
-                subaccountClient,
-                amountToWithdraw,
-                undefined,
-                TransactionMemo.withdrawFromSubaccount
-              );
-            } finally {
-              await sleep(SLEEP_TIME);
+            appQueryClient.invalidateQueries({
+              queryKey: ['validator', 'accountBalances'],
+              exact: false,
+            });
 
-              appQueryClient.invalidateQueries({
-                queryKey: ['validator', 'accountBalances'],
-                exact: false,
-              });
-
-              await sleep(INVALIDATION_SLEEP_TIME);
-            }
+            await sleep(INVALIDATION_SLEEP_TIME);
           }
         }
-      }
 
-      // Don't auto-rebalance on Cosmos
-      // TODO: Add notification to prompt user to rebalance manually
-      if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        return undefined;
+        if (rebalanceAction.requiredAction === 'withdraw') {
+          const { amountToWithdraw, fromSubaccountNumber, usdcBalance, targetAmount } =
+            rebalanceAction;
+
+          const subaccountClient = new SubaccountClient(localDydxWallet!, fromSubaccountNumber);
+
+          logBonsaiInfo(
+            'usdcRebalanceLifecycle',
+            `withdrawing funds from subaccount (${fromSubaccountNumber}) for gas reserve`,
+            {
+              balance: usdcBalance,
+              amountToWithdraw,
+              targetAmount,
+              subaccountNumber: fromSubaccountNumber,
+            }
+          );
+
+          try {
+            await compositeClient.withdrawFromSubaccount(
+              subaccountClient,
+              amountToWithdraw,
+              undefined,
+              TransactionMemo.withdrawFromSubaccount
+            );
+          } finally {
+            await sleep(SLEEP_TIME);
+
+            appQueryClient.invalidateQueries({
+              queryKey: ['validator', 'accountBalances'],
+              exact: false,
+            });
+
+            await sleep(INVALIDATION_SLEEP_TIME);
+          }
+        }
       }
 
       activeRebalance
