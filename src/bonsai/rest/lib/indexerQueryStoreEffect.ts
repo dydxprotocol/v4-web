@@ -1,7 +1,9 @@
 import { logBonsaiError, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import {
+  selectCompositeClientKey,
   selectCompositeClientReady,
   selectCompositeClientUrl,
+  selectIndexerClientKey,
   selectIndexerReady,
   selectNobleClientReady,
 } from '@/bonsai/socketSelectors';
@@ -65,9 +67,9 @@ export function createIndexerStoreEffect<T>(
   config: InfraSetupConfig<IndexerClient, T>
 ) {
   const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectIndexerReady, config.selector],
-    (network, indexerReady, selectorResult) => ({
-      infrastructure: { network, indexerReady },
+    [getSelectedNetwork, selectIndexerReady, selectIndexerClientKey, config.selector],
+    (network, indexerReady, clientId, selectorResult) => ({
+      infrastructure: { network, indexerReady, clientId },
       selectorResult,
     })
   );
@@ -86,11 +88,7 @@ export function createIndexerStoreEffect<T>(
     };
     const indexerClient = CompositeClientManager.use(clientConfig).indexer.client!;
 
-    const unsubscribe = config.handle(
-      `${infrastructure.network}-${infrastructure.indexerReady}`,
-      indexerClient,
-      selectorResult
-    );
+    const unsubscribe = config.handle(infrastructure.clientId, indexerClient, selectorResult);
 
     if (unsubscribe == null) {
       CompositeClientManager.markDone(clientConfig);
@@ -155,9 +153,15 @@ export function createValidatorStoreEffect<T>(
   config: InfraSetupConfig<CompositeClient, T>
 ) {
   const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectCompositeClientReady, selectCompositeClientUrl, config.selector],
-    (network, compositeClientReady, compositeClientUrl, selectorResult) => ({
-      infrastructure: { network, compositeClientReady, compositeClientUrl },
+    [
+      getSelectedNetwork,
+      selectCompositeClientReady,
+      selectCompositeClientUrl,
+      selectCompositeClientKey,
+      config.selector,
+    ],
+    (network, compositeClientReady, compositeClientUrl, clientId, selectorResult) => ({
+      infrastructure: { network, compositeClientReady, compositeClientUrl, clientId },
       selectorResult,
     })
   );
@@ -177,7 +181,7 @@ export function createValidatorStoreEffect<T>(
 
     const unsubscribe = config.handle(
       // we want to trigger refreshes when we switch validator url too
-      `${infrastructure.network}-${infrastructure.compositeClientReady}-${infrastructure.compositeClientUrl}`,
+      infrastructure.clientId,
       compositeClient,
       selectorResult
     );

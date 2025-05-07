@@ -1,5 +1,7 @@
 import './polyfills';
 
+import { StrictMode } from 'react';
+
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
@@ -20,12 +22,12 @@ runFn(async () => {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
-    {/* <StrictMode> */}
-    <Provider store={store}>
-      <Router>
-        <App />
-      </Router>
-    </Provider>
-    {/* </StrictMode> */}
+    <StrictMode>
+      <Provider store={store}>
+        <Router>
+          <App />
+        </Router>
+      </Provider>
+    </StrictMode>
   </ErrorBoundary>
 );
