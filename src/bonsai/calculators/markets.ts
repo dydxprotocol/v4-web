@@ -17,7 +17,7 @@ import {
   getDisplayableTickerFromMarket,
 } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { AttemptNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 
 import { MarketsData } from '../types/rawTypes';
 import {
@@ -135,7 +135,7 @@ export function createMarketSummary(
   }
 
   const recentMarketIdsByClobPairId = new Set(
-    orderBy(Object.values(markets), [(m) => AttemptNumber(m.clobPairId) ?? -1], ['desc'])
+    orderBy(Object.values(markets), [(m) => MustNumber(m.clobPairId)], ['desc'])
       .slice(0, 5)
       .map((m) => m.ticker)
   );
