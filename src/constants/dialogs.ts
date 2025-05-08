@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { OrderSide } from '@/bonsai/forms/trade/types';
 import { PositionUniqueId, SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
@@ -64,6 +65,9 @@ export type SharePNLAnalyticsDialogProps = {
   unrealizedPnl: Nullable<number>;
   side: Nullable<IndexerPositionSide>;
   sideLabel: Nullable<string>;
+};
+export type SimpleUiTradeDialogProps = {
+  side: OrderSide;
 };
 export type StakeDialogProps = {};
 export type StakingRewardDialogProps = { usdcRewards: BigNumberish; validators: string[] };
@@ -134,6 +138,7 @@ export const DialogTypes = unionize(
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
+    SimpleUiTrade: ofType<SimpleUiTradeDialogProps>(),
     Stake: ofType<StakeDialogProps>(),
     StakingReward: ofType<StakingRewardDialogProps>(),
     Trade: ofType<TradeDialogProps>(),

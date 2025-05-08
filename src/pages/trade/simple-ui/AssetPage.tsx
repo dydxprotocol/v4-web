@@ -1,4 +1,7 @@
+import { OrderSide } from '@/bonsai/forms/trade/types';
+
 import { ButtonShape } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
@@ -7,11 +10,15 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
 
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
+
 import AssetDetails from './AssetDetails';
 import AssetHeader from './AssetHeader';
 import AssetPosition from './AssetPosition';
 
 const AssetPage = () => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
 
@@ -28,6 +35,7 @@ const AssetPage = () => {
       </div>
     </>
   );
+
   return (
     <div tw="flexColumn h-full">
       <AssetHeader />
@@ -39,10 +47,21 @@ const AssetPage = () => {
             background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
           }}
         >
-          <Button tw="flex-1 bg-color-negative-dark text-color-negative" shape={ButtonShape.Pill}>
+          <Button
+            tw="flex-1 bg-color-negative-dark text-color-negative"
+            shape={ButtonShape.Pill}
+            onClick={() =>
+              dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.SELL })))
+            }
+          >
             {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
           </Button>
-          <Button tw="flex-1 bg-color-positive-dark text-color-positive" shape={ButtonShape.Pill}>
+
+          <Button
+            tw="flex-1 bg-color-positive-dark text-color-positive"
+            shape={ButtonShape.Pill}
+            onClick={() => dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY })))}
+          >
             {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
           </Button>
         </div>

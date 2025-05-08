@@ -37,6 +37,7 @@ import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
+import { SimpleUiTradeDialog } from '@/views/dialogs/SimpleUiTradeDialog/SimpleUiTradeDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
@@ -110,6 +111,7 @@ export const DialogManager = React.memo(() => {
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
+    SimpleUiTrade: (args) => <SimpleUiTradeDialog {...args} {...modalProps} />,
     Stake: (args) => <StakeDialog {...args} {...modalProps} />,
     StakingReward: (args) => <StakingRewardDialog {...args} {...modalProps} />,
     Trade: (args) => <TradeDialog {...args} {...modalProps} />,
