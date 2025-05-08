@@ -184,7 +184,11 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
       title={title}
       withClose={currentStep !== SimpleUiTradeDialogSteps.Edit}
     >
-      <SimpleTradeForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
+      <SimpleTradeForm
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        onClose={onCloseDialog}
+      />
     </Dialog>
   );
 };

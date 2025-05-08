@@ -26,19 +26,21 @@ import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { track } from '@/lib/analytics/analytics';
-import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
+import { SimpleTradeSteps } from './SimpleTradeSteps';
 
 export const SimpleTradeForm = ({
   currentStep,
   setCurrentStep,
+  onClose,
 }: {
   currentStep: SimpleUiTradeDialogSteps;
   setCurrentStep: (step: SimpleUiTradeDialogSteps) => void;
+  onClose: () => void;
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -55,7 +57,8 @@ export const SimpleTradeForm = ({
   );
 
   const [inputValue, setInputValue] = useState('');
-  const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
+  const [placeOrderError, setPlaceOrderError] = useState<string>();
+  const [clientId, setClientId] = useState<string>();
 
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
   const freeCollateral = summary.accountDetailsBefore?.account?.freeCollateral;
@@ -83,7 +86,7 @@ export const SimpleTradeForm = ({
   }, [initialMarginFraction, effectiveInitialMarginFraction, freeCollateral]);
 
   const onLastOrderIndexed = useCallback(() => {
-    if (currentStep === SimpleUiTradeDialogSteps.Edit) {
+    if (currentStep === SimpleUiTradeDialogSteps.Submit) {
       setCurrentStep(SimpleUiTradeDialogSteps.Confirm);
     }
   }, [currentStep, setCurrentStep]);
@@ -95,11 +98,13 @@ export const SimpleTradeForm = ({
     if (payload == null) {
       return;
     }
+    setCurrentStep(SimpleUiTradeDialogSteps.Submit);
     track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
-      setCurrentStep(SimpleUiTradeDialogSteps.Submit);
-      setUnIndexedClientId(payload.clientId.toString());
+      const payloadClientId = payload.clientId.toString();
+      setUnIndexedClientId(payloadClientId);
+      setClientId(payloadClientId);
     } else {
       const errorParams = operationFailureToErrorParams(result);
       setPlaceOrderError(
@@ -171,6 +176,18 @@ export const SimpleTradeForm = ({
       <Icon iconName={IconName.Switch} />
     </button>
   );
+
+  if (currentStep !== SimpleUiTradeDialogSteps.Edit) {
+    return (
+      <SimpleTradeSteps
+        currentStep={currentStep}
+        placeOrderError={placeOrderError}
+        clientId={clientId}
+        payload={summary.tradePayload}
+        onClose={onClose}
+      />
+    );
+  }
 
   return (
     <div tw="flexColumn items-center gap-2 px-1.25 py-[15vh]">
