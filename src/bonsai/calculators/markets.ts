@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { mapValues, pickBy } from 'lodash';
+import { mapValues, orderBy, pickBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/constants/markets';
@@ -17,7 +17,7 @@ import {
   getDisplayableTickerFromMarket,
 } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { AttemptNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { MarketsData } from '../types/rawTypes';
 import {
@@ -134,12 +134,20 @@ export function createMarketSummary(
     return undefined;
   }
 
+  const recentMarketIdsByClobPairId = new Set(
+    orderBy(Object.values(markets), [(m) => AttemptNumber(m.clobPairId) ?? -1], ['desc'])
+      .slice(0, 5)
+      .map((m) => m.ticker)
+  );
+
   return pickBy(
     mapValues(markets, (market) => {
-      const isNew = Boolean(
-        (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
-          SEVEN_DAY_SPARKLINE_ENTRIES
-      );
+      const isNew =
+        recentMarketIdsByClobPairId.has(market.ticker) ||
+        Boolean(
+          (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
+            SEVEN_DAY_SPARKLINE_ENTRIES
+        );
 
       const assetData = assetInfo[market.assetId];
       if (assetData == null) return undefined;
