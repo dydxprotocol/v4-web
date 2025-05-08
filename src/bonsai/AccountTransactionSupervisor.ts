@@ -56,7 +56,7 @@ import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { AttemptBigNumber, AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { parseToPrimitives, ToPrimitives } from '@/lib/parseToPrimitives';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { ConvertBigNumberToNumber, purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { createTimer, startTimer } from '@/lib/simpleTimer';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
@@ -77,6 +77,8 @@ interface CancelOrderPayload {
   goodTilBlock: number | undefined;
   goodTilBlockTime: number | undefined;
   subaccountNumber: number;
+
+  originalOrder: ConvertBigNumberToNumber<SubaccountOrder> | undefined;
 }
 
 export class AccountTransactionSupervisor {
@@ -284,6 +286,8 @@ export class AccountTransactionSupervisor {
       goodTilBlock: order.goodTilBlock ?? undefined,
       goodTilBlockTime: order.goodTilBlockTimeSeconds ?? undefined,
       subaccountNumber: order.subaccountNumber,
+
+      originalOrder: purgeBigNumbers(order),
     };
   }
 

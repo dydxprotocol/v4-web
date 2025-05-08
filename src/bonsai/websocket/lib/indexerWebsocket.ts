@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import {
+  BONSAI_DETAILED_LOGS,
   logBonsaiError,
   logBonsaiInfo,
   LONG_REQUEST_LOG_THRESHOLD_MS,
@@ -25,8 +26,6 @@ interface SubscriptionHandlerInput {
   handleBaseData: (data: any, fullMessage: any) => void;
   handleUpdates: (updates: any[], fullMessage: any) => void;
 }
-
-const detailedLogging: boolean = false;
 
 type SubscriptionHandlerTrackingMetadata = {
   receivedBaseData: boolean;
@@ -169,7 +168,7 @@ export class IndexerWebsocket {
       return;
     }
 
-    if (detailedLogging) {
+    if (BONSAI_DETAILED_LOGS) {
       logBonsaiInfo('IndexerWebsocket', 'adding subscription', {
         channel,
         id,
@@ -216,7 +215,7 @@ export class IndexerWebsocket {
       return;
     }
 
-    if (detailedLogging) {
+    if (BONSAI_DETAILED_LOGS) {
       logBonsaiInfo('IndexerWebsocket', 'removing subscription', {
         channel,
         id,
@@ -356,7 +355,7 @@ export class IndexerWebsocket {
       } else if (message.type === 'connected') {
         // do nothing
       } else if (message.type === 'unsubscribed') {
-        if (detailedLogging) {
+        if (BONSAI_DETAILED_LOGS) {
           logBonsaiInfo('IndexerWebsocket', `unsubscribe confirmed`, {
             channel: message.channel,
             id: message.id,
@@ -386,7 +385,7 @@ export class IndexerWebsocket {
           return;
         }
         if (message.type === 'subscribed') {
-          if (detailedLogging) {
+          if (BONSAI_DETAILED_LOGS) {
             logBonsaiInfo('IndexerWebsocket', `subscription confirmed`, {
               channel,
               id,
@@ -468,13 +467,15 @@ export class IndexerWebsocket {
     this.missingMessageDetector?.cleanup();
     this.missingMessageDetector = new MissingMessageDetector(this._handleMissingMessageDetected);
 
-    logBonsaiInfo('IndexerWebsocket', 'freshly connected', {
-      socketUrl: this.socket?.url,
-      wsId: this.indexerWsId,
-      socketNonNull: this.socket != null,
-      socketActive: Boolean(this.socket?.isActive()),
-      subs: this.subscriptions.getAllSubscriptions().map((o) => `${o.channel}///${o.id}`),
-    });
+    if (BONSAI_DETAILED_LOGS) {
+      logBonsaiInfo('IndexerWebsocket', 'freshly connected', {
+        socketUrl: this.socket?.url,
+        wsId: this.indexerWsId,
+        socketNonNull: this.socket != null,
+        socketActive: Boolean(this.socket?.isActive()),
+        subs: this.subscriptions.getAllSubscriptions().map((o) => `${o.channel}///${o.id}`),
+      });
+    }
     if (this.socket != null && this.socket.isActive()) {
       this.subscriptions.getAllSubscriptions().forEach(({ channel, id }) => {
         const sub = this.subscriptions.getSubscription(channel, id)!;
