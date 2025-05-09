@@ -186,6 +186,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             // Native
             disabled={disabled}
             placeholder={placeholder ?? defaultNumberPlaceholder}
+            inputMode="decimal"
             value={formattedValue}
             autoComplete="off"
             autoCorrect="off"
