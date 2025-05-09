@@ -13,6 +13,7 @@ export enum TagType {
 export enum TagSign {
   Positive = 'Positive',
   Negative = 'Negative',
+  Warning = 'Warning',
   Neutral = 'Neutral',
 }
 
@@ -66,6 +67,9 @@ export const Tag = styled.span<StyleProps>`
       `,
       [TagSign.Neutral]: css`
         background-color: var(--color-layer-3);
+      `,
+      [TagSign.Warning]: css`
+        background-color: var(--color-gradient-warning);
       `,
     }[sign]}
 

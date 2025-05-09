@@ -52,6 +52,7 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
 const $Search = styled.div`
   ${layoutMixins.row}
   width: auto;
+  overflow: hidden;
   height: 2.5rem;
   background-color: var(--color-layer-5);
   color: ${({ theme }) => theme.textTertiary};
