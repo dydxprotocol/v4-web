@@ -224,18 +224,20 @@ export const SimpleTradeForm = ({
                   value={summary.tradeInfo.fee ?? 0}
                 />
               </div>
-              <div tw="row justify-between gap-1">
-                <span tw="text-color-text-0">
-                  {stringGetter({ key: STRING_KEYS.PRICE_IMPACT })}
-                </span>
-                <Output
-                  tw="text-color-text-2"
-                  useGrouping
-                  type={OutputType.Fiat}
-                  value={priceImpact}
-                  showSign={ShowSign.None}
-                />
-              </div>
+              {selectedTradeType === TradeFormType.MARKET && (
+                <div tw="row justify-between gap-1">
+                  <span tw="text-color-text-0">
+                    {stringGetter({ key: STRING_KEYS.PRICE_IMPACT })}
+                  </span>
+                  <Output
+                    tw="text-color-text-2"
+                    useGrouping
+                    type={OutputType.Fiat}
+                    value={priceImpact}
+                    showSign={ShowSign.None}
+                  />
+                </div>
+              )}
               <HorizontalSeparatorFiller />
               <div tw="row justify-between gap-1">
                 <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
