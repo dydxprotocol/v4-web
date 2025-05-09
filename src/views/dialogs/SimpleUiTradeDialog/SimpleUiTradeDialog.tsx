@@ -21,7 +21,7 @@ import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
-import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -34,9 +34,6 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
-  const { summary } = useAppSelector(getTradeFormSummary);
-  const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
-  const hasEffectSizes = effectiveSizes.size != null;
 
   const { displayableAsset, logo } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -191,12 +188,8 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
       title={title}
       withClose={currentStep !== SimpleUiTradeDialogSteps.Edit}
       css={{
-        '--simpleUi-dialog-backgroundColor': hasEffectSizes
-          ? 'var(--color-layer-1)'
-          : 'var(--color-layer-2)',
-        '--simpleUi-dialog-secondaryColor': hasEffectSizes
-          ? 'var(--color-layer-2)'
-          : 'var(--color-layer-3)',
+        '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
+        '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
         '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
       }}
     >

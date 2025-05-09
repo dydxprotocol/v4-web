@@ -238,20 +238,29 @@ export const SimpleTradeForm = ({
         {sizeToggle}
       </div>
       {receiptArea}
-      <Button
-        type={ButtonType.Button}
-        action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-        tw="mt-auto w-full rounded-[1rem]"
-        size={ButtonSize.Medium}
+
+      <div
+        tw="row fixed bottom-0 left-0 right-0 gap-1.25 px-1.25 py-1.25"
         css={{
-          '--button-textColor': 'var(--color-layer-0)',
+          background:
+            'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
         }}
-        onClick={onSubmitOrder}
       >
-        {tradeValues.side === OrderSide.BUY
-          ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-          : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
-      </Button>
+        <Button
+          type={ButtonType.Button}
+          action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
+          tw="w-full rounded-[1rem]"
+          size={ButtonSize.Medium}
+          css={{
+            '--button-textColor': 'var(--color-layer-0)',
+          }}
+          onClick={onSubmitOrder}
+        >
+          {tradeValues.side === OrderSide.BUY
+            ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+            : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+        </Button>
+      </div>
     </div>
   );
 };
