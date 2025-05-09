@@ -23,7 +23,9 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { SimpleUiPopover } from '@/components/SimpleUiPopover';
 import { useTradeTypeOptions } from '@/views/forms/TradeForm/useTradeTypeOptions';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -68,6 +70,7 @@ export const SimpleTradeForm = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentForm = useAppSelector(getCurrentTradePageForm);
+  const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
 
   const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -189,6 +192,12 @@ export const SimpleTradeForm = ({
     );
   };
 
+  const priceImpact = summary.tradeInfo.inputSummary.worstFillPrice
+    ? midPrice
+      ? midPrice.minus(summary.tradeInfo.inputSummary.worstFillPrice)
+      : 0
+    : 0;
+
   const receiptArea = (
     <div tw="flexColumn w-full gap-[1px] overflow-hidden rounded-[1rem] font-small-book">
       <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
@@ -197,9 +206,54 @@ export const SimpleTradeForm = ({
       </div>
       <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
         <MarginUsageTag marginUsage={marginUsage} />
-        <span tw="row gap-0.25 text-color-text-2">
-          {stringGetter({ key: STRING_KEYS.FEES })} <ChevronDownIcon />
-        </span>
+        <SimpleUiPopover
+          tw="[data-state='open']:rotate-180"
+          withPortal={false}
+          side="top"
+          content={
+            <div tw="grid gap-0.5 p-0.5">
+              <span tw="text-color-text-1">
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_COST })}
+              </span>
+              <div tw="row justify-between gap-1">
+                <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FEE })}</span>
+                <Output
+                  tw="text-color-text-2"
+                  useGrouping
+                  type={OutputType.Fiat}
+                  value={summary.tradeInfo.fee ?? 0}
+                />
+              </div>
+              <div tw="row justify-between gap-1">
+                <span tw="text-color-text-0">
+                  {stringGetter({ key: STRING_KEYS.PRICE_IMPACT })}
+                </span>
+                <Output
+                  tw="text-color-text-2"
+                  useGrouping
+                  type={OutputType.Fiat}
+                  value={priceImpact}
+                  showSign={ShowSign.None}
+                />
+              </div>
+              <HorizontalSeparatorFiller />
+              <div tw="row justify-between gap-1">
+                <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
+                <Output
+                  useGrouping
+                  tw="text-color-text-2"
+                  showSign={ShowSign.None}
+                  type={OutputType.Fiat}
+                  value={summary.tradeInfo.total ?? 0}
+                />
+              </div>
+            </div>
+          }
+        >
+          <span tw="row gap-0.25 text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.FEES })} <ChevronDownIcon tw="" />
+          </span>
+        </SimpleUiPopover>
       </div>
     </div>
   );

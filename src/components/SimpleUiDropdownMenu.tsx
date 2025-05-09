@@ -71,6 +71,7 @@ export const SimpleUiDropdownMenu = forwardRefFn(
     );
 
     const dropdownContent = withPortal ? <Portal>{content}</Portal> : content;
+
     return (
       <Root>
         <Trigger className={className} asChild>
