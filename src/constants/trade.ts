@@ -174,3 +174,10 @@ export type LocalCloseAllPositionsData = {
   operationUuid: string;
   clientIds: string[];
 };
+
+export enum SimpleUiTradeDialogSteps {
+  Edit,
+  Submit,
+  Confirm,
+  Error,
+}

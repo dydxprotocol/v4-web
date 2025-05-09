@@ -17,6 +17,7 @@ import { Themes } from '@/styles/themes';
 import { AppTheme, type AppColorMode } from '@/state/appUiConfigs';
 
 import { getDisplayableTickerFromMarket } from '../assetUtils';
+import { testFlags } from '../testFlags';
 
 // Show order book candles instead of trade candles if there are no trades in that time period
 const MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES = 1;
@@ -199,6 +200,11 @@ export const getWidgetOptions = (
     'chart_zoom',
   ];
 
+  const disabledFeaturesForSimpleUi: TradingTerminalFeatureset[] = [
+    'header_widget',
+    'left_toolbar',
+  ];
+
   const disabledFeatures: TradingTerminalFeatureset[] = [
     'header_symbol_search',
     'header_compare',
@@ -209,6 +215,7 @@ export const getWidgetOptions = (
     'header_layouttoggle',
     'trading_account_manager',
     ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
+    ...(testFlags.simpleUi ? disabledFeaturesForSimpleUi : []),
   ];
 
   return {
