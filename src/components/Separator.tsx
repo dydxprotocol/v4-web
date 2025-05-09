@@ -13,14 +13,14 @@ const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
     align-self: stretch;
     /* margin: 0 0 calc(-1 * var(--border-width)) 0 !important; */
 
-    border-bottom: solid var(--border-width) var(--color-border);
+    border-bottom: solid var(--border-width, var(--default-border-width)) var(--color-border);
   }
 
   &[data-orientation='vertical'] {
     align-self: center;
     width: 0;
     margin: 0 !important;
-    border-right: solid var(--border-width) var(--color-border);
+    border-right: solid var(--border-width, var(--default-border-width)) var(--color-border);
 
     ${({ $fullHeight }) =>
       $fullHeight

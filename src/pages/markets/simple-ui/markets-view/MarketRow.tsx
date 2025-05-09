@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom';
+
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,9 +19,10 @@ const MarketRow = ({ className, market }: { className?: string; market: MarketDa
     : 'var(--color-text-1)';
 
   return (
-    <div
+    <Link
       className={className}
       tw="row cursor-pointer justify-between gap-0.5 px-1.25 hover:bg-color-layer-4"
+      to={`${AppRoute.Trade}/${market.id}`}
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <AssetIcon logoUrl={market.logo} tw="size-[2.25rem] min-w-[2.25rem]" />
@@ -56,7 +60,7 @@ const MarketRow = ({ className, market }: { className?: string; market: MarketDa
           value={market.percentChange24h}
         />
       </div>
-    </div>
+    </Link>
   );
 };
 

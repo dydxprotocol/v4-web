@@ -86,6 +86,7 @@ export { default as SuccessCircleIcon } from './success-circle.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as SwitchIcon } from './switch.svg';
 export { default as TerminalIcon } from './terminal.svg';
+export { default as ThreeDotIcon } from './three-dot.svg';
 export { default as TogglesMenuIcon } from './toggles-menu.svg';
 export { default as TokenIcon } from './token.svg';
 export { default as TradeIcon } from './trade.svg';

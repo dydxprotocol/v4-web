@@ -32,7 +32,7 @@ const getMidMarketPriceColor = ({
   return 'var(--color-text-2)';
 };
 
-export const MidMarketPrice = () => {
+export const MidMarketPrice = ({ richColor = true }: { richColor?: boolean }) => {
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -45,10 +45,12 @@ export const MidMarketPrice = () => {
 
   const lastMidMarketPrice = useRef(midMarketPrice);
 
-  const midMarketColor = getMidMarketPriceColor({
-    midMarketPrice,
-    lastMidMarketPrice: lastMidMarketPrice.current,
-  });
+  const midMarketColor = richColor
+    ? getMidMarketPriceColor({
+        midMarketPrice,
+        lastMidMarketPrice: lastMidMarketPrice.current,
+      })
+    : 'var(--color-text-2)';
 
   useEffect(() => {
     lastMidMarketPrice.current = midMarketPrice;
