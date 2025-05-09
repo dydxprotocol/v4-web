@@ -191,6 +191,7 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
         '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
         '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
+        '--dialog-header-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
       }}
     >
       <SimpleTradeForm

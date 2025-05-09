@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
-import { OrderSide, OrderSizeInputs } from '@/bonsai/forms/trade/types';
+import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
+import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
+import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -20,12 +24,19 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType } from '@/components/Output';
+import { useTradeTypeOptions } from '@/views/forms/TradeForm/useTradeTypeOptions';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
+import {
+  getCurrentTradePageForm,
+  getTradeFormSummary,
+  getTradeFormValues,
+} from '@/state/tradeFormSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
@@ -46,9 +57,17 @@ export const SimpleTradeForm = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+
+  const { connectionError } = useApiState();
+  const { complianceState } = useComplianceState();
+  const { selectedTradeType } = useTradeTypeOptions();
+
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const tradeValues = useAppSelector(getTradeFormValues);
-  const { summary } = useAppSelector(getTradeFormSummary);
+  const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const subaccountNumber = useAppSelector(getSubaccountId);
+  const currentForm = useAppSelector(getCurrentTradePageForm);
 
   const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -64,6 +83,9 @@ export const SimpleTradeForm = ({
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
   const freeCollateral = summary.accountDetailsBefore?.account?.freeCollateral;
   const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
+
+  const hasInputErrors =
+    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentForm !== 'TRADE';
 
   useEffect(() => {
     if (ticker) {
@@ -225,8 +247,23 @@ export const SimpleTradeForm = ({
 
   const inputConfig = inputConfigs[displayUnit];
 
+  const hasMissingData = subaccountNumber === undefined;
+
+  const closeOnlyTradingUnavailable =
+    complianceState === ComplianceStates.CLOSE_ONLY &&
+    selectedTradeType !== TradeFormType.MARKET &&
+    currentForm !== 'CLOSE_POSITION';
+
+  const tradingUnavailable =
+    closeOnlyTradingUnavailable ||
+    complianceState === ComplianceStates.READ_ONLY ||
+    connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
+
+  const shouldEnableTrade =
+    canAccountTrade && !hasMissingData && !hasInputErrors && !tradingUnavailable;
+
   return (
-    <div tw="flexColumn items-center gap-2 px-1.25 pb-1.25 pt-[15vh]">
+    <div tw="flexColumn items-center gap-2 px-1.25 pb-[5.25rem] pt-[6.5vh]">
       <div tw="flexColumn w-full items-center gap-0.5">
         <ResponsiveSizeInput
           inputValue={inputConfig.value}
@@ -249,11 +286,12 @@ export const SimpleTradeForm = ({
         <Button
           type={ButtonType.Button}
           action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-          tw="w-full rounded-[1rem]"
+          tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
           size={ButtonSize.Medium}
           css={{
             '--button-textColor': 'var(--color-layer-0)',
           }}
+          state={{ isDisabled: !shouldEnableTrade }}
           onClick={onSubmitOrder}
         >
           {tradeValues.side === OrderSide.BUY

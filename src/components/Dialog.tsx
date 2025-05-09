@@ -360,6 +360,7 @@ const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
     var(--dialog-header-paddingBottom) var(--dialog-header-paddingRight);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
+  background: var(--dialog-header-backgroundColor, transparent);
 
   ${({ $withBorder }) =>
     $withBorder &&
