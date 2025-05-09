@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
-import { OrderSide } from '@/bonsai/forms/trade/types';
+import { OrderSide, OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
@@ -9,6 +9,7 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
@@ -16,6 +17,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { InputType } from '@/components/Input';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType } from '@/components/Output';
 
@@ -27,7 +29,7 @@ import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelect
 
 import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { AttemptBigNumber, BIG_NUMBERS } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
@@ -48,7 +50,7 @@ export const SimpleTradeForm = ({
   const tradeValues = useAppSelector(getTradeFormValues);
   const { summary } = useAppSelector(getTradeFormSummary);
 
-  const { assetId, displayableAsset, ticker } = orEmptyObj(
+  const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -56,14 +58,12 @@ export const SimpleTradeForm = ({
     useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
   );
 
-  const [inputValue, setInputValue] = useState('');
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [clientId, setClientId] = useState<string>();
 
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
   const freeCollateral = summary.accountDetailsBefore?.account?.freeCollateral;
-  const usdcSize = summary.tradeInfo.inputSummary.size?.usdcSize;
-  const assetSize = summary.tradeInfo.inputSummary.size?.size;
+  const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
 
   useEffect(() => {
     if (ticker) {
@@ -117,25 +117,46 @@ export const SimpleTradeForm = ({
     }
   };
 
-  // Update the form value in Redux as well as local state
-  const onChange = useCallback(
-    ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
-      setInputValue(formattedValue);
-      if (displayUnit === DisplayUnit.Asset) {
-        dispatch(tradeFormActions.setSizeToken(formattedValue));
-      } else {
-        dispatch(tradeFormActions.setSizeUsd(formattedValue));
-      }
+  const onUSDCInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    dispatch(tradeFormActions.setSizeUsd(formattedValue));
+  };
+
+  const onSizeInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    dispatch(tradeFormActions.setSizeToken(formattedValue));
+  };
+
+  const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
+
+  const inputConfigs = {
+    [DisplayUnit.Asset]: {
+      onInput: onSizeInput,
+      type: InputType.Number,
+      outputType: OutputType.Number,
+      decimals,
+      value:
+        tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
+          ? tradeValues.size.value.value
+          : tradeValues.size == null || tradeValues.size.value.value === ''
+            ? ''
+            : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
     },
-    [dispatch, displayUnit]
-  );
+    [DisplayUnit.Fiat]: {
+      onInput: onUSDCInput,
+      type: InputType.Number,
+      outputType: OutputType.Fiat,
+      decimals: USD_DECIMALS,
+      value:
+        tradeValues.size != null && OrderSizeInputs.is.USDC_SIZE(tradeValues.size)
+          ? tradeValues.size.value.value
+          : tradeValues.size == null || tradeValues.size.value.value === ''
+            ? ''
+            : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? '',
+    },
+  };
 
   // Toggle between USD and asset units
   const toggleDisplayUnit = () => {
     if (!assetId) return;
-    const value = displayUnit === DisplayUnit.Asset ? usdcSize : assetSize;
-    const stringValue = value?.toString() ?? '';
-    setInputValue(stringValue);
 
     dispatch(
       setDisplayUnit({
@@ -148,11 +169,11 @@ export const SimpleTradeForm = ({
 
   const receiptArea = (
     <div tw="flexColumn w-full gap-[1px] overflow-hidden rounded-[1rem] font-small-book">
-      <div tw="row justify-between bg-color-layer-2 px-0.75 py-0.5">
+      <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
         <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}</span>
         <Output tw="text-color-text-2" value={buyingPower} type={OutputType.Fiat} />
       </div>
-      <div tw="row justify-between bg-color-layer-2 px-0.75 py-0.5">
+      <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
         <MarginUsageTag marginUsage={marginUsage} />
         <span tw="row gap-0.25 text-color-text-2">
           {stringGetter({ key: STRING_KEYS.FEES })} <ChevronDownIcon />
@@ -161,19 +182,32 @@ export const SimpleTradeForm = ({
     </div>
   );
 
+  const toggleConfig =
+    inputConfigs[displayUnit === DisplayUnit.Asset ? DisplayUnit.Fiat : DisplayUnit.Asset];
+  const toggleValue = toggleConfig.value.trim().length > 0 ? toggleConfig.value : 0;
+
   const sizeToggle = (
     <button
       type="button"
+      disabled={!assetId}
       aria-label="Toggle display unit"
-      tw="row cursor-pointer gap-0.5 px-0.5 py-0.25 hover:bg-color-layer-3"
+      tw="row cursor-pointer gap-0.5 rounded-[1rem] px-0.5 py-0.25 text-color-text-0 hover:bg-[var(--simpleUi-dialog-secondaryColor)]"
       onClick={toggleDisplayUnit}
     >
       <Output
         tw="text-color-text-2 font-small-medium"
-        type={displayUnit === DisplayUnit.Asset ? OutputType.Fiat : OutputType.Asset}
-        value={displayUnit === DisplayUnit.Asset ? usdcSize : assetSize}
+        type={toggleConfig.outputType}
+        value={toggleValue}
+        fractionDigits={toggleConfig.decimals}
+        slotRight={
+          displayUnit === DisplayUnit.Fiat ? (
+            <span tw="ml-[0.5ch] text-color-text-2">{displayableAsset}</span>
+          ) : null
+        }
       />
-      <Icon iconName={IconName.Switch} />
+      <div tw="row size-2 justify-center rounded-[50%] bg-[var(--simpleUi-dialog-secondaryColor)]">
+        <Icon iconName={IconName.Switch} />
+      </div>
     </button>
   );
 
@@ -189,13 +223,17 @@ export const SimpleTradeForm = ({
     );
   }
 
+  const inputConfig = inputConfigs[displayUnit];
+
   return (
-    <div tw="flexColumn items-center gap-2 px-1.25 py-[15vh]">
+    <div tw="flexColumn items-center gap-2 px-1.25 pb-1.25 pt-[15vh]">
       <div tw="flexColumn w-full items-center gap-0.5">
         <ResponsiveSizeInput
-          inputValue={inputValue}
-          onInput={onChange}
+          inputValue={inputConfig.value}
+          inputType={inputConfig.type}
+          onInput={inputConfig.onInput}
           displayableAsset={displayableAsset ?? ''}
+          fractionDigits={inputConfig.decimals}
         />
         {sizeToggle}
       </div>
@@ -203,7 +241,7 @@ export const SimpleTradeForm = ({
       <Button
         type={ButtonType.Button}
         action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-        tw="w-full rounded-[1rem]"
+        tw="mt-auto w-full rounded-[1rem]"
         size={ButtonSize.Medium}
         css={{
           '--button-textColor': 'var(--color-layer-0)',

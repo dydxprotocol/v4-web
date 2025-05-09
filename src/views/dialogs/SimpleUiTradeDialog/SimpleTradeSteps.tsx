@@ -136,7 +136,7 @@ export const SimpleTradeSteps = ({
 
       return (
         <div
-          tw="pointer-events-none absolute inset-0 z-0 h-[50%]"
+          tw="pointer-events-none absolute inset-0 z-0 h-[40%]"
           css={{
             background: `radial-gradient(ellipse 100% 70% at 50% 0%, ${gradientColor} 0%, ${gradientColor} 70%, transparent 100%)`,
           }}

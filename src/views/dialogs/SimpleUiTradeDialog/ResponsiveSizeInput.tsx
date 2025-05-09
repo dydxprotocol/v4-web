@@ -10,11 +10,13 @@ import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 
 export const ResponsiveSizeInput = ({
   inputValue,
+  inputType,
   onInput,
   displayableAsset,
   fractionDigits = USD_DECIMALS,
 }: {
   inputValue: string;
+  inputType: InputType;
   onInput: ({
     value,
     floatValue,
@@ -93,7 +95,7 @@ export const ResponsiveSizeInput = ({
         tw="h-[4.375rem] w-auto min-w-[100px] bg-[transparent] text-right caret-color-accent focus:outline-none"
         value={inputValue}
         placeholder="0.00"
-        type={InputType.Number}
+        type={inputType}
         onInput={onInput}
         decimals={fractionDigits}
         css={{

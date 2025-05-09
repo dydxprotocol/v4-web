@@ -1,6 +1,6 @@
 import { OrderSide } from '@/bonsai/forms/trade/types';
 
-import { ButtonShape } from '@/constants/buttons';
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -9,8 +9,10 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import AssetDetails from './AssetDetails';
@@ -21,6 +23,7 @@ const AssetPage = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const pageContent = isViewingUnlaunchedMarket ? (
     <div>Launch on Desktop</div>
@@ -47,23 +50,31 @@ const AssetPage = () => {
             background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',
           }}
         >
-          <Button
-            tw="flex-1 bg-color-negative-dark text-color-negative"
-            shape={ButtonShape.Pill}
-            onClick={() =>
-              dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.SELL })))
-            }
-          >
-            {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
-          </Button>
+          {canAccountTrade ? (
+            <>
+              <Button
+                tw="flex-1 bg-color-negative-dark text-color-negative"
+                shape={ButtonShape.Pill}
+                onClick={() =>
+                  dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.SELL })))
+                }
+              >
+                {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+              </Button>
 
-          <Button
-            tw="flex-1 bg-color-positive-dark text-color-positive"
-            shape={ButtonShape.Pill}
-            onClick={() => dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY })))}
-          >
-            {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
-          </Button>
+              <Button
+                tw="flex-1 bg-color-positive-dark text-color-positive"
+                shape={ButtonShape.Pill}
+                onClick={() =>
+                  dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY })))
+                }
+              >
+                {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
+              </Button>
+            </>
+          ) : (
+            <OnboardingTriggerButton tw="flex-1" shape={ButtonShape.Pill} size={ButtonSize.Base} />
+          )}
         </div>
       )}
     </div>

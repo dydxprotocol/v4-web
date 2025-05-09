@@ -21,7 +21,7 @@ import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
-import { getTradeFormValues } from '@/state/tradeFormSelectors';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -34,6 +34,9 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
+  const { summary } = useAppSelector(getTradeFormSummary);
+  const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
+  const hasEffectSizes = effectiveSizes.size != null;
 
   const { displayableAsset, logo } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -80,7 +83,7 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
           <div tw="row justify-between">
             <div tw="row">
               <IconButton
-                tw="border-none"
+                tw="border-none bg-[var(--simpleUi-dialog-backgroundColor)]"
                 shape={ButtonShape.Square}
                 size={ButtonSize.Small}
                 iconName={IconName.ChevronLeft}
@@ -125,7 +128,11 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
                 },
               ]}
             >
-              <Button shape={ButtonShape.Pill} size={ButtonSize.Base}>
+              <Button
+                tw="bg-[var(--simpleUi-dialog-secondaryColor)]"
+                shape={ButtonShape.Pill}
+                size={ButtonSize.Base}
+              >
                 {selectedTradeType === TradeFormType.MARKET
                   ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
                   : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
@@ -183,6 +190,15 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
       placement={DialogPlacement.FullScreen} // Simple UI is always full screen
       title={title}
       withClose={currentStep !== SimpleUiTradeDialogSteps.Edit}
+      css={{
+        '--simpleUi-dialog-backgroundColor': hasEffectSizes
+          ? 'var(--color-layer-1)'
+          : 'var(--color-layer-2)',
+        '--simpleUi-dialog-secondaryColor': hasEffectSizes
+          ? 'var(--color-layer-2)'
+          : 'var(--color-layer-3)',
+        '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
+      }}
     >
       <SimpleTradeForm
         currentStep={currentStep}
