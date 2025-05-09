@@ -20,7 +20,7 @@ function isBigNumberLike(obj: unknown): obj is BigNumberLike {
 /**
  * Recursive type that converts BigNumberLike to number at all levels
  */
-type ConvertBigNumberToNumber<T> = T extends BigNumberLike
+export type ConvertBigNumberToNumber<T> = T extends BigNumberLike
   ? number
   : T extends Array<infer U>
     ? Array<ConvertBigNumberToNumber<U>>
@@ -33,36 +33,42 @@ type ConvertBigNumberToNumber<T> = T extends BigNumberLike
  * @param obj - The value to process (object, array, or primitive)
  * @returns A new value with all BigNumber instances converted to numbers
  */
-export function purgeBigNumbers<T>(obj: T): ConvertBigNumberToNumber<T> {
-  // Handle null/undefined
-  if (obj === null || obj === undefined) {
-    return obj as any;
-  }
-
-  // Handle BigNumber directly
-  if (isBigNumberLike(obj)) {
-    return obj.toNumber() as any;
-  }
-
-  // Handle arrays
-  if (Array.isArray(obj)) {
-    return obj.map((item) => purgeBigNumbers(item)) as any;
-  }
-
-  // Handle plain objects
-  if (typeof obj === 'object' && obj.constructor === Object) {
-    const result: Record<string, any> = {};
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        result[key] = purgeBigNumbers((obj as Record<string, any>)[key]);
-      }
+export function purgeBigNumbers<T>(obj: T): ConvertBigNumberToNumber<T> | undefined {
+  try {
+    // Handle null/undefined
+    if (obj === null || obj === undefined) {
+      return obj as any;
     }
 
-    return result as any;
-  }
+    // Handle BigNumber directly
+    if (isBigNumberLike(obj)) {
+      return obj.toNumber() as any;
+    }
 
-  // Return primitives and other types as is
-  return obj as any;
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map((item) => purgeBigNumbers(item)) as any;
+    }
+
+    // Handle plain objects
+    if (typeof obj === 'object' && obj.constructor === Object) {
+      const result: Record<string, any> = {};
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          result[key] = purgeBigNumbers((obj as Record<string, any>)[key]);
+        }
+      }
+
+      return result as any;
+    }
+
+    // Return primitives and other types as is
+    return obj as any;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return undefined;
+  }
 }

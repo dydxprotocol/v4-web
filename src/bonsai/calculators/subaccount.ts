@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js';
 import { groupBy, map, mapValues, orderBy, pickBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
   IndexerPerpetualPositionResponseObject,
   IndexerPerpetualPositionStatus,
@@ -17,15 +16,10 @@ import {
 } from '@/lib/assetUtils';
 import { calc } from '@/lib/do';
 import { isTruthy } from '@/lib/isTruthy';
-import {
-  BIG_NUMBERS,
-  BigNumberish,
-  MaybeBigNumber,
-  MustBigNumber,
-  ToBigNumber,
-} from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { isParentSubaccount } from '../lib/subaccountUtils';
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 import {
   ChildSubaccountSummaries,
@@ -42,10 +36,6 @@ import {
 } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
 import { getMarketEffectiveInitialMarginForMarket } from './markets';
-
-export function isParentSubaccount(subaccountNumber: BigNumberish): boolean {
-  return MustBigNumber(subaccountNumber).lt(NUM_PARENT_SUBACCOUNTS);
-}
 
 export function calculateParentSubaccountPositions(
   parent: ParentSubaccountDataBase,

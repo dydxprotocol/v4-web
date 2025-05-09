@@ -1,3 +1,4 @@
+import { IndexerParentSubaccountTransferResponse } from '@/types/indexer/indexerApiGen';
 import { isParentSubaccountTransferResponse } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
@@ -23,8 +24,24 @@ export function setUpTransfersQuery(store: RootStore) {
       if (!isTruthy(data.wallet) || data.subaccount == null) {
         return null;
       }
-      return () =>
-        indexerClient.account.getParentSubaccountNumberTransfers(data.wallet!, data.subaccount!);
+      return async () => {
+        try {
+          return await indexerClient.account.getParentSubaccountNumberTransfers(
+            data.wallet!,
+            data.subaccount!
+          );
+        } catch (e) {
+          if (
+            e?.message != null &&
+            e?.message.indexOf('404') >= 0 &&
+            e.message.indexOf('No subaccount found with address') >= 0
+          ) {
+            const res: IndexerParentSubaccountTransferResponse = { transfers: [] };
+            return res;
+          }
+          throw e;
+        }
+      };
     },
     onResult: (transfers) => {
       store.dispatch(

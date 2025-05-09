@@ -95,6 +95,7 @@ export { default as TrendingDownIcon } from './trend-down.svg';
 export { default as TrendingUpIcon } from './trend-up.svg';
 export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
+export { default as ViewfinderIcon } from './viewfinder.svg';
 export { default as VolumeIcon } from './volume.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
