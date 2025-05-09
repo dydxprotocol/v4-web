@@ -35,7 +35,7 @@ type ClientState<ClientType> = {
   currentOperationId: number;
 };
 
-type CompositeClientWrapper = {
+export type CompositeClientWrapper = {
   dead?: boolean;
   // makes dead
   tearDown: () => void;

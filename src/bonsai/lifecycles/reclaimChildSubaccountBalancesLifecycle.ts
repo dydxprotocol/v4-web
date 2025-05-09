@@ -1,30 +1,22 @@
 import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
-import { groupBy } from 'lodash';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { PlaceOrderStatuses } from '@/constants/trade';
 import { WalletNetworkType } from '@/constants/wallets';
-import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import type { RootStore } from '@/state/_store';
+import { selectReclaimableChildSubaccountFunds } from '@/state/accountSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { getLocalPlaceOrders } from '@/state/localOrdersSelectors';
 
 import { runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
-import { BIG_NUMBERS } from '@/lib/numbers';
-import { objectEntries } from '@/lib/objectHelpers';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { TimeEjectingSet } from '@/lib/timeEjectingSet';
-import { isPresent } from '@/lib/typeUtils';
 
-import { isParentSubaccount } from '../calculators/subaccount';
 import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
-import { BonsaiCore } from '../ontology';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
   selectTxAuthorizedAccount,
@@ -37,77 +29,13 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   const selector = createAppSelector(
     [
       selectTxAuthorizedAccount,
-      BonsaiCore.account.openOrders.data,
-      getLocalPlaceOrders,
-      BonsaiCore.account.childSubaccountSummaries.data,
-      BonsaiCore.account.parentSubaccountPositions.data,
+      selectReclaimableChildSubaccountFunds,
       selectUserHasUsdcGasForTransaction,
-      BonsaiCore.account.openOrders.loading,
     ],
-    (
-      authorizedAccount,
-      openOrders,
-      localPlaceOrders,
-      childSubaccountSummaries,
-      parentSubaccountPositions,
-      userHasUsdcGasForTransaction,
-      ordersLoading
-    ) => {
-      if (
-        !authorizedAccount ||
-        childSubaccountSummaries == null ||
-        parentSubaccountPositions == null
-      ) {
+    (authorizedAccount, reclaimableChildSubaccounts, userHasUsdcGasForTransaction) => {
+      if (!authorizedAccount || reclaimableChildSubaccounts == null) {
         return undefined;
       }
-
-      const openPositions = parentSubaccountPositions.filter(
-        (position) =>
-          !isParentSubaccount(position.subaccountNumber) &&
-          position.status === IndexerPerpetualPositionStatus.OPEN
-      );
-
-      const groupedPositions = groupBy(openPositions, (p) => p.subaccountNumber);
-      const groupedOrders = groupBy(openOrders, (o) => o.subaccountNumber);
-
-      const summaries = objectEntries(childSubaccountSummaries)
-        .map(([subaccountNumberStr, summary]) => {
-          const subaccountNumber = parseInt(subaccountNumberStr, 10);
-          if (isParentSubaccount(subaccountNumber) || groupedPositions[subaccountNumber] != null) {
-            return undefined;
-          }
-
-          return {
-            subaccountNumber,
-            equity: summary.equity ?? BIG_NUMBERS.ZERO,
-          };
-        })
-        .filter(isPresent);
-
-      const reclaimableChildSubaccounts: Array<{
-        subaccountNumber: number;
-        usdcBalance: BigNumber;
-      }> = summaries
-        .map(({ subaccountNumber, equity }) => {
-          const hasUsdc = equity.gt(0);
-          const hasNoOrders = (groupedOrders[subaccountNumber]?.length ?? 0) === 0;
-
-          const hasLocalPlaceOrders = Object.values(localPlaceOrders).some(
-            ({ cachedData, submissionStatus }) =>
-              cachedData.subaccountNumber === subaccountNumber &&
-              submissionStatus === PlaceOrderStatuses.Submitted
-          );
-
-          if (!hasUsdc || !hasNoOrders || hasLocalPlaceOrders || ordersLoading !== 'success') {
-            return undefined;
-          }
-
-          return {
-            subaccountNumber,
-            usdcBalance: equity,
-          };
-        })
-        .filter(isPresent);
 
       return {
         ...authorizedAccount,
@@ -198,10 +126,6 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
         return undefined;
       }
 
-      if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
-        return undefined;
-      }
-
       runFn(async () => {
         try {
           const {
@@ -213,7 +137,13 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
           const reclaimableChildSubaccounts = reclaimableRaw.filter(
             (r) => !activeReclaims.has(r.subaccountNumber.toFixed(0))
           );
+
           if (reclaimableChildSubaccounts.length === 0) {
+            return;
+          }
+
+          // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
+          if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
             return;
           }
 

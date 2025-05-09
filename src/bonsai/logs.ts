@@ -2,6 +2,8 @@ import { timeUnits } from '@/constants/time';
 
 import { getDurationSinceLastLogMs, log, logInfo } from '@/lib/telemetry';
 
+export const BONSAI_DETAILED_LOGS: boolean = false;
+
 export function logBonsaiError(source: string, message: string, ...args: any[]) {
   log(`bonsai: ${source}: ${message}`, args[0]?.error, { context: args });
 }
