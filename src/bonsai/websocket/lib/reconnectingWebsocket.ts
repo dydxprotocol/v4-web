@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
+import { BONSAI_DETAILED_LOGS, logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
 interface ReconnectingWebSocketConfig {
   url: string;
@@ -218,11 +218,13 @@ class WebSocketConnection {
           clean: close.wasClean,
         });
       } else {
-        logBonsaiInfo('WebSocketConnection', `socket ${this.id} closed`, {
-          code: close.code,
-          reason: close.reason,
-          clean: close.wasClean,
-        });
+        if (BONSAI_DETAILED_LOGS) {
+          logBonsaiInfo('WebSocketConnection', `socket ${this.id} closed`, {
+            code: close.code,
+            reason: close.reason,
+            clean: close.wasClean,
+          });
+        }
       }
       this.close();
     };

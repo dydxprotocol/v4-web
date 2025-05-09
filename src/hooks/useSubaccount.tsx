@@ -619,7 +619,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   );
 
   const transferBetweenSubaccounts = useCallback(
-    async (params: SubaccountTransferPayload) => {
+    async (params: SubaccountTransferPayload, memo?: string) => {
       try {
         const subaccount = localDydxWallet
           ? new SubaccountClient(localDydxWallet, params.subaccountNumber)
@@ -642,7 +642,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           params.destinationAddress,
           params.destinationSubaccountNumber,
           parseFloat(params.amount).toFixed(USDC_DECIMALS),
-          DEFAULT_TRANSACTION_MEMO
+          memo ?? DEFAULT_TRANSACTION_MEMO
         );
 
         const parsedTx = parseToPrimitives(tx);

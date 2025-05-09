@@ -1,5 +1,6 @@
 import { Key, PropsWithChildren, useMemo } from 'react';
 
+import { orderBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -26,7 +27,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber, MustNumber } from '@/lib/numbers';
 
 interface MarketsCompactTableProps {
   className?: string;
@@ -206,9 +207,7 @@ export const MarketsCompactTable = ({
 
   const sortedMarkets = useMemo(() => {
     if (sorting === MarketSorting.RECENTLY_LISTED) {
-      return filteredMarkets.sort(
-        (a, b) => (a.sparkline24h?.length ?? 0) - (b.sparkline24h?.length ?? 0)
-      );
+      return orderBy(filteredMarkets, [(m) => MustNumber(m.clobPairId)], ['desc']);
     }
 
     if (sorting === MarketSorting.GAINERS || sorting === MarketSorting.LOSERS) {

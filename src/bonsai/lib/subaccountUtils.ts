@@ -1,7 +1,10 @@
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
   IndexerPositionSide,
   IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
+
+import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
 import { getSimpleOrderStatus as getSimpleOrderStatusInner } from '../calculators/orders';
 import { ChildSubaccountData } from '../types/rawTypes';
@@ -11,6 +14,10 @@ export function isValidSubaccount(childSubaccount: IndexerSubaccountResponseObje
     Object.keys(childSubaccount.assetPositions).length > 0 ||
     Object.keys(childSubaccount.openPerpetualPositions).length > 0
   );
+}
+
+export function isParentSubaccount(subaccountNumber: BigNumberish): boolean {
+  return MustBigNumber(subaccountNumber).lt(NUM_PARENT_SUBACCOUNTS);
 }
 
 export function convertToStoredChildSubaccount({
