@@ -19,7 +19,7 @@ import { wrapOperationFailure, wrapOperationSuccess } from '../lib/operationResu
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
-  selectTxAuthorizedAccount,
+  selectTxAuthorizedCloseOnlyAccount,
   selectUserHasUsdcGasForTransaction,
 } from '../selectors/accountTransaction';
 
@@ -28,7 +28,7 @@ const SLEEP_TIME = timeUnits.second * 10;
 export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
   const selector = createAppSelector(
     [
-      selectTxAuthorizedAccount,
+      selectTxAuthorizedCloseOnlyAccount,
       selectReclaimableChildSubaccountFunds,
       selectUserHasUsdcGasForTransaction,
     ],
