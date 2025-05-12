@@ -118,8 +118,7 @@ const error = (code?: number, message?: string, codespace?: string): ParsingErro
   if (
     (message?.indexOf(
       'was submitted but was not yet found on the chain. You might want to check later. Query timed out after'
-    ) ?? -1) >= 0 ||
-    (message?.indexOf('Stateful order has failed to commit.') ?? -1) >= 0
+    ) ?? -1) >= 0
   ) {
     return {
       message: 'Operation timed out',
