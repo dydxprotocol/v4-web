@@ -319,6 +319,7 @@ function createPlaceOrderPayload(
   return {
     subaccountNumber: position.subaccountNumber,
     marketId: position.market,
+    clobPairId,
     type: orderType,
     side,
     price,

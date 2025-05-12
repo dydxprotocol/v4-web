@@ -435,6 +435,7 @@ export class AccountTransactionSupervisor {
         return {
           subaccountNumber: position.subaccountNumber,
           marketId,
+          clobPairId,
           clientId,
           type: OrderType.MARKET,
           side,
