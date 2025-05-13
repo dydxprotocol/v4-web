@@ -12,6 +12,9 @@ import { BonsaiCore } from '../ontology';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { ComplianceStatus } from '../types/summaryTypes';
 
+/**
+ * @description Returns an account that is restriction-free and authorized for all transactions
+ */
 export const selectTxAuthorizedAccount = createAppSelector(
   [
     selectParentSubaccountInfo,
@@ -30,6 +33,39 @@ export const selectTxAuthorizedAccount = createAppSelector(
       ].includes(complianceData.status) &&
       complianceData.geo &&
       !isBlockedGeo(complianceData.geo);
+
+    if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
+      return undefined;
+    }
+
+    const localDydxWallet = localWalletManager.getLocalWallet(localWalletNonce);
+    const isCorrectWallet = localDydxWallet?.address === parentSubaccountInfo.wallet;
+    const canWalletTransact = Boolean(localDydxWallet && isCorrectWallet);
+
+    if (!canWalletTransact) return undefined;
+
+    return {
+      localDydxWallet,
+      sourceAccount,
+      parentSubaccountInfo,
+    };
+  }
+);
+
+/**
+ * @description Returns an account that is authorized for actions that are available when in close-only mode
+ */
+export const selectTxAuthorizedCloseOnlyAccount = createAppSelector(
+  [
+    selectParentSubaccountInfo,
+    getSourceAccount,
+    calculateIsAccountViewOnly,
+    BonsaiCore.compliance.data,
+    getLocalWalletNonce,
+  ],
+  (parentSubaccountInfo, sourceAccount, isAccountViewOnly, complianceData, localWalletNonce) => {
+    const isAccountRestrictionFree =
+      !isAccountViewOnly && complianceData.status !== ComplianceStatus.BLOCKED;
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;
