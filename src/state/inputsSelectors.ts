@@ -1,6 +1,5 @@
-import { TriggerOrdersFormFns } from '@/bonsai/forms/triggers/triggers';
 import { TriggerOrderInputData } from '@/bonsai/forms/triggers/types';
-import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiForms, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
@@ -80,10 +79,10 @@ const getTriggersFormInputData = createAppSelector(
 export const getTriggersFormSummary = createAppSelector(
   [getTriggersFormInputData, getTriggersFormState],
   (inputData, state) => {
-    const summary = TriggerOrdersFormFns.calculateSummary(state, inputData);
+    const summary = BonsaiForms.TriggerOrdersFormFns.calculateSummary(state, inputData);
     return {
       summary,
-      errors: TriggerOrdersFormFns.getErrors(state, inputData, summary),
+      errors: BonsaiForms.TriggerOrdersFormFns.getErrors(state, inputData, summary),
     };
   }
 );

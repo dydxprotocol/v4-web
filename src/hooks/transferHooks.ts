@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { TransferFeeData, TransferFormFns, TransferFormInputData } from '@/bonsai/forms/transfers';
+import { TransferFeeData, TransferFormInputData } from '@/bonsai/forms/transfers';
 import { useFormValues } from '@/bonsai/lib/forms';
-import { BonsaiCore, BonsaiRaw } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiForms, BonsaiRaw } from '@/bonsai/ontology';
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
@@ -64,7 +64,7 @@ export function useTransferForm(initialToUsdc: boolean) {
     ]
   );
 
-  const formValues = useFormValues(TransferFormFns, inputs);
+  const formValues = useFormValues(BonsaiForms.TransferFormFns, inputs);
 
   useEffect(() => {
     if (initialToUsdc) {
