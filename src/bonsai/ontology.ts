@@ -14,6 +14,10 @@ import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
+import { AdjustIsolatedMarginFormFns } from './forms/adjustIsolatedMargin';
+import { TradeFormFns } from './forms/trade/trade';
+import { TransferFormFns } from './forms/transfers';
+import { TriggerOrdersFormFns } from './forms/triggers/triggers';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
@@ -430,4 +434,11 @@ export const BonsaiHooks: BonsaiHooksShape = {
   useTotalTradingRewards,
   useUnbondingDelegations,
   useStakingDelegations,
+};
+
+export const BonsaiForms = {
+  TradeFormFns,
+  TriggerOrdersFormFns,
+  AdjustIsolatedMarginFormFns,
+  TransferFormFns,
 };
