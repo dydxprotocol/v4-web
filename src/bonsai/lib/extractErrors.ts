@@ -29,6 +29,20 @@ const parseSubaccountUpdateError = (message: string): ParsingError | null => {
     };
   }
 
+  if (message.indexOf('Invalid transfer amount with gas used') >= 0) {
+    return {
+      message: 'Invalid transfer amount',
+      stringKey: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
+    };
+  }
+
+  if (message.indexOf(': insufficent funds') >= 0) {
+    return {
+      message: 'Insufficient funds',
+      stringKey: STRING_KEYS.INSUFFICIENT_BALANCE,
+    };
+  }
+
   const matchResult = message.match(FAILED_SUBACCOUNT_UPDATE_RESULT_PATTERN);
   if (!matchResult?.[1]) return null;
 
@@ -39,20 +53,7 @@ const parseSubaccountUpdateError = (message: string): ParsingError | null => {
       stringKey: `ERRORS.QUERY_ERROR_SUBACCOUNTS_${updateResult.toUpperCase()}`,
     };
   }
-  if (
-    message.indexOf('rpc error: code = Unknown desc = Invalid transfer amount with gas used') >= 0
-  ) {
-    return {
-      message: 'Invalid transfer amount',
-      stringKey: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
-    };
-  }
-  if (message.indexOf(': insufficent funds') >= 0) {
-    return {
-      message: 'Insufficient funds',
-      stringKey: STRING_KEYS.INSUFFICIENT_BALANCE,
-    };
-  }
+
   return null;
 };
 
@@ -86,6 +87,9 @@ const error = (code?: number, message?: string, codespace?: string): ParsingErro
       stringKey: STRING_KEYS.USER_REJECTED,
     };
   }
+  if ((message?.indexOf('Bad status on response: 5') ?? -1) >= 0) {
+    return { message: message ?? 'Validator error', stringKey: STRING_KEYS.VALIDATOR_RESPONSE_500 };
+  }
   if (
     message === 'client not initialized' ||
     message === 'Missing compositeClient or localWallet'
@@ -95,7 +99,17 @@ const error = (code?: number, message?: string, codespace?: string): ParsingErro
       stringKey: STRING_KEYS.NETWORKING_ERROR,
     };
   }
-  if (message === 'Failed to fetch') {
+  if (message === 'Extension context invalidated.') {
+    return {
+      message,
+      stringKey: STRING_KEYS.WALLET_CONTEXT_INVALIDATED,
+    };
+  }
+  if (
+    message === 'Failed to fetch' ||
+    message === 'Load failed' ||
+    message === 'NetworkError when attempting to fetch resource.'
+  ) {
     return {
       message,
       stringKey: STRING_KEYS.NETWORKING_ERROR,
@@ -108,8 +122,7 @@ const error = (code?: number, message?: string, codespace?: string): ParsingErro
   ) {
     return {
       message: 'Operation timed out',
-      // not sure what to report yet
-      stringKey: undefined,
+      stringKey: STRING_KEYS.FAILED_COMMIT_CONFIRMATION,
     };
   }
   return {

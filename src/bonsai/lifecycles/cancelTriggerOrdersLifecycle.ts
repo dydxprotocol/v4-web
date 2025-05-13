@@ -13,7 +13,7 @@ import { accountTransactionManager } from '../AccountTransactionSupervisor';
 import { isOperationFailure } from '../lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
-import { selectTxAuthorizedAccount } from '../selectors/accountTransaction';
+import { selectTxAuthorizedCloseOnlyAccount } from '../selectors/accountTransaction';
 
 // Sleep time between cancelling trigger orders to ensure that the subaccount has time to process the previous cancels
 const SLEEP_TIME = timeUnits.second * 10;
@@ -23,7 +23,7 @@ const SLEEP_TIME = timeUnits.second * 10;
  */
 export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
   const selector = createAppSelector(
-    [selectTxAuthorizedAccount, selectOrphanedTriggerOrders],
+    [selectTxAuthorizedCloseOnlyAccount, selectOrphanedTriggerOrders],
     (txAuthorizedAccount, orphanedTriggerOrders) => {
       if (!txAuthorizedAccount || orphanedTriggerOrders == null) {
         return undefined;

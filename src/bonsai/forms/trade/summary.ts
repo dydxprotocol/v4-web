@@ -204,6 +204,7 @@ export function calculateTradeSummary(
           subaccountNumber: tradeInfo.subaccountNumber,
           transferToSubaccountAmount: tradeInfo.transferToSubaccountAmount,
           marketId,
+          clobPairId,
           type: tradeType,
           side,
           price,

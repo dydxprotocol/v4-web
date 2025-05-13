@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
+
 import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -42,12 +45,14 @@ export const AmountCloseInput = ({
     commitValue(MustBigNumber(newValue).toFixed(0));
   };
 
+  const stringGetter = useStringGetter();
   return (
     <$InputContainer>
-      {/* TODO: localize */}
-      <$WithLabel label={<div tw="mb-0.25 flex">Amount Close</div>}>
+      <$WithLabel
+        label={<div tw="mb-0.25 flex">{stringGetter({ key: STRING_KEYS.AMOUNT_CLOSE })}</div>}
+      >
         <$AmountCloseSlider
-          label="AmountClose"
+          label={stringGetter({ key: STRING_KEYS.AMOUNT_CLOSE })}
           min={0}
           max={100}
           step={0.1}

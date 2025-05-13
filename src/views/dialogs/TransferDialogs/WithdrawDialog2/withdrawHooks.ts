@@ -130,12 +130,6 @@ export function useWithdrawStep({
         getCosmosSigner,
         route: withdrawRoute,
         userAddresses,
-        simulate: false,
-        getFallbackGasAmount: async (chainId) => {
-          if (chainId === 'dydx-mainnet-1') return 500_000;
-          if (chainId === 'noble-1') return 300_000;
-          return 500_000;
-        },
         beforeMsg: {
           msg: JSON.stringify({
             sender: {
