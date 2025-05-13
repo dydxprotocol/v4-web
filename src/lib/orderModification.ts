@@ -97,6 +97,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
   return {
     subaccountNumber,
     marketId,
+    clobPairId: marketInfo.clobPairId,
     clientId: generateRandomClientId(),
     type: calc(() => {
       switch (type) {

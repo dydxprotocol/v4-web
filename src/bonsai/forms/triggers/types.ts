@@ -98,6 +98,7 @@ export interface PlaceOrderPayload {
   subaccountNumber: number;
   transferToSubaccountAmount: number | undefined;
   marketId: string;
+  clobPairId: number; // this is just for the logs/tracking
   type: OrderType;
   side: OrderSide;
   price: number;

@@ -25,6 +25,7 @@ import {
 } from '@dydxprotocol/v4-client-js';
 
 import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
+import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
@@ -297,7 +298,8 @@ export class AccountTransactionSupervisor {
     if (cancelPayload == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/executeCancelOrder',
-        'Unable to create cancel payload for order'
+        'Unable to create cancel payload for order',
+        STRING_KEYS.NO_ORDERS_TO_CANCEL
       );
     }
 
@@ -344,7 +346,7 @@ export class AccountTransactionSupervisor {
       const errorMsg = 'No valid local wallet available';
       const errSource = `AccountTransactionSupervisor/${fnName}`;
       logBonsaiError(errSource, errorMsg);
-      return wrapSimpleError(errSource, errorMsg);
+      return wrapSimpleError(errSource, errorMsg, STRING_KEYS.NO_LOCAL_WALLET);
     }
     return undefined;
   }
@@ -433,6 +435,7 @@ export class AccountTransactionSupervisor {
         return {
           subaccountNumber: position.subaccountNumber,
           marketId,
+          clobPairId,
           clientId,
           type: OrderType.MARKET,
           side,
@@ -596,13 +599,18 @@ export class AccountTransactionSupervisor {
     if (sourceSubaccount == null || sourceAddress == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/placeOrder',
-        'unknown parent subaccount number or address'
+        'unknown parent subaccount number or address',
+        STRING_KEYS.SOMETHING_WENT_WRONG
       );
     }
 
     const validatorHeight = BonsaiCore.network.validatorHeight.data(this.store.getState());
     if (validatorHeight == null) {
-      return wrapSimpleError('AccountTransactionSupervisor/placeOrder', 'validator height unknown');
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/placeOrder',
+        'validator height unknown',
+        STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
+      );
     }
     const currentHeight = validatorHeight.height;
     const isShortTermOrder = calc(() => {
@@ -729,14 +737,16 @@ export class AccountTransactionSupervisor {
     if (closePayloads == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/closeAllPositions',
-        'error generating close position payloads'
+        'error generating close position payloads',
+        STRING_KEYS.SOMETHING_WENT_WRONG
       );
     }
 
     if (closePayloads.length === 0) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/closeAllPositions',
-        'no positions to close'
+        'no positions to close',
+        STRING_KEYS.NO_POSITIONS_TO_CLOSE
       );
     }
 
@@ -780,7 +790,8 @@ export class AccountTransactionSupervisor {
     if (order == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/cancelOrder',
-        'invalid or missing order id'
+        'invalid or missing order id',
+        STRING_KEYS.NO_ORDERS_TO_CANCEL
       );
     }
 
@@ -846,7 +857,11 @@ export class AccountTransactionSupervisor {
     const orders = this.getCancelableOrders(marketId);
 
     if (orders.length === 0) {
-      return wrapSimpleError('AccountTransactionSupervisor/cancelAllOrders', 'no orders to cancel');
+      return wrapSimpleError(
+        'AccountTransactionSupervisor/cancelAllOrders',
+        'no orders to cancel',
+        STRING_KEYS.NO_ORDERS_TO_CANCEL
+      );
     }
 
     const orderdsWithUuids = orders.map((order) => ({

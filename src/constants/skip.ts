@@ -17,7 +17,7 @@ export const SKIP_GO_DESTINATION_FEE = 0.01; // $0.01 since the only destination
  * @note The fee is hardcoded on Skip's end.
  */
 export const SKIP_GO_FAST_SOURCE_FEE_MAP: Record<string, number> = {
-  [mainnet.id]: 5,
+  [mainnet.id]: 2.5,
   [arbitrum.id]: 0.05,
   [optimism.id]: 0.01,
   [polygon.id]: 0.01,
