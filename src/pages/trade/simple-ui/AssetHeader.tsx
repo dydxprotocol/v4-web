@@ -12,7 +12,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { MustBigNumber } from '@/lib/numbers';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
-const AssetHeader = () => {
+export const AssetHeader = () => {
   const navigate = useNavigate();
   const { marketCap, displayableAsset, percentChange24h, logo } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
@@ -56,5 +56,3 @@ const AssetHeader = () => {
     </div>
   );
 };
-
-export default AssetHeader;

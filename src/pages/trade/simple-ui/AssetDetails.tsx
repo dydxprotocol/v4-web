@@ -17,7 +17,7 @@ import { hasText } from '@/lib/hasString';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-const AssetDetails = () => {
+export const AssetDetails = () => {
   const stringGetter = useStringGetter();
   const freeCollateral = useAppSelector(
     BonsaiCore.account.parentSubaccountSummary.data
@@ -134,5 +134,3 @@ const AssetDetails = () => {
     </div>
   );
 };
-
-export default AssetDetails;

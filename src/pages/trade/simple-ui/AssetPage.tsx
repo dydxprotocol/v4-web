@@ -15,9 +15,9 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import AssetDetails from './AssetDetails';
-import AssetHeader from './AssetHeader';
-import AssetPosition from './AssetPosition';
+import { AssetDetails } from './AssetDetails';
+import { AssetHeader } from './AssetHeader';
+import { AssetPosition } from './AssetPosition';
 
 const AssetPage = () => {
   const dispatch = useAppDispatch();

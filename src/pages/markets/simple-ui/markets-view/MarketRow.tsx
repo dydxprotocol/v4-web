@@ -9,7 +9,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 
-const MarketRow = ({ className, market }: { className?: string; market: MarketData }) => {
+export const MarketRow = ({ className, market }: { className?: string; market: MarketData }) => {
   const stringGetter = useStringGetter();
 
   const percentChangeColor = market.percentChange24h
@@ -63,5 +63,3 @@ const MarketRow = ({ className, market }: { className?: string; market: MarketDa
     </Link>
   );
 };
-
-export default MarketRow;
