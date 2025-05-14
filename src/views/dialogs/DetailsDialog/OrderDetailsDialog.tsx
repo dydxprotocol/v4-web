@@ -22,12 +22,6 @@ import { DetailsDialog } from '@/components/DetailsDialog';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
-import {
-  getIndexerOrderTypeStringKey,
-  getMarginModeStringKey,
-  getOrderStatusStringKey,
-  getOrderTimeInForceStringKey,
-} from '@/views/tables/enumToStringKeyHelpers';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOrderDetails } from '@/state/accountSelectors';
@@ -35,6 +29,12 @@ import { useAppSelector } from '@/state/appTypes';
 import { getLocalCancelOrders } from '@/state/localOrdersSelectors';
 
 import { track } from '@/lib/analytics/analytics';
+import {
+  getIndexerOrderTypeStringKey,
+  getMarginModeStringKey,
+  getOrderStatusStringKey,
+  getOrderTimeInForceStringKey,
+} from '@/lib/enumToStringKeyHelpers';
 import { isMarketOrderTypeNew, isNewOrderStatusClearable } from '@/lib/orders';
 import { Nullable } from '@/lib/typeUtils';
 

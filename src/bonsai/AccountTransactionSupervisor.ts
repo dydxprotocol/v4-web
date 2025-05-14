@@ -65,6 +65,7 @@ import { isPresent } from '@/lib/typeUtils';
 import { getSimpleOrderStatus } from './calculators/orders';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
+import { estimateLiveValidatorHeight } from './selectors/apiStatus';
 
 interface ClientWalletPair {
   compositeClient: CompositeClient;
@@ -368,15 +369,14 @@ export class AccountTransactionSupervisor {
     }
 
     // Get current blockchain height for goodTilBlock
-    const validatorHeight = BonsaiCore.network.validatorHeight.data(state);
-    if (validatorHeight == null) {
+    const currentHeight = estimateLiveValidatorHeight(state);
+    if (currentHeight == null) {
       logBonsaiError(
         'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
         'cannot generate close all positions payload because validatorHeight is null'
       );
       return undefined;
     }
-    const currentHeight = validatorHeight.height;
 
     const markets = BonsaiCore.markets.markets.data(state);
     if (markets == null) {
@@ -604,15 +604,14 @@ export class AccountTransactionSupervisor {
       );
     }
 
-    const validatorHeight = BonsaiCore.network.validatorHeight.data(this.store.getState());
-    if (validatorHeight == null) {
+    const currentHeight = estimateLiveValidatorHeight(this.store.getState());
+    if (currentHeight == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/placeOrder',
         'validator height unknown',
         STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
       );
     }
-    const currentHeight = validatorHeight.height;
     const isShortTermOrder = calc(() => {
       if (payloadBase.type === OrderType.MARKET) {
         return true;

@@ -3,16 +3,11 @@ import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import orderBy from 'lodash/orderBy';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import {
-  CustomItem,
-  ListItem,
-  MarketItem,
-  MarketsSortType,
-  PositionItem,
-} from '@/constants/marketList';
+import { ListItem, MarketsSortType } from '@/constants/marketList';
 import { MarketData, MarketFilters } from '@/constants/markets';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -34,54 +29,21 @@ import MarketFilterRow from './MarketFilterRow';
 import MarketRow from './MarketRow';
 import PositionRow from './PositionRow';
 
-const isPositionItem = (item: ListItem): item is PositionItem => {
-  return item.itemType === 'position';
-};
-
-const isMarketItem = (item: ListItem): item is MarketItem => {
-  return item.itemType === 'market';
-};
-
-const isCustomItem = (item: ListItem): item is CustomItem => {
-  return item.itemType === 'custom';
-};
-
-const narrowListItemType = (item: ListItem) => {
-  if (isPositionItem(item)) {
-    return item;
-  }
-
-  if (isMarketItem(item)) {
-    return item;
-  }
-
-  if (isCustomItem(item)) {
-    return item;
-  }
-
-  return item;
-};
-
 const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
-  return markets.sort((a, b) => {
-    if (sortType === MarketsSortType.Price) {
-      return (b.oraclePrice ?? 0) - (a.oraclePrice ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Volume) {
-      return (b.volume24h ?? 0) - (a.volume24h ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Gainers) {
-      return (b.percentChange24h ?? 0) - (a.percentChange24h ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Losers) {
-      return (a.percentChange24h ?? 0) - (b.percentChange24h ?? 0);
-    }
-
-    return (a.isFavorite ? 1 : 0) - (b.isFavorite ? 1 : 0);
-  });
+  switch (sortType) {
+    case MarketsSortType.Price:
+      return orderBy(markets, (market) => market.oraclePrice, ['desc']);
+    case MarketsSortType.Volume:
+      return orderBy(markets, (market) => market.volume24h, ['desc']);
+    case MarketsSortType.Gainers:
+      return orderBy(markets, (market) => market.percentChange24h, ['desc']);
+    case MarketsSortType.Losers:
+      return orderBy(markets, (market) => market.percentChange24h, ['asc']);
+    case MarketsSortType.Favorites:
+      return orderBy(markets, (market) => market.isFavorite, ['desc']);
+    default:
+      return markets;
+  }
 };
 
 const POSITION_ROW_HEIGHT = 60;
@@ -110,7 +72,7 @@ const getItemHeight = (item: ListItem) => {
   );
 };
 
-const MarketList = ({
+export const MarketList = ({
   slotTop,
 }: {
   slotTop?: {
@@ -351,7 +313,7 @@ const MarketList = ({
               height: `${virtualRow.size}px`,
             }}
           >
-            <ItemRenderer item={items[virtualRow.index]!} />
+            <ItemRenderer listItem={items[virtualRow.index]!} />
           </div>
         ))}
       </div>
@@ -377,9 +339,8 @@ const MarketList = ({
   );
 };
 
-const ItemRenderer = ({ item }: { item: ListItem }) => {
-  const listItem = narrowListItemType(item);
-  const height = getItemHeight(item);
+const ItemRenderer = ({ listItem }: { listItem: ListItem }) => {
+  const height = getItemHeight(listItem);
 
   if (listItem.itemType === 'position') {
     return <PositionRow css={{ height }} position={listItem.item} />;
@@ -403,5 +364,3 @@ const ItemRenderer = ({ item }: { item: ListItem }) => {
     </div>
   );
 };
-
-export default MarketList;

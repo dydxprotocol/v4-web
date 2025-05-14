@@ -12,11 +12,11 @@ import { AssetIcon } from '@/components/AssetIcon';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
+
 import {
   getIndexerOrderTypeStringKey,
   getOrderStatusStringKey,
-} from '@/views/tables/enumToStringKeyHelpers';
-
+} from '@/lib/enumToStringKeyHelpers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
 

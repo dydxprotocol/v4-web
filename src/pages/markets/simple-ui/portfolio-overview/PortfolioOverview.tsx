@@ -16,10 +16,10 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 
-import ConnectedPortfolioOverview from './ConnectedPortfolioOverview';
-import UnconnectedPortfolioOverview from './UnconnectedPortfolioOverview';
+import { ConnectedPortfolioOverview } from './ConnectedPortfolioOverview';
+import { UnconnectedPortfolioOverview } from './UnconnectedPortfolioOverview';
 
-const PortfolioOverview = ({ className }: { className?: string }) => {
+export const PortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { openOnboardingDialog, onboardingState, isOnboardingDisabled, isAccountViewOnly } =
@@ -101,5 +101,3 @@ const PortfolioOverview = ({ className }: { className?: string }) => {
     </div>
   );
 };
-
-export default PortfolioOverview;

@@ -1,7 +1,6 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
@@ -10,6 +9,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
+
+import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 
 const PositionRow = ({
   className,
@@ -32,10 +33,7 @@ const PositionRow = ({
       : 'var(--color-negative)'
     : 'var(--color-text-1)';
 
-  const side =
-    position.side === IndexerPositionSide.LONG
-      ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-      : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
+  const sideString = stringGetter({ key: getIndexerPositionSideStringKey(position.side) });
 
   const sideColor =
     position.side === IndexerPositionSide.LONG ? 'var(--color-positive)' : 'var(--color-negative)';
@@ -51,7 +49,7 @@ const PositionRow = ({
         <div tw="flexColumn gap-0.25">
           <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem]">
             <span tw="mr-0.25" css={{ color: sideColor }}>
-              {side}
+              {sideString}
             </span>
             {market.displayableAsset}
           </span>
