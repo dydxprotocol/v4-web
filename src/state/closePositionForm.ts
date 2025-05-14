@@ -1,8 +1,8 @@
-import { TradeFormFns } from '@/bonsai/forms/trade/trade';
 import { convertVanillaReducerActionsToReduxToolkitReducers } from '@/bonsai/lib/forms';
+import { BonsaiForms } from '@/bonsai/ontology';
 import { createSlice } from '@reduxjs/toolkit';
 
-const closePositionFormReducer = TradeFormFns.reducer;
+const closePositionFormReducer = BonsaiForms.TradeFormFns.reducer;
 
 export const closePositionFormSlice = createSlice({
   name: 'closePositionForm',

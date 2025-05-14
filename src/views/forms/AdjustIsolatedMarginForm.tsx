@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import {
-  AdjustIsolatedMarginFormFns,
   AdjustIsolatedMarginInputType,
   AdjustIsolatedMarginType,
 } from '@/bonsai/forms/adjustIsolatedMargin';
@@ -13,7 +12,7 @@ import {
   getAlertsToRender,
   getFormDisabledButtonStringKey,
 } from '@/bonsai/lib/validationErrors';
-import { BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { BonsaiForms, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
@@ -437,5 +436,5 @@ function useForm() {
     [canViewAccount, rawParentSubaccountData, rawRelevantMarkets]
   );
 
-  return useFormValues(AdjustIsolatedMarginFormFns, inputs);
+  return useFormValues(BonsaiForms.AdjustIsolatedMarginFormFns, inputs);
 }
