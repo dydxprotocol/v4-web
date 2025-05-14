@@ -1,8 +1,7 @@
 import { getErrorTradeSummary } from '@/bonsai/forms/trade/summary';
-import { TradeFormFns } from '@/bonsai/forms/trade/trade';
 import { OrderSide, TradeFormInputData, TradeFormType } from '@/bonsai/forms/trade/types';
 import { createMinimalError } from '@/bonsai/lib/validationErrors';
-import { BonsaiCore, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiForms, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { minBy } from 'lodash';
 
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
@@ -73,8 +72,8 @@ export const getTradeFormSummary = createAppSelector(
     if (marketId == null || marketId !== state.marketId) {
       return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
     }
-    const summary = TradeFormFns.calculateSummary(state, inputData);
-    const errors = TradeFormFns.getErrors(state, inputData, summary);
+    const summary = BonsaiForms.TradeFormFns.calculateSummary(state, inputData);
+    const errors = BonsaiForms.TradeFormFns.getErrors(state, inputData, summary);
 
     return {
       inputData,
@@ -116,7 +115,7 @@ export const getClosePositionFormSummary = createAppSelector(
       return { summary: getErrorTradeSummary(state.marketId), errors: [createMinimalError()] };
     }
 
-    const summary = TradeFormFns.calculateSummary(
+    const summary = BonsaiForms.TradeFormFns.calculateSummary(
       {
         type,
         size,
@@ -140,7 +139,7 @@ export const getClosePositionFormSummary = createAppSelector(
     return {
       inputData,
       summary,
-      errors: TradeFormFns.getErrors(state, inputData, summary),
+      errors: BonsaiForms.TradeFormFns.getErrors(state, inputData, summary),
     };
   }
 );
