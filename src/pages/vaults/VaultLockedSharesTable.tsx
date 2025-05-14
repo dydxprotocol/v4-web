@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
 import { useApiState } from '@/hooks/useApiState';
@@ -80,7 +81,8 @@ const VaultLockedSharesTable = ({
               unlockBlockHeight,
               height,
               // add a day so users don't get confused about why their money isn't unlocked when the day arrives
-              (unblock, actual) => new Date().getTime() + (unblock - actual) * 1000 + timeUnits.day
+              (unblock, actual) =>
+                new Date().getTime() + (unblock - actual) * ESTIMATED_BLOCK_TIME + timeUnits.day
             );
             return (
               <Output

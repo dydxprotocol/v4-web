@@ -33,8 +33,8 @@ import { assertNever } from '@/lib/assertNever';
 import { AttemptNumber } from '@/lib/numbers';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
+import { getOrderStatusStringKey } from '../../lib/enumToStringKeyHelpers';
 import { OrderStatusIconNew } from '../OrderStatusIcon';
-import { getOrderStatusStringKey } from '../tables/enumToStringKeyHelpers';
 import { FillDetails } from './TradeNotification/FillDetails';
 
 type ElementProps = {

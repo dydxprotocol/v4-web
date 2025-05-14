@@ -37,10 +37,7 @@ export const usePortfolioValues = ({
     [activeDatum, selectedLocale, stringGetter]
   );
 
-  const accountEquity = useMemo(
-    () => (activeDatum ? activeDatum.equity : equity),
-    [activeDatum, equity]
-  );
+  const accountEquity = activeDatum ? activeDatum.equity : equity;
 
   const earliestVisibleDatum = visibleData?.[0];
   const latestVisibleDatum = visibleData?.[visibleData.length - 1];
@@ -49,9 +46,9 @@ export const usePortfolioValues = ({
     let pnlDiff;
     let pnlDiffPercent;
     if (earliestVisibleDatum && latestVisibleDatum) {
-      const latestPnlRounded = MustBigNumber(latestVisibleDatum.totalPnl).toFixed(4);
-      const earliestPnlRounded = MustBigNumber(earliestVisibleDatum.totalPnl).toFixed(4);
-      const fullTimeframeDiff = MustBigNumber(latestPnlRounded).minus(earliestPnlRounded);
+      const fullTimeframeDiff = MustBigNumber(latestVisibleDatum.totalPnl).minus(
+        MustBigNumber(earliestVisibleDatum.totalPnl)
+      );
 
       pnlDiff = activeDatum
         ? MustBigNumber(activeDatum.totalPnl).minus(earliestVisibleDatum.totalPnl)
@@ -60,7 +57,7 @@ export const usePortfolioValues = ({
       pnlDiffPercent = pnlDiff.div(earliestVisibleDatum.equity);
 
       return {
-        pnlDiff: pnlDiff.toString(),
+        pnlDiff: pnlDiff.toFixed(4),
         pnlDiffPercent: pnlDiffPercent.toString(),
         sign: fullTimeframeDiff.gte(0) ? NumberSign.Positive : NumberSign.Negative,
       };

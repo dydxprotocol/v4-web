@@ -11,7 +11,7 @@ import { Output, OutputType } from '@/components/Output';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 
-const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => {
+export const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const chartDotBackground = useAppSelector(getChartDotBackground);
   const { openOnboardingDialog, isOnboardingDisabled } = useOnboardingFlow();
@@ -46,5 +46,3 @@ const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => 
     </div>
   );
 };
-
-export default UnconnectedPortfolioOverview;

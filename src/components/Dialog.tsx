@@ -215,7 +215,12 @@ const $Container = styled(Content)<{
   $withAnimation?: boolean;
 }>`
   /* Params */
-  --dialog-inset: ${testFlags.simpleUi ? '2px' : '1rem'};
+  --dialog-inset: 1rem;
+
+  @media ${breakpoints.tablet} {
+    --dialog-inset: ${testFlags.simpleUi ? '2px' : '1rem'};
+  }
+
   --dialog-width: 30rem;
   --dialog-backgroundColor: var(--color-layer-3);
   --dialog-radius: 1rem;

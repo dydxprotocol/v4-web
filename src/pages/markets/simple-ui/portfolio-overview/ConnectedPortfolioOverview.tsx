@@ -33,7 +33,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import SimplePnlChart, { getMsForPeriod, HistoricalPnlPeriod, PnlSide } from './SimplePnlChart';
 
-const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
+export const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const now = useNow({ intervalMs: timeUnits.minute });
   const stringGetter = useStringGetter();
@@ -60,8 +60,8 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const isChartLoading = isLoadingSubaccount || isLoadingPnl;
   const earliestTick = rawPnlData.at(0);
   const latestTick = rawPnlData.at(-1);
-  const earliestCreatedAt = earliestTick && new Date(earliestTick.createdAtMilliseconds).getTime();
-  const latestCreatedAt = latestTick && new Date(latestTick.createdAtMilliseconds).getTime();
+  const earliestCreatedAt = earliestTick?.createdAtMilliseconds;
+  const latestCreatedAt = latestTick?.createdAtMilliseconds;
 
   const { accountEquity, pnlDiff, pnlDiffPercent, pnlDiffSign } = usePortfolioValues({
     equity: equityBN?.toNumber(),
@@ -219,5 +219,3 @@ const ConnectedPortfolioOverview = ({ className }: { className?: string }) => {
     </div>
   );
 };
-
-export default ConnectedPortfolioOverview;
