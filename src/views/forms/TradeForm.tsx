@@ -15,7 +15,7 @@ import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
-import { useTradeErrors } from '@/hooks/Trading/useTradeErrors';
+import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';

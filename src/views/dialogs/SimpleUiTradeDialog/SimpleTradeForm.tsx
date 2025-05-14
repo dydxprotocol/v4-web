@@ -18,7 +18,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
-import { useTradeErrors } from '@/hooks/Trading/useTradeErrors';
+import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
