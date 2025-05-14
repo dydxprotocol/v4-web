@@ -7,9 +7,9 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
 
-import AssetDetails from './AssetDetails';
-import AssetHeader from './AssetHeader';
-import AssetPosition from './AssetPosition';
+import { AssetDetails } from './AssetDetails';
+import { AssetHeader } from './AssetHeader';
+import { AssetPosition } from './AssetPosition';
 
 const AssetPage = () => {
   const stringGetter = useStringGetter();

@@ -12,7 +12,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 
-const PositionRow = ({
+export const PositionRow = ({
   className,
   position,
 }: {
@@ -81,5 +81,3 @@ const PositionRow = ({
     </a>
   );
 };
-
-export default PositionRow;

@@ -7,7 +7,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 
-const AssetPosition = () => {
+export const AssetPosition = () => {
   const stringGetter = useStringGetter();
   const [tab, setTab] = useState<'position' | 'orders'>('position');
   // const position = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
@@ -45,5 +45,3 @@ const AssetPosition = () => {
     </div>
   );
 };
-
-export default AssetPosition;
