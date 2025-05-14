@@ -3,6 +3,7 @@ import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import orderBy from 'lodash/orderBy';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -29,25 +30,20 @@ import MarketRow from './MarketRow';
 import PositionRow from './PositionRow';
 
 const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
-  return markets.sort((a, b) => {
-    if (sortType === MarketsSortType.Price) {
-      return (b.oraclePrice ?? 0) - (a.oraclePrice ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Volume) {
-      return (b.volume24h ?? 0) - (a.volume24h ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Gainers) {
-      return (b.percentChange24h ?? 0) - (a.percentChange24h ?? 0);
-    }
-
-    if (sortType === MarketsSortType.Losers) {
-      return (a.percentChange24h ?? 0) - (b.percentChange24h ?? 0);
-    }
-
-    return (a.isFavorite ? 1 : 0) - (b.isFavorite ? 1 : 0);
-  });
+  switch (sortType) {
+    case MarketsSortType.Price:
+      return orderBy(markets, (market) => market.oraclePrice, ['desc']);
+    case MarketsSortType.Volume:
+      return orderBy(markets, (market) => market.volume24h, ['desc']);
+    case MarketsSortType.Gainers:
+      return orderBy(markets, (market) => market.percentChange24h, ['desc']);
+    case MarketsSortType.Losers:
+      return orderBy(markets, (market) => market.percentChange24h, ['asc']);
+    case MarketsSortType.Favorites:
+      return orderBy(markets, (market) => market.isFavorite, ['desc']);
+    default:
+      return markets;
+  }
 };
 
 const POSITION_ROW_HEIGHT = 60;
