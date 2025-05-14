@@ -29,7 +29,7 @@ import { openDialog } from '@/state/dialogs';
 import { MustNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
-import { getTransferTypeStringKey } from './enumToStringKeyHelpers';
+import { getTransferTypeStringKey } from '../../lib/enumToStringKeyHelpers';
 
 export enum TransferHistoryTableColumnKey {
   Time = 'Time',

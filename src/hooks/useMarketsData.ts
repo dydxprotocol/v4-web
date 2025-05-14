@@ -5,6 +5,7 @@ import { AssetData } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
 import {
+  BOOSTED_MARKETS,
   HiddenMarketFilterTags,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
@@ -40,6 +41,9 @@ const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | u
   },
   [MarketFilters.FAVORITE]: (market) => {
     return market.isFavorite;
+  },
+  [MarketFilters.BOOSTED]: (market) => {
+    return BOOSTED_MARKETS.has(market.id);
   },
   [MarketFilters.FX]: (market) => {
     return market.sectorTags?.includes(MarketFilters.FX);

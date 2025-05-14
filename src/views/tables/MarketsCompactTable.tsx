@@ -56,13 +56,14 @@ export const MarketsCompactTable = ({
             label: stringGetter({ key: STRING_KEYS.MARKET }),
             renderCell: ({
               assetId,
+              id,
               effectiveInitialMarginFraction,
               logo,
               initialMarginFraction,
               name,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction }}
+                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -131,13 +132,14 @@ export const MarketsCompactTable = ({
             label: stringGetter({ key: STRING_KEYS.MARKET }),
             renderCell: ({
               assetId,
+              id,
               effectiveInitialMarginFraction,
               logo,
               initialMarginFraction,
               name,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction }}
+                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName

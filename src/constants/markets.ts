@@ -6,6 +6,9 @@ import { Nullable } from '@/lib/typeUtils';
 
 export const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
 
+export const BOOSTED_MARKETS = new Set(['AIXBT-USD', 'KAITO-USD', 'SUI-USD', 'XRP-USD']);
+export const BOOSTED_MARKETS_EXPIRATION = '2025-06-01T00:00:00.000Z';
+
 /**
  * @description MarketData used for MarketTable and List components
  */
@@ -56,6 +59,7 @@ export enum MarketFilters {
   FAVORITE = 'favorite',
   NEW = 'new',
   PREDICTION_MARKET = 'prediction-market',
+  BOOSTED = 'boosted',
 
   // CMC Sector Tags.
   FX = 'fiat',
@@ -120,6 +124,10 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.FX]: {
     labelStringKey: STRING_KEYS.FOREX,
+  },
+  [MarketFilters.BOOSTED]: {
+    labelStringKey: STRING_KEYS.DOUBLE_REWARDS,
+    isNew: true,
   },
   [MarketFilters.PREDICTION_MARKET]: {
     labelStringKey: STRING_KEYS.PREDICTION_MARKET,

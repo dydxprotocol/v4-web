@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketData } from '@/constants/markets';
+import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION, MarketData } from '@/constants/markets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -9,11 +9,12 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Tag } from '@/components/Tag';
+import { AccentTag, Tag } from '@/components/Tag';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
+import { Icon, IconName } from '../Icon';
 import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';
 
@@ -23,7 +24,7 @@ interface AssetTableCellProps {
   configs:
     | Pick<
         MarketData,
-        'effectiveInitialMarginFraction' | 'logo' | 'initialMarginFraction' | 'isUnlaunched'
+        'effectiveInitialMarginFraction' | 'logo' | 'initialMarginFraction' | 'isUnlaunched' | 'id'
       >
     | null
     | undefined;
@@ -36,7 +37,7 @@ interface AssetTableCellProps {
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
   const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
-  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
+  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched, id } =
     orEmptyObj(configs);
 
   const maxLeverage =
@@ -62,6 +63,13 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
             {name}
           </$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
+          {!truncateAssetName &&
+          new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime() &&
+          BOOSTED_MARKETS.has(id ?? '') ? (
+            <AccentTag tw="row gap-0.125">
+              <Icon iconName={IconName.Fire} /> {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}
+            </AccentTag>
+          ) : undefined}
         </div>
         {children}
       </$TableCellContent>
