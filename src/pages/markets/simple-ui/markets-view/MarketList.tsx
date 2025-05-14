@@ -26,8 +26,8 @@ import { getMarketFilter } from '@/state/perpetualsSelectors';
 import { isPresent } from '@/lib/typeUtils';
 
 import MarketFilterRow from './MarketFilterRow';
-import MarketRow from './MarketRow';
-import PositionRow from './PositionRow';
+import { MarketRow } from './MarketRow';
+import { PositionRow } from './PositionRow';
 
 const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
   switch (sortType) {
