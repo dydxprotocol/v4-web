@@ -31,6 +31,7 @@ export { default as ExportKeysIcon } from './export-keys.svg';
 export { default as FastForwardIcon } from './fast-forward.svg';
 export { default as FeedbackIcon } from './feedback.svg';
 export { default as FileIcon } from './file.svg';
+export { default as FireIcon } from './fire.svg';
 export { default as FundingChartIcon } from './funding-chart.svg';
 export { default as FunkitInstantIcon } from './funkit-instant.svg';
 export { default as FunkitStandardIcon } from './funkit-standard.svg';

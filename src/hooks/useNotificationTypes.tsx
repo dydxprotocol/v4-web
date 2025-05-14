@@ -10,6 +10,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { BOOSTED_MARKETS_EXPIRATION } from '@/constants/markets';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -412,6 +413,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger: _trigger }) => {},
     useNotificationAction: () => {
       return () => {};
+    },
+  },
+  {
+    type: NotificationType.RewardsProgramUpdates,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      useEffect(() => {
+        if (new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime()) {
+          trigger({
+            id: 'rewards-program-surge-s2-boosted',
+            displayData: {
+              icon: <Icon iconName={IconName.Fire} />,
+              title: stringGetter({ key: STRING_KEYS.SURGE_S2_BOOSTED_MARKETS_TITLE }),
+              body: stringGetter({ key: STRING_KEYS.SURGE_S2_BOOSTED_MARKETS_BODY }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://dydx.forum/t/dydx-surge-season-2/3575/3" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: ['rewards-program-surge-s2-boosted'],
+          });
+        }
+      }, [stringGetter, trigger]);
     },
   },
   {

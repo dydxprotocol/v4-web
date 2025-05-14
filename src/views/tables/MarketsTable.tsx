@@ -76,6 +76,7 @@ export const MarketsTable = forwardRef(
                         logo,
                         initialMarginFraction,
                         isUnlaunched,
+                        id,
                       }}
                       name={name}
                       symbol={assetId}
@@ -147,6 +148,7 @@ export const MarketsTable = forwardRef(
                     <FavoriteButton marketId={id} />
                     <AssetTableCell
                       configs={{
+                        id,
                         effectiveInitialMarginFraction,
                         logo,
                         initialMarginFraction,
