@@ -1,8 +1,8 @@
-import { TradeFormFns } from '@/bonsai/forms/trade/trade';
 import { convertVanillaReducerActionsToReduxToolkitReducers } from '@/bonsai/lib/forms';
+import { BonsaiForms } from '@/bonsai/ontology';
 import { createSlice } from '@reduxjs/toolkit';
 
-const tradeFormReducer = TradeFormFns.reducer;
+const tradeFormReducer = BonsaiForms.TradeFormFns.reducer;
 
 export const tradeFormSlice = createSlice({
   name: 'TradeForm',
