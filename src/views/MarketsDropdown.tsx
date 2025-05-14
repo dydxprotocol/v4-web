@@ -7,7 +7,13 @@ import styled from 'styled-components';
 import { ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
+import {
+  BOOSTED_MARKETS,
+  BOOSTED_MARKETS_EXPIRATION,
+  MarketFilters,
+  PREDICTION_MARKET,
+  type MarketData,
+} from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
@@ -27,7 +33,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
-import { Tag } from '@/components/Tag';
+import { AccentTag, Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -104,6 +110,13 @@ const MarketsDropdownContent = ({
                 )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
+              {new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime() &&
+              BOOSTED_MARKETS.has(id) ? (
+                <AccentTag tw="row gap-0.125">
+                  <Icon iconName={IconName.Fire} />{' '}
+                  {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}
+                </AccentTag>
+              ) : undefined}
             </div>
           ),
         },
