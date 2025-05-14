@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
+import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -13,12 +13,11 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
+import { useTradeErrors } from '@/hooks/Trading/useTradeErrors';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -32,7 +31,6 @@ import { IconButton } from '@/components/IconButton';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
@@ -45,7 +43,6 @@ import {
 } from '@/state/tradeFormSelectors';
 
 import { track } from '@/lib/analytics/analytics';
-import { useDisappearingValue } from '@/lib/disappearingValue';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
 import { purgeBigNumbers } from '@/lib/purgeBigNumber';
@@ -76,7 +73,6 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
   const stringGetter = useStringGetter();
@@ -127,36 +123,8 @@ export const TradeForm = ({
   const hasInputErrors =
     !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
 
-  const { getNotificationPreferenceForType } = useNotifications();
-
-  const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
-    const primaryAlert = getHighestPriorityAlert(tradeErrors);
-
-    const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
-      NotificationType.OrderStatus
-    );
-
-    const shouldPromptUserToPlaceLimitOrderInner =
-      primaryAlert?.code === 'MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE';
-
-    return {
-      shortAlertKey: primaryAlert?.resources.title?.stringKey,
-      alertContent:
-        placeOrderError != null && !isErrorShownInOrderStatusToast ? (
-          <AlertMessage type={AlertType.Error}>
-            <div tw="inline-block">{placeOrderError}</div>
-          </AlertMessage>
-        ) : primaryAlert != null && primaryAlert.resources.text?.stringKey != null ? (
-          <ValidationAlertMessage error={primaryAlert} />
-        ) : undefined,
-      alertType:
-        placeOrderError != null && !isErrorShownInOrderStatusToast
-          ? ErrorType.error
-          : primaryAlert?.type,
-      shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
-      inputAlert: primaryAlert,
-    };
-  }, [getNotificationPreferenceForType, placeOrderError, tradeErrors]);
+  const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder, setPlaceOrderError } =
+    useTradeErrors();
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,

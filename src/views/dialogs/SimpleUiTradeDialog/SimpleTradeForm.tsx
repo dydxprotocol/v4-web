@@ -5,22 +5,29 @@ import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
+import styled from 'styled-components';
+import tw from 'twin.macro';
 
+import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
+import { useTradeErrors } from '@/hooks/Trading/useTradeErrors';
 import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -42,7 +49,7 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
-import { AttemptBigNumber, BIG_NUMBERS } from '@/lib/numbers';
+import { AttemptBigNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
@@ -61,7 +68,7 @@ export const SimpleTradeForm = ({
   const stringGetter = useStringGetter();
 
   const { connectionError } = useApiState();
-  const { complianceState } = useComplianceState();
+  const { complianceMessage, complianceStatus, complianceState } = useComplianceState();
   const { selectedTradeType } = useTradeTypeOptions();
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
@@ -72,7 +79,7 @@ export const SimpleTradeForm = ({
   const currentForm = useAppSelector(getCurrentTradePageForm);
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
 
-  const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
+  const { assetId, displayableAsset, stepSizeDecimals, ticker, tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -80,7 +87,6 @@ export const SimpleTradeForm = ({
     useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
   );
 
-  const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [clientId, setClientId] = useState<string>();
 
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
@@ -89,6 +95,14 @@ export const SimpleTradeForm = ({
 
   const hasInputErrors =
     !!tradeErrors.some((error) => error.type === ErrorType.error) || currentForm !== 'TRADE';
+
+  const {
+    alertContent,
+    shortAlertKey,
+    shouldPromptUserToPlaceLimitOrder,
+    placeOrderError,
+    setPlaceOrderError,
+  } = useTradeErrors();
 
   useEffect(() => {
     if (ticker) {
@@ -143,11 +157,32 @@ export const SimpleTradeForm = ({
   };
 
   const onUSDCInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    const formattedValueBN = MustBigNumber(formattedValue);
+    if ((formattedValueBN.decimalPlaces() ?? 0) > USD_DECIMALS) {
+      return;
+    }
     dispatch(tradeFormActions.setSizeUsd(formattedValue));
   };
 
   const onSizeInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+    const formattedValueBN = MustBigNumber(formattedValue);
+    if ((formattedValueBN.decimalPlaces() ?? 0) > (stepSizeDecimals ?? TOKEN_DECIMALS)) {
+      return;
+    }
     dispatch(tradeFormActions.setSizeToken(formattedValue));
+  };
+
+  const onLimitPriceInput = ({
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    const formattedValueBN = MustBigNumber(formattedValue);
+    if ((formattedValueBN.decimalPlaces() ?? 0) > (tickSizeDecimals ?? TOKEN_DECIMALS)) {
+      return;
+    }
+    dispatch(tradeFormActions.setLimitPrice(formattedValue));
   };
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
@@ -158,6 +193,7 @@ export const SimpleTradeForm = ({
       type: InputType.Number,
       outputType: OutputType.Number,
       decimals,
+      inputUnit: DisplayUnit.Asset,
       value:
         tradeValues.size != null && OrderSizeInputs.is.SIZE(tradeValues.size)
           ? tradeValues.size.value.value
@@ -170,6 +206,7 @@ export const SimpleTradeForm = ({
       type: InputType.Number,
       outputType: OutputType.Fiat,
       decimals: USD_DECIMALS,
+      inputUnit: DisplayUnit.Fiat,
       value:
         tradeValues.size != null && OrderSizeInputs.is.USDC_SIZE(tradeValues.size)
           ? tradeValues.size.value.value
@@ -179,7 +216,24 @@ export const SimpleTradeForm = ({
     },
   };
 
-  // Toggle between USD and asset units
+  const limitPriceInput = (
+    <div tw="flexColumn items-center gap-0.25">
+      <span tw="font-mini-book">When {displayableAsset} price reaches</span>
+      <ResponsiveSizeInput
+        css={{
+          '--input-font': 'var(--font-large-medium)',
+        }}
+        inputValue={tradeValues.limitPrice ?? ''}
+        inputType={InputType.Number}
+        onInput={onLimitPriceInput}
+        fractionDigits={tickSizeDecimals}
+        displayableAsset={displayableAsset ?? ''}
+        maxFontSize={32}
+        inputUnit={DisplayUnit.Fiat}
+      />
+    </div>
+  );
+
   const toggleDisplayUnit = () => {
     if (!assetId) return;
 
@@ -252,9 +306,9 @@ export const SimpleTradeForm = ({
             </div>
           }
         >
-          <span tw="row gap-0.25 text-color-text-2">
-            {stringGetter({ key: STRING_KEYS.FEES })} <ChevronDownIcon tw="" />
-          </span>
+          <$FeeTrigger>
+            {stringGetter({ key: STRING_KEYS.FEES })} <ChevronDownIcon />
+          </$FeeTrigger>
         </SimpleUiPopover>
       </div>
     </div>
@@ -318,8 +372,51 @@ export const SimpleTradeForm = ({
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasInputErrors && !tradingUnavailable;
 
+  const placeOrderButton = (
+    <Button
+      type={ButtonType.Button}
+      action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
+      tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
+      size={ButtonSize.Medium}
+      css={{
+        '--button-textColor': 'var(--color-layer-0)',
+      }}
+      state={{ isDisabled: !shouldEnableTrade }}
+      onClick={onSubmitOrder}
+    >
+      {shortAlertKey
+        ? stringGetter({ key: shortAlertKey })
+        : tradeValues.side === OrderSide.BUY
+          ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+          : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+    </Button>
+  );
+
+  const tradeFormMessages = (
+    <>
+      {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+        <AlertMessage type={AlertType.Error}>
+          <span>{complianceMessage}</span>
+        </AlertMessage>
+      )}
+
+      {alertContent}
+
+      {shouldPromptUserToPlaceLimitOrder && (
+        <$IconButton
+          iconName={IconName.Arrow}
+          shape={ButtonShape.Circle}
+          action={ButtonAction.Navigation}
+          size={ButtonSize.XSmall}
+          iconSize="1.25em"
+          onClick={() => dispatch(tradeFormActions.setOrderType(TradeFormType.LIMIT))}
+        />
+      )}
+    </>
+  );
+
   return (
-    <div tw="flexColumn items-center gap-2 px-1.25 pb-[5.25rem] pt-[6.5vh]">
+    <div tw="flexColumn items-center gap-2 px-1.25 pb-[12.5rem] pt-[6.5vh]">
       <div tw="flexColumn w-full items-center gap-0.5">
         <ResponsiveSizeInput
           inputValue={inputConfig.value}
@@ -327,34 +424,45 @@ export const SimpleTradeForm = ({
           onInput={inputConfig.onInput}
           displayableAsset={displayableAsset ?? ''}
           fractionDigits={inputConfig.decimals}
+          inputUnit={inputConfig.inputUnit}
         />
         {sizeToggle}
       </div>
-      {receiptArea}
+      {tradeValues.type === TradeFormType.LIMIT && limitPriceInput}
 
       <div
-        tw="row fixed bottom-0 left-0 right-0 gap-1.25 px-1.25 py-1.25"
+        tw="flexColumn fixed bottom-0 left-0 right-0 gap-1 px-1.25 py-1.25"
         css={{
           background:
             'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--simpleUi-dialog-backgroundColor))',
         }}
       >
-        <Button
-          type={ButtonType.Button}
-          action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-          tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
-          size={ButtonSize.Medium}
-          css={{
-            '--button-textColor': 'var(--color-layer-0)',
-          }}
-          state={{ isDisabled: !shouldEnableTrade }}
-          onClick={onSubmitOrder}
-        >
-          {tradeValues.side === OrderSide.BUY
-            ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-            : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
-        </Button>
+        {tradeFormMessages}
+        {receiptArea}
+        {placeOrderButton}
       </div>
     </div>
   );
 };
+
+const $FeeTrigger = styled.button.attrs({
+  type: 'button',
+})`
+  ${tw`row gap-0.25 text-color-text-2`}
+
+  svg {
+    color: var(--color-text-0);
+  }
+
+  &[data-state='open'] {
+    svg {
+      transition: rotate 0.3s var(--ease-out-expo);
+      rotate: -0.5turn;
+    }
+  }
+`;
+
+const $IconButton = styled(IconButton)`
+  --button-backgroundColor: var(--color-white-faded);
+  flex-shrink: 0;
+`;
