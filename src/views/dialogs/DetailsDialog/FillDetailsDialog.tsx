@@ -9,13 +9,13 @@ import { type DetailsItem } from '@/components/Details';
 import { DetailsDialog } from '@/components/DetailsDialog';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  getIndexerFillTypeStringKey,
-  getIndexerLiquidityStringKey,
-} from '@/views/tables/enumToStringKeyHelpers';
 
 import { getFillDetails } from '@/state/accountSelectors';
 
+import {
+  getIndexerFillTypeStringKey,
+  getIndexerLiquidityStringKey,
+} from '@/lib/enumToStringKeyHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 
 export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetailsDialogProps>) => {

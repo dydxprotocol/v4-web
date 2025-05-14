@@ -42,11 +42,14 @@ import { useAppSelector } from '@/state/appTypes';
 import { getNumberSign, MaybeBigNumber, MaybeNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyRecord } from '@/lib/typeUtils';
 
+import {
+  getIndexerPositionSideStringKey,
+  getMarginModeStringKey,
+} from '../../lib/enumToStringKeyHelpers';
 import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
-import { getIndexerPositionSideStringKey, getMarginModeStringKey } from './enumToStringKeyHelpers';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',

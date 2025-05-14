@@ -39,7 +39,7 @@ import {
   getIndexerFillTypeStringKey,
   getIndexerLiquidityStringKey,
   getIndexerOrderSideStringKey,
-} from './enumToStringKeyHelpers';
+} from '../../lib/enumToStringKeyHelpers';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
