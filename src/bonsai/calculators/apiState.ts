@@ -3,7 +3,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 
 import { timeUnits } from '@/constants/time';
 
-import { HeightState } from '@/state/raw';
+import { HeightEntry, HeightState } from '@/state/raw';
 
 import { assertNever } from '@/lib/assertNever';
 
@@ -129,8 +129,12 @@ function getApiState({
   assertNever(validatorState);
 }
 
+export function getLatestHeightEntry(heightState: HeightState): HeightEntry | undefined {
+  return heightState.lastFewResults.find((s) => s.data?.response != null)?.data;
+}
+
 export function getLatestHeight(heightState: HeightState): HeightResponse | undefined {
-  return heightState.lastFewResults.find((s) => s.data?.response != null)?.data?.response;
+  return getLatestHeightEntry(heightState)?.response;
 }
 
 let lastLoggedStatus: ApiStatus | undefined;
