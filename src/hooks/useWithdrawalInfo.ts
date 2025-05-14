@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { isMainnet } from '@/constants/networks';
+import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
@@ -21,8 +21,6 @@ import { useApiState } from './useApiState';
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useTokenConfigs } from './useTokenConfigs';
-
-const BLOCK_TIME = isMainnet ? 1_000 : 1_500;
 
 export const useWithdrawalInfo = ({
   transferType,
@@ -89,7 +87,7 @@ export const useWithdrawalInfo = ({
     ) {
       return {
         estimatedUnblockTime: formatRelativeTime(
-          Date.now() + (withdrawalsAndTransfersUnblockedAtBlock - height) * BLOCK_TIME,
+          Date.now() + (withdrawalsAndTransfersUnblockedAtBlock - height) * ESTIMATED_BLOCK_TIME,
           {
             locale: selectedLocale,
             largestUnit: 'day',
