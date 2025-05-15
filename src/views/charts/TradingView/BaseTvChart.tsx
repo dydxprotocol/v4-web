@@ -56,24 +56,26 @@ export const BaseTvChart = ({
           <div id="tv-price-chart" />
         </$PriceChart>
 
-        <div tw="row justify-evenly gap-0.5">
-          {objectKeys(isLaunchable ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS : RESOLUTION_MAP).map(
-            (resolution) => (
-              <button
-                tw="size-2.75 max-w-2.75 flex-1 border-t-2 border-solid border-color-accent"
-                type="button"
-                css={{
-                  borderColor:
-                    currentResolution !== resolution ? 'transparent' : 'var(--color-accent)',
-                }}
-                key={resolution}
-                onClick={() => onResolutionChange(resolution)}
-              >
-                {resolution}
-              </button>
-            )
-          )}
-        </div>
+        {isChartReady && (
+          <div tw="row justify-evenly gap-0.5">
+            {objectKeys(isLaunchable ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS : RESOLUTION_MAP).map(
+              (resolution) => (
+                <button
+                  tw="size-2.75 max-w-2.75 flex-1 border-t-2 border-solid border-color-accent"
+                  type="button"
+                  css={{
+                    borderColor:
+                      currentResolution !== resolution ? 'transparent' : 'var(--color-accent)',
+                  }}
+                  key={resolution}
+                  onClick={() => onResolutionChange(resolution)}
+                >
+                  {resolution}
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
     );
   }
