@@ -112,7 +112,6 @@ export const useTradingView = ({
   useEffect(() => {
     if (marketId) {
       const isSimpleUi = isTablet && testFlags.simpleUi;
-      console.log('isSimpleUi', isSimpleUi);
       const widgetOptions = getWidgetOptions(false, isSimpleUi);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
