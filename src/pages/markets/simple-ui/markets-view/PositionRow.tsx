@@ -48,7 +48,7 @@ export const PositionRow = ({
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <AssetIcon logoUrl={market.logo} tw="size-[2.75rem] min-w-[2.75rem]" />
         <div tw="flexColumn gap-0.25">
-          <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem]">
+          <span tw="whitespace-nowrap leading-[1rem]">
             <span tw="mr-0.25" css={{ color: sideColor }}>
               {sideString}
             </span>
