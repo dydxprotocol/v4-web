@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import { OrderSide } from '@/bonsai/forms/trade/types';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+=======
+import { ButtonShape } from '@/constants/buttons';
+>>>>>>> main
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
@@ -38,7 +42,6 @@ const AssetPage = () => {
       </div>
     </>
   );
-
   return (
     <div tw="flexColumn h-full">
       <AssetHeader />
