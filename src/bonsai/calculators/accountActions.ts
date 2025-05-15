@@ -219,7 +219,10 @@ function applyTradeToSubaccount(
     }
 
     const subaccount = draftParentSubaccount.childSubaccounts[subaccountNumber]!;
-    if (subaccount.openPerpetualPositions[marketId] == null) {
+    if (
+      subaccount.openPerpetualPositions[marketId] == null ||
+      subaccount.openPerpetualPositions[marketId].status !== IndexerPerpetualPositionStatus.OPEN
+    ) {
       // handle brand new position, easy case
       if (!reduceOnly) {
         subaccount.openPerpetualPositions[marketId] = createNewPositionFromTrade(tradeProps);

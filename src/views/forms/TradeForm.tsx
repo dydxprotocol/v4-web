@@ -196,8 +196,9 @@ export const TradeForm = ({
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
-    const payload = summary.tradePayload;
-    if (payload == null || hasInputErrors) {
+    const compoundPayload = summary.tradePayload;
+    const tradePayload = compoundPayload?.tradePayload;
+    if (compoundPayload == null || tradePayload == null) {
       return;
     }
     dispatch(tradeFormActions.reset());
@@ -205,10 +206,10 @@ export const TradeForm = ({
     logBonsaiInfo('TradeForm', 'attempting place order', {
       fullTradeFormState: purgeBigNumbers(fullTradeFormState),
     });
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
-    const result = await accountTransactionManager.placeOrder(payload);
+    track(AnalyticsEvents.TradePlaceOrderClick({ ...tradePayload, isClosePosition: false }));
+    const result = await accountTransactionManager.placeCompoundOrder(compoundPayload);
     if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
+      setUnIndexedClientId(tradePayload.clientId.toString());
     } else {
       const errorParams = operationFailureToErrorParams(result);
       setPlaceOrderError(
@@ -280,7 +281,7 @@ export const TradeForm = ({
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
-      hasValidationErrors={hasInputErrors}
+      hasValidationErrors={false}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
       onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={shortAlertKey}

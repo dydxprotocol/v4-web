@@ -17,17 +17,14 @@ import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import {
-  IndexerPerpetualMarketType,
-  IndexerPerpetualPositionStatus,
-  IndexerPositionSide,
-} from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { calculateTriggerOrderDetails, calculateTriggerOrderPayload } from '../triggers/summary';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
 import {
   DEFAULT_TRADE_TYPE,
@@ -76,31 +73,13 @@ export function calculateTradeSummary(
       getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
   );
 
-  const existingPositionOrOpenOrderMarginMode = calc(() => {
-    if (baseAccount?.position != null) {
-      const mode = baseAccount.position.marginMode;
-      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
-    }
-    if (accountData.currentTradeMarketOpenOrders.length > 0) {
-      const mode = accountData.currentTradeMarketOpenOrders[0]!.marginMode;
-      if (mode == null) {
-        return mode;
-      }
-      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
-    }
-    return undefined;
-  });
+  const fieldStates = getTradeFormFieldStates(state, accountData, baseAccount);
 
-  const fieldStates = getTradeFormFieldStates(
-    state,
-    existingPositionOrOpenOrderMarginMode,
-    baseAccount?.position,
-    accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED
-  );
+  const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
 
   const options = calculateTradeFormOptions(state.type, fieldStates, baseAccount);
 
-  const tradeInfo: TradeSummary = calculateTradeInfo(fieldStates, baseAccount, accountData);
+  const tradeInfo: TradeSummary = calculateTradeInfo(effectiveTrade, baseAccount, accountData);
 
   const baseAccountAfter = calc(() => {
     if (accountData.rawParentSubaccountData == null) {
@@ -153,8 +132,6 @@ export function calculateTradeSummary(
         )
     );
   });
-
-  const effectiveTrade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
 
   const tradePayload = calc((): PlaceOrderPayload | undefined => {
     return mapIfPresent(
@@ -265,12 +242,53 @@ export function calculateTradeSummary(
     );
     return undefined;
   });
+
+  const triggersData = mapIfPresent(
+    baseAccountAfter?.account,
+    baseAccountAfter?.position,
+    accountData.currentTradeMarketSummary,
+    (accountAfter, positionAfter, market) => {
+      const inputDataToUse = { position: positionAfter, market };
+      const stateToUse = { showLimits: false, size: { checked: false, size: '' } };
+      const stopLossOrder = calculateTriggerOrderDetails(
+        effectiveTrade.stopLossOrder ?? {},
+        true,
+        stateToUse,
+        inputDataToUse
+      );
+      const takeProfitOrder = calculateTriggerOrderDetails(
+        effectiveTrade.takeProfitOrder ?? {},
+        false,
+        stateToUse,
+        inputDataToUse
+      );
+      const payload = calculateTriggerOrderPayload(
+        stopLossOrder,
+        takeProfitOrder,
+        {
+          ...stateToUse,
+          stopLossOrder: effectiveTrade.stopLossOrder ?? {},
+          takeProfitOrder: effectiveTrade.takeProfitOrder ?? {},
+        },
+        inputDataToUse
+      );
+      return {
+        summary: { stopLossOrder, takeProfitOrder },
+        payloads: payload?.payloads,
+      };
+    }
+  );
+
   return {
     effectiveTrade,
     options,
 
     tradeInfo,
-    tradePayload,
+    triggersSummary: triggersData?.summary,
+    tradePayload: {
+      tradePayload,
+      triggersPayloads: triggersData?.payloads,
+    },
 
     accountDetailsBefore: baseAccount,
     accountDetailsAfter: baseAccountAfter,
@@ -293,6 +311,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       triggerPrice: undefined,
       execution: undefined,
       goodTil: undefined,
+      stopLossOrder: undefined,
+      takeProfitOrder: undefined,
     },
     options: {
       orderTypeOptions: [],
@@ -301,6 +321,8 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       goodTilUnitOptions: [],
       showLeverage: false,
       showAmountClose: false,
+      showTriggerOrders: false,
+      triggerOrdersChecked: false,
 
       needsMarginMode: false,
       needsSize: false,
@@ -327,6 +349,7 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showGoodTil: false,
     },
     tradePayload: undefined,
+    triggersSummary: undefined,
     accountDetailsAfter: undefined,
     accountDetailsBefore: undefined,
     tradeInfo: {
@@ -443,6 +466,10 @@ function calculateTradeFormOptions(
 
     showLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
     showAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
+    showTriggerOrders:
+      isFieldStateEnabled(fields.takeProfitOrder) && isFieldStateEnabled(fields.stopLossOrder),
+    triggerOrdersChecked:
+      fields.takeProfitOrder.effectiveValue != null || fields.stopLossOrder.effectiveValue != null,
 
     showTargetLeverage:
       isFieldStateEnabled(fields.targetLeverage) &&

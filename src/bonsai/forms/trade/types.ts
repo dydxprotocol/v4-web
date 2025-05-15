@@ -15,7 +15,12 @@ import unionize, { ofType, UnionOf } from 'unionize';
 
 import { RecordValueType } from '@/lib/typeUtils';
 
-import { PlaceOrderPayload } from '../triggers/types';
+import {
+  PlaceOrderPayload,
+  TriggerOrderActions,
+  TriggerOrderDetails,
+  TriggerOrderState,
+} from '../triggers/types';
 
 export enum TimeUnit {
   MINUTE = 'M',
@@ -114,11 +119,15 @@ export type TradeForm = {
 
   // Time-related fields
   goodTil: GoodUntilTime | undefined;
+
+  // additional triggers
+  stopLossOrder: TriggerOrderState | undefined;
+  takeProfitOrder: TriggerOrderState | undefined;
 };
 
 // Define the FieldState type with conditional properties
 export type FieldState<T> = {
-  rawValue: T | undefined;
+  rawValue: T;
   effectiveValue: T | undefined;
   // disabled means it's relevant but can't currently be edited
   state: 'irrelevant' | 'disabled' | 'enabled';
@@ -126,7 +135,7 @@ export type FieldState<T> = {
 
 // Type for the transformed form with field states
 export type TradeFormFieldStates = {
-  [K in keyof TradeForm]-?: FieldState<TradeForm[K]>;
+  [K in keyof TradeForm]: FieldState<TradeForm[K]>;
 };
 
 export type SelectionOption<T extends string> = {
@@ -141,6 +150,9 @@ export type TradeFormOptions = {
 
   showLeverage: boolean;
   showAmountClose: boolean;
+
+  showTriggerOrders: boolean;
+  triggerOrdersChecked: boolean;
 
   // these mean the field is relevant to the trade and trade payload in any way (potentially)
   needsSize: boolean;
@@ -182,6 +194,11 @@ export type TradeInputSummary = {
   worstFillPrice: number | undefined;
 };
 
+export type TradeTriggersSummary = {
+  stopLossOrder: TriggerOrderDetails | undefined;
+  takeProfitOrder: TriggerOrderDetails | undefined;
+};
+
 export type TradeSummary = {
   inputSummary: TradeInputSummary;
 
@@ -208,12 +225,18 @@ export type TradeSummary = {
   indexSlippage: number | undefined;
 };
 
+export type TradeFormPayload = {
+  tradePayload: PlaceOrderPayload | undefined;
+  triggersPayloads: TriggerOrderActions[] | undefined;
+};
+
 export type TradeFormSummary = {
   effectiveTrade: TradeForm;
   options: TradeFormOptions;
 
   tradeInfo: TradeSummary;
-  tradePayload: PlaceOrderPayload | undefined;
+  triggersSummary: TradeTriggersSummary | undefined;
+  tradePayload: TradeFormPayload | undefined;
 
   accountDetailsBefore: TradeAccountDetails | undefined;
   accountDetailsAfter: TradeAccountDetails | undefined;
