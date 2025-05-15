@@ -23,10 +23,12 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
+import { testFlags } from '@/lib/testFlags';
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { useBreakpoints } from '../useBreakpoints';
 import { useDydxClient } from '../useDydxClient';
 import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useStringGetter } from '../useStringGetter';
@@ -57,6 +59,7 @@ export const useTradingView = ({
 
   const { group, decimal } = useLocaleSeparators();
 
+  const { isTablet } = useBreakpoints();
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
 
@@ -108,8 +111,10 @@ export const useTradingView = ({
 
   useEffect(() => {
     if (marketId) {
-      const widgetOptions = getWidgetOptions();
-      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+      const isSimpleUi = isTablet && testFlags.simpleUi;
+      console.log('isSimpleUi', isSimpleUi);
+      const widgetOptions = getWidgetOptions(false, isSimpleUi);
+      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
       const options: TradingTerminalWidgetOptions = {
@@ -190,5 +195,6 @@ export const useTradingView = ({
     setOrderLinesToggleOn,
     setTvWidget,
     !!marketId,
+    isTablet,
   ]);
 };
