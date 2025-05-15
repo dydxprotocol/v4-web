@@ -43,14 +43,14 @@ import { getHydratedOrder, getOrderStatusInfoNew, isMarketOrderTypeNew } from '@
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
-import { OrderStatusIconNew } from '../OrderStatusIcon';
-import { CancelAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
-import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
   getOrderStatusStringKey,
-} from './enumToStringKeyHelpers';
+} from '../../lib/enumToStringKeyHelpers';
+import { OrderStatusIconNew } from '../OrderStatusIcon';
+import { CancelAllOrdersButton } from './OrdersTable/CancelOrClearAllOrdersButton';
+import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 
 export enum OrdersTableColumnKey {
   Market = 'Market',

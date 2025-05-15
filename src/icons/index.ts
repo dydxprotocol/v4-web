@@ -64,6 +64,7 @@ export { default as PlusIcon } from './plus.svg';
 export { default as PortfolioIcon } from './portfolio.svg';
 export { default as PositionsIcon } from './positions.svg';
 export { default as PriceChartIcon } from './price-chart.svg';
+export { default as PriceIcon } from './price.svg';
 export { default as PrivacyIcon } from './privacy.svg';
 export { default as ProfileIcon } from './profile.svg';
 export { default as QrIcon } from './qr.svg';
@@ -91,13 +92,17 @@ export { default as TokenIcon } from './token.svg';
 export { default as TradeIcon } from './trade.svg';
 export { default as TransferIcon } from './transfer.svg';
 export { default as TranslateIcon } from './translate.svg';
+export { default as TrendingDownIcon } from './trend-down.svg';
+export { default as TrendingUpIcon } from './trend-up.svg';
 export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
 export { default as ViewfinderIcon } from './viewfinder.svg';
+export { default as VolumeIcon } from './volume.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
 
 // Wallets
+export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
 export { default as BitpieIcon } from './wallets/bitpie.svg';

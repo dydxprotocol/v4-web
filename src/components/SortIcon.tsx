@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
-  sortDirection: SortDirection | 'none';
+  sortDirection?: SortDirection | 'none';
 };
 
 type StyleProps = {

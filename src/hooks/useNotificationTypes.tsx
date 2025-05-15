@@ -30,17 +30,12 @@ import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification } from '@/components/Notification';
 import { formatNumberOutput, OutputType } from '@/components/Output';
-// eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
-import {
-  getIndexerOrderSideStringKey,
-  getIndexerOrderTypeStringKey,
-} from '@/views/tables/enumToStringKeyHelpers';
 
 import {
   selectOrphanedTriggerOrders,
@@ -62,6 +57,11 @@ import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
+// eslint-disable-next-line import/no-cycle
+import {
+  getIndexerOrderSideStringKey,
+  getIndexerOrderTypeStringKey,
+} from '@/lib/enumToStringKeyHelpers';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyRecord } from '@/lib/typeUtils';

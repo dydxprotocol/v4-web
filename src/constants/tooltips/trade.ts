@@ -25,6 +25,9 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.BUYING_POWER_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.BUYING_POWER_BODY, params: stringParams }),
   }),
+  'buying-power-simple': ({ stringGetter }) => ({
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.BUYING_POWER_SIMPLE_BODY }),
+  }),
   'cross-margin-usage': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_MARGIN_USAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_MARGIN_USAGE_BODY }),
@@ -220,6 +223,9 @@ export const tradeTooltips = {
   'reduce-only-timeinforce-ioc': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_BODY }),
+  }),
+  risk: ({ stringGetter }) => ({
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.RISK_BODY }),
   }),
   spread: () => ({
     title: 'Spread',

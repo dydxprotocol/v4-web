@@ -17,8 +17,8 @@ import { getOrderById } from '@/state/accountSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { getIndexerOrderTypeStringKey } from '../../lib/enumToStringKeyHelpers';
 import { OrderStatusIconNew } from '../OrderStatusIcon';
-import { getIndexerOrderTypeStringKey } from '../tables/enumToStringKeyHelpers';
 
 type ElementProps = {
   localCancel: LocalCancelOrderData;
