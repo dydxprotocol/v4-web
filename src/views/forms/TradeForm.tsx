@@ -198,7 +198,7 @@ export const TradeForm = ({
     setPlaceOrderError(undefined);
     const compoundPayload = summary.tradePayload;
     const tradePayload = compoundPayload?.tradePayload;
-    if (compoundPayload == null || tradePayload == null) {
+    if (compoundPayload == null || tradePayload == null || hasInputErrors) {
       return;
     }
     dispatch(tradeFormActions.reset());
@@ -281,7 +281,7 @@ export const TradeForm = ({
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
-      hasValidationErrors={false}
+      hasValidationErrors={hasInputErrors}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
       onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={shortAlertKey}
