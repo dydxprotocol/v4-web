@@ -37,6 +37,7 @@ export const estimateLiveValidatorHeight = (state: RootState) => {
   const now = new Date().getTime();
   const elapsedTime = now - responseTime;
 
-  const elapsedBlocksEst = Math.floor(elapsedTime / ESTIMATED_BLOCK_TIME);
+  // multiply by .9 to be extra conservative
+  const elapsedBlocksEst = Math.floor(elapsedTime / (ESTIMATED_BLOCK_TIME * 0.9));
   return heightAtRequest + elapsedBlocksEst;
 };
