@@ -81,7 +81,7 @@ const MarketFilterRow = ({
               };
             }) satisfies MenuItem<MarketFilters>[]
           }
-          style={{
+          css={{
             '--button-toggle-on-border': 'none',
             '--button-toggle-off-border': 'solid var(--default-border-width) var(--color-border)',
             '--button-toggle-off-backgroundColor': 'transparent',
