@@ -1,6 +1,8 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
+import { Link } from 'react-router-dom';
 
+import { AppRoute } from '@/constants/routes';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
@@ -11,7 +13,7 @@ import { Output, OutputType } from '@/components/Output';
 
 import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 
-const PositionRow = ({
+export const PositionRow = ({
   className,
   position,
 }: {
@@ -38,14 +40,15 @@ const PositionRow = ({
     position.side === IndexerPositionSide.LONG ? 'var(--color-positive)' : 'var(--color-negative)';
 
   return (
-    <div
+    <Link
       className={className}
       tw="row cursor-pointer justify-between gap-0.5 px-[1.25rem] hover:bg-color-layer-4"
+      to={`${AppRoute.Trade}/${market.ticker}`}
     >
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <AssetIcon logoUrl={market.logo} tw="size-[2.75rem] min-w-[2.75rem]" />
         <div tw="flexColumn gap-0.25">
-          <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem]">
+          <span tw="whitespace-nowrap leading-[1rem]">
             <span tw="mr-0.25" css={{ color: sideColor }}>
               {sideString}
             </span>
@@ -76,8 +79,6 @@ const PositionRow = ({
           value={market.percentChange24h}
         />
       </div>
-    </div>
+    </Link>
   );
 };
-
-export default PositionRow;
