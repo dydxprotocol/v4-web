@@ -26,7 +26,7 @@ export const selectLatestValidatorHeight = createAppSelector(
 
 // not a selector since we use current time
 // we return a very conservative estimate, aiming to return the smallest reasonable block height estimate
-export const estimateLiveValidatorHeight = (state: RootState) => {
+export const estimateLiveValidatorHeight = (state: RootState, biasMultiplier: number = 1.0) => {
   const latestEntry = getLatestHeightEntry(selectRawValidatorHeightData(state));
   const heightAtRequest = latestEntry?.response?.height;
   if (latestEntry == null || heightAtRequest == null) {
@@ -37,7 +37,6 @@ export const estimateLiveValidatorHeight = (state: RootState) => {
   const now = new Date().getTime();
   const elapsedTime = now - responseTime;
 
-  // multiply by .9 to be extra conservative
-  const elapsedBlocksEst = Math.floor(elapsedTime / (ESTIMATED_BLOCK_TIME * 0.9));
+  const elapsedBlocksEst = Math.floor(elapsedTime / (ESTIMATED_BLOCK_TIME * biasMultiplier));
   return heightAtRequest + elapsedBlocksEst;
 };
