@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
-import { OrderSide, OrderType } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { SimpleUiTradeDialogSteps } from '@/constants/trade';
-import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+import { ORDER_TYPE_STRINGS, SimpleUiTradeDialogSteps } from '@/constants/trade';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,6 +19,10 @@ import { Output, OutputType } from '@/components/Output';
 import { getOrderByClientId } from '@/state/accountSelectors';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import {
+  getIndexerOrderSideStringKey,
+  getIndexerOrderTypeStringKey,
+} from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const SimpleTradeSteps = ({
@@ -37,29 +41,54 @@ export const SimpleTradeSteps = ({
   const stringGetter = useStringGetter();
   const orderFromClientId = orEmptyObj(useAppSelectorWithArgs(getOrderByClientId, clientId ?? ''));
 
-  const { side, totalFilled, price, type, marketId } = useMemo(() => {
+  const { side, totalFilled, price, marketId, typeString, sideString, sideColor } = useMemo(() => {
     if (currentStep === SimpleUiTradeDialogSteps.Submit) {
+      const orderTypeKey = payload?.type && ORDER_TYPE_STRINGS[payload.type].orderTypeKey;
+      const orderSideKey =
+        payload?.side &&
+        {
+          [OrderSide.BUY]: STRING_KEYS.BUY,
+          [OrderSide.SELL]: STRING_KEYS.SELL,
+        }[payload.side];
+
       return {
         side: payload?.side,
         totalFilled: payload?.size,
         price: payload?.price,
         type: payload?.type,
         marketId: payload?.marketId,
+        typeString: orderTypeKey && stringGetter({ key: orderTypeKey }),
+        sideString: orderSideKey && stringGetter({ key: orderSideKey }),
+        sideColor: {
+          [OrderSide.BUY]: 'var(--color-positive)',
+          [OrderSide.SELL]: 'var(--color-negative)',
+        }[payload?.side ?? OrderSide.BUY],
       };
     }
 
     if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
+      const orderTypeKey =
+        orderFromClientId.type && getIndexerOrderTypeStringKey(orderFromClientId.type);
+      const orderSideKey =
+        orderFromClientId.side && getIndexerOrderSideStringKey(orderFromClientId.side);
+
       return {
         side: orderFromClientId.side,
         totalFilled: orderFromClientId.totalFilled,
         price: orderFromClientId.price,
         type: orderFromClientId.type,
         marketId: orderFromClientId.marketId,
+        typeString: orderTypeKey && stringGetter({ key: orderTypeKey }),
+        sideString: orderSideKey && stringGetter({ key: orderSideKey }),
+        sideColor: {
+          [IndexerOrderSide.BUY]: 'var(--color-positive)',
+          [IndexerOrderSide.SELL]: 'var(--color-negative)',
+        }[orderFromClientId.side ?? IndexerOrderSide.BUY],
       };
     }
 
     return {};
-  }, [currentStep, payload, orderFromClientId]);
+  }, [currentStep, payload, orderFromClientId, stringGetter]);
 
   const renderContent = () => {
     if (currentStep === SimpleUiTradeDialogSteps.Error) {
@@ -69,26 +98,6 @@ export const SimpleTradeSteps = ({
     if (!marketId || !side) return null;
 
     const displayableAsset = getDisplayableAssetFromTicker(marketId);
-    const typeString =
-      type === IndexerOrderType.MARKET || type === OrderType.MARKET
-        ? stringGetter({ key: STRING_KEYS.MARKET_ORDER })
-        : type === IndexerOrderType.LIMIT || type === OrderType.LIMIT
-          ? stringGetter({ key: STRING_KEYS.LIMIT_ORDER })
-          : null;
-
-    const sideString =
-      side === IndexerOrderSide.BUY || side === OrderSide.BUY
-        ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-        : side === IndexerOrderSide.SELL || side === OrderSide.SELL
-          ? stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })
-          : null;
-
-    const sideColor =
-      side === IndexerOrderSide.BUY || side === OrderSide.BUY
-        ? 'var(--color-positive)'
-        : side === IndexerOrderSide.SELL || side === OrderSide.SELL
-          ? 'var(--color-negative)'
-          : undefined;
 
     return (
       <div tw="flexColumn gap-0.5 text-center">

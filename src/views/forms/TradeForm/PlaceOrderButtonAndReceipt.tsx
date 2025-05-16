@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MarginMode, TradeFormSummary, TradeFormType } from '@/bonsai/forms/trade/types';
+import { MarginMode } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -11,7 +11,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -35,15 +34,13 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentTradePageForm, getTradeFormValues } from '@/state/tradeFormSelectors';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
 import { calculateCrossPositionMargin, getDoubleValuesHasDiff } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
-
-import { useTradeTypeOptions } from './useTradeTypeOptions';
 
 type ConfirmButtonConfig = {
   stringKey: string;
@@ -53,33 +50,33 @@ type ConfirmButtonConfig = {
 
 type ElementProps = {
   actionStringKey?: string;
-  summary?: TradeFormSummary;
+  confirmButtonConfig: ConfirmButtonConfig;
+  currentStep?: MobilePlaceOrderSteps;
   hasInput: boolean;
   hasValidationErrors?: boolean;
-  currentStep?: MobilePlaceOrderSteps;
-  showDeposit?: boolean;
-  confirmButtonConfig: ConfirmButtonConfig;
   onClearInputs: () => void;
+  shouldEnableTrade: boolean;
+  showDeposit?: boolean;
+  tradingUnavailable: boolean;
 };
 
 export const PlaceOrderButtonAndReceipt = ({
   actionStringKey,
-  summary,
+  confirmButtonConfig,
+  currentStep,
   hasInput,
   hasValidationErrors,
-  currentStep,
-  showDeposit,
-  confirmButtonConfig,
   onClearInputs,
+  shouldEnableTrade,
+  showDeposit,
+  tradingUnavailable,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
-  const { connectionError } = useApiState();
   const { complianceState } = useComplianceState();
-  const { selectedTradeType } = useTradeTypeOptions();
+  const summary = useAppSelector(getTradeFormSummary).summary;
 
-  const currentForm = useAppSelector(getCurrentTradePageForm);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
 
@@ -103,19 +100,6 @@ export const PlaceOrderButtonAndReceipt = ({
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
   const hasMissingData = subaccountNumber === undefined;
-
-  const closeOnlyTradingUnavailable =
-    complianceState === ComplianceStates.CLOSE_ONLY &&
-    selectedTradeType !== TradeFormType.MARKET &&
-    currentForm !== 'CLOSE_POSITION';
-
-  const tradingUnavailable =
-    closeOnlyTradingUnavailable ||
-    complianceState === ComplianceStates.READ_ONLY ||
-    connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
-
-  const shouldEnableTrade =
-    canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
 
   const { tradeInfo, tradePayload } = orEmptyObj(summary);
   const { fee, inputSummary, reward } = orEmptyObj(tradeInfo);
@@ -162,7 +146,7 @@ export const PlaceOrderButtonAndReceipt = ({
           getDoubleValuesHasDiff(
             marginValueMaintenance?.toNumber(),
             postOrderPositionData.marginValueMaintenance?.toNumber() ??
-              (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
+              (summary.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }
       />
