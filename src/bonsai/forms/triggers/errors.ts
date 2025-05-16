@@ -17,18 +17,18 @@ import { AttemptBigNumber, AttemptNumber, MustBigNumber, MustNumber } from '@/li
 import { isPresent } from '@/lib/typeUtils';
 
 import {
-  SummaryData,
   TriggerOrderDetails,
   TriggerOrderInputData,
   TriggerOrdersFormState,
   TriggerOrdersPayload,
   TriggerOrderState,
+  TriggersSummaryData,
 } from './types';
 
 export function getErrors(
   state: TriggerOrdersFormState,
   inputData: TriggerOrderInputData,
-  summary: SummaryData
+  summary: TriggersSummaryData
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
 

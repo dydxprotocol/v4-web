@@ -76,7 +76,7 @@ export interface TriggerOrderDetails {
   size?: string;
 }
 
-export interface SummaryData {
+export interface TriggersSummaryData {
   effectiveEntryMargin?: number;
   stopLossOrder: TriggerOrderDetails;
   takeProfitOrder: TriggerOrderDetails;

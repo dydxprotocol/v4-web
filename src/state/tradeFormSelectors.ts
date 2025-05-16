@@ -132,6 +132,8 @@ export const getClosePositionFormSummary = createAppSelector(
         triggerPrice: undefined,
         execution: undefined,
         goodTil: undefined,
+        stopLossOrder: undefined,
+        takeProfitOrder: undefined,
       },
       inputData
     );

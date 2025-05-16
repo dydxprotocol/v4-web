@@ -63,6 +63,7 @@ import { sleep } from '@/lib/timeUtils';
 import { isPresent } from '@/lib/typeUtils';
 
 import { getSimpleOrderStatus } from './calculators/orders';
+import { TradeFormPayload } from './forms/trade/types';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
 import { estimateLiveValidatorHeight } from './selectors/apiStatus';
@@ -905,6 +906,41 @@ export class AccountTransactionSupervisor {
       });
     }
     return results.find(isOperationFailure)!;
+  }
+
+  public async placeCompoundOrder(order: TradeFormPayload) {
+    if (order.tradePayload != null) {
+      const res = await this.placeOrder(order.tradePayload);
+      if (isOperationFailure(res)) {
+        return res;
+      }
+    }
+    if (order.triggersPayloads != null && order.triggersPayloads.length > 0) {
+      const operations = await Promise.all(
+        order.triggersPayloads.map(async (operationPayload) => {
+          if (operationPayload.cancelPayload?.orderId) {
+            const res = await this.cancelOrder({
+              orderId: operationPayload.cancelPayload.orderId,
+            });
+            if (isOperationFailure(res)) {
+              return res;
+            }
+          }
+          if (operationPayload.placePayload != null) {
+            const res = await this.placeOrder(operationPayload.placePayload);
+            if (isOperationFailure(res)) {
+              return res;
+            }
+          }
+          return wrapOperationSuccess(true);
+        })
+      );
+      const failure = operations.find(isOperationFailure);
+      if (failure != null) {
+        return failure;
+      }
+    }
+    return wrapOperationSuccess(true);
   }
 
   public tearDown(): void {

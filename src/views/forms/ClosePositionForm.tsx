@@ -199,19 +199,20 @@ export const ClosePositionForm = ({
   const onClosePosition = async () => {
     setClosePositionError(undefined);
 
-    const payload = summary.tradePayload;
-    if (payload == null || hasInputErrors) {
+    const compoundPayload = summary.tradePayload;
+    const tradePayload = compoundPayload?.tradePayload;
+    if (compoundPayload == null || tradePayload == null || hasInputErrors) {
       return;
     }
     onClearInputs();
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: true }));
+    track(AnalyticsEvents.TradePlaceOrderClick({ ...tradePayload, isClosePosition: true }));
     logBonsaiInfo('ClosePositionForm', 'attempting close position', {
       fullTradeFormState: purgeBigNumbers(fullSummary),
     });
 
-    const result = await accountTransactionManager.placeOrder(payload);
+    const result = await accountTransactionManager.placeCompoundOrder(compoundPayload);
     if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
+      setUnIndexedClientId(tradePayload.clientId.toString());
     } else {
       const errorParams = operationFailureToErrorParams(result);
       setClosePositionError(

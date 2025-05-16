@@ -1,4 +1,5 @@
 import { createVanillaReducer } from '../../lib/forms';
+import { TriggerPriceInputType } from '../triggers/types';
 import { DEFAULT_TRADE_TYPE } from './fields';
 import {
   ExecutionType,
@@ -30,6 +31,8 @@ const getMinimumRequiredFields = (
     targetLeverage: undefined,
     timeInForce: undefined,
     triggerPrice: undefined,
+    stopLossOrder: undefined,
+    takeProfitOrder: undefined,
   };
 
   // Add marketId if provided
@@ -145,6 +148,117 @@ export const tradeFormReducer = createVanillaReducer({
     setTargetLeverage: (state, targetLeverage: string) => ({
       ...state,
       targetLeverage,
+    }),
+
+    showTriggers: (state) => ({
+      ...state,
+      takeProfitOrder: {},
+      stopLossOrder: {},
+    }),
+
+    hideTriggers: (state) => ({
+      ...state,
+      stopLossOrder: undefined,
+      takeProfitOrder: undefined,
+    }),
+
+    setStopLossLimitPrice: (state, limitPrice: string | undefined) => ({
+      ...state,
+      stopLossOrder: {
+        ...state.stopLossOrder,
+        limitPrice,
+      },
+    }),
+
+    setStopLossTriggerPrice: (state, triggerPrice: string) => ({
+      ...state,
+      stopLossOrder: {
+        ...state.stopLossOrder,
+        priceInput: {
+          type: TriggerPriceInputType.TriggerPrice,
+          triggerPrice,
+        },
+      },
+    }),
+
+    setStopLossPercentDiff: (state, percentDiff: string) => ({
+      ...state,
+      stopLossOrder: {
+        ...state.stopLossOrder,
+        priceInput: {
+          type: TriggerPriceInputType.PercentDiff,
+          percentDiff,
+        },
+      },
+    }),
+
+    setStopLossUsdcDiff: (state, usdcDiff: string) => ({
+      ...state,
+      stopLossOrder: {
+        ...state.stopLossOrder,
+        priceInput: {
+          type: TriggerPriceInputType.UsdcDiff,
+          usdcDiff,
+        },
+      },
+    }),
+
+    clearStopLossPriceInput: (state) => ({
+      ...state,
+      stopLossOrder: {
+        ...state.stopLossOrder,
+        priceInput: null,
+      },
+    }),
+
+    // Take Profit actions
+    setTakeProfitLimitPrice: (state, limitPrice: string | undefined) => ({
+      ...state,
+      takeProfitOrder: {
+        ...state.takeProfitOrder,
+        limitPrice,
+      },
+    }),
+
+    setTakeProfitTriggerPrice: (state, triggerPrice: string) => ({
+      ...state,
+      takeProfitOrder: {
+        ...state.takeProfitOrder,
+        priceInput: {
+          type: TriggerPriceInputType.TriggerPrice,
+          triggerPrice,
+        },
+      },
+    }),
+
+    setTakeProfitPercentDiff: (state, percentDiff: string) => ({
+      ...state,
+      takeProfitOrder: {
+        ...state.takeProfitOrder,
+        priceInput: {
+          type: TriggerPriceInputType.PercentDiff,
+          percentDiff,
+        },
+      },
+    }),
+
+    setTakeProfitUsdcDiff: (state, usdcDiff: string) => ({
+      ...state,
+      takeProfitOrder: {
+        ...state.takeProfitOrder,
+        priceInput: {
+          type: TriggerPriceInputType.UsdcDiff,
+          usdcDiff,
+        },
+      },
+    }),
+
+    clearTakeProfitPriceInput: (state) => ({
+      ...state,
+      takeProfitOrder: {
+        ...state.takeProfitOrder,
+        priceInput: null,
+      },
     }),
 
     reset: (state, keepSize?: boolean) => {

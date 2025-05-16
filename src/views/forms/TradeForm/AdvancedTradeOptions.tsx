@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { ExecutionType, TimeInForce, TimeUnit } from '@/bonsai/forms/trade/types';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
@@ -28,6 +29,10 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
+import { TradeTriggerOrderInputs } from './TradeTriggerInput';
+
 export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
@@ -37,8 +42,15 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
   const currentTradeFormConfig = currentTradeFormSummary.options;
   const inputTradeData = useAppSelector(getTradeFormValues);
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData;
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce, stopLossOrder, takeProfitOrder } =
+    inputTradeData;
+  const { stopLossOrder: stopLossSummary, takeProfitOrder: takeProfitSummary } = orEmptyObj(
+    currentTradeFormSummary.triggersSummary
+  );
 
   const {
     executionOptions,
@@ -50,6 +62,9 @@ export const AdvancedTradeOptions = () => {
 
     showPostOnlyTooltip,
     showReduceOnlyTooltip,
+
+    showTriggerOrders,
+    triggerOrdersChecked,
   } = currentTradeFormConfig;
 
   const { duration, unit } = goodTil ?? {};
@@ -63,14 +78,14 @@ export const AdvancedTradeOptions = () => {
     shouldShowReduceOnly;
   const hasTimeInForce = timeInForceOptions.length > 0;
   const needsTimeRow = showGoodTil || (hasTimeInForce && timeInForce != null);
-
+  const needsTriggers = showTriggerOrders;
   useEffect(() => {
     if (complianceState === ComplianceStates.CLOSE_ONLY) {
       dispatch(tradeFormActions.setReduceOnly(true));
     }
   }, [complianceState, dispatch]);
 
-  const necessary = needsTimeRow || needsExecution;
+  const necessary = needsTimeRow || needsExecution || needsTriggers;
   if (!necessary) {
     return undefined;
   }
@@ -208,6 +223,49 @@ export const AdvancedTradeOptions = () => {
               />
             )}
           </>
+        )}
+        {needsTriggers && (
+          <div tw="column gap-0.5">
+            <Checkbox
+              checked={!!triggerOrdersChecked}
+              disabled={false}
+              onCheckedChange={(checked) =>
+                dispatch(
+                  checked ? tradeFormActions.showTriggers() : tradeFormActions.hideTriggers()
+                )
+              }
+              id="show-trigger-orders"
+              label={stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS })}
+            />
+            {triggerOrdersChecked && (
+              <div tw="column gap-0.5">
+                <TradeTriggerOrderInputs
+                  stringKeys={{
+                    header: STRING_KEYS.TAKE_PROFIT,
+                    headerDiff: STRING_KEYS.PROFIT_COLON,
+                    price: STRING_KEYS.TP_PRICE,
+                    output: STRING_KEYS.GAIN,
+                  }}
+                  inputState={takeProfitOrder ?? {}}
+                  summaryState={takeProfitSummary ?? {}}
+                  isStopLoss={false}
+                  tickSizeDecimals={tickSizeDecimals}
+                />
+                <TradeTriggerOrderInputs
+                  stringKeys={{
+                    header: STRING_KEYS.STOP_LOSS,
+                    headerDiff: STRING_KEYS.LOSS_COLON,
+                    price: STRING_KEYS.SL_PRICE,
+                    output: STRING_KEYS.LOSS,
+                  }}
+                  inputState={stopLossOrder ?? {}}
+                  summaryState={stopLossSummary ?? {}}
+                  isStopLoss
+                  tickSizeDecimals={tickSizeDecimals}
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
     </$Collapsible>
