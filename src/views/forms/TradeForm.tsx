@@ -1,53 +1,35 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
-import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { TradeFormType } from '@/bonsai/forms/trade/types';
-import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { ErrorType } from '@/bonsai/lib/validationErrors';
-import { logBonsaiInfo } from '@/bonsai/logs';
-import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
-import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
+import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
-import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
-import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import {
-  getCurrentTradePageForm,
-  getTradeFormRawState,
-  getTradeFormSummary,
-} from '@/state/tradeFormSelectors';
-
-import { track } from '@/lib/analytics/analytics';
-import { operationFailureToErrorParams } from '@/lib/errorHelpers';
-import { isTruthy } from '@/lib/isTruthy';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { getTradeFormRawState, getTradeFormSummary } from '@/state/tradeFormSelectors';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
+import { TradeFormAlertContent } from '../TradeFormMessages/TradeFormAlertContent';
+import { TradeFormMessages } from '../TradeFormMessages/TradeFormMessages';
 import { TradeSideTabs } from '../TradeSideTabs';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
@@ -75,26 +57,42 @@ export const TradeForm = ({
 }: ElementProps & StyleProps) => {
   const [showOrderbook, setShowOrderbook] = useState(false);
 
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { complianceMessage, complianceStatus } = useComplianceState();
-
-  const fullTradeFormState = useAppSelector(getTradeFormSummary);
-  const { errors: tradeErrors, summary } = fullTradeFormState;
-
-  const currentInput = useAppSelector(getCurrentTradePageForm);
-
-  const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
-  const dispatch = useAppDispatch();
+  const fullTradeFormState = useAppSelector(getTradeFormSummary);
+
+  const onLastOrderIndexed = useCallback(() => {
+    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
+      setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
+    }
+  }, [currentStep, setCurrentStep]);
+
+  const {
+    placeOrderError,
+    placeOrder,
+    hasValidationErrors,
+    tradingUnavailable,
+    shouldEnableTrade,
+    hasMarketData,
+  } = useTradeForm({
+    source: TradeFormSource.TradeForm,
+    onLastOrderIndexed,
+  });
+
+  const { shouldPromptUserToPlaceLimitOrder, isErrorShownInOrderStatusToast, primaryAlert } =
+    useTradeErrors({
+      placeOrderError,
+    });
 
   useEffect(() => {
     dispatch(tradeFormActions.setMarketId(currentMarketId));
   }, [currentMarketId, dispatch]);
 
+  const { summary } = fullTradeFormState;
   const tradeFormInputValues = summary.effectiveTrade;
-
-  const { marketId, side } = tradeFormInputValues;
+  const { side } = tradeFormInputValues;
   const selectedOrderSide = side ?? OrderSide.BUY;
 
   const { selectedTradeType, tradeTypeItems: allTradeTypeItems } = useTradeTypeOptions({
@@ -120,11 +118,9 @@ export const TradeForm = ({
       rawInput.timeInForce,
     ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
 
-  const hasInputErrors =
-    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
-
-  const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder, setPlaceOrderError } =
-    useTradeErrors();
+  const { shortAlertKey } = useTradeErrors({
+    placeOrderError,
+  });
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -147,45 +143,10 @@ export const TradeForm = ({
       }
       case MobilePlaceOrderSteps.PreviewOrder:
       default: {
-        onPlaceOrder();
+        placeOrder();
         setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
         break;
       }
-    }
-  };
-
-  const onLastOrderIndexed = useCallback(() => {
-    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-      setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
-    }
-  }, [currentStep, setCurrentStep]);
-
-  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
-
-  const onPlaceOrder = async () => {
-    setPlaceOrderError(undefined);
-    const payload = summary.tradePayload;
-    if (payload == null || hasInputErrors) {
-      return;
-    }
-    dispatch(tradeFormActions.reset());
-
-    logBonsaiInfo('TradeForm', 'attempting place order', {
-      fullTradeFormState: purgeBigNumbers(fullTradeFormState),
-    });
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
-    const result = await accountTransactionManager.placeOrder(payload);
-    if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
-    } else {
-      const errorParams = operationFailureToErrorParams(result);
-      setPlaceOrderError(
-        stringGetter({
-          key: errorParams.errorStringKey,
-          fallback: errorParams.errorMessage ?? '',
-        })
-      );
-      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
     }
   };
 
@@ -209,29 +170,6 @@ export const TradeForm = ({
     </$TopActionsRow>
   );
 
-  const tradeFormMessages = (
-    <>
-      {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
-        <AlertMessage type={AlertType.Error}>
-          <span>{complianceMessage}</span>
-        </AlertMessage>
-      )}
-
-      {alertContent}
-
-      {shouldPromptUserToPlaceLimitOrder && (
-        <$IconButton
-          iconName={IconName.Arrow}
-          shape={ButtonShape.Circle}
-          action={ButtonAction.Navigation}
-          size={ButtonSize.XSmall}
-          iconSize="1.25em"
-          onClick={() => onTradeTypeChange(TradeFormType.LIMIT)}
-        />
-      )}
-    </>
-  );
-
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
       {isTablet && showOrderbook && (
@@ -241,30 +179,36 @@ export const TradeForm = ({
         <TradeFormInputs />
         <TradeSizeInputs />
         <AdvancedTradeOptions />
-        {tradeFormMessages}
+        <TradeFormMessages
+          isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+          placeOrderError={placeOrderError}
+          primaryAlert={primaryAlert}
+          shouldPromptUserToPlaceLimitOrder={shouldPromptUserToPlaceLimitOrder}
+        />
       </$InputsColumn>
     </$OrderbookAndInputs>
   );
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
-      hasValidationErrors={hasInputErrors}
-      hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
-      onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={shortAlertKey}
-      summary={summary}
-      currentStep={currentStep}
-      showDeposit={false}
       confirmButtonConfig={{
         stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
         buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
         buttonAction: orderSideAction as ButtonAction,
       }}
+      currentStep={currentStep}
+      hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
+      hasValidationErrors={hasValidationErrors}
+      onClearInputs={() => dispatch(tradeFormActions.reset())}
+      shouldEnableTrade={shouldEnableTrade}
+      showDeposit={false}
+      tradingUnavailable={tradingUnavailable}
     />
   );
 
   // prevent real trading if null/zero oracle price or we are out of sync with form state
-  if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
+  if (!hasMarketData) {
     return <LoadingSpace />;
   }
 
@@ -273,7 +217,11 @@ export const TradeForm = ({
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <>
           <PositionPreview />
-          {alertContent}
+          <TradeFormAlertContent
+            placeOrderError={placeOrderError}
+            isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+            primaryAlert={primaryAlert}
+          />
         </>
       ) : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       currentStep && currentStep === MobilePlaceOrderSteps.EditOrder ? (
@@ -412,11 +360,6 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
-
-const $IconButton = styled(IconButton)`
-  --button-backgroundColor: var(--color-white-faded);
-  flex-shrink: 0;
-`;
 
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}

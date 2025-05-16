@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit } from '@/constants/trade';
 
+import { useResizeObserver } from '@/hooks/useResizeObserver';
+
 import { Input, InputType } from '@/components/Input';
 
 export const ResponsiveSizeInput = ({
@@ -40,19 +42,20 @@ export const ResponsiveSizeInput = ({
 }) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [fontSize, setFontSize] = useState(maxFontSize);
+  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Listen for window resize events
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
+  const { width } = useResizeObserver({
+    ref: containerRef,
+    box: 'border-box',
+  });
 
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  useEffect(() => {
+    if (width) {
+      setWindowWidth(width);
+    }
+  }, [width]);
 
   // Adjust input width and font size based on content and window width
   useEffect(() => {
