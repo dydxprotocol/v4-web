@@ -83,6 +83,8 @@ interface CancelOrderPayload {
   originalOrder: ConvertBigNumberToNumber<SubaccountOrder> | undefined;
 }
 
+const BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION = 0.75;
+
 export class AccountTransactionSupervisor {
   private store: RootStore;
 
@@ -369,7 +371,10 @@ export class AccountTransactionSupervisor {
     }
 
     // Get current blockchain height for goodTilBlock
-    const currentHeight = estimateLiveValidatorHeight(state);
+    const currentHeight = estimateLiveValidatorHeight(
+      state,
+      BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+    );
     if (currentHeight == null) {
       logBonsaiError(
         'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
@@ -604,7 +609,10 @@ export class AccountTransactionSupervisor {
       );
     }
 
-    const currentHeight = estimateLiveValidatorHeight(this.store.getState());
+    const currentHeight = estimateLiveValidatorHeight(
+      this.store.getState(),
+      BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+    );
     if (currentHeight == null) {
       return wrapSimpleError(
         'AccountTransactionSupervisor/placeOrder',
