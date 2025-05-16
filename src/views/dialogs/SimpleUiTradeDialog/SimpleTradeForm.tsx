@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
@@ -42,7 +42,7 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
-import { AttemptBigNumber, BIG_NUMBERS } from '@/lib/numbers';
+import { AttemptBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
@@ -71,20 +71,15 @@ export const SimpleTradeForm = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentForm = useAppSelector(getCurrentTradePageForm);
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
-
+  const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
   const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
-  );
-
-  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
-    useAppSelector(BonsaiHelpers.currentMarket.marketInfo)
   );
 
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [clientId, setClientId] = useState<string>();
 
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
-  const freeCollateral = summary.accountDetailsBefore?.account?.freeCollateral;
   const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
 
   const hasInputErrors =
@@ -95,20 +90,6 @@ export const SimpleTradeForm = ({
       dispatch(tradeFormActions.setMarketId(ticker));
     }
   }, [ticker, dispatch]);
-
-  const buyingPower = useMemo(() => {
-    const defaultMaxLeverage = initialMarginFraction
-      ? BIG_NUMBERS.ONE.div(initialMarginFraction)
-      : null;
-
-    const updatedMaxLeverage = effectiveInitialMarginFraction
-      ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
-      : null;
-
-    const maxLeverage = updatedMaxLeverage ?? defaultMaxLeverage;
-
-    return freeCollateral?.times(maxLeverage ?? 1);
-  }, [initialMarginFraction, effectiveInitialMarginFraction, freeCollateral]);
 
   const onLastOrderIndexed = useCallback(() => {
     if (currentStep === SimpleUiTradeDialogSteps.Submit) {

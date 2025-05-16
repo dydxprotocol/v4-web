@@ -9,9 +9,11 @@ import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
+import { BIG_NUMBERS } from '@/lib/numbers';
 
 import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
+import { getMarketEffectiveInitialMarginForMarket } from '../calculators/markets';
 import {
   calculateAllOrders,
   calculateOpenOrders,
@@ -208,6 +210,31 @@ export const selectAccountFillsLoading = createAppSelector(
 export const selectAccountBlockRewardsLoading = createAppSelector(
   [selectRawBlockTradingRewardsRest, selectRawParentSubaccount],
   mergeLoadableStatus
+);
+
+export const selectCurrentMarketBuyingPower = createAppSelector(
+  [selectCurrentMarketInfoRaw, selectParentSubaccountSummary],
+  (market, parentSubaccountSummary) => {
+    if (market == null || parentSubaccountSummary == null) {
+      return undefined;
+    }
+
+    const { initialMarginFraction } = market;
+    const { freeCollateral } = parentSubaccountSummary;
+    const effectiveInitialMarginFraction = getMarketEffectiveInitialMarginForMarket(market);
+
+    const defaultMaxLeverage = initialMarginFraction
+      ? BIG_NUMBERS.ONE.div(initialMarginFraction)
+      : null;
+
+    const updatedMaxLeverage = effectiveInitialMarginFraction
+      ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+      : null;
+
+    const maxLeverage = updatedMaxLeverage ?? defaultMaxLeverage;
+
+    return freeCollateral.times(maxLeverage ?? 1);
+  }
 );
 
 export const selectAccountTransfers = createAppSelector(

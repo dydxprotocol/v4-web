@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -14,39 +14,15 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getAssetDescriptionStringKeys } from '@/lib/assetUtils';
 import { hasText } from '@/lib/hasString';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AssetDetails = () => {
   const stringGetter = useStringGetter();
-  const freeCollateral = useAppSelector(
-    BonsaiCore.account.parentSubaccountSummary.data
-  )?.freeCollateral;
   const marketData = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
-  const {
-    assetId,
-    volume24H,
-    marketCap,
-    openInterestUSDC,
-    nextFundingRate,
-    initialMarginFraction,
-    effectiveInitialMarginFraction,
-  } = marketData;
+  const { assetId, volume24H, marketCap, openInterestUSDC, nextFundingRate } = marketData;
   const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
-
-  const buyingPower = useMemo(() => {
-    const defaultMaxLeverage = initialMarginFraction
-      ? BIG_NUMBERS.ONE.div(initialMarginFraction)
-      : null;
-
-    const updatedMaxLeverage = effectiveInitialMarginFraction
-      ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
-      : null;
-
-    const maxLeverage = updatedMaxLeverage ?? defaultMaxLeverage;
-
-    return freeCollateral?.times(maxLeverage ?? 1);
-  }, [initialMarginFraction, effectiveInitialMarginFraction, freeCollateral]);
+  const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
 
   const detailItems = useMemo(() => {
     const nextFundingRateBN = MustBigNumber(nextFundingRate);
