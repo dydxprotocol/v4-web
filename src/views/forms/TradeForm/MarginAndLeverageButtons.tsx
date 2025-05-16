@@ -25,5 +25,6 @@ const $MarginAndLeverageButtons = styled.div`
     ${layoutMixins.flexExpandToSpace}
     height: 2.25rem;
     flex-basis: 100%;
+    width: 100%;
   }
 `;

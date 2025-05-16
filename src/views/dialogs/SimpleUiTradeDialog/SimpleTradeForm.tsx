@@ -1,22 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
-import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { ErrorType } from '@/bonsai/lib/validationErrors';
+import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
-import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
-import { useComplianceState } from '@/hooks/useComplianceState';
-import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
+import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -28,20 +22,12 @@ import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { SimpleUiPopover } from '@/components/SimpleUiPopover';
 import { useTradeTypeOptions } from '@/views/forms/TradeForm/useTradeTypeOptions';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import {
-  getCurrentTradePageForm,
-  getTradeFormSummary,
-  getTradeFormValues,
-} from '@/state/tradeFormSelectors';
+import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
-import { track } from '@/lib/analytics/analytics';
-import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { AttemptBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -60,30 +46,21 @@ export const SimpleTradeForm = ({
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const { connectionError } = useApiState();
-  const { complianceState } = useComplianceState();
+  const [placeOrderPayload, setPlaceOrderPayload] = useState<PlaceOrderPayload>();
+
   const { selectedTradeType } = useTradeTypeOptions();
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const tradeValues = useAppSelector(getTradeFormValues);
-  const { errors: tradeErrors, summary } = useAppSelector(getTradeFormSummary);
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
-  const subaccountNumber = useAppSelector(getSubaccountId);
-  const currentForm = useAppSelector(getCurrentTradePageForm);
+  const { summary } = useAppSelector(getTradeFormSummary);
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
   const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const [placeOrderError, setPlaceOrderError] = useState<string>();
-  const [clientId, setClientId] = useState<string>();
-
   const marginUsage = summary.accountDetailsAfter?.account?.marginUsage;
   const effectiveSizes = orEmptyObj(summary.tradeInfo.inputSummary.size);
-
-  const hasInputErrors =
-    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentForm !== 'TRADE';
 
   useEffect(() => {
     if (ticker) {
@@ -97,7 +74,10 @@ export const SimpleTradeForm = ({
     }
   }, [currentStep, setCurrentStep]);
 
-  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
+  const { placeOrderError, placeOrder, unIndexedClientId, shouldEnableTrade } = useTradeForm({
+    source: TradeFormSource.SimpleTradeForm,
+    onLastOrderIndexed,
+  });
 
   const onSubmitOrder = async () => {
     const payload = summary.tradePayload;
@@ -105,22 +85,14 @@ export const SimpleTradeForm = ({
       return;
     }
     setCurrentStep(SimpleUiTradeDialogSteps.Submit);
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
-    const result = await accountTransactionManager.placeOrder(payload);
-    if (isOperationSuccess(result)) {
-      const payloadClientId = payload.clientId.toString();
-      setUnIndexedClientId(payloadClientId);
-      setClientId(payloadClientId);
-    } else {
-      const errorParams = operationFailureToErrorParams(result);
-      setPlaceOrderError(
-        stringGetter({
-          key: errorParams.errorStringKey,
-          fallback: errorParams.errorMessage ?? '',
-        })
-      );
-      setCurrentStep(SimpleUiTradeDialogSteps.Error);
-    }
+    placeOrder({
+      onPlaceOrder: (tradePayload) => {
+        setPlaceOrderPayload(tradePayload);
+      },
+      onFailure: () => {
+        setCurrentStep(SimpleUiTradeDialogSteps.Error);
+      },
+    });
   };
 
   const onUSDCInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
@@ -275,29 +247,14 @@ export const SimpleTradeForm = ({
       <SimpleTradeSteps
         currentStep={currentStep}
         placeOrderError={placeOrderError}
-        clientId={clientId}
-        payload={summary.tradePayload}
+        clientId={unIndexedClientId}
+        payload={placeOrderPayload}
         onClose={onClose}
       />
     );
   }
 
   const inputConfig = inputConfigs[displayUnit];
-
-  const hasMissingData = subaccountNumber === undefined;
-
-  const closeOnlyTradingUnavailable =
-    complianceState === ComplianceStates.CLOSE_ONLY &&
-    selectedTradeType !== TradeFormType.MARKET &&
-    currentForm !== 'CLOSE_POSITION';
-
-  const tradingUnavailable =
-    closeOnlyTradingUnavailable ||
-    complianceState === ComplianceStates.READ_ONLY ||
-    connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
-
-  const shouldEnableTrade =
-    canAccountTrade && !hasMissingData && !hasInputErrors && !tradingUnavailable;
 
   return (
     <div tw="flexColumn items-center gap-2 px-1.25 pb-[5.25rem] pt-[6.5vh]">
