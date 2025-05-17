@@ -78,6 +78,7 @@ export const TradeForm = ({
     hasMarketData,
   } = useTradeForm({
     source: TradeFormSource.TradeForm,
+    fullFormSummary: fullTradeFormState,
     onLastOrderIndexed,
   });
 
@@ -143,7 +144,11 @@ export const TradeForm = ({
       }
       case MobilePlaceOrderSteps.PreviewOrder:
       default: {
-        placeOrder();
+        placeOrder({
+          onPlaceOrder: () => {
+            dispatch(tradeFormActions.reset());
+          },
+        });
         setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
         break;
       }

@@ -1,8 +1,8 @@
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
-import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { TradeFormInputData, TradeFormSummary, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
-import { ErrorType } from '@/bonsai/lib/validationErrors';
+import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import { getCurrentTradePageForm, getTradeFormSummary } from '@/state/tradeFormSelectors';
+import { getCurrentTradePageForm } from '@/state/tradeFormSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { useDisappearingValue } from '@/lib/disappearingValue';
@@ -30,15 +30,28 @@ import { useOnOrderIndexed } from '../useOnOrderIndexed';
 import { useStringGetter } from '../useStringGetter';
 
 export enum TradeFormSource {
-  TradeForm = 'TradeForm',
+  ClosePositionForm = 'ClosePositionForm',
   SimpleTradeForm = 'SimpleTradeForm',
+  TradeForm = 'TradeForm',
 }
 
 export const useTradeForm = ({
   source,
+  fullFormSummary,
   onLastOrderIndexed,
 }: {
   source: string;
+  fullFormSummary:
+    | {
+        errors: ValidationError[];
+        summary: TradeFormSummary;
+        inputData?: undefined;
+      }
+    | {
+        inputData: TradeFormInputData;
+        summary: TradeFormSummary;
+        errors: ValidationError[];
+      };
   onLastOrderIndexed: () => void;
 }) => {
   const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
@@ -57,18 +70,19 @@ export const useTradeForm = ({
     showAssetIcon: true,
   });
 
-  const fullTradeFormState = useAppSelector(getTradeFormSummary);
   const currentInput = useAppSelector(getCurrentTradePageForm);
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  const { errors: tradeErrors, summary } = fullTradeFormState;
+  const { errors: tradeErrors, summary } = fullFormSummary;
   const tradeFormInputValues = summary.effectiveTrade;
   const { marketId } = tradeFormInputValues;
+  const isClosePosition = source === TradeFormSource.ClosePositionForm;
   const hasValidationErrors =
-    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
+    !!tradeErrors.some((error) => error.type === ErrorType.error) ||
+    (!isClosePosition && currentInput !== 'TRADE');
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -84,6 +98,7 @@ export const useTradeForm = ({
 
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
+
   const placeOrder = async ({
     onPlaceOrder,
     onSuccess,
@@ -99,17 +114,24 @@ export const useTradeForm = ({
       return;
     }
     onPlaceOrder?.(payload);
-    dispatch(tradeFormActions.reset());
-    logBonsaiInfo(source, 'attempting place order', {
-      fullTradeFormState: purgeBigNumbers(fullTradeFormState),
-    });
     track(
       AnalyticsEvents.TradePlaceOrderClick({
         ...payload,
-        isClosePosition: false,
-        isSimpleUi: source === 'SimpleTradeForm',
+        isClosePosition: source === TradeFormSource.ClosePositionForm,
+        isSimpleUi: source === TradeFormSource.SimpleTradeForm,
       })
     );
+    dispatch(tradeFormActions.reset());
+    logBonsaiInfo(
+      source,
+      source === TradeFormSource.ClosePositionForm
+        ? 'attempting close position'
+        : 'attempting place order',
+      {
+        fullTradeFormState: purgeBigNumbers(fullFormSummary),
+      }
+    );
+
     const result = await accountTransactionManager.placeOrder(payload);
     if (isOperationSuccess(result)) {
       setUnIndexedClientId(payload.clientId.toString());
