@@ -83,7 +83,8 @@ interface CancelOrderPayload {
   originalOrder: ConvertBigNumberToNumber<SubaccountOrder> | undefined;
 }
 
-const BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION = 0.75;
+const BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION = 0.9;
+export const SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN = 5;
 
 export class AccountTransactionSupervisor {
   private store: RootStore;
@@ -434,7 +435,8 @@ export class AccountTransactionSupervisor {
         };
 
         // Calculate goodTilBlock if we have current height
-        const goodTilBlock = currentHeight + SHORT_TERM_ORDER_DURATION;
+        const goodTilBlock =
+          currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN;
 
         // Return the order payload
         return {
@@ -635,7 +637,9 @@ export class AccountTransactionSupervisor {
     const payload: PlaceOrderPayload = {
       ...payloadBase,
       currentHeight,
-      goodTilBlock: isShortTermOrder ? currentHeight + SHORT_TERM_ORDER_DURATION : undefined,
+      goodTilBlock: isShortTermOrder
+        ? currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
+        : undefined,
     };
 
     this.store.dispatch(
