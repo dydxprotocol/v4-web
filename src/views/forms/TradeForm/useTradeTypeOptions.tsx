@@ -38,12 +38,13 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
       label: stringGetter({
         key: stringKey,
       }),
-      slotBefore: showAssetIcon ? (
-        <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
-      ) : undefined,
+      slotBefore:
+        showAssetIcon && selectedTradeType === value ? (
+          <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
+        ) : undefined,
     }));
     return allItems;
-  }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions]);
+  }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions, selectedTradeType]);
 
   const asSubItems = useMemo((): Array<MenuItem<TradeFormType>> => {
     if (allTradeTypeItems == null || allTradeTypeItems.length === 0) {

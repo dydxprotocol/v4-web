@@ -1,25 +1,21 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { TradeFormType } from '@/bonsai/forms/trade/types';
-import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
-import { logBonsaiInfo } from '@/bonsai/logs';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
+import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -36,19 +32,8 @@ import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
-import { getCurrentMarketOraclePrice } from '@/state/perpetualsSelectors';
 import { tradeFormActions } from '@/state/tradeForm';
-import {
-  getCurrentTradePageForm,
-  getTradeFormRawState,
-  getTradeFormSummary,
-} from '@/state/tradeFormSelectors';
-
-import { track } from '@/lib/analytics/analytics';
-import { useDisappearingValue } from '@/lib/disappearingValue';
-import { operationFailureToErrorParams } from '@/lib/errorHelpers';
-import { isTruthy } from '@/lib/isTruthy';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
+import { getTradeFormRawState, getTradeFormSummary } from '@/state/tradeFormSelectors';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeSideTabs } from '../TradeSideTabs';
@@ -76,29 +61,42 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [placeOrderError, setPlaceOrderError] = useDisappearingValue<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
-
-  const fullTradeFormState = useAppSelector(getTradeFormSummary);
-  const { errors: tradeErrors, summary } = fullTradeFormState;
-
-  const currentInput = useAppSelector(getCurrentTradePageForm);
-
-  const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
   const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
-  const dispatch = useAppDispatch();
+  const fullTradeFormState = useAppSelector(getTradeFormSummary);
+  const { getNotificationPreferenceForType } = useNotifications();
+
+  const onLastOrderIndexed = useCallback(() => {
+    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
+      setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
+    }
+  }, [currentStep, setCurrentStep]);
+
+  const {
+    placeOrderError,
+    placeOrder,
+    hasValidationErrors,
+    tradingUnavailable,
+    shouldEnableTrade,
+    hasMarketData,
+  } = useTradeForm({
+    source: TradeFormSource.TradeForm,
+    fullFormSummary: fullTradeFormState,
+    onLastOrderIndexed,
+  });
 
   useEffect(() => {
     dispatch(tradeFormActions.setMarketId(currentMarketId));
   }, [currentMarketId, dispatch]);
 
+  const { errors: tradeErrors, summary } = fullTradeFormState;
   const tradeFormInputValues = summary.effectiveTrade;
-
-  const { marketId, side } = tradeFormInputValues;
+  const { side } = tradeFormInputValues;
   const selectedOrderSide = side ?? OrderSide.BUY;
 
   const { selectedTradeType, tradeTypeItems: allTradeTypeItems } = useTradeTypeOptions({
@@ -123,11 +121,6 @@ export const TradeForm = ({
       rawInput.postOnly,
       rawInput.timeInForce,
     ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
-
-  const hasInputErrors =
-    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
-
-  const { getNotificationPreferenceForType } = useNotifications();
 
   const { alertContent, shortAlertKey, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
     const primaryAlert = getHighestPriorityAlert(tradeErrors);
@@ -179,45 +172,14 @@ export const TradeForm = ({
       }
       case MobilePlaceOrderSteps.PreviewOrder:
       default: {
-        onPlaceOrder();
+        placeOrder({
+          onPlaceOrder: () => {
+            dispatch(tradeFormActions.reset());
+          },
+        });
         setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
         break;
       }
-    }
-  };
-
-  const onLastOrderIndexed = useCallback(() => {
-    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-      setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
-    }
-  }, [currentStep, setCurrentStep]);
-
-  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
-
-  const onPlaceOrder = async () => {
-    setPlaceOrderError(undefined);
-    const payload = summary.tradePayload;
-    if (payload == null || hasInputErrors) {
-      return;
-    }
-    dispatch(tradeFormActions.reset());
-
-    logBonsaiInfo('TradeForm', 'attempting place order', {
-      fullTradeFormState: purgeBigNumbers(fullTradeFormState),
-    });
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: false }));
-    const result = await accountTransactionManager.placeOrder(payload);
-    if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
-    } else {
-      const errorParams = operationFailureToErrorParams(result);
-      setPlaceOrderError(
-        stringGetter({
-          key: errorParams.errorStringKey,
-          fallback: errorParams.errorMessage ?? '',
-        })
-      );
-      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
     }
   };
 
@@ -280,23 +242,24 @@ export const TradeForm = ({
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
-      hasValidationErrors={hasInputErrors}
-      hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
-      onClearInputs={() => dispatch(tradeFormActions.reset())}
       actionStringKey={shortAlertKey}
-      summary={summary}
-      currentStep={currentStep}
-      showDeposit={false}
       confirmButtonConfig={{
         stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
         buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
         buttonAction: orderSideAction as ButtonAction,
       }}
+      currentStep={currentStep}
+      hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
+      hasValidationErrors={hasValidationErrors}
+      onClearInputs={() => dispatch(tradeFormActions.reset())}
+      shouldEnableTrade={shouldEnableTrade}
+      showDeposit={false}
+      tradingUnavailable={tradingUnavailable}
     />
   );
 
   // prevent real trading if null/zero oracle price or we are out of sync with form state
-  if (!isTruthy(oraclePrice) || currentMarketId !== marketId) {
+  if (!hasMarketData) {
     return <LoadingSpace />;
   }
 

@@ -46,6 +46,7 @@ import {
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
+  selectCurrentMarketBuyingPower,
   selectCurrentMarketInfoRaw,
   selectCurrentMarketOpenOrders,
   selectCurrentMarketOrderHistory,
@@ -319,6 +320,7 @@ interface BonsaiHelpersShape {
     assetName: BasicSelector<string | undefined>;
 
     account: {
+      buyingPower: BasicSelector<BigNumber | undefined>;
       openOrders: BasicSelector<SubaccountOrder[]>;
       orderHistory: BasicSelector<SubaccountOrder[]>;
       fills: BasicSelector<SubaccountFill[]>;
@@ -386,6 +388,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
       loading: selectCurrentMarketOrderbookLoading,
     },
     account: {
+      buyingPower: selectCurrentMarketBuyingPower,
       openOrders: selectCurrentMarketOpenOrders,
       orderHistory: selectCurrentMarketOrderHistory,
       fills: getCurrentMarketAccountFills,
