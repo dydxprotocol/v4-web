@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MarginMode } from '@/bonsai/forms/trade/types';
+import { MarginMode, TradeFormSummary } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -34,7 +34,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
+import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
@@ -57,6 +57,7 @@ type ElementProps = {
   onClearInputs: () => void;
   shouldEnableTrade: boolean;
   showDeposit?: boolean;
+  summary?: TradeFormSummary;
   tradingUnavailable: boolean;
 };
 
@@ -69,13 +70,13 @@ export const PlaceOrderButtonAndReceipt = ({
   onClearInputs,
   shouldEnableTrade,
   showDeposit,
+  summary,
   tradingUnavailable,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const { complianceState } = useComplianceState();
-  const summary = useAppSelector(getTradeFormSummary).summary;
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
@@ -146,7 +147,7 @@ export const PlaceOrderButtonAndReceipt = ({
           getDoubleValuesHasDiff(
             marginValueMaintenance?.toNumber(),
             postOrderPositionData.marginValueMaintenance?.toNumber() ??
-              (summary.tradeInfo.isPositionClosed ? 0 : undefined)
+              (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }
       />

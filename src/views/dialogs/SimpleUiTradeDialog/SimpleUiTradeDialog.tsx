@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ExecutionType, OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
+import { ExecutionType, OrderSide, TimeInForce, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -48,7 +48,12 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
       dispatch(tradeFormActions.reset());
       dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setOrderType(tradeType));
-      dispatch(tradeFormActions.setExecution(ExecutionType.IOC));
+
+      if (tradeType === TradeFormType.MARKET) {
+        dispatch(tradeFormActions.setExecution(ExecutionType.IOC));
+      } else {
+        dispatch(tradeFormActions.setTimeInForce(TimeInForce.GTT));
+      }
     },
     [dispatch, side]
   );
@@ -136,6 +141,7 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
           </div>
         );
       }
+      // TODO: Localize strings when 1.1.291 is released
       case SimpleUiTradeDialogSteps.Submit:
         return (
           <div>
