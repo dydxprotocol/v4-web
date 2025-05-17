@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -17,6 +18,7 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
 import { getOrderByClientId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import {
@@ -40,6 +42,10 @@ export const SimpleTradeSteps = ({
 }) => {
   const stringGetter = useStringGetter();
   const orderFromClientId = orEmptyObj(useAppSelectorWithArgs(getOrderByClientId, clientId ?? ''));
+
+  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
 
   const { side, totalFilled, price, marketId, typeString, sideString, sideColor } = useMemo(() => {
     if (currentStep === SimpleUiTradeDialogSteps.Submit) {
@@ -103,14 +109,19 @@ export const SimpleTradeSteps = ({
       <div tw="flexColumn gap-0.5 text-center">
         <div tw="row gap-[0.5ch] font-extra-large-bold">
           <span css={{ color: sideColor }}>{sideString}</span>
-          <Output type={OutputType.Asset} value={totalFilled} />
+          <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
           <span>{displayableAsset}</span>
         </div>
 
         <span tw="font-medium-book">
           <span tw="text-color-text-2">{typeString}</span>
           <span tw="text-color-text-0"> @ </span>
-          <Output tw="inline text-color-text-1" type={OutputType.Fiat} value={price} />
+          <Output
+            tw="inline text-color-text-1"
+            type={OutputType.Fiat}
+            value={price}
+            fractionDigits={tickSizeDecimals}
+          />
         </span>
       </div>
     );

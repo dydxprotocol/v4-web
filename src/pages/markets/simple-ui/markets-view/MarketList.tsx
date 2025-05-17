@@ -34,7 +34,7 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
     case MarketsSortType.Price:
       return orderBy(markets, (market) => market.oraclePrice, ['desc']);
     case MarketsSortType.Volume:
-      return orderBy(markets, (market) => market.volume24h, ['desc']);
+      return orderBy(markets, (market) => market.volume24h ?? 0, ['desc']);
     case MarketsSortType.Gainers:
       return orderBy(markets, (market) => market.percentChange24h, ['desc']);
     case MarketsSortType.Losers:
@@ -319,7 +319,7 @@ export const MarketList = ({
       </div>
 
       <div
-        tw="fixed bottom-0 left-0 right-0 flex h-[5.5rem]"
+        tw="fixed bottom-0 left-0 right-0 z-10 flex h-[5.5rem]"
         css={{
           display: isSearchOpen ? 'none' : 'flex',
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',

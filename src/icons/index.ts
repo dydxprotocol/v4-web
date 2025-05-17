@@ -43,6 +43,7 @@ export { default as GovernanceIcon } from './governance.svg';
 export { default as HelpCircleIcon } from './help-circle.svg';
 export { default as HideIcon } from './hide.svg';
 export { default as HistoryIcon } from './history.svg';
+export { default as InfoIcon } from './info-circle.svg';
 export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LightningIcon } from './lightning.svg';
 export { default as LinkOutIcon } from './link-out.svg';
