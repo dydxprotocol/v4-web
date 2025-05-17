@@ -1,8 +1,13 @@
+import { forwardRef } from 'react';
+
 import { Content, Item, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu';
+import { CaretDownIcon } from '@radix-ui/react-icons';
 import { Fragment } from 'react/jsx-runtime';
+import styled from 'styled-components';
 
 import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
 
+import { Button, ButtonProps } from './Button';
 import { DropdownMenuItem } from './DropdownMenu';
 
 type StyleProps = {
@@ -83,3 +88,20 @@ export const SimpleUiDropdownMenu = forwardRefFn(
     );
   }
 );
+
+export const DropdownMenuTrigger = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+  ({ children, ...props }, ref) => (
+    <DropdownMenuButton {...props} ref={ref}>
+      {children} <CaretDownIcon />
+    </DropdownMenuButton>
+  )
+);
+
+const DropdownMenuButton = styled(Button)`
+  &[data-state='open'] {
+    svg {
+      transition: rotate 0.3s var(--ease-out-expo);
+      rotate: -0.5turn;
+    }
+  }
+`;
