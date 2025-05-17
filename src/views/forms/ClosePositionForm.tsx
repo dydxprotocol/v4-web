@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
-import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
-import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
-import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
@@ -18,11 +14,11 @@ import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
+import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useOnOrderIndexed } from '@/hooks/useOnOrderIndexed';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -53,12 +49,8 @@ import {
   getClosePositionFormValues,
 } from '@/state/tradeFormSelectors';
 
-import { track } from '@/lib/analytics/analytics';
-import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
-import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
-import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -88,10 +80,6 @@ export const ClosePositionForm = ({
   const isFirstRender = useIsFirstRender();
   const enableLimitClose = useStatsigGateValue(StatsigFlags.ffEnableLimitClose);
 
-  const [closePositionError, setClosePositionError] = useDisappearingValue<string | undefined>(
-    undefined
-  );
-
   const market = useAppSelector(getCurrentMarketIdIfTradeable);
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
 
@@ -113,6 +101,30 @@ export const ClosePositionForm = ({
     limitPriceInput,
     onLimitPriceInput,
   } = useClosePositionFormInputs();
+
+  const onLastOrderIndexed = useCallback(() => {
+    if (!isFirstRender) {
+      dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
+      dispatch(closePositionFormActions.reset());
+      dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
+      onClosePositionSuccess?.();
+
+      if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
+        setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
+      }
+    }
+  }, [currentStep, dispatch, isFirstRender, onClosePositionSuccess, setCurrentStep]);
+
+  const {
+    placeOrderError: closePositionError,
+    placeOrder,
+    shouldEnableTrade,
+    tradingUnavailable,
+  } = useTradeForm({
+    source: TradeFormSource.ClosePositionForm,
+    fullFormSummary: fullSummary,
+    onLastOrderIndexed,
+  });
 
   const currentPositionData = useAppSelector(getCurrentMarketPositionData);
   const { signedSize: currentPositionSize } = currentPositionData ?? {};
@@ -158,21 +170,6 @@ export const ClosePositionForm = ({
     dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
   }, [market, currentStep, dispatch]);
 
-  const onLastOrderIndexed = useCallback(() => {
-    if (!isFirstRender) {
-      dispatch(closePositionFormActions.setOrderType(TradeFormType.MARKET));
-      dispatch(closePositionFormActions.reset());
-      dispatch(closePositionFormActions.setSizeAvailablePercent('1'));
-      onClosePositionSuccess?.();
-
-      if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-        setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
-      }
-    }
-  }, [currentStep, dispatch, isFirstRender, onClosePositionSuccess, setCurrentStep]);
-
-  const { setUnIndexedClientId } = useOnOrderIndexed(onLastOrderIndexed);
-
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -189,38 +186,17 @@ export const ClosePositionForm = ({
       }
       case MobilePlaceOrderSteps.PreviewOrder:
       default: {
-        onClosePosition();
+        placeOrder({
+          onFailure: () => {
+            setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
+          },
+          onPlaceOrder: () => {
+            onClearInputs();
+          },
+        });
         setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
         break;
       }
-    }
-  };
-
-  const onClosePosition = async () => {
-    setClosePositionError(undefined);
-
-    const payload = summary.tradePayload;
-    if (payload == null || hasInputErrors) {
-      return;
-    }
-    onClearInputs();
-    track(AnalyticsEvents.TradePlaceOrderClick({ ...payload, isClosePosition: true }));
-    logBonsaiInfo('ClosePositionForm', 'attempting close position', {
-      fullTradeFormState: purgeBigNumbers(fullSummary),
-    });
-
-    const result = await accountTransactionManager.placeOrder(payload);
-    if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
-    } else {
-      const errorParams = operationFailureToErrorParams(result);
-      setClosePositionError(
-        stringGetter({
-          key: errorParams.errorStringKey,
-          fallback: errorParams.errorMessage ?? '',
-        })
-      );
-      setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
     }
   };
 
@@ -361,6 +337,8 @@ export const ClosePositionForm = ({
         onClearInputs={onClearInputs}
         actionStringKey={shortAlertKey}
         summary={summary}
+        shouldEnableTrade={shouldEnableTrade}
+        tradingUnavailable={tradingUnavailable}
         currentStep={currentStep}
         confirmButtonConfig={{
           stringKey: STRING_KEYS.CLOSE_ORDER,

@@ -52,7 +52,8 @@ export const SimpleTradeForm = ({
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const tradeValues = useAppSelector(getTradeFormValues);
-  const { summary } = useAppSelector(getTradeFormSummary);
+  const fullFormSummary = useAppSelector(getTradeFormSummary);
+  const { summary } = fullFormSummary;
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
   const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
@@ -76,6 +77,7 @@ export const SimpleTradeForm = ({
 
   const { placeOrderError, placeOrder, unIndexedClientId, shouldEnableTrade } = useTradeForm({
     source: TradeFormSource.SimpleTradeForm,
+    fullFormSummary,
     onLastOrderIndexed,
   });
 
@@ -88,6 +90,7 @@ export const SimpleTradeForm = ({
     placeOrder({
       onPlaceOrder: (tradePayload) => {
         setPlaceOrderPayload(tradePayload);
+        dispatch(tradeFormActions.reset());
       },
       onFailure: () => {
         setCurrentStep(SimpleUiTradeDialogSteps.Error);
