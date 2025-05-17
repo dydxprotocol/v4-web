@@ -79,8 +79,10 @@ export const useTradeForm = ({
   const { errors: tradeErrors, summary } = fullFormSummary;
   const tradeFormInputValues = summary.effectiveTrade;
   const { marketId } = tradeFormInputValues;
+  const isClosePosition = source === TradeFormSource.ClosePositionForm;
   const hasValidationErrors =
-    !!tradeErrors.some((error) => error.type === ErrorType.error) || currentInput !== 'TRADE';
+    !!tradeErrors.some((error) => error.type === ErrorType.error) ||
+    (!isClosePosition && currentInput !== 'TRADE');
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -96,6 +98,7 @@ export const useTradeForm = ({
 
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && !tradingUnavailable;
+
   const placeOrder = async ({
     onPlaceOrder,
     onSuccess,

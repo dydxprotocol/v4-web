@@ -77,7 +77,7 @@ export const WithTooltip = ({
   return (
     <Provider>
       <Root delayDuration={300}>
-        <Trigger tw="row" asChild={!!slotTrigger}>
+        <Trigger asChild>
           {slotTrigger ?? (
             <$Abbr>
               {children}
