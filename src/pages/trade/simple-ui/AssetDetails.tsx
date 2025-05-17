@@ -4,6 +4,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
@@ -11,41 +12,69 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { MarketLinks } from '@/views/MarketLinks';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import { getAssetDescriptionStringKeys } from '@/lib/assetUtils';
+import { getAssetDescriptionStringKeys, getAssetFromMarketId } from '@/lib/assetUtils';
 import { hasText } from '@/lib/hasString';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-export const AssetDetails = () => {
+export const AssetDetails = ({ isLaunchableMarket }: { isLaunchableMarket?: boolean }) => {
   const stringGetter = useStringGetter();
+  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const assetId = getAssetFromMarketId(currentMarketId ?? '');
+  const launchableAsset = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetInfo, assetId);
   const marketData = orEmptyObj(useAppSelector(BonsaiHelpers.currentMarket.marketInfo));
-  const { assetId, volume24H, marketCap, openInterestUSDC, nextFundingRate } = marketData;
-  const { primary, secondary } = getAssetDescriptionStringKeys(assetId ?? '');
+  const { primary, secondary } = getAssetDescriptionStringKeys(marketData.assetId ?? '');
   const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
 
   const detailItems = useMemo(() => {
-    const nextFundingRateBN = MustBigNumber(nextFundingRate);
+    if (isLaunchableMarket) {
+      if (launchableAsset == null) {
+        return [];
+      }
+
+      return [
+        {
+          key: 'volume',
+          label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.VOLUME })}</span>,
+          value: <Output type={OutputType.CompactFiat} value={launchableAsset.volume24h} />,
+        },
+        {
+          key: 'marketCap',
+          label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.MARKET_CAP })}</span>,
+          value: (
+            <Output
+              type={OutputType.CompactFiat}
+              value={launchableAsset.marketCap ?? launchableAsset.reportedMarketCap}
+            />
+          ),
+        },
+      ];
+    }
+
+    const nextFundingRateBN = MustBigNumber(marketData.nextFundingRate);
     const fundingRateColor = nextFundingRateBN.isZero()
       ? 'text-color-text-2'
       : nextFundingRateBN.gt(0)
         ? 'text-color-green'
         : 'text-color-red';
+
     return [
       {
         key: 'volume',
         label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.VOLUME })}</span>,
-        value: <Output type={OutputType.CompactFiat} value={volume24H} />,
+        value: <Output type={OutputType.CompactFiat} value={marketData.volume24H} />,
       },
       {
         key: 'marketCap',
         label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.MARKET_CAP })}</span>,
-        value: <Output type={OutputType.CompactFiat} value={marketCap} />,
+        value: <Output type={OutputType.CompactFiat} value={marketData.marketCap} />,
       },
       {
         key: 'openInterest',
         label: <span tw="font-small-book">{stringGetter({ key: STRING_KEYS.OPEN_INTEREST })}</span>,
-        value: <Output type={OutputType.CompactFiat} value={openInterestUSDC} />,
+        value: <Output type={OutputType.CompactFiat} value={marketData.openInterestUSDC} />,
       },
       {
         key: 'fundingRate',
@@ -56,7 +85,7 @@ export const AssetDetails = () => {
               color: fundingRateColor,
             }}
             type={OutputType.SmallPercent}
-            value={nextFundingRate}
+            value={marketData.nextFundingRate}
             showSign={ShowSign.Both}
           />
         ),
@@ -67,7 +96,7 @@ export const AssetDetails = () => {
         value: <Output type={OutputType.Fiat} value={buyingPower} />,
       },
     ];
-  }, [stringGetter, buyingPower, volume24H, marketCap, openInterestUSDC, nextFundingRate]);
+  }, [stringGetter, buyingPower, launchableAsset, isLaunchableMarket, marketData]);
 
   const primaryDescription = stringGetter({ key: primary });
   const secondaryDescription = stringGetter({ key: secondary });
@@ -91,15 +120,23 @@ export const AssetDetails = () => {
       </div>
 
       <div tw="flexColumn">
-        <div tw="row mb-0.25 justify-between">
-          <span tw="text-color-text-2 font-medium-bold">
-            {stringGetter({ key: STRING_KEYS.ABOUT })}
-          </span>
+        {isLaunchableMarket ? (
           <MarketLinks
-            type="menu"
-            tw="font-large-book [&>a]:text-color-text-2 [&>a]:visited:text-color-text-2"
+            launchableMarketId={currentMarketId}
+            type="icons"
+            tw="[&>a]:text-color-text-2 [&>a]:visited:text-color-text-2"
           />
-        </div>
+        ) : (
+          <div tw="row mb-0.25 justify-between">
+            <span tw="text-color-text-2 font-medium-bold">
+              {stringGetter({ key: STRING_KEYS.ABOUT })}
+            </span>
+            <MarketLinks
+              type="menu"
+              tw="font-large-book [&>a]:text-color-text-2 [&>a]:visited:text-color-text-2"
+            />
+          </div>
+        )}
         {hasDescription && (
           <div>
             <p tw="font-small-book">{stringGetter({ key: primary })}</p>
