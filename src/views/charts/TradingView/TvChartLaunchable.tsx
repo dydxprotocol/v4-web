@@ -5,10 +5,16 @@ import type { TvWidget } from '@/constants/tvchart';
 import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
 import { useTradingViewLaunchable } from '@/hooks/tradingView/useTradingViewLaunchable';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+
+import { testFlags } from '@/lib/testFlags';
 
 import { BaseTvChart } from './BaseTvChart';
 
 export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
+
   const [tvWidget, setTvWidget] = useState<TvWidget>();
 
   useTradingViewLaunchable({
@@ -27,5 +33,5 @@ export const TvChartLaunchable = ({ marketId }: { marketId: string }) => {
     tvWidget,
   });
 
-  return <BaseTvChart tvWidget={tvWidget} />;
+  return <BaseTvChart isLaunchable tvWidget={tvWidget} isSimpleUi={isSimpleUi} />;
 };

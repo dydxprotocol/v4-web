@@ -17,7 +17,6 @@ import { Themes } from '@/styles/themes';
 import { AppTheme, type AppColorMode } from '@/state/appUiConfigs';
 
 import { getDisplayableTickerFromMarket } from '../assetUtils';
-import { testFlags } from '../testFlags';
 
 // Show order book candles instead of trade candles if there are no trades in that time period
 const MAX_NUM_TRADES_FOR_ORDERBOOK_PRICES = 1;
@@ -147,9 +146,11 @@ const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 export const getWidgetOverrides = ({
   appTheme,
   appColorMode,
+  isSimpleUi,
 }: {
   appTheme: AppTheme;
   appColorMode: AppColorMode;
+  isSimpleUi?: boolean;
 }) => {
   const theme = Themes[appTheme][appColorMode];
 
@@ -162,7 +163,7 @@ export const getWidgetOverrides = ({
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
       'paneProperties.backgroundType': 'solid' as const,
-
+      priceScaleSelectionStrategyName: isSimpleUi ? 'left' : undefined,
       'mainSeriesProperties.style': 1,
       'mainSeriesProperties.candleStyle.upColor': theme.positive,
       'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
@@ -193,7 +194,8 @@ export const getWidgetOverrides = ({
 };
 
 export const getWidgetOptions = (
-  isViewingUnlaunchedMarket?: boolean
+  isViewingUnlaunchedMarket?: boolean,
+  isSimpleUi?: boolean
 ): Partial<TradingTerminalWidgetOptions> & Pick<TradingTerminalWidgetOptions, 'container'> => {
   const disabledFeaturesForUnlaunchedMarket: TradingTerminalFeatureset[] = [
     'chart_scroll',
@@ -203,6 +205,8 @@ export const getWidgetOptions = (
   const disabledFeaturesForSimpleUi: TradingTerminalFeatureset[] = [
     'header_widget',
     'left_toolbar',
+    'display_market_status',
+    'legend_widget',
   ];
 
   const disabledFeatures: TradingTerminalFeatureset[] = [
@@ -215,7 +219,7 @@ export const getWidgetOptions = (
     'header_layouttoggle',
     'trading_account_manager',
     ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
-    ...(testFlags.simpleUi ? disabledFeaturesForSimpleUi : []),
+    ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
   ];
 
   return {

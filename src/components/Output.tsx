@@ -312,6 +312,7 @@ type ElementProps = {
 type StyleProps = {
   className?: string;
   withBaseFont?: boolean;
+  withSignColor?: boolean;
 };
 
 export type OutputProps = ElementProps & StyleProps;
@@ -334,6 +335,7 @@ export const Output = ({
   withSubscript = false,
   withParentheses,
   showSign = ShowSign.Negative,
+  withSignColor = false,
 
   dateOptions,
   relativeTimeOptions = {
@@ -455,6 +457,12 @@ export const Output = ({
         [ShowSign.None]: undefined,
       }[showSign];
 
+      const signColor = withSignColor
+        ? isNegative
+          ? 'var(--color-negative)'
+          : 'var(--color-positive)'
+        : 'currentColor';
+
       return (
         <$Number
           key={value?.toString()}
@@ -474,7 +482,15 @@ export const Output = ({
           withBaseFont={withBaseFont}
         >
           {slotLeft}
-          {sign && <span tw="text-[color:--output-sign-color]">{sign}</span>}
+          {sign && (
+            <span
+              css={{
+                color: `var(--output-sign-color, ${signColor})`,
+              }}
+            >
+              {sign}
+            </span>
+          )}
           {hasValue && renderedNumber}
           {slotRight}
           {tag && <Tag tw="ml-[0.5ch]">{tag}</Tag>}
@@ -489,7 +505,7 @@ export const Output = ({
 const $Text = styled.output<{ withParentheses?: boolean }>`
   --output-beforeString: '';
   --output-afterString: '';
-  --output-sign-color: currentColor;
+  --output-sign-color: ;
 
   ${layoutMixins.inlineRow}
   gap: 0;
