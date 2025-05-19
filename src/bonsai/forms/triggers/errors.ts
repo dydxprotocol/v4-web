@@ -116,12 +116,12 @@ export function getErrors(
   return validationErrors;
 }
 
-function validateTriggerOrder(
+export function validateTriggerOrder(
   isStopLoss: boolean,
   state: TriggerOrderState,
   details: TriggerOrderDetails,
   formState: TriggerOrdersFormState,
-  inputData: TriggerOrderInputData
+  inputData: Pick<TriggerOrderInputData, 'position' | 'market'>
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
   const { position, market } = inputData;
@@ -264,7 +264,10 @@ function validateTriggerOrder(
   return validationErrors;
 }
 
-function validateCustomSize(size: string, inputData: TriggerOrderInputData): ValidationError[] {
+function validateCustomSize(
+  size: string,
+  inputData: Pick<TriggerOrderInputData, 'position' | 'market'>
+): ValidationError[] {
   const { market, position } = inputData;
   if (!market || !position) return [];
 
