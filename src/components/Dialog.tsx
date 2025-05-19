@@ -23,6 +23,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { Icon, IconName } from '@/components/Icon';
 
+import { testFlags } from '@/lib/testFlags';
+
 export enum DialogPlacement {
   Default = 'Default',
   Sidebar = 'Sidebar',
@@ -214,6 +216,11 @@ const $Container = styled(Content)<{
 }>`
   /* Params */
   --dialog-inset: 1rem;
+
+  @media ${breakpoints.tablet} {
+    --dialog-inset: ${testFlags.simpleUi ? '2px' : '1rem'};
+  }
+
   --dialog-width: 30rem;
   --dialog-backgroundColor: var(--color-layer-3);
   --dialog-radius: 1rem;
@@ -358,6 +365,7 @@ const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
     var(--dialog-header-paddingBottom) var(--dialog-header-paddingRight);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
+  background: var(--dialog-header-backgroundColor, transparent);
 
   ${({ $withBorder }) =>
     $withBorder &&

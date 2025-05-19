@@ -253,6 +253,7 @@ export const AnalyticsEvents = unionize(
     TradePlaceOrderClick: ofType<
       PlaceOrderPayload & {
         isClosePosition: boolean;
+        isSimpleUi?: boolean;
       }
     >(),
     TradePlaceOrder: ofType<PlaceOrderPayload>(),

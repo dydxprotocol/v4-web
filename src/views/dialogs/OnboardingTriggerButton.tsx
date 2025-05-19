@@ -1,20 +1,11 @@
 import { OnboardingState } from '@/constants/account';
-import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
+import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
-
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { forceOpenDialog } from '@/state/dialogs';
-
-import { track } from '@/lib/analytics/analytics';
 
 type OnboardingTriggerButtonProps = {
   onClick?: () => void;
@@ -23,39 +14,28 @@ type OnboardingTriggerButtonProps = {
 type StyleProps = {
   className?: string;
   size?: ButtonSize;
+  shape?: ButtonShape;
 };
 
 export const OnboardingTriggerButton = ({
   onClick,
   className,
+  shape,
   size = ButtonSize.Small,
 }: OnboardingTriggerButtonProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
-  const openOnboardingDialog = () => {
-    onClick?.();
-    track(
-      AnalyticsEvents.OnboardingTriggerClick({
-        state: onboardingState,
-      })
-    );
-    dispatch(forceOpenDialog(DialogTypes.Onboarding()));
-  };
-
-  const { disableConnectButton } = useComplianceState();
-  const onboardingState = useAppSelector(getOnboardingState);
-  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const { openOnboardingDialog, onboardingState, isAccountViewOnly, isOnboardingDisabled } =
+    useOnboardingFlow({ onClick });
 
   return (
     <Button
       className={className}
       action={ButtonAction.Primary}
+      shape={shape}
       size={size}
       type={ButtonType.Button}
       state={{
-        isDisabled:
-          disableConnectButton ||
-          (onboardingState === OnboardingState.AccountConnected && isAccountViewOnly),
+        isDisabled: isOnboardingDisabled,
       }}
       onClick={openOnboardingDialog}
     >

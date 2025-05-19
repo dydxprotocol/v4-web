@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
 import type { ScaleConfig } from '@visx/scale';
+import { AreaProps } from '@visx/shape/lib/shapes/Area';
 import {
   Axis,
   DataProvider,
@@ -41,7 +42,14 @@ type GlyphSeriesProps<Datum extends {} = {}> = Parameters<
   typeof GlyphSeries<AxisScale, AxisScale, Datum>
 >[0];
 
-type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>[0];
+type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>[0] & {
+  aboveAreaProps?: AreaProps<Datum> & {
+    fillTo?: string;
+  };
+  belowAreaProps?: AreaProps<Datum> & {
+    fillTo?: string;
+  };
+};
 
 type ElementProps<Datum extends {}> = {
   selectedLocale: string;
@@ -79,6 +87,7 @@ type ElementProps<Datum extends {}> = {
   onZoom?: (_: { zoomDomain: number | undefined }) => void;
   slotEmpty: React.ReactNode;
   children?: React.ReactNode;
+  disableZoom?: boolean;
   className?: string;
 };
 
@@ -93,6 +102,7 @@ type StyleProps = {
   withGridColumns?: boolean;
   tickSpacingX?: number;
   tickSpacingY?: number;
+  withXAxis?: boolean;
 };
 
 export const TimeSeriesChart = <Datum extends {}>({
@@ -123,11 +133,13 @@ export const TimeSeriesChart = <Datum extends {}>({
   margin,
   padding,
   defaultZoomDomain,
+  disableZoom = false,
   minZoomDomain = 0,
   domainBasePadding = [0, 0],
   numGridLines,
   withGridRows = true,
   withGridColumns = false,
+  withXAxis = true,
   tickSpacingX = 150,
   tickSpacingY = 50,
 }: ElementProps<Datum> & StyleProps) => {
@@ -267,7 +279,7 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   // Events
   const onWheel = ({ deltaY }: React.WheelEvent) => {
-    if (!zoomDomain) return;
+    if (!zoomDomain || disableZoom) return;
 
     setZoomDomain(getClampedZoomDomain(zoomDomain * Math.exp(deltaY / 1000)));
     setZoomDomainAnimateTo(undefined);
@@ -366,7 +378,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                             <LinearGradient
                               id="XYChartThresholdAbove"
                               from={childSeries.threshold.aboveAreaProps?.fill}
-                              to={childSeries.threshold.aboveAreaProps?.fill}
+                              to={childSeries.threshold.aboveAreaProps?.fillTo}
                               toOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
                               toOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
@@ -374,7 +386,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                               id="XYChartThresholdBelow"
                               from={childSeries.threshold.belowAreaProps?.fill}
                               fromOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
-                              to={childSeries.threshold.belowAreaProps?.fill}
+                              to={childSeries.threshold.belowAreaProps?.fillTo}
                               fromOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
                           </>
@@ -431,14 +443,18 @@ export const TimeSeriesChart = <Datum extends {}>({
                     )}
 
                     {/* X-Axis */}
-                    <Axis
-                      orientation="bottom"
-                      numTicks={numTicksX}
-                      stroke="var(--color-border)"
-                      strokeWidth={1}
-                      tickStroke="var(--color-border)"
-                      tickFormat={(x) => tickFormatX(x, { zoom, zoomDomain, numTicks: numTicksX })}
-                    />
+                    {withXAxis && (
+                      <Axis
+                        orientation="bottom"
+                        numTicks={numTicksX}
+                        stroke="var(--color-border)"
+                        strokeWidth={1}
+                        tickStroke="var(--color-border)"
+                        tickFormat={(x) =>
+                          tickFormatX(x, { zoom, zoomDomain, numTicks: numTicksX })
+                        }
+                      />
+                    )}
 
                     {renderTooltip && (
                       <Tooltip<Datum>

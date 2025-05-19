@@ -23,6 +23,7 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
   layer7: ColorToken.GrayBlue0,
 
   borderDefault: ColorToken.GrayBlue2,
+  borderFaded: generateFadedColorVariant(ColorToken.GrayBlue4, OpacityToken.Opacity50),
   borderDestructive: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity20),
   borderButton: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity20),
 
@@ -90,6 +91,7 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
   layer7: ColorToken.DarkGray2,
 
   borderDefault: ColorToken.DarkGray4,
+  borderFaded: generateFadedColorVariant(ColorToken.DarkGray9, OpacityToken.Opacity50),
   borderDestructive: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity20),
   borderButton: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity20),
 
@@ -157,6 +159,7 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   layer7: ColorToken.MediumGray1,
 
   borderDefault: ColorToken.LightGray11,
+  borderFaded: generateFadedColorVariant(ColorToken.LightGray1, OpacityToken.Opacity50),
   borderDestructive: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity20),
   borderButton: generateFadedColorVariant(ColorToken.Black, OpacityToken.Opacity20),
 

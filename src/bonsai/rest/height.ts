@@ -16,6 +16,7 @@ import {
   loadableLoaded,
   loadablePending,
 } from '../lib/loadable';
+import { wrapAndLogBonsaiError } from '../logs';
 import {
   createIndexerQueryStoreEffect,
   createValidatorQueryStoreEffect,
@@ -43,7 +44,10 @@ const doIndexerHeightQuery = async (
 ): Promise<Loadable<HeightEntry>> => {
   const requestTime = new Date().toISOString();
   try {
-    const result = await promiseWithTimeout(indexerClient.utility.getHeight(), requestTimeout);
+    const result = await promiseWithTimeout(
+      wrapAndLogBonsaiError(() => indexerClient.utility.getHeight(), 'indexerHeightInner')(),
+      requestTimeout
+    );
     return loadableLoaded({
       requestTime,
       receivedTime: new Date().toISOString(),
@@ -103,7 +107,10 @@ const doValidatorHeightQuery = async (
   const requestTime = new Date().toISOString();
   try {
     const result = await promiseWithTimeout(
-      compositeClient.validatorClient.get.latestBlock(),
+      wrapAndLogBonsaiError(
+        () => compositeClient.validatorClient.get.latestBlock(),
+        'validatorHeightInner'
+      )(),
       requestTimeout
     );
     return loadableLoaded({

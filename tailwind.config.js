@@ -31,6 +31,7 @@ export default {
       'color-layer-7': 'var(--color-layer-7)',
 
       'color-border': 'var(--color-border)',
+      'color-border-faded': 'var(--color-border-faded)',
       'color-border-white': 'var(--color-border-white)',
       'color-border-red': 'var(--color-border-red)',
 
@@ -76,6 +77,7 @@ export default {
       medium: 'var(--fontSize-medium)',
       large: 'var(--fontSize-large)',
       extra: 'var(--fontSize-extra)',
+      'extra-large': 'var(--fontSize-extra-large)',
     },
     fontWeight: {
       regular: 'var(--fontWeight-regular)',
@@ -125,25 +127,25 @@ export default {
       ...theme('spacing'),
     }),
     extend: {
-      animation:{
-        'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+      animation: {
+        shake: 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
       },
       keyframes: {
-        'shake' : {
+        shake: {
           '10%, 90%': {
-            transform: 'translate3d(-1px, 0, 0)'
+            transform: 'translate3d(-1px, 0, 0)',
           },
           '20%, 80%': {
-            transform: 'translate3d(2px, 0, 0)'
+            transform: 'translate3d(2px, 0, 0)',
           },
           '30%, 50%, 70%': {
-            transform: 'translate3d(-4px, 0, 0)'
+            transform: 'translate3d(-4px, 0, 0)',
           },
           '40%, 60%': {
-            transform: 'translate3d(4px, 0, 0)'
-          }
-        }
-      }
+            transform: 'translate3d(4px, 0, 0)',
+          },
+        },
+      },
     },
   },
   plugins: [
@@ -180,6 +182,11 @@ export default {
         '.font-extra-book': { font: 'var(--font-extra-book)' },
         '.font-extra-medium': { font: 'var(--font-extra-medium)' },
         '.font-extra-bold': { font: 'var(--font-extra-bold)' },
+
+        '.font-extra-large-regular': { font: 'var(--font-extra-large-regular)' },
+        '.font-extra-large-book': { font: 'var(--font-extra-large-book)' },
+        '.font-extra-large-medium': { font: 'var(--font-extra-large-medium)' },
+        '.font-extra-large-bold': { font: 'var(--font-extra-large-bold)' },
       });
       addComponents({
         '.row': {

@@ -1,3 +1,5 @@
+import { isDev } from '@/constants/networks';
+
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -58,6 +60,10 @@ class TestFlags {
 
   get showNewWithdrawFlow() {
     return !!this.queryParams.withdraw_rewrite;
+  }
+
+  get simpleUi() {
+    return isDev || !!this.queryParams.simple_ui;
   }
 }
 

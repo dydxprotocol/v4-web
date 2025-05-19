@@ -19,6 +19,7 @@ export const GlobalStyle = createGlobalStyle`
     --color-layer-7: ${({ theme }) => theme.layer7};
 
     --color-border: ${({ theme }) => theme.borderDefault};
+    --color-border-faded: ${({ theme }) => theme.borderFaded};
     --color-border-white: ${({ theme }) => theme.borderButton};
     --color-border-red: ${({ theme }) => theme.borderDestructive};
 

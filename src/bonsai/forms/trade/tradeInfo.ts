@@ -874,6 +874,9 @@ function divideIfNonZeroElse(numerator: number, denominator: number, backup: num
   return denominator !== 0 ? numerator / denominator : backup;
 }
 
+const RATE_LOST_TO_REV_SHARES = 0.4; // megavault and ops
+const MAX_POSSIBLE_TAKER_REV_SHARE = 0.5; // affiliates
+
 function calculateTakerReward(
   usdcSize: number | undefined,
   fee: number | undefined,
@@ -893,7 +896,12 @@ function calculateTakerReward(
     notional != null &&
     tokenPrice > 0.0
   ) {
-    return (feeMultiplier * (fee - maxMakerRebate * notional)) / tokenPrice;
+    return (
+      ((fee - maxMakerRebate * notional - fee * MAX_POSSIBLE_TAKER_REV_SHARE) *
+        feeMultiplier *
+        RATE_LOST_TO_REV_SHARES) /
+      tokenPrice
+    );
   }
   return undefined;
 }
@@ -906,7 +914,7 @@ function calculateMakerReward(
   const tokenPrice = rewardsParams?.tokenPrice;
 
   if (fee != null && feeMultiplier != null && tokenPrice != null && fee > 0.0 && tokenPrice > 0.0) {
-    return (fee * feeMultiplier) / tokenPrice;
+    return (fee * feeMultiplier * RATE_LOST_TO_REV_SHARES) / tokenPrice;
   }
   return undefined;
 }
