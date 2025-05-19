@@ -25,12 +25,7 @@ import { AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
 import { calculateTriggerOrderDetails, calculateTriggerOrderPayload } from '../triggers/summary';
-import {
-  PlaceOrderMarketInfo,
-  PlaceOrderPayload,
-  TriggerOrderState,
-  TriggerPriceInputType,
-} from '../triggers/types';
+import { PlaceOrderMarketInfo, PlaceOrderPayload } from '../triggers/types';
 import {
   DEFAULT_TRADE_TYPE,
   getTradeFormFieldStates,
@@ -253,44 +248,10 @@ export function calculateTradeSummary(
     baseAccountAfter?.position,
     accountData.currentTradeMarketSummary,
     (accountAfter, positionAfter, market) => {
-      // trade form and triggers form have different semantics for this priceInput object
-      // so we patch in undefined for empty string here
-      function emptyObjIfEmptyString(
-        triggerState: TriggerOrderState | undefined
-      ): TriggerOrderState {
-        if (triggerState == null) {
-          return {};
-        }
-        if (triggerState.priceInput == null) {
-          return {};
-        }
-        switch (triggerState.priceInput.type) {
-          case TriggerPriceInputType.PercentDiff:
-            if (triggerState.priceInput.percentDiff.trim().length === 0) {
-              return {};
-            }
-            break;
-          case TriggerPriceInputType.TriggerPrice:
-            if (triggerState.priceInput.triggerPrice.trim().length === 0) {
-              return {};
-            }
-            break;
-          case TriggerPriceInputType.UsdcDiff:
-            if (triggerState.priceInput.usdcDiff.trim().length === 0) {
-              return {};
-            }
-            break;
-          default:
-            assertNever(triggerState.priceInput);
-            break;
-        }
-        return { priceInput: triggerState.priceInput };
-      }
-
       const inputDataToUse = { position: positionAfter, market };
       const stateToUse = { showLimits: false, size: { checked: false, size: '' } };
-      const slOrder = emptyObjIfEmptyString(effectiveTrade.stopLossOrder);
-      const tpOrder = emptyObjIfEmptyString(effectiveTrade.takeProfitOrder);
+      const slOrder = effectiveTrade.stopLossOrder ?? {};
+      const tpOrder = effectiveTrade.takeProfitOrder ?? {};
       const stopLossOrder = calculateTriggerOrderDetails(slOrder, true, stateToUse, inputDataToUse);
       const takeProfitOrder = calculateTriggerOrderDetails(
         tpOrder,

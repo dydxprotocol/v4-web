@@ -462,34 +462,32 @@ export function calculateTriggerOrderDetails(
 
   const newTriggerPrice = calc(() => {
     if (priceInput.type === TriggerPriceInputType.TriggerPrice) {
-      return MustBigNumber(priceInput.triggerPrice);
+      const price = AttemptBigNumber(priceInput.triggerPrice);
+      if (price == null) {
+        return undefined;
+      }
+      return price;
     }
     if (priceInput.type === TriggerPriceInputType.UsdcDiff) {
-      return MustBigNumber(
-        calculateTriggerPriceFromUsdcDiff(
-          MustBigNumber(priceInput.usdcDiff),
-          size,
-          position,
-          isStopLoss
-        )
-      );
+      const usdcDiff = AttemptBigNumber(priceInput.usdcDiff);
+      if (usdcDiff == null) {
+        return undefined;
+      }
+      return calculateTriggerPriceFromUsdcDiff(usdcDiff, size, position, isStopLoss);
     }
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (priceInput.type === TriggerPriceInputType.PercentDiff) {
-      return MustBigNumber(
-        calculateTriggerPriceFromPercentDiff(
-          MustBigNumber(priceInput.percentDiff).div(100),
-          size,
-          position,
-          isStopLoss
-        )
-      );
+      const percentDiff = AttemptBigNumber(priceInput.percentDiff);
+      if (percentDiff == null) {
+        return undefined;
+      }
+      return calculateTriggerPriceFromPercentDiff(percentDiff.div(100), size, position, isStopLoss);
     }
     assertNever(priceInput);
     return BIG_NUMBERS.ZERO;
   });
 
-  if (!newTriggerPrice.isFinite()) {
+  if (newTriggerPrice == null || !newTriggerPrice.isFinite()) {
     return details;
   }
   return {
