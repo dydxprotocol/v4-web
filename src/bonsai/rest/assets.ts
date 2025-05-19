@@ -24,10 +24,11 @@ export function setUpAssetsQuery(store: RootStore) {
 
     const observer = new QueryObserver(appQueryClient, {
       queryKey: ['metadata', 'assets'],
-      queryFn: wrapAndLogBonsaiError(
-        () => Promise.all([metadataClient.getAssetInfo(), metadataClient.getAssetPrices()]),
-        'assetsQuery'
-      ),
+      queryFn: () =>
+        Promise.all([
+          wrapAndLogBonsaiError(() => metadataClient.getAssetInfo(), 'assetInfo')(),
+          wrapAndLogBonsaiError(() => metadataClient.getAssetPrices(), 'assetPrices')(),
+        ]),
       refetchInterval: timeUnits.minute * 5,
       staleTime: timeUnits.minute * 5,
     });
