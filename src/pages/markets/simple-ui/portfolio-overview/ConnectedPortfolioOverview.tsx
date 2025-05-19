@@ -16,9 +16,9 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType } from '@/components/Output';
 import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
-import { Tag, TagSign, TagType } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PnlDatum } from '@/views/charts/PnlChart';
 
@@ -70,34 +70,6 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   });
 
   const equity = equityBN?.toNumber();
-
-  const marginUsageUiOptions = useMemo(() => {
-    if (marginUsage?.lt(0.2)) {
-      return {
-        marginLabel: stringGetter({ key: STRING_KEYS.LOW_RISK }),
-        tagSign: TagSign.Positive,
-      };
-    }
-
-    if (marginUsage?.lt(0.4)) {
-      return {
-        marginLabel: stringGetter({ key: STRING_KEYS.MEDIUM_RISK }),
-        tagSign: TagSign.Warning,
-      };
-    }
-
-    if (marginUsage?.gt(0.4)) {
-      return {
-        marginLabel: stringGetter({ key: STRING_KEYS.HIGH_RISK }),
-        tagSign: TagSign.Negative,
-      };
-    }
-
-    return {
-      marginLabel: stringGetter({ key: STRING_KEYS.LOW_RISK }),
-      tagSign: TagSign.Neutral,
-    };
-  }, [marginUsage, stringGetter]);
 
   const periodDropdownItems = useMemo(() => {
     return [
@@ -201,36 +173,18 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   );
 
   const portfolioBuyingPowerAndRisk = (
-    <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125">
+    <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125 font-mini-book">
       <div tw="row gap-0.25">
         <WithTooltip tooltip="buying-power-simple">
-          <span tw="text-color-text-0 font-mini-book">
-            {stringGetter({ key: STRING_KEYS.BUYING_POWER })}:
-          </span>
+          <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}:</span>
         </WithTooltip>
         <Output
-          tw="font-mini-book"
           value={freeCollateral?.times(50)}
           type={OutputType.Fiat}
           isLoading={isLoadingSubaccount}
         />
       </div>
-      {!isLoadingSubaccount && (
-        <div tw="row gap-0.25">
-          <WithTooltip tooltip="risk">
-            <span tw="text-color-text-0 font-mini-book">{marginUsageUiOptions.marginLabel}:</span>
-          </WithTooltip>
-
-          <Tag type={TagType.Number} sign={marginUsageUiOptions.tagSign}>
-            <Output
-              tw="font-tiny-book"
-              value={marginUsage}
-              type={OutputType.Percent}
-              fractionDigits={0}
-            />
-          </Tag>
-        </div>
-      )}
+      {!isLoadingSubaccount && <MarginUsageTag marginUsage={marginUsage} />}
     </div>
   );
 

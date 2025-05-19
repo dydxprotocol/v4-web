@@ -139,7 +139,7 @@ const SimplePnlChart = ({
       padding: {
         left: 0,
         right: 0,
-        top: 0.4,
+        top: 1,
         bottom: 0,
       },
     }),

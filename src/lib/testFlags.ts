@@ -1,3 +1,5 @@
+import { isDev } from '@/constants/networks';
+
 class TestFlags {
   public queryParams: { [key: string]: string };
 
@@ -61,7 +63,7 @@ class TestFlags {
   }
 
   get simpleUi() {
-    return !!this.queryParams.simple_ui;
+    return isDev || !!this.queryParams.simple_ui;
   }
 }
 

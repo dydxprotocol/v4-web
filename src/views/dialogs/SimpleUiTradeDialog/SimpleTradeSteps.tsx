@@ -1,0 +1,183 @@
+import { useMemo } from 'react';
+
+import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
+
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { ORDER_TYPE_STRINGS, SimpleUiTradeDialogSteps } from '@/constants/trade';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+import { Output, OutputType } from '@/components/Output';
+
+import { getOrderByClientId } from '@/state/accountSelectors';
+
+import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
+import {
+  getIndexerOrderSideStringKey,
+  getIndexerOrderTypeStringKey,
+} from '@/lib/enumToStringKeyHelpers';
+import { orEmptyObj } from '@/lib/typeUtils';
+
+export const SimpleTradeSteps = ({
+  clientId,
+  currentStep,
+  payload,
+  placeOrderError,
+  onClose,
+}: {
+  clientId?: string;
+  currentStep: SimpleUiTradeDialogSteps;
+  payload?: PlaceOrderPayload;
+  placeOrderError?: string;
+  onClose: () => void;
+}) => {
+  const stringGetter = useStringGetter();
+  const orderFromClientId = orEmptyObj(useAppSelectorWithArgs(getOrderByClientId, clientId ?? ''));
+
+  const { side, totalFilled, price, marketId, typeString, sideString, sideColor } = useMemo(() => {
+    if (currentStep === SimpleUiTradeDialogSteps.Submit) {
+      const orderTypeKey = payload?.type && ORDER_TYPE_STRINGS[payload.type].orderTypeKey;
+      const orderSideKey =
+        payload?.side &&
+        {
+          [OrderSide.BUY]: STRING_KEYS.BUY,
+          [OrderSide.SELL]: STRING_KEYS.SELL,
+        }[payload.side];
+
+      return {
+        side: payload?.side,
+        totalFilled: payload?.size,
+        price: payload?.price,
+        type: payload?.type,
+        marketId: payload?.marketId,
+        typeString: orderTypeKey && stringGetter({ key: orderTypeKey }),
+        sideString: orderSideKey && stringGetter({ key: orderSideKey }),
+        sideColor: {
+          [OrderSide.BUY]: 'var(--color-positive)',
+          [OrderSide.SELL]: 'var(--color-negative)',
+        }[payload?.side ?? OrderSide.BUY],
+      };
+    }
+
+    if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
+      const orderTypeKey =
+        orderFromClientId.type && getIndexerOrderTypeStringKey(orderFromClientId.type);
+      const orderSideKey =
+        orderFromClientId.side && getIndexerOrderSideStringKey(orderFromClientId.side);
+
+      return {
+        side: orderFromClientId.side,
+        totalFilled: orderFromClientId.totalFilled,
+        price: orderFromClientId.price,
+        type: orderFromClientId.type,
+        marketId: orderFromClientId.marketId,
+        typeString: orderTypeKey && stringGetter({ key: orderTypeKey }),
+        sideString: orderSideKey && stringGetter({ key: orderSideKey }),
+        sideColor: {
+          [IndexerOrderSide.BUY]: 'var(--color-positive)',
+          [IndexerOrderSide.SELL]: 'var(--color-negative)',
+        }[orderFromClientId.side ?? IndexerOrderSide.BUY],
+      };
+    }
+
+    return {};
+  }, [currentStep, payload, orderFromClientId, stringGetter]);
+
+  const renderContent = () => {
+    if (currentStep === SimpleUiTradeDialogSteps.Error) {
+      return <span>{placeOrderError}</span>;
+    }
+
+    if (!marketId || !side) return null;
+
+    const displayableAsset = getDisplayableAssetFromTicker(marketId);
+
+    return (
+      <div tw="flexColumn gap-0.5 text-center">
+        <div tw="row gap-[0.5ch] font-extra-large-bold">
+          <span css={{ color: sideColor }}>{sideString}</span>
+          <Output type={OutputType.Asset} value={totalFilled} />
+          <span>{displayableAsset}</span>
+        </div>
+
+        <span tw="font-medium-book">
+          <span tw="text-color-text-2">{typeString}</span>
+          <span tw="text-color-text-0"> @ </span>
+          <Output tw="inline text-color-text-1" type={OutputType.Fiat} value={price} />
+        </span>
+      </div>
+    );
+  };
+
+  const renderIcon = () => {
+    if (currentStep === SimpleUiTradeDialogSteps.Error) {
+      return (
+        <div tw="row size-4 justify-center rounded-[50%] bg-color-gradient-error">
+          <Icon iconName={IconName.ErrorExclamation} tw="size-2 text-color-error" />
+        </div>
+      );
+    }
+
+    if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
+      return (
+        <div tw="row size-4 justify-center rounded-[50%] bg-color-gradient-success">
+          <Icon iconName={IconName.Check} tw="size-2 text-color-success" />
+        </div>
+      );
+    }
+
+    return <LoadingSpinner tw="size-4" size="4rem" />;
+  };
+
+  const renderGradient = () => {
+    if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
+      const gradientColor =
+        side === IndexerOrderSide.BUY
+          ? 'var(--color-gradient-positive)'
+          : 'var(--color-gradient-negative)';
+
+      return (
+        <div
+          tw="pointer-events-none absolute inset-0 z-0 h-[40%]"
+          css={{
+            background: `radial-gradient(ellipse 100% 70% at 50% 0%, ${gradientColor} 0%, ${gradientColor} 70%, transparent 100%)`,
+          }}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div tw="flexColumn items-center gap-2 px-1.25 pb-1.25 pt-[15vh]">
+      {renderGradient()}
+      <div tw="flexColumn z-[1] w-full flex-1 items-center gap-1.5">
+        {renderIcon()}
+        {renderContent()}
+      </div>
+
+      <div tw="flexColumn w-full">
+        <Button
+          tw="w-full rounded-[1rem]"
+          type={ButtonType.Button}
+          state={{
+            isLoading: currentStep === SimpleUiTradeDialogSteps.Submit,
+          }}
+          action={ButtonAction.Primary}
+          size={ButtonSize.Medium}
+          onClick={onClose}
+        >
+          {stringGetter({ key: STRING_KEYS.DONE })}
+        </Button>
+      </div>
+    </div>
+  );
+};

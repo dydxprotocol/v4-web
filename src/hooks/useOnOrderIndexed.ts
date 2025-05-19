@@ -8,6 +8,7 @@ export function useOnOrderIndexed(callback: () => void) {
   const [clientId, setClientId] = useState<string | undefined>();
   const allOrders = useAppSelector(BonsaiCore.account.allOrders.data);
   const hasCalledFunction = useRef(false);
+
   useEffect(() => {
     hasCalledFunction.current = false;
   }, [clientId]);
@@ -19,5 +20,6 @@ export function useOnOrderIndexed(callback: () => void) {
     hasCalledFunction.current = true;
     callback();
   }
-  return { setUnIndexedClientId: setClientId };
+
+  return { setUnIndexedClientId: setClientId, clientId };
 }
