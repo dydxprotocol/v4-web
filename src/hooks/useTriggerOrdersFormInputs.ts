@@ -55,10 +55,8 @@ export const useTriggerOrdersFormInputs = ({
     if (differingOrderSizes) {
       return;
     }
-    if (
-      summary.stopLossOrder.size != null &&
-      position.unsignedSize.gt(summary.stopLossOrder.size)
-    ) {
+    const effSize = summary.stopLossOrder.size ?? summary.takeProfitOrder.size;
+    if (effSize != null && position.unsignedSize.gt(effSize)) {
       dispatch(triggersFormActions.setSizeChecked(true));
     }
     // we only want to run on mount or when position id changes
