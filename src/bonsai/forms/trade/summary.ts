@@ -253,6 +253,8 @@ export function calculateTradeSummary(
     baseAccountAfter?.position,
     accountData.currentTradeMarketSummary,
     (accountAfter, positionAfter, market) => {
+      // trade form and triggers form have different semantics for this priceInput object
+      // so we patch in undefined for empty string here
       function emptyObjIfEmptyString(
         triggerState: TriggerOrderState | undefined
       ): TriggerOrderState {

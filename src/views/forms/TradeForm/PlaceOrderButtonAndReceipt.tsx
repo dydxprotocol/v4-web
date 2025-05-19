@@ -57,7 +57,7 @@ type ElementProps = {
   onClearInputs: () => void;
   shouldEnableTrade: boolean;
   showDeposit?: boolean;
-  summary?: TradeFormSummary;
+  summary: TradeFormSummary;
   tradingUnavailable: boolean;
 };
 
@@ -91,9 +91,9 @@ export const PlaceOrderButtonAndReceipt = ({
     notional: notionalTotal,
     adjustedImf,
     marginValueMaintenance,
-  } = orEmptyObj(summary?.accountDetailsBefore?.position);
+  } = orEmptyObj(summary.accountDetailsBefore?.position);
 
-  const postOrderPositionData = orEmptyObj(summary?.accountDetailsAfter?.position);
+  const postOrderPositionData = orEmptyObj(summary.accountDetailsAfter?.position);
 
   const tradeValues = useAppSelector(getTradeFormValues);
   const { marginMode } = tradeValues;
@@ -147,7 +147,7 @@ export const PlaceOrderButtonAndReceipt = ({
           getDoubleValuesHasDiff(
             marginValueMaintenance?.toNumber(),
             postOrderPositionData.marginValueMaintenance?.toNumber() ??
-              (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
+              (summary.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }
       />
@@ -199,7 +199,7 @@ export const PlaceOrderButtonAndReceipt = ({
               getDoubleValuesHasDiff(
                 liquidationPrice?.toNumber(),
                 postOrderPositionData.liquidationPrice?.toNumber() ??
-                  (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
+                  (summary.tradeInfo.isPositionClosed ? 0 : undefined)
               )
             }
           />
@@ -232,7 +232,7 @@ export const PlaceOrderButtonAndReceipt = ({
               getDoubleValuesHasDiff(
                 leverage?.toNumber(),
                 postOrderPositionData.leverage?.toNumber() ??
-                  (summary?.tradeInfo.isPositionClosed ? 0 : undefined)
+                  (summary.tradeInfo.isPositionClosed ? 0 : undefined)
               )
             }
             showSign={ShowSign.None}
