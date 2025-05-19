@@ -102,7 +102,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
-  const { tradeInfo, tradePayload } = orEmptyObj(summary);
+  const { tradeInfo, tradePayload } = summary;
   const { fee, inputSummary, reward } = orEmptyObj(tradeInfo);
   const expectedPrice = inputSummary?.averageFillPrice;
 

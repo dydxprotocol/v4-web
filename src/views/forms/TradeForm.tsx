@@ -242,6 +242,7 @@ export const TradeForm = ({
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
+      summary={summary}
       actionStringKey={shortAlertKey}
       summary={summary}
       confirmButtonConfig={{
