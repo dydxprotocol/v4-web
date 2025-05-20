@@ -1,8 +1,11 @@
-import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { mapValues } from 'lodash';
 
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerPerpetualMarketType,
+  IndexerPerpetualPositionStatus,
+  IndexerPositionSide,
+} from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc } from '@/lib/do';
@@ -17,8 +20,10 @@ import {
   OrderSizeInputs,
   TimeInForce,
   TimeUnit,
+  TradeAccountDetails,
   TradeForm,
   TradeFormFieldStates,
+  TradeFormInputData,
   TradeFormType,
 } from './types';
 
@@ -33,11 +38,30 @@ const DEFAULT_ISOLATED_TARGET_LEVERAGE = 2.0;
 
 export function getTradeFormFieldStates(
   form: TradeForm,
-  existingPositionOrOpenOrderMarginMode: MarginMode | undefined,
-  existingPosition: SubaccountPosition | undefined,
-  marketIsIsolatedOnly: boolean | undefined
+  accountData: TradeFormInputData,
+  baseAccount: TradeAccountDetails | undefined
 ): TradeFormFieldStates {
   const { type } = form;
+
+  const existingPositionOrOpenOrderMarginMode = calc(() => {
+    if (baseAccount?.position != null) {
+      const mode = baseAccount.position.marginMode;
+      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
+    }
+    if (accountData.currentTradeMarketOpenOrders.length > 0) {
+      const mode = accountData.currentTradeMarketOpenOrders[0]!.marginMode;
+      if (mode == null) {
+        return mode;
+      }
+      return mode === 'CROSS' ? MarginMode.CROSS : MarginMode.ISOLATED;
+    }
+    return undefined;
+  });
+
+  const marketIsIsolatedOnly =
+    accountData.currentTradeMarketSummary?.marketType === IndexerPerpetualMarketType.ISOLATED;
+
+  const existingPosition = baseAccount?.position;
 
   const existingPositionLeverage = existingPosition?.leverage?.toNumber();
   const maxMarketLeverage = existingPosition?.maxLeverage?.toNumber() ?? FALLBACK_MARKET_LEVERAGE;
@@ -67,6 +91,8 @@ export function getTradeFormFieldStates(
     triggerPrice: '',
     execution: ExecutionType.GOOD_TIL_DATE,
     goodTil: DEFAULT_GOOD_TIL_TIME,
+    stopLossOrder: undefined,
+    takeProfitOrder: undefined,
   };
 
   // Initialize all fields as not visible
@@ -131,9 +157,21 @@ export function getTradeFormFieldStates(
     }
   }
 
+  function makeTriggersVisibleIfPossible(states: TradeFormFieldStates) {
+    if (
+      // only enabled for market for now
+      type === TradeFormType.MARKET &&
+      // and no existing position
+      existingPosition?.status !== IndexerPerpetualPositionStatus.OPEN
+    ) {
+      makeVisible(states, ['takeProfitOrder', 'stopLossOrder']);
+    }
+  }
+
   return calc(() => {
     const result = { ...baseResult };
     makeVisible(result, ['type']);
+    makeTriggersVisibleIfPossible(result);
     switch (type) {
       case TradeFormType.MARKET:
         makeVisible(result, ['marketId', 'side', 'size', 'marginMode', 'reduceOnly']);
