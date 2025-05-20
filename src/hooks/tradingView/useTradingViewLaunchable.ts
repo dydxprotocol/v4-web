@@ -21,8 +21,11 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateLaunchableMarketsChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
+import { testFlags } from '@/lib/testFlags';
 import { getLaunchableMarketDatafeed } from '@/lib/tradingView/launchableMarketFeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+
+import { useBreakpoints } from '../useBreakpoints';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -37,6 +40,7 @@ export const useTradingViewLaunchable = ({
   marketId: string;
 }) => {
   const dispatch = useDispatch();
+  const { isTablet } = useBreakpoints();
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
 
@@ -52,8 +56,9 @@ export const useTradingViewLaunchable = ({
 
   useEffect(() => {
     if (marketId && !assetDataLoading && !tvWidget) {
-      const widgetOptions = getWidgetOptions(true);
-      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+      const isSimpleUi = isTablet && testFlags.simpleUi;
+      const widgetOptions = getWidgetOptions(true, isSimpleUi);
+      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
       const options: TradingTerminalWidgetOptions = {
@@ -83,5 +88,5 @@ export const useTradingViewLaunchable = ({
     return () => {
       tvWidget?.remove();
     };
-  }, [dispatch, !!marketId, selectedLocale, assetDataLoading, tvWidget, setTvWidget]);
+  }, [dispatch, !!marketId, selectedLocale, assetDataLoading, tvWidget, setTvWidget, isTablet]);
 };

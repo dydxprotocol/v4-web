@@ -1,17 +1,40 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { orderBy } from 'lodash';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import {
+  getPositionSideFromIndexerPositionSide,
+  PositionSideTag,
+} from '@/components/PositionSideTag';
 import { VerticalSeparator } from '@/components/Separator';
-import { Tag } from '@/components/Tag';
+import { Tag, TagType } from '@/components/Tag';
+
+import { useAppSelector } from '@/state/appTypes';
+
+import { MarketOrderCard } from './MarketOrderCard';
+import { MarketPositionCard } from './MarketPositionCard';
 
 export const AssetPosition = () => {
   const stringGetter = useStringGetter();
   const [tab, setTab] = useState<'position' | 'orders'>('position');
-  // const position = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
-  // const orders = useAppSelector(BonsaiHelpers.currentMarket.account.openOrders);
+  const positions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
+  const openOrders = useAppSelector(BonsaiHelpers.currentMarket.account.openOrders);
+  const currentMarketId = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)?.ticker;
+
+  const position = useMemo(() => {
+    return orderBy(
+      positions?.filter((p) => p.market === currentMarketId),
+      (p) => p.subaccountNumber,
+      ['asc']
+    ).at(0);
+  }, [positions, currentMarketId]);
+
+  const numOpenOrders = openOrders.length;
 
   return (
     <div tw="grid">
@@ -24,10 +47,18 @@ export const AssetPosition = () => {
             }}
             onClick={() => setTab('position')}
           >
-            <span>{stringGetter({ key: STRING_KEYS.POSITION })}</span>
+            <span tw="row gap-0.5">
+              {stringGetter({ key: STRING_KEYS.POSITION })}
+
+              {position ? (
+                <PositionSideTag
+                  positionSide={getPositionSideFromIndexerPositionSide(position.side)}
+                />
+              ) : (
+                <Tag>{stringGetter({ key: STRING_KEYS.NONE })}</Tag>
+              )}
+            </span>
           </button>
-          <VerticalSeparator tw="flex h-full" fullHeight />
-          <Tag>{stringGetter({ key: STRING_KEYS.NONE })}</Tag>
         </div>
 
         <VerticalSeparator tw="flex h-full" fullHeight />
@@ -39,9 +70,25 @@ export const AssetPosition = () => {
           }}
           onClick={() => setTab('orders')}
         >
-          <span>{stringGetter({ key: STRING_KEYS.ORDERS })}</span>
+          <span tw="row gap-0.5">
+            {stringGetter({ key: STRING_KEYS.ORDERS })}
+            {numOpenOrders > 0 && <Tag type={TagType.Number}>{numOpenOrders}</Tag>}
+          </span>
         </button>
       </div>
+
+      {tab === 'position' && position && (
+        <div tw="mt-1">
+          <MarketPositionCard position={position} />
+        </div>
+      )}
+      {tab === 'orders' && openOrders.length > 0 && (
+        <div tw="flexColumn mt-1 gap-1">
+          {openOrders.map((order) => (
+            <MarketOrderCard key={order.id} order={order} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
