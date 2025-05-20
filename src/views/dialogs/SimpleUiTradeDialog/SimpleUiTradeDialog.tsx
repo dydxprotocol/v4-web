@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ExecutionType, OrderSide, TimeInForce, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogProps, SimpleUiTradeDialogProps } from '@/constants/dialogs';
@@ -12,12 +11,11 @@ import { SimpleUiTradeDialogSteps } from '@/constants/trade';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
-import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
+import { DropdownMenuTrigger, SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { tradeFormActions } from '@/state/tradeForm';
@@ -130,7 +128,7 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
                 },
               ]}
             >
-              <Button
+              <DropdownMenuTrigger
                 tw="bg-[var(--simpleUi-dialog-secondaryColor)]"
                 shape={ButtonShape.Pill}
                 size={ButtonSize.Base}
@@ -138,8 +136,7 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
                 {selectedTradeType === TradeFormType.MARKET
                   ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
                   : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
-                <ChevronDownIcon />
-              </Button>
+              </DropdownMenuTrigger>
             </SimpleUiDropdownMenu>
           </div>
         );
@@ -197,7 +194,10 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
         '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
         '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
-        '--dialog-header-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
+        '--dialog-header-backgroundColor':
+          currentStep === SimpleUiTradeDialogSteps.Edit
+            ? 'var(--simpleUi-dialog-backgroundColor)'
+            : 'transparent', // When submitting and confirming we want a transparent header to not interfere with radial-gradient
       }}
     >
       <SimpleTradeForm
