@@ -31,6 +31,7 @@ import { useStringGetter } from '../useStringGetter';
 
 export enum TradeFormSource {
   ClosePositionForm = 'ClosePositionForm',
+  SimpleCloseForm = 'SimpleCloseForm',
   SimpleTradeForm = 'SimpleTradeForm',
   TradeForm = 'TradeForm',
 }

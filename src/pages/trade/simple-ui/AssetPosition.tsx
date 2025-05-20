@@ -1,11 +1,16 @@
 import { useMemo, useState } from 'react';
 
+import { OrderSide } from '@/bonsai/forms/trade/types';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Button } from '@/components/Button';
 import {
   getPositionSideFromIndexerPositionSide,
   PositionSideTag,
@@ -13,12 +18,14 @@ import {
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag, TagType } from '@/components/Tag';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { MarketOrderCard } from './MarketOrderCard';
 import { MarketPositionCard } from './MarketPositionCard';
 
 export const AssetPosition = () => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const [tab, setTab] = useState<'position' | 'orders'>('position');
   const positions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
@@ -70,6 +77,27 @@ export const AssetPosition = () => {
             {numOpenOrders > 0 && <Tag type={TagType.Number}>{numOpenOrders}</Tag>}
           </span>
         </button>
+        {position?.side && (
+          <Button
+            tw="ml-auto [--button-backgroundColor:transparent]"
+            action={ButtonAction.Reset}
+            size={ButtonSize.Small}
+            shape={ButtonShape.Pill}
+            onClick={() =>
+              dispatch(
+                openDialog(
+                  DialogTypes.SimpleUiTrade({
+                    side:
+                      position.side === IndexerPositionSide.LONG ? OrderSide.SELL : OrderSide.BUY,
+                    isClosingPosition: true,
+                  })
+                )
+              )
+            }
+          >
+            {stringGetter({ key: STRING_KEYS.CLOSE })}
+          </Button>
+        )}
       </div>
 
       {tab === 'position' && position && (

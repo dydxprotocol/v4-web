@@ -70,6 +70,7 @@ export type SharePNLAnalyticsDialogProps = {
 };
 export type SimpleUiTradeDialogProps = {
   side: OrderSide;
+  isClosingPosition?: boolean;
 };
 export type StakeDialogProps = {};
 export type StakingRewardDialogProps = { usdcRewards: BigNumberish; validators: string[] };
