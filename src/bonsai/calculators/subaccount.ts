@@ -20,6 +20,7 @@ import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, ToBigNumber } from '@/lib/n
 import { isPresent } from '@/lib/typeUtils';
 
 import { isParentSubaccount } from '../lib/subaccountUtils';
+import { getActualOpenPerpetualPositions } from '../public-calculators/actualOpenPositions';
 import { ChildSubaccountData, MarketsData, ParentSubaccountDataBase } from '../types/rawTypes';
 import {
   ChildSubaccountSummaries,
@@ -46,7 +47,7 @@ export function calculateParentSubaccountPositions(
     .flatMap((child) => {
       const subaccount = calculateSubaccountSummary(child, markets);
       return orderBy(
-        Object.values(child.openPerpetualPositions)
+        Object.values(getActualOpenPerpetualPositions(child.openPerpetualPositions))
           .filter(isPresent)
           .filter((p) => p.status === IndexerPerpetualPositionStatus.OPEN)
           .map((perp) => calculateSubaccountPosition(subaccount, perp, markets[perp.market])),
@@ -81,7 +82,9 @@ export function calculateParentSubaccountSummary(
 
 export function calculateMarketsNeededForSubaccount(parent: ParentSubaccountDataBase) {
   return Object.values(parent.childSubaccounts).flatMap((o) =>
-    Object.values(o?.openPerpetualPositions ?? {}).map((p) => p.market)
+    Object.values(getActualOpenPerpetualPositions(o?.openPerpetualPositions ?? {})).map(
+      (p) => p.market
+    )
   );
 }
 
@@ -110,7 +113,7 @@ function calculateSubaccountSummaryCore(
 
   // Calculate totals from perpetual positions
   const { valueTotal, notionalTotal, initialRiskTotal, maintenanceRiskTotal } = Object.values(
-    subaccountData.openPerpetualPositions
+    getActualOpenPerpetualPositions(subaccountData.openPerpetualPositions)
   ).reduce(
     (acc, position) => {
       const market = markets[position.market];

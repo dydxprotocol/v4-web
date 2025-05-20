@@ -2,12 +2,14 @@ import { getErrorTradeSummary } from '@/bonsai/forms/trade/summary';
 import { OrderSide, TradeFormInputData, TradeFormType } from '@/bonsai/forms/trade/types';
 import { createMinimalError } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore, BonsaiForms, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
+import { getActualOpenPerpetualPositions } from '@/bonsai/public-calculators/actualOpenPositions';
 import { minBy } from 'lodash';
 
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
+import { mapIfPresent } from '@/lib/do';
 import { isPresent } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
@@ -106,7 +108,12 @@ export const getClosePositionFormSummary = createAppSelector(
 
     const currentPosition = minBy(
       Object.values(inputData.rawParentSubaccountData?.childSubaccounts ?? {})
-        .map((a) => a?.openPerpetualPositions[currentMarketId])
+        .map(
+          (a) =>
+            mapIfPresent(a?.openPerpetualPositions, getActualOpenPerpetualPositions)?.[
+              currentMarketId
+            ]
+        )
         .filter(isPresent),
       (a) => a.subaccountNumber
     );

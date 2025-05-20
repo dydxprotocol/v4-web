@@ -12,6 +12,7 @@ import {
 import { AttemptNumber, BIG_NUMBERS, MustBigNumber, MustNumber } from '@/lib/numbers';
 
 import { freshChildSubaccount, newUsdcAssetPosition } from '../lib/subaccountUtils';
+import { getActualOpenPerpetualPositions } from '../public-calculators/actualOpenPositions';
 import {
   ApplyTradeProps,
   SubaccountBatchedOperations,
@@ -219,7 +220,10 @@ function applyTradeToSubaccount(
     }
 
     const subaccount = draftParentSubaccount.childSubaccounts[subaccountNumber]!;
-    if (subaccount.openPerpetualPositions[marketId] == null) {
+    if (
+      subaccount.openPerpetualPositions[marketId] == null ||
+      subaccount.openPerpetualPositions[marketId].status !== IndexerPerpetualPositionStatus.OPEN
+    ) {
       // handle brand new position, easy case
       if (!reduceOnly) {
         subaccount.openPerpetualPositions[marketId] = createNewPositionFromTrade(tradeProps);
@@ -332,9 +336,9 @@ export function applyOperationsToSubaccount(
             return currentParentSubaccount;
           }
           if (
-            Object.values(sourceAccount.openPerpetualPositions).filter(
-              (p) => !MustBigNumber(p.size).isZero()
-            ).length > 0
+            Object.values(
+              getActualOpenPerpetualPositions(sourceAccount.openPerpetualPositions)
+            ).filter((p) => !MustBigNumber(p.size).isZero()).length > 0
           ) {
             // eslint-disable-next-line no-console
             console.error(

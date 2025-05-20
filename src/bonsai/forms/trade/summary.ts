@@ -8,6 +8,7 @@ import {
   calculateParentSubaccountSummary,
   calculateSubaccountSummary,
 } from '@/bonsai/calculators/subaccount';
+import { getActualOpenPerpetualPositions } from '@/bonsai/public-calculators/actualOpenPositions';
 import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
@@ -491,7 +492,8 @@ function getPositionIdToUseForTrade(
   }
 
   const allPositions = Object.values(rawParentSubaccountData?.childSubaccounts ?? {}).flatMap(
-    (o) => (o != null ? o.openPerpetualPositions[marketId] ?? [] : [])
+    (o) =>
+      o != null ? getActualOpenPerpetualPositions(o.openPerpetualPositions)[marketId] ?? [] : []
   );
   const positionToUse = orderBy(
     allPositions.filter(
