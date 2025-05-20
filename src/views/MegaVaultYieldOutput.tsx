@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks/useStringGetter';
 import { useLoadedVaultDetails } from '@/hooks/vaultsHooks';
 
 import { Output, OutputType } from '@/components/Output';
@@ -15,12 +13,17 @@ import { getNumberSign } from '@/lib/numbers';
 export const MegaVaultYieldOutput = ({
   className,
   yieldType = 'ninetyDay',
+  slotRight,
+  withLoading,
 }: {
   className?: string;
   yieldType?: 'ninetyDay' | 'thirtyDay';
+  slotRight?: ReactNode;
+  withLoading?: boolean;
 }) => {
-  const stringGetter = useStringGetter();
   const vault = useLoadedVaultDetails().data;
+  const isVaultDetailsLoading = useLoadedVaultDetails().isLoading;
+  const isLoading = withLoading ? isVaultDetailsLoading : false;
   const depositApr =
     yieldType === 'ninetyDay' ? vault?.ninetyDayReturnPercent : vault?.thirtyDayReturnPercent;
   const numberSign = useMemo(() => getNumberSign(depositApr), [depositApr]);
@@ -32,7 +35,8 @@ export const MegaVaultYieldOutput = ({
       value={depositApr}
       fractionDigits={0}
       sign={numberSign}
-      slotRight={<span>{stringGetter({ key: STRING_KEYS.APR })}</span>}
+      isLoading={isLoading}
+      slotRight={isLoading ? null : slotRight}
     />
   );
 };

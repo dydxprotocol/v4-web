@@ -76,7 +76,12 @@ const AssetPage = () => {
             params: {
               APR_PERCENTAGE: (
                 <WithTooltip tooltip="vault-apr-90d">
-                  <MegaVaultYieldOutput yieldType="ninetyDay" tw="inline-block" />
+                  <MegaVaultYieldOutput
+                    withLoading
+                    yieldType="ninetyDay"
+                    tw="inline-block"
+                    slotRight={<span>{stringGetter({ key: STRING_KEYS.APR })}</span>}
+                  />
                 </WithTooltip>
               ),
             },
