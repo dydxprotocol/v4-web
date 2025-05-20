@@ -5,6 +5,7 @@ import {
   IndexerAssetPositionResponseObject,
   IndexerOrderResponseObject,
   IndexerPerpetualPositionResponseObject,
+  IndexerPerpetualPositionStatus,
 } from '@/types/indexer/indexerApiGen';
 import {
   isWsParentSubaccountSubscribed,
@@ -150,6 +151,12 @@ function accountWebsocketValueCreator(
                     ] as IndexerPerpetualPositionResponseObject),
                     ...positionUpdate,
                   };
+                }
+                if (
+                  perpPositions[positionUpdate.market]?.status !==
+                  IndexerPerpetualPositionStatus.OPEN
+                ) {
+                  delete perpPositions[positionUpdate.market];
                 }
               });
             }
