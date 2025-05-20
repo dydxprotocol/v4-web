@@ -269,7 +269,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 toastSensitivity: 'foreground',
                 groupKey: 'fill',
               },
-              updateKey: [fill.id, marketInfo?.displayableAsset, marketInfo?.logo],
+              updateKey: [fill.id],
             });
           });
       }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
