@@ -1,24 +1,21 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
-import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
+import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -26,7 +23,6 @@ import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { Collapsible } from '@/components/Collapsible';
@@ -35,7 +31,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
-import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
@@ -55,6 +50,7 @@ import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
+import { TradeFormMessages } from '../TradeFormMessages/TradeFormMessages';
 import { AmountCloseInput } from './TradeForm/AmountCloseInput';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
@@ -90,7 +86,7 @@ export const ClosePositionForm = ({
   const tradeValues = useAppSelector(getClosePositionFormValues);
   const { type } = tradeValues;
   const fullSummary = useAppSelector(getClosePositionFormSummary);
-  const { summary, errors } = fullSummary;
+  const { summary } = fullSummary;
   const useLimit = type === TradeFormType.LIMIT;
   const effectiveSizes = summary.tradeInfo.inputSummary.size;
 
@@ -120,6 +116,7 @@ export const ClosePositionForm = ({
     placeOrder,
     shouldEnableTrade,
     tradingUnavailable,
+    hasValidationErrors,
   } = useTradeForm({
     source: TradeFormSource.ClosePositionForm,
     fullFormSummary: fullSummary,
@@ -130,34 +127,15 @@ export const ClosePositionForm = ({
   const { signedSize: currentPositionSize } = currentPositionData ?? {};
   const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
-  const hasInputErrors = errors.find((e) => e.type === ErrorType.error) != null;
-
-  const { getNotificationPreferenceForType } = useNotifications();
-
-  const { alertContent, shortAlertKey } = useMemo(() => {
-    const primaryAlert = getHighestPriorityAlert(errors);
-
-    const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
-      NotificationType.OrderStatus
-    );
-
-    return {
-      shortAlertKey: primaryAlert?.resources.title?.stringKey,
-      alertContent:
-        closePositionError != null && !isErrorShownInOrderStatusToast ? (
-          <AlertMessage type={AlertType.Error}>
-            <div tw="inline-block">{closePositionError}</div>
-          </AlertMessage>
-        ) : primaryAlert != null && primaryAlert.resources.text?.stringKey != null ? (
-          <ValidationAlertMessage error={primaryAlert} />
-        ) : undefined,
-      alertType:
-        closePositionError != null && !isErrorShownInOrderStatusToast
-          ? ErrorType.error
-          : primaryAlert?.type,
-      inputAlert: primaryAlert,
-    };
-  }, [closePositionError, errors, getNotificationPreferenceForType]);
+  const {
+    shouldPromptUserToPlaceLimitOrder,
+    isErrorShownInOrderStatusToast,
+    primaryAlert,
+    shortAlertKey,
+  } = useTradeErrors({
+    placeOrderError: closePositionError,
+    isClosingPosition: true,
+  });
 
   // default to market
   useEffect(() => {
@@ -295,7 +273,12 @@ export const ClosePositionForm = ({
         </Collapsible>
       )}
 
-      {alertContent}
+      <TradeFormMessages
+        isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+        placeOrderError={closePositionError}
+        primaryAlert={primaryAlert}
+        shouldPromptUserToPlaceLimitOrder={shouldPromptUserToPlaceLimitOrder}
+      />
     </$InputsColumn>
   );
 
@@ -307,7 +290,12 @@ export const ClosePositionForm = ({
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <div tw="flexColumn gap-[--form-input-gap]">
           <PositionPreview />
-          {alertContent}
+          <TradeFormMessages
+            isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
+            placeOrderError={closePositionError}
+            primaryAlert={primaryAlert}
+            shouldPromptUserToPlaceLimitOrder={shouldPromptUserToPlaceLimitOrder}
+          />
         </div>
       ) : (
         <$MobileLayout $showOrderbook={showOrderbook}>
@@ -332,7 +320,7 @@ export const ClosePositionForm = ({
       )}
 
       <PlaceOrderButtonAndReceipt
-        hasValidationErrors={hasInputErrors}
+        hasValidationErrors={hasValidationErrors}
         hasInput={!!amountInput}
         onClearInputs={onClearInputs}
         actionStringKey={shortAlertKey}

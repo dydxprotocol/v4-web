@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { OrderSide, OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
+import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
@@ -11,6 +11,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
+import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
@@ -38,6 +39,7 @@ import {
   getClosePositionFormValues,
 } from '@/state/tradeFormSelectors';
 
+import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -61,7 +63,7 @@ export const SimpleCloseForm = ({
   const { selectedTradeType } = useTradeTypeOptions();
 
   const currentPositionData = useAppSelector(getCurrentMarketPositionData);
-  const { signedSize: currentPositionSize } = currentPositionData ?? {};
+  const { signedSize: currentPositionSize, side: currentPositionSide } = currentPositionData ?? {};
   const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
@@ -69,7 +71,7 @@ export const SimpleCloseForm = ({
   const fullFormSummary = useAppSelector(getClosePositionFormSummary);
   const { summary } = fullFormSummary;
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
-  const { assetId, displayableAsset, stepSizeDecimals, ticker, tickSizeDecimals } = orEmptyObj(
+  const { assetId, displayableAsset, stepSizeDecimals, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -101,6 +103,7 @@ export const SimpleCloseForm = ({
     shortAlertKey,
   } = useTradeErrors({
     placeOrderError,
+    isClosingPosition: true,
   });
 
   const onSubmitOrder = async () => {
@@ -134,19 +137,6 @@ export const SimpleCloseForm = ({
       return;
     }
     dispatch(closePositionFormActions.setSizeToken(formattedValue));
-  };
-
-  const onLimitPriceInput = ({
-    formattedValue,
-  }: {
-    floatValue?: number;
-    formattedValue: string;
-  }) => {
-    const formattedValueBN = MustBigNumber(formattedValue);
-    if ((formattedValueBN.decimalPlaces() ?? 0) > (tickSizeDecimals ?? TOKEN_DECIMALS)) {
-      return;
-    }
-    dispatch(closePositionFormActions.setLimitPrice(formattedValue));
   };
 
   const onPercentCloseInput = (value: number) => {
@@ -184,24 +174,6 @@ export const SimpleCloseForm = ({
     },
   };
 
-  const limitPriceInput = (
-    <div tw="flexColumn items-center gap-0.25">
-      <span tw="font-mini-book">When {displayableAsset} price reaches</span>
-      <ResponsiveSizeInput
-        css={{
-          '--input-font': 'var(--font-large-medium)',
-        }}
-        inputValue={tradeValues.limitPrice ?? ''}
-        inputType={InputType.Number}
-        onInput={onLimitPriceInput}
-        fractionDigits={tickSizeDecimals}
-        displayableAsset={displayableAsset ?? ''}
-        maxFontSize={32}
-        inputUnit={DisplayUnit.Fiat}
-      />
-    </div>
-  );
-
   const toggleDisplayUnit = () => {
     if (!assetId) return;
 
@@ -221,24 +193,38 @@ export const SimpleCloseForm = ({
     : 0;
 
   const positionBefore = currentSizeBN;
-  const positionAfterBN = summary.accountDetailsAfter?.position?.signedSize?.abs();
+  const positionAfterBN = MustBigNumber(summary.accountDetailsAfter?.position?.signedSize.abs());
   const positionAfter = positionAfterBN?.toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
-
-  const withDiff =
-    currentPositionSize != null && positionAfterBN != null && !currentSizeBN.eq(positionAfterBN);
+  const sideKey = currentPositionSide ? getIndexerPositionSideStringKey(currentPositionSide) : '';
+  const sideColor = {
+    [IndexerPositionSide.LONG]: 'var(--color-positive)',
+    [IndexerPositionSide.SHORT]: 'var(--color-negative)',
+    default: 'var(--color-text-2)',
+  }[currentPositionSide ?? 'default'];
+  const withDiff = currentPositionSize != null && !currentSizeBN.eq(positionAfterBN);
 
   const receiptArea = (
     <div tw="flexColumn w-full gap-[1px] overflow-hidden rounded-[1rem] font-small-book">
       <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
         <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.POSITION })}</span>
-        <DiffOutput
-          tw="text-color-text-2"
-          type={OutputType.Asset}
-          withDiff={withDiff}
-          value={positionBefore}
-          newValue={positionAfter}
-          fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
-        />
+        <span tw="row gap-0.25">
+          <span
+            css={{
+              color: sideColor,
+            }}
+          >
+            {stringGetter({ key: sideKey })}
+          </span>
+          <DiffOutput
+            tw="text-color-text-2"
+            type={OutputType.Asset}
+            withDiff={withDiff}
+            value={positionBefore}
+            newValue={positionAfter}
+            fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
+          />
+          {displayableAsset}
+        </span>
       </div>
       <div tw="row justify-between bg-[var(--simpleUi-dialog-secondaryColor)] px-0.75 py-0.5">
         <MarginUsageTag marginUsage={marginUsage} />
@@ -342,20 +328,15 @@ export const SimpleCloseForm = ({
   const placeOrderButton = (
     <Button
       type={ButtonType.Button}
-      action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
+      action={ButtonAction.Primary}
       tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
       size={ButtonSize.Medium}
-      css={{
-        '--button-textColor': 'var(--color-layer-0)',
-      }}
       state={{ isDisabled: !shouldEnableTrade }}
       onClick={onSubmitOrder}
     >
       {shortAlertKey
         ? stringGetter({ key: shortAlertKey })
-        : tradeValues.side === OrderSide.BUY
-          ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-          : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
+        : stringGetter({ key: STRING_KEYS.CLOSE })}
     </Button>
   );
 
@@ -380,7 +361,7 @@ export const SimpleCloseForm = ({
 
   return (
     <div tw="flexColumn items-center gap-2 px-1.25 pb-[12.5rem] pt-[6.5vh]">
-      <div tw="flexColumn w-full items-center gap-0.5">
+      <div tw="flexColumn h-[100px] w-full items-center gap-0.5">
         <ResponsiveSizeInput
           inputValue={inputConfig.value}
           inputType={inputConfig.type}
@@ -391,7 +372,6 @@ export const SimpleCloseForm = ({
         />
         {sizeToggle}
       </div>
-      {tradeValues.type === TradeFormType.LIMIT && limitPriceInput}
       {closePositionButtons}
 
       <div

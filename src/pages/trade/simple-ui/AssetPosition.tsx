@@ -22,8 +22,8 @@ import { Tag, TagType } from '@/components/Tag';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { MarketOrderCard } from './MarketOrderCard';
 import { MarketPositionCard } from './MarketPositionCard';
+import { SimpleOrderCard } from './SimpleOrderCard';
 
 export const AssetPosition = () => {
   const dispatch = useAppDispatch();
@@ -113,7 +113,7 @@ export const AssetPosition = () => {
       {tab === 'orders' && openOrders.length > 0 && (
         <div tw="flexColumn mt-1 gap-1">
           {openOrders.map((order) => (
-            <MarketOrderCard key={order.id} order={order} />
+            <SimpleOrderCard key={order.id} order={order} />
           ))}
         </div>
       )}
