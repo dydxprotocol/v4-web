@@ -226,7 +226,7 @@ export type TradeSummary = {
 };
 
 export type TradeFormPayload = {
-  tradePayload: PlaceOrderPayload | undefined;
+  orderPayload: PlaceOrderPayload | undefined;
   triggersPayloads: TriggerOrderActions[] | undefined;
 };
 

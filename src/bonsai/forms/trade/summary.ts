@@ -283,7 +283,7 @@ export function calculateTradeSummary(
     tradeInfo,
     triggersSummary: triggersData?.summary,
     tradePayload: {
-      tradePayload,
+      orderPayload: tradePayload,
       triggersPayloads: triggersData?.payloads,
     },
 

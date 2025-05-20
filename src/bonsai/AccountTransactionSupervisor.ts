@@ -921,8 +921,8 @@ export class AccountTransactionSupervisor {
   }
 
   public async placeCompoundOrder(order: TradeFormPayload) {
-    if (order.tradePayload != null) {
-      const res = await this.placeOrder(order.tradePayload);
+    if (order.orderPayload != null) {
+      const res = await this.placeOrder(order.orderPayload);
       if (isOperationFailure(res)) {
         return res;
       }

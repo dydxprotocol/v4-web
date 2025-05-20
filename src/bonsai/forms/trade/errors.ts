@@ -627,7 +627,7 @@ function validatePositionState(summary: TradeFormSummary): ValidationError[] {
   const needsReduceOnly = summary.options.needsReduceOnly;
   const reduceOnly = state.reduceOnly;
   const side = state.side;
-  const size = AttemptNumber(summary.tradePayload?.tradePayload?.size);
+  const size = AttemptNumber(summary.tradePayload?.orderPayload?.size);
 
   if (side == null || size == null) {
     return errors;
@@ -948,7 +948,7 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
 }
 
 function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSummary) {
-  const subaccountToUse = summary.tradePayload?.tradePayload?.subaccountNumber;
+  const subaccountToUse = summary.tradePayload?.orderPayload?.subaccountNumber;
   if (subaccountToUse == null) {
     return [];
   }
@@ -961,7 +961,7 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
   const subaccountEquity = mapIfPresent(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     summary.accountDetailsBefore?.subaccountSummaries?.[subaccountToUse]?.equity.toNumber() ?? 0,
-    summary.tradePayload?.tradePayload?.transferToSubaccountAmount,
+    summary.tradePayload?.orderPayload?.transferToSubaccountAmount,
     (equity, transferAmount) => {
       return equity + transferAmount;
     }

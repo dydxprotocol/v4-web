@@ -268,7 +268,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(async (payload: TriggerOrdersPayload) => {
     return accountTransactionManager.placeCompoundOrder({
-      tradePayload: undefined,
+      orderPayload: undefined,
       triggersPayloads: payload.payloads,
     });
   }, []);

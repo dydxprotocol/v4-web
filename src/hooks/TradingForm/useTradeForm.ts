@@ -110,7 +110,7 @@ export const useTradeForm = ({
   } = {}) => {
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
-    const tradePayload = payload?.tradePayload;
+    const tradePayload = payload?.orderPayload;
     if (payload == null || tradePayload == null || hasValidationErrors) {
       return;
     }
