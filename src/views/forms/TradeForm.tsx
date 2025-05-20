@@ -82,10 +82,14 @@ export const TradeForm = ({
     onLastOrderIndexed,
   });
 
-  const { shouldPromptUserToPlaceLimitOrder, isErrorShownInOrderStatusToast, primaryAlert } =
-    useTradeErrors({
-      placeOrderError,
-    });
+  const {
+    shouldPromptUserToPlaceLimitOrder,
+    isErrorShownInOrderStatusToast,
+    primaryAlert,
+    shortAlertKey,
+  } = useTradeErrors({
+    placeOrderError,
+  });
 
   useEffect(() => {
     dispatch(tradeFormActions.setMarketId(currentMarketId));
@@ -118,10 +122,6 @@ export const TradeForm = ({
       rawInput.postOnly,
       rawInput.timeInForce,
     ].some((v) => v != null && v !== '') || (rawInput.size?.value.value.trim() ?? '') !== '';
-
-  const { shortAlertKey } = useTradeErrors({
-    placeOrderError,
-  });
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
