@@ -71,7 +71,10 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
         {stringGetter({
           key: STRING_KEYS.CREDITED_WITH,
           params: {
-            AMOUNT_USD: dydxChainId === 'dydxprotocol-testnet' ? 1000 : 100,
+            AMOUNT_USD:
+              dydxChainId === 'dydx-testnet-4' || dydxChainId === 'dydxprotocol-testnet'
+                ? 1000
+                : 100,
           },
         })}
       </p>
