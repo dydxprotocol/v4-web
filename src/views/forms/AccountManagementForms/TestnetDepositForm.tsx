@@ -33,7 +33,6 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const subAccount = useAppSelector(getSubaccount);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const dydxChainId = useEnvConfig('dydxChainId');
-  console.log(dydxChainId);
 
   const [isLoading, setIsLoading] = useState(false);
 
