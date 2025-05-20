@@ -3,8 +3,6 @@ import { useCallback } from 'react';
 import { clamp } from 'lodash';
 import styled, { css } from 'styled-components';
 
-import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
-
 import { Slider } from '@/components/Slider';
 
 import { AttemptNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
@@ -25,35 +23,25 @@ export const LeverageSlider = ({
   setLeverageInputValue,
   className,
 }: ElementProps & StyleProps) => {
-  const leverage = AttemptNumber(leverageInput);
+  const localLeverage = AttemptNumber(leverageInput) ?? leftLeverageSigned;
   const leftLeverage = MustNumber(leftLeverageSigned);
   const rightLeverage = MustNumber(rightLeverageSigned);
 
-  const setLeverageSlow = useCallback(
+  const setLeverage = useCallback(
     (thisLeverage: number) => {
       setLeverageInputValue(MustBigNumber(thisLeverage).toFixed(4));
     },
     [setLeverageInputValue]
   );
 
-  const {
-    value: localLeverage,
-    setValue: setLocalLeverage,
-    commitValue: commitLocalLeverage,
-  } = useQuickUpdatingState({
-    setValueSlow: setLeverageSlow,
-    slowValue: leverage ?? leftLeverageSigned,
-    debounceMs: 100,
-  });
-
   const onSliderDrag = ([newLeverage]: number[]) => {
     const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
-    setLocalLeverage(thisLeverage);
+    setLeverage(thisLeverage);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
     const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
-    commitLocalLeverage(thisLeverage);
+    setLeverage(thisLeverage);
   };
 
   const midpointFraction = getZeroFractionBetween(leftLeverage, rightLeverage);

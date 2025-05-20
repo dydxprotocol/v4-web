@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -108,10 +107,10 @@ export const TargetLeverageInput = () => {
         <Input
           placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
           type={InputType.Leverage}
-          value={targetLeverage ?? ''}
+          value={leverage ?? ''}
           max={maxLeverage}
-          onChange={({ value }: NumberFormatValues) => {
-            commitLeverage(value);
+          onInput={({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+            commitLeverage(formattedValue);
           }}
         />
       </$InnerInputContainer>
