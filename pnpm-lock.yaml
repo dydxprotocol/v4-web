@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.21.3
     version: 1.21.3
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.290
-    version: 1.1.290
+    specifier: ^1.1.291
+    version: 1.1.291
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -590,7 +590,7 @@ packages:
       rehackt: 0.1.0(@types/react@18.3.3)(react@18.2.0)
       symbol-observable: 4.0.0
       ts-invariant: 0.10.3
-      tslib: 2.6.2
+      tslib: 2.7.0
       zen-observable-ts: 1.2.5
     transitivePeerDependencies:
       - '@types/react'
@@ -1530,8 +1530,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.290:
-    resolution: {integrity: sha512-AhNG3OuaPLYHsFQs6PXt8pWmMQ2LuYStVbWo9NTELtkDa7A5ON4jLftiHNurAlgscYM9pvLMWomJ6rQSYecUEA==}
+  /@dydxprotocol/v4-localization@1.1.291:
+    resolution: {integrity: sha512-YnlfOHmg9wMqKRz61WMZCvF2dObr5XiUWT3XW59JVNbQbrGl5UNrxHBme8mW9TzCfXacYZ1686TWEZDhTvkYFw==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -3548,7 +3548,7 @@ packages:
       pump: 3.0.0
       readable-stream: 3.6.2
       socket.io-client: 4.7.5
-      tslib: 2.6.2
+      tslib: 2.7.0
       util: 0.12.5
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -19229,7 +19229,7 @@ packages:
   /rxjs@7.8.1:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   /safaridriver@0.1.2:
     resolution: {integrity: sha512-4R309+gWflJktzPXBQCobbWEHlzC4aK3a+Ov3tz2Ib2aBxiwd11phkdIBH1l0EO22x24CJMUQkpKFumRriCSRg==}

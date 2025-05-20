@@ -55,10 +55,10 @@ export const AssetDetails = ({ isLaunchableMarket }: { isLaunchableMarket?: bool
 
     const nextFundingRateBN = MustBigNumber(marketData.nextFundingRate);
     const fundingRateColor = nextFundingRateBN.isZero()
-      ? 'text-color-text-2'
+      ? 'var(--color-text-2)'
       : nextFundingRateBN.gt(0)
-        ? 'text-color-green'
-        : 'text-color-red';
+        ? 'var(--color-positive)'
+        : 'var(--color-negative)';
 
     return [
       {

@@ -3,6 +3,7 @@ import { OrderSide } from '@/bonsai/forms/trade/types';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,6 +11,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { Output, OutputType } from '@/components/Output';
+import { WithTooltip } from '@/components/WithTooltip';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
 import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
@@ -47,14 +50,37 @@ const AssetPage = () => {
       <div tw="flexColumn gap-2 px-1.25">
         <AssetDetails isLaunchableMarket />
       </div>
-      {/* TODO: Add localization for details */}
+
       <div tw="flexColumn mx-1.25 gap-0.25 rounded-0.5 bg-color-layer-3 p-1 text-center">
-        <span tw="mb-0.25 text-color-text-2 font-medium-bold">Launch on desktop</span>
+        <span tw="mb-0.25 text-color-text-2 font-medium-bold">
+          {stringGetter({ key: STRING_KEYS.LAUNCH_ON_DESKTOP })}
+        </span>
         <span tw="text-color-text-1 font-base-book">
-          Add $10k into MegaVault to launch this market.
+          {stringGetter({
+            key: STRING_KEYS.ADD_FUNDS_TO_LAUNCH,
+            params: {
+              DEPOSIT_AMOUNT: (
+                <Output
+                  useGrouping
+                  type={OutputType.CompactFiat}
+                  tw="inline-block"
+                  value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
+                />
+              ),
+            },
+          })}
         </span>
         <span tw="text-color-text-0 font-small-book">
-          Your funds will earn and estimated <MegaVaultYieldOutput tw="inline" /> APR
+          {stringGetter({
+            key: STRING_KEYS.YOUR_FUNDS_WILL_EARN_EST,
+            params: {
+              APR_PERCENTAGE: (
+                <WithTooltip tooltip="vault-apr-90d">
+                  <MegaVaultYieldOutput yieldType="ninetyDay" tw="inline-block" />
+                </WithTooltip>
+              ),
+            },
+          })}
         </span>
       </div>
     </>
