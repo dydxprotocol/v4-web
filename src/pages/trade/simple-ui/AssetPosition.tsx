@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { orderBy } from 'lodash';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -26,7 +27,11 @@ export const AssetPosition = () => {
   const currentMarketId = useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)?.ticker;
 
   const position = useMemo(() => {
-    return positions?.find((p) => p.market === currentMarketId);
+    return orderBy(
+      positions?.filter((p) => p.market === currentMarketId),
+      (p) => p.subaccountNumber,
+      ['asc']
+    ).at(0);
   }, [positions, currentMarketId]);
 
   const numOpenOrders = openOrders.length;
