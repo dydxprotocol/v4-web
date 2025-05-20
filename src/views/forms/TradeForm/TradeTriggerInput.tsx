@@ -130,7 +130,7 @@ export const TradeTriggerOrderInputs = ({
       <FormInput
         id={`${key}-price`}
         tw="[--form-input-paddingX:0.4rem]"
-        label={<>{stringGetter({ key: stringKeys.price })} </>}
+        label={stringGetter({ key: stringKeys.price })}
         type={InputType.Currency}
         decimals={tickSizeDecimals}
         value={
