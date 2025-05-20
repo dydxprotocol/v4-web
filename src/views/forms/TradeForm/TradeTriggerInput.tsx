@@ -107,8 +107,8 @@ export const TradeTriggerOrderInputs = ({
     onValueChange: (value: InputChangeType) => void;
   }) => (
     <DropdownSelectMenu
+      tw="[--trigger-padding:0.25rem 0.5rem] [--trigger-backgroundColor:var(--color-layer-6)] [--trigger-textColor:--color-text-1]"
       value={value}
-      tw="px-0.5 py-0.25"
       items={[
         {
           value: InputType.Percent,
