@@ -196,6 +196,7 @@ export const TradeForm = ({
 
   const tradeFooter = (
     <PlaceOrderButtonAndReceipt
+      summary={summary}
       actionStringKey={shortAlertKey}
       confirmButtonConfig={{
         stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
