@@ -231,7 +231,6 @@ export const ClosePositionForm = ({
         onInput={onAmountInput}
         type={InputType.Number}
         value={amountInput}
-        max={currentPositionSize != null ? currentSizeBN.toNumber() : undefined}
         tw="w-full"
       />
 
