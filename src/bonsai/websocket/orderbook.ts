@@ -94,14 +94,24 @@ export function setUpOrderbook(store: RootStore) {
     if (!isTruthy(currentMarketId)) {
       return undefined;
     }
-    const throttledSetOrderbook = throttle((data: Loadable<OrderbookData>) => {
+    let lastSetHadData: boolean = false;
+    const setOrderbook = (data: Loadable<OrderbookData>) => {
+      lastSetHadData = data.data != null;
       store.dispatch(setOrderbookRaw({ marketId: currentMarketId, data }));
-    }, timeUnits.second / 2);
+    };
+    const throttledSetOrderbook = throttle(setOrderbook, timeUnits.second / 2);
 
     const unsub = subscribeToWsValue(
       OrderbookValueManager,
       { wsUrl, marketId: currentMarketId },
-      (data) => throttledSetOrderbook(data)
+      (data) => {
+        const hasData = data.data != null;
+        if (hasData && !lastSetHadData) {
+          setOrderbook(data);
+        } else {
+          throttledSetOrderbook(data);
+        }
+      }
     );
 
     return () => {
