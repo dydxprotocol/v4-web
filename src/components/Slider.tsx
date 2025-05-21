@@ -9,7 +9,7 @@ type ElementProps = {
   min?: number;
   max?: number;
   step?: number;
-  ticks?: Array<{ percent: number; light?: boolean }>;
+  ticks?: Array<{ percent: number; light?: boolean; text?: string }>;
 };
 
 type StyleProps = { className?: string };
@@ -36,7 +36,9 @@ export const Slider = ({
     onValueCommit={onValueCommit}
   >
     <$Track>
-      {ticks?.map((t) => <$Tick key={t.percent} $midpoint={t.percent} $light={t.light ?? false} />)}
+      {ticks?.map((t) => (
+        <$Tick key={t.percent} $text={t.text} $midpoint={t.percent} $light={t.light ?? false} />
+      ))}
     </$Track>
     <$Thumb />
   </$Root>
@@ -89,11 +91,25 @@ const $Track = styled(Track)`
   }
 `;
 
-const $Tick = styled.span<{ $midpoint?: number; $light: boolean }>`
-  ${({ $midpoint, $light }) =>
+const $Tick = styled.span<{ $midpoint?: number; $light: boolean; $text?: string }>`
+  ${({ $midpoint, $light, $text }) =>
     $midpoint == null
       ? ''
       : css`
+          ${$text != null && $text.trim().length > 0
+            ? css`
+                &:before {
+                  content: '${$text}';
+                  font-size: 10px;
+                  position: absolute;
+                  left: ${$midpoint}%;
+                  top: 18px;
+                  transform: translate(-50%, -50%);
+                  color: var(--color-text-1);
+                  pointer-events: none;
+                }
+              `
+            : ''}
           &:after {
             content: '';
             position: absolute;

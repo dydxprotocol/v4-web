@@ -40,12 +40,13 @@ export const LeverageSlider = ({
   const MIN_SPACE = 10;
   const ticks = calc(() => {
     // sorted by priority
-    const possibleTicks = [0, -1, 1, -5, 5, -10, 10];
+    const possibleTicks = [0];
     const ticksInner: Array<{
       percent: number;
       fraction: number;
       leverage: number;
       light: boolean;
+      text: string;
     }> = [];
     possibleTicks.forEach((t) => {
       const fraction = getScaledFractionIfValid(t, leftLeverage, rightLeverage, scaleExp);
@@ -55,7 +56,13 @@ export const LeverageSlider = ({
         fraction != null &&
         ticksInner.find((otherTick) => Math.abs(otherTick.percent - percent) < MIN_SPACE) == null
       ) {
-        ticksInner.push({ percent, fraction, light: t === 0, leverage: t });
+        ticksInner.push({
+          percent,
+          fraction,
+          light: t === 0,
+          leverage: t,
+          text: t !== 0 ? `${Math.abs(t)}×` : '',
+        });
       }
       return undefined;
     });
