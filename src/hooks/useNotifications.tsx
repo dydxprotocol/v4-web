@@ -220,7 +220,13 @@ const useNotificationsContext = () => {
                 ? NotificationStatus.Cleared
                 : NotificationStatus.Updated;
             updateStatus(notification, nextStatus);
-          } else if (shouldUnhide && notification.status === NotificationStatus.Hidden) {
+          } else if (
+            shouldUnhide &&
+            !(
+              notification.status === NotificationStatus.Triggered ||
+              notification.status === NotificationStatus.Updated
+            )
+          ) {
             const nextStatus = forceHide ? NotificationStatus.Cleared : NotificationStatus.Updated;
             updateStatus(notification, nextStatus);
           } else if (forceHide && notification.status !== NotificationStatus.Cleared) {
