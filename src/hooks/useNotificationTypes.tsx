@@ -431,7 +431,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               groupKey: NotificationType.RewardsProgramUpdates,
               actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
               renderActionSlot: () => (
-                <Link href="https://dydx.forum/t/dydx-surge-season-2/3575/3" isAccent>
+                <Link href="https://www.dydx.xyz/surge" isAccent>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
                 </Link>
               ),
