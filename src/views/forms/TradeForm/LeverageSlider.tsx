@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { Slider } from '@/components/Slider';
 
+import { calc, mapIfPresent } from '@/lib/do';
 import { AttemptNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 
 type ElementProps = {
@@ -27,6 +28,8 @@ export const LeverageSlider = ({
   const leftLeverage = MustNumber(leftLeverageSigned);
   const rightLeverage = MustNumber(rightLeverageSigned);
 
+  const scaleExp = getScaleExponent(leftLeverage, rightLeverage);
+
   const setLeverage = useCallback(
     (thisLeverage: number) => {
       setLeverageInputValue(MustBigNumber(thisLeverage).toFixed(4));
@@ -34,27 +37,58 @@ export const LeverageSlider = ({
     [setLeverageInputValue]
   );
 
-  const onSliderDrag = ([newLeverage]: number[]) => {
-    const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
+  const MIN_SPACE = 10;
+  const ticks = calc(() => {
+    // sorted by priority
+    const possibleTicks = [0, -1, 1, -5, 5, -10, 10];
+    const ticksInner: Array<{
+      percent: number;
+      fraction: number;
+      leverage: number;
+      light: boolean;
+    }> = [];
+    possibleTicks.forEach((t) => {
+      const fraction = getScaledFractionIfValid(t, leftLeverage, rightLeverage, scaleExp);
+      const percent = mapIfPresent(fraction, (f) => f * 100);
+      if (
+        percent != null &&
+        fraction != null &&
+        ticksInner.find((otherTick) => Math.abs(otherTick.percent - percent) < MIN_SPACE) == null
+      ) {
+        ticksInner.push({ percent, fraction, light: t === 0, leverage: t });
+      }
+      return undefined;
+    });
+    return ticksInner;
+  });
+
+  function snapToTick(val: number): number {
+    const close = ticks.find((t) => Math.abs(t.fraction - val) < MIN_SPACE / 100 / 3);
+    if (close != null) {
+      return close.fraction;
+    }
+    return val;
+  }
+
+  const onSliderDrag = ([sliderValue]: number[]) => {
+    const thisLeverage = fromAdjustedSliderValue(snapToTick(sliderValue ?? 0));
     setLeverage(thisLeverage);
   };
 
-  const onValueCommit = ([newLeverage]: number[]) => {
-    const thisLeverage = fromAdjustedSliderValue(newLeverage ?? leftLeverage);
+  const onValueCommit = ([sliderValue]: number[]) => {
+    const thisLeverage = fromAdjustedSliderValue(snapToTick(sliderValue ?? 0));
     setLeverage(thisLeverage);
   };
 
-  const midpointFraction = getZeroFractionBetween(leftLeverage, rightLeverage);
   const rightIsPositive = rightLeverage >= leftLeverage;
 
   const toAdjustedSliderValue = (val: number) => {
-    return getFractionBetween(val, leftLeverage, rightLeverage);
+    return toScaled(getFractionBetween(val, leftLeverage, rightLeverage), scaleExp);
   };
   const fromAdjustedSliderValue = (val: number) => {
-    return getValueAtFraction(val, leftLeverage, rightLeverage);
+    return getValueAtFraction(fromScaled(val, scaleExp), leftLeverage, rightLeverage);
   };
 
-  const midPercent = midpointFraction != null ? 100 * midpointFraction : undefined;
   return (
     <div className={className} tw="h-[1.375rem]">
       <$Slider
@@ -71,10 +105,8 @@ export const LeverageSlider = ({
         )}
         onSliderDrag={onSliderDrag}
         onValueCommit={onValueCommit}
-        midPercent={
-          midPercent != null && midPercent > 0 && midPercent < 100 ? midPercent : undefined
-        }
-        $midpoint={midPercent}
+        ticks={ticks}
+        $midpoint={ticks.find((t) => t.leverage === 0)?.percent}
         $flipped={!rightIsPositive}
       />
     </div>
@@ -94,26 +126,17 @@ const $Slider = styled(Slider)<{ $midpoint?: number; $flipped: boolean }>`
   `}
 `;
 
-function getZeroFractionBetween(leftLeverage: number, rightLeverage: number): number | undefined {
-  // Check if zero is between the two values (they have opposite signs)
-  const leftIsNegative = leftLeverage < 0;
-  const rightIsNegative = rightLeverage < 0;
-
-  // If both are on the same side of zero (both positive or both negative)
-  // or if one of them is zero, return undefined
-  if (
-    (leftIsNegative && rightIsNegative) ||
-    (!leftIsNegative && !rightIsNegative && leftLeverage !== 0 && rightLeverage !== 0)
-  ) {
+function getScaledFractionIfValid(
+  num: number,
+  leftLeverage: number,
+  rightLeverage: number,
+  exponent: number
+): number | undefined {
+  const fraction = getFractionBetween(num, leftLeverage, rightLeverage);
+  if (fraction === 0 || fraction === 1) {
     return undefined;
   }
-
-  // If zero is equal to one of the values
-  if (leftLeverage === 0) return 0;
-  if (rightLeverage === 0) return 1;
-
-  // Use the general function to calculate the fraction
-  return getFractionBetween(0, leftLeverage, rightLeverage);
+  return toScaled(fraction, exponent);
 }
 
 function getFractionBetween(target: number, leftValue: number, rightValue: number): number {
@@ -155,4 +178,23 @@ function getValueAtFraction(fraction: number, leftValue: number, rightValue: num
 
   // Return the value at the specified fraction
   return leftValue + offset;
+}
+
+function getScaleExponent(left: number, right: number) {
+  const min = 0.2;
+  const max = 0.4;
+  const expectedMinLeverage = 5;
+  const expectedMaxLeverage = 50;
+
+  const diff = clamp(Math.abs(right - left), expectedMinLeverage, expectedMaxLeverage);
+  const normalized = (diff - expectedMinLeverage) / (expectedMaxLeverage - expectedMinLeverage);
+  return max - normalized * (max - min);
+}
+
+function toScaled(num: number, exponent: number) {
+  return num ** exponent;
+}
+
+function fromScaled(num: number, exponent: number) {
+  return num ** (1 / exponent);
 }
