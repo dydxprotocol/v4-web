@@ -22,6 +22,7 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
+import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
@@ -417,6 +418,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const currentMarket = useAppSelector(BonsaiCore.markets.currentMarketId);
       const positions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
       const openOrders = useAppSelector(BonsaiCore.account.openOrders.data);
+      const windDownNotifDuration = timeUnits.week * 2;
+
       const marketsRelevantToAccount = useMemo(
         () =>
           new Set(
@@ -433,30 +436,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
         (): Array<{
           market: string;
           windDownProposalLink?: string;
-          windDownProposalExpirationDate: string;
-          windDownDate?: string;
-          windDownExpirationDate?: string;
+          // date when proposal passes and final settlement happens
+          windDownDate: string;
         }> => [
           {
             market: 'SKITTEN-USD',
             windDownProposalLink: undefined,
-            windDownProposalExpirationDate: '2025-05-24T00:00:00.000Z',
-            windDownDate: undefined,
-            windDownExpirationDate: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
           },
           {
             market: 'EOS-USD',
             windDownProposalLink: undefined,
-            windDownProposalExpirationDate: '2025-05-24T00:00:00.000Z',
-            windDownDate: undefined,
-            windDownExpirationDate: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
           },
           {
             market: 'BTRUMP-USD',
             windDownProposalLink: undefined,
-            windDownProposalExpirationDate: '2025-05-24T00:00:00.000Z',
-            windDownDate: undefined,
-            windDownExpirationDate: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
           },
         ],
         []
@@ -464,19 +460,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         windDownObjects.forEach((obj) => {
-          const { market, windDownProposalLink, windDownProposalExpirationDate } = obj;
+          const { market, windDownProposalLink, windDownDate } = obj;
 
           const notificationProposalId = `market-wind-down-proposal-${market}`;
-          if (
-            marketsRelevantToAccount.has(market) &&
-            new Date() <= new Date(windDownProposalExpirationDate)
-          ) {
+          if (marketsRelevantToAccount.has(market) && new Date() <= new Date(windDownDate)) {
             const outputDate = (
-              <Output
-                tw="inline-block"
-                type={OutputType.DateTime}
-                value={windDownProposalExpirationDate}
-              />
+              <Output tw="inline-block" type={OutputType.DateTime} value={windDownDate} />
             );
 
             trigger({
@@ -515,16 +504,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         windDownObjects.forEach((obj) => {
-          const { market, windDownProposalLink, windDownDate, windDownExpirationDate } = obj;
+          const { market, windDownDate } = obj;
 
           const notificationWindDownId = `market-wind-down-${market}`;
           const learnMoreLink = contractLossMechanismLearnMore;
+          const windDownExpirationDate = new Date(
+            new Date(windDownDate).getTime() + windDownNotifDuration
+          );
           if (
             marketsRelevantToAccount.has(market) &&
-            windDownDate != null &&
-            windDownExpirationDate != null &&
-            windDownProposalLink &&
-            windDownProposalLink !== '' &&
             learnMoreLink &&
             new Date() >= new Date(windDownDate) &&
             new Date() <= new Date(windDownExpirationDate)
@@ -568,6 +556,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         marketsRelevantToAccount,
         stringGetter,
         trigger,
+        windDownNotifDuration,
         windDownObjects,
       ]);
     },
