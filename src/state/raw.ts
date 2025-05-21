@@ -138,112 +138,118 @@ const initialState: RawDataState = {
 export const rawSlice = createSlice({
   name: 'Raw data',
   initialState,
-  reducers: autoBatchAllReducers<RawDataState>()({
-    setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
-      state.markets.allMarkets = action.payload;
-    },
-    setAllAssetsRaw: (state, action: PayloadAction<Loadable<AssetInfos>>) => {
-      state.markets.assets = action.payload;
-    },
+  reducers: {
+    ...autoBatchAllReducers<RawDataState>()({
+      setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
+        state.markets.allMarkets = action.payload;
+      },
+      setAllAssetsRaw: (state, action: PayloadAction<Loadable<AssetInfos>>) => {
+        state.markets.assets = action.payload;
+      },
+      setSparklines: (
+        state,
+        action: PayloadAction<
+          Loadable<{
+            [period: string]: IndexerSparklineResponseObject | undefined;
+          }>
+        >
+      ) => {
+        state.markets.sparklines = action.payload;
+      },
+      setParentSubaccountRaw: (state, action: PayloadAction<Loadable<ParentSubaccountData>>) => {
+        state.account.parentSubaccount = action.payload;
+      },
+      setAccountBalancesRaw: (state, action: PayloadAction<Loadable<Coin[]>>) => {
+        state.account.balances = action.payload;
+      },
+      setAccountNobleUsdcBalanceRaw: (state, action: PayloadAction<Loadable<Coin>>) => {
+        state.account.nobleUsdcBalance = action.payload;
+      },
+      setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
+        state.account.stats = action.payload;
+      },
+      setAccountFeeTierRaw: (state, action: PayloadAction<Loadable<UserFeeTier | undefined>>) => {
+        state.account.feeTier = action.payload;
+      },
+      setConfigTiers: (state, action: PayloadAction<Loadable<ConfigTiers>>) => {
+        state.configs = action.payload;
+      },
+      setAccountFillsRaw: (
+        state,
+        action: PayloadAction<Loadable<IndexerCompositeFillResponse>>
+      ) => {
+        state.account.fills = action.payload;
+      },
+      setAccountTransfersRaw: (
+        state,
+        action: PayloadAction<Loadable<IndexerParentSubaccountTransferResponse>>
+      ) => {
+        state.account.transfers = action.payload;
+      },
+      setAccountBlockTradingRewardsRaw: (
+        state,
+        action: PayloadAction<Loadable<IndexerHistoricalBlockTradingRewardsResponse>>
+      ) => {
+        state.account.blockTradingRewards = action.payload;
+      },
+      setAccountOrdersRaw: (state, action: PayloadAction<Loadable<OrdersData>>) => {
+        state.account.orders = action.payload;
+      },
+      setNetworkStateRaw: (
+        state,
+        action: PayloadAction<{ networkId: DydxNetwork; stateToMerge: Partial<NetworkState> }>
+      ) => {
+        const { networkId, stateToMerge } = action.payload;
+        state.network[networkId] = {
+          ...(state.network[networkId] ?? {
+            compositeClientReady: false,
+            compositeClientUrl: undefined,
+            indexerClientReady: false,
+            nobleClientReady: false,
+            errorInitializing: false,
+          }),
+          ...stateToMerge,
+        };
+      },
+      setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
+        appendToHeight(state.heights.indexerHeight, action.payload);
+      },
+      setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
+        appendToHeight(state.heights.validatorHeight, action.payload);
+      },
+      setComplianceGeoRaw: (state, action: PayloadAction<Loadable<string | undefined>>) => {
+        state.compliance.geo = action.payload;
+      },
+      setLocalAddressScreenV2Raw: (
+        state,
+        action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+      ) => {
+        state.compliance.localAddressScreenV2 = action.payload;
+      },
+      setSourceAddressScreenV2Raw: (
+        state,
+        action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
+      ) => {
+        state.compliance.sourceAddressScreenV2 = action.payload;
+      },
+      setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
+        state.rewards.data = action.payload;
+      },
+      setRewardsTokenPrice: (
+        state,
+        action: PayloadAction<Loadable<TokenPriceResponse | undefined>>
+      ) => {
+        state.rewards.price = action.payload;
+      },
+    }),
+    // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
       state,
       action: PayloadAction<{ marketId: string; data: Loadable<OrderbookData> }>
     ) => {
       state.markets.orderbooks[action.payload.marketId] = action.payload.data;
     },
-    setSparklines: (
-      state,
-      action: PayloadAction<
-        Loadable<{
-          [period: string]: IndexerSparklineResponseObject | undefined;
-        }>
-      >
-    ) => {
-      state.markets.sparklines = action.payload;
-    },
-    setParentSubaccountRaw: (state, action: PayloadAction<Loadable<ParentSubaccountData>>) => {
-      state.account.parentSubaccount = action.payload;
-    },
-    setAccountBalancesRaw: (state, action: PayloadAction<Loadable<Coin[]>>) => {
-      state.account.balances = action.payload;
-    },
-    setAccountNobleUsdcBalanceRaw: (state, action: PayloadAction<Loadable<Coin>>) => {
-      state.account.nobleUsdcBalance = action.payload;
-    },
-    setAccountStatsRaw: (state, action: PayloadAction<Loadable<AccountStats | undefined>>) => {
-      state.account.stats = action.payload;
-    },
-    setAccountFeeTierRaw: (state, action: PayloadAction<Loadable<UserFeeTier | undefined>>) => {
-      state.account.feeTier = action.payload;
-    },
-    setConfigTiers: (state, action: PayloadAction<Loadable<ConfigTiers>>) => {
-      state.configs = action.payload;
-    },
-    setAccountFillsRaw: (state, action: PayloadAction<Loadable<IndexerCompositeFillResponse>>) => {
-      state.account.fills = action.payload;
-    },
-    setAccountTransfersRaw: (
-      state,
-      action: PayloadAction<Loadable<IndexerParentSubaccountTransferResponse>>
-    ) => {
-      state.account.transfers = action.payload;
-    },
-    setAccountBlockTradingRewardsRaw: (
-      state,
-      action: PayloadAction<Loadable<IndexerHistoricalBlockTradingRewardsResponse>>
-    ) => {
-      state.account.blockTradingRewards = action.payload;
-    },
-    setAccountOrdersRaw: (state, action: PayloadAction<Loadable<OrdersData>>) => {
-      state.account.orders = action.payload;
-    },
-    setNetworkStateRaw: (
-      state,
-      action: PayloadAction<{ networkId: DydxNetwork; stateToMerge: Partial<NetworkState> }>
-    ) => {
-      const { networkId, stateToMerge } = action.payload;
-      state.network[networkId] = {
-        ...(state.network[networkId] ?? {
-          compositeClientReady: false,
-          compositeClientUrl: undefined,
-          indexerClientReady: false,
-          nobleClientReady: false,
-          errorInitializing: false,
-        }),
-        ...stateToMerge,
-      };
-    },
-    setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
-      appendToHeight(state.heights.indexerHeight, action.payload);
-    },
-    setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
-      appendToHeight(state.heights.validatorHeight, action.payload);
-    },
-    setComplianceGeoRaw: (state, action: PayloadAction<Loadable<string | undefined>>) => {
-      state.compliance.geo = action.payload;
-    },
-    setLocalAddressScreenV2Raw: (
-      state,
-      action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
-    ) => {
-      state.compliance.localAddressScreenV2 = action.payload;
-    },
-    setSourceAddressScreenV2Raw: (
-      state,
-      action: PayloadAction<Loadable<ComplianceResponse & ComplianceErrors>>
-    ) => {
-      state.compliance.sourceAddressScreenV2 = action.payload;
-    },
-    setRewardsParams: (state, action: PayloadAction<Loadable<RewardsParams | undefined>>) => {
-      state.rewards.data = action.payload;
-    },
-    setRewardsTokenPrice: (
-      state,
-      action: PayloadAction<Loadable<TokenPriceResponse | undefined>>
-    ) => {
-      state.rewards.price = action.payload;
-    },
-  }),
+  },
 });
 
 const HEIGHTS_BUFFER_LENGTH = 12;
