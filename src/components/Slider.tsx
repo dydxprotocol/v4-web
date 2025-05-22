@@ -9,7 +9,7 @@ type ElementProps = {
   min?: number;
   max?: number;
   step?: number;
-  midPercent?: number;
+  ticks?: Array<{ percent: number; light?: boolean; text?: string }>;
 };
 
 type StyleProps = { className?: string };
@@ -22,7 +22,7 @@ export const Slider = ({
   onValueCommit,
   min,
   max,
-  midPercent,
+  ticks,
   step = 0.1,
 }: ElementProps & StyleProps) => (
   <$Root
@@ -35,7 +35,11 @@ export const Slider = ({
     onValueChange={onSliderDrag}
     onValueCommit={onValueCommit}
   >
-    <$Track $midpoint={midPercent} />
+    <$Track>
+      {ticks?.map((t) => (
+        <$Tick key={t.percent} $text={t.text} $midpoint={t.percent} $light={t.light ?? false} />
+      ))}
+    </$Track>
     <$Thumb />
   </$Root>
 );
@@ -55,7 +59,7 @@ const $Root = styled(Root)`
   height: 100%;
 `;
 
-const $Track = styled(Track)<{ $midpoint?: number }>`
+const $Track = styled(Track)`
   position: relative;
 
   display: flex;
@@ -85,11 +89,27 @@ const $Track = styled(Track)<{ $midpoint?: number }>`
       )
       0 0 / 0.6rem;
   }
+`;
 
-  ${({ $midpoint }) =>
+const $Tick = styled.span<{ $midpoint?: number; $light: boolean; $text?: string }>`
+  ${({ $midpoint, $light, $text }) =>
     $midpoint == null
       ? ''
       : css`
+          ${$text != null && $text.trim().length > 0
+            ? css`
+                &:before {
+                  content: '${$text}';
+                  font-size: 10px;
+                  position: absolute;
+                  left: ${$midpoint}%;
+                  top: 18px;
+                  transform: translate(-50%, -50%);
+                  color: var(--color-text-1);
+                  pointer-events: none;
+                }
+              `
+            : ''}
           &:after {
             content: '';
             position: absolute;
@@ -98,7 +118,7 @@ const $Track = styled(Track)<{ $midpoint?: number }>`
             transform: translate(-50%, -50%);
             width: 2px;
             height: 14px;
-            background-color: white;
+            background-color: ${$light ? 'var(--color-text-2)' : 'var(--color-text-0)'};
             border-radius: 1px;
             pointer-events: none;
           }

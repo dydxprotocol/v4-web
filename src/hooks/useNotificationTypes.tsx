@@ -441,18 +441,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }> => [
           {
             market: 'SKITTEN-USD',
-            windDownProposalLink: undefined,
-            windDownDate: '2025-05-24T00:00:00.000Z',
+            windDownProposalLink: 'https://www.mintscan.io/dydx/proposals/247',
+            windDownDate: '2025-05-23T07:25:00.000Z',
           },
           {
             market: 'EOS-USD',
-            windDownProposalLink: undefined,
-            windDownDate: '2025-05-24T00:00:00.000Z',
+            windDownProposalLink: 'https://www.mintscan.io/dydx/proposals/247',
+            windDownDate: '2025-05-23T07:25:00.000Z',
           },
           {
             market: 'BTRUMP-USD',
-            windDownProposalLink: undefined,
-            windDownDate: '2025-05-24T00:00:00.000Z',
+            windDownProposalLink: 'https://www.mintscan.io/dydx/proposals/247',
+            windDownDate: '2025-05-23T07:25:00.000Z',
           },
         ],
         []
