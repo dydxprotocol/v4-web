@@ -5,6 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
+import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -44,17 +45,32 @@ export const MarketLeverageInput = ({
   const minLeverage = Math.min(leftLeverage, rightLeverage);
   const maxLeverage = Math.max(leftLeverage, rightLeverage);
 
+  const {
+    value: localLeverage,
+    setValue: setLocalLeverage,
+    commitValue: commitLocalLeverage,
+  } = useQuickUpdatingState({
+    setValueSlow: setLeverageInputValue,
+    slowValue: leverageInputValue,
+    debounceMs: 100,
+  });
+
   const effectiveLeverageInput = clamp(
-    AttemptNumber(leverageInputValue) ?? leftLeverage,
+    AttemptNumber(localLeverage) ?? leftLeverage,
     minLeverage,
     maxLeverage
   );
 
-  const onLeverageInput = ({ formattedValue }: { floatValue?: number; formattedValue: string }) => {
+  const onLeverageTypedInput = ({
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
     const numberVal = AttemptNumber(formattedValue);
 
     if (numberVal == null) {
-      setLeverageInputValue(formattedValue);
+      commitLocalLeverage(formattedValue);
       return;
     }
 
@@ -68,18 +84,18 @@ export const MarketLeverageInput = ({
       validValues.push(opposite);
     }
     if (validValues.length === 0) {
-      setLeverageInputValue(formattedValue);
+      commitLocalLeverage(formattedValue);
       return;
     }
 
     const minDistanceFromCurrent = minBy(validValues, (v) => Math.abs(effectiveLeverageInput - v))!;
-    setLeverageInputValue(MustBigNumber(minDistanceFromCurrent).toFixed(4));
+    commitLocalLeverage(MustBigNumber(minDistanceFromCurrent).toFixed(4));
   };
 
   const onLeverageSideToggle = () => {
     const flippedValue = effectiveLeverageInput * -1;
     const clampedValue = clamp(flippedValue, minLeverage, maxLeverage);
-    setLeverageInputValue(AttemptBigNumber(clampedValue)?.toFixed(4) ?? '');
+    commitLocalLeverage(AttemptBigNumber(clampedValue)?.toFixed(4) ?? '');
   };
 
   return (
@@ -109,16 +125,16 @@ export const MarketLeverageInput = ({
         <LeverageSlider
           leftLeverageSigned={leftLeverage}
           rightLeverageSigned={rightLeverage}
-          leverageInput={leverageInputValue}
-          setLeverageInputValue={setLeverageInputValue}
+          leverageInput={localLeverage}
+          setLeverageInputValue={setLocalLeverage}
         />
       </$WithLabel>
       <$InnerInputContainer>
         <Input
-          onInput={onLeverageInput}
+          onInput={onLeverageTypedInput}
           placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
           type={InputType.Leverage}
-          value={leverageInputValue}
+          value={localLeverage}
         />
       </$InnerInputContainer>
     </$InputContainer>

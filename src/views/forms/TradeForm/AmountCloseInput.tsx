@@ -65,7 +65,7 @@ export const AmountCloseInput = ({
         <Input
           placeholder={`${MustBigNumber(amountClose).toFixed(0)}%`}
           type={InputType.Percent}
-          value={amountClosePercentInput}
+          value={amountClose}
           max={100}
           onInput={({ formattedValue }: { formattedValue: string }) => {
             commitValue(formattedValue);
