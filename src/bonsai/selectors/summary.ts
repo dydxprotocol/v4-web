@@ -84,7 +84,7 @@ export const selectCurrentMarketAssetName = createAppSelector(
 export const selectCurrentMarketAssetLogoUrl = createAppSelector(
   [selectCurrentMarketInfo],
   (currentMarketInfo) => {
-    return currentMarketInfo?.logo;
+    return currentMarketInfo?.logo ?? undefined;
   }
 );
 
