@@ -2,7 +2,6 @@ export type StatsigConfigType = Record<StatsigFlags, boolean>;
 
 export enum StatsigFlags {
   ffShowPredictionMarketsUi = 'ff_show_prediction_markets_ui',
-  ffEnableKeplr = 'ff_enable_keplr',
   ffEnableAffiliates = 'ff_enable_affiliates',
   ffEnableLimitClose = 'ff_enable_limit_close',
   ffEnableTimestampNonce = 'ff_enable_timestamp_nonce',

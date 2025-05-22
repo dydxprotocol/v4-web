@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { WalletType as CosmosWalletType } from 'graz';
 
-import { StatsigFlags } from '@/constants/statsig';
 import {
   COINBASE_MIPD_RDNS,
   ConnectorType,
@@ -19,7 +18,6 @@ import {
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MipdInjectedWallet, useMipdInjectedWallets } from './useMipdInjectedWallets';
-import { useStatsigGateValue } from './useStatsig';
 
 const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
   return {
@@ -31,7 +29,6 @@ const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
 };
 
 export const useDisplayedWallets = (): WalletInfo[] => {
-  const keplrEnabled = useStatsigGateValue(StatsigFlags.ffEnableKeplr);
   const injectedWallets = useMipdInjectedWallets();
 
   return useMemo(() => {
@@ -87,7 +84,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
       ...otherInjectedWallets,
       phantomWallet,
-      keplrEnabled && keplrWallet,
+      keplrWallet,
       { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
       Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
@@ -99,5 +96,5 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       // Note that OKX mobile app users can still connect through the generic WalletConnect option
       !okxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
     ].filter(isTruthy) as WalletInfo[];
-  }, [injectedWallets, keplrEnabled]);
+  }, [injectedWallets]);
 };
