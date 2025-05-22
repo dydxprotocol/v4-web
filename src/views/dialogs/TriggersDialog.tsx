@@ -26,8 +26,8 @@ export const TriggersDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
-  const { isMobile } = useBreakpoints();
-  const isSimpleUi = testFlags.simpleUi && isMobile;
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = testFlags.simpleUi && isTablet;
 
   const config = isSimpleUi
     ? {

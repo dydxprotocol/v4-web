@@ -167,7 +167,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   }, [inputErrors, stringGetter]);
 
   return (
-    <form onSubmit={onSubmit} tw="column gap-[1.25ch]">
+    <form onSubmit={onSubmit} tw="flexColumn gap-[1.25ch]">
       {priceInfo}
       <TriggerOrdersInputs
         symbol={symbol}
@@ -201,7 +201,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
             slotLeft={
               hasErrors ? <Icon iconName={IconName.Warning} tw="text-color-warning" /> : undefined
             }
-            tw="w-full"
+            tw="mt-auto w-full"
           >
             {hasErrors
               ? ctaErrorAction
