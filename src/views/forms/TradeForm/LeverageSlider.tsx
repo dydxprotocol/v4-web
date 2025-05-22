@@ -203,5 +203,5 @@ function toScaled(num: number, exponent: number) {
 }
 
 function fromScaled(num: number, exponent: number) {
-  return num ** (1 / exponent);
+  return exponent === 0 ? 0 : num ** (1 / exponent);
 }
