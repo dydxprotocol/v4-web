@@ -5,6 +5,7 @@ import {
   logBonsaiInfo,
   LONG_REQUEST_LOG_THRESHOLD_MS,
   OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS,
+  REQUEST_TIME_SAMPLE_RATE,
 } from '@/bonsai/logs';
 import typia from 'typia';
 
@@ -392,22 +393,35 @@ export class IndexerWebsocket {
               wsId: this.indexerWsId,
             });
           }
-          if (
-            !sub.receivedBaseData &&
-            sub.firstSubscriptionTimeMs != null &&
-            Date.now() - sub.firstSubscriptionTimeMs > LONG_REQUEST_LOG_THRESHOLD_MS &&
-            Date.now() - sub.firstSubscriptionTimeMs < OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS
-          ) {
+          if (!sub.receivedBaseData && sub.firstSubscriptionTimeMs != null) {
             const duration = Date.now() - sub.firstSubscriptionTimeMs;
-            logBonsaiInfo(
-              'IndexerWebsocket',
-              `Long request time detected for ${sub.channel}: ${Math.floor(duration / 1000)}s`,
-              {
-                duration,
-                channel,
-                id,
-              }
-            );
+            if (
+              duration > LONG_REQUEST_LOG_THRESHOLD_MS &&
+              duration < OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS
+            ) {
+              logBonsaiInfo(
+                'IndexerWebsocket',
+                `Long request time detected for ${channel}: ${Math.floor(duration / 1000)}s`,
+                {
+                  duration,
+                  channel,
+                  source: channel,
+                  id,
+                }
+              );
+            }
+            if (Math.random() < REQUEST_TIME_SAMPLE_RATE) {
+              logBonsaiInfo(
+                'IndexerWebsocket',
+                `Request time for ${channel}: ${Math.floor(duration / 1000)}s`,
+                {
+                  duration,
+                  source: channel,
+                  channel,
+                  id,
+                }
+              );
+            }
           }
           sub.receivedBaseData = true;
           sub.handleBaseData(message.contents, message);
