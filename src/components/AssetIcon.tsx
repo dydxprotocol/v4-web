@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ASSET_ICON_MAP } from '@/constants/assets';
 import { CHAIN_INFO } from '@/constants/chains';
@@ -52,7 +52,7 @@ export const AssetIcon = ({
       />
     </$Container>
   ) : isAssetSymbol(symbol) ? (
-    <$Container className={className}>
+    <$Container className={className} $hasChainIcon={!!chainId}>
       <$AssetIcon src={ASSET_ICON_MAP[symbol]} alt={symbol} />
       {chainId && (
         <img
@@ -67,7 +67,7 @@ export const AssetIcon = ({
   );
 };
 
-const $Container = styled.div`
+const $Container = styled.div<{ $hasChainIcon?: boolean }>`
   height: var(--asset-icon-size, 1em);
   min-height: var(--asset-icon-size, 1em);
   width: var(--asset-icon-size, 1em);
@@ -78,7 +78,12 @@ const $Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+
+  ${({ $hasChainIcon }) =>
+    !$hasChainIcon &&
+    css`
+      overflow: hidden;
+    `}
 `;
 
 const $AssetIcon = styled.img`
