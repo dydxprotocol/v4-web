@@ -49,6 +49,12 @@ export const TriggersDialog = ({
       slotIcon={config.slotIcon}
       placement={config.placement}
       description={config.description}
+      css={
+        isSimpleUi && {
+          '--dialog-backgroundColor': 'var(--color-layer-1)',
+          '--dialog-header-backgroundColor': 'var(--color-layer-1)',
+        }
+      }
     >
       <TriggersForm
         positionUniqueId={positionUniqueId}
