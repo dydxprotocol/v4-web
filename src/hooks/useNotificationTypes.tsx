@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
@@ -22,6 +22,7 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
+import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
@@ -29,7 +30,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification } from '@/components/Notification';
-import { formatNumberOutput, OutputType } from '@/components/Output';
+import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
@@ -64,7 +65,7 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -410,7 +411,155 @@ export const notificationTypes: NotificationTypeConfig[] = [
   },
   {
     type: NotificationType.MarketWindDown,
-    useTrigger: ({ trigger: _trigger }) => {},
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { contractLossMechanismLearnMore } = useURLConfigs();
+
+      const currentMarket = useAppSelector(BonsaiCore.markets.currentMarketId);
+      const positions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
+      const openOrders = useAppSelector(BonsaiCore.account.openOrders.data);
+      const windDownNotifDuration = timeUnits.week * 2;
+
+      const marketsRelevantToAccount = useMemo(
+        () =>
+          new Set(
+            [
+              currentMarket,
+              ...(positions?.map((p) => p.market) ?? []),
+              ...openOrders.map((o) => o.marketId),
+            ].filter(isPresent)
+          ),
+        [currentMarket, openOrders, positions]
+      );
+
+      const windDownObjects = useMemo(
+        (): Array<{
+          market: string;
+          windDownProposalLink?: string;
+          // date when proposal passes and final settlement happens
+          windDownDate: string;
+        }> => [
+          {
+            market: 'SKITTEN-USD',
+            windDownProposalLink: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
+          },
+          {
+            market: 'EOS-USD',
+            windDownProposalLink: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
+          },
+          {
+            market: 'BTRUMP-USD',
+            windDownProposalLink: undefined,
+            windDownDate: '2025-05-24T00:00:00.000Z',
+          },
+        ],
+        []
+      );
+
+      useEffect(() => {
+        windDownObjects.forEach((obj) => {
+          const { market, windDownProposalLink, windDownDate } = obj;
+
+          const notificationProposalId = `market-wind-down-proposal-${market}`;
+          if (marketsRelevantToAccount.has(market) && new Date() <= new Date(windDownDate)) {
+            const outputDate = (
+              <Output tw="inline-block" type={OutputType.DateTime} value={windDownDate} />
+            );
+
+            trigger({
+              id: notificationProposalId,
+              displayData: {
+                title: stringGetter({
+                  key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.TITLE',
+                  params: {
+                    MARKET: market,
+                  },
+                }),
+                body: stringGetter({
+                  key: 'NOTIFICATIONS.MARKET_WIND_DOWN_PROPOSAL.BODY',
+                  params: {
+                    MARKET: market,
+                    DATE: outputDate,
+                    HERE_LINK:
+                      windDownProposalLink != null && windDownProposalLink !== '' ? (
+                        <Link isInline isAccent href={windDownProposalLink}>
+                          {stringGetter({ key: STRING_KEYS.HERE })}
+                        </Link>
+                      ) : (
+                        <span />
+                      ),
+                  },
+                }),
+                toastSensitivity: 'foreground',
+                groupKey: notificationProposalId,
+              },
+              updateKey: [],
+              shouldUnhide: market === currentMarket,
+            });
+          }
+        });
+      }, [currentMarket, marketsRelevantToAccount, stringGetter, trigger, windDownObjects]);
+
+      useEffect(() => {
+        windDownObjects.forEach((obj) => {
+          const { market, windDownDate } = obj;
+
+          const notificationWindDownId = `market-wind-down-${market}`;
+          const learnMoreLink = contractLossMechanismLearnMore;
+          const windDownExpirationDate = new Date(
+            new Date(windDownDate).getTime() + windDownNotifDuration
+          );
+          if (
+            marketsRelevantToAccount.has(market) &&
+            learnMoreLink &&
+            new Date() >= new Date(windDownDate) &&
+            new Date() <= new Date(windDownExpirationDate)
+          ) {
+            const outputDate = (
+              <Output tw="inline-block" type={OutputType.DateTime} value={windDownDate} />
+            );
+
+            trigger({
+              id: notificationWindDownId,
+              displayData: {
+                title: stringGetter({
+                  key: 'NOTIFICATIONS.MARKET_WIND_DOWN.TITLE',
+                  params: {
+                    MARKET: market,
+                  },
+                }),
+                body: stringGetter({
+                  key: 'NOTIFICATIONS.MARKET_WIND_DOWN.BODY',
+                  params: {
+                    MARKET: market,
+                    DATE: outputDate,
+                    HERE_LINK: (
+                      <Link isInline isAccent href={learnMoreLink}>
+                        {stringGetter({ key: STRING_KEYS.HERE })}
+                      </Link>
+                    ),
+                  },
+                }),
+                groupKey: notificationWindDownId,
+                toastSensitivity: 'foreground',
+              },
+              updateKey: [],
+              shouldUnhide: market === currentMarket,
+            });
+          }
+        });
+      }, [
+        contractLossMechanismLearnMore,
+        currentMarket,
+        marketsRelevantToAccount,
+        stringGetter,
+        trigger,
+        windDownNotifDuration,
+        windDownObjects,
+      ]);
+    },
     useNotificationAction: () => {
       return () => {};
     },
