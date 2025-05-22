@@ -7,19 +7,21 @@ import {
 } from '@/bonsai/lib/validationErrors';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
@@ -34,6 +36,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -47,6 +50,8 @@ type ElementProps = {
 export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -61,9 +66,8 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
     useAppSelectorWithArgs(getSubaccountPositionByUniqueId, positionUniqueId)
   );
 
-  const { oraclePrice, assetId, tickSizeDecimals, stepSizeDecimals } = orEmptyObj(
-    useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market)
-  );
+  const { oraclePrice, assetId, displayableAsset, logo, tickSizeDecimals, stepSizeDecimals } =
+    orEmptyObj(useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market));
 
   const {
     differingOrderSizes,
@@ -86,15 +90,49 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   // multiple, we hide the triggers button CTA
   const existsEditableOrCreatableOrders = !(multipleTakeProfitOrders && multipleStopLossOrders);
 
-  const priceInfo = (
+  const priceInfo = isSimpleUi ? (
+    <div tw="row overflow-x-auto">
+      <AssetIcon tw="mr-0.75 size-[2.25rem] min-w-[2.25rem]" logoUrl={logo} symbol={symbol} />
+      {[
+        {
+          label: stringGetter({ key: STRING_KEYS.MARK_PRICE }),
+          value: (
+            <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+          ),
+        },
+        {
+          label: stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }),
+          value: (
+            <$Output type={OutputType.Fiat} value={entryPrice} fractionDigits={tickSizeDecimals} />
+          ),
+        },
+        {
+          label: stringGetter({ key: STRING_KEYS.SIZE }),
+          value: (
+            <$Output
+              type={OutputType.Number}
+              value={signedSize}
+              fractionDigits={stepSizeDecimals}
+              slotRight={!!signedSize && ` ${displayableAsset}`}
+            />
+          ),
+        },
+      ].map(({ label, value }, idx) => (
+        <$SimplePriceBox key={label} isFirst={idx === 0}>
+          <span tw="text-color-text-0 font-mini-book">{label}</span>
+          {value}
+        </$SimplePriceBox>
+      ))}
+    </div>
+  ) : (
     <$PriceBox>
       <$PriceRow>
         <$PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</$PriceLabel>
-        <$Price type={OutputType.Fiat} value={entryPrice} fractionDigits={tickSizeDecimals} />
+        <$Output type={OutputType.Fiat} value={entryPrice} fractionDigits={tickSizeDecimals} />
       </$PriceRow>
       <$PriceRow>
         <$PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</$PriceLabel>
-        <$Price type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+        <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
       </$PriceRow>
     </$PriceBox>
   );
@@ -186,8 +224,24 @@ const $PriceBox = styled.div`
   padding: 0.625em 0.75em;
 `;
 
+const $SimplePriceBox = styled.div<{ isFirst: boolean }>`
+  display: flex;
+  flex-direction: column;
+  padding: 0 1.5rem;
+
+  ${({ isFirst }) =>
+    isFirst &&
+    css`
+      padding-left: 0;
+    `}
+
+  &:not(:last-child) {
+    border-right: 1px solid var(--color-border);
+  }
+`;
+
 const $PriceRow = tw.div`spacedRow`;
 
 const $PriceLabel = tw.h3`text-color-text-0`;
 
-const $Price = tw(Output)`text-color-text-2`;
+const $Output = tw(Output)`text-color-text-2`;

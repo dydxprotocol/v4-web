@@ -29,13 +29,26 @@ export const TriggersDialog = ({
   const { isMobile } = useBreakpoints();
   const isSimpleUi = testFlags.simpleUi && isMobile;
 
+  const config = isSimpleUi
+    ? {
+        title: stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS }),
+        placement: DialogPlacement.FullScreen,
+        description: 'Minimize losses and secure profits', // TODO: Localize
+      }
+    : {
+        title: stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS }),
+        placement: DialogPlacement.Default,
+        slotIcon: <AssetIcon logoUrl={logoUrl} symbol={assetId} />,
+      };
+
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS })}
-      slotIcon={<AssetIcon logoUrl={logoUrl} symbol={assetId} />}
-      placement={isSimpleUi ? DialogPlacement.FullScreen : DialogPlacement.Default}
+      title={config.title}
+      slotIcon={config.slotIcon}
+      placement={config.placement}
+      description={config.description}
     >
       <TriggersForm
         positionUniqueId={positionUniqueId}
