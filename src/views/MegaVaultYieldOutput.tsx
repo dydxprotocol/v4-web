@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -13,11 +13,17 @@ import { getNumberSign } from '@/lib/numbers';
 export const MegaVaultYieldOutput = ({
   className,
   yieldType = 'ninetyDay',
+  slotRight,
+  withLoading,
 }: {
   className?: string;
   yieldType?: 'ninetyDay' | 'thirtyDay';
+  slotRight?: ReactNode;
+  withLoading?: boolean;
 }) => {
   const vault = useLoadedVaultDetails().data;
+  const isVaultDetailsLoading = useLoadedVaultDetails().isLoading;
+  const isLoading = withLoading ? isVaultDetailsLoading : false;
   const depositApr =
     yieldType === 'ninetyDay' ? vault?.ninetyDayReturnPercent : vault?.thirtyDayReturnPercent;
   const numberSign = useMemo(() => getNumberSign(depositApr), [depositApr]);
@@ -29,6 +35,8 @@ export const MegaVaultYieldOutput = ({
       value={depositApr}
       fractionDigits={0}
       sign={numberSign}
+      isLoading={isLoading}
+      slotRight={isLoading ? null : slotRight}
     />
   );
 };

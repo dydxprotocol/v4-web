@@ -141,23 +141,22 @@ export const SimpleUiTradeDialog = ({ side, setIsOpen }: DialogProps<SimpleUiTra
           </div>
         );
       }
-      // TODO: Localize strings when 1.1.291 is released
       case SimpleUiTradeDialogSteps.Submit:
         return (
           <div>
-            <span>Submitting Order</span>
+            <span>{stringGetter({ key: STRING_KEYS.SUBMITTING_ORDER })}</span>
           </div>
         );
       case SimpleUiTradeDialogSteps.Confirm:
         return (
           <div>
-            <span>Trade Confirmed</span>
+            <span>{stringGetter({ key: STRING_KEYS.TRADE_CONFIRMED })}</span>
           </div>
         );
       case SimpleUiTradeDialogSteps.Error:
         return (
           <div>
-            <span>Error Submitting Order</span>
+            <span>{stringGetter({ key: STRING_KEYS.ERROR_SUBMITTING })}</span>
           </div>
         );
       default:

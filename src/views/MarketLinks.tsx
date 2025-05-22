@@ -74,6 +74,11 @@ export const MarketLinks = ({
           icon: <Icon iconName={icon} />,
           label,
           value: href ?? '',
+          onSelect: () => {
+            if (href) {
+              window.open(href, '_blank');
+            }
+          },
         }))}
       >
         <IconButton
@@ -96,8 +101,8 @@ export const MarketLinks = ({
 };
 
 const $IconButton = styled(IconButton)`
-  --button-icon-size: 1.3em;
-  --button-textColor: var(--color-text-0);
+  --button-icon-size: var('--market-link-icon-size', 1.3em);
+  --button-textColor: var('--market-link-textColor', var(--color-text-0));
   --button-backgroundColor: transparent;
   --button-border: none;
 `;
