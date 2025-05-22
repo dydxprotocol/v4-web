@@ -24,6 +24,8 @@ export const OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 60
 // requests that could fail
 export const EFFECTIVE_HEARTBEAT_LOG_LIFETIME_MS = timeUnits.minute * 5;
 
+export const REQUEST_TIME_SAMPLE_RATE = 0.015;
+
 export function wrapAndLogBonsaiError<T, Args extends any[]>(
   fn: (...args: Args) => Promise<T> | T,
   logId: string
@@ -48,6 +50,12 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
             source: logId,
           }
         );
+      }
+      if (Math.random() < REQUEST_TIME_SAMPLE_RATE) {
+        logBonsaiInfo(logId, `Request time for ${logId}: ${Math.floor(duration / 1000)}s`, {
+          duration,
+          source: logId,
+        });
       }
       return result;
     } catch (error) {
