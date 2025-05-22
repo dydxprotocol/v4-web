@@ -1,5 +1,8 @@
+import { pickBy } from 'lodash';
+
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {
+  IndexerPerpetualPositionStatus,
   IndexerPositionSide,
   IndexerSubaccountResponseObject,
 } from '@/types/indexer/indexerApiGen';
@@ -30,7 +33,10 @@ export function convertToStoredChildSubaccount({
     address,
     subaccountNumber,
     assetPositions,
-    openPerpetualPositions,
+    openPerpetualPositions: pickBy(
+      openPerpetualPositions,
+      (p) => p.status === IndexerPerpetualPositionStatus.OPEN
+    ),
   };
 }
 

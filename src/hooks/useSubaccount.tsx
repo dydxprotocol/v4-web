@@ -4,12 +4,7 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
-import {
-  isOperationFailure,
-  wrapOperationFailure,
-  wrapOperationSuccess,
-  WrappedOperationFailureError,
-} from '@/bonsai/lib/operationResult';
+import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
@@ -272,24 +267,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   // ------ Trigger Orders Methods ------ //
   const placeTriggerOrders = useCallback(async (payload: TriggerOrdersPayload) => {
-    // can assume promise fulfills if all operations are successful, otherwise throws
-    const operations = payload.payloads.map(async (operationPayload) => {
-      if (operationPayload.cancelPayload?.orderId) {
-        const res = await accountTransactionManager.cancelOrder({
-          orderId: operationPayload.cancelPayload.orderId,
-        });
-        if (isOperationFailure(res)) {
-          throw new WrappedOperationFailureError(res);
-        }
-      }
-      if (operationPayload.placePayload != null) {
-        const res = await accountTransactionManager.placeOrder(operationPayload.placePayload);
-        if (isOperationFailure(res)) {
-          throw new WrappedOperationFailureError(res);
-        }
-      }
+    return accountTransactionManager.placeCompoundOrder({
+      orderPayload: undefined,
+      triggersPayloads: payload.payloads,
     });
-    return operations;
   }, []);
 
   // ------ Listing Method ------ //

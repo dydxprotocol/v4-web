@@ -34,7 +34,6 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
-import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
@@ -45,7 +44,7 @@ import {
 } from '@/state/tradeFormSelectors';
 
 import { mapIfPresent } from '@/lib/do';
-import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MaybeBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -122,10 +121,6 @@ export const ClosePositionForm = ({
     fullFormSummary: fullSummary,
     onLastOrderIndexed,
   });
-
-  const currentPositionData = useAppSelector(getCurrentMarketPositionData);
-  const { signedSize: currentPositionSize } = currentPositionData ?? {};
-  const currentSizeBN = MustBigNumber(currentPositionSize).abs();
 
   const {
     shouldPromptUserToPlaceLimitOrder,
@@ -209,7 +204,6 @@ export const ClosePositionForm = ({
         onInput={onAmountInput}
         type={InputType.Number}
         value={amountInput}
-        max={currentPositionSize != null ? currentSizeBN.toNumber() : undefined}
         tw="w-full"
       />
 

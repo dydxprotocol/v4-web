@@ -8,7 +8,6 @@ import {
   SubaccountPosition,
 } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
-import { mapValues } from 'lodash';
 
 import { MAX_SUBACCOUNT_NUMBER, NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { MAJOR_MARKETS } from '@/constants/markets';
@@ -35,7 +34,6 @@ import {
   TimeInForce,
   TradeAccountDetails,
   TradeForm,
-  TradeFormFieldStates,
   TradeFormInputData,
   TradeFormType,
   TradeInputSummary,
@@ -50,12 +48,10 @@ const MAX_LEVERAGE_BUFFER_PERCENT = 0.98;
 const DEFAULT_TARGET_LEVERAGE = 2.0;
 
 export function calculateTradeInfo(
-  fieldStates: TradeFormFieldStates,
+  trade: TradeForm,
   baseAccount: TradeAccountDetails | undefined,
   accountData: TradeFormInputData
 ): TradeSummary {
-  const trade = mapValues(fieldStates, (s) => s.effectiveValue) as TradeForm;
-
   const subaccountToUse = calculateSubaccountToUseForTrade(
     trade.marginMode,
     baseAccount?.position?.subaccountNumber,

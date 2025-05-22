@@ -6,6 +6,7 @@ import {
   ValidationError,
 } from '@/bonsai/lib/validationErrors';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
+import { OrderType } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
@@ -20,6 +21,8 @@ import { assertNever } from '@/lib/assertNever';
 import { mapIfPresent } from '@/lib/do';
 import { AttemptNumber } from '@/lib/numbers';
 
+import { validateTriggerOrder } from '../triggers/errors';
+import { TriggerOrderState, TriggerPriceInputType } from '../triggers/types';
 import { getGoodTilInSeconds } from './summary';
 import {
   ExecutionType,
@@ -52,6 +55,7 @@ export function calculateTradeFormErrors(
   errors.push(...validateAccountState(inputData, summary));
   errors.push(...validateRestrictions(inputData, summary));
   errors.push(...validateTradeFormSummaryFields(summary));
+  errors.push(...validateBracketOrders(inputData, summary));
   errors.push(...validateEquityTiers(inputData, summary));
 
   return errors;
@@ -623,7 +627,7 @@ function validatePositionState(summary: TradeFormSummary): ValidationError[] {
   const needsReduceOnly = summary.options.needsReduceOnly;
   const reduceOnly = state.reduceOnly;
   const side = state.side;
-  const size = AttemptNumber(summary.tradePayload?.size);
+  const size = AttemptNumber(summary.tradePayload?.orderPayload?.size);
 
   if (side == null || size == null) {
     return errors;
@@ -944,7 +948,7 @@ function validateTradeFormSummaryFields(summary: TradeFormSummary): ValidationEr
 }
 
 function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSummary) {
-  const subaccountToUse = summary.tradePayload?.subaccountNumber;
+  const subaccountToUse = summary.tradePayload?.orderPayload?.subaccountNumber;
   if (subaccountToUse == null) {
     return [];
   }
@@ -957,7 +961,7 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
   const subaccountEquity = mapIfPresent(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     summary.accountDetailsBefore?.subaccountSummaries?.[subaccountToUse]?.equity.toNumber() ?? 0,
-    summary.tradePayload?.transferToSubaccountAmount,
+    summary.tradePayload?.orderPayload?.transferToSubaccountAmount,
     (equity, transferAmount) => {
       return equity + transferAmount;
     }
@@ -979,11 +983,15 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
     (summary.effectiveTrade.type === TradeFormType.LIMIT &&
       summary.effectiveTrade.timeInForce === TimeInForce.IOC);
 
-  if (isShortTerm) {
+  const ordersToOpen =
+    (isShortTerm ? 0 : 1) +
+    (summary.tradePayload?.triggersPayloads?.filter((t) => t.placePayload != null).length ?? 0);
+
+  if (ordersToOpen <= 0) {
     return [];
   }
 
-  if (relevantOpenOrders.length + 1 > myEquityTierLimit.maxOrders) {
+  if (relevantOpenOrders.length + ordersToOpen > myEquityTierLimit.maxOrders) {
     const nextTierEquity =
       myEquityTierLimit.nextLevelRequiredTotalNetCollateralUSD ?? Number.MAX_SAFE_INTEGER;
     return [
@@ -1013,4 +1021,107 @@ function validateEquityTiers(inputData: TradeFormInputData, summary: TradeFormSu
     ];
   }
   return [];
+}
+
+function validateBracketOrders(
+  inputData: TradeFormInputData,
+  summary: TradeFormSummary
+): ValidationError[] {
+  const inputTp = summary.effectiveTrade.takeProfitOrder;
+  const inputSl = summary.effectiveTrade.stopLossOrder;
+
+  const tpDetails = summary.triggersSummary?.takeProfitOrder;
+  const slDetails = summary.triggersSummary?.stopLossOrder;
+
+  // This assumes we currently only submit take profit/stop loss MARKET orders, no limits
+  const tpPayload = summary.tradePayload?.triggersPayloads?.find(
+    (t) => t.placePayload?.type === OrderType.TAKE_PROFIT_MARKET
+  );
+  const slPayload = summary.tradePayload?.triggersPayloads?.find(
+    (t) => t.placePayload?.type === OrderType.STOP_MARKET
+  );
+
+  const attemptingTp = isAttempingBracketOperation(inputTp);
+  const attemptingSl = isAttempingBracketOperation(inputSl);
+
+  if (!attemptingSl && !attemptingTp) {
+    return [];
+  }
+
+  const market = inputData.currentTradeMarketSummary;
+  const estPosition = summary.accountDetailsAfter?.position;
+
+  if (market == null || estPosition == null) {
+    return [
+      simpleValidationError({
+        code: 'MISSING_REQUIRED_DATA_FOR_BRACKET_VALIDATION',
+      }),
+    ];
+  }
+
+  const errors: ValidationError[] = [];
+  if (attemptingSl && inputSl != null) {
+    const errorResult = validateTriggerOrder(
+      true,
+      inputSl,
+      slDetails ?? {},
+      {
+        positionId: estPosition.uniqueId,
+        showLimits: false,
+        stopLossOrder: inputSl,
+        takeProfitOrder: inputTp ?? {},
+        size: { checked: false, size: '' },
+      },
+      { market, position: estPosition }
+    );
+    errors.push(...errorResult);
+    if (slPayload == null) {
+      errors.push(
+        simpleValidationError({
+          code: 'MISSING_STOP_LOSS_PAYLOAD',
+        })
+      );
+    }
+  }
+  if (attemptingTp && inputTp != null) {
+    const errorResult = validateTriggerOrder(
+      false,
+      inputTp,
+      tpDetails ?? {},
+      {
+        positionId: estPosition.uniqueId,
+        showLimits: false,
+        stopLossOrder: inputSl ?? {},
+        takeProfitOrder: inputTp,
+        size: { checked: false, size: '' },
+      },
+      { market, position: estPosition }
+    );
+    errors.push(...errorResult);
+    if (tpPayload == null) {
+      errors.push(
+        simpleValidationError({
+          code: 'MISSING_TAKE_PROFIT_PAYLOAD',
+        })
+      );
+    }
+  }
+  return errors;
+}
+
+function isAttempingBracketOperation(state: TriggerOrderState | undefined): boolean {
+  if (state?.priceInput?.type == null) {
+    return false;
+  }
+  switch (state.priceInput.type) {
+    case TriggerPriceInputType.PercentDiff:
+      return state.priceInput.percentDiff.trim().length > 0;
+    case TriggerPriceInputType.TriggerPrice:
+      return state.priceInput.triggerPrice.trim().length > 0;
+    case TriggerPriceInputType.UsdcDiff:
+      return state.priceInput.usdcDiff.trim().length > 0;
+    default:
+      assertNever(state.priceInput);
+  }
+  return false;
 }

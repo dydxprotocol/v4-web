@@ -15,7 +15,6 @@ import {
   CancelOrderPayload,
   PlaceOrderMarketInfo,
   PlaceOrderPayload,
-  SummaryData,
   TriggerOrderActions,
   TriggerOrderDetails,
   TriggerOrderInputData,
@@ -23,12 +22,13 @@ import {
   TriggerOrdersPayload,
   TriggerOrderState,
   TriggerPriceInputType,
+  TriggersSummaryData,
 } from './types';
 
 export function calculateSummary(
   state: TriggerOrdersFormState,
   inputData: TriggerOrderInputData
-): SummaryData {
+): TriggersSummaryData {
   const effectiveEntryMargin = mapIfPresent(
     inputData.position,
     getEffectiveBaseEquityFn
@@ -45,11 +45,11 @@ export function calculateSummary(
   return { effectiveEntryMargin, stopLossOrder, takeProfitOrder, payload };
 }
 
-function calculateTriggerOrderPayload(
+export function calculateTriggerOrderPayload(
   stopLossOrder: TriggerOrderDetails,
   takeProfitOrder: TriggerOrderDetails,
   state: TriggerOrdersFormState,
-  inputData: TriggerOrderInputData
+  inputData: Pick<TriggerOrderInputData, 'existingTriggerOrders' | 'market' | 'position'>
 ): TriggerOrdersPayload | undefined {
   const { position } = inputData;
 
@@ -123,7 +123,7 @@ function getTriggerOrderActions(
   triggerOrderDetails: TriggerOrderDetails,
   formState: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
   position: SubaccountPosition,
-  inputData: TriggerOrderInputData
+  inputData: Pick<TriggerOrderInputData, 'existingTriggerOrders' | 'market'>
 ): TriggerOrderActions | undefined {
   const { orderId } = triggerOrderState;
   const { triggerPrice } = triggerOrderDetails;
@@ -392,14 +392,17 @@ function getPrice(
   return undefined;
 }
 
-function calculateTriggerOrderDetails(
+export function calculateTriggerOrderDetails(
   triggerOrder: TriggerOrderState,
   isStopLoss: boolean,
   {
     showLimits,
     size: { checked: useCustomSize, size: customSize },
   }: Omit<TriggerOrdersFormState, 'takeProfitOrder' | 'stopLossOrder'>,
-  { position, existingTriggerOrders }: TriggerOrderInputData
+  {
+    position,
+    existingTriggerOrders,
+  }: Pick<TriggerOrderInputData, 'position' | 'existingTriggerOrders'>
 ): TriggerOrderDetails {
   const details: TriggerOrderDetails = {};
 
@@ -459,34 +462,32 @@ function calculateTriggerOrderDetails(
 
   const newTriggerPrice = calc(() => {
     if (priceInput.type === TriggerPriceInputType.TriggerPrice) {
-      return MustBigNumber(priceInput.triggerPrice);
+      const price = AttemptBigNumber(priceInput.triggerPrice);
+      if (price == null) {
+        return undefined;
+      }
+      return price;
     }
     if (priceInput.type === TriggerPriceInputType.UsdcDiff) {
-      return MustBigNumber(
-        calculateTriggerPriceFromUsdcDiff(
-          MustBigNumber(priceInput.usdcDiff),
-          size,
-          position,
-          isStopLoss
-        )
-      );
+      const usdcDiff = AttemptBigNumber(priceInput.usdcDiff);
+      if (usdcDiff == null) {
+        return undefined;
+      }
+      return calculateTriggerPriceFromUsdcDiff(usdcDiff, size, position, isStopLoss);
     }
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (priceInput.type === TriggerPriceInputType.PercentDiff) {
-      return MustBigNumber(
-        calculateTriggerPriceFromPercentDiff(
-          MustBigNumber(priceInput.percentDiff).div(100),
-          size,
-          position,
-          isStopLoss
-        )
-      );
+      const percentDiff = AttemptBigNumber(priceInput.percentDiff);
+      if (percentDiff == null) {
+        return undefined;
+      }
+      return calculateTriggerPriceFromPercentDiff(percentDiff.div(100), size, position, isStopLoss);
     }
     assertNever(priceInput);
     return BIG_NUMBERS.ZERO;
   });
 
-  if (!newTriggerPrice.isFinite()) {
+  if (newTriggerPrice == null || !newTriggerPrice.isFinite()) {
     return details;
   }
   return {

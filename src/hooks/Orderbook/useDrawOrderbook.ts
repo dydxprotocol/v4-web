@@ -21,6 +21,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { getConsistentAssetSizeString } from '@/lib/consistentAssetSize';
+import { calc } from '@/lib/do';
 import { MaybeBigNumber } from '@/lib/numbers';
 import {
   getHistogramXValues,
@@ -29,7 +30,7 @@ import {
   getYForElements,
 } from '@/lib/orderbookHelpers';
 import { generateFadedColorVariant } from '@/lib/styles';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 import { useLocaleSeparators } from '../useLocaleSeparators';
 
@@ -414,10 +415,18 @@ export const useDrawOrderbook = ({
       drawOrderbookRow({ ctx, idx, rowToRender: row, animationType });
     });
 
+    const delayBeforeShowingLatestData = calc(() => {
+      // fast track going from empty to non-empty
+      if (prevData.current.find(isPresent) == null && data.find(isPresent) != null) {
+        return 0;
+      }
+      return ORDERBOOK_ANIMATION_DURATION;
+    });
+
     const timeout = setTimeout(() => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       data.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
-    }, ORDERBOOK_ANIMATION_DURATION);
+    }, delayBeforeShowingLatestData);
 
     prevData.current = data;
 

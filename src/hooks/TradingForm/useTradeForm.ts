@@ -111,13 +111,14 @@ export const useTradeForm = ({
   } = {}) => {
     setPlaceOrderError(undefined);
     const payload = summary.tradePayload;
-    if (payload == null || hasValidationErrors) {
+    const tradePayload = payload?.orderPayload;
+    if (payload == null || tradePayload == null || hasValidationErrors) {
       return;
     }
-    onPlaceOrder?.(payload);
+    onPlaceOrder?.(tradePayload);
     track(
       AnalyticsEvents.TradePlaceOrderClick({
-        ...payload,
+        ...tradePayload,
         isClosePosition: source === TradeFormSource.ClosePositionForm,
         isSimpleUi: source === TradeFormSource.SimpleTradeForm,
       })
@@ -133,9 +134,9 @@ export const useTradeForm = ({
       }
     );
 
-    const result = await accountTransactionManager.placeOrder(payload);
+    const result = await accountTransactionManager.placeCompoundOrder(payload);
     if (isOperationSuccess(result)) {
-      setUnIndexedClientId(payload.clientId.toString());
+      setUnIndexedClientId(tradePayload.clientId.toString());
       onSuccess?.();
     } else {
       const errorParams = operationFailureToErrorParams(result);
