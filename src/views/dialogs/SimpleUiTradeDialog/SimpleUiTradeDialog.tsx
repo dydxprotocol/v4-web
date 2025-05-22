@@ -29,15 +29,16 @@ import { SimpleCloseForm } from './SimpleCloseForm';
 import { SimpleTradeForm } from './SimpleTradeForm';
 
 export const SimpleUiTradeDialog = ({
-  side,
-  isClosingPosition,
   setIsOpen,
+  ...props
 }: DialogProps<SimpleUiTradeDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
+  const side = 'side' in props ? props.side : undefined;
+  const isClosingPosition = 'isClosingPosition' in props ? props.isClosingPosition : undefined;
 
   const { displayableAsset, logo, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
@@ -46,7 +47,7 @@ export const SimpleUiTradeDialog = ({
   useEffect(() => {
     if (isClosingPosition) {
       dispatch(closePositionFormActions.setMarketId(ticker));
-    } else {
+    } else if (side) {
       dispatch(tradeFormActions.setOrderType(TradeFormType.MARKET));
       dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setExecution(ExecutionType.IOC));
@@ -55,6 +56,10 @@ export const SimpleUiTradeDialog = ({
 
   const onTradeTypeChange = useCallback(
     (tradeType: TradeFormType) => {
+      if (!side) {
+        return;
+      }
+
       dispatch(tradeFormActions.reset());
       dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setOrderType(tradeType));

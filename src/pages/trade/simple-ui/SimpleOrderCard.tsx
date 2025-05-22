@@ -4,7 +4,6 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-import { OrderFlags } from '@dydxprotocol/v4-client-js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,6 +22,7 @@ import { TagSize } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics/analytics';
+import { getIsShortTermOrder } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const SimpleOrderCard = ({ order }: { order: SubaccountOrder }) => {
@@ -70,7 +70,7 @@ export const SimpleOrderCard = ({ order }: { order: SubaccountOrder }) => {
     }
   }, [orderId]);
 
-  const isShortTermOrder = order.orderFlags?.toString() === OrderFlags.SHORT_TERM.toString();
+  const isShortTermOrder = getIsShortTermOrder(order);
   const isBestEffortCanceled = order.status === OrderStatus.Canceling;
   const isDisabled = isCanceling || (isShortTermOrder && isBestEffortCanceled);
 

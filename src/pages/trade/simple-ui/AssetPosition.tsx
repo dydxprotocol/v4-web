@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react';
 
-import { OrderSide } from '@/bonsai/forms/trade/types';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import { orderBy } from 'lodash';
 
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -92,8 +90,6 @@ export const AssetPosition = () => {
               dispatch(
                 openDialog(
                   DialogTypes.SimpleUiTrade({
-                    side:
-                      position.side === IndexerPositionSide.LONG ? OrderSide.SELL : OrderSide.BUY,
                     isClosingPosition: true,
                   })
                 )
