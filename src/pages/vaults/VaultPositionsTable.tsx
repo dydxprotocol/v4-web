@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultPosition } from '@/bonsai/public-calculators/vault';
@@ -21,6 +21,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
+import { SearchInput } from '@/components/SearchInput';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -30,7 +31,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getNumberSign, MustNumber } from '@/lib/numbers';
-import { orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 type VaultTableRow = VaultPosition;
 
@@ -44,18 +45,32 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
   const navigate = useNavigate();
   const { usdcImage, usdcLabel } = useTokenConfigs();
 
+  const [filter, setFilter] = useState('');
   const vaultsDataRaw = useLoadedVaultPositions();
+  const marketsData = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
   const vaultsData = useMemo(
     () =>
-      vaultsDataRaw?.positions?.filter(
-        (p) =>
-          MustNumber(p.marginUsdc) > 0 ||
-          MustNumber(p.equityUsdc) > 0 ||
-          MustNumber(p.currentPosition?.asset) > 0
-      ) ?? EMPTY_ARR,
-    [vaultsDataRaw?.positions]
+      vaultsDataRaw?.positions?.filter((p) => {
+        const market = marketsData[p.marketId ?? ''];
+
+        return (
+          (MustNumber(p.marginUsdc) > 0 ||
+            MustNumber(p.equityUsdc) > 0 ||
+            MustNumber(p.currentPosition?.asset) > 0) &&
+          (filter.trim().length === 0 ||
+            [
+              market?.displayableAsset,
+              market?.name,
+              market?.displayableTicker,
+              p.marketId,
+              market?.assetId,
+            ]
+              .filter(isPresent)
+              .find((t) => t.toLowerCase().indexOf(filter.toLowerCase()) >= 0))
+        );
+      }) ?? EMPTY_ARR,
+    [filter, marketsData, vaultsDataRaw?.positions]
   );
-  const marketsData = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
   const { isTablet } = useBreakpoints();
 
@@ -206,22 +221,29 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
   );
 
   return (
-    <$Table
-      withInnerBorders
-      withOuterBorder
-      data={vaultsData}
-      tableId="vault-positions"
-      getRowKey={(row) => row.marketId ?? ''}
-      label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
-      defaultSortDescriptor={{
-        column: 'margin',
-        direction: 'descending',
-      }}
-      columns={columns}
-      paginationBehavior={vaultsData.length <= VAULT_PAGE_SIZE ? 'showAll' : 'paginate'}
-      initialPageSize={VAULT_PAGE_SIZE}
-      className={className}
-    />
+    <div>
+      <SearchInput
+        placeholder={stringGetter({ key: STRING_KEYS.TYPE_TO_SEARCH })}
+        onTextChange={setFilter}
+        tw="mb-1"
+      />
+      <$Table
+        withInnerBorders
+        withOuterBorder
+        data={vaultsData}
+        tableId="vault-positions"
+        getRowKey={(row) => row.marketId ?? ''}
+        label={stringGetter({ key: STRING_KEYS.MEGAVAULT })}
+        defaultSortDescriptor={{
+          column: 'margin',
+          direction: 'descending',
+        }}
+        columns={columns}
+        paginationBehavior={vaultsData.length <= VAULT_PAGE_SIZE ? 'showAll' : 'paginate'}
+        initialPageSize={VAULT_PAGE_SIZE}
+        className={className}
+      />
+    </div>
   );
 };
 
