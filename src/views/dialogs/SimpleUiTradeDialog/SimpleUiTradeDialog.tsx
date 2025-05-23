@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ExecutionType, OrderSide, TimeInForce, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
@@ -30,38 +30,36 @@ import { SimpleTradeForm } from './SimpleTradeForm';
 
 export const SimpleUiTradeDialog = ({
   setIsOpen,
-  isClosingPosition,
-  ...rest
+  ...props
 }: DialogProps<SimpleUiTradeDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
-  const side = 'side' in rest ? rest.side : undefined;
 
   const { displayableAsset, logo, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
   useEffect(() => {
-    if (isClosingPosition) {
+    if (props.isClosingPosition === true) {
       dispatch(closePositionFormActions.setMarketId(ticker));
-    } else if (side) {
+    } else {
       dispatch(tradeFormActions.setOrderType(TradeFormType.MARKET));
-      dispatch(tradeFormActions.setSide(side));
+      dispatch(tradeFormActions.setSide(props.side));
       dispatch(tradeFormActions.setExecution(ExecutionType.IOC));
     }
-  }, [dispatch, side, ticker, isClosingPosition]);
+  }, [dispatch, ticker, props]);
 
   const onTradeTypeChange = useCallback(
     (tradeType: TradeFormType) => {
-      if (!side) {
+      if (props.isClosingPosition === true) {
         return;
       }
 
       dispatch(tradeFormActions.reset());
-      dispatch(tradeFormActions.setSide(side));
+      dispatch(tradeFormActions.setSide(props.side));
       dispatch(tradeFormActions.setOrderType(tradeType));
 
       if (tradeType === TradeFormType.MARKET) {
@@ -70,7 +68,7 @@ export const SimpleUiTradeDialog = ({
         dispatch(tradeFormActions.setTimeInForce(TimeInForce.GTT));
       }
     },
-    [dispatch, side]
+    [dispatch, props]
   );
 
   const [currentStep, setCurrentStep] = useState<SimpleUiTradeDialogSteps>(
@@ -81,51 +79,20 @@ export const SimpleUiTradeDialog = ({
     setCurrentStep(SimpleUiTradeDialogSteps.Edit);
     setIsOpen(false);
 
-    if (isClosingPosition) {
+    if (props.isClosingPosition === true) {
       dispatch(closePositionFormActions.reset());
     } else {
       dispatch(tradeFormActions.reset());
     }
-  }, [setCurrentStep, setIsOpen, dispatch, isClosingPosition]);
+  }, [setCurrentStep, setIsOpen, dispatch, props]);
 
   const title = useMemo(() => {
     switch (currentStep) {
       case SimpleUiTradeDialogSteps.Edit: {
-        const sideString =
-          side === OrderSide.BUY
-            ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-            : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
-
-        const sideColor =
-          side === OrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
-
-        const editTitleContent = isClosingPosition ? (
-          <div tw="row">
-            <AssetIcon
-              css={{
-                '--asset-icon-size': '2.625rem',
-              }}
-              logoUrl={logo}
-            />
-            <div tw="flexColumn ml-0.75">
-              <span tw="text-color-text-0 font-small-book">
-                {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
-              </span>
-              <span tw="font-medium-bold">
-                <span>{displayableAsset}</span>
-              </span>
-            </div>
-          </div>
-        ) : (
-          <>
+        let editTitleContent: ReactNode;
+        if (props.isClosingPosition === true) {
+          editTitleContent = (
             <div tw="row">
-              <IconButton
-                tw="border-none bg-[var(--simpleUi-dialog-backgroundColor)]"
-                shape={ButtonShape.Square}
-                size={ButtonSize.Small}
-                iconName={IconName.ChevronLeft}
-                onClick={onCloseDialog}
-              />
               <AssetIcon
                 css={{
                   '--asset-icon-size': '2.625rem',
@@ -133,50 +100,86 @@ export const SimpleUiTradeDialog = ({
                 logoUrl={logo}
               />
               <div tw="flexColumn ml-0.75">
-                <span tw="font-medium-bold">
-                  <span css={{ color: sideColor }}>{sideString}</span>{' '}
-                  <span>{displayableAsset}</span>
-                </span>
                 <span tw="text-color-text-0 font-small-book">
-                  {stringGetter({ key: STRING_KEYS.PRICE })}{' '}
-                  <Output
-                    tw="inline text-color-text-1"
-                    type={OutputType.Fiat}
-                    value={midMarketPrice}
-                  />
+                  {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
+                </span>
+                <span tw="font-medium-bold">
+                  <span>{displayableAsset}</span>
                 </span>
               </div>
             </div>
+          );
+        } else {
+          const sideString =
+            props.side === OrderSide.BUY
+              ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
+              : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
 
-            <SimpleUiDropdownMenu
-              withPortal={false}
-              items={[
-                {
-                  value: TradeFormType.MARKET,
-                  active: selectedTradeType === TradeFormType.MARKET,
-                  label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
-                  onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
-                },
-                {
-                  value: TradeFormType.LIMIT,
-                  active: selectedTradeType === TradeFormType.LIMIT,
-                  label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
-                  onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
-                },
-              ]}
-            >
-              <DropdownMenuTrigger
-                tw="bg-[var(--simpleUi-dialog-secondaryColor)]"
-                shape={ButtonShape.Pill}
-                size={ButtonSize.Base}
+          const sideColor =
+            props.side === OrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
+
+          editTitleContent = (
+            <>
+              <div tw="row">
+                <IconButton
+                  tw="border-none bg-[var(--simpleUi-dialog-backgroundColor)]"
+                  shape={ButtonShape.Square}
+                  size={ButtonSize.Small}
+                  iconName={IconName.ChevronLeft}
+                  onClick={onCloseDialog}
+                />
+                <AssetIcon
+                  css={{
+                    '--asset-icon-size': '2.625rem',
+                  }}
+                  logoUrl={logo}
+                />
+                <div tw="flexColumn ml-0.75">
+                  <span tw="font-medium-bold">
+                    <span css={{ color: sideColor }}>{sideString}</span>{' '}
+                    <span>{displayableAsset}</span>
+                  </span>
+                  <span tw="text-color-text-0 font-small-book">
+                    {stringGetter({ key: STRING_KEYS.PRICE })}{' '}
+                    <Output
+                      tw="inline text-color-text-1"
+                      type={OutputType.Fiat}
+                      value={midMarketPrice}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <SimpleUiDropdownMenu
+                withPortal={false}
+                items={[
+                  {
+                    value: TradeFormType.MARKET,
+                    active: selectedTradeType === TradeFormType.MARKET,
+                    label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
+                    onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
+                  },
+                  {
+                    value: TradeFormType.LIMIT,
+                    active: selectedTradeType === TradeFormType.LIMIT,
+                    label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
+                    onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
+                  },
+                ]}
               >
-                {selectedTradeType === TradeFormType.MARKET
-                  ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
-                  : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
-              </DropdownMenuTrigger>
-            </SimpleUiDropdownMenu>
-          </>
-        );
+                <DropdownMenuTrigger
+                  tw="bg-[var(--simpleUi-dialog-secondaryColor)]"
+                  shape={ButtonShape.Pill}
+                  size={ButtonSize.Base}
+                >
+                  {selectedTradeType === TradeFormType.MARKET
+                    ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
+                    : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
+                </DropdownMenuTrigger>
+              </SimpleUiDropdownMenu>
+            </>
+          );
+        }
 
         return <div tw="row justify-between">{editTitleContent}</div>;
       }
@@ -205,7 +208,6 @@ export const SimpleUiTradeDialog = ({
     return null;
   }, [
     currentStep,
-    side,
     displayableAsset,
     logo,
     stringGetter,
@@ -213,7 +215,7 @@ export const SimpleUiTradeDialog = ({
     midMarketPrice,
     selectedTradeType,
     onCloseDialog,
-    isClosingPosition,
+    props,
   ]);
 
   return (
@@ -228,7 +230,7 @@ export const SimpleUiTradeDialog = ({
       }}
       placement={DialogPlacement.FullScreen} // Simple UI is always full screen
       title={title}
-      withClose={isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
+      withClose={props.isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
       css={{
         '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
@@ -239,7 +241,7 @@ export const SimpleUiTradeDialog = ({
             : 'transparent', // When submitting and confirming we want a transparent header to not interfere with radial-gradient
       }}
     >
-      {isClosingPosition ? (
+      {props.isClosingPosition ? (
         <SimpleCloseForm
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
