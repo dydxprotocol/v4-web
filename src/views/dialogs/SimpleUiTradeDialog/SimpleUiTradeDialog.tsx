@@ -30,7 +30,8 @@ import { SimpleTradeForm } from './SimpleTradeForm';
 
 export const SimpleUiTradeDialog = ({
   setIsOpen,
-  ...props
+  isClosingPosition,
+  side,
 }: DialogProps<SimpleUiTradeDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
@@ -43,23 +44,23 @@ export const SimpleUiTradeDialog = ({
   );
 
   useEffect(() => {
-    if (props.isClosingPosition === true) {
+    if (isClosingPosition === true) {
       dispatch(closePositionFormActions.setMarketId(ticker));
     } else {
       dispatch(tradeFormActions.setOrderType(TradeFormType.MARKET));
-      dispatch(tradeFormActions.setSide(props.side));
+      dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setExecution(ExecutionType.IOC));
     }
-  }, [dispatch, ticker, props]);
+  }, [dispatch, isClosingPosition, side, ticker]);
 
   const onTradeTypeChange = useCallback(
     (tradeType: TradeFormType) => {
-      if (props.isClosingPosition === true) {
+      if (isClosingPosition === true) {
         return;
       }
 
       dispatch(tradeFormActions.reset());
-      dispatch(tradeFormActions.setSide(props.side));
+      dispatch(tradeFormActions.setSide(side));
       dispatch(tradeFormActions.setOrderType(tradeType));
 
       if (tradeType === TradeFormType.MARKET) {
@@ -68,7 +69,7 @@ export const SimpleUiTradeDialog = ({
         dispatch(tradeFormActions.setTimeInForce(TimeInForce.GTT));
       }
     },
-    [dispatch, props]
+    [dispatch, isClosingPosition, side]
   );
 
   const [currentStep, setCurrentStep] = useState<SimpleUiTradeDialogSteps>(
@@ -79,18 +80,18 @@ export const SimpleUiTradeDialog = ({
     setCurrentStep(SimpleUiTradeDialogSteps.Edit);
     setIsOpen(false);
 
-    if (props.isClosingPosition === true) {
+    if (isClosingPosition === true) {
       dispatch(closePositionFormActions.reset());
     } else {
       dispatch(tradeFormActions.reset());
     }
-  }, [setCurrentStep, setIsOpen, dispatch, props]);
+  }, [setIsOpen, isClosingPosition, dispatch]);
 
   const title = useMemo(() => {
     switch (currentStep) {
       case SimpleUiTradeDialogSteps.Edit: {
         let editTitleContent: ReactNode;
-        if (props.isClosingPosition === true) {
+        if (isClosingPosition === true) {
           editTitleContent = (
             <div tw="row">
               <AssetIcon
@@ -111,12 +112,12 @@ export const SimpleUiTradeDialog = ({
           );
         } else {
           const sideString =
-            props.side === OrderSide.BUY
+            side === OrderSide.BUY
               ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
               : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
 
           const sideColor =
-            props.side === OrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
+            side === OrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
 
           editTitleContent = (
             <>
@@ -208,14 +209,15 @@ export const SimpleUiTradeDialog = ({
     return null;
   }, [
     currentStep,
-    displayableAsset,
-    logo,
     stringGetter,
-    onTradeTypeChange,
+    isClosingPosition,
+    logo,
+    displayableAsset,
+    side,
+    onCloseDialog,
     midMarketPrice,
     selectedTradeType,
-    onCloseDialog,
-    props,
+    onTradeTypeChange,
   ]);
 
   return (
@@ -230,7 +232,7 @@ export const SimpleUiTradeDialog = ({
       }}
       placement={DialogPlacement.FullScreen} // Simple UI is always full screen
       title={title}
-      withClose={props.isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
+      withClose={isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
       css={{
         '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
@@ -241,7 +243,7 @@ export const SimpleUiTradeDialog = ({
             : 'transparent', // When submitting and confirming we want a transparent header to not interfere with radial-gradient
       }}
     >
-      {props.isClosingPosition ? (
+      {isClosingPosition ? (
         <SimpleCloseForm
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
