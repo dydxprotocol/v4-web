@@ -91,7 +91,7 @@ export const PortfolioOverview = ({ className }: { className?: string }) => {
 
   return (
     <div tw="flexColumn relative h-[12.5rem] w-full" className={className}>
-      {onboardingState === OnboardingState.Disconnected ? (
+      {onboardingState !== OnboardingState.AccountConnected ? (
         <UnconnectedPortfolioOverview tw="h-full w-full" />
       ) : (
         <ConnectedPortfolioOverview tw="h-full w-full" />

@@ -1,3 +1,4 @@
+import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -14,7 +15,7 @@ import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 export const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const chartDotBackground = useAppSelector(getChartDotBackground);
-  const { openOnboardingDialog, isOnboardingDisabled } = useOnboardingFlow();
+  const { openOnboardingDialog, isOnboardingDisabled, onboardingState } = useOnboardingFlow();
 
   return (
     <div
@@ -40,7 +41,9 @@ export const UnconnectedPortfolioOverview = ({ className }: { className?: string
           action={ButtonAction.Primary}
         >
           <Icon iconName={IconName.Wallet} />
-          {stringGetter({ key: STRING_KEYS.GET_STARTED })}
+          {onboardingState === OnboardingState.Disconnected
+            ? stringGetter({ key: STRING_KEYS.GET_STARTED })
+            : stringGetter({ key: STRING_KEYS.RECOVER_KEYS })}
         </Button>
       </div>
     </div>

@@ -61,7 +61,7 @@ export const BaseTvChart = ({
             {objectKeys(isLaunchable ? LAUNCHABLE_MARKET_RESOLUTION_CONFIGS : RESOLUTION_MAP).map(
               (resolution) => (
                 <button
-                  tw="size-2.75 max-w-2.75 flex-1 border-t-2 border-solid border-color-accent"
+                  tw="size-2.75 max-w-2.75 flex-1 border-b-0 border-l-0 border-r-0 border-t-2 border-solid border-color-accent"
                   type="button"
                   css={{
                     borderColor:

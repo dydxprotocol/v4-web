@@ -1,4 +1,5 @@
 import { MarginMode } from '@/bonsai/forms/trade/types';
+import { OrderFlags, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { USD_DECIMALS } from '@/constants/numbers';
@@ -61,4 +62,8 @@ export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<num
 
 export const getDoubleValuesHasDiff = (current: Nullable<number>, post: Nullable<number>) => {
   return post != null && current !== post;
+};
+
+export const getIsShortTermOrder = (order: SubaccountOrder) => {
+  return order.orderFlags?.toString() === OrderFlags.SHORT_TERM.toString();
 };

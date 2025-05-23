@@ -319,7 +319,7 @@ export const MarketList = ({
       </div>
 
       <div
-        tw="fixed bottom-0 left-0 right-0 z-10 flex h-[5.5rem]"
+        tw="fixed bottom-0 left-0 right-0 z-[1] flex h-[5.5rem]"
         css={{
           display: isSearchOpen ? 'none' : 'flex',
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',

@@ -107,7 +107,7 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-accent);
-      --button-border: solid var(--border-width) var(--color-accent);
+      --button-border: solid var(--border-width, var(--default-border-width)) var(--color-accent);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
     [ButtonStyle.WithoutBackground]: css`
@@ -135,7 +135,8 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-success-background);
-      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-border: solid var(--border-width, var(--default-border-width))
+        var(--color-border-white);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
     [ButtonStyle.WithoutBackground]: css`
@@ -150,7 +151,8 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-red);
-      --button-border: solid var(--border-width) var(--color-border-white);
+      --button-border: solid var(--border-width, var(--default-border-width))
+        var(--color-border-white);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
     [ButtonStyle.WithoutBackground]: css`
@@ -178,7 +180,8 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-red);
       --button-backgroundColor: var(--color-layer-3);
-      --button-border: solid var(--border-width) var(--color-border-red);
+      --button-border: solid var(--border-width, var(--default-border-width))
+        var(--color-border-red);
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
     [ButtonStyle.WithoutBackground]: css`

@@ -5,16 +5,26 @@ import { ErrorType, getHighestPriorityAlert } from '@/bonsai/lib/validationError
 import { NotificationType } from '@/constants/notifications';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getTradeFormSummary } from '@/state/tradeFormSelectors';
+import { getClosePositionFormSummary, getTradeFormSummary } from '@/state/tradeFormSelectors';
 
 import { useNotifications } from '../useNotifications';
 
-export const useTradeErrors = ({ placeOrderError }: { placeOrderError?: string }) => {
+export const useTradeErrors = ({
+  placeOrderError,
+  isClosingPosition,
+}: {
+  placeOrderError?: string;
+  isClosingPosition?: boolean;
+}) => {
   const { errors: tradeErrors } = useAppSelector(getTradeFormSummary);
+  const { errors: closePositionErrors } = useAppSelector(getClosePositionFormSummary);
   const { getNotificationPreferenceForType } = useNotifications();
 
   return useMemo(() => {
-    const primaryAlert = getHighestPriorityAlert(tradeErrors);
+    const primaryAlert = getHighestPriorityAlert(
+      isClosingPosition ? closePositionErrors : tradeErrors
+    );
+
     const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
       NotificationType.OrderStatus
     );
@@ -31,5 +41,11 @@ export const useTradeErrors = ({ placeOrderError }: { placeOrderError?: string }
           : primaryAlert?.type,
       shouldPromptUserToPlaceLimitOrder,
     };
-  }, [getNotificationPreferenceForType, placeOrderError, tradeErrors]);
+  }, [
+    getNotificationPreferenceForType,
+    placeOrderError,
+    isClosingPosition,
+    closePositionErrors,
+    tradeErrors,
+  ]);
 };

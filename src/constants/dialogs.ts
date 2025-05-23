@@ -68,9 +68,14 @@ export type SharePNLAnalyticsDialogProps = {
   side: Nullable<IndexerPositionSide>;
   sideLabel: Nullable<string>;
 };
-export type SimpleUiTradeDialogProps = {
-  side: OrderSide;
-};
+export type SimpleUiTradeDialogProps =
+  | {
+      side: OrderSide;
+      isClosingPosition: false;
+    }
+  | {
+      isClosingPosition: true;
+    };
 export type StakeDialogProps = {};
 export type StakingRewardDialogProps = { usdcRewards: BigNumberish; validators: string[] };
 export type TradeDialogProps = {

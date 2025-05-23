@@ -114,7 +114,7 @@ export const MarketPositionCard = ({ position }: { position: SubaccountPosition 
           TP: <Output type={OutputType.Fiat} value={tpOrder.triggerPrice} />
         </span>
         <div tw="row size-1.5 max-w-1.5 flex-1 justify-center rounded-[50%] bg-color-layer-4">
-          <Icon tw="font-tiny-book" iconName={IconName.Pencil} />
+          <Icon tw="font-tiny-book" iconName={IconName.Pencil2} />
         </div>
       </span>
     ) : (
@@ -133,7 +133,7 @@ export const MarketPositionCard = ({ position }: { position: SubaccountPosition 
           <Output type={OutputType.Fiat} value={slOrder.triggerPrice} />
         </span>
         <div tw="row size-1.5 max-w-1.5 flex-1 justify-center rounded-[50%] bg-color-layer-4">
-          <Icon tw="font-tiny-book" iconName={IconName.Pencil} />
+          <Icon tw="font-tiny-book" iconName={IconName.Pencil2} />
         </div>
       </span>
     ) : (
