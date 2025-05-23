@@ -11,6 +11,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -31,6 +32,7 @@ import { triggersFormActions } from '@/state/triggersForm';
 import { assertNever } from '@/lib/assertNever';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 type InputChangeType = InputType.Currency | InputType.Percent;
 
@@ -66,6 +68,8 @@ export const TriggerOrderInputs = ({
 }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   const clearPriceInputFields = () => {
     dispatch(
@@ -154,6 +158,12 @@ export const TriggerOrderInputs = ({
   }) => (
     <DropdownSelectMenu
       value={value}
+      hideIcon={isSimpleUi}
+      css={
+        isSimpleUi && {
+          '--trigger-padding': '0.25em 0.75em',
+        }
+      }
       items={[
         {
           value: InputType.Percent,

@@ -101,7 +101,7 @@ export const popoverMixins = {
     --popover-origin: var(--radix-popper-transform-origin);
     --popover-border: none;
 
-    z-index: 1;
+    z-index: 3;
 
     color: var(--popover-textColor, inherit);
 
