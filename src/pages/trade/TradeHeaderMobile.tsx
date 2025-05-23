@@ -39,7 +39,7 @@ export const TradeHeaderMobile = ({ launchableMarketId }: { launchableMarketId?:
   const assetRow = launchableAsset ? (
     <div tw="inlineRow gap-[1ch]">
       <img
-        src={launchableAsset.logo}
+        src={launchableAsset.logo ?? undefined}
         alt={launchableAsset.name}
         tw="h-[2.5rem] w-[2.5rem] rounded-[50%]"
       />

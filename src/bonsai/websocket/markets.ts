@@ -76,14 +76,23 @@ function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
 const MarketsValueManager = makeWsValueManager(marketsWebsocketValueCreator);
 
 export function setUpMarkets(store: RootStore) {
-  const throttledSetMarkets = throttle((val: Loadable<MarketsData>) => {
+  let lastSetHadData: boolean = false;
+  const setMarkets = (val: Loadable<MarketsData>) => {
+    lastSetHadData = val.data != null;
     store.dispatch(setAllMarketsRaw(val));
-  }, 2 * timeUnits.second);
+  };
+  const throttledSetMarkets = throttle(setMarkets, 2 * timeUnits.second);
 
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
-    const unsub = subscribeToWsValue(MarketsValueManager, { wsUrl }, (val) =>
-      throttledSetMarkets(val)
-    );
+    const unsub = subscribeToWsValue(MarketsValueManager, { wsUrl }, (val) => {
+      const hasData = val.data != null;
+      if (hasData && !lastSetHadData) {
+        setMarkets(val);
+      } else {
+        throttledSetMarkets(val);
+      }
+    });
+
     return () => {
       unsub();
       throttledSetMarkets.cancel();
