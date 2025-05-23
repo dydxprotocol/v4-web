@@ -16,6 +16,7 @@ import {
   loadableLoaded,
   loadablePending,
 } from '../lib/loadable';
+import { SharedLogIds } from '../logIds';
 import { wrapAndLogBonsaiError } from '../logs';
 import {
   createIndexerQueryStoreEffect,
@@ -45,7 +46,10 @@ const doIndexerHeightQuery = async (
   const requestTime = new Date().toISOString();
   try {
     const result = await promiseWithTimeout(
-      wrapAndLogBonsaiError(() => indexerClient.utility.getHeight(), 'indexerHeightInner')(),
+      wrapAndLogBonsaiError(
+        () => indexerClient.utility.getHeight(),
+        SharedLogIds.INDEXER_HEIGHT_INNER
+      )(),
       requestTimeout
     );
     return loadableLoaded({
@@ -83,7 +87,7 @@ const collapseLoadables = <T extends { requestTime: string; receivedTime: string
 
 export function setUpIndexerHeightQuery(store: RootStore) {
   const cleanupEffect = createIndexerQueryStoreEffect(store, {
-    name: 'indexerHeight',
+    name: SharedLogIds.INDEXER_HEIGHT,
     selector: () => true,
     getQueryFn: (indexerClient) => {
       return () => doIndexerHeightQuery(indexerClient);
@@ -109,7 +113,7 @@ const doValidatorHeightQuery = async (
     const result = await promiseWithTimeout(
       wrapAndLogBonsaiError(
         () => compositeClient.validatorClient.get.latestBlock(),
-        'validatorHeightInner'
+        SharedLogIds.VALIDATOR_HEIGHT_INNER
       )(),
       requestTimeout
     );
@@ -131,7 +135,7 @@ const doValidatorHeightQuery = async (
 
 export function setUpValidatorHeightQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
-    name: 'validatorHeight',
+    name: SharedLogIds.VALIDATOR_HEIGHT,
     selector: () => true,
     getQueryFn: (compositeClient) => {
       return () => doValidatorHeightQuery(compositeClient);

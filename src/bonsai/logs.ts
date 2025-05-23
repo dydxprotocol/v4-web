@@ -2,6 +2,8 @@ import { timeUnits } from '@/constants/time';
 
 import { getDurationSinceLastLogMs, log, logInfo } from '@/lib/telemetry';
 
+import { SharedLogIds } from './logIds';
+
 export const BONSAI_DETAILED_LOGS: boolean = false;
 
 export function logBonsaiError(source: string, message: string, ...args: any[]) {
@@ -25,11 +27,12 @@ export const OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS = timeUnits.second * 60
 export const EFFECTIVE_HEARTBEAT_LOG_LIFETIME_MS = timeUnits.minute * 5;
 
 export const REQUEST_TIME_SAMPLE_RATE = 0.015;
+
 const logIdsToRateLimit = new Set([
-  'indexerHeight',
-  'validatorHeight',
-  'indexerHeightInner',
-  'validatorHeightInner',
+  SharedLogIds.INDEXER_HEIGHT,
+  SharedLogIds.VALIDATOR_HEIGHT,
+  SharedLogIds.INDEXER_HEIGHT_INNER,
+  SharedLogIds.VALIDATOR_HEIGHT_INNER,
 ]);
 
 export function wrapAndLogBonsaiError<T, Args extends any[]>(
