@@ -106,7 +106,13 @@ const AssetPage = () => {
       <Button
         tw="flex-1 bg-color-negative-dark text-color-negative"
         shape={ButtonShape.Pill}
-        onClick={() => dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.SELL })))}
+        onClick={() =>
+          dispatch(
+            openDialog(
+              DialogTypes.SimpleUiTrade({ side: OrderSide.SELL, isClosingPosition: false })
+            )
+          )
+        }
       >
         {stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT })}
       </Button>
@@ -114,7 +120,11 @@ const AssetPage = () => {
       <Button
         tw="flex-1 bg-color-positive-dark text-color-positive"
         shape={ButtonShape.Pill}
-        onClick={() => dispatch(openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY })))}
+        onClick={() =>
+          dispatch(
+            openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY, isClosingPosition: false }))
+          )
+        }
       >
         {stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })}
       </Button>

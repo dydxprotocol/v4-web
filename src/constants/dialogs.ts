@@ -71,6 +71,7 @@ export type SharePNLAnalyticsDialogProps = {
 export type SimpleUiTradeDialogProps =
   | {
       side: OrderSide;
+      isClosingPosition: false;
     }
   | {
       isClosingPosition: boolean;

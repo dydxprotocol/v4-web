@@ -30,15 +30,15 @@ import { SimpleTradeForm } from './SimpleTradeForm';
 
 export const SimpleUiTradeDialog = ({
   setIsOpen,
-  ...props
+  isClosingPosition,
+  ...rest
 }: DialogProps<SimpleUiTradeDialogProps>) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const midMarketPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
-  const side = 'side' in props ? props.side : undefined;
-  const isClosingPosition = 'isClosingPosition' in props ? props.isClosingPosition : undefined;
+  const side = 'side' in rest ? rest.side : undefined;
 
   const { displayableAsset, logo, ticker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
