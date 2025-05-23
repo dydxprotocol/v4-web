@@ -21,7 +21,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
@@ -66,7 +65,7 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
     useAppSelectorWithArgs(getSubaccountPositionByUniqueId, positionUniqueId)
   );
 
-  const { oraclePrice, assetId, displayableAsset, logo, tickSizeDecimals, stepSizeDecimals } =
+  const { oraclePrice, assetId, displayableAsset, tickSizeDecimals, stepSizeDecimals, stepSize } =
     orEmptyObj(useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market));
 
   const {
@@ -89,28 +88,40 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
   // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
   // multiple, we hide the triggers button CTA
   const existsEditableOrCreatableOrders = !(multipleTakeProfitOrders && multipleStopLossOrders);
-
+  const canCompactNumber = stepSize && Number(stepSize) >= 1;
   const priceInfo = isSimpleUi ? (
     <div tw="row overflow-x-auto">
-      <AssetIcon tw="mr-0.75 size-[2.25rem] min-w-[2.25rem]" logoUrl={logo} symbol={symbol} />
       {[
         {
           label: stringGetter({ key: STRING_KEYS.MARK_PRICE }),
           value: (
-            <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+            <$Output
+              tw="font-mini-book"
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
           ),
         },
         {
           label: stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }),
           value: (
-            <$Output type={OutputType.Fiat} value={entryPrice} fractionDigits={tickSizeDecimals} />
+            <$Output
+              tw="font-mini-book"
+              withSubscript
+              type={OutputType.Fiat}
+              value={entryPrice}
+              fractionDigits={tickSizeDecimals}
+            />
           ),
         },
         {
           label: stringGetter({ key: STRING_KEYS.SIZE }),
           value: (
             <$Output
-              type={OutputType.Number}
+              tw="font-mini-book"
+              type={canCompactNumber ? OutputType.CompactNumber : OutputType.Number}
               value={signedSize}
               fractionDigits={stepSizeDecimals}
               slotRight={!!signedSize && ` ${displayableAsset}`}
@@ -227,7 +238,8 @@ const $PriceBox = styled.div`
 const $SimplePriceBox = styled.div<{ isFirst: boolean }>`
   display: flex;
   flex-direction: column;
-  padding: 0 1.5rem;
+  padding-left: 1rem;
+  gap: 0.25rem;
 
   ${({ isFirst }) =>
     isFirst &&
@@ -237,6 +249,7 @@ const $SimplePriceBox = styled.div<{ isFirst: boolean }>`
 
   &:not(:last-child) {
     border-right: 1px solid var(--color-border);
+    padding-right: 1rem;
   }
 `;
 

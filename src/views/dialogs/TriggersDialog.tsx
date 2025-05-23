@@ -33,7 +33,8 @@ export const TriggersDialog = ({
     ? {
         title: stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS }),
         placement: DialogPlacement.FullScreen,
-        description: 'Minimize losses and secure profits', // TODO: Localize
+        description: stringGetter({ key: STRING_KEYS.TRIGGER_DIALOG_DESCRIPTION }),
+        slotIcon: <AssetIcon logoUrl={logoUrl} symbol={assetId} />,
       }
     : {
         title: stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS }),

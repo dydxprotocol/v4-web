@@ -174,7 +174,8 @@ export function formatNumberOutput(
 
   const numberRenderers = {
     [OutputType.CompactNumber]: () => {
-      if (!isNumber(value)) {
+      const numValue = valueBN.toNumber();
+      if (!isNumber(numValue)) {
         return null;
       }
 
@@ -182,7 +183,7 @@ export function formatNumberOutput(
         style: 'decimal',
         notation: 'compact',
         maximumSignificantDigits: 3,
-      }).format(Math.abs(value));
+      }).format(Math.abs(numValue));
     },
     [OutputType.Number]: () => getFormattedVal(valueBN, 0),
     [OutputType.Fiat]: () => getFormattedVal(valueBN, USD_DECIMALS, { prefix: '$' }),
