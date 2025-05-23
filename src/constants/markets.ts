@@ -27,7 +27,7 @@ export type MarketData = {
 
   clobPairId: string;
   effectiveInitialMarginFraction: Nullable<number>;
-  logo: string;
+  logo: Nullable<string>;
   initialMarginFraction: Nullable<number>;
   isNew: boolean;
   isUnlaunched?: boolean;

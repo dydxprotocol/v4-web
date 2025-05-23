@@ -130,7 +130,7 @@ export function createMarketSummary(
   assetInfo: AllAssetData | undefined,
   listOfFavorites: string[]
 ): PerpetualMarketSummaries | undefined {
-  if (markets == null || assetInfo == null) {
+  if (markets == null) {
     return undefined;
   }
 
@@ -149,10 +149,9 @@ export function createMarketSummary(
             SEVEN_DAY_SPARKLINE_ENTRIES
         );
 
-      const assetData = assetInfo[market.assetId];
-      if (assetData == null) return undefined;
+      const assetData = assetInfo?.[market.assetId];
 
-      const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData);
+      const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData, market);
 
       return {
         ...market,

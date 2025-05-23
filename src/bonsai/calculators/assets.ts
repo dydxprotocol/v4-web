@@ -4,7 +4,7 @@ import { weakMapMemoize } from 'reselect';
 import { getTickSizeDecimalsFromPrice } from '@/lib/numbers';
 
 import { AssetInfo, AssetInfos } from '../types/rawTypes';
-import { AssetData, AssetDataForPerpetualMarketSummary } from '../types/summaryTypes';
+import { AssetData, AssetDataForPerpetualMarketSummary, MarketInfo } from '../types/summaryTypes';
 
 export const parseAssetInfo = weakMapMemoize(
   (assetInfo: AssetInfo, assetId: string): AssetData => ({
@@ -27,10 +27,22 @@ export const parseAssetInfo = weakMapMemoize(
 );
 
 export function formatAssetDataForPerpetualMarketSummary(
-  assetData: AssetData
+  assetData: AssetData | undefined,
+  market: MarketInfo
 ): AssetDataForPerpetualMarketSummary & {
   spotVolume24h: number | null;
 } {
+  if (assetData == null) {
+    return {
+      name: market.displayableAsset,
+      logo: null,
+      marketCap: null,
+      reportedMarketCap: null,
+      sectorTags: null,
+      urls: { cmc: null, technicalDoc: null, website: null },
+      spotVolume24h: null,
+    };
+  }
   return {
     name: assetData.name,
     logo: assetData.logo,

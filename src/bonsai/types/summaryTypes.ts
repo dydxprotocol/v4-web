@@ -225,7 +225,7 @@ export enum ApiStatus {
 export type AssetData = {
   assetId: string;
   name: string;
-  logo: string;
+  logo: string | null;
   price: number | null;
   marketCap: number | null;
   volume24h: number | null;

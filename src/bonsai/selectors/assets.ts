@@ -22,4 +22,7 @@ export const selectAssetInfo = createAppSelector(
   }
 );
 
-export const selectAssetLogo = createAppSelector([selectAssetInfo], (asset) => asset?.logo);
+export const selectAssetLogo = createAppSelector(
+  [selectAssetInfo],
+  (asset) => asset?.logo ?? undefined
+);

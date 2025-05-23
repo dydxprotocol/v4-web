@@ -347,7 +347,7 @@ export const MarketsDropdown = memo(
                 {launchableAsset ? (
                   <>
                     <img
-                      src={launchableAsset.logo}
+                      src={launchableAsset.logo ?? undefined}
                       alt={launchableAsset.name}
                       tw="h-[1em] w-auto rounded-[50%]"
                     />

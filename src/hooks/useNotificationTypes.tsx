@@ -154,7 +154,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({
             id: `order:${order.id}`,
             displayData: {
-              icon: marketInfo != null ? <$Icon src={marketInfo.logo} /> : undefined,
+              icon: marketInfo != null ? <$Icon src={marketInfo.logo ?? undefined} /> : undefined,
               title: stringGetter({ key: titleKey }),
               updatedTime: latestUpdateMs,
               body:
@@ -253,7 +253,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             trigger({
               id: `fill:${fill.id ?? ''}`,
               displayData: {
-                icon: <$Icon src={marketInfo?.logo} alt="" />,
+                icon: <$Icon src={marketInfo?.logo ?? undefined} alt="" />,
                 title: stringGetter({ key: titleKey }),
                 updatedTime: createdAt,
                 body: stringGetter({
