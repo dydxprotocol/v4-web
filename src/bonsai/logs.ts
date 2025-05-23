@@ -28,7 +28,7 @@ export const EFFECTIVE_HEARTBEAT_LOG_LIFETIME_MS = timeUnits.minute * 5;
 
 export const REQUEST_TIME_SAMPLE_RATE = 0.015;
 
-const logIdsToRateLimit = new Set([
+const logIdsToRateLimit = new Set<string>([
   SharedLogIds.INDEXER_HEIGHT,
   SharedLogIds.VALIDATOR_HEIGHT,
   SharedLogIds.INDEXER_HEIGHT_INNER,
