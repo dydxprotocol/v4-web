@@ -75,6 +75,7 @@ export type SimpleUiTradeDialogProps =
     }
   | {
       isClosingPosition: true;
+      side: undefined;
     };
 export type StakeDialogProps = {};
 export type StakingRewardDialogProps = { usdcRewards: BigNumberish; validators: string[] };

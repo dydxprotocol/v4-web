@@ -33,7 +33,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
 import { closePositionFormActions } from '@/state/closePositionForm';
-import { tradeFormActions } from '@/state/tradeForm';
 import {
   getClosePositionFormSummary,
   getClosePositionFormValues,
@@ -80,7 +79,7 @@ export const SimpleCloseForm = ({
 
   useEffect(() => {
     if (ticker) {
-      dispatch(tradeFormActions.setMarketId(ticker));
+      dispatch(closePositionFormActions.setMarketId(ticker));
     }
   }, [ticker, dispatch]);
 
