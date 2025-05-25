@@ -1,6 +1,9 @@
 import { useEffect, useMemo } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
+import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+// eslint-disable-next-line no-restricted-imports
+import { useIndexerClient } from '@/bonsai/rest/lib/useIndexer';
+import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
@@ -8,10 +11,12 @@ import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
+import { IndexerPerpetualMarketStatus } from '@/types/indexer/indexerApiGen';
 
 import { useLaunchableMarkets } from '@/hooks/useLaunchableMarkets';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
+import { store } from '@/state/_store';
 import { getOpenPositions } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -24,6 +29,29 @@ import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors'
 import { useMarketsData } from './useMarketsData';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
+// conservative, fast way to tell if a market is real and open for trading
+// using because v4_markets takes 1.1s and this is only .3s
+const useIsMarketValidFast = (market: string | undefined) => {
+  const indexer = useIndexerClient();
+  const { data } = useQuery({
+    queryKey: ['indexer', 'market', market, indexer.key],
+    queryFn: async (): Promise<boolean> => {
+      if (market == null) {
+        return false;
+      }
+      const all = BonsaiCore.markets.markets.data(store.getState());
+      if (all != null) {
+        return all[market]?.oraclePrice != null;
+      }
+      const loaded = (await indexer.indexerClient?.markets.getPerpetualMarkets(market))?.markets[
+        market
+      ];
+      return loaded?.oraclePrice != null && loaded.status === IndexerPerpetualMarketStatus.ACTIVE;
+    },
+  });
+  return data;
+};
+
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
@@ -32,6 +60,7 @@ export const useCurrentMarketId = () => {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const isValidMarketFast = useIsMarketValidFast(marketId);
   const hasMarketIds = marketIds.length > 0;
   const currentMarketOraclePrice = useAppSelectorWithArgs(
     BonsaiHelpers.markets.selectMarketSummaryById,
@@ -142,7 +171,7 @@ export const useCurrentMarketId = () => {
       dispatch(setCurrentMarketIdIfTradeable(undefined));
     } else {
       if (marketId) {
-        const isMarketReadyForSubscription = hasMarketOraclePrice;
+        const isMarketReadyForSubscription = hasMarketOraclePrice || isValidMarketFast;
         if (isMarketReadyForSubscription) {
           dispatch(setCurrentMarketIdIfTradeable(marketId));
         }
@@ -150,7 +179,14 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketIdIfTradeable(undefined));
       }
     }
-  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketOraclePrice, marketId, dispatch]);
+  }, [
+    isViewingUnlaunchedMarket,
+    selectedNetwork,
+    hasMarketOraclePrice,
+    marketId,
+    dispatch,
+    isValidMarketFast,
+  ]);
 
   return {
     isViewingUnlaunchedMarket,
