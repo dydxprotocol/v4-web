@@ -257,7 +257,7 @@ export const DepositForm = ({
       AnalyticsEvents.DepositInitiated({
         isInstantDeposit: isInstantDeposit(depositRoute),
         sourceAssetDenom: depositRoute.sourceAssetDenom,
-        sourceAssetChainID: depositRoute.sourceAssetChainID,
+        sourceAssetChainId: depositRoute.sourceAssetChainId,
         amountIn: depositRoute.amountIn,
         amountOut: depositRoute.amountOut,
         usdAmountOut: depositRoute.usdAmountOut,

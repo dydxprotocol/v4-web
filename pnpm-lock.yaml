@@ -144,8 +144,8 @@ dependencies:
     specifier: ^1.2.0
     version: 1.5.4
   '@skip-go/client':
-    specifier: 0.17.1
-    version: 0.17.1(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17)
+    specifier: 1.1.5
+    version: 1.1.5(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17)
   '@solana/web3.js':
     specifier: ^1.93.0
     version: 1.93.2
@@ -1435,7 +1435,7 @@ packages:
       '@cosmjs/socket': 0.33.1
       '@cosmjs/stream': 0.33.1
       '@cosmjs/utils': 0.33.1
-      axios: 1.7.7
+      axios: 1.9.0
       readonly-date: 1.0.0
       xstream: 11.14.0
     transitivePeerDependencies:
@@ -2790,7 +2790,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -2799,7 +2799,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -2814,7 +2814,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -7131,8 +7131,8 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /@skip-go/client@0.17.1(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17):
-    resolution: {integrity: sha512-ZuDkKQr4uyakELtimlJuJiQCLdA10TzYpNqLgrC/bhtnbwYnHmOYvqWZxyTTC3/2NwxbUw5N++7bhHKfhKfK0Q==}
+  /@skip-go/client@1.1.5(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17):
+    resolution: {integrity: sha512-vrAdeQqUW351ecZ0E2HQ6I40LJa5A1yjr0EsUxq2jLBnyRFDAHj+iebmyD2ppASXRvADFQ46Z1svRvbpwCyaGA==}
     peerDependencies:
       '@solana/web3.js': ^1.95.8
       viem: 2.x
@@ -7143,12 +7143,10 @@ packages:
       '@cosmjs/math': 0.33.1
       '@cosmjs/proto-signing': 0.33.1
       '@cosmjs/stargate': 0.33.1
-      '@cosmjs/tendermint-rpc': 0.33.1
       '@injectivelabs/sdk-ts': 1.15.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
       '@keplr-wallet/unit': 0.12.162(starknet@6.11.0)
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
-      axios: 1.7.7
       bech32: 2.0.0
       cosmjs-types: 0.9.0
       keccak: 3.0.4

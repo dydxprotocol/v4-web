@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { logBonsaiInfo } from '@/bonsai/logs';
-import { StatusState } from '@skip-go/client';
+import { TransactionState } from '@skip-go/client';
 import { formatUnits } from 'viem';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -56,7 +56,7 @@ export function useUpdateTransfers() {
 
         skipClient
           .waitForTransaction({
-            chainID: chainId,
+            chainId,
             txHash,
             async onTransactionTracked(txInfo) {
               if (!txInfo.explorerLink) return;
@@ -137,7 +137,7 @@ export function useUpdateTransfers() {
 
             skipClient
               .waitForTransaction({
-                chainID: chainId,
+                chainId,
                 txHash,
                 async onTransactionTracked(txInfo) {
                   if (!txInfo.explorerLink) return;
@@ -247,7 +247,7 @@ export function useUpdateTransfers() {
   }, [dydxAddress, pendingTransfers, skipClient, dispatch]);
 }
 
-function handleResponseStatus(status: StatusState) {
+function handleResponseStatus(status: TransactionState | string | undefined) {
   switch (status) {
     case 'STATE_ABANDONED':
     case 'STATE_COMPLETED_ERROR':

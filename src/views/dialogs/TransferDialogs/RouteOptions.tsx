@@ -86,14 +86,14 @@ export const TransferRouteOptions = ({
     }
     if (!routes.fast || !goFastOperation) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
-    const fastOperationFee = routes.fast.estimatedFees.reduce(
-      (acc, fee) => acc.plus(fee.usdAmount),
+    const fastOperationFee = routes.fast.estimatedFees?.reduce(
+      (acc, fee) => (fee.usdAmount != null ? acc.plus(fee.usdAmount) : acc),
       BIG_NUMBERS.ZERO
     );
 
     return (
       <span tw="inline-block">
-        {fastOperationFee.gt(0) ? (
+        {fastOperationFee?.gt(0) ? (
           <Output
             tw="inline-block"
             type={OutputType.Fiat}
@@ -109,8 +109,8 @@ export const TransferRouteOptions = ({
   }, [chainId, goFastOperation, routes, disabled, stringGetter, isLoading, type, limitAmount]);
 
   const slowRouteDescription = useMemo(() => {
-    const slowOperationFee = routes?.slow?.estimatedFees.reduce(
-      (acc, fee) => acc.plus(fee.usdAmount),
+    const slowOperationFee = routes?.slow?.estimatedFees?.reduce(
+      (acc, fee) => (fee.usdAmount != null ? acc.plus(fee.usdAmount) : acc),
       BIG_NUMBERS.ZERO
     );
 
@@ -119,7 +119,7 @@ export const TransferRouteOptions = ({
     if (!routes.slow) return stringGetter({ key: STRING_KEYS.UNAVAILABLE });
 
     const gasDenom =
-      routes.slow.sourceAssetChainID && CHAIN_INFO[routes.slow.sourceAssetChainID]?.gasDenom;
+      routes.slow.sourceAssetChainId && CHAIN_INFO[routes.slow.sourceAssetChainId]?.gasDenom;
 
     const gasFeeAdjustment =
       type === 'deposit' && gasDenom ? (

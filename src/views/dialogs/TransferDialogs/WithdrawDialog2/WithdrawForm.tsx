@@ -202,7 +202,7 @@ export const WithdrawForm = ({
     track(
       AnalyticsEvents.WithdrawInitiated({
         sourceAssetDenom: selectedRoute.sourceAssetDenom,
-        sourceAssetChainID: selectedRoute.sourceAssetChainID,
+        sourceAssetChainId: selectedRoute.sourceAssetChainId,
         amountIn: selectedRoute.amountIn,
         amountOut: selectedRoute.amountOut,
         usdAmountOut: selectedRoute.usdAmountOut,

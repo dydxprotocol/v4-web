@@ -1,6 +1,6 @@
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { ERC20Approval, RouteResponse, SkipClient } from '@skip-go/client';
+import { Erc20Approval, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Address, WalletClient, maxUint256 } from 'viem';
 import { useChainId } from 'wagmi';
@@ -12,7 +12,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
-import { useSkipClient } from '@/hooks/transfers/skipClient';
+import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -116,13 +116,14 @@ export function useDepositSteps({
         addressList: userAddressHelper(depositRoute, userAddresses),
       });
 
-      let approvalMaybeNeeded: (ERC20Approval & { chainId: string }) | undefined;
-      for (let i = 0; i < messages.txs.length; i += 1) {
-        const tx = messages.txs[i];
-        if (tx && 'evmTx' in tx && tx.evmTx.requiredERC20Approvals.length) {
+      let approvalMaybeNeeded: (Erc20Approval & { chainId: string }) | undefined;
+
+      for (let i = 0; i < (messages?.txs?.length ?? 0); i += 1) {
+        const tx = messages?.txs?.[i];
+        if (tx && 'evmTx' in tx && tx?.evmTx?.requiredErc20Approvals?.length) {
           approvalMaybeNeeded = {
-            ...tx.evmTx.requiredERC20Approvals[0]!,
-            chainId: tx.evmTx.chainID,
+            ...tx.evmTx.requiredErc20Approvals[0]!,
+            chainId: tx.evmTx.chainId,
           };
         }
       }
@@ -194,11 +195,11 @@ export function useDepositSteps({
             // Bypass because we manually handle allowance checks above
             bypassApprovalCheck: true,
             // TODO(deposit2.0): add custom slippage tolerance here
-            onTransactionBroadcast: async ({ txHash, chainID }) => {
+            onTransactionBroadcast: async ({ txHash, chainId }) => {
               logBonsaiInfo('depositHooks', 'deposit tx submitted', {
                 depositId,
                 txHash,
-                chainID,
+                chainId,
                 depositRoute,
               });
 
@@ -206,7 +207,7 @@ export function useDepositSteps({
                 id: depositId,
                 type: 'deposit' as const,
                 txHash,
-                chainId: chainID,
+                chainId,
                 status: 'pending' as const,
                 tokenAmount: depositRoute.amountIn,
                 estimatedAmountUsd: depositRoute.usdAmountOut ?? '',
@@ -246,7 +247,7 @@ export function useDepositSteps({
       'skip-deposit-steps',
       sourceAccount.address,
       depositRoute?.amountIn,
-      depositRoute?.sourceAssetChainID,
+      depositRoute?.sourceAssetChainId,
       depositRoute?.sourceAssetDenom,
       depositRoute?.operations,
       walletChainId,

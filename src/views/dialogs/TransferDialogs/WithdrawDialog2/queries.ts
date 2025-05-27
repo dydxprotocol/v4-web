@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { RouteRequest, SkipClient } from '@skip-go/client';
+import { RouteRequest } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
@@ -9,7 +9,7 @@ import { DYDX_DEPOSIT_CHAIN } from '@/constants/chains';
 import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 
-import { useSkipClient } from '@/hooks/transfers/skipClient';
+import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { isValidWithdrawalAddress } from '../utils';
@@ -23,9 +23,9 @@ async function getSkipWithdrawalRoutes(
     allowMultiTx: true,
     allowSwaps: true,
     sourceAssetDenom: DYDX_CHAIN_USDC_DENOM,
-    sourceAssetChainID: DYDX_DEPOSIT_CHAIN,
+    sourceAssetChainId: DYDX_DEPOSIT_CHAIN,
     destAssetDenom: token.denom,
-    destAssetChainID: token.chainId,
+    destAssetChainId: token.chainId,
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     smartSwapOptions: { evmSwaps: true, splitRoutes: true },
