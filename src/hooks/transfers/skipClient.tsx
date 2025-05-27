@@ -12,7 +12,6 @@ import {
   messages,
   messagesDirect,
   route,
-  setClientOptions,
   SkipClientOptions,
   waitForTransaction,
 } from '@skip-go/client';
@@ -50,31 +49,64 @@ type SignerGetters = Pick<
 
 function makeLazySkipClient() {
   let signers: SignerGetters;
+  let options: SkipClientOptions;
+  let skipClientPromise: Promise<typeof import('@skip-go/client')> | null = null;
+  let hasNewOptions = false;
+
+  // Lazy loader for the skip client
+  const getSkipClient = async () => {
+    if (!skipClientPromise) {
+      skipClientPromise = import('@skip-go/client');
+    }
+    const skipClient = await skipClientPromise;
+
+    // Apply options if they were set before the client was loaded
+    if (hasNewOptions && options) {
+      skipClient.setClientOptions(options);
+      hasNewOptions = false;
+    }
+
+    return skipClient;
+  };
 
   return {
-    setOptions: (options: SkipClientOptions = {}) => {
-      setClientOptions(options);
+    setOptions: (newOptions: SkipClientOptions = {}) => {
+      options = newOptions;
+      hasNewOptions = true;
     },
+
     setSigners: (newSigners: SignerGetters) => {
       signers = newSigners;
     },
-    route: (req: Parameters<typeof route>[0]) => {
-      return route(req);
+
+    route: async (req: Parameters<typeof route>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.route(req);
     },
-    balances: (req: Parameters<typeof balances>[0]) => {
-      return balances(req);
+
+    balances: async (req: Parameters<typeof balances>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.balances(req);
     },
-    messagesDirect: (req: Parameters<typeof messagesDirect>[0]) => {
-      return messagesDirect(req);
+
+    messagesDirect: async (req: Parameters<typeof messagesDirect>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.messagesDirect(req);
     },
-    messages: (req: Parameters<typeof messages>[0]) => {
-      return messages(req);
+
+    messages: async (req: Parameters<typeof messages>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.messages(req);
     },
-    executeRoute: (req: Parameters<typeof executeRoute>[0]) => {
-      return executeRoute({ ...signers, ...req });
+
+    executeRoute: async (req: Parameters<typeof executeRoute>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.executeRoute({ ...signers, ...req });
     },
-    waitForTransaction: (req: Parameters<typeof waitForTransaction>[0]) => {
-      return waitForTransaction(req);
+
+    waitForTransaction: async (req: Parameters<typeof waitForTransaction>[0]) => {
+      const skipClient = await getSkipClient();
+      return skipClient.waitForTransaction(req);
     },
   };
 }
