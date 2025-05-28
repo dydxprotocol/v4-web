@@ -81,7 +81,6 @@ import {
   QrIcon,
   QuestionMarkIcon,
   RefreshIcon,
-  RewardStarIcon,
   RocketIcon,
   RoundedArrowIcon,
   SearchIcon,
@@ -119,6 +118,8 @@ import {
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { LogoShortIcon } from '@/icons/logo-short';
 import UsdcIcon from '@/icons/usdc.svg';
+
+import { calc } from '@/lib/do';
 
 export enum IconName {
   AddressConnector = 'AddressConnector',
@@ -321,7 +322,7 @@ const icons = {
   [IconName.Qr]: QrIcon,
   [IconName.QuestionMark]: QuestionMarkIcon,
   [IconName.Refresh]: RefreshIcon,
-  [IconName.RewardStar]: RewardStarIcon,
+  [IconName.RewardStar]: undefined,
   [IconName.Rocket]: RocketIcon,
   [IconName.RoundedArrow]: RoundedArrowIcon,
   [IconName.Search]: SearchIcon,
@@ -356,7 +357,12 @@ const icons = {
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
   [IconName.SocialX]: SocialXIcon,
-} as Record<IconName, ElementType>;
+} as Record<IconName, ElementType | undefined>;
+
+// we load reward-start async because it's gigantic for some reason
+calc(async () => {
+  icons[IconName.RewardStar] = (await import('@/icons/reward-star.svg')).default as ElementType;
+});
 
 type ElementProps = {
   iconName?: IconName;
