@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { BalanceRequest, RouteRequest, RouteResponse, SkipClient } from '@skip-go/client';
+import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';
 import { optimism } from 'viem/chains';
@@ -13,7 +13,7 @@ import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer, USDC_ADDRESSES } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
-import { useSkipClient } from '@/hooks/transfers/skipClient';
+import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
@@ -43,7 +43,7 @@ export function useBalance(
   const { data: allBalances } = useBalances();
 
   return useMemo(() => {
-    const balance = allBalances?.chains[chainId]?.denoms[tokenDenom];
+    const balance = allBalances?.chains?.[chainId]?.denoms?.[tokenDenom];
 
     if (!balance?.decimals) return { formatted: undefined, raw: undefined };
 
@@ -81,7 +81,7 @@ function networkTypeToBalances(
         };
         return acc;
       },
-      {} as BalanceRequest['chains']
+      {} as Required<BalanceRequest>['chains']
     );
     return { chains: chainRequest };
   }
@@ -130,9 +130,9 @@ async function getSkipDepositRoutes(
 ) {
   const routeOptions: RouteRequest = {
     sourceAssetDenom: token.denom,
-    sourceAssetChainID: token.chainId,
+    sourceAssetChainId: token.chainId,
     destAssetDenom: DYDX_CHAIN_USDC_DENOM,
-    destAssetChainID: DYDX_DEPOSIT_CHAIN,
+    destAssetChainId: DYDX_DEPOSIT_CHAIN,
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     // TODO(deposit2.0): Manually calculate price impact by comparing USD values and warn user if difference > a certain %
@@ -145,7 +145,7 @@ async function getSkipDepositRoutes(
     skipClient.route({ ...routeOptions, goFast: true }),
   ]);
 
-  return { slow, fast: isInstantDeposit(fast) ? fast : undefined };
+  return { slow, fast: fast != null && isInstantDeposit(fast) ? fast : undefined };
 }
 
 export function useDepositRoutes(token: TokenForTransfer, amount: string) {

@@ -34,7 +34,7 @@ export type Withdraw = {
   finalAmountUsd?: string;
   isInstantWithdraw: boolean;
   destinationChainId: string;
-  transferAssetRelease: TransferAssetRelease | null; // Where the asset was transferred to
+  transferAssetRelease: TransferAssetRelease | null | undefined; // Where the asset was transferred to
   status: 'pending' | 'success' | 'error';
   updatedAt?: number;
 };

@@ -44,9 +44,6 @@ dependencies:
   '@hugocxl/react-to-image':
     specifier: ^0.0.9
     version: 0.0.9(html-to-image@1.11.11)(react@18.2.0)
-  '@js-joda/core':
-    specifier: ^5.5.3
-    version: 5.5.3
   '@keplr-wallet/types':
     specifier: ^0.12.188
     version: 0.12.188(starknet@6.11.0)
@@ -137,15 +134,9 @@ dependencies:
   '@reduxjs/toolkit':
     specifier: ^2.2.5
     version: 2.2.5(react-redux@9.1.2)(react@18.2.0)
-  '@scure/bip32':
-    specifier: ^1.3.0
-    version: 1.6.2
-  '@scure/bip39':
-    specifier: ^1.2.0
-    version: 1.5.4
   '@skip-go/client':
-    specifier: 0.17.1
-    version: 0.17.1(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17)
+    specifier: 1.1.5
+    version: 1.1.5(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17)
   '@solana/web3.js':
     specifier: ^1.93.0
     version: 1.93.2
@@ -182,9 +173,6 @@ dependencies:
   '@visx/point':
     specifier: ^3.0.1
     version: 3.0.1
-  '@visx/react-spring':
-    specifier: ^3.1.0
-    version: 3.1.0(@react-spring/web@9.7.2)(react@18.2.0)
   '@visx/responsive':
     specifier: ^3.0.0
     version: 3.0.0(react@18.2.0)
@@ -192,9 +180,6 @@ dependencies:
     specifier: ^3.0.0
     version: 3.0.0
   '@visx/shape':
-    specifier: ^3.0.0
-    version: 3.0.0(react@18.2.0)
-  '@visx/text':
     specifier: ^3.0.0
     version: 3.0.0(react@18.2.0)
   '@visx/threshold':
@@ -212,18 +197,9 @@ dependencies:
   bignumber.js:
     specifier: ^9.1.1
     version: 9.1.1
-  buffer:
-    specifier: ^6.0.3
-    version: 6.0.3
   cmdk:
     specifier: ^0.2.0
     version: 0.2.0(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
-  color:
-    specifier: ^4.2.3
-    version: 4.2.3
-  cosmjs-types:
-    specifier: ^0.9.0
-    version: 0.9.0
   crypto-js:
     specifier: ^4.1.1
     version: 4.1.1
@@ -257,12 +233,6 @@ dependencies:
   mipd:
     specifier: ^0.0.7
     version: 0.0.7(typescript@5.7.2)
-  prometheus-query:
-    specifier: ^3.4.0
-    version: 3.4.0
-  query-string:
-    specifier: ^8.1.0
-    version: 8.1.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1435,7 +1405,7 @@ packages:
       '@cosmjs/socket': 0.33.1
       '@cosmjs/stream': 0.33.1
       '@cosmjs/utils': 0.33.1
-      axios: 1.7.7
+      axios: 1.9.0
       readonly-date: 1.0.0
       xstream: 11.14.0
     transitivePeerDependencies:
@@ -2790,7 +2760,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -2799,7 +2769,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -2814,7 +2784,7 @@ packages:
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
-      protobufjs: 7.3.2
+      protobufjs: 7.5.1
       rxjs: 7.8.1
     dev: false
 
@@ -3018,10 +2988,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
-
-  /@js-joda/core@5.5.3:
-    resolution: {integrity: sha512-7dqNYwG8gCt4hfg5PKgM7xLEcgSBcx/UgC92OMnhMmvAnq11QzDFPrxUkNR/u5kn17WWLZ8beZ4A3Qrz4pZcmQ==}
-    dev: false
 
   /@jsr/ryoppippi__unplugin-typia@1.1.0(@samchon/openapi@2.2.1)(@types/node@20.12.13)(rollup@2.79.1)(tsx@4.7.1):
     resolution: {integrity: sha512-/Azs26dk4J/Lq9nkNCRIC0A0CbOnRnt2RWSKEcGSbhk2Vh3zKut2uyqiwjy7EJccSAnbwZ3fmrYltMiaiyV14A==, tarball: https://npm.jsr.io/~/11/@jsr/ryoppippi__unplugin-typia/1.1.0.tgz}
@@ -7131,8 +7097,8 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /@skip-go/client@0.17.1(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17):
-    resolution: {integrity: sha512-ZuDkKQr4uyakELtimlJuJiQCLdA10TzYpNqLgrC/bhtnbwYnHmOYvqWZxyTTC3/2NwxbUw5N++7bhHKfhKfK0Q==}
+  /@skip-go/client@1.1.5(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17):
+    resolution: {integrity: sha512-vrAdeQqUW351ecZ0E2HQ6I40LJa5A1yjr0EsUxq2jLBnyRFDAHj+iebmyD2ppASXRvADFQ46Z1svRvbpwCyaGA==}
     peerDependencies:
       '@solana/web3.js': ^1.95.8
       viem: 2.x
@@ -7143,12 +7109,10 @@ packages:
       '@cosmjs/math': 0.33.1
       '@cosmjs/proto-signing': 0.33.1
       '@cosmjs/stargate': 0.33.1
-      '@cosmjs/tendermint-rpc': 0.33.1
       '@injectivelabs/sdk-ts': 1.15.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
       '@keplr-wallet/unit': 0.12.162(starknet@6.11.0)
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
-      axios: 1.7.7
       bech32: 2.0.0
       cosmjs-types: 0.9.0
       keccak: 3.0.4
@@ -11041,21 +11005,6 @@ packages:
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
-  /color-string@1.9.1:
-    resolution: {integrity: sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==}
-    dependencies:
-      color-name: 1.1.4
-      simple-swizzle: 0.2.2
-    dev: false
-
-  /color@4.2.3:
-    resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
-    engines: {node: '>=12.5.0'}
-    dependencies:
-      color-convert: 2.0.1
-      color-string: 1.9.1
-    dev: false
-
   /colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
     dev: false
@@ -11681,6 +11630,7 @@ packages:
   /decode-uri-component@0.4.1:
     resolution: {integrity: sha512-+8VxcR21HhTy8nOt6jf20w0c9CADrw1O8d+VZ/YzzCt4bJ3uBjw+D1q2osAB8RnpwwaeYBxy0HyKQxD5JBMuuQ==}
     engines: {node: '>=14.16'}
+    dev: true
 
   /decompress-response@3.3.0:
     resolution: {integrity: sha512-BzRPQuY1ip+qDonAOz42gRm/pg9F768C+npV/4JOsxRC2sq+Rlk+Q4ZCAsOhnIaMrgarILY+RMUIvMmmX1qAEA==}
@@ -13504,6 +13454,7 @@ packages:
   /filter-obj@5.1.0:
     resolution: {integrity: sha512-qWeTREPoT7I0bifpPUXtxkZJ1XJzxWtfoWWkdVGqa+eCr3SHW/Ocp89o8vLvbUuQnadybJpjOKu4V+RwO6sGng==}
     engines: {node: '>=14.16'}
+    dev: true
 
   /find-cache-dir@3.3.2:
     resolution: {integrity: sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==}
@@ -14912,10 +14863,6 @@ packages:
 
   /is-arrayish@0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
-
-  /is-arrayish@0.3.2:
-    resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
-    dev: false
 
   /is-async-function@2.0.0:
     resolution: {integrity: sha512-Y1JXKrfykRJGdlDwdKlLpLyMIiWqWvuSd17TvZk68PLAOGOoF4Xyav1z0Xhoi+gCYjZVeC5SI+hYFOfvXmGRCA==}
@@ -18118,14 +18065,6 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: true
 
-  /prometheus-query@3.4.0:
-    resolution: {integrity: sha512-PGNwYVjXxenfj2PR4FKEUv5O4XO8ciHT92GX83J5ZJm5ki3YzLLiv+TfbmQSUxvHcXofLg9PYH6CBCSplcvr9g==}
-    dependencies:
-      axios: 1.7.7
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
     dependencies:
@@ -18346,6 +18285,7 @@ packages:
       decode-uri-component: 0.4.1
       filter-obj: 5.1.0
       split-on-first: 3.0.0
+    dev: true
 
   /querystring-es3@0.2.1:
     resolution: {integrity: sha512-773xhDQnZBMFobEiztv8LIl70ch5MSF/jUQVlhwFyBILqq96anmoctVIYz+ZRp0qbCKATTn6ev02M3r7Ga5vqA==}
@@ -19475,12 +19415,6 @@ packages:
       simple-concat: 1.0.1
     dev: false
 
-  /simple-swizzle@0.2.2:
-    resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
-    dependencies:
-      is-arrayish: 0.3.2
-    dev: false
-
   /slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -19645,6 +19579,7 @@ packages:
   /split-on-first@3.0.0:
     resolution: {integrity: sha512-qxQJTx2ryR0Dw0ITYyekNQWpz6f8dGd7vffGNflQQ3Iqj9NJ6qiZ7ELpZsJ/QBhIVAiDfXdag3+Gp8RvWa62AA==}
     engines: {node: '>=12'}
+    dev: true
 
   /split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}

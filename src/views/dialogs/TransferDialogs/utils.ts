@@ -47,33 +47,33 @@ export function getUserAddressesForRoute(
   destinationAddress?: string // Withdraw Only: The final stop for the transfer
 ): UserAddress[] {
   const chains = route.requiredChainAddresses;
-  const destinationChain = route.destAssetChainID;
+  const destinationChain = route.destAssetChainId;
 
   return chains.map((chainId, idx) => {
     // Withdraw Only: The last chain in the route and the destination address is valid
     if (chainId === destinationChain && idx === chains.length - 1 && destinationAddress) {
-      return { chainID: chainId, address: destinationAddress };
+      return { chainId, address: destinationAddress };
     }
 
     switch (chainId) {
       case CosmosChainId.Noble:
         if (!nobleAddress) throw new Error('nobleAddress undefined');
-        return { chainID: chainId, address: nobleAddress };
+        return { chainId, address: nobleAddress };
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
-        return { chainID: chainId, address: osmosisAddress };
+        return { chainId, address: osmosisAddress };
       case CosmosChainId.Neutron:
         if (!neutronAddress) throw new Error('neutronAddress undefined');
-        return { chainID: chainId, address: neutronAddress };
+        return { chainId, address: neutronAddress };
       case DYDX_DEPOSIT_CHAIN:
         if (!dydxAddress) throw new Error('dydxAddress undefined');
-        return { chainID: chainId, address: dydxAddress };
+        return { chainId, address: dydxAddress };
       default:
         if (
           (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) ||
           (chainId === SOLANA_MAINNET_ID && sourceAccount.chain === SOLANA_MAINNET_ID)
         ) {
-          return { chainID: chainId, address: sourceAccount.address as string };
+          return { chainId, address: sourceAccount.address as string };
         }
 
         throw new Error(`unhandled chainId ${chainId} for user address ${sourceAccount.address}`);
@@ -86,7 +86,7 @@ export function userAddressHelper(route: RouteResponse, userAddresses: UserAddre
   let addressList: string[] = [];
   let i = 0;
   for (let j = 0; j < userAddresses.length; j += 1) {
-    if (route.requiredChainAddresses[i] !== userAddresses[j]?.chainID) {
+    if (route.requiredChainAddresses[i] !== userAddresses[j]?.chainId) {
       i = j;
       continue;
     }

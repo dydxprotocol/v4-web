@@ -18,7 +18,7 @@ if [ -z "$VITE_LAST_ORIGINAL_COMMIT" ]; then
 fi
 
 # Find the tag the commit lives in
-VITE_LAST_TAG=$(git describe --exact-match $VITE_LAST_ORIGINAL_COMMIT)
+VITE_LAST_TAG=$(git describe --all --exact-match $VITE_LAST_ORIGINAL_COMMIT)
 
 # Update or add VITE_LAST_ORIGINAL_COMMIT in .env
 if grep -q "VITE_LAST_ORIGINAL_COMMIT=" .env; then

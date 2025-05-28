@@ -1,7 +1,7 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
-import { SupportedLocale } from '@dydxprotocol/v4-localization';
+import { type SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
@@ -418,7 +418,7 @@ export const AnalyticsEvents = unionize(
       Pick<
         RouteResponse,
         | 'sourceAssetDenom'
-        | 'sourceAssetChainID'
+        | 'sourceAssetChainId'
         | 'amountIn'
         | 'amountOut'
         | 'usdAmountOut'
@@ -447,7 +447,7 @@ export const AnalyticsEvents = unionize(
         Pick<
           RouteResponse,
           | 'sourceAssetDenom'
-          | 'sourceAssetChainID'
+          | 'sourceAssetChainId'
           | 'amountIn'
           | 'amountOut'
           | 'usdAmountOut'
