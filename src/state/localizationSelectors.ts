@@ -44,7 +44,7 @@ export const getStringGetterForLocaleData = (
     if (isLocaleLoaded) {
       let formattedString = props.fallback ?? '';
 
-      if (localeData || enLocaleData) {
+      if (localeData != null || enLocaleData != null) {
         if (props.key) {
           const localeString = get(localeData, props.key);
           const englishString = get(enLocaleData, props.key);

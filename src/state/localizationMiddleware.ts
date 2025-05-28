@@ -69,7 +69,8 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
       const { locale, isAutoDetect } = payload as ReturnType<typeof setSelectedLocale>['payload'];
       store.dispatch(setLocaleLoaded(false));
 
-      const mySetId = ++currentSetLocaleId;
+      currentSetLocaleId += 1;
+      const mySetId = currentSetLocaleId;
       const allLocales = await allLocalesPromise;
       // if we got pre-empted
       if (currentSetLocaleId !== mySetId) {
