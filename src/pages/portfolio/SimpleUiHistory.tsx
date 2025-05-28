@@ -1,9 +1,11 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+
+import { Outlet, useMatch, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, HistoryRoute } from '@/constants/routes';
+import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -14,8 +16,24 @@ import { TabNavigator } from '@/components/TabNavigator';
 export const SimpleUiHistory = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  const location = useLocation();
-  const currentRoute = location.pathname.split('/').pop() ?? HistoryRoute.Trades;
+
+  const matchTrades = useMatch(
+    `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`
+  );
+  const matchTransfers = useMatch(
+    `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Transfers}`
+  );
+  const matchVaultTransfers = useMatch(
+    `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.VaultTransfers}`
+  );
+
+  const currentRoute = useMemo(() => {
+    if (matchTrades != null) return HistoryRoute.Trades;
+    if (matchTransfers != null) return HistoryRoute.Transfers;
+    if (matchVaultTransfers != null) return HistoryRoute.VaultTransfers;
+
+    return HistoryRoute.Trades;
+  }, [matchTrades, matchTransfers, matchVaultTransfers]);
 
   const handleBack = () => {
     navigate(AppRoute.Markets);
