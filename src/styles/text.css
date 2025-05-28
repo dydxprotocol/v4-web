@@ -52,6 +52,7 @@
   --font-large-regular: var(--fontWeight-regular) var(--fontSize-large) var(--fontFamily-base);
   --font-large-book: var(--fontWeight-book) var(--fontSize-large) var(--fontFamily-base);
   --font-large-medium: var(--fontWeight-medium) var(--fontSize-large) var(--fontFamily-base);
+  --font-large-bold: var(--fontWeight-bold) var(--fontSize-large) var(--fontFamily-base);
 
   --font-extra-regular: var(--fontWeight-regular) var(--fontSize-extra) var(--fontFamily-base);
   --font-extra-book: var(--fontWeight-book) var(--fontSize-extra) var(--fontFamily-base);

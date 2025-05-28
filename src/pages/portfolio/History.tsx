@@ -54,6 +54,7 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
+
 const $NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
 

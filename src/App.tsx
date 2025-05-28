@@ -93,6 +93,7 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
+  const isSimpleUi = testFlags.simpleUi && isTablet;
 
   const { showRestrictionWarning } = useComplianceState();
 
@@ -105,11 +106,11 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
-  if (isTablet && testFlags.simpleUi) {
+  if (isSimpleUi) {
     return (
       <>
         <GlobalStyle />
-        <main tw="h-[100vh] w-[100vw]">
+        <$MobileMain tw="h-[100vh] w-[100vw]">
           <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
             <Routes>
               <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
@@ -117,10 +118,13 @@ const Content = () => {
                 <Route path=":market" element={<SimpleAssetPage />} />
                 <Route path={AppRoute.Trade} element={<SimpleAssetPage />} />
               </Route>
+              <Route path={AppRoute.Alerts} element={<AlertsPage />} />
+              <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
+              <Route path={AppRoute.Settings} element={<SettingsPage />} />
               <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
             </Routes>
           </Suspense>
-        </main>
+        </$MobileMain>
         <NotificationsToastArea tw="z-[2]" />
 
         <$DialogArea ref={dialogAreaRef}>
@@ -354,6 +358,9 @@ const $Main = styled.main`
 
   position: relative;
 `;
+
+const $MobileMain = styled.main``;
+
 const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;

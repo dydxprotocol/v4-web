@@ -177,6 +177,7 @@ export default {
         '.font-large-regular': { font: 'var(--font-large-regular)' },
         '.font-large-book': { font: 'var(--font-large-book)' },
         '.font-large-medium': { font: 'var(--font-large-medium)' },
+        '.font-large-bold': { font: 'var(--font-large-bold)' },
 
         '.font-extra-regular': { font: 'var(--font-extra-regular)' },
         '.font-extra-book': { font: 'var(--font-extra-book)' },

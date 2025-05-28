@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
+
 import { OnboardingState } from '@/constants/account';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -22,6 +25,7 @@ import { UnconnectedPortfolioOverview } from './UnconnectedPortfolioOverview';
 export const PortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { openOnboardingDialog, onboardingState, isOnboardingDisabled, isAccountViewOnly } =
     useOnboardingFlow();
 
@@ -34,25 +38,28 @@ export const PortfolioOverview = ({ className }: { className?: string }) => {
     },
     onboardingState === OnboardingState.AccountConnected &&
       !isAccountViewOnly && {
-        value: 'transfers',
-        label: stringGetter({ key: STRING_KEYS.TRANSFER }),
-        icon: '🚧',
-      },
-    onboardingState === OnboardingState.AccountConnected &&
-      !isAccountViewOnly && {
         value: 'alerts',
         label: stringGetter({ key: STRING_KEYS.ALERTS }),
-        icon: '🚧',
+        icon: <Icon iconName={IconName.Bell} />,
+        onSelect: () => {
+          navigate(AppRoute.Alerts);
+        },
       },
     onboardingState === OnboardingState.AccountConnected && {
       value: 'history',
       label: stringGetter({ key: STRING_KEYS.HISTORY }),
-      icon: '🚧',
+      icon: <Icon iconName={IconName.History} />,
+      onSelect: () => {
+        navigate(AppRoute.Portfolio);
+      },
     },
     onboardingState === OnboardingState.AccountConnected && {
       value: 'settings',
       label: stringGetter({ key: STRING_KEYS.SETTINGS }),
-      icon: '🚧',
+      icon: <Icon iconName={IconName.Settings} />,
+      onSelect: () => {
+        navigate(AppRoute.Settings);
+      },
     },
     {
       value: 'help',

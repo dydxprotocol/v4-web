@@ -47,6 +47,7 @@ export { default as InfoIcon } from './info-circle.svg';
 export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LightningIcon } from './lightning.svg';
 export { default as LinkOutIcon } from './link-out.svg';
+export { default as LiquidationIcon } from './liquid.svg';
 export { default as ListIcon } from './list.svg';
 export { default as LockIcon } from './lock.svg';
 export { default as CoinMarketCapIcon } from './logos/coinmarketcap.svg';
