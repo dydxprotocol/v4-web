@@ -140,21 +140,21 @@ export function useWithdrawStep({
             assetId: USDC_ASSET_ID,
             quantums: withdrawRoute.amountIn,
           }),
-          msgTypeURL: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+          msgTypeUrl: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
         },
         onTransactionSigned: async () => {
           onWithdrawSigned(withdrawId);
         },
-        onTransactionBroadcast: async ({ txHash, chainID }) => {
+        onTransactionBroadcast: async ({ txHash, chainId }) => {
           // First Broadcast will always originate from v4 chain
-          if (chainID === DYDX_DEPOSIT_CHAIN) {
+          if (chainId === DYDX_DEPOSIT_CHAIN) {
             // Create subtransactions for each chain in the withdrawRoute excluding the last chain. Only the v4 chain will have a txHash at this point
             const subtransactions: WithdrawSubtransaction[] = initial(
               withdrawRoute.requiredChainAddresses
-            ).map((chainId) => ({
-              chainId,
-              txHash: chainId === chainID ? txHash : undefined,
-              status: chainId === chainID ? ('pending' as const) : ('idle' as const),
+            ).map((chainIdInner) => ({
+              chainId: chainIdInner,
+              txHash: chainIdInner === chainId ? txHash : undefined,
+              status: chainIdInner === chainId ? ('pending' as const) : ('idle' as const),
             }));
 
             const baseWithdraw: Withdraw = {
@@ -162,7 +162,7 @@ export function useWithdrawStep({
               transactions: subtransactions,
               type: 'withdraw' as const,
               status: 'pending' as const,
-              destinationChainId: withdrawRoute.destAssetChainID,
+              destinationChainId: withdrawRoute.destAssetChainId,
               estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
               isInstantWithdraw: isInstantTransfer(withdrawRoute),
               transferAssetRelease: null,
@@ -170,7 +170,7 @@ export function useWithdrawStep({
             logBonsaiInfo('withdrawHooks', 'withdraw tx submitted', {
               withdrawId,
               txHash,
-              chainID,
+              chainId,
               withdrawRoute,
             });
             track(AnalyticsEvents.WithdrawSubmitted(baseWithdraw));
@@ -179,12 +179,12 @@ export function useWithdrawStep({
             logBonsaiInfo('withdrawHooks', 'additional withdraw tx submitted', {
               withdrawId,
               txHash,
-              chainID,
+              chainId,
               withdrawRoute,
             });
             // Update the subtransaction with the txHash
             const subtransaction: WithdrawSubtransaction = {
-              chainId: chainID,
+              chainId,
               txHash,
               status: 'pending' as const,
             };

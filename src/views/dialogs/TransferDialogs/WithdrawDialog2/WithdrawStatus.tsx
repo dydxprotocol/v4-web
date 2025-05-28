@@ -37,7 +37,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
       if (transferAssetRelease && transferAssetRelease.released) {
         return stringGetter({
           key: STRING_KEYS.WITHDRAWN_TO_CHAINID,
-          params: { CHAIN_ID: transferAssetRelease.chainID },
+          params: { CHAIN_ID: transferAssetRelease.chainId },
         });
       }
 
