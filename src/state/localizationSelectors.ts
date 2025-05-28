@@ -50,7 +50,7 @@ export const getStringGetterForLocaleData = (
           const englishString = get(enLocaleData, props.key);
 
           // Fallback to english whenever a key doesn't exist for other languages
-          formattedString = localeString || englishString;
+          formattedString = localeString || englishString || '';
         }
       }
 
