@@ -24,6 +24,7 @@ export const VaultTransferRow = ({
   const stringGetter = useStringGetter();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
   const { amountUsdc, timestampMs, transactionHash, type } = orEmptyObj(vaultTransfer);
+
   const typeString =
     type === VaultTransferType.DEPOSIT
       ? stringGetter({ key: STRING_KEYS.ADD_FUNDS })
@@ -32,12 +33,11 @@ export const VaultTransferRow = ({
         : undefined;
 
   const isReceiving = type === VaultTransferType.DEPOSIT;
-
   const sizeBN = MustBigNumber(amountUsdc);
   const value = isReceiving ? sizeBN : sizeBN.negated();
 
   return (
-    <$TransferRow className={className}>
+    <$VaultTransferRow className={className}>
       <div tw="row gap-0.75">
         <div
           tw="row size-2.25 justify-center rounded-0.5 bg-color-layer-3 text-color-text-2"
@@ -78,11 +78,11 @@ export const VaultTransferRow = ({
           </Link>
         )}
       </div>
-    </$TransferRow>
+    </$VaultTransferRow>
   );
 };
 
-const $TransferRow = styled.div`
+const $VaultTransferRow = styled.div`
   ${tw`row w-full justify-between gap-0.5 px-1.25`}
   border-bottom: var(--default-border-width) solid var(--color-layer-3);
 `;
