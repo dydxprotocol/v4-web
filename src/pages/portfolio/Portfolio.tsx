@@ -26,6 +26,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
+import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
@@ -34,6 +35,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -49,6 +51,9 @@ const EquityTiers = lazy(() =>
 );
 
 const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
+const SimpleUiHistory = lazy(() =>
+  import('./SimpleUiHistory').then((module) => ({ default: module.SimpleUiHistory }))
+);
 
 const PortfolioPage = () => {
   const dispatch = useAppDispatch();
@@ -57,6 +62,7 @@ const PortfolioPage = () => {
   const { complianceState } = useComplianceState();
 
   const initialPageSize = 20;
+  const isSimpleUi = testFlags.simpleUi && isTablet;
 
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
@@ -74,7 +80,37 @@ const PortfolioPage = () => {
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
-  const routesComponent = (
+  const routesComponent = isSimpleUi ? (
+    <Suspense fallback={<LoadingSpace id="portfolio" />}>
+      <Routes>
+        <Route path={PortfolioRoute.History} element={<SimpleUiHistory />}>
+          <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
+          <Route path={HistoryRoute.Trades} element={<TradeHistoryList />} />
+
+          <Route
+            path={HistoryRoute.Transfers}
+            element={
+              <TransferHistoryTable initialPageSize={initialPageSize} withOuterBorder={false} />
+            }
+          />
+          <Route
+            path={HistoryRoute.VaultTransfers}
+            element={
+              <VaultTransactionsTable
+                withOuterBorders={false}
+                withTxHashLink
+                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}
+              />
+            }
+          />
+        </Route>
+        <Route
+          path="*"
+          element={<Navigate to={`${PortfolioRoute.History}/${HistoryRoute.Trades}`} replace />}
+        />
+      </Routes>
+    </Suspense>
+  ) : (
     <Suspense fallback={<LoadingSpace id="portfolio" />}>
       <Routes>
         <Route path={PortfolioRoute.Overview} element={<Overview />} />
@@ -147,6 +183,10 @@ const PortfolioPage = () => {
     </Suspense>
   );
 
+  if (isSimpleUi) {
+    return routesComponent;
+  }
+
   return isTablet ? (
     <$PortfolioMobile>
       <PortfolioNavMobile />
@@ -155,125 +195,122 @@ const PortfolioPage = () => {
   ) : (
     <WithSidebar
       sidebar={
-        isTablet ? null : (
-          <div tw="flexColumn h-full justify-between">
-            <NavigationMenu
-              items={[
-                {
-                  group: 'views',
-                  groupLabel: stringGetter({ key: STRING_KEYS.VIEWS }),
-                  items: [
-                    {
-                      value: PortfolioRoute.Overview,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.Overview} />
-                        </$IconContainer>
-                      ),
-                      label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
-                      href: PortfolioRoute.Overview,
-                    },
-                    {
-                      value: PortfolioRoute.Positions,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.Positions} />
-                        </$IconContainer>
-                      ),
-                      label: (
-                        <>
-                          {stringGetter({ key: STRING_KEYS.POSITIONS })}
-                          {numPositions &&
-                            (typeof numPositions === 'string' || numPositions > 0) && (
-                              <Tag type={TagType.Number}> {numPositions} </Tag>
-                            )}
-                        </>
-                      ),
-                      href: PortfolioRoute.Positions,
-                    },
-                    {
-                      value: PortfolioRoute.Orders,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.OrderPending} />
-                        </$IconContainer>
-                      ),
-                      label: (
-                        <>
-                          {stringGetter({ key: STRING_KEYS.ORDERS })}
-                          {numOrders && (typeof numOrders === 'string' || numOrders > 0) && (
-                            <Tag type={TagType.Number}> {numOrders} </Tag>
-                          )}
-                        </>
-                      ),
-                      href: PortfolioRoute.Orders,
-                    },
-                    {
-                      value: PortfolioRoute.Fees,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.Calculator} />
-                        </$IconContainer>
-                      ),
-                      label: stringGetter({ key: STRING_KEYS.FEES }),
-                      href: PortfolioRoute.Fees,
-                    },
-                    {
-                      value: PortfolioRoute.EquityTiers,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.List} />
-                        </$IconContainer>
-                      ),
-                      label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
-                      href: PortfolioRoute.EquityTiers,
-                    },
-                    {
-                      value: PortfolioRoute.History,
-                      slotBefore: (
-                        <$IconContainer>
-                          <Icon iconName={IconName.History} />
-                        </$IconContainer>
-                      ),
-                      label: stringGetter({ key: STRING_KEYS.HISTORY }),
-                      href: PortfolioRoute.History,
-                    },
-                  ],
-                },
-              ]}
-              tw="p-0.5 pt-0"
-            />
-            {onboardingState === OnboardingState.AccountConnected && (
-              <$Footer>
-                {complianceState === ComplianceStates.FULL_ACCESS && (
-                  <Button
-                    action={ButtonAction.Primary}
-                    onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-                  >
-                    {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-                  </Button>
-                )}
-                {usdcBalance > 0 && (
+        <div tw="flexColumn h-full justify-between">
+          <NavigationMenu
+            items={[
+              {
+                group: 'views',
+                groupLabel: stringGetter({ key: STRING_KEYS.VIEWS }),
+                items: [
+                  {
+                    value: PortfolioRoute.Overview,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.Overview} />
+                      </$IconContainer>
+                    ),
+                    label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
+                    href: PortfolioRoute.Overview,
+                  },
+                  {
+                    value: PortfolioRoute.Positions,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.Positions} />
+                      </$IconContainer>
+                    ),
+                    label: (
+                      <>
+                        {stringGetter({ key: STRING_KEYS.POSITIONS })}
+                        {numPositions && (typeof numPositions === 'string' || numPositions > 0) && (
+                          <Tag type={TagType.Number}> {numPositions} </Tag>
+                        )}
+                      </>
+                    ),
+                    href: PortfolioRoute.Positions,
+                  },
+                  {
+                    value: PortfolioRoute.Orders,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.OrderPending} />
+                      </$IconContainer>
+                    ),
+                    label: (
+                      <>
+                        {stringGetter({ key: STRING_KEYS.ORDERS })}
+                        {numOrders && (typeof numOrders === 'string' || numOrders > 0) && (
+                          <Tag type={TagType.Number}> {numOrders} </Tag>
+                        )}
+                      </>
+                    ),
+                    href: PortfolioRoute.Orders,
+                  },
+                  {
+                    value: PortfolioRoute.Fees,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.Calculator} />
+                      </$IconContainer>
+                    ),
+                    label: stringGetter({ key: STRING_KEYS.FEES }),
+                    href: PortfolioRoute.Fees,
+                  },
+                  {
+                    value: PortfolioRoute.EquityTiers,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.List} />
+                      </$IconContainer>
+                    ),
+                    label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
+                    href: PortfolioRoute.EquityTiers,
+                  },
+                  {
+                    value: PortfolioRoute.History,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.History} />
+                      </$IconContainer>
+                    ),
+                    label: stringGetter({ key: STRING_KEYS.HISTORY }),
+                    href: PortfolioRoute.History,
+                  },
+                ],
+              },
+            ]}
+            tw="p-0.5 pt-0"
+          />
+          {onboardingState === OnboardingState.AccountConnected && (
+            <$Footer>
+              {complianceState === ComplianceStates.FULL_ACCESS && (
+                <Button
+                  action={ButtonAction.Primary}
+                  onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+                >
+                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                </Button>
+              )}
+              {usdcBalance > 0 && (
+                <Button
+                  action={ButtonAction.Base}
+                  onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
+                >
+                  {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+                </Button>
+              )}
+              {complianceState === ComplianceStates.FULL_ACCESS &&
+                (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
+                    onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
                   >
-                    {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+                    {stringGetter({ key: STRING_KEYS.TRANSFER })}
                   </Button>
                 )}
-                {complianceState === ComplianceStates.FULL_ACCESS &&
-                  (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
-                    <Button
-                      action={ButtonAction.Base}
-                      onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
-                    >
-                      {stringGetter({ key: STRING_KEYS.TRANSFER })}
-                    </Button>
-                  )}
-              </$Footer>
-            )}
-          </div>
-        )
+            </$Footer>
+          )}
+        </div>
       }
     >
       {routesComponent}
