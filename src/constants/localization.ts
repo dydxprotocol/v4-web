@@ -1,10 +1,8 @@
+import type { LOCALE_DATA, NOTIFICATIONS, TOOLTIPS } from '@dydxprotocol/v4-localization';
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
-  LOCALE_DATA,
-  NOTIFICATIONS,
   NOTIFICATIONS_STRING_KEYS,
-  TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
 
@@ -33,12 +31,6 @@ export enum SupportedLocales {
   DE = 'de',
 }
 
-export const EN_LOCALE_DATA = {
-  ...LOCALE_DATA[SupportedLocales.EN],
-  ...NOTIFICATIONS[SupportedLocales.EN],
-  TOOLTIPS: TOOLTIPS[SupportedLocales.EN],
-};
-
 export const STRING_KEYS = {
   ...APP_STRING_KEYS,
   ...ERRORS_STRING_KEYS,
@@ -52,7 +44,10 @@ export const STRING_KEY_VALUES = Object.fromEntries(
 
 export type StringKey = keyof typeof STRING_KEYS;
 
-export type LocaleData = typeof EN_LOCALE_DATA;
+export type LocaleData = (typeof LOCALE_DATA)[SupportedLocales.EN] &
+  (typeof NOTIFICATIONS)[SupportedLocales.EN] & {
+    TOOLTIPS: (typeof TOOLTIPS)[SupportedLocales.EN];
+  };
 
 export type StringGetterParams = Record<string, any>;
 

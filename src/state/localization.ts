@@ -2,19 +2,21 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { EN_LOCALE_DATA, EU_LOCALES, LocaleData, SupportedLocales } from '@/constants/localization';
+import { EU_LOCALES, LocaleData, SupportedLocales } from '@/constants/localization';
 
 import { track } from '@/lib/analytics/analytics';
 
 export interface LocalizationState {
   isLocaleLoaded: boolean;
-  localeData: LocaleData;
+  localeData: LocaleData | undefined;
+  enLocaleData: LocaleData | undefined;
   selectedLocale: SupportedLocales;
 }
 
 const initialState: LocalizationState = {
   isLocaleLoaded: false,
-  localeData: EN_LOCALE_DATA,
+  localeData: undefined,
+  enLocaleData: undefined,
   selectedLocale: SupportedLocales.EN,
 };
 
@@ -27,10 +29,13 @@ export const localizationSlice = createSlice({
       isLocaleLoaded: action.payload,
     }),
 
-    setLocaleData: (state, action: PayloadAction<LocaleData>) => ({
+    setLocaleData: (
+      state,
+      action: PayloadAction<{ localeData: LocaleData; enLocaleData: LocaleData }>
+    ) => ({
       ...state,
-      localeData: action.payload,
       isLocaleLoaded: true,
+      ...action.payload,
     }),
 
     setSelectedLocale: (

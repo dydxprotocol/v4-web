@@ -1,50 +1,38 @@
-import {
-  LOCALE_DATA,
-  NOTIFICATIONS,
-  SupportedLocale,
-  TOOLTIPS,
-} from '@dydxprotocol/v4-localization';
+import { type SupportedLocale } from '@dydxprotocol/v4-localization';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { mapValues } from 'lodash';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   EU_LOCALES,
+  LocaleData,
   SUPPORTED_LOCALE_MAP,
   SUPPORTED_LOCALES,
   SupportedLocales,
-  type LocaleData,
 } from '@/constants/localization';
 
 import { initializeLocalization } from '@/state/app';
 import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 
+import { calc } from '@/lib/do';
 import { getBrowserLanguage } from '@/lib/language';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 import { objectKeys } from '@/lib/objectHelpers';
 
-const getNewLocaleData = ({
-  store,
-  locale,
-  isAutoDetect,
-}: {
-  store: any;
-  locale: SupportedLocale;
-  isAutoDetect: boolean;
-}) => {
-  store.dispatch(setLocaleLoaded(false));
+const allLocalesPromise = calc(async () => {
+  const { LOCALE_DATA, NOTIFICATIONS, TOOLTIPS } = await import('@dydxprotocol/v4-localization');
+  return mapValues(
+    SUPPORTED_LOCALE_MAP,
+    (obj, locale) =>
+      ({
+        ...LOCALE_DATA[locale as SupportedLocale],
+        ...NOTIFICATIONS[locale as SupportedLocale],
+        TOOLTIPS: TOOLTIPS[locale as SupportedLocale],
+      }) as LocaleData
+  );
+});
 
-  const newLocaleData = {
-    ...LOCALE_DATA[locale],
-    ...NOTIFICATIONS[locale],
-    TOOLTIPS: TOOLTIPS[locale],
-  };
-
-  store.dispatch(setLocaleData(newLocaleData as LocaleData));
-
-  if (!isAutoDetect) {
-    setLocalStorage({ key: LocalStorageKey.SelectedLocale, value: locale });
-  }
-};
+let currentSetLocaleId = 0;
 
 export default (store: any) => (next: any) => async (action: PayloadAction<any>) => {
   next(action);
@@ -78,8 +66,25 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
     }
     // @ts-ignore
     case setSelectedLocale().type: {
-      const { locale, isAutoDetect } = payload;
-      getNewLocaleData({ store, locale, isAutoDetect });
+      const { locale, isAutoDetect } = payload as ReturnType<typeof setSelectedLocale>['payload'];
+      store.dispatch(setLocaleLoaded(false));
+
+      const mySetId = ++currentSetLocaleId;
+      const allLocales = await allLocalesPromise;
+      // if we got pre-empted
+      if (currentSetLocaleId !== mySetId) {
+        break;
+      }
+
+      store.dispatch(
+        setLocaleData({
+          enLocaleData: allLocales[SupportedLocales.EN],
+          localeData: allLocales[locale],
+        })
+      );
+      if (!isAutoDetect) {
+        setLocalStorage({ key: LocalStorageKey.SelectedLocale, value: locale });
+      }
       break;
     }
     default: {
