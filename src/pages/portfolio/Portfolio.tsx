@@ -27,6 +27,8 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
+import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
+import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
@@ -87,22 +89,8 @@ const PortfolioPage = () => {
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route path={HistoryRoute.Trades} element={<TradeHistoryList />} />
 
-          <Route
-            path={HistoryRoute.Transfers}
-            element={
-              <TransferHistoryTable initialPageSize={initialPageSize} withOuterBorder={false} />
-            }
-          />
-          <Route
-            path={HistoryRoute.VaultTransfers}
-            element={
-              <VaultTransactionsTable
-                withOuterBorders={false}
-                withTxHashLink
-                emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}
-              />
-            }
-          />
+          <Route path={HistoryRoute.Transfers} element={<AccountHistoryList />} />
+          <Route path={HistoryRoute.VaultTransfers} element={<VaultTransferList />} />
         </Route>
         <Route
           path="*"

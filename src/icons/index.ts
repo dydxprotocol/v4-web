@@ -58,6 +58,7 @@ export { default as MigrateIcon } from './migrate.svg';
 export { default as MobileIcon } from './mobile.svg';
 export { default as MoneyIcon } from './money.svg';
 export { default as MoonIcon } from './moon.svg';
+export { default as MoveIcon } from './move.svg';
 export { default as OrderbookIcon } from './orderbook.svg';
 export { default as OverviewIcon } from './overview.svg';
 export { default as PencilIcon } from './pencil.svg';
