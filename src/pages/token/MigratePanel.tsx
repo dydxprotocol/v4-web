@@ -86,10 +86,7 @@ export const MigratePanel = ({ className }: { className?: string }) => {
       className={className}
       slotHeader={
         <$MobileMigrateHeader>
-          <h3>
-            <Icon iconName={IconName.Migrate} />
-            {stringGetter({ key: STRING_KEYS.MIGRATE })}
-          </h3>
+          <h3>{stringGetter({ key: STRING_KEYS.MIGRATE })}</h3>
           <$VerticalSeparator />
           <span>
             {stringGetter({
