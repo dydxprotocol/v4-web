@@ -48,13 +48,13 @@ type SignerGetters = Pick<
 >;
 
 function makeLazySkipClient() {
-  let signers: SignerGetters;
-  let options: SkipClientOptions;
+  let signers: SignerGetters | undefined;
+  let options: SkipClientOptions | undefined;
   let skipClientPromise: Promise<typeof import('@skip-go/client')> | null = null;
   let hasNewOptions = false;
 
   // Lazy loader for the skip client
-  const getSkipClient = async () => {
+  const makeOrGetSkiplient = async () => {
     if (!skipClientPromise) {
       skipClientPromise = import('@skip-go/client');
     }
@@ -80,32 +80,32 @@ function makeLazySkipClient() {
     },
 
     route: async (req: Parameters<typeof route>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.route(req);
     },
 
     balances: async (req: Parameters<typeof balances>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.balances(req);
     },
 
     messagesDirect: async (req: Parameters<typeof messagesDirect>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.messagesDirect(req);
     },
 
     messages: async (req: Parameters<typeof messages>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.messages(req);
     },
 
     executeRoute: async (req: Parameters<typeof executeRoute>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.executeRoute({ ...signers, ...req });
     },
 
     waitForTransaction: async (req: Parameters<typeof waitForTransaction>[0]) => {
-      const skipClient = await getSkipClient();
+      const skipClient = await makeOrGetSkiplient();
       return skipClient.waitForTransaction(req);
     },
   };

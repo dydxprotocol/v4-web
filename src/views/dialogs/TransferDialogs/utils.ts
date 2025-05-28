@@ -52,28 +52,28 @@ export function getUserAddressesForRoute(
   return chains.map((chainId, idx) => {
     // Withdraw Only: The last chain in the route and the destination address is valid
     if (chainId === destinationChain && idx === chains.length - 1 && destinationAddress) {
-      return { chainId: chainId, address: destinationAddress };
+      return { chainId, address: destinationAddress };
     }
 
     switch (chainId) {
       case CosmosChainId.Noble:
         if (!nobleAddress) throw new Error('nobleAddress undefined');
-        return { chainId: chainId, address: nobleAddress };
+        return { chainId, address: nobleAddress };
       case CosmosChainId.Osmosis:
         if (!osmosisAddress) throw new Error('osmosisAddress undefined');
-        return { chainId: chainId, address: osmosisAddress };
+        return { chainId, address: osmosisAddress };
       case CosmosChainId.Neutron:
         if (!neutronAddress) throw new Error('neutronAddress undefined');
-        return { chainId: chainId, address: neutronAddress };
+        return { chainId, address: neutronAddress };
       case DYDX_DEPOSIT_CHAIN:
         if (!dydxAddress) throw new Error('dydxAddress undefined');
-        return { chainId: chainId, address: dydxAddress };
+        return { chainId, address: dydxAddress };
       default:
         if (
           (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) ||
           (chainId === SOLANA_MAINNET_ID && sourceAccount.chain === SOLANA_MAINNET_ID)
         ) {
-          return { chainId: chainId, address: sourceAccount.address as string };
+          return { chainId, address: sourceAccount.address as string };
         }
 
         throw new Error(`unhandled chainId ${chainId} for user address ${sourceAccount.address}`);
