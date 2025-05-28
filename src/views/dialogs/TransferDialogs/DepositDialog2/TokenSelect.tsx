@@ -34,11 +34,11 @@ export const TokenSelect = ({
   const { isLoading, data } = useBalances();
 
   const [withBalances, noBalances] = useMemo(() => {
-    if (!data) return [[], []];
+    if (!data || !data.chains) return [[], []];
 
     const allBalances = Object.keys(data.chains)
       .map((chainId) => {
-        const denomToBalance = data.chains[chainId]?.denoms;
+        const denomToBalance = data.chains?.[chainId]?.denoms;
         return denomToBalance
           ? Object.entries(denomToBalance).map(([denom, balance]) => ({
               chainId,
@@ -46,7 +46,7 @@ export const TokenSelect = ({
               formattedAmount: balance.formattedAmount,
               denom,
               decimals: balance.decimals,
-              valueUSD: balance.valueUSD,
+              valueUSD: balance.valueUsd,
             }))
           : [];
       })

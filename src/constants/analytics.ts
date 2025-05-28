@@ -418,7 +418,7 @@ export const AnalyticsEvents = unionize(
       Pick<
         RouteResponse,
         | 'sourceAssetDenom'
-        | 'sourceAssetChainID'
+        | 'sourceAssetChainId'
         | 'amountIn'
         | 'amountOut'
         | 'usdAmountOut'
@@ -447,7 +447,7 @@ export const AnalyticsEvents = unionize(
         Pick<
           RouteResponse,
           | 'sourceAssetDenom'
-          | 'sourceAssetChainID'
+          | 'sourceAssetChainId'
           | 'amountIn'
           | 'amountOut'
           | 'usdAmountOut'

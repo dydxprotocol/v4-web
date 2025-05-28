@@ -1,5 +1,5 @@
 import { GAS_MULTIPLIER, LocalWallet, NobleClient } from '@dydxprotocol/v4-client-js';
-import { CosmosTx, SkipClient, Tx } from '@skip-go/client';
+import { CosmosTx, Tx } from '@skip-go/client';
 import { parseUnits } from 'viem';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
@@ -7,6 +7,8 @@ import { MIN_USDC_AMOUNT_FOR_AUTO_SWEEP } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 import { isNobleIbcMsg } from '@/types/skip';
+
+import { getSkipClient } from '@/hooks/transfers/skipClient';
 
 import type { RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
@@ -49,7 +51,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
   let nobleSigningClient: NobleClient | undefined;
   let storedNobleClientRpcUrl: string | undefined;
   let storedNobleLocalWallet: LocalWallet | undefined;
-  const skipClient = new SkipClient();
+  const skipClient = getSkipClient();
 
   const activeSweep = createSemaphore();
 
@@ -94,11 +96,11 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
         const balanceToSweep = balanceBN.minus(MIN_USDC_AMOUNT_FOR_AUTO_SWEEP).toString();
         const amountIn = parseUnits(balanceToSweep, tokenConfig.usdc.decimals).toString();
 
-        const msgDirectResponse = await skipClient.msgsDirect({
+        const msgDirectResponse = await skipClient.messagesDirect({
           sourceAssetDenom: 'uusdc',
-          sourceAssetChainID: 'noble-1',
+          sourceAssetChainId: 'noble-1',
           destAssetDenom: tokenConfig.usdc.denom,
-          destAssetChainID: chainId,
+          destAssetChainId: chainId,
           chainIdsToAddresses: {
             [chainId]: dydxAddress,
             'noble-1': nobleLocalWallet.address,
@@ -107,18 +109,18 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
           slippageTolerancePercent: '1',
         });
 
-        const msgDirectTx = msgDirectResponse.txs.at(0);
+        const msgDirectTx = msgDirectResponse?.txs?.at(0);
         const cosmosTx = msgDirectTx && isCosmosTx(msgDirectTx) ? msgDirectTx.cosmosTx : null;
-        const msg = cosmosTx?.msgs.at(0);
+        const msg = cosmosTx?.msgs?.at(0);
 
-        if (msg == null) {
+        if (msg == null || msg.msgTypeUrl == null) {
           throw new Error(`No msg found in msgDirectResponse: ${JSON.stringify(msgDirectTx)}`);
         }
 
-        const parsedMsg = isNobleIbcMsg(JSON.parse(msg.msg));
+        const parsedMsg = isNobleIbcMsg(JSON.parse(msg.msg ?? ''));
 
         const ibcMsg = {
-          typeUrl: msg.msgTypeURL, // '/ibc.applications.transfer.v1.MsgTransfer'
+          typeUrl: msg.msgTypeUrl, // '/ibc.applications.transfer.v1.MsgTransfer'
           value: {
             ...parsedMsg,
             sourceChannel: parsedMsg.source_channel,
