@@ -110,7 +110,7 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <$MobileMain tw="h-[100vh] w-[100vw]">
+        <main tw="h-[100vh] w-[100vw]">
           <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
             <Routes>
               <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
@@ -124,7 +124,7 @@ const Content = () => {
               <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
             </Routes>
           </Suspense>
-        </$MobileMain>
+        </main>
         <NotificationsToastArea tw="z-[2]" />
 
         <$DialogArea ref={dialogAreaRef}>
@@ -358,8 +358,6 @@ const $Main = styled.main`
 
   position: relative;
 `;
-
-const $MobileMain = styled.main``;
 
 const $DialogArea = styled.aside`
   position: fixed;
