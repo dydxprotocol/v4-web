@@ -49,7 +49,7 @@ export const SimpleUiHistory = () => {
   return (
     <div tw="flexColumn h-full w-full">
       <div tw="row relative mb-[1rem] mt-[1.375rem] justify-center">
-        <h1 tw="font-large-bold text-color-text-2">{stringGetter({ key: STRING_KEYS.HISTORY })}</h1>
+        <h1 tw="text-color-text-2 font-large-bold">{stringGetter({ key: STRING_KEYS.HISTORY })}</h1>
         <$BackButton
           onClick={handleBack}
           iconName={IconName.Caret}
