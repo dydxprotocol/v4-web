@@ -111,7 +111,12 @@ export function useDepositSteps({
 
     if (isEvmDepositChainId(depositToken.chainId)) {
       const messages = await skipClient.messages({
-        ...depositRoute,
+        amountIn: depositRoute.amountIn,
+        destAssetChainId: depositRoute.destAssetChainId,
+        destAssetDenom: depositRoute.destAssetDenom,
+        operations: depositRoute.operations,
+        sourceAssetChainId: depositRoute.sourceAssetChainId,
+        sourceAssetDenom: depositRoute.sourceAssetDenom,
         amountOut: depositRoute.estimatedAmountOut ?? '0',
         addressList: userAddressHelper(depositRoute, userAddresses),
       });
