@@ -3,6 +3,10 @@ import { useRef } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -14,7 +18,7 @@ const TRANSFER_HEIGHT = 64;
 export const AccountHistoryList = () => {
   const isLoading = useAppSelector(BonsaiCore.account.transfers.loading) === 'pending';
   const transfers = useAppSelector(BonsaiCore.account.transfers.data);
-
+  const stringGetter = useStringGetter();
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -28,6 +32,14 @@ export const AccountHistoryList = () => {
 
   if (isLoading) {
     return <LoadingSpace id="trade-history-list" />;
+  }
+
+  if (transfers.length === 0) {
+    return (
+      <div tw="flex h-full w-full flex-col items-center justify-center">
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.TRANSFERS_EMPTY_STATE })}</div>
+      </div>
+    );
   }
 
   return (

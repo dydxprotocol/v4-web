@@ -184,6 +184,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
+            metadata: {
+              type: NotificationType.Order,
+              order,
+              relevantFills,
+            },
             updateKey: [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
             isNew: !(relevantPlaceOrder != null || relevantLocalCancels.length > 0),
             keepCleared: true,
@@ -271,6 +276,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 groupKey: 'fill',
               },
               updateKey: [fill.id],
+              metadata: {
+                type: NotificationType.FillWithNoOrder,
+                fillId: fill.id,
+              },
             });
           });
       }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
@@ -382,6 +391,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
               groupKey: NotificationType.SkipTransfer,
             },
             updateKey: [isSuccess],
+            metadata: {
+              type: NotificationType.SkipTransfer2,
+              transferId: id,
+            },
           });
         }
       }, [decimalSeparator, groupSeparator, selectedLocale, stringGetter, trigger, userTransfers]);
@@ -725,6 +738,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ),
             },
             updateKey: [localPlace.submissionStatus, localPlace.errorParams],
+            metadata: {
+              type: 'OrderStatusLocalPlaceOrder',
+              localPlaceOrder: localPlace,
+            },
           });
         });
       }, [localCancelOrders, localPlaceOrders, stringGetter, trigger]);
@@ -756,6 +773,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ),
             },
             updateKey: [localCancel.submissionStatus, localCancel.errorParams],
+            metadata: {
+              type: 'OrderStatusLocalCancelOrder',
+              localCancelOrder: localCancel,
+            },
           });
         });
       }, [allOrders, localCancelOrders, stringGetter, trigger]);
