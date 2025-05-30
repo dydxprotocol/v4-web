@@ -3,6 +3,10 @@ import { useRef } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -15,6 +19,7 @@ export const TradeHistoryList = () => {
   const isLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
   const fills = useAppSelector(BonsaiCore.account.fills.data);
   const parentRef = useRef<HTMLDivElement>(null);
+  const stringGetter = useStringGetter();
 
   const rowVirtualizer = useVirtualizer({
     count: fills.length,
@@ -29,6 +34,13 @@ export const TradeHistoryList = () => {
     return <LoadingSpace id="trade-history-list" />;
   }
 
+  if (fills.length === 0) {
+    return (
+      <div tw="flex h-full w-full flex-col items-center justify-center">
+        <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.FILLS_EMPTY_STATE })}</div>
+      </div>
+    );
+  }
   return (
     <div ref={parentRef} tw="relative h-full max-h-full w-full max-w-full overflow-auto">
       <div

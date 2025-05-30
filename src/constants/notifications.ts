@@ -1,3 +1,7 @@
+import { SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
+
+import { LocalCancelOrderData, LocalPlaceOrderData } from './trade';
+
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   // Until we have migrations enabled, we need to keep underlying values the same
@@ -110,6 +114,13 @@ export type NotificationTypeConfig<
        * rather than updating it - keep it hidden.
        */
       keepCleared?: boolean;
+
+      /**
+       * Metadata for the notification.
+       * @description Arbitrary data to be stored with the notification.
+       * @example { orderId: '123' }
+       */
+      metadata?: Record<string, any>;
     }) => void;
 
     /**
@@ -160,6 +171,28 @@ export type Notification<
   status: NotificationStatus;
   timestamps: Partial<Record<NotificationStatus, number>>;
   updateKey: NotificationUpdateKey;
+  metadata?:
+    | {
+        type: NotificationType.Order;
+        order: SubaccountOrder;
+        relevantFills: SubaccountFill[];
+      }
+    | {
+        type: 'OrderStatusLocalPlaceOrder';
+        localPlaceOrder: LocalPlaceOrderData;
+      }
+    | {
+        type: 'OrderStatusLocalCancelOrder';
+        localCancelOrder: LocalCancelOrderData;
+      }
+    | {
+        type: NotificationType.SkipTransfer2;
+        transferId: string;
+      }
+    | {
+        type: NotificationType.FillWithNoOrder;
+        fillId: string;
+      };
 };
 
 export type Notifications = Record<NotificationId, Notification<string, any>>;
