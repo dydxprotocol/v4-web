@@ -120,7 +120,7 @@ export type NotificationTypeConfig<
        * @description Arbitrary data to be stored with the notification.
        * @example { orderId: '123' }
        */
-      metadata?: Record<string, any>;
+      metadata?: NotificationMetadata;
     }) => void;
 
     /**
@@ -161,6 +161,29 @@ export enum NotificationStatus {
   Cleared,
 }
 
+export type NotificationMetadata =
+  | {
+      type: NotificationType.Order;
+      order: SubaccountOrder;
+      relevantFills: SubaccountFill[];
+    }
+  | {
+      type: 'OrderStatusLocalPlaceOrder';
+      localPlaceOrder: LocalPlaceOrderData;
+    }
+  | {
+      type: 'OrderStatusLocalCancelOrder';
+      localCancelOrder: LocalCancelOrderData;
+    }
+  | {
+      type: NotificationType.SkipTransfer2;
+      transferId: string;
+    }
+  | {
+      type: NotificationType.FillWithNoOrder;
+      fillId?: string;
+    };
+
 /** Notification state. Serialized and cached into localStorage. */
 export type Notification<
   NotificationIdType extends NotificationId = string,
@@ -171,28 +194,7 @@ export type Notification<
   status: NotificationStatus;
   timestamps: Partial<Record<NotificationStatus, number>>;
   updateKey: NotificationUpdateKey;
-  metadata?:
-    | {
-        type: NotificationType.Order;
-        order: SubaccountOrder;
-        relevantFills: SubaccountFill[];
-      }
-    | {
-        type: 'OrderStatusLocalPlaceOrder';
-        localPlaceOrder: LocalPlaceOrderData;
-      }
-    | {
-        type: 'OrderStatusLocalCancelOrder';
-        localCancelOrder: LocalCancelOrderData;
-      }
-    | {
-        type: NotificationType.SkipTransfer2;
-        transferId: string;
-      }
-    | {
-        type: NotificationType.FillWithNoOrder;
-        fillId: string;
-      };
+  metadata?: NotificationMetadata;
 };
 
 export type Notifications = Record<NotificationId, Notification<string, any>>;
