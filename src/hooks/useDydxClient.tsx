@@ -5,7 +5,6 @@ import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndex
 import {
   BECH32_PREFIX,
   FaucetClient,
-  LocalWallet,
   PnlTickInterval,
   SelectedGasDenom,
   onboarding,
@@ -85,7 +84,9 @@ const useDydxClientContext = () => {
       onboarding.deriveHDKeyFromEthereumSignature(signature);
 
     return {
-      wallet: await LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX),
+      wallet: await (
+        await import('@dydxprotocol/v4-client-js')
+      ).LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX),
       mnemonic,
       privateKey,
       publicKey,

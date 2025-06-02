@@ -1,14 +1,14 @@
 import './polyfills';
 
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense } from 'react';
 
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 
-import App from './App';
 import { storeLifecycles } from './bonsai/storeLifecycles';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpace } from './components/Loading/LoadingSpinner';
 import './index.css';
 import { runFn } from './lib/do';
 import { store } from './state/_store';
@@ -20,12 +20,17 @@ runFn(async () => {
   storeLifecycles.forEach((fn) => fn(store));
 });
 
+// lazy import the app so we can start up bonsai before the app chugs into being
+const App = lazy(() => import('@/App'));
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <StrictMode>
       <Provider store={store}>
         <Router>
-          <App />
+          <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
+            <App />
+          </Suspense>
         </Router>
       </Provider>
     </StrictMode>

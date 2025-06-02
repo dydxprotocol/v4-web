@@ -1,5 +1,5 @@
 import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { WalletType as GrazWalletType, type ConfigureGrazArgs } from 'graz';
+import { type ConfigureGrazArgs, type WalletType as GrazWalletType } from 'graz';
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
@@ -75,6 +75,6 @@ export const GRAZ_CHAINS = [
 
 export const config: ConfigureGrazArgs = {
   autoReconnect: false,
-  defaultWallet: GrazWalletType.KEPLR,
+  defaultWallet: 'keplr' as GrazWalletType,
   chains: GRAZ_CHAINS as ConfigureGrazArgs['chains'],
 };

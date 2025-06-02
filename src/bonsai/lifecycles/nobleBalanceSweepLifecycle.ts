@@ -1,4 +1,4 @@
-import { GAS_MULTIPLIER, LocalWallet, NobleClient } from '@dydxprotocol/v4-client-js';
+import { GAS_MULTIPLIER, LocalWallet, type NobleClient } from '@dydxprotocol/v4-client-js';
 import { CosmosTx, Tx } from '@skip-go/client';
 import { parseUnits } from 'viem';
 
@@ -82,7 +82,9 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
 
         // Set up Noble and Skip clients
         if (nobleSigningClient == null || storedNobleClientRpcUrl !== nobleClientRpcUrl) {
-          nobleSigningClient = new NobleClient(nobleClientRpcUrl);
+          nobleSigningClient = new (await import('@dydxprotocol/v4-client-js')).NobleClient(
+            nobleClientRpcUrl
+          );
           storedNobleClientRpcUrl = nobleClientRpcUrl;
         }
 

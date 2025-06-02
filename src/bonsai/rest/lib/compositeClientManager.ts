@@ -1,15 +1,8 @@
 import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
 import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { StargateClient } from '@cosmjs/stargate';
-import {
-  CompositeClient,
-  IndexerClient,
-  IndexerConfig,
-  Network,
-  NetworkOptimizer,
-  ValidatorConfig,
-} from '@dydxprotocol/v4-client-js';
+import { type StargateClient } from '@cosmjs/stargate';
+import type { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 
 import { AnalyticsUserProperties, DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import {
@@ -66,23 +59,28 @@ function makeCompositeClient({
     throw new Error(`Unknown chain id: ${chainId}`);
   }
 
-  function getIndexerConfig() {
+  async function getIndexerConfig() {
     const indexerUrl = networkConfig.endpoints.indexers[0];
     if (indexerUrl == null) {
       throw new Error('No indexer urls found');
     }
-    return new IndexerConfig(indexerUrl.api, indexerUrl.socket);
+    return new (await import('@dydxprotocol/v4-client-js')).IndexerConfig(
+      indexerUrl.api,
+      indexerUrl.socket
+    );
   }
 
   async function initializeCompositeClient() {
-    const indexerConfig = getIndexerConfig();
+    const indexerConfig = await getIndexerConfig();
     const validatorUrl = await getValidatorToUse(chainId, networkConfig.endpoints.validators);
 
-    const compositeClient = await CompositeClient.connect(
-      new Network(
+    const compositeClient = await (
+      await import('@dydxprotocol/v4-client-js')
+    ).CompositeClient.connect(
+      new (await import('@dydxprotocol/v4-client-js')).Network(
         chainId,
         indexerConfig,
-        new ValidatorConfig(
+        new (await import('@dydxprotocol/v4-client-js')).ValidatorConfig(
           validatorUrl,
           chainId,
           {
@@ -106,11 +104,13 @@ function makeCompositeClient({
   }
 
   async function initializeNobleClient() {
-    return StargateClient.connect(networkConfig.endpoints.nobleValidator);
+    return (await import('@cosmjs/stargate')).StargateClient.connect(
+      networkConfig.endpoints.nobleValidator
+    );
   }
 
   async function initializeIndexerClient() {
-    return new IndexerClient(getIndexerConfig());
+    return new (await import('@dydxprotocol/v4-client-js')).IndexerClient(await getIndexerConfig());
   }
 
   const clientWrapper = initializeClientWrapper(dispatch, network, {
@@ -143,7 +143,7 @@ export function alwaysUseCurrentNetworkClient(store: RootStore) {
 }
 
 async function getValidatorToUse(chainId: DydxChainId, validatorEndpoints: string[]) {
-  const networkOptimizer = new NetworkOptimizer();
+  const networkOptimizer = new (await import('@dydxprotocol/v4-client-js')).NetworkOptimizer();
   // Timer to measure how long it takes to find the optimal node
   const t0 = performance.now();
   const validatorUrl = await networkOptimizer.findOptimalNode(validatorEndpoints, chainId);
