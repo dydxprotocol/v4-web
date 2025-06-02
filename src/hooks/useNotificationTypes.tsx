@@ -11,7 +11,6 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/markets';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -23,6 +22,11 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
+import {
+  BOOSTED_MARKETS,
+  BOOSTED_MARKETS_EXPIRATION,
+  CURRENT_REWARDS_SEASON,
+} from '@/constants/surgeRewards';
 import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
@@ -572,7 +576,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
-      const currentSeason = 3;
+      const currentSeason = CURRENT_REWARDS_SEASON;
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
@@ -629,7 +633,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason - 1}-payout`],
           });
         }
-      }, [rewards, stringGetter, trigger]);
+      }, [currentSeason, rewards, stringGetter, trigger]);
 
       useEffect(() => {
         const now = new Date().getTime();
@@ -696,7 +700,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
-      }, [stringGetter, trigger]);
+      }, [currentSeason, stringGetter, trigger]);
     },
   },
   {

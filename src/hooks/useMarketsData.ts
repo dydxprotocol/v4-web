@@ -5,12 +5,12 @@ import { AssetData } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
 import {
-  BOOSTED_MARKETS,
   HiddenMarketFilterTags,
   MARKET_FILTER_OPTIONS,
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
+import { BOOSTED_MARKETS } from '@/constants/surgeRewards';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
