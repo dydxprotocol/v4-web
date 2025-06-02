@@ -184,6 +184,23 @@ export const OrderStatusNotificationRow = ({
               </span>
             </>
           );
+
+          slotRight = (
+            <>
+              <span tw="inline text-color-text-0 font-mini-book">
+                {stringGetter({ key: typeStringKey ?? '' })}
+              </span>
+
+              <Output
+                tw="inline text-color-text-2 font-small-book"
+                withSubscript
+                type={OutputType.Fiat}
+                value={order?.price}
+                fractionDigits={tickSizeDecimals}
+                slotLeft={<span>@ </span>}
+              />
+            </>
+          );
         }
 
         miniIcon = (

@@ -1,5 +1,7 @@
 import { SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 
+import { IndexerHistoricalBlockTradingReward } from '@/types/indexer/indexerApiGen';
+
 import { LocalCancelOrderData, LocalPlaceOrderData } from './trade';
 
 /** implemented in useNotificationTypes */
@@ -161,6 +163,9 @@ export enum NotificationStatus {
   Cleared,
 }
 
+/**
+ * @description Metadata for custom notifications when Simple UI is enabled.
+ */
 export type NotificationMetadata =
   | {
       type: NotificationType.Order;
@@ -176,12 +181,16 @@ export type NotificationMetadata =
       localCancelOrder: LocalCancelOrderData;
     }
   | {
+      type: NotificationType.BlockTradingReward;
+      blockReward: IndexerHistoricalBlockTradingReward;
+    }
+  | {
       type: NotificationType.SkipTransfer2;
       transferId: string;
     }
   | {
       type: NotificationType.FillWithNoOrder;
-      fillId?: string;
+      fill: SubaccountFill;
     };
 
 /** Notification state. Serialized and cached into localStorage. */

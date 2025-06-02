@@ -16,9 +16,12 @@ import {
 import { useNotifications } from '@/hooks/useNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { BlockRewardNotificationRow } from './BlockRewardNotificationRow';
+import { FillWithNoOrderNotificationRow } from './FillWithNoOrderNotificationRow';
 import { OrderCancelNotificationRow } from './OrderCancelNotificationRow';
 import { OrderNotificationRow } from './OrderNotificationRow';
 import { OrderStatusNotificationRow } from './OrderStatusNotificationRow';
+import { SkipTransferNotificationRow } from './SkipTransferNotificationRow';
 import { UnseenIndicator } from './UnseenIndicator';
 
 const DEFAULT_NOTIFICATION_HEIGHT = 128;
@@ -29,8 +32,9 @@ const filterMetadata = (notification: Notification) => {
 
   switch (notification.type) {
     case NotificationType.Order:
-    case NotificationType.SkipTransfer:
+    case NotificationType.BlockTradingReward:
     case NotificationType.OrderStatus:
+    case NotificationType.SkipTransfer2:
     case NotificationType.FillWithNoOrder: {
       return metadata != null;
     }
@@ -80,7 +84,9 @@ export const AlertsList = () => {
         key: getKey(notif),
         displayData: getDisplayData(notif)!,
       }))
-      .filter(({ notification }) => filterMetadata(notification));
+      .filter(
+        ({ notification, displayData }) => filterMetadata(notification) && displayData != null
+      );
   }, [notifications, getDisplayData, getKey]);
 
   const parentRef = useRef<HTMLDivElement>(null);
@@ -178,8 +184,39 @@ const ItemRenderer = ({
       <OrderCancelNotificationRow
         className={className}
         timestamp={timestamp}
-        localCancelOrder={metadata.localCancelOrder}
-        // isUnseen={isUnseen}
+        localCancel={metadata.localCancelOrder}
+        isUnseen={isUnseen}
+      />
+    );
+  }
+
+  if (metadata?.type === NotificationType.BlockTradingReward) {
+    return (
+      <BlockRewardNotificationRow
+        className={className}
+        blockReward={metadata.blockReward}
+        isUnseen={isUnseen}
+      />
+    );
+  }
+
+  if (metadata?.type === NotificationType.SkipTransfer2) {
+    return (
+      <SkipTransferNotificationRow
+        className={className}
+        transferId={metadata.transferId}
+        isUnseen={isUnseen}
+      />
+    );
+  }
+
+  if (metadata?.type === NotificationType.FillWithNoOrder) {
+    return (
+      <FillWithNoOrderNotificationRow
+        className={className}
+        fill={metadata.fill}
+        timestamp={timestamp}
+        isUnseen={isUnseen}
       />
     );
   }

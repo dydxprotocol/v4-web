@@ -278,7 +278,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               updateKey: [fill.id],
               metadata: {
                 type: NotificationType.FillWithNoOrder,
-                fillId: fill.id,
+                fill,
               },
             });
           });
@@ -323,6 +323,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
               ),
             },
             updateKey: [reward.createdAtHeight],
+            metadata: {
+              type: NotificationType.BlockTradingReward,
+              blockReward: reward,
+            },
           });
         });
       }, [trigger, blockTradingRewards, stringGetter, tokenName, sessionStartTime]);

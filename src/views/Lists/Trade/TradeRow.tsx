@@ -23,7 +23,17 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-export const TradeRow = ({ className, fill }: { className?: string; fill: SubaccountFill }) => {
+export const TradeRow = ({
+  className,
+  fill,
+  slotRight,
+  timestamp,
+}: {
+  className?: string;
+  fill: SubaccountFill;
+  slotRight?: React.ReactNode;
+  timestamp?: number;
+}) => {
   const stringGetter = useStringGetter();
   const { market, side, price, type, size, createdAt } = fill;
   const marketData = useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market);
@@ -35,6 +45,7 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
 
   const { logo } = orEmptyObj(assetInfo);
   const { displayableAsset, stepSizeDecimals, tickSizeDecimals } = orEmptyObj(marketData);
+  const time = timestamp ?? createdAt;
 
   const { sideString, sideColor, typeString, isLiquidation } = useMemo(() => {
     return {
@@ -92,8 +103,8 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
         {displayableAsset}
       </span>
       <span tw="leading-[0]">
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={createdAt} />{' '}
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={createdAt} />
+        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={time} />{' '}
+        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={time} />
       </span>
     </>
   );
@@ -121,6 +132,7 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
             slotLeft={<span>@ </span>}
           />
         </div>
+        {slotRight}
       </div>
     </$TradeRow>
   );
