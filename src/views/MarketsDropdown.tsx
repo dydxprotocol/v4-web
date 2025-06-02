@@ -7,15 +7,10 @@ import styled from 'styled-components';
 import { ButtonStyle } from '@/constants/buttons';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import {
-  BOOSTED_MARKETS,
-  BOOSTED_MARKETS_EXPIRATION,
-  MarketFilters,
-  PREDICTION_MARKET,
-  type MarketData,
-} from '@/constants/markets';
+import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
+import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/surgeRewards';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
