@@ -166,7 +166,7 @@ export const OrderStatusNotificationRow = ({
 
               <span tw="leading-[0]">
                 {cancelReason ? (
-                  <span>{cancelReason}</span>
+                  <span tw="text-color-text-0 font-tiny-book">{cancelReason}</span>
                 ) : (
                   <>
                     <Output

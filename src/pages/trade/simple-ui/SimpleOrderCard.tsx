@@ -39,7 +39,12 @@ export const SimpleOrderCard = ({ order }: { order: SubaccountOrder }) => {
     {
       label: stringGetter({ key: STRING_KEYS.LIMIT_PRICE }),
       value: (
-        <Output type={OutputType.Fiat} value={order.price} fractionDigits={tickSizeDecimals} />
+        <Output
+          withSubscript
+          type={OutputType.Fiat}
+          value={order.price}
+          fractionDigits={tickSizeDecimals}
+        />
       ),
     },
     {
