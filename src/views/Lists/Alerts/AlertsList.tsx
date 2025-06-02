@@ -51,10 +51,11 @@ const getHeightForNotificationRow = (notification?: Notification) => {
   }
 
   switch (notification.type) {
-    case NotificationType.FillWithNoOrder:
-    case NotificationType.SkipTransfer:
-    case NotificationType.OrderStatus:
     case NotificationType.Order:
+    case NotificationType.BlockTradingReward:
+    case NotificationType.OrderStatus:
+    case NotificationType.SkipTransfer2:
+    case NotificationType.FillWithNoOrder:
       return NOTIFICATION_HEIGHT;
     default:
       return DEFAULT_NOTIFICATION_HEIGHT;

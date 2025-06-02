@@ -48,7 +48,7 @@ export const BlockRewardNotificationRow = ({
         value={blockReward.tradingReward}
         fractionDigits={TOKEN_DECIMALS}
         showSign={ShowSign.Both}
-        slotRight={<AccentTag>{chainTokenLabel}</AccentTag>}
+        slotRight={<AccentTag tw="ml-0.25 rounded-1 px-0.5">{chainTokenLabel}</AccentTag>}
       />
     </>
   );
@@ -57,7 +57,7 @@ export const BlockRewardNotificationRow = ({
     <TradeNotificationRow
       className={className}
       logo={null}
-      iconName={IconName.RewardStar}
+      iconName={IconName.RewardStars}
       slotLeft={slotLeft}
       slotRight={slotRight}
       isUnseen={isUnseen}

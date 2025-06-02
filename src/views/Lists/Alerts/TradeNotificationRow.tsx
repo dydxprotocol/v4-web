@@ -36,7 +36,7 @@ export const TradeNotificationRow = ({
   return (
     <$OrderNotificationRow className={className}>
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
-        <div tw="relative">
+        <div tw="relative flex">
           {icon}
           {miniIcon}
         </div>
