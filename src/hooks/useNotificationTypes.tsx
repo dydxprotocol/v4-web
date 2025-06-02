@@ -576,7 +576,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
-        enabled: dydxAddress != null,
+        enabled:
+          dydxAddress != null &&
+          new Date().getTime() < new Date(BOOSTED_MARKETS_EXPIRATION).getTime(),
         retry: false,
         queryFn: async () => {
           try {
