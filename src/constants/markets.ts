@@ -7,7 +7,7 @@ import { Nullable } from '@/lib/typeUtils';
 export const MAJOR_MARKETS = new Set(['ETH-USD', 'BTC-USD', 'SOL-USD']);
 
 export const BOOSTED_MARKETS = new Set(['AIXBT-USD', 'KAITO-USD', 'SUI-USD', 'XRP-USD']);
-export const BOOSTED_MARKETS_EXPIRATION = '2025-06-01T00:00:00.000Z';
+export const BOOSTED_MARKETS_EXPIRATION = '2025-07-01T00:00:00.000Z';
 
 /**
  * @description MarketData used for MarketTable and List components

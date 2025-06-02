@@ -2,7 +2,8 @@ import { useEffect, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
-import { groupBy, max, pick } from 'lodash';
+import { useQuery } from '@tanstack/react-query';
+import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
@@ -10,7 +11,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { BOOSTED_MARKETS_EXPIRATION } from '@/constants/markets';
+import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/markets';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -38,6 +39,7 @@ import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotifi
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
+import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
@@ -65,6 +67,7 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
+import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
@@ -568,14 +571,50 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.RewardsProgramUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const dydxAddress = useAppSelector(getUserWalletAddress);
+      const currentSeason = 3;
+
+      const { data: rewards } = useQuery({
+        queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
+        enabled: dydxAddress != null,
+        retry: false,
+        queryFn: async () => {
+          try {
+            // don't take up bandwidth during sensitive loading time
+            await sleep(1500);
+            const data = await fetch(
+              `https://cloud.chaoslabs.co/query/api/dydx/reward-distribution?season=${currentSeason - 1}`
+            );
+            const result = await data.json();
+            const maybeNumber = result.find((f: any) => f.address === dydxAddress).rewards;
+            if (isNumber(maybeNumber)) {
+              return maybeNumber;
+            }
+            return undefined;
+          } catch (e) {
+            return undefined;
+          }
+        },
+      });
+
       useEffect(() => {
-        if (new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime()) {
+        const now = new Date().getTime();
+        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        if (now < seasonEnd && rewards != null && rewards > 5) {
           trigger({
-            id: 'rewards-program-surge-s2-boosted',
+            id: `rewards-program-surge-s${currentSeason - 1}-payout`,
             displayData: {
-              icon: <Icon iconName={IconName.Fire} />,
-              title: stringGetter({ key: STRING_KEYS.SURGE_S2_BOOSTED_MARKETS_TITLE }),
-              body: stringGetter({ key: STRING_KEYS.SURGE_S2_BOOSTED_MARKETS_BODY }),
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
+                params: { SEASON_NUMBER: currentSeason - 1, DYDX_REWARDS: rewards },
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.SURGE_PAYOUT_BODY,
+                params: {
+                  SEASON_NUMBER: currentSeason - 1,
+                },
+              }),
               toastSensitivity: 'foreground',
               groupKey: NotificationType.RewardsProgramUpdates,
               actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
@@ -585,7 +624,74 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 </Link>
               ),
             },
-            updateKey: ['rewards-program-surge-s2-boosted'],
+            updateKey: [`rewards-program-surge-s${currentSeason - 1}-payout`],
+          });
+        }
+      }, [rewards, stringGetter, trigger]);
+
+      useEffect(() => {
+        const now = new Date().getTime();
+        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        const endingSoon = seasonEnd - timeUnits.day * 3;
+
+        if (now <= endingSoon) {
+          trigger({
+            id: `rewards-program-surge-s${currentSeason}-start`,
+            displayData: {
+              icon: <Icon iconName={IconName.Trophy} />,
+              title: stringGetter({
+                key: STRING_KEYS.SURGE_BOOSTED_MARKETS_TITLE,
+                params: { SEASON_NUMBER: currentSeason },
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.SURGE_BOOSTED_MARKETS_BODY,
+                params: {
+                  SEASON_NUMBER: currentSeason,
+                  MARKETS_LIST: [...BOOSTED_MARKETS].map((m) => m.split('-')[0]).join(', '),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/surge" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: [`rewards-program-surge-s${currentSeason}-start`],
+          });
+        } else if (now < seasonEnd) {
+          let daysLeft = Math.floor((seasonEnd - now) / timeUnits.day);
+          // oops, we don't want to show 1 days left or 0 days left
+          if (daysLeft < 2) {
+            daysLeft = 2;
+          }
+          trigger({
+            id: `rewards-program-surge-s${currentSeason}-ending`,
+            displayData: {
+              icon: <Icon iconName={IconName.Clock} />,
+              title: stringGetter({
+                key: STRING_KEYS.SURGE_SEASON_ENDING_TITLE,
+                params: { SEASON_NUMBER: currentSeason, DAYS_LEFT: daysLeft },
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.SURGE_SEASON_ENDING_BODY,
+                params: {
+                  SEASON_NUMBER: currentSeason,
+                  DAYS_LEFT: daysLeft,
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/surge" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
       }, [stringGetter, trigger]);
