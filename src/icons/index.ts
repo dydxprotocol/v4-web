@@ -98,6 +98,7 @@ export { default as TranslateIcon } from './translate.svg';
 export { default as TrendingDownIcon } from './trend-down.svg';
 export { default as TrendingUpIcon } from './trend-up.svg';
 export { default as TriangleIcon } from './triangle.svg';
+export { default as TrophyIcon } from './trophy.svg';
 export { default as TryAgainIcon } from './try-again.svg';
 export { default as ViewfinderIcon } from './viewfinder.svg';
 export { default as VolumeIcon } from './volume.svg';
