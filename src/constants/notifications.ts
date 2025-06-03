@@ -1,9 +1,3 @@
-import { SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-
-import { IndexerHistoricalBlockTradingReward } from '@/types/indexer/indexerApiGen';
-
-import { LocalCancelOrderData, LocalPlaceOrderData } from './trade';
-
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   // Until we have migrations enabled, we need to keep underlying values the same
@@ -116,13 +110,6 @@ export type NotificationTypeConfig<
        * rather than updating it - keep it hidden.
        */
       keepCleared?: boolean;
-
-      /**
-       * Metadata for the notification.
-       * @description Arbitrary data to be stored with the notification.
-       * @example { orderId: '123' }
-       */
-      metadata?: NotificationMetadata;
     }) => void;
 
     /**
@@ -163,36 +150,6 @@ export enum NotificationStatus {
   Cleared,
 }
 
-/**
- * @description Metadata for custom notifications when Simple UI is enabled.
- */
-export type NotificationMetadata =
-  | {
-      type: NotificationType.Order;
-      order: SubaccountOrder;
-      relevantFills: SubaccountFill[];
-    }
-  | {
-      type: 'OrderStatusLocalPlaceOrder';
-      localPlaceOrder: LocalPlaceOrderData;
-    }
-  | {
-      type: 'OrderStatusLocalCancelOrder';
-      localCancelOrder: LocalCancelOrderData;
-    }
-  | {
-      type: NotificationType.BlockTradingReward;
-      blockReward: IndexerHistoricalBlockTradingReward;
-    }
-  | {
-      type: NotificationType.SkipTransfer2;
-      transferId: string;
-    }
-  | {
-      type: NotificationType.FillWithNoOrder;
-      fill: SubaccountFill;
-    };
-
 /** Notification state. Serialized and cached into localStorage. */
 export type Notification<
   NotificationIdType extends NotificationId = string,
@@ -203,7 +160,6 @@ export type Notification<
   status: NotificationStatus;
   timestamps: Partial<Record<NotificationStatus, number>>;
   updateKey: NotificationUpdateKey;
-  metadata?: NotificationMetadata;
 };
 
 export type Notifications = Record<NotificationId, Notification<string, any>>;
@@ -238,6 +194,15 @@ export type NotificationDisplayData = {
     isToast?: boolean;
     notification: Notification;
   }) => React.ReactNode; // Custom Notification
+
+  // Render function for Simple UI Alerts Page
+  renderSimpleAlert?: ({
+    className,
+    notification,
+  }: {
+    className?: string;
+    notification: Notification;
+  }) => React.ReactNode;
 
   /** Screen reader: instructions for performing toast action after its timer expires */
   actionAltText?: string;

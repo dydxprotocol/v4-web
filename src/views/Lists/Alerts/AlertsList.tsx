@@ -10,57 +10,17 @@ import {
   Notification,
   NotificationDisplayData,
   NotificationStatus,
-  NotificationType,
 } from '@/constants/notifications';
 
 import { useNotifications } from '@/hooks/useNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { BlockRewardNotificationRow } from './BlockRewardNotificationRow';
-import { FillWithNoOrderNotificationRow } from './FillWithNoOrderNotificationRow';
-import { OrderCancelNotificationRow } from './OrderCancelNotificationRow';
-import { OrderNotificationRow } from './OrderNotificationRow';
-import { OrderStatusNotificationRow } from './OrderStatusNotificationRow';
-import { SkipTransferNotificationRow } from './SkipTransferNotificationRow';
+import { isTruthy } from '@/lib/isTruthy';
+
 import { UnseenIndicator } from './UnseenIndicator';
 
-const DEFAULT_NOTIFICATION_HEIGHT = 128;
-const NOTIFICATION_HEIGHT = 64;
-
-const filterMetadata = (notification: Notification) => {
-  const metadata = notification.metadata;
-
-  switch (notification.type) {
-    case NotificationType.Order:
-    case NotificationType.BlockTradingReward:
-    case NotificationType.OrderStatus:
-    case NotificationType.SkipTransfer2:
-    case NotificationType.FillWithNoOrder: {
-      return metadata != null;
-    }
-
-    default: {
-      return true;
-    }
-  }
-};
-
-const getHeightForNotificationRow = (notification?: Notification) => {
-  if (!notification) {
-    return DEFAULT_NOTIFICATION_HEIGHT;
-  }
-
-  switch (notification.type) {
-    case NotificationType.Order:
-    case NotificationType.BlockTradingReward:
-    case NotificationType.OrderStatus:
-    case NotificationType.SkipTransfer2:
-    case NotificationType.FillWithNoOrder:
-      return NOTIFICATION_HEIGHT;
-    default:
-      return DEFAULT_NOTIFICATION_HEIGHT;
-  }
-};
+const STANDARD_NOTIFICATION_HEIGHT = 128;
+const CUSTOM_ALERT_ROW_HEIGHT = 64;
 
 export const AlertsList = () => {
   const { notifications, getDisplayData, getKey } = useNotifications();
@@ -80,21 +40,30 @@ export const AlertsList = () => {
     );
 
     return sortedNotifications
-      .map((notif) => ({
-        notification: notif,
-        key: getKey(notif),
-        displayData: getDisplayData(notif)!,
-      }))
-      .filter(
-        ({ notification, displayData }) => filterMetadata(notification) && displayData != null
-      );
+      .map((notif) => {
+        const displayData = getDisplayData(notif);
+
+        if (displayData == null) {
+          return undefined;
+        }
+
+        return {
+          notification: notif,
+          key: getKey(notif),
+          displayData,
+        };
+      })
+      .filter(isTruthy);
   }, [notifications, getDisplayData, getKey]);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
     count: items.length,
-    estimateSize: (_index: number) => getHeightForNotificationRow(items?.[_index]?.notification),
+    estimateSize: (_index: number) =>
+      items[_index]?.displayData.renderSimpleAlert
+        ? CUSTOM_ALERT_ROW_HEIGHT
+        : STANDARD_NOTIFICATION_HEIGHT,
     getScrollElement: () => parentRef.current,
     rangeExtractor: (range) => {
       return [...new Set([0, ...defaultRangeExtractor(range)])];
@@ -150,77 +119,11 @@ const ItemRenderer = ({
   notification: Notification;
   displayData: NotificationDisplayData;
 }) => {
-  const metadata = notification.metadata;
+  if (displayData.renderSimpleAlert) {
+    return displayData.renderSimpleAlert({ className, notification });
+  }
+
   const isUnseen = notification.status === NotificationStatus.Unseen;
-
-  const timestamp =
-    notification.timestamps[NotificationStatus.Updated] ??
-    notification.timestamps[NotificationStatus.Triggered]!;
-
-  if (metadata?.type === NotificationType.Order) {
-    return (
-      <OrderNotificationRow
-        className={className}
-        timestamp={timestamp}
-        subaccountOrder={metadata.order}
-        relevantFills={metadata.relevantFills}
-        isUnseen={isUnseen}
-      />
-    );
-  }
-
-  if (metadata?.type === 'OrderStatusLocalPlaceOrder') {
-    return (
-      <OrderStatusNotificationRow
-        className={className}
-        timestamp={timestamp}
-        localPlaceOrder={metadata.localPlaceOrder}
-        isUnseen={isUnseen}
-      />
-    );
-  }
-
-  if (metadata?.type === 'OrderStatusLocalCancelOrder') {
-    return (
-      <OrderCancelNotificationRow
-        className={className}
-        timestamp={timestamp}
-        localCancel={metadata.localCancelOrder}
-        isUnseen={isUnseen}
-      />
-    );
-  }
-
-  if (metadata?.type === NotificationType.BlockTradingReward) {
-    return (
-      <BlockRewardNotificationRow
-        className={className}
-        blockReward={metadata.blockReward}
-        isUnseen={isUnseen}
-      />
-    );
-  }
-
-  if (metadata?.type === NotificationType.SkipTransfer2) {
-    return (
-      <SkipTransferNotificationRow
-        className={className}
-        transferId={metadata.transferId}
-        isUnseen={isUnseen}
-      />
-    );
-  }
-
-  if (metadata?.type === NotificationType.FillWithNoOrder) {
-    return (
-      <FillWithNoOrderNotificationRow
-        className={className}
-        fill={metadata.fill}
-        timestamp={timestamp}
-        isUnseen={isUnseen}
-      />
-    );
-  }
 
   return (
     <$DefaultNotificationRow className={className}>

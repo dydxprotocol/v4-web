@@ -5,34 +5,29 @@ import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 
-import { selectTransfersByAddress } from '@/state/transfersSelectors';
+import { Transfer } from '@/state/transfers';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { orEmptyObj } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
 import { UnseenIndicator } from './UnseenIndicator';
 
 export const SkipTransferNotificationRow = ({
   className,
-  transferId,
+  transfer,
   isUnseen,
 }: {
   className?: string;
-  transferId: string;
+  transfer: Transfer;
   isUnseen: boolean;
 }) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const userTransfers = useAppSelectorWithArgs(selectTransfersByAddress, dydxAddress);
-
-  const transfer = orEmptyObj(userTransfers.find((t) => t.id === transferId));
   const { type, status, estimatedAmountUsd, finalAmountUsd, updatedAt } = transfer;
   const transferAmountBN = MustBigNumber(finalAmountUsd ?? estimatedAmountUsd);
   const isReceiving = type === 'deposit';
