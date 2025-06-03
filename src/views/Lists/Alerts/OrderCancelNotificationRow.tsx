@@ -13,6 +13,7 @@ import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
 
 import { getOrderById } from '@/state/accountSelectors';
 
+import { calc } from '@/lib/do';
 import { getIndexerOrderTypeStringKey } from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -44,79 +45,93 @@ export const OrderCancelNotificationRow = ({
   const indexedOrderStatus = order?.status;
   const cancelStatus = localCancel.submissionStatus;
 
-  let orderStatusStringKey = STRING_KEYS.CANCELING;
+  const { slotLeft, slotRight, miniIcon } = calc(() => {
+    const isPartiallyCanceled = indexedOrderStatus === OrderStatus.PartiallyCanceled;
+    const isCancelFinalized = indexedOrderStatus === OrderStatus.Canceled || isPartiallyCanceled;
 
-  let slotLeft;
-  let slotRight;
-  let miniIcon;
+    if (cancelStatus === CancelOrderStatuses.Canceled || isCancelFinalized) {
+      const orderStatusStringKey = isPartiallyCanceled
+        ? STRING_KEYS.PARTIALLY_FILLED
+        : STRING_KEYS.CANCELED;
 
-  const isPartiallyCanceled = indexedOrderStatus === OrderStatus.PartiallyCanceled;
-  const isCancelFinalized = indexedOrderStatus === OrderStatus.Canceled || isPartiallyCanceled;
+      return {
+        miniIcon: (
+          <OrderStatusIconNew
+            status={OrderStatus.Canceled}
+            tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-h-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 bg-color-layer-2"
+          />
+        ),
+        slotLeft: (
+          <>
+            <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
+              <span tw="text-color-negative">{stringGetter({ key: orderStatusStringKey })}</span>
+            </span>
 
-  if (cancelStatus === CancelOrderStatuses.Canceled || isCancelFinalized) {
-    orderStatusStringKey = isPartiallyCanceled
-      ? STRING_KEYS.PARTIALLY_FILLED
-      : STRING_KEYS.CANCELED;
-    miniIcon = (
-      <OrderStatusIconNew
-        status={OrderStatus.Canceled}
-        tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-h-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 bg-color-layer-2"
-      />
-    );
+            <span tw="leading-[0]">
+              <Output
+                tw="text-color-text-0 font-tiny-book"
+                type={OutputType.Time}
+                value={timestamp}
+              />{' '}
+              <Output
+                tw="text-color-text-0 font-tiny-book"
+                type={OutputType.Date}
+                value={timestamp}
+              />
+            </span>
+          </>
+        ),
+        slotRight: (
+          <>
+            <span tw="inline text-color-text-0 font-mini-book">
+              {stringGetter({ key: orderTypeKey })}
+            </span>
 
-    slotLeft = (
-      <>
-        <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
-          <span tw="text-color-negative">{stringGetter({ key: orderStatusStringKey })}</span>
-        </span>
+            <Output
+              tw="inline text-color-text-2 font-small-book"
+              withSubscript
+              type={OutputType.Fiat}
+              value={order?.price}
+              fractionDigits={tickSizeDecimals}
+              slotLeft={<span>@ </span>}
+            />
+          </>
+        ),
+      };
+    }
 
-        <span tw="leading-[0]">
-          <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={timestamp} />{' '}
-          <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={timestamp} />
-        </span>
-      </>
-    );
+    if (localCancel.errorParams) {
+      return {
+        miniIcon: (
+          <Icon
+            iconName={IconName.Warning}
+            tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 text-color-warning"
+          />
+        ),
+        slotLeft: (
+          <>
+            <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
+              <span>{stringGetter({ key: STRING_KEYS.ERROR })}</span>
+            </span>
 
-    slotRight = (
-      <>
-        <span tw="inline text-color-text-0 font-mini-book">
-          {stringGetter({ key: orderTypeKey })}
-        </span>
+            <span tw="text-color-text-1 font-mini-book">
+              {stringGetter({
+                key: localCancel.errorParams.errorStringKey,
+                fallback: localCancel.errorParams.errorMessage ?? '',
+              })}
+            </span>
+          </>
+        ),
+        slotRight: null,
+      };
+    }
 
-        <Output
-          tw="inline text-color-text-2 font-small-book"
-          withSubscript
-          type={OutputType.Fiat}
-          value={order?.price}
-          fractionDigits={tickSizeDecimals}
-          slotLeft={<span>@ </span>}
-        />
-      </>
-    );
-  }
-
-  if (localCancel.errorParams) {
-    miniIcon = (
-      <Icon
-        iconName={IconName.Warning}
-        tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 text-color-warning"
-      />
-    );
-    slotLeft = (
-      <>
-        <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
-          <span>{stringGetter({ key: STRING_KEYS.ERROR })}</span>
-        </span>
-
-        <span tw="text-color-text-1 font-mini-book">
-          {stringGetter({
-            key: localCancel.errorParams.errorStringKey,
-            fallback: localCancel.errorParams.errorMessage ?? '',
-          })}
-        </span>
-      </>
-    );
-  }
+    return {
+      slotLeft: null,
+      slotRight: null,
+      miniIcon: null,
+    };
+  });
 
   return (
     <TradeNotificationRow

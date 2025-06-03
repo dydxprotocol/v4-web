@@ -22,6 +22,7 @@ import {
 } from '@/state/accountSelectors';
 
 import { assertNever } from '@/lib/assertNever';
+import { calc } from '@/lib/do';
 import {
   getIndexerFillTypeStringKey,
   getIndexerOrderSideStringKey,
@@ -65,110 +66,49 @@ export const OrderStatusNotificationRow = ({
   const { logo } = orEmptyObj(assetInfo);
   const { displayableAsset, stepSizeDecimals, tickSizeDecimals } = orEmptyObj(marketData);
 
-  let slotLeft;
-  let slotRight;
-  let miniIcon;
+  const { slotLeft, slotRight, miniIcon } = calc(() => {
+    const indexedOrderStatus = order?.status ?? localPlaceOrder.cachedData.status;
+    const submissionStatus = localPlaceOrder.submissionStatus;
 
-  const indexedOrderStatus = order?.status ?? localPlaceOrder.cachedData.status;
-  const submissionStatus = localPlaceOrder.submissionStatus;
+    switch (submissionStatus) {
+      case PlaceOrderStatuses.Placed:
+      case PlaceOrderStatuses.Filled:
+      case PlaceOrderStatuses.Canceled:
+      case PlaceOrderStatuses.Submitted: {
+        if (indexedOrderStatus) {
+          if (indexedOrderStatus === OrderStatus.Pending) break;
+          const typeStringKey = order?.type && getIndexerOrderTypeStringKey(order.type);
 
-  switch (submissionStatus) {
-    case PlaceOrderStatuses.Placed:
-    case PlaceOrderStatuses.Filled:
-    case PlaceOrderStatuses.Canceled:
-    case PlaceOrderStatuses.Submitted:
-      if (indexedOrderStatus) {
-        if (indexedOrderStatus === OrderStatus.Pending) break;
-        const typeStringKey = order?.type && getIndexerOrderTypeStringKey(order.type);
+          if (fills.length > 0) {
+            const size =
+              order?.totalFilled ?? sum(fills.map((f) => AttemptNumber(f.size)).filter(isPresent));
+            const sizeBN = MustBigNumber(size);
+            const shouldCompact = (stepSizeDecimals ?? 0) >= 1 && sizeBN.gte(100_000);
+            const firstFill = fills.at(0);
+            const side = firstFill?.side;
+            const sideColor =
+              side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
+            const sideString = stringGetter({
+              key: side ? getIndexerOrderSideStringKey(side) : '',
+            });
+            const typeFillStringKey =
+              firstFill?.type && getIndexerFillTypeStringKey(firstFill.type);
 
-        if (fills.length > 0) {
-          const size =
-            order?.totalFilled ?? sum(fills.map((f) => AttemptNumber(f.size)).filter(isPresent));
-          const sizeBN = MustBigNumber(size);
-          const shouldCompact = (stepSizeDecimals ?? 0) >= 1 && sizeBN.gte(100_000);
-          const firstFill = fills.at(0);
-          const side = firstFill?.side;
-          const sideColor =
-            side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
-          const sideString = stringGetter({ key: side ? getIndexerOrderSideStringKey(side) : '' });
-          const typeFillStringKey = firstFill?.type && getIndexerFillTypeStringKey(firstFill.type);
+            return {
+              slotLeft: (
+                <>
+                  <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
+                    <span css={{ color: sideColor }}>{sideString}</span>{' '}
+                    <Output
+                      tw="inline"
+                      type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
+                      value={size}
+                      fractionDigits={stepSizeDecimals}
+                    />{' '}
+                    {displayableAsset}
+                  </span>
 
-          slotLeft = (
-            <>
-              <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
-                <span css={{ color: sideColor }}>{sideString}</span>{' '}
-                <Output
-                  tw="inline"
-                  type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
-                  value={size}
-                  fractionDigits={stepSizeDecimals}
-                />{' '}
-                {displayableAsset}
-              </span>
-
-              <span tw="leading-[0]">
-                <Output
-                  tw="text-color-text-0 font-tiny-book"
-                  type={OutputType.Time}
-                  value={timestamp}
-                />{' '}
-                <Output
-                  tw="text-color-text-0 font-tiny-book"
-                  type={OutputType.Date}
-                  value={timestamp}
-                />
-              </span>
-            </>
-          );
-
-          slotRight = (
-            <>
-              <span tw="inline text-color-text-0 font-mini-book">
-                {stringGetter({ key: typeStringKey ?? typeFillStringKey ?? '' })}
-              </span>
-
-              <Output
-                tw="inline text-color-text-2 font-small-book"
-                withSubscript
-                type={OutputType.Fiat}
-                value={averageFillPrice ?? order?.price}
-                fractionDigits={tickSizeDecimals}
-                slotLeft={<span>@ </span>}
-              />
-            </>
-          );
-        } else {
-          const size = order?.size;
-          const sizeBN = MustBigNumber(size);
-          const shouldCompact = (stepSizeDecimals ?? 0) >= 1 && sizeBN.gte(100_000);
-          const side = order?.side;
-          const sideColor =
-            side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
-          const sideString = stringGetter({ key: side ? getIndexerOrderSideStringKey(side) : '' });
-          const cancelReason = order?.removalReason
-            ? stringGetter({
-                key: STRING_KEYS[order.removalReason as keyof typeof STRING_KEYS],
-              })
-            : '';
-
-          slotLeft = (
-            <>
-              <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
-                <span css={{ color: sideColor }}>{sideString}</span>{' '}
-                <Output
-                  tw="inline"
-                  type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
-                  value={size}
-                  fractionDigits={stepSizeDecimals}
-                />{' '}
-                {displayableAsset}
-              </span>
-
-              <span tw="leading-[0]">
-                {cancelReason ? (
-                  <span tw="text-color-text-0 font-tiny-book">{cancelReason}</span>
-                ) : (
-                  <>
+                  <span tw="leading-[0]">
                     <Output
                       tw="text-color-text-0 font-tiny-book"
                       type={OutputType.Time}
@@ -179,73 +119,166 @@ export const OrderStatusNotificationRow = ({
                       type={OutputType.Date}
                       value={timestamp}
                     />
-                  </>
-                )}
-              </span>
-            </>
-          );
+                  </span>
+                </>
+              ),
+              slotRight: (
+                <>
+                  <span tw="inline text-color-text-0 font-mini-book">
+                    {stringGetter({ key: typeStringKey ?? typeFillStringKey ?? '' })}
+                  </span>
 
-          slotRight = (
-            <>
-              <span tw="inline text-color-text-0 font-mini-book">
-                {stringGetter({ key: typeStringKey ?? '' })}
-              </span>
+                  <Output
+                    tw="inline text-color-text-2 font-small-book"
+                    withSubscript
+                    type={OutputType.Fiat}
+                    value={averageFillPrice ?? order?.price}
+                    fractionDigits={tickSizeDecimals}
+                    slotLeft={<span>@ </span>}
+                  />
+                </>
+              ),
+              miniIcon: null,
+            };
+          }
 
-              <Output
-                tw="inline text-color-text-2 font-small-book"
-                withSubscript
-                type={OutputType.Fiat}
-                value={order?.price}
-                fractionDigits={tickSizeDecimals}
-                slotLeft={<span>@ </span>}
+          const size = order?.size;
+          const sizeBN = MustBigNumber(size);
+          const shouldCompact = (stepSizeDecimals ?? 0) >= 1 && sizeBN.gte(100_000);
+          const side = order?.side;
+          const sideColor =
+            side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
+          const sideString = stringGetter({
+            key: side ? getIndexerOrderSideStringKey(side) : '',
+          });
+          const cancelReason = order?.removalReason
+            ? stringGetter({
+                key: STRING_KEYS[order.removalReason as keyof typeof STRING_KEYS],
+              })
+            : '';
+
+          return {
+            slotLeft: (
+              <>
+                <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
+                  <span css={{ color: sideColor }}>{sideString}</span>{' '}
+                  <Output
+                    tw="inline"
+                    type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
+                    value={size}
+                    fractionDigits={stepSizeDecimals}
+                  />{' '}
+                  {displayableAsset}
+                </span>
+
+                <span tw="leading-[0]">
+                  {cancelReason ? (
+                    <span tw="text-color-text-0 font-tiny-book">{cancelReason}</span>
+                  ) : (
+                    <>
+                      <Output
+                        tw="text-color-text-0 font-tiny-book"
+                        type={OutputType.Time}
+                        value={timestamp}
+                      />{' '}
+                      <Output
+                        tw="text-color-text-0 font-tiny-book"
+                        type={OutputType.Date}
+                        value={timestamp}
+                      />
+                    </>
+                  )}
+                </span>
+              </>
+            ),
+
+            slotRight: (
+              <>
+                <span tw="inline text-color-text-0 font-mini-book">
+                  {stringGetter({ key: typeStringKey ?? '' })}
+                </span>
+
+                <Output
+                  tw="inline text-color-text-2 font-small-book"
+                  withSubscript
+                  type={OutputType.Fiat}
+                  value={order?.price}
+                  fractionDigits={tickSizeDecimals}
+                  slotLeft={<span>@ </span>}
+                />
+              </>
+            ),
+
+            miniIcon: (
+              <OrderStatusIconNew
+                status={indexedOrderStatus}
+                tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-h-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 bg-color-layer-2"
               />
-            </>
-          );
+            ),
+          };
         }
 
-        miniIcon = (
-          <OrderStatusIconNew
-            status={indexedOrderStatus}
-            tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-h-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 bg-color-layer-2"
-          />
-        );
+        return {
+          slotLeft: null,
+          slotRight: null,
+          miniIcon: null,
+        };
       }
-      break;
-    case PlaceOrderStatuses.FailedSubmission:
-      if (localPlaceOrder.errorParams) {
-        slotLeft = (
-          <>
-            <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
-              <span>{stringGetter({ key: STRING_KEYS.ERROR })}</span>
-            </span>
 
-            <span tw="text-color-text-1 font-mini-book">
-              {stringGetter({
-                key: localPlaceOrder.errorParams.errorStringKey,
-                params: {
-                  EQUITY_TIER_LEARN_MORE: (
-                    <Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()} isInline>
-                      {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-                    </Link>
-                  ),
-                },
-                fallback: localPlaceOrder.errorParams.errorMessage ?? '',
-              })}
-            </span>
-          </>
-        );
+      case PlaceOrderStatuses.FailedSubmission: {
+        if (localPlaceOrder.errorParams) {
+          return {
+            slotLeft: (
+              <>
+                <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
+                  <span>{stringGetter({ key: STRING_KEYS.ERROR })}</span>
+                </span>
 
-        miniIcon = (
-          <Icon
-            iconName={IconName.Warning}
-            tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 text-color-warning"
-          />
-        );
+                <span tw="text-color-text-1 font-mini-book">
+                  {stringGetter({
+                    key: localPlaceOrder.errorParams.errorStringKey,
+                    params: {
+                      EQUITY_TIER_LEARN_MORE: (
+                        <Link
+                          href={equityTiersLearnMore}
+                          onClick={(e) => e.stopPropagation()}
+                          isInline
+                        >
+                          {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+                        </Link>
+                      ),
+                    },
+                    fallback: localPlaceOrder.errorParams.errorMessage ?? '',
+                  })}
+                </span>
+              </>
+            ),
+            slotRight: null,
+            miniIcon: (
+              <Icon
+                iconName={IconName.Warning}
+                tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2 text-color-warning"
+              />
+            ),
+          };
+        }
+
+        return {
+          slotLeft: null,
+          slotRight: null,
+          miniIcon: null,
+        };
       }
-      break;
-    default:
-      assertNever(submissionStatus);
-  }
+      default:
+        assertNever(submissionStatus);
+    }
+
+    return {
+      slotLeft: null,
+      slotRight: null,
+      miniIcon: null,
+    };
+  });
 
   return (
     <TradeNotificationRow
