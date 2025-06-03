@@ -1,7 +1,8 @@
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION, MarketData } from '@/constants/markets';
+import { MarketData } from '@/constants/markets';
+import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/surgeRewards';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
