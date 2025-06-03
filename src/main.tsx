@@ -19,17 +19,9 @@ runFn(async () => {
   storeLifecycles.forEach((fn) => fn(store));
 });
 
-async function sleep(ms = 1000) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(null), ms);
-  });
-}
-
 // lazy import the app so we can start up bonsai before the app chugs into being
 const App = lazy(async () => {
-  await sleep(1000);
-  const res = await import('./App');
-  return { default: res.default };
+  return import('./App');
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
