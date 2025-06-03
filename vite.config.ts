@@ -67,13 +67,7 @@ export default defineConfig(({ mode }) => ({
             },
           ],
         ],
-        exclude: [
-          '@dydxprotocol/v4-client-js',
-          /node_modules\/@dydxprotocol\/v4-client-js/,
-          /v4-client-js\/build/,
-          // Also try the full path pattern
-          /\/v4-clients\/v4-client-js\/build/,
-        ],
+        exclude: ['@dydxprotocol/v4-client-js'],
       },
     }),
 
