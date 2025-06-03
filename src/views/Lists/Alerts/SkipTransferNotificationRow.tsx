@@ -1,20 +1,19 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Icon, IconName } from '@/components/Icon';
-import { formatNumberOutput, Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 
-import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 
+import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
@@ -31,22 +30,18 @@ export const SkipTransferNotificationRow = ({
 }) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const selectedLocale = useAppSelector(getSelectedLocale);
   const userTransfers = useAppSelectorWithArgs(selectTransfersByAddress, dydxAddress);
-  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
 
   const transfer = orEmptyObj(userTransfers.find((t) => t.id === transferId));
   const { type, status, estimatedAmountUsd, finalAmountUsd, updatedAt } = transfer;
-  const finalAmount = formatNumberOutput(finalAmountUsd ?? estimatedAmountUsd, OutputType.Fiat, {
-    decimalSeparator,
-    groupSeparator,
-    selectedLocale,
-  });
-
+  const transferAmountBN = MustBigNumber(finalAmountUsd ?? estimatedAmountUsd);
   const isReceiving = type === 'deposit';
+  const multiplier = isReceiving ? 1 : -1;
   const isSuccess = status === 'success';
+  const transferAmount = transferAmountBN.times(multiplier);
 
-  const chainId = type === 'deposit' ? transfer.chainId : 'DYDX';
+  const chainId = type === 'deposit' ? transfer.chainId : undefined;
+  const chain = chainId ? CHAIN_INFO[chainId]?.name : 'DYDX';
 
   const title =
     type === 'withdraw'
@@ -57,13 +52,13 @@ export const SkipTransferNotificationRow = ({
     ? stringGetter({
         key: STRING_KEYS.FROM,
         params: {
-          FROM: <span>{chainId}</span>,
+          FROM: <span tw="text-color-text-2">{chain}</span>,
         },
       })
     : stringGetter({
         key: STRING_KEYS.TO,
         params: {
-          TO: <span>{truncateAddress(dydxAddress)}</span>,
+          TO: <span tw="text-color-text-2">{truncateAddress(dydxAddress)}</span>,
         },
       });
 
@@ -93,7 +88,7 @@ export const SkipTransferNotificationRow = ({
             }}
             withSignColor
             showSign={ShowSign.Both}
-            value={finalAmount}
+            value={transferAmount}
           />
           <span tw="text-color-text-0 font-small-book">{transferString}</span>
         </div>
