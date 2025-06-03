@@ -195,6 +195,15 @@ export type NotificationDisplayData = {
     notification: Notification;
   }) => React.ReactNode; // Custom Notification
 
+  // Render function for Simple UI Alerts Page
+  renderSimpleAlert?: ({
+    className,
+    notification,
+  }: {
+    className?: string;
+    notification: Notification;
+  }) => React.ReactNode;
+
   /** Screen reader: instructions for performing toast action after its timer expires */
   actionAltText?: string;
 

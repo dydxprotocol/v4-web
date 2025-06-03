@@ -208,6 +208,7 @@ export enum IconName {
   QuestionMark = 'QuestionMark',
   Refresh = 'Refresh',
   RewardStar = 'RewardStar',
+  RewardStars = 'RewardStars',
   Rocket = 'Rocket',
   RoundedArrow = 'RoundedArrow',
   Search = 'Search',
@@ -368,6 +369,7 @@ const icons = {
 // we load reward-start async because it's gigantic for some reason
 calc(async () => {
   icons[IconName.RewardStar] = (await import('@/icons/reward-star.svg')).default as ElementType;
+  icons[IconName.RewardStars] = (await import('@/icons/rewards-stars.svg')).default as ElementType;
 });
 
 type ElementProps = {
