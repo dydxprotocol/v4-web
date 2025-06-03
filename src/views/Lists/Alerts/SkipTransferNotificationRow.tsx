@@ -75,7 +75,18 @@ export const SkipTransferNotificationRow = ({
         </div>
         <div tw="flexColumn">
           <span tw="text-color-text-2">{title}</span>
-          <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={updatedAt} />
+          <span tw="leading-[0]">
+            <Output
+              tw="text-color-text-0 font-tiny-book"
+              type={OutputType.Time}
+              value={updatedAt}
+            />{' '}
+            <Output
+              tw="text-color-text-0 font-tiny-book"
+              type={OutputType.Date}
+              value={updatedAt}
+            />
+          </span>
         </div>
       </div>
 
