@@ -190,7 +190,6 @@ const useNotificationsContext = () => {
           isNew = true,
           shouldUnhide = false,
           keepCleared = false,
-          metadata,
         }) => {
           const key = getKey({ type, id });
 
@@ -210,7 +209,6 @@ const useNotificationsContext = () => {
               timestamps: {},
               status: newStatus,
               updateKey,
-              metadata,
             });
             updateStatus(thisNotification, newStatus);
           } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
