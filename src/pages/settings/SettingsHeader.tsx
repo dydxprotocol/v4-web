@@ -3,9 +3,14 @@ import styled from 'styled-components';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
+import { SimpleUiHeader } from '@/components/SimpleUiHeader';
+
+import { testFlags } from '@/lib/testFlags';
 
 export const SettingsHeader = ({
   pathname,
@@ -14,6 +19,9 @@ export const SettingsHeader = ({
   pathname: string;
   stringGetter: StringGetterFunction;
 }) => {
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
+
   const SettingsRouteItems = [
     {
       value: AppRoute.Settings,
@@ -43,7 +51,9 @@ export const SettingsHeader = ({
 
   const currentRoute = routeMap[pathname];
 
-  return (
+  return isSimpleUi ? (
+    <SimpleUiHeader pageTitle={currentRoute?.label} />
+  ) : (
     <$SettingsHeader>
       <BackButton />
       <h1 tw="p-0.5 font-extra-medium">{currentRoute?.label}</h1>

@@ -204,7 +204,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     notification.timestamps[NotificationStatus.Updated] ??
                     notification.timestamps[NotificationStatus.Triggered]!
                   }
-                  isUnseen={notification.status === NotificationStatus.Unseen}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                   subaccountOrder={order}
                   relevantFills={relevantFills}
                 />
@@ -303,7 +303,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                       notification.timestamps[NotificationStatus.Updated] ??
                       notification.timestamps[NotificationStatus.Triggered]!
                     }
-                    isUnseen={notification.status === NotificationStatus.Unseen}
+                    isUnseen={notification.status <= NotificationStatus.Unseen}
                   />
                 ),
               },
@@ -353,7 +353,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 <BlockRewardNotificationRow
                   className={className}
                   blockReward={reward}
-                  isUnseen={notification.status === NotificationStatus.Unseen}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },
@@ -428,7 +428,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 <SkipTransferNotificationRow
                   className={className}
                   transfer={transfer}
-                  isUnseen={notification.status === NotificationStatus.Unseen}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },
@@ -887,7 +887,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     notification.timestamps[NotificationStatus.Triggered]!
                   }
                   localPlaceOrder={localPlace}
-                  isUnseen={notification.status === NotificationStatus.Unseen}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },
@@ -929,7 +929,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     notification.timestamps[NotificationStatus.Triggered]!
                   }
                   localCancel={localCancel}
-                  isUnseen={notification.status === NotificationStatus.Unseen}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },

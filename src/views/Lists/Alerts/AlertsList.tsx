@@ -123,7 +123,7 @@ const ItemRenderer = ({
     return displayData.renderSimpleAlert({ className, notification });
   }
 
-  const isUnseen = notification.status === NotificationStatus.Unseen;
+  const isUnseen = notification.status <= NotificationStatus.Unseen;
 
   return (
     <$DefaultNotificationRow className={className}>

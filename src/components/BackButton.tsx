@@ -1,11 +1,9 @@
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 
 import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
+import { IconButton, IconButtonProps } from '@/components/IconButton';
 
-type ElementProps = {
-  onClick?: () => void;
-};
+type ElementProps = IconButtonProps;
 
 type StyleProps = {
   className?: string;
@@ -19,13 +17,13 @@ export const BackButton = ({
 
     if (!navigation) {
       globalThis.history.back();
-      // @ts-ignore
     } else if (navigation.canGoBack) {
       navigation.back();
     } else {
       navigation.navigate('/', { replace: true });
     }
   },
+  ...props
 }: ElementProps & StyleProps) => (
   <IconButton
     className={className}
@@ -33,5 +31,6 @@ export const BackButton = ({
     iconName={IconName.ChevronLeft}
     size={ButtonSize.Small}
     action={ButtonAction.Navigation}
+    {...props}
   />
 );
