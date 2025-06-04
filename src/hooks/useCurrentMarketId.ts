@@ -21,7 +21,6 @@ import { getHasSeenPredictionMarketIntroDialog } from '@/state/dismissableSelect
 import { setCurrentMarketId, setCurrentMarketIdIfTradeable } from '@/state/perpetuals';
 import { getLaunchedMarketIds, getMarketIds } from '@/state/perpetualsSelectors';
 
-import { useIsMarketValidFast } from './useIsValidMarketFast';
 import { useMarketsData } from './useMarketsData';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 
@@ -33,7 +32,6 @@ export const useCurrentMarketId = () => {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const openPositions = useAppSelector(getOpenPositions, shallowEqual);
   const marketIds = useAppSelector(getMarketIds, shallowEqual);
-  const isValidMarketFast = useIsMarketValidFast(marketId);
   const hasMarketIds = marketIds.length > 0;
   const currentMarketOraclePrice = useAppSelectorWithArgs(
     BonsaiHelpers.markets.selectMarketSummaryById,
@@ -144,7 +142,7 @@ export const useCurrentMarketId = () => {
       dispatch(setCurrentMarketIdIfTradeable(undefined));
     } else {
       if (marketId) {
-        const isMarketReadyForSubscription = hasMarketOraclePrice || isValidMarketFast;
+        const isMarketReadyForSubscription = hasMarketOraclePrice;
         if (isMarketReadyForSubscription) {
           dispatch(setCurrentMarketIdIfTradeable(marketId));
         }
@@ -152,14 +150,7 @@ export const useCurrentMarketId = () => {
         dispatch(setCurrentMarketIdIfTradeable(undefined));
       }
     }
-  }, [
-    isViewingUnlaunchedMarket,
-    selectedNetwork,
-    hasMarketOraclePrice,
-    marketId,
-    dispatch,
-    isValidMarketFast,
-  ]);
+  }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketOraclePrice, marketId, dispatch]);
 
   return {
     isViewingUnlaunchedMarket,

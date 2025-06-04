@@ -2,6 +2,7 @@ import { throttle } from 'lodash';
 
 import { timeUnits } from '@/constants/time';
 import {
+  isIndexerPerpetualMarketResponse,
   isWsBasePerpetualMarketObject,
   isWsMarketUpdateResponses,
   isWsPerpetualMarketResponse,
@@ -10,9 +11,12 @@ import {
 import { type RootStore } from '@/state/_store';
 import { setAllMarketsRaw } from '@/state/raw';
 
+import { calc } from '@/lib/do';
+
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logBonsaiError } from '../logs';
+import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
+import { createIndexerStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectWebsocketUrl } from '../socketSelectors';
 import { MarketsData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
@@ -81,7 +85,36 @@ export function setUpMarkets(store: RootStore) {
     lastSetHadData = val.data != null;
     store.dispatch(setAllMarketsRaw(val));
   };
+  const setMarketsIfEmpty = (val: Loadable<MarketsData>) => {
+    if (val.data != null && !lastSetHadData) {
+      setMarkets(val);
+    }
+  };
   const throttledSetMarkets = throttle(setMarkets, 2 * timeUnits.second);
+
+  // we load markets via rest call once because it's waaaay faster than websocket for initial load
+  const tearDownLoadOnce = createIndexerStoreEffect(store, {
+    handleNoClient: () => null,
+    selector: () => null,
+    handle: (_clientId, client) => {
+      let valid = true;
+      calc(async () => {
+        const markets = await wrapAndLogBonsaiError(
+          () => client.markets.getPerpetualMarkets(),
+          'perpetualMarkets'
+        )();
+        const allMarkets = isIndexerPerpetualMarketResponse(markets);
+        if (!valid) {
+          return;
+        }
+        setMarketsIfEmpty(loadableLoaded(allMarkets.markets));
+        tearDownLoadOnce();
+      });
+      return () => {
+        valid = false;
+      };
+    },
+  });
 
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
     const unsub = subscribeToWsValue(MarketsValueManager, { wsUrl }, (val) => {
