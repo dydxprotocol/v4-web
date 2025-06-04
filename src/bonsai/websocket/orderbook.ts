@@ -15,6 +15,7 @@ import { setOrderbookRaw } from '@/state/raw';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { AppStartupTimer } from '../appStartupTimer';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { logBonsaiError } from '../logs';
@@ -101,11 +102,15 @@ export function setUpOrderbook(store: RootStore) {
     };
     const throttledSetOrderbook = throttle(setOrderbook, timeUnits.second / 2);
 
+    AppStartupTimer.timeIfFirst('startOrderbook');
     const unsub = subscribeToWsValue(
       OrderbookValueManager,
       { wsUrl, marketId: currentMarketId },
       (data) => {
         const hasData = data.data != null;
+        if (hasData) {
+          AppStartupTimer.timeIfFirst('loadedOrderbook');
+        }
         if (hasData && !lastSetHadData) {
           setOrderbook(data);
         } else {

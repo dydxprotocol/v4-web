@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { AppStartupTimer } from '@/bonsai/appStartupTimer';
 // eslint-disable-next-line no-restricted-imports
 import { logBonsaiInfo } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
@@ -31,6 +32,7 @@ export const useInitializePage = () => {
   });
 
   useEffect(() => {
+    AppStartupTimer.timeIfFirst('renderApp');
     dispatch(initializeLocalization());
   }, []);
 

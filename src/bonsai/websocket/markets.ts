@@ -13,6 +13,7 @@ import { setAllMarketsRaw } from '@/state/raw';
 
 import { calc } from '@/lib/do';
 
+import { AppStartupTimer } from '../appStartupTimer';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
 import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
@@ -99,6 +100,7 @@ export function setUpMarkets(store: RootStore) {
     handle: (_clientId, client) => {
       let valid = true;
       calc(async () => {
+        AppStartupTimer.timeIfFirst('startMarkets');
         const markets = await wrapAndLogBonsaiError(
           () => client.markets.getPerpetualMarkets(),
           'perpetualMarkets'
@@ -107,6 +109,7 @@ export function setUpMarkets(store: RootStore) {
         if (!valid) {
           return;
         }
+        AppStartupTimer.timeIfFirst('loadedMarkets');
         setMarketsIfEmpty(loadableLoaded(allMarkets.markets));
         tearDownLoadOnce();
       });
