@@ -101,7 +101,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           console.log('id', id);
           // Prevent combining by forcing unique chunks
-          if (id.includes('@privy-io') || id.includes('graz')) {
+          if (id.includes('node_modules') && (id.includes('@privy-io') || id.includes('graz'))) {
             return 'chunk-privy';
           }
         },
