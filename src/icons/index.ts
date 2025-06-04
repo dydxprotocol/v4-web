@@ -107,7 +107,7 @@ export { default as ViewfinderIcon } from './viewfinder.svg';
 export { default as VolumeIcon } from './volume.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
-
+export { default as XCircleIcon } from './x-circle.svg';
 // Wallets
 export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
