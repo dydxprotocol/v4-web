@@ -107,5 +107,6 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+    modulePreload: false,
   },
 }));
