@@ -1,26 +1,15 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
-import { PrivyProvider } from '@privy-io/react-auth';
-import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { GrazProvider } from 'graz';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
-import { config as grazConfig } from '@/constants/graz';
 import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 
-import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
-import { DydxProvider } from '@/hooks/useDydxClient';
-import { LocaleProvider } from '@/hooks/useLocaleSeparators';
-import { NotificationsProvider } from '@/hooks/useNotifications';
-import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider } from '@/hooks/useStatsig';
-import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
@@ -37,11 +26,9 @@ import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { LocalStorageKey } from './constants/localStorage';
-import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
@@ -221,22 +208,79 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 const providers = [
-  wrapProvider(PrivyProvider, {
-    appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
-    clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
-    config: privyConfig,
-  }),
-  wrapProvider(StatsigProvider),
+  wrapProvider(Suspense, { fallback: <LoadingSpace id="main" /> }),
+  wrapProvider(PersistGate, { loading: <LoadingSpace id="main" />, persistor }),
+  wrapProvider(
+    lazy(async () => {
+      const { PrivyProvider } = await import('@privy-io/react-auth');
+      const { privyConfig } = await import('@/lib/wagmi');
+      return {
+        default: ({ children }) => (
+          <PrivyProvider
+            {...{
+              appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
+              clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
+              config: privyConfig,
+            }}
+          >
+            {children}
+          </PrivyProvider>
+        ),
+      };
+    }),
+    {}
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useStatsig')).StatsigProvider }))
+  ),
   wrapProvider(QueryClientProvider, { client: appQueryClient }),
-  wrapProvider(GrazProvider, { grazOptions: grazConfig }),
-  wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
-  wrapProvider(LocaleProvider),
-  wrapProvider(RestrictionProvider),
-  wrapProvider(DydxProvider),
-  wrapProvider(AccountsProvider),
-  wrapProvider(SubaccountProvider),
-  wrapProvider(SkipProvider),
-  wrapProvider(NotificationsProvider),
+  wrapProvider(
+    lazy(async () => {
+      const { GrazProvider } = await import('graz');
+      const { config: grazConfig } = await import('@/constants/graz');
+      return {
+        default: ({ children }) => <GrazProvider grazOptions={grazConfig}>{children}</GrazProvider>,
+      };
+    }),
+    {}
+  ),
+  wrapProvider(
+    lazy(async () => {
+      const { WagmiProvider } = await import('@privy-io/wagmi');
+      const { config } = await import('@/lib/wagmi');
+      return {
+        default: ({ children }) => (
+          <WagmiProvider config={config} reconnectOnMount={false}>
+            {children}
+          </WagmiProvider>
+        ),
+      };
+    }),
+    {}
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useLocaleSeparators')).LocaleProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useRestrictions')).RestrictionProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useDydxClient')).DydxProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useAccounts')).AccountsProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('@/hooks/useSubaccount')).SubaccountProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({ default: (await import('./hooks/transfers/skipClient')).SkipProvider }))
+  ),
+  wrapProvider(
+    lazy(async () => ({
+      default: (await import('@/hooks/useNotifications')).NotificationsProvider,
+    }))
+  ),
   wrapProvider(DialogAreaProvider),
   wrapProvider(StyleSheetManager, { shouldForwardProp }),
   wrapProvider(AppThemeAndColorModeProvider),

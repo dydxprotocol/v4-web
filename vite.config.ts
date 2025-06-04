@@ -97,6 +97,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       input: entryPoints,
+      output: {
+        manualChunks(id) {
+          console.log('id', id);
+          // Prevent combining by forcing unique chunks
+          if (id.includes('@privy-io') || id.includes('graz')) {
+            return 'chunk-privy';
+          }
+        },
+      },
     },
   },
 }));
