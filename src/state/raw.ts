@@ -140,9 +140,6 @@ export const rawSlice = createSlice({
   initialState,
   reducers: {
     ...autoBatchAllReducers<RawDataState>()({
-      setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
-        state.markets.allMarkets = action.payload;
-      },
       setAllAssetsRaw: (state, action: PayloadAction<Loadable<AssetInfos>>) => {
         state.markets.assets = action.payload;
       },
@@ -195,22 +192,6 @@ export const rawSlice = createSlice({
       setAccountOrdersRaw: (state, action: PayloadAction<Loadable<OrdersData>>) => {
         state.account.orders = action.payload;
       },
-      setNetworkStateRaw: (
-        state,
-        action: PayloadAction<{ networkId: DydxNetwork; stateToMerge: Partial<NetworkState> }>
-      ) => {
-        const { networkId, stateToMerge } = action.payload;
-        state.network[networkId] = {
-          ...(state.network[networkId] ?? {
-            compositeClientReady: false,
-            compositeClientUrl: undefined,
-            indexerClientReady: false,
-            nobleClientReady: false,
-            errorInitializing: false,
-          }),
-          ...stateToMerge,
-        };
-      },
       setIndexerHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
         appendToHeight(state.heights.indexerHeight, action.payload);
       },
@@ -248,6 +229,25 @@ export const rawSlice = createSlice({
       action: PayloadAction<{ marketId: string; data: Loadable<OrderbookData> }>
     ) => {
       state.markets.orderbooks[action.payload.marketId] = action.payload.data;
+    },
+    setAllMarketsRaw: (state, action: PayloadAction<Loadable<MarketsData>>) => {
+      state.markets.allMarkets = action.payload;
+    },
+    setNetworkStateRaw: (
+      state,
+      action: PayloadAction<{ networkId: DydxNetwork; stateToMerge: Partial<NetworkState> }>
+    ) => {
+      const { networkId, stateToMerge } = action.payload;
+      state.network[networkId] = {
+        ...(state.network[networkId] ?? {
+          compositeClientReady: false,
+          compositeClientUrl: undefined,
+          indexerClientReady: false,
+          nobleClientReady: false,
+          errorInitializing: false,
+        }),
+        ...stateToMerge,
+      };
     },
   },
 });

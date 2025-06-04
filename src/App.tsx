@@ -5,7 +5,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { Navigate, Route, Routes, useLocation, useMatch } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
@@ -47,7 +47,6 @@ import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
-import { useIsMarketValidFast } from './hooks/useIsValidMarketFast';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
@@ -85,7 +84,6 @@ const Content = () => {
   useUpdateTransfers();
   useReferralCode();
   useUiRefreshMigrations();
-  useCacheMarket();
 
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
@@ -110,26 +108,27 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <main tw="h-[100vh] w-[100vw]">
-          <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
-            <Routes>
-              <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
-              <Route path={AppRoute.Trade}>
-                <Route path=":market" element={<SimpleAssetPage />} />
-                <Route path={AppRoute.Trade} element={<SimpleAssetPage />} />
-              </Route>
-              <Route path={AppRoute.Alerts} element={<AlertsPage />} />
-              <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
-              <Route path={AppRoute.Settings} element={<SettingsPage />} />
-              <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
-            </Routes>
-          </Suspense>
-        </main>
-        <NotificationsToastArea tw="z-[2]" />
+        <$SimpleUiGrid>
+          <$SimpleUiMain>
+            <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
+              <Routes>
+                <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
+                <Route path={AppRoute.Trade}>
+                  <Route path=":market" element={<SimpleAssetPage />} />
+                  <Route path={AppRoute.Trade} element={<SimpleAssetPage />} />
+                </Route>
+                <Route path={AppRoute.Alerts} element={<AlertsPage />} />
+                <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
+                <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
+                <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
+              </Routes>
+            </Suspense>
+          </$SimpleUiMain>
 
-        <$DialogArea ref={dialogAreaRef}>
-          <DialogManager />
-        </$DialogArea>
+          <$DialogArea ref={dialogAreaRef}>
+            <DialogManager />
+          </$DialogArea>
+        </$SimpleUiGrid>
       </>
     );
   }
@@ -196,13 +195,6 @@ const Content = () => {
     </>
   );
 };
-
-function useCacheMarket() {
-  const match = useMatch(`/${AppRoute.Trade}/:marketId`);
-  const { marketId } = match?.params ?? {};
-  // just to cache
-  useIsMarketValidFast(marketId);
-}
 
 function useUiRefreshMigrations() {
   const themeSetting = useAppSelector(getAppThemeSetting);
@@ -356,6 +348,20 @@ const $Main = styled.main`
 
   isolation: isolate;
 
+  position: relative;
+`;
+
+const $SimpleUiGrid = styled.div`
+  display: grid;
+  grid-template-areas: 'Main';
+  grid-template-columns: 100vw;
+  grid-template-rows: 100vh;
+`;
+
+const $SimpleUiMain = styled.main`
+  grid-area: Main;
+  box-shadow: none;
+  isolation: isolate;
   position: relative;
 `;
 

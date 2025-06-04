@@ -16,6 +16,7 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
   NotificationDisplayData,
+  NotificationStatus,
   NotificationType,
   type NotificationTypeConfig,
 } from '@/constants/notifications';
@@ -36,6 +37,12 @@ import { Link } from '@/components/Link';
 // eslint-disable-next-line import/no-cycle
 import { Notification } from '@/components/Notification';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
+import { BlockRewardNotificationRow } from '@/views/Lists/Alerts/BlockRewardNotificationRow';
+import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
+import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNotificationRow';
+import { OrderNotificationRow } from '@/views/Lists/Alerts/OrderNotificationRow';
+import { OrderStatusNotificationRow } from '@/views/Lists/Alerts/OrderStatusNotificationRow';
+import { SkipTransferNotificationRow } from '@/views/Lists/Alerts/SkipTransferNotificationRow';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
@@ -190,6 +197,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   order={order}
                 />
               ),
+              renderSimpleAlert: ({ className, notification }) => (
+                <OrderNotificationRow
+                  className={className}
+                  timestamp={
+                    notification.timestamps[NotificationStatus.Updated] ??
+                    notification.timestamps[NotificationStatus.Triggered]!
+                  }
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
+                  subaccountOrder={order}
+                  relevantFills={relevantFills}
+                />
+              ),
             },
             updateKey: [latestUpdateMs, order.status, order.totalFilled?.toNumber()],
             isNew: !(relevantPlaceOrder != null || relevantLocalCancels.length > 0),
@@ -276,6 +295,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                 toastSensitivity: 'foreground',
                 groupKey: 'fill',
+                renderSimpleAlert: ({ className, notification }) => (
+                  <FillWithNoOrderNotificationRow
+                    className={className}
+                    fill={fill}
+                    timestamp={
+                      notification.timestamps[NotificationStatus.Updated] ??
+                      notification.timestamps[NotificationStatus.Triggered]!
+                    }
+                    isUnseen={notification.status <= NotificationStatus.Unseen}
+                  />
+                ),
               },
               updateKey: [fill.id],
             });
@@ -317,6 +347,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   amount={amount}
                   tokenName={tokenName}
                   notification={notification}
+                />
+              ),
+              renderSimpleAlert: ({ className, notification }) => (
+                <BlockRewardNotificationRow
+                  className={className}
+                  blockReward={reward}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },
@@ -387,6 +424,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.SkipTransfer,
+              renderSimpleAlert: ({ className, notification }) => (
+                <SkipTransferNotificationRow
+                  className={className}
+                  transfer={transfer}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
+                />
+              ),
             },
             updateKey: [isSuccess],
           });
@@ -835,6 +879,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   notification={notification}
                 />
               ),
+              renderSimpleAlert: ({ className, notification }) => (
+                <OrderStatusNotificationRow
+                  className={className}
+                  timestamp={
+                    notification.timestamps[NotificationStatus.Updated] ??
+                    notification.timestamps[NotificationStatus.Triggered]!
+                  }
+                  localPlaceOrder={localPlace}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
+                />
+              ),
             },
             updateKey: [localPlace.submissionStatus, localPlace.errorParams],
           });
@@ -864,6 +919,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   isToast={isToast}
                   localCancel={localCancel}
                   notification={notification}
+                />
+              ),
+              renderSimpleAlert: ({ className, notification }) => (
+                <OrderCancelNotificationRow
+                  className={className}
+                  timestamp={
+                    notification.timestamps[NotificationStatus.Updated] ??
+                    notification.timestamps[NotificationStatus.Triggered]!
+                  }
+                  localCancel={localCancel}
+                  isUnseen={notification.status <= NotificationStatus.Unseen}
                 />
               ),
             },

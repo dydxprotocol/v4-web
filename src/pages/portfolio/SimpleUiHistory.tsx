@@ -1,21 +1,18 @@
 import { useMemo } from 'react';
 
-import { Outlet, useMatch, useNavigate } from 'react-router-dom';
+import { Outlet, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
+import { SimpleUiHeader } from '@/components/SimpleUiHeader';
 import { TabNavigator } from '@/components/TabNavigator';
 
 export const SimpleUiHistory = () => {
   const stringGetter = useStringGetter();
-  const navigate = useNavigate();
 
   const matchTrades = useMatch(
     `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`
@@ -34,10 +31,6 @@ export const SimpleUiHistory = () => {
 
     return HistoryRoute.Trades;
   }, [matchTrades, matchTransfers, matchVaultTransfers]);
-
-  const handleBack = () => {
-    navigate(AppRoute.Markets);
-  };
 
   const tabNavivator = (
     <TabNavigator
@@ -66,31 +59,14 @@ export const SimpleUiHistory = () => {
 
   return (
     <div tw="flexColumn h-full w-full">
-      <div tw="row relative mb-[1rem] mt-[1.375rem] justify-center">
-        <h1 tw="text-color-text-2 font-large-bold">{stringGetter({ key: STRING_KEYS.HISTORY })}</h1>
-        <$BackButton
-          onClick={handleBack}
-          iconName={IconName.Caret}
-          buttonStyle={ButtonStyle.WithoutBackground}
-        />
-      </div>
+      <SimpleUiHeader
+        pageTitle={stringGetter({ key: STRING_KEYS.HISTORY })}
+        to={AppRoute.Markets}
+      />
       {tabNavivator}
     </div>
   );
 };
-
-const $BackButton = styled(IconButton)`
-  position: absolute;
-  left: 1.25rem;
-  top: 0;
-  bottom: 0;
-  transform: rotate(0.25turn);
-
-  svg {
-    height: 1rem;
-    width: 1rem;
-  }
-`;
 
 const $TableContainer = styled.div`
   display: grid;

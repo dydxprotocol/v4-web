@@ -159,6 +159,7 @@ const gridStyle = css`
 const $Section = styled.div`
   ${gridStyle}
   padding: 1rem 0;
+  --border-width: var(--default-border-width);
 `;
 const $AppThemeRoot = styled(Root)`
   ${gridStyle}

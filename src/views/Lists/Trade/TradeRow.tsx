@@ -19,15 +19,23 @@ import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
 import {
   getIndexerFillTypeStringKey,
-  getIndexerLiquidityStringKey,
   getIndexerOrderSideStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-export const TradeRow = ({ className, fill }: { className?: string; fill: SubaccountFill }) => {
+export const TradeRow = ({
+  className,
+  fill,
+  slotRight,
+  timestamp,
+}: {
+  className?: string;
+  fill: SubaccountFill;
+  slotRight?: React.ReactNode;
+  timestamp?: number;
+}) => {
   const stringGetter = useStringGetter();
-  const { market, side, price, type, size, createdAt, liquidity } = fill;
+  const { market, side, price, type, size, createdAt } = fill;
   const marketData = useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market);
 
   const assetInfo = useAppSelectorWithArgs(
@@ -37,33 +45,25 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
 
   const { logo } = orEmptyObj(assetInfo);
   const { displayableAsset, stepSizeDecimals, tickSizeDecimals } = orEmptyObj(marketData);
+  const time = timestamp ?? createdAt;
 
-  const { sideString, sideColor, typeString, notionalFill, isLiquidation, liquidityString } =
-    useMemo(() => {
-      const priceBN = MustBigNumber(price);
-      const notionalFillBN = MustBigNumber(size).times(priceBN);
-
-      return {
-        sideString: stringGetter({ key: side ? getIndexerOrderSideStringKey(side) : '' }),
-        sideColor:
-          side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)',
-        typeString: stringGetter({ key: type ? getIndexerFillTypeStringKey(type) : '' }),
-        notionalFill: notionalFillBN.gt(0) ? notionalFillBN : undefined,
-        liquidityString: stringGetter({
-          key: liquidity ? getIndexerLiquidityStringKey(liquidity) : '',
-        }),
-        isLiquidation: type === SubaccountFillType.LIQUIDATED,
-      };
-    }, [side, type, price, size, liquidity, stringGetter]);
+  const { sideString, sideColor, typeString, isLiquidation } = useMemo(() => {
+    return {
+      sideString: stringGetter({ key: side ? getIndexerOrderSideStringKey(side) : '' }),
+      sideColor: side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)',
+      typeString: stringGetter({ key: type ? getIndexerFillTypeStringKey(type) : '' }),
+      isLiquidation: type === SubaccountFillType.LIQUIDATED,
+    };
+  }, [side, type, stringGetter]);
 
   const miniIcon = isLiquidation ? (
     <Icon
-      tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] text-color-layer-3"
+      tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] text-color-layer-2"
       iconName={IconName.Liquidation}
     />
   ) : (
     <span
-      tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-3"
+      tw="absolute right-[-3px] top-[-2px] size-[0.875rem] min-w-[0.875rem] rounded-[50%] border-2 border-solid border-color-layer-2"
       css={{
         backgroundColor: sideColor,
       }}
@@ -102,8 +102,10 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
         />{' '}
         {displayableAsset}
       </span>
-
-      <span tw="text-color-text-1 font-mini-book">{typeString}</span>
+      <span tw="leading-[0]">
+        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={time} />{' '}
+        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={time} />
+      </span>
     </>
   );
 
@@ -119,12 +121,8 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
 
       <div tw="row gap-1">
         <div tw="flex flex-col items-end text-end">
-          <Output
-            tw="inline font-mini-book"
-            type={OutputType.Fiat}
-            value={notionalFill}
-            slotLeft={<span>{liquidityString} </span>}
-          />
+          <span tw="text-color-text-0 font-mini-book">{typeString}</span>
+
           <Output
             tw="inline text-color-text-2 font-small-book"
             withSubscript
@@ -134,13 +132,7 @@ export const TradeRow = ({ className, fill }: { className?: string; fill: Subacc
             slotLeft={<span>@ </span>}
           />
         </div>
-        <span>
-          <Output
-            tw="text-color-text-0 font-mini-book"
-            type={OutputType.RelativeTime}
-            value={createdAt}
-          />
-        </span>
+        {slotRight}
       </div>
     </$TradeRow>
   );
