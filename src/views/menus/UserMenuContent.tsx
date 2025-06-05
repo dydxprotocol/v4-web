@@ -11,7 +11,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -19,8 +18,10 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { MixedColorFiatOutput } from '@/components/MixedColorFiatOutput';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
@@ -28,23 +29,19 @@ import { isTruthy } from '@/lib/isTruthy';
 import { orEmptyObj } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
-import { OnboardingTriggerButton } from '../dialogs/OnboardingTriggerButton';
-
 export const UserMenuContent = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const onboardingState = useAppSelector(getOnboardingState);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const { equity } = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
 
   const isLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
 
-  const { openOnboardingDialog, onboardingState, isOnboardingDisabled, isAccountViewOnly } =
-    useOnboardingFlow();
-
   const {
-    sourceAccount: { walletInfo, address },
+    sourceAccount: { address },
     dydxAddress,
   } = useAccounts();
 
@@ -107,7 +104,7 @@ export const UserMenuContent = () => {
     <div tw="row justify-between">
       <Button
         shape={ButtonShape.Pill}
-        action={ButtonAction.Base}
+        action={ButtonAction.Secondary}
         size={ButtonSize.XSmall}
         tw="justify-start gap-0"
         onClick={onCopy}
@@ -128,20 +125,23 @@ export const UserMenuContent = () => {
         shape={ButtonShape.Pill}
         size={ButtonSize.XSmall}
         action={ButtonAction.Base}
+        disabled={address == null}
         buttonStyle={ButtonStyle.WithoutBackground}
         tw="justify-start gap-0 text-color-text-1 font-mini-book"
         onClick={() => setWalletDisplay((prev) => (prev === 'chain' ? 'source' : 'chain'))}
       >
         <div tw="row gap-0.5">
           {walletDisplay === 'chain'
-            ? stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })
+            ? `dYdX ${stringGetter({ key: STRING_KEYS.ADDRESS })}`
             : stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}
-          <Icon
-            css={{
-              '--icon-size': '0.5rem',
-            }}
-            iconName={IconName.Caret}
-          />
+          {address != null && (
+            <Icon
+              css={{
+                '--icon-size': '0.5rem',
+              }}
+              iconName={IconName.Caret}
+            />
+          )}
         </div>
       </Button>
     </div>
@@ -180,7 +180,14 @@ export const UserMenuContent = () => {
 
   const transferContent = (
     <div tw="row gap-0.5">
-      <Button tw="flex-1" state={{ isDisabled: isTransferDisabled }} action={ButtonAction.Primary}>
+      <Button
+        tw="flex-1"
+        state={{ isDisabled: isTransferDisabled }}
+        action={ButtonAction.Primary}
+        onClick={() => {
+          dispatch(openDialog(DialogTypes.Deposit2()));
+        }}
+      >
         <Icon iconName={IconName.Deposit2} />
         {stringGetter({ key: STRING_KEYS.DEPOSIT })}
       </Button>
@@ -189,6 +196,9 @@ export const UserMenuContent = () => {
         shape={ButtonShape.Square}
         iconName={IconName.TransferArrows}
         state={{ isDisabled: isTransferDisabled }}
+        onClick={() => {
+          dispatch(openDialog(DialogTypes.Withdraw2()));
+        }}
       />
     </div>
   );
