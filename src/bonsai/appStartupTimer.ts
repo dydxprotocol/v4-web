@@ -1,7 +1,7 @@
 import { AppRoute } from '@/constants/routes';
 import { timeUnits } from '@/constants/time';
 
-import { logBonsaiInfo, REQUEST_TIME_SAMPLE_RATE } from './logs';
+import { logBonsaiInfo } from './logs';
 
 type StartupStats = {
   start: number | undefined;
@@ -23,6 +23,8 @@ const TOO_LONG_STARTUP = 15 * timeUnits.second;
 
 const firstSeenPath = document.location.pathname;
 
+const STARTUP_SAMPLE_RATE = 0.25;
+
 export const AppStartupTimer = {
   timeIfFirst(t: keyof StartupStats) {
     if (stats[t] == null) {
@@ -33,7 +35,7 @@ export const AppStartupTimer = {
         stats.loadedOrderbook != null &&
         performance.now() < TOO_LONG_STARTUP &&
         firstSeenPath.indexOf(AppRoute.Trade) >= 0 &&
-        Math.random() < REQUEST_TIME_SAMPLE_RATE
+        Math.random() < STARTUP_SAMPLE_RATE
       ) {
         logBonsaiInfo('AppStartupTimer', 'App started', stats);
       }
