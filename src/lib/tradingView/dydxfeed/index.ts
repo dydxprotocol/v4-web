@@ -1,3 +1,4 @@
+import { AppStartupTimer } from '@/bonsai/appStartupTimer';
 import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
@@ -180,6 +181,7 @@ export const getDydxDatafeed = (
     const toMs = to * 1000 + 1;
 
     try {
+      AppStartupTimer.timeIfFirst('startCandles');
       const fetchedCandles: Candle[] | undefined = await wrapAndLogBonsaiError(
         getCandlesForDatafeed,
         'candles'
@@ -189,6 +191,7 @@ export const getDydxDatafeed = (
         fromMs,
         toMs,
       });
+      AppStartupTimer.timeIfFirst('loadedCandles');
 
       const bars = fetchedCandles.map(mapCandle).reverse();
 

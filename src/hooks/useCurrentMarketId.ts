@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
+import { AppStartupTimer } from '@/bonsai/appStartupTimer';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
@@ -151,6 +152,10 @@ export const useCurrentMarketId = () => {
       }
     }
   }, [isViewingUnlaunchedMarket, selectedNetwork, hasMarketOraclePrice, marketId, dispatch]);
+
+  useEffect(() => {
+    AppStartupTimer.timeIfFirst('renderTrade');
+  }, []);
 
   return {
     isViewingUnlaunchedMarket,
