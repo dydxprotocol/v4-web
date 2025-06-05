@@ -70,7 +70,6 @@ export const TradeRow = ({
     />
   );
 
-  // TODO: Localize
   const content = isLiquidation ? (
     <>
       <span tw="overflow-hidden text-ellipsis whitespace-nowrap leading-[1rem] text-color-text-2 font-base-book">
