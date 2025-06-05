@@ -1,3 +1,4 @@
+import { AppRoute } from '@/constants/routes';
 import { timeUnits } from '@/constants/time';
 
 import { logBonsaiInfo, REQUEST_TIME_SAMPLE_RATE } from './logs';
@@ -31,7 +32,7 @@ export const AppStartupTimer = {
         stats.loadedCandles != null &&
         stats.loadedOrderbook != null &&
         performance.now() < TOO_LONG_STARTUP &&
-        firstSeenPath.indexOf('/trade') >= 0 &&
+        firstSeenPath.indexOf(AppRoute.Trade) >= 0 &&
         Math.random() < REQUEST_TIME_SAMPLE_RATE
       ) {
         logBonsaiInfo('AppStartupTimer', 'App started', stats);
