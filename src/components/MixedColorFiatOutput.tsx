@@ -13,16 +13,16 @@ export const MixedColorFiatOutput = ({
 }) => {
   const { decimal: decimalSeparator } = useLocaleSeparators();
   const valueString = MustBigNumber(value).toFixed(USD_DECIMALS);
-  const equityCharArr = valueString.split('.');
-  const equityInt = equityCharArr[0];
-  const equityDecimals = equityCharArr[1] ?? '00';
+  const valueCharArr = valueString.split('.');
+  const valueInt = valueCharArr[0];
+  const valueDecimals = valueCharArr[1] ?? '00';
 
   return (
     <span className={className}>
-      <span tw="text-color-text-2">${equityInt}</span>
+      <span tw="text-color-text-2">${valueInt}</span>
       <span tw="text-color-text-0">
         {decimalSeparator}
-        {equityDecimals}
+        {valueDecimals}
       </span>
     </span>
   );
