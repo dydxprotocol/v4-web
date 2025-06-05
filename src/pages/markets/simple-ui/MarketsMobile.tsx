@@ -19,8 +19,8 @@ const MarketsMobile = () => {
   const isUserMenuOpen = useAppSelector(getIsUserMenuOpen);
   const dispatch = useAppDispatch();
 
-  const openUserMenu = () => {
-    dispatch(setIsUserMenuOpen(true));
+  const toggleUserMenu = (isOpen: boolean) => {
+    dispatch(setIsUserMenuOpen(isOpen));
   };
 
   return (
@@ -28,7 +28,7 @@ const MarketsMobile = () => {
       <div tw="h-full flex-1">
         <MarketList
           slotTop={{
-            content: <PortfolioOverview tw="w-[100vw]" openUserMenu={openUserMenu} />,
+            content: <PortfolioOverview tw="w-[100vw]" />,
             height: 200,
           }}
         />
@@ -37,9 +37,7 @@ const MarketsMobile = () => {
       <$Dialog
         isOpen={isUserMenuOpen}
         title={stringGetter({ key: STRING_KEYS.MENU })}
-        setIsOpen={(isOpen: boolean) => {
-          dispatch(setIsUserMenuOpen(isOpen));
-        }}
+        setIsOpen={toggleUserMenu}
         placement={DialogPlacement.Inline}
       >
         <UserMenuContent />

@@ -11,21 +11,21 @@ import { Icon, IconName } from '@/components/Icon';
 import { UnseenIndicator } from '@/views/Lists/Alerts/UnseenIndicator';
 
 import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setIsUserMenuOpen } from '@/state/dialogs';
 
 import { ConnectedPortfolioOverview } from './ConnectedPortfolioOverview';
 import { UnconnectedPortfolioOverview } from './UnconnectedPortfolioOverview';
 
-export const PortfolioOverview = ({
-  className,
-  openUserMenu,
-}: {
-  className?: string;
-  openUserMenu: () => void;
-}) => {
-  const onboardingState = useAppSelector(getOnboardingState);
+export const PortfolioOverview = ({ className }: { className?: string }) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const onboardingState = useAppSelector(getOnboardingState);
   const { hasUnreadNotifications } = useNotifications();
+
+  const openUserMenu = () => {
+    dispatch(setIsUserMenuOpen(true));
+  };
 
   const appMenu = (
     <div tw="absolute right-1.25 top-1.25 flex gap-0.5">
