@@ -106,10 +106,10 @@ export const useComplianceState = () => {
     onboardingState === OnboardingState.Disconnected;
 
   return {
-    complianceStatus: ComplianceStatus.COMPLIANT,
-    complianceState: ComplianceStates.FULL_ACCESS,
-    complianceMessage: null,
-    disableConnectButton: false,
-    showRestrictionWarning: false, // complianceState === ComplianceStates.READ_ONLY,
+    complianceStatus,
+    complianceState,
+    complianceMessage,
+    disableConnectButton,
+    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY,
   };
 };
