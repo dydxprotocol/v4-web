@@ -139,7 +139,7 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
   };
 
   return (
-    <div className={className}>
+    <$DisplaySettings className={className}>
       <$Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.THEME }))}
         {themePanels()}
@@ -148,9 +148,14 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
         {sectionHeader(stringGetter({ key: STRING_KEYS.DIRECTION_COLOR_PREFERENCE }))}
         {colorModeOptions()}
       </$Section>
-    </div>
+    </$DisplaySettings>
   );
 };
+
+const $DisplaySettings = styled.div`
+  overflow: auto;
+`;
+
 const gridStyle = css`
   display: grid;
   gap: 1.5rem;
@@ -158,8 +163,8 @@ const gridStyle = css`
 
 const $Section = styled.div`
   ${gridStyle}
-  padding: 1rem 0;
   --border-width: var(--default-border-width);
+  padding: 1rem 0;
 `;
 const $AppThemeRoot = styled(Root)`
   ${gridStyle}
