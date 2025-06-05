@@ -50,7 +50,6 @@ import { TransferStatusDialog } from '@/views/dialogs/TransferDialogs/TransferSt
 import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2/WithdrawDialog2';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
-import { UserMenuDialog } from '@/views/dialogs/UserMenuDialog';
 import { VaultDepositWithdrawDialog } from '@/views/dialogs/VaultDepositWithdrawDialog';
 import { WithdrawFromSubaccountDialog } from '@/views/dialogs/WithdrawFromSubaccountDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
@@ -128,7 +127,6 @@ export const DialogManager = React.memo(() => {
     Transfer: (args) => <TransferDialog {...args} {...modalProps} />,
     TransferStatus: (args) => <TransferStatusDialog {...args} {...modalProps} />,
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
-    UserMenu: (args) => <UserMenuDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
     Withdraw2: (args) => <WithdrawDialog2 {...args} {...modalProps} />,
     WithdrawalGated: (args) => <WithdrawalGateDialog {...args} {...modalProps} />,

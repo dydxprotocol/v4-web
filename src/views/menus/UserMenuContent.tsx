@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { MODERATE_DEBOUNCE_MS } from '@/constants/debounce';
-import { DialogProps, DialogTypes, RestrictedGeoDialogProps } from '@/constants/dialogs';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -16,7 +16,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
-import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { MixedColorFiatOutput } from '@/components/MixedColorFiatOutput';
@@ -29,12 +28,9 @@ import { isTruthy } from '@/lib/isTruthy';
 import { orEmptyObj } from '@/lib/typeUtils';
 import { truncateAddress } from '@/lib/wallet';
 
-import { OnboardingTriggerButton } from './OnboardingTriggerButton';
+import { OnboardingTriggerButton } from '../dialogs/OnboardingTriggerButton';
 
-export const UserMenuDialog = ({
-  preventClose,
-  setIsOpen,
-}: DialogProps<RestrictedGeoDialogProps>) => {
+export const UserMenuContent = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -70,46 +66,39 @@ export const UserMenuDialog = ({
     }
   };
 
-  const onClose = () => {
-    setIsOpen(false);
-  };
-
   const menuItems = [
     onboardingState === OnboardingState.AccountConnected && {
-      value: 'history',
+      key: 'history',
       label: stringGetter({ key: STRING_KEYS.HISTORY }),
       icon: <Icon iconName={IconName.Clock} />,
       onClick: () => {
         navigate(AppRoute.Portfolio);
-        onClose();
       },
     },
     onboardingState === OnboardingState.AccountConnected && {
-      value: 'settings',
+      key: 'settings',
       label: stringGetter({ key: STRING_KEYS.SETTINGS }),
       icon: <Icon iconName={IconName.GearStroke} />,
       onClick: () => {
         navigate(AppRoute.Settings);
-        onClose();
       },
     },
     {
-      value: 'help',
+      key: 'help',
       label: stringGetter({ key: STRING_KEYS.HELP }),
       icon: <Icon iconName={IconName.InfoStroke} />,
       onClick: () => {
         dispatch(openDialog(DialogTypes.Help()));
-        onClose();
       },
     },
     onboardingState !== OnboardingState.Disconnected && {
-      value: 'disconnect-wallet',
+      key: 'disconnect-wallet',
       label: stringGetter({ key: STRING_KEYS.SIGN_OUT }),
       highlightColor: 'var(--color-red)',
       icon: <Icon iconName={IconName.XCircle} />,
+      withoutCaret: true,
       onClick: () => {
         dispatch(openDialog(DialogTypes.DisconnectWallet()));
-        onClose();
       },
     },
   ].filter(isTruthy);
@@ -208,10 +197,11 @@ export const UserMenuDialog = ({
     <$MenuContent>
       {menuItems.map((item) => (
         <Button
-          key={item.value}
+          key={item.key}
           onClick={item.onClick}
           css={{
             '--button-border': 'none',
+            '--button-height': '3rem',
             borderRadius: 0,
             justifyContent: 'space-between',
             color: item.highlightColor ?? 'var(--color-text-1)',
@@ -221,33 +211,18 @@ export const UserMenuDialog = ({
             {item.icon}
             {item.label}
           </div>
-          <$Caret iconName={IconName.Caret} />
+          {!item.withoutCaret && <$Caret iconName={IconName.Caret} />}
         </Button>
       ))}
     </$MenuContent>
   );
 
   return (
-    <Dialog
-      isOpen
-      withClose
-      preventClose={preventClose}
-      setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.MENU })}
-      placement={DialogPlacement.FullScreen}
-      css={{
-        '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
-        '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
-        '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
-        '--dialog-header-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
-      }}
-    >
-      <div tw="flexColumn gap-1.5">
-        {userContent}
-        {transferContent}
-        {menuContent}
-      </div>
-    </Dialog>
+    <div tw="flexColumn gap-1.5">
+      {userContent}
+      {transferContent}
+      {menuContent}
+    </div>
   );
 };
 

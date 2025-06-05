@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
 import { useNotifications } from '@/hooks/useNotifications';
@@ -12,14 +11,18 @@ import { Icon, IconName } from '@/components/Icon';
 import { UnseenIndicator } from '@/views/Lists/Alerts/UnseenIndicator';
 
 import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+import { useAppSelector } from '@/state/appTypes';
 
 import { ConnectedPortfolioOverview } from './ConnectedPortfolioOverview';
 import { UnconnectedPortfolioOverview } from './UnconnectedPortfolioOverview';
 
-export const PortfolioOverview = ({ className }: { className?: string }) => {
-  const dispatch = useAppDispatch();
+export const PortfolioOverview = ({
+  className,
+  openUserMenu,
+}: {
+  className?: string;
+  openUserMenu: () => void;
+}) => {
   const onboardingState = useAppSelector(getOnboardingState);
   const navigate = useNavigate();
   const { hasUnreadNotifications } = useNotifications();
@@ -45,9 +48,7 @@ export const PortfolioOverview = ({ className }: { className?: string }) => {
         tw="size-2.25 min-w-2.25 rounded-[50%] border border-solid border-[color:var(--color-border)]"
         shape={ButtonShape.Circle}
         size={ButtonSize.XSmall}
-        onClick={() => {
-          dispatch(openDialog(DialogTypes.UserMenu({})));
-        }}
+        onClick={openUserMenu}
       >
         <Icon iconName={IconName.Menu} />
       </Button>
