@@ -9,7 +9,7 @@ export const CURRENT_MODE = ({
 
 export const isMainnet = CURRENT_MODE === 'MAINNET';
 export const isTestnet = CURRENT_MODE === 'TESTNET';
-export const isDev = true; // CURRENT_MODE === 'DEV';
+export const isDev = CURRENT_MODE === 'DEV';
 
 export const AVAILABLE_ENVIRONMENTS = environments.deployments[CURRENT_MODE];
 export const ENVIRONMENT_CONFIG_MAP = environments.environments;
