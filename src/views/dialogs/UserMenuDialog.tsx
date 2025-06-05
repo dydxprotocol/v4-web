@@ -87,7 +87,7 @@ export const UserMenuDialog = ({
     onboardingState === OnboardingState.AccountConnected && {
       value: 'settings',
       label: stringGetter({ key: STRING_KEYS.SETTINGS }),
-      icon: <Icon iconName={IconName.Settings} />,
+      icon: <Icon iconName={IconName.GearStroke} />,
       onClick: () => {
         navigate(AppRoute.Settings);
         onClose();
@@ -96,7 +96,7 @@ export const UserMenuDialog = ({
     {
       value: 'help',
       label: stringGetter({ key: STRING_KEYS.HELP }),
-      icon: <Icon iconName={IconName.HelpCircle} />,
+      icon: <Icon iconName={IconName.InfoStroke} />,
       onClick: () => {
         dispatch(openDialog(DialogTypes.Help()));
         onClose();
@@ -105,7 +105,7 @@ export const UserMenuDialog = ({
     onboardingState !== OnboardingState.Disconnected && {
       value: 'disconnect-wallet',
       label: stringGetter({ key: STRING_KEYS.SIGN_OUT }),
-      highlightColor: 'destroy' as const,
+      highlightColor: 'var(--color-red)',
       icon: <Icon iconName={IconName.XCircle} />,
       onClick: () => {
         dispatch(openDialog(DialogTypes.DisconnectWallet()));
@@ -170,6 +170,9 @@ export const UserMenuDialog = ({
               src="/hedgie-profile.png"
               alt="profile"
             />
+            <span tw="absolute bottom-0 right-[-0.25rem] flex size-[1.375rem] min-h-[1.375rem] min-w-[1.375rem] items-center justify-center rounded-[50%] border-2 border-solid border-color-layer-1 bg-color-layer-2">
+              <img src="/logos/dydx-x.png" alt="dydx" tw="size-0.625" />
+            </span>
           </div>
 
           <div tw="flexColumn">
@@ -179,14 +182,6 @@ export const UserMenuDialog = ({
             </span>
           </div>
         </div>
-        <IconButton
-          tw="mb-auto border-none"
-          buttonStyle={ButtonStyle.WithoutBackground}
-          css={{
-            '--button-icon-size': '1.5rem',
-          }}
-          iconName={IconName.ThreeDot}
-        />
       </div>
       {walletDisplayRow}
     </$UserContent>
@@ -197,12 +192,13 @@ export const UserMenuDialog = ({
   const transferContent = (
     <div tw="row gap-0.5">
       <Button tw="flex-1" state={{ isDisabled: isTransferDisabled }} action={ButtonAction.Primary}>
+        <Icon iconName={IconName.Deposit2} />
         {stringGetter({ key: STRING_KEYS.DEPOSIT })}
       </Button>
       <IconButton
         size={ButtonSize.Base}
         shape={ButtonShape.Square}
-        iconName={IconName.Transfer}
+        iconName={IconName.TransferArrows}
         state={{ isDisabled: isTransferDisabled }}
       />
     </div>
@@ -218,6 +214,7 @@ export const UserMenuDialog = ({
             '--button-border': 'none',
             borderRadius: 0,
             justifyContent: 'space-between',
+            color: item.highlightColor ?? 'var(--color-text-1)',
           }}
         >
           <div tw="row gap-0.5">
