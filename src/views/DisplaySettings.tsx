@@ -139,7 +139,7 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
   };
 
   return (
-    <$DisplaySettings className={className}>
+    <div className={className}>
       <$Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.THEME }))}
         {themePanels()}
@@ -148,13 +148,9 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
         {sectionHeader(stringGetter({ key: STRING_KEYS.DIRECTION_COLOR_PREFERENCE }))}
         {colorModeOptions()}
       </$Section>
-    </$DisplaySettings>
+    </div>
   );
 };
-
-const $DisplaySettings = styled.div`
-  overflow: auto;
-`;
 
 const gridStyle = css`
   display: grid;
