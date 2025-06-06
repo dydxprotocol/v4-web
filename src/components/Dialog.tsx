@@ -221,10 +221,6 @@ const $Container = styled(Content)<{
   /* Params */
   --dialog-inset: 1rem;
 
-  @media ${breakpoints.tablet} {
-    --dialog-inset: ${testFlags.simpleUi ? '2px' : '1rem'};
-  }
-
   --dialog-width: 30rem;
   --dialog-backgroundColor: var(--color-layer-3);
   --dialog-radius: 1rem;
@@ -250,6 +246,15 @@ const $Container = styled(Content)<{
 
   --dialog-title-gap: 0.5rem;
   --dialog-icon-size: 1.75em;
+
+  @media ${breakpoints.tablet} {
+    ${testFlags.simpleUi &&
+    css`
+      --dialog-inset: 2px;
+      --dialog-backgroundColor: var(--color-layer-1);
+      --dialog-header-backgroundColor: var(--color-layer-1);
+    `}
+  }
 
   /* Calculated */
   --dialog-height: calc(100% - 2 * var(--dialog-inset));

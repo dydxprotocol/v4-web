@@ -11,6 +11,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -31,6 +32,7 @@ import { setSavedEncryptedSignature } from '@/state/wallet';
 import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
@@ -42,8 +44,9 @@ type ElementProps = {
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-
+  const { isTablet } = useBreakpoints();
   const { sourceAccount, setWalletFromSignature } = useAccounts();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   const [error, setError] = useState<string>();
 
@@ -197,51 +200,75 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
         {[
           {
             status: EvmDerivedAccountStatus.Deriving,
-            title: stringGetter({ key: STRING_KEYS.GENERATE_DYDX_WALLET }),
+            title: isSimpleUi
+              ? 'Verify dYdX Chain wallet'
+              : stringGetter({ key: STRING_KEYS.GENERATE_DYDX_WALLET }),
+            pendingTitle: 'Verifying dYdX Chain wallet...',
             description: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_OWNERSHIP }),
           },
           status === EvmDerivedAccountStatus.EnsuringDeterminism && {
             status: EvmDerivedAccountStatus.EnsuringDeterminism,
             title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
+            pendingTitle: 'Verifying wallet compatibility...',
             description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
           },
         ]
           .filter(isTruthy)
-          .map((step) => (
-            <$StatusCard key={step.status} active={status === step.status}>
-              <div>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-              </div>
-              {status < step.status ? (
-                <LoadingSpinner disabled />
-              ) : status === step.status ? (
-                <LoadingSpinner />
-              ) : (
-                <GreenCheckCircle tw="[--icon-size:2.375rem]" />
-              )}
-            </$StatusCard>
-          ))}
+          .map((step) => {
+            const isActive = status === step.status;
+            return isSimpleUi ? (
+              <$SimpleUiStatusCard
+                key={step.status}
+                active={isActive}
+                pending={status < step.status}
+              >
+                <h3>{isActive ? step.pendingTitle : step.title}</h3>
+                {status < step.status ? (
+                  <LoadingSpinner disabled size="32" />
+                ) : status === step.status ? (
+                  <LoadingSpinner size="32" />
+                ) : (
+                  <GreenCheckCircle tw="[--icon-size:1.25rem]" />
+                )}
+              </$SimpleUiStatusCard>
+            ) : (
+              <$StatusCard key={step.status} active={isActive}>
+                <div>
+                  <h3>{isActive ? step.pendingTitle : step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+                {status < step.status ? (
+                  <LoadingSpinner disabled />
+                ) : status === step.status ? (
+                  <LoadingSpinner />
+                ) : (
+                  <GreenCheckCircle tw="[--icon-size:2.375rem]" />
+                )}
+              </$StatusCard>
+            );
+          })}
       </div>
 
       <$Footer>
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
         <WithReceipt
           slotReceipt={
-            <div tw="p-1 text-center text-color-text-0 font-small-medium">
-              <span>
-                {stringGetter({
-                  key: STRING_KEYS.FREE_SIGNING,
-                  params: {
-                    FREE: (
-                      <span tw="text-green">
-                        {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
-                      </span>
-                    ),
-                  },
-                })}
-              </span>
-            </div>
+            !isSimpleUi && (
+              <div tw="p-1 text-center text-color-text-0 font-small-medium">
+                <span>
+                  {stringGetter({
+                    key: STRING_KEYS.FREE_SIGNING,
+                    params: {
+                      FREE: (
+                        <span tw="text-green">
+                          {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
+                        </span>
+                      ),
+                    },
+                  })}
+                </span>
+              </div>
+            )
           }
           tw="[--withReceipt-backgroundColor:--color-layer-2]"
         >
@@ -309,6 +336,25 @@ const $StatusCard = styled.div<{ active?: boolean }>`
       font: var(--font-small-medium);
     }
   }
+`;
+
+const $SimpleUiStatusCard = styled.div<{ active: boolean; pending: boolean }>`
+  ${layoutMixins.spacedRow}
+  gap: 0.5rem;
+  font: var(--font-small-medium);
+  padding: 1rem;
+  border-radius: 0.5rem;
+
+  ${({ active, pending }) =>
+    active || pending
+      ? css`
+          background-color: var(--color-layer-2);
+          color: var(--color-text-2);
+        `
+      : css`
+          background-color: transparent;
+          color: var(--color-text-0);
+        `}
 `;
 
 const $Footer = styled.footer`
