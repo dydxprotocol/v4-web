@@ -151,6 +151,7 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
     </div>
   );
 };
+
 const gridStyle = css`
   display: grid;
   gap: 1.5rem;
@@ -158,8 +159,8 @@ const gridStyle = css`
 
 const $Section = styled.div`
   ${gridStyle}
-  padding: 1rem 0;
   --border-width: var(--default-border-width);
+  padding: 1rem 0;
 `;
 const $AppThemeRoot = styled(Root)`
   ${gridStyle}

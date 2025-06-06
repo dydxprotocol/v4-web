@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { STRING_KEYS, SUPPORTED_LOCALES, SupportedLocales } from '@/constants/localization';
 import type { MenuItem } from '@/constants/menus';
@@ -19,11 +20,12 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedLocale } from '@/state/localization';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { SettingsHeader } from './SettingsHeader';
 
 const SettingsPage = () => {
   const stringGetter = useStringGetter();
-  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const networks = useNetworks();
@@ -88,9 +90,8 @@ const SettingsPage = () => {
   const preferencesMenuItems = usePreferenceMenu();
 
   return (
-    <>
-      <SettingsHeader pathname={pathname} stringGetter={stringGetter} />
-      <Routes>
+    <Routes>
+      <Route element={<Settings />}>
         <Route path="" element={<PageMenu group="main" items={mainMenuItems} />} />
         <Route
           path={MobileSettingsRoute.Language}
@@ -104,11 +105,39 @@ const SettingsPage = () => {
           path={MobileSettingsRoute.Network}
           element={<PageMenu group="network" items={[networkMenuItems]} />}
         />
-        <Route path={MobileSettingsRoute.Display} element={<DisplaySettings tw="px-1.5 py-1" />} />
-        <Route path="*" element={<Navigate to="" replace />} />
-      </Routes>
-    </>
+        <Route
+          path={MobileSettingsRoute.Display}
+          element={
+            <DisplaySettings
+              css={{
+                padding: testFlags.simpleUi ? '0 1.5rem' : '1rem 1.5rem',
+              }}
+            />
+          }
+        />
+      </Route>
+    </Routes>
   );
 };
+
+const Settings = () => {
+  const { pathname } = useLocation();
+  const stringGetter = useStringGetter();
+  return (
+    <$SettingsContainer>
+      <SettingsHeader pathname={pathname} stringGetter={stringGetter} />
+      <div tw="overflow-auto">
+        <Outlet />
+      </div>
+    </$SettingsContainer>
+  );
+};
+
+const $SettingsContainer = styled.div`
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+`;
 
 export default SettingsPage;
