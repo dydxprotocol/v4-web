@@ -2,7 +2,6 @@ import { PlaceOrderMarketInfo, PlaceOrderPayload } from '@/bonsai/forms/triggers
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
 import { OrderExecution, OrderSide, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
-import { generateRandomClientId } from '@dydxprotocol/v4-client-js/build/src/lib/utils';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
 import { TransactionMemo } from '@/constants/analytics';
@@ -16,7 +15,7 @@ import { store } from '@/state/_store';
 
 import { assertNever } from './assertNever';
 import { calc } from './do';
-import { AttemptNumber } from './numbers';
+import { AttemptNumber, MAX_INT_ROUGHLY } from './numbers';
 import {
   isLimitOrderTypeNew,
   isMarketOrderTypeNew,
@@ -98,7 +97,7 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     subaccountNumber,
     marketId,
     clobPairId: marketInfo.clobPairId,
-    clientId: generateRandomClientId(),
+    clientId: Math.floor(Math.random() * MAX_INT_ROUGHLY),
     type: calc(() => {
       switch (type) {
         case IndexerOrderType.MARKET:

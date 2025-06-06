@@ -1,5 +1,3 @@
-import { Secp256k1, sha256 } from '@cosmjs/crypto';
-
 import { Hdkey } from '@/constants/account';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -32,9 +30,13 @@ const signComplianceSignature = async (
 
   const timestampInSeconds = Math.floor(Date.now() / 1000);
   const messageToSign: string = `${message}:${action}"${status || ''}:${timestampInSeconds}`;
-  const messageHash = sha256(new Uint8Array(Buffer.from(messageToSign)));
+  const messageHash = (await import('@cosmjs/crypto')).sha256(
+    new Uint8Array(Buffer.from(messageToSign))
+  );
 
-  const signed = await Secp256k1.createSignature(messageHash, hdkey.privateKey);
+  const signed = await (
+    await import('@cosmjs/crypto')
+  ).Secp256k1.createSignature(messageHash, hdkey.privateKey);
   const signedMessage = signed.toFixedLength();
   return {
     signedMessage: Buffer.from(signedMessage).toString('base64'),

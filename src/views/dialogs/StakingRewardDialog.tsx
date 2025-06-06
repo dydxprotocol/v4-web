@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
+import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits } from 'viem';

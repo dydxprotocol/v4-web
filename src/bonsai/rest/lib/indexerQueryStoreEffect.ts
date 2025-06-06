@@ -7,7 +7,7 @@ import {
   selectIndexerReady,
   selectNobleClientReady,
 } from '@/bonsai/socketSelectors';
-import { StargateClient } from '@cosmjs/stargate';
+import { type StargateClient } from '@cosmjs/stargate';
 import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 

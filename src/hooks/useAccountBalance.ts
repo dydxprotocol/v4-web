@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
+import { getLazyStargateClient } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { StargateClient } from '@cosmjs/stargate';
 import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
@@ -142,7 +142,7 @@ export const useAccountBalance = ({
 
       if (!rpc) return undefined;
 
-      const client = await StargateClient.connect(rpc);
+      const client = await (await getLazyStargateClient()).connect(rpc);
       const balanceAsCoin = await client.getBalance(cosmosAddress, addressOrDenom);
       await client.disconnect();
 

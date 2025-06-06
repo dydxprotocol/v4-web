@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => ({
             },
           ],
         ],
+        exclude: ['@dydxprotocol/v4-client-js'],
       },
     }),
 
