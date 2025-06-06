@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 
+import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 // eslint-disable-next-line no-restricted-imports
 import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndexer';
 import {
@@ -84,9 +85,7 @@ const useDydxClientContext = () => {
       onboarding.deriveHDKeyFromEthereumSignature(signature);
 
     return {
-      wallet: await (
-        await import('@dydxprotocol/v4-client-js')
-      ).LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX),
+      wallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, BECH32_PREFIX),
       mnemonic,
       privateKey,
       publicKey,

@@ -18,6 +18,7 @@ import { selectHasNonExpiredPendingWithdraws } from '@/state/transfersSelectors'
 import { MaybeBigNumber } from '@/lib/numbers';
 import { sleep } from '@/lib/timeUtils';
 
+import { getLazyNobleWallet } from '../lib/lazyDynamicLibs';
 import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { BonsaiCore } from '../ontology';
@@ -82,9 +83,7 @@ export function setUpNobleBalanceSweepLifecycle(store: RootStore) {
 
         // Set up Noble and Skip clients
         if (nobleSigningClient == null || storedNobleClientRpcUrl !== nobleClientRpcUrl) {
-          nobleSigningClient = new (await import('@dydxprotocol/v4-client-js')).NobleClient(
-            nobleClientRpcUrl
-          );
+          nobleSigningClient = new (await getLazyNobleWallet())(nobleClientRpcUrl);
           storedNobleClientRpcUrl = nobleClientRpcUrl;
         }
 
