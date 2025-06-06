@@ -41,13 +41,15 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
   const stringGetter = useStringGetter();
-  const { isMobile } = useBreakpoints();
+  const { isMobile, isTablet } = useBreakpoints();
   const { walletLearnMore } = useURLConfigs();
   const { selectWallet, sourceAccount } = useAccounts();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen(false);
@@ -72,6 +74,12 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
       setIsOpen={setIsOpenFromDialog}
+      css={
+        isSimpleUi && {
+          '--dialog-backgroundColor': 'var(--color-layer-1)',
+          '--dialog-header-backgroundColor': 'var(--color-layer-1)',
+        }
+      }
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.ChooseWallet]: {
@@ -102,7 +110,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
               </$Content>
             ),
             hasFooterBorder: true,
-            slotFooter: (
+            slotFooter: !isSimpleUi && (
               <$Footer>
                 <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
                   <h3 tw="text-color-text-2 font-medium-book">
@@ -115,16 +123,35 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
             ),
           },
           [OnboardingSteps.KeyDerivation]: {
-            slotIcon: {
-              [EvmDerivedAccountStatus.NotDerived]: sourceAccount.walletInfo && (
-                <WalletIcon wallet={sourceAccount.walletInfo} />
-              ),
-              [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
-              [EvmDerivedAccountStatus.EnsuringDeterminism]: <$Ring withAnimation value={0.25} />,
-              [EvmDerivedAccountStatus.Derived]: <GreenCheckCircle />,
-            }[derivationStatus],
+            slotIcon: isSimpleUi
+              ? sourceAccount.walletInfo && <WalletIcon wallet={sourceAccount.walletInfo} />
+              : {
+                  [EvmDerivedAccountStatus.NotDerived]: sourceAccount.walletInfo && (
+                    <WalletIcon wallet={sourceAccount.walletInfo} />
+                  ),
+                  [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
+                  [EvmDerivedAccountStatus.EnsuringDeterminism]: (
+                    <$Ring withAnimation value={0.25} />
+                  ),
+                  [EvmDerivedAccountStatus.Derived]: <GreenCheckCircle />,
+                }[derivationStatus],
             title: stringGetter({ key: STRING_KEYS.SIGN_MESSAGE }),
-            description: stringGetter({ key: STRING_KEYS.SIGNATURE_CREATES_COSMOS_WALLET }),
+            description: isSimpleUi ? (
+              <span tw="font-small-book">
+                {stringGetter({
+                  key: STRING_KEYS.FREE_SIGNING,
+                  params: {
+                    FREE: (
+                      <span tw="text-green">
+                        {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
+                      </span>
+                    ),
+                  },
+                })}
+              </span>
+            ) : (
+              stringGetter({ key: STRING_KEYS.SIGNATURE_CREATES_COSMOS_WALLET })
+            ),
             children: (
               <$Content>
                 <GenerateKeys status={derivationStatus} setStatus={setDerivationStatus} />

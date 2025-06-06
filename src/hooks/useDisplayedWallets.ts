@@ -16,7 +16,9 @@ import {
 } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
+import { useBreakpoints } from './useBreakpoints';
 import { MipdInjectedWallet, useMipdInjectedWallets } from './useMipdInjectedWallets';
 
 const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
@@ -30,12 +32,14 @@ const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
 
 export const useDisplayedWallets = (): WalletInfo[] => {
   const injectedWallets = useMipdInjectedWallets();
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   return useMemo(() => {
-    const phantomDetected = Boolean(window.phantom?.solana);
-    const keplrDetected = Boolean(window.keplr);
+    const isPhantomDetected = Boolean(window.phantom?.solana);
+    const isKeplrDetected = Boolean(window.keplr);
 
-    const okxDetected =
+    const isOkxDetected =
       injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === OKX_MIPD_RDNS) !== -1;
 
     const injectedMetaMask = injectedWallets.find(
@@ -57,7 +61,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       )
       .map(getWalletInfoFromInjectedWallet);
 
-    const phantomWallet = phantomDetected
+    const phantomWallet = isPhantomDetected
       ? {
           connectorType: ConnectorType.PhantomSolana,
           name: WalletType.Phantom,
@@ -68,7 +72,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           downloadLink: PHANTOM_DOWNLOAD_LINK,
         };
 
-    const keplrWallet = keplrDetected
+    const keplrWallet = isKeplrDetected
       ? {
           connectorType: ConnectorType.Cosmos,
           name: CosmosWalletType.KEPLR,
@@ -78,6 +82,21 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           name: WalletType.Keplr,
           downloadLink: KEPLR_DOWNLOAD_LINK,
         };
+
+    if (isSimpleUi) {
+      return [
+        injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
+        ...otherInjectedWallets,
+        isPhantomDetected && phantomWallet,
+        isKeplrDetected && keplrWallet,
+        { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
+        isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
+        Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
+          connectorType: ConnectorType.Privy,
+          name: WalletType.Privy,
+        },
+      ].filter(isTruthy) as WalletInfo[];
+    }
 
     return [
       // always show Metamask extension first if it is detected
@@ -94,7 +113,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
       // No need to special-case an OKX WalletConnect option if the OKX extension wallet is already detected.
       // Note that OKX mobile app users can still connect through the generic WalletConnect option
-      !okxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
+      !isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
     ].filter(isTruthy) as WalletInfo[];
   }, [injectedWallets]);
 };

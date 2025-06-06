@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -18,6 +19,8 @@ import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
 import { WalletIcon } from '@/components/WalletIcon';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const ChooseWallet = ({
   onChooseWallet,
 }: {
@@ -25,6 +28,8 @@ export const ChooseWallet = ({
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
+  const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   const displayedWallets = useDisplayedWallets();
 
@@ -58,7 +63,7 @@ export const ChooseWallet = ({
             key={wallet.name}
             onClick={() => onChooseWallet(wallet)}
             slotLeft={<WalletIcon wallet={wallet} size="1.5em" />}
-            size={ButtonSize.Small}
+            size={isSimpleUi ? ButtonSize.Large : ButtonSize.Small}
           >
             <$WalletName>
               {wallet.connectorType === ConnectorType.Injected
@@ -69,9 +74,11 @@ export const ChooseWallet = ({
         ))}
       </$Wallets>
 
-      <$Link href={walletLearnMore} withIcon>
-        {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
-      </$Link>
+      {!isSimpleUi && (
+        <$Link href={walletLearnMore} withIcon>
+          {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
+        </$Link>
+      )}
     </>
   );
 };
@@ -91,19 +98,25 @@ const $Wallets = styled.div`
     grid-column: span 2;
   }
 
-  // Flex layout
-  /* display: flex;
-  flex-wrap: wrap;
-
-  &:after {
-    content: '';
-    flex: 2;
-  } */
+  @media ${breakpoints.tablet} {
+    ${testFlags.simpleUi &&
+    css`
+      display: flex;
+      flex-direction: column;
+    `}
+  }
 `;
 
 const $WalletButton = styled(Button)`
   justify-content: start;
   gap: 0.5rem;
+
+  @media ${breakpoints.tablet} {
+    ${testFlags.simpleUi &&
+    css`
+      font: var(--font-medium-book);
+    `}
+  }
 
   @media ${breakpoints.mobile} {
     div {
