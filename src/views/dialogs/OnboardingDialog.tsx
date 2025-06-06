@@ -74,12 +74,6 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
       setIsOpen={setIsOpenFromDialog}
-      css={
-        isSimpleUi && {
-          '--dialog-backgroundColor': 'var(--color-layer-1)',
-          '--dialog-header-backgroundColor': 'var(--color-layer-1)',
-        }
-      }
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.ChooseWallet]: {
