@@ -125,7 +125,7 @@ export function useDepositSteps({
 
       for (let i = 0; i < (messages?.txs?.length ?? 0); i += 1) {
         const tx = messages?.txs?.[i];
-        if (tx && 'evmTx' in tx && tx?.evmTx?.requiredErc20Approvals?.length) {
+        if (tx && 'evmTx' in tx && tx.evmTx.requiredErc20Approvals?.length) {
           approvalMaybeNeeded = {
             ...tx.evmTx.requiredErc20Approvals[0]!,
             chainId: tx.evmTx.chainId,

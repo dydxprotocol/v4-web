@@ -48,6 +48,10 @@ export const SimpleUiHistory = () => {
           value: HistoryRoute.VaultTransfers,
           label: stringGetter({ key: STRING_KEYS.VAULT }),
         },
+        {
+          value: HistoryRoute.Payments,
+          label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS }),
+        },
       ]}
       sharedContent={
         <$TableContainer>

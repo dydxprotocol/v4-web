@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
 import {
+  IndexerFundingPaymentResponseObject,
   IndexerHistoricalBlockTradingReward,
   IndexerHistoricalTradingRewardAggregation,
 } from '@/types/indexer/indexerApiGen';
@@ -20,6 +21,7 @@ import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
+import { useFundingPayments } from './rest/fundingPayments';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
 import {
   useDailyCumulativeTradingRewards,
@@ -424,6 +426,7 @@ interface BonsaiHooksShape {
   useStakingRewards: () => Loadable<StakingRewards>;
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
   useStakingDelegations: () => Loadable<StakingDelegationsResult>;
+  useFundingPayments: () => Loadable<IndexerFundingPaymentResponseObject[]>;
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
@@ -431,6 +434,7 @@ export const BonsaiHooks: BonsaiHooksShape = {
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
   useDailyCumulativeTradingRewards,
   useHistoricalTradingRewards,
+  useFundingPayments,
   useHistoricalTradingRewardsWeekly,
   useParentSubaccountHistoricalPnls,
   useStakingRewards,
