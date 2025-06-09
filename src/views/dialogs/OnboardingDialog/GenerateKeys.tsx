@@ -201,15 +201,15 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
           {
             status: EvmDerivedAccountStatus.Deriving,
             title: isSimpleUi
-              ? 'Verify dYdX Chain wallet'
+              ? stringGetter({ key: STRING_KEYS.VERIFY_YOUR_DYDX_WALLET })
               : stringGetter({ key: STRING_KEYS.GENERATE_DYDX_WALLET }),
-            pendingTitle: 'Verifying dYdX Chain wallet...',
+            pendingTitle: stringGetter({ key: STRING_KEYS.VERIFYING_YOUR_DYDX_WALLET }),
             description: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_OWNERSHIP }),
           },
           status === EvmDerivedAccountStatus.EnsuringDeterminism && {
             status: EvmDerivedAccountStatus.EnsuringDeterminism,
             title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
-            pendingTitle: 'Verifying wallet compatibility...',
+            pendingTitle: stringGetter({ key: STRING_KEYS.VERIFYING_WALLET_COMPATIBILITY }),
             description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
           },
         ]
