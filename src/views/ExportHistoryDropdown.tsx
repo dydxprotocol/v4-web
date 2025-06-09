@@ -426,8 +426,8 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
                 setCheckedFundingPayments(!checkedFundingPayments);
 
                 track(
-                  AnalyticsEvents.ExportVaultTransfersCheckboxClick({
-                    value: !checkedVaultTransfers,
+                  AnalyticsEvents.ExportFundingPaymentsCheckboxClick({
+                    value: !checkedFundingPayments,
                   })
                 );
               }}

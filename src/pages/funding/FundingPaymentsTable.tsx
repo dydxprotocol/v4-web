@@ -1,14 +1,16 @@
 import { forwardRef, useMemo } from 'react';
 
 import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { FundingPayment } from '@/bonsai/rest/fundingPayments';
 import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
-import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+import { FUNDING_DECIMALS, NumberSign } from '@/constants/numbers';
+import {
+  IndexerFundingPaymentResponseObject,
+  IndexerOrderSide,
+} from '@/types/indexer/indexerApiGen';
 
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -44,7 +46,7 @@ export type FundingPaymentTableRow = {
   marketSummary: Nullable<PerpetualMarketSummary>;
   stepSizeDecimals: number;
   tickSizeDecimals: number;
-} & FundingPayment;
+} & IndexerFundingPaymentResponseObject;
 
 const getFundingPaymentsTableColumnDef = ({
   key,
@@ -144,7 +146,7 @@ const getFundingPaymentsTableColumnDef = ({
                 type={OutputType.Percent}
                 value={rate}
                 showSign={ShowSign.Negative}
-                fractionDigits={5}
+                fractionDigits={FUNDING_DECIMALS}
               />
             </TableCell>
           );

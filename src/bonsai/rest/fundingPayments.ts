@@ -3,29 +3,18 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
-import { IndexerFundingPaymentResponse } from '@/types/indexer/indexerApiGen';
+import {
+  IndexerFundingPaymentResponse,
+  IndexerFundingPaymentResponseObject,
+} from '@/types/indexer/indexerApiGen';
 
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { Loadable } from '../lib/loadable';
-import { mapLoadableData } from '../lib/mapLoadable';
 import { wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
-
-export type FundingPayment = {
-  createdAt: string;
-  createdAtHeight: string;
-  perpetualId: string;
-  ticker: string;
-  oraclePrice: string;
-  size: string;
-  side: string;
-  rate: string;
-  payment: string;
-  subaccountNumber: string;
-};
 
 export const useFundingPaymentsData = () => {
   const payments = useFundingPayments();
@@ -34,7 +23,7 @@ export const useFundingPaymentsData = () => {
   }, [payments.data]);
 };
 
-export const useFundingPayments = (): Loadable<FundingPayment[]> => {
+export const useFundingPayments = (): Loadable<IndexerFundingPaymentResponseObject[]> => {
   const { indexerClient, key: indexerKey } = useIndexerClient();
   const address = useAppSelector(getUserWalletAddress);
   const subaccountNumber = useAppSelector(getSubaccountId);
@@ -57,24 +46,11 @@ export const useFundingPayments = (): Loadable<FundingPayment[]> => {
           subaccountNumber
         );
 
-      return result.fundingPayments.reverse().map((funding) => ({
-        createdAt: funding.createdAt,
-        createdAtHeight: funding.createdAtHeight,
-        perpetualId: funding.perpetualId,
-        ticker: funding.ticker,
-        oraclePrice: funding.oraclePrice,
-        size: funding.size,
-        side: funding.side,
-        rate: funding.rate,
-        payment: funding.payment,
-        subaccountNumber: funding.subaccountNumber,
-      }));
+      return result.fundingPayments.reverse();
     }, 'fundingPayments'),
-    refetchInterval: timeUnits.hour,
+    refetchInterval: 10 * timeUnits.minute,
     staleTime: timeUnits.hour,
   });
 
-  const data = useMemo(() => fundingPaymentsQuery.data ?? [], [fundingPaymentsQuery.data]);
-
-  return mapLoadableData(queryResultToLoadable(fundingPaymentsQuery), () => data);
+  return queryResultToLoadable(fundingPaymentsQuery);
 };

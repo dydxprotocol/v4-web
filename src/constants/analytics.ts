@@ -144,6 +144,9 @@ export const AnalyticsEvents = unionize(
     ExportVaultTransfersCheckboxClick: ofType<{
       value: boolean;
     }>(),
+    ExportFundingPaymentsCheckboxClick: ofType<{
+      value: boolean;
+    }>(),
 
     // Navigation
     NavigatePage: ofType<{
