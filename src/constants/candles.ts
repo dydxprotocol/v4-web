@@ -1,6 +1,7 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
+import { STRING_KEYS } from './localization';
 import { timeUnits } from './time';
 
 export interface Candle {
@@ -118,3 +119,13 @@ export const RESOLUTION_CHART_CONFIGS = {
   '240': { defaultRange: 12 * timeUnits.day },
   '1D': { defaultRange: 2 * timeUnits.month },
 } as Record<ResolutionString, { defaultRange: number }>;
+
+export const RESOLUTION_STRING_TO_LABEL = {
+  '1': { value: '1' },
+  '5': { value: '5' },
+  '15': { value: '15' },
+  '30': { value: '30' },
+  '60': { value: '1', unitStringKey: STRING_KEYS.HOURS_ABBREVIATED },
+  '240': { value: '4', unitStringKey: STRING_KEYS.HOURS_ABBREVIATED },
+  '1D': { value: '1', unitStringKey: STRING_KEYS.DAYS_ABBREVIATED },
+} as Record<ResolutionString, { value: string; unitStringKey?: string }>;
