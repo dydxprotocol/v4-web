@@ -3,7 +3,7 @@
  * @export
  * @interface APIOrderStatus
  */
-export type IndexerAPIOrderStatus = IndexerOrderStatus | IndexerBestEffortOpenedStatus;
+export interface IndexerAPIOrderStatus {}
 /**
  *
  * @export
@@ -585,6 +585,104 @@ export enum IndexerFillType {
   LIQUIDATION = 'LIQUIDATION',
   DELEVERAGED = 'DELEVERAGED',
   OFFSETTING = 'OFFSETTING',
+}
+/**
+ *
+ * @export
+ * @interface FundingPaymentResponse
+ */
+export interface IndexerFundingPaymentResponse {
+  /**
+   *
+   * @type {number}
+   * @memberof FundingPaymentResponse
+   */
+  pageSize?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof FundingPaymentResponse
+   */
+  totalResults?: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof FundingPaymentResponse
+   */
+  offset?: number | null;
+  /**
+   *
+   * @type {Array<IndexerFundingPaymentResponseObject>}
+   * @memberof FundingPaymentResponse
+   */
+  fundingPayments: Array<IndexerFundingPaymentResponseObject>;
+}
+/**
+ *
+ * @export
+ * @interface FundingPaymentResponseObject
+ */
+export interface IndexerFundingPaymentResponseObject {
+  /**
+   *
+   * @type {IndexerIsoString}
+   * @memberof FundingPaymentResponseObject
+   */
+  createdAt: IndexerIsoString;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  createdAtHeight: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  perpetualId: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  ticker: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  oraclePrice: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  size: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  side: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  rate: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  payment: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  subaccountNumber: string;
 }
 /**
  *

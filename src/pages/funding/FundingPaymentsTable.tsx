@@ -1,0 +1,249 @@
+import { forwardRef, useMemo } from 'react';
+
+import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
+import { FundingPayment } from '@/bonsai/rest/fundingPayments';
+import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
+import type { ColumnSize } from '@react-types/table';
+import styled from 'styled-components';
+
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { NumberSign } from '@/constants/numbers';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
+
+import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { tradeViewMixins } from '@/styles/tradeViewMixins';
+
+import { Icon, IconName } from '@/components/Icon';
+import { OrderSideTag } from '@/components/OrderSideTag';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketSummaryTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
+import { TagSize } from '@/components/Tag';
+
+import { useAppSelector } from '@/state/appTypes';
+
+import { getHydratedFundingPayment } from '@/lib/fundingPayments';
+import { getNumberSign } from '@/lib/numbers';
+import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
+
+export enum FundingPaymentsTableColumnKey {
+  Time = 'Time',
+  Market = 'Market',
+  Side = 'Side',
+  OraclePrice = 'OraclePrice',
+  Size = 'Size',
+  Payment = 'Payment',
+  Rate = 'Rate',
+}
+
+export type FundingPaymentTableRow = {
+  marketSummary: Nullable<PerpetualMarketSummary>;
+  stepSizeDecimals: number;
+  tickSizeDecimals: number;
+} & FundingPayment;
+
+const getFundingPaymentsTableColumnDef = ({
+  key,
+  stringGetter,
+  width,
+}: {
+  key: FundingPaymentsTableColumnKey;
+  stringGetter: StringGetterFunction;
+  width?: ColumnSize;
+}): ColumnDef<FundingPaymentTableRow> => ({
+  width,
+  ...(
+    {
+      [FundingPaymentsTableColumnKey.Time]: {
+        columnKey: 'time',
+        getCellValue: (row) => row.createdAt,
+        label: stringGetter({ key: STRING_KEYS.TIME }),
+        renderCell: ({ createdAt }) => (
+          <div tw="column">
+            <Output
+              type={OutputType.Date}
+              dateOptions={{ format: 'medium' }}
+              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+              title=""
+            />
+            <TableCell>
+              <Output
+                type={OutputType.Time}
+                dateOptions={{ format: 'medium' }}
+                value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+                tw="text-color-text-0"
+              />
+            </TableCell>
+          </div>
+        ),
+      },
+      [FundingPaymentsTableColumnKey.Market]: {
+        columnKey: 'market',
+        getCellValue: (row) => row.ticker,
+        label: stringGetter({ key: STRING_KEYS.MARKET }),
+        renderCell: ({ marketSummary }) => (
+          <MarketSummaryTableCell marketSummary={marketSummary ?? undefined} />
+        ),
+      },
+      [FundingPaymentsTableColumnKey.Side]: {
+        columnKey: 'side',
+        getCellValue: (row) => row.side,
+        label: stringGetter({ key: STRING_KEYS.SIDE }),
+        renderCell: ({ side }) =>
+          side && <OrderSideTag orderSide={side as IndexerOrderSide} size={TagSize.Medium} />,
+      },
+      [FundingPaymentsTableColumnKey.OraclePrice]: {
+        columnKey: 'oraclePrice',
+        getCellValue: (row) => row.oraclePrice,
+        label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
+        renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+          <Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+        ),
+      },
+      [FundingPaymentsTableColumnKey.Size]: {
+        columnKey: 'size',
+        getCellValue: (row) => {
+          return row.size;
+        },
+        label: stringGetter({ key: STRING_KEYS.SIZE }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        renderCell: ({ marketSummary, size, stepSizeDecimals }) => {
+          return (
+            <TableCell>
+              <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
+              <Output type={OutputType.Text} value={marketSummary?.displayableAsset} />
+            </TableCell>
+          );
+        },
+      },
+      [FundingPaymentsTableColumnKey.Payment]: {
+        columnKey: 'payment',
+        getCellValue: (row) => row.payment,
+        label: stringGetter({ key: STRING_KEYS.PAYMENT }),
+        renderCell: ({ payment }) => {
+          return (
+            <TableCell>
+              <Output type={OutputType.Fiat} value={payment} showSign={ShowSign.Negative} />
+            </TableCell>
+          );
+        },
+      },
+      [FundingPaymentsTableColumnKey.Rate]: {
+        columnKey: 'rate',
+        getCellValue: (row) => row.rate,
+        label: stringGetter({ key: STRING_KEYS.RATE }),
+        renderCell: ({ rate }) => {
+          return (
+            <TableCell>
+              <$OutputSigned
+                sign={getNumberSign(rate)}
+                type={OutputType.Percent}
+                value={rate}
+                showSign={ShowSign.Negative}
+                fractionDigits={5}
+              />
+            </TableCell>
+          );
+        },
+      },
+    } satisfies Record<FundingPaymentsTableColumnKey, ColumnDef<FundingPaymentTableRow>>
+  )[key],
+});
+
+type ElementProps = {
+  columnKeys?: FundingPaymentsTableColumnKey[];
+  columnWidths?: Partial<Record<FundingPaymentsTableColumnKey, ColumnSize>>;
+  initialPageSize?: PageSize;
+};
+
+type StyleProps = {
+  withGradientCardRows?: boolean;
+  withOuterBorder?: boolean;
+  withInnerBorders?: boolean;
+};
+
+export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & StyleProps>(
+  (
+    {
+      columnKeys = [
+        FundingPaymentsTableColumnKey.Time,
+        FundingPaymentsTableColumnKey.Market,
+        FundingPaymentsTableColumnKey.Side,
+        FundingPaymentsTableColumnKey.OraclePrice,
+        FundingPaymentsTableColumnKey.Size,
+        FundingPaymentsTableColumnKey.Payment,
+        FundingPaymentsTableColumnKey.Rate,
+      ],
+      columnWidths,
+      initialPageSize,
+      withOuterBorder,
+      withInnerBorders = true,
+    }: ElementProps & StyleProps,
+    _ref
+  ) => {
+    const stringGetter = useStringGetter();
+
+    const { data: fundingPayments } = BonsaiHooks.useFundingPayments();
+
+    const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
+
+    const fundingPaymentsData = useMemo(
+      () =>
+        fundingPayments?.map(
+          (fundingPayment): FundingPaymentTableRow =>
+            getHydratedFundingPayment({
+              id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
+              data: fundingPayment,
+              marketSummaries,
+            })
+        ),
+      [fundingPayments, marketSummaries]
+    );
+
+    return (
+      <$Table
+        label="Funding Payments"
+        tableId="funding-payments"
+        data={fundingPaymentsData ?? []}
+        getRowKey={(row: FundingPaymentTableRow) => row.perpetualId + row.createdAtHeight}
+        columns={columnKeys.map((key: FundingPaymentsTableColumnKey) =>
+          getFundingPaymentsTableColumnDef({
+            key,
+            stringGetter,
+            width: columnWidths?.[key],
+          })
+        )}
+        slotEmpty={
+          <>
+            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+            <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}</h4>
+          </>
+        }
+        defaultSortDescriptor={{ column: 'time', direction: 'descending' }}
+        initialPageSize={initialPageSize}
+        withOuterBorder={withOuterBorder}
+        withInnerBorders={withInnerBorders}
+        withScrollSnapColumns
+        withScrollSnapRows
+        withFocusStickyRows
+      />
+    );
+  }
+);
+
+const $Table = styled(Table)`
+  ${tradeViewMixins.horizontalTable}
+` as typeof Table;
+
+const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    })[sign]};
+`;

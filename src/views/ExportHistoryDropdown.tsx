@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { useFundingPaymentsData } from '@/bonsai/rest/fundingPayments';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty } from 'lodash';
@@ -43,6 +44,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const [checkedTrades, setCheckedTrades] = useState(true);
   const [checkedTransfers, setCheckedTransfers] = useState(true);
   const [checkedVaultTransfers, setCheckedVaultTransfers] = useState(false);
+  const [checkedFundingPayments, setCheckedFundingPayments] = useState(false);
   const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
     useLocaleSeparators();
 
@@ -237,6 +239,68 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     selectedLocale,
   ]);
 
+  const allFundingPayments = useFundingPaymentsData();
+  const exportFundingPayments = useCallback(async () => {
+    if (dydxAddress && subaccountNumber !== undefined && allFundingPayments != null) {
+      const csvFundingPayments = allFundingPayments.map((payment) => {
+        return {
+          time: new Date(payment.createdAt).toLocaleString(selectedLocale, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          }),
+          market: payment.ticker,
+          side: payment.side,
+          oraclePrice: payment.oraclePrice,
+          size: payment.size,
+          payment: payment.payment,
+          rate: payment.rate,
+        };
+      });
+
+      exportCSV(csvFundingPayments, {
+        filename: 'funding-payments',
+        columnHeaders: [
+          {
+            key: 'time',
+            displayLabel: stringGetter({ key: STRING_KEYS.TIME }),
+          },
+          {
+            key: 'market',
+            displayLabel: stringGetter({ key: STRING_KEYS.MARKET }),
+          },
+          {
+            key: 'side',
+            displayLabel: stringGetter({ key: STRING_KEYS.SIDE }),
+          },
+          {
+            key: 'oraclePrice',
+            displayLabel: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
+          },
+          {
+            key: 'size',
+            displayLabel: stringGetter({ key: STRING_KEYS.SIZE }),
+          },
+          {
+            key: 'payment',
+            displayLabel: stringGetter({ key: STRING_KEYS.PAYMENT }),
+          },
+          {
+            key: 'rate',
+            displayLabel: stringGetter({ key: STRING_KEYS.RATE }),
+          },
+        ],
+      });
+    }
+  }, [
+    dydxAddress,
+    subaccountNumber,
+    allFundingPayments,
+    stringGetter,
+    LOCALE_DECIMAL_SEPARATOR,
+    LOCALE_GROUP_SEPARATOR,
+    selectedLocale,
+  ]);
+
   const { mutate: mutateExportTrades, isPending: isPendingExportTrades } = useMutation({
     mutationFn: exportTrades,
   });
@@ -248,6 +312,11 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const { mutate: mutateExportVaultTransfers, isPending: isPendingExportVaultTransfers } =
     useMutation({
       mutationFn: exportVaultTransfers,
+    });
+
+  const { mutate: mutateExportFundingPayments, isPending: isPendingExportFundingPayments } =
+    useMutation({
+      mutationFn: exportFundingPayments,
     });
 
   const exportData = useCallback(
@@ -266,6 +335,10 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         mutateExportVaultTransfers();
       }
 
+      if (checkedFundingPayments) {
+        mutateExportFundingPayments();
+      }
+
       track(
         AnalyticsEvents.ExportDownloadClick({
           trades: checkedTrades,
@@ -277,9 +350,11 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
       checkedTrades,
       checkedTransfers,
       checkedVaultTransfers,
+      checkedFundingPayments,
       mutateExportTrades,
       mutateExportTransfers,
       mutateExportVaultTransfers,
+      mutateExportFundingPayments,
     ]
   );
 
@@ -343,13 +418,37 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         },
         {
           label: (
+            <Checkbox
+              label={stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}
+              checked={checkedFundingPayments}
+              disabled={isEmpty(allFundingPayments)}
+              onCheckedChange={() => {
+                setCheckedFundingPayments(!checkedFundingPayments);
+
+                track(
+                  AnalyticsEvents.ExportVaultTransfersCheckboxClick({
+                    value: !checkedVaultTransfers,
+                  })
+                );
+              }}
+            />
+          ),
+          value: 'funding-payments',
+          onSelect: (e: Event) => e.preventDefault(),
+        },
+        {
+          label: (
             <Button
               state={{
                 isDisabled:
                   // disable if the hook data is still loading
                   (checkedVaultTransfers && allVaultTransfers == null) ||
+                  (checkedFundingPayments && allFundingPayments == null) ||
                   // or you selected nothing
-                  (!checkedTrades && !checkedTransfers && !checkedVaultTransfers),
+                  (!checkedTrades &&
+                    !checkedTransfers &&
+                    !checkedVaultTransfers &&
+                    !checkedFundingPayments),
                 isLoading:
                   isPendingExportTrades ||
                   isPendingExportTransfers ||

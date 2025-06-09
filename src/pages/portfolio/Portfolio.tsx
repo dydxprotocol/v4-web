@@ -39,6 +39,7 @@ import { openDialog } from '@/state/dialogs';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
+import { FundingPaymentsTable } from '../funding/FundingPaymentsTable';
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
 import { PortfolioNavMobile } from './PortfolioNavMobile';
 
@@ -155,7 +156,6 @@ const PortfolioPage = () => {
               />
             }
           />
-          {/* TODO - TRCL-1693
           <Route
             path={HistoryRoute.Payments}
             element={
@@ -164,7 +164,7 @@ const PortfolioPage = () => {
                 withOuterBorder={isNotTablet}
               />
             }
-          /> */}
+          />
         </Route>
         <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
       </Routes>
