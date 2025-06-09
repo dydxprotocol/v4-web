@@ -20,8 +20,8 @@ export const getHydratedFundingPayment = ({
     id,
     ...data,
     side: data.side === IndexerPositionSide.LONG ? OrderSide.BUY : OrderSide.SELL,
-    marketSummary: marketSummaries[data.ticker ?? ''],
-    stepSizeDecimals: marketSummaries[data.ticker ?? '']?.stepSizeDecimals ?? TOKEN_DECIMALS,
-    tickSizeDecimals: marketSummaries[data.ticker ?? '']?.tickSizeDecimals ?? USD_DECIMALS,
+    marketSummary: marketSummaries[data.ticker],
+    stepSizeDecimals: marketSummaries[data.ticker]?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: marketSummaries[data.ticker]?.tickSizeDecimals ?? USD_DECIMALS,
   };
 };
