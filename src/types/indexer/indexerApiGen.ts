@@ -3,7 +3,7 @@
  * @export
  * @interface APIOrderStatus
  */
-export interface IndexerAPIOrderStatus {}
+export type IndexerAPIOrderStatus = IndexerOrderStatus | IndexerBestEffortOpenedStatus;
 /**
  *
  * @export
