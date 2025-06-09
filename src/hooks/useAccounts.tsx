@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 
@@ -177,7 +178,7 @@ const useAccountsContext = () => {
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
-        const wallet = new LocalWallet();
+        const wallet = new (await getLazyLocalWallet())();
         wallet.address = sourceAccount.address;
         setLocalDydxWallet(wallet);
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
@@ -185,7 +186,9 @@ const useAccountsContext = () => {
         try {
           const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
           if (dydxOfflineSigner) {
-            setLocalDydxWallet(await LocalWallet.fromOfflineSigner(dydxOfflineSigner));
+            setLocalDydxWallet(
+              await (await getLazyLocalWallet()).fromOfflineSigner(dydxOfflineSigner)
+            );
             dispatch(setOnboardingState(OnboardingState.AccountConnected));
           }
         } catch (error) {
@@ -255,23 +258,33 @@ const useAccountsContext = () => {
       let osmosisWallet: LocalWallet | undefined;
       let neutronWallet: LocalWallet | undefined;
       if (hdKey?.mnemonic) {
-        nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
-        osmosisWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
-        neutronWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
+        nobleWallet = await (
+          await getLazyLocalWallet()
+        ).fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        osmosisWallet = await (
+          await getLazyLocalWallet()
+        ).fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
+        neutronWallet = await (
+          await getLazyLocalWallet()
+        ).fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
       }
 
       try {
         const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
         if (nobleOfflineSigner !== undefined) {
-          nobleWallet = await LocalWallet.fromOfflineSigner(nobleOfflineSigner);
+          nobleWallet = await (await getLazyLocalWallet()).fromOfflineSigner(nobleOfflineSigner);
         }
         const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
         if (osmosisOfflineSigner !== undefined) {
-          osmosisWallet = await LocalWallet.fromOfflineSigner(osmosisOfflineSigner);
+          osmosisWallet = await (
+            await getLazyLocalWallet()
+          ).fromOfflineSigner(osmosisOfflineSigner);
         }
         const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
         if (neutronOfflineSigner !== undefined) {
-          neutronWallet = await LocalWallet.fromOfflineSigner(neutronOfflineSigner);
+          neutronWallet = await (
+            await getLazyLocalWallet()
+          ).fromOfflineSigner(neutronOfflineSigner);
         }
 
         if (nobleWallet !== undefined) {

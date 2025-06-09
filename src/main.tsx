@@ -1,12 +1,11 @@
 import './polyfills';
 
-import { StrictMode } from 'react';
+import { lazy, StrictMode } from 'react';
 
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 
-import App from './App';
 import { storeLifecycles } from './bonsai/storeLifecycles';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
@@ -18,6 +17,11 @@ const Router = import.meta.env.VITE_ROUTER_TYPE === 'hash' ? HashRouter : Browse
 runFn(async () => {
   // we ignore the cleanups for now since we want these running forever
   storeLifecycles.forEach((fn) => fn(store));
+});
+
+// lazy import the app so we can start up bonsai before the app chugs into being
+const App = lazy(async () => {
+  return import('./App');
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

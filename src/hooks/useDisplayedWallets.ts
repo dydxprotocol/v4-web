@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { WalletType as CosmosWalletType } from 'graz';
+import { type WalletType as CosmosWalletType } from 'graz';
 
 import {
   COINBASE_MIPD_RDNS,
@@ -75,7 +75,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
     const keplrWallet = isKeplrDetected
       ? {
           connectorType: ConnectorType.Cosmos,
-          name: CosmosWalletType.KEPLR,
+          name: 'keplr' as CosmosWalletType.KEPLR,
         }
       : {
           connectorType: ConnectorType.DownloadWallet,

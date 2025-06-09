@@ -1,6 +1,6 @@
 import { type onboarding } from '@dydxprotocol/v4-client-js';
-import { WalletType as CosmosWalletType } from 'graz';
-import { EIP6963ProviderInfo } from 'mipd';
+import { type WalletType as CosmosWalletType } from 'graz';
+import { type EIP6963ProviderInfo } from 'mipd';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -54,7 +54,7 @@ export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
 
 export enum WalletType {
   CoinbaseWallet = 'COINBASE_WALLET',
-  Keplr = CosmosWalletType.KEPLR,
+  Keplr = 'keplr',
   OkxWallet = 'OKX_WALLET',
   WalletConnect2 = 'WALLETCONNECT_2',
   TestWallet = 'TEST_WALLET',
