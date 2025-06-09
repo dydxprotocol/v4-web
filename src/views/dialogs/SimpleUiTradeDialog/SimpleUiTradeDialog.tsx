@@ -234,13 +234,12 @@ export const SimpleUiTradeDialog = ({
       title={title}
       withClose={isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
       css={{
-        '--simpleUi-dialog-backgroundColor': 'var(--color-layer-1)',
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
-        '--dialog-backgroundColor': 'var(--simpleUi-dialog-backgroundColor)',
+        // When submitting and confirming we want a transparent header to not interfere with radial-gradient
         '--dialog-header-backgroundColor':
           currentStep === SimpleUiTradeDialogSteps.Edit
-            ? 'var(--simpleUi-dialog-backgroundColor)'
-            : 'transparent', // When submitting and confirming we want a transparent header to not interfere with radial-gradient
+            ? 'transparent'
+            : 'var(--dialog-header-backgroundColor)',
       }}
     >
       {isClosingPosition ? (

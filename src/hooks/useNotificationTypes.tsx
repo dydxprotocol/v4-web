@@ -640,9 +640,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
             if (isNumber(maybeNumber)) {
               return maybeNumber;
             }
-            return undefined;
+            return null;
           } catch (e) {
-            return undefined;
+            return null;
           }
         },
       });

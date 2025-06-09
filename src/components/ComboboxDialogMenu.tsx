@@ -4,8 +4,12 @@ import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
+import breakpoints from '@/styles/breakpoints';
+
 import { ComboboxMenu, type ComboboxMenuProps } from '@/components/ComboboxMenu';
 import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
+
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   title?: React.ReactNode;
@@ -106,6 +110,13 @@ const $Dialog = styled(Dialog)<{ $withSearch?: boolean }>`
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
   --comboboxDialogMenu-item-gap: 0.5rem;
   --comboboxDialogMenu-item-padding: 0.5rem 1rem;
+
+  @media ${breakpoints.tablet} {
+    ${testFlags.simpleUi &&
+    css`
+      --comboboxDialogMenu-backgroundColor: var(--color-layer-1);
+    `}
+  }
 
   /* Overrides */
   & {
