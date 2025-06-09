@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
@@ -15,13 +13,6 @@ import { Loadable } from '../lib/loadable';
 import { wrapAndLogBonsaiError } from '../logs';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 import { useIndexerClient } from './lib/useIndexer';
-
-export const useFundingPaymentsData = () => {
-  const payments = useFundingPayments();
-  return useMemo(() => {
-    return payments.data;
-  }, [payments.data]);
-};
 
 export const useFundingPayments = (): Loadable<IndexerFundingPaymentResponseObject[]> => {
   const { indexerClient, key: indexerKey } = useIndexerClient();

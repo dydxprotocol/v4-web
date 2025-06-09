@@ -205,7 +205,7 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient?.account.getParentSubaccountNumberFills(
+          indexerClient.account.getParentSubaccountNumberFills(
             address,
             subaccountNumber,
             undefined,
@@ -260,7 +260,7 @@ const useDydxClientContext = () => {
 
       const results = await Promise.all(
         pages.map((page) =>
-          indexerClient?.account.getParentSubaccountNumberTransfers(
+          indexerClient.account.getParentSubaccountNumberTransfers(
             address,
             subaccountNumber,
             pageSize,

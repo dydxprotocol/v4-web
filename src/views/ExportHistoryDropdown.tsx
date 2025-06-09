@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { useFundingPaymentsData } from '@/bonsai/rest/fundingPayments';
+import { BonsaiHooks } from '@/bonsai/ontology';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty } from 'lodash';
@@ -239,7 +239,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     selectedLocale,
   ]);
 
-  const allFundingPayments = useFundingPaymentsData();
+  const allFundingPayments = BonsaiHooks.useFundingPayments().data;
   const exportFundingPayments = useCallback(async () => {
     if (dydxAddress && subaccountNumber !== undefined && allFundingPayments != null) {
       const csvFundingPayments = allFundingPayments.map((payment) => {
@@ -314,10 +314,9 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
       mutationFn: exportVaultTransfers,
     });
 
-  const { mutate: mutateExportFundingPayments, isPending: isPendingExportFundingPayments } =
-    useMutation({
-      mutationFn: exportFundingPayments,
-    });
+  const { mutate: mutateExportFundingPayments } = useMutation({
+    mutationFn: exportFundingPayments,
+  });
 
   const exportData = useCallback(
     (e: Event) => {

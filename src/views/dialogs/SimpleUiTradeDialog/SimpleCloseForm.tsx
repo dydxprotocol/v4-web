@@ -193,7 +193,7 @@ export const SimpleCloseForm = ({
 
   const positionBefore = currentSizeBN;
   const positionAfterBN = MustBigNumber(summary.accountDetailsAfter?.position?.signedSize.abs());
-  const positionAfter = positionAfterBN?.toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
+  const positionAfter = positionAfterBN.toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
   const sideKey = currentPositionSide ? getIndexerPositionSideStringKey(currentPositionSide) : '';
   const sideColor = {
     [IndexerPositionSide.LONG]: 'var(--color-positive)',

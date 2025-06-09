@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { FUNDING_DECIMALS, NumberSign } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 import {
   IndexerFundingPaymentResponseObject,
   IndexerOrderSide,
@@ -163,7 +164,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
 };
@@ -210,7 +210,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
       <$Table
         label="Funding Payments"
         tableId="funding-payments"
-        data={fundingPaymentsData ?? []}
+        data={fundingPaymentsData ?? EMPTY_ARR}
         getRowKey={(row: FundingPaymentTableRow) => row.perpetualId + row.createdAtHeight}
         columns={columnKeys.map((key: FundingPaymentsTableColumnKey) =>
           getFundingPaymentsTableColumnDef({
