@@ -253,6 +253,9 @@ const $Container = styled(Content)<{
       --dialog-inset: 2px;
       --dialog-backgroundColor: var(--color-layer-1);
       --dialog-header-backgroundColor: var(--color-layer-1);
+      --dialog-paddingX: 1.25rem;
+      --dialog-header-paddingTop: 1.25rem;
+      --dialog-header-paddingBottom: 1.25rem;
     `}
   }
 
@@ -483,7 +486,16 @@ const $BackButton = styled(BackButton)`
 
 const $Title = tw(Title)`flex-1 font-large-medium text-color-text-2 overflow-hidden text-ellipsis`;
 
-const $Description = tw(Description)`mt-0.5 text-color-text-0 font-base-book`;
+const $Description = styled(Description)`
+  ${tw`mt-0.5 text-color-text-0 font-base-book`}
+
+  @media ${breakpoints.tablet} {
+    ${testFlags.simpleUi &&
+    css`
+      font: var(--font-small-book);
+    `}
+  }
+`;
 
 const $Footer = styled.footer<{ $withBorder: boolean }>`
   display: grid;
