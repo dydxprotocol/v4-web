@@ -8,7 +8,7 @@ const tabTriggerStyle = css`
   gap: 0.5ch;
 
   align-self: stretch;
-  padding: 0 1.5rem;
+  padding: var(--trigger-paddingY, 0) var(--trigger-paddingX, 1.5rem);
 
   font: var(--trigger-font, var(--font-base-book));
   color: var(--trigger-textColor);

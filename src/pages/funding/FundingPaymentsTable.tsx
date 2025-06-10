@@ -189,7 +189,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
   ) => {
     const stringGetter = useStringGetter();
 
-    const { data: fundingPayments } = BonsaiHooks.useFundingPayments();
+    const fundingPayments = BonsaiHooks.useFundingPayments().data;
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
@@ -221,7 +221,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
         )}
         slotEmpty={
           <>
-            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
+            <Icon iconName={IconName.Clock} tw="text-[3em]" />
             <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}</h4>
           </>
         }

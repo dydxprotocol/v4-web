@@ -23,18 +23,24 @@ export const SimpleUiHistory = () => {
   const matchVaultTransfers = useMatch(
     `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.VaultTransfers}`
   );
+  const matchPayments = useMatch(
+    `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Payments}`
+  );
 
   const currentRoute = useMemo(() => {
     if (matchTrades != null) return HistoryRoute.Trades;
     if (matchTransfers != null) return HistoryRoute.Transfers;
     if (matchVaultTransfers != null) return HistoryRoute.VaultTransfers;
-
+    if (matchPayments != null) return HistoryRoute.Payments;
     return HistoryRoute.Trades;
-  }, [matchTrades, matchTransfers, matchVaultTransfers]);
+  }, [matchTrades, matchTransfers, matchVaultTransfers, matchPayments]);
 
   const tabNavivator = (
     <TabNavigator
       value={currentRoute}
+      css={{
+        '--trigger-paddingX': 0,
+      }}
       items={[
         {
           value: HistoryRoute.Trades,
@@ -45,12 +51,12 @@ export const SimpleUiHistory = () => {
           label: stringGetter({ key: STRING_KEYS.ACCOUNT }),
         },
         {
-          value: HistoryRoute.VaultTransfers,
-          label: stringGetter({ key: STRING_KEYS.VAULT }),
+          value: HistoryRoute.Payments,
+          label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT }),
         },
         {
-          value: HistoryRoute.Payments,
-          label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS }),
+          value: HistoryRoute.VaultTransfers,
+          label: stringGetter({ key: STRING_KEYS.VAULT }),
         },
       ]}
       sharedContent={
