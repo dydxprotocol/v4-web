@@ -2,7 +2,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { FUNDING_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS, SMALL_USD_DECIMALS } from '@/constants/numbers';
 import {
   IndexerFundingPaymentResponseObject,
   IndexerPositionSide,
@@ -55,7 +55,7 @@ export const FundingTransferRow = ({
   );
 
   return (
-    <$TransferRow className={className}>
+    <$FundingRow className={className}>
       <div tw="row gap-0.75">
         <div
           tw="row size-2.25 justify-center rounded-0.5 bg-color-layer-3 text-color-text-2"
@@ -89,7 +89,7 @@ export const FundingTransferRow = ({
             withSignColor
             showSign={ShowSign.Both}
             value={paymentBN}
-            fractionDigits={TOKEN_DECIMALS}
+            fractionDigits={SMALL_USD_DECIMALS}
           />
           <Output
             type={OutputType.Percent}
@@ -104,11 +104,11 @@ export const FundingTransferRow = ({
           />
         </div>
       </div>
-    </$TransferRow>
+    </$FundingRow>
   );
 };
 
-const $TransferRow = styled.div`
+const $FundingRow = styled.div`
   ${tw`row w-full justify-between gap-0.5 px-1.25`}
   border-bottom: var(--default-border-width) solid var(--color-layer-3);
 `;
