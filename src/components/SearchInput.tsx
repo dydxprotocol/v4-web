@@ -64,11 +64,13 @@ const $Search = styled.div`
 `;
 const $IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
-  color: ${({ theme }) => theme.textSecondary};
+  color: var(--search-input-icon-color, ${({ theme }) => theme.textSecondary});
+  opacity: var(--search-input-icon-opacity, 1);
   width: 1.5rem;
   height: 1.5rem;
 `;
 
 const $Icon = styled(Icon)`
-  color: ${({ theme }) => theme.textSecondary};
+  color: var(--search-input-icon-color, ${({ theme }) => theme.textSecondary});
+  opacity: var(--search-input-icon-opacity, 1);
 `;

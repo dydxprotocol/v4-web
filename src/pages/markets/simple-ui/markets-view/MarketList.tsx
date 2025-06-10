@@ -328,11 +328,13 @@ export const MarketList = ({
         <button
           type="button"
           aria-label="Search"
-          tw="p-[0 0.75rem] row mx-1.25 h-[3.25rem] w-auto flex-1 cursor-pointer gap-0.5 rounded-[2.5rem] bg-color-layer-5 text-color-text-0 font-base-book"
+          tw="p-[0 0.75rem] row mx-1.25 h-[3.25rem] w-auto flex-1 cursor-pointer rounded-[2.5rem] bg-color-layer-4 font-base-book"
           onClick={() => setIsSearchOpen(true)}
         >
-          <Icon tw="scale-x-[-1] scale-y-[1]" iconName={IconName.Search} />
-          <span>{stringGetter({ key: STRING_KEYS.SEARCH })}...</span>
+          <span tw="row gap-0.5 text-color-text-2 opacity-50">
+            <Icon tw="scale-x-[-1] scale-y-[1]" iconName={IconName.Search} />
+            <span>{stringGetter({ key: STRING_KEYS.SEARCH })}...</span>
+          </span>
         </button>
       </div>
     </div>
