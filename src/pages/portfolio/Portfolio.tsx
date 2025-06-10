@@ -28,6 +28,7 @@ import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
+import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
 import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
@@ -89,9 +90,9 @@ const PortfolioPage = () => {
         <Route path={PortfolioRoute.History} element={<SimpleUiHistory />}>
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route path={HistoryRoute.Trades} element={<TradeHistoryList />} />
-
           <Route path={HistoryRoute.Transfers} element={<AccountHistoryList />} />
           <Route path={HistoryRoute.VaultTransfers} element={<VaultTransferList />} />
+          <Route path={HistoryRoute.Payments} element={<FundingHistoryList />} />
         </Route>
         <Route
           path="*"

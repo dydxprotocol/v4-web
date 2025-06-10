@@ -70,14 +70,14 @@ const getFundingPaymentsTableColumnDef = ({
             <Output
               type={OutputType.Date}
               dateOptions={{ format: 'medium' }}
-              value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+              value={new Date(createdAt).getTime()}
               title=""
             />
             <TableCell>
               <Output
                 type={OutputType.Time}
                 dateOptions={{ format: 'medium' }}
-                value={createdAt != null ? new Date(createdAt).getTime() : undefined}
+                value={new Date(createdAt).getTime()}
                 tw="text-color-text-0"
               />
             </TableCell>
@@ -189,7 +189,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
   ) => {
     const stringGetter = useStringGetter();
 
-    const { data: fundingPayments } = BonsaiHooks.useFundingPayments();
+    const fundingPayments = BonsaiHooks.useFundingPayments().data;
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
@@ -221,8 +221,8 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
         )}
         slotEmpty={
           <>
-            <Icon iconName={IconName.OrderPending} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}</h4>
+            <Icon iconName={IconName.Clock} tw="text-[3em]" />
+            <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
           </>
         }
         defaultSortDescriptor={{ column: 'time', direction: 'descending' }}
