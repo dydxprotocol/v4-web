@@ -20,6 +20,8 @@ import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 import { SortIcon } from '@/components/SortIcon';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setSimpleUISortMarketsBy } from '@/state/appUiConfigs';
+import { getSimpleUISortMarketsBy } from '@/state/appUiConfigsSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
@@ -31,14 +33,14 @@ import { PositionRow } from './PositionRow';
 
 const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
   switch (sortType) {
-    case MarketsSortType.Price:
-      return orderBy(markets, (market) => market.oraclePrice, ['desc']);
+    case MarketsSortType.MarketCap:
+      return orderBy(markets, (market) => market.marketCap ?? 0, ['desc']);
     case MarketsSortType.Volume:
       return orderBy(markets, (market) => market.volume24h ?? 0, ['desc']);
     case MarketsSortType.Gainers:
-      return orderBy(markets, (market) => market.percentChange24h, ['desc']);
+      return orderBy(markets, (market) => market.percentChange24h ?? 0, ['desc']);
     case MarketsSortType.Losers:
-      return orderBy(markets, (market) => market.percentChange24h, ['asc']);
+      return orderBy(markets, (market) => market.percentChange24h ?? 0, ['asc']);
     case MarketsSortType.Favorites:
       return orderBy(markets, (market) => market.isFavorite, ['desc']);
     default:
@@ -87,7 +89,14 @@ export const MarketList = ({
   const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState<string>();
-  const [sortType, setSortType] = useState<MarketsSortType>(MarketsSortType.Volume);
+  const sortType = useAppSelector(getSimpleUISortMarketsBy);
+
+  const setSortType = useCallback(
+    (newSortType: MarketsSortType) => {
+      dispatch(setSimpleUISortMarketsBy(newSortType));
+    },
+    [dispatch]
+  );
 
   // Markets and Filters
   const { filteredMarkets, hasMarketIds, marketFilters } = useMarketsData({
@@ -118,11 +127,11 @@ export const MarketList = ({
   const sortItems = useMemo(
     () => [
       {
-        label: stringGetter({ key: STRING_KEYS.PRICE }),
-        value: MarketsSortType.Price,
-        active: sortType === MarketsSortType.Price,
+        label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+        value: MarketsSortType.MarketCap,
+        active: sortType === MarketsSortType.MarketCap,
         icon: <Icon iconName={IconName.Price} />,
-        onSelect: () => setSortType(MarketsSortType.Price),
+        onSelect: () => setSortType(MarketsSortType.MarketCap),
       },
       {
         label: stringGetter({ key: STRING_KEYS.VOLUME }),

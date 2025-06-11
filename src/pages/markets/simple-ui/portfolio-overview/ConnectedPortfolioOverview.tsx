@@ -173,7 +173,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   );
 
   const portfolioBuyingPowerAndRisk = (
-    <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125 font-mini-book">
+    <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125 font-small-book">
       <div tw="row gap-0.25">
         <WithTooltip tooltip="buying-power-simple">
           <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}:</span>
