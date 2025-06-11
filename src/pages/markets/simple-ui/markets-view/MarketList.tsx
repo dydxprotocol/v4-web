@@ -237,7 +237,7 @@ export const MarketList = ({
         item: market,
       })),
     ],
-    [openPositions, sortedMarkets, stringGetter, slotTop, sortItems]
+    [openPositions, sortedMarkets, stringGetter, slotTop, sortItems, sortType]
   );
 
   const items = useMemo(() => {

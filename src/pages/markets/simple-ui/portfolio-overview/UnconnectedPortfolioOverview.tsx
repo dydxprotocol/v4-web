@@ -25,7 +25,7 @@ export const UnconnectedPortfolioOverview = ({ className }: { className?: string
 
   return (
     <div
-      tw="flexColumn relative justify-end border-b-[length:--border-width] border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
+      tw="flexColumn relative justify-end border-b-[1px] border-l-0 border-r-0 border-t-0 border-solid border-color-layer-3 py-1"
       css={{
         background: `url(${chartDotBackground}) no-repeat`,
         backgroundSize: '200%',
