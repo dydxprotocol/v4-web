@@ -212,6 +212,7 @@ export const UserMenuContent = () => {
           css={{
             '--button-border': 'none',
             '--button-height': '3rem',
+            '--button-padding': '0 1rem',
             borderRadius: 0,
             justifyContent: 'space-between',
             color: item.highlightColor ?? 'var(--color-text-1)',
