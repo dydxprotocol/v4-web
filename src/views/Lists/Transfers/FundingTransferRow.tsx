@@ -18,6 +18,8 @@ import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
+
 export const FundingTransferRow = ({
   className,
   fundingPayment,
@@ -67,18 +69,7 @@ export const FundingTransferRow = ({
         </div>
         <div tw="flexColumn">
           <span tw="text-color-text-2">{topRow}</span>
-          <span tw="leading-[0]">
-            <Output
-              tw="text-color-text-0 font-tiny-book"
-              type={OutputType.Time}
-              value={createdAt}
-            />{' '}
-            <Output
-              tw="text-color-text-0 font-tiny-book"
-              type={OutputType.Date}
-              value={createdAt}
-            />
-          </span>
+          <DateContent time={createdAt} />
         </div>
       </div>
 

@@ -46,11 +46,19 @@ export function formatDateOutput(
     // optional
     useUTC,
     dateFormat,
+    hour = '2-digit',
+    minute = '2-digit',
+    second = '2-digit',
+    hour12 = false,
   }: {
     selectedLocale: SupportedLocales;
 
     useUTC?: boolean;
     dateFormat?: 'full' | 'long' | 'medium' | 'short' | undefined;
+    hour?: 'numeric' | '2-digit' | 'none';
+    minute?: 'numeric' | '2-digit' | 'none';
+    second?: 'numeric' | '2-digit' | 'none';
+    hour12?: boolean | undefined;
   }
 ) {
   if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
@@ -66,10 +74,10 @@ export function formatDateOutput(
       timeZone: useUTC ? 'UTC' : undefined,
     }),
     [OutputType.Time]: date.toLocaleString(selectedLocale, {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+      hour12,
+      hour: hour === 'none' ? undefined : hour,
+      minute: minute === 'none' ? undefined : minute,
+      second: second === 'none' ? undefined : second,
       timeZone: useUTC ? 'UTC' : undefined,
     }),
   }[type];
@@ -304,6 +312,10 @@ type ElementProps = {
   };
   timeOptions?: {
     useUTC?: boolean;
+    hour?: 'numeric' | '2-digit' | 'none';
+    minute?: 'numeric' | '2-digit' | 'none';
+    second?: 'numeric' | '2-digit' | 'none';
+    hour12?: boolean | undefined;
   };
   dateOptions?: {
     format?: 'full' | 'long' | 'medium' | 'short' | undefined;
@@ -416,12 +428,18 @@ export const Output = ({
       const dateString = formatDateOutput(value, type, {
         useUTC: timeOptions?.useUTC,
         dateFormat: dateOptions?.format,
+        hour: timeOptions?.hour,
+        minute: timeOptions?.minute,
+        second: timeOptions?.second,
+        hour12: timeOptions?.hour12,
         selectedLocale,
       });
 
       return (
         <$Text key={value} title={title ?? `${value}${tag ? ` ${tag}` : ''}`} className={className}>
+          {slotLeft}
           {dateString}
+          {slotRight}
         </$Text>
       );
     }

@@ -50,7 +50,7 @@ export const VaultTransferRow = ({
         <div tw="flexColumn">
           <span tw="text-color-text-2">{typeString}</span>
           <Output
-            tw="text-color-text-0 font-tiny-book"
+            tw="text-color-text-0 font-mini-book"
             type={OutputType.Date}
             value={timestampMs}
           />

@@ -17,6 +17,7 @@ import { calc } from '@/lib/do';
 import { getIndexerOrderTypeStringKey } from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
 import { TradeNotificationRow } from './TradeNotificationRow';
 
 export const OrderCancelNotificationRow = ({
@@ -67,18 +68,7 @@ export const OrderCancelNotificationRow = ({
               <span tw="text-color-negative">{stringGetter({ key: orderStatusStringKey })}</span>
             </span>
 
-            <span tw="leading-[0]">
-              <Output
-                tw="text-color-text-0 font-tiny-book"
-                type={OutputType.Time}
-                value={timestamp}
-              />{' '}
-              <Output
-                tw="text-color-text-0 font-tiny-book"
-                type={OutputType.Date}
-                value={timestamp}
-              />
-            </span>
+            <DateContent time={timestamp} />
           </>
         ),
         slotRight: (

@@ -31,6 +31,7 @@ import {
 import { AttemptNumber, MustBigNumber } from '@/lib/numbers';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
 import { TradeNotificationRow } from './TradeNotificationRow';
 
 export const OrderStatusNotificationRow = ({
@@ -108,18 +109,7 @@ export const OrderStatusNotificationRow = ({
                     {displayableAsset}
                   </span>
 
-                  <span tw="leading-[0]">
-                    <Output
-                      tw="text-color-text-0 font-tiny-book"
-                      type={OutputType.Time}
-                      value={timestamp}
-                    />{' '}
-                    <Output
-                      tw="text-color-text-0 font-tiny-book"
-                      type={OutputType.Date}
-                      value={timestamp}
-                    />
-                  </span>
+                  <DateContent time={timestamp} />
                 </>
               ),
               slotRight: (

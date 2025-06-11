@@ -20,6 +20,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
 import { TradeNotificationRow } from './TradeNotificationRow';
 
 export const OrderNotificationRow = ({
@@ -86,10 +87,7 @@ export const OrderNotificationRow = ({
         {displayableAsset}
       </span>
 
-      <span tw="leading-[0] text-color-text-0 font-tiny-book">
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={timestamp} />{' '}
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={timestamp} />
-      </span>
+      <DateContent time={timestamp} />
     </>
   );
 

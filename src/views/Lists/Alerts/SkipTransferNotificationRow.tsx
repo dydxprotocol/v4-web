@@ -15,6 +15,7 @@ import { Transfer } from '@/state/transfers';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
+import { DateContent } from '../DateContent';
 import { UnseenIndicator } from './UnseenIndicator';
 
 export const SkipTransferNotificationRow = ({
@@ -70,18 +71,7 @@ export const SkipTransferNotificationRow = ({
         </div>
         <div tw="flexColumn">
           <span tw="text-color-text-2">{title}</span>
-          <span tw="leading-[0]">
-            <Output
-              tw="text-color-text-0 font-tiny-book"
-              type={OutputType.Time}
-              value={updatedAt}
-            />{' '}
-            <Output
-              tw="text-color-text-0 font-tiny-book"
-              type={OutputType.Date}
-              value={updatedAt}
-            />
-          </span>
+          <DateContent time={updatedAt} />
         </div>
       </div>
 
