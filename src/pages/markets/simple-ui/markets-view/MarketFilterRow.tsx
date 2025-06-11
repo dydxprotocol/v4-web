@@ -60,6 +60,10 @@ const MarketFilterRow = ({
       <div tw="flexColumn gap-1">
         <SearchInput
           tw="w-full"
+          css={{
+            '--search-input-icon-color': 'var(--color-text-2)',
+            '--search-input-icon-opacity': 0.5,
+          }}
           placeholder={`${stringGetter({ key: STRING_KEYS.SEARCH })}...`}
           onTextChange={setSearchFilter}
         />

@@ -212,6 +212,7 @@ export const UserMenuContent = () => {
           css={{
             '--button-border': 'none',
             '--button-height': '3rem',
+            '--button-padding': '0 1rem',
             borderRadius: 0,
             justifyContent: 'space-between',
             color: item.highlightColor ?? 'var(--color-text-1)',
@@ -241,7 +242,7 @@ const $UserContent = styled.div`
   flex-direction: column;
   gap: 1rem;
   border-radius: 1rem;
-  border: solid var(--default-border-width) var(--color-border);
+  border: solid 1.6px var(--color-layer-2);
   padding: 1rem;
 `;
 
