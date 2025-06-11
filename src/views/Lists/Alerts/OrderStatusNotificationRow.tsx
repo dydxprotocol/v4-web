@@ -84,7 +84,7 @@ export const OrderStatusNotificationRow = ({
             const size =
               order?.totalFilled ?? sum(fills.map((f) => AttemptNumber(f.size)).filter(isPresent));
             const sizeBN = MustBigNumber(size);
-            const shouldCompact = (stepSizeDecimals ?? 0) >= 1 && sizeBN.gte(100_000);
+            const shouldCompact = (stepSizeDecimals ?? 0) >= 0 && sizeBN.gte(100_000);
             const firstFill = fills.at(0);
             const side = firstFill?.side;
             const sideColor =
