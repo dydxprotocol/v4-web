@@ -68,7 +68,9 @@ const sortPositions = (
       return orderBy(positions, (position) => position.updatedUnrealizedPnlPercent ?? 0, ['desc']);
     case PositionSortType.Leverage: {
       const getMarginUsage = (marginValueInitial: BigNumber) =>
-        subaccountEquity ? marginValueInitial.div(subaccountEquity).toNumber() : undefined;
+        subaccountEquity != null && subaccountEquity !== 0
+          ? marginValueInitial.div(subaccountEquity).toNumber()
+          : undefined;
 
       return orderBy(positions, (position) => getMarginUsage(position.marginValueInitial) ?? 0, [
         'desc',

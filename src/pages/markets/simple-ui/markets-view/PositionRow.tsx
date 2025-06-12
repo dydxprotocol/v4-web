@@ -58,9 +58,10 @@ export const PositionRow = ({
   const slotRight = calc(() => {
     switch (positionSortType) {
       case PositionSortType.Leverage: {
-        const marginUsage = subaccountEquity
-          ? position.marginValueInitial.div(subaccountEquity).toNumber()
-          : undefined;
+        const marginUsage =
+          subaccountEquity != null && subaccountEquity !== 0
+            ? position.marginValueInitial.div(subaccountEquity).toNumber()
+            : undefined;
 
         return (
           <div tw="flex flex-col items-end gap-0.25 text-end">
