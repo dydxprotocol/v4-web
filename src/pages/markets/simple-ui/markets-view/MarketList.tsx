@@ -63,9 +63,13 @@ const sortPositions = (
 ) => {
   switch (sortType) {
     case PositionSortType.Notional:
-      return orderBy(positions, (position) => position.notional, ['desc']);
+      return orderBy(positions, (position) => position.notional.toNumber(), ['desc']);
     case PositionSortType.Pnl:
-      return orderBy(positions, (position) => position.updatedUnrealizedPnlPercent ?? 0, ['desc']);
+      return orderBy(
+        positions,
+        (position) => position.updatedUnrealizedPnlPercent?.toNumber() ?? 0,
+        ['desc']
+      );
     case PositionSortType.Leverage: {
       const getMarginUsage = (marginValueInitial: BigNumber) =>
         subaccountEquity != null && subaccountEquity !== 0
