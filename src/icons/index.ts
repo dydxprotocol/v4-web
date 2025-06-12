@@ -71,6 +71,7 @@ export { default as Pencil2Icon } from './pencil2.svg';
 export { default as PlayIcon } from './play.svg';
 export { default as PlusIcon } from './plus.svg';
 export { default as PortfolioIcon } from './portfolio.svg';
+export { default as PositionIcon } from './position.svg';
 export { default as PositionsIcon } from './positions.svg';
 export { default as PriceChartIcon } from './price-chart.svg';
 export { default as PriceIcon } from './price.svg';

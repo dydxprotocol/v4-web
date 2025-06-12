@@ -219,10 +219,10 @@ export const MarketList = ({
         onSelect: () => setPositionSortType(PositionSortType.Price),
       },
       {
-        label: stringGetter({ key: STRING_KEYS.SIZE }),
+        label: stringGetter({ key: STRING_KEYS.POSITION }),
         value: PositionSortType.Notional,
         active: positionSortType === PositionSortType.Notional,
-        icon: <Icon iconName={IconName.Volume} />,
+        icon: <Icon iconName={IconName.Position} />,
         onSelect: () => setPositionSortType(PositionSortType.Notional),
       },
       {
