@@ -10,9 +10,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 
 import { getIndexerPositionSideStringKey } from '@/lib/enumToStringKeyHelpers';
+import { MustBigNumber } from '@/lib/numbers';
 
 export const PositionRow = ({
   className,
@@ -29,16 +31,19 @@ export const PositionRow = ({
 
   if (!market) return null;
 
-  const percentChangeColor = market.percentChange24h
-    ? market.percentChange24h >= 0
-      ? 'var(--color-positive)'
-      : 'var(--color-negative)'
-    : 'var(--color-text-1)';
+  const pnlColor = position.updatedUnrealizedPnl.gt(0)
+    ? 'var(--color-positive)'
+    : position.updatedUnrealizedPnl.lt(0)
+      ? 'var(--color-negative)'
+      : 'var(--color-text-1)';
 
   const sideString = stringGetter({ key: getIndexerPositionSideStringKey(position.side) });
 
   const sideColor =
     position.side === IndexerPositionSide.LONG ? 'var(--color-positive)' : 'var(--color-negative)';
+
+  const shouldCompact =
+    market.stepSizeDecimals >= 0 && MustBigNumber(position.signedSize).abs().gte(100_000);
 
   return (
     <Link
@@ -52,17 +57,25 @@ export const PositionRow = ({
           <TrendIcon positionSide={position.side} tw="absolute bottom-[-3px] right-[-4px]" />
         </div>
         <div tw="flexColumn gap-0.25">
-          <span tw="whitespace-nowrap leading-[1rem]">
-            <span tw="mr-0.25" css={{ color: sideColor }}>
-              {sideString}
-            </span>
+          <span tw="row gap-0.25 whitespace-nowrap leading-[1rem]">
             {market.displayableAsset}
+            <Tag tw="bg-color-layer-4">
+              <Output
+                type={OutputType.Multiple}
+                value={position.leverage}
+                tw="text-color-text-1"
+                fractionDigits={0}
+              />
+            </Tag>
           </span>
-          <Output
-            tw="text-color-text-1 font-mini-book"
-            type={OutputType.Fiat}
-            value={position.notional}
-          />
+          <span tw="row gap-0.25 font-small-book">
+            <span css={{ color: sideColor }}>{sideString}</span>
+            <Output
+              tw="text-color-text-0"
+              type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
+              value={position.signedSize}
+            />
+          </span>
         </div>
       </div>
 
@@ -71,17 +84,28 @@ export const PositionRow = ({
           tw="text-color-text-2"
           withSubscript
           type={OutputType.Fiat}
-          value={market.oraclePrice}
-          fractionDigits={market.tickSizeDecimals}
+          value={position.notional}
         />
-        <Output
-          tw="font-mini-book"
+        <span
+          tw="row gap-0.25 text-color-text-1 font-small-book"
           css={{
-            color: percentChangeColor,
+            color: pnlColor,
           }}
-          type={OutputType.Percent}
-          value={market.percentChange24h}
-        />
+        >
+          <Output
+            showSign={ShowSign.Both}
+            type={OutputType.Fiat}
+            value={position.updatedUnrealizedPnl}
+          />
+          {position.updatedUnrealizedPnlPercent && (
+            <Output
+              type={OutputType.Percent}
+              value={position.updatedUnrealizedPnlPercent}
+              slotLeft="("
+              slotRight=")"
+            />
+          )}
+        </span>
       </div>
     </Link>
   );
