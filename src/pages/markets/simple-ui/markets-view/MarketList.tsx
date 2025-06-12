@@ -6,7 +6,7 @@ import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 import orderBy from 'lodash/orderBy';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ListItem, MarketsSortType, PositionSortType } from '@/constants/marketList';
 import { MarketData, MarketFilters } from '@/constants/markets';
@@ -290,22 +290,26 @@ export const MarketList = ({
               isSticky: true,
               slotRight: (
                 <div tw="row mb-[-6px] gap-0.5">
-                  <span tw="text-color-text-0 font-small-book">
-                    {sortItems.find((item) => item.value === sortType)?.label}
-                  </span>
                   <SimpleUiDropdownMenu
                     align="end"
                     tw="z-1"
                     items={positionSortItems}
-                    slotTop={<span tw="text-color-text-0 font-small-book">View by</span>}
+                    slotTop={
+                      <span tw="text-color-text-0 font-small-book">
+                        {stringGetter({ key: STRING_KEYS.VIEW })}
+                      </span>
+                    }
                     side="bottom"
                   >
                     <Button
-                      tw="size-2 min-w-2"
-                      shape={ButtonShape.Circle}
-                      size={ButtonSize.XXSmall}
+                      tw="pr-0"
+                      size={ButtonSize.Small}
+                      buttonStyle={ButtonStyle.WithoutBackground}
                     >
-                      <Icon iconName={IconName.Filter} />
+                      <span tw="text-color-text-0 font-small-book">
+                        {positionSortItems.find((item) => item.value === positionSortType)?.label}
+                      </span>
+                      <Icon tw="size-1 min-w-1" iconName={IconName.Filter} />
                     </Button>
                   </SimpleUiDropdownMenu>
                 </div>
@@ -345,7 +349,16 @@ export const MarketList = ({
         item: market,
       })),
     ],
-    [sortedPositions, sortedMarkets, stringGetter, slotTop, sortItems, sortType]
+    [
+      sortedPositions,
+      sortedMarkets,
+      stringGetter,
+      slotTop,
+      positionSortItems,
+      positionSortType,
+      sortItems,
+      sortType,
+    ]
   );
 
   const items = useMemo(() => {
