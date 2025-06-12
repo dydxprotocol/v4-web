@@ -219,6 +219,13 @@ export const MarketList = ({
         onSelect: () => setPositionSortType(PositionSortType.Price),
       },
       {
+        label: stringGetter({ key: STRING_KEYS.PNL }),
+        value: PositionSortType.Pnl,
+        active: positionSortType === PositionSortType.Pnl,
+        icon: <Icon iconName={IconName.TrendingUp} />,
+        onSelect: () => setPositionSortType(PositionSortType.Pnl),
+      },
+      {
         label: stringGetter({ key: STRING_KEYS.POSITION }),
         value: PositionSortType.Notional,
         active: positionSortType === PositionSortType.Notional,
@@ -226,18 +233,11 @@ export const MarketList = ({
         onSelect: () => setPositionSortType(PositionSortType.Notional),
       },
       {
-        label: stringGetter({ key: STRING_KEYS.MARGIN_USED }),
+        label: stringGetter({ key: STRING_KEYS.MARGIN_USAGE }),
         value: PositionSortType.Leverage,
         active: positionSortType === PositionSortType.Leverage,
         icon: <Icon iconName={IconName.Margin} />,
         onSelect: () => setPositionSortType(PositionSortType.Leverage),
-      },
-      {
-        label: stringGetter({ key: STRING_KEYS.PNL }),
-        value: PositionSortType.Pnl,
-        active: positionSortType === PositionSortType.Pnl,
-        icon: <Icon iconName={IconName.TrendingUp} />,
-        onSelect: () => setPositionSortType(PositionSortType.Pnl),
       },
     ],
     [stringGetter, positionSortType, setPositionSortType]
