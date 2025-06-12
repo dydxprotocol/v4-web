@@ -4,6 +4,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import BigNumber from 'bignumber.js';
 import orderBy from 'lodash/orderBy';
 
 import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
@@ -21,6 +22,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 import { SortIcon } from '@/components/SortIcon';
 
+import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSimpleUISortMarketsBy, setSimpleUISortPositionsBy } from '@/state/appUiConfigs';
 import {
@@ -56,6 +58,7 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
 const sortPositions = (
   positions: SubaccountPosition[],
   marketData: MarketData[],
+  subaccountEquity: number | undefined,
   sortType: PositionSortType
 ) => {
   switch (sortType) {
@@ -63,8 +66,14 @@ const sortPositions = (
       return orderBy(positions, (position) => position.notional, ['desc']);
     case PositionSortType.Pnl:
       return orderBy(positions, (position) => position.updatedUnrealizedPnlPercent ?? 0, ['desc']);
-    case PositionSortType.Leverage:
-      return orderBy(positions, (position) => position.leverage ?? 0, ['desc']);
+    case PositionSortType.Leverage: {
+      const getMarginUsage = (marginValueInitial: BigNumber) =>
+        subaccountEquity ? marginValueInitial.div(subaccountEquity).toNumber() : undefined;
+
+      return orderBy(positions, (position) => getMarginUsage(position.marginValueInitial) ?? 0, [
+        'desc',
+      ]);
+    }
     case PositionSortType.Price:
       return orderBy(
         positions,
@@ -122,6 +131,7 @@ export const MarketList = ({
   const [searchFilter, setSearchFilter] = useState<string>();
   const sortType = useAppSelector(getSimpleUISortMarketsBy);
   const positionSortType = useAppSelector(getSimpleUISortPositionsBy);
+  const subaccountEquity = useAppSelector(getSubaccountEquity);
   const setSortType = useCallback(
     (newSortType: MarketsSortType) => {
       dispatch(setSimpleUISortMarketsBy(newSortType));
@@ -165,6 +175,7 @@ export const MarketList = ({
   const sortedPositions = sortPositions(
     openPositions ?? EMPTY_ARR,
     filteredMarkets,
+    subaccountEquity,
     positionSortType
   );
 
