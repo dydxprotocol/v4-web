@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { AnalyticsEvents } from '@/constants/analytics';
+import { MarketsSortType } from '@/constants/marketList';
 import { DisplayUnit } from '@/constants/trade';
 
 import { track } from '@/lib/analytics/analytics';
@@ -39,6 +40,9 @@ export interface AppUIConfigsState {
   favoritedMarkets: string[];
   horizontalPanelHeightPx: number;
   tablePageSizes: { [tableKey: string]: number };
+  simpleUI: {
+    sortMarketsBy: MarketsSortType;
+  };
 }
 
 export const initialState: AppUIConfigsState = {
@@ -51,6 +55,9 @@ export const initialState: AppUIConfigsState = {
   favoritedMarkets: [],
   horizontalPanelHeightPx: 288,
   tablePageSizes: {},
+  simpleUI: {
+    sortMarketsBy: MarketsSortType.MarketCap,
+  },
 };
 
 export const appUiConfigsSlice = createSlice({
@@ -117,6 +124,12 @@ export const appUiConfigsSlice = createSlice({
     ) => {
       state.tablePageSizes[tableId] = pageSize;
     },
+    setSimpleUISortMarketsBy: (
+      state: AppUIConfigsState,
+      { payload }: PayloadAction<MarketsSortType>
+    ) => {
+      state.simpleUI.sortMarketsBy = payload;
+    },
   },
 });
 
@@ -131,4 +144,5 @@ export const {
   unfavoriteMarket,
   setHorizontalPanelHeightPx,
   setTablePageSize,
+  setSimpleUISortMarketsBy,
 } = appUiConfigsSlice.actions;

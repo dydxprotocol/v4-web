@@ -59,7 +59,7 @@ export const AccountTransferRow = ({
         </div>
         <div tw="flexColumn">
           <span tw="text-color-text-2">{typeString}</span>
-          <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={createdAt} />
+          <Output tw="text-color-text-0 font-mini-book" type={OutputType.Date} value={createdAt} />
         </div>
       </div>
 
@@ -75,7 +75,7 @@ export const AccountTransferRow = ({
             value={value}
             slotRight={symbol === 'USDC' ? null : <span>{symbol}</span>}
           />
-          <span tw="text-color-text-0 font-small-book">{transferString}</span>
+          <span tw="text-color-text-0 font-mini-book">{transferString}</span>
         </div>
         <Link
           tw="text-color-text-0"

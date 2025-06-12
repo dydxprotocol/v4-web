@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 import { SubaccountPosition } from '../bonsai/types/summaryTypes';
-import { MarketData } from './markets';
+import type { MarketData } from './markets';
 
 export type CustomItem = {
   itemType: 'custom';
@@ -32,7 +32,7 @@ export type ListItem = (PositionItem | HeaderItem | MarketItem | CustomItem) & {
 };
 
 export enum MarketsSortType {
-  Price = 'price',
+  MarketCap = 'market-cap',
   Volume = 'volume',
   Gainers = 'gainers',
   Losers = 'losers',

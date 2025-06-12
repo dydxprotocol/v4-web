@@ -23,6 +23,8 @@ import {
 } from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
+
 export const TradeRow = ({
   className,
   fill,
@@ -101,10 +103,7 @@ export const TradeRow = ({
         />{' '}
         {displayableAsset}
       </span>
-      <span tw="leading-[0]">
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={time} />{' '}
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={time} />
-      </span>
+      <DateContent time={time} />
     </>
   );
 

@@ -8,12 +8,15 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -29,6 +32,7 @@ import { useTradeTypeOptions } from '@/views/forms/TradeForm/useTradeTypeOptions
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setDisplayUnit } from '@/state/appUiConfigs';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
+import { openDialog } from '@/state/dialogs';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
@@ -57,6 +61,7 @@ export const SimpleTradeForm = ({
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const tradeValues = useAppSelector(getTradeFormValues);
   const fullFormSummary = useAppSelector(getTradeFormSummary);
+  const { complianceState } = useComplianceState();
   const { summary } = fullFormSummary;
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
@@ -312,7 +317,26 @@ export const SimpleTradeForm = ({
 
   const inputConfig = inputConfigs[displayUnit];
 
-  const placeOrderButton = (
+  const isDepositNeeded =
+    summary.accountDetailsBefore?.account?.freeCollateral.lte(0) &&
+    complianceState === ComplianceStates.FULL_ACCESS;
+
+  const onDepositFunds = () => {
+    dispatch(openDialog(DialogTypes.Deposit2({})));
+    onClose();
+  };
+
+  const placeOrderButton = isDepositNeeded ? (
+    <Button
+      type={ButtonType.Button}
+      action={ButtonAction.Primary}
+      tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
+      size={ButtonSize.Medium}
+      onClick={onDepositFunds}
+    >
+      {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+    </Button>
+  ) : (
     <Button
       type={ButtonType.Button}
       action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}

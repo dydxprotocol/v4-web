@@ -9,6 +9,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 export const MarketRow = ({ className, market }: { className?: string; market: MarketData }) => {
   const stringGetter = useStringGetter();
 
@@ -17,6 +19,9 @@ export const MarketRow = ({ className, market }: { className?: string; market: M
       ? 'var(--color-positive)'
       : 'var(--color-negative)'
     : 'var(--color-text-1)';
+
+  const priceBN = MustBigNumber(market.oraclePrice);
+  const shouldCompact = market.tickSizeDecimals === 0 && priceBN.gte(10_000);
 
   return (
     <Link
@@ -47,7 +52,7 @@ export const MarketRow = ({ className, market }: { className?: string; market: M
         <Output
           tw="text-color-text-2"
           withSubscript
-          type={OutputType.Fiat}
+          type={shouldCompact ? OutputType.CompactFiat : OutputType.Fiat}
           value={market.oraclePrice}
           fractionDigits={market.tickSizeDecimals}
         />

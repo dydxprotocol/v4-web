@@ -65,3 +65,7 @@ export const getSavedTablePageSize = createAppSelector(
   [(state) => state.appUiConfigs.tablePageSizes, (_s, id: string) => id],
   (pageSizes, id) => pageSizes[id]
 );
+
+// Simple UI
+export const getSimpleUISortMarketsBy = (state: RootState) =>
+  state.appUiConfigs.simpleUI.sortMarketsBy;

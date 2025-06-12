@@ -20,6 +20,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { DateContent } from '../DateContent';
 import { TradeNotificationRow } from './TradeNotificationRow';
 
 export const OrderNotificationRow = ({
@@ -50,6 +51,8 @@ export const OrderNotificationRow = ({
 
   const { logo } = orEmptyObj(assetInfo);
   const { displayableAsset, stepSizeDecimals, tickSizeDecimals } = orEmptyObj(marketData);
+  const sizeBN = MustBigNumber(size);
+  const shouldCompact = (stepSizeDecimals ?? 0) >= 0 && sizeBN.gte(100_000);
 
   const { avgFillPrice, sideString, sideColor, notionalFill } = useMemo(() => {
     const priceBN = MustBigNumber(price);
@@ -60,7 +63,7 @@ export const OrderNotificationRow = ({
       sideColor: side === IndexerOrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)',
       typeString: stringGetter({ key: getIndexerOrderTypeStringKey(type) }),
       notionalFill: notionalFillBN.gt(0) ? notionalFillBN : undefined,
-      avgFillPrice: getAverageFillPrice(relevantFills),
+      avgFillPrice: getAverageFillPrice(relevantFills) ?? priceBN,
     };
   }, [side, type, price, relevantFills, size, stringGetter]);
 
@@ -79,17 +82,14 @@ export const OrderNotificationRow = ({
         <span css={{ color: sideColor }}>{sideString}</span>{' '}
         <Output
           tw="inline"
-          type={OutputType.Number}
+          type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
           value={size}
           fractionDigits={stepSizeDecimals}
         />{' '}
         {displayableAsset}
       </span>
 
-      <span tw="leading-[0] text-color-text-0 font-tiny-book">
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Time} value={timestamp} />{' '}
-        <Output tw="text-color-text-0 font-tiny-book" type={OutputType.Date} value={timestamp} />
-      </span>
+      <DateContent time={timestamp} />
     </>
   );
 
