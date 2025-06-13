@@ -58,7 +58,7 @@ export const initialState: AppUIConfigsState = {
   tablePageSizes: {},
   simpleUI: {
     sortMarketsBy: MarketsSortType.MarketCap,
-    sortPositionsBy: PositionSortType.Notional,
+    sortPositionsBy: PositionSortType.Pnl,
   },
 };
 
