@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { MarketsSortType } from '@/constants/marketList';
+import { MarketsSortType, PositionSortType } from '@/constants/marketList';
 import { DisplayUnit } from '@/constants/trade';
 
 import { track } from '@/lib/analytics/analytics';
@@ -42,6 +42,7 @@ export interface AppUIConfigsState {
   tablePageSizes: { [tableKey: string]: number };
   simpleUI: {
     sortMarketsBy: MarketsSortType;
+    sortPositionsBy: PositionSortType;
   };
 }
 
@@ -57,6 +58,7 @@ export const initialState: AppUIConfigsState = {
   tablePageSizes: {},
   simpleUI: {
     sortMarketsBy: MarketsSortType.MarketCap,
+    sortPositionsBy: PositionSortType.Pnl,
   },
 };
 
@@ -130,6 +132,12 @@ export const appUiConfigsSlice = createSlice({
     ) => {
       state.simpleUI.sortMarketsBy = payload;
     },
+    setSimpleUISortPositionsBy: (
+      state: AppUIConfigsState,
+      { payload }: PayloadAction<PositionSortType>
+    ) => {
+      state.simpleUI.sortPositionsBy = payload;
+    },
   },
 });
 
@@ -145,4 +153,5 @@ export const {
   setHorizontalPanelHeightPx,
   setTablePageSize,
   setSimpleUISortMarketsBy,
+  setSimpleUISortPositionsBy,
 } = appUiConfigsSlice.actions;

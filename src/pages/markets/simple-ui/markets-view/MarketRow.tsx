@@ -36,7 +36,7 @@ export const MarketRow = ({ className, market }: { className?: string; market: M
             {market.displayableAsset}
           </span>
           <Output
-            tw="text-color-text-1 font-mini-book"
+            tw="text-color-text-1 font-small-book"
             type={OutputType.CompactFiat}
             value={market.marketCap}
             slotLeft={
@@ -57,7 +57,7 @@ export const MarketRow = ({ className, market }: { className?: string; market: M
           fractionDigits={market.tickSizeDecimals}
         />
         <Output
-          tw="font-mini-book"
+          tw="font-small-book"
           css={{
             color: percentChangeColor,
           }}

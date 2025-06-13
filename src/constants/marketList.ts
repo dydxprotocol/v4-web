@@ -38,3 +38,10 @@ export enum MarketsSortType {
   Losers = 'losers',
   Favorites = 'favorites',
 }
+
+export enum PositionSortType {
+  Price = 'price',
+  Notional = 'notional',
+  Pnl = 'pnl',
+  Leverage = 'leverage',
+}
