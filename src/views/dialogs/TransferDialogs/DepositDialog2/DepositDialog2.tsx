@@ -110,8 +110,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
         />
       )}
       {!currentDeposit && (
-        <div tw="w-[100%] overflow-hidden">
-          <div tw="flex w-[200%]">
+        <div tw="h-full w-full overflow-hidden">
+          <div tw="flex h-full w-[200%]">
             <div
               tw="w-[50%]"
               style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
@@ -131,7 +131,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               style={{
                 pointerEvents: formState === 'form' ? 'none' : undefined,
                 height: formState === 'form' ? 0 : '100%',
-                maxHeight: isMobile ? '50vh' : '30rem',
+                maxHeight: isMobile ? undefined : '30rem',
               }}
             >
               <TokenSelect
