@@ -18,14 +18,22 @@ type StyleProps = {
     cells?: Parameters<typeof Cuer.Cells>[0];
     finder?: Parameters<typeof Cuer.Finder>[0];
   };
+  imgOverride?: {
+    src: string;
+    alt: string;
+  };
 };
 
 const DARK_LOGO_MARK_URL = '/logos/logo-mark-dark.svg';
 const LIGHT_LOGO_MARK_URL = '/logos/logo-mark-light.svg';
 
 export const QrCode = memo(
-  ({ className, value, hasLogo, size = 300, options }: ElementProps & StyleProps) => {
+  ({ className, value, hasLogo, imgOverride, size = 300, options }: ElementProps & StyleProps) => {
     const appTheme: AppTheme = useAppSelector(getAppTheme);
+
+    const alt = imgOverride?.alt ?? 'logo';
+    const src =
+      imgOverride?.src ?? (appTheme === AppTheme.Light ? DARK_LOGO_MARK_URL : LIGHT_LOGO_MARK_URL);
 
     return (
       <Cuer.Root className={className} size={size} value={value}>
@@ -34,8 +42,8 @@ export const QrCode = memo(
         {hasLogo && (
           <Cuer.Arena>
             <img
-              alt="logo"
-              src={appTheme === AppTheme.Light ? DARK_LOGO_MARK_URL : LIGHT_LOGO_MARK_URL}
+              alt={alt}
+              src={src}
               style={{
                 height: '100%',
                 objectFit: 'cover',
