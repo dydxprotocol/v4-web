@@ -69,11 +69,10 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const [formState, setFormState] = useState<DepositFormState>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
 
-  // TODO(deposit2): localization
   const dialogTitle = {
     form: stringGetter({ key: STRING_KEYS.DEPOSIT }),
     'token-select': stringGetter({ key: STRING_KEYS.SELECT_TOKEN }),
-    'qr-deposit': 'QR Deposit',
+    'qr-deposit': stringGetter({ key: STRING_KEYS.QR_DEPOSIT }),
   }[formState];
 
   const onDeposit = (deposit: Deposit) => {

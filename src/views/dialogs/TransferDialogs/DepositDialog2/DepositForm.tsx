@@ -323,7 +323,7 @@ export const DepositForm = ({
       items={[
         {
           key: 'deposit-method',
-          label: 'Deposit method',
+          label: stringGetter({ key: STRING_KEYS.DEPOSIT_METHOD }),
           value: depositMethod,
         },
         {

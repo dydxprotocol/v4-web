@@ -109,8 +109,12 @@ export const TokenSelect = ({
             <Icon tw="[--icon-size:2rem]" iconName={IconName.Bank} />
             <div tw="flex flex-col items-start gap-0.125">
               {/* TODO: Localize */}
-              <div tw="text-color-text-2 font-base-medium">Deposit from CEX</div>
-              <div tw="text-color-text-0 font-small-book">Coinbase, Binance, etc...</div>
+              <div tw="text-color-text-2 font-base-medium">
+                {stringGetter({ key: STRING_KEYS.DEPOSIT_FROM_CEX })}
+              </div>
+              <div tw="text-color-text-0 font-small-book">
+                {stringGetter({ key: STRING_KEYS.CEX_EXAMPLES })}
+              </div>
             </div>
           </div>
 

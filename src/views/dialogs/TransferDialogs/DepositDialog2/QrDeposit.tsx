@@ -4,10 +4,11 @@ import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { MODERATE_DEBOUNCE_MS } from '@/constants/debounce';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-// import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -17,7 +18,7 @@ import { QrCode } from '@/components/QrCode';
 import { truncateAddress } from '@/lib/wallet';
 
 export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
-  // const stringGetter = useStringGetter();
+  const stringGetter = useStringGetter();
   const { nobleAddress } = useAccounts();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -34,8 +35,13 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
   return (
     <div tw="flex h-full flex-col gap-1 p-1.25">
       <span tw="text-center text-color-text-0 font-base-medium">
-        To deposit from a centralized exchange, send <span tw="text-color-text-1">USDC</span> on{' '}
-        <span tw="text-color-text-1">Noble Network</span> to the address shown below.
+        {stringGetter({
+          key: STRING_KEYS.TO_DEPOSIT_FROM_CEX,
+          params: {
+            ASSET: <span tw="text-color-text-1">USDC</span>,
+            NETWORK: <span tw="text-color-text-1">Noble Network</span>,
+          },
+        })}
       </span>
 
       <div tw="my-[1.875rem] size-[200px] self-center">
@@ -68,13 +74,13 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
       <div tw="flexColumn items-center">
         <span tw="row gap-0.25 text-color-warning">
           <Icon iconName={IconName.Warning} />
-          <span>Only send funds on Noble Network</span>
+          <span>{stringGetter({ key: STRING_KEYS.ONLY_SEND_ON_NOBLE })}</span>
         </span>
       </div>
 
       <div tw="flexColumn mt-auto items-center">
         <Button tw="w-full" action={ButtonAction.Primary} state={{ isDisabled }} onClick={onCopy}>
-          Copy Noble address
+          {stringGetter({ key: STRING_KEYS.COPY_NOBLE })}
         </Button>
       </div>
     </div>
