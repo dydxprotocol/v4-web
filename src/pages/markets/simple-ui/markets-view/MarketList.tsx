@@ -1,14 +1,17 @@
 import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 import type { Range } from '@tanstack/react-virtual';
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import BigNumber from 'bignumber.js';
 import orderBy from 'lodash/orderBy';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ListItem, MarketsSortType } from '@/constants/marketList';
+import { ListItem, MarketsSortType, PositionSortType } from '@/constants/marketList';
 import { MarketData, MarketFilters } from '@/constants/markets';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -19,9 +22,13 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 import { SortIcon } from '@/components/SortIcon';
 
+import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setSimpleUISortMarketsBy } from '@/state/appUiConfigs';
-import { getSimpleUISortMarketsBy } from '@/state/appUiConfigsSelectors';
+import { setSimpleUISortMarketsBy, setSimpleUISortPositionsBy } from '@/state/appUiConfigs';
+import {
+  getSimpleUISortMarketsBy,
+  getSimpleUISortPositionsBy,
+} from '@/state/appUiConfigsSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
@@ -45,6 +52,45 @@ const sortMarkets = (markets: MarketData[], sortType: MarketsSortType) => {
       return orderBy(markets, (market) => market.isFavorite, ['desc']);
     default:
       return markets;
+  }
+};
+
+const sortPositions = (
+  positions: SubaccountPosition[],
+  marketData: MarketData[],
+  subaccountEquity: number | undefined,
+  sortType: PositionSortType
+) => {
+  switch (sortType) {
+    case PositionSortType.Notional:
+      return orderBy(positions, (position) => position.notional.toNumber(), ['desc']);
+    case PositionSortType.Pnl:
+      return orderBy(
+        positions,
+        (position) => position.updatedUnrealizedPnlPercent?.toNumber() ?? 0,
+        ['desc']
+      );
+    case PositionSortType.Leverage: {
+      const getMarginUsage = (marginValueInitial: BigNumber) =>
+        subaccountEquity != null && subaccountEquity !== 0
+          ? marginValueInitial.div(subaccountEquity).toNumber()
+          : undefined;
+
+      return orderBy(positions, (position) => getMarginUsage(position.marginValueInitial) ?? 0, [
+        'desc',
+      ]);
+    }
+    case PositionSortType.Price:
+      return orderBy(
+        positions,
+        (position) => {
+          const marketCap = marketData.find((market) => market.id === position.market)?.marketCap;
+          return marketCap ?? 0;
+        },
+        ['desc']
+      );
+    default:
+      return positions;
   }
 };
 
@@ -90,7 +136,8 @@ export const MarketList = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState<string>();
   const sortType = useAppSelector(getSimpleUISortMarketsBy);
-
+  const positionSortType = useAppSelector(getSimpleUISortPositionsBy);
+  const subaccountEquity = useAppSelector(getSubaccountEquity);
   const setSortType = useCallback(
     (newSortType: MarketsSortType) => {
       dispatch(setSimpleUISortMarketsBy(newSortType));
@@ -104,14 +151,21 @@ export const MarketList = ({
     searchFilter,
   });
 
+  const setFilter = useCallback(
+    (newFilter: MarketFilters) => {
+      dispatch(setMarketFilter(newFilter));
+    },
+    [dispatch]
+  );
+
   // Positions
   const openPositions = useAppSelector(BonsaiCore.account.parentSubaccountPositions.data);
   const openPositionsLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.loading) === 'pending';
 
-  const setFilter = useCallback(
-    (newFilter: MarketFilters) => {
-      dispatch(setMarketFilter(newFilter));
+  const setPositionSortType = useCallback(
+    (newSortType: PositionSortType) => {
+      dispatch(setSimpleUISortPositionsBy(newSortType));
     },
     [dispatch]
   );
@@ -123,6 +177,13 @@ export const MarketList = ({
   }, [setFilter, setIsSearchOpen, setSearchFilter]);
 
   const sortedMarkets = sortMarkets(filteredMarkets, sortType);
+
+  const sortedPositions = sortPositions(
+    openPositions ?? EMPTY_ARR,
+    filteredMarkets,
+    subaccountEquity,
+    positionSortType
+  );
 
   const sortItems = useMemo(
     () => [
@@ -162,9 +223,42 @@ export const MarketList = ({
         onSelect: () => setSortType(MarketsSortType.Favorites),
       },
     ],
-    [stringGetter, sortType]
+    [stringGetter, sortType, setSortType]
   );
 
+  const positionSortItems = useMemo(
+    () => [
+      {
+        label: stringGetter({ key: STRING_KEYS.PRICE }),
+        value: PositionSortType.Price,
+        active: positionSortType === PositionSortType.Price,
+        icon: <Icon iconName={IconName.Price} />,
+        onSelect: () => setPositionSortType(PositionSortType.Price),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.PNL }),
+        value: PositionSortType.Pnl,
+        active: positionSortType === PositionSortType.Pnl,
+        icon: <Icon iconName={IconName.TrendingUp} />,
+        onSelect: () => setPositionSortType(PositionSortType.Pnl),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.POSITION }),
+        value: PositionSortType.Notional,
+        active: positionSortType === PositionSortType.Notional,
+        icon: <Icon iconName={IconName.Position} />,
+        onSelect: () => setPositionSortType(PositionSortType.Notional),
+      },
+      {
+        label: stringGetter({ key: STRING_KEYS.MARGIN_USAGE }),
+        value: PositionSortType.Leverage,
+        active: positionSortType === PositionSortType.Leverage,
+        icon: <Icon iconName={IconName.Margin} />,
+        onSelect: () => setPositionSortType(PositionSortType.Leverage),
+      },
+    ],
+    [stringGetter, positionSortType, setPositionSortType]
+  );
   const searchViewItems: ListItem[] = useMemo(
     () => [
       {
@@ -205,14 +299,40 @@ export const MarketList = ({
       ...(slotTop
         ? [{ itemType: 'custom' as const, item: slotTop.content, customHeight: slotTop.height }]
         : []),
-      ...(openPositions?.length
+      ...(sortedPositions.length
         ? [
             {
               itemType: 'header' as const,
               item: stringGetter({ key: STRING_KEYS.YOUR_POSITIONS }),
               isSticky: true,
+              slotRight: (
+                <div tw="row mb-[-6px] gap-0.5">
+                  <SimpleUiDropdownMenu
+                    align="end"
+                    tw="z-1"
+                    items={positionSortItems}
+                    slotTop={
+                      <span tw="text-color-text-0 font-small-book">
+                        {stringGetter({ key: STRING_KEYS.VIEW })}
+                      </span>
+                    }
+                    side="bottom"
+                  >
+                    <Button
+                      tw="pr-0"
+                      size={ButtonSize.Small}
+                      buttonStyle={ButtonStyle.WithoutBackground}
+                    >
+                      <span tw="text-color-text-0 font-small-book">
+                        {positionSortItems.find((item) => item.value === positionSortType)?.label}
+                      </span>
+                      <Icon tw="size-1 min-w-1" iconName={IconName.Filter} />
+                    </Button>
+                  </SimpleUiDropdownMenu>
+                </div>
+              ),
             },
-            ...openPositions.map((position) => ({
+            ...sortedPositions.map((position) => ({
               itemType: 'position' as const,
               item: position,
             })),
@@ -246,7 +366,16 @@ export const MarketList = ({
         item: market,
       })),
     ],
-    [openPositions, sortedMarkets, stringGetter, slotTop, sortItems, sortType]
+    [
+      sortedPositions,
+      sortedMarkets,
+      stringGetter,
+      slotTop,
+      positionSortItems,
+      positionSortType,
+      sortItems,
+      sortType,
+    ]
   );
 
   const items = useMemo(() => {

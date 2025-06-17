@@ -244,10 +244,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     if (dydxAddress && subaccountNumber !== undefined && allFundingPayments != null) {
       const csvFundingPayments = allFundingPayments.map((payment) => {
         return {
-          time: new Date(payment.createdAt).toLocaleString(selectedLocale, {
-            dateStyle: 'short',
-            timeStyle: 'short',
-          }),
+          time: new Date(payment.createdAt).toISOString(),
           market: payment.ticker,
           side: payment.side,
           oraclePrice: payment.oraclePrice,
