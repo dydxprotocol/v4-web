@@ -6,7 +6,7 @@ import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
-import { FUNDING_DECIMALS, NumberSign } from '@/constants/numbers';
+import { FUNDING_DECIMALS, NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import {
   IndexerFundingPaymentResponseObject,
@@ -130,7 +130,12 @@ const getFundingPaymentsTableColumnDef = ({
         renderCell: ({ payment }) => {
           return (
             <TableCell>
-              <Output type={OutputType.Fiat} value={payment} showSign={ShowSign.Negative} />
+              <Output
+                type={OutputType.Fiat}
+                value={payment}
+                showSign={ShowSign.Negative}
+                fractionDigits={SMALL_USD_DECIMALS}
+              />
             </TableCell>
           );
         },
@@ -195,14 +200,16 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
 
     const fundingPaymentsData = useMemo(
       () =>
-        fundingPayments?.map(
-          (fundingPayment): FundingPaymentTableRow =>
-            getHydratedFundingPayment({
-              id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
-              data: fundingPayment,
-              marketSummaries,
-            })
-        ),
+        fundingPayments
+          ?.filter((fundingPayment) => Number(fundingPayment.payment) > 0.0001)
+          .map(
+            (fundingPayment): FundingPaymentTableRow =>
+              getHydratedFundingPayment({
+                id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
+                data: fundingPayment,
+                marketSummaries,
+              })
+          ),
       [fundingPayments, marketSummaries]
     );
 
