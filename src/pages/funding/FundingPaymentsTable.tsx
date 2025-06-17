@@ -30,7 +30,7 @@ import { TagSize } from '@/components/Tag';
 import { useAppSelector } from '@/state/appTypes';
 
 import { getHydratedFundingPayment } from '@/lib/fundingPayments';
-import { getNumberSign } from '@/lib/numbers';
+import { getNumberSign, MustBigNumber } from '@/lib/numbers';
 import { Nullable, orEmptyRecord } from '@/lib/typeUtils';
 
 export enum FundingPaymentsTableColumnKey {
@@ -201,7 +201,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
     const fundingPaymentsData = useMemo(
       () =>
         fundingPayments
-          ?.filter((fundingPayment) => Number(fundingPayment.payment) > 0.0001)
+          ?.filter((fundingPayment) => MustBigNumber(fundingPayment.payment).gt(0.0001))
           .map(
             (fundingPayment): FundingPaymentTableRow =>
               getHydratedFundingPayment({
