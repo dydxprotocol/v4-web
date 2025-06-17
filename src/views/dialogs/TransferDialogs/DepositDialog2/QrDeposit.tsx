@@ -32,24 +32,33 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
   const isDisabled = disabled || isCopied || nobleAddress == null || nobleAddress.trim() === '';
 
   return (
-    <div tw="flex flex-col gap-0.5 p-1.25">
+    <div tw="flex h-full flex-col gap-1 p-1.25">
       <span tw="text-center text-color-text-0 font-base-medium">
         To deposit from a centralized exchange, send <span tw="text-color-text-1">USDC</span> on{' '}
         <span tw="text-color-text-1">Noble Network</span> to the address shown below.
       </span>
 
-      <div tw="self-center" style={{ height: 200, width: 200 }}>
-        <QrCode tw="text-center" hasLogo size={200} value={nobleAddress ?? ''} />
+      <div tw="my-[1.875rem] size-[200px] self-center">
+        <QrCode
+          imgOverride={{
+            alt: 'Noble Chain',
+            src: '/chains/noble.png',
+          }}
+          tw="text-center"
+          hasLogo
+          size={200}
+          value={nobleAddress ?? ''}
+        />
       </div>
 
-      <div tw="flexColumn items-center">
+      <div tw="flexColumn items-center gap-0.5">
         <span>Your Noble address</span>
 
         <$CopyAddressButton disabled={isDisabled} onClick={onCopy}>
           <span>{truncateAddress(nobleAddress, 'noble')}</span>
           <Icon
             css={{
-              color: isCopied ? 'var(--color-success)' : 'var(--color-text-1',
+              color: isCopied ? 'var(--color-success)' : 'var(--color-text-1)',
             }}
             iconName={isCopied ? IconName.Check : IconName.Copy}
           />
@@ -57,14 +66,14 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
       </div>
 
       <div tw="flexColumn items-center">
-        <span tw="text-color-warning">
+        <span tw="row gap-0.25 text-color-warning">
           <Icon iconName={IconName.Warning} />
           <span>Only send funds on Noble Network</span>
         </span>
       </div>
 
       <div tw="flexColumn mt-auto items-center">
-        <Button tw="flex-1" action={ButtonAction.Primary} state={{ isDisabled }} onClick={onCopy}>
+        <Button tw="w-full" action={ButtonAction.Primary} state={{ isDisabled }} onClick={onCopy}>
           Copy Noble address
         </Button>
       </div>
