@@ -19,7 +19,7 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider } from '@/hooks/useStatsig';
+import { StatsigProvider, useStatsigGateValue } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -41,6 +41,7 @@ import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { LocalStorageKey } from './constants/localStorage';
+import { StatsigFlags } from './constants/statsig';
 import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
@@ -92,6 +93,7 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
   const isSimpleUi = testFlags.simpleUi && isTablet;
+  const abDefaultToMarkets = useStatsigGateValue(StatsigFlags.abDefaultToMarkets);
 
   const { showRestrictionWarning } = useComplianceState();
 
@@ -178,7 +180,14 @@ const Content = () => {
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
               <Route
                 path="*"
-                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
+                element={
+                  <Navigate
+                    to={
+                      pathFromHash || (abDefaultToMarkets ? AppRoute.Markets : DEFAULT_TRADE_ROUTE)
+                    }
+                    replace
+                  />
+                }
               />
             </Routes>
           </Suspense>
