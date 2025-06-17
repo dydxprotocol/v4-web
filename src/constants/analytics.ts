@@ -443,6 +443,7 @@ export const AnalyticsEvents = unionize(
       Omit<Deposit, 'token'> & { tokenInChainId: string; tokenInDenom: string }
     >(),
     DepositError: ofType<{ error: string }>(),
+    SelectQrDeposit: ofType<{}>(),
 
     // Withdraw
     WithdrawInitiated:

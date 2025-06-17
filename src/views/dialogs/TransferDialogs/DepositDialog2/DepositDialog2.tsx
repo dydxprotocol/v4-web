@@ -23,6 +23,7 @@ import { SourceAccount } from '@/state/wallet';
 
 import { DepositForm } from './DepositForm';
 import { DepositStatus } from './DepositStatus';
+import { QrDeposit } from './QrDeposit';
 import { TokenSelect } from './TokenSelect';
 
 function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
@@ -52,6 +53,8 @@ function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
   };
 }
 
+type DepositFormState = 'form' | 'token-select' | 'qr-deposit';
+
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const dispatch = useAppDispatch();
   const { sourceAccount, dydxAddress } = useAccounts();
@@ -63,14 +66,15 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
 
-  const [formState, setFormState] = useState<'form' | 'token-select'>('form');
+  const [formState, setFormState] = useState<DepositFormState>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
 
   // TODO(deposit2): localization
-  const dialogTitle =
-    formState === 'form'
-      ? stringGetter({ key: STRING_KEYS.DEPOSIT })
-      : stringGetter({ key: STRING_KEYS.SELECT_TOKEN });
+  const dialogTitle = {
+    form: stringGetter({ key: STRING_KEYS.DEPOSIT }),
+    'token-select': stringGetter({ key: STRING_KEYS.SELECT_TOKEN }),
+    'qr-deposit': 'QR Deposit',
+  }[formState];
 
   const onShowForm = () => {
     setFormState('form');
@@ -83,6 +87,23 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     setCurrentDeposit({ txHash: deposit.txHash, chainId: deposit.chainId });
     dispatch(addDeposit({ deposit, dydxAddress }));
   };
+
+  const onShowQrDeposit = () => {
+    setFormState('qr-deposit');
+    tokenSelectRef.current?.scroll({ top: 0 });
+  };
+
+  const onBack =
+    formState === 'form'
+      ? undefined
+      : () => {
+          if (formState === 'token-select') {
+            onShowForm();
+          } else {
+            // formState === 'qr-deposit'
+            setFormState('token-select');
+          }
+        };
 
   useLayoutEffect(() => {
     if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
@@ -98,7 +119,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       withAnimation
       hasHeaderBorder
       setIsOpen={setIsOpen}
-      onBack={formState !== 'form' ? onShowForm : undefined}
+      onBack={onBack}
       title={dialogTitle}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
@@ -111,10 +132,14 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       )}
       {!currentDeposit && (
         <div tw="h-full w-full overflow-hidden">
-          <div tw="flex h-full w-[200%]">
+          <div tw="flex h-full w-[300%]">
             <div
-              tw="w-[50%]"
-              css={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+              tw="w-[33.33%]"
+              css={{
+                marginLeft:
+                  formState === 'form' ? 0 : formState === 'token-select' ? '-33.33%' : '-66.66%',
+                transition: 'margin 500ms',
+              }}
             >
               <DepositForm
                 onDeposit={onDeposit}
@@ -126,7 +151,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
             </div>
             <div
               ref={tokenSelectRef}
-              tw="w-[50%] overflow-scroll"
+              tw="w-[33.33%] overflow-scroll"
               css={{
                 pointerEvents: formState === 'form' ? 'none' : undefined,
                 height: formState === 'form' ? 0 : '100%',
@@ -134,12 +159,23 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
               }}
             >
               <TokenSelect
-                disabled={formState === 'form'}
-                onClose={() => setIsOpen(false)}
+                disabled={formState !== 'token-select'}
+                onQrDeposit={onShowQrDeposit}
                 token={token}
                 setToken={setToken}
                 onBack={onShowForm}
               />
+            </div>
+            <div
+              ref={tokenSelectRef}
+              tw="w-[33.33%] overflow-scroll"
+              css={{
+                pointerEvents: formState === 'form' ? 'none' : undefined,
+                height: formState === 'form' ? 0 : '100%',
+                maxHeight: isMobile ? undefined : '30rem',
+              }}
+            >
+              <QrDeposit disabled={formState !== 'qr-deposit'} />
             </div>
           </div>
         </div>

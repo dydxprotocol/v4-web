@@ -6,8 +6,8 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 import { parseUnits } from 'viem';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { CHAIN_INFO } from '@/constants/chains';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TokenBalance, TokenForTransfer } from '@/constants/tokens';
@@ -19,8 +19,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
+import { track } from '@/lib/analytics/analytics';
 
 import { getTokenSymbol } from '../utils';
 import { useBalances } from './queries';
@@ -28,18 +27,17 @@ import { useBalances } from './queries';
 export const TokenSelect = ({
   disabled,
   onBack,
-  onClose,
+  onQrDeposit,
   token,
   setToken,
 }: {
   // disable buttons to prevent tab events while TokenSelect has 0 height
   disabled?: boolean;
   onBack: () => void;
-  onClose: () => void;
+  onQrDeposit: () => void;
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isLoading, data } = useBalances();
 
@@ -72,14 +70,9 @@ export const TokenSelect = ({
     onBack();
   };
 
-  const onCexClick = () => {
-    dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({ onBack: onCexDepositBack })));
-    onClose();
-  };
-
-  const onCexDepositBack = () => {
-    dispatch(openDialog(DialogTypes.Deposit2({})));
-    dispatch(closeDialog());
+  const onCexDeposit = () => {
+    onQrDeposit();
+    track(AnalyticsEvents.SelectQrDeposit());
   };
 
   if (isLoading)
@@ -111,7 +104,7 @@ export const TokenSelect = ({
             key={balance.denom}
           />
         ))}
-        <$TokenRowButton onClick={onCexClick}>
+        <$TokenRowButton onClick={onCexDeposit}>
           <div tw="flex items-center gap-0.75">
             <Icon tw="[--icon-size:2rem]" iconName={IconName.Bank} />
             <div tw="flex flex-col items-start gap-0.125">
