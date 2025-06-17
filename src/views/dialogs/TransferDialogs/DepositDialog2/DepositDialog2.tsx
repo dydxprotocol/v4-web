@@ -118,7 +118,6 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
             >
               <DepositForm
                 onDeposit={onDeposit}
-                onClose={() => setIsOpen(false)}
                 amount={amount}
                 setAmount={setAmount}
                 token={token}
@@ -136,6 +135,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
             >
               <TokenSelect
                 disabled={formState === 'form'}
+                onClose={() => setIsOpen(false)}
                 token={token}
                 setToken={setToken}
                 onBack={onShowForm}

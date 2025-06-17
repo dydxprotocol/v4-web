@@ -1,19 +1,26 @@
-import { Dispatch, Fragment, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction, useMemo } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { partition } from 'lodash';
+import styled from 'styled-components';
+import tw from 'twin.macro';
 import { parseUnits } from 'viem';
 
 import { CHAIN_INFO } from '@/constants/chains';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { TokenForTransfer } from '@/constants/tokens';
+import { TokenBalance, TokenForTransfer } from '@/constants/tokens';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { closeDialog, openDialog } from '@/state/dialogs';
 
 import { getTokenSymbol } from '../utils';
 import { useBalances } from './queries';
@@ -21,22 +28,25 @@ import { useBalances } from './queries';
 export const TokenSelect = ({
   disabled,
   onBack,
+  onClose,
   token,
   setToken,
 }: {
   // disable buttons to prevent tab events while TokenSelect has 0 height
   disabled?: boolean;
   onBack: () => void;
+  onClose: () => void;
   token: TokenForTransfer;
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isLoading, data } = useBalances();
 
   const [withBalances, noBalances] = useMemo(() => {
     if (!data || !data.chains) return [[], []];
 
-    const allBalances = Object.keys(data.chains)
+    const allBalances: TokenBalance[] = Object.keys(data.chains)
       .map((chainId) => {
         const denomToBalance = data.chains?.[chainId]?.denoms;
         return denomToBalance
@@ -62,6 +72,16 @@ export const TokenSelect = ({
     onBack();
   };
 
+  const onCexClick = () => {
+    dispatch(openDialog(DialogTypes.CoinbaseDepositDialog({ onBack: onCexDepositBack })));
+    onClose();
+  };
+
+  const onCexDepositBack = () => {
+    dispatch(openDialog(DialogTypes.Deposit2({})));
+    dispatch(closeDialog());
+  };
+
   if (isLoading)
     return (
       <div tw="flex h-full flex-col items-center justify-center">
@@ -77,54 +97,35 @@ export const TokenSelect = ({
         </div>
       )}
       <div tw="flex flex-col">
-        {withBalances.map((balance, i) => (
-          <Fragment key={balance.denom}>
-            <button
-              disabled={disabled}
-              onClick={onTokenClick({
-                chainId: balance.chainId,
-                denom: balance.denom,
-                decimals: balance.decimals!,
-              })}
-              type="button"
-              style={{
-                backgroundColor: token.denom === balance.denom ? 'var(--color-layer-4)' : undefined,
-              }}
-              tw="flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4"
-              key={balance.denom}
-            >
-              <div tw="flex items-center gap-0.75">
-                <AssetIcon
-                  tw="[--asset-icon-size:2rem]"
-                  symbol={getTokenSymbol(balance.denom)}
-                  chainId={balance.chainId}
-                />
-                <div tw="flex flex-col items-start gap-0.125">
-                  <div tw="text-medium font-medium">{getTokenSymbol(balance.denom)}</div>
-                  <div>{CHAIN_INFO[balance.chainId]?.name}</div>
-                </div>
-              </div>
-
-              <div tw="flex flex-col items-end gap-0.125">
-                <Output
-                  tw="text-medium font-medium"
-                  fractionDigits={TOKEN_DECIMALS}
-                  type={OutputType.Number}
-                  value={BigNumber(balance.formattedAmount)}
-                />
-                <Output
-                  tw="text-color-text-0"
-                  fractionDigits={USD_DECIMALS}
-                  type={OutputType.SmallFiat}
-                  value={balance.valueUSD}
-                />
-              </div>
-            </button>
-            {i < withBalances.length - 1 && (
-              <hr tw="w-full border border-solid border-color-border" />
-            )}
-          </Fragment>
+        {withBalances.map((balance) => (
+          <TokenRow
+            disabled={disabled}
+            onClick={onTokenClick({
+              chainId: balance.chainId,
+              denom: balance.denom,
+              decimals: balance.decimals!,
+            })}
+            balance={balance}
+            token={token}
+            withBalance
+            key={balance.denom}
+          />
         ))}
+        <$TokenRowButton onClick={onCexClick}>
+          <div tw="flex items-center gap-0.75">
+            <Icon tw="[--icon-size:2rem]" iconName={IconName.Bank} />
+            <div tw="flex flex-col items-start gap-0.125">
+              {/* TODO: Localize */}
+              <div tw="text-color-text-2 font-base-medium">Deposit from CEX</div>
+              <div tw="text-color-text-0 font-small-book">Coinbase, Binance, etc...</div>
+            </div>
+          </div>
+
+          <div tw="row justify-end gap-0.25">
+            <img tw="h-[24px] w-[64px]" src="/exchanges/cex_icons.png" alt="cex icons" />
+            <$CaretIcon iconName={IconName.Caret} />
+          </div>
+        </$TokenRowButton>
       </div>
 
       {noBalances.length > 0 && (
@@ -136,37 +137,85 @@ export const TokenSelect = ({
       )}
 
       <div tw="flex flex-col">
-        {noBalances.map((balance, i) => (
-          <Fragment key={balance.denom}>
-            <button
-              disabled={disabled}
-              onClick={onTokenClick({
-                chainId: balance.chainId,
-                denom: balance.denom,
-                decimals: balance.decimals!,
-              })}
-              type="button"
-              tw="flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4"
-              key={balance.denom}
-            >
-              <div tw="flex items-center gap-0.75">
-                <AssetIcon
-                  tw="[--asset-icon-size:2rem]"
-                  symbol={getTokenSymbol(balance.denom)}
-                  chainId={balance.chainId}
-                />
-                <div tw="flex flex-col items-start gap-0.125">
-                  <div tw="text-medium font-medium">{getTokenSymbol(balance.denom)}</div>
-                  <div>{CHAIN_INFO[balance.chainId]?.name}</div>
-                </div>
-              </div>
-            </button>
-            {i < noBalances.length - 1 && (
-              <hr tw="w-full border border-solid border-color-border" />
-            )}
-          </Fragment>
+        {noBalances.map((balance) => (
+          <TokenRow
+            disabled={disabled}
+            onClick={onTokenClick({
+              chainId: balance.chainId,
+              denom: balance.denom,
+              decimals: balance.decimals!,
+            })}
+            key={balance.denom}
+            balance={balance}
+            token={token}
+            withBalance={false}
+          />
         ))}
       </div>
     </div>
   );
 };
+
+const TokenRow = ({
+  balance,
+  token,
+  withBalance,
+  disabled,
+  onClick,
+}: {
+  balance: TokenBalance;
+  withBalance: boolean;
+  token: TokenForTransfer;
+  disabled?: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <$TokenRowButton
+      disabled={disabled}
+      onClick={onClick}
+      isSelected={token.denom === balance.denom}
+    >
+      <div tw="flex items-center gap-0.75">
+        <AssetIcon
+          tw="[--asset-icon-size:2rem]"
+          symbol={getTokenSymbol(balance.denom)}
+          chainId={balance.chainId}
+        />
+        <div tw="flex flex-col items-start gap-0.125">
+          <div tw="text-color-text-2 font-base-medium">{getTokenSymbol(balance.denom)}</div>
+          <div tw="text-color-text-0 font-small-book">{CHAIN_INFO[balance.chainId]?.name}</div>
+        </div>
+      </div>
+
+      {withBalance && (
+        <div tw="flex flex-col items-end gap-0.125">
+          <Output
+            tw="text-color-text-1 font-base-medium"
+            fractionDigits={TOKEN_DECIMALS}
+            type={OutputType.Number}
+            value={BigNumber(balance.formattedAmount)}
+          />
+          <Output
+            tw="text-color-text-0 font-small-book"
+            fractionDigits={USD_DECIMALS}
+            type={OutputType.SmallFiat}
+            value={balance.valueUSD}
+          />
+        </div>
+      )}
+    </$TokenRowButton>
+  );
+};
+
+const $TokenRowButton = styled.button.attrs({ type: 'button' })<{ isSelected?: boolean }>`
+  ${tw`flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4`}
+  ${({ isSelected }) => isSelected && tw`bg-color-layer-4`}
+`;
+
+const $CaretIcon = styled(Icon)`
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  color: var(--color-text-0);
+  transform: rotate(-0.25turn);
+`;

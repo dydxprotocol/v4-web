@@ -31,6 +31,15 @@ export type TokenForTransfer = {
   denom: string;
 };
 
+export type TokenBalance = {
+  chainId: string;
+  amount: string;
+  formattedAmount: string;
+  denom: string;
+  decimals?: number;
+  valueUSD?: string;
+};
+
 export const WITHDRAWABLE_ASSETS: TokenForTransfer[] = [
   {
     chainId: CosmosChainId.Noble,

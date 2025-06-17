@@ -1,6 +1,7 @@
 // TODO: get rid of this massive barrel file.
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
+export { default as BankIcon } from './bank.svg';
 export { default as Bar3Icon } from './bar3.svg';
 export { default as BellStrokeIcon } from './bell-stroke.svg';
 export { default as BellIcon } from './bell.svg';
