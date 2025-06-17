@@ -101,7 +101,7 @@ export const AmountInput = ({
                   onClick={onClickMax}
                   type="button"
                   tw="font-medium"
-                  style={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
+                  css={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
                 >
                   {stringGetter({ key: STRING_KEYS.MAX })}
                 </button>

@@ -114,7 +114,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           <div tw="flex h-full w-[200%]">
             <div
               tw="w-[50%]"
-              style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
+              css={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
             >
               <DepositForm
                 onDeposit={onDeposit}
@@ -127,7 +127,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
             <div
               ref={tokenSelectRef}
               tw="w-[50%] overflow-scroll"
-              style={{
+              css={{
                 pointerEvents: formState === 'form' ? 'none' : undefined,
                 height: formState === 'form' ? 0 : '100%',
                 maxHeight: isMobile ? undefined : '30rem',
