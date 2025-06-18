@@ -359,7 +359,8 @@ export const DepositForm = ({
         />
       </div>
       <DepositSteps
-        steps={depositSteps ?? []}
+        tw="ml-[-0.5rem]"
+        steps={depositSteps}
         currentStep={currentStep}
         currentStepError={currentStepError}
         onRetry={retryCurrentStep}
