@@ -234,18 +234,22 @@ export const WithdrawForm = ({
         onSelectSpeed={setSelectedSpeed}
         type="withdraw"
       />
-      <Button
-        tw="mt-auto w-full"
-        state={{
-          isLoading: isFetching || isLoading,
-          isDisabled: withdrawDisabled,
-        }}
-        onClick={onWithdrawClick}
-        action={ButtonAction.Primary}
-      >
-        {buttonInner}
-      </Button>
-      {receipt}
+
+      <div tw="flexColumn mt-auto gap-0.5">
+        {receipt}
+
+        <Button
+          tw="w-full"
+          state={{
+            isLoading: isFetching || isLoading,
+            isDisabled: withdrawDisabled,
+          }}
+          onClick={onWithdrawClick}
+          action={ButtonAction.Primary}
+        >
+          {buttonInner}
+        </Button>
+      </div>
     </div>
   );
 };
