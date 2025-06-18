@@ -20,6 +20,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { WarningIcon } from '@/icons';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -345,49 +346,61 @@ export const DepositForm = ({
     />
   );
 
+  const hasDepositSteps = depositSteps?.length != null && depositSteps.length > 0;
+
+  const depositContent = hasDepositSteps ? (
+    <>
+      <div tw="row gap-0.5 text-color-text-2">
+        <Output tw="font-extra-large-bold" type={OutputType.Number} value={debouncedAmount} />
+        <AssetIcon
+          tw="[--asset-icon-size:2rem]"
+          symbol={getTokenSymbol(token.denom)}
+          chainId={token.chainId}
+        />
+      </div>
+      <DepositSteps
+        steps={depositSteps ?? []}
+        currentStep={currentStep}
+        currentStepError={currentStepError}
+        onRetry={retryCurrentStep}
+      />
+    </>
+  ) : (
+    <AmountInput
+      tokenBalance={tokenBalance}
+      value={amount}
+      onChange={setAmount}
+      token={token}
+      onTokenClick={onTokenSelect}
+      error={error}
+    />
+  );
+
+  const depositContentBottom = (
+    <div tw="mt-0.5 flex flex-col gap-0.5">
+      {currentStepError && (
+        <div tw="text-center text-small text-color-error">{currentStepError}</div>
+      )}
+      {receipt}
+      <Button
+        tw="w-full"
+        onClick={onDepositClick}
+        state={{
+          isDisabled: depositDisabled,
+          isLoading: isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
+        }}
+        action={ButtonAction.Primary}
+        type={ButtonType.Submit}
+      >
+        {depositButtonInner}
+      </Button>
+    </div>
+  );
+
   return (
     <div tw="flex h-full min-h-10 flex-col p-1.25">
-      <div tw="flex flex-col gap-0.5">
-        <AmountInput
-          tokenBalance={tokenBalance}
-          value={amount}
-          onChange={setAmount}
-          token={token}
-          onTokenClick={onTokenSelect}
-          error={error}
-        />
-        {depositSteps?.length && (
-          <DepositSteps
-            steps={depositSteps}
-            currentStep={currentStep}
-            currentStepError={currentStepError}
-            onRetry={retryCurrentStep}
-          />
-        )}
-      </div>
-      <div tw="mt-auto flex flex-col gap-0.75">
-        {!depositSteps?.length && (
-          <div tw="mt-0.5 flex flex-col gap-0.5">
-            {currentStepError && (
-              <div tw="text-center text-small text-color-error">{currentStepError}</div>
-            )}
-            {receipt}
-            <Button
-              tw="w-full"
-              onClick={onDepositClick}
-              state={{
-                isDisabled: depositDisabled,
-                isLoading:
-                  isFetching || (!depositDisabled && !steps?.length) || awaitingWalletAction,
-              }}
-              action={ButtonAction.Primary}
-              type={ButtonType.Submit}
-            >
-              {depositButtonInner}
-            </Button>
-          </div>
-        )}
-      </div>
+      <div tw="flex flex-col gap-0.5">{depositContent}</div>
+      <div tw="mt-auto flex flex-col gap-0.75">{depositContentBottom}</div>
     </div>
   );
 };
