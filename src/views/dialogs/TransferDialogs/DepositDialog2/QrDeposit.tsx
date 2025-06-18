@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -44,7 +45,7 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
         })}
       </span>
 
-      <div tw="my-[1.875rem] size-[200px] self-center">
+      <$QrContainer>
         <QrCode
           imgOverride={{
             alt: 'Noble Chain',
@@ -55,7 +56,7 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
           size={200}
           value={nobleAddress ?? ''}
         />
-      </div>
+      </$QrContainer>
 
       <div tw="flexColumn items-center gap-0.5">
         <span>Your Noble address</span>
@@ -86,6 +87,17 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
     </div>
   );
 };
+
+const $QrContainer = styled.div`
+  width: 200px;
+  height: 200px;
+  align-self: center;
+
+  @media ${breakpoints.mobile} {
+    margin-top: 1.875rem;
+    margin-bottom: 1.875rem;
+  }
+`;
 
 const $CopyAddressButton = styled.button.attrs({
   type: 'button',
