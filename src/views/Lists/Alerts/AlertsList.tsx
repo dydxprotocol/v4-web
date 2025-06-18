@@ -127,7 +127,7 @@ const ItemRenderer = ({
 
   return (
     <$DefaultNotificationRow className={className}>
-      <div tw="flexColumn min-w-0 flex-grow-0 gap-0.125">
+      <div tw="flexColumn w-full min-w-0 flex-grow-0 gap-0.125">
         <div tw="row w-full justify-between">
           <div tw="row gap-0.25">
             {displayData.icon && <div tw="relative flex">{displayData.icon}</div>}

@@ -194,7 +194,8 @@ export const PositionRow = ({
             <Output
               tw="text-color-text-0"
               type={shouldCompact ? OutputType.CompactNumber : OutputType.Number}
-              value={position.signedSize}
+              value={position.unsignedSize}
+              fractionDigits={!shouldCompact ? market.stepSizeDecimals : undefined}
             />
           </span>
         </div>

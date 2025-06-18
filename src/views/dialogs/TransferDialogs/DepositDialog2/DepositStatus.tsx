@@ -50,6 +50,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
         ) : (
           <Icon tw="self-center" iconName={IconName.SuccessCircle} size="64px" />
         )}
+
         <div tw="flex flex-col items-center gap-0.375 px-3 py-1 text-center">
           <div tw="text-large">
             {!depositSuccess
@@ -59,7 +60,8 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
       </div>
-      <div tw="flex items-center justify-between self-stretch">
+
+      <div tw="mt-auto flex items-center justify-between self-stretch">
         <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_DEPOSIT })}</div>
         <div tw="flex items-center gap-0.125">
           <Output
@@ -71,6 +73,7 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
           <AssetIcon symbol={getTokenSymbol(deposit.token.denom)} chainId={deposit.token.chainId} />
         </div>
       </div>
+
       <Button onClick={onClose} action={depositSuccess ? ButtonAction.Primary : ButtonAction.Base}>
         {depositSuccess
           ? stringGetter({ key: STRING_KEYS.START_TRADING })

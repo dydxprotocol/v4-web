@@ -1,7 +1,8 @@
 import { EventHandler } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,9 +13,13 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+
+import { testFlags } from '@/lib/testFlags';
 
 import { getTokenSymbol, isNativeTokenDenom } from '../utils';
 
@@ -72,14 +77,13 @@ export const AmountInput = ({
   const onMaxDisabled = !tokenBalance.raw || BigInt(tokenBalance.raw) === BigInt(0);
 
   return (
-    <div tw="flex items-center justify-between gap-0.5 rounded-0.75 border border-solid border-color-border bg-color-layer-4 px-1.25 py-0.75">
+    <$AmountInputContainer>
       <div tw="flex min-w-0 flex-1 flex-col gap-0.5 text-small">
-        <div>
+        <div tw="row justify-between">
           {stringGetter({ key: STRING_KEYS.AMOUNT })}
 
-          {tokenBalance.formatted && (
-            <>
-              <span> • </span>
+          <div>
+            {tokenBalance.formatted && (
               <Output
                 tw="inline font-medium text-color-text-0"
                 fractionDigits={TOKEN_DECIMALS}
@@ -87,56 +91,91 @@ export const AmountInput = ({
                 value={tokenBalance.formatted}
                 type={OutputType.Number}
               />
-            </>
-          )}
+            )}
 
-          {tokenBalance.raw && (
-            <>
-              <span> • </span>
-              <button
-                disabled={onMaxDisabled}
-                onClick={onClickMax}
-                type="button"
-                tw="font-medium"
-                style={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
-              >
-                {stringGetter({ key: STRING_KEYS.MAX })}
-              </button>
-            </>
-          )}
+            {tokenBalance.raw && (
+              <>
+                <span> • </span>
+                <button
+                  disabled={onMaxDisabled}
+                  onClick={onClickMax}
+                  type="button"
+                  tw="font-medium"
+                  css={{ color: onMaxDisabled ? 'var(--color-text-0)' : 'var(--color-accent)' }}
+                >
+                  {stringGetter({ key: STRING_KEYS.MAX })}
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        <input
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-          type="text"
-          placeholder="0.00"
-          tw="flex-1 bg-color-layer-4 text-large font-medium outline-none"
-          style={{ color: error ? 'var(--color-error)' : undefined }}
-          value={value}
-          onChange={onValueChange}
-        />
-      </div>
-      <button
-        tw="flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375"
-        type="button"
-        disabled={sourceAccount.chain === WalletNetworkType.Solana}
-        onClick={onTokenClick}
-      >
-        <div tw="flex items-center gap-0.5">
-          <AssetIcon
-            tw="[--asset-icon-size:2rem]"
-            symbol={getTokenSymbol(token.denom)}
-            chainId={token.chainId}
+        <div tw="row gap-0.5">
+          <$Input
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            type="text"
+            placeholder="0.00"
+            hasError={!!error}
+            value={value}
+            onChange={onValueChange}
           />
-          <div>{getTokenSymbol(token.denom)}</div>
+
+          <$TokenButton
+            type="button"
+            disabled={sourceAccount.chain === WalletNetworkType.Solana}
+            onClick={onTokenClick}
+          >
+            <div tw="flex items-center gap-0.5 text-color-text-2">
+              <AssetIcon
+                tw="[--asset-icon-size:2rem]"
+                symbol={getTokenSymbol(token.denom)}
+                chainId={token.chainId}
+              />
+              <div>{getTokenSymbol(token.denom)}</div>
+            </div>
+            {sourceAccount.chain !== WalletNetworkType.Solana && (
+              <$CaretIcon size="10px" iconName={IconName.Caret} />
+            )}
+          </$TokenButton>
         </div>
-        {sourceAccount.chain !== WalletNetworkType.Solana && (
-          <$CaretIcon size="10px" iconName={IconName.Caret} />
-        )}
-      </button>
-    </div>
+      </div>
+    </$AmountInputContainer>
   );
 };
+
+const $AmountInputContainer = styled.div`
+  ${tw`flex items-center justify-between gap-0.5 rounded-0.75 px-1.25 py-0.75`}
+
+  background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
+  border: 1px solid var(--color-border);
+
+  @media ${breakpoints.tablet} {
+    ${() =>
+      testFlags.simpleUi &&
+      css`
+        --deposit-dialog-amount-bgColor: var(--color-layer-2);
+        border-color: transparent;
+      `}
+  }
+`;
+
+const $Input = styled.input<{ hasError?: boolean }>`
+  ${tw`min-w-0 flex-1 text-color-text-2 outline-none font-extra-medium`}
+  ${({ hasError }) => hasError && tw`text-color-error`}
+  background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
+`;
+
+const $TokenButton = styled.button`
+  ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
+
+  @media ${breakpoints.tablet} {
+    ${() =>
+      testFlags.simpleUi &&
+      css`
+        border-color: transparent;
+      `}
+  }
+`;
 
 const $CaretIcon = styled(Icon)`
   transform: rotate(-90deg);

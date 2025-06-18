@@ -21,6 +21,10 @@ type DepositStepsProps = {
   onRetry: () => void;
 };
 
+type StyleProps = {
+  className?: string;
+};
+
 const STEP_TYPE_TO_INFO: {
   [type: string]: { titleKey: string; icon: ReactNode };
 } = {
@@ -41,11 +45,12 @@ const STEP_TYPE_TO_INFO: {
 const SHAKE_DURATION = 1000;
 
 export const DepositSteps = ({
+  className,
   steps,
   currentStep,
   currentStepError,
   onRetry,
-}: DepositStepsProps) => {
+}: DepositStepsProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const [isShaking, setIsShaking] = useState(false);
   useEffect(() => {
@@ -59,7 +64,7 @@ export const DepositSteps = ({
   }, [currentStepError]);
 
   return (
-    <div tw="flex flex-col">
+    <div className={className} tw="flex flex-col">
       {steps.map((step, i) => {
         const stepInfo = STEP_TYPE_TO_INFO[step.type]!;
         const error = i === currentStep ? currentStepError : undefined;
