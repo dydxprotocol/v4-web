@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
@@ -39,7 +39,9 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
+import { BonsaiCore } from './bonsai/ontology';
 import { RestrictionWarning } from './components/RestrictionWarning';
+import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
 import { StatsigFlags } from './constants/statsig';
 import { SkipProvider } from './hooks/transfers/skipClient';
@@ -57,10 +59,12 @@ import { isTruthy } from './lib/isTruthy';
 import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
+import { setOnboardedThisSession } from './state/account';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
+import { openDialog } from './state/dialogs';
 import breakpoints from './styles/breakpoints';
 
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -85,6 +89,7 @@ const Content = () => {
   useUpdateTransfers();
   useReferralCode();
   useUiRefreshMigrations();
+  useOpenDepositIfRelevant();
 
   const { isTablet, isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
@@ -220,6 +225,22 @@ function useUiRefreshMigrations() {
       }
     }
   }, [themeSetting, seenUiRefresh, dispatch, setSeenUiRefresh]);
+}
+
+function useOpenDepositIfRelevant() {
+  const onboarded = useAppSelector((state) => state.account.onboardedThisSession);
+  const equity = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)?.equity.toNumber();
+  const dispatch = useAppDispatch();
+  const shouldDeposit = useStatsigGateValue(StatsigFlags.abPopupDeposit);
+  const opened = useRef(false);
+
+  useEffect(() => {
+    if (shouldDeposit && onboarded && !opened.current && equity != null && equity < 1) {
+      opened.current = true;
+      dispatch(setOnboardedThisSession(true));
+      dispatch(openDialog(DialogTypes.Deposit2({})));
+    }
+  }, [dispatch, equity, onboarded, shouldDeposit]);
 }
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {

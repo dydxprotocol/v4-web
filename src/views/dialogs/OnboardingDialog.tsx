@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -27,6 +27,7 @@ import { Ring } from '@/components/Ring';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
@@ -36,7 +37,9 @@ import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 
-export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProps>) => {
+export const OnboardingDialog = ({
+  setIsOpen: setIsOpenRaw,
+}: DialogProps<OnboardingDialogProps>) => {
   const dispatch = useAppDispatch();
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
@@ -50,6 +53,16 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
   const isSimpleUi = isTablet && testFlags.simpleUi;
+
+  const setIsOpen = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        dispatch(setOnboardedThisSession(true));
+      }
+      setIsOpenRaw(open);
+    },
+    [dispatch, setIsOpenRaw]
+  );
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen(false);
