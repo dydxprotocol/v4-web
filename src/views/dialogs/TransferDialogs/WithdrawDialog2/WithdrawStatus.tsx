@@ -93,7 +93,7 @@ export const WithdrawStatus = ({ id = '', onClose }: WithdrawStatusProps) => {
           <div tw="text-color-text-0">{statusDescription}</div>
         </div>
       </div>
-      <div tw="flex items-center justify-between self-stretch">
+      <div tw="mt-auto flex items-center justify-between self-stretch">
         <div tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.YOUR_WITHDRAWAL })}</div>
         <div tw="flex items-center gap-0.125">
           {withdrawalOutput}

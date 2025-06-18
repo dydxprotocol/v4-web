@@ -216,7 +216,7 @@ export const WithdrawForm = ({
   };
 
   return (
-    <div tw="flex min-h-10 flex-col gap-1 p-1.25">
+    <div tw="flex h-full min-h-10 flex-col gap-1 p-1.25">
       <AddressInput
         value={destinationAddress}
         onChange={setDestinationAddress}
@@ -235,7 +235,7 @@ export const WithdrawForm = ({
         type="withdraw"
       />
       <Button
-        tw="mt-1 w-full"
+        tw="mt-auto w-full"
         state={{
           isLoading: isFetching || isLoading,
           isDisabled: withdrawDisabled,

@@ -91,8 +91,8 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
         <WithdrawStatus id={currentWithdrawId} onClose={() => setIsOpen(false)} />
       )}
       {!currentWithdrawId && (
-        <div tw="w-[100%] overflow-hidden">
-          <div tw="flex w-[200%]">
+        <div tw="h-full w-full overflow-hidden">
+          <div tw="flex h-full w-[200%]">
             <div
               tw="w-[50%]"
               style={{ marginLeft: formState === 'form' ? 0 : '-50%', transition: 'margin 500ms' }}
