@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logBonsaiError } from '@/bonsai/logs';
-import { toPng } from 'html-to-image';
+import { getFontEmbedCSS, toPng } from 'html-to-image';
 import styled from 'styled-components';
 
 import {
@@ -66,7 +66,13 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
     try {
       setIsCopying(true);
-      const dataUrl = await toPng(affiliateCardRef.current, { cacheBust: true });
+      const fontEmbedCss = await getFontEmbedCSS(affiliateCardRef.current);
+
+      const dataUrl = await toPng(affiliateCardRef.current, {
+        cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: fontEmbedCss,
+      });
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': dataUrl })]);
     } catch (error) {
       logBonsaiError('ShareAffiliateDialog', 'onCopy', { error });

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { toPng } from 'html-to-image';
+import { getFontEmbedCSS, toPng } from 'html-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -61,7 +61,12 @@ export const SharePNLAnalyticsDialog = ({
 
     try {
       setIsCopying(true);
-      const dataUrl = await toPng(pnlCardRef.current, { cacheBust: true });
+      const fontEmbedCss = await getFontEmbedCSS(pnlCardRef.current);
+      const dataUrl = await toPng(pnlCardRef.current, {
+        cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: fontEmbedCss,
+      });
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': dataUrl })]);
     } catch (error) {
       logBonsaiError('SharePNLAnalyticsDialog', 'onCopy', { error });
