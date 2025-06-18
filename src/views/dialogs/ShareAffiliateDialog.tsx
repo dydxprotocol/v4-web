@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useToBlob } from '@hugocxl/react-to-image';
+import { logBonsaiError } from '@/bonsai/logs';
+import { toPng } from 'html-to-image';
 import styled from 'styled-components';
 
 import {
@@ -32,15 +33,6 @@ import { triggerTwitterIntent } from '@/lib/twitter';
 import { AffiliateProgress } from '../Affiliates/AffiliateProgress';
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
-const copyBlobToClipboard = async (blob: Blob | null) => {
-  if (!blob) {
-    return;
-  }
-
-  const item = new ClipboardItem({ 'image/png': blob });
-  await navigator.clipboard.write([item]);
-};
-
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
   const { affiliateProgramFaq, affiliateProgram } = useURLConfigs();
@@ -60,30 +52,45 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
   const maxEarning = maxEarningData?.maxEarning;
 
-  const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
-    quality: 1.0,
-    onSuccess: copyBlobToClipboard,
-  });
-
-  const [{ isLoading: isSharing }, convertShare, refShare] = useToBlob<HTMLDivElement>({
-    quality: 1.0,
-    onSuccess: async (blob) => {
-      await copyBlobToClipboard(blob);
-
-      triggerTwitterIntent({
-        text: `${stringGetter({
-          key: STRING_KEYS.TWEET_SHARE_AFFILIATES,
-          params: {
-            AMOUNT_USD: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
-          },
-        })}\n\n${affiliatesUrl}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
-        related: 'dYdX',
-      });
-    },
-  });
+  const [isCopying, setIsCopying] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const affiliateCardRef = useRef<HTMLDivElement>(null);
 
   const affiliatesUrl =
     data?.metadata?.referralCode && `${window.location.host}?ref=${data.metadata.referralCode}`;
+
+  const onCopy = useCallback(async () => {
+    if (affiliateCardRef.current == null) {
+      return;
+    }
+
+    try {
+      setIsCopying(true);
+      const dataUrl = await toPng(affiliateCardRef.current, { cacheBust: true });
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': dataUrl })]);
+    } catch (error) {
+      logBonsaiError('ShareAffiliateDialog', 'onCopy', { error });
+    } finally {
+      setIsCopying(false);
+    }
+  }, [affiliateCardRef]);
+
+  const onCopyAndShare = useCallback(async () => {
+    setIsSharing(true);
+    await onCopy();
+
+    triggerTwitterIntent({
+      text: `${stringGetter({
+        key: STRING_KEYS.TWEET_SHARE_AFFILIATES,
+        params: {
+          AMOUNT_USD: AFFILIATES_FEE_DISCOUNT_USD.toLocaleString(),
+        },
+      })}\n\n${affiliatesUrl}\n\n#dYdX \n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+      related: 'dYdX',
+    });
+
+    setIsSharing(false);
+  }, [affiliatesUrl, onCopy, stringGetter]);
 
   const dialogDescription = (
     <span>
@@ -148,15 +155,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             )}
           </div>
           {affiliatesUrl && (
-            <div
-              ref={(domNode) => {
-                if (domNode) {
-                  ref(domNode);
-                  refShare(domNode);
-                }
-              }}
-              tw="relative"
-            >
+            <div ref={affiliateCardRef} tw="relative">
               <img src="/affiliates-share.png" alt="share affiliates" tw="w-full rounded-1" />
               <$QrCode
                 tw="rounded-0.75 bg-white p-0.5"
@@ -191,7 +190,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               action={ButtonAction.Base}
               slotLeft={<Icon iconName={IconName.SocialX} />}
               onClick={() => {
-                convertShare();
+                onCopyAndShare();
               }}
               state={{
                 isLoading: isSharing,

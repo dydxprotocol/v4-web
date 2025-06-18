@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { useToBlob } from '@hugocxl/react-to-image';
+import { toPng } from 'html-to-image';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -33,15 +34,6 @@ import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
-const copyBlobToClipboard = async (blob: Blob | null) => {
-  if (!blob) {
-    return;
-  }
-
-  const item = new ClipboardItem({ 'image/png': blob });
-  await navigator.clipboard.write([item]);
-};
-
 export const SharePNLAnalyticsDialog = ({
   marketId,
   assetId,
@@ -56,32 +48,46 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
+  const [isCopying, setIsCopying] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const pnlCardRef = useRef<HTMLDivElement>(null);
 
   const symbol = getDisplayableAssetFromBaseAsset(assetId);
 
-  const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
-    quality: 1.0,
-    onSuccess: copyBlobToClipboard,
-  });
+  const onCopy = useCallback(async () => {
+    if (pnlCardRef.current == null) {
+      return;
+    }
 
-  const [{ isLoading: isSharing }, convertShare, refShare] = useToBlob<HTMLDivElement>({
-    quality: 1.0,
-    onSuccess: async (blob) => {
-      await copyBlobToClipboard(blob);
+    try {
+      setIsCopying(true);
+      const dataUrl = await toPng(pnlCardRef.current, { cacheBust: true });
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': dataUrl })]);
+    } catch (error) {
+      logBonsaiError('SharePNLAnalyticsDialog', 'onCopy', { error });
+    } finally {
+      setIsCopying(false);
+    }
+  }, [pnlCardRef]);
 
-      triggerTwitterIntent({
-        text: `${stringGetter({
-          key: STRING_KEYS.TWEET_MARKET_POSITION,
-          params: {
-            MARKET: symbol,
-          },
-        })}\n\n#dYdX #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
-        related: 'dYdX',
-      });
+  const onCopyAndShare = useCallback(async () => {
+    setIsSharing(true);
+    await onCopy();
 
-      dispatch(closeDialog());
-    },
-  });
+    triggerTwitterIntent({
+      text: `${stringGetter({
+        key: STRING_KEYS.TWEET_MARKET_POSITION,
+        params: {
+          MARKET: symbol,
+        },
+      })}\n\n#dYdX #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+      related: 'dYdX',
+    });
+
+    setIsSharing(false);
+
+    dispatch(closeDialog());
+  }, [dispatch, onCopy, stringGetter, symbol]);
 
   const sideSign = useMemo(() => {
     switch (side) {
@@ -100,14 +106,7 @@ export const SharePNLAnalyticsDialog = ({
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}>
-      <$ShareableCard
-        ref={(domNode) => {
-          if (domNode) {
-            ref(domNode);
-            refShare(domNode);
-          }
-        }}
-      >
+      <$ShareableCard ref={pnlCardRef}>
         <div tw="flexColumn h-full">
           <div tw="row mb-0.75 gap-0.5">
             <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="[--asset-icon-size:1.625rem]" />
@@ -176,9 +175,9 @@ export const SharePNLAnalyticsDialog = ({
         <$Action
           action={ButtonAction.Secondary}
           slotLeft={<Icon iconName={IconName.Copy} />}
-          onClick={() => {
+          onClick={async () => {
             track(AnalyticsEvents.SharePnlCopied({ asset: assetId }));
-            convert();
+            await onCopy();
           }}
           state={{
             isLoading: isCopying,
@@ -189,9 +188,9 @@ export const SharePNLAnalyticsDialog = ({
         <$Action
           action={ButtonAction.Primary}
           slotLeft={<Icon iconName={IconName.SocialX} />}
-          onClick={() => {
+          onClick={async () => {
             track(AnalyticsEvents.SharePnlShared({ asset: assetId }));
-            convertShare();
+            await onCopyAndShare();
           }}
           state={{
             isLoading: isSharing,
