@@ -9,6 +9,8 @@ export enum StatsigFlags {
   ffEnableFunkitNew = 'ff_enable_funkit_new',
   ffDepositRewrite = 'ff_deposit_rewrite',
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
+
+  abDefaultToMarkets = 'ab_default_to_markets',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

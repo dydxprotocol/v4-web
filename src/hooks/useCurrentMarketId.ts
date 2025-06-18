@@ -93,9 +93,9 @@ export const useCurrentMarketId = () => {
   useEffect(() => {
     // If v4_markets has not been subscribed to yet or marketId is not specified, default to validId
     if (!marketId) {
+      dispatch(closeDialogInTradeBox());
       setLastViewedMarket(validId);
       dispatch(setCurrentMarketId(validId));
-      dispatch(closeDialogInTradeBox());
 
       if (validId !== marketId) {
         navigate(`${AppRoute.Trade}/${validId}`, {
