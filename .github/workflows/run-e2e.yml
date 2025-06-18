@@ -40,13 +40,12 @@ jobs:
           pnpm install --loglevel warn --ignore-scripts --frozen-lockfile
           tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
-      - name: Run e2e tests
-        # disabled 4/30/25 because our api key expired and we need to pay for browserstack again
-        # if: steps.check_env.outputs.should_run_tests == 'true'
-        # env:
-        #   BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-        #   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        #   E2E_ENVIRONMENT_PASSWORD: ${{ secrets.E2E_ENVIRONMENT_PASSWORD }}
-        #   E2E_ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
-        # run: pnpm exec wdio run ./wdio.conf.ts
-        run: pnpm test
+      # disabled 4/30/25 because our api key expired and we need to pay for browserstack again
+      # - name: Run e2e tests
+      #   if: steps.check_env.outputs.should_run_tests == 'true'
+      #   env:
+      #     BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+      #     BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+      #     E2E_ENVIRONMENT_PASSWORD: ${{ secrets.E2E_ENVIRONMENT_PASSWORD }}
+      #     E2E_ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
+      #   run: pnpm exec wdio run ./wdio.conf.ts
