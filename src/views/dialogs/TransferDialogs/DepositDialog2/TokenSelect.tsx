@@ -108,7 +108,6 @@ export const TokenSelect = ({
           <div tw="flex items-center gap-0.75">
             <Icon tw="[--icon-size:2rem]" iconName={IconName.Bank} />
             <div tw="flex flex-col items-start gap-0.125">
-              {/* TODO: Localize */}
               <div tw="text-color-text-2 font-base-medium">
                 {stringGetter({ key: STRING_KEYS.DEPOSIT_FROM_CEX })}
               </div>

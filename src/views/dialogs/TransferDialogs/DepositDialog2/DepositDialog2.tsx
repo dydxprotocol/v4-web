@@ -69,11 +69,13 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const [formState, setFormState] = useState<DepositFormState>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
 
-  const dialogTitle = {
-    form: stringGetter({ key: STRING_KEYS.DEPOSIT }),
-    'token-select': stringGetter({ key: STRING_KEYS.SELECT_TOKEN }),
-    'qr-deposit': stringGetter({ key: STRING_KEYS.QR_DEPOSIT }),
-  }[formState];
+  const dialogTitle = (
+    {
+      form: stringGetter({ key: STRING_KEYS.DEPOSIT }),
+      'token-select': stringGetter({ key: STRING_KEYS.SELECT_TOKEN }),
+      'qr-deposit': stringGetter({ key: STRING_KEYS.QR_DEPOSIT }),
+    } satisfies Record<DepositFormState, string>
+  )[formState];
 
   const onDeposit = (deposit: Deposit) => {
     if (!dydxAddress) return;
