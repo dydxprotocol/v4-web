@@ -6,12 +6,14 @@ import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { MODERATE_DEBOUNCE_MS } from '@/constants/debounce';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -34,8 +36,11 @@ export const UserMenuContent = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const onboardingState = useAppSelector(getOnboardingState);
+  const { complianceState } = useComplianceState();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
-  const { equity } = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
+  const { equity, freeCollateral } = orEmptyObj(
+    useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
+  );
 
   const isLoading =
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading) === 'pending';
@@ -177,8 +182,12 @@ export const UserMenuContent = () => {
   );
 
   const isTransferDisabled = !canAccountTrade || isLoading;
+  const hasBalance = freeCollateral?.gt(0);
+  const showWithdrawOnly = canAccountTrade && hasBalance;
+  const showAllTransferOptions =
+    canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
 
-  const transferContent = (
+  const transferContent = showAllTransferOptions ? (
     <div tw="row gap-0.5">
       <Button
         tw="flex-1"
@@ -192,16 +201,39 @@ export const UserMenuContent = () => {
         {stringGetter({ key: STRING_KEYS.DEPOSIT })}
       </Button>
       <IconButton
+        tw="text-color-accent"
+        size={ButtonSize.Base}
+        shape={ButtonShape.Square}
+        iconName={IconName.Move}
+        onClick={() => {
+          dispatch(openDialog(DialogTypes.Withdraw2()));
+        }}
+      />
+      <IconButton
         size={ButtonSize.Base}
         shape={ButtonShape.Square}
         iconName={IconName.TransferArrows}
         state={{ isDisabled: isTransferDisabled }}
         onClick={() => {
-          dispatch(openDialog(DialogTypes.Withdraw2()));
+          dispatch(openDialog(DialogTypes.Transfer({})));
         }}
       />
     </div>
-  );
+  ) : showWithdrawOnly ? (
+    <div tw="row gap-0.5">
+      <Button
+        tw="flex-1"
+        state={{ isDisabled: isTransferDisabled }}
+        action={ButtonAction.Primary}
+        onClick={() => {
+          dispatch(openDialog(DialogTypes.Withdraw2()));
+        }}
+      >
+        <Icon iconName={IconName.Move} />
+        {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+      </Button>
+    </div>
+  ) : null;
 
   const menuContent = (
     <$MenuContent>
