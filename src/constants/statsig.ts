@@ -11,6 +11,7 @@ export enum StatsigFlags {
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
 
   abDefaultToMarkets = 'ab_default_to_markets',
+  abPopupDeposit = 'ab_popup_deposit',
 }
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
