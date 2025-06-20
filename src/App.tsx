@@ -228,19 +228,19 @@ function useUiRefreshMigrations() {
 }
 
 function useOpenDepositIfRelevant() {
-  const onboarded = useAppSelector((state) => state.account.onboardedThisSession);
+  const hasOnboarded = useAppSelector((state) => state.account.onboardedThisSession);
   const equity = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)?.equity.toNumber();
   const dispatch = useAppDispatch();
   const shouldDeposit = useStatsigGateValue(StatsigFlags.abPopupDeposit);
   const opened = useRef(false);
 
   useEffect(() => {
-    if (shouldDeposit && onboarded && !opened.current && equity != null && equity < 1) {
+    if (shouldDeposit && hasOnboarded && !opened.current && equity != null && equity < 1) {
       opened.current = true;
       dispatch(setOnboardedThisSession(true));
       dispatch(openDialog(DialogTypes.Deposit2({})));
     }
-  }, [dispatch, equity, onboarded, shouldDeposit]);
+  }, [dispatch, equity, hasOnboarded, shouldDeposit]);
 }
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
