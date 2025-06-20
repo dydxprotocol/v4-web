@@ -216,7 +216,7 @@ export const WithdrawForm = ({
   };
 
   return (
-    <div tw="flex min-h-10 flex-col gap-1 p-1.25">
+    <div tw="flex h-full min-h-10 flex-col gap-1 p-1.25">
       <AddressInput
         value={destinationAddress}
         onChange={setDestinationAddress}
@@ -234,18 +234,22 @@ export const WithdrawForm = ({
         onSelectSpeed={setSelectedSpeed}
         type="withdraw"
       />
-      <Button
-        tw="mt-1 w-full"
-        state={{
-          isLoading: isFetching || isLoading,
-          isDisabled: withdrawDisabled,
-        }}
-        onClick={onWithdrawClick}
-        action={ButtonAction.Primary}
-      >
-        {buttonInner}
-      </Button>
-      {receipt}
+
+      <div tw="flexColumn mt-auto gap-0.5">
+        {receipt}
+
+        <Button
+          tw="w-full"
+          state={{
+            isLoading: isFetching || isLoading,
+            isDisabled: withdrawDisabled,
+          }}
+          onClick={onWithdrawClick}
+          action={ButtonAction.Primary}
+        >
+          {buttonInner}
+        </Button>
+      </div>
     </div>
   );
 };
