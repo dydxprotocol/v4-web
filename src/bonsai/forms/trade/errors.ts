@@ -691,15 +691,23 @@ function validateParentSubaccountMarginUsage(
   summary: TradeFormSummary
 ): ValidationError | undefined {
   const accountAfter = summary.accountDetailsAfter?.account;
-  if (!accountAfter) {
+  const accountBefore = summary.accountDetailsBefore?.account;
+  if (!accountAfter || !accountBefore) {
     return undefined;
   }
 
-  const equity = accountAfter.equity.toNumber();
-  const marginUsage = accountAfter.marginUsage?.toNumber();
+  const equityAfter = accountAfter.equity.toNumber();
+  const marginUsageAfter = accountAfter.marginUsage?.toNumber();
+
+  const equityBefore = accountBefore.equity.toNumber();
+  const marginUsageBefore = accountBefore.marginUsage?.toNumber();
 
   // Check if margin usage is invalid
-  if (equity <= 0 || marginUsage == null || marginUsage >= 1) {
+  const isInvalidAfter = equityAfter <= 0 || marginUsageAfter == null || marginUsageAfter >= 1;
+  const wasInvalidBefore = equityBefore <= 0 || marginUsageBefore == null || marginUsageBefore >= 1;
+  // only error if they're going from valid->invalid
+  // invalid->invalid is fine and invalid->valid is fine
+  if (isInvalidAfter && !wasInvalidBefore) {
     return simpleValidationError({
       code: 'INVALID_NEW_ACCOUNT_MARGIN_USAGE',
       type: ErrorType.error,
