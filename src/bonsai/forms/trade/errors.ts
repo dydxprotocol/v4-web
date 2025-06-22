@@ -690,6 +690,11 @@ function validateAccountState(
 function validateParentSubaccountMarginUsage(
   summary: TradeFormSummary
 ): ValidationError | undefined {
+  // ignore if reducing
+  if (summary.effectiveTrade.reduceOnly) {
+    return undefined;
+  }
+
   const accountAfter = summary.accountDetailsAfter?.account;
   const accountBefore = summary.accountDetailsBefore?.account;
   if (!accountAfter || !accountBefore) {
