@@ -130,6 +130,20 @@ const Content = () => {
                 <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
               </Routes>
             </Suspense>
+            <div
+              id="debug-log"
+              css={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                maxHeight: 200,
+                overflow: 'auto',
+                background: '#000',
+                color: '#0f0',
+                fontSize: 10,
+                zIndex: 9999,
+              }}
+            />
           </$SimpleUiMain>
 
           <$DialogArea ref={dialogAreaRef}>

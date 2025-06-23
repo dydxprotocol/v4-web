@@ -77,3 +77,8 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
     }
   };
 }
+
+export const debugLog = (msg: string) => {
+  const el = document.getElementById('debug-log');
+  if (el) el.innerHTML += `<div>${msg}</div>`;
+};

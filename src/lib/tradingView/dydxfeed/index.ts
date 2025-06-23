@@ -1,5 +1,5 @@
 import { AppStartupTimer } from '@/bonsai/appStartupTimer';
-import { wrapAndLogBonsaiError } from '@/bonsai/logs';
+import { debugLog, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
 import { subscribeOnStream, unsubscribeFromStream } from '@/bonsai/websocket/candlesForTradingView';
@@ -72,6 +72,7 @@ export const getDydxDatafeed = (
   stringGetter: StringGetterFunction
 ): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
+    debugLog('onReady');
     setTimeout(() => callback(configurationData), 0);
   },
 
