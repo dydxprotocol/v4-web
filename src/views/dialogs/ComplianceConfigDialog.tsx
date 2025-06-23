@@ -72,7 +72,7 @@ const usePreferenceMenu = () => {
             <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
           ),
           onSelect: () => {
-            dispatch(geoRestricted ? setGeo('') : setGeo('US'));
+            dispatch(geoRestricted ? setGeo('JP') : setGeo('US'));
           },
         },
       ],
