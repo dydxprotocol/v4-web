@@ -144,6 +144,7 @@ export const useTradingView = ({
         debugLog('Create and setWidget');
 
         tvChartWidget.onChartReady(() => {
+          debugLog('onChartReady');
           // Initialize additional right-click-menu options
           tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 

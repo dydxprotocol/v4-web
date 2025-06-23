@@ -116,6 +116,7 @@ export const getDydxDatafeed = (
       format: 'price',
     };
 
+    debugLog(`resolveSymbol: ${JSON.stringify(symbolInfo)}`);
     setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
   },
 
