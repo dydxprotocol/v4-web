@@ -83,6 +83,7 @@ export const BaseTvChart = ({
             currentResolution={currentResolution}
           />
         )}
+        {debugCommands}
       </div>
     );
   }
@@ -92,6 +93,7 @@ export const BaseTvChart = ({
       {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
 
       <div id="tv-price-chart" />
+      {debugCommands}
     </$PriceChart>
   );
 };
