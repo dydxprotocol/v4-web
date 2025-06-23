@@ -46,6 +46,27 @@ export const BaseTvChart = ({
     [isChartReady, tvWidget]
   );
 
+  const debugCommands = (
+    <div tw="flexColumn gap-0.25">
+      <button
+        type="button"
+        onClick={() => {
+          window.alert(JSON.stringify(tvWidget));
+        }}
+      >
+        tvWidget
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          window.alert(isChartReady);
+        }}
+      >
+        isChartReady
+      </button>
+    </div>
+  );
+
   if (isSimpleUi) {
     return (
       <div tw="flexColumn h-full">
