@@ -217,14 +217,14 @@ export function useUpdateTransfers() {
 
                 if (status === 'success') {
                   logBonsaiInfo('useUpdateTransfers', 'withdraw finalized', {
-                    ...transfer,
+                    ...latestTransfer,
                     finalAmountUsd: finalAmount,
                     status,
                     transferAssetRelease: response.transferAssetRelease,
                   });
                   track(
                     AnalyticsEvents.WithdrawFinalized({
-                      ...transfer,
+                      ...latestTransfer,
                       finalAmountUsd: finalAmount,
                       status,
                       transferAssetRelease: response.transferAssetRelease,
