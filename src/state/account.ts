@@ -8,6 +8,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
+  onboardedThisSession: boolean;
 };
 
 const initialState: AccountState = {
@@ -22,6 +23,7 @@ const initialState: AccountState = {
     [OnboardingGuard.hasPreviousTransactions]: undefined,
   },
   onboardingState: OnboardingState.Disconnected,
+  onboardedThisSession: false,
 };
 
 export const accountSlice = createSlice({
@@ -42,7 +44,12 @@ export const accountSlice = createSlice({
       ...state,
       onboardingState: action.payload,
     }),
+    setOnboardedThisSession: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      onboardedThisSession: action.payload,
+    }),
   },
 });
 
-export const { setOnboardingGuard, setOnboardingState } = accountSlice.actions;
+export const { setOnboardingGuard, setOnboardingState, setOnboardedThisSession } =
+  accountSlice.actions;
