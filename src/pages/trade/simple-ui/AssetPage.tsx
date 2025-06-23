@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
+
 import { OrderSide } from '@/bonsai/forms/trade/types';
+import { debugLog } from '@/bonsai/logs';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -33,6 +36,10 @@ const AssetPage = () => {
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+
+  useEffect(() => {
+    debugLog('AssetPage');
+  }, []);
 
   if (currentMarketId == null) {
     return <LoadingSpace id="asset-page-loading" />;
