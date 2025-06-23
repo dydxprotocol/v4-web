@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import environments from '../../public/configs/v1/env.json';
 
-export const CURRENT_MODE = 'MAINNET';
+export const CURRENT_MODE = 'MAINNET' as 'MAINNET' | 'TESTNET' | 'DEV';
 // ({
 //   production: 'MAINNET',
 //   testnet: 'TESTNET',
