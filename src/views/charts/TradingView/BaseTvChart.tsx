@@ -48,22 +48,8 @@ export const BaseTvChart = ({
 
   const debugCommands = (
     <div tw="flexColumn gap-0.25">
-      <button
-        type="button"
-        onClick={() => {
-          window.alert(JSON.stringify(tvWidget));
-        }}
-      >
-        tvWidget
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          window.alert(isChartReady);
-        }}
-      >
-        isChartReady
-      </button>
+      <span>{JSON.stringify(isChartReady)}</span>
+      <span tw="h-10 overflow-auto">{JSON.stringify(tvWidget)}</span>
     </div>
   );
 
