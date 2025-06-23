@@ -61,6 +61,88 @@ const configurationData: DatafeedConfiguration = {
   ],
 };
 
+export const TEST_DATAFEED = {
+  onReady: (callback: OnReadyCallback) => {
+    setTimeout(() => {
+      callback({
+        supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'] as ResolutionString[],
+      });
+    }, 0);
+  },
+
+  searchSymbols: (
+    _userInput: string,
+    _exchange: string,
+    _symbolType: string,
+    onResultReadyCallback: SearchSymbolsCallback
+  ) => {
+    onResultReadyCallback([]);
+  },
+
+  resolveSymbol: (symbolName: string, onResolve: ResolveCallback, _onError: ErrorCallback) => {
+    setTimeout(() => {
+      onResolve({
+        ticker: symbolName,
+        name: symbolName,
+        description: '',
+        type: 'crypto',
+        exchange: 'dYdX',
+        listed_exchange: 'dYdX',
+        has_intraday: true,
+        has_daily: true,
+
+        minmov: 1,
+        pricescale: 100,
+
+        session: '24x7',
+        intraday_multipliers: ['1', '5', '15', '30', '60', '240'],
+        supported_resolutions: configurationData.supported_resolutions!,
+        data_status: 'streaming',
+        timezone,
+        format: 'price',
+      });
+    }, 0);
+  },
+
+  getBars: async (
+    _symbolInfo: LibrarySymbolInfo,
+    _resolution: ResolutionString,
+    periodParams: {
+      countBack: number;
+      from: number;
+      to: number;
+      firstDataRequest: boolean;
+    },
+    onHistoryCallback: HistoryCallback,
+    _onErrorCallback: ErrorCallback
+  ) => {
+    // Example: return dummy bars
+    const { from } = periodParams;
+    const bars = [
+      {
+        time: from * 1000,
+        low: 100,
+        high: 110,
+        open: 105,
+        close: 108,
+        volume: 1000,
+      },
+    ];
+    onHistoryCallback(bars, { noData: false });
+  },
+  subscribeBars: (
+    _symbolInfo: LibrarySymbolInfo,
+    _resolution: ResolutionString,
+    _onTick: SubscribeBarsCallback,
+    _listenerGuid: string,
+    _onResetCacheNeededCallback: Function
+  ) => {},
+
+  unsubscribeBars: (subscriberUID: string) => {
+    unsubscribeFromStream(subscriberUID);
+  },
+};
+
 export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
@@ -77,9 +159,9 @@ export const getDydxDatafeed = (
   },
 
   searchSymbols: (
-    userInput: string,
-    exchange: string,
-    symbolType: string,
+    _userInput: string,
+    _exchange: string,
+    _symbolType: string,
     onResultReadyCallback: SearchSymbolsCallback
   ) => {
     onResultReadyCallback([]);

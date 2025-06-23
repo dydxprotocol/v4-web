@@ -26,7 +26,7 @@ import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
 import { testFlags } from '@/lib/testFlags';
-import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
+import { getDydxDatafeed, TEST_DATAFEED } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -117,17 +117,19 @@ export const useTradingView = ({
       const widgetOptions = getWidgetOptions(false, isSimpleUi);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
+      // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
+      const datafeed = getDydxDatafeed(
+        store,
+        getCandlesForDatafeed,
+        { decimal, group },
+        selectedLocale,
+        stringGetter
+      );
 
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(
-          store,
-          getCandlesForDatafeed,
-          { decimal, group },
-          selectedLocale,
-          stringGetter
-        ),
+        datafeed: TEST_DATAFEED,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
         symbol: marketId,
