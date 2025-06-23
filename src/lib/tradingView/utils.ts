@@ -163,7 +163,7 @@ export const getWidgetOverrides = ({
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
       'paneProperties.backgroundType': 'solid' as const,
-      priceScaleSelectionStrategyName: isSimpleUi ? 'left' : undefined,
+      priceScaleSelectionStrategyName: isSimpleUi ? 'left' : 'auto',
       'mainSeriesProperties.style': 1,
       'mainSeriesProperties.candleStyle.upColor': theme.positive,
       'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
@@ -177,7 +177,7 @@ export const getWidgetOverrides = ({
       'scalesProperties.backgroundColor': theme.layer2,
       'scalesProperties.lineColor': theme.layer3,
       'scalesProperties.fontSize': 12,
-    } as Partial<ChartPropertiesOverrides>,
+    } satisfies Partial<ChartPropertiesOverrides>,
     studies_overrides: {
       'volume.volume.color.0': theme.negative,
       'volume.volume.color.1': theme.positive,
