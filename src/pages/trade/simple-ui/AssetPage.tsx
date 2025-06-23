@@ -1,10 +1,12 @@
 import { OrderSide } from '@/bonsai/forms/trade/types';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -33,6 +35,7 @@ const AssetPage = () => {
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const { complianceState } = useComplianceState();
 
   if (currentMarketId == null) {
     return <LoadingSpace id="asset-page-loading" />;
@@ -101,7 +104,17 @@ const AssetPage = () => {
     </>
   );
 
-  const footerContent = canAccountTrade ? (
+  const isDisabled = complianceState !== ComplianceStates.FULL_ACCESS;
+
+  const footerContent = isDisabled ? (
+    <Button
+      tw="flex-1 border border-solid border-color-layer-6"
+      shape={ButtonShape.Pill}
+      state={ButtonState.Disabled}
+    >
+      {stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
+    </Button>
+  ) : canAccountTrade ? (
     <>
       <Button
         tw="flex-1 bg-color-negative-dark text-color-negative"
@@ -140,7 +153,7 @@ const AssetPage = () => {
         <div tw="mt-[5.5rem] grid gap-1.5 overflow-auto pb-1.5">{pageContent}</div>
       ) : (
         <>
-          <div tw="mt-[4rem] overflow-auto">{pageContent}</div>
+          <div tw="overflow-auto">{pageContent}</div>
           <div
             tw="row fixed bottom-0 left-0 right-0 gap-1.25 px-1.25 py-1.25"
             css={{

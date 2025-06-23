@@ -13,6 +13,7 @@ import { ListItem, MarketsSortType, PositionSortType } from '@/constants/marketL
 import { MarketData, MarketFilters } from '@/constants/markets';
 import { EMPTY_ARR } from '@/constants/objects';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -138,6 +139,8 @@ export const MarketList = ({
   const sortType = useAppSelector(getSimpleUISortMarketsBy);
   const positionSortType = useAppSelector(getSimpleUISortPositionsBy);
   const subaccountEquity = useAppSelector(getSubaccountEquity);
+  const { showComplianceBanner } = useComplianceState();
+
   const setSortType = useCallback(
     (newSortType: MarketsSortType) => {
       dispatch(setSimpleUISortMarketsBy(newSortType));
@@ -421,7 +424,7 @@ export const MarketList = ({
       ref={parentRef}
       tw="relative h-full max-h-full w-full max-w-full overflow-auto"
       css={{
-        paddingBottom: isSearchOpen ? '1rem' : '6rem',
+        paddingBottom: showComplianceBanner ? '12rem' : isSearchOpen ? '1rem' : '6rem',
       }}
     >
       <div

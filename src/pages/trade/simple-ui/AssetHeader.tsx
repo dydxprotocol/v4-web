@@ -55,7 +55,7 @@ export const AssetHeader = ({ isLaunchableMarket }: { isLaunchableMarket?: boole
   );
 
   return (
-    <div tw="inlineRow fixed left-0 right-0 top-0 h-[4rem] justify-between gap-[1ch] bg-color-layer-2 pl-0.5 pr-1.25">
+    <div tw="inlineRow h-[4rem] justify-between gap-[1ch] bg-color-layer-2 pl-0.5 pr-1.25">
       <div tw="inlineRow">
         <BackButton tw="text-color-text-0" onClick={() => navigate(AppRoute.Markets)} />
         <AssetIcon

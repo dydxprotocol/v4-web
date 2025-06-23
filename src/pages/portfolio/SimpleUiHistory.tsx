@@ -80,4 +80,5 @@ export const SimpleUiHistory = () => {
 
 const $TableContainer = styled.div`
   display: grid;
+  min-height: 12.5rem;
 `;
