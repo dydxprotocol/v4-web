@@ -1,8 +1,10 @@
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
+import { debugLog } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
+  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   TradingTerminalWidgetOptions,
@@ -131,51 +133,58 @@ export const useTradingView = ({
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
         auto_save_delay: 1,
+        debug: true,
       };
 
-      const tvChartWidget = new Widget(options);
-      setTvWidget(tvChartWidget);
+      let tvChartWidget: IChartingLibraryWidget;
 
-      tvChartWidget.onChartReady(() => {
-        // Initialize additional right-click-menu options
-        tvChartWidget!.onContextMenu(tradingViewLimitOrder);
+      try {
+        tvChartWidget = new Widget(options);
+        setTvWidget(tvChartWidget);
 
-        tvChartWidget!.headerReady().then(() => {
-          // Order Lines
-          initializeToggle({
-            toggleRef: orderLineToggleRef,
-            widget: tvChartWidget!,
-            isOn: orderLinesToggleOn,
-            setToggleOn: setOrderLinesToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-            }),
+        tvChartWidget.onChartReady(() => {
+          // Initialize additional right-click-menu options
+          tvChartWidget!.onContextMenu(tradingViewLimitOrder);
+
+          tvChartWidget!.headerReady().then(() => {
+            // Order Lines
+            initializeToggle({
+              toggleRef: orderLineToggleRef,
+              widget: tvChartWidget!,
+              isOn: orderLinesToggleOn,
+              setToggleOn: setOrderLinesToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.ORDER_LINES,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+              }),
+            });
+
+            // Buy/Sell Marks
+            initializeToggle({
+              toggleRef: buySellMarksToggleRef,
+              widget: tvChartWidget!,
+              isOn: buySellMarksToggleOn,
+              setToggleOn: setBuySellMarksToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+              }),
+            });
           });
 
-          // Buy/Sell Marks
-          initializeToggle({
-            toggleRef: buySellMarksToggleRef,
-            widget: tvChartWidget!,
-            isOn: buySellMarksToggleOn,
-            setToggleOn: setBuySellMarksToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-            }),
-          });
+          tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
+            tvChartWidget!.save((chartConfig: object) => {
+              dispatch(updateChartConfig(chartConfig));
+            })
+          );
         });
-
-        tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
-          tvChartWidget!.save((chartConfig: object) => {
-            dispatch(updateChartConfig(chartConfig));
-          })
-        );
-      });
+      } catch (error) {
+        debugLog(error);
+      }
       return () => {
         orderLineToggleRef.current?.remove();
         orderLineToggleRef.current = null;
