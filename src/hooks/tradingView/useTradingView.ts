@@ -141,6 +141,7 @@ export const useTradingView = ({
       try {
         tvChartWidget = new Widget(options);
         setTvWidget(tvChartWidget);
+        debugLog('Create and setWidget');
 
         tvChartWidget.onChartReady(() => {
           // Initialize additional right-click-menu options
@@ -183,7 +184,7 @@ export const useTradingView = ({
           );
         });
       } catch (error) {
-        debugLog(error);
+        debugLog(`error: ${JSON.stringify(error)}`);
       }
       return () => {
         orderLineToggleRef.current?.remove();
