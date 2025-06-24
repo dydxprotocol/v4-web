@@ -120,7 +120,7 @@ export function getSkipClient() {
 }
 
 const useSkipClientContext = () => {
-  const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators, skip } =
+  const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators } =
     useEndpointsConfig();
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
@@ -169,7 +169,6 @@ const useSkipClientContext = () => {
 
   useEffect(() => {
     const options: SkipClientOptions = {
-      apiUrl: skip,
       endpointOptions: {
         getRpcEndpointForChain: async (chainId: string) => {
           if (chainId === getNobleChainId()) return nobleValidator;
@@ -195,7 +194,6 @@ const useSkipClientContext = () => {
     nobleValidator,
     osmosisValidator,
     selectedDydxChainId,
-    skip,
     solanaRpcUrl,
     validators,
   ]);
