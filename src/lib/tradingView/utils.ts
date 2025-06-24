@@ -216,8 +216,8 @@ export const getWidgetOptions = (
     'symbol_info',
     'go_to_date',
     'timeframes_toolbar',
-    'header_layouttoggle',
-    'trading_account_manager',
+    // 'header_layouttoggle',
+    // 'trading_account_manager',
     ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
     ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
   ];
