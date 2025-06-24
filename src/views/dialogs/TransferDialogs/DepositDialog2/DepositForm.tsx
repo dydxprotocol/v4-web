@@ -1,13 +1,16 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { sumBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useWalletClient } from 'wagmi';
 
+import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
+import { SKIP_GO_FAST_TRANSFER_LIMIT, SKIP_GO_FAST_TRANSFER_MIN } from '@/constants/skip';
 import { ColorToken } from '@/constants/styles/base';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -20,6 +23,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { WarningIcon } from '@/icons';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
@@ -34,6 +38,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { Deposit } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
+import { calc } from '@/lib/do';
 import { MustBigNumber, MustNumber } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -71,11 +76,30 @@ export const DepositForm = ({
     error,
   } = useDepositRoutes(token, debouncedAmount);
 
+  const fastRouteFee =
+    routes?.fast?.estimatedFees &&
+    sumBy(routes.fast.estimatedFees, (fee) => MustNumber(fee.amount));
+
   // Difference between selectedRoute and depositRoute:
   // selectedRoute may be the cached route from the previous query response,
   // whereas depositRoute is undefined while the current route query is still loading
-  const selectedRoute = routes?.fast ?? routes?.slow;
+  const selectedRoute = calc(() => {
+    if (fastRouteFee != null && fastRouteFee > 0) {
+      return routes?.slow;
+    }
+
+    return routes?.fast ?? routes?.slow;
+  });
+
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
+
+  const isBelowInstantDepositMin =
+    depositRoute?.usdAmountIn &&
+    MustBigNumber(depositRoute.usdAmountIn).lt(SKIP_GO_FAST_TRANSFER_MIN);
+
+  const isAboveInstantDepositMax =
+    depositRoute?.usdAmountIn &&
+    MustBigNumber(depositRoute.usdAmountIn).gt(SKIP_GO_FAST_TRANSFER_LIMIT);
 
   const { freeCollateral } = orEmptyObj(
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
@@ -377,6 +401,23 @@ export const DepositForm = ({
     />
   );
 
+  const noticeMessage = calc(() => {
+    if (isBelowInstantDepositMin) {
+      return stringGetter({
+        key: STRING_KEYS.FREE_INSTANT_DEPOSIT_MIN,
+        params: { MIN_AMOUNT: SKIP_GO_FAST_TRANSFER_MIN },
+      });
+    }
+    if (isAboveInstantDepositMax) {
+      return stringGetter({
+        key: STRING_KEYS.FREE_INSTANT_DEPOSIT_MAX,
+        params: { MAX_AMOUNT: SKIP_GO_FAST_TRANSFER_LIMIT },
+      });
+    }
+
+    return undefined;
+  });
+
   const depositContentBottom = (
     <div tw="mt-0.5 flex flex-col gap-0.5">
       {currentStepError && (
@@ -395,6 +436,11 @@ export const DepositForm = ({
       >
         {depositButtonInner}
       </Button>
+      {noticeMessage && (
+        <AlertMessage withAccentText tw="rounded-[0.375rem]" type={AlertType.Notice}>
+          {noticeMessage}
+        </AlertMessage>
+      )}
     </div>
   );
 

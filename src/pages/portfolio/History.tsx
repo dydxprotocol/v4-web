@@ -44,11 +44,11 @@ export const History = () => {
                   href: HistoryRoute.VaultTransfers,
                   tag: 'USDC',
                 },
-                {
-                  value: HistoryRoute.Payments,
-                  label: <h3>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}</h3>,
-                  href: HistoryRoute.Payments,
-                },
+                // {
+                //   value: HistoryRoute.Payments,
+                //   label: <h3>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS })}</h3>,
+                //   href: HistoryRoute.Payments,
+                // },
               ],
             },
           ]}
