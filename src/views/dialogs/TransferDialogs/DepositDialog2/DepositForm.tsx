@@ -77,7 +77,8 @@ export const DepositForm = ({
   } = useDepositRoutes(token, debouncedAmount);
 
   const fastRouteFee =
-    routes?.fast?.estimatedFees && sumBy(routes.fast.estimatedFees, (fee) => Number(fee.amount));
+    routes?.fast?.estimatedFees &&
+    sumBy(routes.fast.estimatedFees, (fee) => MustNumber(fee.amount));
 
   // Difference between selectedRoute and depositRoute:
   // selectedRoute may be the cached route from the previous query response,
