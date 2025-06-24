@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { sumBy } from 'lodash';
 import { DateTime } from 'luxon';
 import { useWalletClient } from 'wagmi';
 
@@ -75,12 +76,8 @@ export const DepositForm = ({
     error,
   } = useDepositRoutes(token, debouncedAmount);
 
-  const fastRouteFee = routes?.fast?.estimatedFees?.reduce((acc, fee) => {
-    if (fee.amount) {
-      return acc + Number(fee.amount);
-    }
-    return acc;
-  }, 0);
+  const fastRouteFee =
+    routes?.fast?.estimatedFees && sumBy(routes.fast.estimatedFees, (fee) => Number(fee.amount));
 
   // Difference between selectedRoute and depositRoute:
   // selectedRoute may be the cached route from the previous query response,
