@@ -17,6 +17,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -70,6 +71,7 @@ export const AccountMenu = () => {
   const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
+  const { debugCompliance } = useEnvFeatures();
   const {
     sourceAccount: { walletInfo, address },
     dydxAddress,
@@ -323,7 +325,7 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(isDev
+        ...(isDev || debugCompliance
           ? [
               {
                 value: 'ComplianceConfig',
