@@ -133,7 +133,8 @@ export function getTradeFormFieldStates(
 
   function defaultSizeIfSizeInputIsInvalid(states: TradeFormFieldStates) {
     if (
-      states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' ||
+      (states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' &&
+        states.reduceOnly.effectiveValue !== true) ||
       states.size.effectiveValue?.type === 'SIGNED_POSITION_LEVERAGE'
     ) {
       states.size.effectiveValue = defaults.size;

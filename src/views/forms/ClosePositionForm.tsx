@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
@@ -16,7 +15,6 @@ import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm'
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useClosePositionFormInputs } from '@/hooks/useClosePositionFormInputs';
 import { useIsFirstRender } from '@/hooks/useIsFirstRender';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -45,7 +43,6 @@ import {
 
 import { mapIfPresent } from '@/lib/do';
 import { AttemptBigNumber, MaybeBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
@@ -73,7 +70,6 @@ export const ClosePositionForm = ({
   const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const isFirstRender = useIsFirstRender();
-  const enableLimitClose = useStatsigGateValue(StatsigFlags.ffEnableLimitClose);
 
   const market = useAppSelector(getCurrentMarketIdIfTradeable);
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
@@ -230,42 +226,40 @@ export const ClosePositionForm = ({
         }}
       />
 
-      {(enableLimitClose || testFlags.showLimitClose) && (
-        <Collapsible
-          slotTrigger={
-            <Checkbox
-              checked={useLimit}
-              onCheckedChange={onUseLimitCheckedChange}
-              id="limit-close"
-              label={
-                <WithTooltip tooltip="limit-close" side="right">
-                  {stringGetter({ key: STRING_KEYS.LIMIT_CLOSE })}
-                </WithTooltip>
-              }
-              tw="my-0.25"
-            />
-          }
-          open={useLimit}
-        >
-          <FormInput
-            key="close-position-limit-price"
-            id="close-position-limit-price"
-            type={InputType.Currency}
+      <Collapsible
+        slotTrigger={
+          <Checkbox
+            checked={useLimit}
+            onCheckedChange={onUseLimitCheckedChange}
+            id="limit-close"
             label={
-              <>
-                <WithTooltip tooltip="limit-price" side="right">
-                  {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-                </WithTooltip>
-                <Tag>USD</Tag>
-              </>
+              <WithTooltip tooltip="limit-close" side="right">
+                {stringGetter({ key: STRING_KEYS.LIMIT_CLOSE })}
+              </WithTooltip>
             }
-            onChange={onLimitPriceInput}
-            value={limitPriceInput}
-            decimals={tickSizeDecimals ?? USD_DECIMALS}
-            slotRight={setLimitPriceToMidPrice ? midMarketPriceButton : undefined}
+            tw="my-0.25"
           />
-        </Collapsible>
-      )}
+        }
+        open={useLimit}
+      >
+        <FormInput
+          key="close-position-limit-price"
+          id="close-position-limit-price"
+          type={InputType.Currency}
+          label={
+            <>
+              <WithTooltip tooltip="limit-price" side="right">
+                {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+              </WithTooltip>
+              <Tag>USD</Tag>
+            </>
+          }
+          onChange={onLimitPriceInput}
+          value={limitPriceInput}
+          decimals={tickSizeDecimals ?? USD_DECIMALS}
+          slotRight={setLimitPriceToMidPrice ? midMarketPriceButton : undefined}
+        />
+      </Collapsible>
 
       <TradeFormMessages
         isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}
