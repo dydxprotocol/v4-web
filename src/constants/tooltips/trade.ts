@@ -89,6 +89,10 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_CLOSE_BODY }),
   }),
+  'ioc-limit-close': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.IOC_LIMIT_CLOSE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.IOC_LIMIT_CLOSE_BODY }),
+  }),
   'limit-price': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIMIT_PRICE_BODY }),

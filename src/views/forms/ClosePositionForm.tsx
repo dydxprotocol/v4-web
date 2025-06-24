@@ -231,9 +231,9 @@ export const ClosePositionForm = ({
           <Checkbox
             checked={useLimit}
             onCheckedChange={onUseLimitCheckedChange}
-            id="limit-close"
+            id="ioc-limit-close"
             label={
-              <WithTooltip tooltip="limit-close" side="right">
+              <WithTooltip tooltip="ioc-limit-close" side="right">
                 {stringGetter({ key: STRING_KEYS.LIMIT_CLOSE })}
               </WithTooltip>
             }
