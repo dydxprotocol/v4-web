@@ -196,6 +196,8 @@ function calculateBaseOrderStatus(
   const isUserCanceled =
     order.removalReason === 'USER_CANCELED' ||
     order.removalReason === 'ORDER_REMOVAL_REASON_USER_CANCELED';
+  const isCancledByIocResting =
+    order.removalReason === 'ORDER_REMOVAL_REASON_IMMEDIATE_OR_CANCEL_WOULD_REST_ON_BOOK';
 
   if (isBestEffortCanceled) {
     const { goodTilBlock } = order;
@@ -210,6 +212,10 @@ function calculateBaseOrderStatus(
   }
 
   if (isShortTermOrder && isBestEffortCanceled && !isUserCanceled) {
+    // can't come back from this one
+    if (isCancledByIocResting) {
+      return OrderStatus.Canceling;
+    }
     return OrderStatus.Pending;
   }
 

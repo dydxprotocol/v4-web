@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
+import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
@@ -21,8 +22,11 @@ import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedDisplayUnit } from '@/state/appUiConfigsSelectors';
+import { closePositionFormActions } from '@/state/closePositionForm';
 import { tradeFormActions } from '@/state/tradeForm';
+import { getCurrentSelectedFormSummary, getCurrentTradePageForm } from '@/state/tradeFormSelectors';
 
+import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber } from '@/lib/numbers';
 import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
@@ -117,14 +121,30 @@ export const CanvasOrderbook = forwardRef(
      * Row action
      */
     const dispatch = useAppDispatch();
+    const currentForm = useAppSelector(getCurrentTradePageForm);
+    const currentFormType = useAppSelector(getCurrentSelectedFormSummary).summary.effectiveTrade
+      .type;
+    const currentFormIsLimit =
+      currentFormType === TradeFormType.LIMIT || currentFormType === TradeFormType.TRIGGER_LIMIT;
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
+        if (!currentFormIsLimit) {
+          return;
+        }
         if (price) {
+          const priceNumber = MustBigNumber(price).toFixed(tickSizeDecimals);
           // avoid scientific notation for when converting small number to string
-          dispatch(tradeFormActions.setLimitPrice(MustBigNumber(price).toFixed(tickSizeDecimals)));
+          if (currentForm === 'TRADE') {
+            dispatch(tradeFormActions.setLimitPrice(priceNumber));
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          } else if (currentForm === 'CLOSE_POSITION') {
+            dispatch(closePositionFormActions.setLimitPrice(priceNumber));
+          } else {
+            assertNever(currentForm);
+          }
         }
       },
-      [dispatch, tickSizeDecimals]
+      [currentForm, currentFormIsLimit, dispatch, tickSizeDecimals]
     );
 
     const displayUnit = useAppSelector(getSelectedDisplayUnit);

@@ -271,6 +271,7 @@ export function calculateTradeInfo(
           const inputSummary = calculateLimitOrderInputSummary(
             trade.size,
             trade.limitPrice,
+            trade.reduceOnly,
             AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
             baseAccount
           );
@@ -839,6 +840,7 @@ function calculateEffectiveSizeTarget(
 function calculateLimitOrderInputSummary(
   size: OrderSizeInput | undefined,
   limitPrice: string | undefined,
+  reduceOnly: boolean | undefined,
   marketStepSize: number | undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   baseAccount: TradeAccountDetails | undefined
@@ -847,8 +849,17 @@ function calculateLimitOrderInputSummary(
   const effectiveSize = toStepSize(
     size != null
       ? OrderSizeInputs.match(size, {
-          // not supported
-          AVAILABLE_PERCENT: () => 0.0,
+          // only reduce only
+          AVAILABLE_PERCENT: ({ value }) => {
+            if (!reduceOnly) {
+              return 0.0;
+            }
+            const percent = AttemptBigNumber(value);
+            if (percent == null) {
+              return 0.0;
+            }
+            return baseAccount?.position?.unsignedSize.times(percent).toNumber() ?? 0.0;
+          },
           // not supported
           SIGNED_POSITION_LEVERAGE: () => 0.0,
           SIZE: ({ value }) => AttemptNumber(value) ?? 0.0,
