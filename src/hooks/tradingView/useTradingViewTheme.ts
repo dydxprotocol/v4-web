@@ -112,5 +112,5 @@ export const useTradingViewTheme = ({
         }
       });
     });
-  }, [appTheme, appColorMode, tvWidget]);
+  }, [appTheme, appColorMode, tvWidget, isTablet]);
 };
