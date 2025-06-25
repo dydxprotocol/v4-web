@@ -19,7 +19,7 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider, useStatsigGateValue } from '@/hooks/useStatsig';
+import { StatsigProvider, useCustomFlagValue, useStatsigGateValue } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -44,7 +44,7 @@ import { ComplianceBanner } from './components/ComplianceBanner';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
-import { StatsigFlags } from './constants/statsig';
+import { CustomFlags, StatsigFlags } from './constants/statsig';
 import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
@@ -99,7 +99,7 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
   const isSimpleUi = testFlags.simpleUi && isTablet;
-  const abDefaultToMarkets = useStatsigGateValue(StatsigFlags.abDefaultToMarkets);
+  const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
 
   const { showComplianceBanner } = useComplianceState();
 

@@ -10,7 +10,6 @@ import tw from 'twin.macro';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isDev } from '@/constants/networks';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -798,7 +797,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { data } = useAffiliateMetadata();
-      const isAffiliate = isDev || !!data?.metadata?.isAffiliate;
+      const isAffiliate = !!data?.metadata?.isAffiliate;
 
       useEffect(() => {
         if (isAffiliate) {

@@ -6,13 +6,20 @@ import {
   useStatsigClient,
 } from '@statsig/react-bindings';
 
+import { AnalyticsUserProperties } from '@/constants/analytics';
+import { LocalStorageKey } from '@/constants/localStorage';
 import {
+  CUSTOM_FLAG_RATES,
+  CUSTOM_FLAG_ROLLED_VALUES,
+  CustomFlags,
   StatsigConfigType,
   StatsigDynamicConfigType,
   StatsigDynamicConfigs,
   StatsigFlags,
 } from '@/constants/statsig';
 
+import { identify } from '@/lib/analytics/analytics';
+import { setLocalStorage } from '@/lib/localStorage';
 import { initStatsigAsync } from '@/lib/statsig';
 
 export const StatsigProvider = ({ children }: { children: React.ReactNode }) => {
@@ -52,3 +59,14 @@ export const useAllStatsigGateValues = () => {
   }, []);
   return allGateValues;
 };
+
+export function useCustomFlagValue(flag: CustomFlags) {
+  if (CUSTOM_FLAG_ROLLED_VALUES[flag] == null) {
+    const rate = CUSTOM_FLAG_RATES[flag];
+    CUSTOM_FLAG_ROLLED_VALUES[flag] = Math.random() < rate;
+    identify(AnalyticsUserProperties.CustomFlags(CUSTOM_FLAG_ROLLED_VALUES));
+    setLocalStorage({ key: LocalStorageKey.CustomFlags, value: CUSTOM_FLAG_ROLLED_VALUES });
+  }
+
+  return CUSTOM_FLAG_ROLLED_VALUES[flag];
+}
