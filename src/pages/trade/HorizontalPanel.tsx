@@ -351,7 +351,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     () => ({
       asChild: true,
       value: InfoSection.Payments,
-      label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
+      label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS }),
 
       content: (
         <FundingPaymentsTable
