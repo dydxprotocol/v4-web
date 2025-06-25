@@ -11,6 +11,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
@@ -82,6 +83,7 @@ import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
+import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useLocaleSeparators } from './useLocaleSeparators';
@@ -790,6 +792,45 @@ export const notificationTypes: NotificationTypeConfig[] = [
         trigger,
         statusPage,
       ]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
+    type: NotificationType.ApiError,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { data } = useAffiliateMetadata();
+      const isAffiliate = isDev || !!data?.metadata?.isAffiliate;
+
+      useEffect(() => {
+        if (isAffiliate) {
+          trigger({
+            id: NotificationType.AffiliatesAlert,
+            displayData: {
+              title: stringGetter({ key: STRING_KEYS.AFFILIATE_BOOSTER_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.AFFILIATE_BOOSTER_BODY,
+                params: {
+                  HERE_LINK: (
+                    <Link
+                      isInline
+                      isAccent
+                      href="https://www.dydx.xyz/blog/introducing-the-dydx-affiliate-booster-program"
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.AffiliatesAlert,
+            },
+            updateKey: ['boosted-affiliates-june-2025'],
+          });
+        }
+      }, [isAffiliate, stringGetter, trigger]);
     },
     useNotificationAction: () => {
       return () => {};

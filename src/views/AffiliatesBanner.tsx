@@ -2,10 +2,7 @@ import { Link } from 'react-router-dom';
 import { css } from 'styled-components';
 import { styled } from 'twin.macro';
 
-import {
-  AFFILIATES_FEE_DISCOUNT_USD,
-  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
-} from '@/constants/affiliates';
+import { DEFAULT_AFFILIATES_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -21,6 +18,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link as ExternalLink } from '@/components/Link';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getGridBackground } from '@/state/appUiConfigsSelectors';
@@ -44,21 +42,27 @@ export const AffiliatesBanner = ({
   const background = useAppSelector(getGridBackground);
 
   const titleString = stringGetter({
-    key: STRING_KEYS.EARN_FOR_EACH_TRADER,
-    params: {
-      AMOUNT_USD:
-        maxEarningData?.maxEarning.toLocaleString() ??
-        DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
-    },
+    key: STRING_KEYS.AFFILIATE_BOOSTER_LIVE,
   });
 
   const description = (
     <div tw="flex flex-col">
       <div>
         {stringGetter({
-          key: STRING_KEYS.REFER_FOR_DISCOUNTS,
+          key: STRING_KEYS.AFFILIATE_BOOSTER_PRIMARY_BODY,
           params: {
-            AMOUNT_USD: `${AFFILIATES_FEE_DISCOUNT_USD.toLocaleString()}`,
+            WEEKLY_AMOUNT:
+              maxEarningData?.maxEarning.toLocaleString() ??
+              DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString(),
+            HERE_LINK: (
+              <ExternalLink
+                isInline
+                isAccent
+                href="https://www.dydx.xyz/blog/introducing-the-dydx-affiliate-booster-program"
+              >
+                {stringGetter({ key: STRING_KEYS.HERE })}
+              </ExternalLink>
+            ),
           },
         })}
       </div>
@@ -141,7 +145,7 @@ export const AffiliatesBanner = ({
         }}
       >
         <span tw="font-bold text-color-text-2">
-          {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}
+          {stringGetter({ key: STRING_KEYS.GET_YOUR_AFFILIATE_LINK })}
         </span>
 
         <$ArrowIcon>

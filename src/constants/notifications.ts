@@ -9,6 +9,7 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  AffiliatesAlert = 'AffiliatesAlert',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
   MarketUpdate = 'MarketUpdate',
@@ -36,6 +37,7 @@ export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
+  [NotificationType.AffiliatesAlert]: NotificationCategoryPreferences.General,
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
