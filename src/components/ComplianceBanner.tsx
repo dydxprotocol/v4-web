@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
+import { AlertType } from '@/constants/alerts';
 import { ButtonSize, ButtonStyle, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,6 +19,9 @@ import breakpoints from '@/styles/breakpoints';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { testFlags } from '@/lib/testFlags';
+
+import { AlertMessage } from './AlertMessage';
 import { Button } from './Button';
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
@@ -31,6 +35,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     useComplianceState();
   const { help } = useURLConfigs();
   const { isTablet } = useBreakpoints();
+  const isSimpleUi = isTablet && testFlags.simpleUi;
 
   if (!showComplianceBanner) {
     return null;
@@ -78,6 +83,31 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   const canHide = isTablet && action == null;
 
+  if (isSimpleUi) {
+    return (
+      <$AlertMessage withAccentText type={AlertType.Error}>
+        {canHide && (
+          <IconButton
+            tw="absolute right-0.25 top-0.25 text-color-text-2"
+            type={ButtonType.Button}
+            onClick={toggleShowLess}
+            iconName={showLess ? IconName.Caret : IconName.Close}
+            buttonStyle={ButtonStyle.WithoutBackground}
+          />
+        )}
+
+        {showLess && canHide ? (
+          stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
+        ) : (
+          <>
+            {complianceContent}
+            {action}
+          </>
+        )}
+      </$AlertMessage>
+    );
+  }
+
   return (
     <$ComplianceBanner className={className}>
       <div tw="absolute inset-0 z-[-1] bg-color-gradient-error" />
@@ -102,6 +132,13 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     </$ComplianceBanner>
   );
 };
+
+const $AlertMessage = styled(AlertMessage)`
+  border-radius: 0.5rem;
+  max-width: 100%;
+  margin: 0.75rem 0.75rem 0 0.75rem;
+  font: var(--font-base-book);
+`;
 
 const $ComplianceBanner = styled.div`
   height: var(--restriction-warning-currentHeight);
