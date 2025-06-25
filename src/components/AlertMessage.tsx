@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -16,19 +18,16 @@ type ElementProps = {
 
 export type AlertMessageProps = ElementProps & StyleProps;
 
-export const AlertMessage: React.FC<AlertMessageProps> = ({
-  className,
-  children,
-  type,
-  withAccentText,
-}: AlertMessageProps) => {
-  return (
-    <$AlertContainer type={type} className={className} withAccentText={withAccentText}>
-      <$AlertAccent />
-      {children}
-    </$AlertContainer>
-  );
-};
+export const AlertMessage = forwardRef<HTMLDivElement, AlertMessageProps>(
+  ({ className, children, type, withAccentText }, ref) => {
+    return (
+      <$AlertContainer ref={ref} type={type} className={className} withAccentText={withAccentText}>
+        <$AlertAccent />
+        {children}
+      </$AlertContainer>
+    );
+  }
+);
 
 const $AlertContainer = styled.div<StyleProps>`
   ${layoutMixins.column}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -29,6 +30,7 @@ import { Link } from './Link';
 
 export const ComplianceBanner = ({ className }: { className?: string }) => {
   const [showLess, setShowLess] = useState(false);
+  const complianceBannerRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
@@ -36,6 +38,16 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   const { help } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = isTablet && testFlags.simpleUi;
+
+  useResizeObserver({
+    box: 'border-box',
+    ref: complianceBannerRef,
+    onResize: (size) => {
+      if (size.height) {
+        document.documentElement.style.setProperty('--complianceBanner-height', `${size.height}px`);
+      }
+    },
+  });
 
   if (!showComplianceBanner) {
     return null;
@@ -85,7 +97,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   if (isSimpleUi) {
     return (
-      <$AlertMessage withAccentText type={AlertType.Error}>
+      <$AlertMessage ref={complianceBannerRef} withAccentText type={AlertType.Error}>
         {canHide && (
           <IconButton
             tw="absolute right-0.25 top-0.25 text-color-text-2"
