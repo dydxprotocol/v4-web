@@ -355,6 +355,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
 
       content: (
         <FundingPaymentsTable
+          currentMarket={currentMarketId}
           columnKeys={
             isTablet
               ? [
@@ -376,7 +377,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
         />
       ),
     }),
-    [stringGetter, showCurrentMarket, isTablet, initialPageSize]
+    [stringGetter, showCurrentMarket, isTablet, initialPageSize, currentMarketId]
   );
 
   const tabItems = useMemo(

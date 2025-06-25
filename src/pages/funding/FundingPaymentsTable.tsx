@@ -165,6 +165,7 @@ const getFundingPaymentsTableColumnDef = ({
 type ElementProps = {
   columnKeys?: FundingPaymentsTableColumnKey[];
   columnWidths?: Partial<Record<FundingPaymentsTableColumnKey, ColumnSize>>;
+  currentMarket?: string;
   initialPageSize?: PageSize;
 };
 
@@ -186,6 +187,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
         FundingPaymentsTableColumnKey.Rate,
       ],
       columnWidths,
+      currentMarket,
       initialPageSize,
       withOuterBorder,
       withInnerBorders = true,
@@ -198,21 +200,27 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    const fundingPaymentsData = useMemo(
-      () =>
-        fundingPayments?.map(
-          (fundingPayment): FundingPaymentTableRow =>
-            getHydratedFundingPayment({
-              id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
-              data: fundingPayment,
-              marketSummaries,
-            })
-        ),
-      [fundingPayments, marketSummaries]
-    );
+    const fundingPaymentsData = useMemo(() => {
+      const filteredFundingPayments = fundingPayments?.filter((fundingPayment) => {
+        if (currentMarket) {
+          return fundingPayment.ticker === currentMarket;
+        }
+        return true;
+      });
+
+      return filteredFundingPayments?.map(
+        (fundingPayment): FundingPaymentTableRow =>
+          getHydratedFundingPayment({
+            id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
+            data: fundingPayment,
+            marketSummaries,
+          })
+      );
+    }, [fundingPayments, marketSummaries, currentMarket]);
 
     return (
       <$Table
+        key={currentMarket ?? 'all-funding-payments'}
         label="Funding Payments"
         tableId="funding-payments"
         data={fundingPaymentsData ?? EMPTY_ARR}
