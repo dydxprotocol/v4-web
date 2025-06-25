@@ -1,21 +1,19 @@
 import { useEffect, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
+import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
-import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
-  NotificationDisplayData,
   NotificationStatus,
   NotificationType,
   type NotificationTypeConfig,
@@ -34,8 +32,6 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-// eslint-disable-next-line import/no-cycle
-import { Notification } from '@/components/Notification';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 import { BlockRewardNotificationRow } from '@/views/Lists/Alerts/BlockRewardNotificationRow';
 import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
@@ -43,6 +39,7 @@ import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNoti
 import { OrderNotificationRow } from '@/views/Lists/Alerts/OrderNotificationRow';
 import { OrderStatusNotificationRow } from '@/views/Lists/Alerts/OrderStatusNotificationRow';
 import { SkipTransferNotificationRow } from '@/views/Lists/Alerts/SkipTransferNotificationRow';
+// eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
@@ -83,7 +80,6 @@ import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
-import { useComplianceState } from './useComplianceState';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -793,48 +789,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       return () => {};
-    },
-  },
-  {
-    type: NotificationType.ComplianceAlert,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
-
-      useEffect(() => {
-        if (complianceState !== ComplianceStates.FULL_ACCESS) {
-          const displayData: NotificationDisplayData = {
-            icon: <$WarningIcon iconName={IconName.Warning} />,
-            title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
-            renderCustomBody: ({ isToast, notification }) => (
-              <Notification
-                isToast={isToast}
-                notification={notification}
-                slotDescription={complianceMessage}
-              />
-            ),
-            toastSensitivity: 'foreground',
-            groupKey: NotificationType.ComplianceAlert,
-            withClose: false,
-          };
-
-          trigger({
-            id: `${NotificationType.ComplianceAlert}-${complianceStatus}`,
-            displayData,
-            updateKey: [],
-          });
-        }
-      }, [stringGetter, complianceMessage, complianceState, complianceStatus, trigger]);
-    },
-    useNotificationAction: () => {
-      const dispatch = useAppDispatch();
-      const { complianceStatus } = useComplianceState();
-
-      return () => {
-        if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-          dispatch(openDialog(DialogTypes.GeoCompliance()));
-        }
-      };
     },
   },
   {
