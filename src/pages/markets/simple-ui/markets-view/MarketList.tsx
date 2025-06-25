@@ -138,6 +138,7 @@ export const MarketList = ({
   const sortType = useAppSelector(getSimpleUISortMarketsBy);
   const positionSortType = useAppSelector(getSimpleUISortPositionsBy);
   const subaccountEquity = useAppSelector(getSubaccountEquity);
+
   const setSortType = useCallback(
     (newSortType: MarketsSortType) => {
       dispatch(setSimpleUISortMarketsBy(newSortType));
@@ -421,7 +422,8 @@ export const MarketList = ({
       ref={parentRef}
       tw="relative h-full max-h-full w-full max-w-full overflow-auto"
       css={{
-        paddingBottom: isSearchOpen ? '1rem' : '6rem',
+        '--marketList-search-height': isSearchOpen ? '0' : '5.5rem',
+        paddingBottom: 'var(--marketList-search-height)',
       }}
     >
       <div
@@ -457,7 +459,7 @@ export const MarketList = ({
       </div>
 
       <div
-        tw="fixed bottom-0 left-0 right-0 z-[1] flex h-[5.5rem]"
+        tw="fixed bottom-0 left-0 right-0 z-[1] flex h-[var(--marketList-search-height)]"
         css={{
           display: isSearchOpen ? 'none' : 'flex',
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--color-layer-1))',

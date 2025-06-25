@@ -40,6 +40,7 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { BonsaiCore } from './bonsai/ontology';
+import { ComplianceBanner } from './components/ComplianceBanner';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
@@ -100,7 +101,7 @@ const Content = () => {
   const isSimpleUi = testFlags.simpleUi && isTablet;
   const abDefaultToMarkets = useStatsigGateValue(StatsigFlags.abDefaultToMarkets);
 
-  const { showRestrictionWarning } = useComplianceState();
+  const { showComplianceBanner } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -115,7 +116,9 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <$SimpleUiGrid>
+        <$SimpleUiGrid showRestrictionBanner={showComplianceBanner}>
+          <ComplianceBanner />
+
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
               <Routes>
@@ -146,10 +149,10 @@ const Content = () => {
       <$Content
         isShowingHeader={isShowingHeader}
         isShowingFooter={isShowingFooter}
-        showRestrictionWarning={showRestrictionWarning}
+        showRestrictionWarning={showComplianceBanner}
       >
         {isShowingHeader && <HeaderDesktop />}
-        {showRestrictionWarning && <RestrictionWarning />}
+        <RestrictionWarning />
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -381,11 +384,22 @@ const $Main = styled.main`
   position: relative;
 `;
 
-const $SimpleUiGrid = styled.div`
+const $SimpleUiGrid = styled.div<{ showRestrictionBanner?: boolean }>`
   display: grid;
-  grid-template-areas: 'Main';
-  grid-template-columns: 100vw;
-  grid-template-rows: 100vh;
+
+  ${({ showRestrictionBanner }) =>
+    showRestrictionBanner
+      ? css`
+          grid-template:
+            'RestrictionWarning' minmax(min-content, auto)
+            'Main' 1fr
+            / 100vw;
+        `
+      : css`
+          grid-template:
+            'Main' 100vh
+            / 100vw;
+        `}
 `;
 
 const $SimpleUiMain = styled.main`

@@ -60,7 +60,7 @@ export const useComplianceState = () => {
     updatedAtDate?.setDate(updatedAtDate.getDate() + CLOSE_ONLY_GRACE_PERIOD);
 
     if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-      message = `${stringGetter({ key: STRING_KEYS.CLICK_TO_VIEW })} →`;
+      message = `${stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })}`;
     } else if (complianceStatus === ComplianceStatus.CLOSE_ONLY) {
       message = stringGetter({
         key: STRING_KEYS.CLOSE_ONLY_MESSAGE_WITH_HELP,
@@ -111,5 +111,7 @@ export const useComplianceState = () => {
     complianceMessage,
     disableConnectButton,
     showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY,
+    showComplianceBanner:
+      complianceMessage != null || complianceState === ComplianceStates.READ_ONLY,
   };
 };
