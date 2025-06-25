@@ -53,10 +53,12 @@ const getFundingPaymentsTableColumnDef = ({
   key,
   stringGetter,
   width,
+  tradePanel,
 }: {
   key: FundingPaymentsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  tradePanel?: boolean;
 }): ColumnDef<FundingPaymentTableRow> => ({
   width,
   ...(
@@ -67,20 +69,31 @@ const getFundingPaymentsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAt }) => (
           <div tw="column">
-            <Output
-              type={OutputType.Date}
-              dateOptions={{ format: 'medium' }}
-              value={new Date(createdAt).getTime()}
-              title=""
-            />
-            <TableCell>
+            {tradePanel ? (
               <Output
-                type={OutputType.Time}
+                type={OutputType.DateTime}
                 dateOptions={{ format: 'medium' }}
                 value={new Date(createdAt).getTime()}
-                tw="text-color-text-0"
+                title=""
               />
-            </TableCell>
+            ) : (
+              <>
+                <Output
+                  type={OutputType.Date}
+                  dateOptions={{ format: 'medium' }}
+                  value={new Date(createdAt).getTime()}
+                  title=""
+                />
+                <TableCell>
+                  <Output
+                    type={OutputType.Time}
+                    dateOptions={{ format: 'medium' }}
+                    value={new Date(createdAt).getTime()}
+                    tw="text-color-text-0"
+                  />
+                </TableCell>
+              </>
+            )}
           </div>
         ),
       },
@@ -167,6 +180,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<FundingPaymentsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
   initialPageSize?: PageSize;
+  tradePanel?: boolean;
 };
 
 type StyleProps = {
@@ -189,6 +203,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
       columnWidths,
       currentMarket,
       initialPageSize,
+      tradePanel,
       withOuterBorder,
       withInnerBorders = true,
     }: ElementProps & StyleProps,
@@ -230,6 +245,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
             key,
             stringGetter,
             width: columnWidths?.[key],
+            tradePanel,
           })
         )}
         slotEmpty={
