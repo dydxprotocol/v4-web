@@ -21,7 +21,9 @@ export enum CustomFlags {
   abDefaultToMarkets = 'ab_default_to_markets',
 }
 
+// we only use these for flags that MUST be available before statsig can complete loading
 // WARNING: if you roll at a low probability, it will remember the value forever
+// best practice is never change the flag rates
 export const CUSTOM_FLAG_ROLLED_VALUES: Record<CustomFlags, boolean | undefined> = getLocalStorage({
   key: LocalStorageKey.CustomFlags,
   defaultValue: {
