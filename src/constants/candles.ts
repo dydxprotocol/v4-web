@@ -121,10 +121,10 @@ export const RESOLUTION_CHART_CONFIGS = {
 } as Record<ResolutionString, { defaultRange: number }>;
 
 export const RESOLUTION_STRING_TO_LABEL = {
-  '1': { value: '1' },
-  '5': { value: '5' },
-  '15': { value: '15' },
-  '30': { value: '30' },
+  '1': { value: '1', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
+  '5': { value: '5', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
+  '15': { value: '15', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
+  '30': { value: '30', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
   '60': { value: '1', unitStringKey: STRING_KEYS.HOURS_ABBREVIATED },
   '240': { value: '4', unitStringKey: STRING_KEYS.HOURS_ABBREVIATED },
   '1D': { value: '1', unitStringKey: STRING_KEYS.DAYS_ABBREVIATED },
