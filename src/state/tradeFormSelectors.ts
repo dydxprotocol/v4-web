@@ -1,5 +1,10 @@
 import { getErrorTradeSummary } from '@/bonsai/forms/trade/summary';
-import { OrderSide, TradeFormInputData, TradeFormType } from '@/bonsai/forms/trade/types';
+import {
+  OrderSide,
+  TimeInForce,
+  TradeFormInputData,
+  TradeFormType,
+} from '@/bonsai/forms/trade/types';
 import { createMinimalError } from '@/bonsai/lib/validationErrors';
 import { BonsaiCore, BonsaiForms, BonsaiHelpers, BonsaiRaw } from '@/bonsai/ontology';
 import { minBy } from 'lodash';
@@ -93,7 +98,7 @@ export const getClosePositionFormRawState = (state: RootState) => state.closePos
 export const getClosePositionFormSummary = createAppSelector(
   [getCurrentMarketIdIfTradeable, getTradeFormInputData, getClosePositionFormRawState],
   (currentMarketId, inputData, state) => {
-    const { size, marketId, type } = state;
+    const { size, marketId, type, limitPrice } = state;
 
     if (
       currentMarketId == null ||
@@ -122,13 +127,13 @@ export const getClosePositionFormSummary = createAppSelector(
         marketId,
         reduceOnly: true,
         side: currentPosition.side === IndexerPositionSide.LONG ? OrderSide.SELL : OrderSide.BUY,
+        limitPrice,
+        timeInForce: TimeInForce.IOC,
 
         // let these default
         marginMode: undefined,
         targetLeverage: undefined,
-        limitPrice: undefined,
         postOnly: undefined,
-        timeInForce: undefined,
         triggerPrice: undefined,
         execution: undefined,
         goodTil: undefined,
