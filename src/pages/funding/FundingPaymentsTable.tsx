@@ -74,7 +74,6 @@ const getFundingPaymentsTableColumnDef = ({
                 type={OutputType.DateTime}
                 dateOptions={{ format: 'medium' }}
                 value={new Date(createdAt).getTime()}
-                title=""
               />
             ) : (
               <>
@@ -82,7 +81,6 @@ const getFundingPaymentsTableColumnDef = ({
                   type={OutputType.Date}
                   dateOptions={{ format: 'medium' }}
                   value={new Date(createdAt).getTime()}
-                  title=""
                 />
                 <TableCell>
                   <Output
@@ -235,7 +233,6 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
 
     return (
       <$Table
-        key={currentMarket ?? 'all-funding-payments'}
         label="Funding Payments"
         tableId="funding-payments"
         data={fundingPaymentsData ?? EMPTY_ARR}
