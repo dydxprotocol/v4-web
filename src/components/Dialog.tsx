@@ -449,7 +449,7 @@ const $Close = styled(Close)<{ $absolute?: boolean }>`
   border-radius: 0.25rem;
   z-index: 1;
 
-  color: var(--color-text-0);
+  color: var(--dialog-header-close-color, var(--color-text-0));
 
   > svg {
     height: 100%;

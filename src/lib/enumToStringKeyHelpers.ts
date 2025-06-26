@@ -1,3 +1,4 @@
+import { OrderSide } from '@/bonsai/forms/trade/types';
 import { MarginMode, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -62,6 +63,13 @@ export function getIndexerOrderTypeStringKey(type: IndexerOrderType): string {
 
 export function getIndexerPositionSideStringKey(side: IndexerPositionSide) {
   if (side === IndexerPositionSide.LONG) {
+    return STRING_KEYS.LONG_POSITION_SHORT;
+  }
+  return STRING_KEYS.SHORT_POSITION_SHORT;
+}
+
+export function getPositionSideStringKeyFromOrderSide(side: OrderSide | IndexerOrderSide) {
+  if (side === OrderSide.BUY || side === IndexerOrderSide.BUY) {
     return STRING_KEYS.LONG_POSITION_SHORT;
   }
   return STRING_KEYS.SHORT_POSITION_SHORT;

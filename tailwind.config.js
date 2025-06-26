@@ -58,6 +58,8 @@ export default {
       'color-negative': 'var(--color-negative)',
       'color-positive-dark': 'var(--color-positive-dark)',
       'color-negative-dark': 'var(--color-negative-dark)',
+      'color-positive-50': 'var(--color-positive-50)',
+      'color-negative-50': 'var(--color-negative-50)',
       'color-gradient-positive': 'var(--color-gradient-positive)',
       'color-gradient-negative': 'var(--color-gradient-negative)',
 

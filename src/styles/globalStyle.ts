@@ -47,6 +47,8 @@ export const GlobalStyle = createGlobalStyle`
     --color-negative: ${({ theme }) => theme.negative};
     --color-positive-dark: ${({ theme }) => theme.positiveDark};
     --color-negative-dark: ${({ theme }) => theme.negativeDark};
+    --color-positive-50: ${({ theme }) => theme.positive50};
+    --color-negative-50: ${({ theme }) => theme.negative50};
     --color-gradient-positive: ${({ theme }) => theme.positiveFaded};
     --color-gradient-negative: ${({ theme }) => theme.negativeFaded};
 
