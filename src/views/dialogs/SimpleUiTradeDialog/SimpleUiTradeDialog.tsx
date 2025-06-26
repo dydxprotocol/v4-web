@@ -39,7 +39,7 @@ export const SimpleUiTradeDialog = ({
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
 
-  const { displayableAsset, logo, ticker } = orEmptyObj(
+  const { displayableAsset, logo, ticker, tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -143,9 +143,11 @@ export const SimpleUiTradeDialog = ({
                   <span tw="text-color-text-0 font-small-book">
                     {stringGetter({ key: STRING_KEYS.PRICE })}{' '}
                     <Output
+                      withSubscript
                       tw="inline text-color-text-1"
                       type={OutputType.Fiat}
                       value={midMarketPrice}
+                      fractionDigits={tickSizeDecimals}
                     />
                   </span>
                 </div>

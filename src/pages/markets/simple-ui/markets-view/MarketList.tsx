@@ -260,6 +260,7 @@ export const MarketList = ({
     ],
     [stringGetter, positionSortType, setPositionSortType]
   );
+
   const searchViewItems: ListItem[] = useMemo(
     () => [
       {
