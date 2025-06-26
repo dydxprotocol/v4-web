@@ -356,7 +356,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       content: (
         <FundingPaymentsTable
           currentMarket={currentMarketId}
-          tradePanel
+          shortRows
           columnKeys={
             isTablet
               ? [

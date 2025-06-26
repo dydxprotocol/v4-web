@@ -4,6 +4,7 @@ import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { FUNDING_DECIMALS, NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
@@ -53,12 +54,12 @@ const getFundingPaymentsTableColumnDef = ({
   key,
   stringGetter,
   width,
-  tradePanel,
+  shortRows,
 }: {
   key: FundingPaymentsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
-  tradePanel?: boolean;
+  shortRows?: boolean;
 }): ColumnDef<FundingPaymentTableRow> => ({
   width,
   ...(
@@ -68,30 +69,18 @@ const getFundingPaymentsTableColumnDef = ({
         getCellValue: (row) => row.createdAt,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAt }) => (
-          <div tw="column">
-            {tradePanel ? (
-              <Output
-                type={OutputType.DateTime}
-                dateOptions={{ format: 'medium' }}
-                value={new Date(createdAt).getTime()}
-              />
-            ) : (
-              <>
-                <Output
-                  type={OutputType.Date}
-                  dateOptions={{ format: 'medium' }}
-                  value={new Date(createdAt).getTime()}
-                />
-                <TableCell>
-                  <Output
-                    type={OutputType.Time}
-                    dateOptions={{ format: 'medium' }}
-                    value={new Date(createdAt).getTime()}
-                    tw="text-color-text-0"
-                  />
-                </TableCell>
-              </>
-            )}
+          <div css={[shortRows ? tw`row gap-0.5` : tw`column`]}>
+            <Output
+              type={OutputType.Date}
+              dateOptions={{ format: 'medium' }}
+              value={new Date(createdAt).getTime()}
+            />
+            <Output
+              type={OutputType.Time}
+              dateOptions={{ format: 'medium' }}
+              value={new Date(createdAt).getTime()}
+              tw="text-color-text-0"
+            />
           </div>
         ),
       },
@@ -178,7 +167,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<FundingPaymentsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
   initialPageSize?: PageSize;
-  tradePanel?: boolean;
+  shortRows?: boolean;
 };
 
 type StyleProps = {
@@ -201,7 +190,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
       columnWidths,
       currentMarket,
       initialPageSize,
-      tradePanel,
+      shortRows,
       withOuterBorder,
       withInnerBorders = true,
     }: ElementProps & StyleProps,
@@ -242,7 +231,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
             key,
             stringGetter,
             width: columnWidths?.[key],
-            tradePanel,
+            shortRows,
           })
         )}
         slotEmpty={
