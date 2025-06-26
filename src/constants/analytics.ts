@@ -5,17 +5,16 @@ import { type SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
-import { StatsigFlags } from '@/constants/statsig';
-import { ConnectorType, WalletType } from '@/constants/wallets';
+import { type CustomFlags, type StatsigFlags } from '@/constants/statsig';
+import { type ConnectorType, type DydxAddress, type WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
 
 import type { OnboardingState, OnboardingSteps } from './account';
-import { DialogTypesTypes } from './dialogs';
+import { type DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
-import { DisplayUnit } from './trade';
-import type { DydxAddress } from './wallets';
+import { type DisplayUnit } from './trade';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
@@ -64,6 +63,7 @@ export const AnalyticsUserProperties = unionize(
 
     // StatSigFlags
     StatsigFlags: ofType<{ [key in StatsigFlags]?: boolean }>(),
+    CustomFlags: ofType<{ [key in CustomFlags]?: boolean }>(),
 
     // Network
     Network: ofType<DydxNetwork>(),
@@ -103,6 +103,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   SubaccountNumber: 'subaccountNumber',
   AffiliateAddress: 'affiliateAddress',
   BonsaiValidatorUrl: 'bonsaiValidator',
+  CustomFlags: 'customFlags',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
