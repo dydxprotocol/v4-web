@@ -8,7 +8,7 @@ export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;
  */
 export const SKIP_GO_FAST_TRANSFER_MIN = 100;
 
-export const SKIP_GO_FAST_TRANSFER_LIMIT = 25_000; // hardcoded on Skip's end
+export const SKIP_GO_FAST_TRANSFER_LIMIT = 100_000; // hardcoded on Skip's end
 
 export const SKIP_GO_BPS_FEE = 0.1; // hardcoded to 10bps on Skip's end
 
