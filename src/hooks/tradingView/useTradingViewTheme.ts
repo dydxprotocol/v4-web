@@ -41,7 +41,11 @@ export const useTradingViewTheme = ({
     if (!tvWidget) return;
 
     tvWidget.onChartReady(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!tvWidget) return;
       tvWidget.changeTheme(THEME_NAMES[appTheme]).then(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!tvWidget) return;
         const tvChartId = tvWidget._id;
 
         if (tvChartId) {
@@ -112,5 +116,5 @@ export const useTradingViewTheme = ({
         }
       });
     });
-  }, [appTheme, appColorMode, tvWidget]);
+  }, [appTheme, appColorMode, tvWidget, isTablet]);
 };
