@@ -25,6 +25,7 @@ import {
   getIndexerOrderTypeStringKey,
   getPositionSideStringKeyFromOrderSide,
 } from '@/lib/enumToStringKeyHelpers';
+import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const SimpleTradeSteps = ({
@@ -102,7 +103,7 @@ export const SimpleTradeSteps = ({
 
     const displayableAsset = getDisplayableAssetFromTicker(marketId);
 
-    const canCompactNumber = stepSize && Number(stepSize) >= 1;
+    const canCompactNumber = stepSize && MustBigNumber(stepSize).gte(1);
 
     return (
       <div tw="flexColumn gap-0.5 text-center">
