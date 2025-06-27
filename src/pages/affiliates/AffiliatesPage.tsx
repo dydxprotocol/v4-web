@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { AFFILIATES_REQUIRED_VOLUME_USD } from '@/constants/affiliates';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -29,7 +30,8 @@ export const AffiliatesPage = () => {
   const userStatus = {
     isAffiliate:
       Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
-      (affiliateMetadata?.totalVolume && affiliateMetadata.totalVolume > 10_000),
+      (affiliateMetadata?.totalVolume &&
+        affiliateMetadata.totalVolume > AFFILIATES_REQUIRED_VOLUME_USD),
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
     stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
