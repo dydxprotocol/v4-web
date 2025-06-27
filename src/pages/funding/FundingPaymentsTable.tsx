@@ -4,6 +4,7 @@ import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { PerpetualMarketSummary } from '@/bonsai/types/summaryTypes';
 import type { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { FUNDING_DECIMALS, NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
@@ -53,10 +54,12 @@ const getFundingPaymentsTableColumnDef = ({
   key,
   stringGetter,
   width,
+  shortRows,
 }: {
   key: FundingPaymentsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  shortRows?: boolean;
 }): ColumnDef<FundingPaymentTableRow> => ({
   width,
   ...(
@@ -66,21 +69,18 @@ const getFundingPaymentsTableColumnDef = ({
         getCellValue: (row) => row.createdAt,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAt }) => (
-          <div tw="column">
+          <div css={[shortRows ? tw`row gap-0.5` : tw`column`]}>
             <Output
               type={OutputType.Date}
               dateOptions={{ format: 'medium' }}
               value={new Date(createdAt).getTime()}
-              title=""
             />
-            <TableCell>
-              <Output
-                type={OutputType.Time}
-                dateOptions={{ format: 'medium' }}
-                value={new Date(createdAt).getTime()}
-                tw="text-color-text-0"
-              />
-            </TableCell>
+            <Output
+              type={OutputType.Time}
+              dateOptions={{ format: 'medium' }}
+              value={new Date(createdAt).getTime()}
+              tw="text-color-text-0"
+            />
           </div>
         ),
       },
@@ -165,7 +165,9 @@ const getFundingPaymentsTableColumnDef = ({
 type ElementProps = {
   columnKeys?: FundingPaymentsTableColumnKey[];
   columnWidths?: Partial<Record<FundingPaymentsTableColumnKey, ColumnSize>>;
+  currentMarket?: string;
   initialPageSize?: PageSize;
+  shortRows?: boolean;
 };
 
 type StyleProps = {
@@ -186,7 +188,9 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
         FundingPaymentsTableColumnKey.Rate,
       ],
       columnWidths,
+      currentMarket,
       initialPageSize,
+      shortRows,
       withOuterBorder,
       withInnerBorders = true,
     }: ElementProps & StyleProps,
@@ -198,18 +202,23 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
-    const fundingPaymentsData = useMemo(
-      () =>
-        fundingPayments?.map(
-          (fundingPayment): FundingPaymentTableRow =>
-            getHydratedFundingPayment({
-              id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
-              data: fundingPayment,
-              marketSummaries,
-            })
-        ),
-      [fundingPayments, marketSummaries]
-    );
+    const fundingPaymentsData = useMemo(() => {
+      const filteredFundingPayments = fundingPayments?.filter((fundingPayment) => {
+        if (currentMarket) {
+          return fundingPayment.ticker === currentMarket;
+        }
+        return true;
+      });
+
+      return filteredFundingPayments?.map(
+        (fundingPayment): FundingPaymentTableRow =>
+          getHydratedFundingPayment({
+            id: fundingPayment.perpetualId + fundingPayment.createdAtHeight,
+            data: fundingPayment,
+            marketSummaries,
+          })
+      );
+    }, [fundingPayments, marketSummaries, currentMarket]);
 
     return (
       <$Table
@@ -222,6 +231,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
             key,
             stringGetter,
             width: columnWidths?.[key],
+            shortRows,
           })
         )}
         slotEmpty={
