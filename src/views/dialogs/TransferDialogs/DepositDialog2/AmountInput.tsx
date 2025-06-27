@@ -168,6 +168,8 @@ const $Input = styled.input<{ hasError?: boolean }>`
 const $TokenButton = styled.button`
   ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
 
+  --asset-icon-chain-icon-borderColor: var(--color-layer-5);
+
   @media ${breakpoints.tablet} {
     ${() =>
       testFlags.simpleUi &&
