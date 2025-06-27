@@ -89,7 +89,7 @@ export const useComplianceState = () => {
           ),
         },
       });
-    } else if (geo && isBlockedGeo(geo)) {
+    } else if (geo && isBlockedGeo(geo) && checkForGeo) {
       message = stringGetter({
         key: STRING_KEYS.BLOCKED_MESSAGE,
         params: {
@@ -99,7 +99,7 @@ export const useComplianceState = () => {
     }
 
     return message;
-  }, [complianceStatus, complianceUpdatedAt, geo, help, selectedLocale, stringGetter]);
+  }, [checkForGeo, complianceStatus, complianceUpdatedAt, geo, help, selectedLocale, stringGetter]);
 
   const disableConnectButton =
     complianceState === ComplianceStates.READ_ONLY &&
