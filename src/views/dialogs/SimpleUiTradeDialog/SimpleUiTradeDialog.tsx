@@ -23,6 +23,7 @@ import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { assertNever } from '@/lib/assertNever';
+import { getPositionSideStringKeyFromOrderSide } from '@/lib/enumToStringKeyHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { SimpleCloseForm } from './SimpleCloseForm';
@@ -39,7 +40,7 @@ export const SimpleUiTradeDialog = ({
   const currentTradeData = useAppSelector(getTradeFormValues);
   const { type: selectedTradeType } = currentTradeData;
 
-  const { displayableAsset, logo, ticker } = orEmptyObj(
+  const { displayableAsset, logo, ticker, tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
@@ -111,10 +112,7 @@ export const SimpleUiTradeDialog = ({
             </div>
           );
         } else {
-          const sideString =
-            side === OrderSide.BUY
-              ? stringGetter({ key: STRING_KEYS.LONG_POSITION_SHORT })
-              : stringGetter({ key: STRING_KEYS.SHORT_POSITION_SHORT });
+          const sideString = stringGetter({ key: getPositionSideStringKeyFromOrderSide(side) });
 
           const sideColor =
             side === OrderSide.BUY ? 'var(--color-positive)' : 'var(--color-negative)';
@@ -143,9 +141,11 @@ export const SimpleUiTradeDialog = ({
                   <span tw="text-color-text-0 font-small-book">
                     {stringGetter({ key: STRING_KEYS.PRICE })}{' '}
                     <Output
+                      withSubscript
                       tw="inline text-color-text-1"
                       type={OutputType.Fiat}
                       value={midMarketPrice}
+                      fractionDigits={tickSizeDecimals}
                     />
                   </span>
                 </div>
@@ -186,20 +186,38 @@ export const SimpleUiTradeDialog = ({
       }
       case SimpleUiTradeDialogSteps.Submit:
         return (
-          <div>
-            <span>{stringGetter({ key: STRING_KEYS.SUBMITTING_ORDER })}</span>
+          <div tw="row gap-0.75">
+            <AssetIcon
+              css={{
+                '--asset-icon-size': '2rem',
+              }}
+              logoUrl={logo}
+            />
+            <span tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.SUBMITTING_ORDER })}</span>
           </div>
         );
       case SimpleUiTradeDialogSteps.Confirm:
         return (
-          <div>
-            <span>{stringGetter({ key: STRING_KEYS.TRADE_CONFIRMED })}</span>
+          <div tw="row gap-0.75">
+            <AssetIcon
+              css={{
+                '--asset-icon-size': '2rem',
+              }}
+              logoUrl={logo}
+            />
+            <span tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.TRADE_CONFIRMED })}</span>
           </div>
         );
       case SimpleUiTradeDialogSteps.Error:
         return (
-          <div>
-            <span>{stringGetter({ key: STRING_KEYS.ERROR_SUBMITTING })}</span>
+          <div tw="row gap-0.75">
+            <AssetIcon
+              css={{
+                '--asset-icon-size': '2rem',
+              }}
+              logoUrl={logo}
+            />
+            <span tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.ERROR_SUBMITTING })}</span>
           </div>
         );
       default:
@@ -218,6 +236,7 @@ export const SimpleUiTradeDialog = ({
     midMarketPrice,
     selectedTradeType,
     onTradeTypeChange,
+    tickSizeDecimals,
   ]);
 
   return (
@@ -235,6 +254,7 @@ export const SimpleUiTradeDialog = ({
       withClose={isClosingPosition ? true : currentStep !== SimpleUiTradeDialogSteps.Edit}
       css={{
         '--simpleUi-dialog-secondaryColor': 'var(--color-layer-2)',
+        '--dialog-header-close-color': 'var(--color-text-1)',
         // When submitting and confirming we want a transparent header to not interfere with radial-gradient
         '--dialog-header-backgroundColor':
           currentStep === SimpleUiTradeDialogSteps.Edit

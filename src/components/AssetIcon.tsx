@@ -54,13 +54,7 @@ export const AssetIcon = ({
   ) : isAssetSymbol(symbol) ? (
     <$Container className={className} $hasChainIcon={!!chainId}>
       <$AssetIcon src={ASSET_ICON_MAP[symbol]} alt={symbol} />
-      {chainId && (
-        <img
-          tw="absolute bottom-[-2px] right-[-2px] h-[50%] w-[50%] rounded-9 border border-solid border-color-layer-4"
-          src={CHAIN_INFO[chainId]?.icon}
-          alt={CHAIN_INFO[chainId]?.name}
-        />
-      )}
+      {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
   ) : (
     <Placeholder className={className} symbol={symbol ?? ''} />
@@ -117,4 +111,14 @@ const $Placeholder = styled.div`
     height: 100%;
     font-size: 0.5em;
   }
+`;
+
+const $ChainIcon = styled.img`
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  height: 50%;
+  width: 50%;
+  border-radius: 9px;
+  border: 2px solid var(--asset-icon-chain-icon-borderColor, var(--color-layer-4));
 `;

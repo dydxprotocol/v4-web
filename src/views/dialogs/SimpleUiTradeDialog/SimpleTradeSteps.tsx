@@ -22,9 +22,10 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import {
-  getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
+  getPositionSideStringKeyFromOrderSide,
 } from '@/lib/enumToStringKeyHelpers';
+import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const SimpleTradeSteps = ({
@@ -43,19 +44,14 @@ export const SimpleTradeSteps = ({
   const stringGetter = useStringGetter();
   const orderFromClientId = orEmptyObj(useAppSelectorWithArgs(getOrderByClientId, clientId ?? ''));
 
-  const { stepSizeDecimals, tickSizeDecimals } = orEmptyObj(
+  const { stepSizeDecimals, tickSizeDecimals, stepSize } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const { side, totalFilled, price, marketId, typeString, sideString, sideColor } = useMemo(() => {
+  const { side, price, marketId, typeString, sideString, sideColor, size } = useMemo(() => {
     if (currentStep === SimpleUiTradeDialogSteps.Submit) {
       const orderTypeKey = payload?.type && ORDER_TYPE_STRINGS[payload.type].orderTypeKey;
-      const orderSideKey =
-        payload?.side &&
-        {
-          [OrderSide.BUY]: STRING_KEYS.BUY,
-          [OrderSide.SELL]: STRING_KEYS.SELL,
-        }[payload.side];
+      const orderSideKey = payload?.side ? getPositionSideStringKeyFromOrderSide(payload.side) : '';
 
       return {
         side: payload?.side,
@@ -69,6 +65,7 @@ export const SimpleTradeSteps = ({
           [OrderSide.BUY]: 'var(--color-positive)',
           [OrderSide.SELL]: 'var(--color-negative)',
         }[payload?.side ?? OrderSide.BUY],
+        size: payload?.size ?? orderFromClientId.size,
       };
     }
 
@@ -76,7 +73,7 @@ export const SimpleTradeSteps = ({
       const orderTypeKey =
         orderFromClientId.type && getIndexerOrderTypeStringKey(orderFromClientId.type);
       const orderSideKey =
-        orderFromClientId.side && getIndexerOrderSideStringKey(orderFromClientId.side);
+        orderFromClientId.side && getPositionSideStringKeyFromOrderSide(orderFromClientId.side);
 
       return {
         side: orderFromClientId.side,
@@ -90,6 +87,7 @@ export const SimpleTradeSteps = ({
           [IndexerOrderSide.BUY]: 'var(--color-positive)',
           [IndexerOrderSide.SELL]: 'var(--color-negative)',
         }[orderFromClientId.side ?? IndexerOrderSide.BUY],
+        size: orderFromClientId.size,
       };
     }
 
@@ -98,18 +96,24 @@ export const SimpleTradeSteps = ({
 
   const renderContent = () => {
     if (currentStep === SimpleUiTradeDialogSteps.Error) {
-      return <span>{placeOrderError}</span>;
+      return <span tw="text-center text-color-text-2">{placeOrderError}</span>;
     }
 
     if (!marketId || !side) return null;
 
     const displayableAsset = getDisplayableAssetFromTicker(marketId);
 
+    const canCompactNumber = stepSize && MustBigNumber(stepSize).gte(1);
+
     return (
       <div tw="flexColumn gap-0.5 text-center">
-        <div tw="row gap-[0.5ch] font-extra-large-bold">
+        <div tw="row gap-[0.5ch] text-color-text-2 font-extra-large-bold">
           <span css={{ color: sideColor }}>{sideString}</span>
-          <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
+          <Output
+            type={canCompactNumber ? OutputType.CompactNumber : OutputType.Number}
+            value={size}
+            fractionDigits={stepSizeDecimals}
+          />
           <span>{displayableAsset}</span>
         </div>
 
@@ -117,6 +121,7 @@ export const SimpleTradeSteps = ({
           <span tw="text-color-text-2">{typeString}</span>
           <span tw="text-color-text-0"> @ </span>
           <Output
+            withSubscript
             tw="inline text-color-text-1"
             type={OutputType.Fiat}
             value={price}
@@ -150,15 +155,13 @@ export const SimpleTradeSteps = ({
   const renderGradient = () => {
     if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
       const gradientColor =
-        side === IndexerOrderSide.BUY
-          ? 'var(--color-gradient-positive)'
-          : 'var(--color-gradient-negative)';
+        side === IndexerOrderSide.BUY ? 'var(--color-positive-50)' : 'var(--color-negative-50)';
 
       return (
         <div
-          tw="pointer-events-none absolute inset-0 z-0 h-[40%]"
+          tw="pointer-events-none absolute inset-0 z-0 h-[60%]"
           css={{
-            background: `radial-gradient(ellipse 100% 70% at 50% 0%, ${gradientColor} 0%, ${gradientColor} 70%, transparent 100%)`,
+            background: `radial-gradient(99.36% 45.83% at 50% 0%, ${gradientColor} 0%, rgba(0, 0, 0, 0.00) 100%), var(--color-layer-1)`,
           }}
         />
       );
@@ -168,7 +171,7 @@ export const SimpleTradeSteps = ({
   };
 
   return (
-    <div tw="flexColumn items-center gap-2 px-1.25 pb-1.25 pt-[15vh]">
+    <div tw="flexColumn items-center gap-2 pt-[40%]">
       {renderGradient()}
       <div tw="flexColumn z-[1] w-full flex-1 items-center gap-1.5">
         {renderIcon()}
