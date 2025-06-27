@@ -154,14 +154,30 @@ export const SimpleTradeSteps = ({
 
   const renderGradient = () => {
     if (currentStep === SimpleUiTradeDialogSteps.Confirm) {
-      const gradientColor =
-        side === IndexerOrderSide.BUY ? 'var(--color-positive-50)' : 'var(--color-negative-50)';
+      const gradientStops =
+        side === OrderSide.BUY
+          ? [
+              'var(--color-positive-50)',
+              'var(--color-positive-20)',
+              'var(--color-gradient-positive)',
+            ]
+          : [
+              'var(--color-negative-50)',
+              'var(--color-negative-20)',
+              'var(--color-gradient-negative)',
+            ];
 
       return (
         <div
-          tw="pointer-events-none absolute inset-0 z-0 h-[60%]"
+          tw="pointer-events-none absolute inset-0 z-0 h-[100%]"
           css={{
-            background: `radial-gradient(99.36% 45.83% at 50% 0%, ${gradientColor} 0%, rgba(0, 0, 0, 0.00) 100%), var(--color-layer-1)`,
+            background: `radial-gradient(
+              ellipse 99.36% 45.83% at 50% 0%,
+              ${gradientStops[0]} 0%,
+              ${gradientStops[1]} 40%,
+              ${gradientStops[2]} 55%,
+              rgba(0, 0, 0, 0.0) 100%
+            )`,
           }}
         />
       );
