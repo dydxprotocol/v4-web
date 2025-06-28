@@ -201,8 +201,8 @@ export const SimpleTradeSteps = ({
           state={{
             isLoading: currentStep === SimpleUiTradeDialogSteps.Submit,
           }}
-          action={ButtonAction.Primary}
-          size={ButtonSize.Medium}
+          action={ButtonAction.SimplePrimary}
+          size={ButtonSize.Large}
           onClick={onClose}
         >
           {stringGetter({ key: STRING_KEYS.DONE })}

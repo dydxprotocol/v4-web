@@ -11,7 +11,7 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -206,7 +206,8 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
           </div>
           <Button
-            action={ButtonAction.Primary}
+            action={isSimpleUi ? ButtonAction.SimplePrimary : ButtonAction.Primary}
+            size={isSimpleUi ? ButtonSize.Large : ButtonSize.Base}
             type={ButtonType.Submit}
             state={{ isDisabled: hasErrors || isAccountViewOnly }}
             slotLeft={

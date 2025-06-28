@@ -1,6 +1,6 @@
 import { OrderSide } from '@/bonsai/forms/trade/types';
 
-import { ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -110,7 +110,9 @@ const AssetPage = () => {
     <Button
       tw="flex-1 border border-solid border-color-layer-6"
       shape={ButtonShape.Pill}
+      size={ButtonSize.Large}
       state={ButtonState.Disabled}
+      action={ButtonAction.SimpleSecondary}
     >
       {stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     </Button>
@@ -119,6 +121,7 @@ const AssetPage = () => {
       <Button
         tw="flex-1 bg-color-negative-dark text-color-negative"
         shape={ButtonShape.Pill}
+        size={ButtonSize.Large}
         onClick={() =>
           dispatch(
             openDialog(
@@ -133,6 +136,7 @@ const AssetPage = () => {
       <Button
         tw="flex-1 bg-color-positive-dark text-color-positive"
         shape={ButtonShape.Pill}
+        size={ButtonSize.Large}
         onClick={() =>
           dispatch(
             openDialog(DialogTypes.SimpleUiTrade({ side: OrderSide.BUY, isClosingPosition: false }))
