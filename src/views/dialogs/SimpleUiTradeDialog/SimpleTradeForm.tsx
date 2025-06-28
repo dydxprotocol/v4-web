@@ -329,9 +329,9 @@ export const SimpleTradeForm = ({
   const placeOrderButton = isDepositNeeded ? (
     <Button
       type={ButtonType.Button}
-      action={ButtonAction.Primary}
+      action={ButtonAction.SimplePrimary}
       tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
-      size={ButtonSize.Medium}
+      size={ButtonSize.Large}
       onClick={onDepositFunds}
     >
       {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
@@ -341,7 +341,7 @@ export const SimpleTradeForm = ({
       type={ButtonType.Button}
       action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
       tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
-      size={ButtonSize.Medium}
+      size={ButtonSize.Large}
       css={{
         '--button-textColor': 'var(--color-layer-0)',
       }}

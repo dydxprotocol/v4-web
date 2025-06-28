@@ -4,6 +4,10 @@ import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
+import breakpoints from '@/styles/breakpoints';
+
+import { testFlags } from '@/lib/testFlags';
+
 type ElementProps = {
   disabled?: boolean;
   type?: ButtonType;
@@ -109,6 +113,10 @@ const buttonSizeVariants = {
     --button-font: var(--font-base-book);
     --button-height: 2.75rem;
   `,
+  [ButtonSize.BasePlus]: css`
+    --button-font: var(--font-base-book);
+    --button-height: 3rem;
+  `,
   [ButtonSize.Medium]: css`
     --button-font: var(--font-medium-medium);
     --button-height: 3.25rem;
@@ -131,6 +139,14 @@ const buttonShapeVariants = {
   `,
   [ButtonShape.Rectangle]: css`
     --button-radius: 0.5em;
+
+    @media ${breakpoints.tablet} {
+      ${() =>
+        testFlags.simpleUi &&
+        css`
+          --button-radius: 1rem;
+        `}
+    }
   `,
   [ButtonShape.Square]: css`
     --button-width: var(--button-height);
@@ -196,6 +212,17 @@ const ButtonStyle = css<StyleProps>`
 
   &:active:not(:disabled) {
     filter: var(--button-active-filter);
+  }
+
+  @media ${breakpoints.tablet} {
+    ${() =>
+      testFlags.simpleUi &&
+      css`
+        &:active:not(:disabled) {
+          background: linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%),
+            var(--button-backgroundColor);
+        }
+      `}
   }
 `;
 

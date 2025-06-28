@@ -1,6 +1,7 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountPosition } from '@/bonsai/types/summaryTypes';
 
+import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -99,9 +100,13 @@ export const MarketPositionCard = ({ position }: { position: SubaccountPosition 
   const renderTriggerOrderButtons = () => {
     if (tpOrder == null && slOrder == null) {
       return (
-        <Button tw="flex-1 py-0.75" onClick={onTriggerClicked}>
-          <div tw="row size-1.5 max-w-1.5 flex-1 justify-center rounded-[50%] bg-color-layer-4">
-            <Icon tw="font-tiny-book" iconName={IconName.Plus} />
+        <Button
+          action={ButtonAction.SimpleSecondary}
+          tw="flex-1 py-0.75"
+          onClick={onTriggerClicked}
+        >
+          <div tw="row size-1.5 max-w-1.5 flex-1 items-center justify-center rounded-[50%] bg-color-layer-5">
+            <Icon tw="ml-[1px] font-tiny-book" iconName={IconName.Plus} />
           </div>
           {stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
         </Button>

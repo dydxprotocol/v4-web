@@ -193,6 +193,7 @@ export const UserMenuContent = () => {
         tw="flex-1"
         state={{ isDisabled: isTransferDisabled }}
         action={ButtonAction.Primary}
+        size={ButtonSize.BasePlus}
         onClick={() => {
           dispatch(openDialog(DialogTypes.Deposit2()));
         }}
@@ -202,7 +203,7 @@ export const UserMenuContent = () => {
       </Button>
       <IconButton
         tw="text-color-accent"
-        size={ButtonSize.Base}
+        size={ButtonSize.BasePlus}
         shape={ButtonShape.Square}
         iconName={IconName.Move}
         onClick={() => {
@@ -210,7 +211,7 @@ export const UserMenuContent = () => {
         }}
       />
       <IconButton
-        size={ButtonSize.Base}
+        size={ButtonSize.BasePlus}
         shape={ButtonShape.Square}
         iconName={IconName.TransferArrows}
         state={{ isDisabled: isTransferDisabled }}
