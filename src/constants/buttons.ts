@@ -10,6 +10,7 @@ export enum ButtonSize {
   XSmall = 'XSmall',
   Small = 'Small',
   Base = 'Base',
+  BasePlus = 'BasePlus',
   Medium = 'Medium',
   Large = 'Large',
   XLarge = 'XLarge',
@@ -30,6 +31,8 @@ export enum ButtonAction {
   Destroy = 'Destroy',
   Navigation = 'Navigation',
   Reset = 'Reset',
+  SimplePrimary = 'SimplePrimary',
+  SimpleSecondary = 'SimpleSecondary',
 }
 
 export enum ButtonState {
