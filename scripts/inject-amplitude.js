@@ -26,14 +26,14 @@ async function inject(fileName) {
 
   const amplitudeCdnScript =
     AMPLITUDE_SERVER_ZONE === 'US'
-      ? `<script src="https://cdn.amplitude.com/script/AMPLITUDE_API_KEY.js"></script>`
-      : `<script src="https://cdn.eu.amplitude.com/script/AMPLITUDE_API_KEY.js"></script>`;
+      ? `<script src="https://cdn.amplitude.com/script/${AMPLITUDE_API_KEY}.js"></script>`
+      : `<script src="https://cdn.eu.amplitude.com/script/${AMPLITUDE_API_KEY}.js"></script>`;
 
   const amplitudeListenerScript = `<script type="module">
     !(function () {
-      var e = "${AMPLITUDE_API_KEY}";
-      e &&
-        (globalThis.amplitude.init(e${
+      var key = "${AMPLITUDE_API_KEY}";
+      key &&
+        (globalThis.amplitude.init(key${
           AMPLITUDE_SERVER_URL
             ? `, undefined, {
               autoCapture: true,
