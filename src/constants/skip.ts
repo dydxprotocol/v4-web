@@ -1,12 +1,25 @@
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
+import { CHAIN_INFO } from './chains';
+
 export const SKIP_EST_TIME_DEFAULT_MINUTES = 30;
 
 /**
  * @url https://docs.skip.build/go/advanced-transfer/go-fast
  * @description The maximum amount that can be transferred using the Go Fast route. All chains currently (4/15/2025) have the same limit.
  */
+export const SKIP_GO_FAST_TRANSFER_MIN_L2 = 20;
 export const SKIP_GO_FAST_TRANSFER_MIN = 100;
+
+// Only EVM Chains have a go fast transfer min
+export const SKIP_GO_FAST_TRANSFER_MIN_MAP: Record<keyof typeof CHAIN_INFO, number> = {
+  [mainnet.id]: SKIP_GO_FAST_TRANSFER_MIN,
+  [arbitrum.id]: SKIP_GO_FAST_TRANSFER_MIN_L2,
+  [base.id]: SKIP_GO_FAST_TRANSFER_MIN_L2,
+  [optimism.id]: SKIP_GO_FAST_TRANSFER_MIN_L2,
+  [polygon.id]: SKIP_GO_FAST_TRANSFER_MIN_L2,
+  [avalanche.id]: SKIP_GO_FAST_TRANSFER_MIN,
+};
 
 export const SKIP_GO_FAST_TRANSFER_LIMIT = 100_000; // hardcoded on Skip's end
 

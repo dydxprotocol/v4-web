@@ -4,7 +4,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { Chain, parseUnits } from 'viem';
-import { optimism } from 'viem/chains';
+import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
@@ -55,8 +55,14 @@ export function useBalance(
 }
 
 function getNativeEvmTokenDenom(chain: Chain) {
+  // special case: chain name is OP Mainnet
   if (chain.id === optimism.id) {
     return 'optimism-native';
+  }
+
+  // special case: chain name is Arbitrum One
+  if (chain.id === arbitrum.id) {
+    return 'arbitrum-native';
   }
 
   return `${chain.name.toLowerCase()}-native`;
