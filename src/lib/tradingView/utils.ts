@@ -163,7 +163,7 @@ export const getWidgetOverrides = ({
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
       'paneProperties.backgroundType': 'solid' as const,
-      priceScaleSelectionStrategyName: isSimpleUi ? 'left' : 'auto',
+      priceScaleSelectionStrategyName: isSimpleUi ? 'left' : 'right',
       'mainSeriesProperties.style': 1,
       'mainSeriesProperties.candleStyle.upColor': theme.positive,
       'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
