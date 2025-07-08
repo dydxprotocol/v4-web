@@ -8,7 +8,11 @@ import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
-import { ESTIMATED_LAUNCH_TIMEOUT, LaunchMarketStatus } from '@/constants/launchableMarkets';
+import {
+  ESTIMATED_LAUNCH_TIMEOUT,
+  LaunchMarketStatus,
+  MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
+} from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
@@ -159,8 +163,8 @@ export const NewMarketPreviewStep = ({
         {stringGetter({
           key: STRING_KEYS.DEPOSIT_LOCKUP_DESCRIPTION,
           params: {
-            NUM_DAYS: <span tw="text-color-text-1">30</span>,
-            PAST_DAYS: 30,
+            NUM_DAYS: <span tw="text-color-text-1">{MARKET_LAUNCH_TOKEN_LOCKUP_DURATION}</span>,
+            PAST_DAYS: MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
             APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
           },
         })}

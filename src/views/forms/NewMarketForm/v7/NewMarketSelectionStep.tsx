@@ -8,6 +8,7 @@ import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { MARKET_LAUNCH_TOKEN_LOCKUP_DURATION } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
@@ -97,7 +98,7 @@ export const NewMarketSelectionStep = ({
                   value={DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH}
                 />
               ),
-              NUM_DAYS: 90,
+              NUM_DAYS: MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
               MEGAVAULT_LINK: (
                 <NavLink
                   tw="inline-flex items-center gap-[0.25ch] text-[var(--link-color)] [--link-color:var(--color-text-1)] hover:underline"

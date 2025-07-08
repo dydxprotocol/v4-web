@@ -7,3 +7,5 @@ export enum LaunchMarketStatus {
 }
 
 export const ESTIMATED_LAUNCH_TIMEOUT = timeUnits.minute;
+
+export const MARKET_LAUNCH_TOKEN_LOCKUP_DURATION = 30; // 30 days
