@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import { AnalyticsEvents } from '@/constants/analytics';
+import { MARKET_LAUNCH_TOKEN_LOCKUP_DURATION } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH, NumberSign } from '@/constants/numbers';
 
@@ -123,7 +124,7 @@ export const NewMarketForm = ({
     return [
       {
         key: 'est-apr',
-        label: `${stringGetter({ key: STRING_KEYS.EST_APR_PLAIN })} (30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
+        label: `${stringGetter({ key: STRING_KEYS.EST_APR_PLAIN })} (${MARKET_LAUNCH_TOKEN_LOCKUP_DURATION}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })})`,
         value: <MegaVaultYieldOutput yieldType="thirtyDay" />,
       },
       {
@@ -132,7 +133,7 @@ export const NewMarketForm = ({
         value: (
           <Output
             type={OutputType.Text}
-            value={`~30${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`}
+            value={`~${MARKET_LAUNCH_TOKEN_LOCKUP_DURATION}${stringGetter({ key: STRING_KEYS.DAYS_ABBREVIATED })}`}
           />
         ),
       },
