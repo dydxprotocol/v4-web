@@ -69,6 +69,16 @@ function wrapperTaskBuilder<StartContext extends {}, AllExtras extends {}>(
   return thisBuilder;
 }
 
+export function createMiddlewareWithProp<TExtra extends {}, TProp>(
+  fn: <TIn extends {}>(
+    context: TIn,
+    next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra>>,
+    prop: TProp
+  ) => Promise<MiddlewareResult<TIn>>
+) {
+  return fn;
+}
+
 export function createMiddleware<TExtra extends {}>(
   fn: <TIn extends {}>(
     context: TIn,
