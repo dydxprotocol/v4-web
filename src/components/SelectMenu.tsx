@@ -29,6 +29,7 @@ export const SelectMenu = <T extends string>({
   onValueChange,
   label,
   withBlur,
+  withPortal = true,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -36,6 +37,7 @@ export const SelectMenu = <T extends string>({
   onValueChange: (value: T) => void;
   label?: React.ReactNode;
   withBlur?: boolean;
+  withPortal?: boolean;
 }) => {
   return (
     <Root value={value} onValueChange={onValueChange}>
@@ -54,13 +56,21 @@ export const SelectMenu = <T extends string>({
           />
         )}
       </$Trigger>
-      <Portal>
+      {withPortal ? (
+        <Portal>
+          <$Content className={className}>
+            {/* <ScrollUpButton /> */}
+            <Viewport>{children}</Viewport>
+            {/* <ScrollDownButton /> */}
+          </$Content>
+        </Portal>
+      ) : (
         <$Content className={className}>
           {/* <ScrollUpButton /> */}
           <Viewport>{children}</Viewport>
           {/* <ScrollDownButton /> */}
         </$Content>
-      </Portal>
+      )}
     </Root>
   );
 };

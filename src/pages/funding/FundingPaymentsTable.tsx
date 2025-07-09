@@ -74,13 +74,21 @@ const getFundingPaymentsTableColumnDef = ({
               type={OutputType.Date}
               dateOptions={{ format: 'medium' }}
               value={new Date(createdAt).getTime()}
+              title=""
             />
-            <Output
-              type={OutputType.Time}
-              dateOptions={{ format: 'medium' }}
-              value={new Date(createdAt).getTime()}
-              tw="text-color-text-0"
-            />
+            <div
+              css={[
+                tw`text-[0.75rem] text-color-text-0`,
+                !shortRows ? tw`leading-[0.7rem]` : tw`row`,
+              ]}
+            >
+              <Output
+                type={OutputType.Time}
+                dateOptions={{ format: 'medium' }}
+                value={new Date(createdAt).getTime()}
+                title=""
+              />
+            </div>
           </div>
         ),
       },
