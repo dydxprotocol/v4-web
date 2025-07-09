@@ -793,7 +793,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.ApiError,
+    type: NotificationType.AffiliatesAlert,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { data } = useAffiliateMetadata();
