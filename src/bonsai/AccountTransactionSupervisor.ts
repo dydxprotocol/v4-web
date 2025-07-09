@@ -1092,3 +1092,23 @@ export const accountTransactionManager = createAccountTransactionSupervisor(
   reduxStore,
   CompositeClientManager
 );
+
+function chainOperationEngine<Payload, T>(
+  fn: (payload: Payload) => Promise<T>,
+  nameForLogging: string
+): (payload: Payload) => Promise<OperationResult<ToPrimitives<T>>> {
+  return async (context: Payload) => {
+    try {
+      const tx = await fn(context);
+      const parsedTx = parseToPrimitives(tx);
+      return wrapOperationSuccess(parsedTx);
+    } catch (error) {
+      if (isWrappedOperationFailureError(error)) {
+        return error.getFailure();
+      }
+      const errorString = stringifyTransactionError(error);
+      const parsed = parseTransactionError(nameForLogging, errorString);
+      return wrapOperationFailure(errorString, parsed);
+    }
+  };
+}
