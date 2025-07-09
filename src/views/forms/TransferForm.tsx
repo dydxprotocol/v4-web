@@ -368,6 +368,7 @@ export const TransferForm = ({
         label={stringGetter({ key: STRING_KEYS.ASSET })}
         value={asset}
         onValueChange={onChangeAsset}
+        withPortal={false}
       >
         {assetOptions.map(({ value, label }) => (
           <$SelectItem key={value} value={value} label={label} />
