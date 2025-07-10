@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import isEmpty from 'lodash/isEmpty';
+// import isEmpty from 'lodash/isEmpty';
 import {
   ChartingLibraryWidgetOptions,
   LanguageCode,
@@ -129,7 +129,7 @@ export const useTradingView = ({
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
         symbol: marketId,
-        saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+        // saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
         auto_save_delay: 1,
       };
 
