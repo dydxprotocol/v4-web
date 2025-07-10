@@ -4,7 +4,6 @@ import {
   ChartingLibraryFeatureset,
   ChartingLibraryWidgetOptions,
   ChartPropertiesOverrides,
-  ThemeName,
   Timezone,
 } from 'public/charting_library';
 
@@ -156,7 +155,7 @@ export const getWidgetOverrides = ({
   const theme = Themes[appTheme][appColorMode];
 
   return {
-    theme: THEME_NAMES[appTheme] as ThemeName,
+    theme: THEME_NAMES[appTheme],
     overrides: {
       'paneProperties.background': theme.layer2,
       'paneProperties.horzGridProperties.color': theme.layer3,
