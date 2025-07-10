@@ -7,7 +7,7 @@ import {
   ResolutionString,
   TradingTerminalWidgetOptions,
   widget as Widget,
-} from 'public/tradingview/';
+} from 'public/charting_library';
 import { useDispatch } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
