@@ -2,12 +2,12 @@ import { calc } from '@/lib/do';
 
 import { OperationResult, wrapOperationFailure } from './lib/operationResult';
 
-type MiddlewareResult<TContext, TResult = any> = {
+export type MiddlewareResult<TContext, TResult = any> = {
   result: OperationResult<TResult>;
   finalContext: TContext;
 };
 
-type Middleware<TIn extends {}, TExtra extends {}> = (
+export type Middleware<TIn extends {}, TExtra extends {}> = (
   context: TIn,
   next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra>>
 ) => Promise<MiddlewareResult<TIn>>;
@@ -69,21 +69,21 @@ function wrapperTaskBuilder<StartContext extends {}, AllExtras extends {}>(
   return thisBuilder;
 }
 
-export function createMiddlewareWithProp<TExtra extends {}, TProp>(
-  fn: <TIn extends {}>(
-    context: TIn,
-    next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra>>,
-    prop: TProp
-  ) => Promise<MiddlewareResult<TIn>>
-) {
-  return fn;
-}
-
-export function createMiddleware<TExtra extends {}>(
-  fn: <TIn extends {}>(
+export function createMiddleware<TExtra extends {}, MinimumContext extends {} = {}>(
+  fn: <TIn extends MinimumContext>(
     context: TIn,
     next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra>>
   ) => Promise<MiddlewareResult<TIn>>
 ) {
   return fn;
+}
+
+export function createMiddlewareFailureResult<TContext, TResult>(
+  operationFailure: OperationResult<TResult>,
+  context: TContext
+): MiddlewareResult<TContext, TResult> {
+  return {
+    result: operationFailure,
+    finalContext: context,
+  };
 }
