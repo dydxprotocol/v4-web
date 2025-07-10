@@ -7,7 +7,7 @@ import {
   ResolutionString,
   TradingTerminalWidgetOptions,
   widget as Widget,
-} from 'public/charting_library';
+} from 'public/tradingview/';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
