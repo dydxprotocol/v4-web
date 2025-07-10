@@ -51,7 +51,7 @@ export const BaseTvChart = forwardRef(
           <$PriceChart isChartReady={isChartReady}>
             {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
 
-            <div id="tv-price-chart" />
+            <div ref={ref} id="tv-price-chart" />
           </$PriceChart>
 
           {isChartReady && (

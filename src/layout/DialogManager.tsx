@@ -2,7 +2,6 @@
 import React from 'react';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { isMainnet } from '@/constants/networks';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
@@ -88,11 +87,7 @@ export const DialogManager = React.memo(() => {
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     Deposit2: (args) =>
-      isMainnet ? (
-        <DepositDialog2 {...args} {...modalProps} />
-      ) : (
-        <TestnetFaucetDialog {...modalProps} />
-      ),
+      true ? <DepositDialog2 {...args} {...modalProps} /> : <TestnetFaucetDialog {...modalProps} />,
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
     ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,

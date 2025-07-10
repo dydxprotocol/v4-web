@@ -3,11 +3,11 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
+  ChartingLibraryWidgetOptions,
   LanguageCode,
   ResolutionString,
-  TradingTerminalWidgetOptions,
   widget as Widget,
-} from 'public/tradingview/';
+} from 'public/charting_library/';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { TOGGLE_ACTIVE_CLASS_NAME } from '@/constants/charts';
@@ -116,7 +116,7 @@ export const useTradingView = ({
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-      const options: TradingTerminalWidgetOptions = {
+      const options: ChartingLibraryWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(
