@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ForwardedRef, forwardRef, useCallback, useEffect, useState } from 'react';
 
 import { ResolutionString } from 'public/tradingview/charting_library';
 import styled, { css } from 'styled-components';
@@ -11,69 +11,69 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { ResolutionSelector } from './ResolutionSelector';
 
-export const BaseTvChart = ({
-  tvWidget,
-  isLaunchable,
-  isSimpleUi,
-}: {
+type BaseTvChartProps = {
   tvWidget?: TvWidget | null;
   isLaunchable?: boolean;
   isSimpleUi?: boolean;
-}) => {
-  const [isChartReady, setIsChartReady] = useState(false);
-  const [currentResolution, setCurrentResolution] = useState<ResolutionString>();
+};
 
-  useEffect(() => {
-    setIsChartReady(false);
-    let dead = false;
-    tvWidget?.onChartReady(() => {
-      if (dead) return;
-      setIsChartReady(true);
-      setCurrentResolution(tvWidget.activeChart().resolution());
-    });
-    return () => {
-      dead = true;
-    };
-  }, [tvWidget]);
+export const BaseTvChart = forwardRef(
+  ({ tvWidget, isLaunchable, isSimpleUi }: BaseTvChartProps, ref: ForwardedRef<HTMLDivElement>) => {
+    const [isChartReady, setIsChartReady] = useState(false);
+    const [currentResolution, setCurrentResolution] = useState<ResolutionString>();
 
-  const onResolutionChange = useCallback(
-    (resolution: ResolutionString) => {
-      if (isChartReady) {
-        tvWidget?.activeChart().setResolution(resolution);
-        setCurrentResolution(resolution);
-      }
-    },
-    [isChartReady, tvWidget]
-  );
+    useEffect(() => {
+      setIsChartReady(false);
+      let dead = false;
+      tvWidget?.onChartReady(() => {
+        if (dead) return;
+        setIsChartReady(true);
+        setCurrentResolution(tvWidget.activeChart().resolution());
+      });
+      return () => {
+        dead = true;
+      };
+    }, [tvWidget]);
 
-  if (isSimpleUi) {
+    const onResolutionChange = useCallback(
+      (resolution: ResolutionString) => {
+        if (isChartReady) {
+          tvWidget?.activeChart().setResolution(resolution);
+          setCurrentResolution(resolution);
+        }
+      },
+      [isChartReady, tvWidget]
+    );
+
+    if (isSimpleUi) {
+      return (
+        <div tw="flexColumn h-full">
+          <$PriceChart isChartReady={isChartReady}>
+            {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
+
+            <div id="tv-price-chart" />
+          </$PriceChart>
+
+          {isChartReady && (
+            <ResolutionSelector
+              isLaunchable={isLaunchable}
+              onResolutionChange={onResolutionChange}
+              currentResolution={currentResolution}
+            />
+          )}
+        </div>
+      );
+    }
+
     return (
-      <div tw="flexColumn h-full">
-        <$PriceChart isChartReady={isChartReady}>
-          {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
+      <$PriceChart isChartReady={isChartReady}>
+        {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
 
-          <div id="tv-price-chart" />
-        </$PriceChart>
-
-        {isChartReady && (
-          <ResolutionSelector
-            isLaunchable={isLaunchable}
-            onResolutionChange={onResolutionChange}
-            currentResolution={currentResolution}
-          />
-        )}
-      </div>
+        <div ref={ref} id="tv-price-chart" />
+      </$PriceChart>
     );
   }
-
-  return (
-    <$PriceChart isChartReady={isChartReady}>
-      {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
-
-      <div id="tv-price-chart" />
-    </$PriceChart>
-  );
-};
+);
 
 const $PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
