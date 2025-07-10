@@ -3,11 +3,11 @@ import { Dispatch, SetStateAction, useEffect } from 'react';
 import { BonsaiCore } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
+  ChartingLibraryWidgetOptions,
   LanguageCode,
   ResolutionString,
-  TradingTerminalWidgetOptions,
   widget as Widget,
-} from 'public/tradingview/';
+} from 'public/charting_library';
 import { useDispatch } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
@@ -61,7 +61,7 @@ export const useTradingViewLaunchable = ({
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-      const options: TradingTerminalWidgetOptions = {
+      const options: ChartingLibraryWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getLaunchableMarketDatafeed(assetData, metadataEndpoint),
