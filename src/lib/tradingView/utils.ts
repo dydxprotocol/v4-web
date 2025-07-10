@@ -226,8 +226,8 @@ export const getWidgetOptions = (
     // debug: true,
     container: 'tv-price-chart',
     library_path: '/charting_library/', // relative to public folder
-    // custom_css_url: '/tradingview/custom-styles.css',
-    // custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
+    custom_css_url: '/tradingview/custom-styles.css',
+    custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: disabledFeatures,
     timezone,
