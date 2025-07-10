@@ -2,7 +2,7 @@
 export async function makeApiRequest(path: string) {
   try {
     const response = await fetch(`https://min-api.cryptocompare.com/${path}`);
-    return response.json();
+    return await response.json();
   } catch (error) {
     throw new Error(`CryptoCompare request error: ${error.status}`);
   }
@@ -28,8 +28,8 @@ export function parseFullSymbol(fullSymbol: string): {
   }
 
   return {
-    exchange: match[1],
-    fromSymbol: match[2],
-    toSymbol: match[3],
+    exchange: match[1] ?? '',
+    fromSymbol: match[2] ?? '',
+    toSymbol: match[3] ?? '',
   };
 }

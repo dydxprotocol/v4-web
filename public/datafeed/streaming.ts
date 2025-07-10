@@ -13,10 +13,12 @@ const socket = io('wss://streamer.cryptocompare.com');
 const channelToSubscription = new Map();
 
 socket.on('disconnect', (reason: string) => {
+  // eslint-disable-next-line no-console
   console.error('[socket] Disconnected:', reason);
 });
 
 socket.on('error', (error: Error) => {
+  // eslint-disable-next-line no-console
   console.error('[socket] Error:', error);
 });
 
@@ -24,13 +26,13 @@ socket.on('m', (data: string) => {
   const [eventTypeStr, exchange, fromSymbol, toSymbol, , , tradeTimeStr, , tradePriceStr] =
     data.split('~');
 
-  if (parseInt(eventTypeStr) !== 0) {
+  if (parseInt(eventTypeStr ?? '0', 10) !== 0) {
     // skip all non-TRADE events
     return;
   }
 
-  const tradePrice = parseFloat(tradePriceStr);
-  const tradeTime = parseInt(tradeTimeStr);
+  const tradePrice = parseFloat(tradePriceStr ?? '0');
+  const tradeTime = parseInt(tradeTimeStr ?? '0', 10);
   const channelString = `0~${exchange}~${fromSymbol}~${toSymbol}`;
   const subscriptionItem = channelToSubscription.get(channelString);
 
@@ -79,7 +81,7 @@ export function subscribeOnStream(
   onResetCacheNeededCallback: () => void,
   lastDailyBar: Bar
 ) {
-  const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
+  const parsedSymbol = parseFullSymbol(symbolInfo.name);
   if (!parsedSymbol) return;
   const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
 
@@ -109,6 +111,7 @@ export function subscribeOnStream(
 
 export function unsubscribeFromStream(subscriberUID: string) {
   // find a subscription with id === subscriberUID
+  // eslint-disable-next-line no-restricted-syntax
   for (const channelString of channelToSubscription.keys()) {
     const subscriptionItem = channelToSubscription.get(channelString);
     const handlerIndex = subscriptionItem.handlers.findIndex(
