@@ -10,7 +10,7 @@ import {
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
-import { BOOSTED_MARKETS } from '@/constants/surgeRewards';
+import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/surgeRewards';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
@@ -43,7 +43,10 @@ const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | u
     return market.isFavorite;
   },
   [MarketFilters.BOOSTED]: (market) => {
-    return BOOSTED_MARKETS.has(market.id);
+    return (
+      new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime() &&
+      BOOSTED_MARKETS.has(market.id)
+    );
   },
   [MarketFilters.FX]: (market) => {
     return market.sectorTags?.includes(MarketFilters.FX);

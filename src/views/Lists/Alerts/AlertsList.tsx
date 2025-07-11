@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
 import { orderBy } from 'lodash';
@@ -23,7 +23,7 @@ const STANDARD_NOTIFICATION_HEIGHT = 128;
 const CUSTOM_ALERT_ROW_HEIGHT = 64;
 
 export const AlertsList = () => {
-  const { notifications, getDisplayData, getKey } = useNotifications();
+  const { notifications, getDisplayData, getKey, markSeen } = useNotifications();
   const stringGetter = useStringGetter();
 
   const items = useMemo(() => {
@@ -44,6 +44,7 @@ export const AlertsList = () => {
         const displayData = getDisplayData(notif);
 
         if (displayData == null) {
+          markSeen(notif);
           return undefined;
         }
 
@@ -54,7 +55,18 @@ export const AlertsList = () => {
         };
       })
       .filter(isTruthy);
-  }, [notifications, getDisplayData, getKey]);
+  }, [notifications, getDisplayData, getKey, markSeen]);
+
+  // Mark all notifications as seen when the user leaves the Alerts Page
+  useEffect(() => {
+    return () => {
+      items.forEach(({ notification }) => {
+        if (notification.status <= NotificationStatus.Unseen) {
+          markSeen(notification);
+        }
+      });
+    };
+  }, [items, markSeen]);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
