@@ -7,10 +7,14 @@ export type MiddlewareResult<TContext, TResult = any> = {
   finalContext: TContext;
 };
 
-export type Middleware<TIn extends {}, TExtra extends {}> = (
+export type Middleware<TIn extends {}, TExtra extends {}, TResult = any> = (
   context: TIn,
-  next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra>>
-) => Promise<MiddlewareResult<TIn>>;
+  next: (context: TIn & TExtra) => Promise<MiddlewareResult<TIn & TExtra, TResult>>
+) => Promise<MiddlewareResult<TIn, TResult>>;
+
+type TopLevelMiddleware<LastContext extends {}, TContext extends LastContext, TResult = any> = (
+  next: (ctx: TContext) => Promise<MiddlewareResult<TContext, TResult>>
+) => Promise<MiddlewareResult<LastContext, TResult>>;
 
 function getEngineMiddleware<TContext, TEngineResult>(
   engine: (context: TContext) => Promise<OperationResult<TEngineResult>>
@@ -35,52 +39,51 @@ function getEngineMiddleware<TContext, TEngineResult>(
   };
 }
 
-function getNoOpMiddleware<TIn extends {}>(): Middleware<TIn, {}> {
-  return (context, next) => next({ ...context });
+function getStartMiddleware<TIn extends {}>(start: TIn): TopLevelMiddleware<{}, TIn> {
+  return (next) => next({ ...start });
 }
 
-type TaskBuilder<StartContext extends {}, AllExtras extends {}, ResultType = any> = {
+type TaskBuilder<TContext extends {}, TResult = any> = {
   with<TExtraContext extends {}>(
-    middleware: Middleware<StartContext & AllExtras, AllExtras & TExtraContext>
-  ): TaskBuilder<StartContext, AllExtras & TExtraContext, ResultType>;
+    nextMiddleware: Middleware<TContext, TExtraContext, TResult>
+  ): TaskBuilder<TContext & TExtraContext, TResult>;
 
   do(
-    engine: (context: StartContext & AllExtras) => Promise<OperationResult<ResultType>>
-  ): Promise<MiddlewareResult<StartContext, ResultType>>;
+    engine: (context: TContext) => Promise<OperationResult<TResult>>
+  ): Promise<OperationResult<TResult>>;
 };
 
-export function taskBuilder<StartContext extends {}>(
+export function taskBuilder<StartContext extends {}, ResultType = any>(
   startContext: StartContext
-): TaskBuilder<StartContext, {}> {
-  return wrapperTaskBuilder(startContext, getNoOpMiddleware<StartContext>());
+): TaskBuilder<StartContext, ResultType> {
+  return wrapperTaskBuilder(getStartMiddleware(startContext));
 }
 
-function wrapperTaskBuilder<StartContext extends {}, AllExtras extends {}>(
-  startContext: StartContext,
-  middleware: Middleware<StartContext, AllExtras>
-) {
-  const thisBuilder: TaskBuilder<StartContext, AllExtras> = {
-    with: (nextMiddleware) => {
-      return wrapperTaskBuilder(startContext, (context, next) => {
-        return middleware(context, async (withAllExtras) => {
-          try {
-            return await nextMiddleware(withAllExtras, next);
-          } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error(
-              'Middleware engine threw an errror. Middleware should never throw errors.',
-              error
-            );
-            return createMiddlewareFailureResult(
-              wrapOperationFailure('Middleware engine returned improper error'),
-              withAllExtras
-            );
-          }
-        });
-      });
+function wrapperTaskBuilder<TContext extends {}>(topMiddleware: TopLevelMiddleware<any, TContext>) {
+  const thisBuilder: TaskBuilder<TContext> = {
+    with: <TExtraContext extends {}>(nextMiddleware: Middleware<TContext, TExtraContext>) => {
+      return wrapperTaskBuilder<TContext & TExtraContext>(
+        (next): Promise<MiddlewareResult<TContext & TExtraContext>> => {
+          return topMiddleware(async (withAllExtras) => {
+            try {
+              return await nextMiddleware(withAllExtras, next);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error(
+                'Middleware engine threw an errror. Middleware should never throw errors.',
+                error
+              );
+              return createMiddlewareFailureResult(
+                wrapOperationFailure('Middleware engine returned improper error'),
+                withAllExtras
+              );
+            }
+          });
+        }
+      );
     },
-    do: (engine) => {
-      return middleware(startContext, getEngineMiddleware(engine));
+    do: async (engine) => {
+      return (await topMiddleware(getEngineMiddleware(engine))).result;
     },
   };
   return thisBuilder;
