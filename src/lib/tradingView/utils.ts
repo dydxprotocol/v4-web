@@ -209,7 +209,6 @@ export const getWidgetOptions = (
     'legend_widget',
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const disabledFeatures: TradingTerminalFeatureset[] = [
     'header_symbol_search',
     'header_compare',
@@ -230,15 +229,16 @@ export const getWidgetOptions = (
     custom_css_url: '/tradingview/custom-styles.css',
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
-    // disabled_features: disabledFeatures,
+    disabled_features: disabledFeatures,
     timezone,
-    // enabled_features: [
-    //   'remove_library_container_border',
-    //   'hide_last_na_study_output',
-    //   'dont_show_boolean_study_arguments',
-    //   'hide_left_toolbar_by_default',
-    //   'hide_right_toolbar',
-    // ],
+    enabled_features: [
+      'remove_library_container_border',
+      'hide_last_na_study_output',
+      'dont_show_boolean_study_arguments',
+      'hide_left_toolbar_by_default',
+      'hide_right_toolbar',
+      'iframe_loading_compatibility_mode',
+    ],
   };
 };
 
