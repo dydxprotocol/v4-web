@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
-import { ContextMenuItem } from 'public/tradingview';
+import { ContextMenuItem } from 'public/tradingview/charting_library';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';

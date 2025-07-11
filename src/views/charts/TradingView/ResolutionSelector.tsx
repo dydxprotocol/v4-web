@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { ResolutionString } from 'public/tradingview';
+import { ResolutionString } from 'public/tradingview/charting_library';
 
 import {
   LAUNCHABLE_MARKET_RESOLUTION_CONFIGS,

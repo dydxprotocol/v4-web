@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import type { ResolutionString } from 'public/tradingview';
+import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import {
   DEFAULT_RESOLUTION,

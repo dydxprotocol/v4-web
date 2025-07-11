@@ -14,7 +14,7 @@ import type {
   SearchSymbolsCallback,
   SubscribeBarsCallback,
   Timezone,
-} from 'public/tradingview';
+} from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { RESOLUTION_TO_TIMEFRAME_MAP, TradingViewBar } from '@/constants/candles';

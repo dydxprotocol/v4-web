@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ResolutionString } from 'public/tradingview';
+import { ResolutionString } from 'public/tradingview/charting_library';
 import styled, { css } from 'styled-components';
 
 import { TvWidget } from '@/constants/tvchart';

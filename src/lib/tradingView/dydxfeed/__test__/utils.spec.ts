@@ -1,4 +1,4 @@
-import { ResolutionString } from 'public/tradingview';
+import { ResolutionString } from 'public/tradingview/charting_library';
 import { describe, expect, it } from 'vitest';
 
 import { timeUnits } from '@/constants/time';

@@ -5,7 +5,7 @@ import {
   Timezone,
   TradingTerminalFeatureset,
   TradingTerminalWidgetOptions,
-} from 'public/tradingview';
+} from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';

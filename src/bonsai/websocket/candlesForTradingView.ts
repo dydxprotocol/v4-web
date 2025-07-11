@@ -6,7 +6,7 @@ import type {
   LibrarySymbolInfo,
   ResolutionString,
   SubscribeBarsCallback,
-} from 'public/tradingview';
+} from 'public/tradingview/charting_library';
 
 import { CandleResolution, RESOLUTION_MAP } from '@/constants/candles';
 
