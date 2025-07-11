@@ -139,14 +139,6 @@ export const useTradingView = ({
         auto_save_delay: 1,
       };
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        const fn = new Function('return 123');
-        console.log('[Test new Function]', fn()); // Should log 123
-      } catch (e) {
-        console.log('[Blocked: new Function]', e);
-      }
-
       let tvChartWidget: IChartingLibraryWidget;
       const initTradingView = setTimeout(() => {
         console.log('TradingView is', typeof globalThis.TradingView); // should be 'object'
@@ -197,7 +189,7 @@ export const useTradingView = ({
             })
           );
         });
-      }, 100);
+      }, 500);
 
       return () => {
         console.log('tvChartWidget', 'remove');
