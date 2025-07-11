@@ -27,8 +27,9 @@
       console.log('TV present?', typeof TradingView);
 
       new TradingView.widget({
-        container_id: 'tv_chart',
-        library_path: '/tradingviewy/',
+        debug: true,
+        container: 'tv_chart',
+        library_path: '/tradingview/',
         autosize: true,
         symbol: 'BTCUSD',
         interval: '1',
