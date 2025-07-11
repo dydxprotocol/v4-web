@@ -710,96 +710,101 @@ export class AccountTransactionSupervisor {
     orderId: string;
     withNotification?: boolean;
   }) {
-    return taskBuilder({ payload: { orderId, withNotification } })
-      .with<AddLoggingNameMiddlewareProps>(
-        addLoggingNameMiddleware('AccountTransactionSupervisor/cancelOrder')
-      )
-      .with<AddSharedMiddlewareProps>(addSharedMiddleware(this.shared))
-      .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
-      .with<{ order: SubaccountOrder; uuid: string }>(async function findOrder(context, next) {
-        const uuid = crypto.randomUUID();
-        const order = getCancelableOrders(context.shared).find((o) => o.id === orderId);
-        if (order == null) {
-          return createMiddlewareFailureResult(
-            wrapSimpleError(
-              context.fnName,
-              'invalid or missing order id',
-              STRING_KEYS.NO_ORDERS_TO_CANCEL
-            ),
-            context
-          );
-        }
-        return next({ ...context, order, uuid });
-      })
-      .with<{}>(async function doCancelDispatches(context, next) {
-        if (withNotification) {
-          context.shared.store.dispatch(
-            cancelOrderSubmitted({
-              order: context.order,
-              orderId: context.order.id,
-              uuid: context.uuid,
-            })
-          );
-        }
-
-        const result = await next(context);
-
-        if (isOperationFailure(result.result) && withNotification) {
-          context.shared.store.dispatch(
-            cancelOrderFailed({
-              uuid: context.uuid,
-              errorParams: operationFailureToErrorParams(result.result),
-            })
-          );
-        }
-
-        return result;
-      })
-      .with<{ onConfirm: () => undefined }>(async function cancelAnalytics(context, next) {
-        track(AnalyticsEvents.TradeCancelOrder({ orderId }));
-
-        const startTime = startTimer();
-        const submitTime = createTimer();
-
-        const result = await next({
-          ...context,
-          onConfirm: () => {
-            track(
-              AnalyticsEvents.TradeCancelOrderConfirmed({
-                orderId,
-                roundtripMs: startTime.elapsed(),
-                sinceSubmissionMs: submitTime.elapsed(),
+    return (
+      taskBuilder({ payload: { orderId, withNotification } })
+        .with<AddLoggingNameMiddlewareProps>(
+          addLoggingNameMiddleware('AccountTransactionSupervisor/cancelOrder')
+        )
+        .with<AddSharedMiddlewareProps>(addSharedMiddleware(this.shared))
+        .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
+        // populate order details
+        .with<{ order: SubaccountOrder; uuid: string }>(async (context, next) => {
+          const uuid = crypto.randomUUID();
+          const order = this.getCancelableOrders().find((o) => o.id === orderId);
+          if (order == null) {
+            return createMiddlewareFailureResult(
+              wrapSimpleError(
+                context.fnName,
+                'invalid or missing order id',
+                STRING_KEYS.NO_ORDERS_TO_CANCEL
+              ),
+              context
+            );
+          }
+          return next({ ...context, order, uuid });
+        })
+        // dispatch store updates
+        .with<{}>(async (context, next) => {
+          if (withNotification) {
+            context.shared.store.dispatch(
+              cancelOrderSubmitted({
+                order: context.order,
+                orderId: context.order.id,
+                uuid: context.uuid,
               })
             );
-          },
-        });
-        submitTime.start();
+          }
 
-        if (isOperationFailure(result.result)) {
-          track(
-            AnalyticsEvents.TradeCancelOrderSubmissionFailed({
-              orderId,
-              error: result.result.errorString,
-              durationMs: startTime.elapsed(),
-            })
-          );
-        } else {
-          track(
-            AnalyticsEvents.TradeCancelOrderSubmissionConfirmed({
-              orderId,
-              durationMs: startTime.elapsed(),
-            })
-          );
-        }
+          const result = await next(context);
 
-        return result;
-      })
-      .do(async (context) => {
-        const result = await this.executeCancelOrder(orderId, () => {
-          context.onConfirm();
-        });
-        return result;
-      });
+          if (isOperationFailure(result.result) && withNotification) {
+            context.shared.store.dispatch(
+              cancelOrderFailed({
+                uuid: context.uuid,
+                errorParams: operationFailureToErrorParams(result.result),
+              })
+            );
+          }
+
+          return result;
+        })
+        // cancel analytics events
+        .with<{ onConfirm: () => undefined }>(async (context, next) => {
+          track(AnalyticsEvents.TradeCancelOrder({ orderId }));
+
+          const startTime = startTimer();
+          const submitTime = createTimer();
+
+          const result = await next({
+            ...context,
+            onConfirm: () => {
+              track(
+                AnalyticsEvents.TradeCancelOrderConfirmed({
+                  orderId,
+                  roundtripMs: startTime.elapsed(),
+                  sinceSubmissionMs: submitTime.elapsed(),
+                })
+              );
+            },
+          });
+          submitTime.start();
+
+          if (isOperationFailure(result.result)) {
+            track(
+              AnalyticsEvents.TradeCancelOrderSubmissionFailed({
+                orderId,
+                error: result.result.errorString,
+                durationMs: startTime.elapsed(),
+              })
+            );
+          } else {
+            track(
+              AnalyticsEvents.TradeCancelOrderSubmissionConfirmed({
+                orderId,
+                durationMs: startTime.elapsed(),
+              })
+            );
+          }
+
+          return result;
+        })
+        .do(async (context) => {
+          const result = await this.executeCancelOrder(orderId, () => {
+            context.onConfirm();
+          });
+          return result;
+        })
+    );
   }
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
@@ -969,16 +974,6 @@ function validateLocalWalletMiddleware() {
       return next(context);
     }
   );
-}
-
-function getCancelableOrders(
-  shared: TransactionSupervisorShared,
-  marketId?: string
-): SubaccountOrder[] {
-  const state = shared.store.getState();
-  const orders = BonsaiCore.account.openOrders.data(state);
-
-  return orders.filter((order) => marketId == null || order.marketId === marketId);
 }
 
 type AddClientAndWalletMiddlewareProps = {
