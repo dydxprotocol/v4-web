@@ -4,6 +4,7 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
   ChartingLibraryWidgetOptions,
+  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   widget as Widget,
@@ -46,7 +47,7 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
 }: {
-  setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
+  setTvWidget: (widget: IChartingLibraryWidget) => void;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
   setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;

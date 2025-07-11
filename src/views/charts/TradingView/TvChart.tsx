@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
+
+import { IChartingLibraryWidget } from 'public/charting_library';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import type { TvWidget } from '@/constants/tvchart';
 
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
 import { useChartLines } from '@/hooks/tradingView/useChartLines';
@@ -21,7 +22,13 @@ import { BaseTvChart } from './BaseTvChart';
 export const TvChart = () => {
   const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
-  const [tvWidget, setTvWidget] = useState<TvWidget>();
+  // const [tvWidget, setTvWidget] = useState<TvWidget>();
+  const tvWidgetRef = useRef<IChartingLibraryWidget | undefined>(undefined);
+  const tvWidget = tvWidgetRef.current;
+
+  const setTvWidget = useCallback((widget: IChartingLibraryWidget) => {
+    tvWidgetRef.current = widget;
+  }, []);
 
   const { isTablet } = useBreakpoints();
   const isSimpleUi = isTablet && testFlags.simpleUi;
@@ -48,15 +55,18 @@ export const TvChart = () => {
     buySellMarksToggleOn,
     setBuySellMarksToggleOn,
   });
+
   useChartMarketAndResolution({
     currentMarketId,
     tvWidget,
   });
+
   const { chartLines } = useChartLines({
     tvWidget,
     orderLineToggle,
     orderLinesToggleOn,
   });
+
   useBuySellMarks({
     buySellMarksToggle,
     buySellMarksToggleOn,
