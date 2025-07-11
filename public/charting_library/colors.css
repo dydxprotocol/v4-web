@@ -1,0 +1,62 @@
+/* Theme: Classic (default) */
+:root {
+  --color-layer-0: #08080C; /* ColorToken.GrayBlue7; */
+  --color-layer-1: #101018; /* ColorToken.GrayBlue6; */
+  --color-layer-2: #181825; /* ColorToken.GrayBlue5; */
+  --color-layer-3: #212131; /* ColorToken.GrayBlue4; */
+  --color-layer-4: #29293D; /* ColorToken.GrayBlue3; */
+  --color-layer-5: #303045; /* ColorToken.GrayBlue2; */
+  --color-layer-6: #38384D; /* ColorToken.GrayBlue1; */
+  --color-layer-7: #464659; /* ColorToken.GrayBlue0; */
+
+  --color-border: #303045; /* ColorToken.GrayBlue2; */
+
+  --color-text-0: #807E98; /* ColorToken.GrayPurple2; */
+  --color-text-1: #C8C7D8; /* ColorToken.GrayPurple1; */
+  --color-text-2: #FAFAFD; /* ColorToken.LightGray2; */
+  --color-text-button: #FAFAFA; /* ColorToken.LightGray0; */
+
+  --color-accent: #6966FF; /* ColorToken.Purple1; */
+}
+
+/* Theme: Light */
+:root.theme-light {
+  --color-layer-0: #FFFFFF; /* ColorToken.White; */
+  --color-layer-1: #E9ECEE; /* ColorToken.LightGray6; */
+  --color-layer-2: #FFFFFF; /* ColorToken.White; */
+  --color-layer-3: #F7F8FA; /* ColorToken.LightGray1; */
+  --color-layer-4: #FFFFFF; /* ColorToken.White; */
+  --color-layer-5: #EDF0F2; /* ColorToken.LightGray4; */
+  --color-layer-6: #D5DADF; /* ColorToken.LightGray9; */
+  --color-layer-7: #C2CBD3; /* ColorToken.MediumGray1; */
+
+  --color-border: #D1D9E0; /* ColorToken.LightGray10; */
+
+  --color-text-0: #737373; /* ColorToken.DarkGray1; */
+  --color-text-1: #4B4B4B; /* ColorToken.DarkGray3; */
+  --color-text-2: #181818; /* ColorToken.DarkGray12; */
+  --color-text-button: #FFFFFF; /* ColorToken.White; */
+
+  --color-accent: #7774FF; /* ColorToken.Purple0; */
+}
+
+/* Theme: Dark */
+:root.theme-dark {
+  --color-layer-0: #000000; /* ColorToken.Black; */
+  --color-layer-1: #18181B; /* ColorToken.DarkGray11; */
+  --color-layer-2: #0C0C0D; /* ColorToken.DarkGray13; */
+  --color-layer-3: #212124; /* ColorToken.DarkGray10; */
+  --color-layer-4: #303033; /* ColorToken.DarkGray6; */
+  --color-layer-5: #3B3B3F; /* ColorToken.DarkGray5; */
+  --color-layer-6: #494950; /* ColorToken.DarkGray4; */
+  --color-layer-7: #56565C; /* ColorToken.DarkGray2; */
+
+  --color-border: #494950; /* ColorToken.DarkGray4; */
+
+  --color-text-0: #888891; /* ColorToken.DarkGray0; */
+  --color-text-1: #CACACE; /* ColorToken.MediumGray0; */
+  --color-text-2: #FAFAFA; /* ColorToken.LightGray0; */
+  --color-text-button: #FAFAFA; /* ColorToken.LightGray0; */
+
+  --color-accent: #7774FF; /* ColorToken.Purple0; */
+}
