@@ -115,6 +115,7 @@ export const useTradingView = ({
     if (marketId) {
       const isSimpleUi = isTablet && testFlags.simpleUi;
       const widgetOptions = getWidgetOptions(false, isSimpleUi);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
@@ -130,7 +131,7 @@ export const useTradingView = ({
 
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
-        ...widgetOverrides,
+        // ...widgetOverrides,
         datafeed,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
