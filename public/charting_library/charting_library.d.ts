@@ -4862,19 +4862,13 @@ export interface CreateTradingViewStyledButtonOptions {
  */
 export interface CrossHairMovedEventParams {
 	/**
-	 * The crosshair time coordinate represented with a UNIX timestamp in UTC.
-	 * You can use this property to do some calculations or retrieve additional data from the datafeed.
+	 * The time coordinate of the crosshair.
 	 */
 	time: number;
 	/**
 	 * The price coordinate of the crosshair.
 	 */
 	price: number;
-	/**
-	 * The crosshair time coordinate represented with a UNIX timestamp in the selected time zone.
-	 * You can use this property to display the crosshair time value in the UI, for example, in a tooltip or data window.
-	 */
-	userTime?: number;
 	/**
 	 * Series and study values at the crosshair position. The object keys are study or series IDs, and the object value are study or series values.
 	 * The ID for the main series will always be the string `'_seriesId'`.
@@ -8621,25 +8615,8 @@ export interface IBoxedValueReadOnly<T> {
 	value(): T;
 }
 export interface IBrokerAccountInfo {
-	/**
-	 * The library calls `accountsMetainfo` to get a list of accounts for a particular user.
-	 * The method should return an array that contains an ID and name for each account.
-	 *
-	 * Note that if `accountsMetainfo` returns an array containing more than one element, you should implement the {@link setCurrentAccount} method.
-	 * Refer to [User accounts](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/user-accounts.md) for more information.
-	 */
 	accountsMetainfo(): Promise<AccountMetainfo[]>;
-	/**
-	 * The library calls `currentAccount` to get the current account ID.
-	 */
 	currentAccount(): AccountId;
-	/**
-	 * The library calls `setCurrentAccount` when users switch accounts using the drop-down menu in the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md).
-	 * This method provides your backend server with the ID of the selected account.
-	 *
-	 * Note that `setCurrentAccount` is required if {@link accountsMetainfo} returns an array containing more than one element.
-	 * Refer to [Multiple accounts](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/user-accounts.md#multiple-accounts) for more information.
-	 */
 	setCurrentAccount?(id: AccountId): void;
 }
 export interface IBrokerCommon {
@@ -8650,19 +8627,19 @@ export interface IBrokerCommon {
 	 */
 	chartContextMenuActions(context: TradeContext, options?: DefaultContextMenuActionsParams): Promise<ActionMetaInfo[]>;
 	/**
-	 * The library calls this method to check if a symbol can be traded.
-	 * If the method returns `false`, users will see the *Non-tradable symbol* message in the UI when creating orders.
-	 * You can also show a custom message with the reason why the symbol cannot be traded and the possible solution to resolve the issue.
-	 * To do this, return an `IsTradableResult` object.
+	 * This function is required for the Floating Trading Panel.
+	 * The ability to trade via the panel depends on the result of this function: `true` or `false`.
+	 * You don't need to implement this method if all symbols can be traded.
+	 *
+	 * If you want to show a custom message with the reason why the symbol cannot be traded then you can return an object `IsTradableResult`.
 	 * @param  {string} symbol - symbol identifier
 	 */
 	isTradable(symbol: string): Promise<boolean | IsTradableResult>;
 	/**
-	 * Defines the connection status for the Broker API.
-	 * You don't need to return values other than `1` (`Connected`) since the broker is already connected when you create the widget.
+	 * Connection status for the Broker API.
 	 *
-	 * If the method is not implemented, the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md) will have a spinner instead of the user's trading data.
-	 * In the console, the *Trading.Core:Broker broker creation error* will also be displayed.
+	 * You don't need to return values other than `1` (`Connected`) typically since the broker is already connected when you create the widget.
+	 * You can use it if you want to display a spinner in the bottom panel while the data is being loaded.
 	 */
 	connectionStatus(): ConnectionStatus;
 	/**
@@ -8692,12 +8669,12 @@ export interface IBrokerCommon {
 	 */
 	executions(symbol: string): Promise<Execution[]>;
 	/**
-	 * Called by the Order Ticket and DOM panel to get symbol information.
+	 * Called by the internal Order dialog, DOM panel, and floating trading panel to get symbol information.
 	 * @param  {string} symbol - symbol identifier
 	 */
 	symbolInfo(symbol: string): Promise<InstrumentInfo>;
 	/**
-	 * This function should return the information that will be used to build the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md).
+	 * This function should return the information that will be used to build an Account manager.
 	 */
 	accountManagerInfo(): AccountManagerInfo;
 	/**
@@ -8874,13 +8851,13 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	individualPositionPLUpdate(individualPositionId: string, pl: number): void;
 	/**
-	 * Call this method when a broker connection has received an equity update. This method is required by the standard Order Ticket to calculate risks.
+	 * Call this method when a broker connection has received an equity update. This method is required by the standard Order Dialog to calculate risks.
 	 * @param  {number} equity - updated equity
 	 */
 	equityUpdate(equity: number): void;
 	/**
 	 * Call this method when a broker connection has received a margin available update.
-	 * This method is required by the standard Order Ticket to display the margin meter.
+	 * This method is required by the standard Order Dialog to display the margin meter.
 	 * This method should be used when {@link BrokerConfigFlags.supportMargin} is set to `true` in {@link SingleBrokerMetaInfo.configFlags}.
 	 * The Trading Platform subscribes to margin available updates using {@link IBrokerWithoutRealtime.subscribeMarginAvailable}.
 	 * @param  {number} marginAvailable - updated available margin
@@ -8888,7 +8865,7 @@ export interface IBrokerConnectionAdapterHost {
 	marginAvailableUpdate(marginAvailable: number): void;
 	/**
 	 * Call this method when a broker connection has received a balance update.
-	 * This method is required by the crypto Order Ticket.
+	 * This method is required by the crypto Order Dialog.
 	 * It should be implemented when the {@link BrokerConfigFlags.supportBalances} flag is set to `true` in {@link SingleBrokerMetaInfo.configFlags}.
 	 * @param  {string} symbol - symbol ID
 	 * @param  {CryptoBalance} balance - updated crypto balance
@@ -8928,7 +8905,7 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	unsubscribeSuggestedQtyChange(symbol: string, listener: SuggestedQtyChangedListener): void;
 	/**
-	 * Shows the Order Ticket
+	 * Shows the order dialog
 	 * @param  {T extends PreOrder} order - order to show in the dialog
 	 * @param  {OrderTicketFocusControl} [focus] - input control to focus on when dialog is opened
 	 */
@@ -8941,13 +8918,13 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	showNotification(title: string, text: string, notificationType?: NotificationType): void;
 	/**
-	 * Shows the cancel Order Ticket for specified order
+	 * Shows the cancel order dialog for specified order
 	 * @param  {string} orderId - id of order to potentially cancel
 	 * @param  {()=>Promise<void>} handler - cancel order confirmation handler (called when order should be cancelled)
 	 */
 	showCancelOrderDialog(orderId: string, handler: () => Promise<void>): Promise<void>;
 	/**
-	 * Shows the cancel Order Ticket for multiple orders
+	 * Shows the cancel order dialog for multiple orders
 	 * @param  {string} symbol - symbol for which to cancel orders
 	 * @param  {Side} side - side of the order
 	 * @param  {number} qty - quantity of the order
@@ -9154,20 +9131,20 @@ export interface IBrokerWithoutRealtime extends IBrokerCommon, IBrokerAccountInf
 	 */
 	previewLeverage?(leverageSetParams: LeverageSetParams): Promise<LeveragePreviewResult>;
 	/**
-	 * The method should be implemented if you use the standard Order Ticket and support stop loss. Equity is used to calculate Risk in Percent.
+	 * The method should be implemented if you use the standard Order dialog and support stop loss. Equity is used to calculate Risk in Percent.
 	 *
 	 * Once this method is called the broker should provide equity (Balance + P/L) updates via {@link IBrokerConnectionAdapterHost.equityUpdate} method.
 	 */
 	subscribeEquity?(): void;
 	/**
-	 * The method should be implemented if you use the standard Order Ticket and want to show the margin meter.
+	 * The method should be implemented if you use the standard Order dialog and want to show the margin meter.
 	 *
 	 * Once this method is called the broker should provide margin available updates via {@link IBrokerConnectionAdapterHost.marginAvailableUpdate} method.
 	 * @param  {string} symbol - symbol identifier
 	 */
 	subscribeMarginAvailable?(symbol: string): void;
 	/**
-	 * The method should be implemented if you use a standard Order Ticket.
+	 * The method should be implemented if you use a standard Order dialog.
 	 * `pipValues` is displayed in the Order info and it is used to calculate the Trade Value and risks.
 	 * If this method is not implemented then `pipValue` from the `symbolInfo` is used in the order panel/dialog.
 	 *
@@ -9176,21 +9153,21 @@ export interface IBrokerWithoutRealtime extends IBrokerCommon, IBrokerAccountInf
 	 */
 	subscribePipValue?(symbol: string): void;
 	/**
-	 * The method should be implemented if you use a standard Order Ticket and implement `subscribePipValue`.
+	 * The method should be implemented if you use a standard Order dialog and implement `subscribePipValue`.
 	 *
 	 * Once this method is called the broker should stop providing `pipValue` updates.
 	 * @param  {string} symbol - symbol identifier
 	 */
 	unsubscribePipValue?(symbol: string): void;
 	/**
-	 * The method should be implemented if you use the standard Order Ticket want to show the margin meter.
+	 * The method should be implemented if you use the standard Order dialog want to show the margin meter.
 	 *
 	 * Once this method is called the broker should stop providing margin available updates.
 	 * @param  {string} symbol - symbol identifier
 	 */
 	unsubscribeMarginAvailable?(symbol: string): void;
 	/**
-	 * The method should be implemented if you use the standard Order Ticket and support stop loss.
+	 * The method should be implemented if you use the standard Order dialog and support stop loss.
 	 *
 	 * Once this method is called the broker should stop providing equity updates.
 	 */
@@ -10512,10 +10489,6 @@ export interface IChartingLibraryWidget {
 	widgetbar(): Promise<IWidgetbarApi>;
 	/**
 	 * Get an API object for interacting with the active chart.
-	 * For example, you can subscribe to events on the active chart, such as {@link IChartWidgetApi.onIntervalChanged}.
-	 * Note that the library does not manage the event subscriptions when users switch between the charts on the [multiple-chart layout](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading_terminal.md#multiple-chart-layout).
-	 * If necessary, you should manually unsubscribe from the previous chart and subscribe to the newly selected one.
-	 * To track the currently active chart, use the {@link SubscribeEventsMap.activeChartChanged} event.
 	 *
 	 * @returns An API object for interacting with the chart.
 	 */
@@ -13013,17 +12986,17 @@ export interface IUpdatableAction extends IAction {
 	update(options: Partial<OmitActionId<ActionOptions>>): void;
 }
 /**
- * An API object for interacting with the [Watchlist](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/Watch-List.md) widget.
- * The Watchlist is a widget that allows users to track price movements and volume of specific financial instruments in real-time.
- * Watchlists also allow users to quickly switch between the symbols.
- * The Watchlist widget is displayed on the widget panel on the right side of the chart.
+ * An API object for interacting with the widgetbar (right sidebar) watchlist.
  *
  * **Notes about watchlist contents**
  *
- * Watchlist items should be symbol names which your datafeed [`resolveSymbol`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API.md#resolvesymbol) method can resolve. This
+ * Watchlist items should be symbol names which your datafeed `resolveSymbol` method can resolve. This
  * means that generally shorter names such as `AAPL` can be used if your datafeed understands it. However,
- * it is recommend that you provide the symbol names as they appear within the `LibrarySymbolInfo` object, for
- * example, `NASDAQ:AAPL`.
+ * it is recommend that you provided the symbol names as they appear within the symbolInfo result (for
+ * example: `NASDAQNM:AAPL`).
+ *
+ * Additionally, any item in the list which is prefixed with `###` will be considered a
+ * section divider in the watchlist.
  */
 export interface IWatchListApi {
 	/**
@@ -13033,7 +13006,7 @@ export interface IWatchListApi {
 	defaultList(): string[];
 	/**
 	 * Get a list of symbols.
-	 * If the `id` parameter is not provided, the current list will be returned. If there is no watchList, `null` will be returned.
+	 * If the `id` parameter is not provided then the current list will be returned. If there is no WatchList then `null` will be returned.
 	 * @param  {string} [id] - Watchlist ID
 	 * @returns list of symbols for watchlist
 	 */
@@ -13063,26 +13036,28 @@ export interface IWatchListApi {
 	/**
 	 * Edit the list of symbols for a watchlist.
 	 * @param  {string} listId - ID of the watchlist
-	 * @param  {string[]} symbols - Symbols to be set for the watchlist. Any list item that has the `###` prefix is considered a section divider in the watchlist.
+	 * @param  {string[]} symbols - symbols to be set for the watchlist. Any item in the list which is prefixed with `###` will be considered a
+	 * section divider in the watchlist.
 	 */
 	updateList(listId: string, symbols: string[]): void;
 	/**
 	 * Rename the watchlist.
 	 * @param  {string} listId - ID of the watchlist
-	 * @param  {string} newName - New name to set for the watchlist
+	 * @param  {string} newName - new name to set for the watchlist
 	 */
 	renameList(listId: string, newName: string): void;
 	/**
 	 * Create a list of symbols with `listName` name. If the `listName` parameter is not provided or there is no WatchList then `null` will be returned;
 	 * @param  {string} [listName] - name for the watchlist
-	 * @param  {string[]} [symbols] - Symbol IDs for the watchlist. Any list item that has the `###` prefix is considered a section divider in the watchlist.
+	 * @param  {string[]} [symbols] - symbol IDs for the watchlist. Any item in the list which is prefixed with `###` will be considered a
+	 * section divider in the watchlist.
 	 * @returns WatchListSymbolList
 	 */
 	createList(listName?: string, symbols?: string[]): WatchListSymbolList | null;
 	/**
 	 * Save a list of symbols.
 	 * @param  {WatchListSymbolList} list
-	 * @returns If there is no watchList or an equivalent list already exists, `false` will be returned. Otherwise, `true` will be returned.
+	 * @returns If there is no WatchList or an equivalent list already exists then `false` will be returned, otherwise `true` will returned.
 	 */
 	saveList(list: WatchListSymbolList): boolean;
 	/**
@@ -13969,7 +13944,7 @@ export interface LibrarySymbolInfo {
 	/**
 	 * Format of displaying labels on the price scale:
 	 *
-	 * `price` - formats decimal or fractional numbers based on `minmov`, `pricescale`, `minmove2`, `fractional` and `variableMinTick` values. See [Price format](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Symbology.md#price-format) for more details.
+	 * `price` - formats decimal or fractional numbers based on `minmov`, `pricescale`, `minmove2`, `fractional` and `variableMinTick` values. See [Price Formatting](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Symbology#price-format) for more details
 	 * `volume` - formats decimal numbers in thousands, millions, billions or trillions
 	 */
 	format: SeriesFormat;
@@ -14027,7 +14002,7 @@ export interface LibrarySymbolInfo {
 	 * If it's `false` then all buttons for intraday resolutions will be disabled for this particular symbol.
 	 * If it is set to `true`, all intradays resolutions that are supplied directly by the datafeed must be provided in `intraday_multipliers` array.
 	 *
-	 * **WARNING** Any daily, weekly or monthly resolutions cannot be inferred from intraday resolutions.
+	 * **WARNING** Any daily, weekly or monthly resolutions cannot be inferred from intraday resolutions!
 	 *
 	 * `false` if DWM only
 	 * @default false
@@ -14121,7 +14096,7 @@ export interface LibrarySymbolInfo {
 	 */
 	has_weekly_and_monthly?: boolean;
 	/**
-	 * Array (of strings) containing the [resolutions](https://www.tradingview.com/charting-library-docs/latest/core_concepts/Resolution.md#resolution-in-weeks--months) (in weeks - without the suffix) supported by the data feed. {@link ResolutionString}
+	 * Array (of strings) containing the [resolutions](https://www.tradingview.com/charting-library-docs/latest/core_concepts/Resolution#weeks) (in weeks - without the suffix) supported by the data feed. {@link ResolutionString}
 	 *
 	 * For example it could be something like
 	 *
@@ -14132,7 +14107,7 @@ export interface LibrarySymbolInfo {
 	 */
 	weekly_multipliers?: string[];
 	/**
-	 * Array (of strings) containing the [resolutions](https://www.tradingview.com/charting-library-docs/latest/core_concepts/Resolution.md#resolution-in-weeks--months) (in months - without the suffix) supported by the data feed. {@link ResolutionString}
+	 * Array (of strings) containing the [resolutions](https://www.tradingview.com/charting-library-docs/latest/core_concepts/Resolution#months) (in months - without the suffix) supported by the data feed. {@link ResolutionString}
 	 *
 	 * For example it could be something like
 	 *
@@ -14154,9 +14129,9 @@ export interface LibrarySymbolInfo {
 	/**
 	 * Represents what values are supported by the symbol. Possible values:
 	 *
-	 * - `ohlcv` — the symbol supports open, high, low, close prices and has volume.
-	 * - `ohlc` — the symbol supports open, high, low, close, prices but doesn't have volume.
-	 * - `c` — the symbol supports only close price. This makes the chart show the symbol data using only line-based styles.
+	 * - `ohlcv` - the symbol supports open, high, low, close and has volume
+	 * - `ohlc` - the symbol supports open, high, low, close, but doesn't have volume
+	 * - `c` - the symbol supports only close, it's displayed on the chart using line-based styles only
 	 * @default 'ohlcv'
 	 */
 	visible_plots_set?: VisiblePlotsSet;
@@ -14217,13 +14192,11 @@ export interface LibrarySymbolInfo {
 	 */
 	unit_conversion_types?: string[];
 	/**
-	 * An ID of a subsession specified in {@link subsessions}. The value must match the subsession that is currently displayed on the chart.
-	 * For more information, refer to the [Extended sessions](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Symbology.md#extended-sessions) section.
+	 * Subsession ID. Must match the `id` property of one of the subsessions.
 	 */
 	subsession_id?: string;
 	/**
-	 * An array of objects that contain information about certain subsessions within the extended session.
-	 * For more information, refer to the [Extended sessions](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Symbology.md#extended-sessions) section.
+	 * Subsessions definitions.
 	 */
 	subsessions?: LibrarySubsessionInfo[];
 	/**
@@ -15698,7 +15671,7 @@ export interface PineJSStd {
 	 * Current bar time
 	 *
 	 * @param context - PineJS execution context.
-	 * @returns UNIX time of current bar according to the symbol timezone and not UTC.
+	 * @returns UNIX time of current bar
 	 */
 	time(context: IContext): number;
 	/**
@@ -15706,9 +15679,10 @@ export interface PineJSStd {
 	 *
 	 * @param context - PineJS execution context.
 	 * @param period - Period
-	 * @returns UNIX time of current bar according to the symbol timezone and not UTC.
+	 * @param spec
+	 * @returns UNIX time of current bar
 	 */
-	time(context: IContext, period: string): number;
+	time(context: IContext, period: string, spec: unknown): number;
 	/**
 	 * Is a shortcut for (high + low)/2
 	 *
@@ -17292,18 +17266,6 @@ export interface RateOfChangeIndicatorOverrides {
  * Use these properties to customize indicator via {@link IChartWidgetApi.createStudy} and {@link IStudyApi.applyOverrides}.
  */
 export interface RatioIndicatorOverrides {
-	/** Default value: `` */
-	"negativefill.color": string;
-	/** Default value: `0` */
-	"negativefill.transparency": number;
-	/** Default value: `true` */
-	"negativefill.visible": boolean;
-	/** Default value: `` */
-	"positivefill.color": string;
-	/** Default value: `0` */
-	"positivefill.transparency": number;
-	/** Default value: `true` */
-	"positivefill.visible": boolean;
 	/** Default value: `0` */
 	"plot.linestyle": number;
 	/** Default value: `2` */
@@ -17318,20 +17280,6 @@ export interface RatioIndicatorOverrides {
 	"plot.color": string;
 	/** Default value: `15` */
 	"plot.display": number;
-	/** Default value: `0` */
-	"baseline.linestyle": number;
-	/** Default value: `2` */
-	"baseline.linewidth": number;
-	/** Default value: `line` */
-	"baseline.plottype": LineStudyPlotStyleName;
-	/** Default value: `false` */
-	"baseline.trackprice": boolean;
-	/** Default value: `0` */
-	"baseline.transparency": number;
-	/** Default value: `rgba(0, 0, 0, 0)` */
-	"baseline.color": string;
-	/** Default value: `0` */
-	"baseline.display": number;
 	[key: string]: StudyOverrideValueType;
 }
 export interface RawStudyMetaInfo extends RawStudyMetaInfoBase {
@@ -18462,14 +18410,10 @@ export interface SortingParameters {
  * Use these properties to customize indicator via {@link IChartWidgetApi.createStudy} and {@link IStudyApi.applyOverrides}.
  */
 export interface SpreadIndicatorOverrides {
-	/** Default value: `` */
-	"negative fill.color": string;
 	/** Default value: `0` */
 	"negative fill.transparency": number;
 	/** Default value: `true` */
 	"negative fill.visible": boolean;
-	/** Default value: `` */
-	"positive fill.color": string;
 	/** Default value: `0` */
 	"positive fill.transparency": number;
 	/** Default value: `true` */
@@ -20450,13 +20394,6 @@ export interface StudyOverrides {
 	 * - Max: `2000`
 	 */
 	"donchian channels.length": number;
-	/**
-	 * - Default value: `0`
-	 * - Input type: `integer`
-	 * - Min: `-1000`
-	 * - Max: `1000`
-	 */
-	"donchian channels.offset": number;
 	/** Default value: `15` */
 	"double ema.plot.display": number;
 	/** Default value: `0` */
@@ -22583,18 +22520,6 @@ export interface StudyOverrides {
 	 * - Max: `1000000000000`
 	 */
 	"rate of change.length": number;
-	/** Default value: `` */
-	"ratio.negativefill.color": string;
-	/** Default value: `0` */
-	"ratio.negativefill.transparency": number;
-	/** Default value: `true` */
-	"ratio.negativefill.visible": boolean;
-	/** Default value: `` */
-	"ratio.positivefill.color": string;
-	/** Default value: `0` */
-	"ratio.positivefill.transparency": number;
-	/** Default value: `true` */
-	"ratio.positivefill.visible": boolean;
 	/** Default value: `0` */
 	"ratio.plot.linestyle": number;
 	/** Default value: `2` */
@@ -22609,20 +22534,6 @@ export interface StudyOverrides {
 	"ratio.plot.color": string;
 	/** Default value: `15` */
 	"ratio.plot.display": number;
-	/** Default value: `0` */
-	"ratio.baseline.linestyle": number;
-	/** Default value: `2` */
-	"ratio.baseline.linewidth": number;
-	/** Default value: `line` */
-	"ratio.baseline.plottype": LineStudyPlotStyleName;
-	/** Default value: `false` */
-	"ratio.baseline.trackprice": boolean;
-	/** Default value: `0` */
-	"ratio.baseline.transparency": number;
-	/** Default value: `rgba(0, 0, 0, 0)` */
-	"ratio.baseline.color": string;
-	/** Default value: `0` */
-	"ratio.baseline.display": number;
 	/**
 	 * - Default value: `close`
 	 * - Input type: `text`
@@ -22941,14 +22852,10 @@ export interface StudyOverrides {
 	 * - Options: `["open","high","low","close","hl2","hlc3","ohlc4"]`
 	 */
 	"smoothed moving average.source": string;
-	/** Default value: `` */
-	"spread.negative fill.color": string;
 	/** Default value: `0` */
 	"spread.negative fill.transparency": number;
 	/** Default value: `true` */
 	"spread.negative fill.visible": boolean;
-	/** Default value: `` */
-	"spread.positive fill.color": string;
 	/** Default value: `0` */
 	"spread.positive fill.transparency": number;
 	/** Default value: `true` */
@@ -24888,11 +24795,6 @@ export interface SubscribeEventsMap {
 	 * Panes' order has changed.
 	 */
 	panes_order_changed: () => void;
-	/**
-	 * Chart's widget bar is shown/hidden.
-	 * @param  {boolean} isVisible - if the widget bar is currently hidden
-	 */
-	widgetbar_visibility_changed: (isVisible: boolean) => void;
 }
 export interface SuccessFormatterParseResult<T> extends FormatterParseResult {
 	/** @inheritDoc */
@@ -25007,7 +24909,7 @@ export interface SymbolResolveExtension {
 	/**
 	 * Indicates the currency for conversions if `currency_codes` configuration field is set,
 	 * and `currency_code` is provided in the original symbol information ({@link LibrarySymbolInfo}).
-	 * Read more about [currency conversion](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Price-Scale.md#currency-conversion).
+	 * Read more about [currency conversion](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Price-Scale#currency-conversion).
 	 */
 	currencyCode?: string;
 	/**
@@ -25016,7 +24918,7 @@ export interface SymbolResolveExtension {
 	 */
 	unitId?: string;
 	/**
-	 * Trading session type, such as `"regular"` or `"extended"`, that the chart should currently display.
+	 * Trading session string
 	 */
 	session?: string;
 }
@@ -25449,9 +25351,9 @@ export interface TradingTerminalWidgetOptions extends Omit<ChartingLibraryWidget
 	 * See {@link ChartingLibraryWidgetOptions.favorites}
 	 */
 	favorites?: Favorites<TradingTerminalChartTypeFavorites>;
-	/** Defines the [configuration flags](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading-concepts/trading-features-configuration.md) for the Trading Platform. */
+	/** configuration flags for the Trading Platform. */
 	brokerConfig?: SingleBrokerMetaInfo;
-	/** Defines the [configuration flags](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading-concepts/trading-features-configuration.md) for the Trading Platform. */
+	/** configuration flags for the Trading Platform. */
 	broker_config?: SingleBrokerMetaInfo;
 	/** Connection configuration settings for Rest Broker API */
 	restConfig?: RestBrokerConnectionInfo;
@@ -26613,24 +26515,6 @@ export interface WatchedValueSubscribeOptions {
 	/** if it is set to true then the callback will be executed with the previous value (if available) */
 	callWithLast?: boolean;
 }
-export interface WatchlistSettings {
-	/**
-	 * Sets the list of default symbols for watchlist.
-	 * Any item in the list which is prefixed with `###` will be considered a section divider in the watchlist.
-	 * @default []
-	 *
-	 * **Example:**
-	 * ```js
-	 * default_symbols: ['###TOP SECTION', 'AAPL', 'IBM', '###SECOND SECTION', 'MSFT']
-	 * ```
-	 */
-	default_symbols: string[];
-	/**
-	 * Enables read-only mode for the watchlist.
-	 * @default false
-	 */
-	readonly?: boolean;
-}
 /**
  * Data provided to the {@link WatermarkContentProvider}.
  */
@@ -26691,7 +26575,26 @@ export interface WidgetBarParams {
 	 */
 	datawindow?: boolean;
 	/** Watchlist settings */
-	watchlist_settings?: WatchlistSettings;
+	watchlist_settings?: {
+		/**
+		 * Sets the list of default symbols for watchlist.
+		 *
+		 * Any item in the list which is prefixed with `###` will be considered a
+		 * section divider in the watchlist.
+		 * @default []
+		 *
+		 * **Example:**
+		 * ```
+		 * default_symbols: ['###TOP SECTION', 'AAPL', 'IBM', '###SECOND SECTION', 'MSFT']
+		 * ```
+		 */
+		default_symbols: string[];
+		/**
+		 * Enables read-only mode for the watchlist
+		 * @default false
+		 */
+		readonly?: boolean;
+	};
 }
 /**
  * Overrides for the 'Williams Alligator' indicator.
@@ -27187,12 +27090,7 @@ export type ChartingLibraryFeatureset =
  * Enables an [alternative saving and loading mode](https://www.tradingview.com/charting-library-docs/latest/saving_loading/saving_loading.md#saving-drawings-separately) for the library. This mode saves the state of the drawings separately from the chart layout.
  * @default false
  */
-"saveload_separate_drawings_storage" | 
-/**
- * Disables the pulse animation when chart type is set to Line.
- * @default false
- */
-"disable_pulse_animation";
+"saveload_separate_drawings_storage";
 /** These are defining the types for a background */
 export type ColorTypes = "solid" | "gradient";
 /**
@@ -27633,7 +27531,7 @@ export type TradingTerminalFeatureset = ChartingLibraryFeatureset |
 "right_toolbar" | 
 /** Shows the Order Panel @default true */
 "order_panel" | 
-/** Shows the Order info section in the Order Ticket @default true */
+/** Shows the Order info section in the Order dialog @default true */
 "order_info" | 
 /** Shows the Buy/Sell Buttons in Legend @default true */
 "buy_sell_buttons" | 
