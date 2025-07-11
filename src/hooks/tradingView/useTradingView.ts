@@ -139,6 +139,10 @@ export const useTradingView = ({
         auto_save_delay: 1,
       };
 
+      console.log('randomUUID:', typeof crypto?.randomUUID);
+      console.log('structuredClone:', typeof window.structuredClone);
+      console.log('userAgent:', navigator.userAgent);
+
       const tvChartWidget = new Widget(options);
       console.log('tvChartWidget', 'set');
       setTvWidget(tvChartWidget);
