@@ -24,6 +24,11 @@ const App = lazy(async () => {
   return import('./App');
 });
 
+window.onerror = (message, source, lineno, colno, error) => {
+  // eslint-disable-next-line no-console
+  console.log('[window.onerror]', { message, source, lineno, colno, error });
+};
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <StrictMode>
