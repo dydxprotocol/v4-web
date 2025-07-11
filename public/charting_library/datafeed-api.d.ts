@@ -76,10 +76,6 @@ export interface DOMLevel {
 	/** Volume for DOM level */
 	volume: number;
 }
-/**
- * Datafeed configuration data.
- * Pass the resulting array of properties as a parameter to {@link OnReadyCallback} of the [`onReady`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#onready) method.
- */
 export interface DatafeedConfiguration {
 	/**
 	 * List of exchange descriptors.
@@ -133,7 +129,7 @@ export interface DatafeedConfiguration {
 	 */
 	symbols_types?: DatafeedSymbolType[];
 	/**
-	 * Set it if you want to group symbols in the [Symbol Search](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Symbol-Search.md).
+	 * Set it if you want to group symbols in the symbol search.
 	 * Represents an object where keys are symbol types {@link SymbolType} and values are regular expressions (each regular expression should divide an instrument name into 2 parts: a root and an expiration).
 	 *
 	 * Sample:
@@ -144,7 +140,6 @@ export interface DatafeedConfiguration {
 	 * }
 	 * ```
 	 * It will be applied to the instruments with futures and stock as a type.
-	 * Refer to [Symbol grouping](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Symbol-Search.md#symbol-grouping) for more information.
 	 */
 	symbols_grouping?: Record<string, string>;
 }
@@ -180,7 +175,7 @@ export interface DatafeedQuoteValues {
 	volume?: number;
 	/** Original name */
 	original_name?: string;
-	[valueName: string]: string | number | string[] | number[] | undefined;
+	[valueName: string]: string | number | undefined;
 }
 export interface DatafeedSymbolType {
 	/** Name of the symbol type */
@@ -292,7 +287,7 @@ export interface IDatafeedChartApi {
 	 */
 	unsubscribeBars(listenerGuid: string): void;
 	/**
-	 * Trading Platform calls this function when it wants to receive real-time level 2 (DOM) for a symbol.
+	 * Trading Terminal calls this function when it wants to receive real-time level 2 (DOM) for a symbol.
 	 *
 	 * @param symbol A SymbolInfo object
 	 * @param callback Function returning an object to update Depth Of Market (DOM) data
@@ -300,7 +295,7 @@ export interface IDatafeedChartApi {
 	 */
 	subscribeDepth?(symbol: string, callback: DOMCallback): string;
 	/**
-	 * Trading Platform calls this function when it doesn't want to receive updates for this listener anymore.
+	 * Trading Terminal calls this function when it doesn't want to receive updates for this listener anymore.
 	 *
 	 * @param subscriberUID A string returned by `subscribeDepth`
 	 */
@@ -331,7 +326,7 @@ export interface IDatafeedQuotesApi {
 	 */
 	getQuotes(symbols: string[], onDataCallback: QuotesCallback, onErrorCallback: QuotesErrorCallback): void;
 	/**
-	 * Trading Platform calls this function when it wants to receive real-time quotes for a symbol.
+	 * Trading Terminal calls this function when it wants to receive real-time quotes for a symbol.
 	 * The library assumes that you will call `onRealtimeCallback` every time you want to update the quotes.
 	 * @param  {string[]} symbols - list of symbols that should be updated rarely (once per minute). These symbols are included in the watchlist but they are not visible at the moment.
 	 * @param  {string[]} fastSymbols - list of symbols that should be updated frequently (at least once every 10 seconds)
@@ -340,7 +335,7 @@ export interface IDatafeedQuotesApi {
 	 */
 	subscribeQuotes(symbols: string[], fastSymbols: string[], onRealtimeCallback: QuotesCallback, listenerGUID: string): void;
 	/**
-	 * Trading Platform calls this function when it doesn't want to receive updates for this listener anymore.
+	 * Trading Terminal calls this function when it doesn't want to receive updates for this listener anymore.
 	 * `listenerGUID` will be the same object that the Library passed to `subscribeQuotes` before.
 	 * @param  {string} listenerGUID - unique identifier of the listener
 	 */
@@ -374,10 +369,6 @@ export interface LibrarySubsessionInfo {
 	 * Session corrections string. See {@link LibrarySymbolInfo.corrections}.
 	 */
 	"session-correction"?: string;
-	/**
-	 * Session to display. See {@link LibrarySymbolInfo.session_display}.
-	 */
-	"session-display"?: string;
 }
 export interface LibrarySymbolInfo {
 	/**
@@ -429,6 +420,8 @@ export interface LibrarySymbolInfo {
 	 * The session value to display in the UI. If not specified, then `session` is used.
 	 */
 	session_display?: string;
+	/** @deprecated Use session_holidays instead */
+	holidays?: string;
 	/**
 	 * List of holidays for this symbol. These dates are not displayed on the chart.
 	 * It's a string in the following format: `YYYYMMDD[,YYYYMMDD]`.
@@ -513,12 +506,6 @@ export interface LibrarySymbolInfo {
 	 */
 	minmove2?: number;
 	/**
-	 * Dynamic minimum price movement. It is used if the instrument's minimum price movement changes depending on the price range.
-	 *
-	 * For example, '0.01 10 0.02 25 0.05', where the tick size is 0.01 for a price less than 10, the tick size is 0.02 for a price less than 25, the tick size is 0.05 for a price greater than or equal to 25.
-	 */
-	variable_tick_size?: string;
-	/**
 	 * Boolean value showing whether the symbol includes intraday (minutes) historical data.
 	 *
 	 * If it's `false` then all buttons for intraday resolutions will be disabled for this particular symbol.
@@ -545,10 +532,10 @@ export interface LibrarySymbolInfo {
 	 *         : symbol.supported_resolutions(resolution);
 	 * ```
 	 *
-	 * In case of the absence of `supported_resolutions` in a symbol info, all DWM resolutions will be available. Intraday resolutions will be available if `has_intraday` is `true`.
+	 * In case of absence of `supported_resolutions` in a symbol info all DWM resolutions will be available. Intraday resolutions will be available if `has_intraday` is `true`.
 	 * Supported resolutions affect available timeframes too. The timeframe will not be available if it requires the resolution that is not supported.
 	 */
-	supported_resolutions?: ResolutionString[];
+	supported_resolutions: ResolutionString[];
 	/**
 	 * Array of resolutions (in minutes) supported directly by the data feed. Each such resolution may be passed to, and should be implemented by, `getBars`. The default of [] means that the data feed supports aggregating by any number of minutes.
 	 *
@@ -584,12 +571,10 @@ export interface LibrarySymbolInfo {
 	 */
 	seconds_multipliers?: string[];
 	/**
-	 * The boolean value specifying whether the datafeed can supply historical data at the daily resolution.
+	 * The boolean value showing whether data feed has its own daily resolution bars or not.
 	 *
-	 * If `has_daily` is set to `false`, all buttons for resolutions that include days are disabled for this particular symbol.
-	 * Otherwise, the library requests daily bars from the datafeed.
-	 * All daily resolutions that the datafeed supplies must be included in the {@link LibrarySymbolInfo.daily_multipliers} array.
-	 *
+	 * If `has_daily` = `false` then the library will build the respective resolutions using 1-minute bars by itself.
+	 * If not, then it will request those bars from the data feed only if specified resolution belongs to `daily_multipliers`, otherwise an error will be thrown.
 	 * @default true
 	 */
 	has_daily?: boolean;
@@ -644,6 +629,11 @@ export interface LibrarySymbolInfo {
 	 * @default false
 	 */
 	has_empty_bars?: boolean;
+	/**
+	 * @deprecated
+	 * use visible_plots_set instead
+	 */
+	has_no_volume?: boolean;
 	/**
 	 * Represents what values are supported by the symbol. Possible values:
 	 *
@@ -811,6 +801,8 @@ export interface Mark {
 	showLabelWhenImageLoaded?: boolean;
 }
 export interface MarkCustomColor {
+	/** @deprecated Foreground color */
+	color?: string;
 	/** Border color */
 	border: string;
 	/** Background color */
@@ -860,8 +852,7 @@ export interface QuoteOkData extends QuoteDataResponse {
 	v: DatafeedQuoteValues;
 }
 /**
- * [Symbol Search](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Symbol-Search) result item.
- * Pass the resulting array of symbols as a parameter to {@link SearchSymbolsCallback} of the [`searchSymbols`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#searchsymbols) method.
+ * Symbol search result item
  *
  * @example
  * ```
@@ -870,7 +861,7 @@ export interface QuoteOkData extends QuoteDataResponse {
  * 	exchange: 'NasdaqNM',
  * 	full_name: 'NasdaqNM:AAPL',
  * 	symbol: 'AAPL',
- * 	ticker: 'AAPL',
+ *  ticker: 'AAPL',
  * 	type: 'stock',
  * }
  * ```
@@ -1003,7 +994,7 @@ export interface Unit {
 	/** Description */
 	description: string;
 }
-export type CustomTimezones = "Africa/Cairo" | "Africa/Casablanca" | "Africa/Johannesburg" | "Africa/Lagos" | "Africa/Nairobi" | "Africa/Tunis" | "America/Anchorage" | "America/Argentina/Buenos_Aires" | "America/Bogota" | "America/Caracas" | "America/Chicago" | "America/El_Salvador" | "America/Juneau" | "America/Lima" | "America/Los_Angeles" | "America/Mexico_City" | "America/New_York" | "America/Phoenix" | "America/Santiago" | "America/Sao_Paulo" | "America/Toronto" | "America/Vancouver" | "Asia/Almaty" | "Asia/Ashkhabad" | "Asia/Bahrain" | "Asia/Bangkok" | "Asia/Chongqing" | "Asia/Colombo" | "Asia/Dhaka" | "Asia/Dubai" | "Asia/Ho_Chi_Minh" | "Asia/Hong_Kong" | "Asia/Jakarta" | "Asia/Jerusalem" | "Asia/Karachi" | "Asia/Kathmandu" | "Asia/Kolkata" | "Asia/Kuwait" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Qatar" | "Asia/Riyadh" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Taipei" | "Asia/Tehran" | "Asia/Tokyo" | "Asia/Yangon" | "Atlantic/Reykjavik" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Helsinki" | "Europe/Istanbul" | "Europe/Lisbon" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Riga" | "Europe/Rome" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Vilnius" | "Europe/Warsaw" | "Europe/Zurich" | "Pacific/Auckland" | "Pacific/Chatham" | "Pacific/Fakaofo" | "Pacific/Honolulu" | "Pacific/Norfolk" | "US/Mountain";
+export type CustomTimezones = "Africa/Cairo" | "Africa/Casablanca" | "Africa/Johannesburg" | "Africa/Lagos" | "Africa/Nairobi" | "Africa/Tunis" | "America/Anchorage" | "America/Argentina/Buenos_Aires" | "America/Bogota" | "America/Caracas" | "America/Chicago" | "America/El_Salvador" | "America/Juneau" | "America/Lima" | "America/Los_Angeles" | "America/Mexico_City" | "America/New_York" | "America/Phoenix" | "America/Santiago" | "America/Sao_Paulo" | "America/Toronto" | "America/Vancouver" | "Asia/Almaty" | "Asia/Ashkhabad" | "Asia/Bahrain" | "Asia/Bangkok" | "Asia/Chongqing" | "Asia/Colombo" | "Asia/Dubai" | "Asia/Ho_Chi_Minh" | "Asia/Hong_Kong" | "Asia/Jakarta" | "Asia/Jerusalem" | "Asia/Karachi" | "Asia/Kathmandu" | "Asia/Kolkata" | "Asia/Kuwait" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Qatar" | "Asia/Riyadh" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Taipei" | "Asia/Tehran" | "Asia/Tokyo" | "Asia/Yangon" | "Atlantic/Reykjavik" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Helsinki" | "Europe/Istanbul" | "Europe/Lisbon" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Riga" | "Europe/Rome" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Vilnius" | "Europe/Warsaw" | "Europe/Zurich" | "Pacific/Auckland" | "Pacific/Chatham" | "Pacific/Fakaofo" | "Pacific/Honolulu" | "Pacific/Norfolk" | "US/Mountain";
 export type DOMCallback = (data: DOMData) => void;
 export type ErrorCallback = (reason: string) => void;
 export type GetMarksCallback<T> = (marks: T[]) => void;
