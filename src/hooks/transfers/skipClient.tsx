@@ -26,6 +26,7 @@ import { WalletNetworkType } from '@/constants/wallets';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { swallowErrorsAndReturnUndefined } from '@/lib/asyncUtils';
 import { RPCUrlsByChainId } from '@/lib/wagmi';
 
 import { useAccounts } from '../useAccounts';
@@ -81,7 +82,7 @@ function makeLazySkipClient() {
 
     route: async (req: Parameters<typeof route>[0]) => {
       const skipClient = await makeOrGetSkiplient();
-      return skipClient.route(req);
+      return swallowErrorsAndReturnUndefined(skipClient.route(req));
     },
 
     balances: async (req: Parameters<typeof balances>[0]) => {
