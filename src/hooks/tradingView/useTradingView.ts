@@ -142,7 +142,8 @@ export const useTradingView = ({
       let tvChartWidget: IChartingLibraryWidget;
       const initTradingView = setTimeout(() => {
         console.log('TradingView is', typeof globalThis.TradingView); // should be 'object'
-
+        const container = document.getElementById('tv-price-chart');
+        console.log('[container exists]', !!container);
         tvChartWidget = new Widget(options);
         console.log('tvChartWidget', 'set');
         setTvWidget(tvChartWidget);
