@@ -84,13 +84,3 @@ export function waitForSelector<T>(
     }, timeoutMs);
   });
 }
-
-export async function swallowErrorsAndReturnUndefined<T>(
-  promise: Promise<T>
-): Promise<T | undefined> {
-  try {
-    return await promise;
-  } catch {
-    return undefined;
-  }
-}
