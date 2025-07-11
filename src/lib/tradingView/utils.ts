@@ -223,7 +223,7 @@ export const getWidgetOptions = (
     ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
   ];
 
-  // Needed for ifram loading on some mobile browsers
+  // Needed for iframe loading on some mobile browsers
   const tabletFeatures: TradingTerminalFeatureset[] = isTablet
     ? ['iframe_loading_compatibility_mode' as const]
     : [];
