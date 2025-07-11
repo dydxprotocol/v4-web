@@ -116,18 +116,16 @@ export const useTradingView = ({
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
-      const datafeed = getDydxDatafeed(
-        store,
-        getCandlesForDatafeed,
-        { decimal, group },
-        selectedLocale,
-        stringGetter
-      );
-
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed,
+        datafeed: getDydxDatafeed(
+          store,
+          getCandlesForDatafeed,
+          { decimal, group },
+          selectedLocale,
+          stringGetter
+        ),
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
         symbol: marketId,

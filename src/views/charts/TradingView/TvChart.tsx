@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { TvWidget } from '@/constants/tvchart';
+import type { TvWidget } from '@/constants/tvchart';
 
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
 import { useChartLines } from '@/hooks/tradingView/useChartLines';

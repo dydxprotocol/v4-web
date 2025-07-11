@@ -72,9 +72,7 @@ export const getDydxDatafeed = (
   stringGetter: StringGetterFunction
 ): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
-    setTimeout(() => {
-      callback(configurationData);
-    }, 0);
+    setTimeout(() => callback(configurationData), 0);
   },
 
   searchSymbols: (
