@@ -35,12 +35,6 @@ import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useStringGetter } from '../useStringGetter';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
-const testScript = document.createElement('script');
-testScript.src = '/charting_library/bundles/chart-widget-gui.75a373be3b6816e8b55a.js';
-testScript.onload = () => console.log('✅ Test chunk loaded');
-testScript.onerror = () => console.log('❌ Test chunk failed');
-document.head.appendChild(testScript);
-
 /**
  * @description Hook to initialize TradingView Chart
  */
@@ -149,20 +143,11 @@ export const useTradingView = ({
       console.log('structuredClone:', typeof window.structuredClone);
       console.log('userAgent:', navigator.userAgent);
 
-      window.onerror = function (msg, src, lineno, colno, err) {
-        console.log('Global error:', msg, src, lineno, colno, err);
-      };
+      let tvChartWidget: IChartingLibraryWidget;
+      const initTradingView = setTimeout(() => {
+        console.log('TradingView is', typeof globalThis.TradingView); // should be 'object'
 
-      fetch('/charting_library/bundles/chart-widget-gui.75a373be3b6816e8b55a.js')
-        .then((r) => {
-          console.log('MIME TYPE:', r.headers.get('Content-Type'));
-          return r.text();
-        })
-        .then((js) => console.log('Script length:', js.length))
-        .catch((err) => console.log('Fetch failed:', err));
-
-      try {
-        const tvChartWidget = new Widget(options);
+        tvChartWidget = new Widget(options);
         console.log('tvChartWidget', 'set');
         setTvWidget(tvChartWidget);
 
@@ -208,17 +193,17 @@ export const useTradingView = ({
             })
           );
         });
-        return () => {
-          console.log('tvChartWidget', 'remove');
-          orderLineToggleRef.current?.remove();
-          orderLineToggleRef.current = null;
-          buySellMarksToggleRef.current?.remove();
-          buySellMarksToggleRef.current = null;
-          tvChartWidget.remove();
-        };
-      } catch (error) {
-        console.log('Error initializing TradingView widget:', error);
-      }
+      }, 100);
+
+      return () => {
+        console.log('tvChartWidget', 'remove');
+        orderLineToggleRef.current?.remove();
+        orderLineToggleRef.current = null;
+        buySellMarksToggleRef.current?.remove();
+        buySellMarksToggleRef.current = null;
+        clearTimeout(initTradingView);
+        tvChartWidget.remove();
+      };
     }
     return () => {
       console.log('tvChartWidget', 'remove2');
