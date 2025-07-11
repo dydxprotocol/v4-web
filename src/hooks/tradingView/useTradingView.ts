@@ -139,9 +139,13 @@ export const useTradingView = ({
         auto_save_delay: 1,
       };
 
-      console.log('randomUUID:', typeof crypto?.randomUUID);
-      console.log('structuredClone:', typeof window.structuredClone);
-      console.log('userAgent:', navigator.userAgent);
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        const fn = new Function('return 123');
+        console.log('[Test new Function]', fn()); // Should log 123
+      } catch (e) {
+        console.log('[Blocked: new Function]', e);
+      }
 
       let tvChartWidget: IChartingLibraryWidget;
       const initTradingView = setTimeout(() => {
