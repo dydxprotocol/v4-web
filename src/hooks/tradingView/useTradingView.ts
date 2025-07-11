@@ -118,16 +118,20 @@ export const useTradingView = ({
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
+      const datafeed = getDydxDatafeed(
+        store,
+        getCandlesForDatafeed,
+        { decimal, group },
+        selectedLocale,
+        stringGetter
+      );
+
+      console.log('datafeed', datafeed);
+
       const options: ChartingLibraryWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(
-          store,
-          getCandlesForDatafeed,
-          { decimal, group },
-          selectedLocale,
-          stringGetter
-        ),
+        datafeed,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
         symbol: marketId,
