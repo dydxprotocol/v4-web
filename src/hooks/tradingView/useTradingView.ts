@@ -147,6 +147,19 @@ export const useTradingView = ({
         console.log('Global error:', msg, src, lineno, colno, err);
       };
 
+      const originalCreateObjectURL = URL.createObjectURL;
+      URL.createObjectURL = function (blob) {
+        console.log('[BLOB] createObjectURL called with:', blob);
+        try {
+          const url = originalCreateObjectURL.call(this, blob);
+          console.log('[BLOB] URL generated:', url);
+          return url;
+        } catch (err) {
+          console.log('[BLOB] Failed to createObjectURL:', err);
+          throw err;
+        }
+      };
+
       try {
         const tvChartWidget = new Widget(options);
         console.log('tvChartWidget', 'set');
