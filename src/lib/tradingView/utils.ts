@@ -223,7 +223,7 @@ export const getWidgetOptions = (
   ];
 
   return {
-    debug: true,
+    // debug: true,
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',

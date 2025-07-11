@@ -3,7 +3,6 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
-  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   TradingTerminalWidgetOptions,
@@ -47,7 +46,7 @@ export const useTradingView = ({
   buySellMarksToggleOn,
   setBuySellMarksToggleOn,
 }: {
-  setTvWidget: (widget: IChartingLibraryWidget) => void;
+  setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
   orderLineToggleRef: React.MutableRefObject<HTMLElement | null>;
   orderLinesToggleOn: boolean;
   setOrderLinesToggleOn: Dispatch<SetStateAction<boolean>>;
@@ -111,11 +110,9 @@ export const useTradingView = ({
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
-    console.log('useTradingView', 'useEffect');
     if (marketId) {
       const isSimpleUi = isTablet && testFlags.simpleUi;
       const widgetOptions = getWidgetOptions(false, isSimpleUi);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
@@ -127,11 +124,9 @@ export const useTradingView = ({
         stringGetter
       );
 
-      console.log('datafeed', datafeed, getCandlesForDatafeed, decimal, group);
-
       const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
-        // ...widgetOverrides,
+        ...widgetOverrides,
         datafeed,
         interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: languageCode as LanguageCode,
@@ -140,20 +135,14 @@ export const useTradingView = ({
         auto_save_delay: 1,
       };
 
-      console.log('TradingView is', typeof globalThis.TradingView); // should be 'object'
-      const container = document.getElementById('tv-price-chart');
-      console.log('[container exists]', !!container);
       const tvChartWidget = new Widget(options);
-      console.log('tvChartWidget', 'set');
       setTvWidget(tvChartWidget);
 
       tvChartWidget.onChartReady(() => {
-        console.log('tvChartWidget', 'onChartReady');
         // Initialize additional right-click-menu options
         tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
         tvChartWidget!.headerReady().then(() => {
-          console.log('tvChartWidget', 'headerReady');
           // Order Lines
           initializeToggle({
             toggleRef: orderLineToggleRef,
@@ -191,7 +180,6 @@ export const useTradingView = ({
       });
 
       return () => {
-        console.log('tvChartWidget', 'remove');
         orderLineToggleRef.current?.remove();
         orderLineToggleRef.current = null;
         buySellMarksToggleRef.current?.remove();
@@ -199,9 +187,7 @@ export const useTradingView = ({
         tvChartWidget.remove();
       };
     }
-    return () => {
-      console.log('tvChartWidget', 'remove2');
-    };
+    return () => {};
   }, [
     selectedLocale,
     selectedNetwork,

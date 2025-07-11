@@ -72,10 +72,8 @@ export const getDydxDatafeed = (
   stringGetter: StringGetterFunction
 ): IBasicDataFeed => ({
   onReady: (callback: OnReadyCallback) => {
-    console.log('onReady', configurationData);
     setTimeout(() => {
       callback(configurationData);
-      console.log('onReady', 'callback');
     }, 0);
   },
 

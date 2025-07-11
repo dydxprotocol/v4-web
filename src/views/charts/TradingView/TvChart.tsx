@@ -1,8 +1,7 @@
-import { useCallback, useRef } from 'react';
-
-import { IChartingLibraryWidget } from 'public/tradingview/charting_library';
+import { useRef, useState } from 'react';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
+import { TvWidget } from '@/constants/tvchart';
 
 import { useBuySellMarks } from '@/hooks/tradingView/useBuySellMarks';
 import { useChartLines } from '@/hooks/tradingView/useChartLines';
@@ -22,13 +21,7 @@ import { BaseTvChart } from './BaseTvChart';
 export const TvChart = () => {
   const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
-  // const [tvWidget, setTvWidget] = useState<TvWidget>();
-  const tvWidgetRef = useRef<IChartingLibraryWidget | undefined>(undefined);
-  const tvWidget = tvWidgetRef.current;
-
-  const setTvWidget = useCallback((widget: IChartingLibraryWidget) => {
-    tvWidgetRef.current = widget;
-  }, []);
+  const [tvWidget, setTvWidget] = useState<TvWidget>();
 
   const { isTablet } = useBreakpoints();
   const isSimpleUi = isTablet && testFlags.simpleUi;
