@@ -112,7 +112,7 @@ export const useTradingView = ({
   useEffect(() => {
     if (marketId) {
       const isSimpleUi = isTablet && testFlags.simpleUi;
-      const widgetOptions = getWidgetOptions(false, isSimpleUi);
+      const widgetOptions = getWidgetOptions(false, isSimpleUi, isTablet);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
 
@@ -176,6 +176,7 @@ export const useTradingView = ({
           })
         );
       });
+
       return () => {
         orderLineToggleRef.current?.remove();
         orderLineToggleRef.current = null;

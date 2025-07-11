@@ -48,15 +48,18 @@ export const TvChart = () => {
     buySellMarksToggleOn,
     setBuySellMarksToggleOn,
   });
+
   useChartMarketAndResolution({
     currentMarketId,
     tvWidget,
   });
+
   const { chartLines } = useChartLines({
     tvWidget,
     orderLineToggle,
     orderLinesToggleOn,
   });
+
   useBuySellMarks({
     buySellMarksToggle,
     buySellMarksToggleOn,

@@ -195,7 +195,8 @@ export const getWidgetOverrides = ({
 
 export const getWidgetOptions = (
   isViewingUnlaunchedMarket?: boolean,
-  isSimpleUi?: boolean
+  isSimpleUi?: boolean,
+  isTablet?: boolean
 ): Partial<TradingTerminalWidgetOptions> & Pick<TradingTerminalWidgetOptions, 'container'> => {
   const disabledFeaturesForUnlaunchedMarket: TradingTerminalFeatureset[] = [
     'chart_scroll',
@@ -222,6 +223,11 @@ export const getWidgetOptions = (
     ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
   ];
 
+  // Needed for iframe loading on some mobile browsers
+  const tabletFeatures: TradingTerminalFeatureset[] = isTablet
+    ? ['iframe_loading_compatibility_mode' as const]
+    : [];
+
   return {
     // debug: true,
     container: 'tv-price-chart',
@@ -237,6 +243,7 @@ export const getWidgetOptions = (
       'dont_show_boolean_study_arguments',
       'hide_left_toolbar_by_default',
       'hide_right_toolbar',
+      ...tabletFeatures,
     ],
   };
 };

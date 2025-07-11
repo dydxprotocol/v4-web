@@ -154,7 +154,7 @@ const AssetPage = () => {
     <div tw="flexColumn h-full">
       <AssetHeader isLaunchableMarket={isViewingUnlaunchedMarket} />
       {isViewingUnlaunchedMarket ? (
-        <div tw="mt-[5.5rem] grid gap-1.5 overflow-auto pb-1.5">{pageContent}</div>
+        <div tw="grid gap-1.5 overflow-auto py-1.5">{pageContent}</div>
       ) : (
         <>
           <div tw="overflow-auto">{pageContent}</div>
