@@ -1,5 +1,5 @@
 /**
- * Broker JS API for TradingView Trading Terminal
+ * Broker JS API for TradingView Charting Library (Trading Terminal only)
  * @packageDocumentation
  * @module Broker
  */
@@ -807,8 +807,6 @@ export interface CustomTableElementFormatter<T extends TableFormatterInputValues
 	formatElement?: CustomTableFormatElementFunction<T>;
 	/** Formatter to generate text. Return an empty string if you don't need to display this */
 	formatText: TableFormatTextFunction<T>;
-	/** Allow usage of priceFormatter */
-	isPriceFormatterNeeded?: boolean;
 }
 /**
  * Depth of Market (Order Book) Data
@@ -1140,7 +1138,7 @@ export interface IBrokerConnectionAdapterHost {
 	 * @param  {string} symbol - symbol identifier
 	 * @param  {DOMData} equity - Depth of market data
 	 */
-	domUpdate(symbol: string, equity: DOMData): void;
+	domeUpdate(symbol: string, equity: DOMData): void;
 	/**
 	 * Shows the order dialog
 	 * @param  {T extends PreOrder} order - order to show in the dialog
@@ -1254,12 +1252,12 @@ export interface IBrokerWithoutRealtime extends IBrokerCommon {
 	 * Library is requesting that realtime DOM (Depth of Market) updates should be supplied for this symbol
 	 * @param  {string} symbol - symbol identifier
 	 */
-	subscribeDOM?(symbol: string): void;
+	subscribeDOME?(symbol: string): void;
 	/**
 	 * Library is notifying that realtime DOM (Depth of Market) updates are no longer required for this symbol.
 	 * @param  {string} symbol - symbol identifier
 	 */
-	unsubscribeDOM?(symbol: string): void;
+	unsubscribeDOME?(symbol: string): void;
 	/**
 	 * Method is called when a user wants to place an order. Order is pre-filled with partial or complete information. This function returns an object with the order id.
 	 * @param  {PreOrder} order - order information
@@ -1400,15 +1398,6 @@ export interface IFormatter<T> {
 	/** Check if the input value satisfies the logic and return either an error or the result of the parsing  */
 	parse?(value: string): ErrorFormatterParseResult | SuccessFormatterParseResult<T>;
 }
-/** Specific formatter for number */
-export interface INumberFormatter extends IFormatter<number> {
-	/**
-	 * Formatter for a price change
-	 * @param currentPrice - current price
-	 * @param prevPrice - previous price
-	 */
-	formatChange?(currentPrice: number, prevPrice: number): string;
-}
 export interface IObservable<T> {
 	/**
 	 * Subscribe to changes
@@ -1514,13 +1503,6 @@ export interface ISubscription<TFunc extends Function> {
 export interface ISymbolValueFormatter {
 	/** Default formatter function used to assign the correct sign (+ or -) to a number  */
 	format(price: number, signPositive?: boolean): string;
-	/**
-	 * Formatter for a price change
-	 * @param currentPrice - current price
-	 * @param prevPrice - previous price
-	 * @param signPositive - is the sign of the number positive
-	 */
-	formatChange?(currentPrice: number, prevPrice: number, signPositive?: boolean): string;
 }
 export interface IWatchedValue<T> extends IWatchedValueReadonly<T>, IObservableValue<T> {
 	/**
@@ -1712,20 +1694,6 @@ export interface NegativeBaseInputFieldValidatorResult extends BaseInputFieldVal
 	valid: false;
 	/** Reason why base input value is invalid  */
 	errorMessage: string;
-}
-/**
- * Interface for an URL which will be opened
- */
-export interface OpenUrlSolution {
-	/**
-	 * Link to be opened
-	 */
-	openUrl: {
-		/** URL to be opened */
-		url: string;
-		/** text for solution button */
-		text: string;
-	};
 }
 export interface OrderDialogOptions extends TradingDialogOptions {
 	/**
@@ -2005,7 +1973,6 @@ export interface SortingParameters {
 	/** Ascending sorting order (default `true`) - If it is `false`, then initial sorting will be in descending order */
 	asc?: boolean;
 }
-/* eslint-disable jsdoc/require-jsdoc */
 export interface StandardFormattersDependenciesMapping {
 	[StandardFormatterName.Default]: string[];
 	[StandardFormatterName.Symbol]: [
@@ -2076,7 +2043,6 @@ export interface StandardFormattersDependenciesMapping {
 	[StandardFormatterName.Empty]: [
 	];
 }
-/* eslint-enable jsdoc/require-jsdoc */
 export interface SuccessFormatterParseResult<T> extends FormatterParseResult {
 	/** @inheritDoc */
 	res: true;
@@ -2092,12 +2058,14 @@ export interface TableFormatterInputs<T extends TableFormatterInputValues = Tabl
 	] ? [
 		...A
 	] : never;
-	/** Optional field. It is array of previous values so you can compare and format accordingly. It exists if current column has the `highlightDiff: true` key. */
+	/** optional field. It is array of previous values so you can compare and format accordingly. It exists if current column has the `highlightDiff: true` key. */
 	prevValues?: Partial<T extends [
 		...args: infer A
 	] ? [
 		...A
 	] : never>;
+	/** standard formatter for price. You can use `format(price)` method to prepare price value. */
+	priceFormatter?: INumberFormatter;
 }
 export interface TextWithCheckboxFieldCustomInfo {
 	/** Title for the checkbox */
@@ -2208,6 +2176,8 @@ export type CustomFieldPossibleTypes = "TextWithCheckBox" | "ComboBox" | "Checkb
  */
 export type CustomTableFormatElementFunction<T extends TableFormatterInputValues = TableFormatterInputValues> = (inputs: TableFormatterInputs<T>) => undefined | string | HTMLElement;
 export type FormatterName = Nominal<string, "FormatterName">;
+/** Specific formatter for number */
+export type INumberFormatter = IFormatter<number>;
 /**
  * Input field validator
  * @param  {any} value - value to be validated
@@ -2232,7 +2202,7 @@ export type OrderTableColumn = AccountManagerColumn & {
 	 */
 	supportedStatusFilters?: OrderStatusFilter[];
 };
-export type SymbolType = "stock" | "index" | "forex" | "futures" | "bitcoin" | "crypto" | "undefined" | "expression" | "spread" | "cfd" | "economic" | "equity" | "dr" | "bond" | "right" | "warrant" | "fund" | "structured" | "commodity" | "fundamental" | "spot";
+export type SymbolType = "stock" | "index" | "forex" | "futures" | "bitcoin" | "crypto" | "undefined" | "expression" | "spread" | "cfd" | "economic" | "equity" | "dr" | "bond" | "right" | "warrant" | "fund" | "structured";
 /**
  * A function that takes an {@link TableFormatterInputs} object and returns a `string`.
  */
@@ -2244,9 +2214,8 @@ export type TextInputFieldValidator = (value: string) => InputFieldValidatorResu
  * `TradableSolutions` has one of the following keys:
  * - `changeAccount` - id of a sub-account suitable for trading the symbol
  * - `changeSymbol` - the symbol suitable for trading with current sub-account
- * - `openUrl` - the object with URL to be opened and text for solution button
  */
-export type TradableSolutions = ChangeAccountSolution | ChangeSymbolSolution | OpenUrlSolution;
+export type TradableSolutions = ChangeAccountSolution | ChangeSymbolSolution;
 export type TradingDialogCustomField = CheckboxFieldMetaInfo | TextWithCheckboxFieldMetaInfo | CustomComboBoxMetaInfo;
 export type WatchedValueCallback<T> = (value: T) => void;
 

@@ -1,5 +1,5 @@
 /**
- * Datafeed JS API for TradingView Advanced Charts
+ * Datafeed JS API for TradingView Charting Library
  * @packageDocumentation
  * @module Datafeed
  */
@@ -27,8 +27,8 @@ export declare type Nominal<T, Name extends string> = T & { /* eslint-disable-ne
 export interface Bar {
 	/** Bar time.
 	 * Amount of **milliseconds** since Unix epoch start in **UTC** timezone.
-	 * `time` for daily, weekly, and monthly bars is expected to be a trading day (not session start day) at 00:00 UTC.
-	 * The library adjusts time according to `session` from {@link LibrarySymbolInfo}.
+	 * `time` for daily bars is expected to be a trading day (not session start day) at 00:00 UTC.
+	 * Charting Library adjusts time according to `session` from {@link LibrarySymbolInfo}.
 	 */
 	time: number;
 	/** Opening price */
@@ -142,6 +142,12 @@ export interface DatafeedConfiguration {
 	 * It will be applied to the instruments with futures and stock as a type.
 	 */
 	symbols_grouping?: Record<string, string>;
+	/**
+	 * Supported price sources for the symbol.
+	 *
+	 * @example ['Bid', 'Ask', 'Spot Price']
+	 */
+	price_sources?: SymbolInfoPriceSource[];
 }
 /** Symbol Quote Data Value */
 export interface DatafeedQuoteValues {
@@ -208,8 +214,8 @@ export interface HistoryMetadata {
 }
 export interface IDatafeedChartApi {
 	/**
-	 * The library calls this function to get marks for visible bars range.
-	 * The library assumes that you will call `onDataCallback` only once per `getMarks` call.
+	 * The Library calls this function to get marks for visible bars range.
+	 * The Library assumes that you will call `onDataCallback` only once per `getMarks` call.
 	 *
 	 * A few marks per bar are allowed (for now, the maximum is 10). The time of each mark must match the time of a bar. For example, if the bar times are `2023-01-01`, `2023-01-08`, and `2023-01-15`, then a mark cannot have the time `2023-01-05`.
 	 *
@@ -223,8 +229,8 @@ export interface IDatafeedChartApi {
 	 */
 	getMarks?(symbolInfo: LibrarySymbolInfo, from: number, to: number, onDataCallback: GetMarksCallback<Mark>, resolution: ResolutionString): void;
 	/**
-	 * The library calls this function to get timescale marks for visible bars range.
-	 * The library assumes that you will call `onDataCallback` only once per `getTimescaleMarks` call.
+	 * The Library calls this function to get timescale marks for visible bars range.
+	 * The Library assumes that you will call `onDataCallback` only once per `getTimescaleMarks` call.
 	 *
 	 * **Remark:** This function will be called only if you confirmed that your back-end is supporting marks ({@link DatafeedConfiguration.supports_timescale_marks}).
 	 *
@@ -237,7 +243,7 @@ export interface IDatafeedChartApi {
 	getTimescaleMarks?(symbolInfo: LibrarySymbolInfo, from: number, to: number, onDataCallback: GetMarksCallback<TimescaleMark>, resolution: ResolutionString): void;
 	/**
 	 * This function is called if configuration flag supports_time is set to true when chart needs to know the server time.
-	 * The library expects callback to be called once.
+	 * The charting library expects callback to be called once.
 	 * The time is provided without milliseconds. Example: `1445324591`. It is used to display Countdown on the price scale.
 	 */
 	getServerTime?(callback: ServerTimeCallback): void;
@@ -270,8 +276,8 @@ export interface IDatafeedChartApi {
 	 */
 	getBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, periodParams: PeriodParams, onResult: HistoryCallback, onError: ErrorCallback): void;
 	/**
-	 * The library calls this function when it wants to receive real-time updates for a symbol.
-	 * The library assumes that you will call the callback provided by the `onTick` parameter every time you want to update the most recent bar or to add a new one.
+	 * Charting Library calls this function when it wants to receive real-time updates for a symbol.
+	 * The Library assumes that you will call the callback provided by the `onTick` parameter every time you want to update the most recent bar or to add a new one.
 	 *
 	 * @param symbolInfo A SymbolInfo object
 	 * @param resolution Resolution of the symbol
@@ -293,7 +299,7 @@ export interface IDatafeedChartApi {
 	 * @param callback Function returning an object to update Depth Of Market (DOM) data
 	 * @returns A unique identifier that will be used to unsubscribe from the data
 	 */
-	subscribeDepth?(symbol: string, callback: DOMCallback): string;
+	subscribeDepth?(symbol: string, callback: DomeCallback): string;
 	/**
 	 * Trading Terminal calls this function when it doesn't want to receive updates for this listener anymore.
 	 *
@@ -319,7 +325,7 @@ export interface IDatafeedChartApi {
 export interface IDatafeedQuotesApi {
 	/**
 	 * This function is called when the library needs quote data.
-	 * The library assumes that `onDataCallback` is called once when all the requested data is received.
+	 * The charting library assumes that `onDataCallback` is called once when all the requested data is received.
 	 * @param  {string[]} symbols - symbol names.
 	 * @param  {QuotesCallback} onDataCallback - callback to return the requested data.
 	 * @param  {QuotesErrorCallback} onErrorCallback - callback for responding with an error.
@@ -344,7 +350,7 @@ export interface IDatafeedQuotesApi {
 export interface IExternalDatafeed {
 	/**
 	 * This call is intended to provide the object filled with the configuration data.
-	 * The lib assumes that you will call the callback function and pass your datafeed {@link DatafeedConfiguration} as an argument.
+	 * Charting Library assumes that you will call the callback function and pass your datafeed {@link DatafeedConfiguration} as an argument.
 	 *
 	 * @param  {OnReadyCallback} callback - callback to return your datafeed configuration ({@link DatafeedConfiguration}) to the library.
 	 */
@@ -567,13 +573,13 @@ export interface LibrarySymbolInfo {
 	/**
 	 * It is an array containing resolutions that include seconds (excluding postfix) that the data feed provides.
 	 * E.g., if the data feed supports resolutions such as `["1S", "5S", "15S"]`, but has 1-second bars for some symbols then you should set `seconds_multipliers` of this symbol to `[1]`.
-	 * This will make the library build 5S and 15S resolutions by itself.
+	 * This will make Charting Library build 5S and 15S resolutions by itself.
 	 */
 	seconds_multipliers?: string[];
 	/**
 	 * The boolean value showing whether data feed has its own daily resolution bars or not.
 	 *
-	 * If `has_daily` = `false` then the library will build the respective resolutions using 1-minute bars by itself.
+	 * If `has_daily` = `false` then Charting Library will build the respective resolutions using 1-minute bars by itself.
 	 * If not, then it will request those bars from the data feed only if specified resolution belongs to `daily_multipliers`, otherwise an error will be thrown.
 	 * @default true
 	 */
@@ -592,7 +598,7 @@ export interface LibrarySymbolInfo {
 	/**
 	 * The boolean value showing whether data feed has its own weekly and monthly resolution bars or not.
 	 *
-	 * If `has_weekly_and_monthly` = `false` then the library will build the respective resolutions using daily bars by itself.
+	 * If `has_weekly_and_monthly` = `false` then Charting Library will build the respective resolutions using daily bars by itself.
 	 * If not, then it will request those bars from the data feed using either the `weekly_multipliers` or `monthly_multipliers` if specified.
 	 * If resolution is not within either list an error will be raised.
 	 * @default false
@@ -651,19 +657,9 @@ export interface LibrarySymbolInfo {
 	 */
 	volume_precision?: number;
 	/**
-	 * The status code of a series with this symbol.
-	 * This could be represented as an icon in the legend, next to the market status icon for `delayed_streaming` & `endofday` type of data.
-	 * When declaring `delayed_streaming` you also have to specify its {@link LibrarySymbolInfo.delay} in seconds.
+	 * The status code of a series with this symbol. The status is shown in the upper right corner of a chart.
 	 */
 	data_status?: "streaming" | "endofday" | "pulsed" | "delayed_streaming";
-	/**
-	 * Type of delay that is associated to the data or real delay for real time data.
-	 * - `0` for realtime
-	 * - `-1` for endofday
-	 * - `-2` for pulsed
-	 * - or delay in seconds (for delayed realtime)
-	 */
-	delay?: number;
 	/**
 	 * Boolean showing whether this symbol is expired futures contract or not.
 	 * @default false
@@ -671,7 +667,7 @@ export interface LibrarySymbolInfo {
 	expired?: boolean;
 	/**
 	 * Unix timestamp of the expiration date. One must set this value when `expired` = `true`.
-	 * The library will request data for this symbol starting from that time point.
+	 * Charting Library will request data for this symbol starting from that time point.
 	 */
 	expiration_date?: number;
 	/** Sector for stocks to be displayed in the Symbol Info. */
@@ -707,55 +703,13 @@ export interface LibrarySymbolInfo {
 	 */
 	subsessions?: LibrarySubsessionInfo[];
 	/**
-	 * Optional ID of a price source for this symbol. Should match one of the price sources from the {@link price_sources} array.
-	 */
-	price_source_id?: string;
-	/**
-	 * Supported price sources for the symbol. The source of the values that this symbol's bars represent.
+	 * Optional field name describing what the bar values of this symbol represent.
 	 *
 	 * For example 'Spot Price', 'Ask', 'Bid', etc.
 	 *
-	 * Mostly useful when viewing non-OHLC series types. The price source will be shown in the series legend.
-	 *
-	 * @example [{ id: '1', name: 'Spot Price' }, { id: '321', name: 'Bid' }]
+	 * @example 'Spot Price'
 	 */
-	price_sources?: SymbolInfoPriceSource[];
-	/**
-	 * URL of image/s to be displayed as the logo/s for the symbol. The `show_symbol_logos` featureset needs to be enabled for this to be visible in the UI.
-	 *
-	 * - If a single url is returned then that url will solely be used to display the symbol logo.
-	 * - If two urls are provided then the images will be displayed as two partially overlapping
-	 * circles with the first url appearing on top. This is typically used for FOREX where you would
-	 * like to display two country flags are the symbol logo.
-	 *
-	 * The image/s should ideally be square in dimension. You can use any image type which
-	 * the browser supports natively.
-	 *
-	 * Examples:
-	 * - `https://yourserver.com/apple.svg`
-	 * - `/images/myImage.png`
-	 * - `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...`
-	 * - `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4...`
-	 */
-	logo_urls?: [
-		string
-	] | [
-		string,
-		string
-	];
-	/**
-	 * URL of image to be displayed as the logo for the exchange. The `show_exchange_logos` featureset needs to be enabled for this to be visible in the UI.
-	 *
-	 * The image should ideally be square in dimension. You can use any image type which
-	 * the browser supports natively. Simple SVG images are recommended.
-	 *
-	 * Examples:
-	 * - `https://yourserver.com/exchangeLogo.svg`
-	 * - `/images/myImage.png`
-	 * - `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...`
-	 * - `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4...`
-	 */
-	exchange_logo?: string;
+	price_source_id?: string;
 }
 export interface Mark {
 	/** ID of the mark */
@@ -786,7 +740,7 @@ export interface Mark {
 	 * the browser supports natively.
 	 *
 	 * Examples:
-	 * - `https://yourserver.com/adobe.svg`
+	 * - `https://s3-symbol-logo.tradingview.com/crypto/XTVCBTC.svg`
 	 * - `/images/myImage.png`
 	 * - `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...`
 	 * - `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4...`
@@ -883,42 +837,6 @@ export interface SearchSymbolResultItem {
 	 * 'stock' | 'futures' | 'forex' | 'index'
 	 */
 	type: string;
-	/**
-	 * URL of image/s to be displayed as the logo/s for the symbol. The `show_symbol_logos` featureset needs to be enabled for this to be visible in the UI.
-	 *
-	 * - If a single url is returned then that url will solely be used to display the symbol logo.
-	 * - If two urls are provided then the images will be displayed as two partially overlapping
-	 * circles with the first url appearing on top. This is typically used for FOREX where you would
-	 * like to display two country flags as the symbol logo.
-	 *
-	 * The image/s should ideally be square in dimension. You can use any image type which
-	 * the browser supports natively. Simple SVG images are recommended.
-	 *
-	 * Examples:
-	 * - `https://yourserver.com/symbolName.svg`
-	 * - `/images/myImage.png`
-	 * - `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...`
-	 * - `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4...`
-	 */
-	logo_urls?: [
-		string
-	] | [
-		string,
-		string
-	];
-	/**
-	 * URL of image to be displayed as the logo for the exchange. The `show_exchange_logos` featureset needs to be enabled for this to be visible in the UI.
-	 *
-	 * The image should ideally be square in dimension. You can use any image type which
-	 * the browser supports natively. Simple SVG images are recommended.
-	 *
-	 * Examples:
-	 * - `https://yourserver.com/exchangeLogo.svg`
-	 * - `/images/myImage.png`
-	 * - `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3...`
-	 * - `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4...`
-	 */
-	exchange_logo?: string;
 }
 export interface SymbolInfoPriceSource {
 	/** Unique ID */
@@ -939,9 +857,6 @@ export interface SymbolResolveExtension {
 	 * field is set and `unit_id` is provided in the original symbol information ({@link LibrarySymbolInfo}).
 	 */
 	unitId?: string;
-	/**
-	 * Trading session string
-	 */
 	session?: string;
 }
 export interface TimescaleMark {
@@ -994,8 +909,8 @@ export interface Unit {
 	/** Description */
 	description: string;
 }
-export type CustomTimezones = "Africa/Cairo" | "Africa/Casablanca" | "Africa/Johannesburg" | "Africa/Lagos" | "Africa/Nairobi" | "Africa/Tunis" | "America/Anchorage" | "America/Argentina/Buenos_Aires" | "America/Bogota" | "America/Caracas" | "America/Chicago" | "America/El_Salvador" | "America/Juneau" | "America/Lima" | "America/Los_Angeles" | "America/Mexico_City" | "America/New_York" | "America/Phoenix" | "America/Santiago" | "America/Sao_Paulo" | "America/Toronto" | "America/Vancouver" | "Asia/Almaty" | "Asia/Ashkhabad" | "Asia/Bahrain" | "Asia/Bangkok" | "Asia/Chongqing" | "Asia/Colombo" | "Asia/Dubai" | "Asia/Ho_Chi_Minh" | "Asia/Hong_Kong" | "Asia/Jakarta" | "Asia/Jerusalem" | "Asia/Karachi" | "Asia/Kathmandu" | "Asia/Kolkata" | "Asia/Kuwait" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Qatar" | "Asia/Riyadh" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Taipei" | "Asia/Tehran" | "Asia/Tokyo" | "Asia/Yangon" | "Atlantic/Reykjavik" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Helsinki" | "Europe/Istanbul" | "Europe/Lisbon" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Riga" | "Europe/Rome" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Vilnius" | "Europe/Warsaw" | "Europe/Zurich" | "Pacific/Auckland" | "Pacific/Chatham" | "Pacific/Fakaofo" | "Pacific/Honolulu" | "Pacific/Norfolk" | "US/Mountain";
-export type DOMCallback = (data: DOMData) => void;
+export type CustomTimezones = "Africa/Cairo" | "Africa/Johannesburg" | "Africa/Lagos" | "Africa/Nairobi" | "Africa/Tunis" | "America/Argentina/Buenos_Aires" | "America/Bogota" | "America/Caracas" | "America/Chicago" | "America/El_Salvador" | "America/Juneau" | "America/Lima" | "America/Los_Angeles" | "America/Mexico_City" | "America/New_York" | "America/Phoenix" | "America/Santiago" | "America/Sao_Paulo" | "America/Toronto" | "America/Vancouver" | "Asia/Almaty" | "Asia/Ashkhabad" | "Asia/Bahrain" | "Asia/Bangkok" | "Asia/Chongqing" | "Asia/Colombo" | "Asia/Dubai" | "Asia/Ho_Chi_Minh" | "Asia/Hong_Kong" | "Asia/Jakarta" | "Asia/Jerusalem" | "Asia/Karachi" | "Asia/Kathmandu" | "Asia/Kolkata" | "Asia/Kuwait" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Qatar" | "Asia/Riyadh" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Taipei" | "Asia/Tehran" | "Asia/Tokyo" | "Asia/Yangon" | "Atlantic/Reykjavik" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Helsinki" | "Europe/Istanbul" | "Europe/Lisbon" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Riga" | "Europe/Rome" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Vilnius" | "Europe/Warsaw" | "Europe/Zurich" | "Pacific/Auckland" | "Pacific/Chatham" | "Pacific/Fakaofo" | "Pacific/Honolulu" | "Pacific/Norfolk" | "US/Mountain";
+export type DomeCallback = (data: DOMData) => void;
 export type ErrorCallback = (reason: string) => void;
 export type GetMarksCallback<T> = (marks: T[]) => void;
 export type HistoryCallback = (bars: Bar[], meta?: HistoryMetadata) => void;
@@ -1014,7 +929,7 @@ export type QuotesCallback = (data: QuoteData[]) => void;
  */
 export type QuotesErrorCallback = (reason: string) => void;
 /**
- * Resolution or time interval is a time period of one bar. Advanced Charts supports tick, intraday (seconds, minutes, hours), and DWM (daily, weekly, monthly) resolutions. The table below describes how to specify different types of resolutions:
+ * Resolution or time interval is a time period of one bar. Charting Library supports tick, intraday (seconds, minutes, hours), and DWM (daily, weekly, monthly) resolutions. The table below describes how to specify different types of resolutions:
  *
  * Resolution | Format | Example
  * ---------|----------|---------
