@@ -35,6 +35,12 @@ import { useLocaleSeparators } from '../useLocaleSeparators';
 import { useStringGetter } from '../useStringGetter';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
+const testScript = document.createElement('script');
+testScript.src = '/charting_library/bundles/chart-widget-gui.75a373be3b6816e8b55a.js';
+testScript.onload = () => console.log('✅ Test chunk loaded');
+testScript.onerror = () => console.log('❌ Test chunk failed');
+document.head.appendChild(testScript);
+
 /**
  * @description Hook to initialize TradingView Chart
  */
@@ -147,18 +153,13 @@ export const useTradingView = ({
         console.log('Global error:', msg, src, lineno, colno, err);
       };
 
-      const originalCreateObjectURL = URL.createObjectURL;
-      URL.createObjectURL = function (blob) {
-        console.log('[BLOB] createObjectURL called with:', blob);
-        try {
-          const url = originalCreateObjectURL.call(this, blob);
-          console.log('[BLOB] URL generated:', url);
-          return url;
-        } catch (err) {
-          console.log('[BLOB] Failed to createObjectURL:', err);
-          throw err;
-        }
-      };
+      fetch('/charting_library/bundles/chart-widget-gui.75a373be3b6816e8b55a.js')
+        .then((r) => {
+          console.log('MIME TYPE:', r.headers.get('Content-Type'));
+          return r.text();
+        })
+        .then((js) => console.log('Script length:', js.length))
+        .catch((err) => console.log('Fetch failed:', err));
 
       try {
         const tvChartWidget = new Widget(options);
