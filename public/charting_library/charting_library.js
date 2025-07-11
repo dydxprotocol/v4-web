@@ -505,4 +505,3 @@ const s = class {
   }
 };
 (window.TradingView = window.TradingView || {}), (window.TradingView.version = o);
-export { o as version, s as widget };
