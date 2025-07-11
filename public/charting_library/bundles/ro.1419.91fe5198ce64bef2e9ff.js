@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[1419],{47742:e=>{e.exports={en:["Close menu"]}},647863:e=>{e.exports={en:["Export"]}},819295:e=>{e.exports={en:["Ok"]}},551136:e=>{e.exports={en:["Select which trading tab to export. Information from the selected tab will be saved to a CSV file."]}}}]);

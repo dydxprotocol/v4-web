@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[8245],{760724:t=>{t.exports={en:["Hide data"],it:["Nascondi dati"]}},198337:t=>{t.exports={en:["Show data"],it:["Mostra dati"]}},351382:t=>{t.exports={en:["show {title}"],it:["mostra {title}"]}}}]);

@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[2342],{364489:e=>{e.exports={en:["Reverse"],pl:["Odwróć"]}},366643:e=>{e.exports={en:["reverse {tool}"],pl:["odwróć {tool}"]}}}]);

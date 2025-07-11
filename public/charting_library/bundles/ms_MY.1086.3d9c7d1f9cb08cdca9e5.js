@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[1086],{455319:e=>{e.exports={en:["Decrease"],ms_MY:["Pengurangan"]}},539832:e=>{e.exports={en:["Increase"],ms_MY:["Pertambahan"]}},71300:e=>{e.exports={en:["Number format is invalid."],ms_MY:["Format nombor tidak sah."]}}}]);

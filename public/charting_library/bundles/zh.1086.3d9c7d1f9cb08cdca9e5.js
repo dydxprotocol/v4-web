@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[1086],{455319:e=>{e.exports={en:["Decrease"],zh:["减少"]}},539832:e=>{e.exports={en:["Increase"],zh:["增加"]}},71300:e=>{e.exports={en:["Number format is invalid."],zh:["号码格式无效。"]}}}]);

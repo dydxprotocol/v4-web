@@ -1,1 +1,0 @@
-(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[8975],{694073:a=>{a.exports={en:["A"]}},466384:a=>{a.exports={en:["L"]}},694465:a=>{a.exports={en:["Toggle auto scale"],it:["Attiva/disattiva scala automatica"]}},146992:a=>{a.exports={en:["Toggle log scale"],it:["Attiva/disattiva scala logaritmica"]}}}]);
