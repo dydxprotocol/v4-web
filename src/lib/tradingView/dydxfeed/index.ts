@@ -19,7 +19,7 @@ import type {
   SearchSymbolsCallback,
   SubscribeBarsCallback,
   Timezone,
-} from 'public/tradingview/charting_library';
+} from 'public/charting_library';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { StringGetterFunction, SupportedLocales } from '@/constants/localization';
