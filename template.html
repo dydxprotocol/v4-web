@@ -32,6 +32,20 @@
       const policy = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
       console.log('🔒 CSP meta tag:', policy?.content);
 
+      try {
+        const blob = new Blob(['console.log("INLINE SCRIPT EXECUTED")'], {
+          type: 'application/javascript',
+        });
+        const url = URL.createObjectURL(blob);
+        const s = document.createElement('script');
+        s.src = url;
+        s.onerror = () => console.error('🚫 Inline script blocked');
+        s.onload = () => console.log('✅ Inline script executed');
+        document.head.appendChild(s);
+      } catch (err) {
+        console.error('🔥 Failed to inject script:', err);
+      }
+
       new TradingView.widget({
         debug: true,
         container: 'tv_chart',
