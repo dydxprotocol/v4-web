@@ -20,11 +20,17 @@
     <script>
       eruda.init();
     </script>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src * 'unsafe-eval' 'unsafe-inline' blob:; object-src *;"
+    />
   </head>
   <body>
     <div id="tv_chart"></div>
     <script>
       console.log('TV present?', typeof TradingView);
+      const policy = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+      console.log('🔒 CSP meta tag:', policy?.content);
 
       new TradingView.widget({
         debug: true,
