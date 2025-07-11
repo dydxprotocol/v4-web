@@ -3,10 +3,10 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import isEmpty from 'lodash/isEmpty';
 import {
-  ChartingLibraryWidgetOptions,
   IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
+  TradingTerminalWidgetOptions,
   widget as Widget,
 } from 'public/tradingview/charting_library';
 
@@ -128,7 +128,7 @@ export const useTradingView = ({
 
       console.log('datafeed', datafeed);
 
-      const options: ChartingLibraryWidgetOptions = {
+      const options: TradingTerminalWidgetOptions = {
         ...widgetOptions,
         ...widgetOverrides,
         datafeed,
