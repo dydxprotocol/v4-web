@@ -3,7 +3,7 @@ import type {
   IChartingLibraryWidget,
   IOrderLineAdapter,
   IPositionLineAdapter,
-} from 'public/tradingview/charting_library';
+} from 'public/tradingview';
 
 export type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 

@@ -1,4 +1,4 @@
-import { ResolutionString } from 'public/tradingview/charting_library';
+import { ResolutionString } from 'public/tradingview';
 
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { STRING_KEYS } from './localization';

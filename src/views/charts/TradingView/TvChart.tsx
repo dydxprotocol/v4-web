@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-import { IChartingLibraryWidget } from 'public/tradingview/charting_library';
+import { IChartingLibraryWidget } from 'public/tradingview';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
 

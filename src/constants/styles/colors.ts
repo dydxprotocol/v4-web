@@ -1,4 +1,4 @@
-import type { ThemeName } from 'public/tradingview/charting_library';
+import type { ThemeName } from 'public/tradingview';
 
 import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
 

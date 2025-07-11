@@ -5,7 +5,7 @@ import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationFailure } from '@/bonsai/lib/operationResult';
 import { SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { IOrderLineAdapter } from 'public/tradingview/charting_library';
+import { IOrderLineAdapter } from 'public/tradingview';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
