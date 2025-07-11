@@ -1207,7 +1207,6 @@ function addClientAndWalletMiddleware(store: RootStore) {
 }
 
 type BonsaiLoggingMiddlewareProps = {};
-
 function bonsaiLoggingMiddleware() {
   return createMiddleware<
     BonsaiLoggingMiddlewareProps,

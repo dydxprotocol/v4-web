@@ -20,6 +20,11 @@ function getEngineMiddleware<TContext, TEngineResult>(
       try {
         return await engine(ctx);
       } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Middleware engine threw an errror. Middleware should never throw errors.',
+          error
+        );
         return wrapOperationFailure('Middleware engine returned improper error');
       }
     });
@@ -57,8 +62,20 @@ function wrapperTaskBuilder<StartContext extends {}, AllExtras extends {}>(
   const thisBuilder: TaskBuilder<StartContext, AllExtras> = {
     with: (nextMiddleware) => {
       return wrapperTaskBuilder(startContext, (context, next) => {
-        return middleware(context, (withAllExtras) => {
-          return nextMiddleware(withAllExtras, next);
+        return middleware(context, async (withAllExtras) => {
+          try {
+            return await nextMiddleware(withAllExtras, next);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(
+              'Middleware engine threw an errror. Middleware should never throw errors.',
+              error
+            );
+            return createMiddlewareFailureResult(
+              wrapOperationFailure('Middleware engine returned improper error'),
+              withAllExtras
+            );
+          }
         });
       });
     },
