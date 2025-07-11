@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[8541],{57285:e=>{e.exports={en:["Do you really want to delete Drawing Template '{name}' ?"]}},623276:e=>{e.exports={en:["Drawing Template '{name}' already exists. Do you really want to replace it?"]}},776047:e=>{e.exports={en:["Save Drawing Template As"]}},59233:e=>{e.exports={en:["Template name"]}}}]);

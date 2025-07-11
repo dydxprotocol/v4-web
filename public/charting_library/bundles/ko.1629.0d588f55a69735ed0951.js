@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[1629],{580473:e=>{e.exports={en:["Add column to right"],ko:["오른쪽에 컬럼 넣기"]}},361702:e=>{e.exports={en:["Add row below"],ko:["아래에 로우 넣기"]}},433500:e=>{e.exports={en:["Remove column"],ko:["컬럼 없애기"]}},185069:e=>{e.exports={en:["Remove row"],ko:["로우 없애기"]}}}]);

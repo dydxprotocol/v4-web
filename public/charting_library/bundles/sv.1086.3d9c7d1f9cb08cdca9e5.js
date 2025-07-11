@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[1086],{455319:e=>{e.exports={en:["Decrease"],sv:["Minska"]}},539832:e=>{e.exports={en:["Increase"],sv:["Öka"]}},71300:e=>{e.exports={en:["Number format is invalid."],sv:["Nummerformatet är felaktigt."]}}}]);

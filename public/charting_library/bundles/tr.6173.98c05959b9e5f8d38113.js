@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[6173],{32310:e=>{e.exports={en:["Collapse panel"],tr:["Paneli daralt"]}},911505:e=>{e.exports={en:["Open panel"],tr:["Paneli aç"]}},573376:e=>{e.exports={en:["Maximize panel"],tr:["Paneli büyüt"]}},123695:e=>{e.exports={en:["Restore panel"],tr:["Paneli geri yükle"]}}}]);

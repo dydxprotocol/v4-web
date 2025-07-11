@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[6778],{436778:e=>{e.exports={en:["Last available bar"],de:["Letzter vorhandener Balken"]}}}]);

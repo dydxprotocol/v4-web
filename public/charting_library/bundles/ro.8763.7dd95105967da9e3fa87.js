@@ -1,0 +1,1 @@
+(self.webpackChunktradingview=self.webpackChunktradingview||[]).push([[8763,5111],{391612:e=>{e.exports={en:["Inside"]}},546005:e=>{e.exports={en:["Original"]}},170382:e=>{e.exports={en:["Modified Schiff"]}},469904:e=>{e.exports={en:["Schiff"]}},598463:e=>{e.exports={en:["change {title} style"]}},77114:e=>{e.exports={en:["erase level line"]}}}]);

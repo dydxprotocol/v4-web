@@ -15,7 +15,7 @@
         height: 100%;
       }
     </style>
-    <script src="/tradingview/charting_library.js"></script>
+    <script src="/charting_library/charting_library.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       eruda.init();
@@ -28,28 +28,10 @@
   <body>
     <div id="tv_chart"></div>
     <script>
-      console.log('TV present?', typeof TradingView);
-      const policy = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-      console.log('🔒 CSP meta tag:', policy?.content);
-
-      try {
-        const blob = new Blob(['console.log("INLINE SCRIPT EXECUTED")'], {
-          type: 'application/javascript',
-        });
-        const url = URL.createObjectURL(blob);
-        const s = document.createElement('script');
-        s.src = url;
-        s.onerror = () => console.error('🚫 Inline script blocked');
-        s.onload = () => console.log('✅ Inline script executed');
-        document.head.appendChild(s);
-      } catch (err) {
-        console.error('🔥 Failed to inject script:', err);
-      }
-
       new TradingView.widget({
         debug: true,
         container: 'tv_chart',
-        library_path: '/tradingview/',
+        library_path: '/charting_library/',
         autosize: true,
         symbol: 'BTCUSD',
         interval: '1',
