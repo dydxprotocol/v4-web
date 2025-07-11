@@ -1,7 +1,7 @@
 import { SubaccountFill } from '@/bonsai/types/summaryTypes';
 import BigNumber from 'bignumber.js';
 import { sum } from 'lodash';
-import { Mark, MarkCustomColor, ResolutionString } from 'public/charting_library';
+import { Mark, MarkCustomColor, ResolutionString } from 'public/tradingview/charting_library';
 
 import { RESOLUTION_TO_INTERVAL_MS } from '@/constants/candles';
 import { STRING_KEYS, StringGetterFunction, SupportedLocales } from '@/constants/localization';

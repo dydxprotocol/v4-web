@@ -1,11 +1,11 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { DateTime } from 'luxon';
 import {
-  ChartingLibraryFeatureset,
-  ChartingLibraryWidgetOptions,
   ChartPropertiesOverrides,
   Timezone,
-} from 'public/charting_library';
+  TradingTerminalFeatureset,
+  TradingTerminalWidgetOptions,
+} from 'public/tradingview/charting_library';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';
@@ -196,28 +196,28 @@ export const getWidgetOverrides = ({
 export const getWidgetOptions = (
   isViewingUnlaunchedMarket?: boolean,
   isSimpleUi?: boolean
-): Partial<ChartingLibraryWidgetOptions> & Pick<ChartingLibraryWidgetOptions, 'container'> => {
-  const disabledFeaturesForUnlaunchedMarket: ChartingLibraryFeatureset[] = [
+): Partial<TradingTerminalWidgetOptions> & Pick<TradingTerminalWidgetOptions, 'container'> => {
+  const disabledFeaturesForUnlaunchedMarket: TradingTerminalFeatureset[] = [
     'chart_scroll',
     'chart_zoom',
   ];
 
-  const disabledFeaturesForSimpleUi: ChartingLibraryFeatureset[] = [
+  const disabledFeaturesForSimpleUi: TradingTerminalFeatureset[] = [
     'header_widget',
     'left_toolbar',
     'display_market_status',
     'legend_widget',
   ];
 
-  const disabledFeatures: ChartingLibraryFeatureset[] = [
+  const disabledFeatures: TradingTerminalFeatureset[] = [
     'header_symbol_search',
     'header_compare',
     'symbol_search_hot_key',
     'symbol_info',
     'go_to_date',
     'timeframes_toolbar',
-    // 'header_layouttoggle',
-    // 'trading_account_manager',
+    'header_layouttoggle',
+    'trading_account_manager',
     ...(isViewingUnlaunchedMarket ? disabledFeaturesForUnlaunchedMarket : []),
     ...(isSimpleUi ? disabledFeaturesForSimpleUi : []),
   ];
@@ -225,7 +225,7 @@ export const getWidgetOptions = (
   return {
     debug: true,
     container: 'tv-price-chart',
-    library_path: '/charting_library/', // relative to public folder
+    library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
@@ -236,7 +236,7 @@ export const getWidgetOptions = (
       'hide_last_na_study_output',
       'dont_show_boolean_study_arguments',
       'hide_left_toolbar_by_default',
-      // 'hide_right_toolbar',
+      'hide_right_toolbar',
     ],
   };
 };
