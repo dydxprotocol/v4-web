@@ -143,60 +143,68 @@ export const useTradingView = ({
       console.log('structuredClone:', typeof window.structuredClone);
       console.log('userAgent:', navigator.userAgent);
 
-      const tvChartWidget = new Widget(options);
-      console.log('tvChartWidget', 'set');
-      setTvWidget(tvChartWidget);
-
-      tvChartWidget.onChartReady(() => {
-        console.log('tvChartWidget', 'onChartReady');
-        // Initialize additional right-click-menu options
-        tvChartWidget!.onContextMenu(tradingViewLimitOrder);
-
-        tvChartWidget!.headerReady().then(() => {
-          console.log('tvChartWidget', 'headerReady');
-          // Order Lines
-          initializeToggle({
-            toggleRef: orderLineToggleRef,
-            widget: tvChartWidget!,
-            isOn: orderLinesToggleOn,
-            setToggleOn: setOrderLinesToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.ORDER_LINES_TOOLTIP,
-            }),
-          });
-
-          // Buy/Sell Marks
-          initializeToggle({
-            toggleRef: buySellMarksToggleRef,
-            widget: tvChartWidget!,
-            isOn: buySellMarksToggleOn,
-            setToggleOn: setBuySellMarksToggleOn,
-            label: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE,
-            }),
-            tooltip: stringGetter({
-              key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
-            }),
-          });
-        });
-
-        tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
-          tvChartWidget!.save((chartConfig: object) => {
-            dispatch(updateChartConfig(chartConfig));
-          })
-        );
-      });
-      return () => {
-        console.log('tvChartWidget', 'remove');
-        orderLineToggleRef.current?.remove();
-        orderLineToggleRef.current = null;
-        buySellMarksToggleRef.current?.remove();
-        buySellMarksToggleRef.current = null;
-        tvChartWidget.remove();
+      window.onerror = function (msg, src, lineno, colno, err) {
+        console.log('Global error:', msg, src, lineno, colno, err);
       };
+
+      try {
+        const tvChartWidget = new Widget(options);
+        console.log('tvChartWidget', 'set');
+        setTvWidget(tvChartWidget);
+
+        tvChartWidget.onChartReady(() => {
+          console.log('tvChartWidget', 'onChartReady');
+          // Initialize additional right-click-menu options
+          tvChartWidget!.onContextMenu(tradingViewLimitOrder);
+
+          tvChartWidget!.headerReady().then(() => {
+            console.log('tvChartWidget', 'headerReady');
+            // Order Lines
+            initializeToggle({
+              toggleRef: orderLineToggleRef,
+              widget: tvChartWidget!,
+              isOn: orderLinesToggleOn,
+              setToggleOn: setOrderLinesToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.ORDER_LINES,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.ORDER_LINES_TOOLTIP,
+              }),
+            });
+
+            // Buy/Sell Marks
+            initializeToggle({
+              toggleRef: buySellMarksToggleRef,
+              widget: tvChartWidget!,
+              isOn: buySellMarksToggleOn,
+              setToggleOn: setBuySellMarksToggleOn,
+              label: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE,
+              }),
+              tooltip: stringGetter({
+                key: STRING_KEYS.BUYS_SELLS_TOGGLE_TOOLTIP,
+              }),
+            });
+          });
+
+          tvChartWidget!.subscribe('onAutoSaveNeeded', () =>
+            tvChartWidget!.save((chartConfig: object) => {
+              dispatch(updateChartConfig(chartConfig));
+            })
+          );
+        });
+        return () => {
+          console.log('tvChartWidget', 'remove');
+          orderLineToggleRef.current?.remove();
+          orderLineToggleRef.current = null;
+          buySellMarksToggleRef.current?.remove();
+          buySellMarksToggleRef.current = null;
+          tvChartWidget.remove();
+        };
+      } catch (error) {
+        console.log('Error initializing TradingView widget:', error);
+      }
     }
     return () => {
       console.log('tvChartWidget', 'remove2');
