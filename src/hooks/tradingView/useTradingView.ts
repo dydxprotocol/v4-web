@@ -110,6 +110,7 @@ export const useTradingView = ({
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
 
   useEffect(() => {
+    console.log('useTradingView', 'useEffect');
     if (marketId) {
       const isSimpleUi = isTablet && testFlags.simpleUi;
       const widgetOptions = getWidgetOptions(false, isSimpleUi);
@@ -134,13 +135,16 @@ export const useTradingView = ({
       };
 
       const tvChartWidget = new Widget(options);
+      console.log('tvChartWidget', 'set');
       setTvWidget(tvChartWidget);
 
       tvChartWidget.onChartReady(() => {
+        console.log('tvChartWidget', 'onChartReady');
         // Initialize additional right-click-menu options
         tvChartWidget!.onContextMenu(tradingViewLimitOrder);
 
         tvChartWidget!.headerReady().then(() => {
+          console.log('tvChartWidget', 'headerReady');
           // Order Lines
           initializeToggle({
             toggleRef: orderLineToggleRef,
@@ -177,6 +181,7 @@ export const useTradingView = ({
         );
       });
       return () => {
+        console.log('tvChartWidget', 'remove');
         orderLineToggleRef.current?.remove();
         orderLineToggleRef.current = null;
         buySellMarksToggleRef.current?.remove();
@@ -184,7 +189,9 @@ export const useTradingView = ({
         tvChartWidget.remove();
       };
     }
-    return () => {};
+    return () => {
+      console.log('tvChartWidget', 'remove2');
+    };
   }, [
     selectedLocale,
     selectedNetwork,
