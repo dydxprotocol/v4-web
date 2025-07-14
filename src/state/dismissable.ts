@@ -7,6 +7,7 @@ export interface DismissableState {
   dismissedAffiliateBanner: boolean;
   hasSeenUnlimitedAnnouncement: boolean; // deprecated
   hasDismissedPmlBanner: boolean;
+  hasDismissedPumpBanner: boolean;
 }
 
 const initialState: DismissableState = {
@@ -14,6 +15,7 @@ const initialState: DismissableState = {
   dismissedAffiliateBanner: false,
   hasSeenUnlimitedAnnouncement: false,
   hasDismissedPmlBanner: false,
+  hasDismissedPumpBanner: false,
 };
 
 export const dismissableSlice = createSlice({
@@ -29,6 +31,9 @@ export const dismissableSlice = createSlice({
     setHasDismissedPmlBanner: (state, action: PayloadAction<boolean>) => {
       state.hasDismissedPmlBanner = action.payload;
     },
+    setHasDismissedPumpBanner: (state, action: PayloadAction<boolean>) => {
+      state.hasDismissedPumpBanner = action.payload;
+    },
   },
 });
 
@@ -36,4 +41,5 @@ export const {
   setHasSeenPredictionMarketIntroDialog,
   setDismissedAffiliateBanner,
   setHasDismissedPmlBanner,
+  setHasDismissedPumpBanner,
 } = dismissableSlice.actions;
