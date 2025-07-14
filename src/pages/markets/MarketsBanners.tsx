@@ -1,10 +1,12 @@
 import { RefObject, useMemo } from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -13,6 +15,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -20,8 +23,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
+import { setHasDismissedPmlBanner, setHasDismissedPumpBanner } from '@/state/dismissable';
+import { getHasDismissedPmlBanner, getHasDismissedPumpBanner } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -52,7 +55,7 @@ export const MarketsBanners = ({
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
 
-  return shouldDisplayPmlBanner ? (
+  const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
       <img src="/affiliates-hedgie.png" alt="affiliates hedgie" tw="h-8 mobile:hidden" />
 
@@ -98,6 +101,53 @@ export const MarketsBanners = ({
       />
     </$PmlBanner>
   ) : null;
+
+  const hasDismissedPumpBanner = useAppSelector(getHasDismissedPumpBanner);
+  const pumpMarketId = 'PUMP-USD';
+
+  const navigate = useNavigate();
+
+  const onDismissPumpBanner = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(setHasDismissedPumpBanner(true));
+  };
+
+  const onClickPumpBanner = () => {
+    navigate(`${AppRoute.Trade}/${pumpMarketId}`);
+  };
+
+  const shouldDisplayPumpBanner = !hasDismissedPumpBanner;
+
+  const pumpBanner = shouldDisplayPumpBanner ? (
+    <$PumpBanner onClick={onClickPumpBanner} role="button" tabIndex={0}>
+      <div tw="mr-auto flex flex-col">
+        <span tw="mb-0.25 text-white font-extra-bold">
+          {stringGetter({
+            key: STRING_KEYS.MARKET_LIVE,
+            params: {
+              MARKET: <span tw="text-color-accent">$PUMP</span>,
+              LEVERAGE: '5',
+            },
+          })}
+        </span>
+        <Button action={ButtonAction.Primary} tw="max-w-10">
+          {stringGetter({ key: STRING_KEYS.VIEW_MARKET })}
+        </Button>
+      </div>
+
+      <img src="/pump-hedgie.png" alt="pump hedgie" tw="mr-2 h-14 mobile:hidden" />
+
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={(e: React.MouseEvent<any>) => onDismissPumpBanner(e)}
+      />
+    </$PumpBanner>
+  ) : null;
+
+  return pumpBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -126,6 +176,23 @@ const $MarketsPageBanner = styled.div`
 `;
 
 const $PmlBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  img,
+  span,
+  button {
+    z-index: 1;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
+  }
+`;
+
+const $PumpBanner = styled($MarketsPageBanner)`
   height: 8rem;
   img,
   span,
