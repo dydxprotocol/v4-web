@@ -59,6 +59,10 @@ class TestFlags {
   get showNewWithdrawFlow() {
     return !!this.queryParams.withdraw_rewrite;
   }
+
+  get simpleUi() {
+    return this.queryParams.simpleui ? this.booleanFlag(this.queryParams.simpleui) : undefined;
+  }
 }
 
 export const testFlags = new TestFlags();
