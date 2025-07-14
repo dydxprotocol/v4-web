@@ -24,11 +24,7 @@ async function inject(fileName) {
   const htmlFilePath = path.resolve(projectRoot, `../dist/entry-points/${fileName}`);
   const html = await fs.readFile(htmlFilePath, 'utf-8');
 
-  // TODO: Manual download lib and replace cdn script
-  const amplitudeCdnScript =
-    AMPLITUDE_SERVER_ZONE === 'US'
-      ? `<script src="https://cdn.amplitude.com/script/${AMPLITUDE_API_KEY}.js"></script>`
-      : `<script src="https://cdn.eu.amplitude.com/script/${AMPLITUDE_API_KEY}.js"></script>`;
+  const amplitudeCdnScript = `<script src="/libs/amplitude-script-eu.js"></script>`;
 
   const amplitudeListenerScript = `<script type="module">
     !(function () {
