@@ -19,6 +19,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -49,6 +50,17 @@ export const useAnalytics = () => {
           : breakpointMatches.isDesktopLarge
             ? 'DESKTOP_LARGE'
             : 'UNSUPPORTED';
+
+  // AnalyticsUserProperty.AppMode
+  useEffect(() => {
+    if (breakpointMatches.isMobile || breakpointMatches.isTablet) {
+      if (testFlags.simpleUi) {
+        identify(AnalyticsUserProperties.AppMode('simple'));
+      }
+    } else {
+      identify(AnalyticsUserProperties.AppMode('none'));
+    }
+  }, [breakpointMatches]);
 
   // AnalyticsUserProperty.Geo
   const geo = useAppSelector(getGeo) ?? undefined;

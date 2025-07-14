@@ -52,6 +52,7 @@ export const AnalyticsUserProperties = unionize(
     CustomDomainReferrer: ofType<string | null>(),
 
     // Environment
+    AppMode: ofType<'simple' | 'pro' | 'none'>(),
     Locale: ofType<SupportedLocales>(),
     Breakpoint: ofType<
       'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
@@ -88,6 +89,7 @@ export const AnalyticsUserProperties = unionize(
 );
 
 export const AnalyticsUserPropertyLoggableTypes = {
+  AppMode: 'appMode',
   Locale: 'selectedLocale',
   Geo: 'geo',
   Breakpoint: 'breakpoint',
