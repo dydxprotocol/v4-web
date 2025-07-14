@@ -24,7 +24,7 @@ async function inject(fileName) {
   const htmlFilePath = path.resolve(projectRoot, `../dist/entry-points/${fileName}`);
   const html = await fs.readFile(htmlFilePath, 'utf-8');
 
-  const amplitudeCdnScript = `<script src="/libs/amplitude-script-eu.js"></script>`;
+  const amplitudeCdnScript = `<script type="text/javascript" src="/libs/amplitude-script-eu.js"></script>`;
 
   const amplitudeListenerScript = `<script type="module">
     !(function () {
