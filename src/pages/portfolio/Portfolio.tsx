@@ -16,6 +16,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -38,7 +39,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { FundingPaymentsTable } from '../funding/FundingPaymentsTable';
 import { VaultTransactionsTable } from '../vaults/VaultTransactions';
@@ -66,7 +66,7 @@ const PortfolioPage = () => {
   const { complianceState } = useComplianceState();
 
   const initialPageSize = 20;
-  const isSimpleUi = testFlags.simpleUi && isTablet;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);

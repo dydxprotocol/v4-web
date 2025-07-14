@@ -11,6 +11,7 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -44,7 +45,7 @@ export const OnboardingDialog = ({
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
   const stringGetter = useStringGetter();
-  const { isMobile, isTablet } = useBreakpoints();
+  const { isMobile } = useBreakpoints();
   const { walletLearnMore } = useURLConfigs();
   const { selectWallet, sourceAccount } = useAccounts();
   const showNewDepositFlow =
@@ -52,7 +53,7 @@ export const OnboardingDialog = ({
 
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const setIsOpen = useCallback(
     (open: boolean) => {

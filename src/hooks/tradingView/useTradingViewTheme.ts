@@ -8,10 +8,9 @@ import { AppColorMode, AppTheme } from '@/state/appUiConfigs';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
-import { testFlags } from '@/lib/testFlags';
 import { getChartLineColors, getWidgetOverrides } from '@/lib/tradingView/utils';
 
-import { useBreakpoints } from '../useBreakpoints';
+import { useSimpleUiEnabled } from '../useSimpleUiEnabled';
 
 /**
  * @description Method to define a type guard and check that an element is an IFRAME
@@ -35,7 +34,7 @@ export const useTradingViewTheme = ({
 }) => {
   const appTheme: AppTheme = useAppSelector(getAppTheme);
   const appColorMode: AppColorMode = useAppSelector(getAppColorMode);
-  const { isTablet } = useBreakpoints();
+  const isSimpleUi = useSimpleUiEnabled();
 
   useEffect(() => {
     if (!tvWidget) return;
@@ -68,7 +67,6 @@ export const useTradingViewTheme = ({
           }
         }
 
-        const isSimpleUi = isTablet && testFlags.simpleUi;
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { overrides, studies_overrides } = getWidgetOverrides({
           appTheme,
@@ -112,5 +110,5 @@ export const useTradingViewTheme = ({
         }
       });
     });
-  }, [appTheme, appColorMode, tvWidget]);
+  }, [appTheme, appColorMode, tvWidget, isSimpleUi]);
 };

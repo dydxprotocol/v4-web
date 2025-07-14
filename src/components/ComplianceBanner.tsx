@@ -12,6 +12,7 @@ import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -19,8 +20,6 @@ import breakpoints from '@/styles/breakpoints';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-
-import { testFlags } from '@/lib/testFlags';
 
 import { AlertMessage } from './AlertMessage';
 import { Button } from './Button';
@@ -37,7 +36,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     useComplianceState();
   const { help } = useURLConfigs();
   const { isTablet } = useBreakpoints();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   useResizeObserver({
     box: 'border-box',

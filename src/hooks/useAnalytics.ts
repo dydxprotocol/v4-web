@@ -19,7 +19,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -27,6 +26,7 @@ import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
+import { useSimpleUiEnabled } from './useSimpleUiEnabled';
 import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
@@ -52,15 +52,14 @@ export const useAnalytics = () => {
             : 'UNSUPPORTED';
 
   // AnalyticsUserProperty.AppMode
+  const isSimpleUi = useSimpleUiEnabled();
   useEffect(() => {
-    if (breakpointMatches.isMobile || breakpointMatches.isTablet) {
-      if (testFlags.simpleUi) {
-        identify(AnalyticsUserProperties.AppMode('simple'));
-      }
+    if (isSimpleUi) {
+      identify(AnalyticsUserProperties.AppMode('simple'));
     } else {
       identify(AnalyticsUserProperties.AppMode('none'));
     }
-  }, [breakpointMatches]);
+  }, [isSimpleUi]);
 
   // AnalyticsUserProperty.Geo
   const geo = useAppSelector(getGeo) ?? undefined;

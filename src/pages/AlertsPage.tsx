@@ -1,6 +1,6 @@
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { DialogPlacement } from '@/components/Dialog';
@@ -8,11 +8,8 @@ import { SimpleUiHeader } from '@/components/SimpleUiHeader';
 import { AlertsList } from '@/views/Lists/Alerts/AlertsList';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
-import { testFlags } from '@/lib/testFlags';
-
 const AlertsPage = () => {
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = testFlags.simpleUi && isTablet;
+  const isSimpleUi = useSimpleUiEnabled();
   const stringGetter = useStringGetter();
 
   if (isSimpleUi) {
