@@ -35,7 +35,9 @@ export const AssetHeader = ({ isLaunchableMarket }: { isLaunchableMarket?: boole
       return {
         marketCap: launchableAsset?.marketCap ?? launchableAsset?.reportedMarketCap,
         displayableAsset: getDisplayableAssetFromBaseAsset(launchableAsset?.assetId),
-        percentChange24h: launchableAsset?.percentChange24h,
+        percentChange24h: launchableAsset?.percentChange24h
+          ? MustBigNumber(launchableAsset.percentChange24h).div(100).toNumber()
+          : undefined,
         logo: launchableAsset?.logo,
       };
     }
