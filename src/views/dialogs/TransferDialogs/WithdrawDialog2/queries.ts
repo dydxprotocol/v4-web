@@ -29,6 +29,7 @@ async function getSkipWithdrawalRoutes(
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     smartSwapOptions: { evmSwaps: true, splitRoutes: true },
+    allowUnsafe: true,
   };
 
   const [slow, fast] = await Promise.all([
