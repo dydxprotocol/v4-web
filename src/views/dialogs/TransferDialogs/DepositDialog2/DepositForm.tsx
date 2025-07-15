@@ -315,8 +315,7 @@ export const DepositForm = ({
     }
   };
 
-  // @ts-expect-error goFastTransfer not typed on RouteOperation
-  const isGoFastRoute = depositRoute?.operations.find((op) => Boolean(op.goFastTransfer));
+  const isGoFastRoute = depositRoute?.operations.find((op) => Boolean((op as any).goFastTransfer));
   const routeSpeed = depositRoute?.estimatedRouteDurationSeconds;
   const routeDuration = Date.now() + (routeSpeed ?? 0) * 1000;
   const { timeString, unitStringKey } = getStringsForDateTimeDiff(
