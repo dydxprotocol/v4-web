@@ -115,8 +115,8 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <$SimpleUiGrid showRestrictionBanner={showComplianceBanner}>
-          <ComplianceBanner />
+        <$SimpleUiContainer showRestrictionBanner={showComplianceBanner}>
+          <ComplianceBanner tw="min-h-fit" />
 
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
@@ -137,7 +137,7 @@ const Content = () => {
           <$DialogArea ref={dialogAreaRef}>
             <DialogManager />
           </$DialogArea>
-        </$SimpleUiGrid>
+        </$SimpleUiContainer>
       </>
     );
   }
@@ -383,22 +383,11 @@ const $Main = styled.main`
   position: relative;
 `;
 
-const $SimpleUiGrid = styled.div<{ showRestrictionBanner?: boolean }>`
-  display: grid;
-
-  ${({ showRestrictionBanner }) =>
-    showRestrictionBanner
-      ? css`
-          grid-template:
-            'RestrictionWarning' minmax(min-content, auto)
-            'Main' 1fr
-            / 100vw;
-        `
-      : css`
-          grid-template:
-            'Main' 100vh
-            / 100vw;
-        `}
+const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 `;
 
 const $SimpleUiMain = styled.main`
@@ -406,6 +395,7 @@ const $SimpleUiMain = styled.main`
   box-shadow: none;
   isolation: isolate;
   position: relative;
+  min-height: 0;
 `;
 
 const $DialogArea = styled.aside`

@@ -233,7 +233,7 @@ const getDisabledStateForButtonAction = (action?: ButtonAction, buttonStyle?: Bu
   if (action === ButtonAction.SimplePrimary || action === ButtonAction.SimpleSecondary) {
     return css`
       --button-textColor: var(--color-text-0);
-      --button-backgroundColor: transparent;
+      --button-backgroundColor: var(--color-layer-2);
       --button-border: solid var(--border-width) var(--color-border);
       --button-hover-filter: none;
       --button-cursor: not-allowed;
