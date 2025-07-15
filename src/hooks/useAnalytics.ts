@@ -26,6 +26,7 @@ import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
+import { useSimpleUiEnabled } from './useSimpleUiEnabled';
 import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
@@ -49,6 +50,16 @@ export const useAnalytics = () => {
           : breakpointMatches.isDesktopLarge
             ? 'DESKTOP_LARGE'
             : 'UNSUPPORTED';
+
+  // AnalyticsUserProperty.AppMode
+  const isSimpleUi = useSimpleUiEnabled();
+  useEffect(() => {
+    if (isSimpleUi) {
+      identify(AnalyticsUserProperties.AppMode('simple'));
+    } else {
+      identify(AnalyticsUserProperties.AppMode('none'));
+    }
+  }, [isSimpleUi]);
 
   // AnalyticsUserProperty.Geo
   const geo = useAppSelector(getGeo) ?? undefined;

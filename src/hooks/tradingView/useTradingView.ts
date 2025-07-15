@@ -23,7 +23,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateChartConfig } from '@/state/tradingView';
 import { getTvChartConfig } from '@/state/tradingViewSelectors';
 
-import { testFlags } from '@/lib/testFlags';
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -31,6 +30,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { useBreakpoints } from '../useBreakpoints';
 import { useDydxClient } from '../useDydxClient';
 import { useLocaleSeparators } from '../useLocaleSeparators';
+import { useSimpleUiEnabled } from '../useSimpleUiEnabled';
 import { useStringGetter } from '../useStringGetter';
 import { useTradingViewLimitOrder } from './useTradingViewLimitOrder';
 
@@ -108,10 +108,10 @@ export const useTradingView = ({
   );
 
   const tradingViewLimitOrder = useTradingViewLimitOrder(marketId, tickSizeDecimals);
+  const isSimpleUi = useSimpleUiEnabled();
 
   useEffect(() => {
     if (marketId) {
-      const isSimpleUi = isTablet && testFlags.simpleUi;
       const widgetOptions = getWidgetOptions(false, isSimpleUi, isTablet);
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode, isSimpleUi });
       const languageCode = SUPPORTED_LOCALE_MAP[selectedLocale].baseTag;
@@ -195,6 +195,7 @@ export const useTradingView = ({
     setOrderLinesToggleOn,
     setTvWidget,
     !!marketId,
+    isSimpleUi,
     isTablet,
   ]);
 };

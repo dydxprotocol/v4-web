@@ -54,10 +54,10 @@ import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
+import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
-import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
@@ -98,9 +98,8 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-  const isSimpleUi = testFlags.simpleUi && isTablet;
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
-
+  const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
