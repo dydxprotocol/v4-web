@@ -58,6 +58,8 @@ export const CanvasOrderbook = forwardRef(
     const {
       asks,
       bids,
+      spread,
+      spreadPercent,
       midMarketPrice,
       hasOrderbook,
       histogramRange,
@@ -244,7 +246,8 @@ export const CanvasOrderbook = forwardRef(
           {(displaySide === 'top' || layout === 'horizontal') && (
             <$OrderbookMiddleRow
               side="top"
-              midMarketPrice={midMarketPrice}
+              spread={spread}
+              spreadPercent={spreadPercent}
               tickSizeDecimals={tickSizeDecimals}
               isHeader={layout === 'horizontal'}
             />
@@ -254,7 +257,8 @@ export const CanvasOrderbook = forwardRef(
               <div ref={orderbookRef} tw="flex flex-1 flex-col justify-center overflow-y-auto">
                 {asksOrderbook}
                 <OrderbookMiddleRow
-                  midMarketPrice={midMarketPrice}
+                  spread={spread}
+                  spreadPercent={spreadPercent}
                   tickSizeDecimals={tickSizeDecimals}
                   ref={orderbookMiddleRowRef}
                 />
@@ -263,7 +267,8 @@ export const CanvasOrderbook = forwardRef(
               {displaySide === 'bottom' && (
                 <$OrderbookMiddleRow
                   side="bottom"
-                  midMarketPrice={midMarketPrice}
+                  spread={spread}
+                  spreadPercent={spreadPercent}
                   tickSizeDecimals={tickSizeDecimals}
                 />
               )}

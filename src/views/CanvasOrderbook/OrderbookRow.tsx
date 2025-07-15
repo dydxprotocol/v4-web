@@ -15,7 +15,8 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  midMarketPrice?: number;
+  spread?: number;
+  spreadPercent?: number;
   tickSizeDecimals?: number;
 };
 
@@ -47,22 +48,24 @@ export const OrderbookRow = styled.div<{ isHeader?: boolean }>`
 `;
 
 export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
-  ({ side, isHeader, midMarketPrice, tickSizeDecimals }, ref) => {
+  ({ side, isHeader, spread, spreadPercent, tickSizeDecimals }, ref) => {
     const stringGetter = useStringGetter();
 
     return (
       <$OrderbookMiddleRow ref={ref} side={side} isHeader={isHeader}>
-        <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
-        <span tw="flex flex-col">
+        <span tw="flex flex-col pr-0.5">{stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}</span>
+        <span tw="flex flex-col pr-0.5">
           <Output
             withSubscript
             type={OutputType.Number}
-            value={midMarketPrice}
+            value={spread}
             fractionDigits={tickSizeDecimals}
             tw="[justify-content:right]"
           />
         </span>
-        <span /> {/* Empty cell */}
+        <span tw="flex flex-col">
+          <Output type={OutputType.Percent} value={spreadPercent} tw="[justify-content:right]" />
+        </span>
       </$OrderbookMiddleRow>
     );
   }
