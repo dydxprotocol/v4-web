@@ -96,7 +96,12 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   if (isSimpleUi) {
     return (
-      <$AlertMessage ref={complianceBannerRef} withAccentText type={AlertType.Error}>
+      <$AlertMessage
+        className={className}
+        ref={complianceBannerRef}
+        withAccentText
+        type={AlertType.Error}
+      >
         {canHide && (
           <IconButton
             tw="absolute right-0.25 top-0.25 text-color-text-2"
