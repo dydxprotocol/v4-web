@@ -742,6 +742,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
         }
       }, [currentSeason, stringGetter, trigger]);
+
+      const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
+      useEffect(() => {
+        if (new Date().getTime() < new Date(PUMP_COMPETITION_EXPIRATION).getTime())
+          trigger({
+            id: `pump-trading-competition-base`,
+            displayData: {
+              title: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_TITLE,
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/blog/pump-trading-competition" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: [`pump-trading-competition-base`],
+          });
+      }, [stringGetter, trigger]);
     },
   },
   {
