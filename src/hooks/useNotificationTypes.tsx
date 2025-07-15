@@ -743,7 +743,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
-      }, [currentSeason, stringGetter, trigger]);
+      }, [boostedMarketIds, currentSeason, stringGetter, trigger]);
 
       const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
       useEffect(() => {
@@ -751,6 +751,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({
             id: `pump-trading-competition-base`,
             displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
                 key: STRING_KEYS.PUMP_COMPETITION_TITLE,
               }),
