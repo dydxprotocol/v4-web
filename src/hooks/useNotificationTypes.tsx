@@ -21,14 +21,15 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
+import { timeUnits } from '@/constants/time';
+import { PlaceOrderStatuses } from '@/constants/trade';
+import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+
 import {
   CURRENT_REWARDS_SEASON,
   CURRENT_REWARDS_SEASON_EXPIRATION,
   useBoostedMarketIds,
-} from '@/constants/surgeRewards';
-import { timeUnits } from '@/constants/time';
-import { PlaceOrderStatuses } from '@/constants/trade';
-import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+} from '@/hooks/surgeRewards';
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';

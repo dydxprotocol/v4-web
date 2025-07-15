@@ -10,8 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/constants/surgeRewards';
 
+import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';

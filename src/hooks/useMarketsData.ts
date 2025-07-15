@@ -10,7 +10,8 @@ import {
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/constants/surgeRewards';
+
+import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';

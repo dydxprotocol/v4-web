@@ -2,8 +2,8 @@ import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/constants/surgeRewards';
 
+import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
