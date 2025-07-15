@@ -60,7 +60,6 @@ export const CanvasOrderbook = forwardRef(
       bids,
       spread,
       spreadPercent,
-      midMarketPrice,
       hasOrderbook,
       histogramRange,
       groupingTickSize,
