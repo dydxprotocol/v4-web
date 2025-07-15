@@ -10,7 +10,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
-import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/surgeRewards';
+import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/constants/surgeRewards';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -69,6 +69,8 @@ const MarketsDropdownContent = ({
     searchFilter,
   });
 
+  const boostedMarketIds = useBoostedMarketIds();
+
   const columns = useMemo(
     () =>
       [
@@ -105,8 +107,8 @@ const MarketsDropdownContent = ({
                 )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
-              {new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime() &&
-              BOOSTED_MARKETS.has(id) ? (
+              {new Date().getTime() <= new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime() &&
+              boostedMarketIds.has(id) ? (
                 <AccentTag tw="row gap-0.125">
                   <Icon iconName={IconName.Fire} />{' '}
                   {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}

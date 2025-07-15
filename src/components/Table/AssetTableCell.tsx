@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
-import { BOOSTED_MARKETS, BOOSTED_MARKETS_EXPIRATION } from '@/constants/surgeRewards';
+import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/constants/surgeRewards';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -40,6 +40,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
   const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched, id } =
     orEmptyObj(configs);
+  const boostedMarketIds = useBoostedMarketIds();
 
   const maxLeverage =
     configs != null ? (
@@ -65,8 +66,8 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
           </$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
           {!truncateAssetName &&
-          new Date().getTime() <= new Date(BOOSTED_MARKETS_EXPIRATION).getTime() &&
-          BOOSTED_MARKETS.has(id ?? '') ? (
+          new Date().getTime() <= new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime() &&
+          boostedMarketIds.has(id ?? '') ? (
             <AccentTag tw="row gap-0.125">
               <Icon iconName={IconName.Fire} /> {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}
             </AccentTag>
