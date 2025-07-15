@@ -1,3 +1,0 @@
-export const BOOSTED_MARKETS = new Set(['ARB-USD', 'SUI-USD', 'XRP-USD', 'KAITO-USD']);
-export const BOOSTED_MARKETS_EXPIRATION = '2025-08-01T00:00:00.000Z';
-export const CURRENT_REWARDS_SEASON = 4;
