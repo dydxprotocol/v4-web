@@ -28,7 +28,8 @@ import { useURLConfigs } from './useURLConfigs';
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
   const { help } = useURLConfigs();
-  const complianceStatus = useAppSelector(getComplianceStatus);
+  // const complianceStatus = useAppSelector(getComplianceStatus);
+  const complianceStatus = ComplianceStatus.BLOCKED;
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
   const selectedLocale = useAppSelector(getSelectedLocale);
