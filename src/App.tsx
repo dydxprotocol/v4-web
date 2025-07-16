@@ -54,10 +54,10 @@ import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
+import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
-import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
@@ -98,9 +98,8 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-  const isSimpleUi = testFlags.simpleUi && isTablet;
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
-
+  const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
@@ -116,8 +115,8 @@ const Content = () => {
     return (
       <>
         <GlobalStyle />
-        <$SimpleUiGrid showRestrictionBanner={showComplianceBanner}>
-          <ComplianceBanner />
+        <$SimpleUiContainer showRestrictionBanner={showComplianceBanner}>
+          <ComplianceBanner tw="min-h-fit" />
 
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
@@ -138,7 +137,7 @@ const Content = () => {
           <$DialogArea ref={dialogAreaRef}>
             <DialogManager />
           </$DialogArea>
-        </$SimpleUiGrid>
+        </$SimpleUiContainer>
       </>
     );
   }
@@ -384,22 +383,11 @@ const $Main = styled.main`
   position: relative;
 `;
 
-const $SimpleUiGrid = styled.div<{ showRestrictionBanner?: boolean }>`
-  display: grid;
-
-  ${({ showRestrictionBanner }) =>
-    showRestrictionBanner
-      ? css`
-          grid-template:
-            'RestrictionWarning' minmax(min-content, auto)
-            'Main' 1fr
-            / 100vw;
-        `
-      : css`
-          grid-template:
-            'Main' 100vh
-            / 100vw;
-        `}
+const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 `;
 
 const $SimpleUiMain = styled.main`
@@ -407,6 +395,7 @@ const $SimpleUiMain = styled.main`
   box-shadow: none;
   isolation: isolate;
   position: relative;
+  min-height: 0;
 `;
 
 const $DialogArea = styled.aside`

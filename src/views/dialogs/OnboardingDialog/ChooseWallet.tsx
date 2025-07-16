@@ -6,8 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -19,8 +19,6 @@ import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
 import { WalletIcon } from '@/components/WalletIcon';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const ChooseWallet = ({
   onChooseWallet,
 }: {
@@ -28,8 +26,7 @@ export const ChooseWallet = ({
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const displayedWallets = useDisplayedWallets();
 
@@ -56,7 +53,7 @@ export const ChooseWallet = ({
         </$AlertMessage>
       )}
 
-      <$Wallets>
+      <$Wallets isSimpleUi={isSimpleUi}>
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
@@ -89,7 +86,7 @@ const $AlertMessage = styled(AlertMessage)`
   }
 `;
 
-const $Wallets = styled.div`
+const $Wallets = styled.div<{ isSimpleUi?: boolean }>`
   gap: 0.5rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -99,23 +96,25 @@ const $Wallets = styled.div`
   }
 
   @media ${breakpoints.tablet} {
-    ${testFlags.simpleUi &&
-    css`
-      display: flex;
-      flex-direction: column;
-    `}
+    ${({ isSimpleUi }) =>
+      isSimpleUi &&
+      css`
+        display: flex;
+        flex-direction: column;
+      `}
   }
 `;
 
-const $WalletButton = styled(Button)`
+const $WalletButton = styled(Button)<{ isSimpleUi?: boolean }>`
   justify-content: start;
   gap: 0.5rem;
 
   @media ${breakpoints.tablet} {
-    ${testFlags.simpleUi &&
-    css`
-      font: var(--font-medium-book);
-    `}
+    ${({ isSimpleUi }) =>
+      isSimpleUi &&
+      css`
+        font: var(--font-medium-book);
+      `}
   }
 
   @media ${breakpoints.mobile} {

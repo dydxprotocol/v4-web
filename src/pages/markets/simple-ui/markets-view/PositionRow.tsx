@@ -74,7 +74,6 @@ export const PositionRow = ({
             <span tw="row gap-0.25 text-color-text-1 font-small-book">
               {marginUsage && (
                 <Output
-                  showSign={ShowSign.Both}
                   type={OutputType.Percent}
                   value={marginUsage}
                   slotRight={<MarginUsageRing tw="ml-0.25" value={marginUsage} />}
@@ -181,12 +180,7 @@ export const PositionRow = ({
           <span tw="row gap-0.25 whitespace-nowrap leading-[1rem]">
             {market.displayableAsset}
             <Tag tw="bg-color-layer-4">
-              <Output
-                type={OutputType.Multiple}
-                value={position.leverage}
-                tw="text-color-text-1"
-                fractionDigits={0}
-              />
+              <Output type={OutputType.Multiple} value={position.leverage} tw="text-color-text-1" />
             </Tag>
           </span>
           <span tw="row gap-0.25 font-small-book">

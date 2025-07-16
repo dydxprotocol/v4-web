@@ -11,7 +11,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TooltipStringKeys } from '@/constants/tooltips';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,7 +32,6 @@ import { triggersFormActions } from '@/state/triggersForm';
 import { assertNever } from '@/lib/assertNever';
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { AttemptBigNumber, AttemptNumber, MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 type InputChangeType = InputType.Currency | InputType.Percent;
 
@@ -68,8 +67,7 @@ export const TriggerOrderInputs = ({
 }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const clearPriceInputFields = () => {
     dispatch(

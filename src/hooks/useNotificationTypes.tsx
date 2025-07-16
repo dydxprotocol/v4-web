@@ -21,14 +21,15 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
-import {
-  BOOSTED_MARKETS,
-  BOOSTED_MARKETS_EXPIRATION,
-  CURRENT_REWARDS_SEASON,
-} from '@/constants/surgeRewards';
 import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
+
+import {
+  CURRENT_REWARDS_SEASON,
+  CURRENT_REWARDS_SEASON_EXPIRATION,
+  useBoostedMarketIds,
+} from '@/hooks/surgeRewards';
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
@@ -618,12 +619,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
+      const boostedMarketIds = useBoostedMarketIds();
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
         enabled:
           dydxAddress != null &&
-          new Date().getTime() < new Date(BOOSTED_MARKETS_EXPIRATION).getTime(),
+          new Date().getTime() < new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime(),
         retry: false,
         queryFn: async () => {
           try {
@@ -646,7 +648,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         const now = new Date().getTime();
-        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
         if (now < seasonEnd && rewards != null && rewards > 5) {
           trigger({
             id: `rewards-program-surge-s${currentSeason - 1}-payout`,
@@ -678,7 +680,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         const now = new Date().getTime();
-        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
         const endingSoon = seasonEnd - timeUnits.day * 3;
 
         if (now <= endingSoon) {
@@ -694,7 +696,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: STRING_KEYS.SURGE_BOOSTED_MARKETS_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  MARKETS_LIST: [...BOOSTED_MARKETS].map((m) => m.split('-')[0]).join(', '),
+                  MARKETS_LIST: [...boostedMarketIds].map((m) => m.split('-')[0]).join(', '),
                 },
               }),
               toastSensitivity: 'foreground',
@@ -741,7 +743,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
-      }, [currentSeason, stringGetter, trigger]);
+      }, [boostedMarketIds, currentSeason, stringGetter, trigger]);
+
+      const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
+      useEffect(() => {
+        if (new Date().getTime() < new Date(PUMP_COMPETITION_EXPIRATION).getTime())
+          trigger({
+            id: `pump-trading-competition-base`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_TITLE,
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/blog/pump-trading-competition" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: [`pump-trading-competition-base`],
+          });
+      }, [stringGetter, trigger]);
     },
   },
   {

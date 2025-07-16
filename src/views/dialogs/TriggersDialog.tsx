@@ -3,8 +3,8 @@ import { BonsaiHelpers } from '@/bonsai/ontology';
 import { DialogProps, TriggersDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -13,8 +13,6 @@ import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
-
-import { testFlags } from '@/lib/testFlags';
 
 export const TriggersDialog = ({
   positionUniqueId,
@@ -26,8 +24,7 @@ export const TriggersDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = testFlags.simpleUi && isTablet;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const config = isSimpleUi
     ? {

@@ -11,11 +11,11 @@ import { STRING_KEYS } from '@/constants/localization';
 import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useDydxClient } from '@/hooks/useDydxClient';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,7 +32,6 @@ import { setSavedEncryptedSignature } from '@/state/wallet';
 import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
 import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
@@ -44,9 +43,8 @@ type ElementProps = {
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const { isTablet } = useBreakpoints();
   const { sourceAccount, setWalletFromSignature } = useAccounts();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const [error, setError] = useState<string>();
 

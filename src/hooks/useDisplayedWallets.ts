@@ -16,10 +16,9 @@ import {
 } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
-import { useBreakpoints } from './useBreakpoints';
 import { MipdInjectedWallet, useMipdInjectedWallets } from './useMipdInjectedWallets';
+import { useSimpleUiEnabled } from './useSimpleUiEnabled';
 
 const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
   return {
@@ -32,8 +31,7 @@ const getWalletInfoFromInjectedWallet = (wallet: MipdInjectedWallet) => {
 
 export const useDisplayedWallets = (): WalletInfo[] => {
   const injectedWallets = useMipdInjectedWallets();
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   return useMemo(() => {
     const isPhantomDetected = Boolean(window.phantom?.solana);

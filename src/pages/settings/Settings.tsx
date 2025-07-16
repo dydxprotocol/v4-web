@@ -8,6 +8,7 @@ import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
 import { usePreferenceMenu } from '@/hooks/usePreferenceMenu';
 import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ComboboxMenu } from '@/components/ComboboxMenu';
@@ -20,8 +21,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedLocale } from '@/state/localization';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { SettingsHeader } from './SettingsHeader';
 
 const SettingsPage = () => {
@@ -30,6 +29,7 @@ const SettingsPage = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const networks = useNetworks();
   const { switchNetwork, selectedNetwork } = useSelectedNetwork();
+  const isSimpleUi = useSimpleUiEnabled();
 
   const selectedNetworkConfig = networks.find((network) => network.value === selectedNetwork);
 
@@ -110,7 +110,7 @@ const SettingsPage = () => {
           element={
             <DisplaySettings
               css={{
-                padding: testFlags.simpleUi ? '0 1.5rem' : '1rem 1.5rem',
+                padding: isSimpleUi ? '0 1.5rem' : '1rem 1.5rem',
               }}
             />
           }

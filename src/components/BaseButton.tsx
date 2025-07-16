@@ -1,12 +1,12 @@
 import { forwardRef } from 'react';
 
-import styled, { css } from 'styled-components';
+import styled, { css, RuleSet } from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
-import breakpoints from '@/styles/breakpoints';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 
-import { testFlags } from '@/lib/testFlags';
+import breakpoints from '@/styles/breakpoints';
 
 type ElementProps = {
   disabled?: boolean;
@@ -51,6 +51,8 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
     },
     ref
   ) => {
+    const isSimpleUi = useSimpleUiEnabled();
+
     return type === ButtonType.Link ? (
       <StyledLinkButton
         // React
@@ -68,6 +70,7 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
         onMouseDown={onMouseDown as React.MouseEventHandler<HTMLAnchorElement>}
         onPointerDown={onPointerDown as React.PointerEventHandler<HTMLAnchorElement>}
         // Other
+        $isSimpleUi={isSimpleUi}
         {...otherProps}
       >
         {children}
@@ -88,6 +91,7 @@ export const BaseButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Base
         onMouseDown={onMouseDown as React.MouseEventHandler<HTMLButtonElement>}
         onPointerDown={onPointerDown as React.PointerEventHandler<HTMLButtonElement>}
         // Other
+        $isSimpleUi={isSimpleUi}
         {...otherProps}
       >
         {children}
@@ -131,18 +135,17 @@ const buttonSizeVariants = {
   `,
 };
 
-const buttonShapeVariants = {
+const buttonShapeVariants: Record<ButtonShape, RuleSet<StyleProps & { $isSimpleUi?: boolean }>> = {
   [ButtonShape.Circle]: css`
     --button-width: var(--button-height);
     min-width: var(--button-width);
     --button-radius: 50%;
   `,
-  [ButtonShape.Rectangle]: css`
+  [ButtonShape.Rectangle]: css<StyleProps & { $isSimpleUi?: boolean }>`
     --button-radius: 0.5em;
-
     @media ${breakpoints.tablet} {
-      ${() =>
-        testFlags.simpleUi &&
+      ${({ $isSimpleUi }) =>
+        $isSimpleUi &&
         css`
           --button-radius: 1rem;
         `}
@@ -157,7 +160,7 @@ const buttonShapeVariants = {
   `,
 };
 
-const ButtonStyle = css<StyleProps>`
+const ButtonStyle = css<StyleProps & { $isSimpleUi?: boolean }>`
   // Props/defaults
 
   --button-font: var(--font-base-book);
@@ -178,7 +181,6 @@ const ButtonStyle = css<StyleProps>`
   --button-cursor: pointer;
 
   // Variants
-
   ${({ size }) => size && buttonSizeVariants[size]}
   ${({ shape }) => shape && buttonShapeVariants[shape]}
 
@@ -215,8 +217,8 @@ const ButtonStyle = css<StyleProps>`
   }
 
   @media ${breakpoints.tablet} {
-    ${() =>
-      testFlags.simpleUi &&
+    ${({ $isSimpleUi }) =>
+      $isSimpleUi &&
       css`
         &:active:not(:disabled) {
           background: linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%),
@@ -226,11 +228,11 @@ const ButtonStyle = css<StyleProps>`
   }
 `;
 
-const StyledButton = styled.button<StyleProps>`
+const StyledButton = styled.button<StyleProps & { $isSimpleUi?: boolean }>`
   ${ButtonStyle}
 `;
 
-const StyledLinkButton = styled.a<StyleProps>`
+const StyledLinkButton = styled.a<StyleProps & { $isSimpleUi?: boolean }>`
   ${ButtonStyle}
 
   &:hover {

@@ -4,12 +4,12 @@ import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
+
 import breakpoints from '@/styles/breakpoints';
 
 import { ComboboxMenu, type ComboboxMenuProps } from '@/components/ComboboxMenu';
 import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
-
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   title?: React.ReactNode;
@@ -76,46 +76,52 @@ export const ComboboxDialogMenu = <
 }: ElementProps<MenuItemValue, MenuGroupValue> &
   PickComboxMenuProps<MenuItemValue, MenuGroupValue> &
   PickDialogProps &
-  StyleProps) => (
-  // TODO: sub-menu state management
-  <$Dialog
-    isOpen={isOpen}
-    setIsOpen={setIsOpen}
-    title={title}
-    description={description}
-    slotHeaderInner={slotHeaderInner}
-    slotTrigger={slotTrigger}
-    slotFooter={slotFooter}
-    withOverlay={withOverlay}
-    placement={placement}
-    preventClose={preventClose}
-    className={className}
-    $withSearch={withSearch}
-  >
-    <$ComboboxMenu
-      items={items}
-      onItemSelected={onItemSelected}
+  StyleProps) => {
+  const isSimpleUi = useSimpleUiEnabled();
+
+  return (
+    // TODO: sub-menu state management
+    <$Dialog
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
       title={title}
-      inputPlaceholder={inputPlaceholder}
-      slotEmpty={slotEmpty}
-      withItemBorders={withItemBorders}
-      withSearch={withSearch}
-      withStickyLayout={withStickyLayout}
-    />
-    {children}
-  </$Dialog>
-);
-const $Dialog = styled(Dialog)<{ $withSearch?: boolean }>`
+      description={description}
+      slotHeaderInner={slotHeaderInner}
+      slotTrigger={slotTrigger}
+      slotFooter={slotFooter}
+      withOverlay={withOverlay}
+      placement={placement}
+      preventClose={preventClose}
+      className={className}
+      $withSearch={withSearch}
+      $isSimpleUi={isSimpleUi}
+    >
+      <$ComboboxMenu
+        items={items}
+        onItemSelected={onItemSelected}
+        title={title}
+        inputPlaceholder={inputPlaceholder}
+        slotEmpty={slotEmpty}
+        withItemBorders={withItemBorders}
+        withSearch={withSearch}
+        withStickyLayout={withStickyLayout}
+      />
+      {children}
+    </$Dialog>
+  );
+};
+const $Dialog = styled(Dialog)<{ $withSearch?: boolean; $isSimpleUi?: boolean }>`
   /* Params */
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
   --comboboxDialogMenu-item-gap: 0.5rem;
   --comboboxDialogMenu-item-padding: 0.5rem 1rem;
 
   @media ${breakpoints.tablet} {
-    ${testFlags.simpleUi &&
-    css`
-      --comboboxDialogMenu-backgroundColor: var(--color-layer-1);
-    `}
+    ${({ $isSimpleUi }) =>
+      $isSimpleUi &&
+      css`
+        --comboboxDialogMenu-backgroundColor: var(--color-layer-1);
+      `}
   }
 
   /* Overrides */
