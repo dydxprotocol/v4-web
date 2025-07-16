@@ -11,7 +11,7 @@ import { OutputType, formatDateOutput } from '@/components/Output';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import {
-  // getComplianceStatus,
+  getComplianceStatus,
   getComplianceUpdatedAt,
   getGeo,
   getOnboardingState,
@@ -28,8 +28,7 @@ import { useURLConfigs } from './useURLConfigs';
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
   const { help } = useURLConfigs();
-  // const complianceStatus = useAppSelector(getComplianceStatus);
-  const complianceStatus = ComplianceStatus.BLOCKED as ComplianceStatus;
+  const complianceStatus = useAppSelector(getComplianceStatus);
   const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
   const geo = useAppSelector(getGeo);
   const selectedLocale = useAppSelector(getSelectedLocale);
