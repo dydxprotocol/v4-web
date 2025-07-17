@@ -5,7 +5,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
@@ -66,6 +66,7 @@ import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
+import { getIsUserMenuOpen } from './state/dialogsSelectors';
 import breakpoints from './styles/breakpoints';
 
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -101,6 +102,7 @@ const Content = () => {
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
+  const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -112,11 +114,20 @@ const Content = () => {
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   if (isSimpleUi) {
+    const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
+    const backgroundColor =
+      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-1)' : 'transparent';
+
     return (
       <>
         <GlobalStyle />
-        <$SimpleUiContainer showRestrictionBanner={showComplianceBanner}>
-          <ComplianceBanner tw="min-h-fit" />
+        <$SimpleUiContainer
+          showRestrictionBanner={showComplianceBanner}
+          css={{
+            backgroundColor,
+          }}
+        >
+          <ComplianceBanner tw="h-fit min-h-0" />
 
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
@@ -391,11 +402,10 @@ const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
 `;
 
 const $SimpleUiMain = styled.main`
-  grid-area: Main;
   box-shadow: none;
-  isolation: isolate;
   position: relative;
   min-height: 0;
+  flex: 1;
 `;
 
 const $DialogArea = styled.aside`
