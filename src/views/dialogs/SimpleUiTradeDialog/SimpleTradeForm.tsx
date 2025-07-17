@@ -42,8 +42,8 @@ import { orEmptyObj } from '@/lib/typeUtils';
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
 import { SimpleTradeSteps } from './SimpleTradeSteps';
 
-type QuickLimitOption = 'mid' | '1' | '2' | '5' | '10';
-const QUICK_LIMIT_OPTIONS: QuickLimitOption[] = ['1', '2', '5', '10', 'mid'];
+const QUICK_LIMIT_OPTIONS = ['1', '2', '5', '10', '0'] as const;
+type QuickLimitOption = (typeof QUICK_LIMIT_OPTIONS)[number];
 
 export const SimpleTradeForm = ({
   currentStep,
@@ -358,24 +358,18 @@ export const SimpleTradeForm = ({
   );
 
   const onQuickLimitClick = (quickLimit: QuickLimitOption) => {
-    if (quickLimit === 'mid') {
-      dispatch(
-        tradeFormActions.setLimitPrice(midPrice?.toFixed(tickSizeDecimals ?? TOKEN_DECIMALS) ?? '')
-      );
-    } else {
-      const percentBN = MustBigNumber(quickLimit).div(100);
+    const percentBN = MustBigNumber(quickLimit).div(100);
 
-      const multiplier =
-        tradeValues.side === OrderSide.BUY
-          ? BIG_NUMBERS.ONE.minus(percentBN)
-          : BIG_NUMBERS.ONE.plus(percentBN);
+    const multiplier =
+      tradeValues.side === OrderSide.BUY
+        ? BIG_NUMBERS.ONE.minus(percentBN)
+        : BIG_NUMBERS.ONE.plus(percentBN);
 
-      dispatch(
-        tradeFormActions.setLimitPrice(
-          midPrice?.times(multiplier).toFixed(tickSizeDecimals ?? TOKEN_DECIMALS) ?? ''
-        )
-      );
-    }
+    dispatch(
+      tradeFormActions.setLimitPrice(
+        midPrice?.times(multiplier).toFixed(tickSizeDecimals ?? TOKEN_DECIMALS) ?? ''
+      )
+    );
   };
 
   const quickLimitSizeButtons = (
@@ -389,7 +383,7 @@ export const SimpleTradeForm = ({
           size={ButtonSize.Small}
           onClick={() => onQuickLimitClick(quickLimit)}
         >
-          {quickLimit === 'mid'
+          {quickLimit === '0'
             ? stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })
             : `${tradeValues.side === OrderSide.BUY ? '-' : ''}${quickLimit}%`}
         </Button>
