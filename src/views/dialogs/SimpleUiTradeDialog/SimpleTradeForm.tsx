@@ -7,12 +7,18 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
+import {
+  DisplayUnit,
+  QUICK_LIMIT_OPTIONS,
+  QuickLimitOption,
+  SimpleUiTradeDialogSteps,
+} from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
@@ -36,14 +42,12 @@ import { openDialog } from '@/state/dialogs';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { AttemptBigNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
 import { SimpleTradeSteps } from './SimpleTradeSteps';
-
-const QUICK_LIMIT_OPTIONS = ['1', '2', '5', '10', '0'] as const;
-type QuickLimitOption = (typeof QUICK_LIMIT_OPTIONS)[number];
 
 export const SimpleTradeForm = ({
   currentStep,
@@ -369,6 +373,14 @@ export const SimpleTradeForm = ({
       tradeFormActions.setLimitPrice(
         midPrice?.times(multiplier).toFixed(tickSizeDecimals ?? TOKEN_DECIMALS) ?? ''
       )
+    );
+
+    track(
+      AnalyticsEvents.TradeQuickLimitOptionClick({
+        quickLimit,
+        side: tradeValues.side,
+        marketId: ticker ?? '',
+      })
     );
   };
 
