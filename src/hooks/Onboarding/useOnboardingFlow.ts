@@ -20,7 +20,7 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
         state: onboardingState,
       })
     );
-    dispatch(forceOpenDialog(DialogTypes.Onboarding()));
+    dispatch(forceOpenDialog(DialogTypes.Onboarding2()));
   };
 
   const { disableConnectButton } = useComplianceState();

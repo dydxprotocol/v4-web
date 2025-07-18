@@ -95,6 +95,7 @@
     "@statsig/react-bindings": "1.4.0",
     "@tanstack/react-query": "^5.37.1",
     "@tanstack/react-virtual": "^3.13.5",
+    "@turnkey/sdk-react": "^5.2.6",
     "@types/lodash": "^4.14.195",
     "@visx/axis": "^3.1.0",
     "@visx/curve": "^3.0.0",

@@ -4,6 +4,7 @@ import isPropValid from '@emotion/is-prop-valid';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { TurnkeyProvider } from '@turnkey/sdk-react';
 import { GrazProvider } from 'graz';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -58,6 +59,7 @@ import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
+import { turnkeyConfig } from './lib/turnkey';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
@@ -268,6 +270,11 @@ const providers = [
     appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
     clientId: import.meta.env.VITE_PRIVY_APP_CLIENT_ID,
     config: privyConfig,
+  }),
+  wrapProvider(TurnkeyProvider, {
+    appId: import.meta.env.VITE_TURNKEY_APP_ID,
+    clientId: import.meta.env.VITE_TURNKEY_CLIENT_ID,
+    config: turnkeyConfig,
   }),
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: appQueryClient }),

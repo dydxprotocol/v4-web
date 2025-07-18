@@ -48,6 +48,7 @@ export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
 export type MobileSignInDialogProps = {};
 export type OnboardingDialogProps = {};
+export type OnboardingDialog2Props = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
 export type PreferencesDialogProps = {};
@@ -138,6 +139,7 @@ export const DialogTypes = unionize(
     MobileDownload: ofType<MobileDownloadDialogProps>(),
     MobileSignIn: ofType<MobileSignInDialogProps>(),
     Onboarding: ofType<OnboardingDialogProps>(),
+    Onboarding2: ofType<OnboardingDialog2Props>(),
     OrderDetails: ofType<OrderDetailsDialogProps>(),
     PredictionMarketIntro: ofType<PredictionMarketIntroDialogProps>(),
     Preferences: ofType<PreferencesDialogProps>(),
