@@ -520,7 +520,7 @@ function simulateMarketOrder(
       // eslint-disable-next-line @typescript-eslint/no-loop-func
       const numerator = calc(() => {
         const base = targetLeverage * equity - thisPositionValue;
-        // if we're heading in the wrong direciton, go nowhere
+        // if we're heading in the wrong direction, go nowhere
         if (base * operationMultipler < 0) {
           return 0;
         }
@@ -535,7 +535,7 @@ function simulateMarketOrder(
         const base = -(targetLeverage * sizeEquityImpact - operationMultipler * oraclePrice);
 
         if (base * operationMultipler < 0) {
-          // somehow adding size is taking position value in the opposite diretion
+          // somehow adding size is taking position value in the opposite direction
           // which means leverage is going down as size goes up
           // so let's force take the whole row I guess, by making numerator/denominator very large
           return numerator / Number.MAX_SAFE_INTEGER;
