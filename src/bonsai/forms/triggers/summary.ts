@@ -630,5 +630,5 @@ function calculateTriggerPriceFromPercentDiff(
   return calculateTriggerPriceFromUsdcDiff(priceDiff, size, position, isStopLoss);
 }
 
-// so we switch easily bewteen possible implementations
+// so we switch easily between possible implementations
 const getEffectiveBaseEquityFn = getPositionBaseEquity;
