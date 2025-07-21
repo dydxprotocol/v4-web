@@ -25,7 +25,6 @@ import { TableCell } from '@/components/Table/TableCell';
 import { NewTag } from '@/components/Tag';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
-import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber, MustNumber } from '@/lib/numbers';
 
@@ -186,19 +185,13 @@ export const MarketsCompactTable = ({
             ),
           },
           !isMobile && {
-            columnKey: 'openInterest',
+            columnKey: 'volume24h',
             allowsSorting: false,
             label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-            renderCell: ({ assetId, openInterestUSDC, openInterest }: MarketData) => (
+            renderCell: ({ volume24h }: MarketData) => (
               <$DetailsCell>
                 <$RecentlyListed>
-                  <Output type={OutputType.CompactFiat} value={openInterestUSDC} />
-                  <Output
-                    type={OutputType.CompactNumber}
-                    value={openInterest}
-                    slotRight={` ${getDisplayableAssetFromBaseAsset(assetId)}`}
-                    tw="text-color-text-0 font-mini-medium"
-                  />
+                  <Output type={OutputType.CompactFiat} value={volume24h} />
                 </$RecentlyListed>
                 <Icon iconName={IconName.ChevronRight} />
               </$DetailsCell>
