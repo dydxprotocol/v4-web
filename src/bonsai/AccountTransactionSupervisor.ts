@@ -124,8 +124,9 @@ export class AccountTransactionSupervisor {
   ) {
     return async () => {
       const result = await taskBuilder({ payload: basePayload })
-        .with<AddLoggingNameMiddlewareProps>(addLoggingNameMiddleware(nameForLogging))
-        .with<AddSharedMiddlewareProps>(addSharedMiddleware(this.shared))
+        .with<AddSharedContextMiddlewareProps>(
+          addSharedContextMiddleware(nameForLogging, this.shared)
+        )
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         .with<StateTrackingProps<Q>>(stateTrackingMiddleware(tracking))
         .with<BonsaiLoggingMiddlewareProps>(bonsaiLoggingMiddleware())
@@ -712,10 +713,9 @@ export class AccountTransactionSupervisor {
   }) {
     return (
       taskBuilder({ payload: { orderId, withNotification } })
-        .with<AddLoggingNameMiddlewareProps>(
-          addLoggingNameMiddleware('AccountTransactionSupervisor/cancelOrder')
+        .with<AddSharedContextMiddlewareProps>(
+          addSharedContextMiddleware('AccountTransactionSupervisor/cancelOrder', this.shared)
         )
-        .with<AddSharedMiddlewareProps>(addSharedMiddleware(this.shared))
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         // populate order details
         .with<{ order: SubaccountOrder; uuid: string }>(async (context, next) => {
@@ -941,39 +941,33 @@ function chainOperationEngine<Payload extends AddLoggingNameMiddlewareProps, T>(
 }
 
 type AddLoggingNameMiddlewareProps = { fnName: string };
-function addLoggingNameMiddleware(fnName: string) {
-  return createMiddleware<AddLoggingNameMiddlewareProps>((context, next) => {
-    return next({ ...context, fnName });
-  });
-}
-
-type AddSharedMiddlewareProps = { shared: TransactionSupervisorShared };
-function addSharedMiddleware(shared: TransactionSupervisorShared) {
-  return createMiddleware<AddSharedMiddlewareProps>((context, next) => {
-    return next({ ...context, shared });
+type AddSharedContextMiddlewareProps = {
+  shared: TransactionSupervisorShared;
+} & AddLoggingNameMiddlewareProps;
+function addSharedContextMiddleware(fnName: string, shared: TransactionSupervisorShared) {
+  return createMiddleware<AddSharedContextMiddlewareProps>((context, next) => {
+    return next({ ...context, shared, fnName });
   });
 }
 
 type ValidateLocalWalletMiddlewareProps = {};
 function validateLocalWalletMiddleware() {
-  return createMiddleware<{}, AddSharedMiddlewareProps & AddLoggingNameMiddlewareProps>(
-    async (context, next) => {
-      const state = context.shared.store.getState();
-      const localWalletNonce = getLocalWalletNonce(state);
+  return createMiddleware<{}, AddSharedContextMiddlewareProps>(async (context, next) => {
+    const state = context.shared.store.getState();
+    const localWalletNonce = getLocalWalletNonce(state);
 
-      if (localWalletNonce == null) {
-        const errorMsg = 'No valid local wallet available';
-        const errSource = context.fnName;
-        logBonsaiError(errSource, errorMsg);
-        return createMiddlewareFailureResult(
-          wrapSimpleError(errSource, errorMsg, STRING_KEYS.NO_LOCAL_WALLET),
-          context
-        );
-      }
-
-      return next(context);
+    if (localWalletNonce == null) {
+      const errorMsg = 'No valid local wallet available';
+      const errSource = context.fnName;
+      logBonsaiError(errSource, errorMsg);
+      return createMiddlewareFailureResult(
+        wrapSimpleError(errSource, errorMsg, STRING_KEYS.NO_LOCAL_WALLET),
+        context
+      );
     }
-  );
+
+    return next(context);
+  });
 }
 
 type AddClientAndWalletMiddlewareProps = {
@@ -984,59 +978,56 @@ function addClientAndWalletMiddleware(store: RootStore) {
   const nonceBefore = getLocalWalletNonce(store.getState());
   const networkBefore = getSelectedNetwork(store.getState());
 
-  return createMiddleware<
-    AddClientAndWalletMiddlewareProps,
-    AddSharedMiddlewareProps & AddLoggingNameMiddlewareProps
-  >(async (context, next) => {
-    const network = getSelectedNetwork(context.shared.store.getState());
-    const localWalletNonce = getLocalWalletNonce(context.shared.store.getState());
+  return createMiddleware<AddClientAndWalletMiddlewareProps, AddSharedContextMiddlewareProps>(
+    async (context, next) => {
+      const network = getSelectedNetwork(context.shared.store.getState());
+      const localWalletNonce = getLocalWalletNonce(context.shared.store.getState());
 
-    const clientConfig = {
-      network,
-      dispatch: context.shared.store.dispatch,
-    };
-    const clientWrapper = context.shared.compositeClientManager.use(clientConfig);
+      const clientConfig = {
+        network,
+        dispatch: context.shared.store.dispatch,
+      };
+      const clientWrapper = context.shared.compositeClientManager.use(clientConfig);
 
-    try {
-      if (network !== networkBefore) {
-        throw new Error('Network changed before operation execution');
+      try {
+        if (network !== networkBefore) {
+          throw new Error('Network changed before operation execution');
+        }
+        if (localWalletNonce !== nonceBefore) {
+          throw new Error('Local wallet changed before operation execution');
+        }
+        if (localWalletNonce == null) {
+          throw new Error('No valid local wallet nonce found');
+        }
+
+        const localWallet = localWalletManager.getLocalWallet(localWalletNonce);
+
+        if (localWallet == null) {
+          throw new Error('Local wallet not initialized or nonce was incorrect.');
+        }
+
+        // Wait for the composite client to be available
+        const compositeClient = await clientWrapper.compositeClient.deferred.promise;
+
+        // Execute the next middleware with the client wallet pair
+        return await next({ ...context, compositeClient, localWallet });
+      } catch (error) {
+        const errorString = stringifyTransactionError(error);
+        const parsed = parseTransactionError(context.fnName, errorString);
+        return createMiddlewareFailureResult(wrapOperationFailure(errorString, parsed), context);
+      } finally {
+        // Always mark the client as done to prevent memory leaks
+        context.shared.compositeClientManager.markDone(clientConfig);
       }
-      if (localWalletNonce !== nonceBefore) {
-        throw new Error('Local wallet changed before operation execution');
-      }
-      if (localWalletNonce == null) {
-        throw new Error('No valid local wallet nonce found');
-      }
-
-      const localWallet = localWalletManager.getLocalWallet(localWalletNonce);
-
-      if (localWallet == null) {
-        throw new Error('Local wallet not initialized or nonce was incorrect.');
-      }
-
-      // Wait for the composite client to be available
-      const compositeClient = await clientWrapper.compositeClient.deferred.promise;
-
-      // Execute the next middleware with the client wallet pair
-      return await next({ ...context, compositeClient, localWallet });
-    } catch (error) {
-      const errorString = stringifyTransactionError(error);
-      const parsed = parseTransactionError(context.fnName, errorString);
-      return createMiddlewareFailureResult(wrapOperationFailure(errorString, parsed), context);
-    } finally {
-      // Always mark the client as done to prevent memory leaks
-      context.shared.compositeClientManager.markDone(clientConfig);
     }
-  });
+  );
 }
 
 type BonsaiLoggingMiddlewareProps = {};
 function bonsaiLoggingMiddleware() {
   return createMiddleware<
     BonsaiLoggingMiddlewareProps,
-    AddSharedMiddlewareProps &
-      AddLoggingNameMiddlewareProps &
-      StateTrackingProps<any> & { payload: any }
+    AddSharedContextMiddlewareProps & StateTrackingProps<any> & { payload: any }
   >(async (context, next) => {
     const startTime = startTimer();
     const submittedTime = createTimer();
@@ -1102,7 +1093,7 @@ type StateTrackingProps<T> = {
   };
 };
 function stateTrackingMiddleware<P, Q>(tracking?: Tracker<P, Q>) {
-  return createMiddleware<StateTrackingProps<Q>, AddSharedMiddlewareProps>(
+  return createMiddleware<StateTrackingProps<Q>, AddSharedContextMiddlewareProps>(
     async (context, next) => {
       let hasStarted = false;
       let hasFinished = false;
