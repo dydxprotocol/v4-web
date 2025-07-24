@@ -1,4 +1,4 @@
-import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { ApiStatus } from '@/bonsai/types/summaryTypes';
 import { type SupportedLocale } from '@dydxprotocol/v4-localization';
@@ -6,6 +6,7 @@ import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { type CustomFlags, type StatsigFlags } from '@/constants/statsig';
+import { type DisplayUnit, type QuickLimitOption } from '@/constants/trade';
 import { type ConnectorType, type DydxAddress, type WalletType } from '@/constants/wallets';
 
 import type { Deposit, Withdraw } from '@/state/transfers';
@@ -14,7 +15,6 @@ import type { OnboardingState, OnboardingSteps } from './account';
 import { type DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
-import { type DisplayUnit } from './trade';
 
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
   detail: {
@@ -291,6 +291,11 @@ export const AnalyticsEvents = unionize(
     TriggerOrderClick: ofType<{ marketId: string | undefined }>(),
     TradeCancelAllOrdersClick: ofType<{ marketId?: string }>(),
     TradeCloseAllPositionsClick: ofType<{}>(),
+    TradeQuickLimitOptionClick: ofType<{
+      quickLimit: QuickLimitOption;
+      side?: OrderSide;
+      marketId?: string;
+    }>(),
 
     // TradingView actions
     TradingViewOrderModificationSubmitted: ofType<

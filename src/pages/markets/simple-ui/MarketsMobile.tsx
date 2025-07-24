@@ -57,6 +57,7 @@ const $MarketsMobile = styled.div`
 const $Dialog = styled(Dialog)`
   --dialog-backgroundColor: var(--color-layer-1);
   --dialog-header-backgroundColor: var(--color-layer-1);
+  box-shadow: none;
 `;
 
 export default MarketsMobile;

@@ -143,12 +143,27 @@ const buttonShapeVariants: Record<ButtonShape, RuleSet<StyleProps & { $isSimpleU
   `,
   [ButtonShape.Rectangle]: css<StyleProps & { $isSimpleUi?: boolean }>`
     --button-radius: 0.5em;
+
     @media ${breakpoints.tablet} {
-      ${({ $isSimpleUi }) =>
-        $isSimpleUi &&
-        css`
-          --button-radius: 1rem;
-        `}
+      ${({ $isSimpleUi, size }) => {
+        if ($isSimpleUi) {
+          switch (size) {
+            case ButtonSize.XXSmall:
+            case ButtonSize.XSmall:
+            case ButtonSize.Small:
+              return css`
+                --button-radius: 0.75rem;
+              `;
+            default: {
+              return css`
+                --button-radius: 1rem;
+              `;
+            }
+          }
+        }
+
+        return '';
+      }}
     }
   `,
   [ButtonShape.Square]: css`
@@ -175,7 +190,6 @@ const ButtonStyle = css<StyleProps & { $isSimpleUi?: boolean }>`
   --button-hover-filter: brightness(var(--hover-filter-base));
   --button-hover-textColor: var(--button-textColor);
 
-  --button-radius: 0.5em;
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   --button-cursor: pointer;
@@ -199,7 +213,7 @@ const ButtonStyle = css<StyleProps & { $isSimpleUi?: boolean }>`
 
   background-color: var(--button-backgroundColor);
   border: var(--button-border);
-  border-radius: var(--button-radius);
+  border-radius: var(--button-radius, 0.5em);
 
   color: var(--button-textColor);
   text-align: center;

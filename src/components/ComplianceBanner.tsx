@@ -92,8 +92,6 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     setShowLess((prev) => !prev);
   };
 
-  const canHide = isTablet && action == null;
-
   if (isSimpleUi) {
     return (
       <$AlertMessage
@@ -102,24 +100,22 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         withAccentText
         type={AlertType.Error}
       >
-        {canHide && (
-          <IconButton
-            tw="absolute right-0.25 top-0.25 text-color-text-2"
-            type={ButtonType.Button}
-            onClick={toggleShowLess}
-            iconName={showLess ? IconName.Caret : IconName.Close}
-            buttonStyle={ButtonStyle.WithoutBackground}
-          />
-        )}
-
-        {showLess && canHide ? (
+        {showLess ? (
           stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
         ) : (
-          <>
+          <div tw="flex flex-col gap-0.5">
             {complianceContent}
             {action}
-          </>
+          </div>
         )}
+
+        <IconButton
+          tw="text-color-text-2"
+          type={ButtonType.Button}
+          onClick={toggleShowLess}
+          iconName={showLess ? IconName.Caret : IconName.Close}
+          buttonStyle={ButtonStyle.WithoutBackground}
+        />
       </$AlertMessage>
     );
   }
@@ -127,7 +123,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   return (
     <$ComplianceBanner className={className}>
       <div tw="absolute inset-0 z-[-1] bg-color-gradient-error" />
-      {canHide && (
+      {isTablet && (
         <IconButton
           tw="absolute right-0.25 top-0.25 text-color-text-2"
           type={ButtonType.Button}
@@ -137,7 +133,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         />
       )}
 
-      {showLess && canHide ? (
+      {showLess && isTablet ? (
         stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
       ) : (
         <>
@@ -154,6 +150,7 @@ const $AlertMessage = styled(AlertMessage)`
   max-width: 100%;
   margin: 0.75rem 0.75rem 0 0.75rem;
   font: var(--font-base-book);
+  grid-auto-flow: column;
 `;
 
 const $ComplianceBanner = styled.div`

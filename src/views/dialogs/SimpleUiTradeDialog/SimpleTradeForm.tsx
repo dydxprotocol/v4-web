@@ -7,12 +7,18 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { DisplayUnit, SimpleUiTradeDialogSteps } from '@/constants/trade';
+import {
+  DisplayUnit,
+  QUICK_LIMIT_OPTIONS,
+  QuickLimitOption,
+  SimpleUiTradeDialogSteps,
+} from '@/constants/trade';
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
@@ -36,7 +42,8 @@ import { openDialog } from '@/state/dialogs';
 import { tradeFormActions } from '@/state/tradeForm';
 import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelectors';
 
-import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
+import { track } from '@/lib/analytics/analytics';
+import { AttemptBigNumber, BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { ResponsiveSizeInput } from './ResponsiveSizeInput';
@@ -180,14 +187,12 @@ export const SimpleTradeForm = ({
     <div tw="flexColumn items-center gap-0.25">
       <span tw="font-mini-book">When {displayableAsset} price reaches</span>
       <ResponsiveSizeInput
-        css={{
-          '--input-font': 'var(--font-large-medium)',
-        }}
         inputValue={tradeValues.limitPrice ?? ''}
         inputType={InputType.Number}
         onInput={onLimitPriceInput}
         fractionDigits={tickSizeDecimals}
         displayableAsset={displayableAsset ?? ''}
+        minFontSize={32}
         maxFontSize={32}
         inputUnit={DisplayUnit.Fiat}
       />
@@ -356,6 +361,48 @@ export const SimpleTradeForm = ({
     </Button>
   );
 
+  const onQuickLimitClick = (quickLimit: QuickLimitOption) => {
+    const percentBN = MustBigNumber(quickLimit).div(100);
+
+    const multiplier =
+      tradeValues.side === OrderSide.BUY
+        ? BIG_NUMBERS.ONE.minus(percentBN)
+        : BIG_NUMBERS.ONE.plus(percentBN);
+
+    dispatch(
+      tradeFormActions.setLimitPrice(
+        midPrice?.times(multiplier).toFixed(tickSizeDecimals ?? TOKEN_DECIMALS) ?? ''
+      )
+    );
+
+    track(
+      AnalyticsEvents.TradeQuickLimitOptionClick({
+        quickLimit,
+        side: tradeValues.side,
+        marketId: ticker ?? '',
+      })
+    );
+  };
+
+  const quickLimitSizeButtons = (
+    <div tw="row gap-0.5">
+      {QUICK_LIMIT_OPTIONS.map((quickLimit: QuickLimitOption) => (
+        <Button
+          tw="[--button-backgroundColor:var(--simpleUi-dialog-primaryColor)]"
+          key={quickLimit}
+          type={ButtonType.Button}
+          action={ButtonAction.Base}
+          size={ButtonSize.Small}
+          onClick={() => onQuickLimitClick(quickLimit)}
+        >
+          {quickLimit === '0'
+            ? stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })
+            : `${tradeValues.side === OrderSide.BUY ? '-' : ''}${quickLimit}%`}
+        </Button>
+      ))}
+    </div>
+  );
+
   return (
     <div tw="flexColumn items-center gap-2 px-1.25 pb-[12.5rem] pt-[6.5vh]">
       <div tw="flexColumn w-full items-center gap-0.5">
@@ -369,7 +416,12 @@ export const SimpleTradeForm = ({
         />
         {sizeToggle}
       </div>
-      {tradeValues.type === TradeFormType.LIMIT && limitPriceInput}
+      {tradeValues.type === TradeFormType.LIMIT && (
+        <div tw="flexColumn items-center gap-1">
+          {limitPriceInput}
+          {quickLimitSizeButtons}
+        </div>
+      )}
 
       <div
         tw="flexColumn fixed bottom-0 left-0 right-0 gap-1 px-1.25 py-1.25"

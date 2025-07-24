@@ -181,3 +181,6 @@ export enum SimpleUiTradeDialogSteps {
   Confirm,
   Error,
 }
+
+export const QUICK_LIMIT_OPTIONS = ['1', '2', '5', '10', '0'] as const;
+export type QuickLimitOption = (typeof QUICK_LIMIT_OPTIONS)[number];
