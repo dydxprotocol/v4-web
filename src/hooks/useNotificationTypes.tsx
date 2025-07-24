@@ -34,14 +34,12 @@ import {
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
-import { BlockRewardNotificationRow } from '@/views/Lists/Alerts/BlockRewardNotificationRow';
 import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
 import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNotificationRow';
 import { OrderNotificationRow } from '@/views/Lists/Alerts/OrderNotificationRow';
 import { OrderStatusNotificationRow } from '@/views/Lists/Alerts/OrderStatusNotificationRow';
 import { SkipTransferNotificationRow } from '@/views/Lists/Alerts/SkipTransferNotificationRow';
 // eslint-disable-next-line import/no-cycle
-import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -74,7 +72,7 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
@@ -86,7 +84,6 @@ import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
-import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
 
 export const notificationTypes: NotificationTypeConfig[] = [
@@ -311,56 +308,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
     },
   },
-  {
-    type: NotificationType.BlockTradingReward,
-    useTrigger: ({ trigger, sessionStartTime }) => {
-      const blockTradingRewards = useAppSelector(BonsaiCore.account.blockTradingRewards.data);
-      const stringGetter = useStringGetter();
-      const tokenName = useTokenConfigs().chainTokenLabel;
-      useEffect(() => {
-        blockTradingRewards.forEach((reward) => {
-          const createdAt = new Date(reward.createdAt).getTime();
-          if (createdAt <= sessionStartTime) {
-            return;
-          }
-          const amount = MustBigNumber(reward.tradingReward).toString(10);
-          trigger({
-            id: `blockReward:${reward.createdAtHeight}`,
-            displayData: {
-              title: stringGetter({ key: STRING_KEYS.BLOCK_REWARD_TITLE }),
-              updatedTime: createdAt,
-              body: stringGetter({
-                key: STRING_KEYS.BLOCK_REWARD_BODY,
-                params: {
-                  BLOCK_REWARD_AMOUNT: amount,
-                  TOKEN_NAME: tokenName,
-                },
-              }),
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              toastSensitivity: 'foreground',
-              groupKey: 'blockReward',
-              renderCustomBody: ({ isToast, notification }) => (
-                <BlockRewardNotification
-                  isToast={isToast}
-                  amount={amount}
-                  tokenName={tokenName}
-                  notification={notification}
-                />
-              ),
-              renderSimpleAlert: ({ className, notification }) => (
-                <BlockRewardNotificationRow
-                  className={className}
-                  blockReward={reward}
-                  isUnseen={notification.status <= NotificationStatus.Unseen}
-                />
-              ),
-            },
-            updateKey: [reward.createdAtHeight],
-          });
-        });
-      }, [trigger, blockTradingRewards, stringGetter, tokenName, sessionStartTime]);
-    },
-  },
+
   {
     type: NotificationType.SkipTransfer2,
     useTrigger: ({ trigger }) => {
