@@ -184,6 +184,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       affiliateInputRef.current.focus();
       const valLength = affiliateInputRef.current.value.length;
       affiliateInputRef.current.setSelectionRange(valLength, valLength);
+      affiliateInputRef.current.scrollLeft = affiliateInputRef.current.scrollWidth;
     }
   }, [isEditMode]);
 
