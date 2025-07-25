@@ -59,7 +59,7 @@ import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
-import { turnkeyConfig } from './lib/turnkey';
+import { turnkeyConfig } from './lib/turnkey/turnkey';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';

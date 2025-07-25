@@ -62,6 +62,7 @@ export enum WalletType {
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
   MetaMask = 'METAMASK',
+  Turnkey = 'TURNKEY',
 }
 
 export enum ConnectorType {
@@ -74,6 +75,7 @@ export enum ConnectorType {
   Test = 'test',
   Privy = 'privy',
   PhantomSolana = 'phantomSolana',
+  Turnkey = 'turnkey',
 }
 
 export enum WalletNetworkType {
@@ -153,6 +155,11 @@ export const wallets = {
     type: WalletType.MetaMask,
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
+  },
+  [WalletType.Turnkey]: {
+    type: WalletType.Turnkey,
+    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
+    icon: EmailIcon,
   },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
 

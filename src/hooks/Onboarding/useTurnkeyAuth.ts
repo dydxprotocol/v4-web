@@ -4,7 +4,7 @@ import { logBonsaiError } from '@/bonsai/logs';
 import { useTurnkey } from '@turnkey/sdk-react';
 
 export const useTurnkeyAuth = () => {
-  const { passkeyClient, turnkey, indexedDbClient } = useTurnkey();
+  const { passkeyClient, turnkey, indexedDbClient, authIframeClient } = useTurnkey();
 
   const initEmailAuth = useCallback(
     async ({ targetUserEmail }: { targetUserEmail: string }) => {
@@ -18,7 +18,7 @@ export const useTurnkeyAuth = () => {
           throw new Error('useTurnkeyAuth: Turnkey not initialized');
         }
 
-        await turnkey?.serverSign('emailAuth', [
+        await turnkey.serverSign('emailAuth', [
           {
             email: targetUserEmail,
             targetPublicKey: publicKey,

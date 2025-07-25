@@ -1,6 +1,7 @@
 export const turnkeyConfig = {
   apiBaseUrl: import.meta.env.VITE_TURNKEY_API_BASE_URL,
   defaultOrganizationId: import.meta.env.VITE_PUBLIC_ORGANIZATION_ID,
+  iframeUrl: 'https://auth.turnkey.com',
 };
 
 export const turnkeyAuthConfig = {
