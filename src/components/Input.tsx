@@ -24,10 +24,14 @@ export enum InputType {
   Search = 'Search',
 }
 
+type OverrideProps = {
+  $backgroundColorOverride?: string;
+  $withEllipsis?: boolean;
+};
+
 type StyleProps = {
   className?: string;
-  $backgroundColorOverride?: string;
-};
+} & OverrideProps;
 
 type ElementProps = {
   type?: InputType;
@@ -85,6 +89,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       // TODO: https://linear.app/dydx/issue/OTE-888/simplify-input-component-bg-styles
       // simplify input component styles. backgroundColorOverride has to override styles in too many places
       $backgroundColorOverride: backgroundColorOverride,
+      $withEllipsis: withEllipsis,
       ...otherProps
     },
     ref
@@ -131,6 +136,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {type === InputType.Text || type === InputType.Search ? (
           <$Input
             $backgroundColorOverride={backgroundColorOverride}
+            $withEllipsis={withEllipsis}
             // React
             ref={ref}
             id={id}
@@ -151,6 +157,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         ) : (
           <$NumericFormat
             $backgroundColorOverride={backgroundColorOverride}
+            $withEllipsis={withEllipsis}
             // React
             getInputRef={ref}
             id={id}
@@ -215,7 +222,7 @@ const $InputContainer = styled.div`
 `;
 
 const InputStyle = css`
-  font: var(--input-font, var(--font-base-book));
+  font: var(--input-font), var(--font-base-book);
   outline: none;
   border: none;
   background-color: var(--input-backgroundColor);
@@ -241,7 +248,7 @@ const InputStyle = css`
   }
 `;
 
-const $NumericFormat = styled(NumericFormat)<{ $backgroundColorOverride?: string }>`
+const $NumericFormat = styled(NumericFormat)<OverrideProps>`
   ${InputStyle}
   font-feature-settings: var(--fontFeature-monoNumbers);
   ${({ $backgroundColorOverride }) =>
@@ -249,13 +256,23 @@ const $NumericFormat = styled(NumericFormat)<{ $backgroundColorOverride?: string
     css`
       background-color: ${$backgroundColorOverride};
     `}
+  ${({ $withEllipsis }) =>
+    $withEllipsis &&
+    css`
+      text-overflow: ellipsis;
+    `}
 `;
 
-const $Input = styled.input<{ $backgroundColorOverride?: string }>`
+const $Input = styled.input<OverrideProps>`
   ${InputStyle}
   ${({ $backgroundColorOverride }) =>
     $backgroundColorOverride &&
     css`
       background-color: ${$backgroundColorOverride};
+    `}
+    ${({ $withEllipsis }) =>
+    $withEllipsis &&
+    css`
+      text-overflow: ellipsis;
     `}
 `;

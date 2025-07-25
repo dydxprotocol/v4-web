@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useToBlob } from '@hugocxl/react-to-image';
+import { useMutation } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import {
@@ -8,8 +9,15 @@ import {
   AFFILIATES_REQUIRED_VOLUME_USD,
   DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
 } from '@/constants/affiliates';
+import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonStyle,
+  ButtonType,
+} from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
@@ -19,13 +27,17 @@ import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
+import { Input, InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
 
+import { parseReferralCodeError, updateReferralCode } from '@/lib/affiliates';
 import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -50,15 +62,27 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     affiliateMaxEarningQuery: { data: maxEarningData },
   } = useAffiliatesInfo(dydxAddress);
 
-  useEffect(() => {
-    if (data?.isEligible === undefined) return;
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editableReferralCode, setEditableReferralCode] = useState('');
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-    track(
-      AnalyticsEvents.AffiliateInviteFriendsModalOpened({ isAffiliateEligible: data.isEligible })
-    );
-  }, [data?.isEligible]);
+  const affiliateInputRef = useRef<HTMLInputElement>(null);
 
   const maxEarning = maxEarningData?.maxEarning;
+
+  const { mutate: updateReferralCodeMutate, isPending: isUpdatingReferralCode } = useMutation({
+    mutationFn: (newCode: string) => updateReferralCode(newCode),
+    onSuccess: () => {
+      setIsEditMode(false);
+      setUpdateError(null);
+    },
+    onError: async (error: unknown) => {
+      const errorMessage = await parseReferralCodeError(error);
+      setUpdateError(stringGetter({ key: errorMessage }));
+    },
+  });
 
   const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
@@ -84,6 +108,84 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
   const affiliatesUrl =
     data?.metadata?.referralCode && `${window.location.host}?ref=${data.metadata.referralCode}`;
+  const editableAffiliatesUrl = `${window.location.host}?ref=${editableReferralCode}`;
+
+  const validateReferralCode = (code: string): string | null => {
+    if (code.length < 3) {
+      return stringGetter({
+        key: STRING_KEYS.REFERRAL_CODE_MIN_LENGTH_ERROR,
+        params: {
+          MIN_CHARACTERS: 3,
+        },
+      });
+    }
+    if (code.length > 32) {
+      return stringGetter({
+        key: STRING_KEYS.REFERRAL_CODE_MAX_LENGTH_ERROR,
+        params: {
+          MAX_CHARACTERS: 32,
+        },
+      });
+    }
+    if (!/^[a-zA-Z0-9]*$/.test(code)) {
+      return stringGetter({
+        key: STRING_KEYS.REFERRAL_CODE_INVALID_CHARACTERS_ERROR,
+      });
+    }
+    return null;
+  };
+
+  const handleEdit = () => {
+    setIsEditMode(true);
+    setUpdateError(null);
+  };
+
+  const handleConfirmEdit = async () => {
+    updateReferralCodeMutate(editableReferralCode);
+  };
+
+  const handleCancelEdit = () => {
+    setEditableReferralCode(data?.metadata?.referralCode ?? '');
+    setIsEditMode(false);
+    setUpdateError(null);
+    setValidationError(null);
+  };
+
+  const handleReferralInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    const refMatch = newUrl.match(/\?ref=(.*)$/);
+
+    const newCode = refMatch?.[1] ?? '';
+    const sanitizedCode = newCode.replace(/[^a-zA-Z0-9]/g, '');
+    const error = validateReferralCode(sanitizedCode);
+
+    setUpdateError(null);
+    setEditableReferralCode(sanitizedCode);
+    setValidationError(error);
+  };
+
+  useEffect(() => {
+    if (data?.isEligible === undefined) return;
+
+    track(
+      AnalyticsEvents.AffiliateInviteFriendsModalOpened({ isAffiliateEligible: data.isEligible })
+    );
+  }, [data?.isEligible]);
+
+  useEffect(() => {
+    if (data?.metadata?.referralCode && !hasInitialized) {
+      setEditableReferralCode(data.metadata.referralCode);
+      setHasInitialized(true);
+    }
+  }, [data?.metadata?.referralCode, hasInitialized]);
+
+  useEffect(() => {
+    if (isEditMode && affiliateInputRef.current) {
+      affiliateInputRef.current.focus();
+      const valLength = affiliateInputRef.current.value.length;
+      affiliateInputRef.current.setSelectionRange(valLength, valLength);
+    }
+  }, [isEditMode]);
 
   const dialogDescription = (
     <span>
@@ -108,12 +210,30 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     </span>
   );
 
+  const AlertMessageElement = useCallback(() => {
+    if (isEditMode && validationError) {
+      return <AlertMessage type={AlertType.Error}>{validationError}</AlertMessage>;
+    }
+    if (updateError) {
+      return <AlertMessage type={AlertType.Error}>{updateError}</AlertMessage>;
+    }
+    if (isEditMode) {
+      return (
+        <AlertMessage type={AlertType.Notice}>
+          {stringGetter({ key: STRING_KEYS.REFERRAL_CODE_UPDATE_WARNING })}
+        </AlertMessage>
+      );
+    }
+    return null;
+  }, [isEditMode, stringGetter, updateError, validationError]);
+
   return (
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNLOCK_AFFILIATE_PROGRAM })}
       description={dialogDescription}
+      withAnimation
     >
       {!dydxAddress && (
         <OnboardingTriggerButton
@@ -127,25 +247,65 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       {dydxAddress && !data?.isEligible && <AffiliateProgress volume={data?.totalVolume} />}
       {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
-          <div tw="row justify-between rounded-0.5 bg-color-layer-6 px-1 py-0.5">
-            <div>
-              <div tw="text-small text-color-text-0">
-                {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
+          <div tw="column gap-0.75">
+            <div tw="row gap-1 rounded-0.5 bg-color-layer-6 px-1 py-0.5">
+              <div tw="flex-1">
+                <div tw="text-small text-color-text-0">
+                  {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
+                </div>
+                <Input
+                  ref={affiliateInputRef}
+                  type={InputType.Text}
+                  value={isEditMode ? editableAffiliatesUrl : affiliatesUrl}
+                  onChange={handleReferralInputChange}
+                  disabled={!isEditMode}
+                  $backgroundColorOverride="transparent"
+                  $withEllipsis
+                />
               </div>
-              <div>{affiliatesUrl}</div>
+              {affiliatesUrl && !isEditMode && (
+                <div tw="row">
+                  <IconButton
+                    iconName={IconName.Pencil2}
+                    size={ButtonSize.Small}
+                    onClick={handleEdit}
+                    buttonStyle={ButtonStyle.WithoutBackground}
+                  />
+                  <CopyButton
+                    action={ButtonAction.Primary}
+                    size={ButtonSize.Small}
+                    value={affiliatesUrl}
+                    onCopy={() => {
+                      track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
+                    }}
+                  />
+                </div>
+              )}
+              {isEditMode && (
+                <div tw="row gap-0.5">
+                  <IconButton
+                    iconName={IconName.Close}
+                    size={ButtonSize.Small}
+                    onClick={handleCancelEdit}
+                    action={ButtonAction.SimpleSecondary}
+                    shape={ButtonShape.Square}
+                    state={{ isDisabled: isUpdatingReferralCode }}
+                  />
+                  <IconButton
+                    iconName={IconName.Check}
+                    size={ButtonSize.Small}
+                    onClick={handleConfirmEdit}
+                    action={ButtonAction.Primary}
+                    shape={ButtonShape.Square}
+                    state={{
+                      isLoading: isUpdatingReferralCode,
+                      isDisabled: editableReferralCode.length === 0 || !!validationError,
+                    }}
+                  />
+                </div>
+              )}
             </div>
-            {affiliatesUrl && (
-              <CopyButton
-                action={ButtonAction.Primary}
-                size={ButtonSize.Small}
-                value={affiliatesUrl}
-                onCopy={() => {
-                  track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
-                }}
-              >
-                {stringGetter({ key: STRING_KEYS.COPY_LINK })}
-              </CopyButton>
-            )}
+            <AlertMessageElement />
           </div>
           {affiliatesUrl && (
             <div
