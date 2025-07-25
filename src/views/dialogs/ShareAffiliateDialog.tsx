@@ -37,7 +37,12 @@ import { Input, InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
 
-import { parseReferralCodeError, updateReferralCode } from '@/lib/affiliates';
+import {
+  isValidReferralCodeFormat,
+  parseReferralCodeError,
+  sanitizeReferralCode,
+  updateReferralCode,
+} from '@/lib/affiliates';
 import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';
 
@@ -127,7 +132,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
         },
       });
     }
-    if (!/^[a-zA-Z0-9]*$/.test(code)) {
+    if (!isValidReferralCodeFormat(code)) {
       return stringGetter({
         key: STRING_KEYS.REFERRAL_CODE_INVALID_CHARACTERS_ERROR,
       });
@@ -140,23 +145,23 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     setUpdateError(null);
   };
 
-  const handleConfirmEdit = async () => {
+  const handleConfirmEdit = useCallback(async () => {
     updateReferralCodeMutate(editableReferralCode);
-  };
+  }, [editableReferralCode, updateReferralCodeMutate]);
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setEditableReferralCode(data?.metadata?.referralCode ?? '');
     setIsEditMode(false);
     setUpdateError(null);
     setValidationError(null);
-  };
+  }, [data?.metadata?.referralCode]);
 
   const handleReferralInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
     const refMatch = newUrl.match(/\?ref=(.*)$/);
 
     const newCode = refMatch?.[1] ?? '';
-    const sanitizedCode = newCode.replace(/[^a-zA-Z0-9]/g, '');
+    const sanitizedCode = sanitizeReferralCode(newCode);
     const error = validateReferralCode(sanitizedCode);
 
     setUpdateError(null);
@@ -228,6 +233,65 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     return null;
   }, [isEditMode, stringGetter, updateError, validationError]);
 
+  const ActionButtonsElement = useCallback(() => {
+    if (affiliatesUrl && !isEditMode) {
+      return (
+        <div tw="row gap-0.5">
+          <IconButton
+            iconName={IconName.Pencil2}
+            size={ButtonSize.Small}
+            onClick={handleEdit}
+            buttonStyle={ButtonStyle.WithoutBackground}
+          />
+          <CopyButton
+            action={ButtonAction.Primary}
+            size={ButtonSize.Small}
+            value={affiliatesUrl}
+            onCopy={() => {
+              track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (isEditMode) {
+      return (
+        <div tw="row gap-0.5">
+          <IconButton
+            iconName={IconName.Close}
+            size={ButtonSize.Small}
+            onClick={handleCancelEdit}
+            action={ButtonAction.SimpleSecondary}
+            shape={ButtonShape.Square}
+            state={{ isDisabled: isUpdatingReferralCode }}
+          />
+          <IconButton
+            iconName={IconName.Check}
+            size={ButtonSize.Small}
+            onClick={handleConfirmEdit}
+            action={ButtonAction.Primary}
+            shape={ButtonShape.Square}
+            state={{
+              isLoading: isUpdatingReferralCode,
+              isDisabled: editableReferralCode.length === 0 || !!validationError,
+            }}
+          />
+        </div>
+      );
+    }
+
+    return null;
+  }, [
+    affiliatesUrl,
+    editableReferralCode.length,
+    handleCancelEdit,
+    handleConfirmEdit,
+    isEditMode,
+    isUpdatingReferralCode,
+    validationError,
+  ]);
+
   return (
     <Dialog
       isOpen
@@ -264,47 +328,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                   $withEllipsis
                 />
               </div>
-              {affiliatesUrl && !isEditMode && (
-                <div tw="row">
-                  <IconButton
-                    iconName={IconName.Pencil2}
-                    size={ButtonSize.Small}
-                    onClick={handleEdit}
-                    buttonStyle={ButtonStyle.WithoutBackground}
-                  />
-                  <CopyButton
-                    action={ButtonAction.Primary}
-                    size={ButtonSize.Small}
-                    value={affiliatesUrl}
-                    onCopy={() => {
-                      track(AnalyticsEvents.AffiliateURLCopied({ url: affiliatesUrl }));
-                    }}
-                  />
-                </div>
-              )}
-              {isEditMode && (
-                <div tw="row gap-0.5">
-                  <IconButton
-                    iconName={IconName.Close}
-                    size={ButtonSize.Small}
-                    onClick={handleCancelEdit}
-                    action={ButtonAction.SimpleSecondary}
-                    shape={ButtonShape.Square}
-                    state={{ isDisabled: isUpdatingReferralCode }}
-                  />
-                  <IconButton
-                    iconName={IconName.Check}
-                    size={ButtonSize.Small}
-                    onClick={handleConfirmEdit}
-                    action={ButtonAction.Primary}
-                    shape={ButtonShape.Square}
-                    state={{
-                      isLoading: isUpdatingReferralCode,
-                      isDisabled: editableReferralCode.length === 0 || !!validationError,
-                    }}
-                  />
-                </div>
-              )}
+              <ActionButtonsElement />
             </div>
             <AlertMessageElement />
           </div>
@@ -334,7 +358,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
               />
             </div>
           )}
-
           <div tw="flex gap-1">
             <Button
               action={ButtonAction.Base}

@@ -222,7 +222,7 @@ const $InputContainer = styled.div`
 `;
 
 const InputStyle = css`
-  font: var(--input-font), var(--font-base-book);
+  font: var(--input-font, var(--font-base-book));
   outline: none;
   border: none;
   background-color: var(--input-backgroundColor);

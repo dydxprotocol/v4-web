@@ -1,3 +1,4 @@
+import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
@@ -6,15 +7,24 @@ import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 
+import { track } from './analytics/analytics';
 import { signCompliancePayload } from './compliance';
 import { mapIfPresent } from './do';
 import { isSimpleFetchError, simpleFetch } from './simpleFetch';
 import { removeTrailingSlash } from './stringifyHelpers';
-import { log } from './telemetry';
+import { log, logInfo } from './telemetry';
 
 export enum ReferralAction {
   UPDATE_CODE = 'UPDATE_CODE',
 }
+
+export const sanitizeReferralCode = (code: string): string => {
+  return code.replace(/[^a-zA-Z0-9]/g, '');
+};
+
+export const isValidReferralCodeFormat = (code: string): boolean => {
+  return /^[a-zA-Z0-9]*$/.test(code);
+};
 
 export const updateReferralCode = async (newCode: string) => {
   try {
@@ -70,6 +80,17 @@ export const updateReferralCode = async (newCode: string) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
     });
+
+    logInfo('updateReferralCode', {
+      address,
+      newCode,
+      endpoint,
+      isKeplr,
+      chainId,
+      network,
+    });
+
+    track(AnalyticsEvents.AffiliateReferralCodeUpdated({ newCode }));
   } catch (error) {
     log('updateReferralCode', error);
     throw error;
