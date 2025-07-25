@@ -9,6 +9,7 @@ export type AccountState = {
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
   onboardedThisSession: boolean;
+  displayChooseWallet: boolean;
 };
 
 const initialState: AccountState = {
@@ -24,6 +25,7 @@ const initialState: AccountState = {
   },
   onboardingState: OnboardingState.Disconnected,
   onboardedThisSession: false,
+  displayChooseWallet: false,
 };
 
 export const accountSlice = createSlice({
@@ -48,8 +50,16 @@ export const accountSlice = createSlice({
       ...state,
       onboardedThisSession: action.payload,
     }),
+    setDisplayChooseWallet: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      displayChooseWallet: action.payload,
+    }),
   },
 });
 
-export const { setOnboardingGuard, setOnboardingState, setOnboardedThisSession } =
-  accountSlice.actions;
+export const {
+  setOnboardingGuard,
+  setOnboardingState,
+  setOnboardedThisSession,
+  setDisplayChooseWallet,
+} = accountSlice.actions;

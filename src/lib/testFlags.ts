@@ -63,6 +63,10 @@ class TestFlags {
   get simpleUi() {
     return this.queryParams.simpleui ? this.booleanFlag(this.queryParams.simpleui) : undefined;
   }
+
+  get enableTurnkey() {
+    return this.queryParams.enable_turnkey;
+  }
 }
 
 export const testFlags = new TestFlags();

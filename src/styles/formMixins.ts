@@ -18,7 +18,6 @@ export const formMixins = {
   inputsColumn,
 
   inputContainer: css`
-    --input-radius: 0.5em;
     --input-height: var(--form-input-height);
     --input-width: 100%;
     --input-backgroundColor: ${({ theme }) => theme.inputBackground};
@@ -35,7 +34,7 @@ export const formMixins = {
 
     background-color: var(--input-backgroundColor);
     border: var(--border-width) solid var(--input-borderColor);
-    border-radius: var(--input-radius);
+    border-radius: var(--input-radius, 0.5em);
 
     &:focus-within {
       filter: brightness(var(--hover-filter-base));

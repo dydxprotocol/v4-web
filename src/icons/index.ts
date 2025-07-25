@@ -1,5 +1,6 @@
 // TODO: get rid of this massive barrel file.
 export { default as AddressConnectorIcon } from './address-connector.svg';
+export { default as AppleLightIcon } from './apple.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as BankIcon } from './bank.svg';
 export { default as Bar3Icon } from './bar3.svg';
@@ -113,9 +114,11 @@ export { default as TrophyIcon } from './trophy.svg';
 export { default as TryAgainIcon } from './try-again.svg';
 export { default as ViewfinderIcon } from './viewfinder.svg';
 export { default as VolumeIcon } from './volume.svg';
+export { default as Wallet2Icon } from './wallet2.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
 export { default as XCircleIcon } from './x-circle.svg';
+
 // Wallets
 export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
@@ -136,8 +139,10 @@ export { default as MagicIcon } from './wallets/magic.svg';
 export { default as MathWalletIcon } from './wallets/mathwallet.svg';
 export { default as MetaMaskIcon } from './wallets/metamask.svg';
 export { default as OkxWalletIcon } from './wallets/okx-wallet.svg';
+export { default as PasskeyIcon } from './wallets/passkey.svg';
 export { default as PhantomIcon } from './wallets/phantom.svg';
 export { default as RainbowIcon } from './wallets/rainbow-wallet.svg';
+export { default as SocialLoginIcon } from './wallets/social-login.svg';
 export { default as TestWalletIcon } from './wallets/test-wallet.svg';
 export { default as TokenPocketIcon } from './wallets/tokenpocket.svg';
 export { default as TrustWalletIcon } from './wallets/trust-wallet.svg';

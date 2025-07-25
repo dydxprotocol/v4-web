@@ -261,6 +261,11 @@ export const getAverageFillPriceForOrder = createAppSelector(
 export const getOnboardingState = (state: RootState) => state.account.onboardingState;
 
 /**
+ * @returns whether to display the choose wallet step in the onboarding flow
+ */
+export const getDisplayChooseWallet = (state: RootState) => state.account.displayChooseWallet;
+
+/**
  * @param state
  * @returns whether an account is connected
  */

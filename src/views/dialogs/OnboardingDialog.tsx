@@ -11,6 +11,7 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -28,8 +29,9 @@ import { Ring } from '@/components/Ring';
 import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { setOnboardedThisSession } from '@/state/account';
+import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
+import { getDisplayChooseWallet } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import { testFlags } from '@/lib/testFlags';
@@ -37,6 +39,7 @@ import { testFlags } from '@/lib/testFlags';
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
+import { SignIn } from './OnboardingDialog/SignIn';
 
 export const OnboardingDialog = ({
   setIsOpen: setIsOpenRaw,
@@ -51,9 +54,14 @@ export const OnboardingDialog = ({
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const displayChooseWallet = useAppSelector(getDisplayChooseWallet);
+  const currentOnboardingStep = useAppSelectorWithArgs(
+    calculateOnboardingStep,
+    displayChooseWallet
+  );
 
   const isSimpleUi = useSimpleUiEnabled();
+  const isTurnkeyEnabled = testFlags.enableTurnkey;
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -66,11 +74,31 @@ export const OnboardingDialog = ({
   );
 
   useEffect(() => {
-    if (!currentOnboardingStep) setIsOpen(false);
+    return () => {
+      dispatch(setDisplayChooseWallet(false));
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!currentOnboardingStep) {
+      setIsOpen(false);
+    }
   }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
 
   const setIsOpenFromDialog = (open: boolean) => {
     setIsOpen(open);
+  };
+
+  const onDisplayChooseWallet = () => {
+    dispatch(setDisplayChooseWallet(true));
+  };
+
+  const onSignInWithSocials = () => {
+    dispatch(setDisplayChooseWallet(false));
+  };
+
+  const onSignInWithPasskey = () => {
+    // TODO(turnkey): Implement passkey sign in
   };
 
   const onChooseWallet = (wallet: WalletInfo) => {
@@ -84,14 +112,30 @@ export const OnboardingDialog = ({
     selectWallet(wallet);
   };
 
+  // TODO(turnkey): Localization
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
+          [OnboardingSteps.SignIn]: {
+            title: 'Sign in',
+            description:
+              'To get started, sign in with your social accounts, create a passkey or connect your wallet.',
+            children: (
+              <$Content>
+                <SignIn
+                  onDisplayChooseWallet={onDisplayChooseWallet}
+                  onSignInWithPasskey={onSignInWithPasskey}
+                />
+              </$Content>
+            ),
+          },
           [OnboardingSteps.ChooseWallet]: {
-            title: (
+            title: isTurnkeyEnabled ? (
+              'Sign In'
+            ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
                 <$WithTooltip
@@ -111,14 +155,20 @@ export const OnboardingDialog = ({
                 </$WithTooltip>
               </div>
             ),
-            description: stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
+            description: isTurnkeyEnabled
+              ? 'To get started, sign in with your social accounts, create a passkey or connect your wallet.'
+              : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
             children: (
               <$Content>
-                <ChooseWallet onChooseWallet={onChooseWallet} />
+                <ChooseWallet
+                  onChooseWallet={onChooseWallet}
+                  onSignInWithSocials={onSignInWithSocials}
+                  onSignInWithPasskey={onSignInWithPasskey}
+                />
               </$Content>
             ),
             hasFooterBorder: true,
-            slotFooter: !isSimpleUi && (
+            slotFooter: !isSimpleUi && !isTurnkeyEnabled && (
               <$Footer>
                 <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
                   <h3 tw="text-color-text-2 font-medium-book">

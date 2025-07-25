@@ -12,16 +12,20 @@ import {
 import { createAppSelector } from '@/state/appTypes';
 
 import { isNewOrderStatusOpen } from '@/lib/orders';
+import { testFlags } from '@/lib/testFlags';
 
 import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [getOnboardingState],
-  (onboardingState: OnboardingState) => {
+  [getOnboardingState, (s, displayChooseWallet: boolean = false) => displayChooseWallet],
+  (onboardingState: OnboardingState, displayChooseWallet: boolean) => {
     return {
-      [OnboardingState.Disconnected]: OnboardingSteps.ChooseWallet,
+      [OnboardingState.Disconnected]:
+        displayChooseWallet || !testFlags.enableTurnkey
+          ? OnboardingSteps.ChooseWallet
+          : OnboardingSteps.SignIn,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
       [OnboardingState.AccountConnected]: undefined,
     }[onboardingState];
