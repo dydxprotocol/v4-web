@@ -133,13 +133,32 @@ const Content = () => {
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
               <Routes>
                 <Route path={AppRoute.Markets} element={<SimpleMarketsPage />} />
+
                 <Route path={AppRoute.Trade}>
                   <Route path=":market" element={<SimpleAssetPage />} />
                   <Route path={AppRoute.Trade} element={<SimpleAssetPage />} />
                 </Route>
+
                 <Route path={AppRoute.Alerts} element={<AlertsPage />} />
                 <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
                 <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
+
+                <Route
+                  path={AppRoute.Terms}
+                  element={
+                    <$ScrollableContent>
+                      <TermsOfUsePage />
+                    </$ScrollableContent>
+                  }
+                />
+                <Route
+                  path={AppRoute.Privacy}
+                  element={
+                    <$ScrollableContent>
+                      <PrivacyPolicyPage />
+                    </$ScrollableContent>
+                  }
+                />
                 <Route path="*" element={<Navigate to={AppRoute.Markets} replace />} />
               </Routes>
             </Suspense>
@@ -415,6 +434,11 @@ const $DialogArea = styled.aside`
   inset: 0;
   overflow: clip;
   ${layoutMixins.noPointerEvents}
+`;
+
+const $ScrollableContent = styled.div`
+  height: 100%;
+  overflow: auto;
 `;
 
 export default App;
