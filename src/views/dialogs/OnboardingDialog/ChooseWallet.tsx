@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -5,6 +7,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
+import { useDetectedWalletBrowser } from '@/hooks/Onboarding/useDetectedWalletBrowser';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
@@ -37,8 +40,22 @@ export const ChooseWallet = ({
   const isSimpleUi = useSimpleUiEnabled();
 
   const displayedWallets = useDisplayedWallets();
-
+  const detectedWalletBrowser = useDetectedWalletBrowser();
   const { selectedWallet, selectedWalletError } = useAccounts();
+
+  useEffect(() => {
+    if (detectedWalletBrowser === 'Standard Browser or Unknown' || !isSimpleUi) {
+      return;
+    }
+
+    const walletToConnect = displayedWallets.find((wallet) => {
+      return wallet.connectorType === ConnectorType.Injected;
+    });
+
+    if (walletToConnect) {
+      onChooseWallet(walletToConnect);
+    }
+  }, [detectedWalletBrowser, isSimpleUi, displayedWallets, onChooseWallet]);
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
