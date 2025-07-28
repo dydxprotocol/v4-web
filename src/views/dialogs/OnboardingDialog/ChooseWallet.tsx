@@ -117,6 +117,7 @@ export const ChooseWallet = ({
       )}
 
       <$Wallets isSimpleUi={isSimpleUi}>
+        <span>{detectedWalletBrowser}</span>
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
@@ -130,6 +131,7 @@ export const ChooseWallet = ({
                 ? wallet.name
                 : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
             </$WalletName>
+            <span>{wallet.connectorType}</span>
           </$WalletButton>
         ))}
       </$Wallets>
