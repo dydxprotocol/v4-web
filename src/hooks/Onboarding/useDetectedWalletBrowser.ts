@@ -1,35 +1,41 @@
 import { useEffect, useState } from 'react';
 
-type WalletBrowser =
-  | 'MetaMask In-App Browser'
-  | 'Trust Wallet In-App Browser'
-  | 'Coinbase Wallet In-App Browser'
-  | 'Rainbow Wallet In-App Browser'
-  | 'imToken In-App Browser'
-  | 'Standard Browser or Unknown';
+export enum WalletBrowser {
+  Metamask,
+  Trust,
+  Coinbase,
+  Rainbow,
+  imToken,
+  Standard,
+}
 
-export function useDetectedWalletBrowser(): WalletBrowser {
-  const [detectedBrowser, setDetectedBrowser] = useState<WalletBrowser>(
-    'Standard Browser or Unknown'
-  );
-
+export function useDetectedWalletBrowser(): {
+  detectedBrowser: WalletBrowser;
+  userAgent?: string;
+} {
+  const [detectedBrowser, setDetectedBrowser] = useState<WalletBrowser>(WalletBrowser.Standard);
+  const [userAgent, setUserAgent] = useState<string>();
   useEffect(() => {
     const ua = navigator.userAgent;
 
     const browser = /MetaMask/i.test(ua)
-      ? 'MetaMask In-App Browser'
+      ? WalletBrowser.Metamask
       : /Trust/i.test(ua)
-        ? 'Trust Wallet In-App Browser'
+        ? WalletBrowser.Trust
         : /CoinbaseWallet|Coinbase/i.test(ua)
-          ? 'Coinbase Wallet In-App Browser'
+          ? WalletBrowser.Coinbase
           : /Rainbow/i.test(ua)
-            ? 'Rainbow Wallet In-App Browser'
+            ? WalletBrowser.Rainbow
             : /imToken/i.test(ua)
-              ? 'imToken In-App Browser'
-              : 'Standard Browser or Unknown';
+              ? WalletBrowser.imToken
+              : WalletBrowser.Standard;
 
+    setUserAgent(ua);
     setDetectedBrowser(browser);
   }, []);
 
-  return detectedBrowser;
+  return {
+    detectedBrowser,
+    userAgent,
+  };
 }
