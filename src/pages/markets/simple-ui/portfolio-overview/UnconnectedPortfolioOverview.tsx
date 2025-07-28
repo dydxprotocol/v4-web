@@ -16,12 +16,13 @@ export const UnconnectedPortfolioOverview = ({ className }: { className?: string
   const chartDotBackground = useAppSelector(getChartDotBackground);
   const { openOnboardingDialog, isOnboardingDisabled, onboardingState } = useOnboardingFlow();
 
-  const buttonContent =
-    onboardingState === OnboardingState.Disconnected ? (
-      <>{stringGetter({ key: STRING_KEYS.GET_STARTED })} →</>
-    ) : (
-      <>{stringGetter({ key: STRING_KEYS.RECOVER_KEYS })}</>
-    );
+  const buttonContent = isOnboardingDisabled ? (
+    <>{stringGetter({ key: STRING_KEYS.UNAVAILABLE })}</>
+  ) : onboardingState === OnboardingState.Disconnected ? (
+    <>{stringGetter({ key: STRING_KEYS.GET_STARTED })} →</>
+  ) : (
+    <>{stringGetter({ key: STRING_KEYS.RECOVER_KEYS })}</>
+  );
 
   return (
     <div
@@ -41,6 +42,11 @@ export const UnconnectedPortfolioOverview = ({ className }: { className?: string
 
         <Button
           tw="mt-1 w-full"
+          css={{
+            '--button-border': isOnboardingDisabled
+              ? 'solid var(--border-width, var(--default-border-width)) var(--color-border)'
+              : 'none',
+          }}
           shape={ButtonShape.Pill}
           onClick={openOnboardingDialog}
           state={{ isDisabled: isOnboardingDisabled }}

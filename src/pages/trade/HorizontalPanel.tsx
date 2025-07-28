@@ -17,6 +17,10 @@ import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
+import {
+  FundingPaymentsTable,
+  FundingPaymentsTableColumnKey,
+} from '@/pages/funding/FundingPaymentsTable';
 import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
@@ -343,9 +347,43 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     ]
   );
 
+  const paymentsTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Payments,
+      label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS }),
+
+      content: (
+        <FundingPaymentsTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          shortRows
+          columnKeys={
+            isTablet
+              ? [
+                  FundingPaymentsTableColumnKey.Time,
+                  FundingPaymentsTableColumnKey.Payment,
+                  FundingPaymentsTableColumnKey.Rate,
+                ]
+              : [
+                  !showCurrentMarket && FundingPaymentsTableColumnKey.Market,
+                  FundingPaymentsTableColumnKey.Time,
+                  FundingPaymentsTableColumnKey.Side,
+                  FundingPaymentsTableColumnKey.OraclePrice,
+                  FundingPaymentsTableColumnKey.Size,
+                  FundingPaymentsTableColumnKey.Payment,
+                  FundingPaymentsTableColumnKey.Rate,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [stringGetter, showCurrentMarket, isTablet, initialPageSize, currentMarketId]
+  );
+
   const tabItems = useMemo(
-    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem]
   );
 
   const slotBottom = {

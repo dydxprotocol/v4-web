@@ -106,7 +106,7 @@ export const TradeForm = ({
   });
 
   const onTradeTypeChange = (tradeType: TradeFormType) => {
-    dispatch(tradeFormActions.reset());
+    dispatch(tradeFormActions.resetPrimaryInputs());
     dispatch(tradeFormActions.setOrderType(tradeType));
   };
 
@@ -146,7 +146,7 @@ export const TradeForm = ({
       default: {
         placeOrder({
           onPlaceOrder: () => {
-            dispatch(tradeFormActions.reset());
+            dispatch(tradeFormActions.resetPrimaryInputs());
           },
         });
         setCurrentStep?.(MobilePlaceOrderSteps.PlacingOrder);
@@ -206,7 +206,7 @@ export const TradeForm = ({
       currentStep={currentStep}
       hasInput={isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder)}
       hasValidationErrors={hasValidationErrors}
-      onClearInputs={() => dispatch(tradeFormActions.reset())}
+      onClearInputs={() => dispatch(tradeFormActions.resetPrimaryInputs())}
       shouldEnableTrade={shouldEnableTrade}
       showDeposit={false}
       tradingUnavailable={tradingUnavailable}

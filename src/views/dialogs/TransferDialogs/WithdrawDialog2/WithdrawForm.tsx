@@ -79,8 +79,7 @@ export const WithdrawForm = ({
     equity: updatedEquity,
   } = orEmptyObj(useWithdrawalDeltas({ withdrawAmount: debouncedAmount }));
 
-  // @ts-expect-error SDK doesn't know about .goFastTransfer
-  const hasGoFastRoute = routes?.fast.operations.find((op) => op.goFastTransfer);
+  const hasGoFastRoute = routes?.fast?.operations.find((op) => (op as any).goFastTransfer);
 
   useEffect(() => {
     if (debouncedAmount && !isFetching && !hasGoFastRoute) setSelectedSpeed('slow');

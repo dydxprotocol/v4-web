@@ -118,6 +118,35 @@ const buttonActionVariants = {
     `,
   },
 
+  [ButtonAction.SimplePrimary]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-2);
+      --button-backgroundColor: var(--color-accent);
+      --button-border: none;
+      --button-hover-filter: none;
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-text-2);
+      --button-backgroundColor: transparent;
+      --button-border: solid var(--border-width, var(--default-border-width)) var(--color-accent);
+      --button-hover-filter: none;
+    `,
+  },
+
+  [ButtonAction.SimpleSecondary]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-text-2);
+      --button-backgroundColor: var(--color-layer-4);
+      --button-border: none;
+      --button-hover-filter: none;
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-text-2);
+      --button-backgroundColor: transparent;
+      --button-border: solid var(--border-width, var(--default-border-width)) var(--color-layer-4);
+      --button-hover-filter: none;
+    `,
+  },
   [ButtonAction.Secondary]: {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-1);
@@ -197,6 +226,15 @@ const getDisabledStateForButtonAction = (action?: ButtonAction, buttonStyle?: Bu
   if (action === ButtonAction.Navigation || buttonStyle === ButtonStyle.WithoutBackground) {
     return css`
       --button-textColor: var(--color-text-0);
+      --button-hover-filter: none;
+      --button-cursor: not-allowed;
+    `;
+  }
+  if (action === ButtonAction.SimplePrimary || action === ButtonAction.SimpleSecondary) {
+    return css`
+      --button-textColor: var(--color-text-0);
+      --button-backgroundColor: var(--color-layer-2);
+      --button-border: solid var(--border-width) var(--color-border);
       --button-hover-filter: none;
       --button-cursor: not-allowed;
     `;

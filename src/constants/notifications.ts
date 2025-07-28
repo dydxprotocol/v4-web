@@ -9,6 +9,7 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  AffiliatesAlert = 'AffiliatesAlert',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
   MarketUpdate = 'MarketUpdate',
@@ -17,7 +18,7 @@ export enum NotificationType {
   FeedbackRequest = 'FeedbackRequest',
   PredictionMarketConcluded = 'PredictionMarketConcluded',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
-  BlockTradingReward = 'BlockTradingReward',
+  BlockTradingReward = 'BlockTradingReward', // deprecated
   FillWithNoOrder = 'FillWithNoOrder',
   Order = 'Order',
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
@@ -36,10 +37,11 @@ export const NotificationTypeCategory: {
   [key in NotificationType]: NotificationCategoryPreferences;
 } = {
   [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
+  [NotificationType.AffiliatesAlert]: NotificationCategoryPreferences.General,
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
-  [NotificationType.BlockTradingReward]: NotificationCategoryPreferences.Trading,
+  [NotificationType.BlockTradingReward]: NotificationCategoryPreferences.Trading, // deprecated
   [NotificationType.FillWithNoOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.Order]: NotificationCategoryPreferences.Trading,
   [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
@@ -61,7 +63,6 @@ export const SingleSessionNotificationTypes = [
   NotificationType.OrderStatus,
   NotificationType.Custom,
   NotificationType.CosmosWalletLifecycle,
-  NotificationType.BlockTradingReward,
 ];
 
 export type NotificationId = string | number;

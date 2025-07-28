@@ -11,12 +11,12 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
@@ -35,7 +35,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
-import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -49,8 +48,7 @@ type ElementProps = {
 export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
-  const { isTablet } = useBreakpoints();
-  const isSimpleUi = isTablet && testFlags.simpleUi;
+  const isSimpleUi = useSimpleUiEnabled();
 
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
@@ -206,7 +204,8 @@ export const TriggersForm = ({ positionUniqueId, onViewOrdersClick }: ElementPro
             {stringGetter({ key: STRING_KEYS.TRIGGERS_INFO_CUSTOM_AMOUNT })}
           </div>
           <Button
-            action={ButtonAction.Primary}
+            action={isSimpleUi ? ButtonAction.SimplePrimary : ButtonAction.Primary}
+            size={isSimpleUi ? ButtonSize.Large : ButtonSize.Base}
             type={ButtonType.Submit}
             state={{ isDisabled: hasErrors || isAccountViewOnly }}
             slotLeft={

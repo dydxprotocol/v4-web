@@ -10,7 +10,7 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MIN_DEPOSIT_AMOUNT, NumberSign } from '@/constants/numbers';
-import { SKIP_GO_FAST_TRANSFER_LIMIT, SKIP_GO_FAST_TRANSFER_MIN } from '@/constants/skip';
+import { SKIP_GO_FAST_TRANSFER_LIMIT, SKIP_GO_FAST_TRANSFER_MIN_MAP } from '@/constants/skip';
 import { ColorToken } from '@/constants/styles/base';
 import { TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -92,10 +92,12 @@ export const DepositForm = ({
   });
 
   const depositRoute = !isPlaceholderData ? selectedRoute : undefined;
+  const skipGoFastTransferMin = SKIP_GO_FAST_TRANSFER_MIN_MAP[token.chainId];
 
   const isBelowInstantDepositMin =
+    skipGoFastTransferMin != null &&
     depositRoute?.usdAmountIn &&
-    MustBigNumber(depositRoute.usdAmountIn).lt(SKIP_GO_FAST_TRANSFER_MIN);
+    MustBigNumber(depositRoute.usdAmountIn).lt(skipGoFastTransferMin);
 
   const isAboveInstantDepositMax =
     depositRoute?.usdAmountIn &&
@@ -313,8 +315,7 @@ export const DepositForm = ({
     }
   };
 
-  // @ts-expect-error goFastTransfer not typed on RouteOperation
-  const isGoFastRoute = depositRoute?.operations.find((op) => Boolean(op.goFastTransfer));
+  const isGoFastRoute = depositRoute?.operations.find((op) => Boolean((op as any).goFastTransfer));
   const routeSpeed = depositRoute?.estimatedRouteDurationSeconds;
   const routeDuration = Date.now() + (routeSpeed ?? 0) * 1000;
   const { timeString, unitStringKey } = getStringsForDateTimeDiff(
@@ -405,7 +406,7 @@ export const DepositForm = ({
     if (isBelowInstantDepositMin) {
       return stringGetter({
         key: STRING_KEYS.FREE_INSTANT_DEPOSIT_MIN,
-        params: { MIN_AMOUNT: SKIP_GO_FAST_TRANSFER_MIN },
+        params: { MIN_AMOUNT: skipGoFastTransferMin },
       });
     }
     if (isAboveInstantDepositMax) {

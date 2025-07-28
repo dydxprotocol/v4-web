@@ -35,7 +35,9 @@ export const AssetHeader = ({ isLaunchableMarket }: { isLaunchableMarket?: boole
       return {
         marketCap: launchableAsset?.marketCap ?? launchableAsset?.reportedMarketCap,
         displayableAsset: getDisplayableAssetFromBaseAsset(launchableAsset?.assetId),
-        percentChange24h: launchableAsset?.percentChange24h,
+        percentChange24h: launchableAsset?.percentChange24h
+          ? MustBigNumber(launchableAsset.percentChange24h).div(100).toNumber()
+          : undefined,
         logo: launchableAsset?.logo,
       };
     }
@@ -55,7 +57,7 @@ export const AssetHeader = ({ isLaunchableMarket }: { isLaunchableMarket?: boole
   );
 
   return (
-    <div tw="inlineRow fixed left-0 right-0 top-0 h-[4rem] justify-between gap-[1ch] bg-color-layer-2 pl-0.5 pr-1.25">
+    <div tw="inlineRow justify-between gap-[1ch] bg-color-layer-2 p-[1.25rem_1.25rem_0.5rem_0.5rem]">
       <div tw="inlineRow">
         <BackButton tw="text-color-text-0" onClick={() => navigate(AppRoute.Markets)} />
         <AssetIcon

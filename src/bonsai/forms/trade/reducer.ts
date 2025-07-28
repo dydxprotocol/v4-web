@@ -268,5 +268,11 @@ export const tradeFormReducer = createVanillaReducer({
       const size = state.size;
       return { ...getMinimumRequiredFields(state.type, state.marketId), size };
     },
+
+    // reset but maintain the stuff above the main form (market, type, side, margin mode)
+    resetPrimaryInputs: (state) => {
+      const { marginMode, side } = state;
+      return { ...getMinimumRequiredFields(state.type, state.marketId), marginMode, side };
+    },
   },
 });

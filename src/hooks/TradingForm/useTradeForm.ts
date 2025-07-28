@@ -123,7 +123,7 @@ export const useTradeForm = ({
         isSimpleUi: source === TradeFormSource.SimpleTradeForm,
       })
     );
-    dispatch(tradeFormActions.reset());
+    dispatch(tradeFormActions.resetPrimaryInputs());
     logBonsaiInfo(
       source,
       source === TradeFormSource.ClosePositionForm

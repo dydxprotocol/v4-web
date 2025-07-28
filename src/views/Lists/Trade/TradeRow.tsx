@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountFill, SubaccountFillType } from '@/bonsai/types/summaryTypes';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
@@ -14,6 +16,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+
+import { openDialog } from '@/state/dialogs';
 
 import { getAssetFromMarketId } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
@@ -36,6 +40,7 @@ export const TradeRow = ({
   slotRight?: React.ReactNode;
   timestamp?: number;
 }) => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { market, side, price, type, size, createdAt } = fill;
   const marketData = useAppSelectorWithArgs(BonsaiHelpers.markets.selectMarketSummaryById, market);
@@ -107,8 +112,16 @@ export const TradeRow = ({
     </>
   );
 
+  const openFillDialog = () => {
+    if (fill.id == null) {
+      return;
+    }
+
+    dispatch(openDialog(DialogTypes.FillDetails({ fillId: fill.id })));
+  };
+
   return (
-    <$TradeRow className={className}>
+    <$TradeRow className={className} onClick={openFillDialog}>
       <div tw="row min-w-0 flex-grow-0 gap-0.5">
         <div tw="relative">
           <AssetIcon logoUrl={logo} tw="size-2 min-w-2" />

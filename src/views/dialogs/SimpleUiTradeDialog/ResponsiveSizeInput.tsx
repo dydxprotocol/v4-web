@@ -14,7 +14,6 @@ export const ResponsiveSizeInput = ({
   onInput,
   displayableAsset,
   fractionDigits = USD_DECIMALS,
-  withResponsiveWidth = true,
   maxFontSize = 52,
   minFontSize = 32,
   inputUnit = DisplayUnit.Fiat,
@@ -34,7 +33,6 @@ export const ResponsiveSizeInput = ({
   }) => void;
   displayableAsset: string;
   fractionDigits?: number;
-  withResponsiveWidth?: boolean;
   minFontSize?: number;
   maxFontSize?: number;
   inputUnit?: DisplayUnit;
@@ -90,13 +88,13 @@ export const ResponsiveSizeInput = ({
       inputRef.current.style.width = `${finalWidth}px`;
       inputRef.current.style.fontSize = `${newFontSize}px`;
     }
-  }, [inputValue, windowWidth, withResponsiveWidth, maxFontSize, minFontSize, placeholder]);
+  }, [inputValue, windowWidth, maxFontSize, minFontSize, placeholder]);
 
   return (
     <div tw="row mx-auto items-start justify-center">
       {inputUnit === DisplayUnit.Fiat && (
         <span
-          tw="ml-auto text-color-text-0 font-large-book"
+          tw="ml-auto mr-0.25 text-color-text-0 font-large-book"
           css={{ fontSize: `${Math.max(fontSize * 0.5, 18)}px` }}
         >
           $
@@ -117,7 +115,7 @@ export const ResponsiveSizeInput = ({
       />
       {inputUnit === DisplayUnit.Asset && (
         <span
-          tw="mr-auto text-color-text-0 font-large-book"
+          tw="ml-0.5 mr-auto text-color-text-0 font-large-book"
           css={{ fontSize: `${Math.max(fontSize * 0.5, 18)}px` }}
         >
           {displayableAsset}

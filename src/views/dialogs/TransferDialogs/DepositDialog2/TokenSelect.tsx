@@ -2,8 +2,7 @@ import { Dispatch, SetStateAction, useMemo } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { partition } from 'lodash';
-import styled from 'styled-components';
-import tw from 'twin.macro';
+import styled, { css } from 'styled-components';
 import { parseUnits } from 'viem';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -204,8 +203,22 @@ const TokenRow = ({
 };
 
 const $TokenRowButton = styled.button.attrs({ type: 'button' })<{ isSelected?: boolean }>`
-  ${tw`flex w-full justify-between px-1.25 py-1 hover:bg-color-layer-4`}
-  ${({ isSelected }) => isSelected && tw`bg-color-layer-4`}
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+
+  &:hover {
+    background-color: var(--token-row-active-bgColor, var(--color-layer-4));
+    --asset-icon-chain-icon-borderColor: var(--token-row-active-bgColor, var(--color-layer-4));
+  }
+
+  ${({ isSelected }) =>
+    isSelected &&
+    css`
+      background-color: var(--token-row-active-bgColor, var(--color-layer-4));
+      --asset-icon-chain-icon-borderColor: var(--token-row-active-bgColor, var(--color-layer-4));
+    `}
 `;
 
 const $CaretIcon = styled(Icon)`

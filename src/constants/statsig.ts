@@ -1,3 +1,7 @@
+import { getLocalStorage } from '@/lib/localStorage';
+
+import { LocalStorageKey } from './localStorage';
+
 export type StatsigConfigType = Record<StatsigFlags, boolean>;
 
 export enum StatsigFlags {
@@ -10,9 +14,29 @@ export enum StatsigFlags {
   ffDepositRewrite = 'ff_deposit_rewrite',
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
 
-  abDefaultToMarkets = 'ab_default_to_markets',
   abPopupDeposit = 'ab_popup_deposit',
 }
+
+export enum CustomFlags {
+  abDefaultToMarkets = 'ab_default_to_markets',
+  abSimpleUi = 'ab_simple_ui',
+}
+
+// we only use these for flags that MUST be available before statsig can complete loading
+// WARNING: if you roll at a low probability, it will remember the value forever
+// best practice is never change the flag rates
+export const CUSTOM_FLAG_ROLLED_VALUES: Record<CustomFlags, boolean | undefined> = getLocalStorage({
+  key: LocalStorageKey.CustomFlags,
+  defaultValue: {
+    ab_default_to_markets: undefined,
+    ab_simple_ui: undefined,
+  },
+});
+
+export const CUSTOM_FLAG_RATES: Record<CustomFlags, number> = {
+  ab_default_to_markets: 0.5,
+  ab_simple_ui: 0.5,
+};
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;
 

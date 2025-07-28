@@ -188,4 +188,6 @@ const $Dialog = styled(Dialog)`
   --dialog-content-paddingRight: 0;
   --dialog-content-paddingBottom: 0;
   --dialog-content-paddingLeft: 0;
+
+  --asset-icon-chain-icon-borderColor: var(--dialog-backgroundColor);
 `;

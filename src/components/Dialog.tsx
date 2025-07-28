@@ -16,14 +16,13 @@ import tw from 'twin.macro';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
 import { Icon, IconName } from '@/components/Icon';
-
-import { testFlags } from '@/lib/testFlags';
 
 export enum DialogPlacement {
   Default = 'Default',
@@ -106,6 +105,7 @@ export const Dialog = ({
 }: DialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const isSimpleUi = useSimpleUiEnabled();
 
   const { height = 0 } = useResizeObserver({
     ref,
@@ -116,7 +116,7 @@ export const Dialog = ({
     <Root modal={withOverlay} open={isOpen} onOpenChange={setIsOpen}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <DialogPortal withPortal={placement !== DialogPlacement.Inline} container={portalContainer}>
-        {withOverlay && <$Overlay />}
+        {withOverlay && <$Overlay $isSimpleUi={isSimpleUi} />}
         <$Container
           placement={placement}
           className={className}
@@ -129,6 +129,7 @@ export const Dialog = ({
             }
           }}
           $height={height}
+          $isSimpleUi={isSimpleUi}
           $stacked={stacked}
           $withAnimation={withAnimation}
         >
@@ -148,7 +149,7 @@ export const Dialog = ({
 
                 {title && <$Title>{title}</$Title>}
 
-                {description && <$Description>{description}</$Description>}
+                {description && <$Description $isSimpleUi={isSimpleUi}>{description}</$Description>}
 
                 {slotHeaderInner}
               </$StackedHeaderTopRow>
@@ -196,7 +197,7 @@ export const Dialog = ({
     </Root>
   );
 };
-const $Overlay = styled(Overlay)`
+const $Overlay = styled(Overlay)<{ $isSimpleUi?: boolean }>`
   z-index: 1;
 
   position: fixed;
@@ -205,7 +206,8 @@ const $Overlay = styled(Overlay)`
   pointer-events: none !important;
 
   @media ${breakpoints.tablet} {
-    pointer-events: ${testFlags.simpleUi ? 'initial !important' : 'none !important'};
+    pointer-events: ${({ $isSimpleUi }) =>
+      $isSimpleUi ? 'initial !important' : 'none !important'};
   }
 
   -webkit-backdrop-filter: brightness(var(--overlay-filter));
@@ -215,6 +217,7 @@ const $Overlay = styled(Overlay)`
 const $Container = styled(Content)<{
   placement: DialogPlacement;
   $height?: number;
+  $isSimpleUi?: boolean;
   $stacked?: boolean;
   $withAnimation?: boolean;
 }>`
@@ -248,15 +251,16 @@ const $Container = styled(Content)<{
   --dialog-icon-size: 1.75em;
 
   @media ${breakpoints.tablet} {
-    ${testFlags.simpleUi &&
-    css`
-      --dialog-inset: 2px;
-      --dialog-backgroundColor: var(--color-layer-1);
-      --dialog-header-backgroundColor: var(--color-layer-1);
-      --dialog-paddingX: 1.25rem;
-      --dialog-header-paddingTop: 1.25rem;
-      --dialog-header-paddingBottom: 1.25rem;
-    `}
+    ${({ $isSimpleUi }) =>
+      $isSimpleUi &&
+      css`
+        --dialog-inset: 2px;
+        --dialog-backgroundColor: var(--color-layer-1);
+        --dialog-header-backgroundColor: var(--color-layer-1);
+        --dialog-paddingX: 1.25rem;
+        --dialog-header-paddingTop: 1.25rem;
+        --dialog-header-paddingBottom: 1.25rem;
+      `}
   }
 
   /* Calculated */
@@ -449,7 +453,7 @@ const $Close = styled(Close)<{ $absolute?: boolean }>`
   border-radius: 0.25rem;
   z-index: 1;
 
-  color: var(--color-text-0);
+  color: var(--dialog-header-close-color, var(--color-text-0));
 
   > svg {
     height: 100%;
@@ -486,14 +490,15 @@ const $BackButton = styled(BackButton)`
 
 const $Title = tw(Title)`flex-1 font-large-medium text-color-text-2 overflow-hidden text-ellipsis`;
 
-const $Description = styled(Description)`
+const $Description = styled(Description)<{ $isSimpleUi?: boolean }>`
   ${tw`mt-0.5 text-color-text-0 font-base-book`}
 
   @media ${breakpoints.tablet} {
-    ${testFlags.simpleUi &&
-    css`
-      font: var(--font-small-book);
-    `}
+    ${({ $isSimpleUi }) =>
+      $isSimpleUi &&
+      css`
+        font: var(--font-small-book);
+      `}
   }
 `;
 

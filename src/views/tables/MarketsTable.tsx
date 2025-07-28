@@ -233,7 +233,10 @@ export const MarketsTable = forwardRef(
                 getCellValue: (row) => row.marketCap,
                 label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
                 renderCell: (row) => (
-                  <$NumberOutput type={OutputType.CompactFiat} value={row.marketCap} />
+                  <$NumberOutput
+                    type={OutputType.CompactFiat}
+                    value={row.marketCap === 0 ? undefined : row.marketCap}
+                  />
                 ),
               },
               {

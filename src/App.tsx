@@ -5,7 +5,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { css, StyleSheetManager, WebTarget } from 'styled-components';
 
@@ -19,7 +19,7 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
-import { StatsigProvider, useStatsigGateValue } from '@/hooks/useStatsig';
+import { StatsigProvider, useCustomFlagValue, useStatsigGateValue } from '@/hooks/useStatsig';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import '@/styles/constants.css';
@@ -40,10 +40,11 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { BonsaiCore } from './bonsai/ontology';
+import { ComplianceBanner } from './components/ComplianceBanner';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
-import { StatsigFlags } from './constants/statsig';
+import { CustomFlags, StatsigFlags } from './constants/statsig';
 import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
@@ -53,10 +54,10 @@ import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
+import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { isTruthy } from './lib/isTruthy';
-import { testFlags } from './lib/testFlags';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
@@ -65,6 +66,7 @@ import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
+import { getIsUserMenuOpen } from './state/dialogsSelectors';
 import breakpoints from './styles/breakpoints';
 
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -97,10 +99,10 @@ const Content = () => {
   const location = useLocation();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-  const isSimpleUi = testFlags.simpleUi && isTablet;
-  const abDefaultToMarkets = useStatsigGateValue(StatsigFlags.abDefaultToMarkets);
-
-  const { showRestrictionWarning } = useComplianceState();
+  const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
+  const isSimpleUi = useSimpleUiEnabled();
+  const { showComplianceBanner } = useComplianceState();
+  const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -112,10 +114,21 @@ const Content = () => {
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   if (isSimpleUi) {
+    const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
+    const backgroundColor =
+      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-1)' : 'transparent';
+
     return (
       <>
         <GlobalStyle />
-        <$SimpleUiGrid>
+        <$SimpleUiContainer
+          showRestrictionBanner={showComplianceBanner}
+          css={{
+            backgroundColor,
+          }}
+        >
+          <ComplianceBanner tw="h-fit min-h-0" />
+
           <$SimpleUiMain>
             <Suspense fallback={<LoadingSpace id="main" tw="h-full w-full" />}>
               <Routes>
@@ -135,7 +148,7 @@ const Content = () => {
           <$DialogArea ref={dialogAreaRef}>
             <DialogManager />
           </$DialogArea>
-        </$SimpleUiGrid>
+        </$SimpleUiContainer>
       </>
     );
   }
@@ -146,10 +159,10 @@ const Content = () => {
       <$Content
         isShowingHeader={isShowingHeader}
         isShowingFooter={isShowingFooter}
-        showRestrictionWarning={showRestrictionWarning}
+        showRestrictionWarning={showComplianceBanner}
       >
         {isShowingHeader && <HeaderDesktop />}
-        {showRestrictionWarning && <RestrictionWarning />}
+        <RestrictionWarning />
         <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
@@ -381,18 +394,18 @@ const $Main = styled.main`
   position: relative;
 `;
 
-const $SimpleUiGrid = styled.div`
-  display: grid;
-  grid-template-areas: 'Main';
-  grid-template-columns: 100vw;
-  grid-template-rows: 100vh;
+const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 `;
 
 const $SimpleUiMain = styled.main`
-  grid-area: Main;
   box-shadow: none;
-  isolation: isolate;
   position: relative;
+  min-height: 0;
+  flex: 1;
 `;
 
 const $DialogArea = styled.aside`

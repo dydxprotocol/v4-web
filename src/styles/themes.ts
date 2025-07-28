@@ -51,6 +51,10 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
   negative: ColorToken.Red2,
   positiveDark: ColorToken.Green6,
   negativeDark: ColorToken.Red4,
+  positive20: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity20),
+  negative20: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity20),
+  positive50: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity50),
+  negative50: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity50),
   positiveFaded: generateFadedColorVariant(ColorToken.Green3, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
@@ -119,6 +123,10 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
   negative: ColorToken.Red0,
   positiveDark: ColorToken.Green6,
   negativeDark: ColorToken.Red3,
+  positive20: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity20),
+  negative20: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity20),
+  positive50: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity50),
+  negative50: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity50),
   positiveFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
 
@@ -187,6 +195,10 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   negative: ColorToken.Red1,
   positiveDark: ColorToken.Green0,
   negativeDark: ColorToken.Red5,
+  positive20: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity20),
+  negative20: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity20),
+  positive50: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity50),
+  negative50: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity50),
   positiveFaded: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 

@@ -1,21 +1,19 @@
 import { useEffect, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { ComplianceStatus, OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
+import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
-import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
   CosmosWalletNotificationTypes,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   FeedbackRequestNotificationIds,
-  NotificationDisplayData,
   NotificationStatus,
   NotificationType,
   type NotificationTypeConfig,
@@ -23,27 +21,25 @@ import {
 import { USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { StatsigDynamicConfigs } from '@/constants/statsig';
-import {
-  BOOSTED_MARKETS,
-  BOOSTED_MARKETS_EXPIRATION,
-  CURRENT_REWARDS_SEASON,
-} from '@/constants/surgeRewards';
 import { timeUnits } from '@/constants/time';
 import { PlaceOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
 
+import {
+  CURRENT_REWARDS_SEASON,
+  CURRENT_REWARDS_SEASON_EXPIRATION,
+  useBoostedMarketIds,
+} from '@/hooks/surgeRewards';
+
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-// eslint-disable-next-line import/no-cycle
-import { Notification } from '@/components/Notification';
 import { formatNumberOutput, Output, OutputType } from '@/components/Output';
-import { BlockRewardNotificationRow } from '@/views/Lists/Alerts/BlockRewardNotificationRow';
 import { FillWithNoOrderNotificationRow } from '@/views/Lists/Alerts/FillWithNoOrderNotificationRow';
 import { OrderCancelNotificationRow } from '@/views/Lists/Alerts/OrderCancelNotificationRow';
 import { OrderNotificationRow } from '@/views/Lists/Alerts/OrderNotificationRow';
 import { OrderStatusNotificationRow } from '@/views/Lists/Alerts/OrderStatusNotificationRow';
 import { SkipTransferNotificationRow } from '@/views/Lists/Alerts/SkipTransferNotificationRow';
-import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
+// eslint-disable-next-line import/no-cycle
 import { CancelAllNotification } from '@/views/notifications/CancelAllNotification';
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -76,19 +72,18 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
+import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
-import { useComplianceState } from './useComplianceState';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
-import { useTokenConfigs } from './useTokenConfigs';
 import { useURLConfigs } from './useURLConfigs';
 
 export const notificationTypes: NotificationTypeConfig[] = [
@@ -313,56 +308,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [trigger, appInitializedTime, stringGetter, fills, allMarkets]);
     },
   },
-  {
-    type: NotificationType.BlockTradingReward,
-    useTrigger: ({ trigger, sessionStartTime }) => {
-      const blockTradingRewards = useAppSelector(BonsaiCore.account.blockTradingRewards.data);
-      const stringGetter = useStringGetter();
-      const tokenName = useTokenConfigs().chainTokenLabel;
-      useEffect(() => {
-        blockTradingRewards.forEach((reward) => {
-          const createdAt = new Date(reward.createdAt).getTime();
-          if (createdAt <= sessionStartTime) {
-            return;
-          }
-          const amount = MustBigNumber(reward.tradingReward).toString(10);
-          trigger({
-            id: `blockReward:${reward.createdAtHeight}`,
-            displayData: {
-              title: stringGetter({ key: STRING_KEYS.BLOCK_REWARD_TITLE }),
-              updatedTime: createdAt,
-              body: stringGetter({
-                key: STRING_KEYS.BLOCK_REWARD_BODY,
-                params: {
-                  BLOCK_REWARD_AMOUNT: amount,
-                  TOKEN_NAME: tokenName,
-                },
-              }),
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              toastSensitivity: 'foreground',
-              groupKey: 'blockReward',
-              renderCustomBody: ({ isToast, notification }) => (
-                <BlockRewardNotification
-                  isToast={isToast}
-                  amount={amount}
-                  tokenName={tokenName}
-                  notification={notification}
-                />
-              ),
-              renderSimpleAlert: ({ className, notification }) => (
-                <BlockRewardNotificationRow
-                  className={className}
-                  blockReward={reward}
-                  isUnseen={notification.status <= NotificationStatus.Unseen}
-                />
-              ),
-            },
-            updateKey: [reward.createdAtHeight],
-          });
-        });
-      }, [trigger, blockTradingRewards, stringGetter, tokenName, sessionStartTime]);
-    },
-  },
+
   {
     type: NotificationType.SkipTransfer2,
     useTrigger: ({ trigger }) => {
@@ -621,12 +567,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
+      const boostedMarketIds = useBoostedMarketIds();
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
         enabled:
           dydxAddress != null &&
-          new Date().getTime() < new Date(BOOSTED_MARKETS_EXPIRATION).getTime(),
+          new Date().getTime() < new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime(),
         retry: false,
         queryFn: async () => {
           try {
@@ -649,7 +596,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         const now = new Date().getTime();
-        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
         if (now < seasonEnd && rewards != null && rewards > 5) {
           trigger({
             id: `rewards-program-surge-s${currentSeason - 1}-payout`,
@@ -681,7 +628,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         const now = new Date().getTime();
-        const seasonEnd = new Date(BOOSTED_MARKETS_EXPIRATION).getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
         const endingSoon = seasonEnd - timeUnits.day * 3;
 
         if (now <= endingSoon) {
@@ -697,7 +644,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: STRING_KEYS.SURGE_BOOSTED_MARKETS_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  MARKETS_LIST: [...BOOSTED_MARKETS].map((m) => m.split('-')[0]).join(', '),
+                  MARKETS_LIST: [...boostedMarketIds].map((m) => m.split('-')[0]).join(', '),
                 },
               }),
               toastSensitivity: 'foreground',
@@ -744,7 +691,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
-      }, [currentSeason, stringGetter, trigger]);
+      }, [boostedMarketIds, currentSeason, stringGetter, trigger]);
+
+      const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
+      useEffect(() => {
+        if (new Date().getTime() < new Date(PUMP_COMPETITION_EXPIRATION).getTime())
+          trigger({
+            id: `pump-trading-competition-base`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_TITLE,
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.PUMP_COMPETITION_BODY,
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.LEARN_MORE }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/blog/pump-trading-competition" isAccent>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+                </Link>
+              ),
+            },
+            updateKey: [`pump-trading-competition-base`],
+          });
+      }, [stringGetter, trigger]);
     },
   },
   {
@@ -796,45 +769,42 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.ComplianceAlert,
+    type: NotificationType.AffiliatesAlert,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
+      const { data } = useAffiliateMetadata();
+      const isAffiliate = !!data?.metadata?.isAffiliate;
 
       useEffect(() => {
-        if (complianceState !== ComplianceStates.FULL_ACCESS) {
-          const displayData: NotificationDisplayData = {
-            icon: <$WarningIcon iconName={IconName.Warning} />,
-            title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
-            renderCustomBody: ({ isToast, notification }) => (
-              <Notification
-                isToast={isToast}
-                notification={notification}
-                slotDescription={complianceMessage}
-              />
-            ),
-            toastSensitivity: 'foreground',
-            groupKey: NotificationType.ComplianceAlert,
-            withClose: false,
-          };
-
+        if (isAffiliate) {
           trigger({
-            id: `${NotificationType.ComplianceAlert}-${complianceStatus}`,
-            displayData,
-            updateKey: [],
+            id: NotificationType.AffiliatesAlert,
+            displayData: {
+              title: stringGetter({ key: STRING_KEYS.AFFILIATE_BOOSTER_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.AFFILIATE_BOOSTER_BODY,
+                params: {
+                  HERE_LINK: (
+                    <Link
+                      isInline
+                      isAccent
+                      href="https://www.dydx.xyz/blog/introducing-the-dydx-affiliate-booster-program"
+                    >
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.AffiliatesAlert,
+            },
+            updateKey: ['boosted-affiliates-june-2025'],
           });
         }
-      }, [stringGetter, complianceMessage, complianceState, complianceStatus, trigger]);
+      }, [isAffiliate, stringGetter, trigger]);
     },
     useNotificationAction: () => {
-      const dispatch = useAppDispatch();
-      const { complianceStatus } = useComplianceState();
-
-      return () => {
-        if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-          dispatch(openDialog(DialogTypes.GeoCompliance()));
-        }
-      };
+      return () => {};
     },
   },
   {
