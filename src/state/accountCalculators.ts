@@ -5,6 +5,7 @@ import { OnboardingState, OnboardingSteps } from '@/constants/account';
 import { ConnectorType } from '@/constants/wallets';
 
 import {
+  getDisplayChooseWallet,
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountOpenOrders,
@@ -19,7 +20,7 @@ import { getCurrentMarketId } from './currentMarketSelectors';
 import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [getOnboardingState, (s, displayChooseWallet: boolean = false) => displayChooseWallet],
+  [getOnboardingState, getDisplayChooseWallet],
   (onboardingState: OnboardingState, displayChooseWallet: boolean) => {
     return {
       [OnboardingState.Disconnected]:

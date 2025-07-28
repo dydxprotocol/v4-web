@@ -12,7 +12,7 @@ import { WalletInfo } from '@/constants/wallets';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
-import { getDisplayChooseWallet, getGeo, getOnboardingState } from '@/state/accountSelectors';
+import { getGeo, getOnboardingState } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -24,7 +24,6 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
-import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useSimpleUiEnabled } from './useSimpleUiEnabled';
@@ -228,11 +227,7 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.OnboardingStepChanged
-  const displayChooseWallet = useAppSelector(getDisplayChooseWallet);
-  const currentOnboardingStep = useAppSelectorWithArgs(
-    calculateOnboardingStep,
-    displayChooseWallet
-  );
+  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
   const onboardingState = useAppSelector(getOnboardingState);
   const [hasOnboardingStateChanged, setHasOnboardingStateChanged] = useState(false);
 

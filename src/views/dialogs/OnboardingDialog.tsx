@@ -11,7 +11,6 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -31,7 +30,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { getDisplayChooseWallet } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import { testFlags } from '@/lib/testFlags';
@@ -54,12 +52,7 @@ export const OnboardingDialog = ({
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
-  const displayChooseWallet = useAppSelector(getDisplayChooseWallet);
-  const currentOnboardingStep = useAppSelectorWithArgs(
-    calculateOnboardingStep,
-    displayChooseWallet
-  );
-
+  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
   const isSimpleUi = useSimpleUiEnabled();
   const isTurnkeyEnabled = testFlags.enableTurnkey;
 
