@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -38,26 +36,11 @@ export const ChooseWallet = ({
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
   const isSimpleUi = useSimpleUiEnabled();
-  const [displayProvider, setDisplayProvider] = useState(false);
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
 
   const { detectedBrowser, userAgent } = useDetectedWalletBrowser();
-
-  // useEffect(() => {
-  //   if (detectedBrowser === WalletBrowser.Standard || !isSimpleUi) {
-  //     return;
-  //   }
-
-  //   const walletToConnect = displayedWallets.find((wallet) => {
-  //     return wallet.connectorType === ConnectorType.Injected;
-  //   });
-
-  //   if (walletToConnect) {
-  //     onChooseWallet(walletToConnect);
-  //   }
-  // }, [detectedBrowser, isSimpleUi, displayedWallets, onChooseWallet]);
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
@@ -97,27 +80,6 @@ export const ChooseWallet = ({
     </div>
   );
 
-  if (displayProvider) {
-    return (
-      <div>
-        <Button onClick={() => setDisplayProvider(false)}>Close</Button>
-
-        {Object.entries(window.ethereum).map(
-          ([key, value]) =>
-            key.includes('is') && (
-              <div key={key}>
-                <span>{key}:</span>
-                <span>
-                  {' '}
-                  {typeof value === 'object' ? JSON.stringify(value) : value?.toString()}
-                </span>
-              </div>
-            )
-        )}
-      </div>
-    );
-  }
-
   return (
     <>
       {selectedWallet && selectedWalletError && (
@@ -142,7 +104,18 @@ export const ChooseWallet = ({
       <$Wallets isSimpleUi={isSimpleUi}>
         <span>{detectedBrowser}</span>
         <span>{userAgent}</span>
-        <Button onClick={() => setDisplayProvider(true)}>Display Provider</Button>
+        {Object.entries(window.ethereum).map(
+          ([key, value]) =>
+            key.includes('is') && (
+              <div key={key}>
+                <span>{key}:</span>
+                <span>
+                  {' '}
+                  {typeof value === 'object' ? JSON.stringify(value) : value?.toString()}
+                </span>
+              </div>
+            )
+        )}
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
