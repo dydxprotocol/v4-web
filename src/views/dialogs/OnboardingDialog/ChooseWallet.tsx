@@ -112,7 +112,6 @@ export const ChooseWallet = ({
                 ? wallet.name
                 : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
             </$WalletName>
-            <span>{wallet.connectorType}</span>
           </$WalletButton>
         ))}
       </$Wallets>
