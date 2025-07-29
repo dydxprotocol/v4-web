@@ -105,12 +105,18 @@ export const ChooseWallet = ({
       <div>
         <Button onClick={() => setDisplayProvider(false)}>Close</Button>
 
-        {Object.entries(window.ethereum).map(([key, value]) => (
-          <div key={key}>
-            <span>{key}</span>
-            <span>{value?.toString()}</span>
-          </div>
-        ))}
+        {Object.entries(window.ethereum).map(
+          ([key, value]) =>
+            key.includes('is') && (
+              <div key={key}>
+                <span>{key}:</span>
+                <span>
+                  {' '}
+                  {typeof value === 'object' ? JSON.stringify(value) : value?.toString()}
+                </span>
+              </div>
+            )
+        )}
       </div>
     );
   }
