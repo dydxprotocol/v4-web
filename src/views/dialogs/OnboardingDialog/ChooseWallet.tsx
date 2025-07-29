@@ -5,7 +5,6 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
-import { useDetectedWalletBrowser } from '@/hooks/Onboarding/useDetectedWalletBrowser';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
@@ -39,8 +38,6 @@ export const ChooseWallet = ({
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
-
-  const { detectedBrowser, userAgent } = useDetectedWalletBrowser();
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
@@ -102,20 +99,6 @@ export const ChooseWallet = ({
       )}
 
       <$Wallets isSimpleUi={isSimpleUi}>
-        <span>{detectedBrowser}</span>
-        <span>{userAgent}</span>
-        {Object.entries(window.ethereum).map(
-          ([key, value]) =>
-            key.includes('is') && (
-              <div key={key}>
-                <span>{key}:</span>
-                <span>
-                  {' '}
-                  {typeof value === 'object' ? JSON.stringify(value) : value?.toString()}
-                </span>
-              </div>
-            )
-        )}
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
