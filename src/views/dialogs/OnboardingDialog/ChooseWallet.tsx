@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -41,6 +41,7 @@ export const ChooseWallet = ({
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
   const isSimpleUi = useSimpleUiEnabled();
+  const [displayProvider, setDisplayProvider] = useState(false);
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
@@ -99,6 +100,21 @@ export const ChooseWallet = ({
     </div>
   );
 
+  if (displayProvider) {
+    return (
+      <div>
+        <Button onClick={() => setDisplayProvider(false)}>Close</Button>
+
+        {Object.entries(window.ethereum).map(([key, value]) => (
+          <div key={key}>
+            <span>{key}</span>
+            <span>{value?.toString()}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <>
       {selectedWallet && selectedWalletError && (
@@ -123,6 +139,7 @@ export const ChooseWallet = ({
       <$Wallets isSimpleUi={isSimpleUi}>
         <span>{detectedBrowser}</span>
         <span>{userAgent}</span>
+        <Button onClick={() => setDisplayProvider(true)}>Display Provider</Button>
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}

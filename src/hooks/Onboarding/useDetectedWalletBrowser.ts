@@ -15,6 +15,7 @@ export function useDetectedWalletBrowser(): {
 } {
   const [detectedBrowser, setDetectedBrowser] = useState<WalletBrowser>(WalletBrowser.Standard);
   const [userAgent, setUserAgent] = useState<string>();
+
   useEffect(() => {
     const ua = navigator.userAgent;
 
