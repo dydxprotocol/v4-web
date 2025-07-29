@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -7,10 +7,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
-import {
-  useDetectedWalletBrowser,
-  WalletBrowser,
-} from '@/hooks/Onboarding/useDetectedWalletBrowser';
+import { useDetectedWalletBrowser } from '@/hooks/Onboarding/useDetectedWalletBrowser';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
@@ -48,19 +45,19 @@ export const ChooseWallet = ({
 
   const { detectedBrowser, userAgent } = useDetectedWalletBrowser();
 
-  useEffect(() => {
-    if (detectedBrowser === WalletBrowser.Standard || !isSimpleUi) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (detectedBrowser === WalletBrowser.Standard || !isSimpleUi) {
+  //     return;
+  //   }
 
-    const walletToConnect = displayedWallets.find((wallet) => {
-      return wallet.connectorType === ConnectorType.Injected;
-    });
+  //   const walletToConnect = displayedWallets.find((wallet) => {
+  //     return wallet.connectorType === ConnectorType.Injected;
+  //   });
 
-    if (walletToConnect) {
-      onChooseWallet(walletToConnect);
-    }
-  }, [detectedBrowser, isSimpleUi, displayedWallets, onChooseWallet]);
+  //   if (walletToConnect) {
+  //     onChooseWallet(walletToConnect);
+  //   }
+  // }, [detectedBrowser, isSimpleUi, displayedWallets, onChooseWallet]);
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
