@@ -47,7 +47,7 @@
                         "/": "*/portfolio/history/funding"
                     },
                     {
-                        "/": "*/onboarding/turnkey"
+                        "/": "*/onboard/turnkey"
                     },
                     {
                         "/": "/walletsegue",
