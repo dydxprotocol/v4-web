@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
@@ -16,13 +16,21 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { WalletIcon } from '@/components/WalletIcon';
+
+import { testFlags } from '@/lib/testFlags';
 
 export const ChooseWallet = ({
   onChooseWallet,
+  onSignInWithSocials,
+  onSignInWithPasskey,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
+  onSignInWithSocials: () => void;
+  onSignInWithPasskey: () => void;
 }) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
@@ -31,6 +39,44 @@ export const ChooseWallet = ({
   const displayedWallets = useDisplayedWallets();
 
   const { selectedWallet, selectedWalletError } = useAccounts();
+
+  const alternateOptions = (
+    <div tw="flexColumn gap-0.75">
+      <div tw="row gap-0.5">
+        <HorizontalSeparatorFiller />
+        <span>or</span>
+        <HorizontalSeparatorFiller />
+      </div>
+
+      <$OtherOptionButton
+        type={ButtonType.Button}
+        action={ButtonAction.Base}
+        size={ButtonSize.BasePlus}
+        onClick={onSignInWithPasskey}
+      >
+        <div tw="row gap-0.5">
+          <Icon iconName={IconName.Passkey} />
+          Sign in with Passkey
+        </div>
+
+        <Icon iconName={IconName.ChevronRight} />
+      </$OtherOptionButton>
+
+      <$OtherOptionButton
+        type={ButtonType.Button}
+        action={ButtonAction.Base}
+        size={ButtonSize.BasePlus}
+        onClick={onSignInWithSocials}
+      >
+        <div tw="row gap-0.5">
+          <Icon iconName={IconName.SocialLogin} />
+          Sign in with Socials
+        </div>
+
+        <Icon iconName={IconName.ChevronRight} />
+      </$OtherOptionButton>
+    </div>
+  );
 
   return (
     <>
@@ -71,7 +117,9 @@ export const ChooseWallet = ({
         ))}
       </$Wallets>
 
-      {!isSimpleUi && (
+      {testFlags.enableTurnkey && alternateOptions}
+
+      {!isSimpleUi && !testFlags.enableTurnkey && (
         <$Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
         </$Link>
@@ -138,4 +186,11 @@ const $Link = styled(Link)`
   &:hover {
     color: var(--color-text-1);
   }
+`;
+
+const $OtherOptionButton = styled(Button)`
+  width: 100%;
+  border-radius: 1rem;
+  justify-content: space-between;
+  --icon-size: 1rem;
 `;
