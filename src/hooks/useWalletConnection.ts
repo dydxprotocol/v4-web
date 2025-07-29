@@ -34,7 +34,6 @@ import { testFlags } from '@/lib/testFlags';
 import { isWagmiConnectorType, isWagmiResolvedWallet, resolveWagmiConnector } from '@/lib/wagmi';
 import { parseWalletError } from '@/lib/wallet';
 
-import { useAutoconnectMobileWalletBrowser } from './Onboarding/useAutoconnectMobileWalletBrowser';
 import { useStringGetter } from './useStringGetter';
 
 export const useWalletConnection = () => {
@@ -289,8 +288,6 @@ export const useWalletConnection = () => {
     ]
   );
 
-  useAutoconnectMobileWalletBrowser({ onSelectWallet: selectWallet });
-
   // On page load, if testFlag.address is set, connect to the test wallet.
   useEffect(() => {
     if (testFlags.addressOverride) {
@@ -300,6 +297,8 @@ export const useWalletConnection = () => {
       );
     }
   }, [dispatch]);
+
+  const [hasAttemptedMobileWalletConnect, setHasAttemptedMobileWalletConnect] = useState(false);
 
   return {
     // Wallet selection
@@ -311,6 +310,8 @@ export const useWalletConnection = () => {
     signerWagmi,
     publicClientWagmi,
     isConnectedWagmi,
+    hasAttemptedMobileWalletConnect,
+    setHasAttemptedMobileWalletConnect,
 
     connectWallet,
 

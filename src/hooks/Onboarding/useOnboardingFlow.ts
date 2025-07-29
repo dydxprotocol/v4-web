@@ -10,9 +10,13 @@ import { forceOpenDialog } from '@/state/dialogs';
 import { track } from '@/lib/analytics/analytics';
 
 import { useComplianceState } from '../useComplianceState';
+import { useAutoconnectMobileWalletBrowser } from './useAutoconnectMobileWalletBrowser';
 
 const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
   const dispatch = useAppDispatch();
+  const { autoconnectMobileWallet, canAutoconnectMobileWallet, hasAttemptedMobileWalletConnect } =
+    useAutoconnectMobileWalletBrowser();
+
   const openOnboardingDialog = () => {
     onClick?.();
     track(
@@ -20,7 +24,11 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
         state: onboardingState,
       })
     );
-    dispatch(forceOpenDialog(DialogTypes.Onboarding()));
+    if (canAutoconnectMobileWallet && !hasAttemptedMobileWalletConnect) {
+      autoconnectMobileWallet();
+    } else {
+      dispatch(forceOpenDialog(DialogTypes.Onboarding()));
+    }
   };
 
   const { disableConnectButton } = useComplianceState();

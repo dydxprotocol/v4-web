@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { OnboardingSteps } from '@/constants/account';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
@@ -13,38 +13,54 @@ import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
-export function useAutoconnectMobileWalletBrowser({
-  onSelectWallet,
-}: {
-  onSelectWallet: (wallet: WalletInfo) => void;
-}) {
-  const [hasAttemptedMobileWalletConnect, setHasAttemptedMobileWalletConnect] = useState(false);
+import { useWalletConnection } from '../useWalletConnection';
+
+export function useAutoconnectMobileWalletBrowser() {
   const { detectedBrowser } = useDetectedWalletBrowser();
   const displayedWallets = useDisplayedWallets();
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
   const isSimpleUi = useSimpleUiEnabled();
+  const { hasAttemptedMobileWalletConnect, selectWallet, setHasAttemptedMobileWalletConnect } =
+    useWalletConnection();
 
-  useEffect(() => {
-    if (!isSimpleUi || hasAttemptedMobileWalletConnect) return;
+  const injectedWallet: WalletInfo | undefined = useMemo(() => {
+    return displayedWallets.find((wallet) => {
+      return wallet.connectorType === ConnectorType.Injected;
+    });
+  }, [displayedWallets]);
 
+  const isUsingWalletBrowser = useMemo(() => {
+    return detectedBrowser !== WalletBrowser.Standard;
+  }, [detectedBrowser]);
+
+  const canAutoconnectMobileWallet = useMemo(() => {
     const injectedWallets = displayedWallets.filter((wallet) => {
       return wallet.connectorType === ConnectorType.Injected;
     });
 
-    const isUsingWalletBrowser =
-      detectedBrowser !== WalletBrowser.Standard && injectedWallets.length === 1;
+    return (
+      isSimpleUi &&
+      isUsingWalletBrowser &&
+      injectedWallets.length === 1 &&
+      currentOnboardingStep === OnboardingSteps.ChooseWallet
+    );
+  }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep]);
 
-    if (isUsingWalletBrowser && currentOnboardingStep === OnboardingSteps.ChooseWallet) {
-      const walletToConnect = injectedWallets[0];
+  const autoconnectMobileWallet = useCallback(() => {
+    if (injectedWallet && canAutoconnectMobileWallet) {
       setHasAttemptedMobileWalletConnect(true);
-      onSelectWallet(walletToConnect as WalletInfo);
+      selectWallet(injectedWallet);
     }
   }, [
-    hasAttemptedMobileWalletConnect,
-    detectedBrowser,
-    displayedWallets,
-    isSimpleUi,
-    onSelectWallet,
-    currentOnboardingStep,
+    canAutoconnectMobileWallet,
+    injectedWallet,
+    selectWallet,
+    setHasAttemptedMobileWalletConnect,
   ]);
+
+  return {
+    hasAttemptedMobileWalletConnect,
+    autoconnectMobileWallet,
+    canAutoconnectMobileWallet,
+  };
 }
