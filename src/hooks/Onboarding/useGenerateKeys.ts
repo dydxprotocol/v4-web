@@ -20,17 +20,16 @@ import { useMatchingEvmNetwork } from '../useMatchingEvmNetwork';
 import useSignForWalletDerivation from '../useSignForWalletDerivation';
 import { useStringGetter } from '../useStringGetter';
 
-export function useGenerateKeys({
-  status,
-  setStatus,
-  onKeysDerived,
-}: {
+type GenerateKeysProps = {
   status?: EvmDerivedAccountStatus;
   setStatus?: (status: EvmDerivedAccountStatus) => void;
   onKeysDerived?: () => void;
-}) {
+};
+
+export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const { status, setStatus, onKeysDerived } = generateKeysProps ?? {};
   const { sourceAccount, setWalletFromSignature } = useAccounts();
   const [derivationStatus, setDerivationStatus] = useState(
     status ?? EvmDerivedAccountStatus.NotDerived

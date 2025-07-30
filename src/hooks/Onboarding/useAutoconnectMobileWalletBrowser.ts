@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
 import { OnboardingSteps } from '@/constants/account';
-import { ConnectorType, WalletInfo } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import {
   useDetectedWalletBrowser,
@@ -39,9 +39,15 @@ export function useAutoconnectMobileWalletBrowser() {
   }, [detectedBrowser]);
 
   // Coinbase wallet is not injected, so we need to manually check for it
-  // const isCoinbaseWallet = useMemo(() => {
-  //   return displayedWallets.some((wallet) => wallet.name === WalletType.CoinbaseWallet);
-  // }, [displayedWallets]);
+  const maybeCoinbaseWallet: WalletInfo | undefined = useMemo(() => {
+    if (detectedBrowser === WalletBrowser.Coinbase) {
+      return {
+        connectorType: ConnectorType.Coinbase,
+        name: WalletType.CoinbaseWallet,
+      } as const;
+    }
+    return undefined;
+  }, [detectedBrowser]);
 
   const canAutoconnectMobileWallet = useMemo(() => {
     const injectedWallets = displayedWallets.filter((wallet) => {
@@ -56,23 +62,25 @@ export function useAutoconnectMobileWalletBrowser() {
     );
   }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep]);
 
-  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } = useGenerateKeys(
-    {
-      status: undefined,
-      setStatus: undefined,
-      onKeysDerived: undefined,
+  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
+    useGenerateKeys();
+
+  const walletToConnect = useMemo(() => {
+    if (maybeCoinbaseWallet) {
+      return maybeCoinbaseWallet;
     }
-  );
+    return injectedWallet;
+  }, [maybeCoinbaseWallet, injectedWallet]);
 
   const autoconnectMobileWallet = useCallback(async () => {
-    if (injectedWallet && canAutoconnectMobileWallet) {
+    if (walletToConnect && canAutoconnectMobileWallet) {
       try {
         logBonsaiInfo('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
-          injectedWallet,
+          walletToConnect,
           isMatchingNetwork,
         });
         setHasAttemptedMobileWalletConnect(true);
-        await selectWallet(injectedWallet);
+        await selectWallet(walletToConnect);
         await sleep(500);
 
         if (isMatchingNetwork) {
@@ -88,7 +96,7 @@ export function useAutoconnectMobileWalletBrowser() {
     }
   }, [
     canAutoconnectMobileWallet,
-    injectedWallet,
+    walletToConnect,
     selectWallet,
     setHasAttemptedMobileWalletConnect,
     isMatchingNetwork,
