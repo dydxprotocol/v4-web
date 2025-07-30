@@ -59,31 +59,6 @@ export function useAutoconnectMobileWalletBrowser() {
     return undefined;
   }, [detectedBrowser]);
 
-  const canAutoconnectMobileWallet = useMemo(() => {
-    const injectedWallets = displayedWallets.filter((wallet) => {
-      return wallet.connectorType === ConnectorType.Injected;
-    });
-
-    const hasSingleInjectedOrCoinbaseWallet =
-      injectedWallets.length === 1 || (injectedWallets.length === 0 && maybeCoinbaseWallet);
-
-    return (
-      isSimpleUi &&
-      isUsingWalletBrowser &&
-      hasSingleInjectedOrCoinbaseWallet &&
-      currentOnboardingStep === OnboardingSteps.ChooseWallet
-    );
-  }, [
-    isSimpleUi,
-    isUsingWalletBrowser,
-    displayedWallets,
-    currentOnboardingStep,
-    maybeCoinbaseWallet,
-  ]);
-
-  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
-    useGenerateKeys();
-
   const walletToConnect = useMemo(() => {
     if (maybeCoinbaseWallet) {
       return maybeCoinbaseWallet;
@@ -93,6 +68,25 @@ export function useAutoconnectMobileWalletBrowser() {
     }
     return injectedWallet;
   }, [maybeCoinbaseWallet, injectedWallet, maybePhantomWallet]);
+
+  const canAutoconnectMobileWallet = useMemo(() => {
+    const injectedWallets = displayedWallets.filter((wallet) => {
+      return wallet.connectorType === ConnectorType.Injected;
+    });
+
+    const hasValidWallet =
+      injectedWallets.length === 1 || (injectedWallets.length === 0 && walletToConnect != null);
+
+    return (
+      isSimpleUi &&
+      isUsingWalletBrowser &&
+      hasValidWallet &&
+      currentOnboardingStep === OnboardingSteps.ChooseWallet
+    );
+  }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep, walletToConnect]);
+
+  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
+    useGenerateKeys();
 
   const autoconnectMobileWallet = useCallback(async () => {
     if (walletToConnect && canAutoconnectMobileWallet) {
