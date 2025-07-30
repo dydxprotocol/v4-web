@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
@@ -88,6 +88,8 @@ export function useAutoconnectMobileWalletBrowser() {
   const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
     useGenerateKeys();
 
+  const [phantomMsg, setPhantomMsg] = useState<string | undefined>(undefined);
+
   const autoconnectMobileWallet = useCallback(async () => {
     if (walletToConnect && canAutoconnectMobileWallet) {
       try {
@@ -97,15 +99,17 @@ export function useAutoconnectMobileWalletBrowser() {
         });
         setHasAttemptedMobileWalletConnect(true);
         await selectWallet(walletToConnect);
-        await sleep(1_000);
+        await sleep(500);
 
         // No need to switch network for Phantom Solana
         if (isMatchingNetwork || walletToConnect.connectorType === ConnectorType.PhantomSolana) {
+          setPhantomMsg('Sending Request...');
           onClickSendRequestOrTryAgain();
         } else {
           onClickSwitchNetwork();
         }
       } catch (error) {
+        setPhantomMsg(error instanceof Error ? error.message : undefined);
         logBonsaiError('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
           error,
         });
@@ -122,6 +126,7 @@ export function useAutoconnectMobileWalletBrowser() {
   ]);
 
   return {
+    phantomMsg,
     hasAttemptedMobileWalletConnect,
     autoconnectMobileWallet,
     canAutoconnectMobileWallet,

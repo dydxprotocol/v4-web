@@ -14,7 +14,8 @@ import { getChartDotBackground } from '@/state/appUiConfigsSelectors';
 export const UnconnectedPortfolioOverview = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const chartDotBackground = useAppSelector(getChartDotBackground);
-  const { openOnboardingDialog, isOnboardingDisabled, onboardingState } = useOnboardingFlow();
+  const { openOnboardingDialog, isOnboardingDisabled, onboardingState, phantomMsg } =
+    useOnboardingFlow();
 
   const buttonContent = isOnboardingDisabled ? (
     <>{stringGetter({ key: STRING_KEYS.UNAVAILABLE })}</>
@@ -39,6 +40,7 @@ export const UnconnectedPortfolioOverview = ({ className }: { className?: string
       </div>
       <div tw="flexColumn w-full items-center justify-center px-1.25 text-center text-color-text-0">
         {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
+        {phantomMsg && <div tw="text-color-text-2">{phantomMsg}</div>}
 
         <Button
           tw="mt-1 w-full"
