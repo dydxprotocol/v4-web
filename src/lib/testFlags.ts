@@ -61,11 +61,11 @@ class TestFlags {
   }
 
   get simpleUi() {
-    return this.queryParams.simpleui ? this.booleanFlag(this.queryParams.simpleui) : undefined;
+    return true; // this.queryParams.simpleui ? this.booleanFlag(this.queryParams.simpleui) : undefined;
   }
 
   get autoConnectMobileWallet() {
-    return this.queryParams.autoconnect_mobile;
+    return true; // this.queryParams.autoconnect_mobile;
   }
 
   get enableTurnkey() {
