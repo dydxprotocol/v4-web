@@ -52,7 +52,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
       PROTOCOL_STAKING_LINK: (
         <Link href={protocolStaking} withIcon isInline>
           {stringGetter({
-            key: STRING_KEYS.PROTOCOL_STAKING,
+            key: STRING_KEYS.MINTSCAN,
           })}
         </Link>
       ),
