@@ -14,12 +14,8 @@ import { useAutoconnectMobileWalletBrowser } from './useAutoconnectMobileWalletB
 
 const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
   const dispatch = useAppDispatch();
-  const {
-    autoconnectMobileWallet,
-    canAutoconnectMobileWallet,
-    hasAttemptedMobileWalletConnect,
-    phantomMsg,
-  } = useAutoconnectMobileWalletBrowser();
+  const { autoconnectMobileWallet, canAutoconnectMobileWallet, hasAttemptedMobileWalletConnect } =
+    useAutoconnectMobileWalletBrowser();
 
   const openOnboardingDialog = () => {
     const enableAutoconnectMobileWallet =
@@ -44,7 +40,6 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   return {
-    phantomMsg,
     openOnboardingDialog,
     disableConnectButton,
     onboardingState,

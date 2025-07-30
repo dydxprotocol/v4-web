@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 
@@ -17,6 +17,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { sleep } from '@/lib/timeUtils';
 
+import { useAccounts } from '../useAccounts';
 import { useWalletConnection } from '../useWalletConnection';
 import { useGenerateKeys } from './useGenerateKeys';
 
@@ -88,28 +89,21 @@ export function useAutoconnectMobileWalletBrowser() {
   const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
     useGenerateKeys();
 
-  const [phantomMsg, setPhantomMsg] = useState<string | undefined>(undefined);
+  const { sourceAccount } = useAccounts();
+  const { walletInfo } = sourceAccount;
+  const [shouldRecoverKeys, setShouldRecoverKeys] = useState(false);
 
   const autoconnectMobileWallet = useCallback(async () => {
     if (walletToConnect && canAutoconnectMobileWallet) {
       try {
         logBonsaiInfo('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
           walletToConnect,
-          isMatchingNetwork,
         });
         setHasAttemptedMobileWalletConnect(true);
         await selectWallet(walletToConnect);
-        await sleep(2_000);
-
-        // No need to switch network for Phantom Solana
-        if (isMatchingNetwork || walletToConnect.connectorType === ConnectorType.PhantomSolana) {
-          setPhantomMsg('Sending Request...');
-          onClickSendRequestOrTryAgain();
-        } else {
-          onClickSwitchNetwork();
-        }
+        await sleep(500);
+        setShouldRecoverKeys(true);
       } catch (error) {
-        setPhantomMsg(error instanceof Error ? error.message : undefined);
         logBonsaiError('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
           error,
         });
@@ -120,15 +114,33 @@ export function useAutoconnectMobileWalletBrowser() {
     walletToConnect,
     selectWallet,
     setHasAttemptedMobileWalletConnect,
-    isMatchingNetwork,
-    onClickSwitchNetwork,
-    onClickSendRequestOrTryAgain,
   ]);
 
+  const handleKeyRecovery = useCallback(async () => {
+    // No need to switch network for Phantom Solana
+    if (isMatchingNetwork || walletToConnect?.connectorType === ConnectorType.PhantomSolana) {
+      onClickSendRequestOrTryAgain();
+    } else {
+      onClickSwitchNetwork();
+    }
+  }, [
+    isMatchingNetwork,
+    walletToConnect?.connectorType,
+    onClickSendRequestOrTryAgain,
+    onClickSwitchNetwork,
+  ]);
+
+  useEffect(() => {
+    if (shouldRecoverKeys && walletInfo) {
+      handleKeyRecovery();
+      setShouldRecoverKeys(false);
+    }
+  }, [shouldRecoverKeys, handleKeyRecovery, walletInfo]);
+
   return {
-    phantomMsg,
     hasAttemptedMobileWalletConnect,
     autoconnectMobileWallet,
     canAutoconnectMobileWallet,
+    walletInfo,
   };
 }
