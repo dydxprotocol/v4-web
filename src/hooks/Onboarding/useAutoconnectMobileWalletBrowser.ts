@@ -99,7 +99,8 @@ export function useAutoconnectMobileWalletBrowser() {
         await selectWallet(walletToConnect);
         await sleep(500);
 
-        if (isMatchingNetwork) {
+        // No need to switch network for Phantom Solana
+        if (isMatchingNetwork || walletToConnect.connectorType === ConnectorType.PhantomSolana) {
           onClickSendRequestOrTryAgain();
         } else {
           onClickSwitchNetwork();
