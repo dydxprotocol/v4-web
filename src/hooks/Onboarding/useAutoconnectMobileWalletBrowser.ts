@@ -15,6 +15,8 @@ import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
+import { sleep } from '@/lib/timeUtils';
+
 import { useWalletConnection } from '../useWalletConnection';
 import { useGenerateKeys } from './useGenerateKeys';
 
@@ -66,6 +68,7 @@ export function useAutoconnectMobileWalletBrowser() {
         });
         setHasAttemptedMobileWalletConnect(true);
         await selectWallet(injectedWallet);
+        await sleep(500);
 
         if (isMatchingNetwork) {
           onClickSendRequestOrTryAgain();
