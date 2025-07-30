@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Supported Wallet Browsers w/ Version tested
 export enum WalletBrowser {
-  Metamask, // iOS v7.51.1 | Android TBD
-  Trust, // iOS v11.46 | Android TBD
-  Coinbase, // iOS v29.52 | Android TBD
-  Rainbow, // iOS v1.9.72 | Android TBD
-  imToken, // iOS v2.17.1 | Android TBD
-  Phantom, // iOS 25.27.0 | Android TBD
+  Metamask, // iOS v7.51.1 | Android v7.51.0
+  Trust, // iOS v11.46 | Android v8.55.0
+  Coinbase, // iOS v29.52 | Android v29.51.0
+  Rainbow, // iOS v1.9.72 | Android v1.9.72
+  imToken, // iOS v2.17.1 | Android v2.17.1
+  Phantom, // iOS 25.27.0 | Android v25.27.0
   Standard,
 }
 

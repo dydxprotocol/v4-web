@@ -49,6 +49,16 @@ export function useAutoconnectMobileWalletBrowser() {
     return undefined;
   }, [detectedBrowser]);
 
+  const maybePhantomWallet: WalletInfo | undefined = useMemo(() => {
+    if (detectedBrowser === WalletBrowser.Phantom) {
+      return {
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      } as const;
+    }
+    return undefined;
+  }, [detectedBrowser]);
+
   const canAutoconnectMobileWallet = useMemo(() => {
     const injectedWallets = displayedWallets.filter((wallet) => {
       return wallet.connectorType === ConnectorType.Injected;
@@ -78,8 +88,11 @@ export function useAutoconnectMobileWalletBrowser() {
     if (maybeCoinbaseWallet) {
       return maybeCoinbaseWallet;
     }
+    if (maybePhantomWallet) {
+      return maybePhantomWallet;
+    }
     return injectedWallet;
-  }, [maybeCoinbaseWallet, injectedWallet]);
+  }, [maybeCoinbaseWallet, injectedWallet, maybePhantomWallet]);
 
   const autoconnectMobileWallet = useCallback(async () => {
     if (walletToConnect && canAutoconnectMobileWallet) {
