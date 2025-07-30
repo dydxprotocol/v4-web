@@ -38,6 +38,11 @@ export function useAutoconnectMobileWalletBrowser() {
     return detectedBrowser !== WalletBrowser.Standard;
   }, [detectedBrowser]);
 
+  // Coinbase wallet is not injected, so we need to manually check for it
+  // const isCoinbaseWallet = useMemo(() => {
+  //   return displayedWallets.some((wallet) => wallet.name === WalletType.CoinbaseWallet);
+  // }, [displayedWallets]);
+
   const canAutoconnectMobileWallet = useMemo(() => {
     const injectedWallets = displayedWallets.filter((wallet) => {
       return wallet.connectorType === ConnectorType.Injected;

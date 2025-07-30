@@ -64,6 +64,10 @@ class TestFlags {
     return this.queryParams.simpleui ? this.booleanFlag(this.queryParams.simpleui) : undefined;
   }
 
+  get autoConnectMobileWallet() {
+    return this.queryParams.autoconnect_mobile;
+  }
+
   get enableTurnkey() {
     return this.queryParams.enable_turnkey;
   }

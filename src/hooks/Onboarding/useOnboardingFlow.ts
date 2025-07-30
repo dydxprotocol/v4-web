@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { testFlags } from '@/lib/testFlags';
 
 import { useComplianceState } from '../useComplianceState';
 import { useAutoconnectMobileWalletBrowser } from './useAutoconnectMobileWalletBrowser';
@@ -24,7 +25,11 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
         state: onboardingState,
       })
     );
-    if (canAutoconnectMobileWallet && !hasAttemptedMobileWalletConnect) {
+    if (
+      testFlags.autoConnectMobileWallet &&
+      canAutoconnectMobileWallet &&
+      !hasAttemptedMobileWalletConnect
+    ) {
       autoconnectMobileWallet();
     } else {
       dispatch(forceOpenDialog(DialogTypes.Onboarding()));

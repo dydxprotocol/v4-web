@@ -11,7 +11,7 @@ export type MipdInjectedWallet = {
   connector: ReturnType<typeof injected>;
 };
 
-function useMipdInjectedProviderDetails(): readonly EIP6963ProviderDetail[] {
+export function useMipdInjectedProviderDetails(): readonly EIP6963ProviderDetail[] {
   const availableProviders = useSyncExternalStore(store.subscribe, store.getProviders);
   return uniqBy(availableProviders, (provider: EIP6963ProviderDetail) => provider.info.rdns);
 }
