@@ -54,13 +54,22 @@ export function useAutoconnectMobileWalletBrowser() {
       return wallet.connectorType === ConnectorType.Injected;
     });
 
+    const hasSingleInjectedOrCoinbaseWallet =
+      injectedWallets.length === 1 || (injectedWallets.length === 0 && maybeCoinbaseWallet);
+
     return (
       isSimpleUi &&
       isUsingWalletBrowser &&
-      injectedWallets.length === 1 &&
+      hasSingleInjectedOrCoinbaseWallet &&
       currentOnboardingStep === OnboardingSteps.ChooseWallet
     );
-  }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep]);
+  }, [
+    isSimpleUi,
+    isUsingWalletBrowser,
+    displayedWallets,
+    currentOnboardingStep,
+    maybeCoinbaseWallet,
+  ]);
 
   const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
     useGenerateKeys();
