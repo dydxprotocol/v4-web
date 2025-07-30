@@ -18,13 +18,17 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
     useAutoconnectMobileWalletBrowser();
 
   const openOnboardingDialog = () => {
+    const enableAutoconnectMobileWallet =
+      canAutoconnectMobileWallet && !hasAttemptedMobileWalletConnect;
+
     onClick?.();
     track(
       AnalyticsEvents.OnboardingTriggerClick({
         state: onboardingState,
+        autoconnectMobileWallet: enableAutoconnectMobileWallet,
       })
     );
-    if (canAutoconnectMobileWallet && !hasAttemptedMobileWalletConnect) {
+    if (enableAutoconnectMobileWallet) {
       autoconnectMobileWallet();
     } else {
       dispatch(forceOpenDialog(DialogTypes.Onboarding()));
