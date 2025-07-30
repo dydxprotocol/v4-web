@@ -1,5 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
+
 import { OnboardingSteps } from '@/constants/account';
 import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
@@ -58,6 +60,10 @@ export function useAutoconnectMobileWalletBrowser() {
   const autoconnectMobileWallet = useCallback(async () => {
     if (injectedWallet && canAutoconnectMobileWallet) {
       try {
+        logBonsaiInfo('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
+          injectedWallet,
+          isMatchingNetwork,
+        });
         setHasAttemptedMobileWalletConnect(true);
         await selectWallet(injectedWallet);
 
@@ -67,7 +73,9 @@ export function useAutoconnectMobileWalletBrowser() {
           onClickSwitchNetwork();
         }
       } catch (error) {
-        console.error(error);
+        logBonsaiError('useAutoconnectMobileWalletBrowser', 'Autoconnecting mobile wallet', {
+          error,
+        });
       }
     }
   }, [
