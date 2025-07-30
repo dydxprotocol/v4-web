@@ -193,13 +193,13 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   }, [data?.metadata?.referralCode, hasInitialized]);
 
   useEffect(() => {
-    if (isEditMode && affiliateInputRef.current) {
+    if (isEditMode && affiliateInputRef.current && !isUpdatingReferralCode) {
       affiliateInputRef.current.focus();
       const valLength = affiliateInputRef.current.value.length;
       affiliateInputRef.current.setSelectionRange(valLength, valLength);
       affiliateInputRef.current.scrollLeft = affiliateInputRef.current.scrollWidth;
     }
-  }, [isEditMode]);
+  }, [isEditMode, isUpdatingReferralCode]);
 
   const dialogDescription = (
     <span>
@@ -250,6 +250,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             size={ButtonSize.Small}
             onClick={handleEdit}
             buttonStyle={ButtonStyle.WithoutBackground}
+            shape={ButtonShape.Square}
           />
           <CopyButton
             action={ButtonAction.Primary}
@@ -265,18 +266,27 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
 
     if (isEditMode) {
       return (
-        <IconButton
-          ref={confirmButtonRef}
-          iconName={IconName.Check}
-          size={ButtonSize.Small}
-          onClick={handleConfirmEdit}
-          action={ButtonAction.Primary}
-          shape={ButtonShape.Square}
-          state={{
-            isLoading: isUpdatingReferralCode,
-            isDisabled: editableReferralCode.length === 0 || !!validationError,
-          }}
-        />
+        <div tw="row gap-0.5">
+          <IconButton
+            iconName={IconName.Close}
+            size={ButtonSize.Small}
+            action={ButtonAction.Destroy}
+            shape={ButtonShape.Square}
+            state={{ isDisabled: isUpdatingReferralCode }}
+          />
+          <IconButton
+            ref={confirmButtonRef}
+            iconName={IconName.Check}
+            size={ButtonSize.Small}
+            onClick={handleConfirmEdit}
+            action={ButtonAction.Primary}
+            shape={ButtonShape.Square}
+            state={{
+              isLoading: isUpdatingReferralCode,
+              isDisabled: editableReferralCode.length === 0 || !!validationError,
+            }}
+          />
+        </div>
       );
     }
 
