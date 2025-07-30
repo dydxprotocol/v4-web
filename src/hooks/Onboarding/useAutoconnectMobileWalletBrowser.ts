@@ -14,6 +14,7 @@ import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 import { useWalletConnection } from '../useWalletConnection';
+import { useGenerateKeys } from './useGenerateKeys';
 
 export function useAutoconnectMobileWalletBrowser() {
   const { detectedBrowser } = useDetectedWalletBrowser();
@@ -46,16 +47,33 @@ export function useAutoconnectMobileWalletBrowser() {
     );
   }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep]);
 
+  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } = useGenerateKeys(
+    {
+      status: undefined,
+      setStatus: undefined,
+      onKeysDerived: undefined,
+    }
+  );
+
   const autoconnectMobileWallet = useCallback(() => {
     if (injectedWallet && canAutoconnectMobileWallet) {
       setHasAttemptedMobileWalletConnect(true);
       selectWallet(injectedWallet);
+
+      if (isMatchingNetwork) {
+        onClickSendRequestOrTryAgain();
+      } else {
+        onClickSwitchNetwork();
+      }
     }
   }, [
     canAutoconnectMobileWallet,
     injectedWallet,
     selectWallet,
     setHasAttemptedMobileWalletConnect,
+    isMatchingNetwork,
+    onClickSwitchNetwork,
+    onClickSendRequestOrTryAgain,
   ]);
 
   return {
