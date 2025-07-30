@@ -7,7 +7,6 @@ import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
-import { useMipdInjectedProviderDetails } from '@/hooks/useMipdInjectedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -39,8 +38,6 @@ export const ChooseWallet = ({
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
-
-  const injectors = useMipdInjectedProviderDetails();
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
@@ -102,15 +99,6 @@ export const ChooseWallet = ({
       )}
 
       <$Wallets isSimpleUi={isSimpleUi}>
-        {injectors.map((inject) => {
-          return (
-            <span key={inject.info.rdns}>
-              {inject.info.name}
-              {inject.info.icon}
-              {inject.info.rdns}
-            </span>
-          );
-        })}
         {displayedWallets.map((wallet) => (
           <$WalletButton
             action={ButtonAction.Base}
