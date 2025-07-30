@@ -55,15 +55,19 @@ export function useAutoconnectMobileWalletBrowser() {
     }
   );
 
-  const autoconnectMobileWallet = useCallback(() => {
+  const autoconnectMobileWallet = useCallback(async () => {
     if (injectedWallet && canAutoconnectMobileWallet) {
-      setHasAttemptedMobileWalletConnect(true);
-      selectWallet(injectedWallet);
+      try {
+        setHasAttemptedMobileWalletConnect(true);
+        await selectWallet(injectedWallet);
 
-      if (isMatchingNetwork) {
-        onClickSendRequestOrTryAgain();
-      } else {
-        onClickSwitchNetwork();
+        if (isMatchingNetwork) {
+          onClickSendRequestOrTryAgain();
+        } else {
+          onClickSwitchNetwork();
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
   }, [

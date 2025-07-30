@@ -77,7 +77,7 @@ export function useGenerateKeys({
 
   const switchNetworkAndDeriveKeys = async () => {
     const networkSwitched = await switchNetwork();
-    if (networkSwitched) await deriveKeys();
+    if (networkSwitched) await deriveKeys().then(onKeysDerived);
   };
 
   // 2. Derive keys from EVM account
