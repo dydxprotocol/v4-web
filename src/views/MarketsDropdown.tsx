@@ -11,7 +11,6 @@ import { MarketFilters, PREDICTION_MARKET, type MarketData } from '@/constants/m
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
@@ -28,7 +27,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
-import { AccentTag, Tag } from '@/components/Tag';
+import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -69,8 +68,6 @@ const MarketsDropdownContent = ({
     searchFilter,
   });
 
-  const boostedMarketIds = useBoostedMarketIds();
-
   const columns = useMemo(
     () =>
       [
@@ -107,13 +104,6 @@ const MarketsDropdownContent = ({
                 )}
               </Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
-              {new Date().getTime() <= new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime() &&
-              boostedMarketIds.has(id) ? (
-                <AccentTag tw="row gap-0.125">
-                  <Icon iconName={IconName.Fire} />{' '}
-                  {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}
-                </AccentTag>
-              ) : undefined}
             </div>
           ),
         },

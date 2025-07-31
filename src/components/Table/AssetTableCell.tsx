@@ -3,19 +3,17 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketData } from '@/constants/markets';
 
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { AccentTag, Tag } from '@/components/Tag';
+import { Tag } from '@/components/Tag';
 
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { Nullable, orEmptyObj } from '@/lib/typeUtils';
 
-import { Icon, IconName } from '../Icon';
 import { Output, OutputType } from '../Output';
 import { TableCell } from './TableCell';
 
@@ -38,9 +36,8 @@ interface AssetTableCellProps {
 export const AssetTableCell = (props: AssetTableCellProps) => {
   const stringGetter = useStringGetter();
   const { symbol, name, stacked, configs, truncateAssetName, children, className } = props;
-  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched, id } =
+  const { logo, initialMarginFraction, effectiveInitialMarginFraction, isUnlaunched } =
     orEmptyObj(configs);
-  const boostedMarketIds = useBoostedMarketIds();
 
   const maxLeverage =
     configs != null ? (
@@ -65,13 +62,6 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
             {name}
           </$Asset>
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
-          {!truncateAssetName &&
-          new Date().getTime() <= new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime() &&
-          boostedMarketIds.has(id ?? '') ? (
-            <AccentTag tw="row gap-0.125">
-              <Icon iconName={IconName.Fire} /> {stringGetter({ key: STRING_KEYS.DOUBLE_REWARDS })}
-            </AccentTag>
-          ) : undefined}
         </div>
         {children}
       </$TableCellContent>
