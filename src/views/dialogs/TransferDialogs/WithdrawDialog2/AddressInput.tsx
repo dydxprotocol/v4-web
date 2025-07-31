@@ -1,16 +1,14 @@
 import { EventHandler, useState } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
-import { CustomFlags } from '@/constants/statsig';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCustomFlagValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -40,7 +38,6 @@ export const AddressInput = ({
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
   const [isFocused, setIsFocused] = useState(false);
-  const abSimpleUi = useCustomFlagValue(CustomFlags.abSimpleUi);
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
     onChange(e.target.value);
@@ -57,7 +54,7 @@ export const AddressInput = ({
   };
 
   return (
-    <$WithdrawAmountInputContainer isSimpleUi={abSimpleUi}>
+    <$WithdrawAmountInputContainer>
       <div tw="flex min-w-0 flex-1 flex-col gap-0.5 text-small">
         <div>
           {stringGetter({ key: STRING_KEYS.ADDRESS })}{' '}
@@ -84,7 +81,6 @@ export const AddressInput = ({
       <$ChainButton
         disabled={sourceAccount.chain === WalletNetworkType.Solana}
         onClick={onDestinationClicked}
-        isSimpleUi={abSimpleUi}
       >
         <div tw="flex items-center gap-0.5">
           <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
@@ -104,12 +100,8 @@ const $WithdrawAmountInputContainer = styled.div<{ isSimpleUi?: boolean }>`
   border: 1px solid var(--color-border);
 
   @media ${breakpoints.tablet} {
-    ${({ isSimpleUi }) =>
-      isSimpleUi &&
-      css`
-        --withdraw-dialog-amount-bgColor: var(--color-layer-2);
-        border-color: transparent;
-      `}
+    --withdraw-dialog-amount-bgColor: var(--color-layer-2);
+    border-color: transparent;
   }
 `;
 
@@ -120,15 +112,11 @@ const $Input = styled.input`
 
 const $ChainButton = styled.button.attrs({
   type: 'button',
-})<{ isSimpleUi?: boolean }>`
+})`
   ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
 
   @media ${breakpoints.tablet} {
-    ${({ isSimpleUi }) =>
-      isSimpleUi &&
-      css`
-        border-color: transparent;
-      `}
+    border-color: transparent;
   }
 `;
 

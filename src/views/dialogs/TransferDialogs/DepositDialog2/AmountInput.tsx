@@ -1,18 +1,16 @@
 import { EventHandler } from 'react';
 
 import { SyntheticInputEvent } from 'react-number-format/types/types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { EVM_GAS_RESERVE_AMOUNT, TOKEN_DECIMALS } from '@/constants/numbers';
-import { CustomFlags } from '@/constants/statsig';
 import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useCustomFlagValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -49,7 +47,6 @@ export const AmountInput = ({
 }: AmountInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
-  const abSimpleUi = useCustomFlagValue(CustomFlags.abSimpleUi);
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
     if (!numericValueRegex.test(escapeRegExp(e.target.value))) {
@@ -78,7 +75,7 @@ export const AmountInput = ({
   const onMaxDisabled = !tokenBalance.raw || BigInt(tokenBalance.raw) === BigInt(0);
 
   return (
-    <$AmountInputContainer isSimpleUi={abSimpleUi}>
+    <$AmountInputContainer>
       <div tw="flex min-w-0 flex-1 flex-col gap-0.5 text-small">
         <div tw="row justify-between">
           {stringGetter({ key: STRING_KEYS.AMOUNT })}
@@ -125,7 +122,6 @@ export const AmountInput = ({
             type="button"
             disabled={sourceAccount.chain === WalletNetworkType.Solana}
             onClick={onTokenClick}
-            isSimpleUi={abSimpleUi}
           >
             <div tw="flex items-center gap-0.5 text-color-text-2">
               <AssetIcon
@@ -145,19 +141,15 @@ export const AmountInput = ({
   );
 };
 
-const $AmountInputContainer = styled.div<{ isSimpleUi?: boolean }>`
+const $AmountInputContainer = styled.div`
   ${tw`flex items-center justify-between gap-0.5 rounded-0.75 px-1.25 py-0.75`}
 
   background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
   border: 1px solid var(--color-border);
 
   @media ${breakpoints.tablet} {
-    ${({ isSimpleUi }) =>
-      isSimpleUi &&
-      css`
-        --deposit-dialog-amount-bgColor: var(--color-layer-2);
-        border-color: transparent;
-      `}
+    --deposit-dialog-amount-bgColor: var(--color-layer-2);
+    border-color: transparent;
   }
 `;
 
@@ -167,17 +159,13 @@ const $Input = styled.input<{ hasError?: boolean }>`
   background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
 `;
 
-const $TokenButton = styled.button<{ isSimpleUi?: boolean }>`
+const $TokenButton = styled.button`
   ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
 
   --asset-icon-chain-icon-borderColor: var(--color-layer-5);
 
   @media ${breakpoints.tablet} {
-    ${({ isSimpleUi }) =>
-      isSimpleUi &&
-      css`
-        border-color: transparent;
-      `}
+    border-color: transparent;
   }
 `;
 
