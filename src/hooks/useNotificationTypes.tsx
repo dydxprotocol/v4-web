@@ -1172,6 +1172,29 @@ export const notificationTypes: NotificationTypeConfig[] = [
       };
     },
   },
+  {
+    type: NotificationType.FreeDepositsMessaging,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        trigger({
+          id: 'free-deposits-live',
+          displayData: {
+            icon: '⚡',
+            title: 'Free, Instant Deposits Now Live',
+            body: '$100+ deposits are now instant and free on dYdX.',
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.FreeDepositsMessaging,
+          },
+          updateKey: ['free-deposits-messaging-v1'],
+        });
+      }, [stringGetter, trigger]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
 ];
 
 const $Icon = tw.img`h-1.5 w-1.5`;

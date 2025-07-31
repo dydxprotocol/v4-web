@@ -22,6 +22,7 @@ export enum NotificationType {
   FillWithNoOrder = 'FillWithNoOrder',
   Order = 'Order',
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
+  FreeDepositsMessaging = 'FreeDepositsMessaging',
 }
 
 export enum NotificationCategoryPreferences {
@@ -55,6 +56,7 @@ export const NotificationTypeCategory: {
   [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.FreeDepositsMessaging]: NotificationCategoryPreferences.General,
 };
 
 export const SingleSessionNotificationTypes = [
