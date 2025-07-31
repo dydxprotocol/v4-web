@@ -75,7 +75,7 @@ import {
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
-import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
+import { isPresent, orEmptyObj, orEmptyRecord } from '@/lib/typeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
@@ -1176,23 +1176,36 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.FreeDepositsMessaging,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const { equity } = orEmptyObj(
+        useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
+      );
+
+      const shouldShowNotification = equity == null || equity.lt(20);
 
       useEffect(() => {
-        trigger({
-          id: 'free-deposits-live',
-          displayData: {
-            icon: '⚡',
-            title: 'Free, Instant Deposits Now Live',
-            body: '$100+ deposits are now instant and free on dYdX.',
-            toastSensitivity: 'foreground',
-            groupKey: NotificationType.FreeDepositsMessaging,
-          },
-          updateKey: ['free-deposits-messaging-v1'],
-        });
-      }, [stringGetter, trigger]);
+        if (shouldShowNotification) {
+          trigger({
+            id: 'free-deposits-live',
+            displayData: {
+              icon: '⚡',
+              title: 'Free, Instant Deposits Now Live',
+              body: '$100+ deposits are now instant and free on dYdX.',
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.FreeDepositsMessaging,
+              actionAltText: 'Deposit now',
+              renderActionSlot: () => <Link isAccent>Deposit now →</Link>,
+            },
+            updateKey: ['free-deposits-messaging'],
+          });
+        }
+      }, [stringGetter, trigger, shouldShowNotification]);
     },
     useNotificationAction: () => {
-      return () => {};
+      const dispatch = useAppDispatch();
+
+      return () => {
+        dispatch(openDialog(DialogTypes.Deposit2({})));
+      };
     },
   },
 ];
