@@ -27,8 +27,8 @@ import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGe
 
 import {
   CURRENT_REWARDS_SEASON,
+  CURRENT_REWARDS_SEASON_AMOUNT,
   CURRENT_REWARDS_SEASON_EXPIRATION,
-  useBoostedMarketIds,
 } from '@/hooks/surgeRewards';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -567,7 +567,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
-      const boostedMarketIds = useBoostedMarketIds();
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
@@ -637,14 +636,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: <Icon iconName={IconName.Trophy} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_BOOSTED_MARKETS_TITLE,
-                params: { SEASON_NUMBER: currentSeason },
-              }),
-              body: stringGetter({
-                key: STRING_KEYS.SURGE_BOOSTED_MARKETS_BODY,
+                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  MARKETS_LIST: [...boostedMarketIds].map((m) => m.split('-')[0]).join(', '),
+                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
+                },
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
+                params: {
+                  SEASON_NUMBER: currentSeason,
+                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               toastSensitivity: 'foreground',
@@ -691,7 +693,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`rewards-program-surge-s${currentSeason}-ending`],
           });
         }
-      }, [boostedMarketIds, currentSeason, stringGetter, trigger]);
+      }, [currentSeason, stringGetter, trigger]);
 
       const PUMP_COMPETITION_EXPIRATION = '2025-07-29T00:00:00.000Z';
       useEffect(() => {

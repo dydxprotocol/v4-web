@@ -56,7 +56,6 @@ export enum MarketFilters {
   FAVORITE = 'favorite',
   NEW = 'new',
   PREDICTION_MARKET = 'prediction-market',
-  BOOSTED = 'boosted',
 
   // CMC Sector Tags.
   FX = 'fiat',
@@ -121,10 +120,6 @@ export const MARKET_FILTER_OPTIONS: Record<
   },
   [MarketFilters.FX]: {
     labelStringKey: STRING_KEYS.FOREX,
-  },
-  [MarketFilters.BOOSTED]: {
-    labelStringKey: STRING_KEYS.DOUBLE_REWARDS,
-    isNew: true,
   },
   [MarketFilters.PREDICTION_MARKET]: {
     labelStringKey: STRING_KEYS.PREDICTION_MARKET,

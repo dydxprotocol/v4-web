@@ -11,8 +11,6 @@ import {
   type MarketData,
 } from '@/constants/markets';
 
-import { CURRENT_REWARDS_SEASON_EXPIRATION, useBoostedMarketIds } from '@/hooks/surgeRewards';
-
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
 
@@ -26,10 +24,7 @@ import { objectKeys } from '@/lib/objectHelpers';
 import { matchesSearchFilter } from '@/lib/search';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-const filterFunctions: Record<
-  MarketFilters,
-  (market: MarketData, boostedMarketIds: Set<string>) => boolean | undefined
-> = {
+const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | undefined> = {
   [MarketFilters.AI]: (market) => {
     return market.sectorTags?.includes(MarketFilters.AI);
   },
@@ -45,12 +40,6 @@ const filterFunctions: Record<
   },
   [MarketFilters.FAVORITE]: (market) => {
     return market.isFavorite;
-  },
-  [MarketFilters.BOOSTED]: (market, boostedMarketIds) => {
-    return (
-      new Date().getTime() <= new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime() &&
-      boostedMarketIds.has(market.id)
-    );
   },
   [MarketFilters.FX]: (market) => {
     return market.sectorTags?.includes(MarketFilters.FX);
@@ -110,7 +99,6 @@ export const useMarketsData = ({
     useAppSelector(getShouldHideLaunchableMarkets) || forceHideUnlaunchedMarkets;
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(perpetualMarkets).length > 0;
-  const boostedMarketIds = useBoostedMarketIds();
 
   // AssetIds from existing PerpetualMarkets
   const marketsAssetIdSet = useMemo(
@@ -160,7 +148,7 @@ export const useMarketsData = ({
   ]);
 
   const filteredMarkets = useMemo(() => {
-    const filtered = markets.filter((m) => filterFunctions[filter](m, boostedMarketIds));
+    const filtered = markets.filter((m) => filterFunctions[filter](m));
 
     if (searchFilter) {
       return filtered.filter(
@@ -171,15 +159,15 @@ export const useMarketsData = ({
       );
     }
     return filtered;
-  }, [markets, searchFilter, filter, boostedMarketIds]);
+  }, [markets, searchFilter, filter]);
 
   const marketFilters = useMemo(
     () => [
       ...objectKeys(MARKET_FILTER_OPTIONS).filter((marketFilter) =>
-        markets.some((market) => filterFunctions[marketFilter](market, boostedMarketIds))
+        markets.some((market) => filterFunctions[marketFilter](market))
       ),
     ],
-    [boostedMarketIds, markets]
+    [markets]
   );
 
   return {
