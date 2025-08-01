@@ -149,20 +149,17 @@ export class AccountTransactionSupervisor {
     const state = this.store.getState();
     const orders = BonsaiCore.account.allOrders.data(state);
     const order = orders.find((o) => o.id === orderId);
+    const fnName = 'AccountTransactionSupervisor/createCancelOrderPayload';
 
     if (!order) {
-      logBonsaiError('AccountTransactionSupervisor/createCancelOrderPayload', 'Order not found', {
+      logBonsaiError(fnName, 'Order not found', {
         orderId,
       });
       return undefined;
     }
 
     if (order.status === OrderStatus.Canceled) {
-      logBonsaiInfo(
-        'AccountTransactionSupervisor/createCancelOrderPayload',
-        'Order already canceled',
-        { orderId }
-      );
+      logBonsaiInfo(fnName, 'Order already canceled', { orderId });
       return undefined;
     }
 
@@ -170,13 +167,9 @@ export class AccountTransactionSupervisor {
     const clientId = AttemptNumber(order.clientId);
 
     if (clientId == null || clobPairId == null) {
-      logBonsaiError(
-        'AccountTransactionSupervisor/createCancelOrderPayload',
-        'Invalid client ID or CLOB pair ID',
-        {
-          orderId,
-        }
-      );
+      logBonsaiError(fnName, 'Invalid client ID or CLOB pair ID', {
+        orderId,
+      });
       return undefined;
     }
 
@@ -193,14 +186,10 @@ export class AccountTransactionSupervisor {
         orderFlags = OrderFlags.LONG_TERM;
         break;
       default:
-        logBonsaiError(
-          'AccountTransactionSupervisor/createCancelOrderPayload',
-          'Unsupported order flags',
-          {
-            orderId,
-            orderFlags: order.orderFlags,
-          }
-        );
+        logBonsaiError(fnName, 'Unsupported order flags', {
+          orderId,
+          orderFlags: order.orderFlags,
+        });
         return undefined;
     }
 
@@ -218,17 +207,18 @@ export class AccountTransactionSupervisor {
 
   private async executeCancelOrder(orderId: string, onConfirmed?: () => void) {
     const cancelPayload = this.createCancelOrderPayload(orderId);
+    const fnName = 'AccountTransactionSupervisor/executeCancelOrder';
 
     if (cancelPayload == null) {
       return wrapSimpleError(
-        'AccountTransactionSupervisor/executeCancelOrder',
+        fnName,
         'Unable to create cancel payload for order',
         STRING_KEYS.NO_ORDERS_TO_CANCEL
       );
     }
 
     return this.wrapOperation(
-      'AccountTransactionSupervisor/executeCancelOrder',
+      fnName,
       cancelPayload,
       async ({ compositeClient, localWallet, payload }) => {
         // Create a SubaccountClient using the wallet and subaccount number
@@ -275,6 +265,7 @@ export class AccountTransactionSupervisor {
   private getCloseAllPositionsPayloads(): PlaceOrderPayload[] | undefined {
     const state = this.store.getState();
     const positions = BonsaiCore.account.parentSubaccountPositions.data(state);
+    const fnName = 'AccountTransactionSupervisor/getCloseAllPositionsPayloads';
 
     if (positions == null || positions.length === 0) {
       // technically could be fine, just no-op
@@ -288,7 +279,7 @@ export class AccountTransactionSupervisor {
     );
     if (currentHeight == null) {
       logBonsaiError(
-        'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
+        fnName,
         'cannot generate close all positions payload because validatorHeight is null'
       );
       return undefined;
@@ -296,10 +287,7 @@ export class AccountTransactionSupervisor {
 
     const markets = BonsaiCore.markets.markets.data(state);
     if (markets == null) {
-      logBonsaiError(
-        'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
-        'cannot generate close all positions payload because markets is null'
-      );
+      logBonsaiError(fnName, 'cannot generate close all positions payload because markets is null');
       return undefined;
     }
 
@@ -315,7 +303,7 @@ export class AccountTransactionSupervisor {
 
         if (!market || oraclePrice == null || oraclePrice.isZero()) {
           logBonsaiError(
-            'AccountTransactionSupervisor/getCloseAllPositionsPayloads',
+            fnName,
             'cannot generate close position payload because market is null or oracle is bad',
             { market }
           );
@@ -645,7 +633,7 @@ export class AccountTransactionSupervisor {
           const { payload, transferMetadata } = context;
 
           const overallResult = await this.wrapOperation(
-            'AccountTransactionSupervisor/placeOrderWrapper',
+            context.fnName,
             payload,
             async ({ payload: innerPayload }) => {
               const subaccountTransferResult = await calc(async () => {
