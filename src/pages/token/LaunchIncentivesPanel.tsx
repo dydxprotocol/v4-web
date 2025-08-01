@@ -70,7 +70,6 @@ const IncentiveProgramDescription = () => {
     <ul tw="list-inside text-color-text-0 font-small-book">
       <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_1 })}</li>
       <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_2 })}</li>
-      <li>{stringGetter({ key: STRING_KEYS.SURGE_HOW_TO_EARN_3 })}</li>
     </ul>
   );
 

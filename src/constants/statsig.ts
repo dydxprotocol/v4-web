@@ -19,7 +19,7 @@ export enum StatsigFlags {
 
 export enum CustomFlags {
   abDefaultToMarkets = 'ab_default_to_markets',
-  abSimpleUi = 'ab_simple_ui',
+  // abSimpleUi = 'ab_simple_ui', Deprecated, Full Release
 }
 
 // we only use these for flags that MUST be available before statsig can complete loading
@@ -29,13 +29,11 @@ export const CUSTOM_FLAG_ROLLED_VALUES: Record<CustomFlags, boolean | undefined>
   key: LocalStorageKey.CustomFlags,
   defaultValue: {
     ab_default_to_markets: undefined,
-    ab_simple_ui: undefined,
   },
 });
 
 export const CUSTOM_FLAG_RATES: Record<CustomFlags, number> = {
   ab_default_to_markets: 0.5,
-  ab_simple_ui: 0.5,
 };
 
 export type StatsigDynamicConfigType = Record<StatsigDynamicConfigs, any>;

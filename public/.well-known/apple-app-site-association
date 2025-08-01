@@ -47,6 +47,9 @@
                         "/": "*/portfolio/history/funding"
                     },
                     {
+                        "/": "*/onboard/turnkey"
+                    },
+                    {
                         "/": "/walletsegue",
                         "comment": "Callback link for WalletSegue/Coinbase SDK"
                     },
