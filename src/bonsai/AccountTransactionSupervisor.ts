@@ -97,21 +97,15 @@ export const SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN = 5;
 export class AccountTransactionSupervisor {
   private store: RootStore;
 
-  private compositeClientManager: typeof CompositeClientManager;
-
-  private stateNotifier: StateConditionNotifier;
-
   private shared: TransactionSupervisorShared;
 
   constructor(store: RootStore, compositeClientManager: typeof CompositeClientManager) {
     this.store = store;
-    this.compositeClientManager = compositeClientManager;
-    this.stateNotifier = new StateConditionNotifier(store);
 
     this.shared = {
       compositeClientManager,
       store,
-      stateNotifier: this.stateNotifier,
+      stateNotifier: new StateConditionNotifier(store),
     };
   }
 
@@ -962,7 +956,7 @@ export class AccountTransactionSupervisor {
   }
 
   public tearDown(): void {
-    this.stateNotifier.tearDown();
+    this.shared.stateNotifier.tearDown();
   }
 }
 

@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-client-js':
-    specifier: 2.1.1
-    version: 2.1.1
+    specifier: 2.5.0
+    version: 2.5.0
   '@dydxprotocol/v4-localization':
     specifier: 1.1.308
     version: 1.1.308
@@ -1467,8 +1467,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-client-js@2.1.1:
-    resolution: {integrity: sha512-S/amjCYkJ1OulvtFY0AwUZfq3I6aeqywehI+BavKc4Jry4LyBbGDvmOW0QH/adiJFzFHrnB+Vx2uHyRON6bmDA==}
+  /@dydxprotocol/v4-client-js@2.5.0:
+    resolution: {integrity: sha512-PZi23AOoqq57eUwnb6BlNStMooU88EGj91dPWgTIKu7Cy7QJqHhQUPe/1gzO+VUSSdFgYvvnj/+L6D8uOaYegw==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1487,12 +1487,14 @@ packages:
       cosmjs-types: 0.9.0
       ethereum-cryptography: 2.1.2
       ethers: 6.14.0
+      https-proxy-agent: 7.0.6
       long: 4.0.0
       protobufjs: 7.5.1
       ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - debug
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -9735,6 +9737,11 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /agent-base@7.1.4:
+    resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
+    engines: {node: '>= 14'}
+    dev: false
+
   /agentkeepalive@4.5.0:
     resolution: {integrity: sha512-5GG/5IbQQpC9FpkRGsSvZI5QYeSCzlJHdpBQntCsuTOxhKD8lqKhrleg2Yi7yvMIf82Ycmmqln9U8V9qwEiJew==}
     engines: {node: '>= 8.0.0'}
@@ -14397,6 +14404,16 @@ packages:
       debug: 4.3.4(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
+
+  /https-proxy-agent@7.0.6:
+    resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
+    engines: {node: '>= 14'}
+    dependencies:
+      agent-base: 7.1.4
+      debug: 4.3.4(supports-color@5.5.0)
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
