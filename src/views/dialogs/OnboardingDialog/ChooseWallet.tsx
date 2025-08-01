@@ -37,7 +37,6 @@ export const ChooseWallet = ({
   const isSimpleUi = useSimpleUiEnabled();
 
   const displayedWallets = useDisplayedWallets();
-
   const { selectedWallet, selectedWalletError } = useAccounts();
 
   const alternateOptions = (

@@ -189,6 +189,7 @@ export const AnalyticsEvents = unionize(
       // if onboarding state is Disconnected, then user clicked "Connect Wallet"
       // if onboarding state is WalletConnected, then user clicked "Recover Keys"
       state: OnboardingState;
+      autoconnectMobileWallet?: boolean;
     }>(),
     OnboardingStepChanged: ofType<{
       state: OnboardingState;

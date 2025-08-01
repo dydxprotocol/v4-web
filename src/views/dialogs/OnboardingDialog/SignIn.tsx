@@ -3,6 +3,9 @@ import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -19,10 +22,13 @@ import { isValidEmail } from '@/lib/emailUtils';
 export const SignIn = ({
   onDisplayChooseWallet,
   onSignInWithPasskey,
+  onSubmitEmail,
 }: {
   onDisplayChooseWallet: () => void;
   onSignInWithPasskey: () => void;
+  onSubmitEmail: () => void;
 }) => {
+  const stringGetter = useStringGetter();
   const [email, setEmail] = useState('');
   const theme = useAppSelector(getAppTheme);
 
@@ -69,7 +75,7 @@ export const SignIn = ({
         <$EmailInput
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          placeholder="your@email.com"
+          placeholder={stringGetter({ key: STRING_KEYS.EMAIL_PLACEHOLDER })}
           type={InputType.Text}
           css={{
             '--input-borderColor': hasValidEmail ? 'var(--color-accent)' : 'var(--color-border)',
@@ -79,6 +85,7 @@ export const SignIn = ({
               tw="rounded-0.75"
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
+              onClick={onSubmitEmail}
               size={ButtonSize.Small}
               state={{
                 isDisabled: !hasValidEmail,
@@ -97,7 +104,7 @@ export const SignIn = ({
 
         <div tw="row gap-0.5">
           <HorizontalSeparatorFiller />
-          <span>or</span>
+          <span>{stringGetter({ key: STRING_KEYS.OR })}</span>
           <HorizontalSeparatorFiller />
         </div>
 
@@ -109,7 +116,7 @@ export const SignIn = ({
         >
           <div tw="row gap-0.5">
             <Icon iconName={IconName.Passkey} />
-            Sign in with Passkey
+            {stringGetter({ key: STRING_KEYS.SIGN_IN_PASSKEY })}
           </div>
 
           <Icon iconName={IconName.ChevronRight} />
@@ -123,7 +130,7 @@ export const SignIn = ({
         >
           <div tw="row gap-0.5">
             <Icon iconName={IconName.Wallet2} />
-            Sign in with Wallet
+            {stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })}
           </div>
 
           <Icon iconName={IconName.ChevronRight} />

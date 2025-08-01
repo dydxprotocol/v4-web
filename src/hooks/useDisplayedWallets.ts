@@ -36,6 +36,9 @@ export const useDisplayedWallets = (): WalletInfo[] => {
   return useMemo(() => {
     const isPhantomDetected = Boolean(window.phantom?.solana);
     const isKeplrDetected = Boolean(window.keplr);
+    const isCoinbaseDetected =
+      Boolean(window.ethereum?.isCoinbaseWallet || window.ethereum?.isCoinbaseBrowser) ||
+      injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === COINBASE_MIPD_RDNS) !== -1;
 
     const isOkxDetected =
       injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === OKX_MIPD_RDNS) !== -1;
@@ -85,6 +88,10 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       return [
         injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
         ...otherInjectedWallets,
+        isCoinbaseDetected && {
+          connectorType: ConnectorType.Coinbase,
+          name: WalletType.CoinbaseWallet,
+        },
         isPhantomDetected && phantomWallet,
         isKeplrDetected && keplrWallet,
         { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
