@@ -19,6 +19,9 @@ export type AcknowledgeTermsDialogProps = {};
 export type AdjustIsolatedMarginDialogProps = {
   positionId: SubaccountPosition['uniqueId'];
 };
+export type CheckEmailDialogProps = {
+  onClose: () => void;
+};
 export type ClosePositionDialogProps = {};
 export type CloseAllPositionsConfirmationDialogProps = {};
 export type CancelAllOrdersConfirmationDialogProps = { marketId?: string };
@@ -57,6 +60,7 @@ export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
   marketId: string;
@@ -116,6 +120,7 @@ export const DialogTypes = unionize(
     CancelAllOrdersConfirmation: ofType<CancelAllOrdersConfirmationDialogProps>(),
     CancelOrphanedTriggers: ofType<CancelOrphanedTriggersDialogProps>(),
     CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
+    CheckEmail: ofType<CheckEmailDialogProps>(),
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
@@ -146,6 +151,7 @@ export const DialogTypes = unionize(
     Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
+    SetupPasskey: ofType<SetupPasskeyDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),
     SimpleUiTrade: ofType<SimpleUiTradeDialogProps>(),

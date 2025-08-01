@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
-import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
@@ -31,6 +31,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -91,7 +92,21 @@ export const OnboardingDialog = ({
   };
 
   const onSignInWithPasskey = () => {
-    // TODO(turnkey): Implement passkey sign in
+    setIsOpen(false);
+    dispatch(
+      openDialog(
+        DialogTypes.SetupPasskey({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
+      )
+    );
+  };
+
+  const onSubmitEmail = () => {
+    setIsOpen(false);
+    dispatch(
+      openDialog(
+        DialogTypes.CheckEmail({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
+      )
+    );
   };
 
   const onChooseWallet = (wallet: WalletInfo) => {
@@ -105,7 +120,6 @@ export const OnboardingDialog = ({
     selectWallet(wallet);
   };
 
-  // TODO(turnkey): Localization
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
@@ -113,21 +127,23 @@ export const OnboardingDialog = ({
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.SignIn]: {
-            title: 'Sign in',
-            description:
-              'To get started, sign in with your social accounts, create a passkey or connect your wallet.',
+            title: stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE }),
+            description: stringGetter({
+              key: STRING_KEYS.SIGN_IN_DESCRIPTION,
+            }),
             children: (
               <$Content>
                 <SignIn
                   onDisplayChooseWallet={onDisplayChooseWallet}
                   onSignInWithPasskey={onSignInWithPasskey}
+                  onSubmitEmail={onSubmitEmail}
                 />
               </$Content>
             ),
           },
           [OnboardingSteps.ChooseWallet]: {
             title: isTurnkeyEnabled ? (
-              'Sign In'
+              stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })
             ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
@@ -149,7 +165,7 @@ export const OnboardingDialog = ({
               </div>
             ),
             description: isTurnkeyEnabled
-              ? 'To get started, sign in with your social accounts, create a passkey or connect your wallet.'
+              ? stringGetter({ key: STRING_KEYS.SIGN_IN_DESCRIPTION })
               : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
             children: (
               <$Content>
