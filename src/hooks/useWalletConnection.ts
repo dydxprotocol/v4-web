@@ -298,6 +298,8 @@ export const useWalletConnection = () => {
     }
   }, [dispatch]);
 
+  const [hasAttemptedMobileWalletConnect, setHasAttemptedMobileWalletConnect] = useState(false);
+
   return {
     // Wallet selection
     selectWallet,
@@ -308,6 +310,8 @@ export const useWalletConnection = () => {
     signerWagmi,
     publicClientWagmi,
     isConnectedWagmi,
+    hasAttemptedMobileWalletConnect,
+    setHasAttemptedMobileWalletConnect,
 
     connectWallet,
 
