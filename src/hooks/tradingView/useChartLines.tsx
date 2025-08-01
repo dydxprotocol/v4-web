@@ -274,7 +274,7 @@ export const useChartLines = ({
         return;
       }
 
-      const res = await accountTransactionManager.placeOrder(orderPayload);
+      const res = await accountTransactionManager.placeOrder(orderPayload, 'TradingViewChart');
       if (isOperationFailure(res)) {
         orderLine.remove();
         removePendingOrderAdjustment(orderPayload.clientId.toString());

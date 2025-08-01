@@ -41,7 +41,7 @@ export const useTradeForm = ({
   fullFormSummary,
   onLastOrderIndexed,
 }: {
-  source: string;
+  source: TradeFormSource;
   fullFormSummary:
     | {
         errors: ValidationError[];
@@ -121,6 +121,8 @@ export const useTradeForm = ({
         ...tradePayload,
         isClosePosition: source === TradeFormSource.ClosePositionForm,
         isSimpleUi: source === TradeFormSource.SimpleTradeForm,
+        source,
+        volume: tradePayload.size * tradePayload.price,
       })
     );
     dispatch(tradeFormActions.resetPrimaryInputs());
@@ -134,7 +136,7 @@ export const useTradeForm = ({
       }
     );
 
-    const result = await accountTransactionManager.placeCompoundOrder(payload);
+    const result = await accountTransactionManager.placeCompoundOrder(payload, source);
     if (isOperationSuccess(result)) {
       setUnIndexedClientId(tradePayload.clientId.toString());
       onSuccess?.();
