@@ -10,6 +10,7 @@ import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMargin
 import { CancelAllOrdersConfirmationDialog } from '@/views/dialogs/CancelAllOrdersConfirmationDialog';
 import { CancelOrphanedTriggerOrdersDialog } from '@/views/dialogs/CancelOrphanedTriggerOrdersDialog';
 import { CancelPendingOrdersDialog } from '@/views/dialogs/CancelPendingOrdersDialog';
+import { CheckEmailDialog } from '@/views/dialogs/CheckEmailDialog';
 import { CloseAllPositionsConfirmationDialog } from '@/views/dialogs/CloseAllPositionsConfirmationDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { CoinbaseDepositDialog } from '@/views/dialogs/CoinbaseDepositDialog';
@@ -37,6 +38,7 @@ import { ReclaimChildSubaccountFundsDialog } from '@/views/dialogs/ReclaimChildS
 import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
+import { SetupPasskeyDialog } from '@/views/dialogs/SetupPasskeyDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
 import { SimpleUiTradeDialog } from '@/views/dialogs/SimpleUiTradeDialog/SimpleUiTradeDialog';
@@ -73,6 +75,7 @@ export const DialogManager = React.memo(() => {
   return DialogTypes.match(activeDialog, {
     AcknowledgeTerms: (args) => <AcknowledgeTermsDialog {...args} {...modalProps} />,
     AdjustIsolatedMargin: (args) => <AdjustIsolatedMarginDialog {...args} {...modalProps} />,
+    CheckEmail: (args) => <CheckEmailDialog {...args} {...modalProps} />,
     ClosePosition: (args) => <ClosePositionDialog {...args} {...modalProps} />,
     CloseAllPositionsConfirmation: (args) => (
       <CloseAllPositionsConfirmationDialog {...args} {...modalProps} />
@@ -117,6 +120,7 @@ export const DialogManager = React.memo(() => {
     Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
+    SetupPasskey: (args) => <SetupPasskeyDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,
     SimpleUiTrade: (args) => <SimpleUiTradeDialog {...args} {...modalProps} />,
