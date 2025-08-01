@@ -24,7 +24,12 @@ import {
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
-import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
+import {
+  AnalyticsEvents,
+  TradeAdditionalMetadata,
+  TradeMetadataSource,
+  TransactionMemo,
+} from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
@@ -108,12 +113,6 @@ export class AccountTransactionSupervisor {
       store,
       stateNotifier: this.stateNotifier,
     };
-  }
-
-  private hasValidLocalWallet(): boolean {
-    const state = this.store.getState();
-    const localWalletNonce = getLocalWalletNonce(state);
-    return localWalletNonce != null;
   }
 
   private wrapOperation<T, Payload, P, Q>(
@@ -264,16 +263,6 @@ export class AccountTransactionSupervisor {
         },
       }
     )();
-  }
-
-  private maybeNoLocalWalletError(fnName: string) {
-    if (!this.hasValidLocalWallet()) {
-      const errorMsg = 'No valid local wallet available';
-      const errSource = `AccountTransactionSupervisor/${fnName}`;
-      logBonsaiError(errSource, errorMsg);
-      return wrapSimpleError(errSource, errorMsg, STRING_KEYS.NO_LOCAL_WALLET);
-    }
-    return undefined;
   }
 
   private getCancelableOrders(marketId?: string): SubaccountOrder[] {
@@ -516,192 +505,255 @@ export class AccountTransactionSupervisor {
   }
 
   // does subaccount transfer and place order and manages local order state
-  public async placeOrder(payloadBase: PlaceOrderPayload): Promise<OperationResult<any>> {
-    const maybeErr = this.maybeNoLocalWalletError('placeOrder');
-    if (maybeErr) {
-      return maybeErr;
-    }
-
-    const sourceSubaccount = getSubaccountId(this.store.getState());
-    const sourceAddress = getUserWalletAddress(this.store.getState());
-    if (sourceSubaccount == null || sourceAddress == null) {
-      return wrapSimpleError(
-        'AccountTransactionSupervisor/placeOrder',
-        'unknown parent subaccount number or address',
-        STRING_KEYS.SOMETHING_WENT_WRONG
-      );
-    }
-
-    const currentHeight = estimateLiveValidatorHeight(
-      this.store.getState(),
-      BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
-    );
-    if (currentHeight == null) {
-      return wrapSimpleError(
-        'AccountTransactionSupervisor/placeOrder',
-        'validator height unknown',
-        STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
-      );
-    }
-    const isShortTermOrder = calc(() => {
-      if (payloadBase.type === OrderType.MARKET) {
-        return true;
-      }
-      if (payloadBase.type === OrderType.LIMIT) {
-        if (payloadBase.timeInForce === OrderTimeInForce.GTT) {
-          return false;
-        }
-        return true;
-      }
-      return false;
-    });
-    const payload: PlaceOrderPayload = {
-      ...payloadBase,
-      currentHeight,
-      goodTilBlock: isShortTermOrder
-        ? currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
-        : undefined,
-    };
-
-    this.store.dispatch(
-      placeOrderSubmitted({
-        marketId: payload.marketId,
-        clientId: `${payload.clientId}`,
-        orderType: payload.type,
-        subaccountNumber: payload.subaccountNumber,
-      })
-    );
-
-    track(AnalyticsEvents.TradePlaceOrder({ ...payload }));
-    const startTime = startTimer();
-    const submitTime = createTimer();
-
-    const overallResult = await this.wrapOperation(
-      'AccountTransactionSupervisor/placeOrderWrapper',
-      payload,
-      async ({ payload: innerPayload }) => {
-        const subaccountTransferResult = await calc(async () => {
-          if (
-            innerPayload.transferToSubaccountAmount != null &&
-            innerPayload.transferToSubaccountAmount > 0
-          ) {
-            const res = await this.executeSubaccountTransfer({
-              fromSubaccountNumber: sourceSubaccount,
-              toSubaccountNumber: innerPayload.subaccountNumber,
-              amount: innerPayload.transferToSubaccountAmount,
-              targetAddress: sourceAddress,
-            });
-            await sleep(POST_TRANSFER_PLACE_ORDER_DELAY);
-            return res;
+  public async placeOrder(
+    payloadArg: PlaceOrderPayload,
+    source: TradeMetadataSource
+  ): Promise<OperationResult<any>> {
+    return (
+      taskBuilder({ payload: payloadArg })
+        .with<AddSharedContextMiddlewareProps>(
+          addSharedContextMiddleware('AccountTransactionSupervisor/placeOrder', this.shared)
+        )
+        .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
+        // fully prepare/augment the trade payload
+        .with<{
+          trackingMetadata: TradeAdditionalMetadata;
+          transferMetadata: { sourceSubaccount: number; sourceAddress: string };
+        }>(async (context, next) => {
+          const currentHeight = estimateLiveValidatorHeight(
+            this.store.getState(),
+            BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+          );
+          if (currentHeight == null) {
+            return createMiddlewareFailureResult(
+              wrapSimpleError(
+                context.fnName,
+                'validator height unknown',
+                STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
+              ),
+              context
+            );
           }
 
-          return wrapOperationSuccess({});
-        });
-
-        if (isOperationFailure(subaccountTransferResult)) {
-          throw new WrappedOperationFailureError(subaccountTransferResult);
-        }
-        const placeOrderResult = await this.executePlaceOrder(payload);
-        if (isOperationFailure(placeOrderResult)) {
-          throw new WrappedOperationFailureError(placeOrderResult);
-        }
-        submitTime.start();
-        return placeOrderResult.payload;
-      },
-      {
-        selector: BonsaiCore.account.allOrders.data,
-        validator: (orders) => {
-          const order = orders.find((o) => o.clientId === `${payload.clientId}`);
-          if (order != null) {
-            return order;
+          const sourceSubaccount = getSubaccountId(this.store.getState());
+          const sourceAddress = getUserWalletAddress(this.store.getState());
+          if (sourceSubaccount == null || sourceAddress == null) {
+            return createMiddlewareFailureResult(
+              wrapSimpleError(
+                context.fnName,
+                'unknown parent subaccount number or address',
+                STRING_KEYS.SOMETHING_WENT_WRONG
+              ),
+              context
+            );
           }
-          return undefined;
-        },
-        onTrigger: (success) => {
-          if (success) {
+          const transferMetadata = { sourceSubaccount, sourceAddress };
+
+          const payloadBase = context.payload;
+          const isShortTermOrder = calc(() => {
+            if (payloadBase.type === OrderType.MARKET) {
+              return true;
+            }
+            if (payloadBase.type === OrderType.LIMIT) {
+              if (payloadBase.timeInForce === OrderTimeInForce.GTT) {
+                return false;
+              }
+              return true;
+            }
+            return false;
+          });
+          const payload: PlaceOrderPayload = {
+            ...payloadBase,
+            currentHeight,
+            goodTilBlock: isShortTermOrder
+              ? currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
+              : undefined,
+          };
+          const trackingMetadata: TradeAdditionalMetadata = {
+            source,
+            volume: payload.size * payload.price,
+          };
+
+          return next({ ...context, payload, trackingMetadata, transferMetadata });
+        })
+        // handle store dispatching
+        .with<{}>(async (context, next) => {
+          const { payload } = context;
+          this.store.dispatch(
+            placeOrderSubmitted({
+              marketId: payload.marketId,
+              clientId: `${payload.clientId}`,
+              orderType: payload.type,
+              subaccountNumber: payload.subaccountNumber,
+            })
+          );
+          const overallResult = await next(context);
+          if (isOperationFailure(overallResult.result)) {
+            this.store.dispatch(
+              placeOrderFailed({
+                clientId: `${payload.clientId}`,
+                errorParams: operationFailureToErrorParams(overallResult.result),
+              })
+            );
+          }
+          return overallResult;
+        })
+        // analytics
+        .with<{ confirmedEvent: SimpleEvent<{}> }>(async (context, next) => {
+          const { payload, trackingMetadata } = context;
+          track(AnalyticsEvents.TradePlaceOrder({ ...payload, ...trackingMetadata }));
+          const startTime = startTimer();
+          const submitTime = createTimer();
+
+          const confirmedEvent = new SimpleEvent<{}>();
+          confirmedEvent.addListener(() => {
             track(
               AnalyticsEvents.TradePlaceOrderConfirmed({
                 ...payload,
                 roundtripMs: startTime.elapsed(),
                 sinceSubmissionMs: submitTime.elapsed(),
+                ...trackingMetadata,
+              })
+            );
+          });
+
+          const overallResult = await next({ ...context, confirmedEvent });
+          submitTime.start();
+
+          if (isOperationFailure(overallResult.result)) {
+            track(
+              AnalyticsEvents.TradePlaceOrderSubmissionFailed({
+                ...payload,
+                error: overallResult.result.errorString,
+                durationMs: startTime.elapsed(),
+                ...trackingMetadata,
+              })
+            );
+          } else if (isOperationSuccess(overallResult.result)) {
+            track(
+              AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
+                ...payload,
+                durationMs: startTime.elapsed(),
+                ...trackingMetadata,
               })
             );
           }
-        },
-      }
-    )();
 
-    if (isOperationFailure(overallResult)) {
-      track(
-        AnalyticsEvents.TradePlaceOrderSubmissionFailed({
-          ...payload,
-          error: overallResult.errorString,
-          durationMs: startTime.elapsed(),
+          return overallResult;
         })
-      );
-      this.store.dispatch(
-        placeOrderFailed({
-          clientId: `${payload.clientId}`,
-          errorParams: operationFailureToErrorParams(overallResult),
+        .do(async (context) => {
+          const { payload, transferMetadata } = context;
+
+          const overallResult = await this.wrapOperation(
+            'AccountTransactionSupervisor/placeOrderWrapper',
+            payload,
+            async ({ payload: innerPayload }) => {
+              const subaccountTransferResult = await calc(async () => {
+                if (
+                  innerPayload.transferToSubaccountAmount != null &&
+                  innerPayload.transferToSubaccountAmount > 0
+                ) {
+                  const res = await this.executeSubaccountTransfer({
+                    fromSubaccountNumber: transferMetadata.sourceSubaccount,
+                    toSubaccountNumber: innerPayload.subaccountNumber,
+                    amount: innerPayload.transferToSubaccountAmount,
+                    targetAddress: transferMetadata.sourceAddress,
+                  });
+                  await sleep(POST_TRANSFER_PLACE_ORDER_DELAY);
+                  return res;
+                }
+
+                return wrapOperationSuccess({});
+              });
+
+              if (isOperationFailure(subaccountTransferResult)) {
+                throw new WrappedOperationFailureError(subaccountTransferResult);
+              }
+              const placeOrderResult = await this.executePlaceOrder(payload);
+              if (isOperationFailure(placeOrderResult)) {
+                throw new WrappedOperationFailureError(placeOrderResult);
+              }
+              return placeOrderResult.payload;
+            },
+            {
+              selector: BonsaiCore.account.allOrders.data,
+              validator: (orders) => {
+                const order = orders.find((o) => o.clientId === `${payload.clientId}`);
+                if (order != null) {
+                  return order;
+                }
+                return undefined;
+              },
+              onTrigger: (success) => {
+                if (success) {
+                  context.confirmedEvent.trigger({});
+                }
+              },
+            }
+          )();
+
+          return overallResult;
         })
-      );
-    } else if (isOperationSuccess(overallResult)) {
-      track(
-        AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
-          ...payload,
-          durationMs: startTime.elapsed(),
-        })
-      );
-    }
-    return overallResult;
+    );
   }
 
   public async closeAllPositions() {
     track(AnalyticsEvents.TradeCloseAllPositionsClick({}));
 
-    const maybeErr = this.maybeNoLocalWalletError('closeAllPositions');
-    if (maybeErr) {
-      return maybeErr;
-    }
-
-    const closePayloads = this.getCloseAllPositionsPayloads();
-
-    if (closePayloads == null) {
-      return wrapSimpleError(
-        'AccountTransactionSupervisor/closeAllPositions',
-        'error generating close position payloads',
-        STRING_KEYS.SOMETHING_WENT_WRONG
-      );
-    }
-
-    if (closePayloads.length === 0) {
-      return wrapSimpleError(
-        'AccountTransactionSupervisor/closeAllPositions',
-        'no positions to close',
-        STRING_KEYS.NO_POSITIONS_TO_CLOSE
-      );
-    }
-
-    this.store.dispatch(
-      closeAllPositionsSubmitted(
-        closePayloads.map((payload) => ({
-          marketId: payload.marketId,
-          clientId: `${payload.clientId}`,
-          orderType: payload.type,
-          subaccountNumber: payload.subaccountNumber,
-        }))
+    return taskBuilder({ payload: {} })
+      .with<AddSharedContextMiddlewareProps>(
+        addSharedContextMiddleware('AccountTransactionSupervisor/closeAllPositions', this.shared)
       )
-    );
+      .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
+      .with<{ closePayloads: PlaceOrderPayload[] }>(async (context, next) => {
+        const closePayloads = this.getCloseAllPositionsPayloads();
 
-    const results = await Promise.all(closePayloads.map((p) => this.executePlaceOrder(p)));
+        if (closePayloads == null) {
+          return createMiddlewareFailureResult(
+            wrapSimpleError(
+              context.fnName,
+              'error generating close position payloads',
+              STRING_KEYS.SOMETHING_WENT_WRONG
+            ),
+            context
+          );
+        }
 
-    if (results.every(isOperationSuccess)) {
-      return wrapOperationSuccess({
-        results,
+        if (closePayloads.length === 0) {
+          return createMiddlewareFailureResult(
+            wrapSimpleError(
+              context.fnName,
+              'no positions to close',
+              STRING_KEYS.NO_POSITIONS_TO_CLOSE
+            ),
+            context
+          );
+        }
+
+        return next({ ...context, closePayloads });
+      })
+      .do(async ({ closePayloads }) => {
+        this.store.dispatch(
+          closeAllPositionsSubmitted(
+            closePayloads.map((payload) => ({
+              marketId: payload.marketId,
+              clientId: `${payload.clientId}`,
+              orderType: payload.type,
+              subaccountNumber: payload.subaccountNumber,
+            }))
+          )
+        );
+
+        const results = await Promise.all(closePayloads.map((p) => this.executePlaceOrder(p)));
+
+        if (results.every(isOperationSuccess)) {
+          return wrapOperationSuccess({
+            results,
+          });
+        }
+
+        return results.find(isOperationFailure)!;
       });
-    }
-
-    return results.find(isOperationFailure)!;
   }
 
   public async cancelOrder({
@@ -809,69 +861,79 @@ export class AccountTransactionSupervisor {
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
     track(AnalyticsEvents.TradeCancelAllOrdersClick({ marketId }));
-    const maybeErr = this.maybeNoLocalWalletError('cancelAllOrders');
-    if (maybeErr) {
-      return maybeErr;
-    }
 
-    // Get all order IDs that can be canceled
-    const orders = this.getCancelableOrders(marketId);
+    return taskBuilder({ payload: { marketId } })
+      .with<AddSharedContextMiddlewareProps>(
+        addSharedContextMiddleware('AccountTransactionSupervisor/cancelAllOrders', this.shared)
+      )
+      .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
+      .with<{ ordersWithUuids: Array<{ order: SubaccountOrder; uuid: string }> }>(
+        async (context, next) => {
+          const orders = this.getCancelableOrders(marketId);
 
-    if (orders.length === 0) {
-      return wrapSimpleError(
-        'AccountTransactionSupervisor/cancelAllOrders',
-        'no orders to cancel',
-        STRING_KEYS.NO_ORDERS_TO_CANCEL
-      );
-    }
+          if (orders.length === 0) {
+            return createMiddlewareFailureResult(
+              wrapSimpleError(
+                context.fnName,
+                'no orders to cancel',
+                STRING_KEYS.NO_ORDERS_TO_CANCEL
+              ),
+              context
+            );
+          }
 
-    const orderdsWithUuids = orders.map((order) => ({
-      order,
-      uuid: crypto.randomUUID(),
-    }));
+          const ordersWithUuids = orders.map((order) => ({
+            order,
+            uuid: crypto.randomUUID(),
+          }));
 
-    // Dispatch action to track cancellation request
-    this.store.dispatch(
-      cancelAllSubmitted({
-        marketId,
-        cancels: orderdsWithUuids.map((o) => ({
-          order: o.order,
-          orderId: o.order.id,
-          uuid: o.uuid,
-        })),
-      })
-    );
-
-    // Execute all cancel operations and collect results
-    const results = await Promise.all(
-      orderdsWithUuids.map(async (orderAndId) => {
-        const { order, uuid } = orderAndId;
-        const result = await this.executeCancelOrder(order.id);
-
-        if (isOperationFailure(result)) {
-          this.store.dispatch(
-            cancelOrderFailed({
-              uuid,
-              errorParams: operationFailureToErrorParams(result),
-            })
-          );
+          return next({ ...context, ordersWithUuids });
         }
-        return result;
-      })
-    );
+      )
+      .do(async ({ ordersWithUuids }) => {
+        // Dispatch action to track cancellation request
+        this.store.dispatch(
+          cancelAllSubmitted({
+            marketId,
+            cancels: ordersWithUuids.map((o) => ({
+              order: o.order,
+              orderId: o.order.id,
+              uuid: o.uuid,
+            })),
+          })
+        );
 
-    const allSuccess = results.every(isOperationSuccess);
-    if (allSuccess) {
-      return wrapOperationSuccess({
-        results,
+        // Execute all cancel operations and collect results
+        const results = await Promise.all(
+          ordersWithUuids.map(async (orderAndId) => {
+            const { order, uuid } = orderAndId;
+            const result = await this.executeCancelOrder(order.id);
+
+            if (isOperationFailure(result)) {
+              this.store.dispatch(
+                cancelOrderFailed({
+                  uuid,
+                  errorParams: operationFailureToErrorParams(result),
+                })
+              );
+            }
+            return result;
+          })
+        );
+
+        const allSuccess = results.every(isOperationSuccess);
+        if (allSuccess) {
+          return wrapOperationSuccess({
+            results,
+          });
+        }
+        return results.find(isOperationFailure)!;
       });
-    }
-    return results.find(isOperationFailure)!;
   }
 
-  public async placeCompoundOrder(order: TradeFormPayload) {
+  public async placeCompoundOrder(order: TradeFormPayload, source: TradeMetadataSource) {
     if (order.orderPayload != null) {
-      const res = await this.placeOrder(order.orderPayload);
+      const res = await this.placeOrder(order.orderPayload, source);
       if (isOperationFailure(res)) {
         return res;
       }
@@ -888,7 +950,7 @@ export class AccountTransactionSupervisor {
             }
           }
           if (operationPayload.placePayload != null) {
-            const res = await this.placeOrder(operationPayload.placePayload);
+            const res = await this.placeOrder(operationPayload.placePayload, source);
             if (isOperationFailure(res)) {
               return res;
             }
@@ -1092,6 +1154,7 @@ type StateTrackingProps<T> = {
     addListener: (onStart: () => void, onComplete: (result: T | null) => void) => void;
   };
 };
+
 function stateTrackingMiddleware<P, Q>(tracking?: Tracker<P, Q>) {
   return createMiddleware<StateTrackingProps<Q>, AddSharedContextMiddlewareProps>(
     async (context, next) => {
@@ -1157,4 +1220,16 @@ function stateTrackingMiddleware<P, Q>(tracking?: Tracker<P, Q>) {
       return result;
     }
   );
+}
+
+class SimpleEvent<T> {
+  private listeners: Array<(data: T) => void> = [];
+
+  addListener(listener: (data: T) => void): void {
+    this.listeners.push(listener);
+  }
+
+  trigger(data: T): void {
+    this.listeners.forEach((listener) => listener(data));
+  }
 }

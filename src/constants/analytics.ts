@@ -257,21 +257,25 @@ export const AnalyticsEvents = unionize(
     }>(),
 
     TradePlaceOrderClick: ofType<
-      PlaceOrderPayload & {
-        isClosePosition: boolean;
-        isSimpleUi?: boolean;
-      }
+      PlaceOrderPayload &
+        TradeAdditionalMetadata & {
+          isClosePosition: boolean;
+          isSimpleUi?: boolean;
+        }
     >(),
-    TradePlaceOrder: ofType<PlaceOrderPayload>(),
-    TradePlaceOrderSubmissionConfirmed: ofType<PlaceOrderPayload & { durationMs: number }>(),
+    TradePlaceOrder: ofType<PlaceOrderPayload & TradeAdditionalMetadata>(),
+    TradePlaceOrderSubmissionConfirmed: ofType<
+      PlaceOrderPayload & TradeAdditionalMetadata & { durationMs: number }
+    >(),
     TradePlaceOrderSubmissionFailed: ofType<
-      PlaceOrderPayload & { error: string; durationMs: number }
+      PlaceOrderPayload & TradeAdditionalMetadata & { error: string; durationMs: number }
     >(),
     TradePlaceOrderConfirmed: ofType<
-      PlaceOrderPayload & {
-        roundtripMs: number;
-        sinceSubmissionMs: number | undefined;
-      }
+      PlaceOrderPayload &
+        TradeAdditionalMetadata & {
+          roundtripMs: number;
+          sinceSubmissionMs: number | undefined;
+        }
     >(),
 
     TradeCancelOrderClick: ofType<{ orderId: string }>(),
@@ -495,6 +499,20 @@ export enum AffiliateRemovalReason {
   OwnReferralCode = 'own_referral_code',
   AffiliateAlreadyRegistered = 'affiliate_already_registered',
 }
+
+export type TradeMetadataSource =
+  | 'ClosePositionForm'
+  | 'SimpleCloseForm'
+  | 'SimpleTradeForm'
+  | 'TradeForm'
+  | 'TriggersForm'
+  | 'SimpleTriggersForm'
+  | 'TradingViewChart';
+
+export type TradeAdditionalMetadata = {
+  source: TradeMetadataSource;
+  volume: number;
+};
 
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
 export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};
