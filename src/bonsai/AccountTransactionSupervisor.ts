@@ -507,6 +507,7 @@ export class AccountTransactionSupervisor {
         .with<{
           trackingMetadata: TradeAdditionalMetadata;
           transferMetadata: { sourceSubaccount: number; sourceAddress: string };
+          isShortTermOrder: boolean;
         }>(async (context, next) => {
           const currentHeight = estimateLiveValidatorHeight(
             this.store.getState(),
@@ -562,7 +563,13 @@ export class AccountTransactionSupervisor {
             volume: payload.size * payload.price,
           };
 
-          return next({ ...context, payload, trackingMetadata, transferMetadata });
+          return next({
+            ...context,
+            payload,
+            trackingMetadata,
+            transferMetadata,
+            isShortTermOrder,
+          });
         })
         // handle store dispatching
         .with<{}>(async (context, next) => {
@@ -657,7 +664,7 @@ export class AccountTransactionSupervisor {
               if (isOperationFailure(subaccountTransferResult)) {
                 throw new WrappedOperationFailureError(subaccountTransferResult);
               }
-              const placeOrderResult = await this.executePlaceOrder(payload);
+              const placeOrderResult = await this.executePlaceOrder(innerPayload);
               if (isOperationFailure(placeOrderResult)) {
                 throw new WrappedOperationFailureError(placeOrderResult);
               }
