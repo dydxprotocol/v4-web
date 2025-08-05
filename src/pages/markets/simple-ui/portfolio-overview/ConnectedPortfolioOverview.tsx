@@ -204,6 +204,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
             action={ButtonAction.Primary}
             slotLeft={<Icon iconName={IconName.Deposit2} />}
             onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+            tw="w-full"
           >
             {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
           </Button>
