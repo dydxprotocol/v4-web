@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -54,6 +56,24 @@ export const MarketsBanners = ({
   };
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
+
+  // Free Deposits Banner State
+  const [hasDismissedFreeDepositsBanner, setHasDismissedFreeDepositsBanner] = useLocalStorage({
+    key: LocalStorageKey.HasSeenFreeDepositsBanner,
+    defaultValue: false,
+  });
+
+  const onDismissFreeDepositsBanner = (e: React.MouseEvent<any>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setHasDismissedFreeDepositsBanner(true);
+  };
+
+  const onClickFreeDepositsBanner = () => {
+    window.open('https://www.dydx.xyz/blog/free-deposits-dydx', '_blank');
+  };
+
+  const shouldDisplayFreeDepositsBanner = !hasDismissedFreeDepositsBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -102,6 +122,27 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
+  // Free Deposits Banner Component
+  const freeDepositsBanner = shouldDisplayFreeDepositsBanner ? (
+    <$FreeDepositsBanner onClick={onClickFreeDepositsBanner} role="button" tabIndex={0}>
+      <div tw="mr-auto flex flex-col">
+        <span tw="text-white font-medium-medium">$100+ Deposits are Now Free and Instant</span>
+        <Button action={ButtonAction.Primary} tw="mt-0.5 max-w-12">
+          Learn more
+        </Button>
+      </div>
+
+      <$DepositIcon />
+
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissFreeDepositsBanner}
+      />
+    </$FreeDepositsBanner>
+  ) : null;
+
   const hasDismissedPumpBanner = useAppSelector(getHasDismissedPumpBanner);
   const pumpMarketId = 'PUMP-USD';
 
@@ -147,7 +188,7 @@ export const MarketsBanners = ({
     </$PumpBanner>
   ) : null;
 
-  return pumpBanner ?? pmlBanner ?? null;
+  return freeDepositsBanner ?? pumpBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -220,5 +261,38 @@ const $Details = styled(Details)`
 
   > :first-child {
     padding-left: 0;
+  }
+`;
+
+const $FreeDepositsBanner = styled($MarketsPageBanner)`
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  height: 5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+  }
+
+  button {
+    z-index: 1;
+  }
+`;
+
+const $DepositIcon = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: 1rem;
+
+  &::before {
+    content: '⚡';
+    font-size: 1.25rem;
   }
 `;

@@ -636,17 +636,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: <Icon iconName={IconName.Trophy} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
+                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
+                  DYDX_REWARDS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
+                key: STRING_KEYS.SURGE_PAYOUT_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               toastSensitivity: 'foreground',
