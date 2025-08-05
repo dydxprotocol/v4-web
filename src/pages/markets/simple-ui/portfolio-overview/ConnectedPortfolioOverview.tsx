@@ -4,7 +4,8 @@ import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { TooltipContextType } from '@visx/xychart';
 import { shallowEqual } from 'react-redux';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -24,7 +25,8 @@ import { PnlDatum } from '@/views/charts/PnlChart';
 
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -119,56 +121,69 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
     [rawPnlData, equity, now, latestTick, subaccountId]
   );
 
-  const portfolioOverviewValues = (
-    <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125">
-      <Output
-        tw="text-color-text-2 font-extra-large-bold"
-        value={accountEquity}
-        type={OutputType.Fiat}
-        isLoading={isLoadingSubaccount}
-      />
-      <div tw="row gap-0.5 font-small-book">
-        <Output
-          css={{
-            color: {
-              [NumberSign.Positive]: 'var(--color-positive)',
-              [NumberSign.Negative]: 'var(--color-negative)',
-              [NumberSign.Neutral]: 'var(--color-text-1)',
-            }[pnlDiffSign],
-          }}
-          value={pnlDiff ?? null}
-          type={OutputType.Fiat}
-          isLoading={isChartLoading}
-          slotRight={
-            pnlDiffPercent && (
-              <span tw="ml-0.5">
-                (<Output tw="inline" value={pnlDiffPercent} type={OutputType.Percent} />)
-              </span>
-            )
-          }
-        />
+  const dispatch = useAppDispatch();
 
-        {!isChartLoading && (
-          <SimpleUiDropdownMenu tw="pointer-events-auto rounded-0.25" items={periodDropdownItems}>
-            <Button
-              shape={ButtonShape.Rectangle}
-              size={ButtonSize.XXSmall}
-              css={{
-                '--button-textColor': 'var(--color-text-2)',
-              }}
-            >
-              {formatRelativeTime(
-                getMsForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
-                {
-                  locale: selectedLocale,
-                  relativeToTimestamp: 0,
-                  largestUnit: 'day',
-                }
-              )}
-            </Button>
-          </SimpleUiDropdownMenu>
-        )}
+  const portfolioOverviewValues = (
+    <div tw="row absolute left-1.25 top-1.25 gap-1.5">
+      <div tw="flexColumn gap-0.125">
+        <Output
+          tw="text-color-text-2 font-extra-large-bold"
+          value={accountEquity}
+          type={OutputType.Fiat}
+          isLoading={isLoadingSubaccount}
+        />
+        <div tw="row gap-0.5 font-small-book">
+          <Output
+            css={{
+              color: {
+                [NumberSign.Positive]: 'var(--color-positive)',
+                [NumberSign.Negative]: 'var(--color-negative)',
+                [NumberSign.Neutral]: 'var(--color-text-1)',
+              }[pnlDiffSign],
+            }}
+            value={pnlDiff ?? null}
+            type={OutputType.Fiat}
+            isLoading={isChartLoading}
+            slotRight={
+              pnlDiffPercent && (
+                <span tw="ml-0.5">
+                  (<Output tw="inline" value={pnlDiffPercent} type={OutputType.Percent} />)
+                </span>
+              )
+            }
+          />
+
+          {!isChartLoading && (
+            <SimpleUiDropdownMenu tw="pointer-events-auto rounded-0.25" items={periodDropdownItems}>
+              <Button
+                shape={ButtonShape.Rectangle}
+                size={ButtonSize.XXSmall}
+                css={{
+                  '--button-textColor': 'var(--color-text-2)',
+                }}
+              >
+                {formatRelativeTime(
+                  getMsForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
+                  {
+                    locale: selectedLocale,
+                    relativeToTimestamp: 0,
+                    largestUnit: 'day',
+                  }
+                )}
+              </Button>
+            </SimpleUiDropdownMenu>
+          )}
+        </div>
       </div>
+      {equityBN == null ||
+        (equityBN.lte(1) && (
+          <Button
+            action={ButtonAction.Primary}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+          </Button>
+        ))}
     </div>
   );
 
