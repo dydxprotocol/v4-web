@@ -125,7 +125,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   const dispatch = useAppDispatch();
 
   const portfolioOverviewValues = (
-    <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125 gap-1.5">
+    <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125">
       <Output
         tw="text-color-text-2 font-extra-large-bold"
         value={accountEquity}
