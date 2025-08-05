@@ -17,6 +17,7 @@ export enum NotificationType {
   MarketWindDown = 'MarketWindDown',
   FeedbackRequest = 'FeedbackRequest',
   PredictionMarketConcluded = 'PredictionMarketConcluded',
+  FreeDeposits = 'FreeDeposits',
   Custom = 'Custom', // custom notifications triggered by components eg user input errors
   BlockTradingReward = 'BlockTradingReward', // deprecated
   FillWithNoOrder = 'FillWithNoOrder',
@@ -53,6 +54,7 @@ export const NotificationTypeCategory: {
   [NotificationType.RewardsProgramUpdates]: NotificationCategoryPreferences.MustSee,
   [NotificationType.FeedbackRequest]: NotificationCategoryPreferences.MustSee,
   [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.FreeDeposits]: NotificationCategoryPreferences.Transfers,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
 };

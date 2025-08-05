@@ -603,12 +603,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
                 key: STRING_KEYS.SURGE_PAYOUT_TITLE,
-                params: { SEASON_NUMBER: currentSeason - 1, DYDX_REWARDS: rewards },
+                params: {
+                  SEASON_NUMBER: currentSeason,
+                  DYDX_REWARDS: CURRENT_REWARDS_SEASON_AMOUNT,
+                },
               }),
               body: stringGetter({
                 key: STRING_KEYS.SURGE_PAYOUT_BODY,
                 params: {
-                  SEASON_NUMBER: currentSeason - 1,
+                  SEASON_NUMBER: currentSeason,
                 },
               }),
               toastSensitivity: 'foreground',
@@ -636,14 +639,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: <Icon iconName={IconName.Trophy} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
+                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
                   AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
+                key: STRING_KEYS.SURGE_PAYOUT_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
                   AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
@@ -672,13 +675,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <Icon iconName={IconName.Clock} />,
               title: stringGetter({
                 key: STRING_KEYS.SURGE_SEASON_ENDING_TITLE,
-                params: { SEASON_NUMBER: currentSeason, DAYS_LEFT: daysLeft },
+                params: {
+                  SEASON_NUMBER: currentSeason,
+                  DAYS_LEFT: CURRENT_REWARDS_SEASON_AMOUNT,
+                },
               }),
               body: stringGetter({
                 key: STRING_KEYS.SURGE_SEASON_ENDING_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  DAYS_LEFT: daysLeft,
+                  DAYS_LEFT: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               toastSensitivity: 'foreground',
@@ -1011,6 +1017,60 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { getInTouch } = useURLConfigs();
       return () => {
         window.open(getInTouch, '_blank', 'noopener, noreferrer');
+      };
+    },
+  },
+  {
+    type: NotificationType.FreeDeposits,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const dispatch = useAppDispatch();
+      const equity =
+        useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)?.equity.toNumber() ?? 0;
+
+      useEffect(() => {
+        // V1: Target all users - uncomment the line below and comment out the targeting logic
+        // const shouldShowNotification = true;
+
+        // Stretch goal: Target only users with less than $20 in equity
+        const shouldShowNotification = equity < 20;
+
+        if (shouldShowNotification) {
+          trigger({
+            id: 'free-deposits-live',
+            displayData: {
+              icon: <Icon iconName={IconName.Lightning} />,
+              title: '⚡Free, Instant Deposits Now Live',
+              body: '$100+ deposits are now instant and free on dYdX.',
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.FreeDeposits,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              withClose: true,
+              // Stretch goal: Add action link
+              actionAltText: 'Deposit now',
+              renderActionSlot: () => (
+                <Link
+                  isAccent
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(openDialog(DialogTypes.Deposit2()));
+                  }}
+                >
+                  Deposit now →
+                </Link>
+              ),
+            },
+            updateKey: ['free-deposits-v1'],
+          });
+        }
+      }, [stringGetter, trigger, dispatch, equity]);
+    },
+
+    useNotificationAction: () => {
+      const dispatch = useAppDispatch();
+      return () => {
+        // Stretch goal: Open deposit dialog on notification click
+        dispatch(openDialog(DialogTypes.Deposit2()));
       };
     },
   },
