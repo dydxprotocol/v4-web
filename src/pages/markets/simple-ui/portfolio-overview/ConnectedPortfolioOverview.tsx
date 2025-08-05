@@ -16,6 +16,7 @@ import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType } from '@/components/Output';
@@ -124,66 +125,55 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   const dispatch = useAppDispatch();
 
   const portfolioOverviewValues = (
-    <div tw="row absolute left-1.25 top-1.25 gap-1.5">
-      <div tw="flexColumn gap-0.125">
+    <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125 gap-1.5">
+      <Output
+        tw="text-color-text-2 font-extra-large-bold"
+        value={accountEquity}
+        type={OutputType.Fiat}
+        isLoading={isLoadingSubaccount}
+      />
+      <div tw="row gap-0.5 font-small-book">
         <Output
-          tw="text-color-text-2 font-extra-large-bold"
-          value={accountEquity}
+          css={{
+            color: {
+              [NumberSign.Positive]: 'var(--color-positive)',
+              [NumberSign.Negative]: 'var(--color-negative)',
+              [NumberSign.Neutral]: 'var(--color-text-1)',
+            }[pnlDiffSign],
+          }}
+          value={pnlDiff ?? null}
           type={OutputType.Fiat}
-          isLoading={isLoadingSubaccount}
+          isLoading={isChartLoading}
+          slotRight={
+            pnlDiffPercent && (
+              <span tw="ml-0.5">
+                (<Output tw="inline" value={pnlDiffPercent} type={OutputType.Percent} />)
+              </span>
+            )
+          }
         />
-        <div tw="row gap-0.5 font-small-book">
-          <Output
-            css={{
-              color: {
-                [NumberSign.Positive]: 'var(--color-positive)',
-                [NumberSign.Negative]: 'var(--color-negative)',
-                [NumberSign.Neutral]: 'var(--color-text-1)',
-              }[pnlDiffSign],
-            }}
-            value={pnlDiff ?? null}
-            type={OutputType.Fiat}
-            isLoading={isChartLoading}
-            slotRight={
-              pnlDiffPercent && (
-                <span tw="ml-0.5">
-                  (<Output tw="inline" value={pnlDiffPercent} type={OutputType.Percent} />)
-                </span>
-              )
-            }
-          />
 
-          {!isChartLoading && (
-            <SimpleUiDropdownMenu tw="pointer-events-auto rounded-0.25" items={periodDropdownItems}>
-              <Button
-                shape={ButtonShape.Rectangle}
-                size={ButtonSize.XXSmall}
-                css={{
-                  '--button-textColor': 'var(--color-text-2)',
-                }}
-              >
-                {formatRelativeTime(
-                  getMsForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
-                  {
-                    locale: selectedLocale,
-                    relativeToTimestamp: 0,
-                    largestUnit: 'day',
-                  }
-                )}
-              </Button>
-            </SimpleUiDropdownMenu>
-          )}
-        </div>
+        {!isChartLoading && (
+          <SimpleUiDropdownMenu tw="pointer-events-auto rounded-0.25" items={periodDropdownItems}>
+            <Button
+              shape={ButtonShape.Rectangle}
+              size={ButtonSize.XXSmall}
+              css={{
+                '--button-textColor': 'var(--color-text-2)',
+              }}
+            >
+              {formatRelativeTime(
+                getMsForPeriod(selectedPeriod, earliestCreatedAt, latestCreatedAt, false),
+                {
+                  locale: selectedLocale,
+                  relativeToTimestamp: 0,
+                  largestUnit: 'day',
+                }
+              )}
+            </Button>
+          </SimpleUiDropdownMenu>
+        )}
       </div>
-      {equityBN == null ||
-        (equityBN.lte(1) && (
-          <Button
-            action={ButtonAction.Primary}
-            onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-          >
-            {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-          </Button>
-        ))}
     </div>
   );
 
@@ -208,7 +198,18 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
       tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
       className={className}
     >
-      {isChartLoading ? (
+      {equityBN == null || equityBN.lte(1) ? (
+        <div tw="flexColumn h-full w-full items-center justify-center gap-0.5 px-1.25 text-center text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
+          <Button
+            action={ButtonAction.Primary}
+            slotLeft={<Icon iconName={IconName.Deposit2} />}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+          </Button>
+        </div>
+      ) : isChartLoading ? (
         <LoadingSpace id="simple-pnl-chart" />
       ) : (
         <SimplePnlChart
