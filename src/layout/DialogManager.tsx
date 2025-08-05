@@ -35,7 +35,6 @@ import { PredictionMarketIntroDialog } from '@/views/dialogs/PredictionMarketInt
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { ReclaimChildSubaccountFundsDialog } from '@/views/dialogs/ReclaimChildSubaccountFundsDialog';
-import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SetupPasskeyDialog } from '@/views/dialogs/SetupPasskeyDialog';
@@ -117,7 +116,6 @@ export const DialogManager = React.memo(() => {
     ReclaimChildSubaccountFunds: (args) => (
       <ReclaimChildSubaccountFundsDialog {...args} {...modalProps} />
     ),
-    Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
     SetupPasskey: (args) => <SetupPasskeyDialog {...args} {...modalProps} />,
