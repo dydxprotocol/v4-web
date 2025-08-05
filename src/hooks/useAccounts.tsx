@@ -119,7 +119,8 @@ const useAccountsContext = () => {
     } catch (error) {
       // 404 is expected if the user has no subaccounts
       // 403 is expected if the user account is blocked
-      if (error.status === 404 || error.status === 403) {
+      const status = error.status ?? error.response?.status;
+      if (status === 404 || status === 403) {
         return [];
       }
       throw error;
