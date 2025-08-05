@@ -4,7 +4,8 @@ import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { TooltipContextType } from '@visx/xychart';
 import { shallowEqual } from 'react-redux';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
@@ -15,6 +16,7 @@ import { useNow } from '@/hooks/useNow';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { MarginUsageTag } from '@/components/MarginUsageTag';
 import { Output, OutputType } from '@/components/Output';
@@ -24,7 +26,8 @@ import { PnlDatum } from '@/views/charts/PnlChart';
 
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -37,6 +40,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   const selectedLocale = useAppSelector(getSelectedLocale);
   const now = useNow({ intervalMs: timeUnits.minute });
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
   // Data
   const {
@@ -193,7 +197,19 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
       tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
       className={className}
     >
-      {isChartLoading ? (
+      {equityBN == null || equityBN.lt(1) ? (
+        <div tw="flexColumn h-full w-full items-center justify-center gap-0.5 px-1.25 text-center text-color-text-0">
+          {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
+          <Button
+            action={ButtonAction.Primary}
+            slotLeft={<Icon iconName={IconName.Deposit2} />}
+            onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
+            tw="w-full"
+          >
+            {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+          </Button>
+        </div>
+      ) : isChartLoading ? (
         <LoadingSpace id="simple-pnl-chart" />
       ) : (
         <SimplePnlChart
