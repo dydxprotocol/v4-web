@@ -40,6 +40,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   const selectedLocale = useAppSelector(getSelectedLocale);
   const now = useNow({ intervalMs: timeUnits.minute });
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
 
   // Data
   const {
@@ -122,8 +123,6 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
     [rawPnlData, equity, now, latestTick, subaccountId]
   );
 
-  const dispatch = useAppDispatch();
-
   const portfolioOverviewValues = (
     <div tw="flexColumn absolute left-1.25 top-1.25 gap-0.125">
       <Output
@@ -198,7 +197,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
       tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
       className={className}
     >
-      {equityBN == null || equityBN.lte(1) ? (
+      {equityBN == null || equityBN.lt(1) ? (
         <div tw="flexColumn h-full w-full items-center justify-center gap-0.5 px-1.25 text-center text-color-text-0">
           {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
           <Button
