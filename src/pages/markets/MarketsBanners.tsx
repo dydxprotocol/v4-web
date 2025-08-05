@@ -266,12 +266,11 @@ const $Details = styled(Details)`
 
 const $FreeDepositsBanner = styled($MarketsPageBanner)`
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  height: 5rem;
+  height: 8rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
   }
 
