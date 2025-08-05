@@ -602,14 +602,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
+                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
                   DYDX_REWARDS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_BODY,
+                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
                 },
@@ -639,14 +639,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: <Icon iconName={IconName.Trophy} />,
               title: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_TITLE,
+                key: STRING_KEYS.SURGE_BASIC_SEASON_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
                   AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
                 },
               }),
               body: stringGetter({
-                key: STRING_KEYS.SURGE_PAYOUT_BODY,
+                key: STRING_KEYS.SURGE_BASIC_SEASON_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
                   AMOUNT_MILLIONS: CURRENT_REWARDS_SEASON_AMOUNT,
@@ -677,14 +677,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 key: STRING_KEYS.SURGE_SEASON_ENDING_TITLE,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  DAYS_LEFT: CURRENT_REWARDS_SEASON_AMOUNT,
+                  DAYS_LEFT: daysLeft,
                 },
               }),
               body: stringGetter({
                 key: STRING_KEYS.SURGE_SEASON_ENDING_BODY,
                 params: {
                   SEASON_NUMBER: currentSeason,
-                  DAYS_LEFT: CURRENT_REWARDS_SEASON_AMOUNT,
+                  DAYS_LEFT: daysLeft,
                 },
               }),
               toastSensitivity: 'foreground',
