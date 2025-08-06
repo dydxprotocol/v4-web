@@ -178,10 +178,10 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
     </div>
   );
 
-  const noEquity = equityBN != null && equityBN.lt(1);
+  const hasNoEquity = equityBN != null && equityBN.lt(1);
   const portfolioBuyingPowerAndRisk = (
     <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125 font-small-book">
-      {noEquity ? (
+      {hasNoEquity ? (
         <div tw="flexColumn h-full w-full items-center justify-center gap-0.5 px-1.25 text-center text-color-text-0">
           {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
           <Button
@@ -216,7 +216,7 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
       tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
       className={className}
     >
-      {isChartLoading && !noEquity ? (
+      {isChartLoading && !hasNoEquity ? (
         <LoadingSpace id="simple-pnl-chart" />
       ) : (
         <SimplePnlChart
