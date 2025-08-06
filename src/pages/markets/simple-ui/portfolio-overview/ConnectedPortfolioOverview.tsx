@@ -50,8 +50,10 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
   } = orEmptyObj(useAppSelector(getSubaccount, shallowEqual));
   const rawPnlData = BonsaiHooks.useParentSubaccountHistoricalPnls().data ?? EMPTY_ARR;
   const status = useAppSelector(BonsaiCore.account.parentSubaccountSummary.loading);
-  const isLoadingSubaccount = status === 'pending';
-  const isLoadingPnl = BonsaiHooks.useParentSubaccountHistoricalPnls().status === 'pending';
+  const subaccount = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data);
+  const isLoadingSubaccount = status === 'pending' && subaccount == null;
+  const isLoadingPnl =
+    BonsaiHooks.useParentSubaccountHistoricalPnls().status === 'pending' && rawPnlData.length === 0;
   const subaccountId = useAppSelector(getSubaccountId, shallowEqual);
 
   // UI
@@ -178,25 +180,6 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
 
   const portfolioBuyingPowerAndRisk = (
     <div tw="row absolute bottom-1 left-1.25 right-1.25 justify-between gap-0.125 font-small-book">
-      <div tw="row gap-0.25">
-        <WithTooltip tooltip="buying-power-simple">
-          <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}:</span>
-        </WithTooltip>
-        <Output
-          value={freeCollateral?.times(50)}
-          type={OutputType.Fiat}
-          isLoading={isLoadingSubaccount}
-        />
-      </div>
-      {!isLoadingSubaccount && <MarginUsageTag marginUsage={marginUsage} />}
-    </div>
-  );
-
-  return (
-    <div
-      tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
-      className={className}
-    >
       {equityBN == null || equityBN.lt(1) ? (
         <div tw="flexColumn h-full w-full items-center justify-center gap-0.5 px-1.25 text-center text-color-text-0">
           {stringGetter({ key: STRING_KEYS.NO_FUNDS })}
@@ -209,8 +192,34 @@ export const ConnectedPortfolioOverview = ({ className }: { className?: string }
             {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
           </Button>
         </div>
-      ) : isChartLoading ? (
-        <LoadingSpace id="simple-pnl-chart" />
+      ) : (
+        <>
+          <div tw="row gap-0.25">
+            <WithTooltip tooltip="buying-power-simple">
+              <span tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.BUYING_POWER })}:</span>
+            </WithTooltip>
+            <Output
+              value={freeCollateral?.times(50)}
+              type={OutputType.Fiat}
+              isLoading={isLoadingSubaccount}
+            />
+          </div>
+          {!isLoadingSubaccount && <MarginUsageTag marginUsage={marginUsage} />}
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <div
+      tw="flexColumn relative border-b border-l-0 border-r-0 border-t-0 border-solid border-color-border py-1"
+      className={className}
+    >
+      {isChartLoading ? (
+        // we have to bump the loading spinner up for the case when bottom row is displaying the deposit button
+        <div tw="h-full w-full pb-1">
+          <LoadingSpace id="simple-pnl-chart" />
+        </div>
       ) : (
         <SimplePnlChart
           data={data}
