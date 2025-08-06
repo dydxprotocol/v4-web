@@ -136,8 +136,8 @@ export const PREDICTION_MARKET = {
 
 export const ISOLATED_LIQUIDITY_TIER_INFO = {
   label: 'Isolated',
-  initialMarginFraction: 0.05,
-  maintenanceMarginFraction: 0.03,
+  initialMarginFraction: 0.2,
+  maintenanceMarginFraction: 0.1,
   impactNotional: 2_500,
 };
 
