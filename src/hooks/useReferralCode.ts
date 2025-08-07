@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 
 import { AffiliateRemovalReason, AnalyticsEvents } from '@/constants/analytics';
+import { DialogTypes } from '@/constants/dialogs';
 
 import { removeLatestReferrer, updateLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
@@ -28,6 +30,12 @@ export function useReferralCode() {
   const latestReferrer = useAppSelector(getLatestReferrer);
 
   const isOwnReferralCode = affiliateMetadata?.metadata?.referralCode === testFlags.referralCode;
+
+  useEffect(() => {
+    if (testFlags.referralCode) {
+      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (referralAddress) {

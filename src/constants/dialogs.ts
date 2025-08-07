@@ -148,6 +148,7 @@ export const DialogTypes = unionize(
     Preferences: ofType<PreferencesDialogProps>(),
     RateLimit: ofType<RateLimitDialogProps>(),
     ReclaimChildSubaccountFunds: ofType<ReclaimChildSubaccountFundsDialogProps>(),
+    Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
     SetupPasskey: ofType<SetupPasskeyDialogProps>(),
