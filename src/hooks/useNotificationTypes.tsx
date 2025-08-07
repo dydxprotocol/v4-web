@@ -1044,8 +1044,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: '$100+ deposits are now instant and free on dYdX.',
               toastSensitivity: 'foreground',
               groupKey: NotificationType.FreeDeposits,
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              withClose: true,
               // Stretch goal: Add action link
               actionAltText: 'Deposit now',
               renderActionSlot: () => (
