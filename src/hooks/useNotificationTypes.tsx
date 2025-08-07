@@ -1025,43 +1025,48 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const dispatch = useAppDispatch();
-      const equity =
-        useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)?.equity.toNumber() ?? 0;
+      const parentSubaccountSummary = useAppSelector(
+        BonsaiCore.account.parentSubaccountSummary.data
+      );
+      const equity = parentSubaccountSummary?.equity.toNumber();
 
       useEffect(() => {
         // V1: Target all users - uncomment the line below and comment out the targeting logic
         // const shouldShowNotification = true;
 
         // Stretch goal: Target only users with less than $20 in equity
-        const shouldShowNotification = equity < 20;
+        // Wait for account data to load before checking equity
+        if (parentSubaccountSummary && equity !== undefined) {
+          const shouldShowNotification = equity < 20;
 
-        if (shouldShowNotification) {
-          trigger({
-            id: 'free-deposits-live',
-            displayData: {
-              icon: <Icon iconName={IconName.Lightning} />,
-              title: '⚡Free, Instant Deposits Now Live',
-              body: '$100+ deposits are now instant and free on dYdX.',
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.FreeDeposits,
-              // Stretch goal: Add action link
-              actionAltText: 'Deposit now',
-              renderActionSlot: () => (
-                <Link
-                  isAccent
-                  onClick={(e) => {
-                    e.preventDefault();
-                    dispatch(openDialog(DialogTypes.Deposit2()));
-                  }}
-                >
-                  Deposit now →
-                </Link>
-              ),
-            },
-            updateKey: ['free-deposits-v1'],
-          });
+          if (shouldShowNotification) {
+            trigger({
+              id: 'free-deposits-live',
+              displayData: {
+                icon: <Icon iconName={IconName.Lightning} />,
+                title: '⚡Free, Instant Deposits Now Live',
+                body: '$100+ deposits are now instant and free on dYdX.',
+                toastSensitivity: 'foreground',
+                groupKey: NotificationType.FreeDeposits,
+                // Stretch goal: Add action link
+                actionAltText: 'Deposit now',
+                renderActionSlot: () => (
+                  <Link
+                    isAccent
+                    onClick={(e) => {
+                      e.preventDefault();
+                      dispatch(openDialog(DialogTypes.Deposit2()));
+                    }}
+                  >
+                    Deposit now →
+                  </Link>
+                ),
+              },
+              updateKey: ['free-deposits-v1'],
+            });
+          }
         }
-      }, [stringGetter, trigger, dispatch, equity]);
+      }, [stringGetter, trigger, dispatch, equity, parentSubaccountSummary]);
     },
 
     useNotificationAction: () => {
