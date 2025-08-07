@@ -124,10 +124,14 @@ export const MarketsBanners = ({
 
   // Free Deposits Banner Component
   const freeDepositsBanner = shouldDisplayFreeDepositsBanner ? (
-    <$FreeDepositsBanner onClick={onClickFreeDepositsBanner} role="button" tabIndex={0}>
+    <$FreeDepositsBanner>
       <div tw="mr-auto flex flex-col">
         <span tw="text-white font-medium-medium">$100+ Deposits are Now Free and Instant</span>
-        <Button action={ButtonAction.Primary} tw="mt-0.5 max-w-12">
+        <Button
+          action={ButtonAction.Primary}
+          tw="mt-0.5 max-w-12"
+          onClick={onClickFreeDepositsBanner}
+        >
           Learn more
         </Button>
       </div>
@@ -267,12 +271,6 @@ const $Details = styled(Details)`
 const $FreeDepositsBanner = styled($MarketsPageBanner)`
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   height: 8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
-  }
 
   button {
     z-index: 1;
