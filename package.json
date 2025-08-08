@@ -101,6 +101,7 @@
     "@turnkey/http": "^3.6.0",
     "@turnkey/sdk-browser": "^5.4.1",
     "@turnkey/sdk-react": "^5.2.11",
+    "@turnkey/sdk-server": "^4.3.0",
     "@turnkey/wallet-stamper": "^1.0.7",
     "@types/lodash": "^4.14.195",
     "@visx/axis": "^3.1.0",

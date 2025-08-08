@@ -59,9 +59,11 @@ import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
+import { WalletConnectionProvider } from './hooks/useWalletConnection';
 import { isTruthy } from './lib/isTruthy';
 import { AffiliatesPage } from './pages/affiliates/AffiliatesPage';
 import { TurnkeyAuthProvider } from './providers/TurnkeyAuthProvider';
+import { TurnkeyWalletProvider } from './providers/TurnkeyWalletProvider';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
 import { appQueryClient } from './state/appQueryClient';
@@ -299,8 +301,10 @@ const providers = [
   wrapProvider(RestrictionProvider),
   wrapProvider(TurnkeyProvider, { config: TURNKEY_CONFIG }),
   wrapProvider(DydxProvider),
-  wrapProvider(AccountsProvider),
+  wrapProvider(WalletConnectionProvider),
   wrapProvider(TurnkeyAuthProvider),
+  wrapProvider(TurnkeyWalletProvider),
+  wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(SkipProvider),
   wrapProvider(NotificationsProvider),

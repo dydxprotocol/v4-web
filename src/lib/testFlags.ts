@@ -65,7 +65,7 @@ class TestFlags {
   }
 
   get enableTurnkey() {
-    return this.queryParams.enable_turnkey;
+    return true; // this.queryParams.enable_turnkey;
   }
 }
 

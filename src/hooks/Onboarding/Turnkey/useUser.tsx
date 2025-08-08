@@ -39,6 +39,7 @@ export const useUser = () => {
         });
       }
     };
+
     fetchUser();
   }, [turnkey, indexedDbClient]);
 

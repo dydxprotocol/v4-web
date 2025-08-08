@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
@@ -36,7 +36,18 @@ import { parseWalletError } from '@/lib/wallet';
 
 import { useStringGetter } from './useStringGetter';
 
-export const useWalletConnection = () => {
+const WalletConnectionContext = createContext<
+  ReturnType<typeof useWalletConnectionContext> | undefined
+>(undefined);
+WalletConnectionContext.displayName = 'WalletConnection';
+
+export const WalletConnectionProvider = ({ ...props }) => (
+  <WalletConnectionContext.Provider value={useWalletConnectionContext()} {...props} />
+);
+
+export const useWalletConnection = () => useContext(WalletConnectionContext)!;
+
+export const useWalletConnectionContext = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
