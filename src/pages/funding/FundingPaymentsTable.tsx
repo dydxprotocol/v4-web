@@ -20,6 +20,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
@@ -206,7 +207,8 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
   ) => {
     const stringGetter = useStringGetter();
 
-    const fundingPayments = BonsaiHooks.useFundingPayments().data;
+    const { data: fundingPayments, status: fundingPaymentsStatus } =
+      BonsaiHooks.useFundingPayments();
 
     const marketSummaries = orEmptyRecord(useAppSelector(BonsaiCore.markets.markets.data));
 
@@ -228,6 +230,9 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
       );
     }, [fundingPayments, marketSummaries, currentMarket]);
 
+    const isLoading =
+      fundingPaymentsStatus === 'pending' && (fundingPaymentsData ?? EMPTY_ARR).length === 0;
+
     return (
       <$Table
         label="Funding Payments"
@@ -243,10 +248,14 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
           })
         )}
         slotEmpty={
-          <>
-            <Icon iconName={IconName.Clock} tw="text-[3em]" />
-            <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
-          </>
+          isLoading ? (
+            <LoadingSpace />
+          ) : (
+            <>
+              <Icon iconName={IconName.Clock} tw="text-[3em]" />
+              <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
+            </>
+          )
         }
         defaultSortDescriptor={{ column: 'time', direction: 'descending' }}
         initialPageSize={initialPageSize}
