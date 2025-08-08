@@ -12,6 +12,8 @@ import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer } from '@/constants/tokens';
 import { SkipClient, useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
+import { AttemptBigNumber } from '@/lib/numbers';
+
 import { isValidWithdrawalAddress } from '../utils';
 
 async function getSkipWithdrawalRoutes(
@@ -19,6 +21,9 @@ async function getSkipWithdrawalRoutes(
   token: TokenForTransfer,
   amount: string
 ) {
+  const withdrawAmountBN = AttemptBigNumber(amount);
+  const allowUnsafe = withdrawAmountBN != null && withdrawAmountBN.lte(1000);
+
   const routeOptions: RouteRequest = {
     allowMultiTx: true,
     allowSwaps: true,
@@ -29,7 +34,7 @@ async function getSkipWithdrawalRoutes(
     amountIn: parseUnits(amount, token.decimals).toString(),
     smartRelay: true,
     smartSwapOptions: { evmSwaps: true, splitRoutes: true },
-    allowUnsafe: true,
+    allowUnsafe,
   };
 
   const [slow, fast] = await Promise.all([
