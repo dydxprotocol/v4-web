@@ -36,6 +36,7 @@ import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 
+import { testFlags } from '@/lib/testFlags';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
@@ -75,6 +76,7 @@ const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
+const SpotPage = lazy(() => import('@/pages/spot/Spot'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
@@ -191,6 +193,8 @@ const Content = () => {
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
+
+              {testFlags.spot && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />

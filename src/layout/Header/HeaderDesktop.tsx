@@ -39,6 +39,7 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -52,7 +53,6 @@ export const HeaderDesktop = () => {
   const availableBalance = useAppSelector(getSubaccountFreeCollateral);
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
@@ -63,6 +63,11 @@ export const HeaderDesktop = () => {
           value: 'TRADE',
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
+        },
+        testFlags.spot && {
+          value: 'SPOT',
+          label: 'Spot',
+          href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
         },
         {
           value: 'MARKETS',

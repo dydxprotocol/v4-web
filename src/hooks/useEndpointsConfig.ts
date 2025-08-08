@@ -17,6 +17,7 @@ export interface EndpointsConfig {
   stakingAPR?: string;
   solanaRpcUrl: string;
   affiliates?: string;
+  spotCandleService?: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -34,5 +35,6 @@ export const useEndpointsConfig = () => {
     stakingAPR: endpointsConfig.stakingAPR,
     solanaRpcUrl: endpointsConfig.solanaRpcUrl,
     affiliatesBaseUrl: endpointsConfig.affiliates,
+    spotCandleService: endpointsConfig.spotCandleService,
   };
 };
