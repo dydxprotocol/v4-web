@@ -20,7 +20,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Icon, IconName } from '@/components/Icon';
-import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
@@ -249,7 +249,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
         )}
         slotEmpty={
           isLoading ? (
-            <LoadingSpinner />
+            <LoadingSpace />
           ) : (
             <>
               <Icon iconName={IconName.Clock} tw="text-[3em]" />
