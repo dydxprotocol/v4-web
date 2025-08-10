@@ -1,0 +1,78 @@
+# Ruscet Protocol Contracts
+
+The contracts that power v1 of the Ruscet Protocol, the high-performance derivatives exchange built on the Fuel network with contracts written in the Sway language.
+
+## Contract Addresses
+
+```bash
+- Vault: 0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc
+- VaultPricefeed: 0x3dfcb460ee3cd6dc2ac4be1fbe73c97ce9b4962aa429f4ebdbbfa8dd1d584b78
+- RLPManager: 0x5b210f226d57696d3d0fbf9c85e1232a045d50c12743d1b2cdbab17134eb80a9
+
+- RLPContract: 0x1d9d3b612524384c98e1cf03a1cda6a3aadb8ac794c9df87fe5ca6ac39ae3bcc
+- RLP (asset): 0x7da3cd371c72dddb5a2ffb133c070272555e6b8b3d23f3b8dc17900cc49c6cea
+
+- RUSDContract: 0x80afa110507a0f1a05fd5c12ebb2f256f33b95cf9ff4d425beb7583234aa785c
+- RUSD (asset): 0x5d996c78c3b54f0c5eb96caa41b995ad7b9d6873acbfa5260883206f74bf912a
+
+- ShortsTracker: 0xa94d01923b60c83430d722dc45ffbd634c57aa79edab554e5f18533f3e9436b6
+```
+
+## Overview
+
+Trading on Ruscet is supported by multi-asset pools that earns liquidity providers fees from market-making, swap fees, and leveraged trading.
+
+The main components of the protocol are:
+
+### 1. Vault
+
+`Vault` is the core contract that handles all trading and liquidity operations. It acts as a peer-to-pool system where users trade against a pool of assets rather than directly with other users. The contract manages:
+
+-   Pooled assets from liquidity providers
+-   Opening/closing of leveraged long/short positions
+-   Minting/burning of the RUSD stablecoin
+-   Liquidations and funding rates
+-   Swap functionality between supported assets
+
+The Vault maintains solvency by ensuring the value of all assets in the pool exceeds the sum of all user deposits and profits. Position collateral is held in the Vault, and liquidations occur automatically when positions become undercollateralized.
+
+### 2. RLP
+
+`RLP` is the liquidity provider asset on the platform, and can be minted using any of the approved assets within the `Vault` pool such as `$ETH`, `$USDC`, and `$BTC`.
+
+The price of RLP is pegged to the worth of all underlying assets within the `Vault`, factoring in profits and losses of all active positions.
+
+### 3. Pricefeeds
+
+`VaultPriceFeed` handles querying and updating of prices from the Pyth network for all assets within the `Vault` pool.
+
+
+## Testing
+
+```bash
+pnpm i
+
+pip install caer
+
+# Build + Generate Types
+pnpm build
+pnpm gen:types
+
+# --------- Testing ---------
+
+### Run local Fuel Node
+fuel-core run --snapshot ./chain-config --debug --db-type in-memory --graphql-max-complexity 200000000
+
+### Ze tests
+pnpm test
+```
+
+## Security
+
+Ruscet v1 has been thorougly audited by [Linum Labs](https://www.linumlabs.com/). The audit report can be found [here](https://github.com/ruscetlabs/ruscet-contracts/tree/dev/audits).
+
+There is also an active bug bounty program by Immunefi. More information can be found [here](https://immunefi.com/bug-bounty/ruscet/).
+
+# License
+
+All code in this repository is protected under the Apache-2.0 License.

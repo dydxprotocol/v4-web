@@ -1,0 +1,8 @@
+[project]
+authors = ["@theausicist"]
+entry = "lib.sw"
+license = "Apache 2.0"
+name = "asset_interfaces"
+
+[dependencies]
+helpers = { path = "../../helpers" }

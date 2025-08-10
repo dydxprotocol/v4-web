@@ -1,0 +1,10 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "vault-pricefeed"
+
+[dependencies]
+core_interfaces = { path = "../interfaces" }
+helpers = { path = "../../helpers" }
+pyth_interface = { git = "https://github.com/pyth-network/pyth-crosschain", rev = "4ab64d2539a749e51e1281bdd7744781f5e9df8c" }
