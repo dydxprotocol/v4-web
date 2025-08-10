@@ -60,7 +60,7 @@ const TradePage = () => {
     min: HORIZONTAL_PANEL_MIN_HEIGHT,
     max: HORIZONTAL_PANEL_MAX_HEIGHT,
   });
-  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
+  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(false);
 
   usePageTitlePriceUpdates();
 
