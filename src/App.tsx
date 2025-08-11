@@ -50,6 +50,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useEnvFeatures } from './hooks/useEnvFeatures';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
@@ -75,6 +76,7 @@ const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
+const SpotPage = lazy(() => import('@/pages/spot/Spot'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 const RewardsPage = lazy(() => import('@/pages/token/RewardsPage'));
@@ -103,6 +105,7 @@ const Content = () => {
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
+  const { enableSpotTrading } = useEnvFeatures();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -191,6 +194,10 @@ const Content = () => {
                 <Route path=":market" element={<TradePage />} />
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
+
+              {enableSpotTrading && (
+                <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />
+              )}
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />

@@ -11,6 +11,7 @@ import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -52,6 +53,7 @@ export const HeaderDesktop = () => {
   const availableBalance = useAppSelector(getSubaccountFreeCollateral);
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const { enableSpotTrading } = useEnvFeatures();
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
@@ -63,6 +65,11 @@ export const HeaderDesktop = () => {
           value: 'TRADE',
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
+        },
+        enableSpotTrading && {
+          value: 'SPOT',
+          label: 'Spot',
+          href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
         },
         {
           value: 'MARKETS',
