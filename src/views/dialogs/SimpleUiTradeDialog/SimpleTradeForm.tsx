@@ -322,7 +322,9 @@ export const SimpleTradeForm = ({
 
   const inputConfig = inputConfigs[displayUnit];
 
-  const hasMarginUsageError = primaryAlert?.code === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
+  const hasMarginUsageError = fullFormSummary.errors.some(
+    (e) => e.code === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE'
+  );
 
   const isDepositNeeded =
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
