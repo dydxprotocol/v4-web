@@ -87,7 +87,7 @@ const $AssetIcon = styled.img`
   width: 100%;
   min-width: 100%;
   object-fit: cover;
-  z-index: 2;
+  transform: scale(1);
   border-radius: 50%;
 `;
 
@@ -98,7 +98,6 @@ const $ContainerBackground = styled.div`
   width: 100%;
   min-width: 100%;
   transform: scale(0.99); // Scale in order to hide outline from '--asset-icon-backgroundColor'
-  z-index: 1;
   background-color: var(--asset-icon-backgroundColor, var(--color-white));
   border-radius: 50%;
 `;
