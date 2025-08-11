@@ -9,7 +9,7 @@ import { initial } from 'lodash';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { USDC_ASSET_ID } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
@@ -221,6 +221,7 @@ export function useWithdrawStep({
 }
 
 const MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW = 0.98;
+const CCTP_WITHDRAWAL_LIMIT = 1_000_000;
 
 export function useProtocolWithdrawalValidation({
   freeCollateral,
@@ -254,6 +255,21 @@ export function useProtocolWithdrawalValidation({
 
   if (updatedMarginUsage && updatedMarginUsage.gt(MAX_SAFE_MARGIN_USAGE_POST_WITHDRAW)) {
     return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+  }
+
+  // temp: no withdrawals over $1M because the skip route is horrible
+  if (withdrawAmountBN.gt(CCTP_WITHDRAWAL_LIMIT)) {
+    return stringGetter({
+      key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
+      params: {
+        USDC_LIMIT: formatNumberOutput(CCTP_WITHDRAWAL_LIMIT, OutputType.Number, {
+          decimalSeparator,
+          groupSeparator,
+          selectedLocale,
+          fractionDigits: USD_DECIMALS,
+        }),
+      },
+    });
   }
 
   if (usdcWithdrawalCapacity.gt(0) && withdrawAmountBN.gt(usdcWithdrawalCapacity)) {

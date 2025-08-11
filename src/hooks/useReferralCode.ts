@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 
 import { AffiliateRemovalReason, AnalyticsEvents } from '@/constants/analytics';
+import { DialogTypes } from '@/constants/dialogs';
 
 import { removeLatestReferrer, updateLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
@@ -13,6 +15,11 @@ import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useReferralAddress } from './useReferralAddress';
 import { useReferredBy } from './useReferredBy';
+
+const HIDE_REFERRAL_DIALOG_ADDRESSES = new Set([
+  // trust wallet
+  'dydx174ywhfe9ws0u0qlz0cjgnw95zjl83qcae7upza',
+]);
 
 export function useReferralCode() {
   const dispatch = useAppDispatch();
@@ -28,6 +35,16 @@ export function useReferralCode() {
   const latestReferrer = useAppSelector(getLatestReferrer);
 
   const isOwnReferralCode = affiliateMetadata?.metadata?.referralCode === testFlags.referralCode;
+
+  useEffect(() => {
+    if (
+      testFlags.referralCode &&
+      referralAddress != null &&
+      !HIDE_REFERRAL_DIALOG_ADDRESSES.has(referralAddress)
+    ) {
+      dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
+    }
+  }, [dispatch, referralAddress]);
 
   useEffect(() => {
     if (referralAddress) {
