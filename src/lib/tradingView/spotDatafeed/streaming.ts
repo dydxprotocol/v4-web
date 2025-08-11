@@ -1,7 +1,6 @@
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import type { ResolutionString, SubscribeBarsCallback } from 'public/tradingview/charting_library';
 import { io, Socket } from 'socket.io-client';
-
-import { log, logInfo } from '@/lib/telemetry';
 
 import {
   SpotCandleServiceInterval,
@@ -20,7 +19,7 @@ class SpotStreamingManager {
 
   constructor(private apiUrl: string) {
     if (!apiUrl) {
-      log('SpotStreamingManager', new Error('Spot candle service API URL not configured'));
+      logBonsaiError('SpotStreamingManager', 'API URL not configured');
     }
   }
 
@@ -30,12 +29,12 @@ class SpotStreamingManager {
     }
 
     if (!this.apiUrl) {
-      log('SpotStreamingManager/connect', new Error('Spot candle service API URL not configured'));
+      logBonsaiError('SpotStreamingManager', 'API URL not configured');
       return;
     }
 
     this.isConnecting = true;
-    logInfo('SpotStreamingManager/connect', { apiUrl: this.apiUrl });
+    logBonsaiInfo('SpotStreamingManager', 'connecting', { apiUrl: this.apiUrl });
 
     try {
       this.socket = io(this.apiUrl, {
@@ -44,21 +43,18 @@ class SpotStreamingManager {
       });
 
       this.socket.on('connect', () => {
-        logInfo('SpotStreamingManager/connected');
+        logBonsaiInfo('SpotStreamingManager', 'connected');
         this.isConnecting = false;
         this.resubscribeAll();
       });
 
       this.socket.on('disconnect', (reason) => {
-        logInfo('SpotStreamingManager/disconnected', { reason });
+        logBonsaiInfo('SpotStreamingManager', 'disconnected', { reason });
         this.isConnecting = false;
       });
 
       this.socket.on('connect_error', (error) => {
-        log(
-          'SpotStreamingManager/connect_error',
-          error instanceof Error ? error : new Error(String(error))
-        );
+        logBonsaiError('SpotStreamingManager', 'connection error', { error });
         this.isConnecting = false;
       });
 
@@ -66,16 +62,13 @@ class SpotStreamingManager {
         this.handleCandleUpdate(update);
       });
     } catch (error) {
-      log(
-        'SpotStreamingManager/connect_failed',
-        error instanceof Error ? error : new Error('Connection failed')
-      );
+      logBonsaiError('SpotStreamingManager', 'connection failed', { error });
       this.isConnecting = false;
     }
   }
 
   private resubscribeAll(): void {
-    logInfo('SpotStreamingManager/resubscribe_all', {
+    logBonsaiInfo('SpotStreamingManager', 'resubscribing all channels', {
       subscriptionCount: this.subscriptions.size,
     });
 
@@ -86,25 +79,25 @@ class SpotStreamingManager {
 
   private sendSubscription(token: string, interval: SpotCandleServiceInterval): void {
     if (!this.socket || !this.socket.connected) {
-      log('SpotStreamingManager/send_subscription_failed', new Error('Socket not ready'));
+      logBonsaiError('SpotStreamingManager', 'socket not ready (subscribe)');
       return;
     }
 
     const subscriptionData = { token, interval };
 
-    logInfo('SpotStreamingManager/subscribe', subscriptionData);
+    logBonsaiInfo('SpotStreamingManager', 'subscribing', subscriptionData);
     this.socket.emit('subscribe', subscriptionData);
   }
 
   private sendUnsubscription(token: string, interval: SpotCandleServiceInterval): void {
     if (!this.socket || !this.socket.connected) {
-      log('SpotStreamingManager/send_unsubscription_failed', new Error('Socket not ready'));
+      logBonsaiError('SpotStreamingManager', 'socket not ready (unsubscribe)');
       return;
     }
 
     const unsubscriptionData = { token, interval };
 
-    logInfo('SpotStreamingManager/unsubscribe', unsubscriptionData);
+    logBonsaiInfo('SpotStreamingManager', 'unsubscribing', unsubscriptionData);
     this.socket.emit('unsubscribe', unsubscriptionData);
   }
 
@@ -120,29 +113,26 @@ class SpotStreamingManager {
 
       const bar = transformSpotCandleForChart(update.candle);
 
-      logInfo('SpotStreamingManager/candle_update', {
+      logBonsaiInfo('SpotStreamingManager', 'received candle update', {
         token,
         interval,
-        time: bar.time,
-        close: bar.close,
         handlerCount: subscription.handlers.length,
+        ...bar,
       });
 
       subscription.handlers.forEach((handler) => {
         try {
           handler.callback(bar);
         } catch (error) {
-          log(
-            'SpotStreamingManager/handler_error',
-            error instanceof Error ? error : new Error('Handler failed')
-          );
+          logBonsaiError('SpotStreamingManager', 'streaming handler error', {
+            error,
+          });
         }
       });
     } catch (error) {
-      log(
-        'SpotStreamingManager/handle_update_error',
-        error instanceof Error ? error : new Error('Handle update failed')
-      );
+      logBonsaiError('SpotStreamingManager', 'failed to handle candle update', {
+        error,
+      });
     }
   }
 
@@ -155,7 +145,7 @@ class SpotStreamingManager {
     const interval = resolutionToSpotInterval(resolution);
     const channelKey = `${token}:${interval}`;
 
-    logInfo('SpotStreamingManager/subscribe_request', {
+    logBonsaiInfo('SpotStreamingManager', 'subscription requested', {
       channelKey,
       subscriberUID,
     });
@@ -168,7 +158,7 @@ class SpotStreamingManager {
     let subscription = this.subscriptions.get(channelKey);
     if (subscription) {
       subscription.handlers.push(handler);
-      logInfo('SpotStreamingManager/handler_added', { channelKey });
+      logBonsaiInfo('SpotStreamingManager', 'added handler', { channelKey, subscriberUID });
       return;
     }
 
@@ -188,7 +178,7 @@ class SpotStreamingManager {
   }
 
   unsubscribe(subscriberUID: string): void {
-    logInfo('SpotStreamingManager/unsubscribe_request', { subscriberUID });
+    logBonsaiInfo('SpotStreamingManager', 'unsubscribe requested', { subscriberUID });
 
     const subscriptionEntries = Array.from(this.subscriptions.entries());
 
@@ -197,10 +187,13 @@ class SpotStreamingManager {
 
       if (handlerIndex !== -1) {
         subscription.handlers.splice(handlerIndex, 1);
-        logInfo('SpotStreamingManager/handler_removed', { channelKey, subscriberUID });
+        logBonsaiInfo('SpotStreamingManager', 'removed handler', { channelKey, subscriberUID });
 
         if (subscription.handlers.length === 0) {
-          logInfo('SpotStreamingManager/channel_unsubscribe', { channelKey });
+          logBonsaiInfo('SpotStreamingManager', 'unsubscribing channel', {
+            channelKey,
+            subscriberUID,
+          });
           this.sendUnsubscription(subscription.token, subscription.interval);
           this.subscriptions.delete(channelKey);
         }
@@ -211,7 +204,7 @@ class SpotStreamingManager {
   }
 
   disconnect(): void {
-    logInfo('SpotStreamingManager/disconnect');
+    logBonsaiInfo('SpotStreamingManager', 'disconnecting');
 
     if (this.socket) {
       this.socket.disconnect();

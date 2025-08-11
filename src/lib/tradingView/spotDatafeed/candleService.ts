@@ -1,4 +1,4 @@
-import { log, logInfo } from '@/lib/telemetry';
+import { logBonsaiError } from '@/bonsai/logs';
 
 import { SpotCandleData, SpotCandleServiceQuery } from './types';
 import { transformSpotCandlesForChart } from './utils';
@@ -8,7 +8,7 @@ export class SpotCandleServiceClient {
 
   constructor(host: string) {
     if (!host) {
-      log('SpotCandleServiceClient', new Error('SpotCandleServiceClient requires a host'));
+      logBonsaiError('SpotCandleServiceClient', 'host not configured');
     }
     this.host = host;
   }
@@ -36,31 +36,13 @@ export class SpotCandleServiceClient {
   }
 
   async getCandles(params: SpotCandleServiceQuery) {
-    try {
-      const response = await this._get<SpotCandleData[]>(`ohlcv/${params.token}`, {
-        interval: params.interval,
-        from: params.from.toString(),
-        ...(params.to && { to: params.to.toString() }),
-      });
+    const response = await this._get<SpotCandleData[]>(`ohlcv/${params.token}`, {
+      interval: params.interval,
+      from: params.from.toString(),
+      ...(params.to && { to: params.to.toString() }),
+    });
 
-      logInfo('SpotCandleServiceClient/getCandles', {
-        token: params.token,
-        interval: params.interval,
-        candleCount: response.length,
-      });
-
-      return transformSpotCandlesForChart(response);
-    } catch (error) {
-      log(
-        'SpotCandleServiceClient/getCandles',
-        error instanceof Error ? error : new Error('Unknown error'),
-        {
-          token: params.token,
-          interval: params.interval,
-        }
-      );
-      throw error;
-    }
+    return transformSpotCandlesForChart(response);
   }
 
   get url() {
