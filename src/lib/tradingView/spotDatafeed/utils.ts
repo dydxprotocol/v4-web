@@ -1,27 +1,18 @@
-import type { LibrarySymbolInfo, ResolutionString } from 'public/tradingview/charting_library';
+import { DateTime } from 'luxon';
+import type {
+  Bar,
+  LibrarySymbolInfo,
+  ResolutionString,
+  Timezone,
+} from 'public/tradingview/charting_library';
 
-import { TradingViewChartBar } from '@/constants/candles';
+import { RESOLUTION_TO_SPOT_INTERVAL_MAP } from '@/constants/candles';
 
 import { objectKeys } from '@/lib/objectHelpers';
 
 import { SpotCandleData, SpotCandleServiceInterval } from './types';
 
-// Resolution mapping for spot candle service
-const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
-  '1S': '1S',
-  '5S': '5S',
-  '15S': '15S',
-  '30S': '30S',
-  '1': '1',
-  '5': '5',
-  '15': '15',
-  '30': '30',
-  '60': '60',
-  '240': '240',
-  '720': '720',
-  '1D': '1D',
-  '1W': '7D',
-} as Record<ResolutionString, SpotCandleServiceInterval>;
+const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
 // Convert TradingView resolution to spot candle service interval
 export const resolutionToSpotInterval = (
@@ -34,27 +25,19 @@ export const resolutionToSpotInterval = (
 export const SPOT_SUPPORTED_RESOLUTIONS = objectKeys(RESOLUTION_TO_SPOT_INTERVAL_MAP);
 
 // Transform single candle item for chart consumption
-export const transformSpotCandleForChart = (candle: SpotCandleData): TradingViewChartBar => {
+export const transformSpotCandleForChart = (candle: SpotCandleData): Bar => {
   return {
     time: candle.t * 1000, // Convert to milliseconds
     open: candle.o,
     high: candle.h,
     low: candle.l,
     close: candle.c,
-    volume: candle.v_usd, // Use USD volume for display
-    // Additional properties for TradingViewChartBar
-    tradeOpen: candle.o,
-    tradeClose: candle.c,
-    tradeLow: candle.l,
-    tradeHigh: candle.h,
-    trades: 1, // Default value since spot data doesn't track trade count
-    assetVolume: candle.v,
-    usdVolume: candle.v_usd,
+    volume: candle.v_usd,
   };
 };
 
 // Transform array of candle data for chart consumption
-export const transformSpotCandlesForChart = (candles: SpotCandleData[]): TradingViewChartBar[] => {
+export const transformSpotCandlesForChart = (candles: SpotCandleData[]): Bar[] => {
   return candles.map(transformSpotCandleForChart);
 };
 
@@ -66,7 +49,7 @@ export const createSpotSymbolInfo = (tokenSymbol: string): LibrarySymbolInfo => 
     description: tokenSymbol,
     type: 'crypto',
     session: '24x7',
-    timezone: 'Etc/UTC' as const,
+    timezone,
     exchange: 'Spot',
     listed_exchange: 'Spot',
     minmov: 1,

@@ -15,7 +15,7 @@ export type SpotCandleServiceInterval =
   | '1D'
   | '7D';
 
-export interface SpotCandleData {
+export type SpotCandleData = {
   t: number; // timestamp
   o: number; // open
   h: number; // high
@@ -23,29 +23,29 @@ export interface SpotCandleData {
   c: number; // close
   v: number; // volume
   v_usd: number; // volume in USD
-}
+};
 
-export interface SpotCandleServiceQuery {
+export type SpotCandleServiceQuery = {
   token: string;
   interval: SpotCandleServiceInterval;
   from: string | number; // ISO 8601 or UNIX milliseconds
   to?: string | number; // ISO 8601 or UNIX milliseconds
-}
+};
 
-export interface WsSpotCandleUpdate {
+export type WsSpotCandleUpdate = {
   candle: SpotCandleData;
   interval: SpotCandleServiceInterval;
   timestamp: number;
   token: string;
-}
+};
 
-export interface SpotStreamingSubscription {
+export type SpotStreamingSubscription = {
   token: string;
   interval: SpotCandleServiceInterval;
   handlers: SpotStreamingHandler[];
-}
+};
 
-export interface SpotStreamingHandler {
+export type SpotStreamingHandler = {
   id: string;
   callback: SubscribeBarsCallback;
-}
+};

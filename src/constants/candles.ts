@@ -1,5 +1,7 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
+import { SpotCandleServiceInterval } from '@/lib/tradingView/spotDatafeed/types';
+
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { STRING_KEYS } from './localization';
 import { timeUnits } from './time';
@@ -129,3 +131,22 @@ export const RESOLUTION_STRING_TO_LABEL = {
   '240': { value: '4', unitStringKey: STRING_KEYS.HOURS_ABBREVIATED },
   '1D': { value: '1', unitStringKey: STRING_KEYS.DAYS_ABBREVIATED },
 } as Record<ResolutionString, { value: string; unitStringKey?: string }>;
+
+/**
+ * @description ResolutionStrings used with TradingView's charting library mapped to SpotCandleServiceInterval
+ */
+export const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
+  '1S': '1S',
+  '5S': '5S',
+  '15S': '15S',
+  '30S': '30S',
+  '1': '1',
+  '5': '5',
+  '15': '15',
+  '30': '30',
+  '60': '60',
+  '240': '240',
+  '720': '720',
+  '1D': '1D',
+  '1W': '7D',
+} as Record<ResolutionString, SpotCandleServiceInterval>;
