@@ -31,7 +31,8 @@ export const useWithdrawalInfo = ({
   const { height } = orEmptyObj(useApiState());
   const selectedLocale = useAppSelector(getSelectedLocale);
   const dispatch = useAppDispatch();
-  const { withdrawalSafetyEnabled } = useEnvFeatures();
+  let { withdrawalSafetyEnabled } = useEnvFeatures();
+  withdrawalSafetyEnabled = false;
 
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
