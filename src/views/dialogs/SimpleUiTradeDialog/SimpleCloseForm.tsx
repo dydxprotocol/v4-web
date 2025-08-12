@@ -328,7 +328,7 @@ export const SimpleCloseForm = ({
     <Button
       type={ButtonType.Button}
       action={ButtonAction.Primary}
-      tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
+      tw="w-full rounded-[1rem] font-medium-bold disabled:[--button-textColor:var(--color-text-0)]"
       size={ButtonSize.Medium}
       state={{ isDisabled: !shouldEnableTrade }}
       onClick={onSubmitOrder}

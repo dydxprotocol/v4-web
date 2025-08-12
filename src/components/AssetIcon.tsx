@@ -37,6 +37,7 @@ export const AssetIcon = ({
 
   return logoUrl ? (
     <$Container className={className}>
+      <$ContainerBackground />
       <$AssetIcon
         src={logoUrl}
         alt={symbol ?? 'logo'}
@@ -53,6 +54,7 @@ export const AssetIcon = ({
     </$Container>
   ) : isAssetSymbol(symbol) ? (
     <$Container className={className} $hasChainIcon={!!chainId}>
+      <$ContainerBackground />
       <$AssetIcon src={ASSET_ICON_MAP[symbol]} alt={symbol} />
       {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
@@ -66,7 +68,6 @@ const $Container = styled.div<{ $hasChainIcon?: boolean }>`
   min-height: var(--asset-icon-size, 1em);
   width: var(--asset-icon-size, 1em);
   min-width: var(--asset-icon-size, 1em);
-  background-color: var(--asset-icon-backgroundColor, var(--color-white));
   border-radius: 50%;
   position: relative;
   display: flex;
@@ -86,8 +87,18 @@ const $AssetIcon = styled.img`
   width: 100%;
   min-width: 100%;
   object-fit: cover;
-  transform: scale(1.05); // Scale in order to hide outline from '--asset-icon-backgroundColor'
+  transform: scale(1);
+  border-radius: 50%;
+`;
 
+const $ContainerBackground = styled.div`
+  position: absolute;
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  min-width: 100%;
+  transform: scale(0.99); // Scale in order to hide outline from '--asset-icon-backgroundColor'
+  background-color: var(--asset-icon-backgroundColor, var(--color-white));
   border-radius: 50%;
 `;
 

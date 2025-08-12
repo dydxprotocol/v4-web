@@ -322,8 +322,11 @@ export const SimpleTradeForm = ({
 
   const inputConfig = inputConfigs[displayUnit];
 
+  const hasMarginUsageError = primaryAlert?.code === 'INVALID_NEW_ACCOUNT_MARGIN_USAGE';
+
   const isDepositNeeded =
-    summary.accountDetailsBefore?.account?.freeCollateral.lte(0) &&
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    (summary.accountDetailsBefore?.account?.freeCollateral.lte(0) || hasMarginUsageError) &&
     complianceState === ComplianceStates.FULL_ACCESS;
 
   const onDepositFunds = () => {
@@ -335,7 +338,7 @@ export const SimpleTradeForm = ({
     <Button
       type={ButtonType.Button}
       action={ButtonAction.SimplePrimary}
-      tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
+      tw="w-full rounded-[1rem] font-medium-bold disabled:[--button-textColor:var(--color-text-0)]"
       size={ButtonSize.Large}
       onClick={onDepositFunds}
     >
@@ -345,7 +348,7 @@ export const SimpleTradeForm = ({
     <Button
       type={ButtonType.Button}
       action={tradeValues.side === OrderSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-      tw="w-full rounded-[1rem] disabled:[--button-textColor:var(--color-text-0)]"
+      tw="w-full rounded-[1rem] font-medium-bold disabled:[--button-textColor:var(--color-text-0)]"
       size={ButtonSize.Large}
       css={{
         '--button-textColor': 'var(--color-layer-0)',
