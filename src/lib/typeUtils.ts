@@ -27,3 +27,5 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type RecordValueType<T> = T extends { [key: string]: infer V } ? V : never;
 
 export type Nullable<T> = T | null | undefined;
+
+export type Awaited<T> = T extends Promise<infer U> ? U : T;
