@@ -1,17 +1,10 @@
 import { TurnkeyApiTypes } from '@turnkey/http';
-import { Address } from 'viem';
 
 export type Attestation = TurnkeyApiTypes['v1Attestation'];
 
 export type Email = `${string}@${string}.${string}`;
 
-export type Account = Omit<
-  TurnkeyApiTypes['v1GetWalletAccountsResponse']['accounts'][number],
-  'address' | 'addressFormat'
-> & {
-  address: Address;
-  balance: bigint | undefined;
-};
+export type Account = TurnkeyApiTypes['v1GetWalletAccountsResponse']['accounts'][number];
 
 export type Wallet = TurnkeyApiTypes['v1GetWalletsResponse']['wallets'][number] & {
   accounts: Account[];

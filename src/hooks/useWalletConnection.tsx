@@ -91,6 +91,9 @@ export const useWalletConnectionContext = () => {
       dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
     } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
       dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
+    } else if (walletInfo.connectorType === ConnectorType.Turnkey) {
+      console.log('turnKey');
+      // dispatch(setSourceAddress({ address: , chain: WalletNetworkType.Evm }));
     }
   }, [sourceAccount.walletInfo, evmAddressWagmi, solAddressPhantom, dydxAddressGraz, dispatch]);
 
@@ -159,6 +162,9 @@ export const useWalletConnectionContext = () => {
       if (!wallet) return;
 
       try {
+        if (wallet.connectorType === ConnectorType.Turnkey) {
+          return;
+        }
         if (wallet.connectorType === ConnectorType.Privy) {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();

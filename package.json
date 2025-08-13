@@ -102,6 +102,7 @@
     "@turnkey/sdk-browser": "^5.4.1",
     "@turnkey/sdk-react": "^5.2.11",
     "@turnkey/sdk-server": "^4.3.0",
+    "@turnkey/viem": "^0.11.0",
     "@turnkey/wallet-stamper": "^1.0.7",
     "@types/lodash": "^4.14.195",
     "@visx/axis": "^3.1.0",
@@ -147,7 +148,7 @@
     "typia": "^7.1.0",
     "unionize": "^3.1.0",
     "use-latest": "^1.2.1",
-    "viem": "^2.22.17",
+    "viem": "^2.33.3",
     "wagmi": "^2.14.9"
   },
   "devDependencies": {

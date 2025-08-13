@@ -12,6 +12,8 @@ import { GoogleIdTokenPayload, LoginMethod, SignInBody } from '@/types/turnkey';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { useTurnkeyWallet } from './TurnkeyWalletProvider';
+
 const TurnkeyAuthContext = createContext<ReturnType<typeof useTurnkeyAuthContext> | undefined>(
   undefined
 );
@@ -123,6 +125,8 @@ const useTurnkeyAuthContext = () => {
     [sendSignInRequest, getTargetPublicKey]
   );
 
+  const { fetchUser, onboardDydxFromTurnkey } = useTurnkeyWallet();
+
   const handleOauthResponse = useCallback(
     async ({
       response,
@@ -137,7 +141,6 @@ const useTurnkeyAuthContext = () => {
       userEmail?: string;
     }) => {
       const { session, salt } = response;
-
       if (session == null) {
         throw new Error('useTurnkeyAuth: No session found');
       } else if (salt == null) {
@@ -147,8 +150,9 @@ const useTurnkeyAuthContext = () => {
       // Do something with providerName and userEmail
       await indexedDbClient?.loginWithSession(session);
       setAdditionalInfo({ providerName, userEmail });
+      await onboardDydxFromTurnkey(salt);
     },
-    [indexedDbClient]
+    [indexedDbClient, fetchUser, onboardDydxFromTurnkey]
   );
 
   const signOutOfTurnkey = useCallback(async () => {

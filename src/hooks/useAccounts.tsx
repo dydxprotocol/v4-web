@@ -157,6 +157,7 @@ const useAccountsContext = () => {
       });
       const key = { mnemonic, privateKey, publicKey };
       hdKeyManager.setHdkey(wallet.address, key);
+      console.log('walletToSet', wallet);
       setLocalDydxWallet(wallet);
       setHdKey(key);
     },
@@ -215,6 +216,8 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
+          } else if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+            dispatch(setOnboardingState(OnboardingState.AccountConnected));
           } else if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);

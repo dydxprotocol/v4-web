@@ -267,12 +267,8 @@ export const getWallet = async (walletId: string, organizationId: string): Promi
   const [{ wallet }, accounts] = await Promise.all([
     client.getWallet({ walletId, organizationId }),
     client.getWalletAccounts({ walletId, organizationId }).then(({ accounts: walletAccounts }) =>
-      walletAccounts.map(({ address, ...account }) => {
-        return {
-          ...account,
-          address: getAddress(address),
-          balance: undefined,
-        };
+      walletAccounts.map((account) => {
+        return account;
       })
     ),
   ]);

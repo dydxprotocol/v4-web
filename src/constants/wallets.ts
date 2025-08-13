@@ -62,6 +62,7 @@ export enum WalletType {
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
   MetaMask = 'METAMASK',
+  Turnkey = 'TURNKEY',
 }
 
 export enum ConnectorType {
@@ -74,6 +75,7 @@ export enum ConnectorType {
   Test = 'test',
   Privy = 'privy',
   PhantomSolana = 'phantomSolana',
+  Turnkey = 'turnkey',
 }
 
 export enum WalletNetworkType {
@@ -92,7 +94,8 @@ export type WalletInfo =
         | ConnectorType.Coinbase
         | ConnectorType.WalletConnect
         | ConnectorType.PhantomSolana
-        | ConnectorType.Privy;
+        | ConnectorType.Privy
+        | ConnectorType.Turnkey;
       name: WalletType;
     }
   | {
@@ -154,6 +157,11 @@ export const wallets = {
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
   },
+  [WalletType.Turnkey]: {
+    type: WalletType.Turnkey,
+    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
+    icon: EmailIcon,
+  },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
 
 /**
@@ -170,6 +178,30 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     },
     message: {
       action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
+    },
+  }) as const;
+
+export const getSignTypedDataForTurnkey = ({
+  selectedDydxChainId,
+  salt,
+}: {
+  selectedDydxChainId: DydxChainId;
+  salt: string;
+}) =>
+  ({
+    primaryType: 'dYdX',
+    domain: {
+      name: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataDomainName,
+    },
+    types: {
+      dYdX: [
+        { name: 'action', type: 'string' },
+        { name: 'salt', type: 'string' },
+      ],
+    },
+    message: {
+      action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
+      salt,
     },
   }) as const;
 

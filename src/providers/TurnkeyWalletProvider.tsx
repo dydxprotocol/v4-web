@@ -1,16 +1,19 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
-import { Address, getAddress, PublicClient } from 'viem';
+import { hashTypedData, PublicClient } from 'viem';
 import { usePublicClient } from 'wagmi';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { Account, Wallet } from '@/types/turnkey';
+import { ConnectorType, getSignTypedDataForTurnkey, WalletType } from '@/constants/wallets';
+import { Account, UserSession, Wallet } from '@/types/turnkey';
 
-import { useUser } from '@/hooks/Onboarding/Turnkey/useUser';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+
+import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { getWalletsWithAccounts } from '@/lib/turnkey/turnkeyUtils';
 
@@ -27,8 +30,8 @@ export const TurnkeyWalletProvider = ({ ...props }) => (
 export const useTurnkeyWallet = () => useContext(TurnkeyWalletContext)!;
 
 const useTurnkeyWalletContext = () => {
-  const { indexedDbClient } = useTurnkey();
-  const { user } = useUser();
+  const { indexedDbClient, turnkey } = useTurnkey();
+  const [turnkeyUser, setTurnkeyUser] = useState<UserSession | undefined>();
   const [preferredWallet, setPreferredWallet] = useLocalStorage<{
     userId: string;
     walletId: string;
@@ -37,14 +40,54 @@ const useTurnkeyWalletContext = () => {
     defaultValue: null,
   });
 
-  const [selectedTurnkeyWallet, setSelectedTurnkeyWallet] = useState<Wallet | null>(null);
   const [turnkeyWallets, setTurnkeyWallets] = useState<Wallet[]>([]);
-
+  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<Wallet | undefined>();
   const publicClient = usePublicClient();
+  const { setWalletFromSignature, selectWallet } = useAccounts();
 
-  async function setWalletsQuery() {
+  const fetchUser = useCallback(async (): Promise<UserSession | undefined> => {
+    if (turnkey) {
+      // Try and get the current user
+
+      const token = await turnkey.getSession();
+
+      // If the user is not found, we assume the user is not logged in
+      if (!token?.expiry || token.expiry > Date.now() || indexedDbClient == null) {
+        return undefined;
+      }
+
+      selectWallet({
+        connectorType: ConnectorType.Turnkey,
+        name: WalletType.Turnkey,
+      });
+
+      // Get the user's email
+      const { user: indexedDbUser } = await indexedDbClient.getUser({
+        organizationId: token.organizationId,
+        userId: token.userId,
+      });
+
+      const userToSet: UserSession = {
+        id: indexedDbUser.userId,
+        name: indexedDbUser.userName,
+        email: indexedDbUser.userEmail ?? '',
+        organization: {
+          organizationId: token.organizationId,
+          organizationName: '',
+        },
+      };
+
+      setTurnkeyUser(userToSet);
+      return userToSet;
+    }
+    return undefined;
+  }, [turnkey, indexedDbClient, selectWallet]);
+
+  const getPrimaryUserWallets = useCallback(async () => {
+    const user = turnkeyUser ?? (await fetchUser());
+
     if (!user?.organization.organizationId) {
-      return;
+      return null;
     }
 
     if (publicClient == null) {
@@ -73,49 +116,79 @@ const useTurnkeyWalletContext = () => {
             selectedWallet = wallet;
           }
         }
-        setSelectedTurnkeyWallet(selectedWallet);
-      }
-    } else {
-      // This case occurs when the user signs up with a new passkey; since a read-only session is not created for new passkey sign-ups,
-      // we need to fetch the wallets from the server
-      const wallets = await getWalletsWithAccounts(user.organization.organizationId);
-      setTurnkeyWallets(wallets);
 
-      if (wallets.length > 0) {
-        setSelectedTurnkeyWallet(wallets[0]!);
+        setPrimaryTurnkeyWallet(selectedWallet);
+        return selectedWallet;
       }
+
+      return null;
     }
-  }
+    // This case occurs when the user signs up with a new passkey; since a read-only session is not created for new passkey sign-ups,
+    // we need to fetch the wallets from the server
+    const wallets = await getWalletsWithAccounts(user.organization.organizationId);
+    setTurnkeyWallets(wallets);
 
-  const { isLoading: isLoadingTurnkeyWallets } = useQuery({
-    queryKey: ['turnkey-wallets', user?.id, publicClient],
-    enabled: user != null && publicClient != null,
-    queryFn: setWalletsQuery,
-    refetchInterval: false,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchIntervalInBackground: false,
-  });
+    if (wallets.length > 0) {
+      setPrimaryTurnkeyWallet(wallets[0]!);
+      return wallets[0]!;
+    }
+
+    return null;
+  }, [fetchUser, preferredWallet, publicClient, indexedDbClient, turnkeyUser]);
+
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+
+  const getTypedDataForOnboardingTurnkey = useCallback(
+    (salt: string) => getSignTypedDataForTurnkey({ selectedDydxChainId, salt }),
+    [selectedDydxChainId]
+  );
+
+  const onboardDydxFromTurnkey = useCallback(
+    async (salt: string) => {
+      const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets());
+
+      if (selectedTurnkeyWallet == null || selectedTurnkeyWallet.accounts[0] == null) {
+        throw new Error('Selected turnkey wallet is not available');
+      }
+
+      if (indexedDbClient == null) {
+        throw new Error('IndexedDB client is not available');
+      }
+
+      const typedData = getTypedDataForOnboardingTurnkey(salt);
+      const digest = hashTypedData(typedData);
+
+      const response = await indexedDbClient.signRawPayload({
+        signWith: selectedTurnkeyWallet.accounts[0].address,
+        payload: digest,
+        encoding: 'PAYLOAD_ENCODING_HEXADECIMAL',
+        hashFunction: 'HASH_FUNCTION_NO_OP',
+        timestampMs: Date.now().toString(),
+      });
+
+      const signature = `${response.r}${response.s}${response.v}`;
+
+      await setWalletFromSignature(signature);
+    },
+    [
+      indexedDbClient,
+      getTypedDataForOnboardingTurnkey,
+      setWalletFromSignature,
+      getPrimaryUserWallets,
+      primaryTurnkeyWallet,
+    ]
+  );
 
   return {
+    fetchUser,
     turnkeyWallets,
-    selectedTurnkeyWallet,
     preferredWallet,
     setPreferredWallet,
-    isLoadingTurnkeyWallets,
+    onboardDydxFromTurnkey,
   };
 };
 
 /* ------ Helpers ------ */
-
-const getBalance = async (publicClient: PublicClient, address: Address) => {
-  const balance = await publicClient.getBalance({
-    address,
-  });
-
-  return balance;
-};
 
 async function getWalletsWithAccountsFromClients(
   publicClient: PublicClient,
@@ -123,6 +196,7 @@ async function getWalletsWithAccountsFromClients(
   organizationId: string
 ): Promise<Wallet[]> {
   const { wallets } = await browserClient.getWallets();
+
   const walletWithAccounts = await Promise.all(
     wallets.map(async (wallet) => {
       const { accounts } = await browserClient.getWalletAccounts({
@@ -130,15 +204,12 @@ async function getWalletsWithAccountsFromClients(
       });
 
       const accountsWithBalance = await accounts.reduce<Promise<Account[]>>(
-        async (accPromise, { address, ...account }) => {
+        async (accPromise, account) => {
           const acc = await accPromise;
           // Ensure the account's organizationId matches the provided organizationId
           if (account.organizationId === organizationId) {
             acc.push({
               ...account,
-              address: getAddress(address),
-              // Balance is initialized to undefined so that it can be fetched lazily on account selection
-              balance: await getBalance(publicClient, getAddress(address)),
             });
           }
           return acc;
