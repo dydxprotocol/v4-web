@@ -14,6 +14,7 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { AttemptBigNumber } from '@/lib/numbers';
 
+import { ALLOW_UNSAFE_BELOW_USD_LIMIT } from '../consts';
 import { isValidWithdrawalAddress } from '../utils';
 
 async function getSkipWithdrawalRoutes(
@@ -22,7 +23,8 @@ async function getSkipWithdrawalRoutes(
   amount: string
 ) {
   const withdrawAmountBN = AttemptBigNumber(amount);
-  const allowUnsafe = withdrawAmountBN != null && withdrawAmountBN.lte(1000);
+  const allowUnsafe =
+    withdrawAmountBN != null && withdrawAmountBN.lte(ALLOW_UNSAFE_BELOW_USD_LIMIT);
 
   const routeOptions: RouteRequest = {
     allowMultiTx: true,
