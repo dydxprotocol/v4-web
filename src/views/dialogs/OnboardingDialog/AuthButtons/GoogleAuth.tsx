@@ -55,25 +55,35 @@ export const GoogleAuth = () => {
         action={ButtonAction.Base}
         size={ButtonSize.BasePlus}
         state={{
-          isDisabled: nonce.trim().length === 0,
           isLoading,
+          isDisabled: nonce.trim().length === 0,
         }}
       >
-        <GoogleLogin
-          containerProps={{
-            style: {
-              backgroundColor: 'transparent',
-              height: '100%',
-              width: '100%',
-            },
-          }}
-          theme="outline"
-          type="standard"
-          nonce={nonce}
-          onSuccess={onSuccess}
-          useOneTap={false}
-          auto_select={false}
-        />
+        {nonce.trim().length > 0 && (
+          <GoogleLogin
+            containerProps={{
+              style: {
+                position: 'absolute',
+                inset: 0,
+                backgroundColor: 'transparent',
+                height: '100%',
+                width: '100%',
+                borderRadius: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+                opacity: 0.01,
+              },
+            }}
+            size="large"
+            type="standard"
+            nonce={nonce}
+            onSuccess={onSuccess}
+            useOneTap={false}
+            auto_select={false}
+          />
+        )}
         <div className="row pointer-events-none absolute inset-0 justify-center bg-color-layer-5">
           <Icon iconName={IconName.Google} />
         </div>
