@@ -26,7 +26,7 @@ import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
-  Event = 'Event',
+  Time = 'Time',
   Earned = 'Earned',
 }
 
@@ -46,10 +46,10 @@ const getTradingRewardHistoryTableColumnDef = ({
 }): ColumnDef<IndexerHistoricalTradingRewardAggregation> => ({
   ...(
     {
-      [TradingRewardHistoryTableColumnKey.Event]: {
-        columnKey: TradingRewardHistoryTableColumnKey.Event,
+      [TradingRewardHistoryTableColumnKey.Time]: {
+        columnKey: TradingRewardHistoryTableColumnKey.Time,
         getCellValue: (row) => row.startedAt,
-        label: stringGetter({ key: STRING_KEYS.EVENT }),
+        label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ startedAt, endedAt }) => (
           <TableCell stacked>
             <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.REWARDED })}</span>

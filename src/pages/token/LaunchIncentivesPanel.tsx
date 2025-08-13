@@ -3,10 +3,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonAction } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -17,7 +14,6 @@ import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
@@ -26,7 +22,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
-import { openDialog } from '@/state/dialogs';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
@@ -94,7 +89,9 @@ const LaunchIncentivesTitle = () => {
       {stringGetter({
         key: STRING_KEYS.SURGE_HEADLINE,
       })}
-      <SuccessTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.ACTIVE })}</SuccessTag>
+      <SuccessTag tw="rounded-2 bg-color-positive-20 px-0.5" size={TagSize.Medium}>
+        {stringGetter({ key: STRING_KEYS.ACTIVE })}
+      </SuccessTag>
       <WithTooltip slotTooltip={<IncentiveProgramDescription />}>
         <Icon iconName={IconName.HelpCircle} tw="text-color-text-1" />
       </WithTooltip>
@@ -110,78 +107,65 @@ const EstimatedRewards = () => {
   const { incentivePoints } = data ?? {};
 
   return (
-    <$EstimatedRewardsCard>
-      <$EstimatedRewardsCardContent>
-        <div>
-          <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_POINTS })}</span>
-          <span tw="text-color-text-1 font-small-book">
-            {stringGetter({ key: STRING_KEYS.TOTAL_POINTS })}
-          </span>
-        </div>
+    <$EstimatedRewardsContainer>
+      <$EstimatedRewardsCard>
+        <$EstimatedRewardsCardContent>
+          <div>
+            <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
+          </div>
 
-        <$Points>
-          <Output
-            type={OutputType.Number}
-            value={incentivePoints}
-            isLoading={isLoading}
-            fractionDigits={TOKEN_DECIMALS}
-          />
-          {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
-        </$Points>
-      </$EstimatedRewardsCardContent>
+          <$Points>
+            <Output
+              tw="font-extra-bold"
+              type={OutputType.Number}
+              value={10}
+              isLoading={isLoading}
+              fractionDigits={2}
+              slotRight={<div tw="ml-0.375 text-color-text-0 font-extra-medium">dYdX</div>}
+            />
+            {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
+          </$Points>
+        </$EstimatedRewardsCardContent>
 
-      <img
-        src="/rewards-stars.svg"
-        alt="reward-stars"
-        tw="relative float-right mb-1.5 h-auto w-[5.25rem]"
-      />
-    </$EstimatedRewardsCard>
+        <img src="/rewards-stars.svg" alt="reward-stars" tw="relative h-auto w-[2rem] self-start" />
+      </$EstimatedRewardsCard>
+      <span tw="flex items-center gap-[0.5em] font-tiny-medium">
+        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
+      </span>
+    </$EstimatedRewardsContainer>
   );
 };
 
 const LaunchIncentivesContent = () => {
   const stringGetter = useStringGetter();
-  const dispatch = useAppDispatch();
 
   return (
-    <$Column>
+    <$Column tw="gap-1">
       <div tw="text-color-text-0">
         {stringGetter({
           key: STRING_KEYS.SURGE_BODY,
         })}{' '}
       </div>
-
-      <span tw="flex items-center gap-[0.5em] font-tiny-medium">
-        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
-      </span>
-      <$ButtonRow>
-        <$Button
-          action={ButtonAction.Secondary}
-          onClick={() => {
-            dispatch(
-              openDialog(
-                DialogTypes.ExternalLink({
-                  link: 'https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard',
-                })
-              )
-            );
-          }}
-          slotRight={<Icon iconName={IconName.LinkOut} />}
-          slotLeft={<Icon iconName={IconName.Leaderboard} />}
-          tw="grow-[2]"
-        >
-          {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-        </$Button>
-      </$ButtonRow>
+      <div tw="self-start rounded-3 bg-color-layer-1 px-1 py-0.5">
+        {/* TODO: localize */}
+        <span tw="font-medium text-color-accent">S3 Countdown</span>
+      </div>
     </$Column>
   );
 };
 
-const $Panel = tw(Panel)`bg-color-layer-3 w-full`;
+const $Panel = styled(Panel)`
+  background: linear-gradient(
+    87.47deg,
+    rgba(119, 116, 255, 0.05) 0.04%,
+    rgba(71, 69, 153, 0.025) 99.96%
+  );
+  border: solid 0.1rem var(--color-layer-3);
+`;
 
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
-  font: var(--font-medium-book);
+  font: var(--font-medium-bold);
   color: var(--color-text-2);
 
   @media ${breakpoints.notTablet} {
@@ -189,45 +173,32 @@ const $Title = styled.h3`
   }
 `;
 
-const $ButtonRow = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-
-  a:last-child {
-    --button-width: 100%;
-  }
-`;
-
-const $Button = styled(Button)`
-  --button-padding: 0 1rem;
-
-  --button-textColor: var(--color-text-2);
-  --button-backgroundColor: var(--color-layer-6);
-  --button-border: solid var(--border-width) var(--color-layer-7);
-`;
-
 const $Column = tw.div`flexColumn gap-0.5`;
 
-const $EstimatedRewardsCard = styled.div`
-  ${layoutMixins.spacedRow}
-  padding: 1rem 1.25rem;
-  min-width: 19rem;
-  height: calc(100% - calc(1.5rem * 2));
-  max-height: 10rem;
-  margin: 1.5rem;
-
-  background-color: var(--color-layer-5);
-  background-image: url('/dots-background.svg');
-  background-size: cover;
-
-  border-radius: 0.75rem;
-  border: solid var(--border-width) var(--color-layer-6);
-  color: var(--color-text-1);
+const $EstimatedRewardsContainer = styled.div`
+  display: flex;
+  flex-flow: column;
+  align-items: flex-end;
+  gap: 1.18rem;
 
   @media ${breakpoints.tablet} {
     margin: 0 0 0.5rem;
   }
+  margin: 1.5rem;
+`;
+
+const $EstimatedRewardsCard = styled.div`
+  ${layoutMixins.spacedRow}
+  padding: 1.125rem;
+  min-width: 19rem;
+
+  background-color: var(--color-accent-faded);
+  background-image: url('/dots-background.svg');
+  background-size: cover;
+
+  border-radius: 0.75rem;
+  border: solid var(--border-width) var(--color-accent-faded);
+  color: var(--color-text-1);
 `;
 
 const $EstimatedRewardsCardContent = styled.div`
@@ -235,23 +206,12 @@ const $EstimatedRewardsCardContent = styled.div`
   gap: 1rem;
   height: 100%;
   justify-content: space-between;
-
-  div {
-    ${layoutMixins.flexColumn}
-    gap: 0.15rem;
-    font: var(--font-medium-book);
-
-    &:first-child {
-      color: var(--color-text-2);
-    }
-  }
 `;
 
 const $Points = styled.span`
   ${layoutMixins.inlineRow}
   gap: 0.25rem;
   font: var(--font-large-book);
-  color: var(--color-text-0);
 
   output {
     color: var(--color-text-2);

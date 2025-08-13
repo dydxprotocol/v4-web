@@ -13,7 +13,6 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { BellStrokeIcon } from '@/icons';
@@ -45,7 +44,6 @@ export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
-  const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
@@ -90,9 +88,9 @@ export const HeaderDesktop = () => {
           href: AppRoute.Referrals,
         },
         {
-          value: chainTokenLabel,
-          label: chainTokenLabel,
-          href: `/${chainTokenLabel}`,
+          value: 'REWARDS',
+          label: stringGetter({ key: STRING_KEYS.REWARDS }),
+          href: AppRoute.Rewards,
           slotAfter: !hasSeenLaunchIncentives && (
             <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
           ),

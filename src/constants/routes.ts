@@ -11,6 +11,7 @@ export enum AppRoute {
   Settings = '/settings',
   Terms = '/terms',
   Privacy = '/privacy',
+  Rewards = '/rewards',
   Referrals = '/referrals',
 }
 

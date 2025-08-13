@@ -201,6 +201,7 @@ const Content = () => {
               </Route>
 
               <Route path={`/${chainTokenLabel}/*`} element={<RewardsPage />} />
+              <Route path={AppRoute.Rewards} element={<RewardsPage />} />
 
               {isTablet && (
                 <>
