@@ -2,7 +2,7 @@ import { RefObject, useMemo } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
 
@@ -114,7 +114,7 @@ export const MarketsBanners = ({
   const surgeBanner = shouldDisplaySurgeBanner ? (
     <$SurgeBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.25 text-large font-extra-bold">
+        <span tw="mb-0.75 text-large font-extra-bold">
           {/* TODO: Add to v4-localization: SURGE_BANNER_TITLE */}
           <span tw="text-color-accent">dYdX Surge:</span>{' '}
           <span tw="text-white">$3M Rewards Up for Grabs.</span>
@@ -122,8 +122,9 @@ export const MarketsBanners = ({
         <div tw="flex items-center gap-1.5">
           <Button
             action={ButtonAction.Primary}
+            type={ButtonType.Link}
             href="https://www.dydx.xyz/surge?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner-learn-more"
-            tw="px-1.5"
+            tw="relative z-10 w-12"
           >
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
           </Button>
@@ -179,7 +180,8 @@ const $PmlBanner = styled($MarketsPageBanner)`
   height: 8rem;
   img,
   span,
-  button {
+  button,
+  a {
     z-index: 1;
   }
 
@@ -194,10 +196,26 @@ const $PmlBanner = styled($MarketsPageBanner)`
 
 const $SurgeBanner = styled($MarketsPageBanner)`
   height: 8rem;
-  background: linear-gradient(135deg, var(--color-layer-2) 0%, var(--color-layer-1) 100%);
+  background: var(--color-layer-0);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 70%;
+    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.2;
+    z-index: 0;
+  }
+
   img,
   span,
-  button {
+  button,
+  a {
     z-index: 1;
   }
 
