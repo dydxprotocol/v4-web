@@ -58,14 +58,12 @@ const useTurnkeyAuthContext = () => {
       loginMethod,
       providerName,
       userEmail,
-      jwt,
     }: {
       headers: HeadersInit;
       body: string;
       loginMethod: LoginMethod;
       providerName: string;
       userEmail?: string;
-      jwt?: string;
     }) => {
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
@@ -81,7 +79,7 @@ const useTurnkeyAuthContext = () => {
 
       switch (loginMethod) {
         case LoginMethod.OAuth:
-          handleOauthResponse({ response, providerName, userEmail, jwt });
+          handleOauthResponse({ response, providerName, userEmail });
           break;
         case LoginMethod.Email: // TODO: handle email response
         case LoginMethod.Passkey: // TODO: handle passkey response
