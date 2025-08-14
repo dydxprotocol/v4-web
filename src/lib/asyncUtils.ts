@@ -4,6 +4,8 @@ import { type RootState, type RootStore } from '@/state/_store';
 
 import { log } from '@/lib/telemetry';
 
+import { sleep } from './timeUtils';
+
 export function wrapAndLogError<T>(
   fn: () => Promise<T>,
   logId: string,
@@ -83,4 +85,25 @@ export function waitForSelector<T>(
       reject(new Error(errorMessage));
     }, timeoutMs);
   });
+}
+
+export async function withRetry<T>(
+  operation: () => Promise<T>,
+  options = { maxRetries: 3, initialDelay: 1000 }
+): Promise<T> {
+  for (let attempt = 0; attempt <= options.maxRetries; attempt += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      return await operation();
+    } catch (error) {
+      if (attempt < options.maxRetries) {
+        const delay = options.initialDelay * 2 ** attempt;
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(delay);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Failed to complete operation - this should be unreachable');
 }
