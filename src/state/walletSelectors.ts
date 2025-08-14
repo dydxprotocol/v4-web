@@ -13,4 +13,9 @@ export const selectIsKeplrConnected = createAppSelector(
   (sourceAccount) => sourceAccount.walletInfo?.name === WalletType.Keplr
 );
 
+export const selectIsTurnkeyConnected = createAppSelector(
+  [getSourceAccount],
+  (sourceAccount) => sourceAccount.walletInfo?.name === WalletType.Turnkey
+);
+
 export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalletNonce;

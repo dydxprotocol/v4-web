@@ -35,21 +35,6 @@ export const SignIn = ({
   const [isLoading, setIsLoading] = useState(false);
   const theme = useAppSelector(getAppTheme);
 
-  const handleSocialLogin = useCallback(
-    async (loginFunction: () => Promise<void>, _provider: string) => {
-      setIsLoading(true);
-      try {
-        await loginFunction();
-      } catch (error) {
-        // You can add toast notification here or handle the error as needed
-        // Error handling can be implemented based on your app's error handling strategy
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
-
   const socialLogins = useMemo(
     () => [
       {
@@ -67,6 +52,9 @@ export const SignIn = ({
   // TODO(turnkey): Implement email login
   const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+    onSubmitEmail();
+    setIsLoading(false);
   }, []);
 
   const hasValidEmail = isValidEmail(email);

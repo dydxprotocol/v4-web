@@ -33,7 +33,7 @@ const useTurnkeyAuthContext = () => {
   } | null>(null);
 
   const indexerUrl = useAppSelector(selectIndexerUrl);
-  const { turnkey, indexedDbClient } = useTurnkey();
+  const { indexedDbClient } = useTurnkey();
 
   const getTargetPublicKey = useCallback(async () => {
     const publicKeyCompressed = await indexedDbClient?.getPublicKey();
@@ -86,6 +86,7 @@ const useTurnkeyAuthContext = () => {
       }
     },
     onError: (error) => {
+      console.log('useTurnkeyAuth/', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
     },
   });
@@ -125,7 +126,7 @@ const useTurnkeyAuthContext = () => {
     [sendSignInRequest, getTargetPublicKey]
   );
 
-  const { fetchUser, onboardDydxFromTurnkey } = useTurnkeyWallet();
+  const { onboardDydxFromTurnkey } = useTurnkeyWallet();
 
   const handleOauthResponse = useCallback(
     async ({
@@ -136,6 +137,7 @@ const useTurnkeyAuthContext = () => {
       response: {
         session?: string;
         salt?: string;
+        dydxAddress?: string;
       };
       providerName: string;
       userEmail?: string;
@@ -150,22 +152,15 @@ const useTurnkeyAuthContext = () => {
       // Do something with providerName and userEmail
       await indexedDbClient?.loginWithSession(session);
       setAdditionalInfo({ providerName, userEmail });
-      await onboardDydxFromTurnkey(salt);
+      await onboardDydxFromTurnkey(salt, session);
     },
-    [indexedDbClient, fetchUser, onboardDydxFromTurnkey]
+    [indexedDbClient, onboardDydxFromTurnkey]
   );
-
-  const signOutOfTurnkey = useCallback(async () => {
-    await turnkey?.logout();
-    await indexedDbClient?.clear();
-    setAdditionalInfo(null);
-  }, [indexedDbClient, turnkey]);
 
   return {
     additionalInfo,
     isLoading: status === 'pending',
     isError: status === 'error',
     signInWithOauth,
-    signOutOfTurnkey,
   };
 };
