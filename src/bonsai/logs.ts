@@ -77,3 +77,7 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
     }
   };
 }
+
+export function logTurnkey(source: string, message: string, ...args: any[]) {
+  console.log(`turnkey: ${source}: ${message}`, { context: args });
+}

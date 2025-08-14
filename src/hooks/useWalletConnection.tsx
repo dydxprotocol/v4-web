@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { logTurnkey } from '@/bonsai/logs';
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import { useTurnkey } from '@turnkey/sdk-react';
 import {
@@ -96,10 +97,10 @@ export const useWalletConnectionContext = () => {
       dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
     } else if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
       if (primaryTurnkeyWallet.accounts[0] == null) {
-        console.log('useWalletConnection/', 'turnKey', 'no accounts');
+        logTurnkey('useWalletConnection/', 'turnKey', 'no accounts');
         return;
       }
-      console.log('useWalletConnection/', 'turnKey', primaryTurnkeyWallet);
+      logTurnkey('useWalletConnection/', 'turnKey', primaryTurnkeyWallet);
       dispatch(
         setSourceAddress({
           address: primaryTurnkeyWallet.accounts[0].address,
@@ -182,7 +183,7 @@ export const useWalletConnectionContext = () => {
 
       try {
         if (wallet.connectorType === ConnectorType.Turnkey) {
-          console.log('connectWallet: ', 'turnkey', wallet);
+          logTurnkey('connectWallet: ', 'turnkey', wallet);
           return;
         }
         if (wallet.connectorType === ConnectorType.Privy) {

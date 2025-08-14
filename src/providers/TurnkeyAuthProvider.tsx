@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react';
 
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { uncompressRawPublicKey } from '@turnkey/crypto';
@@ -46,6 +46,8 @@ const useTurnkeyAuthContext = () => {
       uncompressRawPublicKey(new Uint8Array(Buffer.from(publicKeyCompressed, 'hex')))
     ).replace('0x', '');
 
+    logTurnkey('getTargetPublicKey', '', { publicKey, publicKeyCompressed });
+
     return { publicKey, publicKeyCompressed };
   }, [indexedDbClient]);
 
@@ -56,12 +58,14 @@ const useTurnkeyAuthContext = () => {
       loginMethod,
       providerName,
       userEmail,
+      jwt,
     }: {
       headers: HeadersInit;
       body: string;
       loginMethod: LoginMethod;
       providerName: string;
       userEmail?: string;
+      jwt?: string;
     }) => {
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
@@ -77,7 +81,7 @@ const useTurnkeyAuthContext = () => {
 
       switch (loginMethod) {
         case LoginMethod.OAuth:
-          handleOauthResponse({ response, providerName, userEmail });
+          handleOauthResponse({ response, providerName, userEmail, jwt });
           break;
         case LoginMethod.Email: // TODO: handle email response
         case LoginMethod.Passkey: // TODO: handle passkey response
@@ -86,7 +90,7 @@ const useTurnkeyAuthContext = () => {
       }
     },
     onError: (error) => {
-      console.log('useTurnkeyAuth/', 'error', error);
+      logTurnkey('useTurnkeyAuth/', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
     },
   });
@@ -110,6 +114,8 @@ const useTurnkeyAuthContext = () => {
         userEmail: decoded.email,
       };
 
+      logTurnkey('signInWithOauth/', 'inputBody', inputBody);
+
       const headers = {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -126,7 +132,7 @@ const useTurnkeyAuthContext = () => {
     [sendSignInRequest, getTargetPublicKey]
   );
 
-  const { onboardDydxFromTurnkey } = useTurnkeyWallet();
+  const { decodeSessionJwt, onboardDydxFromTurnkey } = useTurnkeyWallet();
 
   const handleOauthResponse = useCallback(
     async ({
@@ -149,12 +155,22 @@ const useTurnkeyAuthContext = () => {
         throw new Error('useTurnkeyAuth: No salt found');
       }
 
-      // Do something with providerName and userEmail
+      const current = await indexedDbClient?.getPublicKey();
+      const decoded = decodeSessionJwt(session);
+      if (decoded.publicKey !== current) {
+        // If this happens, your server used a different key than the one you sent
+        logTurnkey('handleOauthResponse', 'Mismatch:', {
+          fromClient: current,
+          fromSession: decoded.publicKey,
+        });
+        return;
+      }
+
       await indexedDbClient?.loginWithSession(session);
       setAdditionalInfo({ providerName, userEmail });
       await onboardDydxFromTurnkey(salt, session);
     },
-    [indexedDbClient, onboardDydxFromTurnkey]
+    [onboardDydxFromTurnkey, indexedDbClient, decodeSessionJwt]
   );
 
   return {
