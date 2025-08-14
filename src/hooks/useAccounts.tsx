@@ -5,6 +5,7 @@ import { logTurnkey } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
+import { useTurnkey } from '@turnkey/sdk-react';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -356,7 +357,15 @@ const useAccountsContext = () => {
     hdKeyManager.clearHdkey();
   };
 
+  const { turnkey, indexedDbClient } = useTurnkey();
+
   const disconnect = async () => {
+    // Turnkey Signout
+    logTurnkey('disconnectWallet', 'turnkey', turnkey);
+    await turnkey?.logout();
+    await indexedDbClient?.clear();
+    await indexedDbClient?.init();
+
     // Disconnect local wallet
     disconnectLocalDydxWallet();
     selectWallet(undefined);

@@ -93,83 +93,86 @@ const useTurnkeyAuthContext = () => {
     },
   });
 
-  const signInWithOauth = useCallback(
-    async ({
+  const signInWithOauth = async ({
+    oidcToken,
+    providerName,
+  }: {
+    oidcToken: string;
+    providerName: 'google' | 'apple';
+  }) => {
+    const decoded = jwtDecode<GoogleIdTokenPayload>(oidcToken);
+    const { publicKeyCompressed } = await getTargetPublicKey();
+
+    const inputBody: SignInBody = {
+      signinMethod: 'social',
+      targetPublicKey: publicKeyCompressed,
+      provider: providerName,
       oidcToken,
+      userEmail: decoded.email,
+    };
+
+    logTurnkey('signInWithOauth/', 'inputBody', inputBody);
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+
+    sendSignInRequest({
+      headers,
+      body: JSON.stringify(inputBody),
+      loginMethod: LoginMethod.OAuth,
       providerName,
-    }: {
-      oidcToken: string;
-      providerName: 'google' | 'apple';
-    }) => {
-      const decoded = jwtDecode<GoogleIdTokenPayload>(oidcToken);
-      const { publicKeyCompressed } = await getTargetPublicKey();
-
-      const inputBody: SignInBody = {
-        signinMethod: 'social',
-        targetPublicKey: publicKeyCompressed,
-        provider: providerName,
-        oidcToken,
-        userEmail: decoded.email,
-      };
-
-      logTurnkey('signInWithOauth/', 'inputBody', inputBody);
-
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-
-      sendSignInRequest({
-        headers,
-        body: JSON.stringify(inputBody),
-        loginMethod: LoginMethod.OAuth,
-        providerName,
-        userEmail: decoded.email,
-      });
-    },
-    [sendSignInRequest, getTargetPublicKey]
-  );
+      userEmail: decoded.email,
+    });
+  };
 
   const { decodeSessionJwt, onboardDydxFromTurnkey } = useTurnkeyWallet();
 
-  const handleOauthResponse = useCallback(
-    async ({
-      response,
-      providerName,
-      userEmail,
-    }: {
-      response: {
-        session?: string;
-        salt?: string;
-        dydxAddress?: string;
-      };
-      providerName: string;
-      userEmail?: string;
-    }) => {
-      const { session, salt } = response;
-      if (session == null) {
-        throw new Error('useTurnkeyAuth: No session found');
-      } else if (salt == null) {
-        throw new Error('useTurnkeyAuth: No salt found');
-      }
+  const handleOauthResponse = async ({
+    response,
+    providerName,
+    userEmail,
+  }: {
+    response: {
+      session?: string;
+      salt?: string;
+      dydxAddress?: string;
+    };
+    providerName: string;
+    userEmail?: string;
+  }) => {
+    const { session, salt } = response;
+    if (session == null) {
+      throw new Error('useTurnkeyAuth: No session found');
+    } else if (salt == null) {
+      throw new Error('useTurnkeyAuth: No salt found');
+    }
 
-      const current = await indexedDbClient?.getPublicKey();
-      const decoded = decodeSessionJwt(session);
-      if (decoded.publicKey !== current) {
-        // If this happens, your server used a different key than the one you sent
-        logTurnkey('handleOauthResponse', 'Mismatch:', {
-          fromClient: current,
-          fromSession: decoded.publicKey,
-        });
-        return;
-      }
+    const current = await indexedDbClient?.getPublicKey();
+    const decoded = decodeSessionJwt(session);
+    logTurnkey('handleOauthResponse', 'decoded', decoded, current);
+    if (decoded.publicKey !== current) {
+      // If this happens, your server used a different key than the one you sent
+      logTurnkey('handleOauthResponse', 'Mismatch:', {
+        fromClient: current,
+        fromSession: decoded.publicKey,
+      });
+      return;
+    }
 
-      await indexedDbClient?.loginWithSession(session);
-      setAdditionalInfo({ providerName, userEmail });
-      await onboardDydxFromTurnkey(salt, session);
-    },
-    [onboardDydxFromTurnkey, indexedDbClient, decodeSessionJwt]
-  );
+    await indexedDbClient?.loginWithSession(session);
+    const newPublicKey = await indexedDbClient?.getPublicKey();
+    logTurnkey('handleOauthResponse', 'newPublicKey', decoded, newPublicKey);
+    if (newPublicKey !== decoded.publicKey) {
+      logTurnkey('handleOauthResponse', 'Mismatch:', {
+        fromClient: newPublicKey,
+        fromSession: decoded.publicKey,
+      });
+    }
+    setAdditionalInfo({ providerName, userEmail });
+    await onboardDydxFromTurnkey(salt);
+  };
 
   return {
     additionalInfo,

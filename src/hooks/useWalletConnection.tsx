@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { logTurnkey } from '@/bonsai/logs';
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
-import { useTurnkey } from '@turnkey/sdk-react';
 import {
   useAccount as useAccountGraz,
   useConnect as useConnectGraz,
@@ -227,15 +226,9 @@ export const useWalletConnectionContext = () => {
     [isConnectedGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login, connectPhantom]
   );
 
-  const { turnkey, indexedDbClient } = useTurnkey();
-
   const disconnectWallet = useCallback(async () => {
     setSelectedWallet(undefined);
     dispatch(clearSourceAccount());
-
-    // Turnkey Signout
-    await turnkey?.logout();
-    await indexedDbClient?.clear();
 
     if (isConnectedWagmi) await disconnectWagmi();
     if (isConnectedGraz) await disconnectGraz();
@@ -251,8 +244,6 @@ export const useWalletConnectionContext = () => {
     logout,
     solAddressPhantom,
     disconnectPhantom,
-    turnkey,
-    indexedDbClient,
   ]);
 
   // Wallet selection
