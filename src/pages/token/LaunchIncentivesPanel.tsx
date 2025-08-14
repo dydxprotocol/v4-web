@@ -92,9 +92,6 @@ const LaunchIncentivesTitle = () => {
       <SuccessTag tw="rounded-2 bg-color-positive-20 px-0.5" size={TagSize.Medium}>
         {stringGetter({ key: STRING_KEYS.ACTIVE })}
       </SuccessTag>
-      <WithTooltip slotTooltip={<IncentiveProgramDescription />}>
-        <Icon iconName={IconName.HelpCircle} tw="text-color-text-1" />
-      </WithTooltip>
     </$Title>
   );
 };
@@ -110,20 +107,26 @@ const EstimatedRewards = () => {
     <$EstimatedRewardsContainer>
       <$EstimatedRewardsCard>
         <$EstimatedRewardsCardContent>
-          <div>
+          <div tw="flex items-center gap-0.25">
             <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
+            <WithTooltip slotTooltip={<IncentiveProgramDescription />}>
+              <Icon iconName={IconName.InfoStroke} tw="text-color-text-0" size="0.8rem" />
+            </WithTooltip>
           </div>
 
           <$Points>
             <Output
               tw="font-extra-bold"
               type={OutputType.Number}
-              value={10}
+              value={incentivePoints}
               isLoading={isLoading}
               fractionDigits={2}
-              slotRight={<div tw="ml-0.375 text-color-text-0 font-extra-medium">dYdX</div>}
+              slotRight={
+                incentivePoints !== undefined ? (
+                  <div tw="ml-0.375 text-color-text-0 font-extra-medium">dYdX</div>
+                ) : undefined
+              }
             />
-            {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
           </$Points>
         </$EstimatedRewardsCardContent>
 
@@ -145,6 +148,14 @@ const LaunchIncentivesContent = () => {
         {stringGetter({
           key: STRING_KEYS.SURGE_BODY,
         })}{' '}
+        <a
+          target="_blank"
+          tw="cursor-pointer text-color-text-1"
+          href="https://www.dydx.xyz/surge"
+          rel="noreferrer"
+        >
+          {stringGetter({ key: STRING_KEYS.LEARN_MORE })}.
+        </a>
       </div>
       <div tw="self-start rounded-3 bg-color-layer-1 px-1 py-0.5">
         {/* TODO: localize */}
@@ -161,6 +172,7 @@ const $Panel = styled(Panel)`
     rgba(71, 69, 153, 0.025) 99.96%
   );
   border: solid 0.1rem var(--color-layer-3);
+  --link-color: var(--color-text-1);
 `;
 
 const $Title = styled.h3`
@@ -203,7 +215,7 @@ const $EstimatedRewardsCard = styled.div`
 
 const $EstimatedRewardsCardContent = styled.div`
   ${layoutMixins.flexColumn}
-  gap: 1rem;
+  gap: 0.5rem;
   height: 100%;
   justify-content: space-between;
 `;
