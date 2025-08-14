@@ -40,7 +40,7 @@ const heightPollingOptions = {
   refetchOnMount: false,
 };
 
-const manualHeightRetryConfig = { initialDelay: 500, maxRetries: 3 };
+const manualHeightRetryConfig = { initialDelay: 500, maxRetries: 1 };
 
 const doIndexerHeightQuery = async (
   indexerClient: IndexerClient
