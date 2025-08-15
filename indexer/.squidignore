@@ -1,0 +1,7 @@
+node_modules
+builds
+lib
+Dockerfile
+.git
+.github
+.idea

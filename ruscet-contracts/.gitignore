@@ -1,9 +1,0 @@
-out
-*.lock
-*.DS_Store
-target
-node_modules
-cache
-/types
-contracts/tmp
-Forc.lock

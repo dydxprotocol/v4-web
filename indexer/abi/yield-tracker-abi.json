@@ -1,0 +1,333 @@
+{
+  "programType": "contract",
+  "specVersion": "1",
+  "encodingVersion": "1",
+  "concreteTypes": [
+    {
+      "type": "()",
+      "concreteTypeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+    },
+    {
+      "type": "enum errors::Error",
+      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3",
+      "metadataTypeId": 1
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+      "metadataTypeId": 2
+    },
+    {
+      "type": "struct events::SetGov",
+      "concreteTypeId": "ed61073796af24b33de31ddc59c970aefa2613605f42d0dc94a2b1360de862c8",
+      "metadataTypeId": 3
+    },
+    {
+      "type": "struct events::SetTimeDistributor",
+      "concreteTypeId": "17c88f24f815acd541c0e1bf4ed3e7b28819401fd636fa21c0b88482b48b05fe",
+      "metadataTypeId": 4
+    },
+    {
+      "type": "struct events::SetYieldAssetContract",
+      "concreteTypeId": "8e5706958bdbbcf3d9969b071bb38142d5c6fbfa0f3a29076a9707f17b37e121",
+      "metadataTypeId": 5
+    },
+    {
+      "type": "struct std::contract_id::ContractId",
+      "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
+      "metadataTypeId": 7
+    },
+    {
+      "type": "u256",
+      "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+    },
+    {
+      "type": "u64",
+      "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+    }
+  ],
+  "metadataTypes": [
+    {
+      "type": "b256",
+      "metadataTypeId": 0
+    },
+    {
+      "type": "enum errors::Error",
+      "metadataTypeId": 1,
+      "components": [
+        {
+          "name": "YieldTrackerAlreadyInitialized",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "YieldTrackerForbidden",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        }
+      ]
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "metadataTypeId": 2,
+      "components": [
+        {
+          "name": "Address",
+          "typeId": 6
+        },
+        {
+          "name": "ContractId",
+          "typeId": 7
+        }
+      ]
+    },
+    {
+      "type": "struct events::SetGov",
+      "metadataTypeId": 3,
+      "components": [
+        {
+          "name": "gov",
+          "typeId": 2
+        }
+      ]
+    },
+    {
+      "type": "struct events::SetTimeDistributor",
+      "metadataTypeId": 4,
+      "components": [
+        {
+          "name": "time_distributor",
+          "typeId": 7
+        }
+      ]
+    },
+    {
+      "type": "struct events::SetYieldAssetContract",
+      "metadataTypeId": 5,
+      "components": [
+        {
+          "name": "yield_asset_contr",
+          "typeId": 7
+        }
+      ]
+    },
+    {
+      "type": "struct std::address::Address",
+      "metadataTypeId": 6,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": 0
+        }
+      ]
+    },
+    {
+      "type": "struct std::contract_id::ContractId",
+      "metadataTypeId": 7,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": 0
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "receiver",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "yield_asset_staked_balance",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ],
+      "name": "claim",
+      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "attributes": [
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " callable only by the YieldAsset contract for the specific YieldTracker contract"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " the YieldAsset contract is responsible for retrieving the latest staked balance of an account"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " since doing so onchain isn't possible with Fuel's UTXO model"
+          ]
+        },
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "yield_asset_staked_balance",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ],
+      "name": "claimable",
+      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "name": "get_assets_per_interval",
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "yield_asset_contr",
+          "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54"
+        }
+      ],
+      "name": "initialize",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "gov",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        }
+      ],
+      "name": "set_gov",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "time_distributor",
+          "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54"
+        }
+      ],
+      "name": "set_time_distributor",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "yield_asset_staked_balance",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ],
+      "name": "update_rewards",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " callable only by the YieldAsset contract for the specific YieldTracker contract"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " the YieldAsset contract is responsible for retrieving the latest staked balance of an account"
+          ]
+        },
+        {
+          "name": "doc-comment",
+          "arguments": [
+            " since doing so onchain isn't possible with Fuel's UTXO model"
+          ]
+        },
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    }
+  ],
+  "loggedTypes": [
+    {
+      "logId": "5432468599230875534",
+      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3"
+    },
+    {
+      "logId": "17104960795062510771",
+      "concreteTypeId": "ed61073796af24b33de31ddc59c970aefa2613605f42d0dc94a2b1360de862c8"
+    },
+    {
+      "logId": "10256673915725921523",
+      "concreteTypeId": "8e5706958bdbbcf3d9969b071bb38142d5c6fbfa0f3a29076a9707f17b37e121"
+    },
+    {
+      "logId": "1713777047158238421",
+      "concreteTypeId": "17c88f24f815acd541c0e1bf4ed3e7b28819401fd636fa21c0b88482b48b05fe"
+    }
+  ],
+  "messagesTypes": [],
+  "configurables": []
+}

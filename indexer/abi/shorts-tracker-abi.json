@@ -1,0 +1,542 @@
+{
+  "programType": "contract",
+  "specVersion": "1",
+  "encodingVersion": "1",
+  "concreteTypes": [
+    {
+      "type": "()",
+      "concreteTypeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+    },
+    {
+      "type": "(bool, u256)",
+      "concreteTypeId": "3acef182e41da8f557e6ba5daab7129b9c821fb0b9e53c5b1d4a626825f06b8e",
+      "metadataTypeId": 0
+    },
+    {
+      "type": "(u256, u256)",
+      "concreteTypeId": "2770d9f762bf8ec295d5c253193cd2897c893401f1f438769f92d212641ec779",
+      "metadataTypeId": 1
+    },
+    {
+      "type": "bool",
+      "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+    },
+    {
+      "type": "enum errors::Error",
+      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3",
+      "metadataTypeId": 3
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+      "metadataTypeId": 4
+    },
+    {
+      "type": "struct GlobalShortDataUpdated",
+      "concreteTypeId": "d11b451065406c0beca7d6d175c3cc06c08e09f1cbdec00e56acfdc96f9b0672",
+      "metadataTypeId": 7
+    },
+    {
+      "type": "struct helpers::signed_256::Signed256",
+      "concreteTypeId": "0141a3e1b66250fca81a39c0b293c9ad5d4887822b352f6cc34e3b07f5ba4a4b",
+      "metadataTypeId": 8
+    },
+    {
+      "type": "struct std::asset_id::AssetId",
+      "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
+      "metadataTypeId": 10
+    },
+    {
+      "type": "struct std::contract_id::ContractId",
+      "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
+      "metadataTypeId": 11
+    },
+    {
+      "type": "struct std::vec::Vec<struct std::asset_id::AssetId>",
+      "concreteTypeId": "8b2275934873f381a769c82334e6f66595eeb350d8b2dd012eef4d9bb117942b",
+      "metadataTypeId": 13,
+      "typeArguments": [
+        "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+      ]
+    },
+    {
+      "type": "struct std::vec::Vec<u256>",
+      "concreteTypeId": "742d7b76206a39cfad7eaec9b457390bbd0a92fe1da596db414daa0e4964bf82",
+      "metadataTypeId": 13,
+      "typeArguments": [
+        "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+      ]
+    },
+    {
+      "type": "u256",
+      "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+    }
+  ],
+  "metadataTypes": [
+    {
+      "type": "(_, _)",
+      "metadataTypeId": 0,
+      "components": [
+        {
+          "name": "__tuple_element",
+          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        },
+        {
+          "name": "__tuple_element",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ]
+    },
+    {
+      "type": "(_, _)",
+      "metadataTypeId": 1,
+      "components": [
+        {
+          "name": "__tuple_element",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "__tuple_element",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ]
+    },
+    {
+      "type": "b256",
+      "metadataTypeId": 2
+    },
+    {
+      "type": "enum errors::Error",
+      "metadataTypeId": 3,
+      "components": [
+        {
+          "name": "ShortsTrackerAlreadyInitialized",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "ShortsTrackerForbidden",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "ShortsTrackerHandlerZero",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "ShortsTrackerAlreadyMigrated",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "ShortsTrackerInvalidLen",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "ShortsTrackerVaultZero",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        }
+      ]
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "metadataTypeId": 4,
+      "components": [
+        {
+          "name": "Address",
+          "typeId": 9
+        },
+        {
+          "name": "ContractId",
+          "typeId": 11
+        }
+      ]
+    },
+    {
+      "type": "generic T",
+      "metadataTypeId": 5
+    },
+    {
+      "type": "raw untyped ptr",
+      "metadataTypeId": 6
+    },
+    {
+      "type": "struct GlobalShortDataUpdated",
+      "metadataTypeId": 7,
+      "components": [
+        {
+          "name": "asset",
+          "typeId": 10
+        },
+        {
+          "name": "global_short_size",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "global_short_average_price",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ]
+    },
+    {
+      "type": "struct helpers::signed_256::Signed256",
+      "metadataTypeId": 8,
+      "components": [
+        {
+          "name": "value",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "is_neg",
+          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        }
+      ]
+    },
+    {
+      "type": "struct std::address::Address",
+      "metadataTypeId": 9,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": 2
+        }
+      ]
+    },
+    {
+      "type": "struct std::asset_id::AssetId",
+      "metadataTypeId": 10,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": 2
+        }
+      ]
+    },
+    {
+      "type": "struct std::contract_id::ContractId",
+      "metadataTypeId": 11,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": 2
+        }
+      ]
+    },
+    {
+      "type": "struct std::vec::RawVec",
+      "metadataTypeId": 12,
+      "components": [
+        {
+          "name": "ptr",
+          "typeId": 6
+        },
+        {
+          "name": "cap",
+          "typeId": 14
+        }
+      ],
+      "typeParameters": [
+        5
+      ]
+    },
+    {
+      "type": "struct std::vec::Vec",
+      "metadataTypeId": 13,
+      "components": [
+        {
+          "name": "buf",
+          "typeId": 12,
+          "typeArguments": [
+            {
+              "name": "",
+              "typeId": 5
+            }
+          ]
+        },
+        {
+          "name": "len",
+          "typeId": 14
+        }
+      ],
+      "typeParameters": [
+        5
+      ]
+    },
+    {
+      "type": "u64",
+      "metadataTypeId": 14
+    }
+  ],
+  "functions": [
+    {
+      "inputs": [
+        {
+          "name": "asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        }
+      ],
+      "name": "get_global_short_average_prices",
+      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "delta",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "average_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "next_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "realized_pnl",
+          "concreteTypeId": "0141a3e1b66250fca81a39c0b293c9ad5d4887822b352f6cc34e3b07f5ba4a4b"
+        }
+      ],
+      "name": "get_next_delta",
+      "output": "3acef182e41da8f557e6ba5daab7129b9c821fb0b9e53c5b1d4a626825f06b8e",
+      "attributes": null
+    },
+    {
+      "inputs": [
+        {
+          "name": "average_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "next_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "next_size",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "delta",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "realized_pnl",
+          "concreteTypeId": "0141a3e1b66250fca81a39c0b293c9ad5d4887822b352f6cc34e3b07f5ba4a4b"
+        }
+      ],
+      "name": "get_next_global_average_price",
+      "output": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e",
+      "attributes": null
+    },
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "collateral_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "index_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "next_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "size_delta",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "is_increase",
+          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        }
+      ],
+      "name": "get_next_global_short_data",
+      "output": "2770d9f762bf8ec295d5c253193cd2897c893401f1f438769f92d212641ec779",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "collateral_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "index_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "size_delta",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "is_increase",
+          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        }
+      ],
+      "name": "get_realized_pnl",
+      "output": "0141a3e1b66250fca81a39c0b293c9ad5d4887822b352f6cc34e3b07f5ba4a4b",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "vault",
+          "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54"
+        }
+      ],
+      "name": "initialize",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "name": "is_global_short_data_ready",
+      "output": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "handler",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "is_active",
+          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        }
+      ],
+      "name": "set_handler",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "assets",
+          "concreteTypeId": "8b2275934873f381a769c82334e6f66595eeb350d8b2dd012eef4d9bb117942b"
+        },
+        {
+          "name": "average_prices",
+          "concreteTypeId": "742d7b76206a39cfad7eaec9b457390bbd0a92fe1da596db414daa0e4964bf82"
+        }
+      ],
+      "name": "set_init_data",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "account",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "collateral_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "index_asset",
+          "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974"
+        },
+        {
+          "name": "is_long",
+          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        },
+        {
+          "name": "size_delta",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "mark_price",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        },
+        {
+          "name": "is_increase",
+          "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+        }
+      ],
+      "name": "update_global_short_data",
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    }
+  ],
+  "loggedTypes": [
+    {
+      "logId": "5432468599230875534",
+      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3"
+    },
+    {
+      "logId": "15067712915018640395",
+      "concreteTypeId": "d11b451065406c0beca7d6d175c3cc06c08e09f1cbdec00e56acfdc96f9b0672"
+    }
+  ],
+  "messagesTypes": [],
+  "configurables": []
+}
