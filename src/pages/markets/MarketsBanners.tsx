@@ -115,8 +115,7 @@ export const MarketsBanners = ({
     <$SurgeBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <span tw="mb-0.75 text-large font-extra-bold">
-          <span tw="text-color-accent">dYdX Surge:</span>{' '}
-          <span tw="text-white">$3M Rewards Up for Grabs.</span>
+          {stringGetter({ key: STRING_KEYS.SURGE_BANNER_TITLE })}
         </span>
         <div tw="flex items-center gap-1.5">
           <Button
@@ -127,7 +126,9 @@ export const MarketsBanners = ({
           >
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
           </Button>
-          <span tw="text-color-text-1 font-medium-book">Ends August 31</span>
+          <span tw="text-color-text-1 font-medium-book">
+            {stringGetter({ key: STRING_KEYS.SURGE_BANNER_END_DATE })}
+          </span>
         </div>
       </div>
 
