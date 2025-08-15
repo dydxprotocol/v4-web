@@ -115,7 +115,6 @@ export const MarketsBanners = ({
     <$SurgeBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <span tw="mb-0.75 text-large font-extra-bold">
-          {/* TODO: Add to v4-localization: SURGE_BANNER_TITLE */}
           <span tw="text-color-accent">dYdX Surge:</span>{' '}
           <span tw="text-white">$3M Rewards Up for Grabs.</span>
         </span>
@@ -128,7 +127,6 @@ export const MarketsBanners = ({
           >
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
           </Button>
-          {/* TODO: Add to v4-localization: SURGE_BANNER_END_DATE */}
           <span tw="text-color-text-1 font-medium-book">Ends August 31</span>
         </div>
       </div>
