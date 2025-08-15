@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 import { logTurnkey } from '@/bonsai/logs';
 import { uncompressRawPublicKey } from '@turnkey/crypto';
-import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
+import type { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { AES } from 'crypto-js';
 import { hashTypedData, toHex } from 'viem';
