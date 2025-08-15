@@ -9,7 +9,13 @@ import { hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { getSignTypedDataForTurnkey } from '@/constants/wallets';
-import { Account, UserSession, Wallet } from '@/types/turnkey';
+import {
+  HashFunction,
+  PayloadEncoding,
+  TurnkeyWallet,
+  TurnkeyWalletAccount,
+  UserSession,
+} from '@/types/turnkey';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
@@ -43,8 +49,8 @@ const useTurnkeyWalletContext = () => {
     defaultValue: null,
   });
 
-  const [turnkeyWallets, setTurnkeyWallets] = useState<Wallet[]>([]);
-  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<Wallet | undefined>();
+  const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>([]);
+  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet | undefined>();
   const [targetPublicKeys, setTargetPublicKeys] = useState<{
     publicKey: string;
     publicKeyCompressed: string;
@@ -128,7 +134,7 @@ const useTurnkeyWalletContext = () => {
       );
 
       if (wallets.length > 0) {
-        let selectedWallet: Wallet = wallets[0]!;
+        let selectedWallet: TurnkeyWallet = wallets[0]!;
         // If the user has a preferred wallet, select it
         if (preferredWallet != null) {
           const wallet = wallets.find(
@@ -223,8 +229,8 @@ const useTurnkeyWalletContext = () => {
     const response = await indexedDbClient.signRawPayload({
       signWith: selectedTurnkeyWallet.accounts[0].address,
       payload: digest,
-      encoding: 'PAYLOAD_ENCODING_HEXADECIMAL',
-      hashFunction: 'HASH_FUNCTION_NO_OP',
+      encoding: PayloadEncoding.Hexadecimal,
+      hashFunction: HashFunction.NoOp,
       timestampMs: Date.now().toString(),
     });
 
@@ -268,7 +274,7 @@ const useTurnkeyWalletContext = () => {
 async function getWalletsWithAccountsFromClients(
   browserClient: TurnkeyIndexedDbClient,
   organizationId: string
-): Promise<Wallet[]> {
+): Promise<TurnkeyWallet[]> {
   const { wallets } = await browserClient.getWallets({ organizationId });
 
   const walletWithAccounts = await Promise.all(
@@ -277,7 +283,7 @@ async function getWalletsWithAccountsFromClients(
         walletId: wallet.walletId,
       });
 
-      const accountsWithBalance = await accounts.reduce<Promise<Account[]>>(
+      const accountsWithBalance = await accounts.reduce<Promise<TurnkeyWalletAccount[]>>(
         async (accPromise, account) => {
           const acc = await accPromise;
           // Ensure the account's organizationId matches the provided organizationId

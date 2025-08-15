@@ -1,13 +1,10 @@
-import { TurnkeyApiTypes } from '@turnkey/http';
+import type { TurnkeyApiTypes } from '@turnkey/http';
 
-export type Attestation = TurnkeyApiTypes['v1Attestation'];
+export type TurnkeyWalletAccount =
+  TurnkeyApiTypes['v1GetWalletAccountsResponse']['accounts'][number];
 
-export type Email = `${string}@${string}.${string}`;
-
-export type Account = TurnkeyApiTypes['v1GetWalletAccountsResponse']['accounts'][number];
-
-export type Wallet = TurnkeyApiTypes['v1GetWalletsResponse']['wallets'][number] & {
-  accounts: Account[];
+export type TurnkeyWallet = TurnkeyApiTypes['v1GetWalletsResponse']['wallets'][number] & {
+  accounts: TurnkeyWalletAccount[];
 };
 
 export type UserSession = {
@@ -20,30 +17,15 @@ export type UserSession = {
   };
 };
 
-export type Authenticator =
-  TurnkeyApiTypes['v1GetAuthenticatorsResponse']['authenticators'][number];
-
 export type PreferredWallet = {
   userId: string;
   walletId: string;
 };
 
-export interface ReadOnlySession {
-  session: string;
-  sessionExpiry: number;
-}
-
-export type OauthProviderParams = TurnkeyApiTypes['v1OauthProviderParams'];
-
 export enum LoginMethod {
   Passkey = 'PASSKEY',
   Email = 'EMAIL',
   OAuth = 'OAUTH',
-}
-
-export enum OtpType {
-  Email = 'OTP_TYPE_EMAIL',
-  Sms = 'OTP_TYPE_SMS',
 }
 
 export enum HashFunction {
