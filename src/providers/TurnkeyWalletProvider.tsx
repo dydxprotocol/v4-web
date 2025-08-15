@@ -2,20 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 import { logTurnkey } from '@/bonsai/logs';
 import { uncompressRawPublicKey } from '@turnkey/crypto';
-import type { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { AES } from 'crypto-js';
 import { hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { getSignTypedDataForTurnkey } from '@/constants/wallets';
-import {
-  HashFunction,
-  PayloadEncoding,
-  TurnkeyWallet,
-  TurnkeyWalletAccount,
-  UserSession,
-} from '@/types/turnkey';
+import { HashFunction, PayloadEncoding, TurnkeyWallet, UserSession } from '@/types/turnkey';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
@@ -23,7 +16,10 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSavedEncryptedSignature } from '@/state/wallet';
 
-import { getWalletsWithAccounts } from '@/lib/turnkey/turnkeyUtils';
+import {
+  getWalletsWithAccounts,
+  getWalletsWithAccountsFromIndexedDb,
+} from '@/lib/turnkey/turnkeyUtils';
 
 const TurnkeyWalletContext = createContext<ReturnType<typeof useTurnkeyWalletContext> | undefined>(
   undefined
@@ -128,7 +124,7 @@ const useTurnkeyWalletContext = () => {
     }
 
     if (indexedDbClient) {
-      const wallets = await getWalletsWithAccountsFromClients(
+      const wallets = await getWalletsWithAccountsFromIndexedDb(
         indexedDbClient,
         user.organization.organizationId
       );
@@ -268,38 +264,3 @@ const useTurnkeyWalletContext = () => {
     onboardDydxFromTurnkey,
   };
 };
-
-/* ------ Helpers ------ */
-
-async function getWalletsWithAccountsFromClients(
-  browserClient: TurnkeyIndexedDbClient,
-  organizationId: string
-): Promise<TurnkeyWallet[]> {
-  const { wallets } = await browserClient.getWallets({ organizationId });
-
-  const walletWithAccounts = await Promise.all(
-    wallets.map(async (wallet) => {
-      const { accounts } = await browserClient.getWalletAccounts({
-        walletId: wallet.walletId,
-      });
-
-      const accountsWithBalance = await accounts.reduce<Promise<TurnkeyWalletAccount[]>>(
-        async (accPromise, account) => {
-          const acc = await accPromise;
-          // Ensure the account's organizationId matches the provided organizationId
-          if (account.organizationId === organizationId) {
-            acc.push({
-              ...account,
-            });
-          }
-          return acc;
-        },
-        Promise.resolve([])
-      );
-
-      return { ...wallet, accounts: accountsWithBalance };
-    })
-  );
-
-  return walletWithAccounts;
-}

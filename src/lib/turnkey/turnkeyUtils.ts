@@ -1,9 +1,9 @@
 import { logBonsaiError } from '@/bonsai/logs';
 import { weakMapMemoize } from '@reduxjs/toolkit';
+import type { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import type { ApiKeyStamper, TurnkeyServerClient } from '@turnkey/sdk-server';
-import { getAddress } from 'viem';
 
-import { TurnkeyWallet } from '@/types/turnkey';
+import type { TurnkeyWallet, TurnkeyWalletAccount } from '@/types/turnkey';
 
 const TURNKEY_API_PUBLIC_KEY = import.meta.env.VITE_TURNKEY_API_PUBLIC_KEY;
 const TURNKEY_API_PRIVATE_KEY = import.meta.env.VITE_TURNKEY_API_PRIVATE_KEY;
@@ -19,6 +19,11 @@ const getLazyTurnkeyClient = weakMapMemoize(async () => {
 let stamper: ApiKeyStamper | undefined;
 let turnkeyClient: TurnkeyServerClient | undefined;
 
+/**
+ * Get wallets with accounts from the Turnkey server.
+ * @param organizationId - The organization ID to get wallets for.
+ * @returns A list of wallets with accounts.
+ */
 export async function getWalletsWithAccounts(organizationId: string): Promise<TurnkeyWallet[]> {
   try {
     if (TURNKEY_API_PUBLIC_KEY == null || TURNKEY_API_PRIVATE_KEY == null) {
@@ -56,14 +61,7 @@ export async function getWalletsWithAccounts(organizationId: string): Promise<Tu
         });
 
         const accountsWithBalance = await Promise.all(
-          accounts
-            .filter((account) => account.curve === 'CURVE_SECP256K1')
-            .map(async ({ address, ...account }) => {
-              return {
-                ...account,
-                address: getAddress(address),
-              };
-            })
+          accounts.filter((account) => account.curve === 'CURVE_SECP256K1')
         );
         return { ...wallet, accounts: accountsWithBalance };
       })
@@ -72,4 +70,41 @@ export async function getWalletsWithAccounts(organizationId: string): Promise<Tu
     logBonsaiError('turnkeyUtils', 'getWalletsWithAccounts', error);
     throw error;
   }
+}
+
+/**
+ * Get wallets with accounts from the Turnkey indexedDB client.
+ * @param browserClient - The Turnkey indexedDB client to use.
+ * @param organizationId - The organization ID to get wallets for.
+ * @returns A list of wallets with accounts.
+ */
+export async function getWalletsWithAccountsFromIndexedDb(
+  browserClient: TurnkeyIndexedDbClient,
+  organizationId: string
+): Promise<TurnkeyWallet[]> {
+  const { wallets } = await browserClient.getWallets({ organizationId });
+
+  const walletWithAccounts = await Promise.all(
+    wallets.map(async (wallet) => {
+      const { accounts } = await browserClient.getWalletAccounts({
+        walletId: wallet.walletId,
+      });
+
+      const accountsWithBalance = await accounts.reduce<Promise<TurnkeyWalletAccount[]>>(
+        async (accPromise, account) => {
+          const acc = await accPromise;
+          // Ensure the account's organizationId matches the provided organizationId
+          if (account.organizationId === organizationId) {
+            acc.push(account);
+          }
+          return acc;
+        },
+        Promise.resolve([])
+      );
+
+      return { ...wallet, accounts: accountsWithBalance };
+    })
+  );
+
+  return walletWithAccounts;
 }
