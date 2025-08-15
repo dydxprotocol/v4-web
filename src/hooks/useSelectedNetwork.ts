@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 
-import { logTurnkey } from '@/bonsai/logs';
 import { useWallets } from '@privy-io/react-auth';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -36,7 +35,6 @@ export const useSelectedNetwork = (): {
 
   const switchNetwork = useCallback(
     (network: DydxNetwork) => {
-      logTurnkey('useSelectedNetwork', 'switchNetwork', network);
       disconnect();
 
       setLocalStorageNetwork(network);

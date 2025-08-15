@@ -181,6 +181,10 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     },
   }) as const;
 
+/**
+ * @description Overwrites the types and message to include salt for Turnkey onboarding
+ * @returns Typed data to sign for dYdX Chain onboarding with turnkey
+ */
 export const getSignTypedDataForTurnkey = ({
   selectedDydxChainId,
   salt,
@@ -189,10 +193,7 @@ export const getSignTypedDataForTurnkey = ({
   salt: string;
 }) =>
   ({
-    primaryType: 'dYdX',
-    domain: {
-      name: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataDomainName,
-    },
+    ...getSignTypedData(selectedDydxChainId),
     types: {
       dYdX: [
         { name: 'action', type: 'string' },

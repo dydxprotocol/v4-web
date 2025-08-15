@@ -155,9 +155,6 @@ dependencies:
   '@tanstack/react-virtual':
     specifier: ^3.13.5
     version: 3.13.6(react-dom@18.2.0)(react@18.2.0)
-  '@turnkey/api-key-stamper':
-    specifier: ^0.4.7
-    version: 0.4.7
   '@turnkey/crypto':
     specifier: ^2.4.3
     version: 2.4.3
@@ -173,12 +170,6 @@ dependencies:
   '@turnkey/sdk-server':
     specifier: ^4.3.0
     version: 4.3.0(typescript@5.7.2)
-  '@turnkey/viem':
-    specifier: ^0.11.0
-    version: 0.11.0(typescript@5.7.2)(viem@2.33.3)
-  '@turnkey/wallet-stamper':
-    specifier: ^1.0.7
-    version: 1.0.7(typescript@5.7.2)
   '@types/lodash':
     specifier: ^4.14.195
     version: 4.14.195
@@ -4350,13 +4341,6 @@ packages:
       '@noble/hashes': 1.4.0
     dev: false
 
-  /@noble/curves@1.8.0:
-    resolution: {integrity: sha512-j84kjAbzEnQHaSIhRPUmB3/eVXu2k3dKPl2LOrR8fSOIL+89U+7lV117EWHtq/GHM3ReGHM46iRBdZfpc4HRUQ==}
-    engines: {node: ^14.21.3 || >=16}
-    dependencies:
-      '@noble/hashes': 1.7.0
-    dev: false
-
   /@noble/curves@1.8.1:
     resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
     engines: {node: ^14.21.3 || >=16}
@@ -4409,11 +4393,6 @@ packages:
     engines: {node: '>= 16'}
     dev: false
 
-  /@noble/hashes@1.7.0:
-    resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
-    engines: {node: ^14.21.3 || >=16}
-    dev: false
-
   /@noble/hashes@1.7.1:
     resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
     engines: {node: ^14.21.3 || >=16}
@@ -4464,10 +4443,6 @@ packages:
   /@open-draft/until@2.1.0:
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
     dev: true
-
-  /@openzeppelin/contracts@4.9.6:
-    resolution: {integrity: sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==}
-    dev: false
 
   /@osmonauts/lcd@0.6.0:
     resolution: {integrity: sha512-vz9VavXrEfxZoXbSAfNfk90MLpn34XtBYPV3L9YilE+s56AhqYxUh83nne9J5somnTRfGnyR3oeV8C+lHkqiuA==}
@@ -8473,18 +8448,6 @@ packages:
       bs58check: 4.0.0
     dev: false
 
-  /@turnkey/crypto@2.5.0:
-    resolution: {integrity: sha512-aeYPO9rPFlM6eG+hjDiE6BKi9O6xcSDSIoq3mlw6KaaDgg6T2wFVapquIhAvwdTn+SMemDhcw2XaK5jsrQvsdQ==}
-    engines: {node: '>=18.0.0'}
-    dependencies:
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.0
-      '@noble/hashes': 1.8.0
-      '@turnkey/encoding': 0.5.0
-      bs58: 6.0.0
-      bs58check: 4.0.0
-    dev: false
-
   /@turnkey/encoding@0.5.0:
     resolution: {integrity: sha512-nRlKRQa6B5/xltGUKN1iKo4h4YC/0iFz0fAuFFZevc+YGDj7ddAP/3HkWmVvLmdoicUgs9rxvWbLRlgqPkbwzQ==}
     engines: {node: '>=18.0.0'}
@@ -8492,18 +8455,6 @@ packages:
 
   /@turnkey/http@3.6.0:
     resolution: {integrity: sha512-TpjZNpNWuJVDbnMGQva/kAuDheWDjZwS6BweeXuqQsfPf/pBeuqP0HVj6+3D2jQAQYNfQ1IE0snRURs+Uu0Inw==}
-    engines: {node: '>=18.0.0'}
-    dependencies:
-      '@turnkey/api-key-stamper': 0.4.7
-      '@turnkey/encoding': 0.5.0
-      '@turnkey/webauthn-stamper': 0.5.1
-      cross-fetch: 3.1.8(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@turnkey/http@3.7.0:
-    resolution: {integrity: sha512-FADQX3rR/yUbXbRsVL1j8HQDHGAAWgJQda/hDa82S0HL29dQC4GzHUyglnm9HP2vCRMP4/sRw2LBLFR7CFDglg==}
     engines: {node: '>=18.0.0'}
     dependencies:
       '@turnkey/api-key-stamper': 0.4.7
@@ -8539,31 +8490,6 @@ packages:
       '@turnkey/indexed-db-stamper': 1.1.1
       '@turnkey/sdk-types': 0.2.1
       '@turnkey/wallet-stamper': 1.0.7(typescript@5.7.2)
-      '@turnkey/webauthn-stamper': 0.5.1
-      bs58check: 4.0.0
-      buffer: 6.0.3
-      cross-fetch: 3.1.8(encoding@0.1.13)
-      hpke-js: 1.6.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /@turnkey/sdk-browser@5.5.0(typescript@5.7.2):
-    resolution: {integrity: sha512-fmYx0NewTLS3bkAuLe+r42ytXdW93iykarcQHPC+iketzhCpPF1Q2KDW4dxKBB75gppkiroomlcT/QerSq70QA==}
-    engines: {node: '>=18.0.0'}
-    dependencies:
-      '@turnkey/api-key-stamper': 0.4.7
-      '@turnkey/crypto': 2.5.0
-      '@turnkey/encoding': 0.5.0
-      '@turnkey/http': 3.7.0
-      '@turnkey/iframe-stamper': 2.5.0
-      '@turnkey/indexed-db-stamper': 1.1.1
-      '@turnkey/sdk-types': 0.3.0
-      '@turnkey/wallet-stamper': 1.0.8(typescript@5.7.2)
       '@turnkey/webauthn-stamper': 0.5.1
       bs58check: 4.0.0
       buffer: 6.0.3
@@ -8639,73 +8565,15 @@ packages:
       - zod
     dev: false
 
-  /@turnkey/sdk-server@4.4.0(typescript@5.7.2):
-    resolution: {integrity: sha512-eJJjJlpa2rIgFkEyJe2Vo+AL9XPzUVYZU0u/gCx8rzV6PR5zJPcUwFe3Ytg03OINFrg0CQ2KWCO4nLWriZQnXw==}
-    engines: {node: '>=18.0.0'}
-    dependencies:
-      '@turnkey/api-key-stamper': 0.4.7
-      '@turnkey/http': 3.7.0
-      '@turnkey/wallet-stamper': 1.0.8(typescript@5.7.2)
-      buffer: 6.0.3
-      cross-fetch: 3.1.8(encoding@0.1.13)
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-    dev: false
-
   /@turnkey/sdk-types@0.2.1:
     resolution: {integrity: sha512-nVuhcpaWbBUPd75kZ8OjCYRKfg6zN3dCNqzu1J3VR/O4QxqPaKWKYHqEL1cSCEvvKTlKB8DE6jwmPkOWd4m6kQ==}
     engines: {node: '>=18.0.0'}
-    dev: false
-
-  /@turnkey/sdk-types@0.3.0:
-    resolution: {integrity: sha512-w9WLK8rMBLMIQNtaEriW2mQRuRxWu5GCOZatReaB5FRrtUFJroXjB3V8C+wUER02w3znyZzklQGPL1P32n6iuA==}
-    engines: {node: '>=18.0.0'}
-    dev: false
-
-  /@turnkey/viem@0.11.0(typescript@5.7.2)(viem@2.33.3):
-    resolution: {integrity: sha512-crdKY2p097SNscI6hba9OD3rQtqbSxHvfHx5iopnqYrlq430fyS4P4NWITWyta75+nOEN6cijidWrFMxcIRryA==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      viem: ^1.16.6 || ^2.24.2
-    dependencies:
-      '@noble/curves': 1.8.0
-      '@openzeppelin/contracts': 4.9.6
-      '@turnkey/api-key-stamper': 0.4.7
-      '@turnkey/http': 3.7.0
-      '@turnkey/sdk-browser': 5.5.0(typescript@5.7.2)
-      '@turnkey/sdk-server': 4.4.0(typescript@5.7.2)
-      cross-fetch: 4.0.0(encoding@0.1.13)
-      viem: 2.33.3(typescript@5.7.2)
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
     dev: false
 
   /@turnkey/wallet-stamper@1.0.7(typescript@5.7.2):
     resolution: {integrity: sha512-P3RnoR7rL95puivU0GHVfOp5cxlhKmiOi7tWOlECiGqvPxS4FoU6mCgBVLu21uXVPZLX5FmsZ//AZy+NKdNo+Q==}
     dependencies:
       '@turnkey/crypto': 2.4.3
-      '@turnkey/encoding': 0.5.0
-    optionalDependencies:
-      viem: 2.33.3(typescript@5.7.2)
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /@turnkey/wallet-stamper@1.0.8(typescript@5.7.2):
-    resolution: {integrity: sha512-MgXYt5/ROvnkwC/hZyMMqPcOmENuYDq+Efyf0ipCX09Q3NfM6TLJvR3AgJuVN6WrDO8GNcpQQTBdy8kbAXMlLQ==}
-    dependencies:
-      '@turnkey/crypto': 2.5.0
       '@turnkey/encoding': 0.5.0
     optionalDependencies:
       viem: 2.33.3(typescript@5.7.2)

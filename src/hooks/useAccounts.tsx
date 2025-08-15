@@ -188,7 +188,6 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet]);
 
-  // Auto-Connect on refresh
   useEffect(() => {
     (async () => {
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
@@ -390,8 +389,9 @@ const useAccountsContext = () => {
 
   const disconnect = async () => {
     // Turnkey Signout
-    logTurnkey('useAccounts', 'disconnect', { sourceAccount });
-    await endTurnkeySession();
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      await endTurnkeySession();
+    }
 
     // Disconnect local wallet
     disconnectLocalDydxWallet();
