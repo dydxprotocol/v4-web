@@ -19,6 +19,31 @@ const getLazyTurnkeyClient = weakMapMemoize(async () => {
 let stamper: ApiKeyStamper | undefined;
 let turnkeyClient: TurnkeyServerClient | undefined;
 
+async function getTurnkeyClient() {
+  if (TURNKEY_API_PUBLIC_KEY == null || TURNKEY_API_PRIVATE_KEY == null) {
+    throw new Error('Turnkey API keys are not set');
+  }
+
+  stamper ??= new (await getLazyTurnkeyApiKeyStamper())({
+    apiPublicKey: TURNKEY_API_PUBLIC_KEY,
+    apiPrivateKey: TURNKEY_API_PRIVATE_KEY,
+  });
+
+  if (import.meta.env.VITE_TURNKEY_API_BASE_URL == null) {
+    throw new Error('Turnkey API base URL is not set');
+  } else if (import.meta.env.VITE_PUBLIC_ORGANIZATION_ID == null) {
+    throw new Error('Turnkey organization ID is not set');
+  }
+
+  turnkeyClient ??= new (await getLazyTurnkeyClient())({
+    apiBaseUrl: import.meta.env.VITE_TURNKEY_API_BASE_URL,
+    organizationId: import.meta.env.VITE_PUBLIC_ORGANIZATION_ID,
+    stamper,
+  });
+
+  return turnkeyClient;
+}
+
 /**
  * Get wallets with accounts from the Turnkey server.
  * @param organizationId - The organization ID to get wallets for.
@@ -26,36 +51,15 @@ let turnkeyClient: TurnkeyServerClient | undefined;
  */
 export async function getWalletsWithAccounts(organizationId: string): Promise<TurnkeyWallet[]> {
   try {
-    if (TURNKEY_API_PUBLIC_KEY == null || TURNKEY_API_PRIVATE_KEY == null) {
-      throw new Error('Turnkey API keys and base URL are not set');
-    }
+    const client = await getTurnkeyClient();
 
-    stamper ??= new (await getLazyTurnkeyApiKeyStamper())({
-      apiPublicKey: TURNKEY_API_PUBLIC_KEY,
-      apiPrivateKey: TURNKEY_API_PRIVATE_KEY,
-    });
-
-    if (import.meta.env.VITE_TURNKEY_API_BASE_URL == null) {
-      throw new Error('Turnkey API base URL is not set');
-    }
-
-    turnkeyClient ??= new (await getLazyTurnkeyClient())({
-      apiBaseUrl: import.meta.env.VITE_TURNKEY_API_BASE_URL,
-      organizationId: import.meta.env.VITE_PUBLIC_ORGANIZATION_ID,
-      stamper,
-    });
-
-    const { wallets } = await turnkeyClient.getWallets({
+    const { wallets } = await client.getWallets({
       organizationId,
     });
 
     return await Promise.all(
       wallets.map(async (wallet) => {
-        if (turnkeyClient == null) {
-          throw new Error(`${wallet.walletId} - Turnkey client is not set`);
-        }
-
-        const { accounts } = await turnkeyClient.getWalletAccounts({
+        const { accounts } = await client.getWalletAccounts({
           organizationId,
           walletId: wallet.walletId,
         });
