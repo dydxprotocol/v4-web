@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { logTurnkey } from '@/bonsai/logs';
+import { logBonsaiError } from '@/bonsai/logs';
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
   useAccount as useAccountGraz,
@@ -85,24 +85,27 @@ export const useWalletConnectionContext = () => {
     const walletInfo = sourceAccount.walletInfo;
     if (!walletInfo) return;
 
-    if (isWagmiResolvedWallet(walletInfo) && evmAddressWagmi) {
-      dispatch(setSourceAddress({ address: evmAddressWagmi, chain: WalletNetworkType.Evm }));
-    } else if (walletInfo.connectorType === ConnectorType.PhantomSolana && solAddressPhantom) {
-      dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
-    } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
-      dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
-    } else if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
+    if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
       if (primaryTurnkeyWallet.accounts[0] == null) {
-        logTurnkey('useWalletConnection', 'turnKey', 'no accounts');
+        logBonsaiError('useWalletConnection', 'setSourceAddress side effect', {
+          error: new Error(`No accounts for ${primaryTurnkeyWallet.walletId}`),
+        });
+
         return;
       }
-      logTurnkey('useWalletConnection', 'turnKey', primaryTurnkeyWallet);
+
       dispatch(
         setSourceAddress({
           address: primaryTurnkeyWallet.accounts[0].address,
           chain: WalletNetworkType.Evm,
         })
       );
+    } else if (isWagmiResolvedWallet(walletInfo) && evmAddressWagmi) {
+      dispatch(setSourceAddress({ address: evmAddressWagmi, chain: WalletNetworkType.Evm }));
+    } else if (walletInfo.connectorType === ConnectorType.PhantomSolana && solAddressPhantom) {
+      dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
+    } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
+      dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
     }
   }, [
     sourceAccount.walletInfo,
@@ -175,9 +178,10 @@ export const useWalletConnectionContext = () => {
 
       try {
         if (wallet.connectorType === ConnectorType.Turnkey) {
-          logTurnkey('useWalletConnection', 'connectWallet no_op');
+          // Turnkey does not initiate a wallet connection, so we should no op.
           return;
         }
+
         if (wallet.connectorType === ConnectorType.Privy) {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();
@@ -248,8 +252,8 @@ export const useWalletConnectionContext = () => {
       setSelectedWalletError(undefined);
 
       if (selectedWallet) {
-        // NO OP side effects for turnkey
         if (selectedWallet.connectorType === ConnectorType.Turnkey) {
+          // Turnkey does not initiate a wallet connection, so we should no op.
           return;
         }
 
@@ -283,8 +287,8 @@ export const useWalletConnectionContext = () => {
 
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
+      // Disconnect all wallets prior to selecting a new wallet.
       if (wallet && wallet.connectorType !== ConnectorType.Turnkey) {
-        logTurnkey('selectWallet', 'non turnkey disconnect', wallet);
         await disconnectWallet();
         await new Promise(requestAnimationFrame);
       }
@@ -294,7 +298,6 @@ export const useWalletConnectionContext = () => {
       if (wallet) {
         try {
           if (wallet.connectorType === ConnectorType.Turnkey) {
-            logTurnkey('selectWallet', 'turnkey connect', wallet);
             dispatch(setWalletInfo(wallet));
           } else {
             await connectWallet({
@@ -362,8 +365,5 @@ export const useWalletConnectionContext = () => {
     dydxAccountGraz,
     isConnectedGraz,
     getCosmosOfflineSigner,
-
-    // Wallet connection (Turnkey)
-    primaryTurnkeyWallet,
   };
 };
