@@ -68,28 +68,6 @@ export function decodeJwt(credential: string): JwtPayload | null {
   return null;
 }
 
-export const oauth = async ({
-  credential,
-  publicKey,
-  subOrgId,
-}: {
-  credential: string;
-  publicKey: string;
-  subOrgId: string;
-}) => {
-  const oauthResponse = await client.oauthLogin({
-    oidcToken: credential,
-    publicKey,
-    organizationId: subOrgId,
-  });
-
-  return {
-    userId: oauthResponse.activity.votes?.[0]?.userId,
-    session: oauthResponse.session,
-    organizationId: subOrgId,
-  };
-};
-
 const getMagicLinkTemplate = (
   action: string,
   email: string,

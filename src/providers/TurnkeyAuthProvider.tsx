@@ -1,14 +1,15 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
-import { uncompressRawPublicKey } from '@turnkey/crypto';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
-import { toHex } from 'viem';
 
+import { ConnectorType, WalletType } from '@/constants/wallets';
 import { GoogleIdTokenPayload, LoginMethod, SignInBody } from '@/types/turnkey';
+
+import { useAccounts } from '@/hooks/useAccounts';
 
 import { useAppSelector } from '@/state/appTypes';
 
@@ -35,21 +36,7 @@ const useTurnkeyAuthContext = () => {
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const { indexedDbClient } = useTurnkey();
 
-  const getTargetPublicKey = useCallback(async () => {
-    const publicKeyCompressed = await indexedDbClient?.getPublicKey();
-
-    if (!publicKeyCompressed) {
-      throw new Error('useTurnkeyAuth: No public key found');
-    }
-
-    const publicKey = toHex(
-      uncompressRawPublicKey(new Uint8Array(Buffer.from(publicKeyCompressed, 'hex')))
-    ).replace('0x', '');
-
-    logTurnkey('getTargetPublicKey', '', { publicKey, publicKeyCompressed });
-
-    return { publicKey, publicKeyCompressed };
-  }, [indexedDbClient]);
+  const { selectWallet } = useAccounts();
 
   const { mutate: sendSignInRequest, status } = useMutation({
     mutationFn: async ({
@@ -65,6 +52,11 @@ const useTurnkeyAuthContext = () => {
       providerName: string;
       userEmail?: string;
     }) => {
+      selectWallet({
+        connectorType: ConnectorType.Turnkey,
+        name: WalletType.Turnkey,
+      });
+
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
         headers,
@@ -88,10 +80,13 @@ const useTurnkeyAuthContext = () => {
       }
     },
     onError: (error) => {
-      logTurnkey('useTurnkeyAuth/', 'error', error);
+      selectWallet(undefined);
+      logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
     },
   });
+
+  const { onboardDydxFromTurnkey, targetPublicKeys } = useTurnkeyWallet();
 
   const signInWithOauth = async ({
     oidcToken,
@@ -101,7 +96,11 @@ const useTurnkeyAuthContext = () => {
     providerName: 'google' | 'apple';
   }) => {
     const decoded = jwtDecode<GoogleIdTokenPayload>(oidcToken);
-    const { publicKeyCompressed } = await getTargetPublicKey();
+    const { publicKeyCompressed } = targetPublicKeys ?? {};
+
+    if (!publicKeyCompressed) {
+      throw new Error('useTurnkeyAuth: No public key found');
+    }
 
     const inputBody: SignInBody = {
       signinMethod: 'social',
@@ -110,8 +109,6 @@ const useTurnkeyAuthContext = () => {
       oidcToken,
       userEmail: decoded.email,
     };
-
-    logTurnkey('signInWithOauth/', 'inputBody', inputBody);
 
     const headers = {
       'Content-Type': 'application/json',
@@ -127,7 +124,7 @@ const useTurnkeyAuthContext = () => {
     });
   };
 
-  const { decodeSessionJwt, onboardDydxFromTurnkey } = useTurnkeyWallet();
+  const { setWalletFromSignature } = useAccounts();
 
   const handleOauthResponse = async ({
     response,
@@ -149,33 +146,16 @@ const useTurnkeyAuthContext = () => {
       throw new Error('useTurnkeyAuth: No salt found');
     }
 
-    const current = await indexedDbClient?.getPublicKey();
-    const decoded = decodeSessionJwt(session);
-    logTurnkey('handleOauthResponse', 'decoded', decoded, current);
-    if (decoded.publicKey !== current) {
-      // If this happens, your server used a different key than the one you sent
-      logTurnkey('handleOauthResponse', 'Mismatch:', {
-        fromClient: current,
-        fromSession: decoded.publicKey,
-      });
-      return;
-    }
-
     await indexedDbClient?.loginWithSession(session);
-    const newPublicKey = await indexedDbClient?.getPublicKey();
-    logTurnkey('handleOauthResponse', 'newPublicKey', decoded, newPublicKey);
-    if (newPublicKey !== decoded.publicKey) {
-      logTurnkey('handleOauthResponse', 'Mismatch:', {
-        fromClient: newPublicKey,
-        fromSession: decoded.publicKey,
-      });
-    }
     setAdditionalInfo({ providerName, userEmail });
-    await onboardDydxFromTurnkey(salt);
+    await onboardDydxFromTurnkey({ salt, setWalletFromSignature });
   };
 
   return {
-    additionalInfo,
+    providerName: additionalInfo?.providerName,
+    userEmail: additionalInfo?.userEmail,
+    targetPublicKeys,
+
     isLoading: status === 'pending',
     isError: status === 'error',
     signInWithOauth,

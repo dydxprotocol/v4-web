@@ -6,7 +6,7 @@ export enum LocalStorageKey {
   TurnkeyPreferredWallet = 'dydx.TurnkeyPreferredWallet',
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
-  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
+  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
 

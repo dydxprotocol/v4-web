@@ -16,15 +16,12 @@ import {
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 
-import { EvmDerivedAddresses } from '@/constants/account';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import { ConnectorType, WalletInfo, WalletNetworkType, WalletType } from '@/constants/wallets';
-import { Wallet as TurnkeyWallet } from '@/types/turnkey';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -56,7 +53,7 @@ export const useWalletConnectionContext = () => {
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi, refetch } = useWalletClientWagmi();
-  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet | undefined>();
+  const { primaryTurnkeyWallet } = useTurnkeyWallet();
 
   useEffect(() => {
     if (isConnectedWagmi && !signerWagmi) {
@@ -96,10 +93,10 @@ export const useWalletConnectionContext = () => {
       dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
     } else if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
       if (primaryTurnkeyWallet.accounts[0] == null) {
-        logTurnkey('useWalletConnection/', 'turnKey', 'no accounts');
+        logTurnkey('useWalletConnection', 'turnKey', 'no accounts');
         return;
       }
-      logTurnkey('useWalletConnection/', 'turnKey', primaryTurnkeyWallet);
+      logTurnkey('useWalletConnection', 'turnKey', primaryTurnkeyWallet);
       dispatch(
         setSourceAddress({
           address: primaryTurnkeyWallet.accounts[0].address,
@@ -144,10 +141,6 @@ export const useWalletConnectionContext = () => {
   const { connectAsync: connectWagmi } = useConnectWagmi();
   const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
   const { connectAsync: connectGraz } = useConnectGraz();
-  const [evmDerivedAddresses] = useLocalStorage({
-    key: LocalStorageKey.EvmDerivedAddresses,
-    defaultValue: {} as EvmDerivedAddresses,
-  });
   const { ready, authenticated } = usePrivy();
 
   const { mfaMethods } = useMfa();
@@ -182,7 +175,7 @@ export const useWalletConnectionContext = () => {
 
       try {
         if (wallet.connectorType === ConnectorType.Turnkey) {
-          logTurnkey('connectWallet: ', 'turnkey', wallet);
+          logTurnkey('useWalletConnection', 'connectWallet no_op');
           return;
         }
         if (wallet.connectorType === ConnectorType.Privy) {
@@ -255,8 +248,14 @@ export const useWalletConnectionContext = () => {
       setSelectedWalletError(undefined);
 
       if (selectedWallet) {
+        // NO OP side effects for turnkey
+        if (selectedWallet.connectorType === ConnectorType.Turnkey) {
+          return;
+        }
+
         const isEvmAccountConnected =
           sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature;
+
         if (isWagmiConnectorType(selectedWallet) && !isConnectedWagmi && !isEvmAccountConnected) {
           const connector = resolveWagmiConnector({ wallet: selectedWallet, walletConnectConfig });
           if (!connector) return;
@@ -275,7 +274,6 @@ export const useWalletConnectionContext = () => {
   }, [
     selectedWallet,
     signerWagmi,
-    evmDerivedAddresses,
     sourceAccount,
     reconnectWagmi,
     isConnectedWagmi,
@@ -285,22 +283,29 @@ export const useWalletConnectionContext = () => {
 
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
-      if (wallet) {
+      if (wallet && wallet.connectorType !== ConnectorType.Turnkey) {
+        logTurnkey('selectWallet', 'non turnkey disconnect', wallet);
         await disconnectWallet();
         await new Promise(requestAnimationFrame);
       }
 
       setSelectedWallet(wallet);
+
       if (wallet) {
         try {
-          await connectWallet({
-            wallet,
-            isEvmAccountConnected: Boolean(
-              sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature
-            ),
-          });
+          if (wallet.connectorType === ConnectorType.Turnkey) {
+            logTurnkey('selectWallet', 'turnkey connect', wallet);
+            dispatch(setWalletInfo(wallet));
+          } else {
+            await connectWallet({
+              wallet,
+              isEvmAccountConnected: Boolean(
+                sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature
+              ),
+            });
 
-          dispatch(setWalletInfo(wallet));
+            dispatch(setWalletInfo(wallet));
+          }
         } catch (error) {
           const { walletErrorType, message } = parseWalletError({
             error,
@@ -360,6 +365,5 @@ export const useWalletConnectionContext = () => {
 
     // Wallet connection (Turnkey)
     primaryTurnkeyWallet,
-    setPrimaryTurnkeyWallet,
   };
 };

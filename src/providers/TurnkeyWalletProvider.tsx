@@ -1,20 +1,21 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import { logTurnkey } from '@/bonsai/logs';
+import { uncompressRawPublicKey } from '@turnkey/crypto';
 import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
-import { hashTypedData } from 'viem';
+import { AES } from 'crypto-js';
+import { hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { ConnectorType, getSignTypedDataForTurnkey, WalletType } from '@/constants/wallets';
+import { getSignTypedDataForTurnkey } from '@/constants/wallets';
 import { Account, UserSession, Wallet } from '@/types/turnkey';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setSavedEncryptedSignature } from '@/state/wallet';
 
 import { getWalletsWithAccounts } from '@/lib/turnkey/turnkeyUtils';
 
@@ -31,6 +32,7 @@ export const TurnkeyWalletProvider = ({ ...props }) => (
 export const useTurnkeyWallet = () => useContext(TurnkeyWalletContext)!;
 
 const useTurnkeyWalletContext = () => {
+  const dispatch = useAppDispatch();
   const { turnkey, indexedDbClient } = useTurnkey();
   const [turnkeyUser, setTurnkeyUser] = useState<UserSession | undefined>();
   const [preferredWallet, setPreferredWallet] = useLocalStorage<{
@@ -42,33 +44,58 @@ const useTurnkeyWalletContext = () => {
   });
 
   const [turnkeyWallets, setTurnkeyWallets] = useState<Wallet[]>([]);
-  const { primaryTurnkeyWallet, setPrimaryTurnkeyWallet } = useWalletConnection();
-  const { setWalletFromSignature, selectWallet } = useAccounts();
+  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<Wallet | undefined>();
+  const [targetPublicKeys, setTargetPublicKeys] = useState<{
+    publicKey: string;
+    publicKeyCompressed: string;
+  } | null>(null);
+
+  const initClient = useCallback(async () => {
+    logTurnkey('useTurnkeyWallet', 'initClient');
+
+    if (indexedDbClient == null) {
+      logTurnkey('useTurnkeyWallet', 'initClient', 'no indexedDbClient');
+      return;
+    }
+
+    let publicKeyCompressed = await indexedDbClient.getPublicKey();
+
+    if (!publicKeyCompressed) {
+      await indexedDbClient.init();
+      await indexedDbClient.resetKeyPair();
+      publicKeyCompressed = await indexedDbClient.getPublicKey();
+
+      if (!publicKeyCompressed) {
+        throw new Error('useTurnkeyAuth: No public key found');
+      }
+    }
+
+    const publicKey = toHex(
+      uncompressRawPublicKey(new Uint8Array(Buffer.from(publicKeyCompressed, 'hex')))
+    ).replace('0x', '');
+
+    setTargetPublicKeys({ publicKey, publicKeyCompressed });
+  }, [indexedDbClient]);
+
+  useEffect(() => {
+    initClient();
+  }, [initClient]);
 
   const fetchUser = async (): Promise<UserSession | undefined> => {
     if (turnkey) {
       // Try and get the current user
-      logTurnkey('fetchUser', 'turnkey', turnkey);
       const token = await turnkey.getSession();
-      logTurnkey('fetchUser', 'token', token);
 
       // If the user is not found, we assume the user is not logged in
       if (!token?.expiry || token.expiry > Date.now() || indexedDbClient == null) {
         return undefined;
       }
 
-      selectWallet({
-        connectorType: ConnectorType.Turnkey,
-        name: WalletType.Turnkey,
-      });
-
       // Get the user's email
       const { user: indexedDbUser } = await indexedDbClient.getUser({
         organizationId: token.organizationId,
         userId: token.userId,
       });
-
-      logTurnkey('fetchUser', 'indexedDbUser', indexedDbUser);
 
       const userToSet: UserSession = {
         id: indexedDbUser.userId,
@@ -89,25 +116,16 @@ const useTurnkeyWalletContext = () => {
 
   const getPrimaryUserWallets = async () => {
     const user = turnkeyUser ?? (await fetchUser());
-    logTurnkey('getPrimaryUserWallets', 'user', user);
 
     if (!user?.organization.organizationId) {
       return null;
     }
 
     if (indexedDbClient) {
-      const check = await indexedDbClient.getPublicKey();
-      logTurnkey(
-        'getPrimaryUserWallets',
-        'check public key before getWalletsWithAccountsFromClients',
-        check
-      );
       const wallets = await getWalletsWithAccountsFromClients(
         indexedDbClient,
         user.organization.organizationId
       );
-
-      logTurnkey('getPrimaryUserWallets', 'wallets', wallets);
 
       if (wallets.length > 0) {
         let selectedWallet: Wallet = wallets[0]!;
@@ -133,13 +151,11 @@ const useTurnkeyWalletContext = () => {
     }
 
     logTurnkey('getPrimaryUserWallets', 'no indexedDbClient');
-
     // This case occurs when the user signs up with a new passkey; since a read-only session is not created for new passkey sign-ups,
     // we need to fetch the wallets from the server
     const wallets = await getWalletsWithAccounts(user.organization.organizationId);
     setTurnkeyWallets(wallets);
-
-    logTurnkey('getPrimaryUserWallets', 'wallets2', wallets);
+    logTurnkey('getPrimaryUserWallets', 'no indexedDb Wallets', wallets);
 
     if (wallets.length > 0) {
       setPrimaryTurnkeyWallet(wallets[0]!);
@@ -157,7 +173,6 @@ const useTurnkeyWalletContext = () => {
   );
 
   const decodeSessionJwt = useCallback((token: string) => {
-    logTurnkey('decodeSessionJwt', 'token', token);
     const [, payload] = token.split('.');
     if (!payload) {
       throw new Error('Invalid JWT: Missing payload');
@@ -185,9 +200,13 @@ const useTurnkeyWalletContext = () => {
     };
   }, []);
 
-  const onboardDydxFromTurnkey = async (salt: string) => {
-    const publicKey = await indexedDbClient?.getPublicKey();
-    logTurnkey('onboardDydxFromTurnkey', 'publicKey', publicKey);
+  const onboardDydxFromTurnkey = async ({
+    salt,
+    setWalletFromSignature,
+  }: {
+    salt: string;
+    setWalletFromSignature: (signature: string) => Promise<void>;
+  }) => {
     const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets());
 
     if (selectedTurnkeyWallet == null || selectedTurnkeyWallet.accounts[0] == null) {
@@ -210,15 +229,35 @@ const useTurnkeyWalletContext = () => {
     });
 
     const signature = `${response.r}${response.s}${response.v}`;
+    const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
+
+    if (staticEncryptionKey) {
+      const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
+      dispatch(setSavedEncryptedSignature(encryptedSignature));
+    }
 
     await setWalletFromSignature(signature);
   };
 
+  const endTurnkeySession = async () => {
+    try {
+      logTurnkey('useTurnkeyWallet', 'endTurnkeySession', turnkey);
+      await turnkey?.logout();
+      await indexedDbClient?.clear();
+      await initClient();
+    } catch (error) {
+      logTurnkey('useTurnkeyWallet', 'endTurnkeySession error', error);
+    }
+  };
+
   return {
-    decodeSessionJwt,
-    fetchUser,
     turnkeyWallets,
+    primaryTurnkeyWallet,
     preferredWallet,
+    targetPublicKeys,
+
+    decodeSessionJwt,
+    endTurnkeySession,
     setPreferredWallet,
     onboardDydxFromTurnkey,
   };
@@ -230,9 +269,7 @@ async function getWalletsWithAccountsFromClients(
   browserClient: TurnkeyIndexedDbClient,
   organizationId: string
 ): Promise<Wallet[]> {
-  logTurnkey('getWalletsWithAccountsFromClients', 'browserClient', browserClient);
   const { wallets } = await browserClient.getWallets({ organizationId });
-  logTurnkey('getWalletsWithAccountsFromClients', 'wallets', wallets);
 
   const walletWithAccounts = await Promise.all(
     wallets.map(async (wallet) => {

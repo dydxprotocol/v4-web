@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { useTurnkey } from '@turnkey/sdk-react';
 import { styled } from 'styled-components';
-import { Address, sha256 } from 'viem';
+import { sha256 } from 'viem';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 
@@ -13,25 +12,20 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 
 export const GoogleAuth = () => {
-  const { indexedDbClient } = useTurnkey();
-  const [nonce, setNonce] = useState('');
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const { signInWithOauth, isLoading, targetPublicKeys } = useTurnkeyAuth();
 
-  useEffect(() => {
-    const getPublicKey = async () => {
-      const publicKey = await indexedDbClient?.getPublicKey();
+  const nonce = useMemo(() => {
+    if (targetPublicKeys) {
+      const hashedPublicKey = sha256(targetPublicKeys.publicKeyCompressed as `0x${string}`).replace(
+        /^0x/,
+        ''
+      );
+      return hashedPublicKey;
+    }
 
-      if (publicKey) {
-        const hashedPublicKey = sha256(publicKey as Address).replace(/^0x/, '');
-
-        setNonce(hashedPublicKey);
-      }
-    };
-
-    getPublicKey();
-  }, [indexedDbClient]);
-
-  const { signInWithOauth, isLoading } = useTurnkeyAuth();
+    return '';
+  }, [targetPublicKeys]);
 
   const onSuccess = (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) {

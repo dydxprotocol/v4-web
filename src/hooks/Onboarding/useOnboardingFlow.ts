@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+
+import { logTurnkey } from '@/bonsai/logs';
+
 import { OnboardingState } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
@@ -38,6 +42,10 @@ const useOnboardingFlow = ({ onClick }: { onClick?: () => void } = {}) => {
   const { disableConnectButton } = useComplianceState();
   const onboardingState = useAppSelector(getOnboardingState);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+
+  useEffect(() => {
+    logTurnkey('useOnboardingFlow', 'onboardingState', onboardingState);
+  }, [onboardingState]);
 
   return {
     openOnboardingDialog,

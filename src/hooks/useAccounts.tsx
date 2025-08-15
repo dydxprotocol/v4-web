@@ -5,7 +5,6 @@ import { logTurnkey } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { useTurnkey } from '@turnkey/sdk-react';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -23,6 +22,8 @@ import {
   PrivateInformation,
   WalletNetworkType,
 } from '@/constants/wallets';
+
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
@@ -57,6 +58,7 @@ const useAccountsContext = () => {
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const { endTurnkeySession } = useTurnkeyWallet();
 
   // Wallet connection
   const {
@@ -80,10 +82,18 @@ const useAccountsContext = () => {
   }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
+
   useEffect(() => {
     const { address } = sourceAccount;
     // wallet accounts switched
     if (previousAddress && address !== previousAddress) {
+      logTurnkey(
+        'useAccounts',
+        'mismatch-disconnect',
+        { previousAddress },
+        { sourceAccount },
+        { hasLocalDydxWallet }
+      );
       // Disconnect local wallet
       disconnectLocalDydxWallet();
     }
@@ -178,8 +188,27 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet]);
 
+  // Auto-Connect on refresh
   useEffect(() => {
     (async () => {
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+        if (!hasLocalDydxWallet && sourceAccount.encryptedSignature && !blockedGeo) {
+          try {
+            const signature = decryptSignature(sourceAccount.encryptedSignature);
+            await setWalletFromSignature(signature);
+            dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          } catch (error) {
+            log('useAccounts/decryptSignature', error);
+            dispatch(clearSavedEncryptedSignature());
+          }
+        } else if (hasLocalDydxWallet) {
+          dispatch(setOnboardingState(OnboardingState.AccountConnected));
+        } else {
+          dispatch(setOnboardingState(OnboardingState.Disconnected));
+        }
+        return;
+      }
+
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         const wallet = new (await getLazyLocalWallet())();
@@ -218,8 +247,6 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
-          } else if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-            dispatch(setOnboardingState(OnboardingState.AccountConnected));
           } else if (sourceAccount.encryptedSignature && !blockedGeo) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
@@ -252,6 +279,7 @@ const useAccountsContext = () => {
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else {
+        logTurnkey('useAccounts', 'disconnecting', sourceAccount, hasLocalDydxWallet);
         disconnectLocalDydxWallet();
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
@@ -353,18 +381,17 @@ const useAccountsContext = () => {
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
+    setLocalNobleWallet(undefined);
+    setLocalOsmosisWallet(undefined);
+    setLocalNeutronWallet(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
   };
 
-  const { turnkey, indexedDbClient } = useTurnkey();
-
   const disconnect = async () => {
     // Turnkey Signout
-    logTurnkey('disconnectWallet', 'turnkey', turnkey);
-    await turnkey?.logout();
-    await indexedDbClient?.clear();
-    await indexedDbClient?.init();
+    logTurnkey('useAccounts', 'disconnect', { sourceAccount });
+    await endTurnkeySession();
 
     // Disconnect local wallet
     disconnectLocalDydxWallet();
