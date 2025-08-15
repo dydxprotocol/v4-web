@@ -87,13 +87,6 @@ const useAccountsContext = () => {
     const { address } = sourceAccount;
     // wallet accounts switched
     if (previousAddress && address !== previousAddress) {
-      logTurnkey(
-        'useAccounts',
-        'mismatch-disconnect',
-        { previousAddress },
-        { sourceAccount },
-        { hasLocalDydxWallet }
-      );
       // Disconnect local wallet
       disconnectLocalDydxWallet();
     }
@@ -190,6 +183,10 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
+      /**
+       * Handle Turnkey separately since it is an embedded wallet.
+       * There will not be an OnboardingState.WalletConnected state, only AccountConnected or Disconnected.
+       */
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
         if (!hasLocalDydxWallet && sourceAccount.encryptedSignature && !blockedGeo) {
           try {
@@ -208,6 +205,9 @@ const useAccountsContext = () => {
         return;
       }
 
+      /**
+       * Handle Test (dYdX), Cosmos (dYdX), Evm, and Solana wallets
+       */
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         const wallet = new (await getLazyLocalWallet())();
@@ -278,7 +278,6 @@ const useAccountsContext = () => {
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         }
       } else {
-        logTurnkey('useAccounts', 'disconnecting', sourceAccount, hasLocalDydxWallet);
         disconnectLocalDydxWallet();
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
