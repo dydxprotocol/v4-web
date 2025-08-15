@@ -114,7 +114,7 @@ export const MarketsBanners = ({
   const surgeBanner = shouldDisplaySurgeBanner ? (
     <$SurgeBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.75 text-large font-extra-bold">
+        <span tw="mb-0.75 text-large text-white font-extra-bold">
           {stringGetter({ key: STRING_KEYS.SURGE_BANNER_TITLE })}
         </span>
         <div tw="flex items-center gap-1.5">

@@ -1,0 +1,10 @@
+{
+  "app": {
+    "STOP_MARKET_ORDER_MAY_NOT_EXECUTE": "Stop Market",
+    "TAKE_PROFIT_MARKET_ORDER_MAY_NOT_EXECUTE": "Take Profit Market"
+  },
+  "SURGE_BANNER": {
+    "TITLE": "dYdX Surge: $3M Rewards Up for Grabs.",
+    "END_DATE": "Ends August 31"
+  }
+}
