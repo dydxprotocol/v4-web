@@ -114,8 +114,8 @@ export const MarketsBanners = ({
   const surgeBanner = shouldDisplaySurgeBanner ? (
     <$SurgeBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.75 text-large text-white font-extra-bold">
-          {stringGetter({ key: STRING_KEYS.SURGE_BANNER_TITLE })}
+        <span tw="mb-0.75 text-large font-extra-bold">
+          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
         </span>
         <div tw="flex items-center gap-1.5">
           <Button
@@ -124,7 +124,7 @@ export const MarketsBanners = ({
             href="https://www.dydx.xyz/surge?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner-learn-more"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            {stringGetter({ key: STRING_KEYS.END_DATE })}
           </Button>
           <span tw="text-color-text-1 font-medium-book">
             {stringGetter({ key: STRING_KEYS.SURGE_BANNER_END_DATE })}
