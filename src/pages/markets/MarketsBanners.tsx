@@ -211,13 +211,6 @@ const $SurgeBanner = styled($MarketsPageBanner)`
     z-index: 0;
   }
 
-  img,
-  span,
-  button,
-  a {
-    z-index: 1;
-  }
-
   @media ${breakpoints.mobile} {
     height: 8rem;
 
