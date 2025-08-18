@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
@@ -11,7 +11,8 @@ import { GoogleIdTokenPayload, LoginMethod, SignInBody } from '@/types/turnkey';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setWalletInfo } from '@/state/wallet';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -28,11 +29,7 @@ export const TurnkeyAuthProvider = ({ ...props }) => (
 export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 
 const useTurnkeyAuthContext = () => {
-  const [additionalInfo, setAdditionalInfo] = useState<{
-    providerName: string;
-    userEmail?: string;
-  } | null>(null);
-
+  const dispatch = useAppDispatch();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const { indexedDbClient } = useTurnkey();
 
@@ -49,13 +46,18 @@ const useTurnkeyAuthContext = () => {
       headers: HeadersInit;
       body: string;
       loginMethod: LoginMethod;
-      providerName: string;
+      providerName?: string;
       userEmail?: string;
     }) => {
-      selectWallet({
-        connectorType: ConnectorType.Turnkey,
-        name: WalletType.Turnkey,
-      });
+      dispatch(
+        setWalletInfo({
+          connectorType: ConnectorType.Turnkey,
+          name: WalletType.Turnkey,
+          userEmail,
+          providerName,
+          loginMethod,
+        })
+      );
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
@@ -71,7 +73,7 @@ const useTurnkeyAuthContext = () => {
 
       switch (loginMethod) {
         case LoginMethod.OAuth:
-          handleOauthResponse({ response, providerName, userEmail });
+          handleOauthResponse({ response });
           break;
         case LoginMethod.Email: // TODO: handle email response
         case LoginMethod.Passkey: // TODO: handle passkey response
@@ -128,16 +130,12 @@ const useTurnkeyAuthContext = () => {
 
   const handleOauthResponse = async ({
     response,
-    providerName,
-    userEmail,
   }: {
     response: {
       session?: string;
       salt?: string;
       dydxAddress?: string;
     };
-    providerName: string;
-    userEmail?: string;
   }) => {
     const { session, salt } = response;
     if (session == null) {
@@ -147,13 +145,10 @@ const useTurnkeyAuthContext = () => {
     }
 
     await indexedDbClient?.loginWithSession(session);
-    setAdditionalInfo({ providerName, userEmail });
     await onboardDydxFromTurnkey({ salt, setWalletFromSignature });
   };
 
   return {
-    providerName: additionalInfo?.providerName,
-    userEmail: additionalInfo?.userEmail,
     targetPublicKeys,
 
     isLoading: status === 'pending',

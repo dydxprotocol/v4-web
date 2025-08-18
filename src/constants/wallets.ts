@@ -3,6 +3,7 @@ import { type WalletType as CosmosWalletType } from 'graz';
 import { type EIP6963ProviderInfo } from 'mipd';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { LoginMethod } from '@/types/turnkey';
 
 import {
   CoinbaseIcon,
@@ -94,9 +95,15 @@ export type WalletInfo =
         | ConnectorType.Coinbase
         | ConnectorType.WalletConnect
         | ConnectorType.PhantomSolana
-        | ConnectorType.Privy
-        | ConnectorType.Turnkey;
+        | ConnectorType.Privy;
       name: WalletType;
+    }
+  | {
+      connectorType: ConnectorType.Turnkey;
+      name: WalletType.Turnkey;
+      userEmail?: string;
+      providerName?: string;
+      loginMethod: LoginMethod;
     }
   | {
       connectorType: ConnectorType.Cosmos;

@@ -36,7 +36,7 @@ export const useTurnkeyWallet = () => useContext(TurnkeyWalletContext)!;
 const useTurnkeyWalletContext = () => {
   const dispatch = useAppDispatch();
   const { turnkey, indexedDbClient } = useTurnkey();
-  const [turnkeyUser, setTurnkeyUser] = useState<UserSession | undefined>();
+  const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
   const [preferredWallet, setPreferredWallet] = useLocalStorage<{
     userId: string;
     walletId: string;
@@ -46,7 +46,7 @@ const useTurnkeyWalletContext = () => {
   });
 
   const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>([]);
-  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet | undefined>();
+  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet>();
   const [targetPublicKeys, setTargetPublicKeys] = useState<{
     publicKey: string;
     publicKeyCompressed: string;
@@ -82,6 +82,13 @@ const useTurnkeyWalletContext = () => {
   useEffect(() => {
     initClient();
   }, [initClient]);
+
+  const clearTurnkeyState = useCallback(() => {
+    setTurnkeyUser(undefined);
+    setPrimaryTurnkeyWallet(undefined);
+    setTurnkeyWallets([]);
+    setTargetPublicKeys(null);
+  }, []);
 
   const fetchUser = async (): Promise<UserSession | undefined> => {
     if (turnkey) {
@@ -244,6 +251,7 @@ const useTurnkeyWalletContext = () => {
   const endTurnkeySession = async () => {
     try {
       logTurnkey('useTurnkeyWallet', 'endTurnkeySession', turnkey);
+      clearTurnkeyState();
       await turnkey?.logout();
       await indexedDbClient?.clear();
       await initClient();

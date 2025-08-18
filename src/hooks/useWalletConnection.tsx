@@ -178,7 +178,7 @@ export const useWalletConnectionContext = () => {
 
       try {
         if (wallet.connectorType === ConnectorType.Turnkey) {
-          // Turnkey does not initiate a wallet connection, so we should no op.
+          // Turnkey connection is handled by the TurnkeyAuthProvider using signInWithOauth
           return;
         }
 
@@ -288,7 +288,7 @@ export const useWalletConnectionContext = () => {
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
       // Disconnect all wallets prior to selecting a new wallet.
-      if (wallet && wallet.connectorType !== ConnectorType.Turnkey) {
+      if (wallet) {
         await disconnectWallet();
         await new Promise(requestAnimationFrame);
       }
