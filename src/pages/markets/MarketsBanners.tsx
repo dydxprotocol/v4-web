@@ -124,10 +124,10 @@ export const MarketsBanners = ({
             href="https://www.dydx.xyz/surge?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner-learn-more"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.END_DATE })}
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
           </Button>
           <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.SURGE_BANNER_END_DATE })}
+            {stringGetter({ key: STRING_KEYS.END_DATE })}
           </span>
         </div>
       </div>
