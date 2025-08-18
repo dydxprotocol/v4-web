@@ -211,12 +211,11 @@ const $SurgeBanner = styled($MarketsPageBanner)`
     z-index: 0;
   }
 
-  @media ${breakpoints.mobile} {
-    height: 8rem;
-
-    span {
-      font: var(--font-small-book);
-    }
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
   }
 `;
 
