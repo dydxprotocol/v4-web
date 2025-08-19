@@ -16,6 +16,11 @@ import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useReferralAddress } from './useReferralAddress';
 import { useReferredBy } from './useReferredBy';
 
+const HIDE_REFERRAL_DIALOG_ADDRESSES = new Set([
+  // trust wallet
+  'dydx174ywhfe9ws0u0qlz0cjgnw95zjl83qcae7upza',
+]);
+
 export function useReferralCode() {
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
@@ -32,10 +37,14 @@ export function useReferralCode() {
   const isOwnReferralCode = affiliateMetadata?.metadata?.referralCode === testFlags.referralCode;
 
   useEffect(() => {
-    if (testFlags.referralCode) {
+    if (
+      testFlags.referralCode &&
+      referralAddress != null &&
+      !HIDE_REFERRAL_DIALOG_ADDRESSES.has(referralAddress)
+    ) {
       dispatch(openDialog(DialogTypes.Referral({ refCode: testFlags.referralCode })));
     }
-  }, [dispatch]);
+  }, [dispatch, referralAddress]);
 
   useEffect(() => {
     if (referralAddress) {

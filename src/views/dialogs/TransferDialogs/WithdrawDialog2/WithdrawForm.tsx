@@ -1,15 +1,18 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { WarningIcon } from '@/icons';
@@ -17,13 +20,15 @@ import { WarningIcon } from '@/icons';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { Output, OutputType } from '@/components/Output';
+import { formatNumberOutput, Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 import { Withdraw, WithdrawSubtransaction } from '@/state/transfers';
 
 import { track } from '@/lib/analytics/analytics';
+import { AttemptBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -33,6 +38,8 @@ import { AddressInput } from './AddressInput';
 import { AmountInput } from './AmountInput';
 import { useWithdrawalDeltas, useWithdrawalRoutes } from './queries';
 import { useProtocolWithdrawalValidation, useWithdrawStep } from './withdrawHooks';
+
+const WITHDRAWAL_SLIPPAGE_WARN_THRESHOLD = 0.05;
 
 export const WithdrawForm = ({
   amount,
@@ -56,6 +63,9 @@ export const WithdrawForm = ({
   onWithdrawSigned: (withdrawId: string) => void;
 }) => {
   const stringGetter = useStringGetter();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
   const selectedToken = WITHDRAWABLE_ASSETS.find((token) => token.chainId === destinationChain);
@@ -119,6 +129,30 @@ export const WithdrawForm = ({
     !isDebouncedAmountSame ||
     !isValidWithdrawalAddress(destinationAddress, destinationChain);
 
+  const amountOut = formatUnits(BigInt(selectedRoute?.amountOut ?? '0'), USDC_DECIMALS);
+  const slippageAmount = AttemptBigNumber(debouncedAmount)?.minus(amountOut);
+  const slippagePercent = slippageAmount?.div(debouncedAmount).toNumber() ?? 0;
+  const showSlippageWarning = slippagePercent > WITHDRAWAL_SLIPPAGE_WARN_THRESHOLD;
+  const slippageWarning = showSlippageWarning
+    ? stringGetter({
+        key: STRING_KEYS.WITHDRAW_SLIPPAGE_WARNING,
+        params: {
+          DOLLAR_AMOUNT: formatNumberOutput(slippageAmount, OutputType.Number, {
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
+            fractionDigits: USD_DECIMALS,
+          }),
+          PERCENT_AMOUNT: formatNumberOutput(slippagePercent * 100, OutputType.Number, {
+            decimalSeparator,
+            groupSeparator,
+            selectedLocale,
+            fractionDigits: 0,
+          }),
+        },
+      })
+    : undefined;
+
   const buttonInner = error ? (
     <div tw="row gap-0.5">
       <WithTooltip tooltipString={error.message}>
@@ -130,6 +164,13 @@ export const WithdrawForm = ({
     <div tw="row gap-0.5">
       <WithTooltip tooltipString={validationError}>
         <WarningIcon tw="text-color-error" />
+      </WithTooltip>
+      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+    </div>
+  ) : showSlippageWarning ? (
+    <div tw="row gap-0.5">
+      <WithTooltip tooltipString={slippageWarning}>
+        <WarningIcon tw="text-color-warning" />
       </WithTooltip>
       {stringGetter({ key: STRING_KEYS.WITHDRAW })}
     </div>
@@ -145,12 +186,15 @@ export const WithdrawForm = ({
           key: 'amount',
           label: stringGetter({ key: STRING_KEYS.WITHDRAW }),
           value: (
-            <Output
-              tw="inline"
-              type={OutputType.Fiat}
-              isLoading={isFetching}
-              value={formatUnits(BigInt(selectedRoute.amountOut), USDC_DECIMALS)}
-            />
+            <WithTooltip tooltipString={showSlippageWarning ? slippageWarning : undefined}>
+              <Output
+                tw="inline"
+                type={OutputType.Fiat}
+                isLoading={isFetching}
+                value={amountOut}
+                css={showSlippageWarning ? tw`text-color-error` : ''}
+              />
+            </WithTooltip>
           ),
         },
         {

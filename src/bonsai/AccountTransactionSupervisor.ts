@@ -24,7 +24,12 @@ import {
   SubaccountClient,
 } from '@dydxprotocol/v4-client-js';
 
-import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
+import {
+  AnalyticsEvents,
+  TradeAdditionalMetadata,
+  TradeMetadataSource,
+  TransactionMemo,
+} from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 import {
@@ -596,7 +601,10 @@ export class AccountTransactionSupervisor {
   }
 
   // does subaccount transfer and place order and manages local order state
-  public async placeOrder(payloadBase: PlaceOrderPayload): Promise<OperationResult<any>> {
+  public async placeOrder(
+    payloadBase: PlaceOrderPayload,
+    source: TradeMetadataSource
+  ): Promise<OperationResult<any>> {
     const maybeErr = this.maybeNoLocalWalletError('placeOrder');
     if (maybeErr) {
       return maybeErr;
@@ -652,7 +660,11 @@ export class AccountTransactionSupervisor {
       })
     );
 
-    track(AnalyticsEvents.TradePlaceOrder({ ...payload }));
+    const trackingMetadata: TradeAdditionalMetadata = {
+      source,
+      volume: payload.size * payload.price,
+    };
+    track(AnalyticsEvents.TradePlaceOrder({ ...payload, ...trackingMetadata }));
     const startTime = startTimer();
     const submitTime = createTimer();
 
@@ -704,6 +716,7 @@ export class AccountTransactionSupervisor {
                 ...payload,
                 roundtripMs: startTime.elapsed(),
                 sinceSubmissionMs: submitTime.elapsed(),
+                ...trackingMetadata,
               })
             );
           }
@@ -717,6 +730,7 @@ export class AccountTransactionSupervisor {
           ...payload,
           error: overallResult.errorString,
           durationMs: startTime.elapsed(),
+          ...trackingMetadata,
         })
       );
       this.store.dispatch(
@@ -730,6 +744,7 @@ export class AccountTransactionSupervisor {
         AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
           ...payload,
           durationMs: startTime.elapsed(),
+          ...trackingMetadata,
         })
       );
     }
@@ -920,9 +935,9 @@ export class AccountTransactionSupervisor {
     return results.find(isOperationFailure)!;
   }
 
-  public async placeCompoundOrder(order: TradeFormPayload) {
+  public async placeCompoundOrder(order: TradeFormPayload, source: TradeMetadataSource) {
     if (order.orderPayload != null) {
-      const res = await this.placeOrder(order.orderPayload);
+      const res = await this.placeOrder(order.orderPayload, source);
       if (isOperationFailure(res)) {
         return res;
       }
@@ -939,7 +954,7 @@ export class AccountTransactionSupervisor {
             }
           }
           if (operationPayload.placePayload != null) {
-            const res = await this.placeOrder(operationPayload.placePayload);
+            const res = await this.placeOrder(operationPayload.placePayload, source);
             if (isOperationFailure(res)) {
               return res;
             }

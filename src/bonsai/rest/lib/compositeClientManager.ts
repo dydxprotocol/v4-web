@@ -19,8 +19,8 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { setNetworkStateRaw } from '@/state/raw';
 
 import { identify } from '@/lib/analytics/analytics';
+import { withRetry } from '@/lib/asyncUtils';
 import { browserTimeOffsetPromise } from '@/lib/timeOffset';
-import { sleep } from '@/lib/timeUtils';
 
 type ClientState<ClientType> = {
   dead: boolean;
@@ -360,27 +360,6 @@ function createDeferred<T>(): Deferred<T> {
   });
 
   return { promise, resolve, reject, state };
-}
-
-async function withRetry<T>(
-  operation: () => Promise<T>,
-  options = { maxRetries: 3, initialDelay: 1000 }
-): Promise<T> {
-  for (let attempt = 0; attempt <= options.maxRetries; attempt += 1) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      return await operation();
-    } catch (error) {
-      if (attempt < options.maxRetries) {
-        const delay = options.initialDelay * 2 ** attempt;
-        // eslint-disable-next-line no-await-in-loop
-        await sleep(delay);
-      } else {
-        throw error;
-      }
-    }
-  }
-  throw new Error('Failed to complete operation - this should be unreachable');
 }
 
 // must lazy load separately to ensure best-possible tree shaking/static analysis

@@ -4,6 +4,8 @@ import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type StyleProps = {
@@ -20,8 +22,15 @@ export type AlertMessageProps = ElementProps & StyleProps;
 
 export const AlertMessage = forwardRef<HTMLDivElement, AlertMessageProps>(
   ({ className, children, type, withAccentText }, ref) => {
+    const isSimpleUi = useSimpleUiEnabled();
+
     return (
-      <$AlertContainer ref={ref} type={type} className={className} withAccentText={withAccentText}>
+      <$AlertContainer
+        ref={ref}
+        type={type}
+        className={className}
+        withAccentText={withAccentText ?? isSimpleUi}
+      >
         <$AlertAccent />
         {children}
       </$AlertContainer>
