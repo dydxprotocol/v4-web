@@ -1,12 +1,10 @@
 import { RefObject, useMemo } from 'react';
 
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
-import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -23,8 +21,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedPumpBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner, getHasDismissedPumpBanner } from '@/state/dismissableSelectors';
+import { setHasDismissedPmlBanner, setHasDismissedSurgeBanner } from '@/state/dismissable';
+import { getHasDismissedPmlBanner, getHasDismissedSurgeBanner } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -102,52 +100,54 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
-  const hasDismissedPumpBanner = useAppSelector(getHasDismissedPumpBanner);
-  const pumpMarketId = 'PUMP-USD';
+  // Surge Banner - New Implementation
+  const hasDismissedSurgeBanner = useAppSelector(getHasDismissedSurgeBanner);
 
-  const navigate = useNavigate();
-
-  const onDismissPumpBanner = (e: React.MouseEvent<any>) => {
+  const onDismissSurgeBanner = (e: React.MouseEvent<any>) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(setHasDismissedPumpBanner(true));
+    dispatch(setHasDismissedSurgeBanner(true));
   };
 
-  const onClickPumpBanner = () => {
-    navigate(`${AppRoute.Trade}/${pumpMarketId}`);
-  };
+  const shouldDisplaySurgeBanner = !hasDismissedSurgeBanner;
 
-  const shouldDisplayPumpBanner = !hasDismissedPumpBanner;
-
-  const pumpBanner = shouldDisplayPumpBanner ? (
-    <$PumpBanner onClick={onClickPumpBanner} role="button" tabIndex={0}>
-      <div tw="mr-auto flex flex-col">
-        <span tw="mb-0.25 text-white font-extra-bold">
-          {stringGetter({
-            key: STRING_KEYS.MARKET_LIVE,
-            params: {
-              MARKET: <span tw="text-color-accent">$PUMP</span>,
-              LEVERAGE: '5',
-            },
-          })}
+  const surgeBanner = shouldDisplaySurgeBanner ? (
+    <$SurgeBanner>
+      <div tw="mr-auto flex h-full flex-col justify-center">
+        <span tw="mb-0.75 text-large font-extra-bold">
+          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
         </span>
-        <Button action={ButtonAction.Primary} tw="max-w-10">
-          {stringGetter({ key: STRING_KEYS.VIEW_MARKET })}
-        </Button>
+        <div tw="flex items-center gap-1.5">
+          <Button
+            action={ButtonAction.Primary}
+            type={ButtonType.Link}
+            href="https://www.dydx.xyz/surge?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner-learn-more"
+            tw="relative z-10 w-12"
+          >
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+          </Button>
+          <span tw="text-color-text-1 font-medium-book">
+            {stringGetter({ key: STRING_KEYS.END_DATE })}
+          </span>
+        </div>
       </div>
 
-      <img src="/pump-hedgie.png" alt="pump hedgie" tw="mr-2 h-14 mobile:hidden" />
+      <img
+        src="/surge-banner-hedgies.png"
+        alt="surge rewards hedgies"
+        tw="h-full object-contain mobile:hidden"
+      />
 
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
         size={ButtonSize.XSmall}
-        onClick={(e: React.MouseEvent<any>) => onDismissPumpBanner(e)}
+        onClick={onDismissSurgeBanner}
       />
-    </$PumpBanner>
+    </$SurgeBanner>
   ) : null;
 
-  return pumpBanner ?? pmlBanner ?? null;
+  return surgeBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -179,7 +179,8 @@ const $PmlBanner = styled($MarketsPageBanner)`
   height: 8rem;
   img,
   span,
-  button {
+  button,
+  a {
     z-index: 1;
   }
 
@@ -192,11 +193,28 @@ const $PmlBanner = styled($MarketsPageBanner)`
   }
 `;
 
-const $PumpBanner = styled($MarketsPageBanner)`
+const $SurgeBanner = styled($MarketsPageBanner)`
   height: 8rem;
+  background: var(--color-layer-0);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 70%;
+    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.2;
+    z-index: 0;
+  }
+
   img,
   span,
-  button {
+  button,
+  a {
     z-index: 1;
   }
 `;
