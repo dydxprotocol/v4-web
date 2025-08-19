@@ -31,6 +31,7 @@ export enum LocalStorageKey {
   // Discoverability
   HasSeenElectionBannerTRUMPWIN = 'dydx.HasSeenElectionBannerTRUMPWIN',
   HasSeenTradeFormMessageTRUMPWIN = 'dydx.HasSeenTradeFormMessageTRUMPWIN',
+  HasSeenSurgeBanner = 'dydx.HasSeenSurgeBanner',
 
   CustomFlags = 'dydx.CustomFlags',
 }
