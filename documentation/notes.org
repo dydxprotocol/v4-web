@@ -1,0 +1,154 @@
+
+* ADDRESS
+
+* SUBACCOUNT
+
+- [X] Only single accounts associated with addresses. Treat them as same as account for now.
+
+* PERPETUAL_POSITION
+
+* ASSET_POSITION
+
+#+begin_src mermaid :file ./erd.png
+ASSET_POSITION {
+    string id
+    string subaccount_id
+    string asset_symbol
+    string status
+    string created_at
+    string created_height
+  }
+    SUBACCOUNT ||--o{ ASSET_POSITION : owns
+#+end_src
+
+* ORDER
+- [X] Every time we create a position in Starboard/Ruscet, we'll create an order that's immediately filled alongside it.
+
+* TRANSFER
+- [X] Will be hard with an indexer. Leave it blank until we have special trading accounts.
+
+#+begin_src mermaid :file ./erd.png
+ TRANSFER {
+   ruscet dydx
+     null transfer_id 
+     null source_subaccount_id
+    null recipient_subaccount_id
+     null created_at
+     null created_height
+   }
+   SUBACCOUNT ||--o{ STARBOARD_TRANSFER : as_source
+  SUBACCOUNT ||--o{ STARBOARD_TRANSFER : as_recipient
+#+end_src
+
+* PNL_TICK
+
+- [x] Going to be relatively difficult in the indexer.
+- Anytime there's a change in price, we could index the user's pnl.
+  - May get very expensive, because we're indexing every block. Requires emitting a ton of events. Scripts and contracts both emit events. Predicates can't.
+  - No strong preference for scipts or contracts. Most events will probably be logged by contract calls.
+  - Can index on position close pnl. In the sdk we can calculate pnl on any open positions.
+
+- Ticker is specifically the name of an asset. like GOOG for Google. Sometimes we call them symbols in defi.
+
+* CANDLE
+
+- [x] With the candle, we also need open, close, high, low. They're missing from the diagram.
+- Every time there's a price update from oracle, we're going to store that as a new thing called =price_tick=.
+
+price_tick.id = market.id+timestamp 
+
+price_tick {
+marketId = market.id;
+price: string = event.tick;
+timestamp: string = event.block.timeStamp;
+
+
+- Candles will be updated everytime there's a tick in its time interval.
+  - First time you get a tick, create a new candle for each interval.
+  - For the first tick in that interval, set it to the high, low, open & close.
+  - For the next tick, check that tick falls inside the interval.
+    - For 1 min interval, if start of candle is less than 1 min earlier than the timestamp of the tick, go to the next step.
+    - Else, create new candle & treat it as first tick this interval.
+
+handler onTick
+create a new priceTick entity. then...
+
+  for each Interval
+     find expected interval open
+      // could use small modulo operation
+// example for 1 min
+{
+timestamp - (module (60, timestamp))
+// use UNiX time
+}
+
+// try to find existing candle. Search by timestamp, marketId, and interval.
+// Next tick you get, check whether it's higher than high, or lower than low, then set the candle's position.
+if (interval exists)
+   high = max(candle.high, tick)
+   low = min(candle.low, tick)
+// ALWAYS set the close when the candle moves.
+   close = tick;
+
+Candle.save(
+  tick.market,
+openTime, interval, high = tick, low = tick,
+ open = tick, // only set once, any tick works
+ close = tick)
+
+
+- [ ] Create a simple processor containing this one handler working in the indexer and deploy.
+
+* TRADE
+
+- [X] Changes in positions.
+  - increase/decrease events.
+  - Each events maps to a single trade, whether increase or decrease.
+
+- [X] Global to market
+
+- Queried often, therefore require new entity. Can be derived from changes in positions.
+
+* FUNDING_PAYMENT
+
+- [X] Missing some stuff
+
+- Look at event emitted by update funding.
+- For each time there's an emission of a payment event, create an entity.
+- When event emitted by the same function indicating the payment of a position fee (see below), create a funding payment.
+
+* FILL
+- [X] Can be contained in ORDER.
+
+* FUNDING_RATE
+- Global to the market.
+- If there are 5 long positions, then every event that relates to funding rates will cause each long to pay their short a funding payment.
+- Every time update funding is called, there will possibly be a change to the funding rate.
+- [ ] Create new funding rate entity.
+
+* MARKET
+
+Markets are global and affect everyone.
+
+- In ruscet there's the concept of a funding rate and a position fee.
+  - Funding rate is based on the balance of longs and shorts.
+  - Position fee is constant.
+  - We'll consider funding & position fee payments to be equivalent to funding payment in dydx.
+  - We could have them both as separate funding payments.
+  - Keep them separately in the indexer. Query them both from the sdk side.
+
+* Rules
+
+- When we simplify things on the ruscet side, do it in the sdk, not the indexer.
+- Gives more flexibility later because we don't have to mangle the indexer schema.
+- In this version of the contract, we only have isolated margins.
+- The collaterals are currently only in USDC, and we have to keep track of positions only.
+- [X] We can ignore rewards for now.
+
+* Goals
+
+- Get read-only demoable frontend in next 2 days.
+- Need the indexer to be working and for us to have connected the dydx client to reading the correct entities from the fuel sqd indexer.
+- Highest priority is to get indexer in.
+
+- [ ] Extract out vault

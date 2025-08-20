@@ -13,16 +13,16 @@ This project shows how one can index Fuel network using Subsquid SDK.
 
 ```bash
 # Install dependencies
-npm i
+pnpm i
 
 # Compile the project
-npx tsc
+pnpx tsc
 
 # Launch Postgres database to store the data
 docker compose up -d
 
 # Apply database migrations to create the target schema
-npx squid-typeorm-migration apply
+pnpx squid-typeorm-migration apply
 
 # Run indexer
 node -r dotenv/config lib/main.js

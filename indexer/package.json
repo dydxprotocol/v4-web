@@ -5,14 +5,13 @@
   "scripts": {
     "build": "tsc",
     "generate": "squid-gen-abi",
-    "typegen": "squid-evm-typegen ./src/abi ./abi/*.json --multicall",
-    "start": "docker compose up -d; node -r dotenv/config lib/main.js ",
+    "typegen": "squid-evm-typegen ./src/abi ./abi/mock-pricefeed-abi.json",
+    "start": "docker compose up -d; tsc; node -r dotenv/config lib/main.js ",
     "codegen": "squid-typeorm-codegen",
     "migrate:generate": "squid-typeorm-migration generate",
     "migrate:create": "squid-typeorm-migration create",
     "migrate:apply": "squid-typeorm-migration apply",
-    "serve": "squid-graphql-server",
-    "process": "tsx src/main.ts"
+    "serve": "squid-graphql-server"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.2",
