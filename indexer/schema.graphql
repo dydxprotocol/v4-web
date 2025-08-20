@@ -1,11 +1,20 @@
-scalar DateTime
-scalar JSON
-scalar BigInt
-scalar Decimal
-
 enum PositionSide {
   LONG
   SHORT
+}
+
+enum MarketStatus {
+  Active
+  Paused
+  CancelOnly
+  PostOnly
+  Initializing
+  FinalSettlement
+}
+
+enum TradeType {
+  Limit
+  Liquidation
 }
 
 enum PositionStatus {
@@ -19,379 +28,254 @@ enum OrderSide {
   SELL
 }
 
+enum OrderType {
+  MARKET
+}
+
 enum OrderStatus {
-  FILLED
+  Filled
 }
 
 enum MarketType {
   PERP
-  SPOT
-  OTHER
 }
 
-enum CandleInterval {
-  ONE_MIN
-  FIVE_MIN
-  FIFTEEN_MIN
-  ONE_HOUR
-  FOUR_HOUR
-  ONE_DAY
-  OTHER
+enum PaymentType {
+  FUNDING,
+  POSITION,
 }
 
-"""Entities"""
-type Address {
+enum CandleResolution {
+  M1
+  M5
+  M15
+  M30
+  H1
+  H4
+  D1
+}
+
+type Account @entity {
   id: ID!
-  address: String
-  metadata: JSON
-  subaccount: Subaccount
+  address: String # "user identity"
+  subaccountNumber: Int # "leave as 0"
+  subaccountId: String # "set to identity"
+
+  # ruscet only
+  isLiquidator: Boolean
+  isHandler: Boolean
+  isManager: Boolean
+
+  #FK
+  positions: [Position!] @derivedFrom(field: "account")
 }
 
-type Subaccount {
-  id: ID!
-  ruscet: String
-  dydx: String
-  address: ID # "user identity"
-  subaccount_number: Int # "leave as 0"
-  subaccount_id: ID # "set to identity"
-  is_liquidator: Boolean
-  is_handler: Boolean
-  is_manager: Boolean
-  metadata: JSON
-
-  owner: Address
-  positions(
-    status: PositionStatus
-    ticker: String
-    first: Int
-    after: String
-  ): PositionConnection
-}
-
-type Position {
+type Position @entity {
   id: ID! # "AssetId+Identity+timestamp from ruscet"
-  ruscet: String
-  dydx: String
 
-  size: Decimal
-  collateral: Decimal
-  average_price: Decimal
-  entry_funding_rate: Decimal
-  reserve_amount: Decimal
-  realized_pnl: Decimal
-  last_increased_time: DateTime
+  status: PositionStatus
+  side: PositionSide
+  size: BigInt
+  maxSize: BigInt
+  entryPrice: BigDecimal #ruscet's average price
+  exitPrice: BigDecimal
+  realizedPnl: BigDecimal
+  createdAt: DateTime
+  createdAtHeight: Int
+  sumOpen: BigDecimal
+  sumClose: BigDecimal
+  netFunding: BigDecimal
+  unrealizedPnl: BigDecimal
+  closedAt: DateTime
+  subaccountNumber: Int
 
-  subaccount_id: ID # FK "set to identity"
-  subaccount: Subaccount
+  # name changed
+  ticker: String # used to be market
+  # "MarketId.Symbol-USD from ruscet i.e. ETH-USD"
 
-  ticker: String # "MarketId.Symbol from ruscet"
-  market: Market
+  # Ruscet only
+  collateral: BigDecimal
+  positionFees: BigDecimal
+  entryFundingRate: BigDecimal
+  reserveAmount: BigDecimal
+  lastIncreasedTime: DateTime
 
-  status: PositionStatus # "event-driven"
-  created_at: DateTime
-  created_height: BigInt
-  side: PositionSide # "PositionKey.long -> enum"
-  metadata: JSON
-
-  order: Order
-  trades(first: Int, after: String): TradeConnection
-  pnlTicks(first: Int, after: String): PnlTickConnection
+  # FKs
+  account: Account # many-to-one
+  market: Market # many-to-one
+  trades: [Trade!] @derivedFrom(field: "position")
+  payments: [Payment!] @derivedFrom(field: "position")
 }
 
-type Order {
-  id: ID!
-  ruscet: String
-  dydx: String
+# nuking orders as it's not required
+# type Order { }
 
-  order_id: ID # "position.id"
-  position: Position
 
-  subaccount_id: ID # "position.subaccount_id"
-  subaccount: Subaccount
-
-  ticker: String # "position.ticker"
-  market: Market
-
-  side: OrderSide # "position.side"
-  status: OrderStatus # "always filled"
-  type: String
-  good_til_block: BigInt # "position.created_height"
-  good_til_time: DateTime # "position.created_at"
-  created_at: DateTime # "postion.created_at"
-  fill_id: String # "vault.contractId"
-  metadata: JSON
-}
-
-type PnlTick {
-  id: ID!
-  ruscet: String
-  dydx: String
-
-  subaccount_id: ID
-  subaccount: Subaccount
-
-  effective_at: DateTime
-  created_height: BigInt
-  metadata: JSON
-
-  position: Position
-}
+# nuking PnLTick as well
+# type PnlTick {}
 
 type Candle {
-  id: ID! # "market.id+interval+timestamp"
-  ruscet: String
-  dydx: String
-
+  id: ID! # "market.id+resolution+timestamp"
   ticker: String # "market.symbol"
-  market: Market
+  resolution: CandleResolution
+  startedAt: DateTime
+  open: BigDecimal
+  close: BigDecimal
+  high: BigDecimal
+  low: BigDecimal
 
-  interval: CandleInterval
-  open_time: DateTime
-  open: Decimal
-  close: Decimal
-  high: Decimal
-  low: Decimal
-  metadata: JSON
+  baseTokenVolume: BigDecimal #volume accumulator in token
+  usdVolume: BigDecimal #volume accumulator in usd
+
+  startingOpenInterest: BigDecimal # open interest at beginning of candle period
+
+  # relations
+  market: Market
 }
 
-type Market {
+type Market @entity {
   id: ID!
-  ruscet: String
-  dydx: String
+# Typical values for something with 9 decimals
+# "atomicResolution": -9,
+#   "tickSize": "0.01",
+#   "stepSize": "1",
+#   "stepBaseQuantums": 1000000000,
+#   "subticksPerTick": 100000,
+#   "quantumConversionExponent": -6
 
-  is_initialized: Boolean
-  average_price: Decimal
-  is_global_short_data_ready: Boolean
-  max_leverage: Decimal
-  decimals: Int
-  whitelisted: Boolean
-  stable: Boolean
-  shortable: Boolean
-  min_profit_basis_points: Int
-  weight: Decimal
-  buffer_amount: Decimal
-  last_funding_time: DateTime
-  cumulative_funding_rate: Decimal
-  fee_reserve: Decimal
-  pool_amount: Decimal
-  reserved_amount: Decimal
-  size: Decimal
-  max_size: Decimal
-  ordinal: Int
-  guaranteed_usd: Decimal
+  atomicResolution: Int! # -Decimals e.g. -9 for most fuel assets
+  baseOpenInterest: String! # We'll set this to zero
+  defaultFundingRate1H: BigDecimal!
+  initialMarginFraction: BigDecimal!
+  maintenanceMarginFraction: BigDecimal!
+  marketType: MarketType!
+  nextFundingRate: BigDecimal!
+  openInterest: BigDecimal!
+  openInterestLowerCap: BigDecimal
+  openInterestUpperCap: BigDecimal
+  oraclePrice: BigDecimal
+  priceChange24H: BigDecimal!
+  quantumConversionExponent: Int!
+  status: MarketStatus!
+  stepBaseQuantums: BigInt!
+  stepSize: BigDecimal!
+  subticksPerTick: Int! #32 bit integer
+  tickSize: BigDecimal!
+  ticker: String! # AssetSymbol-USD
+  trades24H: BigDecimal!
+  volume24H: BigDecimal!
 
-  lock: Boolean
-  has_dynamic_fees: Boolean
-  min_profit_time: BigInt
-  router: String
-  rusd_contr: String
-  rusd: String
-  pricefeed_provider: String
-  liquidation_fee_usd: Decimal
-  tax_basis_points: Int
-  stable_tax_basis_points: Int
-  mint_burn_fee_basis_points: Int
-  swap_fee_basis_points: Int
-  stable_swap_fee_basis_points: Int
-  margin_fee_basis_points: Int
-  total_asset_weights: Decimal
-  whitelisted_asset_count: Int
-  all_whitelisted_assets: [String!]
-  funding_interval: BigInt
-  funding_rate_factor: Int
-  stable_funding_rate_factor: Int
+  # reference
+  clobPairId: Int #32 bit integer
+  # id: ID!
+  # ruscet: String
+  # dydx: String
+  #
+  # is_initialized: Boolean
+  # average_price: Decimal
+  # is_global_short_data_ready: Boolean
+  # max_leverage: Decimal
+  # decimals: Int
+  # whitelisted: Boolean
+  # stable: Boolean
+  # shortable: Boolean
+  # min_profit_basis_points: Int
+  # weight: Decimal
+  # buffer_amount: Decimal
+  # last_funding_time: DateTime
+  # cumulative_funding_rate: Decimal
+  # fee_reserve: Decimal
+  # pool_amount: Decimal
+  # reserved_amount: Decimal
+  # size: Decimal
+  # max_size: Decimal
+  # ordinal: Int
+  # guaranteed_usd: Decimal
+  # lock: Boolean
+  # has_dynamic_fees: Boolean
+  # min_profit_time: BigInt
+  # router: String
+  #
+  # rusd_contr: String
+  # rusd: String
+  # pricefeed_provider: String
+  # liquidation_fee_usd: Decimal
+  # tax_basis_points: Int
+  # stable_tax_basis_points: Int
+  # mint_burn_fee_basis_points: Int
+  # swap_fee_basis_points: Int
+  # stable_swap_fee_basis_points: Int
+  # margin_fee_basis_points: Int
+  # total_asset_weights: Decimal
+  # whitelisted_asset_count: Int
+  # funding_interval: BigInt
+  # funding_rate_factor: Int
+  # stable_funding_rate_factor: Int
+  #
+  # ticker: String
+  # market_type: MarketType
+  # metadata: JSON
+  #
+  # price_feed: PriceFeed
+  # candles(first: Int, after: String, interval: CandleResolution): CandleConnection
+  # fundingPayments(first: Int, after: String): FundingPaymentConnection
+  # orders(first: Int, after: String): OrderConnection
+  # positions(first: Int, after: String, status: PositionStatus): PositionConnection
+  # assets(first: Int, after: String): AssetConnection
+  # trades(first: Int, after: String): TradeConnection
 
-  ticker: String
-  market_type: MarketType
-  metadata: JSON
-
-  price_feed: PriceFeed
-  candles(first: Int, after: String, interval: CandleInterval): CandleConnection
-  fundingPayments(first: Int, after: String): FundingPaymentConnection
-  orders(first: Int, after: String): OrderConnection
-  positions(first: Int, after: String, status: PositionStatus): PositionConnection
-  assets(first: Int, after: String): AssetConnection
-  trades(first: Int, after: String): TradeConnection
+  positions: [Position!] @derivedFrom(field: "market")
+  trades: [Trade!] @derivedFrom(field: "market")
+  candles: [Candle!] @derivedFrom(field: "market")
+  payments: [Payment!] @derivedFrom(field: "market")
 }
 
-type Trade {
+type Trade @entity {
   id: ID!
-  ruscet: String
-  dydx: String
+  createdAtHeight: Int!
+  createdAt: DateTime
+  side: OrderSide
+  price: BigDecimal
+  size: BigDecimal
+  tradeType: TradeType # always llimit
 
-  trade_id: ID
-  ticker: String
+  # ruscet only
   market: Market
-  executed_at: DateTime
   position: Position
-  metadata: JSON
 }
 
-type FundingPayment {
+type Payment @entity {
   id: ID!
-  ruscet: String
-  dydx: String
-
+  createdAt: DateTime
+  createdAtHeight: Int
   ticker: String
+  oraclePrice: BigDecimal
+  size: BigDecimal
+  side: PositionSide
+  rate: BigDecimal
+  payment: BigDecimal
+  subaccountNumber: Int #0
+  fundingIndex: BigDecimal
+
+  # Utility
+  type: PaymentType
+
+  #FKs
+  position: Position # renamed from perpetualId
   market: Market
-  effective_at: DateTime
-  metadata: JSON
 }
 
-type FundingRate {
+# TODO: There appears to be some overlap between asset and market currently
+type Asset @entity {
   id: ID!
-  ruscet: String
-  dydx: String
-
-  ticker: String
-  market: Market
-  effective_at: DateTime
-  rate: Decimal
-  metadata: JSON
-}
-
-type PositionFee {
-  id: ID!
-  metadata: JSON
-}
-
-type Asset {
-  id: ID!
-  ruscet: String
-  dydx: String
 
   decimals: Int
   whitelisted: Boolean
   stable: Boolean
   shortable: Boolean
-  min_profit_basis_points: Int
-  weight: Decimal
+  minProfitBasisPoints: Int
+  weight: BigDecimal
 
-  feed_id: String
-  price: Decimal
-  metadata: JSON
-}
-
-type PriceFeed {
-  id: ID!
-  ruscet: String
-  dydx: String
-
-  feed_id: String
-  price: Decimal
-  decimals: Int
-  is_initialized: Boolean
-  price_signer: String
-  max_price_aheadness: BigInt
-  max_price_staleness: BigInt
-  metadata: JSON
-
-  market: Market
-}
-
-type Vault {
-  id: ID!
-  ruscet: String
-  dydx: String
-  metadata: JSON
-}
-
-"""Connections"""
-type PageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-}
-
-type PositionConnection {
-  edges: [PositionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type PositionEdge {
-  node: Position!
-  cursor: String!
-}
-
-type OrderConnection {
-  edges: [OrderEdge!]!
-  pageInfo: PageInfo!
-}
-
-type OrderEdge {
-  node: Order!
-  cursor: String!
-}
-
-type CandleConnection {
-  edges: [CandleEdge!]!
-  pageInfo: PageInfo!
-}
-
-type CandleEdge {
-  node: Candle!
-  cursor: String!
-}
-
-type TradeConnection {
-  edges: [TradeEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TradeEdge {
-  node: Trade!
-  cursor: String!
-}
-
-type FundingPaymentConnection {
-  edges: [FundingPaymentEdge!]!
-  pageInfo: PageInfo!
-}
-
-type FundingPaymentEdge {
-  node: FundingPayment!
-  cursor: String!
-}
-
-type PnlTickConnection {
-  edges: [PnlTickEdge!]!
-  pageInfo: PageInfo!
-}
-
-type PnlTickEdge {
-  node: PnlTick!
-  cursor: String!
-}
-
-type AssetConnection {
-  edges: [AssetEdge!]!
-  pageInfo: PageInfo!
-}
-
-type AssetEdge {
-  node: Asset!
-  cursor: String!
-}
-
-type Query {
-  address(id: ID!): Address
-  subaccount(id: ID!): Subaccount
-  position(id: ID!): Position
-  order(id: ID!): Order
-  market(id: ID!): Market
-  trade(id: ID!): Trade
-  fundingPayment(id: ID!): FundingPayment
-  fundingRate(id: ID!): FundingRate
-  asset(id: ID!): Asset
-  priceFeed(id: ID!): PriceFeed
-  vault(id: ID!): Vault
-
-  addresses(first: Int, after: String): [Address!]!
-  subaccounts(first: Int, after: String): [Subaccount!]!
-  markets(first: Int, after: String): [Market!]!
-  positions(first: Int, after: String, status: PositionStatus, ticker: String): PositionConnection
-  orders(first: Int, after: String): OrderConnection
-  trades(first: Int, after: String): TradeConnection
-  candles(marketId: ID!, interval: CandleInterval, first: Int, after: String): CandleConnection
-  fundingPayments(marketId: ID!, first: Int, after: String): FundingPaymentConnection
-  assets(marketId: ID, first: Int, after: String): AssetConnection
+  feedId: String
+  price: BigDecimal
 }
