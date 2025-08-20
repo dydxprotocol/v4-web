@@ -1,9 +1,9 @@
 ## Events
 
 ## VaultAbi Events
-### Markets
+### Positions
 #### Increase Position
-```
+event;
 ```
     pub key: b256,
     pub account: Identity,

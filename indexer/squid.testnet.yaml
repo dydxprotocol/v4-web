@@ -1,0 +1,39 @@
+manifestVersion: subsquid.io/v0.1
+name: starboard
+version: 1
+description: "Starboard Indexer"
+
+build:
+  node_version: "20"
+  package_manager: "pnpm"
+
+deploy:
+  addons:
+    postgres:
+    rpc:
+      - eth.http
+      # - eth-sepolia.http
+  processor:
+    cmd:
+      - sqd
+      - process:prod
+  api:
+    cmd:
+      - sqd
+      - serve:prod
+  env:
+    # SQD_DEBUG: "*"
+    GATEWAY_URL: https://v2.archive.subsquid.io/network/fuel-testnet
+    GRAPHQL_URL: https://testnet.fuel.network/v1/graphql
+    # VAULT_CONTRACT_ADDRESS: "0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc"
+# scale:
+#   addons:
+#     postgres:
+#       storage: 100G
+#       profile: medium
+#   processor:
+#     profile: medium
+#   api:
+#     profile: large
+#     # load-balance three replicas
+#     replicas: 3
