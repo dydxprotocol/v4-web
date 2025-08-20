@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: "starboard-indexer-postgres"
     image: postgres:15
     environment:
       POSTGRES_DB: "${DB_NAME}"
