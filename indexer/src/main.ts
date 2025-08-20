@@ -9,13 +9,21 @@ const SUBSQUID_NETWORK_GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/net
 const MAINNET_URL = 'https://mainnet.fuel.network/v1/graphql'
 const TESTNET_URL = 'https://testnet.fuel.network/v1/graphql'
 const LOCAL_NODE_URL = 'http://localhost:4000/v1/graphql'
-// const CONTRACT_ADDRESS = "0xd5a716d967a9137222219657d7877bd8c79c64e1edb5de9f2901c98ebe74da80";
+const CONTRACTS = {
+    VAULT: {
+        ADDRESS: {
+            TESTNET: "0x4a0ba139fbea5af20369bd22bc83c5a9f23484193e56124c57e6f9bd1e7605fd",
+            MAINNET: "0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc"
+        }
+    }
+}
 
 const dataSource = new DataSourceBuilder()
-    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
+    // .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
+    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_MAINNET)
     .setGraphql({
-        // url: MAINNET_URL,
-        url: TESTNET_URL,
+        url: MAINNET_URL,
+        // url: TESTNET_URL,
         // url: LOCAL_NODE_URL,
         strideConcurrency: 3,
         strideSize: 30
@@ -55,7 +63,8 @@ const dataSource = new DataSourceBuilder()
     // Eequest items via `.addXxx()` methods that accept item selection criteria
     // & allow to request related items.
     .addReceipt({
-        type: ['LOG_DATA', 'MINT'],
+        type: ['LOG_DATA', 'MINT', 'TRANSFER', 'TRANSFER_OUT'],
+        contract: [CONTRACTS.VAULT.ADDRESS.MAINNET],
         transaction: true,
     })
     .build()
