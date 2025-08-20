@@ -1,0 +1,255 @@
+scalar BigInt
+scalar BigDecimal
+scalar DateTime
+scalar JSON
+
+enum PositionSide {
+  LONG
+  SHORT
+}
+
+enum MarketStatus {
+  Active
+  Paused
+  CancelOnly
+  PostOnly
+  Initializing
+  FinalSettlement
+}
+
+enum TradeType {
+  Limit
+  Liquidation
+}
+
+enum PositionStatus {
+  OPEN
+  CLOSED
+  LIQUIDATED
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  MARKET
+}
+
+enum OrderStatus {
+  Filled
+}
+
+enum MarketType {
+  PERP
+}
+
+enum PaymentType {
+  FUNDING
+  POSITION
+}
+
+enum CandleResolution {
+  M1
+  M5
+  M15
+  M30
+  H1
+  H4
+  D1
+}
+
+type Address {
+  id: ID!
+  address: String
+  metadata: JSON
+  subaccount: Subaccount
+}
+
+type ClobPair {
+  id: String!
+  market: Market
+}
+
+type Account {
+  id: ID!
+  address: String
+  subaccountNumber: Int
+  subaccountId: String
+
+  # ruscet only
+  isLiquidator: Boolean
+  isHandler: Boolean
+  isManager: Boolean
+  metadata: JSON
+
+  owner: Address
+
+  #FK
+  positions: [Position!]
+}
+
+type Position {
+  id: ID!
+
+  status: PositionStatus
+  side: PositionSide
+  size: BigInt
+  maxSize: BigInt
+  entryPrice: BigDecimal
+  exitPrice: BigDecimal
+  realizedPnl: BigDecimal
+  createdAt: DateTime
+  createdAtHeight: Int
+  sumOpen: BigDecimal
+  sumClose: BigDecimal
+  netFunding: BigDecimal
+  unrealizedPnl: BigDecimal
+  closedAt: DateTime
+  subaccountNumber: Int
+
+  ticker: String
+
+  # Ruscet only
+  collateral: BigDecimal
+  positionFees: BigDecimal
+  entryFundingRate: BigDecimal
+  reserveAmount: BigDecimal
+  lastIncreasedTime: DateTime
+
+  #FKs
+  account: Account
+  market: Market
+}
+
+type Candle {
+  id: ID!
+  ticker: String
+  resolution: CandleResolution
+  startedAt: BigInt
+  open: BigDecimal
+  close: BigDecimal
+  high: BigDecimal
+  low: BigDecimal
+
+  baseTokenVolume: BigDecimal
+  usdVolume: BigDecimal
+
+  startingOpenInterest: BigDecimal
+
+  # relations
+  market: Market
+}
+
+type Market {
+  id: ID!
+  ticker: String!
+  atomicResolution: Int!
+  baseOpenInterest: String!
+  defaultFundingRate1H: String!
+  initialMarginFraction: String!
+  maintenanceMarginFraction: String!
+  marketType: MarketType!
+  nextFundingRate: String!
+  openInterest: String!
+  openInterestLowerCap: String
+  openInterestUpperCap: String
+  oraclePrice: Price
+  priceChange24H: String!
+  quantumConversionExponent: Int!
+  status: MarketStatus!
+  stepBaseQuantums: BigInt!
+  stepSize: String!
+  subticksPerTick: Int!
+  tickSize: String!
+  trades24H: BigInt!
+  volume24H: BigInt!
+
+  #reference
+  clobPairId: ClobPair
+
+  positions: [Position!]
+  trades: [Trade!]
+  candles: [Candle!]
+  payments: [Payment!]
+}
+
+type Trade {
+  id: ID!
+  created_at_height: Int!
+  created_at: DateTime
+  side: OrderSide
+  price: BigDecimal
+  size: BigInt
+  trade_type: TradeType
+
+  # ruscet only
+  market: Market
+  position: Position
+}
+
+type Payment {
+  id: ID!
+  createdAt: BigInt
+  createdAtHeight: Int
+  ticker: String
+  oraclePrice: String
+  size: String
+  side: PositionSide
+  rate: String
+  payment: String
+  subaccountNumber: Int
+  fundingIndex: String
+
+  # Utility
+  type: PaymentType
+
+  #FKs
+  position: Position
+  market: Market
+}
+
+type Asset {
+  id: ID!
+
+  decimals: Int
+  whitelisted: Boolean
+  stable: Boolean
+  shortable: Boolean
+  min_profit_basis_points: Int
+  weight: BigDecimal
+
+  feed_id: String
+  price: BigDecimal
+  metadata: JSON
+}
+
+type Price {
+  price: String!
+  timestamp: BigInt!
+}
+
+type Subaccount {
+  id: ID!
+  account: Account!
+}
+
+type Query {
+  addresses(first: Int, after: String): [Address!]!
+  address(id: ID!): Address
+  markets(first: Int, after: String, ticker: String): [Market!]!
+  market(id: ID!): Market
+  accounts(first: Int, after: String, address: String): [Account!]!
+  account(id: ID!): Account
+  positions(first: Int, after: String, status: PositionStatus, account: String, market: String, side: PositionSide): [Position!]!
+  position(id: ID!): Position
+  trades(first: Int, after: String, market: String, side: OrderSide): [Trade!]!
+  trade(id: ID!): Trade
+  payments(first: Int, after: String, market: String, type: PaymentType, side: PositionSide): [Payment!]!
+  payment(id: ID!): Payment
+  candles(first: Int, after: String, market: String, resolution: CandleResolution, from: BigInt, to: BigInt): [Candle!]!
+  candle(id: ID!): Candle
+  assets(first: Int, after: String): [Asset!]!
+  asset(id: ID!): Asset
+}
