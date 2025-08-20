@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
 name: starboard
 version: 1
-description: 'The very first evm squid from manifest.'
+description: 'Starboard Indexer'
 build: 
 deploy:
   addons:

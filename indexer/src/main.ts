@@ -4,23 +4,15 @@ import { DataSourceBuilder } from '@subsquid/fuel-stream'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { Contract } from './model'
 
-const GATEWAY_URL_MAINNET = 'https://v2.archive.subsquid.io/network/fuel-mainnet'
-const GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/network/fuel-testnet'
+const SUBSQUID_NETWORK_GATEWAY_URL_MAINNET = 'https://v2.archive.subsquid.io/network/fuel-mainnet'
+const SUBSQUID_NETWORK_GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/network/fuel-testnet'
 const MAINNET_URL = 'https://mainnet.fuel.network/v1/graphql'
 const TESTNET_URL = 'https://testnet.fuel.network/v1/graphql'
 const LOCAL_NODE_URL = 'http://localhost:4000/v1/graphql'
 // const CONTRACT_ADDRESS = "0xd5a716d967a9137222219657d7877bd8c79c64e1edb5de9f2901c98ebe74da80";
 
-// First we create a DataSource - the component that
-// defines what data we need and where to get it
 const dataSource = new DataSourceBuilder()
-    // Provide a Subsquid Network Gateway URL
-    // .setGateway('https://v2.archive.subsquid.io/network/fuel-mainnet')
-    .setGateway(GATEWAY_URL_TESTNET)
-    // Subsquid Network is always about 10000 blocks behind the head.
-    // We must use a regular GraphQL endpoint to get through
-    // the last mile and stay on top of the chain.
-    // This is a limitation, and we promise to lift it in the future!
+    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
     .setGraphql({
         // url: MAINNET_URL,
         // url: TESTNET_URL,
@@ -66,30 +58,18 @@ const dataSource = new DataSourceBuilder()
     })
     .build()
 
-// Once we've prepared a data source we can start fetching the data right away:
-//
-// for await (let batch of dataSource.getBlockStream()) {
-//     for (let block of batch) {
-//         console.log(block)
-//     }
-// }
-//
-// However, Subsquid SDK can also help to transform and persist the data.
+for await (let batch of dataSource.getBlockStream()) {
+    for (let block of batch) {
+        console.log(block)
+    }
+}
 
+// Subsquid SDK can help transform & persist the data.
 // Data processing in Subsquid SDK is defined by four components:
-//
 //  1. Data source (such as we've created above)
-//  2. Database
-//  3. Data handler
-//  4. Processor
-//
-// Database is responsible for persisting the work progress (last processed block)
-// and for providing storage API to the data handler.
-//
-// Data handler is a user defined function which accepts consecutive block batches,
-// storage API and is responsible for entire data transformation.
-//
-// Processor connects and executes above three components.
+//  2. Database, responsible for persisting the work progress (last processed block) & for providing storage API to data handler.
+//  3. Data handler, user defined function which accepts consecutive block batches, storage API and is responsible for entire data transformation.
+//  4. Processor, connects and executes above three components.
 
 // Below we create a `TypeormDatabase`.
 //
@@ -105,7 +85,7 @@ const dataSource = new DataSourceBuilder()
 // https://github.com/subsquid/squid-sdk/blob/278195bd5a5ed0a9e24bfb99ee7bbb86ff94ccb3/typeorm/typeorm-config/src/config.ts#L21
 const database = new TypeormDatabase()
 
-// Now we are ready to start processing the data
+// start processing data
 run(dataSource, database, async ctx => {
     // Block items that we get from `ctx.blocks` are flat JS objects.
     //

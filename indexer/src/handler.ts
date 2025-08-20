@@ -76,6 +76,7 @@ const onTick = (
     tick: PriceTick,
 ): void => {
     intervals.forEach(interval => {
+        debugger;
         const openTime = intervalOpenTime(tick.timestampSec, interval)
         const existing = getCandle(store, tick.marketId, interval, openTime)
 
