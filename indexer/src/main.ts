@@ -15,8 +15,8 @@ const dataSource = new DataSourceBuilder()
     .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
     .setGraphql({
         // url: MAINNET_URL,
-        // url: TESTNET_URL,
-        url: LOCAL_NODE_URL,
+        url: TESTNET_URL,
+        // url: LOCAL_NODE_URL,
         strideConcurrency: 3,
         strideSize: 30
     })
@@ -58,11 +58,20 @@ const dataSource = new DataSourceBuilder()
     })
     .build()
 
-for await (let batch of dataSource.getBlockStream()) {
-    for (let block of batch) {
-        console.log(block)
+// for await (let batch of dataSource.getBlockStream()) {
+//     for (let block of batch) {
+//         console.log(block)
+//     }
+// }
+
+async function processBlocks() {
+  for await (const batch of dataSource.getBlockStream()) {
+    for (const block of batch) {
+      console.log(block);
     }
+  }
 }
+processBlocks()
 
 // Subsquid SDK can help transform & persist the data.
 // Data processing in Subsquid SDK is defined by four components:

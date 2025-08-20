@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - esbuild
