@@ -152,3 +152,4 @@ Markets are global and affect everyone.
 - Highest priority is to get indexer in.
 
 - [ ] Extract out vault
+  

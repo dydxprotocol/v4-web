@@ -2,7 +2,7 @@ import { run } from '@subsquid/batch-processor'
 import { augmentBlock } from '@subsquid/fuel-objects'
 import { DataSourceBuilder } from '@subsquid/fuel-stream'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
-import { Contract } from './model'
+import { Contract, Position, Market, Asset, Account, Payment, Trade } from './model'
 
 const SUBSQUID_NETWORK_GATEWAY_URL_MAINNET = 'https://v2.archive.subsquid.io/network/fuel-mainnet'
 const SUBSQUID_NETWORK_GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/network/fuel-testnet'
@@ -40,21 +40,23 @@ const dataSource = new DataSourceBuilder()
     //
     // We do it below only for illustration as all fields we've
     // selected are fetched by default.
-    //
-    // It is possible to override default selection by setting
-    // the flags for undesirable fields to `false`.
+    // Override default selection by setting flags for undesirable fields to `false`.
     .setFields({
         receipt: {
             contract: true,
-            receiptType: true
+            receiptType: true,
+            data: true,
+            rb: true,
+            assetId: true,
+            subId: true,
+            amount: true,
         }
     })
-    // We request items via `.addXxx()` methods.
-    //
-    // Each `.addXxx()` method accepts item selection criteria
-    // and also allows to request related items.
+    // Eequest items via `.addXxx()` methods that accept item selection criteria
+    // & allow to request related items.
     .addReceipt({
-        type: ['LOG_DATA']
+        type: ['LOG_DATA', 'MINT'],
+        transaction: true,
     })
     .build()
 
@@ -64,14 +66,14 @@ const dataSource = new DataSourceBuilder()
 //     }
 // }
 
-async function processBlocks() {
-  for await (const batch of dataSource.getBlockStream()) {
-    for (const block of batch) {
-      console.log(block);
-    }
-  }
-}
-processBlocks()
+// async function processBlocks() {
+//   for await (const batch of dataSource.getBlockStream()) {
+//     for (const block of batch) {
+//       console.log(block);
+//     }
+//   }
+// }
+// processBlocks()
 
 // Subsquid SDK can help transform & persist the data.
 // Data processing in Subsquid SDK is defined by four components:
@@ -94,15 +96,31 @@ processBlocks()
 // https://github.com/subsquid/squid-sdk/blob/278195bd5a5ed0a9e24bfb99ee7bbb86ff94ccb3/typeorm/typeorm-config/src/config.ts#L21
 const database = new TypeormDatabase()
 
-// start processing data
-run(dataSource, database, async ctx => {
-    // Block items that we get from `ctx.blocks` are flat JS objects.
-    //
-    // We can use `augmentBlock()` function from `@subsquid/fuel-objects`
-    // to enrich block items with references to related objects.
-    let contracts: Map<String, Contract> = new Map()
+export type Context = {
+    getPosition(positionId: string): Promise<Position>;
+    getTrade(tradeId: string): Promise<Trade>;
+    getPayment(tradeId: string): Promise<Payment>;
+    getMarket(positionId: string): Promise<Market>;
+    getAsset(positionId: string): Promise<Asset>;
+    getAccount(positionId: string): Promise<Account>;
+    tx: string;
+    block: number;
+    index: number;
+    timestamp: Date;
+}
 
-    let blocks = ctx.blocks.map(augmentBlock)
+run(dataSource, database, async ctx => {
+
+    // `augmentBlock()` function from `@subsquid/fuel-objects` to enrich block items with references to related objects
+    let blocks = ctx.blocks.map(augmentBlock) // `ctx.blocks` items are flat JS objects
+
+    // let positions: Map<String, Position> = new Map()
+    // let trades: Map<String, Trade> = new Map()
+    // let payment: Map<String, Payment> = new Map()
+    // let market: Map<String, Market> = new Map()
+    // let assets: Map<String, Asset> = new Map()
+    let contracts: Map<String, Contract> = new Map()
+    // let account: Map<String, Account> = new Map()
 
     for (let block of blocks) {
         for (let receipt of block.receipts) {
