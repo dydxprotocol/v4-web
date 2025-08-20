@@ -114,6 +114,13 @@ type Position @entity {
 # nuking PnLTick as well
 # type PnlTick {}
 
+type PriceTick {
+  id: ID!
+  ticker: String,
+  timestamp: DateTime,
+  price: BigDecimal,
+}
+
 type Candle {
   id: ID! # "market.id+resolution+timestamp"
   ticker: String # "market.symbol"
