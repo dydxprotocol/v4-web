@@ -1,22 +1,30 @@
-import {run} from '@subsquid/batch-processor'
-import {augmentBlock} from '@subsquid/fuel-objects'
-import {DataSourceBuilder} from '@subsquid/fuel-stream'
-import {TypeormDatabase} from '@subsquid/typeorm-store'
-import {Contract} from './model'
+import { run } from '@subsquid/batch-processor'
+import { augmentBlock } from '@subsquid/fuel-objects'
+import { DataSourceBuilder } from '@subsquid/fuel-stream'
+import { TypeormDatabase } from '@subsquid/typeorm-store'
+import { Contract } from './model'
 
+const GATEWAY_URL_MAINNET = 'https://v2.archive.subsquid.io/network/fuel-mainnet'
+const GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/network/fuel-testnet'
+const MAINNET_URL = 'https://mainnet.fuel.network/v1/graphql'
+const TESTNET_URL = 'https://testnet.fuel.network/v1/graphql'
+const LOCAL_NODE_URL = 'http://localhost:4000/v1/graphql'
+// const CONTRACT_ADDRESS = "0xd5a716d967a9137222219657d7877bd8c79c64e1edb5de9f2901c98ebe74da80";
 
 // First we create a DataSource - the component that
 // defines what data we need and where to get it
 const dataSource = new DataSourceBuilder()
     // Provide a Subsquid Network Gateway URL
-    .setGateway('https://v2.archive.subsquid.io/network/fuel-mainnet')
+    // .setGateway('https://v2.archive.subsquid.io/network/fuel-mainnet')
+    .setGateway(GATEWAY_URL_TESTNET)
     // Subsquid Network is always about 10000 blocks behind the head.
     // We must use a regular GraphQL endpoint to get through
     // the last mile and stay on top of the chain.
     // This is a limitation, and we promise to lift it in the future!
     .setGraphql({
-        url: 'https://mainnet.fuel.network/v1/graphql',
-        // url: 'https://testnet.fuel.network/v1/graphql',
+        // url: MAINNET_URL,
+        // url: TESTNET_URL,
+        url: LOCAL_NODE_URL,
         strideConcurrency: 3,
         strideSize: 30
     })
@@ -112,7 +120,7 @@ run(dataSource, database, async ctx => {
             if (receipt.receiptType == 'LOG_DATA' && receipt.contract != null) {
                 let contract = contracts.get(receipt.contract)
                 if (!contract) {
-                    contract = await ctx.store.findOne(Contract, {where: {id: receipt.contract}})
+                    contract = await ctx.store.findOne(Contract, { where: { id: receipt.contract } })
                     if (!contract) {
                         contract = new Contract({
                             id: receipt.contract,

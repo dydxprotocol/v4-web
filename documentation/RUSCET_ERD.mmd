@@ -1,0 +1,180 @@
+---
+config:
+  theme: redux-dark-color
+  layout: elk
+title: Starboard Entity Relationship Diagram
+---
+erDiagram
+	direction TB
+
+    RUSCET
+	Position {
+		u256 size  ""
+		u256 collateral  ""
+		u256 average_price  ""
+		u256 entry_funding_rate  ""
+		u256 reserve_amount  ""
+		Signed256 realized_pnl  ""
+		u64 last_increased_time  ""
+	}
+	PositionKey {
+		Identity account  ""
+		AssetId collateral_asset  ""
+		AssetId index_asset  ""
+		bool is_long  ""
+	}
+	VAULT {
+		gov Identity  ""
+		bool is_initialized  ""
+		bool lock  ""
+		bool has_dynamic_fees  ""
+		u64 min_profit_time  ""
+		ContractId router  ""
+		ContractId rusd_contr  ""
+		AssetId rusd  ""
+		ContractId pricefeed_provider  ""
+		u256 liquidation_fee_usd  ""
+		u64 tax_basis_points  ""
+		u64 stable_tax_basis_points  ""
+		u64 mint_burn_fee_basis_points  ""
+		u64 swap_fee_basis_points  ""
+		u64 stable_swap_fee_basis_points  ""
+		u64 margin_fee_basis_points  ""
+		u64 total_asset_weights  ""
+		u64 whitelisted_asset_count  ""
+    storagevec all_whitelisted_assets
+		u64 funding_interval  ""
+		u64 funding_rate_factor  ""
+		u64 stable_funding_rate_factor  ""
+	}
+	ApprovedRouter {
+		Identity account  ""
+		Identity router  ""
+		bool is_approved  ""
+	}
+	Liquidator {
+		Identity account  ""
+		bool is_liquidator  ""
+	}
+	Manager {
+		ContractId manager  ""
+		bool is_manager  ""
+	}
+	LeverageLimit {
+		AssetId asset  ""
+		u256 max_leverage  ""
+	}
+	AssetConfig {
+		AssetId asset  ""
+		u32 decimals  ""
+		bool whitelisted  ""
+		bool stable  ""
+		bool shortable  ""
+		u64 min_profit_basis_points  ""
+		u64 weight  ""
+	}
+	AssetDebtLimit {
+		AssetId asset  ""
+		u256 max_rusd_amount  ""
+	}
+	BufferAmount {
+		AssetId asset  ""
+		u256 buffer_amount  ""
+	}
+	FundingState {
+		AssetId asset  ""
+		u64 last_funding_time  ""
+		u256 cumulative_funding_rate  ""
+	}
+	FeeReserve {
+		AssetId asset  ""
+		u256 fee_reserve  ""
+	}
+	RusdDebt {
+		AssetId asset  ""
+		u256 rusd_amount  ""
+	}
+	PoolBalance {
+		AssetId asset  ""
+		u256 pool_amount  ""
+	}
+	GuaranteedUSD {
+		AssetId asset  ""
+		u256 guaranteed_usd  ""
+	}
+	ReservedAmount {
+		AssetId asset  ""
+		u256 reserved_amount  ""
+	}
+	GlobalShortStat {
+		AssetId asset  ""
+		u256 size  ""
+		u256 average_price  ""
+		u256 max_size  ""
+	}
+	WhitelistedAssetList {
+		AssetId asset  ""
+		u64 ordinal  ""
+	}
+	VaultPricefeed {
+		Identity gov  ""
+		bool is_initialized  ""
+		Address price_signer  ""
+		u64 max_price_aheadness  ""
+		u64 max_price_staleness  ""
+	}
+	PythPricefeedMapping {
+		AssetId asset  ""
+		PriceFeedId feed_id  ""
+	}
+	FeedObservedPrice {
+		PriceFeedId feed_id  ""
+		Price price  ""
+	}
+	AssetPriceDecimals {
+		AssetId asset  ""
+		u32 decimals  ""
+	}
+	UsedHashedMessage {
+		b256 message_hash  ""
+		bool used  ""
+	}
+	ShortsTracker {
+		Identity gov  ""
+		bool is_initialized  ""
+		bool is_global_short_data_ready  ""
+		ContractId vault  ""
+	}
+	Handler {
+		Identity account  ""
+		bool is_handler  ""
+	}
+	GlobalShortAveragePrices {
+		AssetId asset  ""
+		u256 average_price  ""
+	}
+
+	VAULT||--o{Position:"has"
+	VAULT||--||PositionKey:"keys"
+	VAULT||--o{ApprovedRouter:"approves"
+	VAULT||--o{Liquidator:"authorizes"
+	VAULT||--o{Manager:"managed_by"
+	VAULT||--o{LeverageLimit:"caps"
+	VAULT||--o{AssetConfig:"config_for"
+	VAULT||--o{AssetDebtLimit:"max_debt"
+	VAULT||--o{BufferAmount:"buffer"
+	VAULT||--o{FundingState:"funding"
+	VAULT||--o{FeeReserve:"fees"
+	VAULT||--o{RusdDebt:"rusd_debt"
+	VAULT||--o{PoolBalance:"pool"
+	VAULT||--o{ReservedAmount:"reserved"
+	VAULT||--o{GlobalShortStat:"global_shorts"
+	VAULT||--o{WhitelistedAssetList:"all_whitelisted_assets"
+	VAULT||--||VaultPricefeed:"uses"
+	VAULT||--||VaultPricefeed:"uses_pricefeed"
+	VaultPricefeed||--o{PythPricefeedMapping:"maps_asset_to_pyth_feed"
+	VaultPricefeed||--o{FeedObservedPrice:"holds_prices"
+	VaultPricefeed||--o{AssetPriceDecimals:"asset_decimals"
+	VaultPricefeed||--o{UsedHashedMessage:"anti_replay"
+	ShortsTracker||--o{Handler:"has"
+	ShortsTracker||--o{GlobalShortAveragePrices:"has"

@@ -1,0 +1,174 @@
+---
+config:
+  theme: redux-dark-color
+  layout: elk
+title: Starboard Entity Relationship Diagram
+---
+erDiagram
+	direction TB
+	ADDRESS {
+		string address  ""  
+	}
+	SUBACCOUNT {
+		ruscet dydx  ""  
+		null address  "user identity"  
+		null subaccount_number  "leave as 0"  
+		null subaccount_id  "set to identity"  
+		is_liquidator null  "Vault->Liquidator"  
+		is_handler null  "Vault->Handler"  
+		is_manager null  "Vault->Manager"  
+	}
+	POSITION {
+		ruscet dydx  ""  
+		size null  "vault->Position"  
+		collateral null  "vault->Position"  
+		average_price null  "vault->Position"  
+		entry_funding_rate null  "vault->Position"  
+		reserve_amount null  "vault->Position"  
+		realized_pnl null  "vault->Position"  
+		last_increased_time null  "vault->Position"  
+		null id  "AssetId+Identity+timestamp from ruscet"  
+		null subaccount_id FK "set to identity"  
+		null ticker  "MarketId.Symbol from ruscet"  
+		null status  "event-driven, open/closed/liquidated"  
+		null created_at  "event-driven, equivalent to open. Increase from 0 to timestamp of event."  
+		null created_height  "event-driven, equivalent to open. Increase from 0 to size for block height."  
+		null side  "get from PositionKey.long. Change from bool to enum."  
+	}
+	ORDER {
+		ruscet dydx  ""  
+		null order_id  "position.id"  
+		null subaccount_id FK "position.subaccount_id"  
+		null ticker  "position.ticker"  
+		null side  "position.side"  
+		null status  "always filled"  
+		null type  "? TODO"  
+		null good_til_block  "position.created_height"  
+		null good_til_time  "position.created_at"  
+		null created_at  "postion.created_at"  
+        null fill_id "vault.contractId"
+	}
+	PNL_TICK {
+		ruscet dydx  ""  
+		null id  ""  
+		null subaccount_id  ""  
+		null effective_at  ""  
+		null created_height  ""  
+	}
+	CANDLE {
+		ruscet dydx  ""  
+		null id  "market.id+interval+timestamp"  
+		null ticker  "market.symbol"  
+		null interval  ""  
+		null open_time  ""  
+		null null  "open"  
+		null null  "close"  
+		null null  "high"  
+		null null  "low"  
+	}
+	MARKET {
+		ruscet dydx  ""  
+		is_initialized null  "vault->ShortsTracker"  
+		average_price null  "vault->GlobalShortAveragePrices"  
+		is_global_short_data_ready null  "vault->ShortsTracker"  
+		max_leverage null  "vault->LeverageLimit"  
+		decimals null  "vault->AssetConfig"  
+		whitelisted null  "vault->AssetConfig"  
+		stable null  "vault->AssetConfig"  
+		shortable null  "vault->AssetConfig"  
+		min_profit_basis_points null  "vault->AssetConfig"  
+		weight null  "vault->AssetConfig"  
+		buffer_amount null  "vault->BufferAmount"  
+		last_funding_time null  "vault->FundingState"  
+		cumulative_funding_rate null  "vault->FundingState"  
+		fee_reserve null  "vault->FeeReserve"  
+		pool_amount null  "vault->FeeReserve"  
+		reserved_amount null  "vault->ReservedAmount"  
+		size null  "vault->GlobalShortStat"  
+		average_price null  "vault->GlobalShortStat"  
+		max_size null  "vault->GlobalShortStat"  
+		ordinal null  "vault->WhitelistedAssetList"  
+		guaranteed_usd null  "vault->GuaranteedUSD"  
+		lock null  "Vault"  
+		has_dynamic_fees null  "Vault"  
+		min_profit_time null  "Vault"  
+		router null  "Vault"  
+		rusd_contr null  ""  
+		rusd null  "Vault"  
+		pricefeed_provider null  "Vault"  
+		liquidation_fee_usd null  "Vault"  
+		tax_basis_points null  "Vault"  
+		stable_tax_basis_points null  "Vault"  
+		mint_burn_fee_basis_points null  "Vault"  
+		swap_fee_basis_points null  "Vault"  
+		stable_swap_fee_basis_points null  "Vault"  
+		margin_fee_basis_points null  "Vault"  
+		total_asset_weights null  "Vault"  
+		whitelisted_asset_count null  "Vault"  
+		all_whitelisted_assets null  ""  
+		funding_interval null  "Vault"  
+		funding_rate_factor null  "Vault"  
+		stable_funding_rate_factor null  "Vault"  
+		null ticker  ""  
+		null market_type  ""  
+	}
+	TRADE {
+		ruscet dydx  ""  
+		null trade_id  ""  
+		null ticker  ""  
+		null executed_at  ""  
+	}
+	FUNDING_PAYMENT {
+		ruscet dydx  ""  
+		null id  ""  
+		null ticker  ""  
+		null effective_at  ""  
+	}
+	FUNDING_RATE {
+		ruscet dydx  ""  
+		null id  ""  
+		null ticker  ""  
+		null effective_at  ""  
+	}
+	POSITION_FEE {
+	}
+	ASSET {
+		ruscet dydx  "vault->AssetConfig"  
+		decimals null  "vault->AssetConfig"  
+		whitelisted null  "vault->AssetConfig"  
+		stable null  "vault->AssetConfig"  
+		shortable null  "vault->AssetConfig"  
+		min_profit_basis_points null  "vault->AssetConfig"  
+		weight null  "vault->AssetConfig"  
+		feed_id null  "VaultPricefeed->PythPricefeedMapping"  
+		price null  "VaultPricefeed->FeedObservedPrice"  
+	}
+	PRICE_FEED {
+		ruscet dydx  ""  
+		feed_id null  "VaultPricefeed->PythPricefeedMapping"  
+		price null  "VaultPricefeed->FeedObservedPrice"  
+		decimals null  "VaultPricefeed->AssetpriceDecimals"  
+		is_initialized null  "VaultPricefeed"  
+		price_signer null  "VaultPricefeed"  
+		max_price_aheadness null  "VaultPricefeed"  
+		max_price_staleness null  "VaultPricefeed"  
+	}
+
+VAULT {
+ruscet dydx 
+
+}
+
+	ADDRESS||--||SUBACCOUNT:"has"
+	SUBACCOUNT||--o{POSITION:"owns"
+	POSITION||--||ORDER:"Immediately places when created"
+	PNL_TICK||--o{POSITION:"indexed and calculated based on"
+	MARKET||--o{CANDLE:"aggregates"
+	TRADE||--o{POSITION:"calculated based on changes to"
+	TRADE}o--||MARKET:"global to"
+	MARKET||--o{FUNDING_PAYMENT:"applies_to"
+	FUNDING_RATE}o--||MARKET:"global to"
+	MARKET||--o{ORDER:"on"
+	MARKET||--o{POSITION:"for"
+	MARKET||--o{ASSET:"contains"
+	MARKET||--||PRICE_FEED:"consumes"
