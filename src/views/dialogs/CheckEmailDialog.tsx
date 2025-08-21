@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -33,6 +33,13 @@ export const CheckEmailDialog = ({
     [onClose, setIsOpen]
   );
 
+  const [resendCounter, setResendCounter] = useState(0);
+
+  const onResend = useCallback(() => {
+    signInWithOtp({ userEmail });
+    setResendCounter((prev) => prev + 1);
+  }, [signInWithOtp, userEmail]);
+
   return (
     <Dialog isOpen setIsOpen={modifiedSetIsOpen} title={<div />}>
       <div tw="column justify-items-center gap-0.5 text-center">
@@ -43,16 +50,21 @@ export const CheckEmailDialog = ({
         <p tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.CHECK_EMAIL_DESCRIPTION })}</p>
         <TimeoutButton
           timeoutInSeconds={15}
-          tw="mt-1"
+          tw="mb-0.25 mt-1"
           type={ButtonType.Button}
           action={ButtonAction.SimplePrimary}
           size={ButtonSize.Small}
           shape={ButtonShape.Pill}
-          onClick={() => signInWithOtp({ userEmail })}
+          resetCounter={resendCounter}
+          onClick={onResend}
         >
           <Icon iconName={IconName.Resend} />
           {stringGetter({ key: STRING_KEYS.RESEND })}
         </TimeoutButton>
+
+        {resendCounter > 0 && (
+          <span tw="text-color-text-0 font-small-book">Email resent. Check your inbox.</span>
+        )}
       </div>
     </Dialog>
   );
