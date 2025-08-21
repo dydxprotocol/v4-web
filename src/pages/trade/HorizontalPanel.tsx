@@ -23,13 +23,23 @@ import {
 } from '@/pages/funding/FundingPaymentsTable';
 import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
+import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
-import { createGetUnseenFillsCount } from '@/state/accountSelectors';
+import {
+  calculateIsAccountViewOnly,
+  calculateShouldRenderActionsInPositionsTable,
+} from '@/state/accountCalculators';
+import {
+  createGetOpenOrdersCount,
+  createGetUnseenFillsCount,
+  createGetUnseenOpenOrdersCount,
+  createGetUnseenOrderHistoryCount,
+} from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
+import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
@@ -67,10 +77,28 @@ export const HorizontalPanel = ({ isOpen = false, setIsOpen, handleStartResize }
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
   const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useAppSelectorWithArgs(calculateShouldRenderActionsInPositionsTable);
+  const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
+  const areOrdersLoading = useAppSelector(BonsaiCore.account.openOrders.loading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
+  const numUnseenOrderHistory = useAppSelectorWithArgs(
+    createGetUnseenOrderHistoryCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
+
+  const openOrdersCount = useAppSelectorWithArgs(
+    createGetOpenOrdersCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const unseenOpenOrdersCount = useAppSelectorWithArgs(
+    createGetUnseenOpenOrdersCount,
+    showCurrentMarket ? currentMarketId : undefined
+  );
+  const ordersTagNumber = shortenNumberForDisplay(openOrdersCount);
 
   const numTotalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
@@ -82,6 +110,7 @@ export const HorizontalPanel = ({ isOpen = false, setIsOpen, handleStartResize }
   );
   const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
 
+  const hasUnseenOrderUpdates = unseenOpenOrdersCount > 0;
   const hasUnseenFillUpdates = numUnseenFills > 0;
 
   const initialPageSize = 20;
@@ -148,6 +177,117 @@ export const HorizontalPanel = ({ isOpen = false, setIsOpen, handleStartResize }
       shouldRenderTriggers,
       numTotalPositions,
       onViewOrders,
+    ]
+  );
+
+  const ordersTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Orders,
+      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
+
+      slotRight:
+        areOrdersLoading || isWaitingForOrderToIndex ? (
+          <LoadingSpinner tw="[--spinner-width:1rem]" />
+        ) : (
+          ordersTagNumber && (
+            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+              {ordersTagNumber}
+            </Tag>
+          )
+        ),
+
+      content: (
+        <OrdersTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          tableType="OPEN"
+          columnKeys={
+            isTablet
+              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+              : [
+                  !showCurrentMarket && OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.Amount,
+                  OrdersTableColumnKey.Filled,
+                  OrdersTableColumnKey.OrderValue,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.GoodTil,
+                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [
+      stringGetter,
+      areOrdersLoading,
+      isWaitingForOrderToIndex,
+      ordersTagNumber,
+      hasUnseenOrderUpdates,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
+      isAccountViewOnly,
+    ]
+  );
+
+  const orderHistoryTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.OrderHistory,
+      label: stringGetter({ key: STRING_KEYS.ORDER_HISTORY_HEADER }),
+
+      slotRight: areOrdersLoading ? (
+        <LoadingSpinner tw="[--spinner-width:1rem]" />
+      ) : (
+        orderHistoryTagNumber &&
+        numUnseenOrderHistory > 0 && (
+          <Tag type={TagType.Number} isHighlighted={numUnseenOrderHistory > 0}>
+            {orderHistoryTagNumber}
+          </Tag>
+        )
+      ),
+
+      content: (
+        <OrdersTable
+          currentMarket={showCurrentMarket ? currentMarketId : undefined}
+          marketTypeFilter={viewIsolated}
+          tableType="HISTORY"
+          columnKeys={
+            isTablet
+              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+              : [
+                  !showCurrentMarket && OrdersTableColumnKey.Market,
+                  OrdersTableColumnKey.Status,
+                  OrdersTableColumnKey.Side,
+                  OrdersTableColumnKey.Amount,
+                  OrdersTableColumnKey.Filled,
+                  OrdersTableColumnKey.OrderValue,
+                  OrdersTableColumnKey.Price,
+                  OrdersTableColumnKey.Trigger,
+                  OrdersTableColumnKey.MarginType,
+                  OrdersTableColumnKey.Updated,
+                ].filter(isTruthy)
+          }
+          initialPageSize={initialPageSize}
+        />
+      ),
+    }),
+    [
+      stringGetter,
+      areOrdersLoading,
+      orderHistoryTagNumber,
+      numUnseenOrderHistory,
+      showCurrentMarket,
+      currentMarketId,
+      viewIsolated,
+      isTablet,
     ]
   );
 
@@ -242,8 +382,8 @@ export const HorizontalPanel = ({ isOpen = false, setIsOpen, handleStartResize }
   );
 
   const tabItems = useMemo(
-    () => [positionTabItem, fillsTabItem, paymentsTabItem],
-    [positionTabItem, fillsTabItem, paymentsTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem]
   );
 
   const slotBottom = {
