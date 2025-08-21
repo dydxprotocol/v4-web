@@ -14,7 +14,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { useAppSelector } from '@/state/appTypes';
 import { getSourceAccount } from '@/state/walletSelectors';
 
-export const EmailSignInSuccessDialog = ({
+export const EmailSignInStatusDialog = ({
   setIsOpen,
 }: {
   setIsOpen: (isOpen: boolean) => void;
@@ -32,25 +32,27 @@ export const EmailSignInSuccessDialog = ({
     }
   }, [isTurnkey, setIsOpen]);
 
+  // TODO(turnkey): Localization - Pending Design
   const title = useMemo(
     () =>
-      emailSignInStatus === 'loading'
-        ? 'Logging in...'
-        : emailSignInStatus === 'error'
-          ? 'Error logging in'
-          : isTurnkey
-            ? `Logged in with ${walletInfo.userEmail}`
-            : 'Logged in',
+      ({
+        loading: 'Logging in...',
+        error: 'Error logging in',
+        success: isTurnkey ? `Logged in with ${walletInfo.userEmail}` : 'Logged in',
+        idle: 'Logging in...',
+      })[emailSignInStatus],
     [emailSignInStatus, isTurnkey, walletInfo]
   );
 
+  // TODO(turnkey): Localization - Pending Design
   const description = useMemo(
     () =>
-      emailSignInStatus === 'loading'
-        ? 'Please wait while we log you in...'
-        : emailSignInStatus === 'error'
-          ? emailSignInError ?? 'An error occurred while logging in. Please try again.'
-          : 'You are now logged in with your email account.',
+      ({
+        loading: 'Please wait while we log you in...',
+        error: emailSignInError ?? 'An error occurred while logging in. Please try again.',
+        success: 'You are now logged in with your email account.',
+        idle: 'Please wait while we log you in...',
+      })[emailSignInStatus],
     [emailSignInStatus, emailSignInError]
   );
 
@@ -60,16 +62,17 @@ export const EmailSignInSuccessDialog = ({
         <Icon tw="size-3 text-color-text-2" iconName={IconName.EmailStroke} />
         <span tw="text-color-text-2 font-medium-medium">{title}</span>
         <p tw="text-color-text-0">{description}</p>
+
         <Button
           tw="mt-1"
           type={ButtonType.Button}
           action={ButtonAction.SimplePrimary}
           size={ButtonSize.Small}
           shape={ButtonShape.Pill}
-          state={{
-            isLoading: emailSignInStatus === 'loading',
-          }}
           onClick={() => setIsOpen(false)}
+          state={{
+            isDisabled: emailSignInStatus === 'loading' || emailSignInStatus === 'idle',
+          }}
         >
           {stringGetter({ key: STRING_KEYS.CONTINUE })}
         </Button>

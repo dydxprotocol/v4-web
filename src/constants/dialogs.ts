@@ -34,7 +34,7 @@ export type ConfirmPendingDepositDialogProps = {
 };
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
-export type EmailSignInSuccessDialogProps = {};
+export type EmailSignInStatusDialogProps = {};
 export type ExchangeOfflineDialogProps = { preventClose?: boolean };
 export type ExternalLinkDialogProps = {
   buttonText?: ReactNode;
@@ -133,7 +133,7 @@ export const DialogTypes = unionize(
     Deposit2: ofType<DepositDialog2Props>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
-    EmailSignInSuccess: ofType<EmailSignInSuccessDialogProps>(),
+    EmailSignInStatus: ofType<EmailSignInStatusDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
     ExternalLink: ofType<ExternalLinkDialogProps>(),
     ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),

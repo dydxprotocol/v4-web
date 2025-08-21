@@ -242,16 +242,9 @@ const useTurnkeyWalletContext = () => {
   const resetAuthIframeClientKey = useCallback(async () => {
     let authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();
     await authIframeClient?.clearEmbeddedKey();
-    authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();
+    authIframeEmbeddedPublicKey = await authIframeClient?.initEmbeddedKey();
     setEmbeddedPublicKey(authIframeEmbeddedPublicKey);
   }, [authIframeClient]);
-
-  const clearTurnkeyState = useCallback(() => {
-    setTurnkeyUser(undefined);
-    setPrimaryTurnkeyWallet(undefined);
-    setTurnkeyWallets([]);
-    setTargetPublicKeys(null);
-  }, []);
 
   const fetchUserFrommAuthIframe = async () => {
     const { organizationId, userId } = turnkeyEmailOnboardingData ?? {};
@@ -381,6 +374,13 @@ const useTurnkeyWalletContext = () => {
 
   const sourceAccount = useAppSelector(getSourceAccount);
   const walletInfo = sourceAccount.walletInfo;
+
+  const clearTurnkeyState = useCallback(() => {
+    setTurnkeyUser(undefined);
+    setPrimaryTurnkeyWallet(undefined);
+    setTurnkeyWallets([]);
+    setTargetPublicKeys(null);
+  }, []);
 
   const endTurnkeySession = useCallback(async () => {
     try {

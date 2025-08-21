@@ -20,7 +20,7 @@ import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDial
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
-import { EmailSignInSuccessDialog } from '@/views/dialogs/EmailSignInSuccessDialog';
+import { EmailSignInStatusDialog } from '@/views/dialogs/EmailSignInStatusDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
@@ -99,7 +99,7 @@ export const DialogManager = React.memo(() => {
       ),
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
-    EmailSignInSuccess: (args) => <EmailSignInSuccessDialog {...args} {...modalProps} />,
+    EmailSignInStatus: (args) => <EmailSignInStatusDialog {...args} {...modalProps} />,
     ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,
     ExternalLink: (args) => <ExternalLinkDialog {...args} {...modalProps} />,
     ExternalNavStride: (args) => <ExternalNavStrideDialog {...args} {...modalProps} />,

@@ -25,6 +25,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { setWalletInfo } from '@/state/wallet';
+import { getSourceAccount } from '@/state/walletSelectors';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -198,12 +199,16 @@ const useTurnkeyAuthContext = () => {
     });
   };
 
-  const [emailSignInStatus, setEmailSignInStatus] = useState<'loading' | 'success' | 'error'>();
+  const [emailSignInStatus, setEmailSignInStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
   const [emailSignInError, setEmailSignInError] = useState<string>();
 
   const handleEmailMagicLink = useCallback(
     async ({ token }: { token: string }) => {
       try {
+        setEmailSignInStatus('loading');
+
         if (authIframeClient == null) {
           throw new Error('cannot initialize auth without an iframe');
         }
@@ -212,8 +217,24 @@ const useTurnkeyAuthContext = () => {
         await onboardDydxFromAuthIframe({ setWalletFromSignature });
         setEmailSignInStatus('success');
       } catch (error) {
-        logBonsaiError('handleEmailMagicLink', 'error', { error });
-        setEmailSignInError(error instanceof Error ? error.message : 'An unknown error occurred');
+        let errorMessage: string | undefined;
+
+        if (error instanceof Error) {
+          if (
+            error.message.includes('unable to decrypt bundle using embedded key') ||
+            error.message.includes('Organization ID is not available')
+          ) {
+            errorMessage =
+              'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';
+          } else {
+            logBonsaiError('handleEmailMagicLink', 'error', { error });
+            errorMessage = error.message;
+          }
+        } else {
+          logBonsaiError('handleEmailMagicLink', 'error', { error });
+        }
+
+        setEmailSignInError(errorMessage ?? 'An unknown error occurred');
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
@@ -235,18 +256,28 @@ const useTurnkeyAuthContext = () => {
     ]
   );
 
+  const sourceAccount = useAppSelector(getSourceAccount);
+
+  /**
+   * @description Side effect to handle email link containing a token.
+   * Kickstarts the onboarding process by saving the token and opening the EmailSignInStatus Dialog
+   */
   useEffect(() => {
     const turnkeyOnboardingToken = searchParams.get('token');
-    if (turnkeyOnboardingToken) {
-      setEmailToken(turnkeyOnboardingToken);
-      setEmailSignInStatus('loading');
-      dispatch(openDialog(DialogTypes.EmailSignInSuccess({})));
-    }
-  }, [searchParams, dispatch]);
+    const hasEncryptedSignature = sourceAccount.encryptedSignature != null;
 
+    if (turnkeyOnboardingToken && !hasEncryptedSignature) {
+      setEmailToken(turnkeyOnboardingToken);
+      dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
+    }
+  }, [searchParams, dispatch, sourceAccount]);
+
+  /**
+   * @description Side effect triggered after the email token is saved to state.
+   * Triggers the onboarding process that manages the sign in status and attempts to sign the onboarding message.
+   */
   useEffect(() => {
     if (emailToken && targetPublicKeys?.publicKey && authIframeClient) {
-      logTurnkey('handleEmailMagicLink', 'attempting to onboard', emailToken);
       handleEmailMagicLink({ token: emailToken });
     }
   }, [
@@ -264,7 +295,7 @@ const useTurnkeyAuthContext = () => {
 
     const targetPublicKey = embeddedPublicKey;
 
-    if (targetPublicKey == null) {
+    if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
       throw new Error('No target public key found');
     }
 
