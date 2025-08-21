@@ -241,7 +241,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
             if (
               type == null ||
               type === SubaccountFillType.LIMIT ||
-              type === SubaccountFillType.MARKET
+              type === SubaccountFillType.MARKET ||
+              type === SubaccountFillType.TWAP
             ) {
               return;
             }
