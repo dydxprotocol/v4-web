@@ -74,24 +74,24 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
         },
-        {
-          value: 'VAULT',
-          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
-          href: AppRoute.Vault,
-        },
-        affiliatesEnabled && {
-          value: 'REFERRALS',
-          label: stringGetter({ key: STRING_KEYS.REFERRALS }),
-          href: AppRoute.Referrals,
-        },
-        {
-          value: chainTokenLabel,
-          label: chainTokenLabel,
-          href: `/${chainTokenLabel}`,
-          slotAfter: !hasSeenLaunchIncentives && (
-            <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
-          ),
-        },
+        /* {
+         *   value: 'VAULT',
+         *   label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
+         *   href: AppRoute.Vault,
+         * }, */
+        /* affiliatesEnabled && {
+         *   value: 'REFERRALS',
+         *   label: stringGetter({ key: STRING_KEYS.REFERRALS }),
+         *   href: AppRoute.Referrals,
+         * }, */
+        /* {
+         *   value: chainTokenLabel,
+         *   label: chainTokenLabel,
+         *   href: `/${chainTokenLabel}`,
+         *   slotAfter: !hasSeenLaunchIncentives && (
+         *     <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
+         *   ),
+         * }, */
         {
           value: 'MORE',
           label: stringGetter({ key: STRING_KEYS.MORE }),
@@ -113,8 +113,10 @@ export const HeaderDesktop = () => {
             {
               value: 'MINTSCAN',
               slotBefore: <Icon iconName={IconName.Mintscan} />,
-              label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
-              href: mintscanBase,
+              /* label: stringGetter({ key: STRING_KEYS.MINTSCAN }), */
+              /* href: mintscanBase, */
+              label: 'Block Explorer',
+              href: "https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions",
             },
             {
               value: 'COMMUNITY',
