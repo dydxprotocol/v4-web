@@ -63,7 +63,7 @@ const dataSource = new DataSourceBuilder()
     // Eequest items via `.addXxx()` methods that accept item selection criteria
     // & allow to request related items.
     .addReceipt({
-        type: ['LOG_DATA', 'MINT', 'TRANSFER', 'TRANSFER_OUT'],
+        // type: ['LOG_DATA', 'MINT', 'TRANSFER', 'TRANSFER_OUT'],
         contract: [CONTRACTS.VAULT.ADDRESS.MAINNET],
         transaction: true,
     })
