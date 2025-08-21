@@ -352,9 +352,9 @@ export const MarketsDropdown = memo(
                   <div tw="flex items-center gap-0.25">
                     <$AssetIconWithStar>
                       {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
-                      <$AssetIcon logoUrl={logoUrl} tw="mr-0.25" />
+                      <$AssetIcon logoUrl="https://verified-assets.fuel.network/images/fuel.svg" tw="mr-0.25" />
                     </$AssetIconWithStar>
-                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                    <h2 tw="text-color-text-2 font-medium-medium">MIRG.BA-USD</h2>
                   </div>
                 )}
               </div>
