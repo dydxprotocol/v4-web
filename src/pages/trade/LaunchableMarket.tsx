@@ -42,7 +42,7 @@ const LaunchableMarket = () => {
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
 
-  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(false);
+  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
   const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
   const dispatch = useAppDispatch();
   const setPanelHeight = useCallback(

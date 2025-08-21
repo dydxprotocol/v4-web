@@ -62,7 +62,7 @@ type ElementProps = {
   handleStartResize?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-export const HorizontalPanel = ({ isOpen = false, setIsOpen, handleStartResize }: ElementProps) => {
+export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
