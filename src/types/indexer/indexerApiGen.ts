@@ -204,6 +204,25 @@ export interface IndexerAffiliateTotalVolumeResponse {
 /**
  *
  * @export
+ * @interface AffiliatesReferralCodeBody
+ */
+export interface IndexerAffiliatesReferralCodeBody {
+  /**
+   *
+   * @type {string}
+   * @memberof AffiliatesReferralCodeBody
+   */
+  newCode: string;
+  /**
+   *
+   * @type {string}
+   * @memberof AffiliatesReferralCodeBody
+   */
+  address: string;
+}
+/**
+ *
+ * @export
  * @interface AssetPositionResponse
  */
 export interface IndexerAssetPositionResponse {
@@ -449,6 +468,19 @@ export interface IndexerComplianceV2Response {
 /**
  *
  * @export
+ * @interface CreateReferralCodeResponse
+ */
+export interface IndexerCreateReferralCodeResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateReferralCodeResponse
+   */
+  referralCode: string;
+}
+/**
+ *
+ * @export
  * @interface FillResponse
  */
 export interface IndexerFillResponse {
@@ -573,6 +605,30 @@ export interface IndexerFillResponseObject {
    * @memberof FillResponseObject
    */
   subaccountNumber: number;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  builderFee?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  builderAddress?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  orderRouterAddress?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof FillResponseObject
+   */
+  orderRouterFee?: string | null;
 }
 /**
  *
@@ -585,6 +641,7 @@ export enum IndexerFillType {
   LIQUIDATION = 'LIQUIDATION',
   DELEVERAGED = 'DELEVERAGED',
   OFFSETTING = 'OFFSETTING',
+  TWAPSUBORDER = 'TWAP_SUBORDER',
 }
 /**
  *
@@ -683,6 +740,12 @@ export interface IndexerFundingPaymentResponseObject {
    * @memberof FundingPaymentResponseObject
    */
   subaccountNumber: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FundingPaymentResponseObject
+   */
+  fundingIndex: string;
 }
 /**
  *
@@ -1031,6 +1094,42 @@ export interface IndexerOrderResponseObject {
   triggerPrice?: string | null;
   /**
    *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  builderAddress?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  feePpm?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  orderRouterAddress?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  duration?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  interval?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof OrderResponseObject
+   */
+  priceTolerance?: string | null;
+  /**
+   *
    * @type {IndexerAPITimeInForce}
    * @memberof OrderResponseObject
    */
@@ -1092,6 +1191,7 @@ export enum IndexerOrderStatus {
   CANCELED = 'CANCELED',
   BESTEFFORTCANCELED = 'BEST_EFFORT_CANCELED',
   UNTRIGGERED = 'UNTRIGGERED',
+  ERROR = 'ERROR',
 }
 /**
  *
@@ -1106,6 +1206,8 @@ export enum IndexerOrderType {
   TRAILINGSTOP = 'TRAILING_STOP',
   TAKEPROFIT = 'TAKE_PROFIT',
   TAKEPROFITMARKET = 'TAKE_PROFIT_MARKET',
+  TWAP = 'TWAP',
+  TWAPSUBORDER = 'TWAP_SUBORDER',
 }
 /**
  *
@@ -1752,6 +1854,7 @@ export enum IndexerTradeType {
   LIMIT = 'LIMIT',
   LIQUIDATED = 'LIQUIDATED',
   DELEVERAGED = 'DELEVERAGED',
+  TWAPSUBORDER = 'TWAP_SUBORDER',
 }
 /**
  *

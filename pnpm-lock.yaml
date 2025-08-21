@@ -33,8 +33,8 @@ dependencies:
     specifier: 2.1.1
     version: 2.1.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.311
-    version: 1.1.311
+    specifier: 1.1.312
+    version: 1.1.312
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1499,8 +1499,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.311:
-    resolution: {integrity: sha512-KI/wbc3LgXeIqWn4P7nB/SpgO7UyJwBLDoc7LuJazTVmBba5wrbItvaaR685D3Ds3bmmyuRSb3wn7ZLuNouOoQ==}
+  /@dydxprotocol/v4-localization@1.1.312:
+    resolution: {integrity: sha512-jg/mLRjawRzBD9VLOlZTDUgdRJBmIBLkps42E9uIfxW0ZrSt9mEpC1iX1v/qkkSr79dbwqNZsIBYG8gKMP5dyA==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -20578,7 +20578,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.4
       mime: 3.0.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       pathe: 1.1.2
     dev: false
 
@@ -20734,7 +20734,7 @@ packages:
       listhen: 1.5.5
       lru-cache: 10.2.2
       mri: 1.2.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       ofetch: 1.3.4
       ufo: 1.5.4
     transitivePeerDependencies:
