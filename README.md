@@ -10,7 +10,7 @@
 
 ## Prerequisites
 
-- Node.js version 18 and `pnpm` installed on your system
+- Node.js v18, `pnpm`, and docker installed on your system
 - Wallet Connect account
 
 For deploying with Vercel, create an account with [Vercel](https://vercel.com/signup) if you don't have one already.
@@ -26,27 +26,26 @@ Alternatively, follow the [IPFS Kubo installation guide](https://docs.ipfs.tech
 
 ## Part 1: Setting up your local environment
 
-### 1. Clone the repo
-
-Clone the repository and navigate to its directory:
+### 1. Clone repo & navigate to directory
 
 ```bash
 git clone https://github.com/dydxprotocol/v4-web.git
 cd v4-web
 ```
 
-### 2. Install pnpm and dependencies
-
-Install pnpm and the project dependencies:
+### 2. Install pnpm 
 
 ```bash
-npm i -g pnpm
-pnpm i
+curl -fsSL https://get.pnpm.io/install.sh | sh -
 ```
 
-## Part 2: Running the project locally
+## 3: Run indexer
 
-Run the following command in the project directory to start the development server:
+```bash
+pnpm nx dev indexer
+```
+
+## 3: Run web app
 
 ```bash
 pnpm dev
