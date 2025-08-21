@@ -4,16 +4,16 @@ High-performance derivatives exchange built on the Fuel network. Smart Contracts
 
 ** Contract Addresses
 
-|                |                           Address                                  |
-|----------------+--------------------------------------------------------------------|
-| Vault          | 0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc |
-| VaultPricefeed | 0x3dfcb460ee3cd6dc2ac4be1fbe73c97ce9b4962aa429f4ebdbbfa8dd1d584b78 |
-| RLPManager     | 0x5b210f226d57696d3d0fbf9c85e1232a045d50c12743d1b2cdbab17134eb80a9 |
-| RLPContract    | 0x1d9d3b612524384c98e1cf03a1cda6a3aadb8ac794c9df87fe5ca6ac39ae3bcc |
-| RLP (asset)    | 0x7da3cd371c72dddb5a2ffb133c070272555e6b8b3d23f3b8dc17900cc49c6cea |
-| RUSDContract   | 0x80afa110507a0f1a05fd5c12ebb2f256f33b95cf9ff4d425beb7583234aa785c |
-| RUSD (asset)   | 0x5d996c78c3b54f0c5eb96caa41b995ad7b9d6873acbfa5260883206f74bf912a |
-| ShortsTracker  | 0xa94d01923b60c83430d722dc45ffbd634c57aa79edab554e5f18533f3e9436b6 |
+| Contract       |                                                            Mainnet |                                                            Testnet |
+|----------------+--------------------------------------------------------------------+--------------------------------------------------------------------|
+| Vault          | [[https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/assets][0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc]] | [[https://app-testnet.fuel.network/contract/0x4a0ba139fbea5af20369bd22bc83c5a9f23484193e56124c57e6f9bd1e7605fd/transactions][0x4a0ba139fbea5af20369bd22bc83c5a9f23484193e56124c57e6f9bd1e7605fd]] |
+| VaultPricefeed | 0x3dfcb460ee3cd6dc2ac4be1fbe73c97ce9b4962aa429f4ebdbbfa8dd1d584b78 | 0xcb4b0de860b5a51eb55b45437cfda46390ab335b9aa4af8da8e6ed2a69c54931 |
+| RLPManager     | 0x5b210f226d57696d3d0fbf9c85e1232a045d50c12743d1b2cdbab17134eb80a9 | 0xb2b80579cfa76582b9b013111dd2f2f7da9e2815c007e06a3a7bf35c6adaf838 |
+| RLPContract    | 0x1d9d3b612524384c98e1cf03a1cda6a3aadb8ac794c9df87fe5ca6ac39ae3bcc | 0xa65388b2951fe0aa973328985a382fe5038b118fe96174e5e62abc2483c90717 |
+| RLP (asset)    | 0x7da3cd371c72dddb5a2ffb133c070272555e6b8b3d23f3b8dc17900cc49c6cea | 0x38f8890d3ef665584697665eb08a529ca89bd8db3df028f611009926f629811b |
+| RUSDContract   | 0x80afa110507a0f1a05fd5c12ebb2f256f33b95cf9ff4d425beb7583234aa785c | 0xb299577df88db2a22e1912eb170a6a4f52d84316fa4a7cf369f852c9eee22424 |
+| RUSD (asset)   | 0x5d996c78c3b54f0c5eb96caa41b995ad7b9d6873acbfa5260883206f74bf912a | 0xccd9da5c14b2542f2e8f415522dafd3041750c8ce811cb2e0a09e98477495d78 |
+| ShortsTracker  | 0xa94d01923b60c83430d722dc45ffbd634c57aa79edab554e5f18533f3e9436b6 | 0x1e5cd447e88eee2721f7f036f9373480b1b61d43b947441e7af75e57d3ead1a4 |
 
 
 ** Overview
@@ -37,16 +37,17 @@ The Vault maintains solvency by ensuring the value of all assets in the pool exc
 
 2. RLP
 
-Liquidity provider asset on the platform, and can be minted using any of the approved assets within the =Vault= pool such as =$ETH=, =$USDC=, and =$BTC=.
-
-The price of RLP is pegged to the worth of all underlying assets within the =Vault=, factoring in profits and losses of all active positions.
+- Liquidity provider asset on the platform
+- Can be minted using any of the approved assets within the =Vault= pool such as =$ETH=, =$USDC=, and =$BTC=
+- The price of RLP is pegged to the worth of all underlying assets within the =Vault=, factoring in profits and losses of all active positions
 
 3. Pricefeeds
 
 =VaultPriceFeed= handles querying and updating of prices from the Pyth network for all assets within the =Vault= pool.
-
-
+       
 ** Testing
+
+TODO: update this section, it's out-of-date
 
 #+begin_src shell
 pnpm i;
