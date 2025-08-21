@@ -1,0 +1,60 @@
+{
+  "name": "indexer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/indexer",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project web --web",
+  "targets": {
+    "dev": {
+      "dependsOn": [
+        "up",
+        "build"
+      ],
+      "command": "node --require=dotenv/config lib/main.js",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "deploy": {
+      "command": "pnpm i; sqd deploy -m squid.mainnet.yaml -o charthouse-labs --allow-update",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "deploy:reset": {
+      "dependsOn": [
+        "build",
+        "codegen"
+      ],
+      "command": "pnpm i; sqd deploy -m squid.mainnet.yaml -o charthouse-labs --allow-update --hard-reset",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "build": {
+      "command": "tsc",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "up": {
+      "command": "docker compose up -d",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "codegen": {
+      "command": "squid-typeorm-codegen",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
+    "log": {
+      "command": "docker exec $(basename '$(pwd)')-db-1 psql -U postgres -c 'SELECT id, logs_count, found_at FROM contract ORDER BY logs_count desc LIMIT 10'",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    }
+  }
+}

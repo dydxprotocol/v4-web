@@ -12,18 +12,18 @@ const LOCAL_NODE_URL = 'http://localhost:4000/v1/graphql'
 const CONTRACTS = {
     VAULT: {
         ADDRESS: {
+            MAINNET: "0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc",
             TESTNET: "0x4a0ba139fbea5af20369bd22bc83c5a9f23484193e56124c57e6f9bd1e7605fd",
-            MAINNET: "0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc"
         }
     }
 }
 
 const dataSource = new DataSourceBuilder()
-    // .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
-    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_MAINNET)
+    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
+    // .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_MAINNET)
     .setGraphql({
-        url: MAINNET_URL,
-        // url: TESTNET_URL,
+        // url: MAINNET_URL,
+        url: TESTNET_URL,
         // url: LOCAL_NODE_URL,
         strideConcurrency: 3,
         strideSize: 30
@@ -63,8 +63,8 @@ const dataSource = new DataSourceBuilder()
     // Eequest items via `.addXxx()` methods that accept item selection criteria
     // & allow to request related items.
     .addReceipt({
-        type: ['LOG_DATA', 'MINT', 'TRANSFER', 'TRANSFER_OUT'],
-        contract: [CONTRACTS.VAULT.ADDRESS.MAINNET],
+        type: ['LOG_DATA', 'MINT'],
+        // contract: [CONTRACTS.VAULT.ADDRESS.MAINNET],
         transaction: true,
     })
     .build()
@@ -91,12 +91,10 @@ const dataSource = new DataSourceBuilder()
 //  3. Data handler, user defined function which accepts consecutive block batches, storage API and is responsible for entire data transformation.
 //  4. Processor, connects and executes above three components.
 
-// Below we create a `TypeormDatabase`.
+// `TypeormDatabase` provides restricted subset of [TypeORM EntityManager API](https://typeorm.io/working-with-entity-manager)
+// as a persistent storage interface & works with any Postgres-compatible database.
 //
-// It provides restricted subset of [TypeORM EntityManager API](https://typeorm.io/working-with-entity-manager)
-// as a persistent storage interface and works with any Postgres-compatible database.
-//
-// Note, that we don't pass any database connection parameters.
+// Note, we don't pass any database connection parameters.
 // That's because `TypeormDatabase` expects a certain project structure
 // and environment variables to pick everything it needs by convention.
 // Companion `@subsquid/typeorm-migration` tool works in the same way.

@@ -43,3 +43,10 @@ public/datafeed
 local-abacus-hash
 local-client-js-hash
 public/._tradingview
+
+
+
+.nx/cache
+.nx/workspace-data
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md

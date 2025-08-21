@@ -1,3 +1,8 @@
+# scalar BigInt
+# scalar BigDecimal
+# scalar DateTime
+# scalar JSON
+
 enum PositionSide {
   LONG
   SHORT
@@ -55,17 +60,17 @@ enum CandleResolution {
   D1
 }
 
-# type Address {
-#   id: ID!
-#   address: String
-#   metadata: JSON
-#   subaccount: Subaccount
-# }
+type Address {
+  id: ID!
+  address: String
+  metadata: JSON
+  subaccount: Subaccount
+}
 
-# type ClobPair {
-#   id: String!
-#   market: Market
-# }
+type ClobPair {
+  id: String!
+  market: Market
+}
 
 # type Account {
 #   id: ID!
@@ -225,10 +230,10 @@ enum CandleResolution {
 #   timestamp: BigInt!
 # }
 
-# type Subaccount {
-#   id: ID!
-#   account: Account!
-# }
+type Subaccount {
+  id: ID!
+  account: Account!
+}
 
 # type Query {
 #   addresses(first: Int, after: String): [Address!]!

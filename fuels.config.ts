@@ -2,12 +2,12 @@ import { createConfig } from "fuels"
 
 export default createConfig({
     workspace: "./",
-    output: "./types",
+    output: "./apps/indexer/types",
     snapshotDir: './chain-config',
     forcBuildFlags: [
         "--release",
         "--output-directory",
-        "indexer/abi"
+        "apps/indexer/abi"
     ],
     fuelCorePort: 4000,
     autoStartFuelCore: true,
