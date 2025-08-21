@@ -38,8 +38,8 @@ export const TimeoutButton = ({
 
   return (
     <Button
-      {...otherProps}
       action={ButtonAction.Primary}
+      {...otherProps}
       state={{
         isDisabled:
           secondsLeft > 0 ||

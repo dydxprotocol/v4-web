@@ -47,10 +47,39 @@ export type GoogleIdTokenPayload = {
   email_verified?: boolean;
 };
 
-export type SignInBody = {
-  signinMethod: 'social' | 'passkey' | 'email';
-  targetPublicKey: string;
-  provider: 'google' | 'apple';
-  oidcToken: string;
-  userEmail?: string;
+export type SignInBody =
+  | {
+      signinMethod: 'social' | 'passkey';
+      targetPublicKey: string;
+      provider: 'google' | 'apple';
+      oidcToken: string;
+      userEmail?: string;
+    }
+  | {
+      signinMethod: 'email';
+      targetPublicKey: string;
+      userEmail: string;
+      magicLink: string;
+    };
+
+export type TurnkeyEmailOnboardingData = {
+  salt: string;
+  organizationId: string;
+  userId: string;
+  userEmail: string;
+  dydxAddress?: string;
+};
+
+export type TurnkeyOAuthResponse = {
+  session?: string;
+  salt?: string;
+  dydxAddress?: string;
+};
+
+export type TurnkeyEmailResponse = {
+  apiKeyId?: string;
+  userId?: string;
+  organizationId?: string;
+  salt?: string;
+  dydxAddress?: string;
 };

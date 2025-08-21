@@ -4,19 +4,23 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
-import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { TimeoutButton } from '@/components/TimeoutButton';
 
 export const CheckEmailDialog = ({
+  userEmail,
   onClose,
   setIsOpen,
 }: {
+  userEmail: string;
   onClose: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
   const stringGetter = useStringGetter();
+  const { signInWithOtp } = useTurnkeyAuth();
 
   const modifiedSetIsOpen = useCallback(
     (isOpen: boolean) => {
@@ -37,16 +41,18 @@ export const CheckEmailDialog = ({
           {stringGetter({ key: STRING_KEYS.CHECK_EMAIL_TITLE })}
         </span>
         <p tw="text-color-text-0">{stringGetter({ key: STRING_KEYS.CHECK_EMAIL_DESCRIPTION })}</p>
-        <Button
+        <TimeoutButton
+          timeoutInSeconds={15}
           tw="mt-1"
           type={ButtonType.Button}
           action={ButtonAction.SimplePrimary}
           size={ButtonSize.Small}
           shape={ButtonShape.Pill}
+          onClick={() => signInWithOtp({ userEmail })}
         >
           <Icon iconName={IconName.Resend} />
           {stringGetter({ key: STRING_KEYS.RESEND })}
-        </Button>
+        </TimeoutButton>
       </div>
     </Dialog>
   );

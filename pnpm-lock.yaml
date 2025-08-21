@@ -257,6 +257,9 @@ dependencies:
   react:
     specifier: ^18.2.0
     version: 18.2.0
+  react-apple-login:
+    specifier: ^1.1.6
+    version: 1.1.6(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
   react-aria:
     specifier: ^3.25.0
     version: 3.25.0(react-dom@18.2.0)(react@18.2.0)
@@ -4667,7 +4670,7 @@ packages:
     dependencies:
       '@privy-io/api-base': 1.2.0
       ethers: 5.7.2
-      libphonenumber-js: 1.10.59
+      libphonenumber-js: 1.12.10
       zod: 3.23.8
     transitivePeerDependencies:
       - bufferutil

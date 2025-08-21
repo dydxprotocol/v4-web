@@ -100,11 +100,14 @@ export const OnboardingDialog = ({
     );
   };
 
-  const onSubmitEmail = () => {
+  const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
     setIsOpen(false);
     dispatch(
       openDialog(
-        DialogTypes.CheckEmail({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
+        DialogTypes.CheckEmail({
+          userEmail,
+          onClose: () => dispatch(openDialog(DialogTypes.Onboarding())),
+        })
       )
     );
   };
@@ -136,7 +139,9 @@ export const OnboardingDialog = ({
                 <SignIn
                   onDisplayChooseWallet={onDisplayChooseWallet}
                   onSignInWithPasskey={onSignInWithPasskey}
-                  onSubmitEmail={onSubmitEmail}
+                  onSubmitEmail={({ userEmail }: { userEmail: string }) =>
+                    onSubmitEmail({ userEmail })
+                  }
                 />
               </$Content>
             ),

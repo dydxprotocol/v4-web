@@ -1,17 +1,29 @@
-import { createContext, useContext } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
+import { useSearchParams } from 'react-router-dom';
 
+import { DialogTypes } from '@/constants/dialogs';
+import { LocalStorageKey } from '@/constants/localStorage';
 import { ConnectorType, WalletType } from '@/constants/wallets';
-import { GoogleIdTokenPayload, LoginMethod, SignInBody } from '@/types/turnkey';
+import {
+  GoogleIdTokenPayload,
+  LoginMethod,
+  SignInBody,
+  TurnkeyEmailOnboardingData,
+  TurnkeyEmailResponse,
+  TurnkeyOAuthResponse,
+} from '@/types/turnkey';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { setWalletInfo } from '@/state/wallet';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
@@ -31,7 +43,9 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
   const indexerUrl = useAppSelector(selectIndexerUrl);
-  const { indexedDbClient } = useTurnkey();
+  const { indexedDbClient, authIframeClient } = useTurnkey();
+  const [emailToken, setEmailToken] = useState<string>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { selectWallet } = useAccounts();
 
@@ -75,7 +89,13 @@ const useTurnkeyAuthContext = () => {
         case LoginMethod.OAuth:
           handleOauthResponse({ response });
           break;
-        case LoginMethod.Email: // TODO: handle email response
+        case LoginMethod.Email:
+          if (!userEmail) {
+            throw new Error('No userEmail provided');
+          }
+
+          handleEmailResponse({ userEmail, response });
+          break;
         case LoginMethod.Passkey: // TODO: handle passkey response
         default:
           throw new Error('Current unsupported login method');
@@ -88,7 +108,8 @@ const useTurnkeyAuthContext = () => {
     },
   });
 
-  const { onboardDydxFromTurnkey, targetPublicKeys } = useTurnkeyWallet();
+  const { onboardDydxFromTurnkey, onboardDydxFromAuthIframe, embeddedPublicKey, targetPublicKeys } =
+    useTurnkeyWallet();
 
   const signInWithOauth = async ({
     oidcToken,
@@ -128,15 +149,7 @@ const useTurnkeyAuthContext = () => {
 
   const { setWalletFromSignature } = useAccounts();
 
-  const handleOauthResponse = async ({
-    response,
-  }: {
-    response: {
-      session?: string;
-      salt?: string;
-      dydxAddress?: string;
-    };
-  }) => {
+  const handleOauthResponse = async ({ response }: { response: TurnkeyOAuthResponse }) => {
     const { session, salt } = response;
     if (session == null) {
       throw new Error('useTurnkeyAuth: No session found');
@@ -148,11 +161,140 @@ const useTurnkeyAuthContext = () => {
     await onboardDydxFromTurnkey({ salt, setWalletFromSignature });
   };
 
+  const [, setTurnkeyEmailOnboardingData] = useLocalStorage<TurnkeyEmailOnboardingData | undefined>(
+    {
+      key: LocalStorageKey.TurnkeyEmailOnboardingData,
+      defaultValue: undefined,
+    }
+  );
+
+  const handleEmailResponse = async ({
+    response,
+    userEmail,
+  }: {
+    response: TurnkeyEmailResponse;
+    userEmail: string;
+  }) => {
+    const { salt, organizationId, userId, dydxAddress } = response;
+
+    if (!salt) {
+      throw new Error('No salt provided in response');
+    }
+    if (!organizationId) {
+      throw new Error('No organizationId provided in response');
+    }
+    if (!userId) {
+      throw new Error('No userId provided in response');
+    }
+
+    // Store the Turnkey email onboarding data in local storage.
+    // This data will be used after the user clicks the Magic link in their email.
+    setTurnkeyEmailOnboardingData({
+      salt,
+      organizationId,
+      userId,
+      userEmail,
+      dydxAddress,
+    });
+  };
+
+  const [emailSignInStatus, setEmailSignInStatus] = useState<'loading' | 'success' | 'error'>();
+  const [emailSignInError, setEmailSignInError] = useState<string>();
+
+  const handleEmailMagicLink = useCallback(
+    async ({ token }: { token: string }) => {
+      try {
+        if (authIframeClient == null) {
+          throw new Error('cannot initialize auth without an iframe');
+        }
+
+        await authIframeClient.injectCredentialBundle(token);
+        await onboardDydxFromAuthIframe({ setWalletFromSignature });
+        setEmailSignInStatus('success');
+      } catch (error) {
+        logBonsaiError('handleEmailMagicLink', 'error', { error });
+        setEmailSignInError(error instanceof Error ? error.message : 'An unknown error occurred');
+        setEmailSignInStatus('error');
+      } finally {
+        // Clear token from state after it has been consumed
+        setEmailToken(undefined);
+        // Remove the token from the search params after it has been saved to state
+        searchParams.delete('token');
+        setSearchParams(searchParams);
+        // Clear email sign in data
+        setTurnkeyEmailOnboardingData(undefined);
+      }
+    },
+    [
+      authIframeClient,
+      onboardDydxFromAuthIframe,
+      setWalletFromSignature,
+      searchParams,
+      setSearchParams,
+      setTurnkeyEmailOnboardingData,
+    ]
+  );
+
+  useEffect(() => {
+    const turnkeyOnboardingToken = searchParams.get('token');
+    if (turnkeyOnboardingToken) {
+      setEmailToken(turnkeyOnboardingToken);
+      setEmailSignInStatus('loading');
+      dispatch(openDialog(DialogTypes.EmailSignInSuccess({})));
+    }
+  }, [searchParams, dispatch]);
+
+  useEffect(() => {
+    if (emailToken && targetPublicKeys?.publicKey && authIframeClient) {
+      logTurnkey('handleEmailMagicLink', 'attempting to onboard', emailToken);
+      handleEmailMagicLink({ token: emailToken });
+    }
+  }, [
+    emailToken,
+    targetPublicKeys?.publicKey,
+    authIframeClient,
+    handleEmailMagicLink,
+    setSearchParams,
+  ]);
+
+  const signInWithOtp = async ({ userEmail }: { userEmail: string }) => {
+    if (authIframeClient == null) {
+      throw new Error('cannot initialize auth without an iframe');
+    }
+
+    const targetPublicKey = embeddedPublicKey;
+
+    if (targetPublicKey == null) {
+      throw new Error('No target public key found');
+    }
+
+    const inputBody: SignInBody = {
+      signinMethod: 'email',
+      userEmail,
+      targetPublicKey,
+      magicLink: `${globalThis.location.origin}/markets/?token`,
+    };
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+
+    sendSignInRequest({
+      headers,
+      body: JSON.stringify(inputBody),
+      loginMethod: LoginMethod.Email,
+      userEmail,
+    });
+  };
+
   return {
     targetPublicKeys,
-
-    isLoading: status === 'pending',
-    isError: status === 'error',
+    emailSignInError,
+    emailSignInStatus,
+    isLoading: status === 'pending' || emailSignInStatus === 'loading',
+    isError: status === 'error' || emailSignInStatus === 'error',
     signInWithOauth,
+    signInWithOtp,
   };
 };

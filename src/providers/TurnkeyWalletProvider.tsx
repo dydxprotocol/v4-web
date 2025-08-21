@@ -7,18 +7,27 @@ import { AES } from 'crypto-js';
 import { hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { getSignTypedDataForTurnkey } from '@/constants/wallets';
-import { HashFunction, PayloadEncoding, TurnkeyWallet, UserSession } from '@/types/turnkey';
+import { ConnectorType, getSignTypedDataForTurnkey } from '@/constants/wallets';
+import {
+  HashFunction,
+  LoginMethod,
+  PayloadEncoding,
+  TurnkeyEmailOnboardingData,
+  TurnkeyWallet,
+  UserSession,
+} from '@/types/turnkey';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSavedEncryptedSignature } from '@/state/wallet';
+import { getSourceAccount } from '@/state/walletSelectors';
 
 import {
   getWalletsWithAccounts,
-  getWalletsWithAccountsFromIndexedDb,
+  getWalletsWithAccountsFromClient,
+  TURNKEY_ORGANIZATION_ID,
 } from '@/lib/turnkey/turnkeyUtils';
 
 const TurnkeyWalletContext = createContext<ReturnType<typeof useTurnkeyWalletContext> | undefined>(
@@ -35,8 +44,7 @@ export const useTurnkeyWallet = () => useContext(TurnkeyWalletContext)!;
 
 const useTurnkeyWalletContext = () => {
   const dispatch = useAppDispatch();
-  const { turnkey, indexedDbClient } = useTurnkey();
-  const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
+  const { turnkey, indexedDbClient, authIframeClient } = useTurnkey();
   const [preferredWallet, setPreferredWallet] = useLocalStorage<{
     userId: string;
     walletId: string;
@@ -45,18 +53,19 @@ const useTurnkeyWalletContext = () => {
     defaultValue: null,
   });
 
+  const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
   const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>([]);
   const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet>();
+
+  /* ----------------------------- IndexedDbClient ----------------------------- */
+
   const [targetPublicKeys, setTargetPublicKeys] = useState<{
     publicKey: string;
     publicKeyCompressed: string;
   } | null>(null);
 
   const initClient = useCallback(async () => {
-    logTurnkey('useTurnkeyWallet', 'initClient');
-
     if (indexedDbClient == null) {
-      logTurnkey('useTurnkeyWallet', 'initClient', 'no indexedDbClient');
       return;
     }
 
@@ -74,7 +83,7 @@ const useTurnkeyWalletContext = () => {
 
     const publicKey = toHex(
       uncompressRawPublicKey(new Uint8Array(Buffer.from(publicKeyCompressed, 'hex')))
-    ).replace('0x', '');
+    );
 
     setTargetPublicKeys({ publicKey, publicKeyCompressed });
   }, [indexedDbClient]);
@@ -82,13 +91,6 @@ const useTurnkeyWalletContext = () => {
   useEffect(() => {
     initClient();
   }, [initClient]);
-
-  const clearTurnkeyState = useCallback(() => {
-    setTurnkeyUser(undefined);
-    setPrimaryTurnkeyWallet(undefined);
-    setTurnkeyWallets([]);
-    setTargetPublicKeys(null);
-  }, []);
 
   const fetchUser = async (): Promise<UserSession | undefined> => {
     if (turnkey) {
@@ -131,7 +133,7 @@ const useTurnkeyWalletContext = () => {
     }
 
     if (indexedDbClient) {
-      const wallets = await getWalletsWithAccountsFromIndexedDb(
+      const wallets = await getWalletsWithAccountsFromClient(
         indexedDbClient,
         user.organization.organizationId
       );
@@ -181,34 +183,6 @@ const useTurnkeyWalletContext = () => {
     [selectedDydxChainId]
   );
 
-  const decodeSessionJwt = useCallback((token: string) => {
-    const [, payload] = token.split('.');
-    if (!payload) {
-      throw new Error('Invalid JWT: Missing payload');
-    }
-
-    const decoded = JSON.parse(atob(payload));
-    const {
-      exp,
-      public_key: publicKey,
-      session_type: sessionType,
-      user_id: userId,
-      organization_id: organizationId,
-    } = decoded;
-
-    if (!exp || !publicKey || !sessionType || !userId || !organizationId) {
-      throw new Error('JWT payload missing required fields');
-    }
-
-    return {
-      sessionType,
-      userId,
-      organizationId,
-      expiry: exp,
-      publicKey,
-    };
-  }, []);
-
   const onboardDydxFromTurnkey = async ({
     salt,
     setWalletFromSignature,
@@ -248,27 +222,209 @@ const useTurnkeyWalletContext = () => {
     await setWalletFromSignature(signature);
   };
 
-  const endTurnkeySession = async () => {
+  /* ----------------------------- AuthIframeClient ----------------------------- */
+
+  const [embeddedPublicKey, setEmbeddedPublicKey] = useState<string | null>();
+  const [turnkeyEmailOnboardingData] = useLocalStorage<TurnkeyEmailOnboardingData | undefined>({
+    key: LocalStorageKey.TurnkeyEmailOnboardingData,
+    defaultValue: undefined,
+  });
+
+  const initAuthIframeClient = useCallback(async () => {
+    const authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();
+    setEmbeddedPublicKey(authIframeEmbeddedPublicKey);
+  }, [authIframeClient]);
+
+  useEffect(() => {
+    initAuthIframeClient();
+  }, [initAuthIframeClient]);
+
+  const resetAuthIframeClientKey = useCallback(async () => {
+    let authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();
+    await authIframeClient?.clearEmbeddedKey();
+    authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();
+    setEmbeddedPublicKey(authIframeEmbeddedPublicKey);
+  }, [authIframeClient]);
+
+  const clearTurnkeyState = useCallback(() => {
+    setTurnkeyUser(undefined);
+    setPrimaryTurnkeyWallet(undefined);
+    setTurnkeyWallets([]);
+    setTargetPublicKeys(null);
+  }, []);
+
+  const fetchUserFrommAuthIframe = async () => {
+    const { organizationId, userId } = turnkeyEmailOnboardingData ?? {};
+
+    if (authIframeClient == null) {
+      throw new Error('AuthIframeClient is not available');
+    }
+
+    if (TURNKEY_ORGANIZATION_ID == null) {
+      throw new Error('Turnkey organization ID is not set');
+    }
+
+    if (!organizationId) {
+      throw new Error('Organization ID is not available');
+    }
+
+    if (!userId) {
+      throw new Error('User ID is not available');
+    }
+
+    const authIframeUser = await authIframeClient.getUser({
+      organizationId,
+      userId,
+    });
+
+    const userToSet: UserSession = {
+      id: authIframeUser.user.userId,
+      name: authIframeUser.user.userName,
+      email: authIframeUser.user.userEmail ?? '',
+      organization: {
+        organizationId,
+        organizationName: '',
+      },
+    };
+
+    logTurnkey('fetchUserFrommAuthIframe', 'userToSet', userToSet);
+
+    setTurnkeyUser(userToSet);
+
+    return userToSet;
+  };
+
+  const getPrimaryUserWalletsFromAuthIframe = async () => {
+    const user = turnkeyUser ?? (await fetchUserFrommAuthIframe());
+
+    logTurnkey('getPrimaryUserWalletsFromAuthIframe', 'user', user);
+
+    if (!user.organization.organizationId) {
+      return null;
+    }
+
+    if (authIframeClient) {
+      const wallets = await getWalletsWithAccountsFromClient(
+        authIframeClient,
+        user.organization.organizationId
+      );
+
+      if (wallets.length > 0) {
+        let selectedWallet: TurnkeyWallet = wallets[0]!;
+        // If the user has a preferred wallet, select it
+        if (preferredWallet != null) {
+          const wallet = wallets.find(
+            (userWallet) =>
+              userWallet.walletId === preferredWallet.walletId && user.id === preferredWallet.userId
+          );
+
+          // Preferred wallet is found select it as the current wallet
+          // otherwise select the first wallet in the list of wallets
+          if (wallet) {
+            selectedWallet = wallet;
+          }
+        }
+
+        setPrimaryTurnkeyWallet(selectedWallet);
+        return selectedWallet;
+      }
+    }
+
+    return null;
+  };
+
+  const onboardDydxFromAuthIframe = async ({
+    setWalletFromSignature,
+  }: {
+    setWalletFromSignature: (signature: string) => Promise<void>;
+  }) => {
+    const selectedTurnkeyWallet =
+      primaryTurnkeyWallet ?? (await getPrimaryUserWalletsFromAuthIframe());
+
+    if (selectedTurnkeyWallet == null || selectedTurnkeyWallet.accounts[0] == null) {
+      throw new Error('Selected turnkey wallet is not available');
+    }
+
+    if (authIframeClient == null) {
+      throw new Error('AuthIframeClient is not available');
+    }
+
+    const { salt } = turnkeyEmailOnboardingData ?? {};
+
+    if (!salt) {
+      throw new Error('Salt is not available');
+    }
+
+    const typedData = getTypedDataForOnboardingTurnkey(salt);
+    const digest = hashTypedData(typedData);
+
+    const response = await authIframeClient.signRawPayload({
+      signWith: selectedTurnkeyWallet.accounts[0].address,
+      organizationId: selectedTurnkeyWallet.accounts[0].organizationId,
+      payload: digest,
+      encoding: PayloadEncoding.Hexadecimal,
+      hashFunction: HashFunction.NoOp,
+    });
+
+    const signature = `${response.r}${response.s}${response.v}`;
+    const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
+
+    if (staticEncryptionKey) {
+      const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
+      dispatch(setSavedEncryptedSignature(encryptedSignature));
+    }
+
+    await setWalletFromSignature(signature);
+  };
+
+  /* ----------------------------- End Turnkey Session ----------------------------- */
+
+  const sourceAccount = useAppSelector(getSourceAccount);
+  const walletInfo = sourceAccount.walletInfo;
+
+  const endTurnkeySession = useCallback(async () => {
     try {
-      logTurnkey('useTurnkeyWallet', 'endTurnkeySession', turnkey);
-      clearTurnkeyState();
-      await turnkey?.logout();
-      await indexedDbClient?.clear();
-      await initClient();
+      if (walletInfo?.connectorType === ConnectorType.Turnkey) {
+        clearTurnkeyState();
+        await turnkey?.logout();
+
+        if (walletInfo.loginMethod === LoginMethod.Email) {
+          await resetAuthIframeClientKey();
+          return;
+        }
+
+        if (walletInfo.loginMethod === LoginMethod.Passkey) {
+          return;
+        }
+
+        // LoginMethod.OAuth
+        await indexedDbClient?.clear();
+        await initClient();
+      }
     } catch (error) {
       logTurnkey('useTurnkeyWallet', 'endTurnkeySession error', error);
     }
-  };
+  }, [
+    clearTurnkeyState,
+    indexedDbClient,
+    initClient,
+    resetAuthIframeClientKey,
+    turnkey,
+    walletInfo,
+  ]);
 
+  /* ----------------------------- Return ----------------------------- */
   return {
     turnkeyWallets,
     primaryTurnkeyWallet,
     preferredWallet,
+    embeddedPublicKey,
     targetPublicKeys,
 
-    decodeSessionJwt,
     endTurnkeySession,
     setPreferredWallet,
     onboardDydxFromTurnkey,
+    onboardDydxFromAuthIframe,
+    resetAuthIframeClientKey,
   };
 };
