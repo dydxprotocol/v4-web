@@ -27,6 +27,7 @@
         "deploy:update-ipns": "node scripts/update-ipns.js",
         "deploy:update-dnslink": "node scripts/update-dnslink.js",
         "coverage": "vitest run --coverage",
+        "ni": "git clean -fdX; pnpm i -r",
         "clean-install": "rm -rf node_modules/.vite && pnpm i",
         "preinstall": "node scripts/check-pnpm-version.js",
         "preview": "vite preview",
