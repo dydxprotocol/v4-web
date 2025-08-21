@@ -5,12 +5,12 @@
   "scripts": {
     "start": "tsx mock-server.ts",
     "dev": "tsx watch mock-server.ts",
-    "gen": "squid-typeorm-codegen && tsc && squid-typeorm-migration generate",
     "apply": "squid-typeorm-migration apply",
     "build": "rm -rf lib && tsc"
   },
   "dependencies": {
     "@apollo/server": "^4.9.5",
+        "@subsquid/big-decimal": "^1.0.0",
     "@apollo/subgraph": "^2.5.5",
     "@subsquid/batch-processor": "^0.0.0",
     "@subsquid/fuel-objects": "^0.0.4",

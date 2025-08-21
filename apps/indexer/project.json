@@ -8,10 +8,11 @@
   "targets": {
     "dev": {
       "dependsOn": [
+        "build",
         "up",
-        "build"
       ],
       "command": "node --require=dotenv/config lib/main.js",
+      "continuous": true,
       "options": {
         "cwd": "apps/indexer"
       }
@@ -38,8 +39,14 @@
         "cwd": "apps/indexer"
       }
     },
+    "migrate:apply": {
+      "command": "rm -rf ./db/migrations; squid-typeorm-migration apply",
+      "options": {
+        "cwd": "apps/indexer"
+      }
+    },
     "up": {
-      "command": "docker compose up -d",
+      "command": "docker compose up -d; squid-typeorm-migration apply",
       "options": {
         "cwd": "apps/indexer"
       }
