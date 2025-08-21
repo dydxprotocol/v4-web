@@ -109,58 +109,63 @@ const useTurnkeyAuthContext = () => {
     },
   });
 
-  const { onboardDydxFromTurnkey, onboardDydxFromAuthIframe, embeddedPublicKey, targetPublicKeys } =
-    useTurnkeyWallet();
+  const { onboardDydxShared, embeddedPublicKey, targetPublicKeys } = useTurnkeyWallet();
 
-  const signInWithOauth = async ({
-    oidcToken,
-    providerName,
-  }: {
-    oidcToken: string;
-    providerName: 'google' | 'apple';
-  }) => {
-    const decoded = jwtDecode<GoogleIdTokenPayload>(oidcToken);
-    const { publicKeyCompressed } = targetPublicKeys ?? {};
-
-    if (!publicKeyCompressed) {
-      throw new Error('useTurnkeyAuth: No public key found');
-    }
-
-    const inputBody: SignInBody = {
-      signinMethod: 'social',
-      targetPublicKey: publicKeyCompressed,
-      provider: providerName,
+  const signInWithOauth = useCallback(
+    async ({
       oidcToken,
-      userEmail: decoded.email,
-    };
-
-    const headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    };
-
-    sendSignInRequest({
-      headers,
-      body: JSON.stringify(inputBody),
-      loginMethod: LoginMethod.OAuth,
       providerName,
-      userEmail: decoded.email,
-    });
-  };
+    }: {
+      oidcToken: string;
+      providerName: 'google' | 'apple';
+    }) => {
+      const decoded = jwtDecode<GoogleIdTokenPayload>(oidcToken);
+      const { publicKeyCompressed } = targetPublicKeys ?? {};
+
+      if (!publicKeyCompressed) {
+        throw new Error('useTurnkeyAuth: No public key found');
+      }
+
+      const inputBody: SignInBody = {
+        signinMethod: 'social',
+        targetPublicKey: publicKeyCompressed,
+        provider: providerName,
+        oidcToken,
+        userEmail: decoded.email,
+      };
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      };
+
+      sendSignInRequest({
+        headers,
+        body: JSON.stringify(inputBody),
+        loginMethod: LoginMethod.OAuth,
+        providerName,
+        userEmail: decoded.email,
+      });
+    },
+    [sendSignInRequest, targetPublicKeys]
+  );
 
   const { setWalletFromSignature } = useAccounts();
 
-  const handleOauthResponse = async ({ response }: { response: TurnkeyOAuthResponse }) => {
-    const { session, salt } = response;
-    if (session == null) {
-      throw new Error('useTurnkeyAuth: No session found');
-    } else if (salt == null) {
-      throw new Error('useTurnkeyAuth: No salt found');
-    }
+  const handleOauthResponse = useCallback(
+    async ({ response }: { response: TurnkeyOAuthResponse }) => {
+      const { session, salt } = response;
+      if (session == null) {
+        throw new Error('useTurnkeyAuth: No session found');
+      } else if (salt == null) {
+        throw new Error('useTurnkeyAuth: No salt found');
+      }
 
-    await indexedDbClient?.loginWithSession(session);
-    await onboardDydxFromTurnkey({ salt, setWalletFromSignature });
-  };
+      await indexedDbClient?.loginWithSession(session);
+      await onboardDydxShared({ salt, setWalletFromSignature, tkClient: indexedDbClient });
+    },
+    [onboardDydxShared, indexedDbClient, setWalletFromSignature]
+  );
 
   const [, setTurnkeyEmailOnboardingData] = useLocalStorage<TurnkeyEmailOnboardingData | undefined>(
     {
@@ -169,35 +174,32 @@ const useTurnkeyAuthContext = () => {
     }
   );
 
-  const handleEmailResponse = async ({
-    response,
-    userEmail,
-  }: {
-    response: TurnkeyEmailResponse;
-    userEmail: string;
-  }) => {
-    const { salt, organizationId, userId, dydxAddress } = response;
+  const handleEmailResponse = useCallback(
+    async ({ response, userEmail }: { response: TurnkeyEmailResponse; userEmail: string }) => {
+      const { salt, organizationId, userId, dydxAddress } = response;
 
-    if (!salt) {
-      throw new Error('No salt provided in response');
-    }
-    if (!organizationId) {
-      throw new Error('No organizationId provided in response');
-    }
-    if (!userId) {
-      throw new Error('No userId provided in response');
-    }
+      if (!salt) {
+        throw new Error('No salt provided in response');
+      }
+      if (!organizationId) {
+        throw new Error('No organizationId provided in response');
+      }
+      if (!userId) {
+        throw new Error('No userId provided in response');
+      }
 
-    // Store the Turnkey email onboarding data in local storage.
-    // This data will be used after the user clicks the Magic link in their email.
-    setTurnkeyEmailOnboardingData({
-      salt,
-      organizationId,
-      userId,
-      userEmail,
-      dydxAddress,
-    });
-  };
+      // Store the Turnkey email onboarding data in local storage.
+      // This data will be used after the user clicks the Magic link in their email.
+      setTurnkeyEmailOnboardingData({
+        salt,
+        organizationId,
+        userId,
+        userEmail,
+        dydxAddress,
+      });
+    },
+    [setTurnkeyEmailOnboardingData]
+  );
 
   const [emailSignInStatus, setEmailSignInStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
@@ -214,7 +216,7 @@ const useTurnkeyAuthContext = () => {
         }
 
         await authIframeClient.injectCredentialBundle(token);
-        await onboardDydxFromAuthIframe({ setWalletFromSignature });
+        await onboardDydxShared({ setWalletFromSignature, tkClient: authIframeClient });
         setEmailSignInStatus('success');
       } catch (error) {
         let errorMessage: string | undefined;
@@ -248,7 +250,7 @@ const useTurnkeyAuthContext = () => {
     },
     [
       authIframeClient,
-      onboardDydxFromAuthIframe,
+      onboardDydxShared,
       setWalletFromSignature,
       searchParams,
       setSearchParams,
@@ -277,7 +279,12 @@ const useTurnkeyAuthContext = () => {
    * Triggers the onboarding process that manages the sign in status and attempts to sign the onboarding message.
    */
   useEffect(() => {
-    if (emailToken && targetPublicKeys?.publicKey && authIframeClient) {
+    if (
+      emailToken &&
+      targetPublicKeys?.publicKey &&
+      authIframeClient &&
+      emailSignInStatus === 'idle'
+    ) {
       handleEmailMagicLink({ token: emailToken });
     }
   }, [
@@ -286,38 +293,47 @@ const useTurnkeyAuthContext = () => {
     authIframeClient,
     handleEmailMagicLink,
     setSearchParams,
+    emailSignInStatus,
   ]);
 
-  const signInWithOtp = async ({ userEmail }: { userEmail: string }) => {
-    if (authIframeClient == null) {
-      throw new Error('cannot initialize auth without an iframe');
-    }
+  const signInWithOtp = useCallback(
+    async ({ userEmail }: { userEmail: string }) => {
+      if (authIframeClient == null) {
+        throw new Error('cannot initialize auth without an iframe');
+      }
 
-    const targetPublicKey = embeddedPublicKey;
+      const targetPublicKey = embeddedPublicKey;
 
-    if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
-      throw new Error('No target public key found');
-    }
+      if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
+        throw new Error('No target public key found');
+      }
 
-    const inputBody: SignInBody = {
-      signinMethod: 'email',
-      userEmail,
-      targetPublicKey,
-      magicLink: `${globalThis.location.origin}/markets/?token`,
-    };
+      const inputBody: SignInBody = {
+        signinMethod: 'email',
+        userEmail,
+        targetPublicKey,
+        magicLink: `${globalThis.location.origin}/markets/?token`,
+      };
 
-    const headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    };
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      };
 
-    sendSignInRequest({
-      headers,
-      body: JSON.stringify(inputBody),
-      loginMethod: LoginMethod.Email,
-      userEmail,
-    });
-  };
+      sendSignInRequest({
+        headers,
+        body: JSON.stringify(inputBody),
+        loginMethod: LoginMethod.Email,
+        userEmail,
+      });
+    },
+    [sendSignInRequest, authIframeClient, embeddedPublicKey]
+  );
+
+  const resetEmailSignInStatus = useCallback(() => {
+    setEmailSignInStatus('idle');
+    setEmailSignInError(undefined);
+  }, []);
 
   return {
     targetPublicKeys,
@@ -327,5 +343,6 @@ const useTurnkeyAuthContext = () => {
     isError: status === 'error' || emailSignInStatus === 'error',
     signInWithOauth,
     signInWithOtp,
+    resetEmailSignInStatus,
   };
 };

@@ -20,7 +20,7 @@ export const EmailSignInStatusDialog = ({
   setIsOpen: (isOpen: boolean) => void;
 }) => {
   const stringGetter = useStringGetter();
-  const { emailSignInError, emailSignInStatus } = useTurnkeyAuth();
+  const { emailSignInError, emailSignInStatus, resetEmailSignInStatus } = useTurnkeyAuth();
   const sourceAccount = useAppSelector(getSourceAccount);
   const walletInfo = sourceAccount.walletInfo;
 
@@ -30,7 +30,11 @@ export const EmailSignInStatusDialog = ({
     if (!isTurnkey) {
       setIsOpen(false);
     }
-  }, [isTurnkey, setIsOpen]);
+
+    return () => {
+      resetEmailSignInStatus();
+    };
+  }, [isTurnkey, setIsOpen, resetEmailSignInStatus]);
 
   // TODO(turnkey): Localization - Pending Design
   const title = useMemo(
