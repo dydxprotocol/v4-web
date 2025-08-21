@@ -134,6 +134,9 @@ dependencies:
   '@reduxjs/toolkit':
     specifier: ^2.2.5
     version: 2.2.5(react-redux@9.1.2)(react@18.2.0)
+  '@scure/bip39':
+    specifier: ^1.1.1
+    version: 1.5.4
   '@skip-go/client':
     specifier: 1.1.7
     version: 1.1.7(@solana/web3.js@1.93.2)(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)(starknet@6.11.0)(viem@2.22.17)
@@ -20578,7 +20581,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.4
       mime: 3.0.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       pathe: 1.1.2
     dev: false
 
@@ -20734,7 +20737,7 @@ packages:
       listhen: 1.5.5
       lru-cache: 10.2.2
       mri: 1.2.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       ofetch: 1.3.4
       ufo: 1.5.4
     transitivePeerDependencies:

@@ -4,12 +4,23 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
+import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { toBase64 } from '@cosmjs/encoding';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import {
+  AuthenticatorType,
+  BECH32_PREFIX,
+  onboarding,
+  SubaccountClient,
+  TYPE_URL_BATCH_CANCEL,
+  TYPE_URL_MSG_CANCEL_ORDER,
+  TYPE_URL_MSG_PLACE_ORDER,
+  type LocalWallet,
+} from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
@@ -29,6 +40,7 @@ import { clearLocalOrders } from '@/state/localOrders';
 
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
+import { runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
@@ -780,6 +792,114 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, compositeClient, createTransferMessage]
   );
 
+  const createAuthorizedAccount = useCallback(async () => {
+    if (subaccountClient == null) {
+      throw new Error('local wallet client not initialized');
+    }
+
+    if (compositeClient == null) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const newRandomLocalWallet = await runFn(async () => {
+      const [fullBip39Lib, englishWorldList, lazyLocalWallet] = await Promise.all([
+        import('@scure/bip39'),
+        import('@scure/bip39/wordlists/english'),
+        getLazyLocalWallet(),
+      ]);
+      const mnemonic = fullBip39Lib.generateMnemonic(englishWorldList.wordlist, 128);
+      const { privateKey: privateKeyRaw, publicKey: publicKeyRaw } =
+        onboarding.deriveHDKeyFromMnemonic(mnemonic);
+      const wallet = await lazyLocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
+      return {
+        privateKeyRaw,
+        publicKeyRaw,
+        publicKey: wallet.pubKey,
+        address: wallet.address,
+        mnemonic,
+        seed: fullBip39Lib.mnemonicToSeedSync(mnemonic),
+      };
+    });
+
+    const { publicKey } = newRandomLocalWallet;
+    if (publicKey == null) {
+      throw new Error('Unable to find pubKey of generated wallet');
+    }
+
+    const msgType = (s: string): string => toBase64(new TextEncoder().encode(s));
+    const anyOfSubAuth = [
+      {
+        type: AuthenticatorType.MESSAGE_FILTER,
+        config: msgType(TYPE_URL_MSG_PLACE_ORDER),
+      },
+      {
+        type: AuthenticatorType.MESSAGE_FILTER,
+        config: msgType(TYPE_URL_MSG_CANCEL_ORDER),
+      },
+      {
+        type: AuthenticatorType.MESSAGE_FILTER,
+        config: msgType(TYPE_URL_BATCH_CANCEL),
+      },
+    ];
+
+    // Nested AnyOf config must be base64(JSON([...])) as on-chain expects []byte
+    const anyOfConfigB64 = toBase64(new TextEncoder().encode(JSON.stringify(anyOfSubAuth)));
+
+    const subAuth = [
+      {
+        type: AuthenticatorType.SIGNATURE_VERIFICATION,
+        config: publicKey,
+      },
+      {
+        type: AuthenticatorType.ANY_OF,
+        config: anyOfConfigB64,
+      },
+      {
+        type: AuthenticatorType.SUBACCOUNT_FILTER,
+        config: '0',
+      },
+    ];
+
+    const jsonString = JSON.stringify(subAuth);
+    const encodedData = new TextEncoder().encode(jsonString);
+
+    // const creationResult = await compositeClient.addAuthenticator(
+    //   subaccountClient,
+    //   AuthenticatorType.ALL_OF,
+    //   encodedData
+    // );
+
+    // const parsed = parseToPrimitives(creationResult);
+
+    // check if it worked
+
+    console.log(newRandomLocalWallet, newRandomLocalWallet.privateKeyRaw?.toString());
+    return {
+      address: newRandomLocalWallet.address,
+      privateKey: newRandomLocalWallet.privateKeyRaw?.toString(),
+    };
+  }, [compositeClient, subaccountClient]);
+
+  const removeAuthorizedAccount = useCallback(
+    async (idToRemove: Long) => {
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      return compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  useEffect(() => {
+    createAuthorizedAccount();
+    return () => {};
+  }, [createAuthorizedAccount]);
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -814,5 +934,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getVaultAccountInfo,
     depositToMegavault,
     withdrawFromMegavault,
+
+    // Permissioned Keys
+    createAuthorizedAccount,
+    removeAuthorizedAccount,
   };
 };
