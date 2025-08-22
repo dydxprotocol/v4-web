@@ -231,8 +231,8 @@ const StarboardThemeBase: () => ThemeColorBase = () => ({
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.Black,
-  layer1: ColorToken.DarkGray14,
-  layer2: ColorToken.DarkGray11,
+  layer1: ColorToken.Black,
+  layer2: ColorToken.Black,
   layer3: ColorToken.DarkGray9,
   layer4: ColorToken.DarkGray6,
   layer5: ColorToken.DarkGray5,
