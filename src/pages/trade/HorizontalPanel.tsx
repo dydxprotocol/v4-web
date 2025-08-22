@@ -51,7 +51,7 @@ import { MarketTypeFilter, PanelView } from './types';
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
-  OrderHistory = 'OrderHistory',
+    OrderHistory = 'OrderHistory',
   Fills = 'Fills',
   Payments = 'Payments',
 }
@@ -181,61 +181,61 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
 
   const ordersTabItem = useMemo(
-    () => ({
-      asChild: true,
-      value: InfoSection.Orders,
-      label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
+        () => ({
+            asChild: true,
+            value: InfoSection.Orders,
+            label: stringGetter({ key: STRING_KEYS.OPEN_ORDERS_HEADER }),
 
-      slotRight:
-        areOrdersLoading || isWaitingForOrderToIndex ? (
-          <LoadingSpinner tw="[--spinner-width:1rem]" />
-        ) : (
-          ordersTagNumber && (
-            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
-              {ordersTagNumber}
-            </Tag>
-          )
-        ),
+            slotRight:
+                areOrdersLoading || isWaitingForOrderToIndex ? (
+                    <LoadingSpinner tw="[--spinner-width:1rem]" />
+                ) : (
+                    ordersTagNumber && (
+                        <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+                            {ordersTagNumber}
+                        </Tag>
+                    )
+                ),
 
-      content: (
-        <OrdersTable
-          currentMarket={showCurrentMarket ? currentMarketId : undefined}
-          marketTypeFilter={viewIsolated}
-          tableType="OPEN"
-          columnKeys={
-            isTablet
-              ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
-              : [
-                  !showCurrentMarket && OrdersTableColumnKey.Market,
-                  OrdersTableColumnKey.Status,
-                  OrdersTableColumnKey.Side,
-                  OrdersTableColumnKey.Amount,
-                  OrdersTableColumnKey.Filled,
-                  OrdersTableColumnKey.OrderValue,
-                  OrdersTableColumnKey.Price,
-                  OrdersTableColumnKey.Trigger,
-                  OrdersTableColumnKey.MarginType,
-                  OrdersTableColumnKey.GoodTil,
-                  !isAccountViewOnly && OrdersTableColumnKey.Actions,
-                ].filter(isTruthy)
-          }
-          initialPageSize={initialPageSize}
-        />
-      ),
-    }),
-    [
-      stringGetter,
-      areOrdersLoading,
-      isWaitingForOrderToIndex,
-      ordersTagNumber,
-      hasUnseenOrderUpdates,
-      showCurrentMarket,
-      currentMarketId,
-      viewIsolated,
-      isTablet,
-      isAccountViewOnly,
-    ]
-  );
+            content: (
+                <OrdersTable
+                    currentMarket={showCurrentMarket ? currentMarketId : undefined}
+                    marketTypeFilter={viewIsolated}
+                    tableType="OPEN"
+                    columnKeys={
+                        isTablet
+                            ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
+                            : [
+                                !showCurrentMarket && OrdersTableColumnKey.Market,
+                                OrdersTableColumnKey.Status,
+                                OrdersTableColumnKey.Side,
+                                OrdersTableColumnKey.Amount,
+                                OrdersTableColumnKey.Filled,
+                                OrdersTableColumnKey.OrderValue,
+                                OrdersTableColumnKey.Price,
+                                OrdersTableColumnKey.Trigger,
+                                OrdersTableColumnKey.MarginType,
+                                OrdersTableColumnKey.GoodTil,
+                                !isAccountViewOnly && OrdersTableColumnKey.Actions,
+                            ].filter(isTruthy)
+                    }
+                    initialPageSize={initialPageSize}
+                />
+            ),
+        }),
+        [
+            stringGetter,
+            areOrdersLoading,
+            isWaitingForOrderToIndex,
+            ordersTagNumber,
+            hasUnseenOrderUpdates,
+            showCurrentMarket,
+            currentMarketId,
+            viewIsolated,
+            isTablet,
+            isAccountViewOnly,
+        ]
+    );
 
   const orderHistoryTabItem = useMemo(
     () => ({
@@ -382,8 +382,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
 
   const tabItems = useMemo(
-    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem]
+    () => [positionTabItem,
+          /* NOTE: disabled for proof-of-concept */
+          /* ordersTabItem, */
+           fillsTabItem,
+          /* orderHistoryTabItem, */
+           paymentsTabItem],
+    [positionTabItem, fillsTabItem,
+        /* ordersTabItem, */
+        /* orderHistoryTabItem, */
+     paymentsTabItem]
   );
 
   const slotBottom = {
@@ -391,7 +399,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       <MaybeUnopenedIsolatedPositionsDrawer onViewOrders={onViewOrders} tw="mt-auto" />
     ),
     [InfoSection.Orders]: null,
-    [InfoSection.OrderHistory]: null,
+      [InfoSection.OrderHistory]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
   }[tab];
