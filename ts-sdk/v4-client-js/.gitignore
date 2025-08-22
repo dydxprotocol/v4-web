@@ -1,0 +1,29 @@
+
+# dependencies
+node_modules/
+
+# testing
+coverage/
+.env.test
+
+# production
+build/
+out/
+
+# misc
+.DS_Store
+.env.local
+.nyc_output
+npm-debug.log
+.env.test
+*.map
+
+# vim
+*.swo
+*.swp
+
+# IDE
+.idea
+
+# Packed tgz for local dev
+*.tgz
