@@ -130,7 +130,7 @@
     "luxon": "^3.3.0",
     "mipd": "^0.0.7",
     "react": "^18.2.0",
-    "react-apple-login": "^1.1.6",
+    "react-apple-signin-auth": "^1.1.2",
     "react-aria": "^3.25.0",
     "react-dom": "^18.2.0",
     "react-number-format": "^5.2.2",

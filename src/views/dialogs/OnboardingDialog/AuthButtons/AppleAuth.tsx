@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
-import AppleLogin from 'react-apple-login';
+import { logTurnkey } from '@/bonsai/logs';
+import AppleSignIn from 'react-apple-signin-auth';
 import { styled } from 'styled-components';
 import { sha256 } from 'viem';
 
@@ -11,10 +12,31 @@ import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 
+import { useAppSelector } from '@/state/appTypes';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
+
+type AppleAuthSuccessData = {
+  authorization: {
+    state?: string;
+    code?: string;
+    id_token: string;
+  };
+  user: {
+    email: string;
+    name: {
+      firstName?: string;
+      lastName?: string;
+    };
+  };
+};
+
 export const AppleAuth = () => {
   const clientId = import.meta.env.VITE_APPLE_CLIENT_ID;
-  const redirectURI = `${import.meta.env.VITE_BASE_URL}/oauth-callback/apple`;
-  const { isLoading, targetPublicKeys } = useTurnkeyAuth();
+  const redirectURI = import.meta.env.VITE_APPLE_REDIRECT_URI;
+  const { signInWithOauth, isLoading, targetPublicKeys } = useTurnkeyAuth();
+  const appTheme = useAppSelector(getAppTheme);
+  const isLightMode = appTheme === AppTheme.Light;
 
   const nonce = useMemo(() => {
     if (targetPublicKeys) {
@@ -28,18 +50,43 @@ export const AppleAuth = () => {
     return '';
   }, [targetPublicKeys]);
 
-  if (!clientId) {
+  const handleSuccess = (data: AppleAuthSuccessData) => {
+    const { authorization } = data;
+
+    if (!authorization.id_token) {
+      return;
+    }
+
+    logTurnkey('AppleAuth', 'Success', data);
+
+    signInWithOauth({
+      oidcToken: authorization.id_token,
+      providerName: 'apple',
+    });
+  };
+
+  const handleError = (error: any) => {
+    logTurnkey('AppleAuth', 'Error', error);
+  };
+
+  if (!clientId || !redirectURI) {
     return null;
   }
 
   return (
-    <AppleLogin
-      clientId={clientId}
-      redirectURI={redirectURI}
-      responseType="code id_token"
-      nonce={nonce}
-      responseMode="fragment"
-      render={({ onClick }) => (
+    <AppleSignIn
+      authOptions={{
+        clientId,
+        scope: 'email name',
+        redirectURI,
+        state: '',
+        nonce,
+        usePopup: true,
+      }}
+      uiType="dark"
+      onSuccess={handleSuccess}
+      onError={handleError}
+      render={(props: any) => (
         <$SocialLoginButton
           type={ButtonType.Button}
           action={ButtonAction.Base}
@@ -48,10 +95,10 @@ export const AppleAuth = () => {
             isLoading,
             isDisabled: nonce.trim().length === 0,
           }}
-          onClick={onClick}
+          {...props}
         >
           <div className="row pointer-events-none absolute inset-0 justify-center bg-color-layer-5">
-            <Icon iconName={IconName.Google} />
+            <Icon iconName={isLightMode ? IconName.Apple : IconName.AppleLight} />
           </div>
         </$SocialLoginButton>
       )}

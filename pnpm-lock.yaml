@@ -257,9 +257,9 @@ dependencies:
   react:
     specifier: ^18.2.0
     version: 18.2.0
-  react-apple-login:
-    specifier: ^1.1.6
-    version: 1.1.6(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+  react-apple-signin-auth:
+    specifier: ^1.1.2
+    version: 1.1.2(react-dom@18.2.0)(react@18.2.0)
   react-aria:
     specifier: ^3.25.0
     version: 3.25.0(react-dom@18.2.0)(react@18.2.0)
@@ -19346,6 +19346,16 @@ packages:
       react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     dependencies:
       prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-apple-signin-auth@1.1.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-E5bPu4LtNR3IDsd08A/f1Y0HyuHfjqQpRNRCtQQ3JSVby2JK50FoixyK8EwUh6cbu8N4qrJStL77dEb51Ny5uA==}
+    peerDependencies:
+      react: '>= 16.8.0'
+      react-dom: '>= 16.8.0'
+    dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
