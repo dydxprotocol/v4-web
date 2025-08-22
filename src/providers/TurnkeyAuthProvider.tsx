@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
+import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
@@ -24,7 +25,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { setWalletInfo } from '@/state/wallet';
+import { setRequiresAddressUpload, setWalletInfo } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
@@ -44,21 +45,24 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
   const indexerUrl = useAppSelector(selectIndexerUrl);
+  const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
-  const [emailToken, setEmailToken] = useState<string>();
+  const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [emailToken, setEmailToken] = useState<string>();
 
-  const { selectWallet } = useAccounts();
+  const { onboardDydxShared, embeddedPublicKey, targetPublicKeys, getUploadAddressPayload } =
+    useTurnkeyWallet();
+
+  /* ----------------------------- Sign In ----------------------------- */
 
   const { mutate: sendSignInRequest, status } = useMutation({
     mutationFn: async ({
-      headers,
       body,
       loginMethod,
       providerName,
       userEmail,
     }: {
-      headers: HeadersInit;
       body: string;
       loginMethod: LoginMethod;
       providerName?: string;
@@ -76,7 +80,10 @@ const useTurnkeyAuthContext = () => {
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
         body,
       }).then((res) => res.json());
 
@@ -84,6 +91,10 @@ const useTurnkeyAuthContext = () => {
         // Handle API-reported errors
         const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
         throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
+      }
+
+      if (response.dydxAddress === '') {
+        dispatch(setRequiresAddressUpload(true));
       }
 
       switch (loginMethod) {
@@ -109,7 +120,7 @@ const useTurnkeyAuthContext = () => {
     },
   });
 
-  const { onboardDydxShared, embeddedPublicKey, targetPublicKeys } = useTurnkeyWallet();
+  /* ----------------------------- OAuth Sign In ----------------------------- */
 
   const signInWithOauth = useCallback(
     async ({
@@ -134,13 +145,7 @@ const useTurnkeyAuthContext = () => {
         userEmail: decoded.email,
       };
 
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-
       sendSignInRequest({
-        headers,
         body: JSON.stringify(inputBody),
         loginMethod: LoginMethod.OAuth,
         providerName,
@@ -149,8 +154,6 @@ const useTurnkeyAuthContext = () => {
     },
     [sendSignInRequest, targetPublicKeys]
   );
-
-  const { setWalletFromSignature } = useAccounts();
 
   const handleOauthResponse = useCallback(
     async ({ response }: { response: TurnkeyOAuthResponse }) => {
@@ -174,9 +177,16 @@ const useTurnkeyAuthContext = () => {
     }
   );
 
+  /* ----------------------------- Email Sign In ----------------------------- */
+
+  const [emailSignInStatus, setEmailSignInStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
+  const [emailSignInError, setEmailSignInError] = useState<string>();
+
   const handleEmailResponse = useCallback(
     async ({ response, userEmail }: { response: TurnkeyEmailResponse; userEmail: string }) => {
-      const { salt, organizationId, userId, dydxAddress } = response;
+      const { salt, organizationId, userId, dydxAddress: dydxAddressFromResponse } = response;
 
       if (!salt) {
         throw new Error('No salt provided in response');
@@ -195,16 +205,11 @@ const useTurnkeyAuthContext = () => {
         organizationId,
         userId,
         userEmail,
-        dydxAddress,
+        dydxAddress: dydxAddressFromResponse,
       });
     },
     [setTurnkeyEmailOnboardingData]
   );
-
-  const [emailSignInStatus, setEmailSignInStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [emailSignInError, setEmailSignInError] = useState<string>();
 
   const handleEmailMagicLink = useCallback(
     async ({ token }: { token: string }) => {
@@ -258,7 +263,85 @@ const useTurnkeyAuthContext = () => {
     ]
   );
 
-  const sourceAccount = useAppSelector(getSourceAccount);
+  const signInWithOtp = useCallback(
+    async ({ userEmail }: { userEmail: string }) => {
+      if (authIframeClient == null) {
+        throw new Error('cannot initialize auth without an iframe');
+      }
+
+      const targetPublicKey = embeddedPublicKey;
+
+      if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
+        throw new Error('No target public key found');
+      }
+
+      const inputBody: SignInBody = {
+        signinMethod: 'email',
+        userEmail,
+        targetPublicKey,
+        magicLink: `${globalThis.location.origin}/markets/?token`,
+      };
+
+      sendSignInRequest({
+        body: JSON.stringify(inputBody),
+        loginMethod: LoginMethod.Email,
+        userEmail,
+      });
+    },
+    [sendSignInRequest, authIframeClient, embeddedPublicKey]
+  );
+
+  const resetEmailSignInStatus = useCallback(() => {
+    setEmailSignInStatus('idle');
+    setEmailSignInError(undefined);
+  }, []);
+
+  /* ----------------------------- Upload Address ----------------------------- */
+  const { mutate: sendUploadAddressRequest } = useMutation({
+    mutationFn: async ({ payload }: { payload: [string, string] }) => {
+      const body = JSON.stringify(payload);
+
+      const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body,
+      }).then((res) => res.json());
+
+      if (response.errors && Array.isArray(response.errors)) {
+        const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
+        throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
+      }
+
+      // TODO(turnkey): handle policy returned in response
+      dispatch(setRequiresAddressUpload(false));
+      return response;
+    },
+    onError: (error) => {
+      logTurnkey('useTurnkeyAuth', 'error', error);
+      logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
+    },
+  });
+
+  const uploadAddress = useCallback(
+    async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient }) => {
+      if (dydxAddress == null) {
+        throw new Error('No dydx address provided');
+      }
+
+      if (tkClient == null) {
+        throw new Error('No tk client provided');
+      }
+
+      const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
+      sendUploadAddressRequest({ payload });
+    },
+    [dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
+  );
+
+  /* ----------------------------- Side Effects ----------------------------- */
 
   /**
    * @description Side effect to handle email link containing a token.
@@ -296,44 +379,34 @@ const useTurnkeyAuthContext = () => {
     emailSignInStatus,
   ]);
 
-  const signInWithOtp = useCallback(
-    async ({ userEmail }: { userEmail: string }) => {
-      if (authIframeClient == null) {
-        throw new Error('cannot initialize auth without an iframe');
-      }
+  const needsAddressUpload = useMemo(() => {
+    return (
+      sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey &&
+      sourceAccount.walletInfo.requiresAddressUpload
+    );
+  }, [sourceAccount.walletInfo]);
 
-      const targetPublicKey = embeddedPublicKey;
+  const tkClient = useMemo(() => {
+    return sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey
+      ? sourceAccount.walletInfo.loginMethod === LoginMethod.Email
+        ? authIframeClient
+        : sourceAccount.walletInfo.loginMethod === LoginMethod.OAuth
+          ? indexedDbClient
+          : undefined
+      : undefined;
+  }, [sourceAccount.walletInfo, authIframeClient, indexedDbClient]);
 
-      if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
-        throw new Error('No target public key found');
-      }
+  /**
+   * @description Side effect to upload the address if it is required and the user has a dydx address.
+   * This is triggered after the user has signed in with email or OAuth and has derived their dydx address.
+   */
+  useEffect(() => {
+    if (tkClient && needsAddressUpload && dydxAddress != null) {
+      uploadAddress({ tkClient });
+    }
+  }, [dydxAddress, uploadAddress, tkClient, needsAddressUpload]);
 
-      const inputBody: SignInBody = {
-        signinMethod: 'email',
-        userEmail,
-        targetPublicKey,
-        magicLink: `${globalThis.location.origin}/markets/?token`,
-      };
-
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-
-      sendSignInRequest({
-        headers,
-        body: JSON.stringify(inputBody),
-        loginMethod: LoginMethod.Email,
-        userEmail,
-      });
-    },
-    [sendSignInRequest, authIframeClient, embeddedPublicKey]
-  );
-
-  const resetEmailSignInStatus = useCallback(() => {
-    setEmailSignInStatus('idle');
-    setEmailSignInError(undefined);
-  }, []);
+  /* ----------------------------- Return Values----------------------------- */
 
   return {
     targetPublicKeys,

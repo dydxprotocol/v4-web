@@ -104,6 +104,7 @@ export type WalletInfo =
       userEmail?: string;
       providerName?: string;
       loginMethod: LoginMethod;
+      requiresAddressUpload?: boolean;
     }
   | {
       connectorType: ConnectorType.Cosmos;
