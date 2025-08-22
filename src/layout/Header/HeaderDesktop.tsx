@@ -93,13 +93,10 @@ export const HeaderDesktop = () => {
          *   ),
          * }, */
         {
-          value: 'MORE',
-          label: stringGetter({ key: STRING_KEYS.MORE }),
-          subitems: [
-            {
               value: 'DOCUMENTATION',
+              label: "API",
               slotBefore: <Icon iconName={IconName.Terminal} />,
-              label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
+              href: `https://docs.dydx.exchange/`,
               onClick: () => {
                 dispatch(
                   openDialog(
@@ -109,7 +106,25 @@ export const HeaderDesktop = () => {
                   )
                 );
               },
-            },
+          },
+          {
+          value: 'MORE',
+          label: stringGetter({ key: STRING_KEYS.MORE }),
+          subitems: [
+              /* {
+  *   value: 'DOCUMENTATION',
+  *   slotBefore: <Icon iconName={IconName.Terminal} />,
+  *   label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
+  *   onClick: () => {
+  *     dispatch(
+  *       openDialog(
+  *         DialogTypes.ExternalLink({
+  *           link: documentation,
+  *         })
+  *       )
+  *     );
+  *   },
+  * }, */
             {
               value: 'MINTSCAN',
               slotBefore: <Icon iconName={IconName.Mintscan} />,
