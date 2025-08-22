@@ -55,7 +55,7 @@ pip install caer;
 pnpm build; pnpm gen:types;
 
 # --------- Testing ---------
-fuel-core run --snapshot ./public/configs/fuel/snapshots --debug --db-type in-memory --graphql-max-complexity 200000000;
+fuel-core run --snapshot ./contracts/snapshots --debug --db-type in-memory --graphql-max-complexity 200000000;
 
 pnpm test;
 #+end_src

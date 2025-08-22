@@ -3,7 +3,7 @@ import { createConfig } from "fuels"
 export default createConfig({
     workspace: "./",
     output: "./apps/indexer/types",
-    snapshotDir: './public/configs/fuel/snapshots',
+    snapshotDir: './contracts/snapshots',
     forcBuildFlags: [
         "--release",
         "--output-directory",
