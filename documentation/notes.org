@@ -99,6 +99,19 @@ openTime, interval, high = tick, low = tick,
 
 - [ ] Create a simple processor containing this one handler working in the indexer and deploy.
 
+
+| Country   | Company                                             | Ticker   | Link          |
+|-----------+-----------------------------------------------------+----------+---------------|
+| Argentina | Migor Sociedad Anonima                              | MIRG.BA  | [[https://finance.yahoo.com/quote/MIRG.BA/][Yahoo Finance]] |
+| Argentina | Grupo Financiero Galicia S.A.                       | GGAL     | [[https://finance.yahoo.com/quote/GGAL/][Yahoo Finance]] |
+| Argentina | Banco Marco S.A.                                    | BMA.BA   | [[https://finance.yahoo.com/quote/BMA.BA/][Yahoo Finance]] |
+| Argentina | Bolsas Mercados Argentinos S.A.                     | BYMA.BA  | [[https://finance.yahoo.com/quote/BYMA.BA/][Yahoo Finance]] |
+| Vietnam   | FPT Corporation                                     | FPT.VN   | [[https://finance.yahoo.com/quote/FPT.VN/][Yahoo Finance]] |
+| Vietnam   | Hoa Phat Group Joint Stock Company                  | HPG.VN   | [[https://finance.yahoo.com/quote/HPG.VN/][Yahoo Finance]] |
+| Thailand  | Delta Electronics (Thailand) Public Company Limited | DELTA.BK | [[https://finance.yahoo.com/quote/DELTA.BK/][Yahoo Finance]] |
+| Thailand  | Kasikornbank Public Company Limited                 | KBANK.BK | [[https://finance.yahoo.com/quote/KBANK.BK/][Yahoo Finance]] |
+
+
 * TRADE
 
 - [X] Changes in positions.
