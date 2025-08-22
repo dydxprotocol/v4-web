@@ -1,0 +1,34 @@
+{  "$schema": "https://cdn.scalar.com/schema/scalar-config.json",
+  "siteMeta": {
+    "title": "Starboard API Reference",
+    "description": "🚢✨"
+  },
+  "subdomain": "api.starboard.xyz",
+  "theme": "mars",
+  "references": [
+    {
+      "name": "API Reference",
+      "path": "./openapi.json"
+    }
+  ],
+  "guides": [
+{
+      "name": "Starboard",
+      "sidebar": [
+        {
+          "name": "Introduction",
+          "description": "Starboard",
+          "icon": "phosphor/regular/house",
+          "path": "../../README.md",
+          "type": "page"
+        },
+        ],
+        }
+],
+    "siteConfig": {
+    "logo": {
+      "darkMode": "https://raw.githubusercontent.com/wt-xyz/starboard/8b3ee6a20850848ec4fb441a9e7b820b2cafc0b0/public/starboard-symbol-yellow.svg",
+      "lightMode": "https://raw.githubusercontent.com/wt-xyz/starboard/8b3ee6a20850848ec4fb441a9e7b820b2cafc0b0/public/starboard-symbol-yellow.svg"
+    },
+  }
+}
