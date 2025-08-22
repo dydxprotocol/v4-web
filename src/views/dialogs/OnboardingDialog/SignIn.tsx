@@ -19,6 +19,8 @@ import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { isValidEmail } from '@/lib/emailUtils';
 
+import { GoogleAuth } from './AuthButtons/GoogleAuth';
+
 export const SignIn = ({
   onDisplayChooseWallet,
   onSignInWithPasskey,
@@ -30,6 +32,7 @@ export const SignIn = ({
 }) => {
   const stringGetter = useStringGetter();
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const theme = useAppSelector(getAppTheme);
 
   const socialLogins = useMemo(
@@ -37,10 +40,6 @@ export const SignIn = ({
       {
         key: 'apple',
         icon: <Icon iconName={theme === AppTheme.Light ? IconName.Apple : IconName.AppleLight} />,
-      },
-      {
-        key: 'google',
-        icon: <Icon iconName={IconName.Google} />,
       },
       {
         key: 'x/twitter',
@@ -53,6 +52,9 @@ export const SignIn = ({
   // TODO(turnkey): Implement email login
   const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+    onSubmitEmail();
+    setIsLoading(false);
   }, []);
 
   const hasValidEmail = isValidEmail(email);
@@ -60,17 +62,22 @@ export const SignIn = ({
   return (
     <form onSubmit={onSubmit} tw="flexColumn gap-1.25">
       <div tw="row gap-1">
+        <GoogleAuth />
         {socialLogins.map((login) => (
           <$SocialLoginButton
             key={login.key}
             type={ButtonType.Button}
             action={ButtonAction.Base}
             size={ButtonSize.BasePlus}
+            state={{
+              isDisabled: isLoading,
+            }}
           >
             {login.icon}
           </$SocialLoginButton>
         ))}
       </div>
+
       <div tw="flexColumn gap-0.75">
         <$EmailInput
           value={email}
