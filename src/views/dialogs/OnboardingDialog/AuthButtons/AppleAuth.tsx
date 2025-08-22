@@ -19,10 +19,10 @@ import { getAppTheme } from '@/state/appUiConfigsSelectors';
 type AppleAuthSuccessData = {
   authorization: {
     state?: string;
-    code?: string;
+    code: string;
     id_token: string;
   };
-  user: {
+  user?: {
     email: string;
     name: {
       firstName?: string;
