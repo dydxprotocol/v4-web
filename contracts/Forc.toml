@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "contracts/mocks/fungible",
+    "contracts/mocks/mock-pricefeed",
+
+    "contracts/core/vault-pricefeed",
+    "contracts/core/vault",
+
+    "contracts/core/rlp-manager",
+    "contracts/core/shorts-tracker",
+
+    "contracts/assets/yield-tracker",
+    "contracts/assets/rusd",
+    "contracts/assets/rlp",
+    "contracts/assets/time-distributor",
+
+    "contracts/utils",
+
+    "contracts/testnet/token",
+]

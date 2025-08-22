@@ -1,0 +1,9 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "mock-pricefeed"
+
+[dependencies]
+helpers = { path = "../../helpers" }
+mock_interfaces = { path = "../interfaces" }

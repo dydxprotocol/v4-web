@@ -1,0 +1,9 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache 2.0"
+name = "time-distributor"
+
+[dependencies]
+asset_interfaces = { path = "../interfaces" }
+helpers = { path = "../../helpers" }

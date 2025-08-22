@@ -1,0 +1,9 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "shorts-tracker"
+
+[dependencies]
+helpers = { path = "../../helpers" }
+core_interfaces = { path = "../interfaces" }

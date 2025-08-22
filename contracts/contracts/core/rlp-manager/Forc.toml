@@ -1,0 +1,15 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "rlp-manager"
+
+[dependencies]
+standards = { git = "https://github.com/FuelLabs/sway-standards", tag = "v0.5.1" }
+helpers = { path = "../../helpers" }
+core_interfaces = { path = "../interfaces" }
+asset_interfaces = { path = "../../assets/interfaces" }
+
+[proxy]
+enabled = true
+address = "0x5b210f226d57696d3d0fbf9c85e1232a045d50c12743d1b2cdbab17134eb80a9"

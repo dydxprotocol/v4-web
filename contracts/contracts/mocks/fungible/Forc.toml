@@ -1,0 +1,11 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache 2.0"
+name = "fungible"
+
+[dependencies]
+src20 = { git = "https://github.com/FuelLabs/sway-standards", tag = "v0.3.3" }
+src3  = { git = "https://github.com/FuelLabs/sway-standards", tag = "v0.3.3" }
+fungible_abi = { path = "../fungible-abi" }
+helpers = { path = "../../helpers" }

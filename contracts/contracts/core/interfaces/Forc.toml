@@ -1,0 +1,9 @@
+[project]
+authors = ["@theausicist"]
+entry = "lib.sw"
+license = "Apache-2.0"
+name = "core_interfaces"
+
+[dependencies]
+pyth_interface = { git = "https://github.com/pyth-network/pyth-crosschain", rev = "4ab64d2539a749e51e1281bdd7744781f5e9df8c" }
+helpers = { path = "../../helpers" }

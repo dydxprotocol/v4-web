@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "strict": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noUnusedLocals": false,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "module": "commonjs",
+        "lib": ["es6", "es2017", "dom"],
+        "typeRoots": ["./node_modules/@types", "./types"]
+    },
+    "include": ["**/*.ts", "./types/**/*.ts"],
+    "exclude": ["node_modules", "build", "cache", "artifacts"]
+}

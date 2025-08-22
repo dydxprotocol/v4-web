@@ -1,0 +1,43 @@
+{
+    "name": "starboard/contracts",
+    "version": "1.0.0",
+    "main": "node.js",
+    "license": "Apache-2.0",
+    "scripts": {
+        "build": "forc build --release --log-level 4",
+        "gen:types": "rm -rf ./types && pnpm gen:contract:types && pnpm process:types",
+        "gen:contract:types": "sh ./utils/generate-contract-types.sh",
+        "process:types": "python3 utils/process_types.py",
+        "test": "hardhat test",
+        "test:specific": "hardhat test test/core/vault/withdrawCollateral.test.ts",
+        "p": "biome format --write ."
+    },
+    "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.2.3",
+        "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "@types/mocha": "^8.2.0",
+        "@types/node": "^14.14.28",
+        "chai": "^4.3.0",
+        "chai-bn": "^0.2.1",
+        "dotenv": "^8.2.0",
+        "ethers": "^5.0.31",
+        "hardhat": "2.22.5",
+        "husky": "8.0.3",
+        "patch-package": "8.0.0",
+        "prettier": "3.1.0",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.1.5",
+        "@biomejs/biome": "1.7.3"
+    },
+    "dependencies": {
+        "bn.js": "^5.2.0",
+        "fuels": "0.94.5"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "@fuel-ts/account@0.94.5": "patches/@fuel-ts__account@0.94.5.patch",
+            "@fuel-ts/errors@0.94.5": "patches/@fuel-ts__errors@0.94.5.patch",
+            "@fuel-ts/program@0.94.5": "patches/@fuel-ts__program@0.94.5.patch"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+[project]
+authors = ["@theausicist"]
+entry = "main.sw"
+license = "Apache 2.0"
+name = "yield-tracker"
+
+[dependencies]
+asset_interfaces = { path = "../interfaces" }
+helpers = { path = "../../helpers" }
