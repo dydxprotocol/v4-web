@@ -1,24 +1,39 @@
-<p align="center"><img src="https://dydx.exchange/icon.svg?" width="256" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/wt-xyz/starboard/8b3ee6a20850848ec4fb441a9e7b820b2cafc0b0/public/starboard-symbol-yellow.svg" width="512" /></p>
 
-<h1 align="center">dYdX Chain Web</h1>
+<h1 align="center">Starboard</h1>
 
 <div align="center">
+
+![Static Badge](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=fff)
+
+![Static Badge](https://img.shields.io/badge/Monorepo-%23143055?style=flat&logo=Nx&link=https%3A%2F%2Fnx.dev%2F)
+
+<a href="https://conventionalcommits.org">
+<img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white" alt="Conventional Commits">
+</a> 
+<a href="http://commitizen.github.io/cz-cli/">
+<img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly">
+</a> 
   <a href='https://github.com/dydxprotocol/v4-web/blob/main/LICENSE'>
     <img src='https://img.shields.io/badge/License-AGPL_v3-blue.svg' alt='License' />
   </a>
+
+[![Maturity badge - level 3](https://img.shields.io/badge/Maturity-Level%203%20--%20Stable-green.svg)](https://github.com/tophat/getting-started/blob/master/scorecard.md)
 </div>
 
 ## Prerequisites
 
-- Node.js v18, `pnpm`, and docker installed on your system
+- Node.js v18,
+- `pnpm`
+- Docker
 - Wallet Connect account
 
 For deploying with Vercel, create an account with [Vercel](https://vercel.com/signup) if you don't have one already.
 
 For deploying to IPFS, choose one of the following:
 
-- **Option 1:** A free [web3.storage](https://web3.storage/) account
-- **Option 2:** An IPFS client such as [IPFS Kubo](https://docs.ipfs.tech/install/command-line/)
+- A free [web3.storage](https://web3.storage/) account, or
+- An IPFS client such as [IPFS Kubo](https://docs.ipfs.tech/install/command-line/)
 
 For web3.storage, sign up for an account and generate an API token on the [API tokens page](https://web3.storage/manage/tokens). web3.storage offers an easy-to-use interface for storing and retrieving content on IPFS.
 
