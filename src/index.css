@@ -19,7 +19,7 @@ body,
   display: block;
   position: fixed;
   inset: 0;
-  background: url(/grid-loader.svg) no-repeat center / 50px 50px;
+  background: url(/starboard-symbol-yellow.svg) no-repeat center / 100px 100px;
 }
 
 * {
