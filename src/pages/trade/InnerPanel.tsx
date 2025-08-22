@@ -8,20 +8,21 @@ import { Tabs } from '@/components/Tabs';
 import { CurrentMarketDetails } from '@/views/MarketDetails/CurrentMarketDetails';
 import { LaunchableMarketDetails } from '@/views/MarketDetails/LaunchableMarketDetails';
 import { MarketLinks } from '@/views/MarketLinks';
-import { DepthChart } from '@/views/charts/DepthChart';
+/* import { DepthChart } from '@/views/charts/DepthChart'; */
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TradingView/TvChart';
 import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { tradeFormActions } from '@/state/tradeForm';
+/* import { tradeFormActions } from '@/state/tradeForm'; */
 
-import { MustBigNumber } from '@/lib/numbers';
+/* import { MustBigNumber } from '@/lib/numbers'; */
 
 enum Tab {
   Price = 'Price',
-  Depth = 'Depth',
+    /* NOTE: disabled for proof-of-concept */
+    /* Depth = 'Depth', */
   Funding = 'Funding',
   Details = 'Details',
 }
@@ -56,21 +57,21 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         label: stringGetter({ key: STRING_KEYS.PRICE_CHART_SHORT }),
         value: Tab.Price,
       },
-      {
-        content: (
-          <DepthChart
-            onChartClick={({ side, price, size }) => {
-              dispatch(tradeFormActions.setLimitPrice(MustBigNumber(price).toString(10)));
-              dispatch(tradeFormActions.setSide(side));
-              dispatch(tradeFormActions.setSizeToken(MustBigNumber(size).toString(10)));
-            }}
-            stringGetter={stringGetter}
-            selectedLocale={selectedLocale}
-          />
-        ),
-        label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
-        value: Tab.Depth,
-      },
+        /* {
+  *   content: (
+  *     <DepthChart
+  *       onChartClick={({ side, price, size }) => {
+  *         dispatch(tradeFormActions.setLimitPrice(MustBigNumber(price).toString(10)));
+  *         dispatch(tradeFormActions.setSide(side));
+  *         dispatch(tradeFormActions.setSizeToken(MustBigNumber(size).toString(10)));
+  *       }}
+  *       stringGetter={stringGetter}
+  *       selectedLocale={selectedLocale}
+  *     />
+  *   ),
+  *   label: stringGetter({ key: STRING_KEYS.DEPTH_CHART_SHORT }),
+  *   value: Tab.Depth,
+  * }, */
       {
         content: <FundingChart selectedLocale={selectedLocale} />,
         label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_CHART_SHORT }),
@@ -82,7 +83,12 @@ export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string
         value: Tab.Details,
       },
     ];
-  }, [dispatch, launchableMarketId, selectedLocale, stringGetter]);
+  }, [
+      /* dispatch, */
+    launchableMarketId,
+    selectedLocale,
+    stringGetter
+  ]);
 
   return (
     <Tabs
