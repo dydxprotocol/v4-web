@@ -93,12 +93,12 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 const buttonActionVariants = {
   [ButtonAction.Base]: {
     [ButtonStyle.Default]: css`
-      --button-textColor: var(--color-text-1);
+      --button-textColor: var(--color-text-2);
       --button-backgroundColor: var(--color-layer-5);
       --button-border: solid var(--border-width) var(--color-border);
     `,
     [ButtonStyle.WithoutBackground]: css`
-      --button-textColor: var(--color-text-1);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: none;
     `,
@@ -120,13 +120,13 @@ const buttonActionVariants = {
 
   [ButtonAction.SimplePrimary]: {
     [ButtonStyle.Default]: css`
-      --button-textColor: var(--color-text-2);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-accent);
       --button-border: none;
       --button-hover-filter: none;
     `,
     [ButtonStyle.WithoutBackground]: css`
-      --button-textColor: var(--color-text-2);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: solid var(--border-width, var(--default-border-width)) var(--color-accent);
       --button-hover-filter: none;
@@ -141,7 +141,7 @@ const buttonActionVariants = {
       --button-hover-filter: none;
     `,
     [ButtonStyle.WithoutBackground]: css`
-      --button-textColor: var(--color-text-2);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: solid var(--border-width, var(--default-border-width)) var(--color-layer-4);
       --button-hover-filter: none;
@@ -149,12 +149,12 @@ const buttonActionVariants = {
   },
   [ButtonAction.Secondary]: {
     [ButtonStyle.Default]: css`
-      --button-textColor: var(--color-text-1);
+      --button-textColor: var(--color-text-2);
       --button-backgroundColor: var(--color-layer-3);
       --button-border: solid var(--border-width) var(--color-border);
     `,
     [ButtonStyle.WithoutBackground]: css`
-      --button-textColor: var(--color-text-0);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: none;
     `,
@@ -194,12 +194,12 @@ const buttonActionVariants = {
 
   [ButtonAction.Navigation]: {
     [ButtonStyle.Default]: css`
-      --button-textColor: var(--color-text-1);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: none;
     `,
     [ButtonStyle.WithoutBackground]: css`
-      --button-textColor: var(--color-text-1);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: transparent;
       --button-border: none;
     `,

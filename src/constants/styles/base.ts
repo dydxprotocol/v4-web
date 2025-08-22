@@ -15,6 +15,8 @@ export enum ColorToken {
   LightGray10 = '#D5DADF',
   LightGray11 = '#D1D9E0',
 
+  // LightGray0 = '#08080C',
+
   MediumGray0 = '#CACACE',
   MediumGray1 = '#C2CBD3',
 
@@ -48,8 +50,10 @@ export enum ColorToken {
   GrayPurple1 = '#C8C7D8',
   GrayPurple2 = '#807E98',
 
-  Purple0 = '#7774FF',
-  Purple1 = '#6966FF',
+  // Purple0 = '#7774FF',
+  // Purple1 = '#6966FF',
+  Purple0 = '#FACC15',
+  Purple1 = '#EAB308',
 
   Green0 = '#CEEDE3',
   Green1 = '#1AFFB9',
