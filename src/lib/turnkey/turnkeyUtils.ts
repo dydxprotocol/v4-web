@@ -1,12 +1,13 @@
 import { logBonsaiError } from '@/bonsai/logs';
 import { weakMapMemoize } from '@reduxjs/toolkit';
-import type { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
+import type { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import type { ApiKeyStamper, TurnkeyServerClient } from '@turnkey/sdk-server';
 
 import type { TurnkeyWallet, TurnkeyWalletAccount } from '@/types/turnkey';
 
 const TURNKEY_API_PUBLIC_KEY = import.meta.env.VITE_TURNKEY_API_PUBLIC_KEY;
 const TURNKEY_API_PRIVATE_KEY = import.meta.env.VITE_TURNKEY_API_PRIVATE_KEY;
+export const TURNKEY_ORGANIZATION_ID = import.meta.env.VITE_TURNKEY_PUBLIC_ORGANIZATION_ID;
 
 const getLazyTurnkeyApiKeyStamper = weakMapMemoize(async () => {
   return (await import('@turnkey/sdk-server')).ApiKeyStamper;
@@ -78,20 +79,21 @@ export async function getWalletsWithAccounts(organizationId: string): Promise<Tu
 
 /**
  * Get wallets with accounts from the Turnkey indexedDB client.
- * @param browserClient - The Turnkey indexedDB client to use.
+ * @param tkClient - The Turnkey (indexedDB or authIframe) client to use.
  * @param organizationId - The organization ID to get wallets for.
  * @returns A list of wallets with accounts.
  */
-export async function getWalletsWithAccountsFromIndexedDb(
-  browserClient: TurnkeyIndexedDbClient,
+export async function getWalletsWithAccountsFromClient(
+  tkClient: TurnkeyIndexedDbClient | TurnkeyIframeClient,
   organizationId: string
 ): Promise<TurnkeyWallet[]> {
-  const { wallets } = await browserClient.getWallets({ organizationId });
+  const { wallets } = await tkClient.getWallets({ organizationId });
 
   const walletWithAccounts = await Promise.all(
     wallets.map(async (wallet) => {
-      const { accounts } = await browserClient.getWalletAccounts({
+      const { accounts } = await tkClient.getWalletAccounts({
         walletId: wallet.walletId,
+        organizationId,
       });
 
       const accountsWithBalance = await accounts.reduce<Promise<TurnkeyWalletAccount[]>>(

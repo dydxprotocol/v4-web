@@ -3,12 +3,15 @@ export enum LocalStorageKey {
   EvmAddress = 'dydx.EvmAddress',
   SolAddress = 'dydx.SolAddress',
   DydxAddress = 'dydx.DydxAddress',
-  TurnkeyPreferredWallet = 'dydx.TurnkeyPreferredWallet',
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
+
+  // Turnkey
+  TurnkeyPreferredWallet = 'dydx.TurnkeyPreferredWallet',
+  TurnkeyEmailOnboardingData = 'dydx.TurnkeyEmailOnboardingData',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
@@ -45,5 +48,6 @@ export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.Notifications]: 'v1',
   [LocalStorageKey.KeplrCompliance]: 'v1',
   [LocalStorageKey.SelectedTradeLayout]: 'v1',
+  [LocalStorageKey.TurnkeyEmailOnboardingData]: 'v1',
   // TODO: version all localStorage keys
 };

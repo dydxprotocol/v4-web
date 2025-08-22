@@ -1,11 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import styled from 'styled-components';
+import { logBonsaiError } from '@/bonsai/logs';
+import { useTurnkey } from '@turnkey/sdk-react';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -13,12 +16,9 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
-import { useAppSelector } from '@/state/appTypes';
-import { AppTheme } from '@/state/appUiConfigs';
-import { getAppTheme } from '@/state/appUiConfigsSelectors';
-
 import { isValidEmail } from '@/lib/emailUtils';
 
+import { AppleAuth } from './AuthButtons/AppleAuth';
 import { GoogleAuth } from './AuthButtons/GoogleAuth';
 
 export const SignIn = ({
@@ -28,34 +28,29 @@ export const SignIn = ({
 }: {
   onDisplayChooseWallet: () => void;
   onSignInWithPasskey: () => void;
-  onSubmitEmail: () => void;
+  onSubmitEmail: ({ userEmail }: { userEmail: string }) => void;
 }) => {
   const stringGetter = useStringGetter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const theme = useAppSelector(getAppTheme);
+  const { authIframeClient } = useTurnkey();
+  const { signInWithOtp } = useTurnkeyAuth();
 
-  const socialLogins = useMemo(
-    () => [
-      {
-        key: 'apple',
-        icon: <Icon iconName={theme === AppTheme.Light ? IconName.Apple : IconName.AppleLight} />,
-      },
-      {
-        key: 'x/twitter',
-        icon: <Icon iconName={IconName.SocialX} />,
-      },
-    ],
-    [theme]
+  const onSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsLoading(true);
+      try {
+        await signInWithOtp({ userEmail: email });
+        onSubmitEmail({ userEmail: email });
+      } catch (error) {
+        logBonsaiError('SignIn', 'onSubmit error', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [email, onSubmitEmail, signInWithOtp]
   );
-
-  // TODO(turnkey): Implement email login
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    onSubmitEmail();
-    setIsLoading(false);
-  }, []);
 
   const hasValidEmail = isValidEmail(email);
 
@@ -63,19 +58,7 @@ export const SignIn = ({
     <form onSubmit={onSubmit} tw="flexColumn gap-1.25">
       <div tw="row gap-1">
         <GoogleAuth />
-        {socialLogins.map((login) => (
-          <$SocialLoginButton
-            key={login.key}
-            type={ButtonType.Button}
-            action={ButtonAction.Base}
-            size={ButtonSize.BasePlus}
-            state={{
-              isDisabled: isLoading,
-            }}
-          >
-            {login.icon}
-          </$SocialLoginButton>
-        ))}
+        <AppleAuth />
       </div>
 
       <div tw="flexColumn gap-0.75">
@@ -84,18 +67,17 @@ export const SignIn = ({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           placeholder={stringGetter({ key: STRING_KEYS.EMAIL_PLACEHOLDER })}
           type={InputType.Text}
-          css={{
-            '--input-borderColor': hasValidEmail ? 'var(--color-accent)' : 'var(--color-border)',
-          }}
+          $hasValidEmail={hasValidEmail}
+          slotLeft={<$EmailIcon iconName={IconName.Email} />}
           slotRight={
             <Button
-              tw="rounded-0.75"
+              tw="size-2 rounded-0.5"
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
-              onClick={onSubmitEmail}
               size={ButtonSize.Small}
               state={{
-                isDisabled: !hasValidEmail,
+                isDisabled: !hasValidEmail || authIframeClient == null,
+                isLoading,
               }}
               css={{
                 '--button-textColor': hasValidEmail
@@ -126,7 +108,7 @@ export const SignIn = ({
             {stringGetter({ key: STRING_KEYS.SIGN_IN_PASSKEY })}
           </div>
 
-          <Icon iconName={IconName.ChevronRight} />
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
 
         <$OtherOptionButton
@@ -140,25 +122,38 @@ export const SignIn = ({
             {stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })}
           </div>
 
-          <Icon iconName={IconName.ChevronRight} />
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
       </div>
     </form>
   );
 };
 
-const $SocialLoginButton = styled(Button)`
-  width: 100%;
-  border-radius: 1rem;
-  --icon-size: 1.5rem;
-`;
-
-const $EmailInput = styled(FormInput)`
+const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean }>`
   font-size: 1rem;
   --input-radius: 1rem;
   --border-width: 1px;
-  --form-input-paddingY: 0.75rem;
-  --form-input-paddingX: 1rem;
+  --form-input-paddingY: 0.5rem;
+  --form-input-paddingLeft: 0.75rem;
+  --form-input-paddingRight: 0.5rem;
+  --input-borderColor: var(--color-border);
+
+  &:focus-within {
+    --input-borderColor: var(--color-accent);
+  }
+
+  ${({ $hasValidEmail }) =>
+    $hasValidEmail &&
+    css`
+      --input-borderColor: var(--color-accent);
+    `}
+`;
+
+const $EmailIcon = styled(Icon)`
+  margin-right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-text-0);
 `;
 
 const $OtherOptionButton = styled(Button)`
