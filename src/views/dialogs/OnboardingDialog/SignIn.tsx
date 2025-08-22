@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { logBonsaiError } from '@/bonsai/logs';
 import { useTurnkey } from '@turnkey/sdk-react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -67,12 +67,11 @@ export const SignIn = ({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           placeholder={stringGetter({ key: STRING_KEYS.EMAIL_PLACEHOLDER })}
           type={InputType.Text}
-          css={{
-            '--input-borderColor': hasValidEmail ? 'var(--color-accent)' : 'var(--color-border)',
-          }}
+          $hasValidEmail={hasValidEmail}
+          slotLeft={<$EmailIcon iconName={IconName.Email} />}
           slotRight={
             <Button
-              tw="rounded-0.75"
+              tw="size-2 rounded-0.5"
               type={ButtonType.Submit}
               action={ButtonAction.Primary}
               size={ButtonSize.Small}
@@ -109,7 +108,7 @@ export const SignIn = ({
             {stringGetter({ key: STRING_KEYS.SIGN_IN_PASSKEY })}
           </div>
 
-          <Icon iconName={IconName.ChevronRight} />
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
 
         <$OtherOptionButton
@@ -123,19 +122,38 @@ export const SignIn = ({
             {stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })}
           </div>
 
-          <Icon iconName={IconName.ChevronRight} />
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
       </div>
     </form>
   );
 };
 
-const $EmailInput = styled(FormInput)`
+const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean }>`
   font-size: 1rem;
   --input-radius: 1rem;
   --border-width: 1px;
-  --form-input-paddingY: 0.75rem;
-  --form-input-paddingX: 1rem;
+  --form-input-paddingY: 0.5rem;
+  --form-input-paddingLeft: 0.75rem;
+  --form-input-paddingRight: 0.5rem;
+  --input-borderColor: var(--color-border);
+
+  &:focus-within {
+    --input-borderColor: var(--color-accent);
+  }
+
+  ${({ $hasValidEmail }) =>
+    $hasValidEmail &&
+    css`
+      --input-borderColor: var(--color-accent);
+    `}
+`;
+
+const $EmailIcon = styled(Icon)`
+  margin-right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-text-0);
 `;
 
 const $OtherOptionButton = styled(Button)`

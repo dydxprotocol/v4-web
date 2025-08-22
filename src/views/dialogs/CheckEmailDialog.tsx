@@ -41,7 +41,14 @@ export const CheckEmailDialog = ({
   }, [signInWithOtp, userEmail]);
 
   return (
-    <Dialog isOpen setIsOpen={modifiedSetIsOpen} title={<div />}>
+    <Dialog
+      css={{
+        '--dialog-header-paddingBottom': 0,
+      }}
+      isOpen
+      setIsOpen={modifiedSetIsOpen}
+      title={<div />}
+    >
       <div tw="column justify-items-center gap-0.5 text-center">
         <Icon tw="size-3 text-color-text-2" iconName={IconName.EmailStroke} />
         <span tw="text-color-text-2 font-medium-medium">

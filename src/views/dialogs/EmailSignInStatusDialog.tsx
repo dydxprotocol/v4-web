@@ -61,7 +61,14 @@ export const EmailSignInStatusDialog = ({
   );
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title={<div />}>
+    <Dialog
+      isOpen
+      css={{
+        '--dialog-header-paddingBottom': 0,
+      }}
+      setIsOpen={setIsOpen}
+      title={<div />}
+    >
       <div tw="column justify-items-center gap-0.5 text-center">
         <Icon tw="size-3 text-color-text-2" iconName={IconName.EmailStroke} />
         <span tw="text-color-text-2 font-medium-medium">{title}</span>
