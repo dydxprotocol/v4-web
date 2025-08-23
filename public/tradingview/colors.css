@@ -1,5 +1,6 @@
 /* This file is intended to replace colors-deprecated.css with the ui-refresh */
 
+/* Theme: Classic (default) */
 :root {
   --color-layer-0: #08080C; /* ColorToken.GrayBlue7; */
   --color-layer-1: #101018; /* ColorToken.GrayBlue6; */
@@ -15,13 +16,12 @@
   --color-text-0: #807E98; /* ColorToken.GrayPurple2; */
   --color-text-1: #C8C7D8; /* ColorToken.GrayPurple1; */
   --color-text-2: #FAFAFD; /* ColorToken.LightGray2; */
-  /* --color-text-button: #FAFAFA; /\* ColorToken.LightGray0; *\/ */
-  --color-text-button: #08080C; /* ColorToken.LightGray0; */
+  --color-text-button: #FAFAFA; /* ColorToken.LightGray0; */
 
-  /* --color-accent: #6966FF; /\* ColorToken.Purple1; *\/ */
-  --color-accent: #EAB308; /* yellow-600; */
+  --color-accent: #6966FF; /* ColorToken.Purple1; */
 }
   
+  /* Theme: Light */
   :root.theme-light {
   --color-layer-0: #E9ECEE; /* ColorToken.LightGray7; */
   --color-layer-1: #ECEFF1; /* ColorToken.LightGray5; */
@@ -37,13 +37,12 @@
   --color-text-0: #737373; /* ColorToken.DarkGray1; */
   --color-text-1: #4B4B4B; /* ColorToken.DarkGray3; */
   --color-text-2: #181818; /* ColorToken.DarkGray13; */
-  /* --color-text-button: #FFFFFF; /\* ColorToken.White; *\/ */
-  --color-text-button: #08080C; /* ColorToken.LightGray0; */
+  --color-text-button: #FFFFFF; /* ColorToken.White; */
 
-  /* --color-accent: #7774FF; /\* ColorToken.Purple0; *\/ */
-  --color-accent: #FACC15; /* yellow-600; */
+  --color-accent: #7774FF; /* ColorToken.Purple0; */
 }
   
+  /* Theme: Dark */
   :root.theme-dark {
   --color-layer-0: #000000; /* ColorToken.Black; */
   --color-layer-1: #1B1B1D; /* ColorToken.DarkGray14; */
@@ -59,11 +58,8 @@
   --color-text-0: #888891; /* ColorToken.DarkGray0; */
   --color-text-1: #CACACE; /* ColorToken.MediumGray0; */
   --color-text-2: #FAFAFA; /* ColorToken.LightGray0; */
+  --color-text-button: #FAFAFA; /* ColorToken.LightGray0; */
 
-  --color-text-3: #08080C; /* ColorToken.LightGray0; */
-  /* --color-text-button: #FAFAFA; /\* ColorToken.LightGray0; *\/ */
-  --color-text-button: #08080C; /* ColorToken.LightGray0; */
-
-  /* --color-accent: #7774FF; /\* ColorToken.Purple0; *\/ */
-  --color-accent: #FACC15; /* yellow-500; */
+  --color-accent: #7774FF; /* ColorToken.Purple0; */
 }
+  

@@ -1,4 +1,14 @@
 {
+    "FUEL-USDC": {
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/fuel-network/",
+        "name": "Fuel Network",
+        "tags": [
+            "Defi",
+            "Layer 2"
+        ],
+        "websiteLink": "https://fuel.network/",
+        "whitepaperLink": "https://docs.fuel.network/docs/intro/what-is-fuel/"
+    },
     "1CAT-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitcoin-cats/",
         "name": "Bitcoin Cats",
@@ -1998,7 +2008,9 @@
     "EIGEN-USD": {
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/eigenlayer/",
         "name": "EigenLayer",
-        "tags": ["Defi"],
+        "tags": [
+            "Defi"
+        ],
         "websiteLink": "https://www.eigenlayer.xyz/",
         "whitepaperLink": "https://docs.eigenlayer.xyz/assets/files/EIGEN_Token_Whitepaper-0df8e17b7efa052fd2a22e1ade9c6f69.pdf/"
     },

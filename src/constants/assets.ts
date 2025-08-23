@@ -250,6 +250,7 @@ export const ASSET_ICON_MAP = {
   FTM: '/currencies/ftm.png',
   FTT: '/currencies/ftt.png',
   FURY: '/currencies/fury.png',
+  FUEL: '/fuel-symbol.svg',
   FX: '/currencies/fx.png',
   FXS: '/currencies/fxs.png',
   G: '/currencies/g.png',
