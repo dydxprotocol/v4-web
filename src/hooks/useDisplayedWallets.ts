@@ -64,25 +64,25 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
     const phantomWallet = isPhantomDetected
       ? {
-          connectorType: ConnectorType.PhantomSolana,
-          name: WalletType.Phantom,
-        }
+        connectorType: ConnectorType.PhantomSolana,
+        name: WalletType.Phantom,
+      }
       : {
-          connectorType: ConnectorType.DownloadWallet,
-          name: WalletType.Phantom,
-          downloadLink: PHANTOM_DOWNLOAD_LINK,
-        };
+        connectorType: ConnectorType.DownloadWallet,
+        name: WalletType.Phantom,
+        downloadLink: PHANTOM_DOWNLOAD_LINK,
+      };
 
     const keplrWallet = isKeplrDetected
       ? {
-          connectorType: ConnectorType.Cosmos,
-          name: 'keplr' as CosmosWalletType.KEPLR,
-        }
+        connectorType: ConnectorType.Cosmos,
+        name: 'keplr' as CosmosWalletType.KEPLR,
+      }
       : {
-          connectorType: ConnectorType.DownloadWallet,
-          name: WalletType.Keplr,
-          downloadLink: KEPLR_DOWNLOAD_LINK,
-        };
+        connectorType: ConnectorType.DownloadWallet,
+        name: WalletType.Keplr,
+        downloadLink: KEPLR_DOWNLOAD_LINK,
+      };
 
     if (isSimpleUi) {
       return [
@@ -114,6 +114,12 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
         connectorType: ConnectorType.Privy,
         name: WalletType.Privy,
+      },
+      // Add Fuel Wallet
+      {
+        connectorType: ConnectorType.Fuel,
+        name: WalletType.FuelWallet,
+        icon: '/icons/wallets/fuel-wallet.svg',
       },
 
       // No need to special-case an OKX WalletConnect option if the OKX extension wallet is already detected.

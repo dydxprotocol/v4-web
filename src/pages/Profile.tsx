@@ -136,9 +136,11 @@ const Profile = () => {
               <span>
                 {sourceAccount.walletInfo.connectorType === ConnectorType.Injected
                   ? sourceAccount.walletInfo.name
-                  : stringGetter({
+                  : wallets[sourceAccount.walletInfo.name as keyof typeof wallets]?.stringKey
+                  ? stringGetter({
                       key: wallets[sourceAccount.walletInfo.name as keyof typeof wallets].stringKey,
-                    })}
+                    })
+                  : sourceAccount.walletInfo.name}
               </span>
             </$SubHeader>
           ) : (

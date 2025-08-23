@@ -3,6 +3,7 @@ import { ElementType } from 'react';
 import styled from 'styled-components';
 
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
+import { GenericWalletIcon } from '@/icons';
 
 import { Icon } from './Icon';
 
@@ -11,12 +12,18 @@ export const WalletIcon = ({ wallet, size = '1em' }: { wallet: WalletInfo; size?
     return <$Image src={wallet.icon} alt={wallet.name} size={size} />;
   }
 
-  return (
-    <Icon
-      iconComponent={wallets[wallet.name as keyof typeof wallets].icon as ElementType}
-      size={size}
-    />
-  );
+  const walletConfig = wallets[wallet.name as keyof typeof wallets];
+  if (walletConfig?.icon) {
+    return (
+      <Icon
+        iconComponent={walletConfig.icon as ElementType}
+        size={size}
+      />
+    );
+  }
+
+  // Fallback to generic wallet icon if no specific icon found
+  return <Icon iconComponent={GenericWalletIcon as ElementType} size={size} />;
 };
 
 const $Image = styled.img<{ size: string }>`

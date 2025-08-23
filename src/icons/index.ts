@@ -134,6 +134,7 @@ export { default as Coin98Icon } from './wallets/coin98.svg';
 export { default as CoinbaseIcon } from './wallets/coinbase-wallet.svg';
 export { default as Discord2Icon } from './wallets/discord.svg';
 export { default as EmailIcon } from './wallets/email.svg';
+export { default as FuelWalletIcon } from './wallets/fuel-wallet.svg';
 export { default as GenericWalletIcon } from './wallets/generic-wallet.svg';
 export { default as GoogleIcon } from './wallets/google.svg';
 export { default as HuobiIcon } from './wallets/huobi-wallet.svg';

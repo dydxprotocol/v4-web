@@ -2,18 +2,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  NEUTRON_BECH32_PREFIX,
-  OSMO_BECH32_PREFIX,
-} from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
   ConnectorType,
@@ -36,9 +29,9 @@ import { sleep } from '@/lib/timeUtils';
 
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
+import { useFuelWallet } from './useFuelWallet';
 import { useLocalStorage } from './useLocalStorage';
 import useSignForWalletDerivation from './useSignForWalletDerivation';
-import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -58,18 +51,31 @@ const useAccountsContext = () => {
 
   // Wallet connection
   const {
-    selectWallet,
-    selectedWallet,
-    selectedWalletError,
-    signerWagmi,
-    publicClientWagmi,
-    getCosmosOfflineSigner,
-    isConnectedGraz,
-    dydxAccountGraz,
-  } = useWalletConnection();
+    fuel,
+    isConnected: isConnectedFuel,
+    address: fuelAddress,
+    error: selectedWalletError,
+    connect: selectWallet,
+    disconnect: disconnectFuel,
+  } = useFuelWallet();
 
   const hasSubAccount = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data) != null;
   const sourceAccount = useAppSelector(getSourceAccount);
+
+  // Debug: Log current onboarding state
+  const onboardingState = useAppSelector((state) => state.account.onboardingState);
+
+  // Auto-set onboarding state to AccountConnected when Fuel wallet connects
+  useEffect(() => {
+    if (isConnectedFuel && fuelAddress) {
+      if (onboardingState === OnboardingState.WalletConnected || onboardingState === OnboardingState.Disconnected) {
+        dispatch(setOnboardingState(OnboardingState.AccountConnected));
+      }
+    } else if (!isConnectedFuel && onboardingState !== OnboardingState.Disconnected) {
+      // If Fuel wallet is disconnected but onboarding state is not Disconnected, reset it
+      dispatch(setOnboardingState(OnboardingState.Disconnected));
+    }
+  }, [isConnectedFuel, fuelAddress, onboardingState, dispatch]);
 
   const { ready, authenticated } = usePrivy();
 
@@ -128,10 +134,17 @@ const useAccountsContext = () => {
   };
 
   // dYdX wallet / onboarding state
-  const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
-  const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
-  const [localOsmosisWallet, setLocalOsmosisWallet] = useState<LocalWallet>();
-  const [localNeutronWallet, setLocalNeutronWallet] = useState<LocalWallet>();
+  // Disconnect wallet / accounts - moved up to fix order
+  const disconnectLocalDydxWallet = () => {
+    setLocalDydxWallet(undefined);
+    setHdKey(undefined);
+    hdKeyManager.clearHdkey();
+  };
+
+  const [localDydxWallet, setLocalDydxWallet] = useState<any>();
+  const [localNobleWallet, setLocalNobleWallet] = useState<any>();
+  const [localOsmosisWallet, setLocalOsmosisWallet] = useState<any>();
+  const [localNeutronWallet, setLocalNeutronWallet] = useState<any>();
 
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
@@ -183,18 +196,6 @@ const useAccountsContext = () => {
         wallet.address = sourceAccount.address;
         setLocalDydxWallet(wallet);
         dispatch(setOnboardingState(OnboardingState.AccountConnected));
-      } else if (sourceAccount.chain === WalletNetworkType.Cosmos && isConnectedGraz) {
-        try {
-          const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
-          if (dydxOfflineSigner) {
-            setLocalDydxWallet(
-              await (await getLazyLocalWallet()).fromOfflineSigner(dydxOfflineSigner)
-            );
-            dispatch(setOnboardingState(OnboardingState.AccountConnected));
-          }
-        } catch (error) {
-          log('useAccounts/setLocalDydxWallet', error);
-        }
       } else if (sourceAccount.chain === WalletNetworkType.Evm) {
         if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
@@ -251,58 +252,9 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
+  }, [isConnectedFuel, sourceAccount, hasLocalDydxWallet, blockedGeo]);
 
-  useEffect(() => {
-    const setCosmosWallets = async () => {
-      let nobleWallet: LocalWallet | undefined;
-      let osmosisWallet: LocalWallet | undefined;
-      let neutronWallet: LocalWallet | undefined;
-      if (hdKey?.mnemonic) {
-        nobleWallet = await (
-          await getLazyLocalWallet()
-        ).fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
-        osmosisWallet = await (
-          await getLazyLocalWallet()
-        ).fromMnemonic(hdKey.mnemonic, OSMO_BECH32_PREFIX);
-        neutronWallet = await (
-          await getLazyLocalWallet()
-        ).fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
-      }
 
-      try {
-        const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
-        if (nobleOfflineSigner !== undefined) {
-          nobleWallet = await (await getLazyLocalWallet()).fromOfflineSigner(nobleOfflineSigner);
-        }
-        const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
-        if (osmosisOfflineSigner !== undefined) {
-          osmosisWallet = await (
-            await getLazyLocalWallet()
-          ).fromOfflineSigner(osmosisOfflineSigner);
-        }
-        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
-        if (neutronOfflineSigner !== undefined) {
-          neutronWallet = await (
-            await getLazyLocalWallet()
-          ).fromOfflineSigner(neutronOfflineSigner);
-        }
-
-        if (nobleWallet !== undefined) {
-          setLocalNobleWallet(nobleWallet);
-        }
-        if (osmosisWallet !== undefined) {
-          setLocalOsmosisWallet(osmosisWallet);
-        }
-        if (neutronWallet !== undefined) {
-          setLocalNeutronWallet(neutronWallet);
-        }
-      } catch (error) {
-        log('useAccounts/setCosmosWallets', error);
-      }
-    };
-    setCosmosWallets();
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -345,18 +297,27 @@ const useAccountsContext = () => {
     }
   }, [blockedGeo]);
 
-  // Disconnect wallet / accounts
-  const disconnectLocalDydxWallet = () => {
-    setLocalDydxWallet(undefined);
-    setHdKey(undefined);
-    hdKeyManager.clearHdkey();
-  };
+
 
   const disconnect = async () => {
     // Disconnect local wallet
     disconnectLocalDydxWallet();
-    selectWallet(undefined);
+    disconnectFuel();
   };
+
+  // Mock localDydxWallet for Fuel wallet to satisfy subaccount system requirements
+  const mockLocalDydxWallet = useMemo(() => {
+    if (isConnectedFuel && fuelAddress) {
+      return {
+        address: fuelAddress,
+        accounts: [{ address: fuelAddress, pubkey: new Uint8Array(0), algo: 'secp256k1' }],
+        pubKey: { type: 'tendermint/PubKeySecp256k1', value: '' },
+        signer: undefined,
+        offlineSigner: undefined,
+      } as any; // Type assertion to avoid import issues
+    }
+    return localDydxWallet;
+  }, [isConnectedFuel, fuelAddress, localDydxWallet]);
 
   return {
     // Wallet connection
@@ -365,18 +326,18 @@ const useAccountsContext = () => {
 
     // Wallet selection
     selectWallet,
-    selectedWallet,
     selectedWalletError,
 
-    // Wallet connection (EVM)
-    signerWagmi,
-    publicClientWagmi,
+    // Wallet connection (Fuel)
+    fuel,
+    isConnected: isConnectedFuel,
+    address: fuelAddress,
 
     setWalletFromSignature,
 
     // dYdX accounts
     hdKey,
-    localDydxWallet,
+    localDydxWallet: mockLocalDydxWallet,
     dydxAccounts,
     dydxAddress,
 
@@ -392,8 +353,5 @@ const useAccountsContext = () => {
 
     // dydxClient Account methods
     getSubaccounts,
-
-    // cosmos account
-    dydxAccountGraz,
   };
 };

@@ -117,6 +117,16 @@ export const OnboardingDialog = ({
     if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
       setIsOpenFromDialog(false);
     }
+    
+    // For Fuel wallet, connect immediately and close the dialog
+    if (wallet.name === WalletType.FuelWallet) {
+      selectWallet(wallet);
+      // Close the dialog immediately for Fuel wallet
+      // The connection and state changes will happen in the background
+      setIsOpenFromDialog(false);
+      return;
+    }
+    
     selectWallet(wallet);
   };
 
