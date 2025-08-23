@@ -2,13 +2,12 @@
   "name": "@dydxprotocol/v4-client-js",
   "version": "1.3.17",
   "description": "General client library for the new dYdX system (v4 decentralized)",
-  "main": "build/cjs/src/index.js",
-  "module": "build/esm/src/index.js",
-  "types": "build/esm/src/index.d.ts",
+  "module": "src/index.ts",
+  "types": "src/types.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./build/esm/src/index.js",
+      "import": "src/index.ts",
       "require": "./build/cjs/src/index.js",
       "types": "./build/esm/src/index.d.ts"
     },

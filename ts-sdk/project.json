@@ -1,0 +1,16 @@
+{
+  "name": "ts-sdk",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "ts-sdk",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project ts-sdk --web",
+  "targets": {
+    "build": {
+      "command": "tsc",
+      "options": {
+        "cwd": "ts-sdk"
+      }
+    }
+  }
+}
