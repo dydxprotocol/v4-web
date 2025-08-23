@@ -66,6 +66,7 @@ const MarketsDropdownContent = ({
     const { filteredMarkets, marketFilters } = useMarketsData({
         filter,
         searchFilter,
+        forceHideUnlaunchedMarkets: true,
     });
 
     const columns = useMemo(
@@ -350,15 +351,15 @@ export const MarketsDropdown = memo(
                                     </>
                                 ) : (
                                     <div tw="flex items-center gap-0.25">
-                                            {/* HACK: hardcoded and done for demo purposes. Try to use real market data. */}
                                         <$AssetIconWithStar>
                                             {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
                                             <$AssetIcon
-                        logoUrl="https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/MIRGA.svg"
-                        tw="mr-0.25"
-                      />
+                                                logoUrl={logoUrl}
+                                                symbol={currentMarketId}
+                                                tw="mr-0.25"
+                                            />
                                         </$AssetIconWithStar>
-                                        <h2 tw="text-color-text-2 font-medium-medium">MIRG.BA-USD</h2>
+                                        <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
                                     </div>
                                 )}
                             </div>
