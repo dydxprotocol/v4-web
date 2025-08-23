@@ -28,6 +28,7 @@ import {
   PerpetualMarketSummaries,
 } from '../types/summaryTypes';
 import { formatAssetDataForPerpetualMarketSummary } from './assets';
+import { calculatePriceChangePercent } from '../lib/marketUtils';
 
 export function calculateAllMarkets(markets: MarketsData | undefined): MarketsInfo | undefined {
   if (markets == null) {
@@ -77,18 +78,6 @@ function calculateDerivedMarketDisplayItems(market: IndexerWsBaseMarketObject) {
     displayableAsset: getDisplayableAssetFromTicker(market.ticker),
     displayableTicker: getDisplayableTickerFromMarket(market.ticker),
   };
-}
-
-function calculatePriceChangePercent(
-  priceChange24H: string | null | undefined,
-  oraclePrice: string | null | undefined
-): BigNumber | null {
-  if (priceChange24H == null || oraclePrice == null) {
-    return null;
-  }
-
-  const price24hAgo = MustBigNumber(oraclePrice).minus(priceChange24H);
-  return price24hAgo.gt(0) ? MustBigNumber(priceChange24H).div(price24hAgo) : null;
 }
 
 function calculateDerivedMarketCore(market: IndexerWsBaseMarketObject) {
@@ -146,7 +135,7 @@ export function createMarketSummary(
         recentMarketIdsByClobPairId.has(market.ticker) ||
         Boolean(
           (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
-            SEVEN_DAY_SPARKLINE_ENTRIES
+          SEVEN_DAY_SPARKLINE_ENTRIES
         );
 
       const assetData = assetInfo?.[market.assetId];

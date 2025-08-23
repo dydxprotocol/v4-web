@@ -460,6 +460,7 @@ export class IndexerWebsocket {
       } else {
         assertNever(message);
       }
+
     } catch (e) {
       logBonsaiError('IndexerWebsocket', 'Error handling websocket message', {
         messagePre,
