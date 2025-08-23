@@ -8217,5 +8217,93 @@
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/devve/",
         "websiteLink": "https://devve.io/",
         "whitepaperLink": "https://assets-global.website-files.com/6509e01d2c57f1be928c4ad1/657734916a8fe48f1b8039cd_DevvE%20Whitepaper%20Dec%2011%20-%2023.pdf"
+    },
+    "MIRG": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/MIRG.BA/",
+        "name": "Migor Sociedad Anonima",
+        "tags": [
+            "Argentina",
+            "Financial",
+            "Banking"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "GGAL": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/GGAL",
+        "name": "Grupo Financiero Galicia S.A.",
+        "tags": [
+            "Argentina",
+            "Financial",
+            "Banking"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "BMA": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/BMA.BA/",
+        "name": "Banco Macro S.A.",
+        "tags": [
+            "Argentina",
+            "Financial",
+            "Banking"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "BYMA": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/BYMA.BA/",
+        "name": "Bolsas Mercados Argentinos S.A.",
+        "tags": [
+            "Argentina",
+            "Financial",
+            "Exchange"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "FPT": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/FPT.VN/",
+        "name": "FPT Corporation",
+        "tags": [
+            "Vietnam",
+            "Technology",
+            "Telecommunications"
+        ],
+        "websiteLink": "https://fpt.com.vn/",
+        "whitepaperLink": null
+    },
+    "HPG": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/HPG.VN/",
+        "name": "Hoa Phat Group Joint Stock Company",
+        "tags": [
+            "Vietnam",
+            "Industrial",
+            "Steel"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "DELTA": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/DELTA.BK/",
+        "name": "Delta Electronics (Thailand) Public Company Limited",
+        "tags": [
+            "Thailand",
+            "Technology",
+            "Electronics"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
+    },
+    "KBANK": {
+        "yahooFinanceLink": "https://finance.yahoo.com/quote/KBANK.BK/",
+        "name": "Kasikornbank Public Company Limited",
+        "tags": [
+            "Thailand",
+            "Financial",
+            "Banking"
+        ],
+        "websiteLink": null,
+        "whitepaperLink": null
     }
 }
