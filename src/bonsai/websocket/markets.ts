@@ -5,7 +5,7 @@ import {
   isIndexerPerpetualMarketResponse,
   isWsBasePerpetualMarketObject,
   isWsMarketUpdateResponses,
-  isWsPerpetualMarketResponse,
+  isWsPerpetualMarketResponse
 } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
@@ -110,7 +110,54 @@ export function setUpMarkets(store: RootStore) {
           return;
         }
         AppStartupTimer.timeIfFirst('loadedMarkets');
-        setMarketsIfEmpty(loadableLoaded(allMarkets.markets));
+
+        // Transform the raw market data into the final PerpetualMarketSummary format
+        const transformedMarkets = Object.entries(allMarkets.markets).reduce((acc, [marketId, market]) => {
+          // Create the final market summary structure that the MarketsDropdown expects
+          acc[marketId] = {
+            // Base market data
+            ...market,
+
+            // Derived display items
+            assetId: market.ticker.split('-')[0], // Extract asset from ticker like "MIRG.BA-USD" -> "MIRG.BA"
+            displayableAsset: market.ticker.split('-')[0],
+            displayableTicker: market.ticker,
+
+            // Derived market core
+            effectiveInitialMarginFraction: parseFloat(market.initialMarginFraction) || null,
+            openInterestUSDC: parseFloat(market.openInterest) * parseFloat(market.oraclePrice || '0'),
+            percentChange24h: parseFloat(market.priceChange24H) || null,
+            stepSizeDecimals: parseFloat(market.stepSize) ? parseFloat(market.stepSize).toString().split('.')[1]?.length || 0 : 2,
+            tickSizeDecimals: parseFloat(market.tickSize) ? parseFloat(market.tickSize).toString().split('.')[1]?.length || 0 : 2,
+
+            // Asset data (simplified)
+            name: market.ticker.split('-')[0],
+            logo: null,
+            sectorTags: [],
+
+            // Market summary specific fields
+            sparkline24h: [],
+            isNew: false,
+            spotVolume24h: null,
+            isFavorite: false,
+            isUnlaunched: false,
+
+            // Convert string values to numbers where needed
+            oraclePrice: parseFloat(market.oraclePrice) || 0,
+            priceChange24h: parseFloat(market.priceChange24H) || 0,
+            volume24h: parseFloat(market.volume24H) || 0,
+            trades24h: market.trades24H,
+            nextFundingRate: parseFloat(market.nextFundingRate) || 0,
+            openInterest: parseFloat(market.openInterest) || 0,
+            marketCap: null,
+
+            // Preserve the status field - this is critical for filtering
+            status: market.status,
+          };
+          return acc;
+        }, {} as any);
+
+        setMarketsIfEmpty(loadableLoaded(transformedMarkets));
         tearDownLoadOnce();
       });
       return () => {
@@ -122,10 +169,14 @@ export function setUpMarkets(store: RootStore) {
   return createStoreEffect(store, selectWebsocketUrl, (wsUrl) => {
     const unsub = subscribeToWsValue(MarketsValueManager, { wsUrl }, (val) => {
       const hasData = val.data != null;
+      // Only set markets if we haven't already set them via REST call
+      // HACK: disable websockets temproarily
       if (hasData && !lastSetHadData) {
         setMarkets(val);
-      } else {
-        throttledSetMarkets(val);
+      } else if (hasData && lastSetHadData) {
+        // Don't overwrite the transformed data with raw websocket data
+        console.log("Websocket received market updates, but keeping transformed data from REST call");
+        // Optionally, you could merge specific updates here instead of ignoring them completely
       }
     });
 

@@ -1593,4 +1593,5 @@ export const ASSET_ICON_MAP = {
     '/currencies/zero,raydium,93rc484omk5t9h89rzt5qiaxkhgp9jscxfffrihnbe57.png',
   ZKP: '/currencies/zkp.png',
   ZTX: '/currencies/ztx.png',
+  "MIRG.BA": "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/MIRGA.svg"
 } as const;

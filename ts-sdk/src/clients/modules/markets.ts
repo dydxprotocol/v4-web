@@ -8,35 +8,35 @@ import RestClient from './rest';
 export default class MarketsClient extends RestClient {
   async getPerpetualMarkets(market?: string): Promise<Data> {
     const uri = '/v4/perpetualMarkets';
-    console.log("hello mattias");
-    return this.get(uri, { ticker: market });
     // return this.get(uri, { ticker: "MIRG.BA-USD" });
-    // return {
-    //   "propertyName*": {
-    //     "clobPairId": "MIRG.BA-USD",
-    //     "ticker": "MIRG.BA-USD",
-    //     "status": "ACTIVE",
-    //     "oraclePrice": "—",  // USD conversion not available publicly; placeholder
-    //     "priceChange24H": "≈ -0.48%",  // based on ARS 20,525 vs 20,625 close :contentReference[oaicite:4]{index=4}
-    //     "volume24H": "≈ 5,799",  // volume in shares :contentReference[oaicite:5]{index=5}
-    //     "trades24H": 1,  // placeholder; actual trades count not public
-    //     "nextFundingRate": "—",
-    //     "initialMarginFraction": "—",
-    //     "maintenanceMarginFraction": "—",
-    //     "openInterest": "—",
-    //     "atomicResolution": 1,
-    //     "quantumConversionExponent": 1,
-    //     "tickSize": "—",  // not publicly disclosed
-    //     "stepSize": "—",  // unknown
-    //     "stepBaseQuantums": 1,
-    //     "subticksPerTick": 1,
-    //     "marketType": "CROSS",  // as provided
-    //     "openInterestLowerCap": "—",
-    //     "openInterestUpperCap": "—",
-    //     "baseOpenInterest": "—",
-    //     "defaultFundingRate1H": "—"
-    //   }
-    // }
+    return {
+      markets: {
+        "MIRG.BA-USD": {
+          "clobPairId": "0",
+          "ticker": "MIRG.BA-USD",
+          "status": "ACTIVE",
+          "oraclePrice": "1.00",
+          "priceChange24H": "-0.48",
+          "volume24H": "5799",
+          "trades24H": 1,
+          "nextFundingRate": "0.0001",
+          "initialMarginFraction": "0.10",
+          "maintenanceMarginFraction": "0.05",
+          "openInterest": "0",
+          "atomicResolution": 1,
+          "quantumConversionExponent": 1,
+          "tickSize": "0.01",
+          "stepSize": "0.01",
+          "stepBaseQuantums": 1,
+          "subticksPerTick": 1,
+          "marketType": "CROSS",
+          "openInterestLowerCap": "0",
+          "openInterestUpperCap": "1000000",
+          "baseOpenInterest": "0",
+          "defaultFundingRate1H": "0.0001"
+        }
+      }
+    }
   }
 
   async getPerpetualMarketOrderbook(market: string): Promise<Data> {
