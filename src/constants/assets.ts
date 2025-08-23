@@ -1593,5 +1593,12 @@ export const ASSET_ICON_MAP = {
     '/currencies/zero,raydium,93rc484omk5t9h89rzt5qiaxkhgp9jscxfffrihnbe57.png',
   ZKP: '/currencies/zkp.png',
   ZTX: '/currencies/ztx.png',
-  "MIRG.BA": "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/MIRGA.svg"
+  MIRG: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/MIRGA.svg",
+  GGAL: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/GGAL.svg",
+  BMA: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/BMA.svg",
+  BYMA: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/BYMA.svg",
+  FPT: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/FPT.svg",
+  HPG: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/HPG.svg",
+  DELTA: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/DELTA.svg",
+  KBANK: "https://raw.githubusercontent.com/wt-xyz/starboard/3156ea1d704084694ba8f4a04a5f3e17e018b697/public/KBANK.svg"
 } as const;
