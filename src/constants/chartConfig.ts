@@ -13,14 +13,21 @@ export const USE_WIDGET_CHARTS = true;
  * Add your market mappings here
  */
 export const MARKET_SYMBOL_MAP: Record<string, string> = {
-    // Example mappings - replace with your actual market symbols
-    'MIRGOR': 'BCBA:MIRG',
-    'BTC-USD': 'CRYPTOCAP:BTC',
-    'ETH-USD': 'CRYPTOCAP:ETH',
-    'AAPL': 'NASDAQ:AAPL',
-    'MSFT': 'NASDAQ:MSFT',
-    'GOOGL': 'NASDAQ:GOOGL',
-    // Add more mappings as needed
+  // Example mappings - replace with your actual market symbols
+  'MIRG-USD': 'BCBA:MIRG',
+  'BMA-USD': 'BCBA:BMA',
+  'BYMA-USD': 'BCBA:BYMA',
+  'FPT-USD': 'HOSE:FPT',
+  'HPG-USD': 'HOSE:HPG',
+  'KBANK-USD': 'SET:KBANK',
+  'GGAL-USD': 'BCBA:GGAL',
+  'DELTA-USD': 'SET:DELTA',
+  'BTC-USD': 'CRYPTOCAP:BTC',
+  'ETH-USD': 'CRYPTOCAP:ETH',
+  'AAPL': 'NASDAQ:AAPL',
+  'MSFT': 'NASDAQ:MSFT',
+  'GOOGL': 'NASDAQ:GOOGL',
+  // Add more mappings as needed
 };
 
 /**
@@ -36,41 +43,41 @@ export const MARKET_SYMBOL_MAP: Record<string, string> = {
  * - Years: xM months (12M — one year)
  */
 export const RESOLUTION_TO_WIDGET_INTERVAL: Record<string, string> = {
-    '1': '1',      // 1 minute
-    '5': '5',      // 5 minutes
-    '15': '15',    // 15 minutes
-    '30': '30',    // 30 minutes
-    '60': '60',    // 1 hour
-    '240': '240',  // 4 hours
-    '1D': '1D',    // 1 day
-    '1W': '1W',    // 1 week
-    '1M': '1M',    // 1 month
-    '12M': '12M',  // 1 year
+  '1': '1',      // 1 minute
+  '5': '5',      // 5 minutes
+  '15': '15',    // 15 minutes
+  '30': '30',    // 30 minutes
+  '60': '60',    // 1 hour
+  '240': '240',  // 4 hours
+  '1D': '1D',    // 1 day
+  '1W': '1W',    // 1 week
+  '1M': '1M',    // 1 month
+  '12M': '12M',  // 1 year
 };
 
 /**
  * Default TradingView widget settings
  */
 export const DEFAULT_WIDGET_SETTINGS = {
-    timezone: 'Etc/UTC',
-    style: '1' as const,
-    locale: 'en',
-    enable_publishing: false,
-    allow_symbol_change: false,
-    hide_top_toolbar: true,
-    hide_legend: false,
-    save_image: true,
-    studies: ['Volume@tv-basicstudies'],
-    disabled_features: ['use_localstorage_for_settings'],
-    enabled_features: ['study_templates'],
-    autosize: true,
-    // Additional settings to reduce gaps and improve styling
-    loading_screen: {
-        backgroundColor: 'transparent',
-        foregroundColor: 'transparent',
-    },
-    // Use standard TradingView dark theme colors that work reliably
-    backgroundColor: '#000000',
-    gridColor: '#363c4e',
-    toolbar_bg: '#2a2e39',
+  timezone: 'Etc/UTC',
+  style: '1' as const,
+  locale: 'en',
+  enable_publishing: false,
+  allow_symbol_change: false,
+  hide_top_toolbar: true,
+  hide_legend: false,
+  save_image: true,
+  studies: ['Volume@tv-basicstudies'],
+  disabled_features: ['use_localstorage_for_settings'],
+  enabled_features: ['study_templates'],
+  autosize: true,
+  // Additional settings to reduce gaps and improve styling
+  loading_screen: {
+    backgroundColor: 'transparent',
+    foregroundColor: 'transparent',
+  },
+  // Use standard TradingView dark theme colors that work reliably
+  backgroundColor: '#000000',
+  gridColor: '#363c4e',
+  toolbar_bg: '#2a2e39',
 };
