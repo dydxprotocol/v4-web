@@ -2,16 +2,12 @@
 import {
   BONSAI_DETAILED_LOGS,
   logBonsaiError,
-  logBonsaiInfo,
-  LONG_REQUEST_LOG_THRESHOLD_MS,
-  OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS,
-  REQUEST_TIME_SAMPLE_RATE,
+  logBonsaiInfo
 } from '@/bonsai/logs';
 import typia from 'typia';
 
 import { timeUnits } from '@/constants/time';
 
-import { assertNever } from '@/lib/assertNever';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MissingMessageDetector } from './missingMessageDetector';
@@ -96,17 +92,15 @@ class SubscriptionManager {
 
 export class IndexerWebsocket {
   private socket: ReconnectingWebSocket | null = null;
-
-  private missingMessageDetector: MissingMessageDetector | null = null;
-
-  // for logging purposes, to differentiate when user has many tabs open
-  private indexerWsId = crypto.randomUUID();
-
   private subscriptions = new SubscriptionManager();
+  private missingMessageDetector: MissingMessageDetector | null = null;
+  private indexerWsId: string;
+  private sentMessageIds = new Set<number>(); // Track sent message IDs
 
-  constructor(url: string) {
+  constructor(private wsUrl: string) {
+    this.indexerWsId = crypto.randomUUID();
     this.socket = new ReconnectingWebSocket({
-      url,
+      url: this.wsUrl,
       handleFreshConnect: this._handleFreshConnect,
       handleMessage: this._handleMessage,
     });
@@ -119,6 +113,97 @@ export class IndexerWebsocket {
   teardown(): void {
     this.socket?.teardown();
     this.socket = null;
+  }
+
+  /**
+   * Inject a fake message into the websocket connection for client-side consumption
+   * This simulates receiving a message from the server without actually sending to the server
+   * 
+   * @param channel - The channel to inject the message into (e.g., 'v4_trades', 'v4_orderbook', 'v4_markets')
+   * @param data - The data to inject (generic structure)
+   * @param id - The ID for the channel (e.g., marketId for trades)
+   * 
+   * @example
+   * // Inject fake trade data
+   * websocket.injectFakeMessage('v4_trades', { trades: [tradeObject] }, marketId);
+   * 
+   * // Inject fake orderbook data
+   * websocket.injectFakeMessage('v4_orderbook', { orderbook: orderbookData }, marketId);
+   * 
+   * // Inject fake market data
+   * websocket.injectFakeMessage('v4_markets', { market: marketData }, marketId);
+   * 
+   * // Inject custom data to any channel
+   * websocket.injectFakeMessage('custom_channel', { customField: 'value' }, 'custom_id');
+   */
+  injectFakeMessage(channel: string, data: any, id: string): void {
+    try {
+      const sub = this.subscriptions.getSubscription(channel, id);
+
+      if (!sub || !sub.handleUpdates) {
+        logBonsaiError(
+          'IndexerWebsocket', 'injectFakeMessage: no subscription found', {
+          channel,
+          id,
+          wsId: this.indexerWsId
+        });
+        return;
+      }
+
+      const updateMessage = { ...data, type: 'fake_injection' as const };
+
+      const fullMessage = {
+        type: 'fake_injection',
+        message_id: Date.now(), channel, id, contents: updateMessage
+      }
+      sub.handleUpdates([updateMessage], fullMessage)
+
+    } catch (error) {
+      logBonsaiError('IndexerWebsocket', 'Error in injectFakeMessage', {
+        error,
+        channel,
+        data,
+        id,
+        wsId: this.indexerWsId,
+      });
+    }
+  }
+
+  /**
+   * Inject a fake trade message into the websocket connection for client-side consumption
+   * This simulates receiving a trade from the server without actually sending to the server
+   * @param trade - The trade object to inject
+   * @param marketId - The market ID for the trade
+   */
+  injectFakeTrade(trade: {
+    id: string;
+    side: 'BUY' | 'SELL';
+    size: string;
+    price: string;
+    type: 'LIMIT' | 'LIQUIDATED' | 'DELEVERAGED';
+    createdAt: string;
+    market?: string;
+  }, marketId: string): void {
+    // Use the generic injectFakeMessage method for trades
+    this.injectFakeMessage('v4_trades', { trades: [trade] }, marketId);
+  }
+
+  /**
+   * Inject fake orderbook data into the websocket connection
+   * @param orderbookData - The orderbook data to inject
+   * @param marketId - The market ID for the orderbook
+   */
+  injectFakeOrderbook(orderbookData: any, marketId: string): void {
+    this.injectFakeMessage('v4_orderbook', { orderbook: orderbookData }, marketId);
+  }
+
+  /**
+   * Inject fake market data into the websocket connection
+   * @param marketData - The market data to inject
+   * @param marketId - The market ID
+   */
+  injectFakeMarketData(marketData: any, marketId: string): void {
+    this.injectFakeMessage('v4_markets', { market: marketData }, marketId);
   }
 
   // returns the unsubscribe function
@@ -342,123 +427,57 @@ export class IndexerWebsocket {
 
   private _handleMessage = (messagePre: any) => {
     try {
+      // messagePre is already parsed by ReconnectingWebSocket, so we don't need to parse it again
       const message = isWsMessage(messagePre);
+
+      logBonsaiInfo('IndexerWebsocket', 'Raw message received', { messagePre, wsId: this.indexerWsId, });
+
+      // Check if this is a trade message we sent
+
+      if (message.type === 'error') {
+
+        this._handleErrorReceived(message);
+        return;
+      }
+
       if (this.missingMessageDetector != null) {
         this.missingMessageDetector.insert(message.message_id);
       } else {
-        logBonsaiError(
-          'IndexerWebsocket',
-          'message received before missing message detector initialized'
-        );
+        logBonsaiError('IndexerWebsocket', 'message received before missing message detector initialized');
       }
-      if (message.type === 'error') {
-        this._handleErrorReceived(message);
-      } else if (message.type === 'connected') {
-        // do nothing
-      } else if (message.type === 'unsubscribed') {
-        if (BONSAI_DETAILED_LOGS) {
-          logBonsaiInfo('IndexerWebsocket', `unsubscribe confirmed`, {
-            channel: message.channel,
-            id: message.id,
-            wsId: this.indexerWsId,
-          });
-        }
-      } else if (
-        message.type === 'subscribed' ||
-        message.type === 'channel_batch_data' ||
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        message.type === 'channel_data'
-      ) {
-        const channel = message.channel;
-        const id = message.id;
 
-        const sub = this.subscriptions.getSubscription(channel, id);
-        if (!this.subscriptions.hasSubscription(channel, id) || sub == null) {
-          // hide error for channel we expect to see it on
-          if (channel !== 'v4_orderbook') {
-            logBonsaiInfo('IndexerWebsocket', 'encountered message with unknown target', {
-              channel,
-              id,
-              type: message.type,
-              wsId: this.indexerWsId,
-            });
-          }
-          return;
-        }
-        if (message.type === 'subscribed') {
-          if (BONSAI_DETAILED_LOGS) {
-            logBonsaiInfo('IndexerWebsocket', `subscription confirmed`, {
-              channel,
-              id,
-              wsId: this.indexerWsId,
-            });
-          }
-          if (!sub.receivedBaseData && sub.firstSubscriptionTimeMs != null) {
-            const duration = Date.now() - sub.firstSubscriptionTimeMs;
-            if (
-              duration > LONG_REQUEST_LOG_THRESHOLD_MS &&
-              duration < OBVIOUSLY_TOO_LONG_REQUEST_LOG_THRESHOLD_MS
-            ) {
-              logBonsaiInfo(
-                'IndexerWebsocket',
-                `Long request time detected for ${channel}: ${Math.floor(duration / 1000)}s`,
-                {
-                  duration,
-                  channel,
-                  source: channel,
-                  id,
-                }
-              );
-            }
-            if (Math.random() < REQUEST_TIME_SAMPLE_RATE) {
-              logBonsaiInfo(
-                'IndexerWebsocket',
-                `Request time for ${channel}: ${Math.floor(duration / 1000)}s`,
-                {
-                  duration,
-                  source: channel,
-                  channel,
-                  id,
-                }
-              );
-            }
-          }
-          sub.receivedBaseData = true;
+      if (message.type === 'connected') {
+        // Handle connection confirmation
+        return;
+      }
+
+      if (message.type === 'subscribed') {
+        const sub = this.subscriptions.getSubscription(message.channel, message.id);
+        if (sub != null) {
           sub.handleBaseData(message.contents, message);
-        } else if (message.type === 'channel_data') {
-          if (!sub.receivedBaseData) {
-            logBonsaiError(
-              'IndexerWebsocket',
-              'message received before subscription confirmed, hiding',
-              {
-                channel,
-                id,
-                wsId: this.indexerWsId,
-              }
-            );
-            return;
-          }
-          sub.handleUpdates([message.contents], message);
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        } else if (message.type === 'channel_batch_data') {
-          if (!sub.receivedBaseData) {
-            logBonsaiError(
-              'IndexerWebsocket',
-              'message received before subscription confirmed, hiding',
-              {
-                channel,
-                id,
-                wsId: this.indexerWsId,
-              }
-            );
-            return;
-          }
-          sub.handleUpdates(message.contents, message);
-        } else {
-          assertNever(message);
         }
-      } else {
-        assertNever(message);
+        return;
+      }
+
+      if (message.type === 'unsubscribed') {
+        // Handle unsubscription confirmation
+        return;
+      }
+
+      if (message.type === 'channel_data') {
+        const sub = this.subscriptions.getSubscription(message.channel, message.id);
+        if (sub != null) {
+          sub.handleUpdates([message.contents], message);
+        }
+        return;
+      }
+
+      if (message.type === 'channel_batch_data') {
+        const sub = this.subscriptions.getSubscription(message.channel, message.id);
+        if (sub != null) {
+          sub.handleUpdates(message.contents, message);
+        }
+        return;
       }
 
     } catch (e) {
@@ -518,36 +537,42 @@ type IndexerWebsocketMessageType =
   | IndexerWebsocketErrorMessage
   | { type: 'connected'; message_id: number }
   | {
-      type: 'channel_batch_data';
-      message_id: number;
-      channel: string;
-      id: string | undefined;
-      version: string;
-      subaccountNumber?: number;
-      contents: any[];
-    }
+    type: 'channel_batch_data';
+    message_id: number;
+    channel: string;
+    id: string | undefined;
+    version: string;
+    subaccountNumber?: number;
+    contents: any[];
+  }
   | {
-      type: 'channel_data';
-      message_id: number;
-      channel: string;
-      id: string | undefined;
-      version: string;
-      subaccountNumber?: number;
-      contents: any;
-    }
+    type: 'channel_data';
+    message_id: number;
+    channel: string;
+    id: string | undefined;
+    version: string;
+    subaccountNumber?: number;
+    contents: any;
+  }
   | {
-      type: 'subscribed';
-      message_id: number;
-      channel: string;
-      id: string | undefined;
-      contents: any;
-    }
+    type: 'subscribed';
+    message_id: number;
+    channel: string;
+    id: string | undefined;
+    contents: any;
+  }
   | {
-      type: 'unsubscribed';
-      message_id: number;
-      channel: string;
-      id: string | undefined;
-      contents: any;
-    };
+    type: 'unsubscribed';
+    message_id: number;
+    channel: string;
+    id: string | undefined;
+    contents: any;
+  } | {
+    type: 'fake_injection';
+    message_id: number;
+    channel: string;
+    id: string | undefined;
+    contents: any;
+  };
 
 export const isWsMessage = typia.createAssert<IndexerWebsocketMessageType>();
