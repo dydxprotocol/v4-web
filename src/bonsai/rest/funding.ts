@@ -42,7 +42,9 @@ export const useCurrentMarketHistoricalFunding = (): Loadable<HistoricalFundingO
       const result: IndexerHistoricalFundingResponse =
         await indexerClient.markets.getPerpetualMarketHistoricalFunding(currentMarketId);
 
-      return result.historicalFunding.reverse().map(mapFundingChartObject);
+      const transformedData = result.historicalFunding.map(mapFundingChartObject);
+
+      return transformedData;
     }, 'currentMarketHistoricalFunding'),
     refetchInterval: timeUnits.hour,
     staleTime: timeUnits.hour,
