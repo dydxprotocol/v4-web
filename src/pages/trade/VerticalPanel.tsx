@@ -1,4 +1,4 @@
-import { useContinuousTradeGeneration } from '@/bonsai/websocket/trades';
+import { useContinuousTradeGeneration } from '@/hooks/useContinuousTradeGeneration';
 import { Tabs } from '@/components/Tabs';
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
@@ -9,8 +9,8 @@ import styled from 'styled-components';
 
 
 enum Tab {
-    Orderbook = 'Orderbook',
-    Trades = 'Trades',
+  Orderbook = 'Orderbook',
+  Trades = 'Trades',
 }
 
 // Define histogram sides mapping locally

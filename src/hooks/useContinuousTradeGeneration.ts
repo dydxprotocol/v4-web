@@ -2,23 +2,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { orderBy } from 'lodash';
 
-import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
-import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
+import { isWsTradesResponse, isWsTradesUpdateResponses } from '../types/indexer/indexerChecks';
+import { IndexerWsTradesUpdateObject } from '../types/indexer/indexerManual';
 
+import { useAppSelector } from '../state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '../state/currentMarketSelectors';
+
+import { mergeById } from '../lib/mergeById';
+
+import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../bonsai/lib/loadable';
+import { logBonsaiError, logBonsaiInfo } from '../bonsai/logs';
+import { selectWebsocketUrl } from '../bonsai/socketSelectors';
+import { makeWsValueManager, subscribeToWsValue } from '../bonsai/websocket/lib/indexerValueManagerHelpers';
+import { IndexerWebsocket } from '../bonsai/websocket/lib/indexerWebsocket';
+import { IndexerWebsocketManager } from '../bonsai/websocket/lib/indexerWebsocketManager';
+import { WebsocketDerivedValue } from '../bonsai/websocket/lib/websocketDerivedValue';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { orEmptyObj } from '@/lib/typeUtils';
-import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
-
-import { mergeById } from '@/lib/mergeById';
-
-import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
-import { logBonsaiError, logBonsaiInfo } from '../logs';
-import { selectWebsocketUrl } from '../socketSelectors';
-import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
-import { IndexerWebsocket } from './lib/indexerWebsocket';
-import { IndexerWebsocketManager } from './lib/indexerWebsocketManager';
-import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
 
 // Type definitions for fake message injection
 export interface FakeTradeData {
@@ -275,3 +275,164 @@ export function createSampleTrade(
   };
 }
 
+/**
+ * Hook for continuous trade generation using a reasonable price range
+ * @param intervalMs - Interval between trades in milliseconds (default: 1000ms)
+ * @param enabled - Whether continuous generation is enabled (default: true for auto-start)
+ * @returns Object with control functions and status
+ */
+export function useContinuousTradeGeneration(
+  intervalMs: number = 1000,
+  enabled: boolean = true
+) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [tradesGenerated, setTradesGenerated] = useState(0);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const websocket = useTradesWebsocket();
+  const currentMarketId = useAppSelector(getCurrentMarketIdIfTradeable);
+  const { tickSizeDecimals } = orEmptyObj(
+    useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
+  );
+
+  // Auto-start when websocket and market are available
+  useEffect(() => {
+    if (enabled && websocket && currentMarketId && !isRunning) {
+      startGeneration();
+    }
+  }, [enabled, websocket, currentMarketId, isRunning]);
+
+  // Generate initial batch of 30 trades
+  const generateInitialTrades = useCallback(() => {
+    if (!websocket || !currentMarketId || hasInitialized) {
+      return;
+    }
+
+    for (let i = 0; i < 30; i++) {
+      try {
+        // Use a reasonable price range for demo purposes
+        const basePrice = 100 + Math.random() * 1900; // Random price between $100-$2000
+
+        // Add some small random variation to make it look more realistic
+        const priceVariation = (Math.random() - 0.5) * 0.02; // ±1%
+        const randomPrice = basePrice * (1 + priceVariation);
+
+        // Generate random size between 0.1 and 5.0
+        const randomSize = (Math.random() * 4.9 + 0.1).toFixed(2);
+
+        // Randomly choose BUY or SELL (slightly favor BUY for demo purposes)
+        const randomSide = Math.random() > 0.45 ? 'BUY' : 'SELL';
+
+        // Format price according to tick size decimals
+        const formattedPrice = randomPrice.toFixed(tickSizeDecimals ?? 2);
+
+        const trade = createSampleTrade(currentMarketId, randomSide, randomSize, formattedPrice);
+
+        // Inject the fake trade
+        injectFakeTrade(websocket, trade, currentMarketId);
+
+        setTradesGenerated(prev => prev + 1);
+
+      } catch (error) {
+        console.error(`Error generating initial trade ${i + 1}:`, error);
+      }
+    }
+
+    setHasInitialized(true);
+  }, [websocket, currentMarketId, hasInitialized, tickSizeDecimals]);
+
+  const generateTrade = useCallback(() => {
+    if (!websocket || !currentMarketId) {
+      return;
+    }
+
+    try {
+      // Use a reasonable price range for demo purposes
+      // Most crypto assets trade between $1-$10000, so we'll use $100-$2000 as a reasonable range
+      const basePrice = 100 + Math.random() * 1900; // Random price between $100-$2000
+
+      // Add some small random variation to make it look more realistic
+      const priceVariation = (Math.random() - 0.5) * 0.02; // ±1%
+      const randomPrice = basePrice * (1 + priceVariation);
+
+      // Generate random size between 0.1 and 5.0
+      const randomSize = (Math.random() * 4.9 + 0.1).toFixed(2);
+
+      // Randomly choose BUY or SELL (slightly favor BUY for demo purposes)
+      const randomSide = Math.random() > 0.45 ? 'BUY' : 'SELL';
+
+      // Format price according to tick size decimals
+      const formattedPrice = randomPrice.toFixed(tickSizeDecimals ?? 2);
+
+      const trade = createSampleTrade(currentMarketId, randomSide, randomSize, formattedPrice);
+
+      // Inject the fake trade
+      injectFakeTrade(websocket, trade, currentMarketId);
+
+      setTradesGenerated(prev => prev + 1);
+
+    } catch (error) {
+      console.error('Error generating trade:', error);
+    }
+  }, [websocket, currentMarketId, tickSizeDecimals, isRunning]);
+
+  const startGeneration = useCallback(() => {
+    if (isRunning) {
+      return;
+    }
+
+    setIsRunning(true);
+
+    // Generate initial batch of 30 trades first
+    generateInitialTrades();
+
+    // Set up interval for subsequent trades (every 1 second)
+    intervalRef.current = setInterval(() => {
+      generateTrade();
+    }, intervalMs);
+  }, [isRunning, generateTrade, generateInitialTrades, intervalMs, websocket, currentMarketId]);
+
+  const stopGeneration = useCallback(() => {
+    if (!isRunning) {
+      return;
+    }
+
+    setIsRunning(false);
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, [isRunning]);
+
+  const resetCounter = useCallback(() => {
+    setTradesGenerated(0);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  // Auto-stop if disabled
+  useEffect(() => {
+    if (!enabled && isRunning) {
+      stopGeneration();
+    }
+  }, [enabled, isRunning, stopGeneration]);
+
+  return {
+    isRunning,
+    tradesGenerated,
+    startGeneration,
+    stopGeneration,
+    resetCounter,
+    canGenerate: Boolean(websocket && currentMarketId),
+    currentPrice: undefined, // We don't have access to current price
+  };
+}

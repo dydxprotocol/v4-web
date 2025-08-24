@@ -1,3 +1,4 @@
+import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import './TradingViewWidget.css';
@@ -98,7 +99,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
   onChartReady,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const colorTheme = useAppThemeAndColorModeContext();
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/tv.js';
@@ -116,7 +117,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
           theme,
           style,
           locale,
-          toolbar_bg,
+          toolbar_bg: colorTheme.layer2,
           enable_publishing,
           allow_symbol_change,
           container_id,
@@ -125,20 +126,23 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
           popup_height,
           popup_min_width,
           popup_min_height,
-          hide_top_toolbar,
+          hide_top_toolbar: true,
           hide_legend,
           save_image,
-          backgroundColor,
+          backgroundColor: colorTheme.layer2,
           gridColor,
           width_scale,
           height_scale,
           hide_volume,
-          hide_side_toolbar,
+          hide_side_toolbar: true,
           studies_overrides,
           disabled_features,
           enabled_features,
           overrides,
-          loading_screen,
+          loading_screen: {
+            backgroundColor: colorTheme.layer2,
+            foregroundColor: colorTheme.layer0,
+          },
           favorites,
           charts_storage_url,
           client_id,

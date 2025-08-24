@@ -103,7 +103,7 @@ export const AccountOverviewSection = () => {
       ),
       labelString: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
       amount: vaultBalance,
-      color: ColorToken.Purple1,
+      color: ColorToken.Orange1,
     },
   ];
 

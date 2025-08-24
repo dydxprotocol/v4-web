@@ -52,8 +52,8 @@ export enum ColorToken {
 
   // Purple0 = '#7774FF',
   // Purple1 = '#6966FF',
-  Purple0 = '#FACC15',
-  Purple1 = '#EAB308',
+  Orange0 = '#F56E0F',
+  Orange1 = '#F56E0F',
 
   Green0 = '#CEEDE3',
   Green1 = '#1AFFB9',
@@ -72,6 +72,13 @@ export enum ColorToken {
   Red3 = '#462C2E',
   Red4 = '#412A38',
   Red5 = '#F5E1E3',
+
+  DarkVoid = '#151419',
+  GluonGrey = '#1B1B1E',
+  SlateGrey = '#262626',
+  DustyGrey = '#878787',
+  Snow = '#FBFBFB'
+
 }
 
 /** Maps opacity to corresponding hex value */
