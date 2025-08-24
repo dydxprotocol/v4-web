@@ -16,7 +16,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 import { MegaVaultYieldOutput } from '@/views/MegaVaultYieldOutput';
-import { TvChart } from '@/views/charts/TradingView/TvChart';
+import { ChartSelector } from '@/views/charts/TradingView/ChartSelector';
 import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -95,7 +95,7 @@ const AssetPage = () => {
   ) : (
     <>
       <div tw="mb-1.5 h-[20rem] font-small-book">
-        <TvChart />
+        <ChartSelector />
       </div>
       <div tw="flexColumn gap-2 px-1.25 pb-[5.25rem]">
         <AssetPosition />

@@ -1,0 +1,44 @@
+/* TradingView Widget Custom Styling */
+
+/* Remove default margins and padding */
+.tradingview-widget-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Ensure the widget fills the container completely */
+.tradingview-widget-container > div {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Remove any default borders */
+.tradingview-widget-container iframe {
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Use standard TradingView colors that work reliably */
+.tradingview-widget-container {
+  /* Let TradingView handle its own theming */
+}
+
+/* Ensure no gaps between chart elements */
+.tradingview-widget-container .chart-container {
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Remove any default TradingView spacing */
+.tradingview-widget-container .tv-chart-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}

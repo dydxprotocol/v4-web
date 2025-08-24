@@ -16,7 +16,7 @@ import { AccountInfo } from '@/views/AccountInfo';
 import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
-import { TvChart } from '@/views/charts/TradingView/TvChart';
+import { ChartSelector } from '@/views/charts/TradingView/ChartSelector';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -64,7 +64,7 @@ export const MobileTopPanel = ({
       icon: IconName.Coins,
     },
     {
-      content: <TvChart />,
+              content: <ChartSelector />,
       forceMount: true,
       label: stringGetter({ key: STRING_KEYS.PRICE }),
       value: Tab.Price,
