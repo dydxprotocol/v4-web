@@ -48,6 +48,7 @@ import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
+import { DepositAddressDialog } from '@/views/dialogs/TransferDialogs/DepositAddressDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
 import { TransferStatusDialog } from '@/views/dialogs/TransferDialogs/TransferStatusDialog';
 import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2/WithdrawDialog2';
@@ -60,10 +61,12 @@ import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
+import { selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 export const DialogManager = React.memo(() => {
   const dispatch = useAppDispatch();
   const activeDialog = useAppSelector(getActiveDialog);
+  const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
 
   if (!activeDialog) return null;
 
@@ -91,8 +94,11 @@ export const DialogManager = React.memo(() => {
     CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
+    DepositAddresses: (args) => <DepositAddressDialog {...args} {...modalProps} />,
     Deposit2: (args) =>
-      isMainnet ? (
+      isTurnkey ? (
+        <DepositAddressDialog {...args} {...modalProps} />
+      ) : isMainnet ? (
         <DepositDialog2 {...args} {...modalProps} />
       ) : (
         <TestnetFaucetDialog {...modalProps} />
