@@ -312,11 +312,11 @@ const useTurnkeyAuthContext = () => {
 
       if (response.errors && Array.isArray(response.errors)) {
         const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
+        dispatch(setRequiresAddressUpload(true));
         throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
       }
 
       // TODO(turnkey): handle policy returned in response
-      dispatch(setRequiresAddressUpload(false));
       return response;
     },
     onError: (error) => {
@@ -402,9 +402,12 @@ const useTurnkeyAuthContext = () => {
    */
   useEffect(() => {
     if (tkClient && needsAddressUpload && dydxAddress != null) {
+      // Set RequiredAddressUpload to false to prevent the upload from being triggered again.
+      // If the uploadAddress mutation fails, the requiredAddressUpload flag will be set back to true.
+      dispatch(setRequiresAddressUpload(false));
       uploadAddress({ tkClient });
     }
-  }, [dydxAddress, uploadAddress, tkClient, needsAddressUpload]);
+  }, [dispatch, dydxAddress, uploadAddress, tkClient, needsAddressUpload]);
 
   /* ----------------------------- Return Values----------------------------- */
 

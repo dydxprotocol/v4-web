@@ -5,7 +5,7 @@ import { uncompressRawPublicKey } from '@turnkey/crypto';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { AES } from 'crypto-js';
-import { hashTypedData, toHex } from 'viem';
+import { hashMessage, hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { ConnectorType, getSignTypedDataForTurnkey } from '@/constants/wallets';
@@ -364,16 +364,19 @@ const useTurnkeyWalletContext = () => {
         throw new Error('TK client is not available');
       }
 
+      const payload = hashMessage(dydxAddress);
+
       const response = await tkClient.signRawPayload({
         signWith: selectedTurnkeyWallet.accounts[0].address,
         organizationId: selectedTurnkeyWallet.accounts[0].organizationId,
-        payload: dydxAddress,
+        payload,
         encoding: PayloadEncoding.Hexadecimal,
         hashFunction: HashFunction.NoOp,
         timestampMs: Date.now().toString(),
       });
 
-      const signature = `${response.r}${response.s}${response.v}`;
+      // Combine rsv values with 0x prefix to constuct the signature
+      const signature = `0x${response.r}${response.s}${response.v}`;
 
       return { dydxAddress, signature };
     },
