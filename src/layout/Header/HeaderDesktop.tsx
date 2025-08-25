@@ -210,12 +210,6 @@ export const HeaderDesktop = () => {
 
         <MobileDownloadLinks />
 
-        <$IconButton
-          shape={ButtonShape.Rectangle}
-          iconName={IconName.HelpCircle}
-          onClick={() => dispatch(openDialog(DialogTypes.Help()))}
-        />
-
         <VerticalSeparator />
 
         <NotificationsMenu
