@@ -1,22 +1,66 @@
 import { useState } from 'react';
 
+import { logTurnkey } from '@/bonsai/logs';
+import { useQuery } from '@tanstack/react-query';
+import { useTurnkey } from '@turnkey/sdk-react';
 import styled from 'styled-components';
 
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { ConnectorType } from '@/constants/wallets';
+import { LoginMethod } from '@/types/turnkey';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { QrCode } from '@/components/QrCode';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 
+import { useAppSelector } from '@/state/appTypes';
+import { getSourceAccount } from '@/state/walletSelectors';
+
 export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const [selectedChain, setSelectedChain] = useState('1');
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const { indexedDbClient, authIframeClient } = useTurnkey();
+  const { getPrimaryUserWalletsShared, turnkeyWallets } = useTurnkeyWallet();
+
+  const sourceAccount = useAppSelector(getSourceAccount);
+  const walletInfo = sourceAccount.walletInfo;
+  const isTurnkey = walletInfo?.connectorType === ConnectorType.Turnkey;
+  const tkClient = isTurnkey
+    ? walletInfo.loginMethod === LoginMethod.OAuth
+      ? indexedDbClient
+      : authIframeClient
+    : null;
+
+  const walletsQuery = useQuery({
+    enabled: turnkeyWallets == null && tkClient != null,
+    queryKey: ['turnkeyWallets'],
+    queryFn: async () => {
+      logTurnkey('DepositAddressDialog', 'tkClient', tkClient);
+      if (tkClient == null) {
+        return null;
+      }
+
+      const wallets = await getPrimaryUserWalletsShared(tkClient);
+      logTurnkey('DepositAddressDialog', 'wallets', wallets);
+      return wallets;
+    },
+  });
+
+  logTurnkey(
+    'DepositAddressDialog',
+    'walletsQuery',
+    walletInfo,
+    walletsQuery.data,
+    walletsQuery.error,
+    turnkeyWallets
+  );
 
   return (
     <$Dialog

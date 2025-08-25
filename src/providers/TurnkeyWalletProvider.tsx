@@ -53,7 +53,7 @@ const useTurnkeyWalletContext = () => {
   });
 
   const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
-  const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>([]);
+  const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>();
   const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet>();
 
   /* ----------------------------- IndexedDbClient ----------------------------- */
@@ -131,12 +131,14 @@ const useTurnkeyWalletContext = () => {
       const isAuthIframeFlow = tkClient instanceof TurnkeyIframeClient;
 
       if (turnkey == null || tkClient == null) {
+        logTurnkey('fetchUserShared', 'turnkey or tkClient is null', turnkey, tkClient);
         return undefined;
       }
 
       if (isIndexedDbFlow) {
         // Try and get the current user
         const token = await turnkey.getSession();
+        logTurnkey('fetchUserShared', 'token', token);
 
         // If the user is not found, we assume the user is not logged in
         if (!token?.expiry || token.expiry > Date.now()) {
@@ -204,6 +206,7 @@ const useTurnkeyWalletContext = () => {
   const getPrimaryUserWalletsShared = useCallback(
     async (tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient) => {
       const user = turnkeyUser ?? (await fetchUserShared(tkClient));
+      logTurnkey('getPrimaryUserWalletsShared', 'user', user);
       const isIndexedDbFlow = tkClient instanceof TurnkeyIndexedDbClient;
       const isAuthIframeFlow = tkClient instanceof TurnkeyIframeClient;
 
@@ -391,13 +394,14 @@ const useTurnkeyWalletContext = () => {
   const clearTurnkeyState = useCallback(() => {
     setTurnkeyUser(undefined);
     setPrimaryTurnkeyWallet(undefined);
-    setTurnkeyWallets([]);
+    setTurnkeyWallets(undefined);
     setTargetPublicKeys(null);
   }, []);
 
   const endTurnkeySession = useCallback(async () => {
     try {
       if (walletInfo?.connectorType === ConnectorType.Turnkey) {
+        logTurnkey('endTurnkeySession', 'Ending Turnkey Session', walletInfo);
         await turnkey?.logout();
         clearTurnkeyState();
         await resetAuthIframeClientKey();
@@ -428,6 +432,7 @@ const useTurnkeyWalletContext = () => {
     setPreferredWallet,
     resetAuthIframeClientKey,
     onboardDydxShared,
+    getPrimaryUserWalletsShared,
     getUploadAddressPayload,
   };
 };
