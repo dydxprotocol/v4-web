@@ -50,9 +50,9 @@ const Positions = lazy(() =>
 );
 const Orders = lazy(() => import('./Orders').then((module) => ({ default: module.Orders })));
 const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
-const EquityTiers = lazy(() =>
-  import('./EquityTiers').then((module) => ({ default: module.EquityTiers }))
-);
+/* const EquityTiers = lazy(() =>
+*   import('./EquityTiers').then((module) => ({ default: module.EquityTiers }))
+* ); */
 
 const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
 const SimpleUiHistory = lazy(() =>
@@ -107,7 +107,7 @@ const PortfolioPage = () => {
         <Route path={PortfolioRoute.Positions} element={<Positions />} />
         <Route path={PortfolioRoute.Orders} element={<Orders />} />
         <Route path={PortfolioRoute.Fees} element={<Fees />} />
-        <Route path={PortfolioRoute.EquityTiers} element={<EquityTiers />} />
+                  {/* <Route path={PortfolioRoute.EquityTiers} element={<EquityTiers />} /> */}
         <Route path={PortfolioRoute.History} element={<History />}>
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route
@@ -245,7 +245,7 @@ const PortfolioPage = () => {
                     label: stringGetter({ key: STRING_KEYS.FEES }),
                     href: PortfolioRoute.Fees,
                   },
-                  {
+                    /* {
                     value: PortfolioRoute.EquityTiers,
                     slotBefore: (
                       <$IconContainer>
@@ -254,7 +254,7 @@ const PortfolioPage = () => {
                     ),
                     label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
                     href: PortfolioRoute.EquityTiers,
-                  },
+                  }, */
                   {
                     value: PortfolioRoute.History,
                     slotBefore: (

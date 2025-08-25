@@ -36,11 +36,11 @@ export const PortfolioNavMobile = () => {
       label: stringGetter({ key: STRING_KEYS.FEES }),
       description: stringGetter({ key: STRING_KEYS.FEE_STRUCTURE }),
     },
-    {
-      value: `${AppRoute.Portfolio}/${PortfolioRoute.EquityTiers}`,
-      label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
-      description: stringGetter({ key: STRING_KEYS.EQUITY_TIERS_DESCRIPTION }),
-    },
+      /* {
+  *   value: `${AppRoute.Portfolio}/${PortfolioRoute.EquityTiers}`,
+  *   label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
+  *   description: stringGetter({ key: STRING_KEYS.EQUITY_TIERS_DESCRIPTION }),
+  * }, */
     {
       value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`,
       label: stringGetter({ key: STRING_KEYS.TRADES }),
