@@ -123,9 +123,10 @@ export function getSkipClient() {
 const useSkipClientContext = () => {
   const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators, skip } =
     useEndpointsConfig();
+
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const { sourceAccount } = useAccounts();
+  const { sourceAccount, localDydxWallet } = useAccounts();
   const wagmiConfig = useConfig();
 
   const [instanceId, setInstanceId] = useState<string>();
@@ -142,7 +143,11 @@ const useSkipClientContext = () => {
       },
       getCosmosSigner: async (chainId: string) => {
         if (sourceAccount.chain !== WalletNetworkType.Cosmos) {
-          throw new Error('no cosmos wallet connected');
+          console.log('localDydxWallet', localDydxWallet);
+          if (!localDydxWallet?.offlineSigner) {
+            throw new Error('no cosmos wallet connected');
+          }
+          return localDydxWallet.offlineSigner;
         }
         if (!window.keplr) {
           throw new Error('keplr wallet not connected');
@@ -166,7 +171,7 @@ const useSkipClientContext = () => {
     skipClient.setSigners(signers);
     const id = crypto.randomUUID();
     setInstanceId(id);
-  }, [sourceAccount.chain, wagmiConfig]);
+  }, [sourceAccount.chain, wagmiConfig, localDydxWallet]);
 
   useEffect(() => {
     const options: SkipClientOptions = {
@@ -181,6 +186,7 @@ const useSkipClientContext = () => {
           if (chainId === getSolanaChainId()) return solanaRpcUrl;
           const evmRpcUrls = RPCUrlsByChainId[chainId];
           if (evmRpcUrls?.length) return evmRpcUrls[0]!;
+          if (chainId === 'dydx-mainnet-1') return 'https://dydx-rpc.publicnode.com:443';
           throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
         },
       },
