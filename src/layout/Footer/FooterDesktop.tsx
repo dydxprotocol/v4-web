@@ -113,7 +113,7 @@ export const FooterDesktop = () => {
           items={[
             {
               key: FooterItems.ChainHeight.toString(),
-              label: 'Block Height',
+              label: 'Fuel Network Block Height',
               value: <Output useGrouping type={OutputType.Number} value={height} />,
             },
             height !== indexerHeight
