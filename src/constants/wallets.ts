@@ -12,6 +12,7 @@ import {
   MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
+  FuelWalletIcon,
   WalletConnectIcon,
 } from '@/icons';
 
@@ -62,7 +63,7 @@ export enum WalletType {
   Privy = 'PRIVY',
   Phantom = 'PHANTOM',
   MetaMask = 'METAMASK',
-  FuelWallet = 'FUEL_WALLET',
+  FuelWallet = 'Fuel Wallet',
 }
 
 export enum ConnectorType {
@@ -75,7 +76,7 @@ export enum ConnectorType {
   Test = 'test',
   Privy = 'privy',
   PhantomSolana = 'phantomSolana',
-  Fuel = 'fuel'
+  Fuel = 'fuel',
 }
 
 export enum WalletNetworkType {
@@ -87,23 +88,23 @@ export enum WalletNetworkType {
 // This is the type stored in localstorage, so it must consist of only serializable fields
 export type WalletInfo =
   | ({
-    connectorType: ConnectorType.Injected;
-  } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
+      connectorType: ConnectorType.Injected;
+    } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
   | {
-    connectorType:
-    | ConnectorType.Coinbase
-    | ConnectorType.WalletConnect
-    | ConnectorType.PhantomSolana
-    | ConnectorType.Privy;
-    name: WalletType;
-  }
+      connectorType:
+        | ConnectorType.Coinbase
+        | ConnectorType.WalletConnect
+        | ConnectorType.PhantomSolana
+        | ConnectorType.Privy;
+      name: WalletType;
+    }
   | {
-    connectorType: ConnectorType.Cosmos;
-    name: CosmosWalletType;
-  }
+      connectorType: ConnectorType.Cosmos;
+      name: CosmosWalletType;
+    }
   | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
   | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string }
-  | { connectorType: ConnectorType.Fuel; name: WalletType.FuelWallet };
+  | { connectorType: ConnectorType.Fuel; name: 'Fuel Wallet' };
 
 type WalletConfig = {
   type: WalletType;
@@ -159,8 +160,8 @@ export const wallets = {
   },
   [WalletType.FuelWallet]: {
     type: WalletType.FuelWallet,
-    stringKey: STRING_KEYS.OTHER_WALLET,
-    icon: GenericWalletIcon,
+    // stringKey: STRING_KEYS.STARBOARD_STRING_KEYS.FUEL_WALLET,
+    icon: FuelWalletIcon,
   },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
 

@@ -86,6 +86,11 @@ export const useDisplayedWallets = (): WalletInfo[] => {
 
     if (isSimpleUi) {
       return [
+          {
+            connectorType: ConnectorType.Fuel,
+            name: WalletType.FuelWallet,
+            icon: '/icons/wallets/fuel-wallet.svg',
+          },
         injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
         ...otherInjectedWallets,
         isCoinbaseDetected && {
@@ -104,6 +109,11 @@ export const useDisplayedWallets = (): WalletInfo[] => {
     }
 
     return [
+      {
+        connectorType: ConnectorType.Fuel,
+        name: WalletType.FuelWallet,
+        icon: '/icons/wallets/fuel-wallet.svg',
+      },
       // always show Metamask extension first if it is detected
       injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
       ...otherInjectedWallets,
@@ -115,13 +125,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
         connectorType: ConnectorType.Privy,
         name: WalletType.Privy,
       },
-      // Add Fuel Wallet
-      {
-        connectorType: ConnectorType.Fuel,
-        name: WalletType.FuelWallet,
-        icon: '/icons/wallets/fuel-wallet.svg',
-      },
-
       // No need to special-case an OKX WalletConnect option if the OKX extension wallet is already detected.
       // Note that OKX mobile app users can still connect through the generic WalletConnect option
       !isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
