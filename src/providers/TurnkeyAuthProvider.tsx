@@ -298,7 +298,7 @@ const useTurnkeyAuthContext = () => {
 
   /* ----------------------------- Upload Address ----------------------------- */
   const { mutate: sendUploadAddressRequest } = useMutation({
-    mutationFn: async ({ payload }: { payload: [string, string] }) => {
+    mutationFn: async ({ payload }: { payload: { dydxAddress: string; signature: string } }) => {
       const body = JSON.stringify(payload);
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
