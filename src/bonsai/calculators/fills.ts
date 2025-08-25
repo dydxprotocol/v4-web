@@ -40,6 +40,7 @@ function getFillType({
   if (type == null) {
     return type;
   }
+  if (type === IndexerFillType.TWAPSUBORDER) return SubaccountFillType.TWAP;
   if (type === IndexerFillType.LIQUIDATION) return SubaccountFillType.LIMIT; // CT-916
   if (type === IndexerFillType.DELEVERAGED) return SubaccountFillType.LIQUIDATED; // CT-1118
   if (type === IndexerFillType.OFFSETTING) return SubaccountFillType.DELEVERAGED; // CT-1118

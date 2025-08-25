@@ -225,6 +225,7 @@ function calculateBaseOrderStatus(
       return OrderStatus.Open;
     case IndexerOrderStatus.FILLED:
       return OrderStatus.Filled;
+    case IndexerOrderStatus.ERROR:
     case IndexerOrderStatus.CANCELED:
       return OrderStatus.Canceled;
     case IndexerOrderStatus.BESTEFFORTCANCELED:

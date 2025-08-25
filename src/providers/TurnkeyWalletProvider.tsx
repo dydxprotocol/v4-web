@@ -352,7 +352,7 @@ const useTurnkeyWalletContext = () => {
     }: {
       dydxAddress: string;
       tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient;
-    }): Promise<[string, string]> => {
+    }): Promise<{ dydxAddress: string; signature: string }> => {
       const selectedTurnkeyWallet =
         primaryTurnkeyWallet ?? (await getPrimaryUserWalletsShared(tkClient));
 
@@ -375,7 +375,7 @@ const useTurnkeyWalletContext = () => {
 
       const signature = `${response.r}${response.s}${response.v}`;
 
-      return [dydxAddress, signature];
+      return { dydxAddress, signature };
     },
     [primaryTurnkeyWallet, getPrimaryUserWalletsShared]
   );
