@@ -92,81 +92,70 @@ export const HeaderDesktop = () => {
          *     <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
          *   ),
          * }, */
-          /* {
-  *       value: 'DOCUMENTATION',
-  *       label: "API",
-  *       slotBefore: <Icon iconName={IconName.Terminal} />,
-  *       href: `https://docs.dydx.exchange/`,
-  *       onClick: () => {
-  *         dispatch(
-  *           openDialog(
-  *             DialogTypes.ExternalLink({
-  *               link: documentation,
-  *             })
-  *           )
-  *         );
-  *       },
-  *   }, */
-          {
-          value: 'MORE',
-          label: stringGetter({ key: STRING_KEYS.MORE }),
-          subitems: [
-              /* {
-  *   value: 'DOCUMENTATION',
-  *   slotBefore: <Icon iconName={IconName.Terminal} />,
-  *   label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
-  *   onClick: () => {
-  *     dispatch(
-  *       openDialog(
-  *         DialogTypes.ExternalLink({
-  *           link: documentation,
-  *         })
-  *       )
-  *     );
-  *   },
-  * }, */
             {
               value: 'MINTSCAN',
-              slotBefore: <Icon iconName={IconName.Mintscan} />,
-              /* label: stringGetter({ key: STRING_KEYS.MINTSCAN }), */
-              /* href: mintscanBase, */
               label: 'Block Explorer',
+              slotBefore: <Icon iconName={IconName.Terminal} />,
               href: "https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions",
             },
-              /* {
-  *   value: 'COMMUNITY',
-  *   slotBefore: <Icon iconName={IconName.Discord} />,
-  *   label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-  *   href: community,
-  * },
-  * {
-  *   value: 'TERMS_OF_USE',
-  *   slotBefore: <Icon iconName={IconName.File} />,
-  *   label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
-  *   href: AppRoute.Terms,
-  * },
-  * {
-  *   value: 'PRIVACY_POLICY',
-  *   slotBefore: <Icon iconName={IconName.Privacy} />,
-  *   label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
-  *   href: AppRoute.Privacy,
-  * },
-  * {
-  *   value: 'HELP',
-  *   slotBefore: <Icon iconName={IconName.HelpCircle} />,
-  *   label: stringGetter({ key: STRING_KEYS.HELP }),
-  *   onClick: () => {
-  *     dispatch(openDialog(DialogTypes.Help()));
-  *   },
-  * }, */
-            {
-              value: 'STATS',
-              slotBefore: <Icon iconName={IconName.FundingChart} />,
-              label: stringGetter({ key: STRING_KEYS.STATISTICS }),
-              href: exchangeStats,
-            },
-          ],
-        },
+          /* {
+* value: 'MORE',
+* label: stringGetter({ key: STRING_KEYS.MORE }),
+* subitems: [
+*   {
+*     value: 'DOCUMENTATION',
+*     slotBefore: <Icon iconName={IconName.Terminal} />,
+*     label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
+*     onClick: () => {
+*       dispatch(
+*         openDialog(
+*           DialogTypes.ExternalLink({
+*             link: documentation,
+*           })
+*         )
+*       );
+*     },
+*   },
+*   {
+*     value: 'MINTSCAN',
+*     slotBefore: <Icon iconName={IconName.Mintscan} />,
+*     label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
+*     href: mintscanBase,
+*     },
+*   {
+*     value: 'COMMUNITY',
+*     slotBefore: <Icon iconName={IconName.Discord} />,
+*     label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
+*     href: community,
+*   },
+*   {
+*     value: 'TERMS_OF_USE',
+*     slotBefore: <Icon iconName={IconName.File} />,
+*     label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
+*     href: AppRoute.Terms,
+*   },
+*   {
+*     value: 'PRIVACY_POLICY',
+*     slotBefore: <Icon iconName={IconName.Privacy} />,
+*     label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
+*     href: AppRoute.Privacy,
+*   },
+*   {
+*     value: 'HELP',
+*     slotBefore: <Icon iconName={IconName.HelpCircle} />,
+*     label: stringGetter({ key: STRING_KEYS.HELP }),
+*     onClick: () => {
+*       dispatch(openDialog(DialogTypes.Help()));
+*     },
+*   },
+*   {
+*     value: 'STATS',
+*     slotBefore: <Icon iconName={IconName.FundingChart} />,
+*     label: stringGetter({ key: STRING_KEYS.STATISTICS }),
+*     href: exchangeStats,
+*   },
+* ],
+        }, */
       ].filter(isTruthy),
     },
   ];
