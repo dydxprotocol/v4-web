@@ -133,32 +133,32 @@ export const HeaderDesktop = () => {
               label: 'Block Explorer',
               href: "https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions",
             },
-            {
-              value: 'COMMUNITY',
-              slotBefore: <Icon iconName={IconName.Discord} />,
-              label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-              href: community,
-            },
-            {
-              value: 'TERMS_OF_USE',
-              slotBefore: <Icon iconName={IconName.File} />,
-              label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
-              href: AppRoute.Terms,
-            },
-            {
-              value: 'PRIVACY_POLICY',
-              slotBefore: <Icon iconName={IconName.Privacy} />,
-              label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
-              href: AppRoute.Privacy,
-            },
-            {
-              value: 'HELP',
-              slotBefore: <Icon iconName={IconName.HelpCircle} />,
-              label: stringGetter({ key: STRING_KEYS.HELP }),
-              onClick: () => {
-                dispatch(openDialog(DialogTypes.Help()));
-              },
-            },
+              /* {
+  *   value: 'COMMUNITY',
+  *   slotBefore: <Icon iconName={IconName.Discord} />,
+  *   label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
+  *   href: community,
+  * },
+  * {
+  *   value: 'TERMS_OF_USE',
+  *   slotBefore: <Icon iconName={IconName.File} />,
+  *   label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
+  *   href: AppRoute.Terms,
+  * },
+  * {
+  *   value: 'PRIVACY_POLICY',
+  *   slotBefore: <Icon iconName={IconName.Privacy} />,
+  *   label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
+  *   href: AppRoute.Privacy,
+  * },
+  * {
+  *   value: 'HELP',
+  *   slotBefore: <Icon iconName={IconName.HelpCircle} />,
+  *   label: stringGetter({ key: STRING_KEYS.HELP }),
+  *   onClick: () => {
+  *     dispatch(openDialog(DialogTypes.Help()));
+  *   },
+  * }, */
             {
               value: 'STATS',
               slotBefore: <Icon iconName={IconName.FundingChart} />,
