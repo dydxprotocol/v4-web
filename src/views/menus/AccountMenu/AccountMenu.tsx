@@ -175,7 +175,8 @@ export const AccountMenu = () => {
                 </$AddressRow>
               )}
             <$Balances>
-              <div>
+                      {/* NOTE: disabled for demo */}
+                      {/* <div>
                 <div>
                   <$label>
                     {stringGetter({
@@ -193,7 +194,7 @@ export const AccountMenu = () => {
                   hasBalance={nativeTokenBalance.gt(0)}
                   stringGetter={stringGetter}
                 />
-              </div>
+              </div> */}
               {(isDev || isKeplr) && (
                 <div>
                   <div>
