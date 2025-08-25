@@ -56,127 +56,131 @@ import { SubaccountActions } from './SubaccountActions';
 import { WalletActions } from './WalletActions';
 
 export const AccountMenu = () => {
-  const stringGetter = useStringGetter();
-  const { mintscanBase } = useURLConfigs();
-  const { isTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
-  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-  const dispatch = useAppDispatch();
-  const onboardingState = useAppSelector(getOnboardingState);
-  const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
-  const isKeplr = useAppSelector(selectIsKeplrConnected);
+    const stringGetter = useStringGetter();
+    const { mintscanBase } = useURLConfigs();
+    const { isTablet } = useBreakpoints();
+    const { complianceState } = useComplianceState();
+    const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+    const dispatch = useAppDispatch();
+    const onboardingState = useAppSelector(getOnboardingState);
+    const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
+    const isKeplr = useAppSelector(selectIsKeplrConnected);
 
-  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
+    const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
-  const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
-  const theme = useAppSelector(getAppTheme);
+    const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
+    const theme = useAppSelector(getAppTheme);
 
-  const { debugCompliance } = useEnvFeatures();
-  const {
-    sourceAccount: { walletInfo, address },
-    dydxAddress,
-    hdKey,
-  } = useAccounts();
-  const { registerAffiliate } = useSubaccount();
+    const { debugCompliance } = useEnvFeatures();
+    const {
+        sourceAccount: { walletInfo, address },
+        dydxAddress,
+        hdKey,
+    } = useAccounts();
+    const { registerAffiliate } = useSubaccount();
 
-  let displayAddress: string | undefined;
-  if (walletInfo?.name === WalletType.Phantom) {
-    displayAddress = truncateAddress(address, '');
-  } else {
-    displayAddress = truncateAddress(address, '0x');
-  }
-
-  const privy = usePrivy();
-  const { google, discord, twitter } = privy.user ?? {};
-
-  const { showMfaEnrollmentModal } = useMfaEnrollment();
-
-  const onRecoverKeys = () => {
-    dispatch(openDialog(DialogTypes.Onboarding()));
-  };
-
-  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
-
-  const usedBalanceBN = MustBigNumber(usdcBalance);
-
-  const showConfirmPendingDeposit =
-    walletInfo?.name === WalletType.Keplr &&
-    usedBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC) &&
-    usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
-
-  let walletIcon;
-  if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
-  } else if (
-    onboardingState === OnboardingState.AccountConnected &&
-    walletInfo?.name === WalletType.Privy
-  ) {
-    if (google) {
-      walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
-    } else if (discord) {
-      walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
-    } else if (twitter) {
-      walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
+    let displayAddress: string | undefined;
+    if (walletInfo?.name === WalletType.Phantom) {
+        displayAddress = truncateAddress(address, '');
     } else {
-      walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+        displayAddress = truncateAddress(address, '0x');
     }
-  } else if (walletInfo) {
-    walletIcon = <WalletIcon wallet={walletInfo} />;
-  }
 
-  return onboardingState === OnboardingState.Disconnected ? (
-    <OnboardingTriggerButton size={ButtonSize.XSmall} />
-  ) : (
-    <$DropdownMenu
-      modal={false}
-      slotTopContent={
-        onboardingState === OnboardingState.AccountConnected && (
-          <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
-            <$AddressRow>
-              <AssetIcon
-                logoUrl={chainTokenImage}
-                symbol={chainTokenLabel}
-                tw="z-[2] [--asset-icon-size:1.75rem]"
-              />
-              <$Column>
-                {walletInfo && walletInfo.name !== WalletType.Keplr ? (
-                  <DydxDerivedAddress address={address} />
-                ) : (
-                  <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                )}
-                <$Address>{truncateAddress(dydxAddress)}</$Address>
-              </$Column>
-              <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
-              <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                <$IconButton
-                  action={ButtonAction.Base}
-                  href={`${mintscanBase}/account/${dydxAddress}`}
-                  iconName={IconName.LinkOut}
-                  shape={ButtonShape.Square}
-                  type={ButtonType.Link}
-                />
-              </WithTooltip>
-            </$AddressRow>
-            {walletInfo &&
-              walletInfo.name !== WalletType.Privy &&
-              walletInfo.name !== WalletType.Keplr && (
-                <$AddressRow>
-                  <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
-                    <Icon
-                      iconName={IconName.AddressConnector}
-                      tw="absolute top-[-1.625rem] h-1.75"
-                    />
-                    <WalletIcon wallet={walletInfo} />
-                  </div>
-                  <$Column>
-                    <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                    <$Address>{displayAddress}</$Address>
-                  </$Column>
-                </$AddressRow>
-              )}
-            <$Balances>
-                      {/* NOTE: disabled for demo */}
-                      {/* <div>
+    const privy = usePrivy();
+    const { google, discord, twitter } = privy.user ?? {};
+
+    const { showMfaEnrollmentModal } = useMfaEnrollment();
+
+    const onRecoverKeys = () => {
+        dispatch(openDialog(DialogTypes.Onboarding()));
+    };
+
+    const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
+
+    const usedBalanceBN = MustBigNumber(usdcBalance);
+
+    const showConfirmPendingDeposit =
+        walletInfo?.name === WalletType.Keplr &&
+        usedBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC) &&
+        usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
+
+    let walletIcon;
+    if (onboardingState === OnboardingState.WalletConnected) {
+        walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
+    } else if (
+        onboardingState === OnboardingState.AccountConnected &&
+        walletInfo?.name === WalletType.Privy
+    ) {
+        if (google) {
+            walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
+        } else if (discord) {
+            walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
+        } else if (twitter) {
+            walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
+        } else {
+            walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+        }
+    } else if (walletInfo) {
+        walletIcon = <WalletIcon wallet={walletInfo} />;
+    }
+
+    return onboardingState === OnboardingState.Disconnected ? (
+        <OnboardingTriggerButton size={ButtonSize.XSmall} />
+    ) : (
+        <$DropdownMenu
+            modal={false}
+            slotTopContent={
+                onboardingState === OnboardingState.AccountConnected && (
+                    <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
+                        <$AddressRow>
+                            <AssetIcon
+                                logoUrl={"https://verified-assets.fuel.network/images/fuel.svg"}
+                                symbol={chainTokenLabel}
+                                tw="z-[2] [--asset-icon-size:1.75rem]"
+                            />
+                            <$Column>
+                                {walletInfo && walletInfo.name !== WalletType.Keplr ? (
+                                    "Fuel Address"
+                                ) : (
+                                    <$label>
+                                        "Fuel Address"
+                                    </$label>
+                                )}
+                                <$Address>{truncateAddress(dydxAddress)}</$Address>
+                            </$Column>
+                            <$CopyButton buttonType="icon" value={address} shape={ButtonShape.Square} />
+                            <WithTooltip tooltipString={
+                                "Fuel Block Explorer"
+                            }>
+                                <$IconButton
+                                    action={ButtonAction.Base}
+                                    href={`https://app.fuel.network/account/${address}/transactions`}
+                                    iconName={IconName.LinkOut}
+                                    shape={ButtonShape.Square}
+                                    type={ButtonType.Link}
+                                />
+                            </WithTooltip>
+                        </$AddressRow>
+                        {walletInfo &&
+                            walletInfo.name !== WalletType.Privy &&
+                            walletInfo.name !== WalletType.Keplr && (
+                                <$AddressRow>
+                                    <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
+                                        <Icon
+                                            iconName={IconName.AddressConnector}
+                                            tw="absolute top-[-1.625rem] h-1.75"
+                                        />
+                                        <WalletIcon wallet={walletInfo} />
+                                    </div>
+                                    <$Column>
+                                        <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
+                                        <$Address>{displayAddress}</$Address>
+                                    </$Column>
+                                </$AddressRow>
+                            )}
+                        <$Balances>
+                            {/* NOTE: disabled for demo */}
+                            {/* <div>
                 <div>
                   <$label>
                     {stringGetter({
@@ -195,251 +199,254 @@ export const AccountMenu = () => {
                   stringGetter={stringGetter}
                 />
               </div> */}
-              {(isDev || isKeplr) && (
-                <div>
-                  <div>
-                    <$label>
-                      {stringGetter({
-                        key: STRING_KEYS.WALLET_BALANCE,
-                        params: { ASSET: usdcLabel },
-                      })}
-                      <AssetIcon logoUrl={usdcImage} symbol="USDC" />
-                    </$label>
-                    <$BalanceOutput
-                      type={OutputType.Asset}
-                      value={usdcBalance}
-                      fractionDigits={SMALL_USD_DECIMALS}
-                    />
-                  </div>
-                  <WalletActions
-                    complianceState={complianceState}
-                    dispatch={dispatch}
-                    stringGetter={stringGetter}
-                  />
-                </div>
-              )}
-              <div>
-                <div>
-                  <$label>
-                    {stringGetter({
-                      key: STRING_KEYS.ASSET_BALANCE,
-                      params: { ASSET: usdcLabel },
-                    })}
-                    <AssetIcon logoUrl={usdcImage} symbol="USDC" />
-                  </$label>
-                  <$BalanceOutput
-                    type={OutputType.Asset}
-                    value={freeCollateral ?? 0}
-                    fractionDigits={USD_DECIMALS}
-                  />
-                </div>
-                <SubaccountActions
-                  asset={DydxChainAsset.USDC}
-                  complianceState={complianceState}
-                  dispatch={dispatch}
-                  hasBalance={MustBigNumber(freeCollateral).gt(0)}
-                  stringGetter={stringGetter}
-                  withOnboarding
-                />
-              </div>
-            </$Balances>
-            {showConfirmPendingDeposit && (
-              <$ConfirmPendingDeposit>
-                You have a pending deposit
-                <br /> for confirmation
-                <$IconButton
-                  action={ButtonAction.Base}
-                  shape={ButtonShape.Square}
-                  iconName={IconName.Send}
-                  onClick={() =>
-                    dispatch(
-                      openDialog(
-                        DialogTypes.ConfirmPendingDeposit({
-                          usdcBalance:
-                            MustBigNumber(usdcBalance).toNumber() - AMOUNT_RESERVED_FOR_GAS_USDC,
-                        })
-                      )
-                    )
-                  }
-                />
-              </$ConfirmPendingDeposit>
-            )}
-          </div>
-        )
-      }
-      items={[
-        onboardingState === OnboardingState.WalletConnected && {
-          value: 'ConnectToChain',
-          label: (
-            <$ConnectToChain>
-              <p>{stringGetter({ key: STRING_KEYS.MISSING_KEYS_DESCRIPTION })}</p>
-              <OnboardingTriggerButton />
-            </$ConnectToChain>
-          ),
-          onSelect: onRecoverKeys,
-          separator: true,
-        },
-        affiliatesEnabled &&
-          onboardingState === OnboardingState.AccountConnected && {
-            value: 'Affiliates',
-            icon: <Icon iconName={IconName.Giftbox} />,
-            label: (
-              <span>
-                {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}{' '}
-                <Tag sign={TagSign.Positive}>{stringGetter({ key: STRING_KEYS.EARN_FEES })}</Tag>
-              </span>
-            ),
-            onSelect: () => {
-              dispatch(openDialog(DialogTypes.ShareAffiliate()));
-            },
-          },
-        {
-          value: 'Preferences',
-          icon: <Icon iconName={IconName.Gear} />,
-          label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
-          onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
-        },
-        {
-          value: 'DisplaySettings',
-          icon:
-            theme === AppTheme.Light ? (
-              <Icon iconName={IconName.Sun} />
-            ) : (
-              <Icon iconName={IconName.Moon} />
-            ),
-          label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
-          onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
-        },
-        ...(isDev
-          ? [
-              {
-                value: 'registerAffiliate',
-                icon: <Icon iconName={IconName.Gear} />,
-                label: 'Register Affiliate',
-                onSelect: () => {
-                  // eslint-disable-next-line no-alert
-                  const affiliate = window.prompt('Enter affiliate address');
-                  if (affiliate) {
-                    registerAffiliate(affiliate);
-                  }
-                },
-              },
-            ]
-          : []),
-        ...(isDev || debugCompliance
-          ? [
-              {
-                value: 'ComplianceConfig',
-                icon: <Icon iconName={IconName.Gear} />,
-                label: 'Compliance Config',
-                onSelect: () => {
-                  dispatch(openDialog(DialogTypes.ComplianceConfig()));
-                },
-              },
-            ]
-          : []),
-        ...(appleAppStoreUrl ?? googlePlayStoreUrl
-          ? [
-              {
-                value: 'MobileDownload',
-                icon: <Icon iconName={IconName.Qr} />,
-                label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
-                onSelect: () => {
-                  dispatch(
-                    openDialog(
-                      DialogTypes.MobileDownload({
-                        mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
-                      })
-                    )
-                  );
-                },
-              },
-            ]
-          : []),
-        ...(onboardingState === OnboardingState.AccountConnected && hdKey
-          ? [
-              {
-                value: 'MobileQrSignIn',
-                icon: <Icon iconName={IconName.Qr} />,
-                label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
-                onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
-              },
-              {
-                value: 'MnemonicExport',
-                icon: <Icon iconName={IconName.ExportKeys} />,
-                label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'destroy' as const,
-                onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
-              },
-            ]
-          : []),
-        ...(privy.ready && privy.authenticated
-          ? [
-              {
-                value: 'MFA',
-                icon: <Icon iconName={IconName.Lock} />,
-                label: stringGetter({ key: STRING_KEYS.MULTI_FACTOR_AUTH }),
-                onSelect: () => showMfaEnrollmentModal(),
-              },
-            ]
-          : []),
-        {
-          value: 'Disconnect',
-          icon: <Icon iconName={IconName.BoxClose} />,
-          label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
-          highlightColor: 'destroy' as const,
-          onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
-        },
-      ].filter(isTruthy)}
-      slotBottomContent={<MobileDownloadLinks withBadges />}
-      align="end"
-      sideOffset={16}
-    >
-      {walletIcon}
-      {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
-    </$DropdownMenu>
-  );
+                            {(isDev || isKeplr) && (
+                                <div>
+                                    <div>
+                                        <$label>
+                                            {stringGetter({
+                                                key: STRING_KEYS.WALLET_BALANCE,
+                                                params: { ASSET: usdcLabel },
+                                            })}
+                                            <AssetIcon logoUrl={usdcImage} symbol="USDC" />
+                                        </$label>
+                                        <$BalanceOutput
+                                            type={OutputType.Asset}
+                                            value={usdcBalance}
+                                            fractionDigits={SMALL_USD_DECIMALS}
+                                        />
+                                    </div>
+                                    <WalletActions
+                                        complianceState={complianceState}
+                                        dispatch={dispatch}
+                                        stringGetter={stringGetter}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <div>
+                                    <$label>
+                                        {stringGetter({
+                                            key: STRING_KEYS.ASSET_BALANCE,
+                                            params: { ASSET: usdcLabel },
+                                        })}
+                                        <AssetIcon logoUrl={usdcImage} symbol="USDC" />
+                                    </$label>
+                                    <$BalanceOutput
+                                        type={OutputType.Asset}
+                                        value={freeCollateral ?? 0}
+                                        fractionDigits={USD_DECIMALS}
+                                    />
+                                </div>
+                                <SubaccountActions
+                                    asset={DydxChainAsset.USDC}
+                                    complianceState={complianceState}
+                                    dispatch={dispatch}
+                                    hasBalance={MustBigNumber(freeCollateral).gt(0)}
+                                    stringGetter={stringGetter}
+                                    withOnboarding
+                                />
+                            </div>
+                        </$Balances>
+                        {
+                            showConfirmPendingDeposit && (
+                                <$ConfirmPendingDeposit>
+                                    You have a pending deposit
+                                    <br /> for confirmation
+                                    <$IconButton
+                                        action={ButtonAction.Base}
+                                        shape={ButtonShape.Square}
+                                        iconName={IconName.Send}
+                                        onClick={() =>
+                                            dispatch(
+                                                openDialog(
+                                                    DialogTypes.ConfirmPendingDeposit({
+                                                        usdcBalance:
+                                                            MustBigNumber(usdcBalance).toNumber() - AMOUNT_RESERVED_FOR_GAS_USDC,
+                                                    })
+                                                )
+                                            )
+                                        }
+                                    />
+                                </$ConfirmPendingDeposit>
+                            )
+                        }
+                    </div >
+                )
+            }
+            items={
+                [
+                    onboardingState === OnboardingState.WalletConnected && {
+                        value: 'ConnectToChain',
+                        label: (
+                            <$ConnectToChain>
+                                <p>{stringGetter({ key: STRING_KEYS.MISSING_KEYS_DESCRIPTION })}</p>
+                                <OnboardingTriggerButton />
+                            </$ConnectToChain>
+                        ),
+                        onSelect: onRecoverKeys,
+                        separator: true,
+                    },
+                    affiliatesEnabled &&
+                    onboardingState === OnboardingState.AccountConnected && {
+                        value: 'Affiliates',
+                        icon: <Icon iconName={IconName.Giftbox} />,
+                        label: (
+                            <span>
+                                {stringGetter({ key: STRING_KEYS.INVITE_FRIENDS })}{' '}
+                                <Tag sign={TagSign.Positive}>{stringGetter({ key: STRING_KEYS.EARN_FEES })}</Tag>
+                            </span>
+                        ),
+                        onSelect: () => {
+                            dispatch(openDialog(DialogTypes.ShareAffiliate()));
+                        },
+                    },
+                    {
+                        value: 'Preferences',
+                        icon: <Icon iconName={IconName.Gear} />,
+                        label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
+                        onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
+                    },
+                    {
+                        value: 'DisplaySettings',
+                        icon:
+                            theme === AppTheme.Light ? (
+                                <Icon iconName={IconName.Sun} />
+                            ) : (
+                                <Icon iconName={IconName.Moon} />
+                            ),
+                        label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
+                        onSelect: () => dispatch(openDialog(DialogTypes.DisplaySettings())),
+                    },
+                    ...(isDev
+                        ? [
+                            {
+                                value: 'registerAffiliate',
+                                icon: <Icon iconName={IconName.Gear} />,
+                                label: 'Register Affiliate',
+                                onSelect: () => {
+                                    // eslint-disable-next-line no-alert
+                                    const affiliate = window.prompt('Enter affiliate address');
+                                    if (affiliate) {
+                                        registerAffiliate(affiliate);
+                                    }
+                                },
+                            },
+                        ]
+                        : []),
+                    ...(isDev || debugCompliance
+                        ? [
+                            {
+                                value: 'ComplianceConfig',
+                                icon: <Icon iconName={IconName.Gear} />,
+                                label: 'Compliance Config',
+                                onSelect: () => {
+                                    dispatch(openDialog(DialogTypes.ComplianceConfig()));
+                                },
+                            },
+                        ]
+                        : []),
+                    ...(appleAppStoreUrl ?? googlePlayStoreUrl
+                        ? [
+                            {
+                                value: 'MobileDownload',
+                                icon: <Icon iconName={IconName.Qr} />,
+                                label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
+                                onSelect: () => {
+                                    dispatch(
+                                        openDialog(
+                                            DialogTypes.MobileDownload({
+                                                mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
+                                            })
+                                        )
+                                    );
+                                },
+                            },
+                        ]
+                        : []),
+                    ...(onboardingState === OnboardingState.AccountConnected && hdKey
+                        ? [
+                            {
+                                value: 'MobileQrSignIn',
+                                icon: <Icon iconName={IconName.Qr} />,
+                                label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
+                                onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
+                            },
+                            {
+                                value: 'MnemonicExport',
+                                icon: <Icon iconName={IconName.ExportKeys} />,
+                                label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
+                                highlightColor: 'destroy' as const,
+                                onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
+                            },
+                        ]
+                        : []),
+                    ...(privy.ready && privy.authenticated
+                        ? [
+                            {
+                                value: 'MFA',
+                                icon: <Icon iconName={IconName.Lock} />,
+                                label: stringGetter({ key: STRING_KEYS.MULTI_FACTOR_AUTH }),
+                                onSelect: () => showMfaEnrollmentModal(),
+                            },
+                        ]
+                        : []),
+                    {
+                        value: 'Disconnect',
+                        icon: <Icon iconName={IconName.BoxClose} />,
+                        label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
+                        highlightColor: 'destroy' as const,
+                        onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
+                    },
+                ].filter(isTruthy)}
+            slotBottomContent={< MobileDownloadLinks withBadges />}
+            align="end"
+            sideOffset={16}
+        >
+            {walletIcon}
+            {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
+        </$DropdownMenu >
+    );
 };
 
 const DydxDerivedAddress = ({
-  address,
-  chain,
-  dydxAddress,
+    address,
+    chain,
+    dydxAddress,
 }: {
-  address?: string;
-  chain?: WalletNetworkType.Solana | WalletNetworkType.Evm;
-  dydxAddress?: string;
+    address?: string;
+    chain?: WalletNetworkType.Solana | WalletNetworkType.Evm;
+    dydxAddress?: string;
 }) => {
-  const stringGetter = useStringGetter();
+    const stringGetter = useStringGetter();
 
-  const tooltipText =
-    chain === WalletNetworkType.Solana
-      ? stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            SOLANA_ADDRESS: truncateAddress(address, ''),
-          },
-        })
-      : stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            EVM_ADDRESS: truncateAddress(address, '0x'),
-          },
-        });
+    const tooltipText =
+        chain === WalletNetworkType.Solana
+            ? stringGetter({
+                key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
+                params: {
+                    DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+                    SOLANA_ADDRESS: truncateAddress(address, ''),
+                },
+            })
+            : stringGetter({
+                key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
+                params: {
+                    DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+                    EVM_ADDRESS: truncateAddress(address, '0x'),
+                },
+            });
 
-  return (
-    <WithTooltip
-      slotTooltip={
-        <dl>
-          <dt>{tooltipText}</dt>
-        </dl>
-      }
-    >
-      <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-    </WithTooltip>
-  );
+    return (
+        <WithTooltip
+            slotTooltip={
+                <dl>
+                    <dt>{tooltipText}</dt>
+                </dl>
+            }
+        >
+            <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
+        </WithTooltip>
+    );
 };
 
 const $Column = styled.div`
@@ -523,9 +530,9 @@ const $IconButton = styled(IconButton)`
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   ${({ iconName }) =>
-    iconName != null &&
-    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
-    css`
+        iconName != null &&
+        [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+        css`
       --button-icon-size: 1.375em;
     `}
 `;
