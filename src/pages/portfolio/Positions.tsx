@@ -24,7 +24,7 @@ import { track } from '@/lib/analytics/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 
 import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
-import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions';
+/* import { MaybeVaultPositionsPanel } from '../vaults/VaultPositions'; */
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
@@ -40,12 +40,12 @@ export const Positions = () => {
     });
   }, [navigate]);
 
-  const handleViewVault = useCallback(() => {
-    track(AnalyticsEvents.ClickViewVaultFromPositionCard());
-    navigate(`${AppRoute.Vault}`, {
-      state: { from: AppRoute.Portfolio },
-    });
-  }, [navigate]);
+    /* const handleViewVault = useCallback(() => {
+  *   track(AnalyticsEvents.ClickViewVaultFromPositionCard());
+  *   navigate(`${AppRoute.Vault}`, {
+  *     state: { from: AppRoute.Portfolio },
+  *   });
+  * }, [navigate]); */
 
   return (
     <>
@@ -100,7 +100,7 @@ export const Positions = () => {
         />
       </DetachedSection>
       <DetachedSection>
-        <$MaybeVaultPositionsPanel
+              {/* <$MaybeVaultPositionsPanel
           header={
             <ContentSectionHeader
               title={stringGetter({ key: STRING_KEYS.VAULTS })}
@@ -115,7 +115,7 @@ export const Positions = () => {
             />
           }
           onViewVault={handleViewVault}
-        />
+        /> */}
       </DetachedSection>
     </>
   );
@@ -129,11 +129,11 @@ const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositio
   }
 `;
 
-const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-
-  > div {
-    padding-left: 1rem;
-  }
-`;
+/* const $MaybeVaultPositionsPanel = styled(MaybeVaultPositionsPanel)`
+*   margin-top: 1rem;
+*   margin-bottom: 1rem;
+*
+*   > div {
+*     padding-left: 1rem;
+*   }
+* `; */
