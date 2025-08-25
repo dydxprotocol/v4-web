@@ -92,21 +92,21 @@ export const HeaderDesktop = () => {
          *     <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
          *   ),
          * }, */
-        {
-              value: 'DOCUMENTATION',
-              label: "API",
-              slotBefore: <Icon iconName={IconName.Terminal} />,
-              href: `https://docs.dydx.exchange/`,
-              onClick: () => {
-                dispatch(
-                  openDialog(
-                    DialogTypes.ExternalLink({
-                      link: documentation,
-                    })
-                  )
-                );
-              },
-          },
+          /* {
+  *       value: 'DOCUMENTATION',
+  *       label: "API",
+  *       slotBefore: <Icon iconName={IconName.Terminal} />,
+  *       href: `https://docs.dydx.exchange/`,
+  *       onClick: () => {
+  *         dispatch(
+  *           openDialog(
+  *             DialogTypes.ExternalLink({
+  *               link: documentation,
+  *             })
+  *           )
+  *         );
+  *       },
+  *   }, */
           {
           value: 'MORE',
           label: stringGetter({ key: STRING_KEYS.MORE }),
