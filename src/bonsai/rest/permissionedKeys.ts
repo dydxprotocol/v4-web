@@ -6,7 +6,7 @@ import { AccountAuthenticator } from '@/constants/validators';
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { parseToPrimitives } from '@/lib/abacus/parseToPrimitives';
+import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { isPresent } from '@/lib/typeUtils';
 
 import { useCompositeClient } from './lib/useIndexer';

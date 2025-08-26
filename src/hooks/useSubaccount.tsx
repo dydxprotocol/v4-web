@@ -7,8 +7,8 @@ import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { BonsaiCore } from '@/bonsai/ontology';
-import { toBase64 } from '@cosmjs/encoding';
+import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
+import { toBase64, toHex } from '@cosmjs/encoding';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 import {
@@ -40,7 +40,7 @@ import { clearLocalOrders } from '@/state/localOrders';
 
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
-import { runFn } from '@/lib/do';
+import { mapIfPresent, runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
@@ -813,6 +813,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       const wallet = await lazyLocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
       return {
         privateKeyRaw,
+        privateKeyHex: mapIfPresent(privateKeyRaw, (pk) => toHex(pk)),
         publicKeyRaw,
         publicKey: wallet.pubKey,
         address: wallet.address,
@@ -826,29 +827,29 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       throw new Error('Unable to find pubKey of generated wallet');
     }
 
-    const msgType = (s: string): string => toBase64(new TextEncoder().encode(s));
+    const wrapAndEncode64 = (s: string): string => toBase64(new TextEncoder().encode(s));
     const anyOfSubAuth = [
       {
         type: AuthenticatorType.MESSAGE_FILTER,
-        config: msgType(TYPE_URL_MSG_PLACE_ORDER),
+        config: wrapAndEncode64(TYPE_URL_MSG_PLACE_ORDER),
       },
       {
         type: AuthenticatorType.MESSAGE_FILTER,
-        config: msgType(TYPE_URL_MSG_CANCEL_ORDER),
+        config: wrapAndEncode64(TYPE_URL_MSG_CANCEL_ORDER),
       },
       {
         type: AuthenticatorType.MESSAGE_FILTER,
-        config: msgType(TYPE_URL_BATCH_CANCEL),
+        config: wrapAndEncode64(TYPE_URL_BATCH_CANCEL),
       },
     ];
 
     // Nested AnyOf config must be base64(JSON([...])) as on-chain expects []byte
-    const anyOfConfigB64 = toBase64(new TextEncoder().encode(JSON.stringify(anyOfSubAuth)));
+    const anyOfConfigB64 = wrapAndEncode64(JSON.stringify(anyOfSubAuth));
 
     const subAuth = [
       {
         type: AuthenticatorType.SIGNATURE_VERIFICATION,
-        config: publicKey,
+        config: publicKey.value,
       },
       {
         type: AuthenticatorType.ANY_OF,
@@ -856,27 +857,32 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       },
       {
         type: AuthenticatorType.SUBACCOUNT_FILTER,
-        config: '0',
+        config: wrapAndEncode64('0'),
       },
     ];
 
     const jsonString = JSON.stringify(subAuth);
     const encodedData = new TextEncoder().encode(jsonString);
 
-    // const creationResult = await compositeClient.addAuthenticator(
-    //   subaccountClient,
-    //   AuthenticatorType.ALL_OF,
-    //   encodedData
-    // );
+    const creationResult = await compositeClient.addAuthenticator(
+      subaccountClient,
+      AuthenticatorType.ALL_OF,
+      encodedData
+    );
 
-    // const parsed = parseToPrimitives(creationResult);
+    const parsed = parseToPrimitives(creationResult);
 
+    console.log(parsed);
     // check if it worked
 
-    console.log(newRandomLocalWallet, newRandomLocalWallet.privateKeyRaw?.toString());
+    console.log(
+      newRandomLocalWallet,
+      newRandomLocalWallet.address,
+      newRandomLocalWallet.privateKeyHex
+    );
     return {
       address: newRandomLocalWallet.address,
-      privateKey: newRandomLocalWallet.privateKeyRaw?.toString(),
+      privateKey: newRandomLocalWallet.privateKeyHex,
     };
   }, [compositeClient, subaccountClient]);
 
@@ -895,10 +901,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, subaccountClient]
   );
 
+  const tradingKeys = BonsaiHooks.useAuthorizedAccounts().data;
+  useEffect(() => {
+    console.log('trading keys', tradingKeys);
+  }, [tradingKeys]);
+
   useEffect(() => {
     createAuthorizedAccount();
     return () => {};
-  }, [createAuthorizedAccount]);
+  }, [createAuthorizedAccount, compositeClient, subaccountClient]);
 
   return {
     // Deposit/Withdraw/Faucet Methods
