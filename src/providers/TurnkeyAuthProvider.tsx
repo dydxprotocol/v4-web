@@ -9,23 +9,25 @@ import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 import {
   GoogleIdTokenPayload,
   LoginMethod,
   SignInBody,
-  TurnkeyEmailOnboardingData,
   TurnkeyEmailResponse,
   TurnkeyOAuthResponse,
 } from '@/types/turnkey';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { setRequiresAddressUpload, setWalletInfo } from '@/state/wallet';
+import {
+  clearTurnkeyEmailOnboardingData,
+  setRequiresAddressUpload,
+  setTurnkeyEmailOnboardingData,
+  setWalletInfo,
+} from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
@@ -170,13 +172,6 @@ const useTurnkeyAuthContext = () => {
     [onboardDydxShared, indexedDbClient, setWalletFromSignature]
   );
 
-  const [, setTurnkeyEmailOnboardingData] = useLocalStorage<TurnkeyEmailOnboardingData | undefined>(
-    {
-      key: LocalStorageKey.TurnkeyEmailOnboardingData,
-      defaultValue: undefined,
-    }
-  );
-
   /* ----------------------------- Email Sign In ----------------------------- */
 
   const [emailSignInStatus, setEmailSignInStatus] = useState<
@@ -200,15 +195,17 @@ const useTurnkeyAuthContext = () => {
 
       // Store the Turnkey email onboarding data in local storage.
       // This data will be used after the user clicks the Magic link in their email.
-      setTurnkeyEmailOnboardingData({
-        salt,
-        organizationId,
-        userId,
-        userEmail,
-        dydxAddress: dydxAddressFromResponse,
-      });
+      dispatch(
+        setTurnkeyEmailOnboardingData({
+          salt,
+          organizationId,
+          userId,
+          userEmail,
+          dydxAddress: dydxAddressFromResponse,
+        })
+      );
     },
-    [setTurnkeyEmailOnboardingData]
+    [dispatch]
   );
 
   const handleEmailMagicLink = useCallback(
@@ -250,16 +247,16 @@ const useTurnkeyAuthContext = () => {
         searchParams.delete('token');
         setSearchParams(searchParams);
         // Clear email sign in data
-        setTurnkeyEmailOnboardingData(undefined);
+        dispatch(clearTurnkeyEmailOnboardingData());
       }
     },
     [
       authIframeClient,
+      dispatch,
       onboardDydxShared,
       setWalletFromSignature,
       searchParams,
       setSearchParams,
-      setTurnkeyEmailOnboardingData,
     ]
   );
 

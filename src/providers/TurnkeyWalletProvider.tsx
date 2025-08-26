@@ -9,20 +9,14 @@ import { hashMessage, hashTypedData, toHex } from 'viem';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { ConnectorType, getSignTypedDataForTurnkey } from '@/constants/wallets';
-import {
-  HashFunction,
-  PayloadEncoding,
-  TurnkeyEmailOnboardingData,
-  TurnkeyWallet,
-  UserSession,
-} from '@/types/turnkey';
+import { HashFunction, PayloadEncoding, TurnkeyWallet, UserSession } from '@/types/turnkey';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSavedEncryptedSignature } from '@/state/wallet';
-import { getSourceAccount } from '@/state/walletSelectors';
+import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import {
   getWalletsWithAccounts,
@@ -101,10 +95,7 @@ const useTurnkeyWalletContext = () => {
   /* ----------------------------- AuthIframeClient ----------------------------- */
 
   const [embeddedPublicKey, setEmbeddedPublicKey] = useState<string | null>();
-  const [turnkeyEmailOnboardingData] = useLocalStorage<TurnkeyEmailOnboardingData | undefined>({
-    key: LocalStorageKey.TurnkeyEmailOnboardingData,
-    defaultValue: undefined,
-  });
+  const turnkeyEmailOnboardingData = useAppSelector(getTurnkeyEmailOnboardingData);
 
   const initAuthIframeClient = useCallback(async () => {
     const authIframeEmbeddedPublicKey = await authIframeClient?.getEmbeddedPublicKey();

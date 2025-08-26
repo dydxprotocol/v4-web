@@ -19,3 +19,6 @@ export const selectIsTurnkeyConnected = createAppSelector(
 );
 
 export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalletNonce;
+
+export const getTurnkeyEmailOnboardingData = (state: RootState) =>
+  state.wallet.turnkeyEmailOnboardingData;
