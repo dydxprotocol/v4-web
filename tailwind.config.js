@@ -71,7 +71,7 @@ export default {
     },
     fontFamily: {
       base: 'var(--fontFamily-base)',
-      monospace: 'var(--fontFamily-monospace',
+      monospace: 'var(--fontFamily-monospace)',
     },
     fontSize: {
       tiny: 'var(--fontSize-tiny)',
@@ -192,6 +192,8 @@ export default {
         '.font-extra-large-book': { font: 'var(--font-extra-large-book)' },
         '.font-extra-large-medium': { font: 'var(--font-extra-large-medium)' },
         '.font-extra-large-bold': { font: 'var(--font-extra-large-bold)' },
+
+        '.font-mono': { fontFamily: 'var(--fontFamily-monospace)' },
       });
       addComponents({
         '.row': {

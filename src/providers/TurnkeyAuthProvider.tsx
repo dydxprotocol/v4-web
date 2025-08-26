@@ -294,8 +294,12 @@ const useTurnkeyAuthContext = () => {
   }, []);
 
   /* ----------------------------- Upload Address ----------------------------- */
-  const { mutate: sendUploadAddressRequest } = useMutation({
-    mutationFn: async ({ payload }: { payload: { dydxAddress: string; signature: string } }) => {
+  const { mutateAsync: sendUploadAddressRequest } = useMutation({
+    mutationFn: async ({
+      payload,
+    }: {
+      payload: { dydxAddress: string; signature: string };
+    }): Promise<{ success: boolean }> => {
       const body = JSON.stringify(payload);
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
@@ -309,7 +313,6 @@ const useTurnkeyAuthContext = () => {
 
       if (response.errors && Array.isArray(response.errors)) {
         const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
-        dispatch(setRequiresAddressUpload(true));
         throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
       }
 
@@ -317,6 +320,7 @@ const useTurnkeyAuthContext = () => {
       return response;
     },
     onError: (error) => {
+      dispatch(setRequiresAddressUpload(true));
       logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
     },
@@ -333,9 +337,13 @@ const useTurnkeyAuthContext = () => {
       }
 
       const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
-      sendUploadAddressRequest({ payload });
+      const result = await sendUploadAddressRequest({ payload });
+
+      if (!result.success) {
+        dispatch(setRequiresAddressUpload(true));
+      }
     },
-    [dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
+    [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
   );
 
   /* ----------------------------- Side Effects ----------------------------- */

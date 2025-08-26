@@ -12,7 +12,7 @@ import {
   Value,
   Viewport,
 } from '@radix-ui/react-select';
-import styled from 'styled-components';
+import styled, { css, CSSProp } from 'styled-components';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -30,6 +30,9 @@ export const SelectMenu = <T extends string>({
   label,
   withBlur,
   withPortal = true,
+  fullWidthPopper = false,
+  contentCss,
+  ...props
 }: {
   children: React.ReactNode;
   className?: string;
@@ -38,6 +41,18 @@ export const SelectMenu = <T extends string>({
   label?: React.ReactNode;
   withBlur?: boolean;
   withPortal?: boolean;
+  fullWidthPopper?: boolean;
+
+  // Content CSS Props
+  contentCss?: CSSProp;
+
+  // Content Props
+  position?: 'item-aligned' | 'popper';
+  align?: 'start' | 'center' | 'end';
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  sideOffset?: number;
+  alignOffset?: number;
+  avoidCollisions?: boolean;
 }) => {
   return (
     <Root value={value} onValueChange={onValueChange}>
@@ -58,14 +73,14 @@ export const SelectMenu = <T extends string>({
       </$Trigger>
       {withPortal ? (
         <Portal>
-          <$Content className={className}>
+          <$Content {...props} $fullWidthPopper={fullWidthPopper} css={contentCss}>
             {/* <ScrollUpButton /> */}
             <Viewport>{children}</Viewport>
             {/* <ScrollDownButton /> */}
           </$Content>
         </Portal>
       ) : (
-        <$Content className={className}>
+        <$Content {...props} $fullWidthPopper={fullWidthPopper} css={contentCss}>
           {/* <ScrollUpButton /> */}
           <Viewport>{children}</Viewport>
           {/* <ScrollDownButton /> */}
@@ -105,12 +120,19 @@ const $Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
   }
 `;
 
-const $Content = styled(Content)`
+const $Content = styled(Content)<{ $fullWidthPopper?: boolean }>`
   --select-menu-content-maxWidth: ;
   max-width: var(--select-menu-content-maxWidth);
 
   ${popoverMixins.popover}
   ${popoverMixins.popoverAnimation}
+
+  ${({ $fullWidthPopper }) =>
+    $fullWidthPopper &&
+    css`
+      width: var(--radix-select-trigger-width);
+      --select-menu-content-maxWidth: var(--radix-select-trigger-width);
+    `}
 `;
 
 const $Item = styled(Item)`
