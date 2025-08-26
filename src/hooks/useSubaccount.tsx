@@ -808,17 +808,12 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         getLazyLocalWallet(),
       ]);
       const mnemonic = fullBip39Lib.generateMnemonic(englishWorldList.wordlist, 128);
-      const { privateKey: privateKeyRaw, publicKey: publicKeyRaw } =
-        onboarding.deriveHDKeyFromMnemonic(mnemonic);
+      const { privateKey: privateKeyRaw } = onboarding.deriveHDKeyFromMnemonic(mnemonic);
       const wallet = await lazyLocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
       return {
-        privateKeyRaw,
-        privateKeyHex: mapIfPresent(privateKeyRaw, (pk) => toHex(pk)),
-        publicKeyRaw,
+        privateKeyHex: mapIfPresent(privateKeyRaw, (pk) => `0x${toHex(pk)}`),
         publicKey: wallet.pubKey,
         address: wallet.address,
-        mnemonic,
-        seed: fullBip39Lib.mnemonicToSeedSync(mnemonic),
       };
     });
 
@@ -864,15 +859,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     const jsonString = JSON.stringify(subAuth);
     const encodedData = new TextEncoder().encode(jsonString);
 
-    const creationResult = await compositeClient.addAuthenticator(
-      subaccountClient,
-      AuthenticatorType.ALL_OF,
-      encodedData
-    );
+    // const creationResult = await compositeClient.addAuthenticator(
+    //   subaccountClient,
+    //   AuthenticatorType.ALL_OF,
+    //   encodedData
+    // );
 
-    const parsed = parseToPrimitives(creationResult);
+    // const parsed = parseToPrimitives(creationResult);
 
-    console.log(parsed);
+    // console.log(parsed);
     // check if it worked
 
     console.log(
@@ -903,8 +898,16 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const tradingKeys = BonsaiHooks.useAuthorizedAccounts().data;
   useEffect(() => {
-    console.log('trading keys', tradingKeys);
-  }, [tradingKeys]);
+    runFn(async () => {
+      console.log('trading keys', tradingKeys);
+      if ((tradingKeys?.length ?? 0) > 0) {
+        const id = tradingKeys![0]!.id;
+        console.log('removing', id, Long.fromString(id));
+        const res = await removeAuthorizedAccount(Long.fromString(id));
+        console.log('removed', id, Long.fromString(id), res);
+      }
+    });
+  }, [removeAuthorizedAccount, tradingKeys]);
 
   useEffect(() => {
     createAuthorizedAccount();
