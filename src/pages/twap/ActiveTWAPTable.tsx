@@ -1,11 +1,14 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { selectActiveTWAPOrders } from '@/bonsai/selectors/account';
+import { OrderSideTag } from '@/components/OrderSideTag';
 import { Table, type BaseTableRowData, type ColumnDef } from '@/components/Table';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { TagSize } from '@/components/Tag';
 import { orEmptyRecord } from '@/lib/typeUtils';
 import { MarketTypeFilter } from '@/pages/trade/types';
 import { useAppSelector } from '@/state/appTypes';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import type { ColumnSize } from '@react-types/table';
 import { forwardRef } from 'react';
 import styled from 'styled-components';
@@ -13,7 +16,7 @@ import styled from 'styled-components';
 type ActiveTWAPOrder = BaseTableRowData & {
   uniqueId: string;
   market: string;
-  side: 'Buy' | 'Sell';
+  side: IndexerOrderSide;
   quantity: number;
   price: number;
   status: 'Active' | 'Filled' | 'Cancelled';
@@ -29,6 +32,7 @@ type ActiveTWAPOrder = BaseTableRowData & {
 
 export enum ActiveTWAPTableColumnKey {
     Market = 'Market',
+    Side = 'Side',
     Execution = 'Executed / Total Size',
     AveragePrice = 'Average Price',
     Runtime = "Runtime / Total",
@@ -64,14 +68,18 @@ const getActiveTWAPTableColumnDef = ({
         getCellValue: (row) => row.market,
         label: 'Market',
         allowsSorting: true,
-        renderCell: ({ market, side }) => (
+        renderCell: ({ market }) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
             <span>{market}</span>
-            <span style={{ color: side === 'Buy' ? 'var(--color-positive)' : 'var(--color-negative)', fontWeight: 500 }}>
-              {side}
-            </span>
           </div>
         ),
+      },
+      [ActiveTWAPTableColumnKey.Side]: {
+        columnKey: 'side',
+        getCellValue: (row) => row.side,
+        label: 'Side',
+        allowsSorting: true,
+        renderCell: ({ side }) => side && <OrderSideTag orderSide={side} size={TagSize.Medium} />,
       },
       [ActiveTWAPTableColumnKey.Execution]: {
         columnKey: 'execution',
@@ -164,7 +172,7 @@ export const ActiveTWAPTable = forwardRef(
         const twapOrdersData: ActiveTWAPOrder[] = activeTWAPOrders.map((order) => ({
             uniqueId: order.id,
             market: marketSummaries[order.marketId]?.displayableTicker || order.displayId,
-            side: order.side === 'BUY' ? 'Buy' : 'Sell',
+            side: order.side,
             quantity: parseFloat(order.totalFilled?.toString() || '0'), // For sorting by execution amount
             price: parseFloat(order.price.toString()),
             status: 'Active', // All active TWAP orders are active
