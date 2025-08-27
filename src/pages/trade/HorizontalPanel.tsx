@@ -47,10 +47,12 @@ import { shortenNumberForDisplay } from '@/lib/numbers';
 import { TradeTableSettings } from './TradeTableSettings';
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 import { MarketTypeFilter, PanelView } from './types';
+import { TWAPTable } from '../twap/TWAPTable';
 
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
+  Twap = 'Twap',
   OrderHistory = 'OrderHistory',
   Fills = 'Fills',
   Payments = 'Payments',
@@ -381,9 +383,22 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     [stringGetter, showCurrentMarket, isTablet, initialPageSize, currentMarketId]
   );
 
+  const twapTabItem = useMemo(
+    () => ({
+      asChild: true,
+      value: InfoSection.Twap,
+      label: stringGetter({ key: STRING_KEYS.TWAP }),
+
+      content: (
+        <TWAPTable />
+      ),
+    }),
+    [stringGetter]
+  );
+
   const tabItems = useMemo(
-    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem],
-    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem]
+    () => [positionTabItem, ordersTabItem, fillsTabItem, orderHistoryTabItem, paymentsTabItem, twapTabItem],
+    [positionTabItem, fillsTabItem, ordersTabItem, orderHistoryTabItem, paymentsTabItem, twapTabItem]
   );
 
   const slotBottom = {
@@ -394,6 +409,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
     [InfoSection.OrderHistory]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,
+    [InfoSection.Twap]: null,
   }[tab];
 
   return isTablet ? (

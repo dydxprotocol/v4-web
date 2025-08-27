@@ -76,6 +76,10 @@ function calculateSubaccountOrder(
     reduceOnly: !!base.reduceOnly,
     remainingSize: MustBigNumber(base.size).minus(MustBigNumber(base.totalFilled)),
     removalReason: base.removalReason,
+    // TWAP order parameters
+    duration: base.duration || undefined,
+    interval: base.interval || undefined,
+    priceTolerance: base.priceTolerance || undefined,
   };
   order = maybeUpdateOrderIfExpired(order, protocolHeight);
   return order;
@@ -231,6 +235,8 @@ function calculateBaseOrderStatus(
       return OrderStatus.Canceling;
     case IndexerOrderStatus.UNTRIGGERED:
       return OrderStatus.Untriggered;
+    case IndexerOrderStatus.ERROR:
+      return OrderStatus.Canceled; // Treat ERROR status as canceled
     default:
       assertNever(status);
       return undefined;

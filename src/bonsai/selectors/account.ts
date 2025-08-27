@@ -11,6 +11,7 @@ import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 import { convertBech32Address } from '@/lib/addressUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
 
+import { IndexerOrderType } from '@/types/indexer/indexerApiGen';
 import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
 import { getMarketEffectiveInitialMarginForMarket } from '../calculators/markets';
@@ -29,7 +30,7 @@ import {
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
-import { SubaccountTransfer } from '../types/summaryTypes';
+import { OrderFlags, SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
   selectRawBlockTradingRewardsLiveData,
@@ -136,6 +137,16 @@ export const selectOpenOrders = createAppSelector([selectAccountOrders], (orders
 
 export const selectOrderHistory = createAppSelector([selectAccountOrders], (orders) => {
   return calculateOrderHistory(orders);
+});
+
+export const selectTWAPOrders = createAppSelector([selectAccountOrders], (orders) => {
+  return orders.filter((order) => 
+    order.orderFlags === OrderFlags.TWAP && order.type === IndexerOrderType.TWAP
+  );
+});
+
+export const selectActiveTWAPOrders = createAppSelector([selectTWAPOrders], (twapOrders) => {
+  return calculateOpenOrders(twapOrders);
 });
 
 export const selectCurrentMarketOpenOrders = createAppSelector(

@@ -6,6 +6,8 @@ settings:
 
 overrides:
   follow-redirects: 1.15.3
+  '@injectivelabs/sdk-ts': 1.16.10
+  '@injectivelabs/ts-types': 1.16.10
 
 dependencies:
   '@cosmjs/amino':
@@ -33,8 +35,8 @@ dependencies:
     specifier: 2.1.1
     version: 2.1.1
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.311
-    version: 1.1.311
+    specifier: ^1.1.313
+    version: 1.1.313
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1499,8 +1501,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.311:
-    resolution: {integrity: sha512-KI/wbc3LgXeIqWn4P7nB/SpgO7UyJwBLDoc7LuJazTVmBba5wrbItvaaR685D3Ds3bmmyuRSb3wn7ZLuNouOoQ==}
+  /@dydxprotocol/v4-localization@1.1.313:
+    resolution: {integrity: sha512-VMBGj7/1RUeRAFa0qxew8V4e2VUh188qa7tVudJqdo7CLLZz8su+A0GRmADv7/ntnYBBQhHwMWQFrJkT4kQphA==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -2711,20 +2713,20 @@ packages:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
       protobufjs: 7.5.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
     dev: false
 
-  /@injectivelabs/core-proto-ts@1.14.3:
-    resolution: {integrity: sha512-V45Pr3hFD09Rlkai2bWKjntfvgDFvGEBWh5Wy1iRpjnYzeiwnizvaJtyLrAEfZ87d5AD5qtPCNJN5fd27iFa5w==}
+  /@injectivelabs/core-proto-ts@1.16.1:
+    resolution: {integrity: sha512-/6LWwZ/ZcC6/sI21s92cf3/8mgma6xRnBXtsF+708g2SX87WatJuXL8DjZsY1agCCnyw6bLVLtjKAfLQopNkxw==}
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
       protobufjs: 7.5.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
     dev: false
 
-  /@injectivelabs/exceptions@1.15.2:
-    resolution: {integrity: sha512-sAlJfLMH9HxlABKrlnjNX/O/gg49ao2r/yuuFbQci1vVNeF2TSoaa3f0OzUckakyPBslDJCK24Ddi+mft0qQqg==}
+  /@injectivelabs/exceptions@1.16.10:
+    resolution: {integrity: sha512-Tv0yM1JGSRzqtHp5fQlJ+B16Xej78WJrOqPrHC1H1MB9wr0NL3krAo86sm04IZI1RCq0Mv3hqCPPWqpZ6z+pRQ==}
     dependencies:
       http-status-codes: 2.3.0
     dev: false
@@ -2754,13 +2756,13 @@ packages:
       google-protobuf: 3.21.4
     dev: false
 
-  /@injectivelabs/indexer-proto-ts@1.13.9:
-    resolution: {integrity: sha512-05goWVmXpwiHDVPK/p2fr9xUrslHrKSUdsu5N2AYbQoXMs0Txnke8vFrLtIbKV0BMOxteqlOunAClJ75Wt6hTA==}
+  /@injectivelabs/indexer-proto-ts@1.13.14:
+    resolution: {integrity: sha512-tOXIvmKbsotMWz1w3ajUbzwQOenNbgk3mHjvbiJltldr9QYCaKH/++CHZ4/O+uuW7rb3HtAStjXbXC4lyIizEQ==}
     dependencies:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
       protobufjs: 7.5.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
     dev: false
 
   /@injectivelabs/mito-proto-ts@1.13.2:
@@ -2769,13 +2771,13 @@ packages:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
       protobufjs: 7.5.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
     dev: false
 
-  /@injectivelabs/networks@1.15.3:
-    resolution: {integrity: sha512-WZ4E5TLUgHudVXpU7AGlLppx1NUmk9mtOOsDJQcpRaKXTQ520AXMov6DsqMY5aLUJ7QCkDz5HuoK0D7/SSrh6Q==}
+  /@injectivelabs/networks@1.16.10:
+    resolution: {integrity: sha512-vdAKoMqJ7O3zEMaPzTcskDJfgS7zz6eSCQ7tJE7kIfStGEoK0aGJI7RdgWxfm4CApW4PKqb4u/LSmNkYHmMrww==}
     dependencies:
-      '@injectivelabs/ts-types': 1.15.3
+      '@injectivelabs/ts-types': 1.16.10
     dev: false
 
   /@injectivelabs/olp-proto-ts@1.13.4:
@@ -2784,34 +2786,33 @@ packages:
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       google-protobuf: 3.21.4
       protobufjs: 7.5.1
-      rxjs: 7.8.1
+      rxjs: 7.8.2
     dev: false
 
-  /@injectivelabs/sdk-ts@1.15.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-R6iTABejgO2LVJqeHS2BYFjutIbMwxMVMqFCoowedIBUiUbnKA3Lqn/4fKDSgHJngOmI1RGafqS2SVvA8tSh1w==}
+  /@injectivelabs/sdk-ts@1.16.10(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-krRmlDzeKjJWZjIerVoIzN2ULgVVFvVlqbzOUfbv59KCJCU17e/6idadYlzBBxVa4r4Ybjs8A0fat7CjvVj0pw==}
     dependencies:
       '@apollo/client': 3.13.8(@types/react@18.3.3)(graphql@16.11.0)(react-dom@18.2.0)(react@18.2.0)
       '@cosmjs/amino': 0.33.1
       '@cosmjs/proto-signing': 0.33.1
       '@cosmjs/stargate': 0.33.1
-      '@ethersproject/bytes': 5.8.0
       '@injectivelabs/abacus-proto-ts': 1.14.0
-      '@injectivelabs/core-proto-ts': 1.14.3
-      '@injectivelabs/exceptions': 1.15.2
+      '@injectivelabs/core-proto-ts': 1.16.1
+      '@injectivelabs/exceptions': 1.16.10
       '@injectivelabs/grpc-web': 0.0.1(google-protobuf@3.21.4)
       '@injectivelabs/grpc-web-node-http-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
       '@injectivelabs/grpc-web-react-native-transport': 0.0.2(@injectivelabs/grpc-web@0.0.1)
-      '@injectivelabs/indexer-proto-ts': 1.13.9
+      '@injectivelabs/indexer-proto-ts': 1.13.14
       '@injectivelabs/mito-proto-ts': 1.13.2
-      '@injectivelabs/networks': 1.15.3
+      '@injectivelabs/networks': 1.16.10
       '@injectivelabs/olp-proto-ts': 1.13.4
-      '@injectivelabs/ts-types': 1.15.3
-      '@injectivelabs/utils': 1.15.3
+      '@injectivelabs/ts-types': 1.16.10
+      '@injectivelabs/utils': 1.16.10
       '@metamask/eth-sig-util': 8.2.0
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.6
       axios: 1.9.0
-      bech32: 2.0.0
       bip39: 3.1.0
       cosmjs-types: 0.9.0
       crypto-js: 4.2.0
@@ -2821,6 +2822,7 @@ packages:
       graphql: 16.11.0
       http-status-codes: 2.3.0
       keccak256: 1.0.6
+      rxjs: 7.8.2
       secp256k1: 4.0.3
       shx: 0.3.4
       snakecase-keys: 5.5.0
@@ -2836,17 +2838,17 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@injectivelabs/ts-types@1.15.3:
-    resolution: {integrity: sha512-bMLLP6WQAK8/x8DrPWKov+czHYj0newP6hSJLGYxThlJEFHMu3bHMPj9nfReLTUKzfkbG2zg2g/bcNMKWgImew==}
+  /@injectivelabs/ts-types@1.16.10:
+    resolution: {integrity: sha512-ZkECbMz5zD2+pp3tHQzFnezuK1r23IgJc8SQ/Rbu+jogwGkQmHurQTLut0MfYFLKWaqfJPQhqndBs2Fm17NBAA==}
     dev: false
 
-  /@injectivelabs/utils@1.15.3:
-    resolution: {integrity: sha512-S15az5c4uY+YCqC19yKkT9cEUrwhrKYdd1TGVta1EbnjDEU0tTAUMYJNhzW7/gyivd2gdjrO9Ie0o2rtViniMQ==}
+  /@injectivelabs/utils@1.16.10:
+    resolution: {integrity: sha512-0eOcKlQ9Uly9e3zgEmWlCA3uA2mPtmBH6qC94JQB/H2+dy+/3/OsksEuRTc5HJ8WIGKus/EtDbHygae/wkKz4w==}
     dependencies:
       '@bangjelkoski/store2': 2.14.3
-      '@injectivelabs/exceptions': 1.15.2
-      '@injectivelabs/networks': 1.15.3
-      '@injectivelabs/ts-types': 1.15.3
+      '@injectivelabs/exceptions': 1.16.10
+      '@injectivelabs/networks': 1.16.10
+      '@injectivelabs/ts-types': 1.16.10
       axios: 1.9.0
       bignumber.js: 9.3.0
       http-status-codes: 2.3.0
@@ -3053,7 +3055,7 @@ packages:
       bip39: 3.1.0
       bs58check: 2.1.2
       buffer: 6.0.3
-      crypto-js: 4.1.1
+      crypto-js: 4.2.0
       elliptic: 6.6.1
       sha.js: 2.4.11
     dev: false
@@ -3535,7 +3537,7 @@ packages:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.7.1
-      '@scure/base': 1.2.4
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.12
       debug: 4.3.4(supports-color@5.5.0)
       pony-cause: 2.1.10
@@ -7033,6 +7035,10 @@ packages:
     resolution: {integrity: sha512-5Yy9czTO47mqz+/J8GM6GIId4umdCk1wc1q8rKERQulIoc8VP9pzDcghv10Tl2E7R96ZUx/PhND3ESYUQX8NuQ==}
     dev: false
 
+  /@scure/base@1.2.6:
+    resolution: {integrity: sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==}
+    dev: false
+
   /@scure/bip32@1.3.1:
     resolution: {integrity: sha512-osvveYtyzdEVbt3OfwwXFr4P2iVBL5u1Q3q4ONBfDY/UpOuXmOlbgwc1xECEboY8wIays8Yt6onaWMUdUbfl0A==}
     dependencies:
@@ -7106,7 +7112,7 @@ packages:
       '@cosmjs/math': 0.33.1
       '@cosmjs/proto-signing': 0.33.1
       '@cosmjs/stargate': 0.33.1
-      '@injectivelabs/sdk-ts': 1.15.3(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
+      '@injectivelabs/sdk-ts': 1.16.10(@types/react@18.3.3)(react-dom@18.2.0)(react@18.2.0)
       '@keplr-wallet/unit': 0.12.162(starknet@6.11.0)
       '@solana/wallet-adapter-base': 0.9.23(@solana/web3.js@1.93.2)
       '@solana/web3.js': 1.93.2
@@ -7573,13 +7579,13 @@ packages:
     resolution: {integrity: sha512-5lxnyLEYFskErRPenYItLRSge5DjrJngYKdVjRSrWfza9G6KkgHEXi0vUZiyUeMU5JfXH1YnvXZzSp8ul88o2Q==}
     dependencies:
       legacy-swc-helpers: /@swc/helpers@0.4.14
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /@swc/helpers@0.5.11:
     resolution: {integrity: sha512-YNlnKRWF2sVojTpIyzwou9XoTNbzbzONwRhOoniEioF1AtaitTvVZblaQRrAzChWQ1bLYyYSWzM18y4WwgzJ+A==}
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /@swc/types@0.1.5:
@@ -17308,7 +17314,7 @@ packages:
     resolution: {integrity: sha512-KLIET85ik3vhEfS+3fDlc/BAZiAp+43QEC/yCo5zkNoY2YaKvNkOaFr/6wCFgFH1kuYQM5pMNi0Tg8koiIemtw==}
     dependencies:
       destr: 2.0.3
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       ufo: 1.5.4
     dev: false
 
@@ -18469,7 +18475,7 @@ packages:
       '@types/react': 18.3.3
       react: 18.2.0
       react-style-singleton: 2.2.1(@types/react@18.3.3)(react@18.2.0)
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /react-remove-scroll@2.5.4(@types/react@18.3.3)(react@18.2.0):
@@ -18577,7 +18583,7 @@ packages:
       get-nonce: 1.0.1
       invariant: 2.2.4
       react: 18.2.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /react-use-measure@2.1.1(react-dom@18.2.0)(react@18.2.0):
@@ -19136,6 +19142,12 @@ packages:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
     dependencies:
       tslib: 2.7.0
+
+  /rxjs@7.8.2:
+    resolution: {integrity: sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==}
+    dependencies:
+      tslib: 2.7.0
+    dev: false
 
   /safaridriver@0.1.2:
     resolution: {integrity: sha512-4R309+gWflJktzPXBQCobbWEHlzC4aK3a+Ov3tz2Ib2aBxiwd11phkdIBH1l0EO22x24CJMUQkpKFumRriCSRg==}
@@ -20578,7 +20590,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.4
       mime: 3.0.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       pathe: 1.1.2
     dev: false
 
@@ -20822,7 +20834,7 @@ packages:
     dependencies:
       '@types/react': 18.3.3
       react: 18.2.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /use-isomorphic-layout-effect@1.1.2(@types/react@18.3.3)(react@18.2.0):
@@ -20865,7 +20877,7 @@ packages:
       '@types/react': 18.3.3
       detect-node-es: 1.1.0
       react: 18.2.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     dev: false
 
   /use-sync-external-store@1.2.0(react@18.2.0):
