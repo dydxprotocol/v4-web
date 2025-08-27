@@ -188,6 +188,7 @@ export enum SubaccountFillType {
   LIQUIDATED = 'LIQUIDATED',
   DELEVERAGED = 'DELEVERAGED',
   MARKET = 'MARKET',
+  TWAP = 'TWAP',
 }
 
 export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {

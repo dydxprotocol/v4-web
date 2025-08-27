@@ -93,6 +93,11 @@ export const createPlaceOrderPayloadFromExistingOrder = (
     ? [newPrice, triggerPrice?.toNumber()]
     : [price.toNumber(), newPrice];
 
+  // DO NOT SUPPORT MODIFYING TWAP ORDERS
+  if (type === IndexerOrderType.TWAP || type === IndexerOrderType.TWAPSUBORDER) {
+    return undefined;
+  }
+
   return {
     subaccountNumber,
     marketId,
