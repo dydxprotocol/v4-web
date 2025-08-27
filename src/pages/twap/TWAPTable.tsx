@@ -9,6 +9,7 @@ const tabItems: TabItem<string>[] = [
     content: (
       <ActiveTWAPTable columnKeys={[
         ActiveTWAPTableColumnKey.Market,
+        ActiveTWAPTableColumnKey.Side,
         ActiveTWAPTableColumnKey.Execution,
         ActiveTWAPTableColumnKey.AveragePrice,
         ActiveTWAPTableColumnKey.Runtime,
