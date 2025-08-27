@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
-import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
@@ -46,7 +45,7 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
-  const indexerUrl = useAppSelector(selectIndexerUrl);
+  const indexerUrl = 'https://indexerv4dev.dydx.exchange'; // useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
   const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
@@ -226,7 +225,8 @@ const useTurnkeyAuthContext = () => {
         if (error instanceof Error) {
           if (
             error.message.includes('unable to decrypt bundle using embedded key') ||
-            error.message.includes('Organization ID is not available')
+            error.message.includes('Organization ID is not available') ||
+            error.message.includes('Unauthenticated desc')
           ) {
             errorMessage =
               'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';

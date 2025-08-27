@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { logTurnkey } from '@/bonsai/logs';
-import { selectIndexerReady, selectIndexerUrl } from '@/bonsai/socketSelectors';
+import { selectIndexerReady } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { avalanche } from 'viem/chains';
@@ -38,7 +38,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const stringGetter = useStringGetter();
 
   const { dydxAddress } = useAccounts();
-  const indexerUrl = useAppSelector(selectIndexerUrl);
+  const indexerUrl = 'https://indexerv4dev.dydx.exchange'; // useAppSelector(selectIndexerUrl);
   const indexerReady = useAppSelector(selectIndexerReady);
 
   const canQueryForDepositAddresses = dydxAddress != null && indexerReady;
@@ -67,9 +67,11 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
   const chains = useMemo(() => {
     if (selectedTab === 'perpetuals') {
-      return EVM_DEPOSIT_CHAINS.map((chain) => {
+      const evmChains = EVM_DEPOSIT_CHAINS.map((chain) => {
         return chain.id;
       });
+
+      return [...evmChains, SOLANA_MAINNET_ID];
     }
 
     return [SOLANA_MAINNET_ID];
@@ -85,10 +87,14 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
         return depositAddresses.avalancheAddress;
       }
 
+      if (selectedChain === SOLANA_MAINNET_ID) {
+        return depositAddresses.svmAddress;
+      }
+
       return depositAddresses.evmAddress;
     }
 
-    return depositAddresses.svmAddress;
+    return undefined; // TODO(spot): Add spot deposit address
   }, [depositAddresses, selectedChain, selectedTab]);
 
   useEffect(() => {
@@ -118,13 +124,22 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     };
   }, [depositAddress]);
 
-  logTurnkey('DepositAddressDialog', 'addressRepresentation', {
-    addressRepresentation,
-    depositAddress,
-    selectedChain,
-    selectedTab,
-    depositAddresses,
-  });
+  const warningMessage = useMemo(() => {
+    const chainName = CHAIN_INFO[selectedChain]?.name;
+    const assets =
+      selectedChain === SOLANA_MAINNET_ID
+        ? 'USDC'
+        : selectedChain === avalanche.id.toString()
+          ? 'USDC or AVAX'
+          : 'USDC or ETH';
+
+    return (
+      <span tw="block text-center text-color-warning font-small-medium">
+        Only deposit {assets} on {chainName} network. <br />
+        Any other assets sent to this address can result in a loss of funds.
+      </span>
+    );
+  }, [selectedChain]);
 
   const addressCard = isLoadingDepositAddresses ? (
     <$AddressCard>
@@ -187,7 +202,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
             onTabChange={setSelectedTab}
             options={[
               // TODO(spot): Localize
-              { label: 'Spot', value: 'spot' },
+              { label: 'Spot', value: 'spot', disabled: true },
               { label: stringGetter({ key: STRING_KEYS.PERPETUALS }), value: 'perpetuals' },
             ]}
           />
@@ -213,10 +228,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
         {addressCard}
 
-        <span tw="block text-center text-color-warning font-small-medium">
-          Only deposit USDC or ETH on Ethereum network. <br />
-          Funds sent to any other networks can result in a loss of funds.
-        </span>
+        {warningMessage}
       </div>
     </$Dialog>
   );

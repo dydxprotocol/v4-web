@@ -5,6 +5,7 @@ import styled from 'styled-components';
 export interface TabOption<T> {
   label: React.ReactNode;
   value: T;
+  disabled?: boolean;
 }
 
 interface TabGroupProps<T> {
@@ -55,6 +56,7 @@ export const TabGroup = <T,>({ value, onTabChange, options, className }: TabGrou
       <$ActiveTabIndicator ref={activeTabRef} />
       {options.map((option) => (
         <$Tab
+          disabled={option.disabled}
           key={String(option.value)}
           data-value={option.value}
           onClick={() => onTabChange(option.value)}
