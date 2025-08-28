@@ -15,7 +15,6 @@ import {
     getEthConfig,
     validateVaultBalance,
 } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition, getPositionLeverage } from "../../utils/contract"
 import {
     BNB_PRICEFEED_ID,

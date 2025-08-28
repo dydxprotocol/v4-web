@@ -8,7 +8,6 @@ import { toPrice, toUsd } from "../../utils/units"
 import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BNB_MAX_LEVERAGE, getBnbConfig, validateVaultBalance } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
 
 import { launchNode, getNodeWallets } from "../../utils/node"

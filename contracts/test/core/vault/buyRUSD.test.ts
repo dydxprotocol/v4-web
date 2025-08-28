@@ -17,7 +17,6 @@ import {
     getDaiConfig,
     validateVaultBalance,
 } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import {
     BNB_PRICEFEED_ID,
     BTC_PRICEFEED_ID,

@@ -9,7 +9,6 @@ import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BigNumber } from "ethers"
 import { BTC_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBtcConfig, getDaiConfig, validateVaultBalance } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
 
