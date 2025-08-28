@@ -3,7 +3,8 @@ import { Provider, Signer, Wallet, WalletUnlocked } from "fuels"
 import { Utils } from "../../../types"
 import { deploy } from "../../utils/utils"
 import { useChai } from "../../utils/chai"
-import { launchNode } from "../../utils/node"
+import { launchNode, getNodeWallets } from "../../utils/node"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 
 use(useChai)
 
@@ -13,6 +14,7 @@ function convertTai64ToUnixTimestamp(tai64_time: string) {
 
 describe("Utils", () => {
     let priceUpdateSigner: Signer
+    let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
     let user1: WalletUnlocked
@@ -21,7 +23,8 @@ describe("Utils", () => {
     let utils: Utils
 
     beforeEach(async () => {
-        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+        launchedNode = await launchNode()
+        ;[ deployer, user0, user1, user2, user3 ] = getNodeWallets(launchedNode)
           
         priceUpdateSigner = new Signer(deployer.privateKey)
 
@@ -38,5 +41,9 @@ describe("Utils", () => {
         // console.log("Date:", unix_date)
 
         expect(unix_time).to.equal(convertTai64ToUnixTimestamp(tai64_time))
+    })
+
+    afterEach(async () => {
+        launchedNode.cleanup()
     })
 })

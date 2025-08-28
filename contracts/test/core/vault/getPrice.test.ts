@@ -1,5 +1,6 @@
 import { expect, use } from "chai"
 import { Provider, Signer, Wallet, WalletUnlocked } from "fuels"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { Fungible, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
 import { deploy, getValStr, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
@@ -14,12 +15,13 @@ import {
     getUpdatePriceDataCall,
     USDC_PRICEFEED_ID,
 } from "../../utils/mock-pyth"
-import { launchNode } from "../../utils/node"
+import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
 describe("Vault.getPrice", function () {
     let priceUpdateSigner: Signer
+    let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
     let user1: WalletUnlocked
@@ -39,7 +41,8 @@ describe("Vault.getPrice", function () {
     let yieldTracker: YieldTracker
 
     beforeEach(async () => {
-        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+        launchedNode = await launchNode()
+        ;[ deployer, user0, user1, user2, user3 ] = getNodeWallets(launchedNode)
           
         priceUpdateSigner = new Signer(deployer.privateKey)
 
@@ -136,5 +139,9 @@ describe("Vault.getPrice", function () {
         expect(await getValStr(vaultPricefeed.functions.get_price(toAsset(BTC), true))).eq("40040000000000000000000000000000000")
 
         expect(await getValStr(vaultPricefeed.functions.get_price(toAsset(BTC), false))).eq("39960000000000000000000000000000000")
+    })
+
+    afterEach(async () => {
+        launchedNode.cleanup()
     })
 })

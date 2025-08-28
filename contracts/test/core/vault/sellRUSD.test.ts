@@ -1,5 +1,6 @@
 import { expect, use } from "chai"
 import { AbstractContract, assets, Provider, Signer, Wallet, WalletUnlocked, AssetId } from "fuels"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { Fungible, Rlp, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
 import { deploy, getBalance, getValStr, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
@@ -10,13 +11,14 @@ import { BNB_MAX_LEVERAGE, BTC_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBnbConfig, get
 import { WALLETS } from "../../utils/wallets"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
 
-import { launchNode } from "../../utils/node"
+import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
 describe("Vault.sellRUSD", function () {
     let attachedContracts: AbstractContract[]
     let priceUpdateSigner: Signer
+    let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
     let user1: WalletUnlocked
@@ -37,7 +39,8 @@ describe("Vault.sellRUSD", function () {
     let rlp: Rlp
 
     beforeEach(async () => {
-        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+        launchedNode = await launchNode()
+        ;[ deployer, user0, user1, user2, user3 ] = getNodeWallets(launchedNode)
           
         priceUpdateSigner = new Signer(deployer.privateKey)
 
@@ -336,5 +339,9 @@ describe("Vault.sellRUSD", function () {
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq(expandDecimals(1))
 
         expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("4975039960038")
+    })
+
+    afterEach(async () => {
+        launchedNode.cleanup()
     })
 })

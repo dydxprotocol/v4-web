@@ -1,5 +1,6 @@
 import { expect, use } from "chai"
 import { AbstractContract, Provider, Signer, Wallet, WalletUnlocked } from "fuels"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { Fungible, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
 import { deploy, getValStr, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
@@ -8,13 +9,14 @@ import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BNB_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBnbConfig, getDaiConfig } from "../../utils/vault"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
-import { launchNode } from "../../utils/node"
+import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
 describe("Vault.getFeeBasisPoints", function () {
     let attachedContracts: AbstractContract[]
     let priceUpdateSigner: Signer
+    let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
     let user1: WalletUnlocked
@@ -34,7 +36,8 @@ describe("Vault.getFeeBasisPoints", function () {
     let vault_user1: Vault
 
     beforeEach(async () => {
-        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+        launchedNode = await launchNode()
+        ;[ deployer, user0, user1, user2, user3 ] = getNodeWallets(launchedNode)
           
         priceUpdateSigner = new Signer(deployer.privateKey)
 
@@ -216,5 +219,9 @@ describe("Vault.getFeeBasisPoints", function () {
         expect(await getValStr(vault.functions.get_fee_basis_points(toAsset(BNB), 5000 * 10, 50, 100, false))).eq("0")
         expect(await getValStr(vault.functions.get_fee_basis_points(toAsset(BNB), 20000 * 10, 50, 100, false))).eq("0")
         expect(await getValStr(vault.functions.get_fee_basis_points(toAsset(BNB), 50000 * 10, 50, 100, false))).eq("0")
+    })
+
+    afterEach(async () => {
+        launchedNode.cleanup()
     })
 })

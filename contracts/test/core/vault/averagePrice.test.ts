@@ -1,5 +1,6 @@
 import { expect, use } from "chai"
 import { AbstractContract, assets, Provider, Signer, Wallet, WalletUnlocked, AssetId } from "fuels"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { Fungible, Rlp, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
 import { deploy, getBalance, getValue, getValStr, formatObj, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
@@ -24,13 +25,14 @@ import {
     getUpdatePriceDataCall,
 } from "../../utils/mock-pyth"
 
-import { launchNode } from "../../utils/node"
+import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
 describe("Vault.averagePrice", () => {
     let attachedContracts: AbstractContract[]
     let priceUpdateSigner: Signer
+    let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
     let user1: WalletUnlocked
@@ -51,7 +53,8 @@ describe("Vault.averagePrice", () => {
     let rlp: Rlp
 
     beforeEach(async () => {
-        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+        launchedNode = await launchNode()
+        ;[ deployer, user0, user1, user2, user3 ] = getNodeWallets(launchedNode)
           
         priceUpdateSigner = new Signer(deployer.privateKey)
 
@@ -886,5 +889,9 @@ describe("Vault.averagePrice", () => {
         position = formatObj(await getPosition(addrToIdentity(user0), toAsset(ETH), toAsset(ETH), true, vault))
         expect(position.size).eq("9796792232002357947081599665915068")
         expect(position.average_price).eq("2452296235817722670635628923178700")
+    })
+
+    afterEach(async () => {
+        launchedNode.cleanup()
     })
 })
