@@ -7,7 +7,6 @@ import { expandDecimals, toPrice, toUsd } from "../../utils/units"
 import { toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { DAI_MAX_LEVERAGE, getDaiConfig } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import {
     BNB_PRICEFEED_ID,
     BTC_PRICEFEED_ID,
@@ -15,6 +14,7 @@ import {
     getUpdatePriceDataCall,
     USDC_PRICEFEED_ID,
 } from "../../utils/mock-pyth"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -32,17 +32,16 @@ describe("Vault.getPrice", function () {
     let USDC: Fungible
     let vault: Vault
     let rusd: Rusd
-
+    let vault_user0: Vault
+    let vault_user1: Vault
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
     let yieldTracker: YieldTracker
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         /*
             NativeAsset + Pricefeed
@@ -88,6 +87,9 @@ describe("Vault.getPrice", function () {
                 600, // stableFundingRateFactor
             ),
         )
+
+        vault_user0 = new Vault(vault.id.toAddress(), user0)
+        vault_user1 = new Vault(vault.id.toAddress(), user1)
     })
 
     it("get_price", async () => {

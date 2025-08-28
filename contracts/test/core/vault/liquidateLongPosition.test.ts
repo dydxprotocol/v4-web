@@ -1,16 +1,16 @@
 import { expect, use } from "chai"
 import { AbstractContract, Provider, Signer, Wallet, WalletUnlocked } from "fuels"
 import { Fungible, Rlp, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
-import { deploy, getBalance, getValue, getValStr, formatObj, call } from "../../utils/utils"
+import { deploy, getValue, getValStr, formatObj, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
 import { expandDecimals, toPrice, toUsd } from "../../utils/units"
 import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BigNumber } from "ethers"
 import { BTC_MAX_LEVERAGE, getBtcConfig, getDaiConfig } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -28,18 +28,17 @@ describe("Vault.liquidateLongPosition", () => {
     let BTC: Fungible
     let vault: Vault
     let rusd: Rusd
-
+    let vault_user0: Vault
+    let vault_user1: Vault
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
     let yieldTracker: YieldTracker
     let rlp: Rlp
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         /*
             NativeAsset + Pricefeed
@@ -89,6 +88,9 @@ describe("Vault.liquidateLongPosition", () => {
         )
 
         await call(rlp.functions.initialize())
+
+        vault_user0 = new Vault(vault.id.toAddress(), user0)
+        vault_user1 = new Vault(vault.id.toAddress(), user1)
     })
 
     it("liquidate long", async () => {
@@ -105,8 +107,7 @@ describe("Vault.liquidateLongPosition", () => {
         await call(vault.functions.set_liquidator(addrToIdentity(user0), true))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -116,8 +117,7 @@ describe("Vault.liquidateLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
 
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -129,8 +129,7 @@ describe("Vault.liquidateLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -219,12 +218,11 @@ describe("Vault.liquidateLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("2252252")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(80.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2740253")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         await expect(
             call(
-                vault
-                    .connect(user1)
+                vault_user1
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -235,8 +233,7 @@ describe("Vault.liquidateLongPosition", () => {
         expect(await getValue(vault.functions.is_liquidator(addrToIdentity(user1)))).eq(true)
 
         await call(
-            vault
-                .connect(user1)
+            vault_user1
                 .functions.liquidate_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true, addrToIdentity(user2))
                 .addContracts(attachedContracts),
         )
@@ -252,13 +249,11 @@ describe("Vault.liquidateLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2602823")
-        expect(await getBalance(user2, BTC)).eq("135000")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("135000")
 
-        expect(await getBalance(user2, BTC))
+        expect((await vault.getBalance(getAssetId(BTC))).toString()).eq("2615000")
 
-        expect(await getBalance(vault, BTC, utils)).eq("2615000")
-
-        const balance = BigNumber.from(await getBalance(vault, BTC, utils))
+        const balance = BigNumber.from((await vault.getBalance(getAssetId(BTC))).toString())
         const poolAmount = BigNumber.from(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC))))
         const feeReserve = BigNumber.from(await getValStr(vault.functions.get_fee_reserves(toAsset(BTC))))
         expect(poolAmount.add(feeReserve).sub(balance).toString()).eq("0")
@@ -267,8 +262,7 @@ describe("Vault.liquidateLongPosition", () => {
 
         // await call(BTC.functions.mint(contrToIdentity(vault), 1000))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -289,8 +283,7 @@ describe("Vault.liquidateLongPosition", () => {
         await call(vault.functions.set_liquidator(addrToIdentity(user0), true))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -298,8 +291,7 @@ describe("Vault.liquidateLongPosition", () => {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -311,8 +303,7 @@ describe("Vault.liquidateLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(BTC.functions.mint(addrToIdentity(user0), 250000 * 10))
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(1000), true)
                 .callParams({
                     // 0.0025 BTC => 100 USD
@@ -402,10 +393,10 @@ describe("Vault.liquidateLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("24818411")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq("900268332500000000000000000000000")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("52325232")
-        expect(await getBalance(deployer, BTC)).eq("0")
-        expect(await getBalance(user0, BTC)).eq("0")
-        expect(await getBalance(user1, BTC)).eq("1950000000")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await deployer.getBalance(getAssetId(BTC))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(BTC))).toString()).eq("0")
+        expect((await user1.getBalance(getAssetId(BTC))).toString()).eq("1950000000")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(36000), vaultPricefeed, priceUpdateSigner))
         await call(
@@ -425,14 +416,14 @@ describe("Vault.liquidateLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("52158732")
-        expect(await getBalance(deployer, BTC)).eq("0")
-        expect(await getBalance(user0, BTC)).eq("0")
-        expect(await getBalance(user1, BTC)).eq("1950000000")
-        expect(await getBalance(user2, BTC)).eq("138750")
+        expect((await deployer.getBalance(getAssetId(BTC))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(BTC))).toString()).eq("0")
+        expect((await user1.getBalance(getAssetId(BTC))).toString()).eq("1950000000")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("138750")
 
-        expect(await getBalance(vault, BTC, utils)).eq("52361250")
+        expect((await vault.getBalance(getAssetId(BTC))).toString()).eq("52361250")
 
-        const balance = BigNumber.from(await getBalance(vault, BTC, utils))
+        const balance = BigNumber.from((await vault.getBalance(getAssetId(BTC))).toString())
         const poolAmount = BigNumber.from(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC))))
         const feeReserve = BigNumber.from(await getValStr(vault.functions.get_fee_reserves(toAsset(BTC))))
         expect(poolAmount.add(feeReserve).sub(balance).toString()).eq("0")
@@ -441,8 +432,7 @@ describe("Vault.liquidateLongPosition", () => {
 
         // await call(BTC.functions.mint(contrToIdentity(vault), 1000))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({

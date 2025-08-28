@@ -16,9 +16,9 @@ import {
     getDaiConfig,
     validateVaultBalance,
 } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -36,18 +36,17 @@ describe("Vault.liquidateShortPosition", function () {
     let BTC: Fungible
     let vault: Vault
     let rusd: Rusd
-
+    let vault_user0: Vault
+    let vault_user1: Vault
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
     let yieldTracker: YieldTracker
     let rlp: Rlp
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         /*
             NativeAsset + Pricefeed
@@ -95,6 +94,9 @@ describe("Vault.liquidateShortPosition", function () {
         )
 
         await call(rlp.functions.initialize())
+
+        vault_user0 = new Vault(vault.id.toAddress(), user0)
+        vault_user1 = new Vault(vault.id.toAddress(), user1)
     })
 
     it("liquidate short", async () => {
@@ -129,8 +131,7 @@ describe("Vault.liquidateShortPosition", function () {
         await call(vault.functions.set_liquidator(addrToIdentity(user0), true))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), false, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -141,8 +142,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(1000)))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.buy_rusd(toAsset(DAI), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -151,8 +151,7 @@ describe("Vault.liquidateShortPosition", function () {
         )
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(90), false)
                 .callParams({
                     forward: [expandDecimals(10), getAssetId(DAI)],
@@ -243,7 +242,7 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(DAI)))).eq("90090090090")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("99960000000")
-        expect(await getBalance(user2, DAI)).eq("0")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("0")
 
         await call(vault.functions.set_liquidator(addrToIdentity(deployer), true))
         await call(
@@ -263,7 +262,7 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("104765194805")
-        expect(await getBalance(user2, DAI)).eq("4995004995")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("4995004995")
 
         expect(await getValStr(vault.functions.get_global_short_sizes(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_global_short_average_prices(toAsset(BTC)))).eq(
@@ -275,8 +274,7 @@ describe("Vault.liquidateShortPosition", function () {
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(50000), vaultPricefeed, priceUpdateSigner))
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(100), false)
                 .callParams({
                     forward: [expandDecimals(20), getAssetId(DAI)],
@@ -320,8 +318,7 @@ describe("Vault.liquidateShortPosition", function () {
         await call(vault.functions.set_liquidator(addrToIdentity(user0), true))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), false, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -332,8 +329,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(1002)))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.buy_rusd(toAsset(DAI), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -343,8 +339,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(100)))
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(1000), false)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -454,10 +449,10 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
 
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("1001599200000")
-        expect(await getBalance(deployer, DAI)).eq("0")
-        expect(await getBalance(user0, DAI)).eq("0")
-        expect(await getBalance(user1, DAI)).eq("0")
-        expect(await getBalance(user2, DAI)).eq("0")
+        expect((await deployer.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user1.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("0")
         expect(await getValStr(vault.functions.get_global_short_sizes(toAsset(BTC)))).eq(toUsd(1000))
         expect(await getValStr(vault.functions.get_global_short_average_prices(toAsset(BTC)))).eq(
             "40292667000000000000000000000000000",
@@ -481,10 +476,10 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("1084680953178")
-        expect(await getBalance(deployer, DAI)).eq("0")
-        expect(await getBalance(user0, DAI)).eq("14720444623")
-        expect(await getBalance(user1, DAI)).eq("0")
-        expect(await getBalance(user2, DAI)).eq("0")
+        expect((await deployer.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(DAI))).toString()).eq("14720444623")
+        expect((await user1.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("0")
 
         expect(await getValStr(vault.functions.get_global_short_sizes(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_global_short_average_prices(toAsset(BTC)))).eq(
@@ -497,8 +492,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(20)))
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(100), false)
                 .callParams({
                     forward: [expandDecimals(20), getAssetId(DAI)],
@@ -545,8 +539,7 @@ describe("Vault.liquidateShortPosition", function () {
         await call(vault.functions.set_liquidator(addrToIdentity(user0), true))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.liquidate_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), false, addrToIdentity(user2))
                     .addContracts(attachedContracts),
             ),
@@ -557,8 +550,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(1002)))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.buy_rusd(toAsset(DAI), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -568,8 +560,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(100)))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(1000), false)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -666,10 +657,10 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(DAI)))).eq("1001001001001")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("1001599200000")
-        expect(await getBalance(deployer, DAI)).eq("0")
-        expect(await getBalance(user0, DAI)).eq("0")
-        expect(await getBalance(user1, DAI)).eq("0")
-        expect(await getBalance(user2, DAI)).eq("0")
+        expect((await deployer.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user1.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("0")
         expect(await getValStr(vault.functions.get_global_short_sizes(toAsset(BTC)))).eq(toUsd(1000))
         expect(await getValStr(vault.functions.get_global_short_average_prices(toAsset(BTC)))).eq(
             "40292667000000000000000000000000000",
@@ -693,10 +684,10 @@ describe("Vault.liquidateShortPosition", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(DAI)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(DAI)))).eq("1094406392807")
-        expect(await getBalance(deployer, DAI)).eq("0")
-        expect(await getBalance(user0, DAI)).eq("0")
-        expect(await getBalance(user1, DAI)).eq("0")
-        expect(await getBalance(user2, DAI)).eq("4995004995")
+        expect((await deployer.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user0.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user1.getBalance(getAssetId(DAI))).toString()).eq("0")
+        expect((await user2.getBalance(getAssetId(DAI))).toString()).eq("4995004995")
 
         expect(await getValStr(vault.functions.get_global_short_sizes(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_global_short_average_prices(toAsset(BTC)))).eq(
@@ -709,8 +700,7 @@ describe("Vault.liquidateShortPosition", function () {
 
         await call(DAI.functions.mint(addrToIdentity(user0), expandDecimals(20)))
         await call(
-            vault
-                .as(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(DAI), toAsset(BTC), toUsd(100), false)
                 .callParams({
                     forward: [expandDecimals(20), getAssetId(DAI)],

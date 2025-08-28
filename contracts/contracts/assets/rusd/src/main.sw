@@ -33,19 +33,15 @@ use helpers::{
     transfer::*,
     zero::*,
 };
-use standards::{
-    src20::SRC20,
-    src3::SRC3,
-};
-use sway_libs::{
-    asset::{
-        base::{
-            _total_supply as sl_total_supply,
-        },
-        supply::{
-            _burn as sl_burn,
-            _mint as sl_mint,
-        },
+use src20::SRC20;
+use src3::SRC3;
+use asset::{
+    base::{
+        _total_supply as sl_total_supply,
+    },
+    supply::{
+        _burn as sl_burn,
+        _mint as sl_mint,
     },
 };
 use asset_interfaces::{
@@ -341,7 +337,7 @@ impl SRC3 for Contract {
     #[storage(read, write)]
     fn mint(
         recipient: Identity,
-        _sub_id: SubId,
+        _sub_id: Option<SubId>,
         amount: u64
     ) {
         _only_authorized_vaults();

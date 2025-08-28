@@ -15,9 +15,9 @@ import {
     getDaiConfig,
     validateVaultBalance,
 } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition, getPositionLeverage } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -35,6 +35,8 @@ describe("Vault.decreaseLongPosition", () => {
     let BTC: Fungible
     let vault: Vault
     let rusd: Rusd
+    let vault_user0: Vault
+    let vault_user1: Vault
 
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
@@ -42,11 +44,9 @@ describe("Vault.decreaseLongPosition", () => {
     let rlp: Rlp
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         /*
             NativeAsset + Pricefeed
@@ -108,6 +108,9 @@ describe("Vault.decreaseLongPosition", () => {
         )
 
         await call(rlp.functions.initialize())
+
+        vault_user0 = new Vault(vault.id.toAddress(), user0)
+        vault_user1 = new Vault(vault.id.toAddress(), user1)
     })
 
     it("decreasePosition long", async () => {
@@ -116,8 +119,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await expect(
             call(
-                vault
-                    .connect(user1)
+                vault_user1
                     .functions.decrease_position(
                         addrToIdentity(user0),
                         toAsset(BTC),
@@ -140,8 +142,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.decrease_position(
                         addrToIdentity(user0),
                         toAsset(BTC),
@@ -157,8 +158,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -170,8 +170,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(110), true)
                     .addContracts(attachedContracts)
                     .callParams({
@@ -182,8 +181,7 @@ describe("Vault.decreaseLongPosition", () => {
         ).to.be.revertedWith("VaultReserveExceedsPool")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -249,8 +247,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.decrease_position(
                         addrToIdentity(user0),
                         toAsset(BTC),
@@ -268,11 +265,10 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("2252252")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(80.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2740253")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -302,7 +298,7 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("1001001")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(33.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2490877")
-        expect(await getBalance(user2, BTC)).eq("248315")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("248315")
 
         await validateVaultBalance(expect, vault, BTC, 1)
     })
@@ -331,8 +327,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(BNB.functions.mint(addrToIdentity(deployer), expandDecimals(1)))
         await call(BNB.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BNB), toAsset(BNB), toUsd(1000), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -345,8 +340,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(getUpdatePriceDataCall(toAsset(BNB), toPrice(750), vaultPricefeed, priceUpdateSigner))
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BNB),
@@ -360,8 +354,7 @@ describe("Vault.decreaseLongPosition", () => {
         )
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BNB),
@@ -381,8 +374,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await expect(
             call(
-                vault
-                    .connect(user1)
+                vault_user1
                     .functions.decrease_position(
                         addrToIdentity(user0),
                         toAsset(BTC),
@@ -405,8 +397,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.decrease_position(
                         addrToIdentity(user0),
                         toAsset(BTC),
@@ -422,8 +413,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -435,8 +425,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(110), true)
                     .addContracts(attachedContracts)
                     .callParams({
@@ -447,8 +436,7 @@ describe("Vault.decreaseLongPosition", () => {
         ).to.be.revertedWith("VaultReserveExceedsPool")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -497,8 +485,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -510,8 +497,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(110), true)
                     .addContracts(attachedContracts)
                     .callParams({
@@ -522,8 +508,7 @@ describe("Vault.decreaseLongPosition", () => {
         ).to.be.revertedWith("VaultReserveExceedsPool")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -547,7 +532,7 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("2252252")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(80.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2740253")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         let delta = formatObj(
             await getValue(vault.functions.get_position_delta(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true)),
@@ -556,8 +541,7 @@ describe("Vault.decreaseLongPosition", () => {
         expect(delta[1]).eq("1145027472527472527472527472527")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -583,11 +567,10 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("1001001")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq("30100000000000000000000000000000")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2724597")
-        expect(await getBalance(user2, BTC)).eq("14425")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("14425")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -613,7 +596,7 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq("0")
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2468414")
-        expect(await getBalance(user2, BTC)).eq("269624")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("269624")
 
         await validateVaultBalance(expect, vault, BTC, 1)
     })
@@ -631,8 +614,7 @@ describe("Vault.decreaseLongPosition", () => {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -644,8 +626,7 @@ describe("Vault.decreaseLongPosition", () => {
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await expect(
             call(
-                vault
-                    .connect(user0)
+                vault_user0
                     .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(110), true)
                     .addContracts(attachedContracts)
                     .callParams({
@@ -656,8 +637,7 @@ describe("Vault.decreaseLongPosition", () => {
         ).to.be.revertedWith("VaultReserveExceedsPool")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -681,7 +661,7 @@ describe("Vault.decreaseLongPosition", () => {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("2252252")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(80.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2740253")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         let delta = formatObj(
             await getValue(vault.functions.get_position_delta(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), true)),
@@ -713,8 +693,7 @@ describe("Vault.decreaseLongPosition", () => {
         // ).to.be.revertedWith("ArithmeticOverflow")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),

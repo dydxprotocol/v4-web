@@ -1,6 +1,5 @@
 [toolchain]
-channel = "latest-aarch64-apple-darwin"
+channel = "testnet"
 
 [components]
-forc="0.66.4"
-fuel-core = "0.40.0"
+forc="0.69.1"

@@ -31,7 +31,7 @@ use asset_interfaces::{
     yield_asset::YieldAsset,
     rusd::RUSD
 };
-use standards::src3::SRC3;
+use src3::SRC3;
 use helpers::{
     time::get_unix_timestamp,
     utils::*,
@@ -44,6 +44,7 @@ use errors::*;
 use constants::*;
 
 const REVISION: u8 = 1u8;
+const DEFAULT_SUB_ID: SubId = SubId::zero();
 
 storage { 
     // gov is not restricted to an `Address` (EOA) or a `Contract` (external)
@@ -460,7 +461,7 @@ fn _add_liquidity(
     // @TODO: potential revert here
     rlp_src3.mint(
         account,
-        ZERO, // this is unused, but required by the interface to meet the SRC3 standard
+        Some(DEFAULT_SUB_ID), // this is unused, but required by the interface to meet the SRC3 standard
         u64::try_from(mint_amount).unwrap()
     );
 
@@ -518,7 +519,7 @@ fn _remove_liquidity(
         // @TODO: potential revert here
         rusd_src3.mint(
             Identity::ContractId(ContractId::this()), 
-            ZERO, // this is unused, but required by the interface to meet the SRC3 standard
+            Some(DEFAULT_SUB_ID), // this is unused, but required by the interface to meet the SRC3 standard
             u64::try_from(rusd_amount - rusd_balance).unwrap(),
         );
     }

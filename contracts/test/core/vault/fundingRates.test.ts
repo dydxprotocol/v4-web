@@ -7,9 +7,9 @@ import { asStr, expandDecimals, toNormalizedPrice, toPrice, toUsd } from "../../
 import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BTC_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBtcConfig, getDaiConfig, validateVaultBalance } from "../../utils/vault"
-import { WALLETS } from "../../utils/wallets"
 import { getPosition, getPositionLeverage } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -27,18 +27,17 @@ describe("Vault.fundingRates", function () {
     let BTC: Fungible
     let vault: Vault
     let rusd: Rusd
-
+    let vault_user0: Vault
+    let vault_user1: Vault
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
     let yieldTracker: YieldTracker
     let rlp: Rlp
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         /*
             NativeAsset + Pricefeed
@@ -86,6 +85,9 @@ describe("Vault.fundingRates", function () {
         )
 
         await call(rlp.functions.initialize())
+
+        vault_user0 = new Vault(vault.id.toAddress(), user0)
+        vault_user1 = new Vault(vault.id.toAddress(), user1)
     })
 
     it("funding rate", async () => {
@@ -101,8 +103,7 @@ describe("Vault.fundingRates", function () {
 
         await call(BTC.functions.mint(addrToIdentity(user1), expandDecimals(1)))
         await call(
-            vault
-                .as(user1)
+            vault_user1
                 .functions.buy_rusd(toAsset(BTC), addrToIdentity(user1))
                 .addContracts(attachedContracts)
                 .callParams({
@@ -113,8 +114,7 @@ describe("Vault.fundingRates", function () {
 
         await call(BTC.functions.mint(addrToIdentity(user0), expandDecimals(1)))
         await expect(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(110), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -125,8 +125,7 @@ describe("Vault.fundingRates", function () {
         ).to.be.revertedWith("VaultReserveExceedsPool")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.increase_position(addrToIdentity(user0), toAsset(BTC), toAsset(BTC), toUsd(90), true)
                 .addContracts(attachedContracts)
                 .callParams({
@@ -154,11 +153,10 @@ describe("Vault.fundingRates", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("2252252")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(80.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2740253")
-        expect(await getBalance(user2, BTC)).eq("0")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("0")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -188,11 +186,10 @@ describe("Vault.fundingRates", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("1001001")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(33.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2490877")
-        expect(await getBalance(user2, BTC)).eq("248315")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("248315")
 
         await expect(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -207,8 +204,7 @@ describe("Vault.fundingRates", function () {
         ).to.be.revertedWith("VaultLiquidationFeesExceedCollateral")
 
         await call(
-            vault
-                .connect(user0)
+            vault_user0
                 .functions.decrease_position(
                     addrToIdentity(user0),
                     toAsset(BTC),
@@ -243,7 +239,7 @@ describe("Vault.fundingRates", function () {
         expect(await getValStr(vault.functions.get_reserved_amount(toAsset(BTC)))).eq("1001001")
         expect(await getValStr(vault.functions.get_guaranteed_usd(toAsset(BTC)))).eq(toUsd(34.1))
         expect(await getValStr(vault.functions.get_pool_amounts(toAsset(BTC)))).eq("2469667")
-        expect(await getBalance(user2, BTC)).eq("269525")
+        expect((await user2.getBalance(getAssetId(BTC))).toString()).eq("269525")
 
         await validateVaultBalance(expect, vault, BTC, 1)
     })

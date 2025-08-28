@@ -37,7 +37,7 @@ use helpers::{
     zero::*,
     reentrancy::*,
 };
-use standards::src3::SRC3;
+use src3::SRC3;
 use core_interfaces::{
     vault::{
         Vault,
@@ -47,7 +47,7 @@ use core_interfaces::{
     vault_pricefeed::VaultPricefeed,
 };
 use asset_interfaces::rusd::RUSD;
-use sway_libs::pausable::{
+use pausable::{
     _is_paused as sl_is_paused,
     _pause as sl_pause,
     _unpause as sl_unpause,
@@ -60,6 +60,7 @@ use errors::*;
 
 // revision of the contract
 const REVISION: u8 = 6u8;
+const DEFAULT_SUB_ID: SubId = SubId::zero();
 
 storage {
     // gov is not restricted to an `Address` (EOA) or a `Contract` (external)
@@ -2235,7 +2236,7 @@ fn _buy_rusd(
     let rusd = abi(SRC3, storage.rusd_contr.read().into());
     rusd.mint(
         receiver,
-        ZERO, // this is unused, but required by the interface to meet the SRC3 standard
+        Some(DEFAULT_SUB_ID), // this is unused, but required by the interface to meet the SRC3 standard
         u64::try_from(mint_amount).unwrap(),
     );
 
@@ -2327,7 +2328,7 @@ fn _sell_rusd(
         asset_id: rusd.into(),
         coins: u64_rusd_amount
     }(
-        ZERO, // this is unused, but required by the interface to meet the SRC3 standard
+        DEFAULT_SUB_ID, // this is unused, but required by the interface to meet the SRC3 standard
         u64_rusd_amount
     );
 

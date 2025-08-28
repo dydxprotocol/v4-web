@@ -3,7 +3,7 @@ import { Provider, Signer, Wallet, WalletUnlocked } from "fuels"
 import { Utils } from "../../../types"
 import { deploy } from "../../utils/utils"
 import { useChai } from "../../utils/chai"
-import { WALLETS } from "../../utils/wallets"
+import { launchNode } from "../../utils/node"
 
 use(useChai)
 
@@ -21,11 +21,9 @@ describe("Utils", () => {
     let utils: Utils
 
     beforeEach(async () => {
-        const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
-
-        const wallets = WALLETS.map((k) => Wallet.fromPrivateKey(k, provider))
-        ;[deployer, user0, user1, user2, user3] = wallets
-        priceUpdateSigner = new Signer(WALLETS[0])
+        [ deployer, user0, user1, user2, user3 ] = await launchNode()
+          
+        priceUpdateSigner = new Signer(deployer.privateKey)
 
         utils = await deploy("Utils", deployer)
     })

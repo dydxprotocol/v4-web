@@ -29,13 +29,6 @@
     },
     "dependencies": {
         "bn.js": "^5.2.0",
-        "fuels": "0.94.5"
-    },
-    "pnpm": {
-        "patchedDependencies": {
-            "@fuel-ts/account@0.94.5": "patches/@fuel-ts__account@0.94.5.patch",
-            "@fuel-ts/errors@0.94.5": "patches/@fuel-ts__errors@0.94.5.patch",
-            "@fuel-ts/program@0.94.5": "patches/@fuel-ts__program@0.94.5.patch"
-        }
+        "fuels": "0.101.3"
     }
 }
