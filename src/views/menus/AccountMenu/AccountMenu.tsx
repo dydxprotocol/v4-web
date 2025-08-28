@@ -1,4 +1,4 @@
-import { ElementType } from 'react';
+import { ElementType, useMemo } from 'react';
 
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import styled, { css } from 'styled-components';
@@ -11,7 +11,13 @@ import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
-import { DydxChainAsset, WalletNetworkType, wallets, WalletType } from '@/constants/wallets';
+import {
+  ConnectorType,
+  DydxChainAsset,
+  WalletNetworkType,
+  wallets,
+  WalletType,
+} from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -25,7 +31,7 @@ import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
+import { AppleIcon, DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -104,25 +110,37 @@ export const AccountMenu = () => {
     usedBalanceBN.gt(AMOUNT_RESERVED_FOR_GAS_USDC) &&
     usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
 
-  let walletIcon;
-  if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
-  } else if (
-    onboardingState === OnboardingState.AccountConnected &&
-    walletInfo?.name === WalletType.Privy
-  ) {
-    if (google) {
-      walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
-    } else if (discord) {
-      walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
-    } else if (twitter) {
-      walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
-    } else {
-      walletIcon = <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+  const walletIcon = useMemo(() => {
+    if (onboardingState === OnboardingState.WalletConnected) {
+      return <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
+    } else if (
+      onboardingState === OnboardingState.AccountConnected &&
+      walletInfo?.name === WalletType.Privy
+    ) {
+      if (google) {
+        return <Icon iconComponent={GoogleIcon as ElementType} />;
+      } else if (discord) {
+        return <Icon iconComponent={DiscordIcon as ElementType} />;
+      } else if (twitter) {
+        return <Icon iconComponent={TwitterIcon as ElementType} />;
+      } else {
+        return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+      }
+    } else if (
+      onboardingState === OnboardingState.AccountConnected &&
+      walletInfo?.connectorType === ConnectorType.Turnkey
+    ) {
+      if (walletInfo.providerName === 'google') {
+        return <Icon iconComponent={GoogleIcon as ElementType} />;
+      } else if (walletInfo.providerName === 'apple') {
+        return <Icon iconComponent={AppleIcon as ElementType} />;
+      } else {
+        return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+      }
+    } else if (walletInfo) {
+      return <WalletIcon wallet={walletInfo} />;
     }
-  } else if (walletInfo) {
-    walletIcon = <WalletIcon wallet={walletInfo} />;
-  }
+  }, [onboardingState, walletInfo]);
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -166,7 +184,7 @@ export const AccountMenu = () => {
                       iconName={IconName.AddressConnector}
                       tw="absolute top-[-1.625rem] h-1.75"
                     />
-                    <WalletIcon wallet={walletInfo} />
+                    {walletIcon}
                   </div>
                   <$Column>
                     <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>

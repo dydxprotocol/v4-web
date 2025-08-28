@@ -1,4 +1,4 @@
-import { WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletType } from '@/constants/wallets';
 
 import type { RootState } from './_store';
 import { createAppSelector } from './appTypes';
@@ -17,6 +17,19 @@ export const selectIsTurnkeyConnected = createAppSelector(
   [getSourceAccount],
   (sourceAccount) => sourceAccount.walletInfo?.name === WalletType.Turnkey
 );
+
+export const selectWalletInfo = createAppSelector(
+  [getSourceAccount],
+  (sourceAccount) => sourceAccount.walletInfo
+);
+
+export const selectTurnkeyWalletInfo = createAppSelector([selectWalletInfo], (walletInfo) => {
+  if (walletInfo?.connectorType === ConnectorType.Turnkey) {
+    return walletInfo;
+  }
+
+  return undefined;
+});
 
 export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalletNonce;
 
