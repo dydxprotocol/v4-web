@@ -1,14 +1,20 @@
 [[package]]
+name = "asset"
+version = "0.26.1"
+source = "registry+asset?0.26.1#QmRX3CYxadKPi2pz7aFNoHmTrEYK7TfBv3D8mzDmvcniAQ!"
+dependencies = [
+    "src20",
+    "src7",
+    "std",
+]
+
+[[package]]
 name = "asset_interfaces"
 source = "path+from-root-A0F0AE9A73C286A0"
 dependencies = [
     "helpers",
     "std",
 ]
-
-[[package]]
-name = "core"
-source = "path+from-root-F64B6E1A883A7E7B"
 
 [[package]]
 name = "core_interfaces"
@@ -61,22 +67,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "pausable"
+version = "0.26.1"
+source = "registry+pausable?0.26.1#QmapdwdUETu3aWXa5xnjdsgqDWhh9WnGkYQcBi7UqfWsrL!"
+dependencies = ["std"]
+
+[[package]]
 name = "pyth_interface"
-source = "git+https://github.com/pyth-network/pyth-crosschain?rev#4ab64d2539a749e51e1281bdd7744781f5e9df8c"
-dependencies = [
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.4.4#a001d3c248595112aae67e5633a06ef9bc0536ae",
-    "std",
-]
+source = "git+https://github.com/pyth-network/pyth-crosschain?tag=pyth-lazer-agent-v0.4.1#2a543d4b8719c7d0b3dad40f982c121307647815"
+dependencies = ["std"]
 
 [[package]]
 name = "rlp"
 source = "member"
 dependencies = [
+    "asset",
     "asset_interfaces",
     "helpers",
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "src20",
+    "src3",
     "std",
-    "sway_libs",
 ]
 
 [[package]]
@@ -86,7 +96,7 @@ dependencies = [
     "asset_interfaces",
     "core_interfaces",
     "helpers",
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "src3",
     "std",
 ]
 
@@ -94,11 +104,12 @@ dependencies = [
 name = "rusd"
 source = "member"
 dependencies = [
+    "asset",
     "asset_interfaces",
     "helpers",
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "src20",
+    "src3",
     "std",
-    "sway_libs",
 ]
 
 [[package]]
@@ -112,41 +123,26 @@ dependencies = [
 
 [[package]]
 name = "src20"
-source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.3.3#4198b4b07449ad16104cc8a0501f3013670fdcfd"
+version = "0.8.0"
+source = "registry+src20?0.8.0#QmSwYjybtdvSF3Ey9RncVUUaFaWsizSBNgAtY9JoyaAHvh!"
 dependencies = ["std"]
 
 [[package]]
 name = "src3"
-source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.3.3#4198b4b07449ad16104cc8a0501f3013670fdcfd"
+version = "0.8.0"
+source = "registry+src3?0.8.0#QmWZt1NRQHid4p5cmFMG11n1tnRfNSgWGXUWDgojt9hjzs!"
 dependencies = ["std"]
 
 [[package]]
-name = "standards"
-source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.4.4#a001d3c248595112aae67e5633a06ef9bc0536ae"
-dependencies = ["std"]
-
-[[package]]
-name = "standards"
-source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f"
-dependencies = ["std"]
-
-[[package]]
-name = "standards"
-source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.6.0#65e09f95ea8b9476b171a66c8a47108f352fa32c"
+name = "src7"
+version = "0.8.0"
+source = "registry+src7?0.8.0#QmbDHPdbKzpRg31bxNNLHQ6pyreH2GjHiXjnR7aKoNC2Y5!"
 dependencies = ["std"]
 
 [[package]]
 name = "std"
-source = "git+https://github.com/fuellabs/sway?tag=v0.66.4#d7dd104dac4394aa7af56f05b720c975744db853"
-dependencies = ["core"]
-
-[[package]]
-name = "sway_libs"
-source = "git+https://github.com/FuelLabs/sway-libs?tag=v0.24.0#e19f96f85ae12426d20adc176b70aa38fd9a2a5b"
-dependencies = [
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.6.0#65e09f95ea8b9476b171a66c8a47108f352fa32c",
-    "std",
-]
+version = "0.69.1"
+source = "registry+std?0.69.1#QmbPunScay4xpfHKpxQ71dFKXSiyJuPP8P8YhgX5Dkmzm9!"
 
 [[package]]
 name = "testnet-token"
@@ -181,9 +177,9 @@ dependencies = [
     "asset_interfaces",
     "core_interfaces",
     "helpers",
-    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "pausable",
+    "src3",
     "std",
-    "sway_libs",
 ]
 
 [[package]]
