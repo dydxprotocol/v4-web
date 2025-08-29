@@ -285,7 +285,7 @@ const Inner = ({
             {
               label: 'SOL',
               value: SpotBuyType.SOL,
-              slotBefore: <StackedIcon primaryIcon={IconName.Sol} secondaryIcon={IconName.Usdc} />,
+              slotBefore: <StackedIcon primaryIcon={IconName.Sol} secondaryIcon={IconName.Sol} />,
             },
           ]}
         />
