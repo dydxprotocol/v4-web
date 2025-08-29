@@ -2,7 +2,7 @@ import { RefObject, useMemo } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
 
@@ -13,7 +13,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -21,8 +20,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedSurgeBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner, getHasDismissedSurgeBanner } from '@/state/dismissableSelectors';
+import { setHasDismissedPmlBanner } from '@/state/dismissable';
+import { getHasDismissedPmlBanner } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -100,54 +99,7 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
-  // Surge Banner - New Implementation
-  const hasDismissedSurgeBanner = useAppSelector(getHasDismissedSurgeBanner);
-
-  const onDismissSurgeBanner = (e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(setHasDismissedSurgeBanner(true));
-  };
-
-  const shouldDisplaySurgeBanner = !hasDismissedSurgeBanner;
-
-  const surgeBanner = shouldDisplaySurgeBanner ? (
-    <$SurgeBanner>
-      <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.75 text-large font-extra-bold">
-          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
-        </span>
-        <div tw="flex items-center gap-1.5">
-          <Button
-            action={ButtonAction.Primary}
-            type={ButtonType.Link}
-            href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
-            tw="relative z-10 w-12"
-          >
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-          </Button>
-          <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.END_DATE })}
-          </span>
-        </div>
-      </div>
-
-      <img
-        src="/surge-banner-hedgies.png"
-        alt="surge rewards hedgies"
-        tw="h-full object-contain mobile:hidden"
-      />
-
-      <IconButton
-        tw="absolute right-0.5 top-0.5 border-none"
-        iconName={IconName.Close}
-        size={ButtonSize.XSmall}
-        onClick={onDismissSurgeBanner}
-      />
-    </$SurgeBanner>
-  ) : null;
-
-  return surgeBanner ?? pmlBanner ?? null;
+  return pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -190,32 +142,6 @@ const $PmlBanner = styled($MarketsPageBanner)`
     span {
       font: var(--font-small-book);
     }
-  }
-`;
-
-const $SurgeBanner = styled($MarketsPageBanner)`
-  height: 8rem;
-  background: var(--color-layer-0);
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 70%;
-    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
-    opacity: 0.2;
-    z-index: 0;
-  }
-
-  img,
-  span,
-  button,
-  a {
-    z-index: 1;
   }
 `;
 
