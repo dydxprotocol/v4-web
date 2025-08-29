@@ -84,6 +84,7 @@ export const QuickButtons = ({
         type="button"
         onClick={isEditing ? handleConfirmEdit : handleEdit}
         disabled={disabled}
+        isEditing={isEditing}
       >
         <Icon iconName={isEditing ? IconName.Check : IconName.Pencil2} size="1rem" />
       </$QuickButtonContainer>
@@ -127,7 +128,7 @@ const QuickButtonContainerStyles = css`
   border: 1px solid var(--color-layer-4);
   padding: 0 0.5rem;
   font: var(--font-base-medium);
-  color: var(--color-text);
+  color: var(--color-text-1);
   min-width: 0;
 
   @media (prefers-reduced-motion: no-preference) {
@@ -142,16 +143,26 @@ const $InputQuickButtonContainer = styled.div`
 
   &:focus-within {
     background-color: var(--color-layer-4);
+    border-color: var(--color-layer-5);
+    color: var(--color-text-2);
   }
 `;
 
-const $QuickButtonContainer = styled.button<{ isSelected?: boolean }>`
+const $QuickButtonContainer = styled.button<{ isSelected?: boolean; isEditing?: boolean }>`
   ${QuickButtonContainerStyles}
 
   ${({ isSelected }) =>
     isSelected &&
     css`
       background-color: var(--color-layer-4);
+    `}
+
+  ${({ isEditing }) =>
+    isEditing &&
+    css`
+      background-color: var(--color-accent-faded);
+      color: var(--color-accent);
+      border-color: var(--color-accent);
     `}
 
   @media (hover: hover) {

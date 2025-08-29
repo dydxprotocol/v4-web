@@ -79,9 +79,10 @@ const $Root = styled(Root)`
 const $List = styled(List)`
   display: flex;
   flex-direction: row;
-  padding: 3px;
+  padding: 2px;
   background-color: var(--color-layer-1);
   border-radius: var(--tab-border-radius);
+  gap: 2px;
 `;
 
 const spotTabVariants: Record<SpotTabVariant, ReturnType<typeof css>> = {
@@ -125,7 +126,7 @@ const $Trigger = styled(Trigger)<{
   font-weight: 500;
   flex: 1;
   height: 37px;
-  border-radius: var(--tab-border-radius);
+  border-radius: calc(var(--tab-border-radius) - 2px);
   padding: 0 1rem;
   text-align: center;
 `;
