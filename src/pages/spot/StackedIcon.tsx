@@ -16,10 +16,10 @@ export type StackedIconProps = {
 export const StackedIcon = ({
   primaryIcon,
   secondaryIcon,
-  primarySize = '1rem',
+  primarySize = '1.25rem',
   secondarySize = '0.625rem',
   secondaryPosition = 'bottom-right',
-  secondaryOffset = 25,
+  secondaryOffset = 15,
 }: StackedIconProps) => {
   return (
     <div tw="relative flex">
@@ -41,7 +41,7 @@ const $SecondaryIcon = styled(Icon)<{
   --offset: ${({ $offset }) => $offset}%;
 
   position: absolute;
-  outline: 1px solid var(--color-layer-3);
+  outline: 1.5px solid var(--color-layer-4);
   border-radius: 9999px;
   overflow: hidden;
 
