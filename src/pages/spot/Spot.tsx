@@ -11,6 +11,8 @@ import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { SpotTradeForm } from './SpotTradeForm';
+
 const SpotPage = () => {
   const { symbol } = useParams<{ symbol: string }>();
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
@@ -21,8 +23,8 @@ const SpotPage = () => {
         <div tw="p-1">Spot Market Selector (Coming Soon)</div>
       </header>
 
-      <$GridSection gridArea="Side">
-        <div tw="p-1">Spot Side Panel (Coming Soon)</div>
+      <$GridSection gridArea="Side" tw="p-1">
+        <SpotTradeForm />
       </$GridSection>
 
       <$GridSection gridArea="Inner">
@@ -45,15 +47,15 @@ const $SpotLayout = styled.article<{
   --layout-default: 
     'Top Top' auto 
     'Inner Side' minmax(0, 1fr)
-    'Horizontal Side' 200px
-    / 1fr var(--sidebar-width);
+    'Horizontal Side' 300px
+    / 1fr 400px;
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
     'Top Side' auto
     'Inner Side' minmax(0, 1fr)
-    'Horizontal Side' 200px
-    / 1fr var(--sidebar-width);
+    'Horizontal Side' 300px
+    / 1fr 400px;
 
   // Props/defaults
   --layout: var(--layout-default);
