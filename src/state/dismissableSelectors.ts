@@ -14,3 +14,6 @@ export const getHasDismissedPumpBanner = (state: RootState) =>
 
 export const getHasDismissedSurgeBanner = (state: RootState) =>
   state.dismissable.hasDismissedSurgeBanner;
+
+export const getHasDismissedRebateBanner = (state: RootState) =>
+  state.dismissable.hasDismissedRebateBanner;
