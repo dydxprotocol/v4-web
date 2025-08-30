@@ -22,7 +22,7 @@ type ElementProps = {
   tooltipStringTitle?: string;
   stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
-  customIcon?: ReactNode;
+  slotRight?: ReactNode;
   children?: ReactNode;
   slotTooltip?: ReactNode;
   slotTrigger?: ReactNode;
@@ -42,7 +42,7 @@ export const WithTooltip = ({
   slotTrigger,
   stringParams,
   withIcon,
-  customIcon,
+  slotRight,
   children,
   align,
   side,
@@ -84,7 +84,7 @@ export const WithTooltip = ({
             <$Abbr>
               <$Underlined>{children}</$Underlined>
               {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-color-text-0" />}
-              {customIcon}
+              {slotRight}
             </$Abbr>
           )}
         </Trigger>

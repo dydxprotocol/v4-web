@@ -23,7 +23,7 @@ export type DetailsItem = {
   // eslint-disable-next-line react/no-unused-prop-types
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
-  customIcon?: ReactNode;
+  slotRight?: ReactNode;
 };
 
 const DETAIL_LAYOUTS = {
@@ -68,7 +68,7 @@ const DetailItem = ({
   justifyItems,
   layout = 'column',
   withOverflow,
-  customIcon,
+  slotRight,
 }: DetailsItem & StyleProps) => (
   <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
@@ -77,7 +77,7 @@ const DetailItem = ({
         stringParams={tooltipParams}
         side={DETAIL_ITEM_TOOLTIP_LAYOUTS[layout]}
         withIcon={withTooltipIcon}
-        customIcon={customIcon}
+        slotRight={slotRight}
       >
         {label}
       </WithTooltip>
@@ -100,16 +100,7 @@ export const Details = ({
     <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
         {items.map(
-          ({
-            key,
-            tooltip,
-            tooltipParams,
-            label,
-            subitems,
-            value,
-            withTooltipIcon,
-            customIcon,
-          }) => (
+          ({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon, slotRight }) => (
             <Fragment key={key}>
               <DetailItem
                 {...{
@@ -122,7 +113,7 @@ export const Details = ({
                   justifyItems,
                   layout,
                   withOverflow,
-                  customIcon,
+                  slotRight,
                 }}
               />
               {subitems && showSubitems && layout === 'column' && (
