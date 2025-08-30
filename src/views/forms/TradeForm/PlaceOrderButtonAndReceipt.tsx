@@ -156,7 +156,7 @@ export const PlaceOrderButtonAndReceipt = ({
     );
   };
 
-  const september2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+  const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
 
   const items = (
     [
@@ -252,7 +252,7 @@ export const PlaceOrderButtonAndReceipt = ({
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
       },
-      !september2025Rewards
+      isSept2025Rewards
         ? {
             key: 'max-reward',
             label: (

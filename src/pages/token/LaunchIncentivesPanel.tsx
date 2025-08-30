@@ -50,7 +50,7 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
   }, [dispatch]);
 
   const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
-  if (!isSept2025Rewards) {
+  if (isSept2025Rewards) {
     return <September2025RewardsPanel />;
   }
 
