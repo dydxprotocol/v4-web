@@ -261,7 +261,7 @@ export const PlaceOrderButtonAndReceipt = ({
                 <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
               </>
             ),
-            customIcon: (
+            slotRight: (
               <div tw="rounded-0.25 bg-color-accent-faded px-0.25 py-0.125 text-tiny text-color-accent">
                 {stringGetter({ key: STRING_KEYS.NEW })}
               </div>
