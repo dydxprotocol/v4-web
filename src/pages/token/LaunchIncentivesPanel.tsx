@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
+import { Duration } from 'luxon';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
@@ -7,10 +8,13 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { StatsigFlags } from '@/constants/statsig';
+import { timeUnits } from '@/constants/time';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
@@ -19,6 +23,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
@@ -28,6 +33,14 @@ import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
 
+// Move to Chaos Labs query once its available
+const SEPT_2025_REWARDS_DETAILS = {
+  season: 5,
+  rewardAmount: '$1M',
+  rebatePercent: '50%',
+  endTime: '2025-09-30T23:59:59.000Z', // end of sept
+};
+
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const dispatch = useAppDispatch();
@@ -35,6 +48,11 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
   useEffect(() => {
     dispatch(markLaunchIncentivesSeen());
   }, [dispatch]);
+
+  const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+  if (!isSept2025Rewards) {
+    return <September2025RewardsPanel />;
+  }
 
   return isNotTablet ? (
     <$Panel
@@ -52,6 +70,105 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
         <LaunchIncentivesContent />
       </$Column>
     </$Panel>
+  );
+};
+
+const September2025RewardsPanel = () => {
+  const stringGetter = useStringGetter();
+
+  return (
+    <$Panel>
+      <div tw="flex gap-3 pb-0.25 pt-0.5">
+        <div tw="flex flex-col gap-1.5">
+          <div tw="flex flex-col gap-0.5">
+            <div tw="flex items-center gap-0.5">
+              <div tw="font-medium-bold">
+                <span tw="font-bold text-color-accent">
+                  {stringGetter({ key: STRING_KEYS.SURGE })}:
+                </span>{' '}
+                <span tw="font-bold">
+                  {stringGetter({
+                    key: STRING_KEYS.SURGE_HEADLINE_SEP_2025,
+                    params: {
+                      REWARD_AMOUNT: SEPT_2025_REWARDS_DETAILS.rewardAmount,
+                      REBATE_PERCENT: SEPT_2025_REWARDS_DETAILS.rebatePercent,
+                    },
+                  })}
+                </span>
+              </div>
+              <SuccessTag size={TagSize.Medium}>
+                {stringGetter({ key: STRING_KEYS.ACTIVE })}
+              </SuccessTag>
+            </div>
+            <span>
+              <span tw="text-color-text-0">
+                {stringGetter({
+                  key: STRING_KEYS.SURGE_BODY_SEP_2025,
+                  params: { REWARD_AMOUNT: '$1M', REBATE_PERCENT: '50%' },
+                })}{' '}
+                <Link href="https://www.dydx.xyz/surge" isInline>
+                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+                </Link>
+              </span>
+            </span>
+          </div>
+          <div tw="flex items-center gap-0.25 self-start rounded-3 bg-color-layer-1 px-0.875 py-0.5">
+            <Icon iconName={IconName.Clock} size="1.25rem" tw="text-color-accent" />
+            <div tw="flex gap-0.375">
+              <div tw="text-color-accent">
+                {stringGetter({
+                  key: STRING_KEYS.SURGE_COUNTDOWN,
+                  params: { SURGE_SEASON: SEPT_2025_REWARDS_DETAILS.season },
+                })}
+                :
+              </div>
+              <MinutesCountdown endTime={SEPT_2025_REWARDS_DETAILS.endTime} />
+            </div>
+          </div>
+        </div>
+        <Sept2025RewardsPanel />
+      </div>
+    </$Panel>
+  );
+};
+
+const Sept2025RewardsPanel = () => {
+  const stringGetter = useStringGetter();
+  const { dydxAddress } = useAccounts();
+
+  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress });
+  const { incentivePoints } = data ?? {};
+
+  return (
+    <div tw="flex flex-col justify-between gap-0.75 self-stretch">
+      <div
+        style={{
+          backgroundImage: `url('/dots-background.svg')`,
+          backgroundSize: 'cover',
+        }}
+        tw="bg-color-accent-more-faded flex gap-4 rounded-0.75 border border-solid border-color-accent-faded p-1.25"
+      >
+        <div tw="flex flex-col gap-0.5">
+          <div tw="text-nowrap font-medium text-color-text-1">
+            {stringGetter({ key: STRING_KEYS.ESTIMATED_POINTS })}
+          </div>
+          <$Points>
+            <Output
+              type={OutputType.Number}
+              value={incentivePoints}
+              isLoading={isLoading}
+              fractionDigits={TOKEN_DECIMALS}
+            />
+            {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
+          </$Points>
+        </div>
+        <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />
+      </div>
+
+      <div tw="flex items-center gap-[0.5em] self-end font-tiny-medium">
+        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
+      </div>
+    </div>
   );
 };
 
@@ -89,6 +206,7 @@ const IncentiveProgramDescription = () => {
 
 const LaunchIncentivesTitle = () => {
   const stringGetter = useStringGetter();
+
   return (
     <$Title>
       {stringGetter({
@@ -174,6 +292,33 @@ const LaunchIncentivesContent = () => {
         </$Button>
       </$ButtonRow>
     </$Column>
+  );
+};
+
+const MinutesCountdown = ({ endTime }: { endTime: string }) => {
+  const targetMs = Date.parse(endTime);
+  const [msLeft, setMsLeft] = useState(Math.max(0, Math.floor(targetMs - Date.now())));
+
+  useEffect(() => {
+    const tick = () => {
+      const newMsLeft = Math.max(0, Math.floor(targetMs - Date.now()));
+      setMsLeft(newMsLeft);
+
+      if (newMsLeft <= 0) clearInterval(id);
+    };
+
+    const id = setInterval(tick, timeUnits.minute);
+
+    tick();
+    return () => clearInterval(id);
+  }, [targetMs]);
+
+  return (
+    <div>
+      {Duration.fromMillis(msLeft)
+        .shiftTo('days', 'hours', 'minutes')
+        .toFormat('d:hh:mm', { floor: true })}{' '}
+    </div>
   );
 };
 
