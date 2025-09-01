@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Duration } from 'luxon';
 import styled from 'styled-components';
@@ -9,10 +9,10 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
-import { timeUnits } from '@/constants/time';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useNow } from '@/hooks/useNow';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -35,7 +35,7 @@ import { openDialog } from '@/state/dialogs';
 
 // Move to Chaos Labs query once its available
 const SEPT_2025_REWARDS_DETAILS = {
-  season: 5,
+  season: 6,
   rewardAmount: '$1M',
   rebatePercent: '50%',
   endTime: '2025-09-30T23:59:59.000Z', // end of sept
@@ -297,29 +297,25 @@ const LaunchIncentivesContent = () => {
 
 const MinutesCountdown = ({ endTime }: { endTime: string }) => {
   const targetMs = Date.parse(endTime);
+  const now = useNow();
   const [msLeft, setMsLeft] = useState(Math.max(0, Math.floor(targetMs - Date.now())));
 
   useEffect(() => {
-    const tick = () => {
-      const newMsLeft = Math.max(0, Math.floor(targetMs - Date.now()));
-      setMsLeft(newMsLeft);
+    if (now > targetMs) {
+      return;
+    }
 
-      if (newMsLeft <= 0) clearInterval(id);
-    };
+    const newMsLeft = Math.max(0, Math.floor(targetMs - now));
+    setMsLeft(newMsLeft);
+  }, [now, targetMs]);
 
-    const id = setInterval(tick, timeUnits.minute);
+  const formattedMsLeft = useMemo(() => {
+    return Duration.fromMillis(msLeft)
+      .shiftTo('days', 'hours', 'minutes')
+      .toFormat('d:hh:mm', { floor: true });
+  }, [msLeft]);
 
-    tick();
-    return () => clearInterval(id);
-  }, [targetMs]);
-
-  return (
-    <div>
-      {Duration.fromMillis(msLeft)
-        .shiftTo('days', 'hours', 'minutes')
-        .toFormat('d:hh:mm', { floor: true })}{' '}
-    </div>
-  );
+  return <div>{formattedMsLeft}</div>;
 };
 
 const $Panel = tw(Panel)`bg-color-layer-3 w-full`;
