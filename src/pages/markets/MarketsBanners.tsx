@@ -121,7 +121,7 @@ export const MarketsBanners = ({
           <Button
             action={ButtonAction.Primary}
             type={ButtonType.Link}
-            href="https://dydx.exchange/blog/trading-rewards"
+            href="https://dydx.trade/DYDX"
             tw="relative z-10 w-12"
           >
             {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
