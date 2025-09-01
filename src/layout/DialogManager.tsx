@@ -28,6 +28,7 @@ import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { ManageAccountDialog } from '@/views/dialogs/ManageAccountDialog/ManageAccountDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
@@ -114,6 +115,7 @@ export const DialogManager = React.memo(() => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
+    ManageAccount: (args) => <ManageAccountDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
     MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,

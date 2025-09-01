@@ -50,6 +50,7 @@ export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
+export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
 export type MobileSignInDialogProps = {};
@@ -144,6 +145,7 @@ export const DialogTypes = unionize(
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
+    ManageAccount: ofType<ManageAccountDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
     MobileSignIn: ofType<MobileSignInDialogProps>(),

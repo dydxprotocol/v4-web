@@ -413,6 +413,7 @@ const useTurnkeyWalletContext = () => {
 
   /* ----------------------------- Return ----------------------------- */
   return {
+    turnkeyUser,
     turnkeyWallets,
     primaryTurnkeyWallet,
     preferredWallet,

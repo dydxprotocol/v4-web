@@ -52,7 +52,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { selectIsKeplrConnected } from '@/state/walletSelectors';
+import { selectIsKeplrConnected, selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
@@ -71,6 +71,7 @@ export const AccountMenu = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const isKeplr = useAppSelector(selectIsKeplrConnected);
+  const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
@@ -113,34 +114,48 @@ export const AccountMenu = () => {
   const walletIcon = useMemo(() => {
     if (onboardingState === OnboardingState.WalletConnected) {
       return <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
-    } else if (
+    }
+
+    if (walletInfo == null) {
+      return null;
+    }
+
+    if (
       onboardingState === OnboardingState.AccountConnected &&
-      walletInfo?.name === WalletType.Privy
+      walletInfo.name === WalletType.Privy
     ) {
       if (google) {
         return <Icon iconComponent={GoogleIcon as ElementType} />;
-      } else if (discord) {
-        return <Icon iconComponent={DiscordIcon as ElementType} />;
-      } else if (twitter) {
-        return <Icon iconComponent={TwitterIcon as ElementType} />;
-      } else {
-        return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
       }
-    } else if (
+
+      if (discord) {
+        return <Icon iconComponent={DiscordIcon as ElementType} />;
+      }
+
+      if (twitter) {
+        return <Icon iconComponent={TwitterIcon as ElementType} />;
+      }
+
+      return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+    }
+
+    if (
       onboardingState === OnboardingState.AccountConnected &&
-      walletInfo?.connectorType === ConnectorType.Turnkey
+      walletInfo.connectorType === ConnectorType.Turnkey
     ) {
       if (walletInfo.providerName === 'google') {
         return <Icon iconComponent={GoogleIcon as ElementType} />;
-      } else if (walletInfo.providerName === 'apple') {
-        return <Icon iconComponent={AppleIcon as ElementType} />;
-      } else {
-        return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
       }
-    } else if (walletInfo) {
-      return <WalletIcon wallet={walletInfo} />;
+
+      if (walletInfo.providerName === 'apple') {
+        return <Icon iconComponent={AppleIcon as ElementType} />;
+      }
+
+      return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
     }
-  }, [onboardingState, walletInfo]);
+
+    return <WalletIcon wallet={walletInfo} />;
+  }, [onboardingState, walletInfo, google, discord, twitter]);
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -296,6 +311,13 @@ export const AccountMenu = () => {
           onSelect: onRecoverKeys,
           separator: true,
         },
+        onboardingState === OnboardingState.AccountConnected &&
+          isTurnkey && {
+            value: 'ManageAccount',
+            icon: <Icon iconName={IconName.Gear} />,
+            label: 'Account Management', // TODO(turnkey): Localization
+            onSelect: () => dispatch(openDialog(DialogTypes.ManageAccount())),
+          },
         affiliatesEnabled &&
           onboardingState === OnboardingState.AccountConnected && {
             value: 'Affiliates',
@@ -373,23 +395,22 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...(onboardingState === OnboardingState.AccountConnected && hdKey
-          ? [
-              {
-                value: 'MobileQrSignIn',
-                icon: <Icon iconName={IconName.Qr} />,
-                label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
-                onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
-              },
-              {
-                value: 'MnemonicExport',
-                icon: <Icon iconName={IconName.ExportKeys} />,
-                label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'destroy' as const,
-                onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
-              },
-            ]
-          : []),
+        onboardingState === OnboardingState.AccountConnected &&
+          hdKey && {
+            value: 'MobileQrSignIn',
+            icon: <Icon iconName={IconName.Qr} />,
+            label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
+            onSelect: () => dispatch(openDialog(DialogTypes.MobileSignIn())),
+          },
+        onboardingState === OnboardingState.AccountConnected &&
+          hdKey &&
+          !isTurnkey && {
+            value: 'MnemonicExport',
+            icon: <Icon iconName={IconName.ExportKeys} />,
+            label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
+            highlightColor: 'destroy' as const,
+            onSelect: () => dispatch(openDialog(DialogTypes.MnemonicExport())),
+          },
         ...(privy.ready && privy.authenticated
           ? [
               {

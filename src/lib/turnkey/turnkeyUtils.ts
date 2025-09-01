@@ -5,9 +5,10 @@ import type { ApiKeyStamper, TurnkeyServerClient } from '@turnkey/sdk-server';
 
 import type { TurnkeyWallet, TurnkeyWalletAccount } from '@/types/turnkey';
 
+const TURNKEY_API_BASE_URL = import.meta.env.VITE_TURNKEY_API_BASE_URL;
 const TURNKEY_API_PUBLIC_KEY = import.meta.env.VITE_TURNKEY_API_PUBLIC_KEY;
 const TURNKEY_API_PRIVATE_KEY = import.meta.env.VITE_TURNKEY_API_PRIVATE_KEY;
-export const TURNKEY_ORGANIZATION_ID = import.meta.env.VITE_TURNKEY_PUBLIC_ORGANIZATION_ID;
+const TURNKEY_ORGANIZATION_ID = import.meta.env.VITE_TURNKEY_PUBLIC_ORGANIZATION_ID;
 
 const getLazyTurnkeyApiKeyStamper = weakMapMemoize(async () => {
   return (await import('@turnkey/sdk-server')).ApiKeyStamper;
@@ -30,15 +31,15 @@ async function getTurnkeyClient() {
     apiPrivateKey: TURNKEY_API_PRIVATE_KEY,
   });
 
-  if (import.meta.env.VITE_TURNKEY_API_BASE_URL == null) {
+  if (TURNKEY_API_BASE_URL == null) {
     throw new Error('Turnkey API base URL is not set');
-  } else if (import.meta.env.VITE_PUBLIC_ORGANIZATION_ID == null) {
+  } else if (TURNKEY_ORGANIZATION_ID == null) {
     throw new Error('Turnkey organization ID is not set');
   }
 
   turnkeyClient ??= new (await getLazyTurnkeyClient())({
-    apiBaseUrl: import.meta.env.VITE_TURNKEY_API_BASE_URL,
-    organizationId: import.meta.env.VITE_PUBLIC_ORGANIZATION_ID,
+    apiBaseUrl: TURNKEY_API_BASE_URL,
+    organizationId: TURNKEY_ORGANIZATION_ID,
     stamper,
   });
 

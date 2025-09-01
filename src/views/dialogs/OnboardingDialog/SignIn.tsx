@@ -136,7 +136,8 @@ const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean }>`
   --form-input-paddingY: 0.5rem;
   --form-input-paddingLeft: 0.75rem;
   --form-input-paddingRight: 0.5rem;
-  --input-borderColor: var(--color-border);
+  --input-borderColor: var(--color-layer-4);
+  --input-backgroundColor: transparent;
 
   &:focus-within {
     --input-borderColor: var(--color-accent);
