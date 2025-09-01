@@ -113,7 +113,9 @@ export const MarketsBanners = ({
     <$RebateBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <span tw="mb-0.75 text-large font-extra-bold">
-          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
+          <span tw="text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE })}
+          </span>
         </span>
         <div tw="flex items-center gap-1.5">
           <Button
@@ -122,10 +124,10 @@ export const MarketsBanners = ({
             href="https://dydx.exchange/blog/trading-rewards"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.BUTTON_TEXT })}
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
           </Button>
           <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.SUBTITLE })}
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_SUBTITLE })}
           </span>
         </div>
       </div>
