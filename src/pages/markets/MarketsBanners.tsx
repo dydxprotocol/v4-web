@@ -21,8 +21,11 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedSurgeBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner, getHasDismissedSurgeBanner } from '@/state/dismissableSelectors';
+import { setHasDismissedPmlBanner, setHasDismissedRebateBanner } from '@/state/dismissable';
+import {
+  getHasDismissedPmlBanner,
+  getHasDismissedRebateBanner,
+} from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -39,10 +42,15 @@ export const MarketsBanners = ({
   const launched = useMemo(() => allMarkets.filter((f) => !f.isUnlaunched), [allMarkets]);
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
+  const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
   const dispatch = useAppDispatch();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
+  };
+
+  const onDismissRebateBanner = () => {
+    dispatch(setHasDismissedRebateBanner(true));
   };
 
   const onClickPmlBanner = () => {
@@ -52,6 +60,7 @@ export const MarketsBanners = ({
   };
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
+  const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -100,41 +109,32 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
-  // Surge Banner - New Implementation
-  const hasDismissedSurgeBanner = useAppSelector(getHasDismissedSurgeBanner);
-
-  const onDismissSurgeBanner = (e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(setHasDismissedSurgeBanner(true));
-  };
-
-  const shouldDisplaySurgeBanner = !hasDismissedSurgeBanner;
-
-  const surgeBanner = shouldDisplaySurgeBanner ? (
-    <$SurgeBanner>
+  const rebateBanner = shouldDisplayRebateBanner ? (
+    <$RebateBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <span tw="mb-0.75 text-large font-extra-bold">
-          <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.TITLE })}</span>
+          <span tw="text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE })}
+          </span>
         </span>
         <div tw="flex items-center gap-1.5">
           <Button
             action={ButtonAction.Primary}
             type={ButtonType.Link}
-            href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=13082025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
+            href="https://dydx.trade/DYDX"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
           </Button>
           <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.END_DATE })}
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_SUBTITLE })}
           </span>
         </div>
       </div>
 
       <img
-        src="/surge-banner-hedgies.png"
-        alt="surge rewards hedgies"
+        src="/hedgiepercentage1.png"
+        alt="rebate rewards hedgies"
         tw="h-full object-contain mobile:hidden"
       />
 
@@ -142,12 +142,12 @@ export const MarketsBanners = ({
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
         size={ButtonSize.XSmall}
-        onClick={onDismissSurgeBanner}
+        onClick={onDismissRebateBanner}
       />
-    </$SurgeBanner>
+    </$RebateBanner>
   ) : null;
 
-  return surgeBanner ?? pmlBanner ?? null;
+  return rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -193,32 +193,6 @@ const $PmlBanner = styled($MarketsPageBanner)`
   }
 `;
 
-const $SurgeBanner = styled($MarketsPageBanner)`
-  height: 8rem;
-  background: var(--color-layer-0);
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 70%;
-    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
-    opacity: 0.2;
-    z-index: 0;
-  }
-
-  img,
-  span,
-  button,
-  a {
-    z-index: 1;
-  }
-`;
-
 const $StarsOverlay = styled.div`
   position: absolute;
   left: 0;
@@ -238,5 +212,39 @@ const $Details = styled(Details)`
 
   > :first-child {
     padding-left: 0;
+  }
+`;
+
+const $RebateBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  background: var(--color-layer-1);
+  position: relative;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 70%;
+    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.2;
+    z-index: 0;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
   }
 `;
