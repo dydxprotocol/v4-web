@@ -32,8 +32,8 @@ import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
-import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
+import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
@@ -90,7 +90,7 @@ const RewardsPage = () => {
           <$DetachedSection>
             {showGeoblockedPanel && <GeoblockedPanel />}
             {showStakingRewardPanel && stakingRewardPanel}
-            <StakingPanel />
+            <SwapAndStakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
             <TradingRewardsChartPanel />
@@ -112,7 +112,7 @@ const RewardsPage = () => {
             <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
-              <StakingPanel />
+              <SwapAndStakingPanel />
               <UnbondingPanels />
               <GovernancePanel />
               <RewardsHelpPanel />
