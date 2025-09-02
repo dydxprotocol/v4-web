@@ -13,6 +13,34 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
 
 ### Stories
 
+#### Traders
+- As a trader, I want to open long positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can amplify my gains on price increases
+- As a trader, I want to open short positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can profit from price decreases
+- As a trader, I want to use only USDC as collateral for my positions so that I have a stable reference for my margin requirements
+- As a trader, I want to view my current positions, including size, leverage, PnL, and margin requirements
+- As a trader, I want to close my positions partially or fully to realize profits or cut losses
+- As a trader, I want to view real-time price charts and market data for the assets I'm trading
+- As a trader, I want to see my trading history and performance metrics
+- As a trader, I want to connect my Fuel wallet to the platform to manage my trades
+- As a trader, I want to receive clear error messages when transactions fail or when I have insufficient collateral
+- As a trader, I want to understand the funding fees I'll pay based on my position length and open interest imbalances
+
+#### Funding Rate Arbitragers
+- As a funding rate arbitrager, I want to monitor funding rates across different time periods to identify arbitrage opportunities
+- As a funding rate arbitrager, I want to quickly open positions to capture favorable funding rate differentials
+- As a funding rate arbitrager, I want to track my funding rate income/costs across all my positions
+- As a funding rate arbitrager, I want to see open interest imbalances that affect funding rates
+- As a funding rate arbitrager, I want to monitor my overall portfolio exposure and risk across multiple positions
+
+#### Liquidity Providers
+- As a liquidity provider, I want to deposit USDC into the liquidity pool to earn fees from traders
+- As a liquidity provider, I want to withdraw my USDC from the liquidity pool when needed
+- As a liquidity provider, I want to see my share of the total liquidity pool and my proportional ownership
+- As a liquidity provider, I want to view my earnings from trading fees and my exposure to trader profits/losses
+- As a liquidity provider, I want to understand the risks I'm taking by providing liquidity (house risk from winning long positions)
+- As a liquidity provider, I want to track my historical returns and performance as an LP
+- As a liquidity provider, I want to see the current utilization of the liquidity pool and overall platform metrics
+- As a liquidity provider, I want to receive RLP tokens that represent my proportional share of house value/risk
 
 
 ### Contract changes
