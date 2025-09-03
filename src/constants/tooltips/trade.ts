@@ -139,6 +139,10 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_BODY }),
   }),
+  'max-reward-sept-2025': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_BODY }),
+  }),
   'max-withdraw': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_BODY }),
