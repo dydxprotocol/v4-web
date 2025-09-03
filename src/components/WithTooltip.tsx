@@ -22,6 +22,7 @@ type ElementProps = {
   tooltipStringTitle?: string;
   stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
+  slotRight?: ReactNode;
   children?: ReactNode;
   slotTooltip?: ReactNode;
   slotTrigger?: ReactNode;
@@ -41,6 +42,7 @@ export const WithTooltip = ({
   slotTrigger,
   stringParams,
   withIcon,
+  slotRight,
   children,
   align,
   side,
@@ -80,8 +82,9 @@ export const WithTooltip = ({
         <Trigger asChild>
           {slotTrigger ?? (
             <$Abbr>
-              {children}
+              <$Underlined>{children}</$Underlined>
               {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-color-text-0" />}
+              {slotRight}
             </$Abbr>
           )}
         </Trigger>
@@ -115,13 +118,17 @@ export const WithTooltip = ({
   );
 };
 
-const $Abbr = styled.abbr`
+const $Underlined = styled.span`
   ${layoutMixins.inlineRow}
 
   text-decoration: underline dashed 0px;
   text-underline-position: under;
   text-decoration-color: var(--color-text-0);
   text-decoration-skip-ink: all;
+`;
+
+const $Abbr = styled.abbr`
+  ${layoutMixins.inlineRow}
 
   cursor: help;
 `;

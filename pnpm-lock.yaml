@@ -33,8 +33,8 @@ dependencies:
     specifier: 2.1.1
     version: 2.1.1
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.312
-    version: 1.1.312
+    specifier: 1.1.317
+    version: 1.1.317
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1520,8 +1520,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.312:
-    resolution: {integrity: sha512-jg/mLRjawRzBD9VLOlZTDUgdRJBmIBLkps42E9uIfxW0ZrSt9mEpC1iX1v/qkkSr79dbwqNZsIBYG8gKMP5dyA==}
+  /@dydxprotocol/v4-localization@1.1.317:
+    resolution: {integrity: sha512-xalIWxsOj8KpxDkdza+dG4S8EayWraA+LJ9QzhEq8V0VTUA20QJqVt3CrIa33ZVd09kqV5EIF3kIU20YuWnylQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -4534,7 +4534,6 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
-      napi-wasm: 1.1.3
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -17944,10 +17943,6 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-
-  /napi-wasm@1.1.3:
-    resolution: {integrity: sha512-h/4nMGsHjZDCYmQVNODIrYACVJ+I9KItbG+0si6W/jSjdA9JbWDoU4LLeMXVcEQGHjttI2tuXqDrbGF7qkUHHg==}
-    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
