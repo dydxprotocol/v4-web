@@ -11,7 +11,6 @@ export enum LocalStorageKey {
 
   // Turnkey
   TurnkeyPreferredWallet = 'dydx.TurnkeyPreferredWallet',
-  TurnkeyEmailOnboardingData = 'dydx.TurnkeyEmailOnboardingData',
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
@@ -48,6 +47,5 @@ export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.Notifications]: 'v1',
   [LocalStorageKey.KeplrCompliance]: 'v1',
   [LocalStorageKey.SelectedTradeLayout]: 'v1',
-  [LocalStorageKey.TurnkeyEmailOnboardingData]: 'v1',
   // TODO: version all localStorage keys
 };
