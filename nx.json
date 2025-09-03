@@ -16,5 +16,5 @@
       "!{projectRoot}/src/test-setup.[jt]s"
     ],
     "sharedGlobals": ["{workspaceRoot}/package.json", "{workspaceRoot}/pnpm-lock.yaml"]
-  },
+  }
 }

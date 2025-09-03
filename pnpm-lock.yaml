@@ -3610,7 +3610,7 @@ packages:
       '@ethereumjs/common': 3.2.0
       '@ethereumjs/rlp': 4.0.1
       '@ethereumjs/util': 8.1.0
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
     dev: false
 
   /@ethereumjs/util@8.1.0:
@@ -3618,7 +3618,7 @@ packages:
     engines: {node: '>=14'}
     dependencies:
       '@ethereumjs/rlp': 4.0.1
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
       micro-ftch: 0.3.1
     dev: false
 
@@ -4547,7 +4547,7 @@ packages:
     dependencies:
       '@graphql-tools/utils': 10.9.1(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   /@graphql-tools/mock@8.7.20(graphql@15.10.1):
     resolution: {integrity: sha512-ljcHSJWjC/ZyzpXd5cfNhPI7YljRVvabKHPzKjEs5ElxWu2cdlLGvyNYepApXDsM/OJG/2xuhGM+9GWu5gEAPQ==}
@@ -4569,7 +4569,7 @@ packages:
       '@graphql-tools/merge': 9.1.1(graphql@15.10.1)
       '@graphql-tools/utils': 10.9.1(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /@graphql-tools/schema@8.5.1(graphql@15.10.1):
@@ -4634,7 +4634,7 @@ packages:
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@15.10.1)
       graphql: 15.10.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   /@graphql-tools/utils@9.2.1(graphql@16.8.1):
     resolution: {integrity: sha512-WUw506Ql6xzmOORlriNrD6Ugx+HjVgYxt9KCXD9mHAak+eaXSwuGGPyE60hy9xaDEoXKBsG7SkG69ybitaVl6A==}
@@ -4643,7 +4643,7 @@ packages:
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.8.1)
       graphql: 16.8.1
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /@graphql-typed-document-node/core@3.2.0(graphql@15.10.1):
@@ -5270,7 +5270,7 @@ packages:
     engines: {node: '>=6.0.0'}
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
       '@jridgewell/trace-mapping': 0.3.25
 
   /@jridgewell/resolve-uri@3.1.2:
@@ -5288,9 +5288,6 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: true
 
-  /@jridgewell/sourcemap-codec@1.5.0:
-    resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
-
   /@jridgewell/sourcemap-codec@1.5.5:
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
@@ -5298,13 +5295,13 @@ packages:
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   /@jridgewell/trace-mapping@0.3.9:
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   /@jsep-plugin/assignment@1.3.0(jsep@1.4.0):
     resolution: {integrity: sha512-VVgV+CXrhbMI3aSusQyclHkenWSAm95WaiKrMxRFam3JSUiIaQjoMIw2sEs/OX4XifnqeQUN4DYbJjlA8EfktQ==}
@@ -5720,7 +5717,7 @@ packages:
       '@ethereumjs/util': 8.1.0
       '@metamask/abi-utils': 1.2.0
       '@metamask/utils': 5.0.2
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
       ethjs-util: 0.1.6
       tweetnacl: 1.0.3
       tweetnacl-util: 0.15.1
@@ -5737,7 +5734,7 @@ packages:
       '@metamask/abi-utils': 3.0.0
       '@metamask/utils': 11.4.0
       '@scure/base': 1.1.9
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
       tweetnacl: 1.0.3
     transitivePeerDependencies:
       - supports-color
@@ -9536,7 +9533,7 @@ packages:
     dependencies:
       '@rollup/pluginutils': 5.1.3(rollup@2.79.1)
       estree-walker: 2.0.2
-      magic-string: 0.30.14
+      magic-string: 0.30.18
       rollup: 2.79.1
     dev: true
 
@@ -9768,7 +9765,7 @@ packages:
   /@scure/bip32@1.4.0:
     resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
     dependencies:
-      '@noble/curves': 1.4.0
+      '@noble/curves': 1.4.2
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.9
     dev: false
@@ -11340,7 +11337,7 @@ packages:
     resolution: {integrity: sha512-5lxnyLEYFskErRPenYItLRSge5DjrJngYKdVjRSrWfza9G6KkgHEXi0vUZiyUeMU5JfXH1YnvXZzSp8ul88o2Q==}
     dependencies:
       legacy-swc-helpers: /@swc/helpers@0.4.14
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /@swc/helpers@0.5.11:
@@ -12965,7 +12962,7 @@ packages:
   /@vitest/snapshot@1.4.0:
     resolution: {integrity: sha512-saAFnt5pPIA5qDGxOHxJ/XxhMFKkUSBJmVt5VgDsAqPTX6JP326r5C/c9UuCMPoXNzuudTPsYDZCoJ5ilpqG2A==}
     dependencies:
-      magic-string: 0.30.14
+      magic-string: 0.30.18
       pathe: 1.1.2
       pretty-format: 29.7.0
 
@@ -14785,7 +14782,7 @@ packages:
     resolution: {integrity: sha512-Nst5JdK47VIl9UcGwtv2Rcgyn5lWtZ0/mhRQ4G8NN2isxpq2TO30iqHzmwoJycjWuyUfg3GFXqP/gFHXeV57IA==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   /@wry/caches@1.0.1:
     resolution: {integrity: sha512-bXuaUNLVVkD20wcGBWRyo7j9N3TxePEWFZj2Y+r9OoUzfqmavM84+mFykRicNsBqatba5JLay1t48wxaXaWnlA==}
@@ -17868,7 +17865,7 @@ packages:
     resolution: {integrity: sha512-Pcw1JTvZLSJH83iiGWt6fRcT+BjZlCDRVwYLbUcHzv/CRpB7r0MlSrGbIyQvVSNyGnbt7G4AXuyCiDR3POvZ1A==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   /cross-spawn@6.0.6:
     resolution: {integrity: sha512-VqCUuhcd1iB+dsv8gxPttb5iZh/D0iubSP21g36KXdEuf6I5JiioesUVjpCdHV9MZRUfVFlvwtIUyPfxo5trtw==}
@@ -25268,7 +25265,7 @@ packages:
   /magic-string@0.30.14:
     resolution: {integrity: sha512-5c99P1WKTed11ZC0HMJOj6CDIue6F8ySu+bJL+85q1zBEIY8IklrJ1eiKC2NDRh3Ct3FcvmJPyQHb9erXMTJNw==}
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   /magic-string@0.30.18:
     resolution: {integrity: sha512-yi8swmWbO17qHhwIBNeeZxTceJMeBvWJaId6dyvTSOwTipqeHhMhOrz6513r1sOKnpvQ7zkhlG8tPrpilwTxHQ==}
@@ -26353,7 +26350,7 @@ packages:
       outvariant: 1.4.2
       path-to-regexp: 6.2.1
       strict-event-emitter: 0.5.1
-      type-fest: 4.30.0
+      type-fest: 4.41.0
       typescript: 5.7.2
       yargs: 17.7.2
     dev: true
@@ -28707,7 +28704,7 @@ packages:
       '@types/react': 18.3.3
       react: 18.2.0
       react-style-singleton: 2.2.1(@types/react@18.3.3)(react@18.2.0)
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /react-remove-scroll@2.5.4(@types/react@18.3.3)(react@18.2.0):
@@ -28815,7 +28812,7 @@ packages:
       get-nonce: 1.0.1
       invariant: 2.2.4
       react: 18.2.0
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /react-use-measure@2.1.1(react-dom@18.2.0)(react@18.2.0):
@@ -28884,7 +28881,7 @@ packages:
       '@types/normalize-package-data': 2.4.1
       normalize-package-data: 6.0.0
       parse-json: 7.1.1
-      type-fest: 4.34.1
+      type-fest: 4.41.0
     dev: true
 
   /read-pkg@9.0.1:
@@ -30430,7 +30427,7 @@ packages:
   /starknet@6.11.0:
     resolution: {integrity: sha512-u50KrGDi9fbu1Ogu7ynwF/tSeFlp3mzOg1/Y5x50tYFICImo3OfY4lOz9OtYDk404HK4eUujKkhov9tG7GAKlg==}
     dependencies:
-      '@noble/curves': 1.4.0
+      '@noble/curves': 1.4.2
       '@noble/hashes': 1.7.1
       '@scure/base': 1.1.9
       '@scure/starknet': 1.0.0
@@ -31712,11 +31709,6 @@ packages:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
 
-  /type-fest@4.30.0:
-    resolution: {integrity: sha512-G6zXWS1dLj6eagy6sVhOMQiLtJdxQBHIA9Z6HFUNLOlr6MFOgzV8wvmidtPONfPtEUv0uZsy77XJNzTAfwPDaA==}
-    engines: {node: '>=16'}
-    dev: true
-
   /type-fest@4.34.1:
     resolution: {integrity: sha512-6kSc32kT0rbwxD6QL1CYe8IqdzN/J/ILMrNK+HMQCKH3insCDRY/3ITb0vcBss0a3t72fzh2YSzj8ko1HgwT3g==}
     engines: {node: '>=16'}
@@ -32353,7 +32345,7 @@ packages:
     dependencies:
       '@types/react': 18.3.3
       react: 18.2.0
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /use-isomorphic-layout-effect@1.1.2(@types/react@18.3.3)(react@18.2.0):
@@ -32396,7 +32388,7 @@ packages:
       '@types/react': 18.3.3
       detect-node-es: 1.1.0
       react: 18.2.0
-      tslib: 2.7.0
+      tslib: 2.8.1
     dev: false
 
   /use-sync-external-store@1.2.0(react@18.2.0):
@@ -33292,7 +33284,7 @@ packages:
       '@ethereumjs/util': 8.1.0
       bn.js: 5.2.1
       ethereum-bloom-filters: 1.0.10
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
       ethjs-unit: 0.1.6
       number-to-bn: 1.7.0
       randombytes: 2.1.0
@@ -33306,7 +33298,7 @@ packages:
       '@ethereumjs/util': 8.1.0
       bn.js: 5.2.1
       ethereum-bloom-filters: 1.0.10
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.2.1
       ethjs-unit: 0.1.6
       number-to-bn: 1.7.0
       randombytes: 2.1.0
