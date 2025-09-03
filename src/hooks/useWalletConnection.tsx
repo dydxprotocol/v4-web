@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
   useAccount as useAccountGraz,
@@ -15,14 +16,12 @@ import {
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 
-import { EvmDerivedAddresses } from '@/constants/account';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import { ConnectorType, WalletInfo, WalletNetworkType, WalletType } from '@/constants/wallets';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -36,13 +35,25 @@ import { parseWalletError } from '@/lib/wallet';
 
 import { useStringGetter } from './useStringGetter';
 
-export const useWalletConnection = () => {
+const WalletConnectionContext = createContext<
+  ReturnType<typeof useWalletConnectionContext> | undefined
+>(undefined);
+WalletConnectionContext.displayName = 'WalletConnection';
+
+export const WalletConnectionProvider = ({ ...props }) => (
+  <WalletConnectionContext.Provider value={useWalletConnectionContext()} {...props} />
+);
+
+export const useWalletConnection = () => useContext(WalletConnectionContext)!;
+
+export const useWalletConnectionContext = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
   const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi, refetch } = useWalletClientWagmi();
+  const { primaryTurnkeyWallet } = useTurnkeyWallet();
 
   useEffect(() => {
     if (isConnectedWagmi && !signerWagmi) {
@@ -74,14 +85,36 @@ export const useWalletConnection = () => {
     const walletInfo = sourceAccount.walletInfo;
     if (!walletInfo) return;
 
-    if (isWagmiResolvedWallet(walletInfo) && evmAddressWagmi) {
+    if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
+      if (primaryTurnkeyWallet.accounts[0] == null) {
+        logBonsaiError('useWalletConnection', 'setSourceAddress side effect', {
+          error: new Error(`No accounts for ${primaryTurnkeyWallet.walletId}`),
+        });
+
+        return;
+      }
+
+      dispatch(
+        setSourceAddress({
+          address: primaryTurnkeyWallet.accounts[0].address,
+          chain: WalletNetworkType.Evm,
+        })
+      );
+    } else if (isWagmiResolvedWallet(walletInfo) && evmAddressWagmi) {
       dispatch(setSourceAddress({ address: evmAddressWagmi, chain: WalletNetworkType.Evm }));
     } else if (walletInfo.connectorType === ConnectorType.PhantomSolana && solAddressPhantom) {
       dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
     } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
       dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
     }
-  }, [sourceAccount.walletInfo, evmAddressWagmi, solAddressPhantom, dydxAddressGraz, dispatch]);
+  }, [
+    sourceAccount.walletInfo,
+    evmAddressWagmi,
+    solAddressPhantom,
+    dydxAddressGraz,
+    dispatch,
+    primaryTurnkeyWallet,
+  ]);
 
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
@@ -111,10 +144,6 @@ export const useWalletConnection = () => {
   const { connectAsync: connectWagmi } = useConnectWagmi();
   const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
   const { connectAsync: connectGraz } = useConnectGraz();
-  const [evmDerivedAddresses] = useLocalStorage({
-    key: LocalStorageKey.EvmDerivedAddresses,
-    defaultValue: {} as EvmDerivedAddresses,
-  });
   const { ready, authenticated } = usePrivy();
 
   const { mfaMethods } = useMfa();
@@ -148,6 +177,11 @@ export const useWalletConnection = () => {
       if (!wallet) return;
 
       try {
+        if (wallet.connectorType === ConnectorType.Turnkey) {
+          // Turnkey connection is handled by the TurnkeyAuthProvider using signInWithOauth
+          return;
+        }
+
         if (wallet.connectorType === ConnectorType.Privy) {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();
@@ -218,8 +252,14 @@ export const useWalletConnection = () => {
       setSelectedWalletError(undefined);
 
       if (selectedWallet) {
+        if (selectedWallet.connectorType === ConnectorType.Turnkey) {
+          // Turnkey does not initiate a wallet connection, so we should no op.
+          return;
+        }
+
         const isEvmAccountConnected =
           sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature;
+
         if (isWagmiConnectorType(selectedWallet) && !isConnectedWagmi && !isEvmAccountConnected) {
           const connector = resolveWagmiConnector({ wallet: selectedWallet, walletConnectConfig });
           if (!connector) return;
@@ -238,7 +278,6 @@ export const useWalletConnection = () => {
   }, [
     selectedWallet,
     signerWagmi,
-    evmDerivedAddresses,
     sourceAccount,
     reconnectWagmi,
     isConnectedWagmi,
@@ -248,21 +287,28 @@ export const useWalletConnection = () => {
 
   const selectWallet = useCallback(
     async (wallet: WalletInfo | undefined) => {
+      // Disconnect all wallets prior to selecting a new wallet.
       if (wallet) {
         await disconnectWallet();
         await new Promise(requestAnimationFrame);
       }
 
       setSelectedWallet(wallet);
+
       if (wallet) {
         try {
-          await connectWallet({
-            wallet,
-            isEvmAccountConnected: Boolean(
-              sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature
-            ),
-          });
-          dispatch(setWalletInfo(wallet));
+          if (wallet.connectorType === ConnectorType.Turnkey) {
+            dispatch(setWalletInfo(wallet));
+          } else {
+            await connectWallet({
+              wallet,
+              isEvmAccountConnected: Boolean(
+                sourceAccount.chain === WalletNetworkType.Evm && sourceAccount.encryptedSignature
+              ),
+            });
+
+            dispatch(setWalletInfo(wallet));
+          }
         } catch (error) {
           const { walletErrorType, message } = parseWalletError({
             error,
