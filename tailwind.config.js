@@ -45,6 +45,7 @@ export default {
 
       'color-accent': 'var(--color-accent)',
       'color-accent-faded': 'var(--color-accent-faded)',
+      'color-accent-more-faded': 'var(--color-accent-more-faded)',
       'color-favorite': 'var(--color-favorite)',
 
       'color-success': 'var(--color-success)',

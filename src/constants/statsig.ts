@@ -13,6 +13,7 @@ export enum StatsigFlags {
   ffEnableFunkitNew = 'ff_enable_funkit_new',
   ffDepositRewrite = 'ff_deposit_rewrite',
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
+  ffSeptember2025Rewards = 'ff_rewards_sep_2025',
 
   abPopupDeposit = 'ab_popup_deposit',
 }
