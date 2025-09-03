@@ -14,6 +14,8 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
 ### Stories
 
 #### Traders
+- As a trader, I want to deposit USDC into my account so that I can 
+- As a trader, I want to view the current balance of my account so that I can
 - As a trader, I want to open long positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can amplify my gains on price increases
 - As a trader, I want to open short positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can profit from price decreases
 - As a trader, I want to use only USDC as collateral for my positions so that I have a stable reference for my margin requirements
@@ -83,7 +85,41 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
   b. This should use the EVM connectors to allow for worldchain wallets to control user actions
   c. The user should be able to see trading history, current positions and price history
 
-### Open questions
+## Technical Stories
+### Frontend
+- Scaffolding
+- Local environment
+- Build system
+  - Link custom client and custom frontend
+  - Link contract build outputs and set up typegen
+  - ensure that they build
+- CI/CD (GH actions, Vercel)
+  - linting
+  - test running
+  - building
+
+### Docs
+- Docs scaffolding (fumadocs)
+- Docs hosting (vercel)
+- Linking forc docgen
+- Linking JSDocs
+
+### Indexer
+- Indexer Scaffolding
+- CI/CD (GH actions, sqd hosting)
+- Local environment running
+
+### Contracts
+- Scaffolding
+- CI
+  - linting
+  - test running
+  - building
+- Local node set up
+- Deployment script
+- Testnet Deployment
+
+## Open questions
 - How much leverage should be allowed for each asset?
 - How will using rest endpoints for fetching real-time data effect the speed and responsiveness of the app
 
