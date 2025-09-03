@@ -1,15 +1,14 @@
 {
   "extends": "./node_modules/@dydxprotocol/node-service-base-dev/tsconfig.json",
   "exclude": ["src/codegen/**/*.ts", "__native__/*.js", "__native__/__ios__/*.js"],
-  "include": [
-    "__tests__",
-    "examples",
-    "scripts",
-    "src",
-    "node_modules/@dydxprotocol/v4-proto/**/**.ts"
-  ],
+  "include": ["__tests__/**/*", "examples/**/*", "scripts/**/*", "src/**/*"],
   "compilerOptions": {
+    "composite": true,
     "noFallthroughCasesInSwitch": false,
-    "target": "ES2019"
+    "target": "ES2019",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true
   }
 }

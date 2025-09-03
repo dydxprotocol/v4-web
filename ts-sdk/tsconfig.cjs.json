@@ -1,9 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
+  "include": ["scripts/**/*", "src/**/*"],
+  "exclude": ["examples/**/*", "__tests__/**/*"],
   "compilerOptions": {
     "outDir": "build/cjs",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "declaration": false
+    "declaration": true,
+    "resolveJsonModule": true,
+    "composite": false
   }
 }
