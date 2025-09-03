@@ -8,10 +8,12 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { StatsigFlags } from '@/constants/statsig';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -154,6 +156,8 @@ export const PlaceOrderButtonAndReceipt = ({
     );
   };
 
+  const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+
   const items = (
     [
       {
@@ -248,24 +252,48 @@ export const PlaceOrderButtonAndReceipt = ({
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
       },
-      {
-        key: 'max-reward',
-        label: (
-          <>
-            {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
-            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
-          </>
-        ),
-        value: (
-          <Output
-            type={OutputType.Asset}
-            value={reward}
-            useGrouping
-            tag={reward ? chainTokenLabel : ''}
-          />
-        ),
-        tooltip: 'max-reward',
-      },
+      isSept2025Rewards
+        ? {
+            key: 'max-reward',
+            label: (
+              <>
+                {stringGetter({ key: STRING_KEYS.REWARDS })}
+                <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
+              </>
+            ),
+            slotRight: (
+              <div tw="rounded-0.25 bg-color-accent-faded px-0.25 py-0.125 text-tiny text-color-accent">
+                {stringGetter({ key: STRING_KEYS.NEW })}
+              </div>
+            ),
+            value: (
+              <Output
+                type={OutputType.Asset}
+                value={reward}
+                useGrouping
+                tag={reward ? chainTokenLabel : ''}
+              />
+            ),
+            tooltip: 'max-reward-sept-2025',
+          }
+        : {
+            key: 'max-reward',
+            label: (
+              <>
+                {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
+                <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
+              </>
+            ),
+            value: (
+              <Output
+                type={OutputType.Asset}
+                value={reward}
+                useGrouping
+                tag={reward ? chainTokenLabel : ''}
+              />
+            ),
+            tooltip: 'max-reward',
+          },
     ] satisfies Array<DetailsItem | false | undefined>
   ).filter(isTruthy);
 
