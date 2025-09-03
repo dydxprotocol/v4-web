@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
-import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
@@ -46,7 +45,7 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
-  const indexerUrl = useAppSelector(selectIndexerUrl);
+  const indexerUrl = 'https://indexerv4dev.dydx.exchange'; // useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
   const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
@@ -226,7 +225,8 @@ const useTurnkeyAuthContext = () => {
         if (error instanceof Error) {
           if (
             error.message.includes('unable to decrypt bundle using embedded key') ||
-            error.message.includes('Organization ID is not available')
+            error.message.includes('Organization ID is not available') ||
+            error.message.includes('Unauthenticated desc')
           ) {
             errorMessage =
               'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';
@@ -294,8 +294,12 @@ const useTurnkeyAuthContext = () => {
   }, []);
 
   /* ----------------------------- Upload Address ----------------------------- */
-  const { mutate: sendUploadAddressRequest } = useMutation({
-    mutationFn: async ({ payload }: { payload: { dydxAddress: string; signature: string } }) => {
+  const { mutateAsync: sendUploadAddressRequest } = useMutation({
+    mutationFn: async ({
+      payload,
+    }: {
+      payload: { dydxAddress: string; signature: string };
+    }): Promise<{ success: boolean }> => {
       const body = JSON.stringify(payload);
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
@@ -309,7 +313,6 @@ const useTurnkeyAuthContext = () => {
 
       if (response.errors && Array.isArray(response.errors)) {
         const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
-        dispatch(setRequiresAddressUpload(true));
         throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
       }
 
@@ -317,6 +320,7 @@ const useTurnkeyAuthContext = () => {
       return response;
     },
     onError: (error) => {
+      dispatch(setRequiresAddressUpload(true));
       logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
     },
@@ -333,9 +337,13 @@ const useTurnkeyAuthContext = () => {
       }
 
       const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
-      sendUploadAddressRequest({ payload });
+      const result = await sendUploadAddressRequest({ payload });
+
+      if (!result.success) {
+        dispatch(setRequiresAddressUpload(true));
+      }
     },
-    [dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
+    [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
   );
 
   /* ----------------------------- Side Effects ----------------------------- */

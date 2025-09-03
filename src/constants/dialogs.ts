@@ -32,6 +32,7 @@ export type ComplianceConfigDialogProps = {};
 export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
+export type DepositAddressDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
 export type EmailSignInStatusDialogProps = {};
@@ -129,6 +130,7 @@ export const DialogTypes = unionize(
     CoinbaseDepositDialog: ofType<CoinbaseDepositDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
+    DepositAddresses: ofType<DepositAddressDialogProps>(),
     /* TODO: rename Deposit2 to Deposit once old deposit flow is deprecated */
     Deposit2: ofType<DepositDialog2Props>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),

@@ -148,7 +148,7 @@ export const OnboardingDialog = ({
           },
           [OnboardingSteps.ChooseWallet]: {
             title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })
+              stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })
             ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
