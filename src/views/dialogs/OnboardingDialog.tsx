@@ -15,6 +15,7 @@ import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -49,7 +50,8 @@ export const OnboardingDialog = ({
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
   const { walletLearnMore } = useURLConfigs();
-  const { selectWallet, sourceAccount } = useAccounts();
+  const { sourceAccount } = useAccounts();
+  const { selectWallet } = useWalletConnection();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
@@ -117,7 +119,7 @@ export const OnboardingDialog = ({
     if (wallet.name === WalletType.Privy || wallet.name === WalletType.Keplr) {
       setIsOpenFromDialog(false);
     }
-    
+
     // For Fuel wallet, connect immediately and close the dialog
     if (wallet.name === WalletType.FuelWallet) {
       selectWallet(wallet);
@@ -126,7 +128,7 @@ export const OnboardingDialog = ({
       setIsOpenFromDialog(false);
       return;
     }
-    
+
     selectWallet(wallet);
   };
 

@@ -4,6 +4,7 @@ import { ResolutionString } from 'public/tradingview/charting_library';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_WIDGET_SETTINGS } from '@/constants/chartConfig';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -23,42 +24,28 @@ export const BaseTvChartWidget = ({
   theme?: 'light' | 'dark';
 }) => {
   const [isChartReady, setIsChartReady] = useState(false);
+  // @ts-ignore
   const [currentResolution, setCurrentResolution] = useState<ResolutionString>('1D');
 
   // Map TradingView widget intervals to resolution strings
   const getWidgetInterval = (resolution: ResolutionString): string => {
-    const intervalMap: Record<ResolutionString, string> = {
-      '1': '1',      // 1 minute
-      '5': '5',      // 5 minutes
-      '15': '15',    // 15 minutes
-      '30': '30',    // 30 minutes
-      '60': '60',    // 1 hour
-      '240': '240',  // 4 hours
-      '1D': 'D',    // 1 day
+    // Resolution strings are correct
+    // @see https://www.tradingview.com/charting-library-docs/latest/core_concepts/Resolution/
+    const intervalMap: Record<string, string> = {
+      '1': '1', // 1 minute
+      '5': '5', // 5 minutes
+      '15': '15', // 15 minutes
+      '30': '30', // 30 minutes
+      '60': '60', // 1 hour
+      '240': '240', // 4 hours
+      '1D': 'D', // 1 day
     } as const;
     return intervalMap[resolution] || 'D';
   };
 
-  // Map widget intervals back to resolution strings
-  const getResolutionFromInterval = (interval: string): ResolutionString => {
-    const resolutionMap: Record<string, ResolutionString> = {
-      '1': '1' as ResolutionString,
-      '5': '5' as ResolutionString,
-      '15': '15' as ResolutionString,
-      '30': '30' as ResolutionString,
-      '60': '60' as ResolutionString,
-      '240': '240' as ResolutionString,
-      'D': '1D' as ResolutionString,
-    };
-    return resolutionMap[interval] || 'D';
-  };
-
-  const onResolutionChange = useCallback(
-    (resolution: ResolutionString) => {
-      setCurrentResolution(resolution);
-    },
-    []
-  );
+  const onResolutionChange = useCallback((resolution: ResolutionString) => {
+    setCurrentResolution(resolution);
+  }, []);
 
   const handleWidgetReady = useCallback(() => {
     setIsChartReady(true);

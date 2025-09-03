@@ -10,6 +10,7 @@ import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -37,7 +38,8 @@ export const ChooseWallet = ({
   const isSimpleUi = useSimpleUiEnabled();
 
   const displayedWallets = useDisplayedWallets();
-  const { selectedWallet, selectedWalletError } = useAccounts();
+  const { selectedWallet } = useWalletConnection();
+  const { selectedWalletError } = useAccounts();
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
@@ -89,10 +91,10 @@ export const ChooseWallet = ({
                   selectedWallet.connectorType === ConnectorType.Injected
                     ? selectedWallet.name
                     : wallets[selectedWallet.name as keyof typeof wallets]?.stringKey
-                    ? stringGetter({
-                        key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
-                      })
-                    : selectedWallet.name,
+                      ? stringGetter({
+                          key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
+                        })
+                      : selectedWallet.name,
               },
             })}
           </h4>
@@ -113,8 +115,8 @@ export const ChooseWallet = ({
               {wallet.connectorType === ConnectorType.Injected
                 ? wallet.name
                 : wallets[wallet.name as keyof typeof wallets]?.stringKey
-                ? stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })
-                : wallet.name}
+                  ? stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })
+                  : wallet.name}
             </$WalletName>
           </$WalletButton>
         ))}

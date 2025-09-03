@@ -143,7 +143,7 @@ export const OrderStatusNotificationRow = ({
           });
           const cancelReason = order?.removalReason
             ? stringGetter({
-                key: STRING_KEYS[order.removalReason as keyof typeof STRING_KEYS],
+                key: (STRING_KEYS as any)[order.removalReason],
               })
             : '';
 

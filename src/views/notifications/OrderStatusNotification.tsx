@@ -98,7 +98,7 @@ export const OrderStatusNotification = ({
         } else if (indexedOrderStatus === OrderStatus.Canceled && order?.removalReason) {
           // when there's no fill and has a cancel reason, i.e. just plain canceled
           const cancelReason = order.removalReason as keyof typeof STRING_KEYS;
-          customContent = <span>{stringGetter({ key: STRING_KEYS[cancelReason] })}</span>;
+          customContent = <span>{stringGetter({ key: (STRING_KEYS as any)[cancelReason] })}</span>;
         }
       }
       break;
