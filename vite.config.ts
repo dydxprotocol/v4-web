@@ -1,3 +1,4 @@
+//@ts-ignore
 import UnpluginTypia from '@ryoppippi/unplugin-typia/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';

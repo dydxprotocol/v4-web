@@ -3,17 +3,21 @@ import {
   Account,
   accountFromAny,
   Block,
+  QueryAbciResponse,
   QueryClient as StargateQueryClient,
   TxExtension,
-  QueryAbciResponse,
 } from '@cosmjs/stargate';
-import { GetAuthenticatorsRequest, GetAuthenticatorsResponse } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/accountplus/query';
+import {
+  GetAuthenticatorsRequest,
+  GetAuthenticatorsResponse,
+} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/accountplus/query';
 import * as AuthModule from 'cosmjs-types/cosmos/auth/v1beta1/query';
 import * as BankModule from 'cosmjs-types/cosmos/bank/v1beta1/query';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import Long from 'long';
 import protobuf from 'protobufjs';
 
+import type { UserStats } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/stats/stats';
 import { bigIntToBytes } from '../../lib/helpers';
 import { PAGE_REQUEST } from '../constants';
 import { UnexpectedClientError } from '../lib/errors';
@@ -113,9 +117,7 @@ export class Get {
    *
    * @returns return the user's taker and maker volume
    */
-  async getUserStats(
-    address: string,
-  ): Promise<{ takerNotional: Long; makerNotional: Long } | undefined> {
+  async getUserStats(address: string): Promise<UserStats | undefined> {
     const requestData = Uint8Array.from(
       StatsModule.QueryUserStatsRequest.encode({ user: address }).finish(),
     );

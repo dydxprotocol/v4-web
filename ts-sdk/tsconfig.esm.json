@@ -5,7 +5,7 @@
   "compilerOptions": {
     "outDir": "build/esm",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
     "resolveJsonModule": true
