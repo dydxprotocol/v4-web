@@ -33,7 +33,7 @@ export enum SupportedLocales {
 
 export const STARBOARD_STRING_KEYS = {
   FUEL_WALLET: 'FUEL_WALLET',
-};
+} as const;
 
 export const STRING_KEYS = {
   ...APP_STRING_KEYS,
