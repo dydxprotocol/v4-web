@@ -1,2 +1,5 @@
 node_modules/
-public/
+public/*
+!public/configs/
+!public/configs/*.json
+!public/configs/**/*.json
