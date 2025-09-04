@@ -1,7 +1,7 @@
 import { expect, use } from "chai"
 import { AbstractContract, assets, Provider, Signer, Wallet, WalletUnlocked, AssetId } from "fuels"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import { Fungible, Rlp, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
+import { Fungible, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
 import { deploy, getValue, getValStr, formatObj, call } from "../../utils/utils"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
 import { asStr, expandDecimals, toNormalizedPrice, toPrice, toUsd } from "../../utils/units"
@@ -36,7 +36,7 @@ describe("Vault.increaseLongPosition", function () {
     let vaultPricefeed: VaultPricefeed
     let timeDistributor: TimeDistributor
     let yieldTracker: YieldTracker
-    let rlp: Rlp
+    
 
     beforeEach(async () => {
         launchedNode = await launchNode()
@@ -60,7 +60,7 @@ describe("Vault.increaseLongPosition", function () {
         rusd = await deploy("Rusd", deployer)
         timeDistributor = await deploy("TimeDistributor", deployer)
         yieldTracker = await deploy("YieldTracker", deployer)
-        rlp = await deploy("Rlp", deployer)
+        
         attachedContracts = [vault, vaultPricefeed, rusd]
 
         await call(rusd.functions.initialize(toContract(vault), toAddress(user0)))
@@ -88,8 +88,6 @@ describe("Vault.increaseLongPosition", function () {
                 600, // stableFundingRateFactor
             ),
         )
-
-        await call(rlp.functions.initialize())
 
         vault_user0 = new Vault(vault.id.toAddress(), user0)
         vault_user1 = new Vault(vault.id.toAddress(), user1)

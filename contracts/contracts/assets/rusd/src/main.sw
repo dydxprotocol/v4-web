@@ -325,7 +325,7 @@ impl SRC20 for Contract {
         sl_total_supply(storage.total_supply, asset)
     }
 
-    /// @dev only 1 DEFAULT_SUB_ID is utilized for RLP minting
+    /// @dev only 1 DEFAULT_SUB_ID is utilized for RUSD minting
     #[storage(read)]
     fn total_assets() -> u64 {
         storage.total_assets.read()

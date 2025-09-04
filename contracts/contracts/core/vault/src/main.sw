@@ -161,8 +161,7 @@ storage {
     /// tracks the total size of all short positions for each Asset
     /// value is total size of all short positions across all users
     global_short_sizes: StorageMap<AssetId, u256> = StorageMap {},
- 
-    managers: StorageMap<ContractId, bool> = StorageMap {},
+    
 }
 
 impl Pausable for Contract {
@@ -230,18 +229,7 @@ impl Vault for Contract {
         log(SetGov { gov })
     }
 
-    #[storage(write)]
-    fn set_manager(
-        manager: ContractId, 
-        is_active: bool
-    ) {
-        _only_gov();
-        if(is_active) {
-            storage.managers.insert(manager, true);
-        } else {
-            storage.managers.remove(manager);
-        }
-    }
+    
 
     #[storage(write)]
     fn set_liquidator(
@@ -1080,13 +1068,7 @@ fn _only_gov() {
     require(get_sender() == storage.gov.read(), Error::VaultForbiddenNotGov);
 }
 
-#[storage(read)]
-fn _only_manager() {
-    require(
-        storage.managers.get(get_contract_or_revert()).try_read().unwrap_or(false), 
-        Error::VaultForbiddenNotManager
-    );
-}
+ 
 
 fn _transfer_in(asset: AssetId) -> u64 {
     let amount = msg_amount();
@@ -2193,7 +2175,7 @@ fn _buy_rusd(
     asset: AssetId, 
     receiver: Identity,
 ) -> u256 {
-//    _only_manager();
+ 
 
     require(
         !receiver.is_zero(),
@@ -2282,7 +2264,7 @@ fn _sell_rusd(
     asset: AssetId, 
     receiver: Identity,
 ) -> u256 {
-//    _only_manager();
+ 
 
     require(
         !receiver.is_zero(),
