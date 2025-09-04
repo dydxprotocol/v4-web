@@ -10,7 +10,7 @@ dependencies = [
 
 [[package]]
 name = "asset_interfaces"
-source = "path+from-root-A0F0AE9A73C286A0"
+source = "path+from-root-1B6596007668D2B9"
 dependencies = [
     "helpers",
     "std",
@@ -18,7 +18,7 @@ dependencies = [
 
 [[package]]
 name = "core_interfaces"
-source = "path+from-root-57A643A88405500A"
+source = "path+from-root-695D6AEEAEEED3C2"
 dependencies = [
     "helpers",
     "pyth_interface",
@@ -76,29 +76,6 @@ dependencies = ["std"]
 name = "pyth_interface"
 source = "git+https://github.com/pyth-network/pyth-crosschain?tag=pyth-lazer-agent-v0.4.1#2a543d4b8719c7d0b3dad40f982c121307647815"
 dependencies = ["std"]
-
-[[package]]
-name = "rlp"
-source = "member"
-dependencies = [
-    "asset",
-    "asset_interfaces",
-    "helpers",
-    "src20",
-    "src3",
-    "std",
-]
-
-[[package]]
-name = "rlp-manager"
-source = "member"
-dependencies = [
-    "asset_interfaces",
-    "core_interfaces",
-    "helpers",
-    "src3",
-    "std",
-]
 
 [[package]]
 name = "rusd"
