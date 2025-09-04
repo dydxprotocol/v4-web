@@ -1,3 +1,4 @@
+import STARBOARD_EN from '@/i18n/en.json';
 import { type SupportedLocale } from '@dydxprotocol/v4-localization';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { mapValues } from 'lodash';
@@ -19,17 +20,23 @@ import { getBrowserLanguage } from '@/lib/language';
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 import { objectKeys } from '@/lib/objectHelpers';
 
+// NOTE: We might want to include more locales in the future
+// for now we'll just use EN
+const STARBOARD_LOCALES = {
+  [SupportedLocales.EN]: STARBOARD_EN,
+} as Record<SupportedLocale, any>;
+
 const allLocalesPromise = calc(async () => {
   const { LOCALE_DATA, NOTIFICATIONS, TOOLTIPS } = await import('@dydxprotocol/v4-localization');
-  return mapValues(
-    SUPPORTED_LOCALE_MAP,
-    (obj, locale) =>
-      ({
-        ...LOCALE_DATA[locale as SupportedLocale],
-        ...NOTIFICATIONS[locale as SupportedLocale],
-        TOOLTIPS: TOOLTIPS[locale as SupportedLocale],
-      }) as LocaleData
-  );
+  return mapValues(SUPPORTED_LOCALE_MAP, (obj, locale) => {
+    const STARBOARD_LOCALE = STARBOARD_LOCALES[locale as SupportedLocale] ?? {};
+    return {
+      ...LOCALE_DATA[locale as SupportedLocale],
+      ...NOTIFICATIONS[locale as SupportedLocale],
+      TOOLTIPS: TOOLTIPS[locale as SupportedLocale],
+      ...STARBOARD_LOCALE,
+    } as LocaleData;
+  });
 });
 
 let currentSetLocaleId = 0;

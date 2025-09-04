@@ -31,14 +31,16 @@ export enum SupportedLocales {
   DE = 'de',
 }
 
+export const STARBOARD_STRING_KEYS = {
+  FUEL_WALLET: 'FUEL_WALLET',
+};
+
 export const STRING_KEYS = {
   ...APP_STRING_KEYS,
   ...ERRORS_STRING_KEYS,
   ...WARNINGS_STRING_KEYS,
   ...NOTIFICATIONS_STRING_KEYS,
-  STARBOARD_STRING_KEYS: {
-   FUEL_WALLET: "Fuel Wallet"
-  }
+  ...STARBOARD_STRING_KEYS,
 };
 
 export const STRING_KEY_VALUES = Object.fromEntries(
@@ -56,15 +58,15 @@ export type StringGetterParams = Record<string, any>;
 
 export type StringGetterProps<T extends StringGetterParams> =
   | {
-    key: string;
-    params?: T;
-    fallback?: string;
-  }
+      key: string;
+      params?: T;
+      fallback?: string;
+    }
   | {
-    key?: Nullable<string>;
-    params?: T;
-    fallback: string;
-  };
+      key?: Nullable<string>;
+      params?: T;
+      fallback: string;
+    };
 
 export type StringGetterFunction = <T extends StringGetterParams>(
   props: StringGetterProps<T>

@@ -7,12 +7,12 @@ import { STRING_KEYS } from '@/constants/localization';
 import {
   CoinbaseIcon,
   EmailIcon,
+  FuelWalletIcon,
   GenericWalletIcon,
   KeplrIcon,
   MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
-  FuelWalletIcon,
   WalletConnectIcon,
 } from '@/icons';
 
@@ -160,7 +160,7 @@ export const wallets = {
   },
   [WalletType.FuelWallet]: {
     type: WalletType.FuelWallet,
-    // stringKey: STRING_KEYS.STARBOARD_STRING_KEYS.FUEL_WALLET,
+    stringKey: STRING_KEYS.FUEL_WALLET,
     icon: FuelWalletIcon,
   },
 } satisfies Record<WalletInfo['name'], WalletConfig>;
