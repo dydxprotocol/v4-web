@@ -58,12 +58,12 @@ export type StringGetterParams = Record<string, any>;
 
 export type StringGetterProps<T extends StringGetterParams> =
   | {
-      key: string;
+      key: StringKey;
       params?: T;
       fallback?: string;
     }
   | {
-      key?: Nullable<string>;
+      key?: Nullable<StringKey>;
       params?: T;
       fallback: string;
     };

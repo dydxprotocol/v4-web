@@ -7,6 +7,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import {
   EU_LOCALES,
   LocaleData,
+  STARBOARD_STRING_KEYS,
   SUPPORTED_LOCALE_MAP,
   SUPPORTED_LOCALES,
   SupportedLocales,
@@ -22,9 +23,10 @@ import { objectKeys } from '@/lib/objectHelpers';
 
 // NOTE: We might want to include more locales in the future
 // for now we'll just use EN
-const STARBOARD_LOCALES = {
-  [SupportedLocales.EN]: STARBOARD_EN,
-} as Record<SupportedLocale, any>;
+type StarboardLocale = Partial<Record<keyof typeof STARBOARD_STRING_KEYS, string>>;
+const STARBOARD_LOCALES: Partial<Record<SupportedLocale, StarboardLocale>> = {
+  [SupportedLocales.EN]: STARBOARD_EN as StarboardLocale,
+};
 
 const allLocalesPromise = calc(async () => {
   const { LOCALE_DATA, NOTIFICATIONS, TOOLTIPS } = await import('@dydxprotocol/v4-localization');
