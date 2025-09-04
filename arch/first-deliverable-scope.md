@@ -14,8 +14,8 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
 ### Stories
 
 #### Traders
-- As a trader, I want to deposit USDC into my account so that I can 
-- As a trader, I want to view the current balance of my account so that I can
+- As a trader, I want to deposit USDC into my account so that I can use it as collateral for opening leveraged positions
+- As a trader, I want to view the current balance of my account so that I can understand my available collateral and make informed trading decisions
 - As a trader, I want to open long positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can amplify my gains on price increases
 - As a trader, I want to open short positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can profit from price decreases
 - As a trader, I want to use only USDC as collateral for my positions so that I have a stable reference for my margin requirements
@@ -86,40 +86,89 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
   c. The user should be able to see trading history, current positions and price history
 
 ## Technical Stories
+
 ### Frontend
-- Scaffolding
-- Local environment
-- Build system
-  - Link custom client and custom frontend
-  - Link contract build outputs and set up typegen
-  - ensure that they build
-- CI/CD (GH actions, Vercel)
-  - linting
-  - test running
-  - building
+#### Scaffolding
+- Fork DYDX frontend repository and rebrand with Starboard identity
+- Set up new project structure with updated dependencies and configurations
 
-### Docs
-- Docs scaffolding (fumadocs)
-- Docs hosting (vercel)
-- Linking forc docgen
-- Linking JSDocs
+#### Local Development Environment
+- Configure Node.js development environment with hot reloading and debugging tools
+- Set up environment variables and local API connections
 
-### Indexer
-- Indexer Scaffolding
-- CI/CD (GH actions, sqd hosting)
-- Local environment running
+#### Build System & Integration
+- Create Fuel-specific client library to replace DYDX client with fuel-ts-sdk
+- Set up automated TypeScript generation from Sway contract ABIs
 
-### Contracts
-- Scaffolding
-- CI
-  - linting
-  - test running
-  - building
-- Local node set up
-- Deployment script
-- Testnet Deployment
+#### CI/CD Pipeline (GitHub Actions + Vercel)
+- Configure linting, testing (Jest/Cypress), and code quality checks
+- Set up automated deployment pipeline with staging/production environments
+
+### Documentation
+#### Docs Platform Setup (Fumadocs)
+- Initialize Fumadocs project with Starboard branding and navigation structure
+- Configure search functionality and responsive design
+
+#### Docs Hosting & Deployment (Vercel)
+- Set up Vercel project with automatic deployments and custom domain
+- Configure staging environment and build optimizations
+
+#### Contract Documentation Integration (Forc Docgen)
+- Set up automated contract documentation generation from Sway code
+- Create integration pipeline to include contract docs in main docs site
+
+#### Frontend Documentation (JSDoc)
+- Configure JSDoc for TypeScript client library documentation
+- Set up automated API documentation generation with code examples
+
+### Indexer (SubSquid)
+#### Indexer Scaffolding & Setup
+- Initialize SubSquid project with TypeScript and database schema for DYDX-compatible data models
+- Set up logging, monitoring, and initial migration scripts
+
+#### Data Model Mapping & Architecture
+- Map Ruscet contract events to DYDX data structures and create event handlers
+- Design database schema with tables for positions, orders, accounts, and market data
+
+#### GraphQL API Development
+- Configure GraphQL schema compatible with DYDX frontend expectations
+- Implement resolvers with real-time subscriptions, pagination, and rate limiting
+
+#### Local Development Environment
+- Set up local PostgreSQL database and Fuel network node with Docker
+- Configure debugging tools and document local development workflow
+
+#### CI/CD Pipeline (GitHub Actions + SubSquid Cloud)
+- Set up automated testing (unit/integration), linting, and deployment to SubSquid Cloud
+- Configure monitoring, error tracking, and performance dashboards
+
+### Contracts (Sway/Fuel)
+#### Project Scaffolding & Setup
+- Fork Ruscet contracts repository and set up Sway project with latest Forc toolchain
+- Configure workspace structure and update dependencies
+
+#### Contract Modifications & Development
+- Modify contracts for USDC-only deposits, remove RUSD, add RLP tokens, and integrate Stork oracles
+- Add comprehensive security measures, input validation, and proper error handling
+
+#### Testing Infrastructure
+- Set up comprehensive unit and integration test suites with coverage reporting
+- Configure end-to-end testing with local Fuel node for complex trading scenarios
+
+#### Local Development Environment
+- Configure local Fuel node with proper network settings and wallet management
+- Set up IDE integration, debugging tools, and development scripts
+
+#### CI/CD Pipeline (GitHub Actions)
+- Configure automated linting, testing, building, and ABI generation
+- Set up deployment pipeline with artifact management and build caching
+
+#### Deployment Infrastructure
+- Create deployment scripts for testnet/mainnet with verification and monitoring
+- Set up security scanning, and audit preparation
 
 ## Open questions
 - How much leverage should be allowed for each asset?
 - How will using rest endpoints for fetching real-time data effect the speed and responsiveness of the app
+
 
