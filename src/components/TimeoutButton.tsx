@@ -12,6 +12,7 @@ type ElementProps = {
   timeoutInSeconds: number;
   onTimeOut?: () => void;
   slotFinal?: ReactNode;
+  renderCustomCountdown?: (props: { secondsLeft: number }) => ReactNode;
   resetCounter?: number; // Increment this to reset the counter
 } & ButtonProps;
 
@@ -22,6 +23,7 @@ export const TimeoutButton = ({
   timeoutInSeconds,
   onTimeOut,
   slotFinal,
+  renderCustomCountdown,
   resetCounter = 0,
   ...otherProps
 }: TimeoutButtonProps) => {
@@ -47,6 +49,10 @@ export const TimeoutButton = ({
   }, [resetCounter, setTimeoutDeadline]);
 
   if (slotFinal && secondsLeft <= 0) return slotFinal;
+
+  if (renderCustomCountdown && secondsLeft > 0) {
+    return renderCustomCountdown({ secondsLeft });
+  }
 
   return (
     <Button

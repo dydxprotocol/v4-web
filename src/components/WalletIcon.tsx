@@ -4,11 +4,15 @@ import styled from 'styled-components';
 
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
-import { Icon } from './Icon';
+import { Icon, IconName } from './Icon';
 
 export const WalletIcon = ({ wallet, size = '1em' }: { wallet: WalletInfo; size?: string }) => {
   if (wallet.connectorType === ConnectorType.Injected) {
     return <$Image src={wallet.icon} alt={wallet.name} size={size} />;
+  }
+
+  if (wallets[wallet.name as keyof typeof wallets] == null) {
+    return <Icon iconName={IconName.Wallet} size={size} />;
   }
 
   return (

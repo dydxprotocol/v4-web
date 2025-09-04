@@ -80,10 +80,9 @@ export const SignIn = ({
                 isLoading,
               }}
               css={{
-                '--button-textColor': hasValidEmail
-                  ? 'var(--input-backgroundColor)'
-                  : 'var(--color-border)',
-                '--button-disabled-backgroundColor': 'var(--color-layer-3)',
+                '--button-textColor': 'var(--color-layer-2)',
+                '--button-disabled-backgroundColor': 'var(--color-layer-4)',
+                '--button-border': 'none',
               }}
             >
               <Icon iconName={IconName.Arrow} />
@@ -92,9 +91,9 @@ export const SignIn = ({
         />
 
         <div tw="row gap-0.5">
-          <HorizontalSeparatorFiller />
+          <HorizontalSeparatorFiller tw="bg-color-layer-4" />
           <span>{stringGetter({ key: STRING_KEYS.OR })}</span>
-          <HorizontalSeparatorFiller />
+          <HorizontalSeparatorFiller tw="bg-color-layer-4" />
         </div>
 
         <$OtherOptionButton
@@ -131,7 +130,7 @@ export const SignIn = ({
 
 const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean }>`
   font-size: 1rem;
-  --input-radius: 1rem;
+  --input-radius: 0.75rem;
   --border-width: 1px;
   --form-input-paddingY: 0.5rem;
   --form-input-paddingLeft: 0.75rem;

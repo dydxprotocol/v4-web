@@ -162,6 +162,7 @@ export { default as WhitepaperIcon } from './whitepaper.svg';
 // export { default as ChaosLabsIcon } from './chaos-labs';
 // export { default as LogoShortIcon } from './logo-short';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
+export { default as PoweredByTurnkeyIcon } from './logos/powered-by-turnkey.svg';
 
 // Trade
 export { default as OrderCanceledIcon } from './trade/order-canceled.svg';
