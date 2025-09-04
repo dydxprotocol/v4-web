@@ -250,6 +250,8 @@ const $Container = styled(Content)<{
   --dialog-title-gap: 0.5rem;
   --dialog-icon-size: 1.75em;
 
+  --closeIcon-size: var(--dialog-closeIcon-size, 0.7813rem);
+
   @media ${breakpoints.tablet} {
     ${({ $isSimpleUi }) =>
       $isSimpleUi &&
@@ -439,8 +441,8 @@ const $Content = styled.div`
 `;
 
 const $Close = styled(Close)<{ $absolute?: boolean }>`
-  width: 0.7813rem;
-  height: 0.7813rem;
+  width: var(--closeIcon-size);
+  height: var(--closeIcon-size);
 
   box-sizing: content-box;
   padding: 0.5rem;

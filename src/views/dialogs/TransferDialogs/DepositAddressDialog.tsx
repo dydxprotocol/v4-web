@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { avalanche } from 'viem/chains';
 
-import { ButtonStyle } from '@/constants/buttons';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -14,11 +13,11 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useCopyValue } from '@/hooks/useCopyValue';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { CopyButton } from '@/components/CopyButton';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -141,6 +140,8 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     );
   }, [selectedChain]);
 
+  const { copied, copy } = useCopyValue({ value: depositAddress });
+
   const addressCard = isLoadingDepositAddresses ? (
     <$AddressCard>
       <div tw="mx-auto flex size-[155px] items-center justify-center">
@@ -157,7 +158,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       </div>
     </$AddressCard>
   ) : (
-    <$AddressCard>
+    <$AddressCard onClick={copy} tabIndex={0} role="button">
       <div tw="flexColumn min-w-0 justify-between">
         <img
           tw="size-2.25 rounded-[50%]"
@@ -165,18 +166,17 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
           alt={CHAIN_INFO[selectedChain]?.name}
         />
         {addressRepresentation && depositAddress ? (
-          <div tw="row items-end gap-0.25">
+          <div tw="row ml-[-0.5rem] cursor-pointer items-end gap-0.125 rounded-[6px] p-0.5 hover:bg-color-layer-1">
             <div tw="min-w-0 whitespace-normal break-words text-justify">
               <span tw="text-color-text-2">{addressRepresentation.firstPart}</span>
               <span tw="text-color-text-0">{addressRepresentation.middlePart}</span>
               <span tw="text-color-text-2">{addressRepresentation.lastPart}</span>
             </div>
-            <CopyButton
-              buttonType="icon"
-              tw="text-color-accent"
-              buttonStyle={ButtonStyle.WithoutBackground}
-              value={depositAddress}
-            />
+            {copied ? (
+              <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
+            ) : (
+              <Icon iconName={IconName.Copy} tw="text-color-accent" />
+            )}
           </div>
         ) : null}
       </div>
@@ -192,7 +192,16 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       isOpen
       withAnimation
       setIsOpen={setIsOpen}
-      title={stringGetter({ key: STRING_KEYS.DEPOSIT })}
+      title={
+        <div
+          tw="w-full text-center"
+          css={{
+            marginLeft: 'var(--closeIcon-size)', // Keeps title centered despite close icon
+          }}
+        >
+          {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+        </div>
+      }
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <div tw="flexColumn gap-1">
@@ -240,6 +249,9 @@ const $Dialog = styled(Dialog)`
     --dialog-content-paddingLeft: 1.25rem;
     --dialog-content-paddingRight: 1.25rem;
     --dialog-content-paddingBottom: 1.25rem;
+    --dialog-paddingX: 1.25rem;
+    --dialog-header-paddingTop: 1.25rem;
+    --dialog-header-paddingBottom: 1.25rem;
   }
 `;
 
@@ -249,5 +261,5 @@ const $AddressCard = styled.div`
   border-radius: 1rem;
   border: 1px solid var(--border-color);
   padding: 1rem;
-  gap: 2rem;
+  gap: 1rem;
 `;
