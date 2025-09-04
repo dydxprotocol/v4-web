@@ -46,12 +46,6 @@ abi Vault {
     fn set_gov(gov: Identity);
 
     #[storage(write)]
-    fn set_manager(
-        manager: ContractId, 
-        is_active: bool
-    );
-
-    #[storage(write)]
     fn set_liquidator(
         liquidator: Identity, 
         is_active: bool
