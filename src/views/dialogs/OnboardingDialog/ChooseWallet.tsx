@@ -5,7 +5,6 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -38,8 +37,7 @@ export const ChooseWallet = ({
   const isSimpleUi = useSimpleUiEnabled();
 
   const displayedWallets = useDisplayedWallets();
-  const { selectedWallet } = useWalletConnection();
-  const { selectedWalletError } = useAccounts();
+  const { selectedWallet, selectedWalletError } = useWalletConnection();
 
   const alternateOptions = (
     <div tw="flexColumn gap-0.75">
