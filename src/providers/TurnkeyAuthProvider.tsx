@@ -20,7 +20,7 @@ import {
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+import { forceOpenDialog, openDialog } from '@/state/dialogs';
 import {
   clearTurnkeyEmailOnboardingData,
   setRequiresAddressUpload,
@@ -50,7 +50,12 @@ const useTurnkeyAuthContext = () => {
   const { indexedDbClient, authIframeClient } = useTurnkey();
   const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isFirstSignIn, setIsFirstSignIn] = useState(false);
   const [emailToken, setEmailToken] = useState<string>();
+  const [emailSignInError, setEmailSignInError] = useState<string>();
+  const [emailSignInStatus, setEmailSignInStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
 
   const { onboardDydxShared, embeddedPublicKey, targetPublicKeys, getUploadAddressPayload } =
     useTurnkeyWallet();
@@ -69,6 +74,8 @@ const useTurnkeyAuthContext = () => {
       providerName?: string;
       userEmail?: string;
     }) => {
+      setEmailSignInError(undefined);
+      setEmailSignInStatus('loading');
       dispatch(
         setWalletInfo({
           connectorType: ConnectorType.Turnkey,
@@ -78,6 +85,10 @@ const useTurnkeyAuthContext = () => {
           loginMethod,
         })
       );
+
+      if (loginMethod === LoginMethod.OAuth) {
+        dispatch(forceOpenDialog(DialogTypes.EmailSignInStatus({})));
+      }
 
       const response = await fetch(`${indexerUrl}/v4/turnkey/signin`, {
         method: 'POST',
@@ -96,6 +107,7 @@ const useTurnkeyAuthContext = () => {
 
       if (response.dydxAddress === '') {
         dispatch(setRequiresAddressUpload(true));
+        setIsFirstSignIn(true);
       }
 
       switch (loginMethod) {
@@ -118,6 +130,8 @@ const useTurnkeyAuthContext = () => {
       selectWallet(undefined);
       logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
+      setEmailSignInStatus('error');
+      setEmailSignInError(error.message);
     },
   });
 
@@ -167,16 +181,13 @@ const useTurnkeyAuthContext = () => {
 
       await indexedDbClient?.loginWithSession(session);
       await onboardDydxShared({ salt, setWalletFromSignature, tkClient: indexedDbClient });
+      setEmailSignInStatus('success');
+      setEmailSignInError(undefined);
     },
     [onboardDydxShared, indexedDbClient, setWalletFromSignature]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
-
-  const [emailSignInStatus, setEmailSignInStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [emailSignInError, setEmailSignInError] = useState<string>();
 
   const handleEmailResponse = useCallback(
     async ({ response, userEmail }: { response: TurnkeyEmailResponse; userEmail: string }) => {
@@ -355,6 +366,7 @@ const useTurnkeyAuthContext = () => {
   useEffect(() => {
     const turnkeyOnboardingToken = searchParams.get('token');
     const hasEncryptedSignature = sourceAccount.encryptedSignature != null;
+    dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
 
     if (turnkeyOnboardingToken && !hasEncryptedSignature) {
       setEmailToken(turnkeyOnboardingToken);
@@ -422,6 +434,7 @@ const useTurnkeyAuthContext = () => {
     emailSignInStatus,
     isLoading: status === 'pending' || emailSignInStatus === 'loading',
     isError: status === 'error' || emailSignInStatus === 'error',
+    isFirstSignIn,
     signInWithOauth,
     signInWithOtp,
     resetEmailSignInStatus,
