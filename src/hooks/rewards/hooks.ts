@@ -39,6 +39,7 @@ async function getChaosLabsPointsDistribution() {
   const parsedRes = (await res.json()) as {
     data: { incentivesLeaderboard: ChaosLabsLeaderboardItem[] };
   };
+
   return parsedRes.data.incentivesLeaderboard;
 }
 

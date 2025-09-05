@@ -64,7 +64,7 @@ export const RewardsLeaderboardPanel = () => {
   const { data, isLoading } = useChaosLabsPointsDistribution();
   // const { dydxAddress } = useAccounts();
 
-  const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.account, []);
+  const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -119,7 +119,6 @@ export const RewardsLeaderboardPanel = () => {
               },
             })}
             selectionBehavior="replace"
-            // withOuterBorder={isNotTablet || data?.length === 0}
             withInnerBorders
             initialPageSize={10}
             withScrollSnapColumns
