@@ -10,9 +10,7 @@ import { StatsigConfigType } from '@/constants/statsig';
 
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
-import formatString from '@/lib/formatString';
 import { objectFromEntries } from '@/lib/objectHelpers';
-import { Nullable } from '@/lib/typeUtils';
 
 import environments from '../../public/configs/v1/env.json';
 
@@ -56,25 +54,15 @@ export type LocaleData = (typeof LOCALE_DATA)[SupportedLocales.EN] &
 
 export type StringGetterParams = Record<string, any>;
 
-export type StringGetterProps<T extends StringGetterParams> =
-  | {
-      key: StringKey;
-      params?: T;
-      fallback?: string;
-    }
-  | {
-      key?: Nullable<StringKey>;
-      params?: T;
-      fallback: string;
-    };
+export type StringGetterProps<T extends StringGetterParams = StringGetterParams> = {
+  key?: string;
+  params?: T;
+  fallback?: string;
+};
 
-export type StringGetterFunction = <T extends StringGetterParams>(
+export type StringGetterFunction = <T extends StringGetterParams = StringGetterParams>(
   props: StringGetterProps<T>
-) => T extends {
-  [K in keyof T]: T[K] extends string | number ? any : T[K] extends JSX.Element ? any : never;
-}
-  ? string
-  : ReturnType<typeof formatString>;
+) => string;
 
 export const EU_LOCALES: SupportedLocales[] = [
   SupportedLocales.DE,

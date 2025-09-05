@@ -138,7 +138,7 @@ export const OrderDetailsDialog = ({
         key: 'cancel-reason',
         label: stringGetter({ key: STRING_KEYS.CANCEL_REASON }),
         value: removalReason
-          ? stringGetter({ key: STRING_KEYS[removalReason as StringKey] as NonNullable<StringKey> })
+          ? stringGetter({ key: STRING_KEYS[removalReason as StringKey] })
           : undefined,
       },
       {

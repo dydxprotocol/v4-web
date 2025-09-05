@@ -6,7 +6,7 @@ import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 
 import { ComplianceStates } from '@/constants/compliance';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
@@ -114,11 +114,7 @@ export const AdvancedTradeOptions = () => {
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
                 {timeInForceOptions.map(({ value, stringKey }) => (
-                  <$SelectItem
-                    key={value}
-                    value={value}
-                    label={stringGetter({ key: stringKey as StringKey })}
-                  />
+                  <$SelectItem key={value} value={value} label={stringGetter({ key: stringKey })} />
                 ))}
               </$SelectMenu>
             )}
@@ -182,11 +178,7 @@ export const AdvancedTradeOptions = () => {
                 }}
               >
                 {executionOptions.map(({ value, stringKey }) => (
-                  <$SelectItem
-                    key={value}
-                    value={value}
-                    label={stringGetter({ key: stringKey as StringKey })}
-                  />
+                  <$SelectItem key={value} value={value} label={stringGetter({ key: stringKey })} />
                 ))}
               </$SelectMenu>
             )}
