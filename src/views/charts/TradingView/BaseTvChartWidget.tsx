@@ -24,9 +24,8 @@ export const BaseTvChartWidget = ({
   theme?: 'light' | 'dark';
 }) => {
   const [isChartReady, setIsChartReady] = useState(false);
-  // @ts-ignore
-  const [currentResolution, setCurrentResolution] = useState<ResolutionString>('1D');
-
+  const DEFAULT_RESOLUTION = '1D' as ResolutionString;
+  const [currentResolution, setCurrentResolution] = useState<ResolutionString>(DEFAULT_RESOLUTION);
   // Map TradingView widget intervals to resolution strings
   const getWidgetInterval = (resolution: ResolutionString): string => {
     // Resolution strings are correct
