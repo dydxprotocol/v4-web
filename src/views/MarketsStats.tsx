@@ -1,8 +1,9 @@
-import { useState } from 'react';
-
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { AnalyticsEvents } from '@/constants/analytics';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
@@ -13,8 +14,13 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { NewTag } from '@/components/Tag';
-import { ToggleGroup } from '@/components/ToggleGroup';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
+
+import { track } from '@/lib/analytics/analytics';
 
 import { ExchangeBillboards } from './ExchangeBillboards';
 import { MarketsCompactTable } from './tables/MarketsCompactTable';
@@ -26,7 +32,7 @@ interface MarketsStatsProps {
 export const MarketsStats = (props: MarketsStatsProps) => {
   const { className } = props;
   const stringGetter = useStringGetter();
-  const [sorting, setSorting] = useState(MarketSorting.GAINERS);
+  const dispatch = useAppDispatch();
 
   const { hasResults: hasNewMarkets } = useMarketsData({
     filter: MarketFilters.NEW,
@@ -34,6 +40,20 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   });
 
   const { isTablet } = useBreakpoints();
+
+  const handleFreeDepositClick = () => {
+    // Track analytics event
+    track(
+      AnalyticsEvents.MarketingBannerClick({
+        source: 'markets',
+        campaign: '04092025-markets-deposits-banner-modal',
+        timestamp: Date.now(),
+      })
+    );
+
+    // Open deposit dialog
+    dispatch(openDialog(DialogTypes.Deposit2()));
+  };
   return (
     <section
       className={className}
@@ -51,54 +71,38 @@ export const MarketsStats = (props: MarketsStatsProps) => {
           <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
         </$Section>
       )}
-      <$Section>
-        <$SectionHeader>
-          <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>
-          <NewTag>{stringGetter({ key: STRING_KEYS._24H })}</NewTag>
+      <$FreeDepositBanner>
+        <div tw="flex items-center justify-between gap-0.75">
+          <div tw="relative z-10 mr-auto flex max-w-10 flex-col">
+            <span tw="mb-0.75 font-extra-large-bold" style={{ lineHeight: '1.2' }}>
+              <span tw="mr-0.25 rounded-0 bg-white px-0.25 text-color-accent">Free</span>
+              <span tw="text-color-text-2">& Instant Deposits</span>
+            </span>
+            <div tw="mt-0.5 flex flex-col gap-0.25">
+              <Button
+                action={ButtonAction.Primary}
+                type={ButtonType.Button}
+                tw="relative z-10 w-full border-none bg-color-layer-0 text-white"
+                onClick={handleFreeDepositClick}
+              >
+                Free Deposit
+              </Button>
+              <span tw="text-color-text-2 font-mini-book">For amounts of $100 or more</span>
+            </div>
+          </div>
 
-          <$ToggleGroupContainer>
-            <ToggleGroup
-              items={[
-                {
-                  label: stringGetter({ key: STRING_KEYS.GAINERS }),
-                  value: MarketSorting.GAINERS,
-                },
-                {
-                  label: stringGetter({ key: STRING_KEYS.LOSERS }),
-                  value: MarketSorting.LOSERS,
-                },
-              ]}
-              value={sorting}
-              onValueChange={setSorting}
-            />
-          </$ToggleGroupContainer>
-        </$SectionHeader>
-        <MarketsCompactTable sorting={sorting} />
-      </$Section>
+          <img
+            src="/free-deposit-hedgie.png"
+            alt="free deposit hedgie"
+            tw="absolute bottom-0 left-7 z-0 h-14 object-contain mobile:hidden"
+          />
+        </div>
+      </$FreeDepositBanner>
     </section>
   );
 };
+
 const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-color-layer-3`;
-const $ToggleGroupContainer = styled.div`
-  ${layoutMixins.row}
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 2;
-
-  @media ${breakpoints.tablet} {
-    top: 0.8125rem;
-  }
-
-  & button {
-    --button-toggle-off-backgroundColor: var(--color-layer-3);
-    --button-toggle-off-textColor: var(--color-text-1);
-    --border-color: var(--color-layer-6);
-    --button-height: 1.75rem;
-    --button-padding: 0 0.75rem;
-    --button-font: var(--font-mini-book);
-  }
-`;
 
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
@@ -114,5 +118,62 @@ const $SectionHeader = styled.div`
 
   @media ${breakpoints.tablet} {
     padding: 1rem;
+  }
+`;
+
+const $FreeDepositBanner = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 0.625rem;
+  background: var(--color-accent);
+  position: relative;
+  overflow: hidden;
+  padding: 1.25rem;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(
+        circle at 20% 20%,
+        rgba(255, 255, 255, 0.1) 1px,
+        transparent 1px
+      ),
+      radial-gradient(circle at 60% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size:
+      50px 50px,
+      30px 30px,
+      40px 40px;
+    animation: confetti 20s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes confetti {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-100vh) rotate(360deg);
+    }
+  }
+
+  @media ${breakpoints.tablet} {
+    padding: 1rem;
+
+    span {
+      font: var(--font-small-book);
+    }
   }
 `;
