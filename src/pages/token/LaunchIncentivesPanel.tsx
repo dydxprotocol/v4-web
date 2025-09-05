@@ -146,7 +146,7 @@ const Sept2025RewardsPanel = () => {
           backgroundImage: `url('/dots-background.svg')`,
           backgroundSize: 'cover',
         }}
-        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1.25"
+        tw="bg-color-accent-more-faded flex gap-4 rounded-0.75 border border-solid border-color-accent-faded p-1.25"
       >
         <div tw="flex flex-col gap-0.5">
           <div tw="text-nowrap font-medium text-color-text-1">
