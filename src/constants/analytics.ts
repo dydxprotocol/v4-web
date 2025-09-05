@@ -476,6 +476,13 @@ export const AnalyticsEvents = unionize(
     WithdrawSubmitted: ofType<Withdraw>(),
     WithdrawFinalized: ofType<Withdraw>(),
     WithdrawError: ofType<{ error: string }>(),
+
+    // Marketing Banner
+    MarketingBannerClick: ofType<{
+      source: string;
+      campaign: string;
+      timestamp: number;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
