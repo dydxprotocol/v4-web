@@ -375,7 +375,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   } = props;
 
   const baseState = useTableState<TableRowData>({
-    ...(props as any),
+    ...(props as TableStateProps<TableRowData>),
     showSelectionCheckboxes: selectionMode === 'multiple' && selectionBehavior !== 'replace',
   });
   const state: typeof baseState = {
