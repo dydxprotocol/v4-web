@@ -227,7 +227,9 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     [getRowKey]
   );
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(defaultSortDescriptor ?? {});
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(
+    defaultSortDescriptor ?? ({} as SortDescriptor)
+  );
   const items = useMemo(() => {
     return sortDescriptor.column
       ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor.column, sortDescriptor.direction))
@@ -310,7 +312,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           <TableBody items={bodyListItems}>
             {(item) => (
               <Row key={internalGetRowKey(item)}>
-                {(columnKey) => (
+                {(columnKey: React.Key) => (
                   <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
                     {isTableRowData(item) &&
                       columns.find((column) => column.columnKey === columnKey)?.renderCell(item)}
@@ -373,13 +375,15 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   } = props;
 
   const baseState = useTableState<TableRowData>({
-    ...props,
+    ...(props as any),
     showSelectionCheckboxes: selectionMode === 'multiple' && selectionBehavior !== 'replace',
   });
   const state: typeof baseState = {
     ...baseState,
     sort: (columnKey, direction) => {
-      const { column: currentColumnKey, direction: currentDirection } = baseState.sortDescriptor;
+      const { column: currentColumnKey, direction: currentDirection } =
+        baseState.sortDescriptor as SortDescriptor;
+
       // first time touching this column sort
       if (direction == null && (columnKey !== currentColumnKey || currentDirection == null)) {
         return baseState.sort(columnKey, firstClickSortDirection);
@@ -594,8 +598,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
         {(column.props.allowsSorting ?? true) && (
           <SortIcon
             sortDirection={
-              state.sortDescriptor.column === column.key
-                ? state.sortDescriptor.direction ?? 'none'
+              state.sortDescriptor?.column === column.key
+                ? state.sortDescriptor?.direction ?? 'none'
                 : 'none'
             }
           />
@@ -793,7 +797,7 @@ const $Table = styled.table<StyledTableStyleProps>`
         padding: 0;
       }
     `}
-  
+
   @media ${breakpoints.tablet} {
     min-height: 6.25rem;
   }
