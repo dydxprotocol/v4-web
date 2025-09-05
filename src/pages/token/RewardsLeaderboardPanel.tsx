@@ -149,7 +149,7 @@ const getRewardsLeaderboardTableColumnDef = ({
         columnKey: RewardsLeaderboardTableColumns.Rank,
         getCellValue: (row) => row.rank,
         label: (
-          <div tw="text-base font-medium text-color-text-0">
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
             {stringGetter({ key: STRING_KEYS.RANK })}
           </div>
         ),
@@ -174,7 +174,7 @@ const getRewardsLeaderboardTableColumnDef = ({
         columnKey: RewardsLeaderboardTableColumns.Trader,
         getCellValue: (row) => row.account,
         label: (
-          <div tw="text-base font-medium text-color-text-0">
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
             {stringGetter({ key: STRING_KEYS.TRADER })}
           </div>
         ),
@@ -191,7 +191,7 @@ const getRewardsLeaderboardTableColumnDef = ({
         columnKey: RewardsLeaderboardTableColumns.Rewards,
         getCellValue: (row) => row.incentivePoints,
         label: (
-          <div tw="text-base font-medium text-color-text-0">
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
             {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
           </div>
         ),
