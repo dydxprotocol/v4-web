@@ -152,7 +152,7 @@ export const RevealPhrase = ({
     <div tw="flexColumn gap-1">
       <div tw="flexColumn gap-0.5">
         <span tw="row gap-0.25">
-          <AccentTag tw="font-tiny-bold rounded-[360px] px-0.5 py-0.25">
+          <AccentTag tw="rounded-[360px] px-0.5 py-0.25 font-tiny-bold">
             {exportWalletType === 'turnkey' ? 'Turnkey' : 'dYdX'}
           </AccentTag>
           Secret Recovery Phrase

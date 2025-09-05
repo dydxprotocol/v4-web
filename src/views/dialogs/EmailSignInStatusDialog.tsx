@@ -224,19 +224,18 @@ export const EmailSignInStatusDialog = ({
           <span tw="text-color-text-2 font-medium-medium">{title}</span>
           <p tw="text-color-text-0">{description}</p>
 
-          <Button
-            tw="mt-1"
-            type={ButtonType.Button}
-            action={ButtonAction.SimplePrimary}
-            size={ButtonSize.Small}
-            shape={ButtonShape.Pill}
-            onClick={() => setIsOpen(false)}
-            state={{
-              isDisabled: emailSignInStatus === 'loading' || emailSignInStatus === 'idle',
-            }}
-          >
-            {stringGetter({ key: STRING_KEYS.CONTINUE })}
-          </Button>
+          {emailSignInStatus === 'error' && (
+            <Button
+              tw="mt-1"
+              type={ButtonType.Button}
+              action={ButtonAction.SimplePrimary}
+              size={ButtonSize.Small}
+              shape={ButtonShape.Pill}
+              onClick={() => setIsOpen(false)}
+            >
+              {stringGetter({ key: STRING_KEYS.CONTINUE })}
+            </Button>
+          )}
         </div>
       )}
     </Dialog>
