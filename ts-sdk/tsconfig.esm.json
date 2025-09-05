@@ -3,7 +3,7 @@
   "include": ["scripts/**/*", "src/**/*"],
   "exclude": ["examples/**/*", "__tests__/**/*"],
   "compilerOptions": {
-    "outDir": "build/esm",
+    "outDir": "build",
     "module": "ESNext",
     "moduleResolution": "node",
     "declaration": true,

@@ -2,23 +2,20 @@
   "name": "@dydxprotocol/v4-client-js",
   "version": "1.3.17",
   "description": "General client library for the new dYdX system (v4 decentralized)",
-  "module": "./build/esm/src/index.js",
-  "main": "./build/cjs/src/index.js",
-  "types": "./build/esm/src/index.d.ts",
+  "module": "./build/src/index.js",
+  "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./build/esm/src/index.js",
-      "require": "./build/cjs/src/index.js",
-      "types": "./build/esm/src/index.d.ts"
+      "import": "./build/src/index.js",
+      "types": "./build/src/index.d.ts"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "rm -rf build && pnpm run build:esm && pnpm run build:cjs && pnpm run fix-package-json",
+    "build": "rm -rf build && pnpm run build:esm",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "fix-package-json": "echo '{\"type\":\"commonjs\"}' > build/cjs/package.json",
     "commitlint": "commitlint --edit",
     "compile": "tsc -p tsconfig.esm.json",
     "compile:watch": "pnpm run compile -- --watch",
@@ -65,8 +62,7 @@
     "https-proxy-agent": "^7.0.6",
     "long": "^4.0.0",
     "protobufjs": ">=6.11.4",
-    "ws": "^8.14.2",
-    "typescript": "^5.7.2"
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.4",
@@ -100,6 +96,7 @@
     "stream-http": "^3.2.0",
     "ts-loader": "^9.4.2",
     "ts-proto": "^1.165.1",
+    "typescript": "^5.7.2",
     "util": "^0.12.5",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1"
