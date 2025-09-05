@@ -1,11 +1,18 @@
 import environments from '../../public/configs/v1/env.json';
 
-export const CURRENT_MODE = ({
-  production: 'MAINNET',
-  testnet: 'TESTNET',
-  staging: 'DEV',
-  development: 'DEV',
-}[import.meta.env.MODE] ?? 'MAINNET') as 'MAINNET' | 'TESTNET' | 'DEV';
+// NOTE: This logic will be replaced by wt-xyz#21
+// https://github.com/wt-xyz/starboard/pull/21
+// It is a temporary config to test prod and staging builds :/
+export const CURRENT_MODE = 'DEV' as 'MAINNET' | 'TESTNET' | 'DEV';
+
+// Muted for now to allow local dev with the new config
+export const __CURRENT_MODE =
+  {
+    production: 'MAINNET',
+    testnet: 'TESTNET',
+    staging: 'DEV',
+    development: 'DEV',
+  }[import.meta.env.MODE] ?? 'MAINNET';
 
 export const isMainnet = CURRENT_MODE === 'MAINNET';
 export const isTestnet = CURRENT_MODE === 'TESTNET';
