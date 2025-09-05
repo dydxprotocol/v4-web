@@ -21,7 +21,6 @@ type ElementProps = {
   iconComponent?: ElementType;
   action?: ButtonAction;
   state?: ButtonState | ButtonStateConfig;
-  iconProps?: { tw?: string };
 };
 
 type StyleProps = {
@@ -46,7 +45,6 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
       onPressedChange,
       className,
       buttonStyle = ButtonStyle.Default,
-      iconProps,
 
       ...otherProps
     },
@@ -76,7 +74,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         buttonStyle={buttonStyle}
         {...otherProps}
       >
-        <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} {...iconProps} />
+        <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
       </$IconButton>
     );
   }

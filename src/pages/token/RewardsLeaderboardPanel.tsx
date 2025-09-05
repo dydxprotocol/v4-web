@@ -6,6 +6,7 @@ import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import BadgeRank1 from '@/icons/badge-rank-1.svg';
@@ -62,7 +63,7 @@ const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactN
 export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
   const { data, isLoading } = useChaosLabsPointsDistribution();
-  // const { dydxAddress } = useAccounts();
+  const { dydxAddress } = useAccounts();
 
   const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.rank, []);
 
@@ -71,7 +72,7 @@ export const RewardsLeaderboardPanel = () => {
       getRewardsLeaderboardTableColumnDef({
         key,
         stringGetter,
-        dydxAddress: 'dydx1uhvq8zj2y053j9pe43nce0456e5t56r42k69pt',
+        dydxAddress,
       })
   );
 
@@ -97,8 +98,7 @@ export const RewardsLeaderboardPanel = () => {
               direction: 'ascending',
             }}
             getIsRowPinned={(row) => {
-              // TODO: return true if this is YOU
-              return row.account === 'dydx1uhvq8zj2y053j9pe43nce0456e5t56r42k69pt';
+              return row.account === dydxAddress;
             }}
             slotEmpty={
               isLoading ? (
@@ -112,10 +112,7 @@ export const RewardsLeaderboardPanel = () => {
             }
             getRowAttributes={({ account }) => ({
               style: {
-                backgroundColor:
-                  account === 'dydx1uhvq8zj2y053j9pe43nce0456e5t56r42k69pt'
-                    ? 'var(--color-accent-faded)'
-                    : undefined,
+                backgroundColor: account === dydxAddress ? 'var(--color-accent-faded)' : undefined,
               },
             })}
             selectionBehavior="replace"
