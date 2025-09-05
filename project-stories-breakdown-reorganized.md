@@ -17,21 +17,21 @@
 - [STAR-157: Pulumi Environment Variable Management](#star-157-pulumi-environment-variable-management)
 
 ### [3. Implementation EPIC](#3-implementation-epic)
-- [STAR-106: View Account Balance and Collateral](#star-106-view-account-balance-and-collateral)
-- [STAR-107: Open Long Position](#star-107-open-long-position)
-- [STAR-108: Open Short Position](#star-108-open-short-position)
-- [STAR-109: View Current Positions](#star-109-view-current-positions)
-- [STAR-110: Close Positions](#star-110-close-positions)
-- [STAR-111: View Market Data and Charts](#star-111-view-market-data-and-charts)
-- [STAR-112: Connect Fuel Wallet](#star-112-connect-fuel-wallet)
-- [STAR-113: View Trading History](#star-113-view-trading-history)
-- [STAR-114: Monitor Funding Rates](#star-114-monitor-funding-rates)
-- [STAR-115: Provide Liquidity (LP)](#star-115-provide-liquidity-lp)
-- [STAR-116: Withdraw Liquidity (LP)](#star-116-withdraw-liquidity-lp)
-- [STAR-117: View LP Performance](#star-117-view-lp-performance)
-- [STAR-118: Handle Transaction Errors](#star-118-handle-transaction-errors)
-- [STAR-119: View Funding Costs](#star-119-view-funding-costs)
-- [STAR-120: Select Network (Testnet/Mainnet)](#star-120-select-network-testnetmainnet)
+- [STAR-113: View Account Balance and Collateral](#star-113-view-account-balance-and-collateral)
+- [STAR-114: Open Long Position](#star-114-open-long-position)
+- [STAR-115: Open Short Position](#star-115-open-short-position)
+- [STAR-116: View Current Positions](#star-116-view-current-positions)
+- [STAR-117: Close Positions](#star-117-close-positions)
+- [STAR-118: View Market Data and Charts](#star-118-view-market-data-and-charts)
+- [STAR-119: Connect Fuel Wallet](#star-119-connect-fuel-wallet)
+- [STAR-120: View Trading History](#star-120-view-trading-history)
+- [STAR-121: Monitor Funding Rates](#star-121-monitor-funding-rates)
+- [STAR-122: Provide Liquidity (LP)](#star-122-provide-liquidity-lp)
+- [STAR-123: Withdraw Liquidity (LP)](#star-123-withdraw-liquidity-lp)
+- [STAR-124: View LP Performance](#star-124-view-lp-performance)
+- [STAR-125: Handle Transaction Errors](#star-125-handle-transaction-errors)
+- [STAR-126: View Funding Costs](#star-126-view-funding-costs)
+- [STAR-127: Select Network (Testnet/Mainnet)](#star-127-select-network-testnetmainnet)
 
 ---
 
@@ -378,7 +378,7 @@
 
 ## 3. Implementation EPIC
 
-### STAR-106: View Account Balance and Collateral
+### STAR-113: View Account Balance and Collateral
 
 **Name**: View Account Balance and Collateral
 
@@ -422,7 +422,7 @@ sequenceDiagram
 5. Check margin utilization percentage
 6. Monitor balance updates via polling
 
-**Prerequisite Stories**: STAR-112
+**Prerequisite Stories**: STAR-119
 
 **Prerequisite Technical Stories**: 
 - Frontend scaffolding and wallet integration
@@ -475,7 +475,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Unit tests for calculations, integration tests for data flow, E2E tests for user journey
 
-### STAR-107: Open Long Position
+### STAR-114: Open Long Position
 
 **Name**: Open Long Position
 
@@ -526,7 +526,7 @@ sequenceDiagram
 7. Confirm transaction in wallet
 8. Wait for position to open and contract events
 
-**Prerequisite Stories**: STAR-106, STAR-112
+**Prerequisite Stories**: STAR-113, STAR-119
 
 **Prerequisite Technical Stories**: 
 - Contract position management implementation
@@ -584,7 +584,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Leverage edge cases, liquidation scenarios, oracle manipulation tests
 
-### STAR-108: Open Short Position
+### STAR-115: Open Short Position
 
 **Name**: Open Short Position
 
@@ -630,7 +630,7 @@ sequenceDiagram
 7. Confirm transaction in wallet
 8. Wait for position to open
 
-**Prerequisite Stories**: STAR-106, STAR-112
+**Prerequisite Stories**: STAR-113, STAR-119
 
 **Prerequisite Technical Stories**: 
 - Contract position management
@@ -682,7 +682,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Short squeeze scenarios, funding payment edge cases
 
-### STAR-109: View Current Positions
+### STAR-116: View Current Positions
 
 **Name**: View Current Positions
 
@@ -727,7 +727,7 @@ sequenceDiagram
 5. Check margin requirements and liquidation prices
 6. View position history and performance metrics
 
-**Prerequisite Stories**: STAR-107, STAR-108
+**Prerequisite Stories**: STAR-114, STAR-115
 
 **Prerequisite Technical Stories**: 
 - Client SDK position data processing
@@ -776,7 +776,7 @@ sequenceDiagram
   - Required competencies: Frontend Testing, Data Validation
   - Area of project modified: Test Suite
 
-### STAR-110: Close Positions
+### STAR-117: Close Positions
 
 **Name**: Close Positions
 
@@ -818,7 +818,7 @@ sequenceDiagram
 6. Confirm transaction in wallet
 7. Wait for position closure and contract events
 
-**Prerequisite Stories**: STAR-109
+**Prerequisite Stories**: STAR-116
 
 **Prerequisite Technical Stories**: 
 - Position closure functionality in contracts
@@ -867,7 +867,7 @@ sequenceDiagram
   - Required competencies: DeFi Testing, Transaction Testing
   - Area of project modified: Test Suite
 
-### STAR-111: View Market Data and Charts
+### STAR-118: View Market Data and Charts
 
 **Name**: View Market Data and Charts
 
@@ -960,7 +960,7 @@ sequenceDiagram
   - Required competencies: Frontend Testing, Performance Testing
   - Area of project modified: Test Suite
 
-### STAR-112: Connect Fuel Wallet
+### STAR-119: Connect Fuel Wallet
 
 **Name**: Connect Fuel Wallet
 
@@ -1031,7 +1031,7 @@ sequenceDiagram
   - Area of project modified: Header and Auth Components
   - Details: Connection modal, account display, network indicator, wallet state management, connection persistence
 
-### STAR-113: View Trading History
+### STAR-120: View Trading History
 
 **Name**: View Trading History
 
@@ -1071,7 +1071,7 @@ sequenceDiagram
 4. See trade details: open price, close price, size, fees, PnL
 5. View aggregate performance statistics calculated in Client (bonsai layer)
 
-**Prerequisite Stories**: STAR-107, STAR-108, STAR-110
+**Prerequisite Stories**: STAR-114, STAR-115, STAR-110
 
 **Prerequisite Technical Stories**: 
 - Trade history processing in indexer
@@ -1119,7 +1119,7 @@ sequenceDiagram
   - Required competencies: Data Testing, Performance Testing
   - Area of project modified: Test Suite
 
-### STAR-114: Monitor Funding Rates
+### STAR-121: Monitor Funding Rates
 
 **Name**: Monitor Funding Rates
 
@@ -1159,7 +1159,7 @@ sequenceDiagram
 4. Monitor funding rate predictions
 5. Track funding costs for open positions
 
-**Prerequisite Stories**: STAR-109
+**Prerequisite Stories**: STAR-116
 
 **Prerequisite Technical Stories**: 
 - Funding rate mechanism in contracts
@@ -1210,7 +1210,7 @@ sequenceDiagram
   - Required competencies: Financial Testing, Data Validation
   - Area of project modified: Test Suite
 
-### STAR-115: Provide Liquidity (LP)
+### STAR-122: Provide Liquidity (LP)
 
 **Name**: Provide Liquidity (LP)
 
@@ -1257,7 +1257,7 @@ sequenceDiagram
 7. Confirm transaction in wallet
 8. Receive RLP tokens representing pool share
 
-**Prerequisite Stories**: STAR-112
+**Prerequisite Stories**: STAR-119
 
 **Prerequisite Technical Stories**: 
 - RLP token system implementation
@@ -1313,7 +1313,7 @@ sequenceDiagram
   - Required competencies: DeFi Testing, Security Testing
   - Area of project modified: Test Suite
 
-### STAR-116: Withdraw Liquidity (LP)
+### STAR-123: Withdraw Liquidity (LP)
 
 **Name**: Withdraw Liquidity (LP)
 
@@ -1368,7 +1368,7 @@ sequenceDiagram
 8. Confirm transaction in wallet
 9. Receive USDC and see updated RLP balance
 
-**Prerequisite Stories**: STAR-115
+**Prerequisite Stories**: STAR-122
 
 **Prerequisite Technical Stories**: 
 - RLP token burning mechanism
@@ -1425,7 +1425,7 @@ sequenceDiagram
   - Required competencies: DeFi Testing, Edge Cases
   - Area of project modified: Test Suite
 
-### STAR-117: View LP Performance
+### STAR-124: View LP Performance
 
 **Name**: View LP Performance
 
@@ -1465,7 +1465,7 @@ sequenceDiagram
 5. Track historical LP performance and returns calculated in Client (bonsai layer)
 6. View pool utilization and risk metrics
 
-**Prerequisite Stories**: STAR-115
+**Prerequisite Stories**: STAR-122
 
 **Prerequisite Technical Stories**: 
 - LP analytics system in Client SDK
@@ -1519,7 +1519,7 @@ sequenceDiagram
   - Required competencies: Analytics Testing, Data Validation
   - Area of project modified: Test Suite
 
-### STAR-118: Handle Transaction Errors
+### STAR-125: Handle Transaction Errors
 
 **Name**: Handle Transaction Errors
 
@@ -1572,7 +1572,7 @@ sequenceDiagram
 4. Understand the specific issue (insufficient balance, etc.)
 5. Get guidance on how to resolve the problem
 
-**Prerequisite Stories**: STAR-107, STAR-108
+**Prerequisite Stories**: STAR-114, STAR-115
 
 **Prerequisite Technical Stories**: 
 - Client SDK transaction management system
@@ -1625,7 +1625,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Error scenario testing, recovery testing
 
-### STAR-119: View Funding Costs
+### STAR-126: View Funding Costs
 
 **Name**: View Funding Costs
 
@@ -1667,7 +1667,7 @@ sequenceDiagram
 4. View funding payment history
 5. Factor funding costs into position sizing through Client SDK calculator
 
-**Prerequisite Stories**: STAR-107, STAR-108, STAR-109
+**Prerequisite Stories**: STAR-114, STAR-115, STAR-109
 
 **Prerequisite Technical Stories**: 
 - Funding rate mechanism
@@ -1716,7 +1716,7 @@ sequenceDiagram
   - Required competencies: Calculator Testing, Math Validation
   - Area of project modified: Test Suite
 
-### STAR-120: Select Network (Testnet/Mainnet)
+### STAR-127: Select Network (Testnet/Mainnet)
 
 **Name**: Select Network (Testnet/Mainnet)
 
@@ -1752,7 +1752,7 @@ sequenceDiagram
 5. See updated network indicator in header
 6. Wallet automatically switches to correct network
 
-**Prerequisite Stories**: STAR-112
+**Prerequisite Stories**: STAR-119
 
 **Prerequisite Technical Stories**: 
 - Multi-network contract deployment
