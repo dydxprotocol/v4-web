@@ -6,22 +6,15 @@
 - [STAR-140: System Architecture Documentation](#star-140-system-architecture-documentation)
 - [STAR-141: Sequence Diagrams for User Flows](#star-141-sequence-diagrams-for-user-flows)
 - [STAR-142: Architecture Decision Records](#star-142-architecture-decision-records)
-- [STAR-143: Entity Relationship Diagram](#star-143-entity-relationship-diagram)
-- [STAR-144: API Specification Documentation](#star-144-api-specification-documentation)
+- [STAR-143: Entity Relationship Diagram and API Specification](#star-143-entity-relationship-diagram-and-api-specification)
 - [STAR-145: Smart Contract ABI Specification](#star-145-smart-contract-abi-specification)
 - [STAR-146: Data Flow Diagrams](#star-146-data-flow-diagrams)
 
-### [2. Cloud Infrastructure EPIC](#2-cloud-infrastructure-epic)
-- [STAR-147: Database Infrastructure](#star-147-database-infrastructure)
-- [STAR-148: Indexer Infrastructure](#star-148-indexer-infrastructure)
-- [STAR-149: API Gateway and Load Balancing](#star-149-api-gateway-and-load-balancing)
-- [STAR-150: Redis Cache Infrastructure](#star-150-redis-cache-infrastructure)
-- [STAR-151: Monitoring and Observability Stack](#star-151-monitoring-and-observability-stack)
-- [STAR-152: CI/CD Pipeline Infrastructure](#star-152-cicd-pipeline-infrastructure)
-- [STAR-153: Container Orchestration Platform](#star-153-container-orchestration-platform)
-- [STAR-154: CDN and Static Asset Hosting](#star-154-cdn-and-static-asset-hosting)
-- [STAR-155: Backup and Disaster Recovery](#star-155-backup-and-disaster-recovery)
-- [STAR-156: Security Infrastructure](#star-156-security-infrastructure)
+### [2. Technical Implementation EPIC](#2-technical-implementation-epic)
+- [STAR-148: Subsquid Indexer Infrastructure](#star-148-subsquid-indexer-infrastructure)
+- [STAR-151: Monitoring and Observability with Sentry](#star-151-monitoring-and-observability-with-sentry)
+- [STAR-152: Vercel Hosting and Deployment](#star-152-vercel-hosting-and-deployment)
+- [STAR-157: Pulumi Environment Variable Management](#star-157-pulumi-environment-variable-management)
 
 ### [3. Implementation EPIC](#3-implementation-epic)
 - [STAR-106: View Account Balance and Collateral](#star-106-view-account-balance-and-collateral)
@@ -53,7 +46,7 @@
 **Task Flow**:
 1. Analyze existing Ruscet architecture and DYDX frontend structure
 2. Define Starboard's architectural patterns and principles
-3. Document component interactions and data flow
+3. Document component interactions and data flow through Client SDK
 4. Create architectural diagrams and documentation
 5. Review with team for completeness and accuracy
 
@@ -62,13 +55,13 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **Architecture Review** (16 hours)
+- **Architecture Review**
   - Required competencies: Solution Architecture, Systems Design
   - Area of project modified: Documentation
-- **Component Mapping** (12 hours)
+- **Component Mapping**
   - Required competencies: Frontend Architecture, Smart Contract Architecture
   - Area of project modified: Documentation
-- **Documentation Creation** (20 hours)
+- **Documentation Creation**
   - Required competencies: Technical Writing, Architecture Documentation
   - Area of project modified: Documentation
 
@@ -76,11 +69,11 @@
 
 **Name**: Sequence Diagrams for Key User Flows
 
-**Story**: As a developer, I want sequence diagrams for key user flows so that I can understand the interaction patterns between components during critical operations.
+**Story**: As a developer, I want sequence diagrams for key user flows so that I can understand the interaction patterns between components during critical operations through the Client SDK.
 
 **Task Flow**:
 1. Identify critical user flows (trading, LP operations, wallet connection)
-2. Map component interactions for each flow
+2. Map component interactions for each flow through Client SDK
 3. Create sequence diagrams using standard notation
 4. Document edge cases and error scenarios
 5. Review with development team
@@ -90,13 +83,13 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **Flow Identification** (8 hours)
+- **Flow Identification**
   - Required competencies: Business Analysis, User Experience
   - Area of project modified: Documentation
-- **Sequence Diagram Creation** (24 hours)
+- **Sequence Diagram Creation**
   - Required competencies: Systems Design, UML
   - Area of project modified: Documentation
-- **Error Flow Documentation** (12 hours)
+- **Error Flow Documentation**
   - Required competencies: Systems Design, Error Handling
   - Area of project modified: Documentation
 
@@ -118,70 +111,44 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **ADR Template Creation** (4 hours)
+- **ADR Template Creation**
   - Required competencies: Technical Documentation
   - Area of project modified: Documentation
-- **Initial ADR Documentation** (20 hours)
+- **Initial ADR Documentation**
   - Required competencies: Architecture, Technical Writing
   - Area of project modified: Documentation
-- **Review and Validation** (8 hours)
+- **Review and Validation**
   - Required competencies: Architecture Review
   - Area of project modified: Documentation
 
-### STAR-143: Entity Relationship Diagram
+### STAR-143: Entity Relationship Diagram and API Specification
 
-**Name**: Entity Relationship Diagram
+**Name**: Entity Relationship Diagram and API Specification
 
-**Story**: As a developer, I want an Entity Relationship Diagram so that I can understand the data model and relationships between entities in the system.
+**Story**: As a developer, I want an Entity Relationship Diagram and comprehensive API documentation so that I can understand the data model and integrate with all system endpoints and GraphQL queries via Subsquid indexer.
 
 **Task Flow**:
 1. Analyze smart contract storage structures
-2. Map indexer database schema
+2. Map indexer database schema defined by Subsquid configuration
 3. Document entity relationships and cardinality
 4. Create ERD using standard notation
-5. Validate with contract and backend developers
+5. Document GraphQL schema and queries
+6. Specify request/response formats
+7. Validate with contract and backend developers
 
 **Prerequisite Stories**: STAR-140
 
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **Data Model Analysis** (12 hours)
+- **Data Model Analysis**
   - Required competencies: Database Design, Smart Contract Development
   - Area of project modified: Documentation
-- **ERD Creation** (8 hours)
-  - Required competencies: Data Modeling, ERD Tools
+- **ERD and GraphQL Schema Creation**
+  - Required competencies: Data Modeling, GraphQL, API Design
   - Area of project modified: Documentation
-- **Schema Documentation** (8 hours)
-  - Required competencies: Technical Writing, Database Documentation
-  - Area of project modified: Documentation
-
-### STAR-144: API Specification Documentation
-
-**Name**: API Specification Documentation
-
-**Story**: As a developer, I want comprehensive API documentation so that I can understand and integrate with all system endpoints and GraphQL queries.
-
-**Task Flow**:
-1. Document GraphQL schema and queries
-2. Define REST endpoints if any
-3. Specify request/response formats
-4. Document authentication and rate limiting
-5. Create OpenAPI/GraphQL schema files
-
-**Prerequisite Stories**: STAR-140
-
-**Prerequisite Technical Stories**: None
-
-**Subtasks**:
-- **GraphQL Schema Documentation** (16 hours)
-  - Required competencies: GraphQL, API Design
-  - Area of project modified: Documentation
-- **API Testing Documentation** (8 hours)
-  - Required competencies: API Testing, Documentation
-  - Area of project modified: Documentation
-- **Integration Examples** (12 hours)
-  - Required competencies: Full Stack Development, Documentation
+- **Schema Documentation and Integration Examples**
+  - Required competencies: Technical Writing, Full Stack Development
   - Area of project modified: Documentation
 
 ### STAR-145: Smart Contract ABI Specification
@@ -202,13 +169,13 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **ABI Extraction and Documentation** (12 hours)
+- **ABI Extraction and Documentation**
   - Required competencies: Smart Contract Development, Sway/Solidity
   - Area of project modified: Documentation
-- **Event Documentation** (8 hours)
+- **Event Documentation**
   - Required competencies: Smart Contract Development, Event-Driven Architecture
   - Area of project modified: Documentation
-- **Integration Guide Creation** (12 hours)
+- **Integration Guide Creation**
   - Required competencies: Full Stack Development, Technical Writing
   - Area of project modified: Documentation
 
@@ -216,12 +183,12 @@
 
 **Name**: Data Flow Diagrams
 
-**Story**: As a developer, I want data flow diagrams showing how data moves through the system so that I can understand data transformations and processing pipelines.
+**Story**: As a developer, I want data flow diagrams showing how data moves through the system so that I can understand data transformations and processing pipelines through the Client SDK.
 
 **Task Flow**:
 1. Map data sources (blockchain, oracles, user input)
-2. Document data transformations at each layer
-3. Identify data storage points and caching strategies
+2. Document data transformations at each layer through Client SDK
+3. Identify data storage points (no caching)
 4. Create data flow diagrams for key processes
 5. Document data consistency and synchronization patterns
 
@@ -230,32 +197,33 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
-- **Data Pipeline Mapping** (12 hours)
+- **Data Pipeline Mapping**
   - Required competencies: Data Architecture, Systems Design
   - Area of project modified: Documentation
-- **DFD Creation** (16 hours)
+- **DFD Creation**
   - Required competencies: Data Modeling, Diagram Tools
   - Area of project modified: Documentation
-- **Data Consistency Documentation** (8 hours)
+- **Data Consistency Documentation**
   - Required competencies: Distributed Systems, Data Architecture
   - Area of project modified: Documentation
 
 ---
 
-## 2. Cloud Infrastructure EPIC
+## 2. Technical Implementation EPIC
 
-### STAR-147: Database Infrastructure
+### STAR-148: Subsquid Indexer Infrastructure
 
-**Name**: Database Infrastructure Setup
+**Name**: Subsquid Indexer Infrastructure for Testnet and Mainnet
 
-**Story**: As a dev, I want a PostgreSQL database infrastructure deployed so that the indexer can store and query blockchain event data efficiently.
+**Story**: As a dev, I want Subsquid indexer infrastructure deployed for both testnet and mainnet so that blockchain events can be processed and made available via GraphQL API, handling database configuration and API gateway functionality.
 
 **Task Flow**:
-1. Provision PostgreSQL instances for dev/staging/production
-2. Configure replication and high availability
-3. Set up connection pooling and optimization
-4. Implement backup and recovery procedures
-5. Configure monitoring and alerting
+1. Deploy Subsquid processor nodes for testnet and mainnet
+2. Configure event processing pipelines
+3. Set up GraphQL gateway and API routing
+4. Configure database as part of Subsquid configuration
+5. Implement auto-scaling policies
+6. Configure monitoring and logging
 
 **Prerequisite Stories**: None
 
@@ -263,48 +231,10 @@
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
-  - PostgreSQL 14+ deployed with appropriate sizing
-  - Read replicas configured for query distribution
-  - Connection pooling via PgBouncer or similar
-  - Automated backup every 6 hours
-- **Non-Functional Requirements**:
-  - 99.9% uptime SLA
-  - Query response time < 100ms for indexed queries
-  - Support for 1000+ concurrent connections
-  - Point-in-time recovery capability
-
-**Subtasks**:
-- **Database Provisioning** (8 hours)
-  - Required competencies: Database Administration, Cloud Infrastructure
-  - Area of project modified: Infrastructure
-- **High Availability Setup** (12 hours)
-  - Required competencies: Database Administration, DevOps
-  - Area of project modified: Infrastructure
-- **Performance Optimization** (8 hours)
-  - Required competencies: Database Optimization, PostgreSQL
-  - Area of project modified: Infrastructure
-
-### STAR-148: Indexer Infrastructure
-
-**Name**: Subsquid Indexer Infrastructure
-
-**Story**: As a dev, I want a Subsquid indexer infrastructure deployed so that blockchain events can be processed and made available via GraphQL API.
-
-**Task Flow**:
-1. Deploy Subsquid processor nodes
-2. Configure event processing pipelines
-3. Set up GraphQL gateway
-4. Implement auto-scaling policies
-5. Configure monitoring and logging
-
-**Prerequisite Stories**: STAR-147
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - Subsquid processor running and syncing with Fuel network
+  - Subsquid processor running and syncing with Fuel testnet and mainnet networks
   - GraphQL endpoint accessible with proper authentication
+  - Database configured automatically through Subsquid setup
+  - API gateway functionality handled by indexer
   - Event processing lag < 2 seconds
   - Automatic restart on failure
 - **Non-Functional Requirements**:
@@ -314,28 +244,28 @@
   - Automated deployment via CI/CD
 
 **Subtasks**:
-- **Subsquid Deployment** (12 hours)
-  - Required competencies: DevOps, Blockchain Infrastructure
+- **Subsquid Deployment for Both Networks**
+  - Required competencies: DevOps, Blockchain Infrastructure, Subsquid
   - Area of project modified: Infrastructure
-- **GraphQL Gateway Setup** (8 hours)
-  - Required competencies: API Infrastructure, GraphQL
+- **GraphQL Gateway Setup**
+  - Required competencies: API Infrastructure, GraphQL, Database Configuration
   - Area of project modified: Infrastructure
-- **Auto-scaling Configuration** (8 hours)
-  - Required competencies: Cloud Infrastructure, Kubernetes
+- **Auto-scaling Configuration**
+  - Required competencies: Cloud Infrastructure, Scaling
   - Area of project modified: Infrastructure
 
-### STAR-149: API Gateway and Load Balancing
+### STAR-151: Monitoring and Observability with Sentry
 
-**Name**: API Gateway and Load Balancing
+**Name**: Monitoring and Observability with Sentry
 
-**Story**: As a dev, I want an API gateway and load balancer deployed so that API traffic is distributed efficiently and securely across backend services.
+**Story**: As a dev, I want Sentry configured for monitoring and observability so that I can track system health, debug issues, and ensure optimal performance.
 
 **Task Flow**:
-1. Deploy API gateway (Kong, AWS API Gateway, etc.)
-2. Configure rate limiting and throttling rules
-3. Set up load balancing for backend services
-4. Implement SSL/TLS termination
-5. Configure request routing and transformation
+1. Configure Sentry for error tracking and performance monitoring
+2. Set up log aggregation through Sentry
+3. Create dashboards and visualizations
+4. Set up alerting rules and escalation
+5. Integrate with frontend and backend services
 
 **Prerequisite Stories**: None
 
@@ -343,119 +273,39 @@
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
-  - API gateway routing requests to appropriate services
-  - Rate limiting per API key/IP address
-  - Load balancing across multiple backend instances
-  - SSL/TLS encryption for all endpoints
-- **Non-Functional Requirements**:
-  - < 10ms added latency from gateway
-  - Support for 10,000 requests per second
-  - Automatic failover for unhealthy backends
-  - API key management and authentication
-
-**Subtasks**:
-- **Gateway Deployment** (8 hours)
-  - Required competencies: API Infrastructure, DevOps
-  - Area of project modified: Infrastructure
-- **Security Configuration** (8 hours)
-  - Required competencies: Security, API Management
-  - Area of project modified: Infrastructure
-- **Load Balancer Setup** (6 hours)
-  - Required competencies: Network Engineering, Cloud Infrastructure
-  - Area of project modified: Infrastructure
-
-### STAR-150: Redis Cache Infrastructure
-
-**Name**: Redis Cache Infrastructure
-
-**Story**: As a dev, I want a Redis cache infrastructure deployed so that frequently accessed data can be served with low latency and reduced database load.
-
-**Task Flow**:
-1. Deploy Redis cluster for caching
-2. Configure replication and persistence
-3. Set up cache invalidation strategies
-4. Implement connection pooling
-5. Configure monitoring and alerting
-
-**Prerequisite Stories**: None
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - Redis cluster with master-slave replication
-  - Automatic failover capability
-  - Cache hit ratio > 80% for hot data
-  - TTL-based and event-based invalidation
-- **Non-Functional Requirements**:
-  - < 1ms response time for cache hits
-  - Support for 50,000 operations per second
-  - Persistence with AOF and RDB snapshots
-  - Memory usage monitoring and alerts
-
-**Subtasks**:
-- **Redis Cluster Setup** (8 hours)
-  - Required competencies: Redis, Cache Infrastructure
-  - Area of project modified: Infrastructure
-- **Caching Strategy Implementation** (10 hours)
-  - Required competencies: Backend Development, Caching
-  - Area of project modified: Infrastructure
-- **Monitoring Setup** (4 hours)
-  - Required competencies: DevOps, Monitoring
-  - Area of project modified: Infrastructure
-
-### STAR-151: Monitoring and Observability Stack
-
-**Name**: Monitoring and Observability Stack
-
-**Story**: As a dev, I want a comprehensive monitoring and observability stack deployed so that I can track system health, debug issues, and ensure optimal performance.
-
-**Task Flow**:
-1. Deploy metrics collection (Prometheus/DataDog)
-2. Set up log aggregation (ELK/CloudWatch)
-3. Configure distributed tracing (Jaeger/X-Ray)
-4. Create dashboards and visualizations
-5. Set up alerting rules and escalation
-
-**Prerequisite Stories**: None
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - Metrics collected from all services
-  - Centralized log aggregation and search
-  - End-to-end request tracing
+  - Sentry configured for all services (frontend, indexer)
+  - Error tracking with full context and stack traces
+  - Performance monitoring for critical paths
   - Custom dashboards for key metrics
 - **Non-Functional Requirements**:
-  - 1-minute metric resolution
-  - 30-day log retention
+  - Real-time error reporting
+  - 30-day error retention
   - Alert response time < 1 minute
   - Dashboard load time < 3 seconds
 
 **Subtasks**:
-- **Metrics Infrastructure** (12 hours)
-  - Required competencies: DevOps, Monitoring Tools
+- **Sentry Configuration**
+  - Required competencies: DevOps, Monitoring Tools, Sentry
   - Area of project modified: Infrastructure
-- **Log Aggregation Setup** (10 hours)
-  - Required competencies: DevOps, Log Management
+- **Error Tracking Setup**
+  - Required competencies: Error Management, Performance Monitoring
   - Area of project modified: Infrastructure
-- **Dashboard Creation** (8 hours)
+- **Dashboard Creation**
   - Required competencies: Data Visualization, Monitoring
   - Area of project modified: Infrastructure
 
-### STAR-152: CI/CD Pipeline Infrastructure
+### STAR-152: Vercel Hosting and Deployment
 
-**Name**: CI/CD Pipeline Infrastructure
+**Name**: Vercel Hosting and Deployment
 
-**Story**: As a dev, I want a CI/CD pipeline infrastructure so that code changes are automatically tested, built, and deployed to the appropriate environments.
+**Story**: As a dev, I want Vercel hosting configured so that the frontend is deployed with CDN, static asset optimization, and automated deployment pipeline.
 
 **Task Flow**:
-1. Set up GitHub Actions workflows
-2. Configure build and test automation
-3. Implement deployment pipelines
-4. Set up environment promotion
-5. Configure rollback mechanisms
+1. Configure Vercel project for frontend hosting
+2. Set up automated deployments from Git
+3. Configure custom domains and SSL
+4. Optimize build and deployment settings
+5. Set up preview deployments for branches
 
 **Prerequisite Stories**: None
 
@@ -463,159 +313,39 @@
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
-  - Automated testing on pull requests
-  - Build artifacts created and stored
-  - Automated deployment to staging
-  - Manual approval for production deployment
-- **Non-Functional Requirements**:
-  - Build time < 10 minutes
-  - Zero-downtime deployments
-  - Automatic rollback on failure
-  - Deployment audit trail
-
-**Subtasks**:
-- **Pipeline Setup** (12 hours)
-  - Required competencies: DevOps, CI/CD
-  - Area of project modified: Infrastructure
-- **Test Automation** (10 hours)
-  - Required competencies: Test Automation, DevOps
-  - Area of project modified: Infrastructure
-- **Deployment Automation** (10 hours)
-  - Required competencies: DevOps, Cloud Deployment
-  - Area of project modified: Infrastructure
-
-### STAR-153: Container Orchestration Platform
-
-**Name**: Container Orchestration Platform
-
-**Story**: As a dev, I want a container orchestration platform deployed so that services can be deployed, scaled, and managed efficiently.
-
-**Task Flow**:
-1. Deploy Kubernetes cluster or ECS
-2. Configure namespaces and RBAC
-3. Set up service mesh (optional)
-4. Implement auto-scaling policies
-5. Configure resource monitoring
-
-**Prerequisite Stories**: None
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - Container orchestration platform operational
-  - Services deployed as containers
-  - Automatic scaling based on load
-  - Health checks and self-healing
-- **Non-Functional Requirements**:
-  - 99.95% platform availability
-  - Scale from 2 to 100 pods in < 2 minutes
-  - Resource utilization > 70%
-  - Network policies enforced
-
-**Subtasks**:
-- **Kubernetes Setup** (16 hours)
-  - Required competencies: Kubernetes, Container Orchestration
-  - Area of project modified: Infrastructure
-- **Service Configuration** (12 hours)
-  - Required competencies: DevOps, Microservices
-  - Area of project modified: Infrastructure
-- **Security Hardening** (8 hours)
-  - Required competencies: Security, Kubernetes
-  - Area of project modified: Infrastructure
-
-### STAR-154: CDN and Static Asset Hosting
-
-**Name**: CDN and Static Asset Hosting
-
-**Story**: As a dev, I want a CDN and static asset hosting solution so that frontend assets are delivered quickly to users globally.
-
-**Task Flow**:
-1. Configure CDN (CloudFlare/CloudFront)
-2. Set up origin servers
-3. Configure caching policies
-4. Implement cache invalidation
-5. Set up monitoring and analytics
-
-**Prerequisite Stories**: None
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - CDN configured for all static assets
-  - Automatic cache invalidation on deployment
+  - Vercel project configured with auto-deployments
+  - CDN optimization for static assets handled by Vercel
   - HTTPS enforcement
-  - Image optimization and compression
+  - Preview deployments for pull requests
 - **Non-Functional Requirements**:
   - Global latency < 100ms
-  - 99.99% CDN availability
-  - Bandwidth cost optimization
-  - DDoS protection enabled
+  - 99.99% availability
+  - Zero-downtime deployments
+  - Build time optimization
 
 **Subtasks**:
-- **CDN Configuration** (6 hours)
-  - Required competencies: CDN, Web Performance
+- **Vercel Project Setup**
+  - Required competencies: Frontend Deployment, Vercel
   - Area of project modified: Infrastructure
-- **Origin Setup** (4 hours)
-  - Required competencies: DevOps, Web Infrastructure
+- **Deployment Configuration**
+  - Required competencies: DevOps, CI/CD
   - Area of project modified: Infrastructure
-- **Performance Optimization** (6 hours)
-  - Required competencies: Web Performance, Frontend
+- **Performance Optimization**
+  - Required competencies: Web Performance, Frontend Optimization
   - Area of project modified: Infrastructure
 
-### STAR-155: Backup and Disaster Recovery
+### STAR-157: Pulumi Environment Variable Management
 
-**Name**: Backup and Disaster Recovery
+**Name**: Pulumi Environment Variable Management
 
-**Story**: As a dev, I want backup and disaster recovery procedures so that the system can be restored quickly in case of data loss or system failure.
+**Story**: As a dev, I want Pulumi configured for environment variable management so that secrets and configuration can be managed securely across different environments.
 
 **Task Flow**:
-1. Implement automated backup procedures
-2. Configure cross-region replication
-3. Create disaster recovery runbooks
-4. Set up recovery testing schedule
-5. Implement monitoring and alerting
-
-**Prerequisite Stories**: STAR-147
-
-**Prerequisite Technical Stories**: None
-
-**Acceptance Criteria**:
-- **Functional Requirements**:
-  - Daily automated backups of all critical data
-  - Cross-region backup replication
-  - Documented recovery procedures
-  - Regular recovery drills
-- **Non-Functional Requirements**:
-  - RPO (Recovery Point Objective) < 1 hour
-  - RTO (Recovery Time Objective) < 4 hours
-  - Backup retention for 30 days
-  - Encrypted backups at rest and in transit
-
-**Subtasks**:
-- **Backup Implementation** (10 hours)
-  - Required competencies: DevOps, Backup Solutions
-  - Area of project modified: Infrastructure
-- **DR Documentation** (8 hours)
-  - Required competencies: DevOps, Documentation
-  - Area of project modified: Infrastructure
-- **Recovery Testing** (6 hours)
-  - Required competencies: DevOps, System Administration
-  - Area of project modified: Infrastructure
-
-### STAR-156: Security Infrastructure
-
-**Name**: Security Infrastructure
-
-**Story**: As a dev, I want comprehensive security infrastructure so that the platform is protected against common attacks and vulnerabilities.
-
-**Task Flow**:
-1. Deploy WAF (Web Application Firewall)
-2. Configure DDoS protection
+1. Set up Pulumi project structure
+2. Configure environment-specific stacks (dev, staging, production)
 3. Implement secrets management
-4. Set up security scanning
-5. Configure audit logging
+4. Set up automated deployment of configurations
+5. Document configuration management process
 
 **Prerequisite Stories**: None
 
@@ -623,25 +353,25 @@
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
-  - WAF protecting all public endpoints
-  - DDoS mitigation active
-  - Secrets stored in vault (HashiCorp Vault/AWS Secrets Manager)
-  - Vulnerability scanning on deployments
+  - Pulumi stacks for each environment
+  - Secure secrets management
+  - Automated configuration deployment
+  - Environment variable injection for all services
 - **Non-Functional Requirements**:
-  - Block OWASP Top 10 attacks
-  - < 5 minute DDoS mitigation time
-  - Audit logs retained for 1 year
-  - Security alerts < 1 minute
+  - Secrets encrypted at rest and in transit
+  - Configuration changes tracked and auditable
+  - Rollback capability for configuration changes
+  - Integration with existing CI/CD pipeline
 
 **Subtasks**:
-- **WAF Configuration** (8 hours)
-  - Required competencies: Security, Web Security
+- **Pulumi Project Setup**
+  - Required competencies: Pulumi, Infrastructure as Code
   - Area of project modified: Infrastructure
-- **Secrets Management** (8 hours)
-  - Required competencies: Security, DevOps
+- **Secrets Management Configuration**
+  - Required competencies: Security, Secret Management
   - Area of project modified: Infrastructure
-- **Security Monitoring** (8 hours)
-  - Required competencies: Security, SIEM
+- **Environment Configuration**
+  - Required competencies: DevOps, Configuration Management
   - Area of project modified: Infrastructure
 
 ---
@@ -659,34 +389,36 @@
 sequenceDiagram
     participant User
     participant Frontend
-    participant GraphQL
-    participant Contracts
-    participant Cache
+    participant Client
+    participant FuelSDK
+    participant FuelRPC
+    participant Indexer
     
     User->>Frontend: Navigate to Dashboard
-    Frontend->>GraphQL: Query account balance
-    GraphQL->>Cache: Check cached balance
-    alt Cache Hit
-        Cache-->>Frontend: Return cached data
-    else Cache Miss
-        GraphQL->>Contracts: Fetch balance via RPC
-        Contracts-->>GraphQL: Return balance data
-        GraphQL->>Cache: Store in cache
-        GraphQL-->>Frontend: Return balance data
-    end
+    Frontend->>Client: Get account balance
+    Client->>FuelSDK: wallet.getBalance(USDC_ASSET_ID)
+    FuelSDK->>FuelRPC: Query balance
+    FuelRPC-->>FuelSDK: Return balance data
+    FuelSDK-->>Client: Balance data
+    Client-->>Frontend: Account balance
+    
+    Frontend->>Client: Get locked collateral
+    Client->>Indexer: Query locked collateral
+    Indexer-->>Client: Collateral data
+    Client-->>Frontend: Collateral information
     Frontend-->>User: Display balance & collateral
     
     loop Every 5 seconds
-        Frontend->>GraphQL: Poll for updates
+        Frontend->>Client: Poll for updates
         Frontend-->>User: Update display
     end
 ```
 
 **Task Flow**:
 1. Navigate to account/portfolio section
-2. View total USDC balance
+2. View total USDC balance from Fuel RPC via fuel-sdk
 3. See available collateral for new positions
-4. View used collateral in existing positions
+4. View used collateral in existing positions from Indexer
 5. Check margin utilization percentage
 6. Monitor balance updates via polling
 
@@ -694,7 +426,7 @@ sequenceDiagram
 
 **Prerequisite Technical Stories**: 
 - Frontend scaffolding and wallet integration
-- GraphQL API setup with data transformation
+- Client SDK setup with data transformation
 - Indexer configuration for balance tracking
 
 **Acceptance Criteria**:
@@ -710,39 +442,35 @@ sequenceDiagram
   - Page load time < 2 seconds
   - Balance query response time < 500ms
   - Polling doesn't cause memory leaks after 24 hours
-  - Graceful handling of RPC failures with cached data fallback
+  - Graceful handling of RPC failures with fallback
   - Unit tests with 90% coverage
   - Integration tests for balance calculations
   - Documented balance calculation formulas
 
 **Unhappy Paths**:
   - Network disconnection shows last known balance with "offline" indicator
-  - Contract query failure displays cached balance with timestamp
+  - Contract query failure displays fallback data with timestamp
   - Invalid balance data triggers error boundary with recovery option
   - Negative balance prevention with validation checks
 
 **Subtasks**:
 
-- **UI/UX Design** (8 hours)
-  - Required competencies: UI/UX Design, Financial Interfaces
-  - Area of project modified: Design System
-  
-- **Frontend Implementation** (20 hours)
+- **Frontend Implementation**
   - Required competencies: React, TypeScript, GraphQL Client
   - Area of project modified: Frontend Dashboard Component
-  - Details: Implement balance display component with polling, integrate with wallet connector (STAR-122 subtask), create margin utilization visualizations
+  - Details: Implement balance display component with polling, integrate with wallet connector, create margin utilization visualizations
   
-- **GraphQL Integration** (12 hours)
-  - Required competencies: GraphQL, Backend Development
-  - Area of project modified: GraphQL Schema and Resolvers
-  - Details: Create balance queries, implement caching layer, optimize polling endpoints
+- **Client SDK Integration**
+  - Required competencies: Client SDK, Backend Development
+  - Area of project modified: Client SDK Layer
+  - Details: Balance queries through fuel-sdk, collateral data from indexer, polling optimization
   
-- **Smart Contract Integration** (8 hours)
+- **Smart Contract Integration**
   - Required competencies: Sway/Fuel, Contract Integration
   - Area of project modified: Contract Interfaces
-  - Details: Integrate balance query functions, handle multiple collateral types
+  - Details: Integrate balance query functions via fuel-sdk, handle multiple collateral types
   
-- **Testing & QA** (12 hours)
+- **Testing & QA**
   - Required competencies: Test Automation, E2E Testing
   - Area of project modified: Test Suite
   - Details: Unit tests for calculations, integration tests for data flow, E2E tests for user journey
@@ -758,21 +486,23 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
+    participant Client
     participant Wallet
     participant Contracts
     participant Oracle
     participant Indexer
     
     User->>Frontend: Select asset and enter position details
-    Frontend->>Validation: Validate position parameters
-    Validation-->>Frontend: Return validation result
+    Frontend->>Client: Validate position parameters
+    Client-->>Frontend: Return validation result
     
     alt Validation Failed
         Frontend-->>User: Show error message
     else Validation Passed
-        Frontend->>Oracle: Fetch current price
-        Oracle-->>Frontend: Return price data
+        Frontend->>Client: Fetch current price
+        Client->>Oracle: Get price data
+        Oracle-->>Client: Return price data
+        Client-->>Frontend: Price information
         Frontend-->>User: Show position preview
         User->>Frontend: Confirm position
         Frontend->>Wallet: Request signature
@@ -780,8 +510,8 @@ sequenceDiagram
         Wallet->>Contracts: Submit position transaction
         Contracts->>Oracle: Verify price
         Contracts->>Contracts: Open position
-        Contracts-->>Indexer: Emit PositionOpened event
-        Indexer-->>Frontend: Position update via polling
+        Contracts-->>Frontend: IncreasePosition event
+        Contracts-->>Indexer: Emit IncreasePosition event
         Frontend-->>User: Show success message
     end
 ```
@@ -794,15 +524,15 @@ sequenceDiagram
 5. Review position details (collateral required, liquidation price)
 6. Submit position order
 7. Confirm transaction in wallet
-8. Wait for position to open
+8. Wait for position to open and contract events
 
 **Prerequisite Stories**: STAR-106, STAR-112
 
 **Prerequisite Technical Stories**: 
-- Contract position management implementation (STAR-129)
-- Oracle integration for price feeds (STAR-133)
-- Trading interface development (STAR-123)
-- Transaction management system (STAR-124)
+- Contract position management implementation
+- Oracle integration for price feeds
+- Trading interface development
+- Client SDK transaction management
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
@@ -810,14 +540,12 @@ sequenceDiagram
   - Position size validation: min $10, max $1,000,000
   - Leverage limits: 2x-20x for BTC/ETH, 2x-10x for FUEL/stFUEL
   - Real-time liquidation price calculation: entry_price * (1 - 1/leverage + fees)
-  - Slippage tolerance setting: 0.1%, 0.5%, 1%, custom
   - Transaction completes within 60 seconds or times out with rollback
   - Position appears in portfolio immediately after confirmation
   
 - **Non-Functional Requirements**:
   - Price updates every 1 second during position entry
   - Gas estimation accurate within 10%
-  - Transaction retry logic for temporary failures
   - Comprehensive audit trail of position parameters
   - Unit tests for leverage calculations
   - Integration tests for position lifecycle
@@ -825,38 +553,33 @@ sequenceDiagram
 
 **Unhappy Paths**:
   - Insufficient collateral shows required amount and deposit option
-  - Price movement beyond slippage reverts with explanation
   - Oracle failure prevents position with safety message
   - Network congestion warning with gas price options
   - Contract paused state shows maintenance message
 
 **Subtasks**:
 
-- **UI/UX Design** (12 hours)
-  - Required competencies: UI/UX Design, Trading Interfaces
-  - Area of project modified: Trading Interface Design
-  
-- **Frontend Development** (24 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Web3 Integration
   - Area of project modified: Trading Interface Components
-  - Details: Position entry form, leverage slider, preview modal, real-time price updates, integration with charts (STAR-126 subtask)
+  - Details: Position entry form, leverage slider, preview modal, real-time price updates
   
-- **Smart Contract Development** (32 hours)
+- **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols, Financial Mathematics
   - Area of project modified: Position Manager Contract
-  - Details: Implement increase_position function (STAR-129 subtask), margin calculations, leverage validation, slippage protection
+  - Details: Implement increase_position function, margin calculations, leverage validation
   
-- **Oracle Integration** (16 hours)
+- **Oracle Integration**
   - Required competencies: Blockchain Oracles, Price Feeds
   - Area of project modified: Oracle Interface
-  - Details: Integrate Stork oracle feeds (STAR-133 subtask), price validation, staleness checks
+  - Details: Integrate Stork oracle feeds, price validation, staleness checks
   
-- **Backend Processing** (16 hours)
-  - Required competencies: Node.js, GraphQL, Event Processing
-  - Area of project modified: Backend Services
-  - Details: Position event processing, state management, analytics tracking (STAR-127 subtask)
+- **Client SDK Processing**
+  - Required competencies: Client SDK, Event Processing
+  - Area of project modified: Client SDK Services
+  - Details: Position event processing, state management, analytics tracking
   
-- **QA & Testing** (16 hours)
+- **QA & Testing**
   - Required competencies: DeFi Testing, Smart Contract Auditing
   - Area of project modified: Test Suite
   - Details: Leverage edge cases, liquidation scenarios, oracle manipulation tests
@@ -872,25 +595,28 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
+    participant Client
     participant Wallet
     participant Contracts
     participant Oracle
-    participant FundingRate
+    participant Indexer
     
     User->>Frontend: Select asset for shorting
-    Frontend->>Frontend: Calculate borrowing costs
-    Frontend->>FundingRate: Fetch current funding rate
-    FundingRate-->>Frontend: Return funding data
+    Frontend->>Client: Calculate borrowing costs
+    Client->>Indexer: Fetch current funding rate
+    Indexer-->>Client: Return funding data
+    Client-->>Frontend: Funding information
     User->>Frontend: Enter short position details
-    Frontend->>Validation: Validate short parameters
+    Frontend->>Client: Validate short parameters
+    Client-->>Frontend: Validation result
     Frontend-->>User: Show short preview with costs
     User->>Frontend: Confirm short position
     Frontend->>Wallet: Request signature
     Wallet->>Contracts: Submit short transaction
     Contracts->>Oracle: Get mark price
     Contracts->>Contracts: Open short position
-    Contracts-->>Frontend: Position opened event
+    Contracts-->>Frontend: IncreasePosition event
+    Contracts-->>Indexer: Emit IncreasePosition event
     Frontend-->>User: Display short position
 ```
 
@@ -907,9 +633,9 @@ sequenceDiagram
 **Prerequisite Stories**: STAR-106, STAR-112
 
 **Prerequisite Technical Stories**: 
-- Contract position management (STAR-129)
-- Funding rate mechanism (STAR-130)
-- Oracle integration (STAR-133)
+- Contract position management
+- Funding rate mechanism
+- Oracle integration
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
@@ -922,7 +648,7 @@ sequenceDiagram
   
 - **Non-Functional Requirements**:
   - Funding rate updates every minute
-  - Short interest calculations cached for performance
+  - Short interest calculations optimized for performance
   - Accurate P&L calculations including funding costs
   - Stress testing for extreme market conditions
   - Documentation of short position mechanics
@@ -936,26 +662,22 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (8 hours)
-  - Required competencies: UI/UX Design, Financial Interfaces
-  - Area of project modified: Trading Interface
-  
-- **Frontend Development** (20 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, DeFi Interfaces
   - Area of project modified: Trading Components
   - Details: Short position form, funding rate display, cost calculator
   
-- **Smart Contract Development** (28 hours)
+- **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Mathematics
   - Area of project modified: Position Manager Contract
-  - Details: Short position logic, funding rate integration (STAR-130 subtask), borrowing mechanics
+  - Details: Short position logic, funding rate integration, borrowing mechanics
   
-- **Funding Rate Integration** (16 hours)
+- **Funding Rate Integration**
   - Required competencies: DeFi Protocols, Financial Engineering
   - Area of project modified: Funding System
-  - Details: Implement funding rate calculations (STAR-130 subtask), payment collection
+  - Details: Funding rate calculations, payment collection
   
-- **QA & Testing** (12 hours)
+- **QA & Testing**
   - Required competencies: DeFi Testing, Risk Analysis
   - Area of project modified: Test Suite
   - Details: Short squeeze scenarios, funding payment edge cases
@@ -971,19 +693,25 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant GraphQL
+    participant Client
+    participant Indexer
     participant PriceOracle
-    participant Cache
     
     User->>Frontend: Navigate to positions
-    Frontend->>GraphQL: Query open positions
-    GraphQL->>Cache: Check position cache
-    GraphQL-->>Frontend: Return position data
+    Frontend->>Client: Query open positions
+    Client->>Indexer: Get position data
+    Indexer-->>Client: Return position data
+    Client-->>Frontend: Position information
+    Frontend-->>User: Display positions
     
     loop Every 10 seconds
-        Frontend->>PriceOracle: Fetch current prices
-        Frontend->>Frontend: Calculate unrealized P&L
-        Frontend->>GraphQL: Poll position updates
+        Frontend->>Client: Fetch current prices
+        Client->>PriceOracle: Get latest prices
+        PriceOracle-->>Client: Price data
+        Client->>Client: Calculate unrealized P&L
+        Client->>Indexer: Poll position updates
+        Indexer-->>Client: Updated positions
+        Client-->>Frontend: Updated position data
         Frontend-->>User: Update position display
     end
     
@@ -993,7 +721,7 @@ sequenceDiagram
 
 **Task Flow**:
 1. Navigate to portfolio/positions section
-2. View list of all open positions
+2. View list of all open positions via Client SDK
 3. See position details: asset, side, size, leverage
 4. Monitor PnL via periodic polling (realized and unrealized)
 5. Check margin requirements and liquidation prices
@@ -1002,7 +730,7 @@ sequenceDiagram
 **Prerequisite Stories**: STAR-107, STAR-108
 
 **Prerequisite Technical Stories**: 
-- GraphQL position data processing
+- Client SDK position data processing
 - Real-time P&L calculation system with polling
 
 **Acceptance Criteria**:
@@ -1018,7 +746,6 @@ sequenceDiagram
   - Position updates every 10 seconds via polling
   - P&L calculations accurate to 6 decimal places
   - Table renders 100+ positions without lag
-  - Export functionality for position data (CSV)
   - Mobile-responsive table design
   - Real-time price feeds integrated
 
@@ -1030,26 +757,22 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (10 hours)
-  - Required competencies: UI/UX Design, Data Visualization
-  - Area of project modified: Portfolio Interface
-  
-- **Frontend Implementation** (20 hours)
+- **Frontend Implementation**
   - Required competencies: React, TypeScript, Table Components
   - Area of project modified: Portfolio Components
-  - Details: Position table, P&L calculations, real-time updates via polling (STAR-125 subtask)
+  - Details: Position table, P&L calculations, real-time updates via polling
   
-- **Backend Integration** (16 hours)
-  - Required competencies: GraphQL, Real-time Data
-  - Area of project modified: GraphQL Resolvers
-  - Details: Position aggregation, P&L calculations, performance metrics (STAR-127 subtask)
+- **Client SDK Integration**
+  - Required competencies: Client SDK, Real-time Data
+  - Area of project modified: Client SDK Layer
+  - Details: Position aggregation, P&L calculations, performance metrics
   
-- **Data Processing** (12 hours)
+- **Data Processing**
   - Required competencies: Data Engineering, Event Processing
   - Area of project modified: Indexer
-  - Details: Position event processing (STAR-135 subtask), state reconstruction
+  - Details: Position event processing, state reconstruction
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Frontend Testing, Data Validation
   - Area of project modified: Test Suite
 
@@ -1064,22 +787,25 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
+    participant Client
     participant Wallet
     participant Contracts
     participant Oracle
+    participant Indexer
     
     User->>Frontend: Select position to close
     Frontend-->>User: Show close modal
     User->>Frontend: Choose close amount
-    Frontend->>Frontend: Calculate exit details
+    Frontend->>Client: Calculate exit details
+    Client-->>Frontend: Exit calculation
     Frontend-->>User: Preview P&L and fees
     User->>Frontend: Confirm close
     Frontend->>Wallet: Request signature
     Wallet->>Contracts: Submit close transaction
     Contracts->>Oracle: Get exit price
     Contracts->>Contracts: Close position
-    Contracts-->>Frontend: Position closed event
+    Contracts-->>Frontend: DecreasePosition event
+    Contracts-->>Indexer: Emit DecreasePosition event
     Frontend-->>User: Show realized P&L
 ```
 
@@ -1090,18 +816,18 @@ sequenceDiagram
 4. Review closing details (exit price, fees, final PnL)
 5. Submit close position transaction
 6. Confirm transaction in wallet
-7. Wait for position closure
+7. Wait for position closure and contract events
 
 **Prerequisite Stories**: STAR-109
 
 **Prerequisite Technical Stories**: 
-- Position closure functionality in contracts (STAR-129)
-- Transaction management system (STAR-124)
+- Position closure functionality in contracts
+- Client SDK transaction management
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Close modal with slider for partial close (25%, 50%, 75%, 100%, custom)
-  - Exit price estimation including slippage impact
+  - Exit price estimation
   - Fee breakdown: trading fee, funding fee (if any), network fee
   - Final P&L calculation: (exit_price - entry_price) * size - total_fees
   - Position closure confirmation within 60 seconds
@@ -1117,33 +843,27 @@ sequenceDiagram
 
 **Unhappy Paths**:
   - Insufficient gas shows required amount
-  - Price movement beyond slippage shows requote option
   - Contract pause prevents closure with explanation
   - Partial close leaving dust amount prevented
-  - Failed transaction triggers automatic retry
 
 **Subtasks**:
 
-- **UI/UX Design** (6 hours)
-  - Required competencies: UI/UX Design, Modal Design
-  - Area of project modified: Trading Interface
-  
-- **Frontend Development** (16 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Transaction UI
   - Area of project modified: Position Management Components
   - Details: Close modal, partial close slider, P&L preview
   
-- **Smart Contract Development** (20 hours)
+- **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Position Manager Contract
-  - Details: Implement decrease_position function (STAR-129 subtask), partial close logic
+  - Details: Implement decrease_position function, partial close logic
   
-- **Transaction Processing** (12 hours)
-  - Required competencies: Web3, Transaction Management
-  - Area of project modified: Transaction System
-  - Details: Transaction management integration (STAR-124 subtask), retry logic
+- **Client SDK Processing**
+  - Required competencies: Client SDK, Transaction Management
+  - Area of project modified: Client SDK System
+  - Details: Transaction management integration, event handling
   
-- **QA & Testing** (10 hours)
+- **QA & Testing**
   - Required competencies: DeFi Testing, Transaction Testing
   - Area of project modified: Test Suite
 
@@ -1158,20 +878,27 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant ChartLibrary
-    participant GraphQL
-    participant PriceOracle
+    participant TradingView
+    participant Client
+    participant Indexer
+    participant Oracle
     
     User->>Frontend: Select asset and timeframe
-    Frontend->>GraphQL: Query historical data
-    GraphQL-->>Frontend: Return price history
-    Frontend->>ChartLibrary: Initialize chart
-    ChartLibrary-->>User: Display chart
+    Frontend->>Client: Query historical data
+    Client->>Indexer: Get price history
+    Indexer-->>Client: Return price history
+    Client-->>Frontend: Historical data
+    Frontend->>TradingView: Initialize chart
+    TradingView-->>User: Display chart
     
     loop Every 5 seconds
-        Frontend->>PriceOracle: Poll latest price
-        PriceOracle-->>Frontend: Return price update
-        Frontend->>ChartLibrary: Update chart
+        Frontend->>Client: Poll latest price
+        Client->>Oracle: Get current price
+        Oracle-->>Client: Price update
+        Client->>Indexer: Get aggregated candles
+        Indexer-->>Client: Candle data
+        Client-->>Frontend: Updated data
+        Frontend->>TradingView: Update chart
         Frontend-->>User: Update market stats
     end
 ```
@@ -1186,8 +913,8 @@ sequenceDiagram
 **Prerequisite Stories**: None
 
 **Prerequisite Technical Stories**: 
-- Oracle integration (STAR-133)
-- Charts infrastructure setup (STAR-126)
+- Oracle integration
+- Charts infrastructure setup
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
@@ -1196,7 +923,7 @@ sequenceDiagram
   - Market stats: 24h volume, high, low, price change %, open interest
   - Technical indicators: MA, EMA, RSI, MACD, Bollinger Bands (minimum)
   - Drawing tools: trendlines, horizontal lines, fibonacci
-  - Price updates every 5 seconds via polling
+  - Price updates every 5 seconds via polling through Client SDK
   - Chart data persistence in localStorage
   
 - **Non-Functional Requirements**:
@@ -1204,7 +931,6 @@ sequenceDiagram
   - Smooth chart performance with 10,000+ candles
   - Mobile-responsive chart interface
   - Offline chart viewing with cached data
-  - WebSocket fallback to polling if needed
   - Chart library bundle size < 500KB
 
 **Unhappy Paths**:
@@ -1215,26 +941,22 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (8 hours)
-  - Required competencies: UI/UX Design, Financial Charts
-  - Area of project modified: Trading Interface
-  
-- **Frontend Implementation** (24 hours)
+- **Frontend Implementation**
   - Required competencies: React, TradingView, TypeScript
   - Area of project modified: Chart Components
-  - Details: TradingView integration (STAR-126 subtask), custom indicators, toolbar
+  - Details: TradingView integration, custom indicators, toolbar
   
-- **Data Pipeline** (16 hours)
+- **Data Pipeline**
   - Required competencies: Data Engineering, Time-series Data
-  - Area of project modified: Backend Services
-  - Details: OHLCV data aggregation, historical data storage, polling infrastructure (STAR-137 subtask)
+  - Area of project modified: Client SDK Services
+  - Details: OHLCV data aggregation, historical data storage, polling infrastructure
   
-- **Price Feed Integration** (12 hours)
-  - Required competencies: Real-time Data, GraphQL
-  - Area of project modified: GraphQL Layer
-  - Details: Real-time price subscription, data transformation (STAR-136 subtask)
+- **Price Feed Integration**
+  - Required competencies: Real-time Data, Client SDK
+  - Area of project modified: Client SDK Layer
+  - Details: Real-time price subscription, data transformation through Client
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Frontend Testing, Performance Testing
   - Area of project modified: Test Suite
 
@@ -1275,7 +997,7 @@ sequenceDiagram
 **Prerequisite Stories**: None
 
 **Prerequisite Technical Stories**: 
-- Frontend project setup (STAR-121)
+- Frontend project setup
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
@@ -1304,28 +1026,10 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (4 hours)
-  - Required competencies: UI/UX Design, Web3 UX
-  - Area of project modified: Header Component
-  
-- **Wallet Integration** (16 hours)
-  - Required competencies: Web3, Fuel SDK, TypeScript
-  - Area of project modified: Wallet Service
-  - Details: Fuel connector setup (STAR-122 subtask), wallet state management, connection persistence
-  
-- **Frontend Components** (12 hours)
-  - Required competencies: React, TypeScript
+- **Frontend Components**
+  - Required competencies: React, TypeScript, Web3, Fuel SDK
   - Area of project modified: Header and Auth Components
-  - Details: Connection modal, account display, network indicator
-  
-- **Network Validation** (6 hours)
-  - Required competencies: Blockchain, Network Management
-  - Area of project modified: Network Service
-  - Details: Chain ID validation, network switching logic
-  
-- **QA & Testing** (8 hours)
-  - Required competencies: Web3 Testing, E2E Testing
-  - Area of project modified: Test Suite
+  - Details: Connection modal, account display, network indicator, wallet state management, connection persistence
 
 ### STAR-113: View Trading History
 
@@ -1338,46 +1042,48 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant GraphQL
-    participant Analytics
+    participant Client
+    participant Indexer
     
     User->>Frontend: Navigate to history
-    Frontend->>GraphQL: Query trade history
-    GraphQL-->>Frontend: Return paginated trades
+    Frontend->>Client: Query trade history
+    Client->>Indexer: Get paginated trades
+    Indexer-->>Client: Return trade data
+    Client-->>Frontend: Formatted trade history
     Frontend-->>User: Display trade table
     
     User->>Frontend: Apply filters
-    Frontend->>GraphQL: Query filtered data
-    GraphQL-->>Frontend: Return filtered trades
+    Frontend->>Client: Query filtered data
+    Client->>Indexer: Get filtered trades
+    Indexer-->>Client: Filtered results
+    Client-->>Frontend: Filtered trade data
     
     User->>Frontend: View analytics
-    Frontend->>Analytics: Calculate metrics
-    Analytics-->>Frontend: Return performance data
+    Frontend->>Client: Calculate metrics
+    Client-->>Frontend: Performance data
     Frontend-->>User: Display analytics dashboard
 ```
 
 **Task Flow**:
 1. Navigate to account/history section
-2. View chronological list of all trades
+2. View chronological list of all trades through Client SDK
 3. Filter by date range, asset, or trade type
-4. See trade details: price, size, fees, PnL
-5. View aggregate performance statistics
-6. Export trading data (optional)
+4. See trade details: open price, close price, size, fees, PnL
+5. View aggregate performance statistics calculated in Client (bonsai layer)
 
 **Prerequisite Stories**: STAR-107, STAR-108, STAR-110
 
 **Prerequisite Technical Stories**: 
 - Trade history processing in indexer
-- Analytics system setup (STAR-127)
+- Client SDK analytics system
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
-  - Trade history table: Date, Asset, Side, Size, Entry/Exit Price, Fees, P&L, ROE
+  - Trade history table: Date, Asset, Side, Size, Open Price, Close Price, Fees, P&L, ROE
   - Filters: date range picker, asset selector, long/short filter, profit/loss filter
   - Pagination with 25, 50, 100 items per page
   - Trade details modal with complete transaction information
   - Performance metrics: Total P&L, Win Rate, Average Win/Loss, Sharpe Ratio, Max Drawdown
-  - CSV export with all trade data and calculations
   - Cumulative P&L chart over time
   
 - **Non-Functional Requirements**:
@@ -1386,36 +1092,30 @@ sequenceDiagram
   - Data retention for 1 year minimum
   - Mobile-optimized table view
   - Audit trail for all modifications
-  - GDPR-compliant data export
 
 **Unhappy Paths**:
   - No trades shows onboarding message
   - Large date ranges trigger pagination warning
-  - Export failure provides retry option
   - Missing price data shows estimation notice
 
 **Subtasks**:
 
-- **UI/UX Design** (8 hours)
-  - Required competencies: UI/UX Design, Data Tables
-  - Area of project modified: History Interface
-  
-- **Frontend Development** (20 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Data Visualization
   - Area of project modified: History Components
-  - Details: Trade table, filters, export functionality, performance charts
+  - Details: Trade table, filters, performance charts
   
-- **Analytics Engine** (16 hours)
-  - Required competencies: Financial Analytics, Statistics
-  - Area of project modified: Analytics Service
-  - Details: Performance metrics calculation (STAR-127 subtask), risk metrics
+- **Client SDK Analytics Engine**
+  - Required competencies: Financial Analytics, Statistics, Client SDK
+  - Area of project modified: Client SDK Analytics Service
+  - Details: Performance metrics calculation in bonsai layer, risk metrics
   
-- **Data Processing** (12 hours)
-  - Required competencies: GraphQL, Database Optimization
-  - Area of project modified: GraphQL Layer
+- **Data Processing**
+  - Required competencies: Client SDK, Database Optimization
+  - Area of project modified: Client SDK Layer
   - Details: Trade aggregation queries, pagination optimization
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Data Testing, Performance Testing
   - Area of project modified: Test Suite
 
@@ -1430,27 +1130,31 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant GraphQL
-    participant FundingService
+    participant Client
+    participant Indexer
     participant Contracts
     
     User->>Frontend: Navigate to funding rates
-    Frontend->>GraphQL: Query current rates
-    GraphQL->>FundingService: Get funding data
-    FundingService->>Contracts: Read funding state
-    Contracts-->>FundingService: Return rates
-    FundingService-->>Frontend: Formatted funding data
+    Frontend->>Client: Query current rates
+    Client->>Indexer: Get funding data
+    Indexer->>Contracts: Read funding state
+    Contracts-->>Indexer: Return rates
+    Indexer-->>Client: Funding data
+    Client-->>Frontend: Formatted funding data
     Frontend-->>User: Display funding dashboard
     
     loop Every minute
-        Frontend->>GraphQL: Poll funding updates
+        Frontend->>Client: Poll funding updates
+        Client->>Indexer: Get latest rates
+        Indexer-->>Client: Updated rates
+        Client-->>Frontend: Rate updates
         Frontend-->>User: Update rates display
     end
 ```
 
 **Task Flow**:
 1. Navigate to funding rates section
-2. View current funding rates for all markets
+2. View current funding rates for all markets from Indexer
 3. See funding rate history and trends
 4. Monitor funding rate predictions
 5. Track funding costs for open positions
@@ -1458,7 +1162,7 @@ sequenceDiagram
 **Prerequisite Stories**: STAR-109
 
 **Prerequisite Technical Stories**: 
-- Funding rate mechanism in contracts (STAR-130)
+- Funding rate mechanism in contracts
 - Funding data processing in indexer
 
 **Acceptance Criteria**:
@@ -1487,26 +1191,22 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (10 hours)
-  - Required competencies: UI/UX Design, Data Visualization
-  - Area of project modified: Funding Dashboard
-  
-- **Frontend Development** (20 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Charting
   - Area of project modified: Funding Components
   - Details: Rate dashboard, historical charts, prediction display
   
-- **Funding Calculations** (16 hours)
+- **Funding Calculations**
   - Required competencies: DeFi Mathematics, Financial Engineering
   - Area of project modified: Funding Service
-  - Details: Rate calculation engine (STAR-130 subtask), prediction model
+  - Details: Rate calculation engine, prediction model
   
-- **Data Pipeline** (12 hours)
+- **Data Pipeline**
   - Required competencies: Data Engineering, Time-series Analysis
-  - Area of project modified: Indexer and GraphQL
+  - Area of project modified: Indexer and Client SDK
   - Details: Funding event processing, aggregation queries
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Financial Testing, Data Validation
   - Area of project modified: Test Suite
 
@@ -1521,16 +1221,21 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
+    participant Client
     participant Wallet
     participant Contracts
     participant RLPToken
+    participant Indexer
     
     User->>Frontend: Navigate to LP section
-    Frontend->>Contracts: Query pool statistics
-    Contracts-->>Frontend: Return TVL, APY, utilization
+    Frontend->>Client: Query pool statistics
+    Client->>Indexer: Get pool data
+    Indexer-->>Client: TVL, APY, utilization
+    Client-->>Frontend: Pool statistics
+    Frontend-->>User: Display pool info
     User->>Frontend: Enter USDC amount
-    Frontend->>Frontend: Calculate RLP tokens
+    Frontend->>Client: Calculate RLP tokens
+    Client-->>Frontend: RLP calculation
     Frontend-->>User: Preview LP details
     User->>Frontend: Confirm deposit
     Frontend->>Wallet: Request approval
@@ -1538,12 +1243,13 @@ sequenceDiagram
     Wallet->>Contracts: Deposit to pool
     Contracts->>RLPToken: Mint RLP tokens
     RLPToken-->>User: Receive RLP tokens
+    Contracts-->>Indexer: Emit AddLiquidity event
     Frontend-->>User: Show success
 ```
 
 **Task Flow**:
 1. Navigate to liquidity provision section
-2. View current pool statistics (TVL, APY, utilization)
+2. View current pool statistics (TVL, APY, utilization) from Indexer
 3. Enter USDC amount to deposit
 4. Review RLP tokens to be received
 5. Review transaction details and fees
@@ -1554,7 +1260,7 @@ sequenceDiagram
 **Prerequisite Stories**: STAR-112
 
 **Prerequisite Technical Stories**: 
-- RLP token system implementation (STAR-131)
+- RLP token system implementation
 - Liquidity pool management in contracts
 
 **Acceptance Criteria**:
@@ -1569,7 +1275,7 @@ sequenceDiagram
   
 - **Non-Functional Requirements**:
   - APY calculation updated hourly
-  - Pool statistics cached for 1 minute
+  - Pool statistics from Indexer updated every minute
   - Transaction completes within 60 seconds
   - Gas-optimized approval + deposit pattern
   - Comprehensive documentation of risks
@@ -1584,26 +1290,26 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (8 hours)
+- **UI/UX Design**
   - Required competencies: UI/UX Design, DeFi Interfaces
   - Area of project modified: LP Interface
   
-- **Frontend Development** (16 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Web3
   - Area of project modified: LP Components
   - Details: Deposit form, pool statistics, RLP calculator
   
-- **Smart Contract Development** (24 hours)
+- **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Liquidity Pool Contract
-  - Details: Deposit function, RLP minting logic (STAR-131 subtask)
+  - Details: Deposit function, RLP minting logic
   
-- **RLP Token Integration** (16 hours)
+- **RLP Token Integration**
   - Required competencies: Token Standards, DeFi
   - Area of project modified: RLP Token Contract
-  - Details: Token minting, balance tracking (STAR-131 subtask)
+  - Details: Token minting, balance tracking
   
-- **QA & Testing** (12 hours)
+- **QA & Testing**
   - Required competencies: DeFi Testing, Security Testing
   - Area of project modified: Test Suite
 
@@ -1611,23 +1317,29 @@ sequenceDiagram
 
 **Name**: Withdraw Liquidity (LP)
 
-**Story**: As a liquidity provider, I want to withdraw my USDC from the liquidity pool when needed by burning RLP tokens and receiving my proportional share.
+**Story**: As a liquidity provider, I want to withdraw my USDC from the liquidity pool when needed by specifying USD amount to withdraw and receiving my proportional share.
 
 **User Flow Diagram**:
 ```mermaid
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
+    participant Client
     participant Wallet
     participant Contracts
     participant RLPToken
+    participant Indexer
     
     User->>Frontend: Navigate to withdraw
-    Frontend->>RLPToken: Query RLP balance
-    RLPToken-->>Frontend: Return balance
-    User->>Frontend: Enter RLP amount
-    Frontend->>Contracts: Calculate USDC value
+    Frontend->>Client: Query RLP balance
+    Client->>RLPToken: Get RLP balance
+    RLPToken-->>Client: Return balance
+    Client-->>Frontend: RLP balance data
+    User->>Frontend: Enter USD amount to withdraw
+    Frontend->>Client: Calculate RLP tokens needed
+    Client->>Indexer: Get current pool value
+    Indexer-->>Client: Pool value data
+    Client-->>Frontend: RLP calculation
     Frontend-->>User: Preview withdrawal
     User->>Frontend: Confirm withdrawal
     Frontend->>Wallet: Request signature
@@ -1635,30 +1347,40 @@ sequenceDiagram
     Wallet->>Contracts: Withdraw from pool
     Contracts->>RLPToken: Burn RLP tokens
     Contracts-->>User: Transfer USDC
+    Contracts-->>Indexer: Emit RemoveLiquidity event
     Frontend-->>User: Show success
+    
+    alt Complete Withdrawal Option
+        User->>Frontend: Click complete withdrawal
+        Frontend->>Client: Calculate full withdrawal
+        Frontend-->>User: Show complete withdrawal details
+    end
 ```
 
 **Task Flow**:
 1. Navigate to liquidity withdrawal section
-2. View current RLP token balance
-3. Enter amount of RLP tokens to burn
-4. Review USDC amount to be received
+2. View current RLP token balance and USDC value
+3. Enter USD amount to withdraw (not RLP tokens)
+4. Review RLP tokens to be burned for withdrawal
 5. Check for any withdrawal fees or cooldowns
-6. Submit withdrawal transaction
-7. Confirm transaction in wallet
-8. Receive USDC and see updated RLP balance
+6. Option for complete withdrawal
+7. Submit withdrawal transaction
+8. Confirm transaction in wallet
+9. Receive USDC and see updated RLP balance
 
 **Prerequisite Stories**: STAR-115
 
 **Prerequisite Technical Stories**: 
-- RLP token burning mechanism (STAR-131)
+- RLP token burning mechanism
 - Withdrawal logic in contracts
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - RLP balance display with current USDC value
-  - USDC calculation: rlp_amount / total_rlp_supply * pool_value
-  - Partial withdrawal support (minimum 10 RLP or 10%)
+  - USD amount input for withdrawal (not RLP tokens)
+  - RLP calculation: usd_amount / pool_value * total_rlp_supply
+  - Complete withdrawal option
+  - Partial withdrawal support (minimum $100 or 10%)
   - Withdrawal fee: 0.1% (configurable)
   - 24-hour cooldown period after deposit (configurable)
   - Immediate USDC transfer upon confirmation
@@ -1669,7 +1391,6 @@ sequenceDiagram
   - Withdrawal preview accuracy > 99.9%
   - Transaction completes within 60 seconds
   - Clear display of any lockup periods
-  - Slippage protection for large withdrawals
   - Audit trail of all withdrawals
 
 **Unhappy Paths**:
@@ -1681,26 +1402,26 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (6 hours)
+- **UI/UX Design**
   - Required competencies: UI/UX Design, DeFi Interfaces
   - Area of project modified: LP Interface
   
-- **Frontend Development** (14 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Web3
   - Area of project modified: LP Components
-  - Details: Withdrawal form, cooldown timer, value calculator
+  - Details: USD withdrawal form, complete withdrawal option, cooldown timer, value calculator
   
-- **Smart Contract Development** (20 hours)
+- **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Liquidity Pool Contract
-  - Details: Withdrawal function, RLP burning logic (STAR-131 subtask)
+  - Details: USD-based withdrawal function, RLP burning logic, complete withdrawal
   
-- **Cooldown Mechanism** (8 hours)
+- **Cooldown Mechanism**
   - Required competencies: Smart Contracts, Time-locks
   - Area of project modified: Pool Contract
   - Details: Cooldown tracking, emergency withdrawal
   
-- **QA & Testing** (10 hours)
+- **QA & Testing**
   - Required competencies: DeFi Testing, Edge Cases
   - Area of project modified: Test Suite
 
@@ -1715,20 +1436,24 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant GraphQL
-    participant Analytics
+    participant Client
+    participant Indexer
     participant Contracts
     
     User->>Frontend: Navigate to LP dashboard
-    Frontend->>GraphQL: Query LP position
-    GraphQL->>Contracts: Get current RLP value
-    GraphQL->>Analytics: Calculate performance
-    Analytics-->>Frontend: Return metrics
+    Frontend->>Client: Query LP position
+    Client->>Indexer: Get LP data
+    Indexer->>Contracts: Get current RLP value
+    Contracts-->>Indexer: RLP value data
+    Client->>Client: Calculate performance (bonsai layer)
+    Client-->>Frontend: Performance metrics
     Frontend-->>User: Display LP dashboard
     
     User->>Frontend: View historical chart
-    Frontend->>GraphQL: Query historical data
-    GraphQL-->>Frontend: Return time series
+    Frontend->>Client: Query historical data
+    Client->>Indexer: Get time series data
+    Indexer-->>Client: Historical performance
+    Client-->>Frontend: Chart data
     Frontend-->>User: Display performance chart
 ```
 
@@ -1737,13 +1462,13 @@ sequenceDiagram
 2. View current RLP token value and share of pool
 3. See earnings from trading fees over time
 4. Monitor exposure to trader PnL
-5. Track historical LP performance and returns
+5. Track historical LP performance and returns calculated in Client (bonsai layer)
 6. View pool utilization and risk metrics
 
 **Prerequisite Stories**: STAR-115
 
 **Prerequisite Technical Stories**: 
-- LP analytics system (STAR-127)
+- LP analytics system in Client SDK
 - Fee distribution tracking in indexer
 
 **Acceptance Criteria**:
@@ -1761,7 +1486,6 @@ sequenceDiagram
   - Historical data for 1 year
   - Chart renders 10,000+ data points smoothly
   - Mobile-optimized dashboard
-  - CSV export for tax reporting
   - Real-time fee accrual display
 
 **Unhappy Paths**:
@@ -1772,26 +1496,26 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (10 hours)
+- **UI/UX Design**
   - Required competencies: UI/UX Design, Dashboard Design
   - Area of project modified: LP Dashboard
   
-- **Frontend Development** (20 hours)
+- **Frontend Development**
   - Required competencies: React, TypeScript, Data Visualization
   - Area of project modified: LP Analytics Components
   - Details: Dashboard layout, performance charts, metrics display
   
-- **Analytics Engine** (18 hours)
-  - Required competencies: Financial Analytics, DeFi Metrics
-  - Area of project modified: Analytics Service
-  - Details: APY calculations, risk metrics (STAR-127 subtask), P&L attribution
+- **Client SDK Analytics Engine**
+  - Required competencies: Financial Analytics, DeFi Metrics, Client SDK
+  - Area of project modified: Client SDK Analytics Service
+  - Details: APY calculations, risk metrics in bonsai layer, P&L attribution
   
-- **Data Pipeline** (14 hours)
-  - Required competencies: Data Engineering, GraphQL
-  - Area of project modified: Indexer and GraphQL
-  - Details: Fee event processing (STAR-135 subtask), historical aggregation
+- **Data Pipeline**
+  - Required competencies: Data Engineering, Client SDK
+  - Area of project modified: Indexer and Client SDK
+  - Details: Fee event processing, historical aggregation
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Analytics Testing, Data Validation
   - Area of project modified: Test Suite
 
@@ -1806,36 +1530,36 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Validation
-    participant TransactionManager
+    participant Client
     participant Wallet
     participant Contracts
     
     User->>Frontend: Initiate transaction
-    Frontend->>Validation: Pre-flight checks
+    Frontend->>Client: Pre-flight checks
     
     alt Validation Failed
-        Validation-->>Frontend: Error details
+        Client-->>Frontend: Error details
         Frontend-->>User: Show error with solution
     else Validation Passed
-        Frontend->>TransactionManager: Submit transaction
-        TransactionManager->>Wallet: Request signature
+        Frontend->>Wallet: Submit transaction
+        Wallet->>Client: Request signature
         
         alt User Rejected
-            Wallet-->>TransactionManager: Rejection
-            TransactionManager-->>Frontend: User cancelled
+            Wallet-->>Client: Rejection
+            Client-->>Frontend: User cancelled
             Frontend-->>User: Show cancellation message
         else Wallet Error
-            Wallet-->>TransactionManager: Wallet error
-            TransactionManager-->>Frontend: Parse error
+            Wallet-->>Client: Wallet error
+            Client->>Client: Parse error
+            Client-->>Frontend: Formatted error
             Frontend-->>User: Show wallet error with fix
         else Transaction Sent
             Wallet->>Contracts: Send transaction
             alt Transaction Failed
-                Contracts-->>TransactionManager: Revert reason
-                TransactionManager->>TransactionManager: Parse error
-                TransactionManager-->>Frontend: Formatted error
-                Frontend-->>User: Show error with retry option
+                Contracts-->>Client: Revert reason
+                Client->>Client: Parse error
+                Client-->>Frontend: Formatted error
+                Frontend-->>User: Show error
             end
         end
     end
@@ -1844,15 +1568,14 @@ sequenceDiagram
 **Task Flow**:
 1. Attempt a transaction (deposit, trade, withdrawal)
 2. Encounter transaction failure or validation error
-3. Receive clear, actionable error message
-4. Understand the specific issue (insufficient balance, slippage, etc.)
+3. Receive clear, actionable error message through Client SDK
+4. Understand the specific issue (insufficient balance, etc.)
 5. Get guidance on how to resolve the problem
-6. Retry transaction after addressing the issue
 
 **Prerequisite Stories**: STAR-107, STAR-108
 
 **Prerequisite Technical Stories**: 
-- Transaction management system (STAR-124)
+- Client SDK transaction management system
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
@@ -1860,7 +1583,6 @@ sequenceDiagram
   - Error categorization: user errors, network errors, contract errors, wallet errors
   - User-friendly error messages mapping technical errors to plain English
   - Suggested actions for each error type with actionable buttons
-  - Retry mechanism with exponential backoff for network errors
   - Error tracking and analytics for monitoring common issues
   - Toast notifications for non-blocking errors
   - Modal dialogs for blocking errors requiring user action
@@ -1868,39 +1590,37 @@ sequenceDiagram
 - **Non-Functional Requirements**:
   - Error detection within 100ms for validation errors
   - Error message display within 500ms of failure
-  - Retry attempts limited to 3 with increasing delays
   - Error logs sent to monitoring service
   - Localization support for error messages
   - Accessibility compliance for error displays
 
 **Unhappy Paths**:
   - Unknown errors show generic message with support link
-  - Repeated failures trigger cooldown period
   - Critical errors trigger emergency mode
   - Network timeout shows offline indicator
 
 **Subtasks**:
 
-- **UX Writing** (6 hours)
+- **UX Writing**
   - Required competencies: UX Writing, Technical Communication
   - Area of project modified: Error Messages
   
-- **Error Handling System** (16 hours)
-  - Required competencies: TypeScript, Error Management
-  - Area of project modified: Transaction Manager
-  - Details: Error parser, retry logic (STAR-124 subtask), recovery flows
+- **Error Handling System**
+  - Required competencies: TypeScript, Error Management, Client SDK
+  - Area of project modified: Client SDK Transaction Manager
+  - Details: Error parser within Client SDK, recovery flows
   
-- **Frontend Components** (12 hours)
+- **Frontend Components**
   - Required competencies: React, TypeScript, UI Components
   - Area of project modified: Error Components
   - Details: Error modals, toast notifications, inline validation
   
-- **Validation Layer** (10 hours)
-  - Required competencies: Web3, Validation Logic
-  - Area of project modified: Validation Service
+- **Validation Layer**
+  - Required competencies: Web3, Validation Logic, Client SDK
+  - Area of project modified: Client SDK Validation Service
   - Details: Pre-flight checks, parameter validation
   
-- **QA & Testing** (12 hours)
+- **QA & Testing**
   - Required competencies: Error Testing, E2E Testing
   - Area of project modified: Test Suite
   - Details: Error scenario testing, recovery testing
@@ -1916,22 +1636,27 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend
-    participant Calculator
-    participant FundingService
+    participant Client
+    participant Indexer
     participant Contracts
     
     User->>Frontend: Open position form
-    Frontend->>FundingService: Get current rate
-    FundingService->>Contracts: Query funding rate
-    Contracts-->>FundingService: Return rate
+    Frontend->>Client: Get current rate
+    Client->>Indexer: Query funding rate
+    Indexer->>Contracts: Get funding state
+    Contracts-->>Indexer: Return rate
+    Indexer-->>Client: Funding data
+    Client-->>Frontend: Rate information
     User->>Frontend: Enter position details
-    Frontend->>Calculator: Calculate funding cost
-    Calculator-->>Frontend: Projected costs
+    Frontend->>Client: Calculate funding cost (bonsai layer)
+    Client-->>Frontend: Projected costs
     Frontend-->>User: Display funding preview
     
     User->>Frontend: View existing position
-    Frontend->>FundingService: Get accumulated funding
-    FundingService-->>Frontend: Funding history
+    Frontend->>Client: Get accumulated funding
+    Client->>Indexer: Get funding history
+    Indexer-->>Client: Funding history
+    Client-->>Frontend: Historical funding
     Frontend-->>User: Show funding paid/received
 ```
 
@@ -1940,17 +1665,17 @@ sequenceDiagram
 2. Monitor ongoing funding costs for open positions
 3. Understand how funding rates are calculated
 4. View funding payment history
-5. Factor funding costs into position sizing
+5. Factor funding costs into position sizing through Client SDK calculator
 
 **Prerequisite Stories**: STAR-107, STAR-108, STAR-109
 
 **Prerequisite Technical Stories**: 
-- Funding rate mechanism (STAR-130)
+- Funding rate mechanism
 
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Funding rate display on position entry form (rate per 8 hours)
-  - Cost calculator: position_size * funding_rate * (hours_held / 8)
+  - Cost calculator in Client (bonsai layer): position_size * funding_rate * (hours_held / 8)
   - Funding direction indicator (pay/receive based on long/short and rate)
   - Break-even calculator including funding costs
   - Accumulated funding display per position
@@ -1962,7 +1687,6 @@ sequenceDiagram
   - Historical funding data for 90 days
   - Calculator accuracy to 6 decimal places
   - Mobile-friendly calculator interface
-  - Funding rate API endpoint for external tools
   - Documentation of funding mechanism
 
 **Unhappy Paths**:
@@ -1973,26 +1697,22 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (6 hours)
-  - Required competencies: UI/UX Design, Financial Calculators
-  - Area of project modified: Trading Interface
+- **Funding Calculator**
+  - Required competencies: React, Financial Mathematics, Client SDK
+  - Area of project modified: Client SDK Calculator Components
+  - Details: Cost calculator in bonsai layer, break-even analysis, projections
   
-- **Funding Calculator** (12 hours)
-  - Required competencies: React, Financial Mathematics
-  - Area of project modified: Calculator Components
-  - Details: Cost calculator, break-even analysis, projections
-  
-- **Frontend Integration** (10 hours)
+- **Frontend Integration**
   - Required competencies: React, TypeScript
   - Area of project modified: Position Components
   - Details: Funding display integration, payment history
   
-- **Data Processing** (8 hours)
-  - Required competencies: GraphQL, Data Aggregation
-  - Area of project modified: GraphQL Layer
+- **Data Processing**
+  - Required competencies: Client SDK, Data Aggregation
+  - Area of project modified: Client SDK Layer
   - Details: Funding aggregation queries, history processing
   
-- **QA & Testing** (6 hours)
+- **QA & Testing**
   - Required competencies: Calculator Testing, Math Validation
   - Area of project modified: Test Suite
 
@@ -2011,7 +1731,7 @@ sequenceDiagram
     participant Wallet
     participant Contracts
     
-    User->>Frontend: Click network selector
+    User->>Frontend: Click network selector in header
     Frontend-->>User: Show network options
     User->>Frontend: Select network
     Frontend->>NetworkManager: Switch network
@@ -2021,21 +1741,21 @@ sequenceDiagram
     Wallet-->>NetworkManager: Network switched
     NetworkManager->>Contracts: Update endpoints
     NetworkManager-->>Frontend: Network updated
-    Frontend-->>User: Show new network
+    Frontend-->>User: Show new network in header
 ```
 
 **Task Flow**:
 1. Visit Starboard Finance platform
-2. See network selector in header or settings
+2. See network selector in header
 3. Choose between Testnet and Mainnet
 4. Confirm network switching
-5. See updated network indicator
+5. See updated network indicator in header
 6. Wallet automatically switches to correct network
 
 **Prerequisite Stories**: STAR-112
 
 **Prerequisite Technical Stories**: 
-- Multi-network contract deployment (STAR-128)
+- Multi-network contract deployment
 - Network configuration in frontend
 
 **Acceptance Criteria**:
@@ -2064,44 +1784,23 @@ sequenceDiagram
 
 **Subtasks**:
 
-- **UI/UX Design** (4 hours)
-  - Required competencies: UI/UX Design, Network Indicators
-  - Area of project modified: Header Component
-  
-- **Network Management** (12 hours)
+- **Network Management**
   - Required competencies: Web3, Network Configuration
   - Area of project modified: Network Service
   - Details: Network switching logic, configuration management
   
-- **Frontend Integration** (8 hours)
+- **Frontend Integration**
   - Required competencies: React, TypeScript
   - Area of project modified: Header and App Components
-  - Details: Network selector, visual indicators, state management
+  - Details: Network selector in header, visual indicators, state management
   
-- **Contract Configuration** (6 hours)
+- **Contract Configuration**
   - Required competencies: Smart Contracts, Multi-chain
   - Area of project modified: Contract Configs
   - Details: Network-specific addresses, ABI management
   
-- **QA & Testing** (8 hours)
+- **QA & Testing**
   - Required competencies: Network Testing, E2E Testing
   - Area of project modified: Test Suite
   - Details: Network switch scenarios, data isolation testing
 
----
-
-## Summary
-
-This comprehensive breakdown reorganizes the project into three clear EPICs:
-
-1. **Architecture EPIC**: 7 documentation and design stories for system architecture
-2. **Cloud Infrastructure EPIC**: 10 actual infrastructure stories for platform deployment
-3. **Implementation EPIC**: 15 detailed user stories with comprehensive subtasks
-
-Key improvements in this reorganization:
-- Moved functional requirements (wallet integration, trading interface, etc.) from Cloud Infrastructure to become subtasks within relevant user stories
-- Created proper infrastructure stories for actual cloud/DevOps needs
-- Each user story now includes detailed subtasks referencing the original technical stories as implementation details
-- Maintained traceability while properly categorizing work
-
-Total estimated effort: ~2,400 hours across all competencies and project areas.
