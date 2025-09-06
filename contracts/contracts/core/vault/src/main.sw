@@ -93,8 +93,6 @@ storage {
     mint_burn_fee_basis_points: u64 = 30, // 0.3%
     /// charged when swapping b/w different assets within the protocol
     swap_fee_basis_points: u64 = 30, // 0.3%
-    /// reduced swap fee for stable assets
-    stable_swap_fee_basis_points: u64 = 4, // 0.04%
     /// applied to size of leveraged positions
     margin_fee_basis_points: u64 = 10, // 0.1%
 
@@ -111,7 +109,7 @@ storage {
     whitelisted_assets: StorageMap<AssetId, bool> = StorageMap {},
     asset_decimals: StorageMap<AssetId, u32> = StorageMap {},
     min_profit_basis_points: StorageMap<AssetId, u64> = StorageMap {},
-    stable_assets: StorageMap<AssetId, bool> = StorageMap {},
+    stable_asset: AssetId = ZERO_ASSET,
     shortable_assets: StorageMap<AssetId, bool> = StorageMap {},
 
     // allows customisation of index composition
@@ -281,7 +279,6 @@ impl Vault for Contract {
         stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
         swap_fee_basis_points: u64,
-        stable_swap_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
         min_profit_time: u64,
@@ -294,7 +291,6 @@ impl Vault for Contract {
             stable_tax_basis_points <= MAX_FEE_BASIS_POINTS &&
             mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
             swap_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
-            stable_swap_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
             margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints
         );
@@ -304,7 +300,6 @@ impl Vault for Contract {
         storage.stable_tax_basis_points.write(stable_tax_basis_points);
         storage.mint_burn_fee_basis_points.write(mint_burn_fee_basis_points);
         storage.swap_fee_basis_points.write(swap_fee_basis_points);
-        storage.stable_swap_fee_basis_points.write(stable_swap_fee_basis_points);
         storage.margin_fee_basis_points.write(margin_fee_basis_points);
         storage.liquidation_fee_usd.write(liquidation_fee_usd);
         storage.min_profit_time.write(min_profit_time);
@@ -315,7 +310,6 @@ impl Vault for Contract {
             stable_tax_basis_points,
             mint_burn_fee_basis_points,
             swap_fee_basis_points,
-            stable_swap_fee_basis_points,
             margin_fee_basis_points,
             liquidation_fee_usd,
             min_profit_time,
@@ -366,7 +360,6 @@ impl Vault for Contract {
         asset_weight: u64,
         min_profit_bps: u64,
         max_rusd_amount: u256,
-        is_stable: bool,
         is_shortable: bool
     ) {
         _only_gov();
@@ -386,7 +379,6 @@ impl Vault for Contract {
         storage.asset_weights.insert(asset, asset_weight);
         storage.min_profit_basis_points.insert(asset, min_profit_bps);
         storage.max_rusd_amounts.insert(asset, max_rusd_amount);
-        storage.stable_assets.insert(asset, is_stable);
         storage.shortable_assets.insert(asset, is_shortable);
 
         storage.total_asset_weights.write(total_asset_weights + asset_weight);
@@ -397,7 +389,6 @@ impl Vault for Contract {
             asset_weight,
             min_profit_bps,
             max_rusd_amount,
-            is_stable,
             is_shortable
         });
     }
@@ -420,12 +411,18 @@ impl Vault for Contract {
         storage.asset_weights.remove(asset);
         storage.min_profit_basis_points.remove(asset);
         storage.max_rusd_amounts.remove(asset);
-        storage.stable_assets.remove(asset);
         storage.shortable_assets.remove(asset);
 
         storage.whitelisted_asset_count.write(storage.whitelisted_asset_count.read() - 1);
 
         log(ClearAssetConfig { asset });
+    }
+
+    #[storage(read, write)]
+    fn set_stable_asset(asset: AssetId) {
+        _only_gov();
+        storage.stable_asset.write(asset);
+        log(SetStableAsset { asset });
     }
 
      #[storage(write)]
@@ -719,8 +716,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn is_stable_asset(asset: AssetId) -> bool {
-        storage.stable_assets.get(asset).try_read().unwrap_or(false)
+    fn get_stable_asset() -> AssetId {
+        storage.stable_asset.try_read().unwrap_or(ZERO_ASSET)
     }
 
     #[storage(read)]
@@ -795,11 +792,6 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_swap_fee_basis_points() -> u64 {
         storage.swap_fee_basis_points.read()
-    }
-
-    #[storage(read)]
-    fn get_stable_swap_fee_basis_points() -> u64 {
-        storage.stable_swap_fee_basis_points.read()
     }
 
     #[storage(read)]
@@ -1191,21 +1183,9 @@ fn _get_swap_fee_basis_points(
     asset_out: AssetId,
     rusd_amount: u256,
 ) -> u256 {
-    let is_stableswap = 
-        storage.stable_assets.get(asset_in).try_read().unwrap_or(false) && 
-        storage.stable_assets.get(asset_out).try_read().unwrap_or(false);
+    let base_bps = storage.swap_fee_basis_points.read();
 
-    let base_bps = if is_stableswap {
-        storage.stable_swap_fee_basis_points.read()
-    } else {
-        storage.swap_fee_basis_points.read()
-    };
-
-    let tax_bps = if is_stableswap {
-        storage.stable_tax_basis_points.read()
-    } else {
-        storage.tax_basis_points.read()
-    };
+    let tax_bps = storage.tax_basis_points.read();
 
     let fee_basis_points_0 = _get_fee_basis_points(
         asset_in,
@@ -1608,7 +1588,7 @@ fn _get_next_funding_rate(asset: AssetId) -> u256 {
         return 0;
     }
 
-    let funding_rate_factor = if storage.stable_assets.get(asset).try_read().unwrap_or(false) {
+    let funding_rate_factor = if storage.stable_asset.try_read().unwrap_or(ZERO_ASSET) == asset {
         storage.stable_funding_rate_factor.read()
     } else {
         storage.funding_rate_factor.read()
@@ -1922,7 +1902,7 @@ fn _update_cumulative_funding_rate(collateral_asset: AssetId) {
 
 #[storage(read)]
 fn _get_redemption_collateral(asset: AssetId) -> u256 {
-    if storage.stable_assets.get(asset).try_read().unwrap_or(false) {
+    if storage.stable_asset.try_read().unwrap_or(ZERO_ASSET) == asset {
         return _get_pool_amounts(asset);
     }
 
@@ -1962,7 +1942,7 @@ fn _validate_assets(
         Error::VaultCollateralAssetNotWhitelisted
     );
 
-    let collateral_is_stable = storage.stable_assets.get(collateral_asset).try_read().unwrap_or(false);
+    let collateral_is_stable = storage.stable_asset.try_read().unwrap_or(ZERO_ASSET) == collateral_asset;
 
     if is_long {
         require(
@@ -1982,7 +1962,7 @@ fn _validate_assets(
         Error::VaultShortCollateralAssetMustBeStableAsset
     );
     require(
-        !storage.stable_assets.get(index_asset).try_read().unwrap_or(false),
+        !(storage.stable_asset.try_read().unwrap_or(ZERO_ASSET) == index_asset),
         Error::VaultShortIndexAssetMustNotBeStableAsset
     );
     require(

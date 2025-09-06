@@ -94,7 +94,6 @@ describe("Vault.getFeeBasisPoints", function () {
                 10, // stable_tax_basis_points
                 20, // mint_burn_fee_basis_points
                 30, // swap_fee_basis_points
-                4, // stable_swap_fee_basis_points
                 10, // margin_fee_basis_points
                 toUsd(5), // liquidation_fee_usd
                 0, // min_profit_time
@@ -137,6 +136,7 @@ describe("Vault.getFeeBasisPoints", function () {
 
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         expect(await getValStr(vault.functions.get_target_rusd_amount(toAsset(BNB)))).eq("149550")
         expect(await getValStr(vault.functions.get_target_rusd_amount(toAsset(DAI)))).eq("149550")

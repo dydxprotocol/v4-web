@@ -34,11 +34,14 @@ pub struct SetAssetConfig {
     pub asset_weight: u64,
     pub min_profit_bps: u64,
     pub max_rusd_amount: u256,
-    pub is_stable: bool,
     pub is_shortable: bool
 }
 
 pub struct ClearAssetConfig {
+    pub asset: AssetId,
+}
+
+pub struct SetStableAsset {
     pub asset: AssetId,
 }
 
@@ -52,7 +55,6 @@ pub struct SetFees {
     pub stable_tax_basis_points: u64,
     pub mint_burn_fee_basis_points: u64,
     pub swap_fee_basis_points: u64,
-    pub stable_swap_fee_basis_points: u64,
     pub margin_fee_basis_points: u64,
     pub liquidation_fee_usd: u256,
     pub min_profit_time: u64,

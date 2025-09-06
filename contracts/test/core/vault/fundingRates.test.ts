@@ -94,6 +94,7 @@ describe("Vault.fundingRates", function () {
     it("funding rate", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))

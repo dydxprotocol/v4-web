@@ -94,7 +94,6 @@ describe("Vault.decreaseLongPosition", () => {
                 20, // stable_tax_basis_points
                 30, // mint_burn_fee_basis_points
                 30, // swap_fee_basis_points
-                4, // stable_swap_fee_basis_points
                 10, // margin_fee_basis_points
                 toUsd(5), // liquidation_fee_usd
                 60 * 60, // min_profit_time
@@ -117,6 +116,7 @@ describe("Vault.decreaseLongPosition", () => {
     it("decreasePosition long", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await expect(
             call(
@@ -307,6 +307,7 @@ describe("Vault.decreaseLongPosition", () => {
     it("decreasePosition long aum", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BNB), toPrice(500), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBnbConfig(BNB)))
@@ -372,6 +373,7 @@ describe("Vault.decreaseLongPosition", () => {
     it("decreasePosition long minProfitBasisPoints", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await expect(
             call(
@@ -476,6 +478,7 @@ describe("Vault.decreaseLongPosition", () => {
     it("decreasePosition long with loss", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -605,6 +608,7 @@ describe("Vault.decreaseLongPosition", () => {
     it("decreasePosition negative collateral", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))

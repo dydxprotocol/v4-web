@@ -98,6 +98,7 @@ describe("Vault.getPrice", function () {
     it("get_price", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
         expect(await getValStr(vaultPricefeed.functions.get_price(toAsset(DAI), true))).eq("1001000000000000000000000000000")
 
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1.1), vaultPricefeed, priceUpdateSigner))
@@ -111,7 +112,6 @@ describe("Vault.getPrice", function () {
                 10000, // _tokenWeight
                 75, // _minProfitBps,
                 0, // _maxRusdAmount
-                false, // _isStable
                 true, // _isShortable
             ),
         )

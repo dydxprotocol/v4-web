@@ -95,6 +95,7 @@ describe("Vault.withdrawCollateral", function () {
     it("withdraw collateral", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -236,6 +237,7 @@ describe("Vault.withdrawCollateral", function () {
     it("withdraw during cooldown duration", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -326,6 +328,7 @@ describe("Vault.withdrawCollateral", function () {
     it("withdraw collateral long", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BNB), toPrice(500), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBnbConfig(BNB)))
@@ -416,6 +419,7 @@ describe("Vault.withdrawCollateral", function () {
     it("withdraw collateral short", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BNB), toPrice(500), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBnbConfig(BNB)))

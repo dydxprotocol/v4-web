@@ -84,7 +84,6 @@ abi Vault {
         stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
         swap_fee_basis_points: u64,
-        stable_swap_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
         min_profit_time: u64,
@@ -111,12 +110,14 @@ abi Vault {
         asset_weight: u64,
         min_profit_bps: u64,
         max_rusd_amount: u256,
-        is_stable: bool,
         is_shortable: bool
     );
 
     #[storage(read, write)]
     fn clear_asset_config(asset: AssetId);
+
+    #[storage(read, write)]
+    fn set_stable_asset(asset: AssetId);
 
     #[storage(write)]
     fn set_approved_router(
@@ -286,7 +287,7 @@ abi Vault {
     fn get_asset_decimals(asset: AssetId) -> u32;
 
     #[storage(read)]
-    fn is_stable_asset(asset: AssetId) -> bool;
+    fn get_stable_asset() -> AssetId;
 
     #[storage(read)]
     fn is_shortable_asset(asset: AssetId) -> bool;
@@ -325,9 +326,6 @@ abi Vault {
 
     #[storage(read)]
     fn get_swap_fee_basis_points() -> u64;
-
-    #[storage(read)]
-    fn get_stable_swap_fee_basis_points() -> u64;
 
     #[storage(read)]
     fn get_margin_fee_basis_points() -> u64;

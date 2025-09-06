@@ -97,6 +97,7 @@ describe("Vault.liquidateLongPosition", () => {
     it("liquidate long", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -275,6 +276,7 @@ describe("Vault.liquidateLongPosition", () => {
     it("automatic stop-loss", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
         await call(vault.functions.set_max_leverage(toAsset(BTC), BTC_MAX_LEVERAGE))

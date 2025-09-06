@@ -96,6 +96,7 @@ describe("Vault.increaseLongPosition", function () {
     it("increasePosition long validations", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await expect(
             vault_user1

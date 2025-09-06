@@ -104,7 +104,6 @@ describe("Vault.averagePrice", () => {
                 20, // stable_tax_basis_points
                 30, // mint_burn_fee_basis_points
                 30, // swap_fee_basis_points
-                4, // stable_swap_fee_basis_points
                 10, // margin_fee_basis_points
                 toUsd(5), // liquidation_fee_usd
                 60 * 60, // min_profit_time
@@ -127,6 +126,7 @@ describe("Vault.averagePrice", () => {
     it("position.averagePrice, buyPrice < averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -248,6 +248,7 @@ describe("Vault.averagePrice", () => {
     it("long position.averagePrice, buyPrice == averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -321,6 +322,7 @@ describe("Vault.averagePrice", () => {
     it("long position.averagePrice, buyPrice > averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -391,6 +393,7 @@ describe("Vault.averagePrice", () => {
     it("long position.averagePrice, buyPrice < averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -461,6 +464,7 @@ describe("Vault.averagePrice", () => {
     it("long position.averagePrice, buyPrice < averagePrice + minProfitBasisPoints", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -541,6 +545,7 @@ describe("Vault.averagePrice", () => {
     it("short position.averagePrice, buyPrice == averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -609,6 +614,7 @@ describe("Vault.averagePrice", () => {
     it("short position.averagePrice, buyPrice > averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -677,6 +683,7 @@ describe("Vault.averagePrice", () => {
     it("short position.averagePrice, buyPrice < averagePrice", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
@@ -745,6 +752,7 @@ describe("Vault.averagePrice", () => {
     it("short position.averagePrice, buyPrice < averagePrice - minProfitBasisPoints", async () => {
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
+        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
