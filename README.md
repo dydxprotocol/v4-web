@@ -10,15 +10,16 @@
 
 <a href="https://conventionalcommits.org">
 <img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white" alt="Conventional Commits">
-</a> 
+</a>
 <a href="http://commitizen.github.io/cz-cli/">
 <img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly">
-</a> 
+</a>
   <a href='https://github.com/dydxprotocol/v4-web/blob/main/LICENSE'>
     <img src='https://img.shields.io/badge/License-AGPL_v3-blue.svg' alt='License' />
   </a>
 
 [![Maturity badge - level 3](https://img.shields.io/badge/Maturity-Level%203%20--%20Stable-green.svg)](https://github.com/tophat/getting-started/blob/master/scorecard.md)
+
 </div>
 
 ## Prerequisites
@@ -48,7 +49,7 @@ git clone https://github.com/dydxprotocol/v4-web.git
 cd v4-web
 ```
 
-### 2. Install pnpm 
+### 2. Install pnpm
 
 ```bash
 curl -fsSL https://get.pnpm.io/install.sh | sh -
