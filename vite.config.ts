@@ -98,6 +98,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       input: entryPoints,
+      output: {
+        manualChunks: {
+          radix: [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-dropdown-menu',
+          ],
+        },
+      },
     },
   },
 }));
