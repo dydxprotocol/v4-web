@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -15,7 +15,7 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
-import { getAppTheme } from '@/state/appUiConfigsSelectors';
+import { getAppTheme, getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getSourceAccount } from '@/state/walletSelectors';
 
@@ -30,23 +30,25 @@ export const EmailSignInStatusDialog = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const { emailSignInError, emailSignInStatus, isFirstSignIn, resetEmailSignInStatus } =
+  const { emailSignInError, emailSignInStatus, needsAddressUpload, resetEmailSignInStatus } =
     useTurnkeyAuth();
   const sourceAccount = useAppSelector(getSourceAccount);
   const walletInfo = sourceAccount.walletInfo;
   const appTheme = useAppSelector(getAppTheme);
   const isLightMode = appTheme === AppTheme.Light;
   const isTurnkey = walletInfo?.connectorType === ConnectorType.Turnkey;
+  const chartDotBackground = useAppSelector(getChartDotBackground);
 
-  useEffect(() => {
-    if (!isTurnkey) {
-      setIsOpen(false);
-    }
+  const setIsOpenInner = useCallback(
+    (isOpen: boolean) => {
+      if (!isOpen) {
+        resetEmailSignInStatus();
+      }
 
-    return () => {
-      resetEmailSignInStatus();
-    };
-  }, [isTurnkey, setIsOpen, resetEmailSignInStatus]);
+      setIsOpen(isOpen);
+    },
+    [setIsOpen, resetEmailSignInStatus]
+  );
 
   // TODO(turnkey): Localization - Pending Design
   const title = useMemo(
@@ -166,7 +168,7 @@ export const EmailSignInStatusDialog = ({
             backgroundClip: 'text',
           }}
         >
-          {isFirstSignIn ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX }) : 'Welcome back'}
+          {needsAddressUpload ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX }) : 'Welcome back'}
         </span>
       </div>
 
@@ -181,13 +183,13 @@ export const EmailSignInStatusDialog = ({
         onClick={async () => {
           setIsOpen(false);
 
-          if (isFirstSignIn) {
+          if (needsAddressUpload) {
             await sleep(0);
             dispatch(openDialog(DialogTypes.Deposit2({})));
           }
         }}
       >
-        {isFirstSignIn
+        {needsAddressUpload
           ? 'Deposit and Start Trading →'
           : stringGetter({ key: STRING_KEYS.CONTINUE })}
       </Button>
@@ -200,7 +202,7 @@ export const EmailSignInStatusDialog = ({
       css={{
         '--dialog-header-paddingBottom': 0,
       }}
-      setIsOpen={setIsOpen}
+      setIsOpen={setIsOpenInner}
       title={<div />}
     >
       {emailSignInStatus === 'success' ? (
@@ -209,8 +211,7 @@ export const EmailSignInStatusDialog = ({
             tw="absolute inset-0 left-[50%] top-0 h-[222px] w-full opacity-75"
             css={{
               transform: 'translateX(-50%) scale(1.25)',
-              background:
-                'url("/dots-background.svg"), radial-gradient(circle, var(--color-layer-4), transparent 100%)',
+              background: `url("${chartDotBackground}"), radial-gradient(circle, var(--color-layer-4), transparent 100%)`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

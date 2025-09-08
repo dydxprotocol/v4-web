@@ -50,7 +50,6 @@ const useTurnkeyAuthContext = () => {
   const { indexedDbClient, authIframeClient } = useTurnkey();
   const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isFirstSignIn, setIsFirstSignIn] = useState(false);
   const [emailToken, setEmailToken] = useState<string>();
   const [emailSignInError, setEmailSignInError] = useState<string>();
   const [emailSignInStatus, setEmailSignInStatus] = useState<
@@ -74,7 +73,6 @@ const useTurnkeyAuthContext = () => {
       providerName?: string;
       userEmail?: string;
     }) => {
-      setEmailSignInError(undefined);
       setEmailSignInStatus('loading');
       dispatch(
         setWalletInfo({
@@ -87,6 +85,7 @@ const useTurnkeyAuthContext = () => {
       );
 
       if (loginMethod === LoginMethod.OAuth) {
+        logTurnkey('sendSignInRequest', 'opening email sign in status dialog', { loginMethod });
         dispatch(forceOpenDialog(DialogTypes.EmailSignInStatus({})));
       }
 
@@ -107,7 +106,6 @@ const useTurnkeyAuthContext = () => {
 
       if (response.dydxAddress === '') {
         dispatch(setRequiresAddressUpload(true));
-        setIsFirstSignIn(true);
       }
 
       switch (loginMethod) {
@@ -300,9 +298,12 @@ const useTurnkeyAuthContext = () => {
   );
 
   const resetEmailSignInStatus = useCallback(() => {
+    searchParams.delete('token');
+    setSearchParams(searchParams);
+    setEmailToken(undefined);
     setEmailSignInStatus('idle');
     setEmailSignInError(undefined);
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   /* ----------------------------- Upload Address ----------------------------- */
   const { mutateAsync: sendUploadAddressRequest } = useMutation({
@@ -366,13 +367,15 @@ const useTurnkeyAuthContext = () => {
   useEffect(() => {
     const turnkeyOnboardingToken = searchParams.get('token');
     const hasEncryptedSignature = sourceAccount.encryptedSignature != null;
-    dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
 
-    if (turnkeyOnboardingToken && !hasEncryptedSignature) {
+    if (turnkeyOnboardingToken && dydxAddress != null) {
+      searchParams.delete('token');
+      setSearchParams(searchParams);
+    } else if (turnkeyOnboardingToken && !hasEncryptedSignature) {
       setEmailToken(turnkeyOnboardingToken);
       dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
     }
-  }, [searchParams, dispatch, sourceAccount]);
+  }, [searchParams, dispatch, sourceAccount, dydxAddress, resetEmailSignInStatus, setSearchParams]);
 
   /**
    * @description Side effect triggered after the email token is saved to state.
@@ -392,7 +395,6 @@ const useTurnkeyAuthContext = () => {
     targetPublicKeys?.publicKey,
     authIframeClient,
     handleEmailMagicLink,
-    setSearchParams,
     emailSignInStatus,
   ]);
 
@@ -434,7 +436,7 @@ const useTurnkeyAuthContext = () => {
     emailSignInStatus,
     isLoading: status === 'pending' || emailSignInStatus === 'loading',
     isError: status === 'error' || emailSignInStatus === 'error',
-    isFirstSignIn,
+    needsAddressUpload,
     signInWithOauth,
     signInWithOtp,
     resetEmailSignInStatus,
