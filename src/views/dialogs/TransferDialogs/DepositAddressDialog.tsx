@@ -14,6 +14,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCopyValue } from '@/hooks/useCopyValue';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -32,7 +33,7 @@ type DepositTab = 'spot' | 'perpetuals';
 export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const [selectedChain, setSelectedChain] = useState('1');
   const [selectedTab, setSelectedTab] = useState<DepositTab>('perpetuals');
-
+  const isSimpleUi = useSimpleUiEnabled();
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -219,6 +220,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
         <SelectMenu
           fullWidthPopper
+          withPortal={isSimpleUi ? false : undefined}
           tw="h-4 w-full text-color-text-2"
           value={selectedChain}
           onValueChange={setSelectedChain}
@@ -226,6 +228,11 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
           position="popper"
           side="bottom"
           sideOffset={8}
+          css={
+            isSimpleUi && {
+              '--trigger-open-backgroundColor': 'var(--color-layer-2)',
+            }
+          }
           contentCss={{
             '--popover-backgroundColor': 'var(--color-layer-2)',
           }}
