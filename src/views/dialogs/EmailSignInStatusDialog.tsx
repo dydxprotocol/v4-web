@@ -201,6 +201,7 @@ export const EmailSignInStatusDialog = ({
       isOpen
       css={{
         '--dialog-header-paddingBottom': 0,
+        '--dialog-header-backgroundColor': 'transparent',
       }}
       setIsOpen={setIsOpenInner}
       title={<div />}
