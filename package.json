@@ -45,7 +45,8 @@
     "postinstall": "tar -xzC public -f tradingview/tradingview.tgz; cp apps/indexer/.env.example apps/indexer/.env",
     "prepare": "ts-patch install && typia patch",
     "commitlint": "commitlint --edit",
-    "wdio": "wdio run ./wdio.conf.ts"
+    "wdio": "wdio run ./wdio.conf.ts",
+    "validate-mermaid": "node scripts/validate-mermaid-remark.js"
   },
   "packageManager": "pnpm@8.6.6",
   "dependencies": {
@@ -203,7 +204,9 @@
     "eslint-plugin-react": "^7.34.2",
     "eslint-plugin-react-hooks": "^4.6.2",
     "graphql": "^16.8.1",
+    "isomorphic-dompurify": "^2.26.0",
     "jsdom": "^24.1.0",
+    "mermaid": "^11.11.0",
     "minimist": "^1.2.8",
     "node-fetch": "^3.3.1",
     "nx": "21.4.0",
@@ -213,6 +216,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "readline-sync": "^1.4.10",
+    "remark": "^15.0.1",
     "rimraf": "^6.0.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "stream-browserify": "^3.0.0",
@@ -224,6 +228,7 @@
     "twin.macro": "^3.4.1",
     "typeorm": "^0.3.20",
     "typescript": "^5.7.2",
+    "unist-util-visit": "^5.0.0",
     "url-polyfill": "^1.1.12",
     "util": "^0.12.5",
     "vite": "^5.4.19",
