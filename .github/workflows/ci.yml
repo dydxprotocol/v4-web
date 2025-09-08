@@ -21,6 +21,7 @@ jobs:
 
     - run: |
         pnpm install --ignore-scripts --frozen-lockfile
+        pnpm run build:ts-sdk
         tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
     - run: pnpm exec vitest run
