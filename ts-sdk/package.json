@@ -2,6 +2,7 @@
   "name": "starboard-client-js",
   "version": "1.3.17",
   "description": "General client library for the new dYdX system (v4 decentralized)",
+  "type": "module",
   "module": "./build/src/index.js",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",

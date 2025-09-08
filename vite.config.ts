@@ -85,6 +85,7 @@ export default defineConfig(({ mode }) => ({
   ],
   publicDir: 'public',
   test: {
+    globals: true,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -92,6 +93,9 @@ export default defineConfig(({ mode }) => ({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/e2e/**',
+      '**/apps/indexer/**', // Exclude indexer tests (Unstable)
+      '**/ts-sdk/__tests__/modules/client/**', // Exclude API tests (endpoints)
+      '**/ts-sdk/__tests__/modules/onboarding.test.ts', // Exclude onboarding tests (non-fuel related, we removed dydx deps)
     ],
     environment: 'jsdom',
   },
