@@ -12,7 +12,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import BadgeRank1 from '@/icons/badge-rank-1.svg';
 import BadgeRank2 from '@/icons/badge-rank-2.svg';
 import BadgeRank3 from '@/icons/badge-rank-3.svg';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
@@ -21,7 +20,10 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ColumnDef, Table } from '@/components/Table';
 
+import { exportCSV } from '@/lib/csv';
 import { truncateAddress } from '@/lib/wallet';
+
+import { SEPT_2025_REWARDS_DETAILS } from './LaunchIncentivesPanel';
 
 export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
@@ -30,8 +32,6 @@ export enum RewardsLeaderboardTableColumns {
 }
 
 const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactNode }) => {
-  const stringGetter = useStringGetter();
-
   return (
     <div tw="flex gap-0.5">
       {icon}
@@ -47,12 +47,10 @@ const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactN
 
         <Output
           tw="text-large font-bold text-color-text-2"
-          value={item.incentivePoints}
+          value={item.estimatedDydxRewards}
           type={OutputType.CompactNumber}
           slotRight={
-            <div tw="mb-0.125 ml-0.5 self-end text-small font-medium text-color-text-0">
-              {stringGetter({ key: STRING_KEYS.POINTS })}
-            </div>
+            <div tw="mb-0.125 ml-0.5 self-end text-small font-medium text-color-text-0">dYdX</div>
           }
         />
       </div>
@@ -76,12 +74,50 @@ export const RewardsLeaderboardPanel = () => {
       })
   );
 
+  const onDownload = () => {
+    if (!data) return;
+
+    const csvRows = data.map((item) => ({
+      rank: item.rank,
+      address: item.account,
+      estimatedRewards: item.estimatedDydxRewards,
+    }));
+
+    exportCSV(csvRows, {
+      filename: `rewards-leaderboard-season-${SEPT_2025_REWARDS_DETAILS.season}`,
+      columnHeaders: [
+        {
+          key: 'rank',
+          displayLabel: stringGetter({ key: STRING_KEYS.RANK }),
+        },
+        {
+          key: 'address',
+          displayLabel: stringGetter({ key: STRING_KEYS.TRADER }),
+        },
+        {
+          key: 'estimatedRewards',
+          displayLabel: stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS }),
+        },
+      ],
+    });
+  };
+
   const [first, second, third] = (data ?? []).slice(0, 3);
 
   return (
-    <Panel>
+    <$Panel>
       <div tw="flex flex-col gap-1">
-        <div tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.LEADERBOARD })}</div>
+        <div tw="flex items-center justify-between">
+          <div tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.LEADERBOARD })}</div>
+          <button
+            onClick={onDownload}
+            type="button"
+            aria-label={stringGetter({ key: STRING_KEYS.DOWNLOAD })}
+          >
+            <Icon tw="text-color-text-0" size="1.25rem" iconName={IconName.Download} />
+          </button>
+        </div>
+
         <div tw="flex items-center justify-between gap-2 px-1.5 py-0.5 pr-2">
           {first && <Top3Item icon={<BadgeRank1 />} item={first} />}
           {second && <Top3Item icon={<BadgeRank2 />} item={second} />}
@@ -123,11 +159,48 @@ export const RewardsLeaderboardPanel = () => {
           />
         </div>
       </div>
-    </Panel>
+    </$Panel>
   );
 };
+
+const $Panel = styled(Panel)`
+  --panel-content-paddingY: 1.5rem;
+  --panel-content-paddingX: 1.5rem;
+`;
+
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  --tableCell-padding: 0.25rem;
+  font: var(--font-mini-book);
+  --stickyArea-background: transparent;
+
+  table {
+    --stickyArea-background: transparent;
+  }
+
+  thead,
+  tbody {
+    --stickyArea-background: transparent;
+    tr {
+      td:first-of-type,
+      th:first-of-type {
+        --tableCell-padding: 0.5rem 0.25rem 0.5rem 1rem;
+      }
+      td:last-of-type,
+      th:last-of-type {
+        --tableCell-padding: 0.5rem 1rem 0.5rem 0.25rem;
+      }
+    }
+  }
+
+  tbody {
+    font: var(--font-small-book);
+  }
+
+  tfoot {
+    --stickyArea-background: transparent;
+    --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
+  }
+
   min-width: 1px;
   tbody {
     font: var(--font-small-book);
@@ -189,18 +262,19 @@ const getRewardsLeaderboardTableColumnDef = ({
       },
       [RewardsLeaderboardTableColumns.Rewards]: {
         columnKey: RewardsLeaderboardTableColumns.Rewards,
-        getCellValue: (row) => row.incentivePoints,
+        getCellValue: (row) => row.estimatedDydxRewards,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
             {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
           </div>
         ),
-        renderCell: ({ incentivePoints, account }) => (
+        renderCell: ({ estimatedDydxRewards, account }) => (
           <Output
+            slotRight=" DYDX"
             css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
             tw="text-small font-medium"
             type={OutputType.Number}
-            value={incentivePoints}
+            value={estimatedDydxRewards}
           />
         ),
       },

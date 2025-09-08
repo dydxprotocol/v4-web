@@ -34,9 +34,10 @@ import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
 
 // Move to Chaos Labs query once its available
-const SEPT_2025_REWARDS_DETAILS = {
+export const SEPT_2025_REWARDS_DETAILS = {
   season: 6,
   rewardAmount: '$1M',
+  rewardAmountUsd: 1_000_000,
   rebatePercent: '50%',
   endTime: '2025-09-30T23:59:59.000Z', // end of sept
 };
@@ -50,7 +51,7 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
   }, [dispatch]);
 
   const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
-  if (isSept2025Rewards) {
+  if (!isSept2025Rewards) {
     return <September2025RewardsPanel />;
   }
 
@@ -146,7 +147,7 @@ const Sept2025RewardsPanel = () => {
           backgroundImage: `url('/dots-background.svg')`,
           backgroundSize: 'cover',
         }}
-        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1.25"
+        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1"
       >
         <div tw="flex flex-col gap-0.5">
           <div tw="text-nowrap font-medium text-color-text-1">
