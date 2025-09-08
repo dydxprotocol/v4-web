@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install @commitlint/config-conventional
+          pnpm install -w @commitlint/config-conventional
 
       - name: Lint PR Title
         run: |
