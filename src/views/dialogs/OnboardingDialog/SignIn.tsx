@@ -16,6 +16,10 @@ import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { useAppSelector } from '@/state/appTypes';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
+
 import { isValidEmail } from '@/lib/emailUtils';
 
 import { AppleAuth } from './AuthButtons/AppleAuth';
@@ -35,6 +39,7 @@ export const SignIn = ({
   const [isLoading, setIsLoading] = useState(false);
   const { authIframeClient } = useTurnkey();
   const { signInWithOtp } = useTurnkeyAuth();
+  const appTheme = useAppSelector(getAppTheme);
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -68,6 +73,7 @@ export const SignIn = ({
           placeholder={stringGetter({ key: STRING_KEYS.EMAIL_PLACEHOLDER })}
           type={InputType.Text}
           $hasValidEmail={hasValidEmail}
+          $isLightMode={appTheme === AppTheme.Light}
           slotLeft={<$EmailIcon iconName={IconName.Email} />}
           slotRight={
             <Button
@@ -91,9 +97,9 @@ export const SignIn = ({
         />
 
         <div tw="row gap-0.5">
-          <HorizontalSeparatorFiller tw="bg-color-layer-4" />
+          <$HorizontalSeparatorFiller $isLightMode={appTheme === AppTheme.Light} />
           <span>{stringGetter({ key: STRING_KEYS.OR })}</span>
-          <HorizontalSeparatorFiller tw="bg-color-layer-4" />
+          <$HorizontalSeparatorFiller $isLightMode={appTheme === AppTheme.Light} />
         </div>
 
         <$OtherOptionButton
@@ -128,14 +134,15 @@ export const SignIn = ({
   );
 };
 
-const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean }>`
+const $EmailInput = styled(FormInput)<{ $hasValidEmail: boolean; $isLightMode: boolean }>`
   font-size: 1rem;
   --input-radius: 0.75rem;
   --border-width: 1px;
   --form-input-paddingY: 0.5rem;
   --form-input-paddingLeft: 0.75rem;
   --form-input-paddingRight: 0.5rem;
-  --input-borderColor: var(--color-layer-4);
+  --input-borderColor: ${({ $isLightMode }) =>
+    $isLightMode ? 'var(--color-layer-6)' : 'var(--color-layer-4)'};
   --input-backgroundColor: transparent;
 
   &:focus-within {
@@ -154,6 +161,11 @@ const $EmailIcon = styled(Icon)`
   width: 1.5rem;
   height: 1.5rem;
   color: var(--color-text-0);
+`;
+
+const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)<{ $isLightMode: boolean }>`
+  background-color: ${({ $isLightMode }) =>
+    $isLightMode ? 'var(--color-layer-6)' : 'var(--color-layer-4)'};
 `;
 
 const $OtherOptionButton = styled(Button)`
