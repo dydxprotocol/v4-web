@@ -1,6 +1,6 @@
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
+import { NOBLE_BECH32_PREFIX } from 'starboard-client-js';
 
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
@@ -15,16 +15,16 @@ import { calculateBlockRewards } from '../calculators/blockRewards';
 import { calculateFills } from '../calculators/fills';
 import { getMarketEffectiveInitialMarginForMarket } from '../calculators/markets';
 import {
-  calculateAllOrders,
-  calculateOpenOrders,
-  calculateOrderHistory,
+    calculateAllOrders,
+    calculateOpenOrders,
+    calculateOrderHistory,
 } from '../calculators/orders';
 import {
-  calculateChildSubaccountSummaries,
-  calculateMarketsNeededForSubaccount,
-  calculateParentSubaccountPositions,
-  calculateParentSubaccountSummary,
-  calculateUnopenedIsolatedPositions,
+    calculateChildSubaccountSummaries,
+    calculateMarketsNeededForSubaccount,
+    calculateParentSubaccountPositions,
+    calculateParentSubaccountSummary,
+    calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
@@ -32,24 +32,24 @@ import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
-  selectRawBlockTradingRewardsLiveData,
-  selectRawBlockTradingRewardsRest,
-  selectRawBlockTradingRewardsRestData,
-  selectRawFillsLiveData,
-  selectRawFillsRest,
-  selectRawFillsRestData,
-  selectRawIndexerHeightDataLoadable,
-  selectRawMarkets,
-  selectRawMarketsData,
-  selectRawOrdersLiveData,
-  selectRawOrdersRest,
-  selectRawOrdersRestData,
-  selectRawParentSubaccount,
-  selectRawParentSubaccountData,
-  selectRawTransfersLiveData,
-  selectRawTransfersRest,
-  selectRawTransfersRestData,
-  selectRawValidatorHeightDataLoadable,
+    selectRawBlockTradingRewardsLiveData,
+    selectRawBlockTradingRewardsRest,
+    selectRawBlockTradingRewardsRestData,
+    selectRawFillsLiveData,
+    selectRawFillsRest,
+    selectRawFillsRestData,
+    selectRawIndexerHeightDataLoadable,
+    selectRawMarkets,
+    selectRawMarketsData,
+    selectRawOrdersLiveData,
+    selectRawOrdersRest,
+    selectRawOrdersRestData,
+    selectRawParentSubaccount,
+    selectRawParentSubaccountData,
+    selectRawTransfersLiveData,
+    selectRawTransfersRest,
+    selectRawTransfersRestData,
+    selectRawValidatorHeightDataLoadable,
 } from './base';
 
 const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };

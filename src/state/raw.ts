@@ -1,33 +1,33 @@
 import { Loadable, LoadableError, loadableIdle, LoadableSuccess } from '@/bonsai/lib/loadable';
 // eslint-disable-next-line no-restricted-imports
 import {
-  AssetInfos,
-  MarketsData,
-  OrderbookData,
-  OrdersData,
-  ParentSubaccountData,
+    AssetInfos,
+    MarketsData,
+    OrderbookData,
+    OrdersData,
+    ParentSubaccountData,
 } from '@/bonsai/types/rawTypes';
 import {
-  AccountStats,
-  ComplianceResponse,
-  ConfigTiers,
-  RewardsParams,
-  TokenPriceResponse,
-  UserFeeTier,
+    AccountStats,
+    ComplianceResponse,
+    ConfigTiers,
+    RewardsParams,
+    TokenPriceResponse,
+    UserFeeTier,
 } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
+import { HeightResponse } from 'starboard-client-js';
 
 import { DydxNetwork } from '@/constants/networks';
 import {
-  IndexerHistoricalBlockTradingRewardsResponse,
-  IndexerParentSubaccountTransferResponse,
+    IndexerHistoricalBlockTradingRewardsResponse,
+    IndexerParentSubaccountTransferResponse,
 } from '@/types/indexer/indexerApiGen';
 import {
-  IndexerCompositeFillResponse,
-  IndexerSparklineResponseObject,
+    IndexerCompositeFillResponse,
+    IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
 import { calc } from '@/lib/do';

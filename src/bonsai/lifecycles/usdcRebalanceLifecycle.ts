@@ -1,4 +1,4 @@
-import { SubaccountClient } from '@dydxprotocol/v4-client-js';
+import { SubaccountClient } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
@@ -15,8 +15,8 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
-  selectTxAuthorizedAccount,
-  selectUserHasUsdcGasForTransaction,
+    selectTxAuthorizedAccount,
+    selectUserHasUsdcGasForTransaction,
 } from '../selectors/accountTransaction';
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction

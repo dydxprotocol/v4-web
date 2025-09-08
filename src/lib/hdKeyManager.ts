@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { LocalWallet } from '@dydxprotocol/v4-client-js';
+import { LocalWallet } from 'starboard-client-js';
 
 import { Hdkey } from '@/constants/account';
 

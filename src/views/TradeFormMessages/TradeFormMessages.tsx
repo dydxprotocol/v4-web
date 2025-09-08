@@ -1,6 +1,6 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { ValidationError } from '@/bonsai/lib/validationErrors';
-import { ComplianceStatus } from '@dydxprotocol/v4-client-js';
+import { ComplianceStatus } from 'starboard-client-js';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';

@@ -1,4 +1,4 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from 'starboard-client-js';
 
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';

@@ -1,5 +1,5 @@
-import { GAS_MULTIPLIER, LocalWallet, type NobleClient } from '@dydxprotocol/v4-client-js';
 import { CosmosTx, Tx } from '@skip-go/client';
+import { GAS_MULTIPLIER, LocalWallet, type NobleClient } from 'starboard-client-js';
 import { parseUnits } from 'viem';
 
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';

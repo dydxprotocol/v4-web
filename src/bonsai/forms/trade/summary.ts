@@ -11,9 +11,9 @@ import {
 import { ApplyTradeProps, SubaccountOperations } from '@/bonsai/types/operationTypes';
 import { MarketsData, ParentSubaccountDataBase } from '@/bonsai/types/rawTypes';
 import { PositionUniqueId } from '@/bonsai/types/summaryTypes';
-import { OrderExecution, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
 import { mapValues, orderBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
+import { OrderExecution, OrderTimeInForce, OrderType } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';

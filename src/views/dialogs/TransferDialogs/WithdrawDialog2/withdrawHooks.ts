@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from '@dydxprotocol/v4-client-js';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import BigNumber from 'bignumber.js';
 import { initial } from 'lodash';
+import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from 'starboard-client-js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { CosmosChainId } from '@/constants/graz';
@@ -29,10 +29,10 @@ import { AttemptBigNumber } from '@/lib/numbers';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import {
-  getUserAddressesForRoute,
-  isInstantTransfer,
-  isValidWithdrawalAddress,
-  parseWithdrawError,
+    getUserAddressesForRoute,
+    isInstantTransfer,
+    isValidWithdrawalAddress,
+    parseWithdrawError,
 } from '../utils';
 
 export function useWithdrawStep({

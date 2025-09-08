@@ -1,6 +1,6 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 import { produce } from 'immer';
+import { OrderSide } from 'starboard-client-js';
 
 import {
   IndexerAssetPositionResponseObject,

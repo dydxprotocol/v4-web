@@ -1,7 +1,7 @@
 import { getPositionBaseEquity } from '@/bonsai/calculators/subaccount';
 import { MarketInfo, SubaccountOrder, SubaccountPosition } from '@/bonsai/types/summaryTypes';
-import { OrderExecution, OrderFlags, OrderSide, OrderType } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
+import { OrderExecution, OrderFlags, OrderSide, OrderType } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';

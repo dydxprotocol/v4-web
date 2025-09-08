@@ -1,8 +1,8 @@
 import React, { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 
-import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { debounce } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
+import { SelectedGasDenom } from 'starboard-client-js';
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -25,8 +25,8 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import {
-  StakeButtonAlert,
-  StakeRewardButtonAndReceipt,
+    StakeButtonAlert,
+    StakeRewardButtonAndReceipt,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics/analytics';

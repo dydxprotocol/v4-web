@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from 'starboard-client-js';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,8 +22,8 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import {
-  getIndexerOrderTypeStringKey,
-  getPositionSideStringKeyFromOrderSide,
+    getIndexerOrderTypeStringKey,
+    getPositionSideStringKeyFromOrderSide,
 } from '@/lib/enumToStringKeyHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';

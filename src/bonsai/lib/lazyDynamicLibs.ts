@@ -2,11 +2,11 @@ import { weakMapMemoize } from 'reselect';
 
 // must lazy load separately to ensure best-possible tree shaking/static analysis
 export const getLazyLocalWallet = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).LocalWallet;
+  return (await import('starboard-client-js')).LocalWallet;
 });
 
 export const getLazyNobleWallet = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).NobleClient;
+  return (await import('starboard-client-js')).NobleClient;
 });
 
 export const getLazyStargateClient = weakMapMemoize(async () => {

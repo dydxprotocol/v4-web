@@ -1,5 +1,5 @@
 {
-  "name": "@dydxprotocol/v4-client-js",
+  "name": "starboard-client-js",
   "version": "1.3.17",
   "description": "General client library for the new dYdX system (v4 decentralized)",
   "module": "./build/src/index.js",

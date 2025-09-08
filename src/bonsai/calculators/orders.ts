@@ -1,5 +1,5 @@
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { mapValues, maxBy, orderBy } from 'lodash';
+import { HeightResponse } from 'starboard-client-js';
 
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import {

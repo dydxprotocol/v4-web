@@ -1,9 +1,9 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type {
-  IChartingLibraryWidget,
-  IOrderLineAdapter,
-  IPositionLineAdapter,
+    IChartingLibraryWidget,
+    IOrderLineAdapter,
+    IPositionLineAdapter,
 } from 'public/tradingview/charting_library';
+import { OrderSide } from 'starboard-client-js';
 
 export type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 

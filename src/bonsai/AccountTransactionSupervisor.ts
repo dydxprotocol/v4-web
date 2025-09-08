@@ -22,7 +22,7 @@ import {
   OrderTimeInForce,
   OrderType,
   SubaccountClient,
-} from '@dydxprotocol/v4-client-js';
+} from 'starboard-client-js';
 
 import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';

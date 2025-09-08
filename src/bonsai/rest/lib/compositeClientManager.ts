@@ -3,15 +3,15 @@ import { getLazyStargateClient } from '@/bonsai/lib/lazyDynamicLibs';
 import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { type StargateClient } from '@cosmjs/stargate';
-import type { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { weakMapMemoize } from 'reselect';
+import type { CompositeClient, IndexerClient } from 'starboard-client-js';
 
 import { AnalyticsUserProperties, DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import {
-  DydxChainId,
-  DydxNetwork,
-  ENVIRONMENT_CONFIG_MAP,
-  TOKEN_CONFIG_MAP,
+    DydxChainId,
+    DydxNetwork,
+    ENVIRONMENT_CONFIG_MAP,
+    TOKEN_CONFIG_MAP,
 } from '@/constants/networks';
 
 import { type AppDispatch, type RootStore } from '@/state/_store';
@@ -385,25 +385,25 @@ async function withRetry<T>(
 
 // must lazy load separately to ensure best-possible tree shaking/static analysis
 const getLazyIndexerConfig = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).IndexerConfig;
+  return (await import('starboard-client-js')).IndexerConfig;
 });
 
 const getLazyCompositeClient = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).CompositeClient;
+  return (await import('starboard-client-js')).CompositeClient;
 });
 
 const getLazyNetwork = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).Network;
+  return (await import('starboard-client-js')).Network;
 });
 
 const getLazyValidatorConfig = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).ValidatorConfig;
+  return (await import('starboard-client-js')).ValidatorConfig;
 });
 
 const getLazyIndexerClient = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).IndexerClient;
+  return (await import('starboard-client-js')).IndexerClient;
 });
 
 const getLazyNetworkOptimizer = weakMapMemoize(async () => {
-  return (await import('@dydxprotocol/v4-client-js')).NetworkOptimizer;
+  return (await import('starboard-client-js')).NetworkOptimizer;
 });

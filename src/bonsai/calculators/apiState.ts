@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
+import { HeightResponse } from 'starboard-client-js';
 
 import { timeUnits } from '@/constants/time';
 

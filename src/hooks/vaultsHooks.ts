@@ -4,18 +4,18 @@ import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import { calculateVaultPositions, calculateVaultSummary } from '@/bonsai/public-calculators/vault';
 import { calculateUserVaultInfo } from '@/bonsai/public-calculators/vaultAccount';
 import {
-  calculateSharesToWithdraw,
-  validateVaultForm,
-  VaultFormAction,
-  VaultFormData,
+    calculateSharesToWithdraw,
+    validateVaultForm,
+    VaultFormAction,
+    VaultFormData,
 } from '@/bonsai/public-calculators/vaultFormValidation';
 // we need this because vaults table sometimes has rows which we can't render but do have balance
 // eslint-disable-next-line no-restricted-imports
 import { selectAllMarketsInfo } from '@/bonsai/selectors/markets';
 import { MarketsInfo } from '@/bonsai/types/summaryTypes';
-import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from '@dydxprotocol/v4-client-js';
 import { useQuery } from '@tanstack/react-query';
 import { throttle } from 'lodash';
+import { MEGAVAULT_MODULE_ADDRESS, PnlTickInterval } from 'starboard-client-js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';

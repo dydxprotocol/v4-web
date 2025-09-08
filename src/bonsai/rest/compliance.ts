@@ -1,4 +1,4 @@
-import { ComplianceV2Response } from '@dydxprotocol/v4-client-js';
+import { ComplianceV2Response } from 'starboard-client-js';
 
 import { DydxChainId, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { timeUnits } from '@/constants/time';
@@ -9,9 +9,9 @@ import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import {
-  ComplianceErrors,
-  setLocalAddressScreenV2Raw,
-  setSourceAddressScreenV2Raw,
+    ComplianceErrors,
+    setLocalAddressScreenV2Raw,
+    setSourceAddressScreenV2Raw,
 } from '@/state/raw';
 
 import { signCompliancePayload } from '@/lib/compliance';

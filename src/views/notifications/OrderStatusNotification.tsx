@@ -1,14 +1,14 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { sum } from 'lodash';
+import { OrderSide } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
-  ORDER_TYPE_STRINGS,
-  PlaceOrderStatuses,
-  type LocalPlaceOrderData,
+    ORDER_TYPE_STRINGS,
+    PlaceOrderStatuses,
+    type LocalPlaceOrderData,
 } from '@/constants/trade';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
@@ -24,9 +24,9 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import {
-  getAverageFillPriceForOrder,
-  getFillsForOrderId,
-  getOrderByClientId,
+    getAverageFillPriceForOrder,
+    getFillsForOrderId,
+    getOrderByClientId,
 } from '@/state/accountSelectors';
 
 import { assertNever } from '@/lib/assertNever';

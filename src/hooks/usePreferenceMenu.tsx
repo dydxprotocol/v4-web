@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
+import { SelectedGasDenom } from 'starboard-client-js';
 
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
@@ -16,8 +16,8 @@ import { Switch } from '@/components/Switch';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import {
-  OtherPreference,
-  setDefaultToAllMarketsInPositionsOrdersFills,
+    OtherPreference,
+    setDefaultToAllMarketsInPositionsOrdersFills,
 } from '@/state/appUiConfigs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { setSelectedTradeLayout } from '@/state/layout';

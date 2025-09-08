@@ -3,10 +3,10 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { TransferToken } from '@/bonsai/forms/transfers';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { ErrorType } from '@/bonsai/lib/validationErrors';
-import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
+import { validation } from 'starboard-client-js';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';

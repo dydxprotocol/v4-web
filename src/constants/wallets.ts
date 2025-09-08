@@ -1,19 +1,19 @@
-import { type onboarding } from '@dydxprotocol/v4-client-js';
 import { type WalletType as CosmosWalletType } from 'graz';
 import { type EIP6963ProviderInfo } from 'mipd';
+import { type onboarding } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import {
-  CoinbaseIcon,
-  EmailIcon,
-  FuelWalletIcon,
-  GenericWalletIcon,
-  KeplrIcon,
-  MetaMaskIcon,
-  OkxWalletIcon,
-  PhantomIcon,
-  WalletConnectIcon,
+    CoinbaseIcon,
+    EmailIcon,
+    FuelWalletIcon,
+    GenericWalletIcon,
+    KeplrIcon,
+    MetaMaskIcon,
+    OkxWalletIcon,
+    PhantomIcon,
+    WalletConnectIcon,
 } from '@/icons';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';

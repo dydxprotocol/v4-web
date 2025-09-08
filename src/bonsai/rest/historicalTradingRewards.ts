@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { TradingRewardAggregationPeriod } from '@dydxprotocol/v4-client-js';
 import { useQuery } from '@tanstack/react-query';
+import { TradingRewardAggregationPeriod } from 'starboard-client-js';
 
 import { EMPTY_ARR } from '@/constants/objects';
 import { timeUnits } from '@/constants/time';

@@ -3,19 +3,19 @@ import { createContext, useContext, useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useCompositeClient } from '@/bonsai/rest/lib/useIndexer';
 import {
-  MsgWithdrawFromSubaccount,
-  TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
-} from '@dydxprotocol/v4-client-js';
-import {
-  balances,
-  executeRoute,
-  messages,
-  messagesDirect,
-  route,
-  SkipClientOptions,
-  waitForTransaction,
+    balances,
+    executeRoute,
+    messages,
+    messagesDirect,
+    route,
+    SkipClientOptions,
+    waitForTransaction,
 } from '@skip-go/client';
 import { getWalletClient } from '@wagmi/core';
+import {
+    MsgWithdrawFromSubaccount,
+    TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+} from 'starboard-client-js';
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
 

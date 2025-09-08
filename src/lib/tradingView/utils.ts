@@ -1,11 +1,11 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { DateTime } from 'luxon';
 import {
-  ChartPropertiesOverrides,
-  Timezone,
-  TradingTerminalFeatureset,
-  TradingTerminalWidgetOptions,
+    ChartPropertiesOverrides,
+    Timezone,
+    TradingTerminalFeatureset,
+    TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
+import { OrderSide } from 'starboard-client-js';
 
 import { MetadataServiceCandlesResponse } from '@/constants/assetMetadata';
 import { Candle, TradingViewChartBar, TradingViewSymbol } from '@/constants/candles';

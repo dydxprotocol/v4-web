@@ -1,4 +1,4 @@
-import { VaultModule } from '@dydxprotocol/v4-client-js';
+import { VaultModule } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 

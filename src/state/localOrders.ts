@@ -1,19 +1,19 @@
 import { getSimpleOrderStatus } from '@/bonsai/lib/subaccountUtils';
 import { OrderStatus, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-import { OrderType } from '@dydxprotocol/v4-client-js';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
+import { OrderType } from 'starboard-client-js';
 
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
-  CANCEL_ALL_ORDERS_KEY,
-  CancelOrderStatuses,
-  LocalCancelAllData,
-  LocalCancelOrderData,
-  LocalCloseAllPositionsData,
-  LocalPlaceOrderData,
-  PlaceOrderStatuses,
+    CANCEL_ALL_ORDERS_KEY,
+    CancelOrderStatuses,
+    LocalCancelAllData,
+    LocalCancelOrderData,
+    LocalCloseAllPositionsData,
+    LocalPlaceOrderData,
+    PlaceOrderStatuses,
 } from '@/constants/trade';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';

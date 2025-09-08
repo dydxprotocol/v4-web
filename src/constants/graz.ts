@@ -1,5 +1,5 @@
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { type ConfigureGrazArgs, type WalletType as GrazWalletType } from 'graz';
+import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from 'starboard-client-js';
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';

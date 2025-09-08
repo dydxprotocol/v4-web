@@ -1,5 +1,5 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { Story } from '@ladle/react';
+import { OrderSide } from 'starboard-client-js';
 
 import { OrderSideTag } from '@/components/OrderSideTag';
 

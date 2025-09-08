@@ -1,15 +1,15 @@
 import { logBonsaiError, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import {
-  selectCompositeClientKey,
-  selectCompositeClientReady,
-  selectCompositeClientUrl,
-  selectIndexerClientKey,
-  selectIndexerReady,
-  selectNobleClientReady,
+    selectCompositeClientKey,
+    selectCompositeClientReady,
+    selectCompositeClientUrl,
+    selectIndexerClientKey,
+    selectIndexerReady,
+    selectNobleClientReady,
 } from '@/bonsai/socketSelectors';
 import { type StargateClient } from '@cosmjs/stargate';
-import { CompositeClient, IndexerClient } from '@dydxprotocol/v4-client-js';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
+import { CompositeClient, IndexerClient } from 'starboard-client-js';
 
 import { timeUnits } from '@/constants/time';
 

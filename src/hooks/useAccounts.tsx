@@ -2,17 +2,17 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
+import { type Subaccount } from 'starboard-client-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
-  ConnectorType,
-  DydxAddress,
-  PrivateInformation,
-  WalletNetworkType,
+    ConnectorType,
+    DydxAddress,
+    PrivateInformation,
+    WalletNetworkType,
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';

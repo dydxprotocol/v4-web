@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { Validator } from '@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import BigNumber from 'bignumber.js';
 import { debounce } from 'lodash';
 import { NumberFormatValues } from 'react-number-format';
+import { SelectedGasDenom } from 'starboard-client-js';
 
 import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -25,8 +25,8 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import {
-  StakeButtonAlert,
-  StakeRewardButtonAndReceipt,
+    StakeButtonAlert,
+    StakeRewardButtonAndReceipt,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics/analytics';

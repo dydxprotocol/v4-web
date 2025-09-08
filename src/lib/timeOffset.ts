@@ -1,6 +1,6 @@
 import { logBonsaiInfo, wrapAndLogBonsaiError } from '@/bonsai/logs';
-import { utils } from '@dydxprotocol/v4-client-js';
 import { isFinite } from 'lodash';
+import { utils } from 'starboard-client-js';
 
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 

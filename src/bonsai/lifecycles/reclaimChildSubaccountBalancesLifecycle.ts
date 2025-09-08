@@ -1,5 +1,5 @@
-import { CompositeClient, LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
+import { CompositeClient, LocalWallet, SubaccountClient } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';

@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
+import { OrderSide } from 'starboard-client-js';
 
 import {
-  DepthChartDatum,
-  DepthChartPoint,
-  DepthChartSeries,
-  SERIES_KEY_FOR_ORDER_SIDE,
+    DepthChartDatum,
+    DepthChartPoint,
+    DepthChartSeries,
+    SERIES_KEY_FOR_ORDER_SIDE,
 } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 

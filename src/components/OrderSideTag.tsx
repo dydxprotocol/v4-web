@@ -1,4 +1,4 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';

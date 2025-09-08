@@ -2,16 +2,16 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { IndexedTx } from '@cosmjs/stargate';
-import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { encodeJson } from 'starboard-client-js';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import {
-  ESTIMATED_LAUNCH_TIMEOUT,
-  LaunchMarketStatus,
-  MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
+    ESTIMATED_LAUNCH_TIMEOUT,
+    LaunchMarketStatus,
+    MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
 } from '@/constants/launchableMarkets';
 import { STRING_KEYS } from '@/constants/localization';
 import { ISOLATED_LIQUIDITY_TIER_INFO } from '@/constants/markets';
@@ -45,9 +45,9 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLaunchMarketIds } from '@/state/perpetuals';
 
 import {
-  getAssetFromMarketId,
-  getDisplayableAssetFromTicker,
-  getDisplayableTickerFromMarket,
+    getAssetFromMarketId,
+    getDisplayableAssetFromTicker,
+    getDisplayableTickerFromMarket,
 } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';

@@ -1,6 +1,6 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { OrderStatus } from '@/bonsai/types/summaryTypes';
-import { OrderType as ClientOrderType } from '@dydxprotocol/v4-client-js';
+import { OrderType as ClientOrderType } from 'starboard-client-js';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';

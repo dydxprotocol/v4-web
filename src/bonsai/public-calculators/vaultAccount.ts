@@ -1,5 +1,5 @@
-import { VaultModule } from '@dydxprotocol/v4-client-js';
 import { orderBy, sumBy } from 'lodash';
+import { VaultModule } from 'starboard-client-js';
 
 import { IndexerTransferBetweenResponse, IndexerTransferType } from '@/types/indexer/indexerApiGen';
 

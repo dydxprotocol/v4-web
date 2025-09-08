@@ -1,7 +1,7 @@
 import { BonsaiCore } from '@/bonsai/ontology';
 import { selectParentSubaccountInfo } from '@/bonsai/socketSelectors';
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
-import { LocalWallet, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
+import { LocalWallet, NOBLE_BECH32_PREFIX } from 'starboard-client-js';
 
 import { DydxChainId, ENVIRONMENT_CONFIG_MAP, TOKEN_CONFIG_MAP } from '@/constants/networks';
 

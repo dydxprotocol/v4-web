@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
 
 import { BonsaiHooks } from '@/bonsai/ontology';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty } from 'lodash';
+import { OrderSide } from 'starboard-client-js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';

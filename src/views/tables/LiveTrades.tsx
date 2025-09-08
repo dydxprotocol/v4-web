@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { BonsaiHelpers, BonsaiHooks } from '@/bonsai/ontology';
 import { LiveTrade } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from 'starboard-client-js';
 import styled, { css, keyframes } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';

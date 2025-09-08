@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => ({
             },
           ],
         ],
-        exclude: ['@dydxprotocol/v4-client-js'],
+        exclude: ['starboard-client-js'],
       },
     }),
 

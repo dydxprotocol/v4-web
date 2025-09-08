@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
 
-import { ByteArrayEncoding, encodeJson } from '@dydxprotocol/v4-client-js';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
+import { ByteArrayEncoding, encodeJson } from 'starboard-client-js';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';

@@ -1,5 +1,5 @@
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { HeightResponse } from 'starboard-client-js';
 
 import { DydxNetwork } from '@/constants/networks';
 

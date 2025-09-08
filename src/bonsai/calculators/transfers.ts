@@ -1,5 +1,5 @@
-import { MEGAVAULT_MODULE_ADDRESS } from '@dydxprotocol/v4-client-js';
 import { keyBy, maxBy } from 'lodash';
+import { MEGAVAULT_MODULE_ADDRESS } from 'starboard-client-js';
 
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerTransferType } from '@/types/indexer/indexerApiGen';

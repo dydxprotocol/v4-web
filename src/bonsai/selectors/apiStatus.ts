@@ -1,4 +1,4 @@
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
+import { HeightResponse } from 'starboard-client-js';
 
 import { ESTIMATED_BLOCK_TIME } from '@/constants/numbers';
 

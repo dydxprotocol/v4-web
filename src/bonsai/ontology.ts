@@ -1,5 +1,5 @@
-import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
+import { HeightResponse } from 'starboard-client-js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
 import {

@@ -3,8 +3,8 @@
 <h1 align="center">dYdX Chain Client for Javascript</h1>
 
 <div align="center">
-  <a href='https://www.npmjs.com/package/@dydxprotocol/v4-client-js'>
-    <img src='https://img.shields.io/npm/v/@dydxprotocol/v4-client-js.svg' alt='npm'/>
+  <a href='https://www.npmjs.com/package/starboard-client-js'>
+    <img src='https://img.shields.io/npm/v/starboard-client-js.svg' alt='npm'/>
   </a>
   <a href='https://github.com/dydxprotocol/v4-clients/blob/main/v4-client-js/LICENSE'>
     <img src='https://img.shields.io/badge/License-AGPL_v3-blue.svg' alt='License' />

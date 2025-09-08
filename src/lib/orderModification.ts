@@ -1,14 +1,14 @@
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { SubaccountOrder as SubaccountOrderNew } from '@/bonsai/types/summaryTypes';
-import { OrderExecution, OrderSide, OrderTimeInForce, OrderType } from '@dydxprotocol/v4-client-js';
 import { ERRORS_STRING_KEYS } from '@dydxprotocol/v4-localization';
+import { OrderExecution, OrderSide, OrderTimeInForce, OrderType } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import {
-  IndexerAPITimeInForce,
-  IndexerOrderSide,
-  IndexerOrderType,
+    IndexerAPITimeInForce,
+    IndexerOrderSide,
+    IndexerOrderType,
 } from '@/types/indexer/indexerApiGen';
 
 import { store } from '@/state/_store';
@@ -17,11 +17,11 @@ import { assertNever } from './assertNever';
 import { calc } from './do';
 import { AttemptNumber, MAX_INT_ROUGHLY } from './numbers';
 import {
-  isLimitOrderTypeNew,
-  isMarketOrderTypeNew,
-  isSellOrderNew,
-  isStopLossOrderNew,
-  isTakeProfitOrderNew,
+    isLimitOrderTypeNew,
+    isMarketOrderTypeNew,
+    isSellOrderNew,
+    isStopLossOrderNew,
+    isTakeProfitOrderNew,
 } from './orders';
 
 const ORDER_TYPES_MODIFICATION_ENABLED = [

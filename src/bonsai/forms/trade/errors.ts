@@ -6,7 +6,7 @@ import {
   ValidationError,
 } from '@/bonsai/lib/validationErrors';
 import { OrderFlags, OrderStatus } from '@/bonsai/types/summaryTypes';
-import { OrderType } from '@dydxprotocol/v4-client-js';
+import { OrderType } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';

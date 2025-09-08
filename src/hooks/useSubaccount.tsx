@@ -9,9 +9,9 @@ import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
+import { SubaccountClient, type LocalWallet } from 'starboard-client-js';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';

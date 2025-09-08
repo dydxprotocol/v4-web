@@ -1,6 +1,6 @@
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFill, SubaccountOrder } from '@/bonsai/types/summaryTypes';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { OrderSide } from 'starboard-client-js';
 
 import { USD_DECIMALS } from '@/constants/numbers';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
@@ -14,8 +14,8 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
 
 import {
-  getIndexerOrderTypeStringKey,
-  getOrderStatusStringKey,
+    getIndexerOrderTypeStringKey,
+    getOrderStatusStringKey,
 } from '@/lib/enumToStringKeyHelpers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';

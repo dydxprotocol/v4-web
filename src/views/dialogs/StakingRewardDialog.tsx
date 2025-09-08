@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
+import { SelectedGasDenom } from 'starboard-client-js';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits } from 'viem';
@@ -23,8 +23,8 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import {
-  StakeRewardButtonAndReceipt,
-  type StakeButtonAlert,
+    StakeRewardButtonAndReceipt,
+    type StakeButtonAlert,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { useAppSelector } from '@/state/appTypes';

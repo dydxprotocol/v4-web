@@ -12,7 +12,7 @@ import {
   OrderSide,
   OrderTimeInForce,
   OrderType,
-} from '@dydxprotocol/v4-client-js';
+} from 'starboard-client-js';
 
 export interface TriggerOrdersFormState {
   positionId?: PositionUniqueId;
