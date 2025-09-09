@@ -2,7 +2,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { isDev } from '@/constants/networks';
 
 import { track } from './analytics/analytics';
-import { dd } from './analytics/datadog';
 
 let lastLogTime = Date.now();
 
@@ -33,8 +32,6 @@ export const log = (location: string, error?: Error, metadata?: object) => {
     })
   );
 
-  dd.error(`[Error] ${location}`, metadata, error);
-
   globalThis.dispatchEvent(customEvent);
 };
 
@@ -45,8 +42,6 @@ export const logInfo = (location: string, metadata?: object) => {
     // eslint-disable-next-line no-console
     console.log('telemetry/logInfo:', { location, metadata });
   }
-
-  dd.info(`[Info] ${location}`, metadata);
 };
 
 // Log rejected Promises without a .catch() handler

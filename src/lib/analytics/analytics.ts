@@ -6,8 +6,6 @@ import {
   type AnalyticsUserProperty,
 } from '@/constants/analytics';
 
-import { dd } from './datadog';
-
 const DEBUG_ANALYTICS = false;
 
 export const identify = (property: AnalyticsUserProperty) => {
@@ -21,9 +19,6 @@ export const identify = (property: AnalyticsUserProperty) => {
   const customEvent = customIdentifyEvent({
     detail: { property: propertyTypeToLog, propertyValue: property.payload },
   });
-  const ddPropertyName = `user-property-${propertyTypeToLog}`;
-  dd.setContextProperty(ddPropertyName, property.payload);
-  dd.info(`set context item: ${ddPropertyName} to value ${property.payload}`, dd.getContext());
 
   globalThis.dispatchEvent(customEvent);
 };

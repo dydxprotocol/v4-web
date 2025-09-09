@@ -63,7 +63,6 @@ import {
 } from '@/state/vaults';
 
 import { track } from '@/lib/analytics/analytics';
-import { dd } from '@/lib/analytics/datadog';
 import { assertNever } from '@/lib/assertNever';
 import { mapIfPresent, runFn } from '@/lib/do';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
@@ -217,9 +216,7 @@ export const VaultDepositWithdrawForm = ({
               operation,
             })
           );
-          dd.error('Megavault deposit blocked, invalid validation response amount', {
-            deposit: submissionData?.deposit,
-          });
+
           // eslint-disable-next-line no-console
           console.error(
             'Somehow got to deposit submission with empty amount in validation response'
@@ -273,9 +270,7 @@ export const VaultDepositWithdrawForm = ({
               operation,
             })
           );
-          dd.error('Megavault withdraw blocked, invalid validation response values', {
-            withdraw: submissionData?.withdraw,
-          });
+
           // eslint-disable-next-line no-console
           console.error(
             'Somehow got to withdraw submission with empty data in validation response'
@@ -356,7 +351,6 @@ export const VaultDepositWithdrawForm = ({
           userOperationId,
         })
       );
-      dd.error('Megavault transaction failed', { ...validationResponse.submissionData }, e);
       // eslint-disable-next-line no-console
       console.error('Error submitting megavault transaction', e);
     } finally {
