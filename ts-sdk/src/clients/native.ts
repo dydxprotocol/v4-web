@@ -1309,6 +1309,7 @@ export async function signCompliancePayload(payload: string): Promise<string> {
     }
 
     const timestampInSeconds = Math.floor(Date.now() / 1000);
+    // NOTE: Check if the (") is intentional
     const messageToSign: string = `${message}:${action}"${currentStatus ?? ''}:${timestampInSeconds}`;
     const messageHash = sha256(Buffer.from(messageToSign) as Uint8Array);
 
@@ -1339,6 +1340,8 @@ export async function signPushNotificationTokenRegistrationPayload(
     }
 
     const timestampInSeconds = Math.floor(Date.now() / 1000);
+
+    // NOTE: Check if the (") is intentional
     const messageToSign: string = `${message}:REGISTER_TOKEN"${''}:${timestampInSeconds}`;
     const messageHash = sha256(Buffer.from(messageToSign) as Uint8Array);
 

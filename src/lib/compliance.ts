@@ -29,6 +29,7 @@ const signComplianceSignature = async (
   }
 
   const timestampInSeconds = Math.floor(Date.now() / 1000);
+  // NOTE: Check if the (") is intentional
   const messageToSign: string = `${message}:${action}"${status || ''}:${timestampInSeconds}`;
   const messageHash = (await import('@cosmjs/crypto')).sha256(
     new Uint8Array(Buffer.from(messageToSign))
