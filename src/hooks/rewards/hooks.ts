@@ -1,4 +1,4 @@
-import { selectRewardsSummary } from '@/bonsai/selectors/rewards';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useQuery } from '@tanstack/react-query';
 
 import { DydxAddress } from '@/constants/wallets';
@@ -62,7 +62,7 @@ function pointsToEstimatedDydxRewards(
 
 export function useChaosLabsPointsDistribution() {
   const { data: pointsInfo, isLoading: rewardsInfoLoading } = useTotalRewardsPoints();
-  const dydxPrice = useAppSelector(selectRewardsSummary).tokenPrice;
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
 
   const { data: leaderboardItems, isLoading: leaderboardItemsLoading } = useQuery({
     queryKey: ['chaoslabs/points'],
