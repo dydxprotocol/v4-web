@@ -61,7 +61,7 @@ export const useAccountBalance = ({
   const stakingBalances = BonsaiHooks.useStakingDelegations().data?.balances;
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { nobleValidator, osmosisValidator, neutronValidator, validators } = useEndpointsConfig();
+  const { validators } = useEndpointsConfig();
   const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
 
   const evmAddress =
@@ -141,9 +141,6 @@ export const useAccountBalance = ({
     usdcDecimals,
     chainId,
     selectedDydxChainId,
-    nobleValidator,
-    osmosisValidator,
-    neutronValidator,
     validators,
   ]);
 

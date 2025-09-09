@@ -1,13 +1,11 @@
 import { logBonsaiError, wrapAndLogBonsaiError } from '@/bonsai/logs';
 import {
-    selectCompositeClientKey,
-    selectCompositeClientReady,
-    selectCompositeClientUrl,
-    selectIndexerClientKey,
-    selectIndexerReady,
-    selectNobleClientReady,
+  selectCompositeClientKey,
+  selectCompositeClientReady,
+  selectCompositeClientUrl,
+  selectIndexerClientKey,
+  selectIndexerReady,
 } from '@/bonsai/socketSelectors';
-import { type StargateClient } from '@cosmjs/stargate';
 import { QueryObserver, QueryObserverOptions, QueryObserverResult } from '@tanstack/react-query';
 import { CompositeClient, IndexerClient } from 'starboard-client-js';
 
@@ -240,68 +238,5 @@ export function createValidatorQueryStoreEffect<T, R>(
         unsubscribe();
       };
     },
-  });
-}
-
-export function createNobleQueryStoreEffect<T, R>(
-  store: RootStore,
-  config: QuerySetupConfig<StargateClient, T, R>
-) {
-  const fullSelector = createAppSelector(
-    [getSelectedNetwork, selectNobleClientReady, config.selector],
-    (network, nobleClientReady, selectorResult) => ({
-      infrastructure: { network, nobleClientReady },
-      queryData: selectorResult,
-    })
-  );
-
-  return createStoreEffect(store, fullSelector, (fullResult) => {
-    const { infrastructure, queryData } = fullResult;
-
-    if (!infrastructure.nobleClientReady) {
-      config.onNoQuery();
-      return undefined;
-    }
-
-    const clientConfig = {
-      network: infrastructure.network,
-      dispatch: store.dispatch,
-    };
-
-    const nobleClient = CompositeClientManager.use(clientConfig).nobleClient.client!;
-
-    const queryFn = config.getQueryFn(nobleClient, queryData);
-    if (!queryFn) {
-      CompositeClientManager.markDone(clientConfig);
-      config.onNoQuery();
-      return undefined;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { selector, getQueryKey, getQueryFn, onResult, ...otherOpts } = config;
-    const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['nobleClient', ...config.getQueryKey(queryData), clientConfig.network],
-      queryFn: wrapAndLogBonsaiError(queryFn, config.name),
-      ...baseOptions,
-      ...otherOpts,
-    });
-
-    const unsubscribe = safeSubscribeObserver(observer, (result) => {
-      try {
-        config.onResult(result);
-      } catch (e) {
-        logBonsaiError(
-          'NobleClientQueryStoreEffect',
-          'Error handling result from react query store effect',
-          e,
-          result
-        );
-      }
-    });
-
-    return () => {
-      unsubscribe();
-      CompositeClientManager.markDone(clientConfig);
-    };
   });
 }

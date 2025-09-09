@@ -3,18 +3,18 @@ import { createContext, useContext, useEffect, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useCompositeClient } from '@/bonsai/rest/lib/useIndexer';
 import {
-    balances,
-    executeRoute,
-    messages,
-    messagesDirect,
-    route,
-    SkipClientOptions,
-    waitForTransaction,
+  balances,
+  executeRoute,
+  messages,
+  messagesDirect,
+  route,
+  SkipClientOptions,
+  waitForTransaction,
 } from '@skip-go/client';
 import { getWalletClient } from '@wagmi/core';
 import {
-    MsgWithdrawFromSubaccount,
-    TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+  MsgWithdrawFromSubaccount,
+  TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
 } from 'starboard-client-js';
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
@@ -119,8 +119,7 @@ export function getSkipClient() {
 }
 
 const useSkipClientContext = () => {
-  const { solanaRpcUrl, nobleValidator, neutronValidator, osmosisValidator, validators, skip } =
-    useEndpointsConfig();
+  const { solanaRpcUrl, validators, skip } = useEndpointsConfig();
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { sourceAccount } = useAccounts();
@@ -186,9 +185,6 @@ const useSkipClientContext = () => {
     setInstanceId(id);
   }, [
     compositeClient?.network.validatorConfig.restEndpoint,
-    neutronValidator,
-    nobleValidator,
-    osmosisValidator,
     selectedDydxChainId,
     skip,
     solanaRpcUrl,

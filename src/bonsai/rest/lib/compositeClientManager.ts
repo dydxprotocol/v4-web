@@ -1,17 +1,15 @@
 import { createStoreEffect } from '@/bonsai/lib/createStoreEffect';
-import { getLazyStargateClient } from '@/bonsai/lib/lazyDynamicLibs';
 import { ResourceCacheManager } from '@/bonsai/lib/resourceCacheManager';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { type StargateClient } from '@cosmjs/stargate';
 import { weakMapMemoize } from 'reselect';
 import type { CompositeClient, IndexerClient } from 'starboard-client-js';
 
 import { AnalyticsUserProperties, DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import {
-    DydxChainId,
-    DydxNetwork,
-    ENVIRONMENT_CONFIG_MAP,
-    TOKEN_CONFIG_MAP,
+  DydxChainId,
+  DydxNetwork,
+  ENVIRONMENT_CONFIG_MAP,
+  TOKEN_CONFIG_MAP,
 } from '@/constants/networks';
 
 import { type AppDispatch, type RootStore } from '@/state/_store';
@@ -39,7 +37,6 @@ export type CompositeClientWrapper = {
 
   compositeClient: ClientState<CompositeClient>;
   indexer: ClientState<IndexerClient>;
-  nobleClient: ClientState<StargateClient>;
 };
 
 function makeCompositeClient({
@@ -102,10 +99,6 @@ function makeCompositeClient({
     return compositeClient;
   }
 
-  async function initializeNobleClient() {
-    return (await getLazyStargateClient()).connect(networkConfig.endpoints.nobleValidator);
-  }
-
   async function initializeIndexerClient() {
     return new (await getLazyIndexerClient())(await getIndexerConfig());
   }
@@ -113,7 +106,6 @@ function makeCompositeClient({
   const clientWrapper = initializeClientWrapper(dispatch, network, {
     compositeClient: initializeCompositeClient,
     indexer: initializeIndexerClient,
-    nobleClient: initializeNobleClient,
   });
 
   return clientWrapper;
@@ -230,7 +222,6 @@ function initializeClientWrapper(
   loads: {
     compositeClient: () => Promise<CompositeClient>;
     indexer: () => Promise<IndexerClient>;
-    nobleClient: () => Promise<StargateClient>;
   }
 ) {
   dispatch(
@@ -286,33 +277,13 @@ function initializeClientWrapper(
       );
     },
   });
-  const nobleClient = makeClientManager({
-    load: loads.nobleClient,
-    onSuccess: () =>
-      dispatch(
-        setNetworkStateRaw({
-          networkId: network,
-          stateToMerge: { nobleClientReady: true },
-        })
-      ),
-    onError: (e) => {
-      logBonsaiError('CompositeClientManager', 'error initializing noble client', { error: e });
-      dispatch(
-        setNetworkStateRaw({
-          networkId: network,
-          stateToMerge: { nobleClientReady: false, errorInitializing: true },
-        })
-      );
-    },
-  });
 
-  const clients = [compositeClient, indexer, nobleClient];
+  const clients = [compositeClient, indexer];
 
   const clientWrapper: CompositeClientWrapper = {
     dead: false,
     compositeClient: compositeClient.clientState,
     indexer: indexer.clientState,
-    nobleClient: nobleClient.clientState,
     tearDown: () => {
       clientWrapper.dead = true;
       clients.forEach((c) => c.tearDown());

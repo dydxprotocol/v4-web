@@ -21,14 +21,14 @@ import { deriveHDKeyFromEthereumSignature, deriveHDKeyFromMnemonic } from '../li
 import { NetworkOptimizer } from '../network_optimizer';
 import { CompositeClient, MarketInfo } from './composite-client';
 import {
+  IndexerConfig,
   Network,
-  OrderType,
+  OrderExecution,
   OrderSide,
   OrderTimeInForce,
-  OrderExecution,
-  IndexerConfig,
-  ValidatorConfig,
+  OrderType,
   SelectedGasDenom,
+  ValidatorConfig,
 } from './constants';
 import { FaucetClient } from './faucet-client';
 import { parseToPrimitives } from './helpers/request-helpers';
@@ -75,7 +75,6 @@ export async function connectNetwork(paramsJSON: string): Promise<string> {
       validatorUrl,
       chainId,
       faucetUrl,
-      nobleValidatorUrl,
       USDC_DENOM,
       USDC_DECIMALS,
       USDC_GAS_DENOM,
@@ -127,15 +126,6 @@ export async function connectNetwork(paramsJSON: string): Promise<string> {
       globalThis.faucetClient = new FaucetClient(faucetUrl);
     } else {
       globalThis.faucetClient = null;
-    }
-
-    try {
-      globalThis.nobleClient = new NobleClient(nobleValidatorUrl, txnMemo);
-      if (globalThis.nobleWallet) {
-        await globalThis.nobleClient.connect(globalThis.nobleWallet);
-      }
-    } catch (e) {
-      console.error('Failed to connect to noble validator');
     }
 
     return encodeJson(config);
@@ -275,7 +265,7 @@ export async function isWalletConnected(): Promise<string> {
     if (wallet === undefined) {
       throw new UserError('wallet is not set. Call connectWallet() first');
     }
-    return await encodeJson( { "result": true } );
+    return await encodeJson({ result: true });
   } catch (e) {
     return wrappedError(e);
   }
@@ -902,7 +892,7 @@ export async function encodeAccountRequestData(address: string): Promise<string>
 export async function decodeAccountResponseValue(value: string): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
-      const rawData = Buffer.from(value, 'base64');
+      const rawData = Buffer.from(value, 'base64') as Uint8Array;
       const rawAccount = AuthModule.QueryAccountResponse.decode(rawData).account;
       // The promise should have been rejected if the rawAccount was undefined.
       if (rawAccount === undefined) {
@@ -1187,11 +1177,10 @@ export async function cctpWithdraw(squidPayload: string): Promise<String> {
   }
 }
 
-
 export async function cctpMultiMsgWithdraw(cosmosPayload: string): Promise<string> {
   try {
     const client = globalThis.nobleClient;
-    const messages: { typeUrl:string, value: { amount: string } }[] = JSON.parse(cosmosPayload)
+    const messages: { typeUrl: string; value: { amount: string } }[] = JSON.parse(cosmosPayload);
     if (client === undefined || !client.isConnected) {
       throw new UserError('client is not connected.');
     }
@@ -1217,7 +1206,7 @@ export async function cctpMultiMsgWithdraw(cosmosPayload: string): Promise<strin
 
     return encodeJson(tx);
   } catch (error) {
-    return wrappedError(error)
+    return wrappedError(error);
   }
 }
 
@@ -1247,7 +1236,8 @@ export async function getWithdrawalAndTransferGatingStatus(perpetualId: number):
       throw new UserError('client is not connected. Call connectClient() first');
     }
 
-    const response = await client.validatorClient.get.getWithdrawalAndTransferGatingStatus(perpetualId);
+    const response =
+      await client.validatorClient.get.getWithdrawalAndTransferGatingStatus(perpetualId);
     return encodeJson(response);
   } catch (error) {
     return wrappedError(error);
@@ -1320,7 +1310,7 @@ export async function signCompliancePayload(payload: string): Promise<string> {
 
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const messageToSign: string = `${message}:${action}"${currentStatus ?? ''}:${timestampInSeconds}`;
-    const messageHash = sha256(Buffer.from(messageToSign));
+    const messageHash = sha256(Buffer.from(messageToSign) as Uint8Array);
 
     const signed = await Secp256k1.createSignature(messageHash, globalThis.hdKey.privateKey);
     const signedMessage = signed.toFixedLength();
@@ -1335,7 +1325,9 @@ export async function signCompliancePayload(payload: string): Promise<string> {
   }
 }
 
-export async function signPushNotificationTokenRegistrationPayload(payload: string): Promise<string> {
+export async function signPushNotificationTokenRegistrationPayload(
+  payload: string,
+): Promise<string> {
   try {
     const json = JSON.parse(payload);
     const message = json.message;
@@ -1348,7 +1340,7 @@ export async function signPushNotificationTokenRegistrationPayload(payload: stri
 
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const messageToSign: string = `${message}:REGISTER_TOKEN"${''}:${timestampInSeconds}`;
-    const messageHash = sha256(Buffer.from(messageToSign));
+    const messageHash = sha256(Buffer.from(messageToSign) as Uint8Array);
 
     const signed = await Secp256k1.createSignature(messageHash, globalThis.hdKey.privateKey);
     const signedMessage = signed.toFixedLength();
@@ -1387,17 +1379,14 @@ export async function getMegavaultOwnerShares(payload: string): Promise<string> 
     if (address === undefined) {
       throw new UserError('address is not set');
     }
-    const response =
-      await globalThis.client?.validatorClient.get.getMegavaultOwnerShares(address);
+    const response = await globalThis.client?.validatorClient.get.getMegavaultOwnerShares(address);
     return encodeJson(parseToPrimitives(response));
   } catch (e) {
     return wrappedError(e);
   }
 }
 
-export async function getMegavaultWithdrawalInfo(
-  sharesToWithdraw: bigint
-): Promise<string> {
+export async function getMegavaultWithdrawalInfo(sharesToWithdraw: bigint): Promise<string> {
   try {
     const client = globalThis.client;
     if (client === undefined) {
@@ -1405,7 +1394,7 @@ export async function getMegavaultWithdrawalInfo(
     }
     const response =
       await globalThis.client?.validatorClient.get.getMegavaultWithdrawalInfo(sharesToWithdraw);
-      return encodeJson(parseToPrimitives(response));
+    return encodeJson(parseToPrimitives(response));
   } catch (e) {
     return wrappedError(e);
   }
@@ -1413,7 +1402,7 @@ export async function getMegavaultWithdrawalInfo(
 
 export async function depositToMegavault(
   subaccountNumber: number,
-  amountUsdc: number
+  amountUsdc: number,
 ): Promise<string> {
   try {
     const client = globalThis.client;
@@ -1425,11 +1414,7 @@ export async function depositToMegavault(
       throw new UserError('wallet is not set. Call connectWallet() first');
     }
     const subaccount = new SubaccountInfo(wallet, subaccountNumber);
-    const tx = await client.depositToMegavault(
-      subaccount,
-      amountUsdc,
-      Method.BroadcastTxCommit,
-    );
+    const tx = await client.depositToMegavault(subaccount, amountUsdc, Method.BroadcastTxCommit);
     return encodeJson(parseToPrimitives(tx));
   } catch (error) {
     return wrappedError(error);
