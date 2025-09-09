@@ -2,17 +2,13 @@ import { useCallback, useMemo } from 'react';
 
 import { getLazyStargateClient } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { PublicKey } from '@solana/web3.js';
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
-import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
-import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
-
-import { useSolanaConnection } from '@/hooks/useSolanaConnection';
+import { EvmAddress, WalletNetworkType } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -62,13 +58,11 @@ export const useAccountBalance = ({
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { validators } = useEndpointsConfig();
-  const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
 
   const evmAddress =
     sourceAccount.chain === WalletNetworkType.Evm
       ? (sourceAccount.address as EvmAddress)
       : undefined;
-  const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
   const isEVMnativeToken = isNativeDenom(addressOrDenom);
 
@@ -76,7 +70,7 @@ export const useAccountBalance = ({
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
     query: {
-      enabled: Boolean(!isCosmosChain && !isSolanaChain && isEVMnativeToken),
+      enabled: Boolean(evmAddress && isEVMnativeToken),
     },
   });
 
@@ -155,58 +149,6 @@ export const useAccountBalance = ({
     staleTime: 10_000,
   });
 
-  const connection = useSolanaConnection();
-  const solanaQueryFn = useCallback(async (): Promise<{ data: { formatted: string } }> => {
-    try {
-      const address = solAddress;
-      const token = addressOrDenom;
-      if (!address || !token) {
-        throw new Error('Account or token address is not present');
-      }
-      const owner = new PublicKey(address);
-      const mint = new PublicKey(token);
-      const response = await connection.getParsedTokenAccountsByOwner(owner, { mint });
-
-      // An array of all of the owner's associated token accounts for the `mint`.
-      const accounts = response.value;
-
-      // The owner has no associated token accounts open for the
-      // specified token mint, and therefore, their balance is zero.
-      if (accounts.length === 0)
-        return {
-          data: {
-            formatted: '0',
-          },
-        };
-
-      // Select the associated token account owned by the user with the highest amount
-      const largestAccount = accounts.reduce((largest, current) => {
-        const currentBalance = current.account.data.parsed.info.tokenAmount.uiAmount;
-        const largestBalance = largest.account.data.parsed.info.tokenAmount.uiAmount;
-        return currentBalance >= largestBalance ? current : largest;
-      }, accounts[0]!);
-
-      return {
-        data: {
-          formatted: largestAccount.account.data.parsed.info.tokenAmount.uiAmountString as string,
-        },
-      };
-    } catch (error) {
-      throw new Error(`Failed to fetch Solana balance: ${error.message}`);
-    }
-  }, [solAddress, addressOrDenom, connection]);
-
-  const solanaQuery = useQuery({
-    enabled: Boolean(isSolanaChain && dydxAddress && solAddress && addressOrDenom),
-    queryKey: ['accountBalancesSol', chainId, solAddress, addressOrDenom],
-    queryFn: solanaQueryFn,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchInterval: 10_000,
-    staleTime: 10_000,
-  });
-
   const { value: evmNativeBalance, decimals: evmNativeDecimals } = evmNative.data ?? {};
   const [evmTokenBalance, evmTokenDecimals] = evmToken.data ?? [];
 
@@ -218,14 +160,7 @@ export const useAccountBalance = ({
       ? formatUnits(evmTokenBalance.result, evmTokenDecimals.result)
       : undefined;
 
-  // remove fee from usdc cosmos balance
-  const cosmosBalance = cosmosQuery.data
-    ? Math.max(parseFloat(cosmosQuery.data) - COSMOS_GAS_RESERVE, 0)
-    : undefined;
-
-  const solBalance = solanaQuery.data?.data.formatted;
-
-  const balance = isCosmosChain ? cosmosBalance : isSolanaChain ? solBalance : evmBalance;
+  const balance = evmBalance;
 
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance);
   const usdcBalance = MustBigNumber(usdcCoinBalance).toNumber();
@@ -239,10 +174,6 @@ export const useAccountBalance = ({
     queryStatus = cosmosQuery.status;
     isQueryFetching = cosmosQuery.isFetching;
   }
-  if (isSolanaChain) {
-    queryStatus = solanaQuery.status;
-    isQueryFetching = solanaQuery.isFetching;
-  }
 
   return {
     balance: balance?.toString(),
@@ -251,10 +182,6 @@ export const useAccountBalance = ({
     usdcBalance,
     queryStatus,
     isQueryFetching,
-    refetchQuery: isCosmosChain
-      ? cosmosQuery.refetch
-      : isSolanaChain
-        ? solanaQuery.refetch
-        : evmNative.refetch,
+    refetchQuery: evmNative.refetch,
   };
 };

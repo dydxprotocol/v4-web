@@ -7,7 +7,6 @@ import { Chain, parseUnits } from 'viem';
 import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
-import { CosmosChainId } from '@/constants/graz';
 import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer, USDC_ADDRESSES } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -89,29 +88,6 @@ function networkTypeToBalances(
       {} as Required<BalanceRequest>['chains']
     );
     return { chains: chainRequest };
-  }
-
-  if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-    if (!neutronAddress || !osmosisAddress || !nobleAddress) {
-      throw new Error('cosmos addresses not defined');
-    }
-
-    return {
-      chains: {
-        [CosmosChainId.Neutron]: {
-          address: neutronAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Neutron]],
-        },
-        [CosmosChainId.Osmosis]: {
-          address: osmosisAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Osmosis]],
-        },
-        [CosmosChainId.Noble]: {
-          address: nobleAddress,
-          denoms: [USDC_ADDRESSES[CosmosChainId.Noble]],
-        },
-      },
-    };
   }
 
   throw new Error('Fetching balances for unknown chain');

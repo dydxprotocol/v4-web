@@ -19,7 +19,7 @@ import { EvmDerivedAddresses } from '@/constants/account';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
-import { ConnectorType, WalletInfo, WalletNetworkType, WalletType } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, WalletNetworkType } from '@/constants/wallets';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
@@ -30,7 +30,6 @@ import { clearSourceAccount, setSourceAddress, setWalletInfo } from '@/state/wal
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
 import { isWagmiConnectorType, isWagmiResolvedWallet, resolveWagmiConnector } from '@/lib/wagmi';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -76,10 +75,6 @@ export const useWalletConnection = () => {
 
     if (isWagmiResolvedWallet(walletInfo) && evmAddressWagmi) {
       dispatch(setSourceAddress({ address: evmAddressWagmi, chain: WalletNetworkType.Evm }));
-    } else if (walletInfo.connectorType === ConnectorType.PhantomSolana && solAddressPhantom) {
-      dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
-    } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
-      dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
     }
   }, [sourceAccount.walletInfo, evmAddressWagmi, solAddressPhantom, dydxAddressGraz, dispatch]);
 
@@ -152,15 +147,6 @@ export const useWalletConnection = () => {
           if (!isConnectedWagmi && ready && !authenticated) {
             login();
           }
-        } else if (wallet.connectorType === ConnectorType.Cosmos) {
-          if (!isConnectedGraz) {
-            await connectGraz({
-              chainId: SUPPORTED_COSMOS_CHAINS,
-              walletType: wallet.name,
-            });
-          }
-        } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
-          await connectPhantom();
         } else if (isWagmiConnectorType(wallet)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
@@ -227,11 +213,6 @@ export const useWalletConnection = () => {
           await reconnectWagmi({
             connectors: [connector],
           });
-        } else if (
-          selectedWallet.connectorType === ConnectorType.PhantomSolana &&
-          !sourceAccount.address
-        ) {
-          await connectPhantom();
         }
       }
     })();
@@ -287,16 +268,6 @@ export const useWalletConnection = () => {
       stringGetter,
     ]
   );
-
-  // On page load, if testFlag.address is set, connect to the test wallet.
-  useEffect(() => {
-    if (testFlags.addressOverride) {
-      dispatch(setWalletInfo({ connectorType: ConnectorType.Test, name: WalletType.TestWallet }));
-      dispatch(
-        setSourceAddress({ address: testFlags.addressOverride, chain: WalletNetworkType.Cosmos })
-      );
-    }
-  }, [dispatch]);
 
   const [hasAttemptedMobileWalletConnect, setHasAttemptedMobileWalletConnect] = useState(false);
 

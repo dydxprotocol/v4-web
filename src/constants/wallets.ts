@@ -1,19 +1,18 @@
-import { type WalletType as CosmosWalletType } from 'graz';
 import { type EIP6963ProviderInfo } from 'mipd';
 import { type onboarding } from 'starboard-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import {
-    CoinbaseIcon,
-    EmailIcon,
-    FuelWalletIcon,
-    GenericWalletIcon,
-    KeplrIcon,
-    MetaMaskIcon,
-    OkxWalletIcon,
-    PhantomIcon,
-    WalletConnectIcon,
+  CoinbaseIcon,
+  EmailIcon,
+  FuelWalletIcon,
+  GenericWalletIcon,
+  KeplrIcon,
+  MetaMaskIcon,
+  OkxWalletIcon,
+  PhantomIcon,
+  WalletConnectIcon,
 } from '@/icons';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
@@ -70,19 +69,14 @@ export enum ConnectorType {
   Injected = 'injected',
   // Not a real connector type, but a link to download the wallet for those who don't have it installed
   DownloadWallet = 'downloadWallet',
-  Coinbase = 'coinbase',
   WalletConnect = 'walletConnect',
-  Cosmos = 'cosmos',
-  Test = 'test',
   Privy = 'privy',
-  PhantomSolana = 'phantomSolana',
   Fuel = 'fuel',
 }
 
 export enum WalletNetworkType {
   Evm = 'evm',
-  Cosmos = 'cosmos',
-  Solana = 'solana',
+  Fuel = 'fuel',
 }
 
 // This is the type stored in localstorage, so it must consist of only serializable fields
@@ -91,18 +85,9 @@ export type WalletInfo =
       connectorType: ConnectorType.Injected;
     } & Pick<EIP6963ProviderInfo<string>, 'icon' | 'name' | 'rdns'>)
   | {
-      connectorType:
-        | ConnectorType.Coinbase
-        | ConnectorType.WalletConnect
-        | ConnectorType.PhantomSolana
-        | ConnectorType.Privy;
+      connectorType: ConnectorType.WalletConnect | ConnectorType.Privy;
       name: WalletType;
     }
-  | {
-      connectorType: ConnectorType.Cosmos;
-      name: CosmosWalletType;
-    }
-  | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
   | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string }
   | { connectorType: ConnectorType.Fuel; name: 'Fuel Wallet' };
 
