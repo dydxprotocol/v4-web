@@ -6,7 +6,6 @@ import { mainnet } from 'viem/chains';
 import { DepositDialog2Props, DialogProps, DialogTypes } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
@@ -34,14 +33,6 @@ function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
     return {
       chainId: mainnet.id.toString(),
       denom: USDC_ADDRESSES[mainnet.id],
-      decimals: USDC_DECIMALS,
-    };
-  }
-
-  if (sourceAccount.chain === WalletNetworkType.Solana) {
-    return {
-      chainId: SOLANA_MAINNET_ID,
-      denom: USDC_ADDRESSES[SOLANA_MAINNET_ID],
       decimals: USDC_DECIMALS,
     };
   }

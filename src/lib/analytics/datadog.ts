@@ -1,7 +1,5 @@
 import { datadogLogs } from '@datadog/browser-logs';
 
-import { CURRENT_MODE } from '@/constants/networks';
-
 const CLIENT_TOKEN = import.meta.env.VITE_DATADOG_CLIENT_TOKEN;
 const PROXY_URL = import.meta.env.VITE_DATADOG_PROXY_URL;
 const SERVICE_NAME = 'v4-web';
@@ -18,7 +16,7 @@ if (CLIENT_TOKEN) {
     service: SERVICE_NAME,
     forwardErrorsToLogs: true,
     sessionSampleRate: 100,
-    env: CURRENT_MODE,
+    env: process.env.NODE_ENV,
     proxy: PROXY_URL ? `${PROXY_URL}${LOG_ENDPOINT_PATH}` : undefined,
     sendLogsAfterSessionExpiration: true,
   });

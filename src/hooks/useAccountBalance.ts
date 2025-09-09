@@ -8,12 +8,7 @@ import BigNumber from 'bignumber.js';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
-import {
-  getNeutronChainId,
-  getNobleChainId,
-  getOsmosisChainId,
-  SUPPORTED_COSMOS_CHAINS,
-} from '@/constants/graz';
+import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { COSMOS_GAS_RESERVE } from '@/constants/numbers';
 import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
 
@@ -123,19 +118,7 @@ export const useAccountBalance = ({
 
   const cosmosQueryFn = useCallback(async () => {
     if (dydxAddress && cosmosAddress && addressOrDenom) {
-      const nobleChainId = getNobleChainId();
-      const osmosisChainId = getOsmosisChainId();
-      const neutronChainId = getNeutronChainId();
       const rpc = (() => {
-        if (chainId === nobleChainId) {
-          return nobleValidator;
-        }
-        if (chainId === osmosisChainId) {
-          return osmosisValidator;
-        }
-        if (chainId === neutronChainId) {
-          return neutronValidator;
-        }
         if (chainId === selectedDydxChainId) {
           return validators[0];
         }

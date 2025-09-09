@@ -19,8 +19,6 @@ import {
 import { WalletClient } from 'viem';
 import { useConfig } from 'wagmi';
 
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
-import { getSolanaChainId } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -173,12 +171,8 @@ const useSkipClientContext = () => {
       apiUrl: skip,
       endpointOptions: {
         getRpcEndpointForChain: async (chainId: string) => {
-          if (chainId === getNobleChainId()) return nobleValidator;
-          if (chainId === getNeutronChainId()) return neutronValidator;
-          if (chainId === getOsmosisChainId()) return osmosisValidator;
           if (chainId === selectedDydxChainId)
             return compositeClient?.network.validatorConfig.restEndpoint ?? validators[0]!;
-          if (chainId === getSolanaChainId()) return solanaRpcUrl;
           const evmRpcUrls = RPCUrlsByChainId[chainId];
           if (evmRpcUrls?.length) return evmRpcUrls[0]!;
           throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);

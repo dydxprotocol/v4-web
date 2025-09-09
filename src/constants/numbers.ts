@@ -1,5 +1,3 @@
-import { isMainnet } from './networks';
-
 export const USD_DECIMALS = 2;
 export const SMALL_USD_DECIMALS = 4;
 
@@ -35,4 +33,4 @@ export const MIN_USDC_AMOUNT_FOR_AUTO_SWEEP = 0.05;
 // Launch Market
 export const DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH = 10_000;
 
-export const ESTIMATED_BLOCK_TIME = isMainnet ? 1_000 : 1_100;
+export const ESTIMATED_BLOCK_TIME = 1_000;

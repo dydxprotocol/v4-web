@@ -5,12 +5,11 @@ import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chai
 import { DYDX_DEPOSIT_CHAIN, isEvmDepositChainId } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType } from '@/constants/wallets';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { isValidSolanaAddress, validateCosmosAddress } from '@/lib/addressUtils';
+import { validateCosmosAddress } from '@/lib/addressUtils';
 
 // Because our deposit flow only supports ETH and USDC
 
@@ -69,10 +68,7 @@ export function getUserAddressesForRoute(
         if (!dydxAddress) throw new Error('dydxAddress undefined');
         return { chainId, address: dydxAddress };
       default:
-        if (
-          (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) ||
-          (chainId === SOLANA_MAINNET_ID && sourceAccount.chain === SOLANA_MAINNET_ID)
-        ) {
+        if (isEvmDepositChainId(chainId) && sourceAccount.chain === WalletNetworkType.Evm) {
           return { chainId, address: sourceAccount.address as string };
         }
 
@@ -132,9 +128,6 @@ export function isValidWithdrawalAddress(address: string, chainId: string): bool
       return validateCosmosAddress(address, 'osmo');
     case CosmosChainId.Neutron:
       return validateCosmosAddress(address, 'neutron');
-    case SOLANA_MAINNET_ID: {
-      return isValidSolanaAddress(address);
-    }
     case mainnet.id.toString():
     case arbitrum.id.toString():
     case base.id.toString():

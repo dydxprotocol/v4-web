@@ -6,7 +6,6 @@ import { mainnet } from 'viem/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { WalletNetworkType, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -36,11 +35,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
 
   const { isMobile } = useBreakpoints();
   const [destinationChain, setDestinationChain] = useState(
-    sourceAccount.chain === WalletNetworkType.Evm
-      ? mainnet.id.toString()
-      : sourceAccount.chain === SOLANA_MAINNET_ID
-        ? SOLANA_MAINNET_ID
-        : CosmosChainId.Noble
+    sourceAccount.chain === WalletNetworkType.Evm ? mainnet.id.toString() : CosmosChainId.Noble
   );
 
   const stringGetter = useStringGetter();

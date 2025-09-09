@@ -8,7 +8,6 @@ import { arbitrum, optimism } from 'viem/chains';
 
 import { DYDX_DEPOSIT_CHAIN, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { CosmosChainId } from '@/constants/graz';
-import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { timeUnits } from '@/constants/time';
 import { DYDX_CHAIN_USDC_DENOM, TokenForTransfer, USDC_ADDRESSES } from '@/constants/tokens';
 import { WalletNetworkType } from '@/constants/wallets';
@@ -90,17 +89,6 @@ function networkTypeToBalances(
       {} as Required<BalanceRequest>['chains']
     );
     return { chains: chainRequest };
-  }
-
-  if (sourceAccount.chain === WalletNetworkType.Solana) {
-    return {
-      chains: {
-        [SOLANA_MAINNET_ID]: {
-          address: sourceAccount.address!,
-          denoms: [USDC_ADDRESSES[SOLANA_MAINNET_ID]],
-        },
-      },
-    };
   }
 
   if (sourceAccount.chain === WalletNetworkType.Cosmos) {

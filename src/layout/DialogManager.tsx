@@ -2,7 +2,6 @@
 import React from 'react';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { isMainnet } from '@/constants/networks';
 
 import { CriteriaDialog } from '@/views/Affiliates/CriteriaDialog';
 import { AcknowledgeTermsDialog } from '@/views/dialogs/AcknowledgeTermsDialog';
@@ -44,7 +43,6 @@ import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog
 import { SimpleUiTradeDialog } from '@/views/dialogs/SimpleUiTradeDialog/SimpleUiTradeDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
-import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
@@ -90,12 +88,7 @@ export const DialogManager = React.memo(() => {
     CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
-    Deposit2: (args) =>
-      isMainnet ? (
-        <DepositDialog2 {...args} {...modalProps} />
-      ) : (
-        <TestnetFaucetDialog {...modalProps} />
-      ),
+    Deposit2: (args) => <DepositDialog2 {...args} {...modalProps} />,
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
     ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,

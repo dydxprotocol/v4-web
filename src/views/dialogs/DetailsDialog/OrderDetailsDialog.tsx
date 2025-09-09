@@ -7,7 +7,6 @@ import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, OrderDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 import { CancelOrderStatuses } from '@/constants/trade';
 import { IndexerOrderSide, IndexerOrderType } from '@/types/indexer/indexerApiGen';
@@ -195,7 +194,7 @@ export const OrderDetailsDialog = ({
       {
         key: 'subaccount',
         label: 'Subaccount # (Debug Only)',
-        value: !isMainnet ? `${subaccountNumber}` : undefined,
+        value: subaccountNumber?.toString(),
       },
     ] satisfies DetailsItem[]
   ).filter((item) => Boolean(item.value));

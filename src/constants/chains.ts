@@ -1,7 +1,6 @@
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { CosmosChainId } from './graz';
-import { SOLANA_MAINNET_ID } from './solana';
 import { WalletNetworkType } from './wallets';
 
 type Chain = {
@@ -47,12 +46,6 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
     icon: '/chains/avalanche.png',
     walletNetworkType: WalletNetworkType.Evm,
     gasDenom: 'AVAX',
-  },
-  [SOLANA_MAINNET_ID]: {
-    name: 'Solana',
-    icon: '/chains/solana.png',
-    walletNetworkType: WalletNetworkType.Solana,
-    gasDenom: 'SOL',
   },
   [CosmosChainId.Neutron]: {
     name: 'Neutron',

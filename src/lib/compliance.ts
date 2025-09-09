@@ -1,7 +1,7 @@
 import { Hdkey } from '@/constants/account';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
-import { isMainnet } from '@/constants/networks';
+import { isDev } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
@@ -131,7 +131,7 @@ export const signCompliancePayload = async (
 };
 
 export const isBlockedGeo = (geo: string): boolean => {
-  return isMainnet
-    ? [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
-    : false;
+  return isDev
+    ? false
+    : [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes);
 };

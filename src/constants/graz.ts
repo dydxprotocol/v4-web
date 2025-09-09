@@ -1,11 +1,11 @@
 import { type ConfigureGrazArgs, type WalletType as GrazWalletType } from 'graz';
-import { BECH32_PREFIX, NOBLE_BECH32_PREFIX } from 'starboard-client-js';
+import { BECH32_PREFIX } from 'starboard-client-js';
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
 
 import { LocalStorageKey } from './localStorage';
-import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP, isMainnet } from './networks';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from './networks';
 
 export enum CosmosChainId {
   Osmosis = 'osmosis-1',
@@ -26,23 +26,7 @@ const selectedNetwork = getLocalStorage({
 });
 const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
-export const getNobleChainId = () => {
-  return isMainnet ? CosmosChainId.Noble : CosmosChainId.NobleTestnet;
-};
-
-export const getOsmosisChainId = () => {
-  return isMainnet ? CosmosChainId.Osmosis : CosmosChainId.OsmosisTestnet;
-};
-
-export const getNeutronChainId = () => {
-  return isMainnet ? CosmosChainId.Neutron : CosmosChainId.NeutronTestnet;
-};
-
-const osmosisChainId = getOsmosisChainId();
-const nobleChainId = getNobleChainId();
-const neutronChainId = getNeutronChainId();
-
-export const SUPPORTED_COSMOS_CHAINS = [dydxChainId, osmosisChainId, nobleChainId, neutronChainId];
+export const SUPPORTED_COSMOS_CHAINS = [dydxChainId];
 
 export const GRAZ_CHAINS = [
   // dYdX
@@ -52,24 +36,6 @@ export const GRAZ_CHAINS = [
     bech32Config: {
       bech32PrefixAccAddr: BECH32_PREFIX,
     },
-  },
-  // Noble
-  {
-    chainId: nobleChainId,
-    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.nobleValidator,
-    bech32Config: { bech32PrefixAccAddr: NOBLE_BECH32_PREFIX },
-  },
-  // Osmosis
-  {
-    chainId: osmosisChainId,
-    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.osmosisValidator,
-    bech32Config: { bech32PrefixAccAddr: OSMO_BECH32_PREFIX },
-  },
-  // Neutron
-  {
-    chainId: neutronChainId,
-    rpc: ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.neutronValidator,
-    bech32Config: { bech32PrefixAccAddr: NEUTRON_BECH32_PREFIX },
   },
 ];
 

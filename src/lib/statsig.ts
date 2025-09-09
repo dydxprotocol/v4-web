@@ -1,6 +1,7 @@
 import { StatsigClient } from '@statsig/js-client';
 
-import { STATSIG_ENVIRONMENT_TIER } from '@/constants/networks';
+// TODO: We should remove this logic
+// or decide how to use Feature flags instead of going with Stagsig
 
 let statsigClient: StatsigClient;
 let initPromise: Promise<StatsigClient> | null = null;
@@ -26,7 +27,6 @@ export const initStatsigAsync = async () => {
       {
         disableLogging: process.env.VITEST === 'true',
         disableStorage: process.env.VITEST === 'true',
-        environment: { tier: STATSIG_ENVIRONMENT_TIER },
       }
     );
     await statsigClient.initializeAsync();
