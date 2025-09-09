@@ -29,6 +29,7 @@ import { useAccounts } from './useAccounts';
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useEnvConfig } from './useEnvConfig';
 import { useTokenConfigs } from './useTokenConfigs';
+import { useWalletConnection } from './useWalletConnection';
 
 type UseAccountBalanceProps = {
   // Token Items
@@ -53,7 +54,8 @@ export const useAccountBalance = ({
   usdcBalance: number;
   refetchQuery: (options?: RefetchOptions) => Promise<QueryObserverResult>;
 } => {
-  const { sourceAccount, dydxAccountGraz, dydxAddress } = useAccounts();
+  const { dydxAccountGraz } = useWalletConnection();
+  const { sourceAccount, dydxAddress } = useAccounts();
 
   const { chainTokenAmount: nativeTokenCoinBalance, usdcAmount: usdcCoinBalance } = useAppSelector(
     BonsaiCore.account.balances.data

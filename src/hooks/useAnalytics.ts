@@ -28,10 +28,12 @@ import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useSimpleUiEnabled } from './useSimpleUiEnabled';
 import { useAllStatsigGateValues } from './useStatsig';
+import { useWalletConnection } from './useWalletConnection';
 
 export const useAnalytics = () => {
   const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
-  const { sourceAccount, selectedWallet, dydxAddress } = useAccounts();
+  const { sourceAccount, dydxAddress } = useAccounts();
+  const { selectedWallet } = useWalletConnection();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
   /** User properties */
