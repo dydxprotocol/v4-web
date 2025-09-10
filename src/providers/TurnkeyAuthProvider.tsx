@@ -27,7 +27,7 @@ import {
   setTurnkeyEmailOnboardingData,
   setWalletInfo,
 } from '@/state/wallet';
-import { getSourceAccount } from '@/state/walletSelectors';
+import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -56,7 +56,7 @@ const useTurnkeyAuthContext = () => {
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
 
-  const { onboardDydxShared, embeddedPublicKey, targetPublicKeys, getUploadAddressPayload } =
+  const { embeddedPublicKey, onboardDydxShared, targetPublicKeys, getUploadAddressPayload } =
     useTurnkeyWallet();
 
   /* ----------------------------- Sign In ----------------------------- */
@@ -216,17 +216,44 @@ const useTurnkeyAuthContext = () => {
     [dispatch]
   );
 
+  const turnkeyEmailOnboardingData = useAppSelector(getTurnkeyEmailOnboardingData);
+
   const handleEmailMagicLink = useCallback(
     async ({ token }: { token: string }) => {
       try {
         setEmailSignInStatus('loading');
 
-        if (authIframeClient == null) {
+        if (authIframeClient == null || indexedDbClient == null) {
           throw new Error('cannot initialize auth without an iframe');
         }
 
+        const { publicKeyCompressed } = targetPublicKeys ?? {};
+
+        if (!publicKeyCompressed) {
+          throw new Error('No public key found');
+        }
+
+        const { organizationId } = turnkeyEmailOnboardingData ?? {};
+
+        if (!organizationId) {
+          throw new Error('Organization ID was not found');
+        }
+
         await authIframeClient.injectCredentialBundle(token);
-        await onboardDydxShared({ setWalletFromSignature, tkClient: authIframeClient });
+
+        const sessionResponse = await authIframeClient.stampLogin({
+          publicKey: publicKeyCompressed,
+          organizationId,
+        });
+
+        const { session } = sessionResponse;
+
+        if (!session) {
+          throw new Error('No session found');
+        }
+
+        await indexedDbClient.loginWithSession(session);
+        await onboardDydxShared({ setWalletFromSignature, tkClient: indexedDbClient });
         setEmailSignInStatus('success');
       } catch (error) {
         let errorMessage: string | undefined;
@@ -235,7 +262,8 @@ const useTurnkeyAuthContext = () => {
           if (
             error.message.includes('unable to decrypt bundle using embedded key') ||
             error.message.includes('Organization ID is not available') ||
-            error.message.includes('Unauthenticated desc')
+            error.message.includes('Unauthenticated desc') ||
+            error.message.includes('Organization ID was not found')
           ) {
             errorMessage =
               'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';
@@ -261,11 +289,14 @@ const useTurnkeyAuthContext = () => {
     },
     [
       authIframeClient,
-      dispatch,
+      indexedDbClient,
+      targetPublicKeys,
+      turnkeyEmailOnboardingData,
       onboardDydxShared,
       setWalletFromSignature,
       searchParams,
       setSearchParams,
+      dispatch,
     ]
   );
 
@@ -275,16 +306,14 @@ const useTurnkeyAuthContext = () => {
         throw new Error('cannot initialize auth without an iframe');
       }
 
-      const targetPublicKey = embeddedPublicKey;
-
-      if (targetPublicKey == null || targetPublicKey.trim().length === 0) {
+      if (embeddedPublicKey == null) {
         throw new Error('No target public key found');
       }
 
       const inputBody: SignInBody = {
         signinMethod: 'email',
         userEmail,
-        targetPublicKey,
+        targetPublicKey: embeddedPublicKey,
         magicLink: `${globalThis.location.origin}/markets/?token`,
       };
 

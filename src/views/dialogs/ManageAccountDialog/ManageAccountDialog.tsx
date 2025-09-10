@@ -66,7 +66,7 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
           onClick={() => setPage('turnkeyExport')}
         >
           Reveal Turnkey Phrase
-          <PrivateTag tw="font-tiny-bold rounded-[360px] px-0.5">Private</PrivateTag>
+          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">Private</PrivateTag>
           <Icon
             iconName={IconName.ChevronRight}
             tw="ml-auto text-color-text-0"
@@ -82,7 +82,7 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
           onClick={() => setPage('dydxExport')}
         >
           Reveal dYdX Phrase
-          <PrivateTag tw="font-tiny-bold rounded-[360px] px-0.5">Private</PrivateTag>
+          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">Private</PrivateTag>
           <Icon
             iconName={IconName.ChevronRight}
             tw="ml-auto size-0.5 text-color-text-0"

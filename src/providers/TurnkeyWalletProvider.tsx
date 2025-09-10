@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import { logTurnkey } from '@/bonsai/logs';
-import { uncompressRawPublicKey } from '@turnkey/crypto';
+import { decryptExportBundle, generateP256KeyPair, uncompressRawPublicKey } from '@turnkey/crypto';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { AES } from 'crypto-js';
@@ -15,8 +15,16 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setSavedEncryptedSignature } from '@/state/wallet';
-import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
+import {
+  clearTurnkeyPrimaryWallet,
+  setSavedEncryptedSignature,
+  setTurnkeyPrimaryWallet,
+} from '@/state/wallet';
+import {
+  getSourceAccount,
+  getTurnkeyEmailOnboardingData,
+  getTurnkeyPrimaryWallet,
+} from '@/state/walletSelectors';
 
 import {
   getWalletsWithAccounts,
@@ -48,7 +56,14 @@ const useTurnkeyWalletContext = () => {
 
   const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
   const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>();
-  const [primaryTurnkeyWallet, setPrimaryTurnkeyWallet] = useState<TurnkeyWallet>();
+  const primaryTurnkeyWallet = useAppSelector(getTurnkeyPrimaryWallet);
+
+  const setPrimaryTurnkeyWallet = useCallback(
+    (primaryWallet: TurnkeyWallet) => {
+      dispatch(setTurnkeyPrimaryWallet(primaryWallet));
+    },
+    [dispatch]
+  );
 
   /* ----------------------------- IndexedDbClient ----------------------------- */
 
@@ -278,7 +293,7 @@ const useTurnkeyWalletContext = () => {
 
       return null;
     },
-    [turnkeyUser, fetchUserShared, preferredWallet]
+    [turnkeyUser, fetchUserShared, preferredWallet, setPrimaryTurnkeyWallet]
   );
 
   const onboardDydxShared = useCallback(
@@ -377,6 +392,37 @@ const useTurnkeyWalletContext = () => {
     [primaryTurnkeyWallet, getPrimaryUserWalletsShared]
   );
 
+  /* ----------------------------- Export Wallet ----------------------------- */
+
+  const exportTurnkeyBundle = useCallback(
+    async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient }) => {
+      if (tkClient == null) {
+        throw new Error('TK client is not available');
+      }
+
+      if (primaryTurnkeyWallet == null || primaryTurnkeyWallet.accounts[0] == null) {
+        throw new Error('Primary turnkey wallet is not available');
+      }
+
+      const { publicKeyUncompressed: targetPublicKey, privateKey } = generateP256KeyPair();
+
+      const bundle = await tkClient.exportWallet({
+        walletId: primaryTurnkeyWallet.walletId,
+        targetPublicKey,
+      });
+
+      const mnemonic = await decryptExportBundle({
+        exportBundle: bundle.exportBundle,
+        organizationId: primaryTurnkeyWallet.accounts[0].organizationId,
+        embeddedKey: privateKey,
+        returnMnemonic: true,
+      });
+
+      return mnemonic;
+    },
+    [primaryTurnkeyWallet]
+  );
+
   /* ----------------------------- End Turnkey Session ----------------------------- */
 
   const sourceAccount = useAppSelector(getSourceAccount);
@@ -384,7 +430,7 @@ const useTurnkeyWalletContext = () => {
 
   const clearTurnkeyState = useCallback(() => {
     setTurnkeyUser(undefined);
-    setPrimaryTurnkeyWallet(undefined);
+    dispatch(clearTurnkeyPrimaryWallet());
     setTurnkeyWallets(undefined);
     setTargetPublicKeys(null);
   }, []);
@@ -426,5 +472,6 @@ const useTurnkeyWalletContext = () => {
     onboardDydxShared,
     getPrimaryUserWalletsShared,
     getUploadAddressPayload,
+    exportTurnkeyBundle,
   };
 };

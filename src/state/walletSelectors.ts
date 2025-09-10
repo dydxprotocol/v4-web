@@ -35,3 +35,5 @@ export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalle
 
 export const getTurnkeyEmailOnboardingData = (state: RootState) =>
   state.wallet.turnkeyEmailOnboardingData;
+
+export const getTurnkeyPrimaryWallet = (state: RootState) => state.wallet.turnkeyPrimaryWallet;

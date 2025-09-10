@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
-import { TurnkeyIframeClient } from '@turnkey/sdk-browser';
+import { logBonsaiError } from '@/bonsai/logs';
+import type { TurnkeyIframeClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonStyle } from '@/constants/buttons';
+import { ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ConnectorType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -15,8 +16,13 @@ import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
+import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { AccentTag } from '@/components/Tag';
+import { ToggleButton } from '@/components/ToggleButton';
+
+import { useAppSelector } from '@/state/appTypes';
+import { getSourceAccount } from '@/state/walletSelectors';
 
 type ExportWalletType = 'turnkey' | 'dydx';
 
@@ -29,122 +35,103 @@ export const RevealPhrase = ({
   exportWalletType: ExportWalletType;
 }) => {
   const stringGetter = useStringGetter();
-
-  const iframeContainerRef = useRef<HTMLDivElement | null>(null);
-  const [iframeClient, setIframeClient] = useState<TurnkeyIframeClient | null>(null);
-  const [injectResponse, setInjectResponse] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const [showPhrase, setShowPhrase] = useState(false);
   const { turnkey, indexedDbClient } = useTurnkey();
-  const { primaryTurnkeyWallet, targetPublicKeys, turnkeyUser } = useTurnkeyWallet();
+  const { primaryTurnkeyWallet } = useTurnkeyWallet();
   const { hdKey } = useAccounts();
+  const sourceAccount = useAppSelector(getSourceAccount);
 
-  const initIframe = async () => {
-    logTurnkey('initIframe', 'initIframe');
+  const [exportIframeClient, setExportIframeClient] = useState<TurnkeyIframeClient | null>(null);
+  const [isIframeVisible, setIsIframeVisible] = useState(false);
+  const TurnkeyExportIframeContainerId = 'turnkey-export-iframe-container-id';
+  const TurnkeyIframeElementId = 'turnkey-default-iframe-element-id';
 
-    if (iframeContainerRef.current) {
-      const iframeContainer = iframeContainerRef.current;
-      const exportIframeClient = await turnkey?.iframeClient({
-        iframeContainer,
-        iframeUrl: 'https://export.turnkey.com',
-      });
-
-      logTurnkey('initIframe', 'exportIframeClient', exportIframeClient);
-
-      if (exportIframeClient) {
-        setIframeClient(exportIframeClient);
+  const initIframe = useCallback(async () => {
+    // Wait for the modal and its content to render
+    requestAnimationFrame(async () => {
+      const iframeContainer = document.getElementById(TurnkeyExportIframeContainerId);
+      if (!iframeContainer) {
+        throw new Error('Iframe container not found.');
       }
-    }
-  };
 
-  const getTurnkeySecretPhrase = async () => {
+      const existingIframe = document.getElementById(TurnkeyIframeElementId);
+
+      if (!existingIframe) {
+        try {
+          const newExportIframeClient = await turnkey?.iframeClient({
+            iframeContainer: document.getElementById(TurnkeyExportIframeContainerId),
+            iframeUrl: 'https://export.turnkey.com',
+          });
+          setExportIframeClient(newExportIframeClient!);
+        } catch (error) {
+          logBonsaiError('initIframe', 'error initializing turnkey export iframe', { error });
+        }
+      }
+    });
+  }, [turnkey, setExportIframeClient]);
+
+  const exportWallet = useCallback(async () => {
     try {
       setLoading(true);
-      if (!indexedDbClient) {
-        throw new Error('No indexed db client');
+      if (!primaryTurnkeyWallet) {
+        throw new Error('No primary turnkey wallet');
       }
 
-      if (!primaryTurnkeyWallet?.walletId || !targetPublicKeys?.publicKey) {
-        throw new Error('No primary turnkey wallet or target public key');
-      }
+      const whoami = await indexedDbClient!.getWhoami();
 
-      if (!iframeClient) {
-        throw new Error('No iframe client');
-      }
-
-      if (!turnkeyUser) {
-        throw new Error('No turnkey user');
-      }
-
-      const walletExportBundle = await indexedDbClient.exportWallet({
+      const exportResponse = await indexedDbClient?.exportWallet({
+        organizationId: whoami.organizationId,
         walletId: primaryTurnkeyWallet.walletId,
-        targetPublicKey: targetPublicKeys.publicKey,
+        targetPublicKey: exportIframeClient!.iframePublicKey!,
       });
 
-      logTurnkey('getTurnkeySecretPhrase', 'walletExportBundle', walletExportBundle);
-
-      if (walletExportBundle.exportBundle) {
-        const session = await turnkey?.getSession();
-
-        const response = await iframeClient.injectWalletExportBundle(
-          walletExportBundle.exportBundle,
-          `${session?.organizationId}`
-        );
-
-        setInjectResponse(response);
+      if (!exportResponse?.exportBundle) {
+        throw new Error('Failed to retrieve export bundle');
       }
+
+      await exportIframeClient?.injectWalletExportBundle(
+        exportResponse.exportBundle,
+        whoami.organizationId
+      );
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
-      logBonsaiError('getTurnkeySecretPhrase', 'Error getting turnkey secret phrase', { error });
     } finally {
       setLoading(false);
     }
-  };
+  }, [primaryTurnkeyWallet, indexedDbClient, exportIframeClient]);
 
-  useEffect(() => {
-    logTurnkey('side-effect', 'turnkey', iframeContainerRef.current);
-    if (turnkey) {
-      if (iframeContainerRef.current) {
-        initIframe();
-      }
+  const handleExport = useCallback(async () => {
+    try {
+      await initIframe();
+      await exportWallet();
+      setIsIframeVisible(true);
+    } catch (error) {
+      logBonsaiError('handleExport', 'error', { error });
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
+    }
+  }, [initIframe, exportWallet, setIsIframeVisible]);
 
-      // Create a MutationObserver to watch for changes in the DOM
-      const observer = new MutationObserver(() => {
-        // If the iframe container is found, initialize the iframe and stop observing
-        logTurnkey(
-          'observer',
-          'iframeContainerRef is found, initialize iFrame',
-          iframeContainerRef.current
-        );
-        if (iframeContainerRef.current) {
-          initIframe();
-          observer.disconnect();
-        }
-      });
-
-      // If the iframe container is not yet available, start observing the DOM
-      if (!iframeContainerRef.current) {
-        logTurnkey('observer', 'iframeContainerRef.current is null');
-        observer.observe(document.body, { childList: true, subtree: true });
-      }
-
-      // Cleanup function to disconnect the observer when the dialog is closed
-      return () => observer.disconnect();
+  const ctaButton = useMemo(() => {
+    const walletInfo = sourceAccount.walletInfo;
+    if (exportWalletType === 'turnkey' && walletInfo?.connectorType === ConnectorType.Turnkey) {
+      return (
+        <Button onClick={handleExport}>{stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}</Button>
+      );
     }
 
-    return () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turnkey]);
+    return <Button onClick={closeDialog}>{stringGetter({ key: STRING_KEYS.CLOSE })}</Button>;
+  }, [sourceAccount.walletInfo, exportWalletType, closeDialog, stringGetter, handleExport]);
 
-  const phrase = exportWalletType === 'dydx' ? <span>{hdKey?.mnemonic}</span> : null;
+  const phrase = exportWalletType === 'dydx' ? hdKey?.mnemonic : undefined;
 
-  const copyButton = (
+  const copyButton = phrase && (
     <CopyButton
       buttonType="icon"
       buttonStyle={ButtonStyle.WithoutBackground}
       tw="ml-auto text-color-accent"
-      value="hihihi"
+      value={phrase}
     />
   );
 
@@ -158,12 +145,30 @@ export const RevealPhrase = ({
           Secret Recovery Phrase
         </span>
 
-        <div tw="row rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
+        <div tw="row justify-center rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
           {loading && <LoadingSpace />}
+          {exportWalletType === 'turnkey' && (
+            <div
+              id={TurnkeyExportIframeContainerId}
+              style={{
+                display: isIframeVisible ? 'block' : 'none',
+                backgroundColor: 'var(--bg-color-layer-2)',
+                color: 'var(--text-color-text-1)',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+          )}
 
-          {phrase}
-          <div ref={iframeContainerRef} />
-          {exportWalletType === 'dydx' && copyButton}
+          {exportWalletType === 'dydx' && (
+            <span tw="font-small-book">
+              {phrase
+                ?.split(' ')
+                // eslint-disable-next-line react/no-array-index-key
+                .map((word, idx) => <span key={idx}>{showPhrase ? `${word} ` : '***** '}</span>)}
+            </span>
+          )}
+          {copyButton}
         </div>
       </div>
 
@@ -172,11 +177,20 @@ export const RevealPhrase = ({
           'Your recovery key can grant anyone to access your funds. Save it in a secure, private location.'}
       </AlertMessage>
 
-      <Button onClick={injectResponse ? closeDialog : getTurnkeySecretPhrase}>
-        {injectResponse
-          ? stringGetter({ key: STRING_KEYS.CLOSE })
-          : stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}
-      </Button>
+      {exportWalletType === 'dydx' && (
+        <ToggleButton
+          size={ButtonSize.Small}
+          isPressed={showPhrase}
+          onPressedChange={setShowPhrase}
+          slotLeft={<Icon iconName={!showPhrase ? IconName.Show : IconName.Hide} />}
+        >
+          {stringGetter({
+            key: !showPhrase ? STRING_KEYS.SHOW_PHRASE : STRING_KEYS.HIDE_PHRASE,
+          })}
+        </ToggleButton>
+      )}
+
+      {ctaButton}
     </div>
   );
 };

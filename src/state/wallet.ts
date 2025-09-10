@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 import { ConnectorType, WalletInfo, WalletNetworkType } from '@/constants/wallets';
-import { TurnkeyEmailOnboardingData } from '@/types/turnkey';
+import { TurnkeyEmailOnboardingData, TurnkeyWallet } from '@/types/turnkey';
 
 export type SourceAccount = {
   address?: string;
@@ -21,6 +21,7 @@ export interface WalletState {
   };
   localWalletNonce?: number;
   turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
+  turnkeyPrimaryWallet?: TurnkeyWallet;
 }
 
 const initialState: WalletState = {
@@ -36,6 +37,7 @@ const initialState: WalletState = {
   },
   localWalletNonce: undefined,
   turnkeyEmailOnboardingData: undefined,
+  turnkeyPrimaryWallet: undefined,
 };
 
 export const walletSlice = createSlice({
@@ -100,6 +102,12 @@ export const walletSlice = createSlice({
     clearTurnkeyEmailOnboardingData: (state) => {
       state.turnkeyEmailOnboardingData = undefined;
     },
+    setTurnkeyPrimaryWallet: (state, action: PayloadAction<TurnkeyWallet>) => {
+      state.turnkeyPrimaryWallet = action.payload;
+    },
+    clearTurnkeyPrimaryWallet: (state) => {
+      state.turnkeyPrimaryWallet = undefined;
+    },
     clearSourceAccount: (state) => {
       state.sourceAccount = {
         address: undefined,
@@ -107,6 +115,7 @@ export const walletSlice = createSlice({
         encryptedSignature: undefined,
         walletInfo: undefined,
       };
+      state.turnkeyPrimaryWallet = undefined;
     },
   },
 });
@@ -122,4 +131,6 @@ export const {
   setLocalWallet,
   setTurnkeyEmailOnboardingData,
   clearTurnkeyEmailOnboardingData,
+  setTurnkeyPrimaryWallet,
+  clearTurnkeyPrimaryWallet,
 } = walletSlice.actions;
