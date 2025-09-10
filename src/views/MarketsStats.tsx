@@ -75,8 +75,12 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         <div tw="flex items-center justify-between gap-0.75">
           <div tw="relative z-10 mr-auto flex max-w-10 flex-col">
             <span tw="mb-0.75 font-extra-large-bold" style={{ lineHeight: '1.2' }}>
-              <span tw="mr-0.25 rounded-0 bg-white px-0.25 text-color-accent">Free</span>
-              <span tw="text-color-text-2">& Instant Deposits</span>
+              <span tw="mr-0.25 rounded-0 bg-white px-0.25 text-color-accent">
+                {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_TITLE_FREE })}
+              </span>
+              <span tw="text-color-text-2">
+                {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_TITLE_AND })}
+              </span>
             </span>
             <div tw="mt-0.5 flex flex-col gap-0.25">
               <Button
@@ -85,9 +89,11 @@ export const MarketsStats = (props: MarketsStatsProps) => {
                 tw="relative z-10 w-full border-none bg-color-layer-0 text-white"
                 onClick={handleFreeDepositClick}
               >
-                Free Deposit
+                {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
               </Button>
-              <span tw="text-color-text-2 font-mini-book">For amounts of $100 or more</span>
+              <span tw="text-color-text-2 font-mini-book">
+                {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_SUBTITLE })}
+              </span>
             </div>
           </div>
 
