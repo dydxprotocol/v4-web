@@ -104,9 +104,19 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
         {exportSection}
       </div>
     ),
-    dydxExport: <RevealPhrase exportWalletType="dydx" closeDialog={() => setPage('default')} />,
+    dydxExport: (
+      <RevealPhrase
+        exportWalletType="dydx"
+        closeDialog={() => setIsOpen(false)}
+        onBack={() => setPage('default')}
+      />
+    ),
     turnkeyExport: (
-      <RevealPhrase exportWalletType="turnkey" closeDialog={() => setPage('default')} />
+      <RevealPhrase
+        exportWalletType="turnkey"
+        closeDialog={() => setIsOpen(false)}
+        onBack={() => setPage('default')}
+      />
     ),
   }[page];
 

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError } from '@/bonsai/logs';
+import { useQuery } from '@tanstack/react-query';
 import type { TurnkeyIframeClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonStyle } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType } from '@/constants/wallets';
 
@@ -21,7 +23,8 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { AccentTag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 type ExportWalletType = 'turnkey' | 'dydx';
@@ -30,10 +33,13 @@ type ExportWalletType = 'turnkey' | 'dydx';
 export const RevealPhrase = ({
   closeDialog,
   exportWalletType,
+  onBack,
 }: {
   closeDialog: () => void;
   exportWalletType: ExportWalletType;
+  onBack: () => void;
 }) => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -47,6 +53,34 @@ export const RevealPhrase = ({
   const [isIframeVisible, setIsIframeVisible] = useState(false);
   const TurnkeyExportIframeContainerId = 'turnkey-export-iframe-container-id';
   const TurnkeyIframeElementId = 'turnkey-default-iframe-element-id';
+
+  const sessionQuery = useQuery({
+    queryKey: ['turnkeySession'],
+    queryFn: async () => {
+      const session = await turnkey!.getSession();
+
+      if (session == null) {
+        return {
+          session: null,
+          error: 'No session',
+        };
+      }
+
+      if (session.expiry > Math.floor(Date.now() / 1000)) {
+        return {
+          session,
+        };
+      }
+
+      setErrorMessage('Session expired. Please disconnect and login again to reveal your phrase.');
+
+      return {
+        session: null,
+        error: 'Session expired',
+      };
+    },
+    enabled: !!turnkey,
+  });
 
   const initIframe = useCallback(async () => {
     // Wait for the modal and its content to render
@@ -73,8 +107,10 @@ export const RevealPhrase = ({
   }, [turnkey, setExportIframeClient]);
 
   useEffect(() => {
-    initIframe();
-  }, [initIframe]);
+    if (!exportIframeClient) {
+      initIframe();
+    }
+  }, [initIframe, exportIframeClient]);
 
   const exportWallet = useCallback(async () => {
     try {
@@ -96,7 +132,7 @@ export const RevealPhrase = ({
         throw new Error('No organization id');
       }
 
-      const whoami = await indexedDbClient!.getWhoami({
+      const whoami = await indexedDbClient.getWhoami({
         organizationId: primaryTurnkeyWallet.accounts[0].organizationId,
       });
 
@@ -127,8 +163,26 @@ export const RevealPhrase = ({
       walletInfo?.connectorType === ConnectorType.Turnkey &&
       !isIframeVisible
     ) {
+      if (sessionQuery.data && sessionQuery.data.session) {
+        return (
+          <Button
+            state={{ isLoading: !exportIframeClient || sessionQuery.isLoading }}
+            onClick={exportWallet}
+          >
+            {stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}
+          </Button>
+        );
+      }
+
       return (
-        <Button onClick={exportWallet}>{stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}</Button>
+        <Button
+          onClick={() => {
+            closeDialog();
+            dispatch(openDialog(DialogTypes.DisconnectWallet({})));
+          }}
+        >
+          {stringGetter({ key: STRING_KEYS.DISCONNECT })}
+        </Button>
       );
     }
 
@@ -147,15 +201,20 @@ export const RevealPhrase = ({
       );
     }
 
-    return <Button onClick={closeDialog}>{stringGetter({ key: STRING_KEYS.CLOSE })}</Button>;
+    return <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.CLOSE })}</Button>;
   }, [
     sourceAccount.walletInfo,
     exportWalletType,
+    isIframeVisible,
     closeDialog,
     stringGetter,
+    sessionQuery.data,
+    sessionQuery.isLoading,
+    exportIframeClient,
     exportWallet,
+    dispatch,
     showPhrase,
-    isIframeVisible,
+    onBack,
   ]);
 
   const phrase = exportWalletType === 'dydx' ? hdKey?.mnemonic : undefined;

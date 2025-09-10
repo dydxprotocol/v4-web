@@ -56,6 +56,7 @@ export const OnboardingDialog = ({
   const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
   const isSimpleUi = useSimpleUiEnabled();
   const isTurnkeyEnabled = testFlags.enableTurnkey;
+  const { dydxAddress } = useAccounts();
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -74,10 +75,10 @@ export const OnboardingDialog = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (!currentOnboardingStep) {
+    if (!currentOnboardingStep || dydxAddress) {
       setIsOpen(false);
     }
-  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
+  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow, dydxAddress]);
 
   const setIsOpenFromDialog = (open: boolean) => {
     setIsOpen(open);
