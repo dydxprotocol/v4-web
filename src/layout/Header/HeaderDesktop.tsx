@@ -9,8 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -41,11 +41,12 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 
 export const HeaderDesktop = () => {
+  const { isUrlDataEmpty } = useMobileAppUrl();
+
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
-  const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
@@ -92,13 +93,13 @@ export const HeaderDesktop = () => {
          *     <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
          *   ),
          * }, */
-            {
-              value: 'MINTSCAN',
-              label: 'Block Explorer',
-              slotBefore: <Icon iconName={IconName.Terminal} />,
-              href: "https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions",
-            },
-          /* {
+        {
+          value: 'MINTSCAN',
+          label: 'Block Explorer',
+          slotBefore: <Icon iconName={IconName.Terminal} />,
+          href: 'https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions',
+        },
+        /* {
 * value: 'MORE',
 * label: stringGetter({ key: STRING_KEYS.MORE }),
 * subitems: [
@@ -200,7 +201,6 @@ export const HeaderDesktop = () => {
                 onClick={() => {
                   dispatch(openDialog(DialogTypes.Deposit2({})));
                 }}
-                state={{ isDisabled: !dydxAccounts }}
               >
                 {stringGetter({ key: STRING_KEYS.DEPOSIT })}
               </Button>
@@ -210,7 +210,7 @@ export const HeaderDesktop = () => {
 
         <MobileDownloadLinks />
 
-        <VerticalSeparator />
+        {isUrlDataEmpty || <VerticalSeparator />}
 
         <NotificationsMenu
           slotTrigger={
