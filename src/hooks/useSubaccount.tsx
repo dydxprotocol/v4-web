@@ -44,10 +44,13 @@ const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountC
 SubaccountContext.displayName = 'Subaccount';
 
 export const SubaccountProvider = ({ ...props }) => {
-  const { localDydxWallet } = useAccounts();
-
   return (
-    <SubaccountContext.Provider value={useSubaccountContext({ localDydxWallet })} {...props} />
+    <SubaccountContext.Provider
+      value={useSubaccountContext({
+        localDydxWallet: undefined, // We'll remove this later
+      })}
+      {...props}
+    />
   );
 };
 

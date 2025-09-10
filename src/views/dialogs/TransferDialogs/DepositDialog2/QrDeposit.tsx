@@ -20,18 +20,18 @@ import { truncateAddress } from '@/lib/wallet';
 
 export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
   const stringGetter = useStringGetter();
-  const { nobleAddress } = useAccounts();
+  const { address } = useAccounts();
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopy = () => {
-    if (!nobleAddress || nobleAddress.trim() === '') return;
+    if (!address || address.trim() === '') return;
 
     setIsCopied(true);
-    navigator.clipboard.writeText(nobleAddress);
+    navigator.clipboard.writeText(address);
     setTimeout(() => setIsCopied(false), MODERATE_DEBOUNCE_MS);
   };
 
-  const isDisabled = disabled || isCopied || nobleAddress == null || nobleAddress.trim() === '';
+  const isDisabled = disabled || isCopied || address == null || address.trim() === '';
 
   return (
     <div tw="flex h-full flex-col gap-1 p-1.25">
@@ -48,13 +48,13 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
       <$QrContainer>
         <QrCode
           imgOverride={{
-            alt: 'Noble Chain',
+            alt: 'Fuel Mainnet',
             src: '/chains/noble.png',
           }}
           tw="text-center"
           hasLogo
           size={200}
-          value={nobleAddress ?? ''}
+          value={address ?? ''}
         />
       </$QrContainer>
 
@@ -62,7 +62,7 @@ export const QrDeposit = ({ disabled }: { disabled: boolean }) => {
         <span>Your Noble address</span>
 
         <$CopyAddressButton disabled={isDisabled} onClick={onCopy}>
-          <span>{truncateAddress(nobleAddress, 'noble')}</span>
+          <span>{truncateAddress(address, 'fuel')}</span>
           <Icon
             css={{
               color: isCopied ? 'var(--color-success)' : 'var(--color-text-1)',

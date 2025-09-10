@@ -7,7 +7,6 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -51,7 +50,6 @@ export const AccountInfoSection = () => {
 
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
-  const { dydxAccounts } = useAccounts();
 
   const subAccount = orEmptyObj(useAppSelector(BonsaiCore.account.parentSubaccountSummary.data));
   const isLoadingGuards = useAppSelector(calculateIsAccountLoading);
@@ -74,7 +72,6 @@ export const AccountInfoSection = () => {
 
   const withdrawButton = (
     <$Button
-      state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}
@@ -87,7 +84,6 @@ export const AccountInfoSection = () => {
 
   const depositButton = (
     <$Button
-      state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
       shape={ButtonShape.Rectangle}
       size={ButtonSize.XSmall}

@@ -4,16 +4,13 @@ import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { CHAIN_INFO } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -78,18 +75,6 @@ export const AddressInput = ({
           </span>
         )}
       </div>
-      <$ChainButton
-        disabled={sourceAccount.chain === WalletNetworkType.Solana}
-        onClick={onDestinationClicked}
-      >
-        <div tw="flex items-center gap-0.5">
-          <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
-          <div>{CHAIN_INFO[destinationChain]?.name}</div>
-        </div>
-        {sourceAccount.chain !== WalletNetworkType.Solana && (
-          <$CaretIcon size="10px" iconName={IconName.Caret} />
-        )}
-      </$ChainButton>
     </$WithdrawAmountInputContainer>
   );
 };

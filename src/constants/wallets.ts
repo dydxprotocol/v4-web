@@ -68,6 +68,7 @@ export enum WalletType {
 
 export enum ConnectorType {
   Injected = 'injected',
+  Coinbase = 'coinbase',
   // Not a real connector type, but a link to download the wallet for those who don't have it installed
   DownloadWallet = 'downloadWallet',
   Coinbase = 'coinbase',
@@ -104,7 +105,8 @@ export type WalletInfo =
     }
   | { connectorType: ConnectorType.Test; name: WalletType.TestWallet }
   | { connectorType: ConnectorType.DownloadWallet; name: string; downloadLink: string }
-  | { connectorType: ConnectorType.Fuel; name: 'Fuel Wallet' };
+  | { connectorType: ConnectorType.Fuel; name: WalletType.FuelWallet }
+  | { connectorType: ConnectorType.Coinbase; name: WalletType.CoinbaseWallet };
 
 type WalletConfig = {
   type: WalletType;

@@ -109,9 +109,6 @@ export type CriteriaDialogProps = {
   stakedAmount?: bigint;
   userTier?: number | 'vip';
 };
-export type CoinbaseDepositDialogProps = {
-  onBack?: () => void;
-};
 
 export const DialogTypes = unionize(
   {
@@ -124,7 +121,6 @@ export const DialogTypes = unionize(
     CloseAllPositionsConfirmation: ofType<CloseAllPositionsConfirmationDialogProps>(),
     ClosePosition: ofType<ClosePositionDialogProps>(),
     ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
-    CoinbaseDepositDialog: ofType<CoinbaseDepositDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
     /* TODO: rename Deposit2 to Deposit once old deposit flow is deprecated */

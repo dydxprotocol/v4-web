@@ -1,5 +1,4 @@
 import { timeUnits } from '@/constants/time';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 import { selectOrphanedTriggerOrders } from '@/state/accountSelectors';
@@ -53,14 +52,6 @@ export function setUpCancelOrphanedTriggerOrdersLifecycle(store: RootStore) {
         try {
           const { ordersToCancel: ordersToCancelRaw } = data;
           const ordersToCancel = ordersToCancelRaw.filter((o) => !cancelingOrderIds.has(o.id));
-
-          // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
-          if (
-            ordersToCancel.length === 0 ||
-            data.sourceAccount.chain === WalletNetworkType.Cosmos
-          ) {
-            return undefined;
-          }
 
           logBonsaiInfo(
             'cancelTriggerOrdersWithClosedOrFlippedPositions',

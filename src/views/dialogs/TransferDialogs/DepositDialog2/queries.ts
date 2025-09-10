@@ -19,17 +19,15 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { SourceAccount } from '@/state/wallet';
 
 export function useBalances() {
-  const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { sourceAccount } = useAccounts();
   const { skipClient } = useSkipClient();
 
   return useQuery({
-    queryKey: ['balances', sourceAccount.address, nobleAddress, osmosisAddress, neutronAddress],
+    queryKey: ['balances', sourceAccount.address],
     queryFn: async () => {
-      return skipClient.balances(
-        networkTypeToBalances(sourceAccount, nobleAddress, osmosisAddress, neutronAddress)
-      );
+      return skipClient.balances(networkTypeToBalances(sourceAccount));
     },
-    enabled: Boolean(sourceAccount.address && nobleAddress && osmosisAddress && neutronAddress),
+    enabled: Boolean(sourceAccount.address),
     staleTime: 5 * timeUnits.minute,
     refetchOnMount: 'always',
   });

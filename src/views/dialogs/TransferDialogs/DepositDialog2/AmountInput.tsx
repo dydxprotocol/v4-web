@@ -8,18 +8,16 @@ import { formatUnits, parseUnits } from 'viem';
 import { STRING_KEYS } from '@/constants/localization';
 import { EVM_GAS_RESERVE_AMOUNT, TOKEN_DECIMALS } from '@/constants/numbers';
 import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { AssetIcon } from '@/components/AssetIcon';
-import { Icon, IconName } from '@/components/Icon';
+import { Icon } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { getTokenSymbol, isNativeTokenDenom } from '../utils';
+import { isNativeTokenDenom } from '../utils';
 
 export type AmountInputProps = {
   value: string;
@@ -117,24 +115,6 @@ export const AmountInput = ({
             value={value}
             onChange={onValueChange}
           />
-
-          <$TokenButton
-            type="button"
-            disabled={sourceAccount.chain === WalletNetworkType.Solana}
-            onClick={onTokenClick}
-          >
-            <div tw="flex items-center gap-0.5 text-color-text-2">
-              <AssetIcon
-                tw="[--asset-icon-size:2rem]"
-                symbol={getTokenSymbol(token.denom)}
-                chainId={token.chainId}
-              />
-              <div>{getTokenSymbol(token.denom)}</div>
-            </div>
-            {sourceAccount.chain !== WalletNetworkType.Solana && (
-              <$CaretIcon size="10px" iconName={IconName.Caret} />
-            )}
-          </$TokenButton>
         </div>
       </div>
     </$AmountInputContainer>

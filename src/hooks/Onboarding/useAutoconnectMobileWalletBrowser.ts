@@ -19,7 +19,6 @@ import { sleep } from '@/lib/timeUtils';
 
 import { useAccounts } from '../useAccounts';
 import { useWalletConnection } from '../useWalletConnection';
-import { useGenerateKeys } from './useGenerateKeys';
 
 export function useAutoconnectMobileWalletBrowser() {
   const { detectedBrowser } = useDetectedWalletBrowser();
@@ -50,25 +49,13 @@ export function useAutoconnectMobileWalletBrowser() {
     return undefined;
   }, [detectedBrowser]);
 
-  const maybePhantomWallet: WalletInfo | undefined = useMemo(() => {
-    if (detectedBrowser === WalletBrowser.Phantom) {
-      return {
-        connectorType: ConnectorType.PhantomSolana,
-        name: WalletType.Phantom,
-      } as const;
-    }
-    return undefined;
-  }, [detectedBrowser]);
-
   const walletToConnect = useMemo(() => {
     if (maybeCoinbaseWallet) {
       return maybeCoinbaseWallet;
     }
-    if (maybePhantomWallet) {
-      return maybePhantomWallet;
-    }
+
     return injectedWallet;
-  }, [maybeCoinbaseWallet, injectedWallet, maybePhantomWallet]);
+  }, [maybeCoinbaseWallet, injectedWallet]);
 
   const canAutoconnectMobileWallet = useMemo(() => {
     const injectedWallets = displayedWallets.filter((wallet) => {
@@ -85,9 +72,6 @@ export function useAutoconnectMobileWalletBrowser() {
       currentOnboardingStep === OnboardingSteps.ChooseWallet
     );
   }, [isSimpleUi, isUsingWalletBrowser, displayedWallets, currentOnboardingStep, walletToConnect]);
-
-  const { isMatchingNetwork, onClickSwitchNetwork, onClickSendRequestOrTryAgain } =
-    useGenerateKeys();
 
   const { sourceAccount } = useAccounts();
   const { walletInfo } = sourceAccount;
@@ -116,26 +100,11 @@ export function useAutoconnectMobileWalletBrowser() {
     setHasAttemptedMobileWalletConnect,
   ]);
 
-  const handleKeyRecovery = useCallback(async () => {
-    // No need to switch network for Phantom Solana
-    if (isMatchingNetwork || walletToConnect?.connectorType === ConnectorType.PhantomSolana) {
-      onClickSendRequestOrTryAgain();
-    } else {
-      onClickSwitchNetwork();
-    }
-  }, [
-    isMatchingNetwork,
-    walletToConnect?.connectorType,
-    onClickSendRequestOrTryAgain,
-    onClickSwitchNetwork,
-  ]);
-
   useEffect(() => {
     if (shouldRecoverKeys && walletInfo) {
-      handleKeyRecovery();
       setShouldRecoverKeys(false);
     }
-  }, [shouldRecoverKeys, handleKeyRecovery, walletInfo]);
+  }, [shouldRecoverKeys, walletInfo]);
 
   return {
     hasAttemptedMobileWalletConnect,

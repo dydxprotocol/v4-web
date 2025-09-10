@@ -129,24 +129,6 @@ const useSkipClientContext = () => {
 
   useEffect(() => {
     const signers: SignerGetters = {
-      getSvmSigner: async () => {
-        if (sourceAccount.chain !== WalletNetworkType.Solana || !window.phantom?.solana) {
-          throw new Error('no solana wallet connected');
-        }
-
-        await window.phantom.solana.connect();
-        return (window as any).phantom.solana;
-      },
-      getCosmosSigner: async (chainId: string) => {
-        if (sourceAccount.chain !== WalletNetworkType.Cosmos) {
-          throw new Error('no cosmos wallet connected');
-        }
-        if (!window.keplr) {
-          throw new Error('keplr wallet not connected');
-        }
-
-        return window.keplr.getOfflineSigner(chainId);
-      },
       getEvmSigner: async (chainId: string) => {
         if (sourceAccount.chain !== WalletNetworkType.Evm) {
           throw new Error('no EVM wallet connected');

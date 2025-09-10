@@ -1,6 +1,5 @@
 import { arbitrum, avalanche, base, mainnet, optimism, polygon } from 'viem/chains';
 
-import { CosmosChainId } from './graz';
 import { WalletNetworkType } from './wallets';
 
 type Chain = {
@@ -46,24 +45,6 @@ export const CHAIN_INFO: { [chainId: string]: Chain } = {
     icon: '/chains/avalanche.png',
     walletNetworkType: WalletNetworkType.Evm,
     gasDenom: 'AVAX',
-  },
-  [CosmosChainId.Neutron]: {
-    name: 'Neutron',
-    icon: '/chains/neutron.png',
-    walletNetworkType: WalletNetworkType.Cosmos,
-    gasDenom: 'NTRN',
-  },
-  [CosmosChainId.Noble]: {
-    name: 'Noble',
-    icon: '/chains/noble.png',
-    walletNetworkType: WalletNetworkType.Cosmos,
-    gasDenom: 'USDC',
-  },
-  [CosmosChainId.Osmosis]: {
-    name: 'Osmosis',
-    icon: '/chains/osmosis.png',
-    walletNetworkType: WalletNetworkType.Cosmos,
-    gasDenom: 'OSMO',
   },
 };
 
