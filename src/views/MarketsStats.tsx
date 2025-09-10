@@ -75,7 +75,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
         <div tw="flex items-center justify-between gap-0.75">
           <div tw="relative z-10 mr-auto flex max-w-10 flex-col">
             <span tw="mb-0.75 leading-[1.2] font-extra-large-bold">
-              <span tw="mr-0.25 rounded-0 bg-white px-0.25 text-color-accent">
+              <span tw="mr-0.25 rounded-0 bg-color-layer-1 px-0.25 text-color-accent">
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_TITLE_FREE })}
               </span>
               <span tw="text-color-text-2">
@@ -84,9 +84,9 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             </span>
             <div tw="mt-0.5 flex flex-col gap-0.25">
               <Button
-                action={ButtonAction.Primary}
+                action={ButtonAction.Secondary}
                 type={ButtonType.Button}
-                tw="relative z-10 w-full border-none bg-color-layer-0 text-white"
+                tw="relative z-10 w-full border-none bg-color-layer-0 text-color-text-2"
                 onClick={handleFreeDepositClick}
               >
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
