@@ -42,13 +42,7 @@ export const OtherDepositOptions = ({
       </div>
       <Button
         onClick={() => {
-          dispatch(
-            openDialog(
-              DialogTypes.CoinbaseDepositDialog({
-                onBack,
-              })
-            )
-          );
+          // TODO: Add a proper implementation for Fuel Wallets
           onClose();
         }}
         disabled={otherOptionsDisabled}

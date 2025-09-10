@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { RouteResponse, UserAddress } from '@skip-go/client';
@@ -7,7 +7,6 @@ import { initial } from 'lodash';
 import { TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT } from 'starboard-client-js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
-import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { USDC_ASSET_ID } from '@/constants/tokens';
@@ -29,10 +28,10 @@ import { AttemptBigNumber } from '@/lib/numbers';
 
 import { DYDX_DEPOSIT_CHAIN } from '../consts';
 import {
-    getUserAddressesForRoute,
-    isInstantTransfer,
-    isValidWithdrawalAddress,
-    parseWithdrawError,
+  getUserAddressesForRoute,
+  isInstantTransfer,
+  isValidWithdrawalAddress,
+  parseWithdrawError,
 } from '../utils';
 
 export function useWithdrawStep({
@@ -50,15 +49,7 @@ export function useWithdrawStep({
 }) {
   const stringGetter = useStringGetter();
   const { skipClient } = useSkipClient();
-  const {
-    dydxAddress,
-    localDydxWallet,
-    localNobleWallet,
-    nobleAddress,
-    osmosisAddress,
-    neutronAddress,
-    sourceAccount,
-  } = useAccounts();
+  const { dydxAddress, sourceAccount } = useAccounts();
   const [isLoading, setIsLoading] = useState(false);
 
   const userAddresses: UserAddress[] | undefined = useMemo(() => {
@@ -74,50 +65,14 @@ export function useWithdrawStep({
       return undefined;
     }
 
-    return getUserAddressesForRoute(
-      withdrawRoute,
-      sourceAccount,
-      nobleAddress,
-      dydxAddress,
-      osmosisAddress,
-      neutronAddress,
-      destinationAddress
-    );
-  }, [
-    dydxAddress,
-    neutronAddress,
-    nobleAddress,
-    osmosisAddress,
-    sourceAccount,
-    withdrawRoute,
-    destinationAddress,
-  ]);
-
-  const getCosmosSigner = useCallback(
-    async (chainID: string) => {
-      if (chainID === CosmosChainId.Noble) {
-        if (!localNobleWallet?.offlineSigner) {
-          throw new Error('No local noblewallet offline signer. Cannot submit tx');
-        }
-        return localNobleWallet.offlineSigner;
-      }
-
-      if (!localDydxWallet?.offlineSigner)
-        throw new Error('No local dydxwallet offline signer. Cannot submit tx');
-
-      return localDydxWallet.offlineSigner;
-    },
-    [localDydxWallet, localNobleWallet]
-  );
+    return getUserAddressesForRoute(withdrawRoute, sourceAccount, dydxAddress, destinationAddress);
+  }, [dydxAddress, sourceAccount, withdrawRoute, destinationAddress]);
 
   const executeWithdraw = async () => {
     try {
       setIsLoading(true);
       if (!withdrawRoute) throw new Error('No route found');
       if (!userAddresses) throw new Error('No user addresses found');
-      if (!localDydxWallet || !localNobleWallet || !dydxAddress) {
-        throw new Error('No local wallets found');
-      }
 
       const withdrawId = `withdraw-${crypto.randomUUID()}`;
 
@@ -127,7 +82,6 @@ export function useWithdrawStep({
       });
 
       await skipClient.executeRoute({
-        getCosmosSigner,
         route: withdrawRoute,
         userAddresses,
         beforeMsg: {

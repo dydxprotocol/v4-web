@@ -4,7 +4,6 @@ import { CompositeClient, LocalWallet, SubaccountClient } from 'starboard-client
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { USDC_DECIMALS } from '@/constants/tokens';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
 import { selectReclaimableChildSubaccountFunds } from '@/state/accountSelectors';
@@ -139,11 +138,6 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
           );
 
           if (reclaimableChildSubaccounts.length === 0) {
-            return;
-          }
-
-          // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
-          if (data.sourceAccount.chain === WalletNetworkType.Cosmos) {
             return;
           }
 

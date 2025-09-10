@@ -111,23 +111,15 @@ export const DepositForm = ({
     useDepositDeltas({ depositAmount: depositRoute?.usdAmountOut })
   );
 
-  const { sourceAccount, localDydxWallet } = useAccounts();
+  const { sourceAccount } = useAccounts();
 
   const signer = useMemo(() => {
     if (sourceAccount.chain === WalletNetworkType.Evm) {
       return walletClient;
     }
 
-    if (sourceAccount.chain === WalletNetworkType.Solana) {
-      return window.phantom?.solana;
-    }
-
-    if (sourceAccount.chain === WalletNetworkType.Cosmos) {
-      return localDydxWallet;
-    }
-
     throw new Error('wallet type not handled');
-  }, [localDydxWallet, sourceAccount.chain, walletClient]);
+  }, [sourceAccount.chain, walletClient]);
 
   const hasSufficientBalance = depositRoute
     ? tokenBalance.raw && BigInt(depositRoute.amountIn) <= BigInt(tokenBalance.raw)

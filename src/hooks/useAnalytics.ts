@@ -120,11 +120,6 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperties.WalletAddress(sourceAccount.address ?? null));
   }, [sourceAccount.address]);
 
-  // AnalyticsUserProperty.DydxAddress
-  useEffect(() => {
-    identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
-  }, [dydxAddress]);
-
   useEffect(() => {
     identify(
       AnalyticsUserProperties.IsRememberMe(

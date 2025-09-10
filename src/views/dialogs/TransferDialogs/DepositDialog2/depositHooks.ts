@@ -59,7 +59,7 @@ export function useDepositSteps({
   const stringGetter = useStringGetter();
   const walletChainId = useChainId();
   const { skipClient } = useSkipClient();
-  const { nobleAddress, dydxAddress, osmosisAddress } = useAccounts();
+  const { dydxAddress } = useAccounts();
 
   async function getStepsQuery() {
     if (!depositRoute || !sourceAccount.address) return [];
@@ -101,13 +101,7 @@ export function useDepositSteps({
 
     /* ----- 2. Token allowance checks -------- */
     // Only evm tokens may need token allowance checks
-    const userAddresses = getUserAddressesForRoute(
-      depositRoute,
-      sourceAccount,
-      nobleAddress,
-      dydxAddress,
-      osmosisAddress
-    );
+    const userAddresses = getUserAddressesForRoute(depositRoute, sourceAccount, dydxAddress);
 
     if (isEvmDepositChainId(depositToken.chainId)) {
       const messages = await skipClient.messages({

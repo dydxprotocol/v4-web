@@ -43,10 +43,6 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
   }, [phantomSignMessage, signTypedData]);
 
   const signMessage = useCallback(async (): Promise<string> => {
-    if (wallet?.connectorType === ConnectorType.PhantomSolana) {
-      return signSolanaMessage();
-    }
-
     const isMetaMask =
       wallet?.connectorType === ConnectorType.Injected && wallet.name === 'MetaMask';
 

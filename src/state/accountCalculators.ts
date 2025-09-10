@@ -2,7 +2,6 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { VaultFormAccountData } from '@/bonsai/public-calculators/vaultFormValidation';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ConnectorType } from '@/constants/wallets';
 
 import {
   getDisplayChooseWallet,
@@ -27,7 +26,7 @@ export const calculateOnboardingStep = createAppSelector(
         displayChooseWallet || !testFlags.enableTurnkey
           ? OnboardingSteps.ChooseWallet
           : OnboardingSteps.SignIn,
-      [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,
+      [OnboardingState.WalletConnected]: undefined,
       [OnboardingState.AccountConnected]: undefined,
     }[onboardingState];
   }
@@ -49,10 +48,8 @@ export const calculateCanViewAccount = createAppSelector(
  */
 export const calculateIsAccountViewOnly = createAppSelector(
   [getOnboardingState, calculateCanViewAccount, getSourceAccount],
-  (onboardingState: OnboardingState, canViewAccountInfo: boolean, sourceAccount) =>
-    sourceAccount.walletInfo?.connectorType === ConnectorType.Test
-      ? true
-      : onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
+  (onboardingState: OnboardingState, canViewAccountInfo: boolean) =>
+    onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
 );
 
 /**

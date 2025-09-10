@@ -2,7 +2,6 @@ import { SubaccountClient } from 'starboard-client-js';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { WalletNetworkType } from '@/constants/wallets';
 
 import type { RootStore } from '@/state/_store';
 import { selectShouldAccountRebalanceUsdc } from '@/state/accountSelectors';
@@ -15,8 +14,8 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
-    selectTxAuthorizedAccount,
-    selectUserHasUsdcGasForTransaction,
+  selectTxAuthorizedAccount,
+  selectUserHasUsdcGasForTransaction,
 } from '../selectors/accountTransaction';
 
 // Sleep time between rebalances to ensure that the subaccount has time to process the previous transaction
@@ -62,10 +61,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
       async function rebalanceWalletFunds() {
         const { localDydxWallet, parentSubaccountInfo, sourceAccount, rebalanceAction } = data!;
 
-        // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
-        if (rebalanceAction == null || sourceAccount.chain === WalletNetworkType.Cosmos) {
-          return;
-        }
+        if (rebalanceAction == null) return;
 
         if (rebalanceAction.requiredAction === 'deposit') {
           const { amountToDeposit, usdcBalance, targetAmount } = rebalanceAction;

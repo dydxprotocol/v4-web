@@ -1,15 +1,11 @@
 import { useMemo } from 'react';
 
-import { type WalletType as CosmosWalletType } from 'graz';
-
 import {
   COINBASE_MIPD_RDNS,
   ConnectorType,
-  KEPLR_DOWNLOAD_LINK,
   KEPLR_MIPD_RDNS,
   METAMASK_MIPD_RDNS,
   OKX_MIPD_RDNS,
-  PHANTOM_DOWNLOAD_LINK,
   PHANTOM_MIPD_RDNS,
   WalletInfo,
   WalletType,
@@ -62,43 +58,19 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       )
       .map(getWalletInfoFromInjectedWallet);
 
-    const phantomWallet = isPhantomDetected
-      ? {
-        connectorType: ConnectorType.PhantomSolana,
-        name: WalletType.Phantom,
-      }
-      : {
-        connectorType: ConnectorType.DownloadWallet,
-        name: WalletType.Phantom,
-        downloadLink: PHANTOM_DOWNLOAD_LINK,
-      };
-
-    const keplrWallet = isKeplrDetected
-      ? {
-        connectorType: ConnectorType.Cosmos,
-        name: 'keplr' as CosmosWalletType.KEPLR,
-      }
-      : {
-        connectorType: ConnectorType.DownloadWallet,
-        name: WalletType.Keplr,
-        downloadLink: KEPLR_DOWNLOAD_LINK,
-      };
-
     if (isSimpleUi) {
       return [
-          {
-            connectorType: ConnectorType.Fuel,
-            name: WalletType.FuelWallet,
-            icon: '/icons/wallets/fuel-wallet.svg',
-          },
+        {
+          connectorType: ConnectorType.Fuel,
+          name: WalletType.FuelWallet,
+          icon: '/icons/wallets/fuel-wallet.svg',
+        },
         injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
         ...otherInjectedWallets,
         isCoinbaseDetected && {
           connectorType: ConnectorType.Coinbase,
           name: WalletType.CoinbaseWallet,
         },
-        isPhantomDetected && phantomWallet,
-        isKeplrDetected && keplrWallet,
         { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
         isOkxDetected && { connectorType: ConnectorType.WalletConnect, name: WalletType.OkxWallet },
         Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {
@@ -117,8 +89,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       // always show Metamask extension first if it is detected
       injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
       ...otherInjectedWallets,
-      phantomWallet,
-      keplrWallet,
       { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },
       Boolean(import.meta.env.VITE_PRIVY_APP_ID) && {

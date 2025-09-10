@@ -18,9 +18,9 @@ import { VerticalSeparator } from '@/components/Separator';
 
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
   const stringGetter = useStringGetter();
-  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
+  const { appleAppStoreUrl, googlePlayStoreUrl, isUrlDataEmpty } = useMobileAppUrl();
 
-  if (!appleAppStoreUrl && !googlePlayStoreUrl) return null;
+  if (isUrlDataEmpty) return null;
 
   if (withBadges) {
     return (

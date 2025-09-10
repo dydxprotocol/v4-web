@@ -21,11 +21,9 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Ring } from '@/components/Ring';
-import { WalletIcon } from '@/components/WalletIcon';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
@@ -37,7 +35,6 @@ import { testFlags } from '@/lib/testFlags';
 
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
-import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
 import { SignIn } from './OnboardingDialog/SignIn';
 
 export const OnboardingDialog = ({
@@ -198,43 +195,6 @@ export const OnboardingDialog = ({
                 <$LanguageSelector />
               </$Footer>
             ),
-          },
-          [OnboardingSteps.KeyDerivation]: {
-            slotIcon: isSimpleUi
-              ? sourceAccount.walletInfo && <WalletIcon wallet={sourceAccount.walletInfo} />
-              : {
-                  [EvmDerivedAccountStatus.NotDerived]: sourceAccount.walletInfo && (
-                    <WalletIcon wallet={sourceAccount.walletInfo} />
-                  ),
-                  [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
-                  [EvmDerivedAccountStatus.EnsuringDeterminism]: (
-                    <$Ring withAnimation value={0.25} />
-                  ),
-                  [EvmDerivedAccountStatus.Derived]: <GreenCheckCircle />,
-                }[derivationStatus],
-            title: stringGetter({ key: STRING_KEYS.SIGN_MESSAGE }),
-            description: isSimpleUi ? (
-              <span tw="font-small-book">
-                {stringGetter({
-                  key: STRING_KEYS.FREE_SIGNING,
-                  params: {
-                    FREE: (
-                      <span tw="text-green">
-                        {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
-                      </span>
-                    ),
-                  },
-                })}
-              </span>
-            ) : (
-              stringGetter({ key: STRING_KEYS.SIGNATURE_CREATES_COSMOS_WALLET })
-            ),
-            children: (
-              <$Content>
-                <GenerateKeys status={derivationStatus} setStatus={setDerivationStatus} />
-              </$Content>
-            ),
-            width: '23rem',
           },
         }[currentOnboardingStep])}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}

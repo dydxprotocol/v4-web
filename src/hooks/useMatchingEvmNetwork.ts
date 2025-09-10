@@ -24,10 +24,6 @@ export const useMatchingEvmNetwork = ({
   const { wallets } = useWallets();
 
   const isMatchingNetwork = useMemo(() => {
-    // In the Keplr wallet, the network will always match
-    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Cosmos) {
-      return true;
-    }
     // If chainId is not a number, we can assume it is a non EVM compatible chain
     return Boolean(chain && chainId && typeof chainId === 'number' && chain.id === chainId);
   }, [sourceAccount.walletInfo, chain, chainId]);
