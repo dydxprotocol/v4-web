@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError } from '@/bonsai/logs';
 import type { TurnkeyIframeClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType } from '@/constants/wallets';
 
@@ -72,57 +72,91 @@ export const RevealPhrase = ({
     });
   }, [turnkey, setExportIframeClient]);
 
+  useEffect(() => {
+    initIframe();
+  }, [initIframe]);
+
   const exportWallet = useCallback(async () => {
     try {
       setLoading(true);
+
+      if (!indexedDbClient) {
+        throw new Error('No indexed db client');
+      }
+
+      if (!exportIframeClient) {
+        throw new Error('No export iframe client');
+      }
+
       if (!primaryTurnkeyWallet) {
         throw new Error('No primary turnkey wallet');
       }
 
-      const whoami = await indexedDbClient!.getWhoami();
+      if (!primaryTurnkeyWallet.accounts[0]?.organizationId) {
+        throw new Error('No organization id');
+      }
 
-      const exportResponse = await indexedDbClient?.exportWallet({
+      const whoami = await indexedDbClient!.getWhoami({
+        organizationId: primaryTurnkeyWallet.accounts[0].organizationId,
+      });
+
+      const exportResponse = await indexedDbClient.exportWallet({
         organizationId: whoami.organizationId,
         walletId: primaryTurnkeyWallet.walletId,
         targetPublicKey: exportIframeClient!.iframePublicKey!,
       });
 
-      if (!exportResponse?.exportBundle) {
-        throw new Error('Failed to retrieve export bundle');
-      }
+      setIsIframeVisible(true);
 
-      await exportIframeClient?.injectWalletExportBundle(
+      await exportIframeClient.injectWalletExportBundle(
         exportResponse.exportBundle,
         whoami.organizationId
       );
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
+      logBonsaiError('exportWallet', 'error', { error });
     } finally {
       setLoading(false);
     }
   }, [primaryTurnkeyWallet, indexedDbClient, exportIframeClient]);
 
-  const handleExport = useCallback(async () => {
-    try {
-      await initIframe();
-      await exportWallet();
-      setIsIframeVisible(true);
-    } catch (error) {
-      logBonsaiError('handleExport', 'error', { error });
-      setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
-    }
-  }, [initIframe, exportWallet, setIsIframeVisible]);
-
   const ctaButton = useMemo(() => {
     const walletInfo = sourceAccount.walletInfo;
-    if (exportWalletType === 'turnkey' && walletInfo?.connectorType === ConnectorType.Turnkey) {
+    if (
+      exportWalletType === 'turnkey' &&
+      walletInfo?.connectorType === ConnectorType.Turnkey &&
+      !isIframeVisible
+    ) {
       return (
-        <Button onClick={handleExport}>{stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}</Button>
+        <Button onClick={exportWallet}>{stringGetter({ key: STRING_KEYS.EXPORT_PHRASE })}</Button>
+      );
+    }
+
+    if (exportWalletType === 'dydx') {
+      return (
+        <ToggleButton
+          tw="[& svg]:w-auto"
+          isPressed={showPhrase}
+          onPressedChange={setShowPhrase}
+          slotLeft={<Icon iconName={!showPhrase ? IconName.Show : IconName.Hide} />}
+        >
+          {stringGetter({
+            key: !showPhrase ? STRING_KEYS.SHOW_PHRASE : STRING_KEYS.HIDE_PHRASE,
+          })}
+        </ToggleButton>
       );
     }
 
     return <Button onClick={closeDialog}>{stringGetter({ key: STRING_KEYS.CLOSE })}</Button>;
-  }, [sourceAccount.walletInfo, exportWalletType, closeDialog, stringGetter, handleExport]);
+  }, [
+    sourceAccount.walletInfo,
+    exportWalletType,
+    closeDialog,
+    stringGetter,
+    exportWallet,
+    showPhrase,
+    isIframeVisible,
+  ]);
 
   const phrase = exportWalletType === 'dydx' ? hdKey?.mnemonic : undefined;
 
@@ -145,19 +179,33 @@ export const RevealPhrase = ({
           Secret Recovery Phrase
         </span>
 
-        <div tw="row justify-center rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
-          {loading && <LoadingSpace />}
+        <div tw="row relative justify-center overflow-hidden rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
+          {loading && <LoadingSpace tw="absolute inset-0" />}
           {exportWalletType === 'turnkey' && (
-            <div
-              id={TurnkeyExportIframeContainerId}
-              style={{
-                display: isIframeVisible ? 'block' : 'none',
-                backgroundColor: 'var(--bg-color-layer-2)',
-                color: 'var(--text-color-text-1)',
-                width: '100%',
-                boxSizing: 'border-box',
-              }}
-            />
+            <>
+              <div
+                id={TurnkeyExportIframeContainerId}
+                style={{
+                  display: isIframeVisible ? 'block' : 'none',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  position: 'absolute',
+                  inset: 0,
+                }}
+              />
+
+              <span
+                tw="font-small-book"
+                css={{
+                  opacity: !isIframeVisible && !loading ? 1 : 0,
+                }}
+              >
+                {Array.from({ length: 12 }).map((_, idx) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <span key={idx}>{'***** '}</span>
+                ))}
+              </span>
+            </>
           )}
 
           {exportWalletType === 'dydx' && (
@@ -176,19 +224,6 @@ export const RevealPhrase = ({
         {errorMessage ??
           'Your recovery key can grant anyone to access your funds. Save it in a secure, private location.'}
       </AlertMessage>
-
-      {exportWalletType === 'dydx' && (
-        <ToggleButton
-          size={ButtonSize.Small}
-          isPressed={showPhrase}
-          onPressedChange={setShowPhrase}
-          slotLeft={<Icon iconName={!showPhrase ? IconName.Show : IconName.Hide} />}
-        >
-          {stringGetter({
-            key: !showPhrase ? STRING_KEYS.SHOW_PHRASE : STRING_KEYS.HIDE_PHRASE,
-          })}
-        </ToggleButton>
-      )}
 
       {ctaButton}
     </div>
