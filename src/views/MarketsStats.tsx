@@ -74,7 +74,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <$FreeDepositBanner>
         <div tw="flex items-center justify-between gap-0.75">
           <div tw="relative z-10 mr-auto flex max-w-10 flex-col">
-            <span tw="mb-0.75 font-extra-large-bold" style={{ lineHeight: '1.2' }}>
+            <span tw="mb-0.75 leading-[1.2] font-extra-large-bold">
               <span tw="mr-0.25 rounded-0 bg-white px-0.25 text-color-accent">
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_TITLE_FREE })}
               </span>
