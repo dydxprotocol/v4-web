@@ -3,11 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DydxAddress } from '@/constants/wallets';
 
-import { SEPT_2025_REWARDS_DETAILS } from '@/pages/token/LaunchIncentivesPanel';
-
 import { useAppSelector } from '@/state/appTypes';
 
 import { wrapAndLogError } from '@/lib/asyncUtils';
+
+import { useQueryChaosLabsIncentives } from '../useQueryChaosLabsIncentives';
+import {
+  pointsToEstimatedDollarRewards,
+  pointsToEstimatedDydxRewards,
+  SEPT_2025_REWARDS_DETAILS,
+} from './util';
 
 export type ChaosLabsLeaderboardItem = {
   rank: number;
@@ -49,17 +54,6 @@ async function getChaosLabsPointsDistribution() {
   return parsedRes.data.incentivesLeaderboard;
 }
 
-function pointsToEstimatedDydxRewards(
-  points?: number,
-  totalPoints?: number,
-  dydxPrice?: number,
-  totalUsdRewards?: number
-) {
-  if (!totalPoints || !dydxPrice || !totalUsdRewards || points === undefined) return '-';
-  const usdRewards = (points / totalPoints) * totalUsdRewards;
-  return usdRewards / dydxPrice;
-}
-
 export function useChaosLabsPointsDistribution() {
   const { data: pointsInfo, isLoading: rewardsInfoLoading } = useTotalRewardsPoints();
   const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
@@ -99,3 +93,28 @@ export function useTotalRewardsPoints() {
     queryFn: () => getTotalRewardsPoints(),
   });
 }
+
+export const useChaosLabsUsdRewards = ({
+  dydxAddress,
+  season,
+  totalUsdRewards,
+}: {
+  dydxAddress?: DydxAddress;
+  season?: number;
+  totalUsdRewards?: number;
+}) => {
+  const { data: totalPoints, isLoading: totalPointsLoading } = useTotalRewardsPoints();
+  const { data: points, isLoading: pointsLoading } = useQueryChaosLabsIncentives({
+    dydxAddress,
+    season,
+  });
+
+  return {
+    data: pointsToEstimatedDollarRewards(
+      points?.incentivePoints,
+      totalPoints?.totalPoints,
+      totalUsdRewards
+    ),
+    isLoading: totalPointsLoading || pointsLoading,
+  };
+};

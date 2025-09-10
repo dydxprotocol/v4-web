@@ -6,6 +6,7 @@ import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
+import { SEPT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -23,8 +24,6 @@ import { ColumnDef, Table } from '@/components/Table';
 
 import { exportCSV } from '@/lib/csv';
 import { truncateAddress } from '@/lib/wallet';
-
-import { SEPT_2025_REWARDS_DETAILS } from './LaunchIncentivesPanel';
 
 export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
@@ -126,6 +125,7 @@ export const RewardsLeaderboardPanel = () => {
         </div>
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
+            label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
             data={data ?? []}
             tableId="trading-rewards"
             getRowKey={getRowKey}
