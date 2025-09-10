@@ -22,7 +22,6 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
-import { Panel } from '@/components/Panel';
 import { Tag, TagSign } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -32,7 +31,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-export const StakingPanel = ({ className }: { className?: string }) => {
+export const StakingPanel = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
@@ -67,118 +66,111 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   });
 
   return (
-    <Panel
-      className={className}
-      slotHeader={
-        <$Header>
-          <$Title>
-            <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
-            {chainTokenLabel}
-          </$Title>
-          {complianceState === ComplianceStates.FULL_ACCESS && (
-            <Toolbar tw="inlineRow gap-0.5 p-0 [--stickyArea-topHeight:max-content]">
-              {!canAccountTrade ? (
-                <OnboardingTriggerButton size={ButtonSize.Small} />
-              ) : (
-                <IconButton
-                  iconName={IconName.Send}
-                  shape={ButtonShape.Square}
-                  size={ButtonSize.Small}
-                  action={ButtonAction.Base}
-                  onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
-                />
-              )}
-            </Toolbar>
-          )}
-        </$Header>
-      }
-    >
-      <div tw="flexColumn gap-0.75">
-        <$BalanceRow>
-          <div>
-            <$Label>
-              <WithTooltip tooltipString={estimatedAprTooltipString}>
-                {stringGetter({
-                  key: STRING_KEYS.UNSTAKED,
-                })}
-              </WithTooltip>
-            </$Label>
-            <$BalanceOutput
-              type={OutputType.Asset}
-              value={nativeTokenBalance}
-              isPositive={nativeTokenBalance.gt(0)}
-            />
-          </div>
-          {showStakingActions && (
-            <div>
-              <Button
-                action={ButtonAction.Primary}
-                onClick={() => dispatch(openDialog(DialogTypes.Stake()))}
-              >
-                {stringGetter({ key: STRING_KEYS.STAKE })}
-              </Button>
-            </div>
-          )}
-        </$BalanceRow>
-        <$BalanceRow>
-          <div tw="min-w-px">
-            <$Label>
-              <WithTooltip tooltipString={estimatedAprTooltipString}>
-                {stringGetter({
-                  key: STRING_KEYS.STAKED,
-                })}
-              </WithTooltip>
-              {stakingApr && (
-                <Tag sign={TagSign.Positive} tw="inline-block">
-                  {aprText}
-                </Tag>
-              )}
-            </$Label>
-            <$BalanceOutput
-              type={OutputType.Asset}
-              value={nativeStakingBalance}
-              isPositive={nativeStakingBalance > 0}
-            />
-          </div>
-          {showStakingActions && nativeStakingBalance > 0 && (
-            <div>
-              <Button
+    <div tw="flexColumn gap-0.75">
+      <$Header>
+        <$Title>
+          <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
+          {chainTokenLabel}
+        </$Title>
+        {complianceState === ComplianceStates.FULL_ACCESS && (
+          <Toolbar tw="inlineRow gap-0.5 p-0 [--stickyArea-topHeight:max-content]">
+            {!canAccountTrade ? (
+              <OnboardingTriggerButton size={ButtonSize.Small} />
+            ) : (
+              <IconButton
+                iconName={IconName.Send}
+                shape={ButtonShape.Square}
+                size={ButtonSize.Small}
                 action={ButtonAction.Base}
-                onClick={() => dispatch(openDialog(DialogTypes.Unstake()))}
-              >
-                {stringGetter({ key: STRING_KEYS.UNSTAKE })}
-              </Button>
-            </div>
-          )}
-        </$BalanceRow>
-        <$TotalBalance
-          items={[
-            {
-              key: 'totalBalance',
-              label: (
-                <$Label>
-                  {stringGetter({ key: STRING_KEYS.TOTAL_BALANCE })}
-                  <Tag>{chainTokenLabel}</Tag>
-                </$Label>
-              ),
-              value: (
-                <Output
-                  type={OutputType.Asset}
-                  value={nativeTokenBalance.plus(nativeStakingBalance)}
-                />
-              ),
-            },
-          ]}
-        />
-      </div>
-    </Panel>
+                onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
+              />
+            )}
+          </Toolbar>
+        )}
+      </$Header>
+      <$BalanceRow>
+        <div>
+          <$Label>
+            <WithTooltip tooltipString={estimatedAprTooltipString}>
+              {stringGetter({
+                key: STRING_KEYS.UNSTAKED,
+              })}
+            </WithTooltip>
+          </$Label>
+          <$BalanceOutput
+            type={OutputType.Asset}
+            value={nativeTokenBalance}
+            isPositive={nativeTokenBalance.gt(0)}
+          />
+        </div>
+        {showStakingActions && (
+          <div>
+            <Button
+              action={ButtonAction.Primary}
+              onClick={() => dispatch(openDialog(DialogTypes.Stake()))}
+            >
+              {stringGetter({ key: STRING_KEYS.STAKE })}
+            </Button>
+          </div>
+        )}
+      </$BalanceRow>
+      <$BalanceRow>
+        <div tw="min-w-px">
+          <$Label>
+            <WithTooltip tooltipString={estimatedAprTooltipString}>
+              {stringGetter({
+                key: STRING_KEYS.STAKED,
+              })}
+            </WithTooltip>
+            {stakingApr && (
+              <Tag sign={TagSign.Positive} tw="inline-block">
+                {aprText}
+              </Tag>
+            )}
+          </$Label>
+          <$BalanceOutput
+            type={OutputType.Asset}
+            value={nativeStakingBalance}
+            isPositive={nativeStakingBalance > 0}
+          />
+        </div>
+        {showStakingActions && nativeStakingBalance > 0 && (
+          <div>
+            <Button
+              action={ButtonAction.Base}
+              onClick={() => dispatch(openDialog(DialogTypes.Unstake()))}
+            >
+              {stringGetter({ key: STRING_KEYS.UNSTAKE })}
+            </Button>
+          </div>
+        )}
+      </$BalanceRow>
+      <$TotalBalance
+        items={[
+          {
+            key: 'totalBalance',
+            label: (
+              <$Label>
+                {stringGetter({ key: STRING_KEYS.TOTAL_BALANCE })}
+                <Tag>{chainTokenLabel}</Tag>
+              </$Label>
+            ),
+            value: (
+              <Output
+                type={OutputType.Asset}
+                value={nativeTokenBalance.plus(nativeStakingBalance)}
+              />
+            ),
+          },
+        ]}
+      />
+    </div>
   );
 };
 
 const $Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1rem;
-  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
 const $Title = styled.h3`
