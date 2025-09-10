@@ -44,7 +44,7 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
   }, [dispatch]);
 
   const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
-  if (!isSept2025Rewards) {
+  if (isSept2025Rewards) {
     return <September2025RewardsPanel />;
   }
 
@@ -149,16 +149,12 @@ const Sept2025RewardsPanel = () => {
             {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
           </div>
           <$Points>
-            {incentiveRewards !== undefined ? (
-              <Output
-                tw="text-extra font-extra-bold"
-                type={OutputType.Fiat}
-                value={incentiveRewards}
-                isLoading={isLoading}
-              />
-            ) : (
-              '-'
-            )}
+            <Output
+              tw="text-extra font-extra-bold"
+              type={OutputType.Fiat}
+              value={incentiveRewards}
+              isLoading={isLoading}
+            />
           </$Points>
         </div>
         <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />

@@ -68,7 +68,7 @@ export function useChaosLabsPointsDistribution() {
   });
 
   return {
-    isLoading: rewardsInfoLoading || leaderboardItemsLoading,
+    isLoading: rewardsInfoLoading || leaderboardItemsLoading || !dydxPrice,
     data: leaderboardItems?.map((item) => ({
       ...item,
       estimatedDydxRewards: pointsToEstimatedDydxRewards(
