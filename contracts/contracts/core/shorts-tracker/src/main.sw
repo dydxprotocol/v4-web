@@ -371,7 +371,7 @@ fn _get_realized_pnl(
 
     let vault = abi(Vault, storage.vault.read().into());
 
-    let position_key = vault.get_position_key(account, collateral_asset, index_asset, false);
+    let position_key = vault.get_position_key(account, index_asset, false);
     let position = vault.get_position_by_key(position_key);
 
     let size = position.size;

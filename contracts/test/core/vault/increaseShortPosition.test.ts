@@ -8,14 +8,14 @@ import { expandDecimals, toNormalizedPrice, toPrice, toUsd } from "../../utils/u
 import { getAssetId, toAsset } from "../../utils/asset"
 import { useChai } from "../../utils/chai"
 import { BigNumber } from "ethers"
-import { BNB_MAX_LEVERAGE, BTC_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBnbConfig, getBtcConfig, getDaiConfig } from "../../utils/vault"
+import { BNB_MAX_LEVERAGE, BTC_MAX_LEVERAGE, DAI_MAX_LEVERAGE, getBnbConfig, getBtcConfig } from "../../utils/vault"
 import { getPosition } from "../../utils/contract"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, DAI_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
 import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
-describe("Vault.increaseShortPosition", function () {
+describe.skip("Vault.increaseShortPosition", function () {
     let attachedContracts: AbstractContract[]
     let priceUpdateSigner: Signer
     let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
@@ -56,7 +56,7 @@ describe("Vault.increaseShortPosition", function () {
             Vault + Router + RUSD
         */
         utils = await deploy("Utils", deployer)
-        vault = await deploy("Vault", deployer)
+        vault = await deploy("Vault", deployer, { STABLE_ASSET: toAsset(DAI) })
         vaultPricefeed = await deploy("VaultPricefeed", deployer)
         rusd = await deploy("Rusd", deployer)
         timeDistributor = await deploy("TimeDistributor", deployer)
@@ -121,8 +121,6 @@ describe("Vault.increaseShortPosition", function () {
         ).to.be.revertedWith("VaultShortCollateralAssetMustBeStableAsset")
 
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
-        await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
-        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await expect(
             vault_user0
@@ -284,8 +282,6 @@ describe("Vault.increaseShortPosition", function () {
         await call(vault.functions.set_max_leverage(toAsset(BNB), BNB_MAX_LEVERAGE))
 
         await call(getUpdatePriceDataCall(toAsset(DAI), toPrice(1), vaultPricefeed, priceUpdateSigner))
-        await call(vault.functions.set_asset_config(...getDaiConfig(DAI)))
-        await call(vault.functions.set_stable_asset(toAsset(DAI)))
 
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
         await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))

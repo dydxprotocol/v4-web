@@ -23,6 +23,7 @@ pub enum Error {
     VaultInvalidStableFundingRateFactor: (),
 
     VaultAssetNotWhitelisted: (),
+    VaultAssetIsNotStableAsset: (),
     VaultInvalidAssetAmount: (),
     VaultInvalidRedemptionAmount: (),
 

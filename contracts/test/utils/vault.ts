@@ -23,47 +23,53 @@ export const BTC_MAX_LEVERAGE = 50 * 10_000
 export const ETH_MAX_LEVERAGE = 50 * 10_000
 export const BNB_MAX_LEVERAGE = 50 * 10_000
 
+export function getUsdcConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
+    return [
+        toAsset(fungible), // asset
+        9, // asset_decimals
+        10000, // asset_weight
+        75, // min_profit_bps
+        0, // max_rusd_amount
+    ]
+}
+
 // https://cumsum.wordpress.com/2021/08/28/typescript-a-spread-argument-must-either-have-a-tuple-type-or-be-passed-to-a-rest-parameter/
-export function getDaiConfig(fungible: Fungible): [{ bits: string }, number, number, number, number, boolean] {
+export function getDaiConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
         0, // max_rusd_amount
-        false, // is_shortable
     ]
 }
 
-export function getBtcConfig(fungible: Fungible): [{ bits: string }, number, number, number, number, boolean] {
+export function getBtcConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
         0, // max_rusd_amount
-        true, // is_shortable
     ]
 }
 
-export function getEthConfig(fungible: Fungible): [{ bits: string }, number, number, number, number, boolean] {
+export function getEthConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
         0, // max_rusd_amount
-        true, // is_shortable
     ]
 }
 
-export function getBnbConfig(fungible: Fungible): [{ bits: string }, number, number, number, number | string, boolean] {
+export function getBnbConfig(fungible: Fungible): [{ bits: string }, number, number, number, number | string] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
         0, // max_rusd_amount
-        true, // is_shortable
     ]
 }
