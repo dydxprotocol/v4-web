@@ -1,0 +1,206 @@
+[[package]]
+name = "asset_interfaces"
+source = "path+from-root-A0F0AE9A73C286A0"
+dependencies = [
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "core"
+source = "path+from-root-F64B6E1A883A7E7B"
+
+[[package]]
+name = "core_interfaces"
+source = "path+from-root-57A643A88405500A"
+dependencies = [
+    "helpers",
+    "pyth_interface",
+    "std",
+]
+
+[[package]]
+name = "fungible"
+source = "member"
+dependencies = [
+    "fungible_abi",
+    "helpers",
+    "src20",
+    "src3",
+    "std",
+]
+
+[[package]]
+name = "fungible_abi"
+source = "path+from-root-A53CDECCD463BB5B"
+dependencies = [
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "helpers"
+source = "path+from-root-A53CDECCD463BB5B"
+dependencies = ["std"]
+
+[[package]]
+name = "mock-pricefeed"
+source = "member"
+dependencies = [
+    "helpers",
+    "mock_interfaces",
+    "std",
+]
+
+[[package]]
+name = "mock_interfaces"
+source = "path+from-root-31481B2BEA49490C"
+dependencies = [
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "pyth_interface"
+source = "git+https://github.com/pyth-network/pyth-crosschain?rev#4ab64d2539a749e51e1281bdd7744781f5e9df8c"
+dependencies = [
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.4.4#a001d3c248595112aae67e5633a06ef9bc0536ae",
+    "std",
+]
+
+[[package]]
+name = "rlp"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "helpers",
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "std",
+    "sway_libs",
+]
+
+[[package]]
+name = "rlp-manager"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "core_interfaces",
+    "helpers",
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "std",
+]
+
+[[package]]
+name = "rusd"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "helpers",
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "std",
+    "sway_libs",
+]
+
+[[package]]
+name = "shorts-tracker"
+source = "member"
+dependencies = [
+    "core_interfaces",
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "src20"
+source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.3.3#4198b4b07449ad16104cc8a0501f3013670fdcfd"
+dependencies = ["std"]
+
+[[package]]
+name = "src3"
+source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.3.3#4198b4b07449ad16104cc8a0501f3013670fdcfd"
+dependencies = ["std"]
+
+[[package]]
+name = "standards"
+source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.4.4#a001d3c248595112aae67e5633a06ef9bc0536ae"
+dependencies = ["std"]
+
+[[package]]
+name = "standards"
+source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f"
+dependencies = ["std"]
+
+[[package]]
+name = "standards"
+source = "git+https://github.com/FuelLabs/sway-standards?tag=v0.6.0#65e09f95ea8b9476b171a66c8a47108f352fa32c"
+dependencies = ["std"]
+
+[[package]]
+name = "std"
+source = "git+https://github.com/fuellabs/sway?tag=v0.66.4#d7dd104dac4394aa7af56f05b720c975744db853"
+dependencies = ["core"]
+
+[[package]]
+name = "sway_libs"
+source = "git+https://github.com/FuelLabs/sway-libs?tag=v0.24.0#e19f96f85ae12426d20adc176b70aa38fd9a2a5b"
+dependencies = [
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.6.0#65e09f95ea8b9476b171a66c8a47108f352fa32c",
+    "std",
+]
+
+[[package]]
+name = "testnet-token"
+source = "member"
+dependencies = [
+    "src20",
+    "std",
+]
+
+[[package]]
+name = "time-distributor"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "utils"
+source = "member"
+dependencies = [
+    "core_interfaces",
+    "helpers",
+    "std",
+]
+
+[[package]]
+name = "vault"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "core_interfaces",
+    "helpers",
+    "standards git+https://github.com/FuelLabs/sway-standards?tag=v0.5.1#e2d5ac40a1d11a9e38e0a662d35141076515319f",
+    "std",
+    "sway_libs",
+]
+
+[[package]]
+name = "vault-pricefeed"
+source = "member"
+dependencies = [
+    "core_interfaces",
+    "helpers",
+    "pyth_interface",
+    "std",
+]
+
+[[package]]
+name = "yield-tracker"
+source = "member"
+dependencies = [
+    "asset_interfaces",
+    "helpers",
+    "std",
+]

@@ -24,7 +24,7 @@ task("deploy-testnet-token", "Deploy a token for the testnet")
 );
 
 async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
-  const factory = require(`../types/${contract}Factory.ts`)[`${contract}Factory`]
+  const factory = require(`../types/${contract}Factory`)[`${contract}Factory`]
   if (!factory) {
       throw new Error(`Could not find factory for contract ${contract}`)
   }

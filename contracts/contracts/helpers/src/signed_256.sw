@@ -28,7 +28,11 @@ enum Error {
 
 impl core::ops::Eq for Signed256 {
     fn eq(self, other: Self) -> bool {
-        self.value == other.value && self.is_neg == other.is_neg
+        if self.value == 0 && other.value == 0 { // special case for 0
+            true
+        } else {
+            self.value == other.value && self.is_neg == other.is_neg
+        }    
     }
 }
 
@@ -99,7 +103,7 @@ impl Signed256 {
     /// The smallest value that can be represented by this integer type.
     pub fn min() -> Self {
         Self {
-            value: u256::min(),
+            value: u256::max(),
             is_neg: true,
         }
     }
@@ -181,16 +185,14 @@ impl core::ops::Multiply for Signed256 {
 impl core::ops::Divide for Signed256 {
     /// Divide a Signed256 by a Signed256. Panics if divisor is zero.
     fn divide(self, divisor: Self) -> Self {
-        require(divisor != Self::new(), "ZeroDivisor");
-        if self.value == 0{
-            Self::new()    
-        }else if !self.is_neg == !divisor.is_neg {
+        // guard true zero regardless of sign bit
+        require(divisor.value != 0, "ZeroDivisor");
+        if self.value == 0 {
+            Self::new()
+        } else if self.is_neg == divisor.is_neg {
             Self::from(self.value / divisor.value)
-        }else if !self.is_neg != !divisor.is_neg{
-            Self::neg_from(self.value * divisor.value)
         } else {
-            require(false, Error::Signed256DivisionOverflow);
-            revert(0);
+            Self::neg_from(self.value / divisor.value)
         }
     }
 }

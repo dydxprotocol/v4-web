@@ -104,7 +104,7 @@ abi MockVaultPricefeed {
     */
     // this is just a helper method to update the price of an asset directly from VaultPricefeed
     // this will be removed in the future when Pyth prices are supported on-chain
-    #[storage(read)]
+    #[storage(read, write)]
     fn update_price(
         asset: AssetId,
         new_price: u256
