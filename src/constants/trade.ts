@@ -71,11 +71,20 @@ export const ORDER_TYPE_STRINGS: Record<
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_MARKET_DESCRIPTION,
   },
-
   [IndexerOrderType.TAKEPROFIT]: {
     orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
+  },
+  [IndexerOrderType.TWAP]: {
+    orderTypeKeyShort: STRING_KEYS.TWAP,
+    orderTypeKey: STRING_KEYS.TWAP,
+    descriptionKey: STRING_KEYS.TWAP,
+  },
+  [IndexerOrderType.TWAPSUBORDER]: {
+    orderTypeKeyShort: STRING_KEYS.TWAP,
+    orderTypeKey: STRING_KEYS.TWAP,
+    descriptionKey: STRING_KEYS.TWAP,
   },
   [IndexerOrderType.TRAILINGSTOP]: {
     orderTypeKeyShort: STRING_KEYS.TRAILING_STOP,

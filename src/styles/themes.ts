@@ -37,6 +37,7 @@ const ClassicThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple1,
   accentFaded: generateFadedColorVariant(ColorToken.Purple1, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple1, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green3,
