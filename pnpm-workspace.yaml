@@ -1,5 +1,6 @@
 packages:
   - apps/*
+  - contracts
   - ts-sdk
 linkWorkspacePackages: true
 overrides:
