@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
+import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
@@ -45,7 +46,7 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
-  const indexerUrl = 'https://indexerv4dev.dydx.exchange'; // useAppSelector(selectIndexerUrl);
+  const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
   const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
