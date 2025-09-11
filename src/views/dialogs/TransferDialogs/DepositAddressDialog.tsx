@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { logTurnkey } from '@/bonsai/logs';
-import { selectIndexerReady, selectIndexerUrl } from '@/bonsai/socketSelectors';
+import { selectIndexerReady } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { avalanche } from 'viem/chains';
@@ -38,7 +38,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const stringGetter = useStringGetter();
 
   const { dydxAddress } = useAccounts();
-  const indexerUrl = useAppSelector(selectIndexerUrl);
+  const indexerUrl = 'https://indexerv4dev.dydx.exchange'; // useAppSelector(selectIndexerUrl);
   const indexerReady = useAppSelector(selectIndexerReady);
 
   const canQueryForDepositAddresses = dydxAddress != null && indexerReady;
