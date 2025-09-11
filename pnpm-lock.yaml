@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-client-js':
-    specifier: 2.5.2
-    version: 2.5.2
+    specifier: 3.0.0
+    version: 3.0.0
   '@dydxprotocol/v4-localization':
     specifier: 1.1.318
     version: 1.1.318
@@ -1473,8 +1473,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-client-js@2.5.2:
-    resolution: {integrity: sha512-VbGidv17tSw5DAjfz6QdueaXviNlCfqTp0X4+/dFCuHHW+QqA15dJzfraX+I5XiZFgXbUaMSYCp//BF5jhUVcQ==}
+  /@dydxprotocol/v4-client-js@3.0.0:
+    resolution: {integrity: sha512-hiJy0/XFqQYUQL0OZxf4vFu695bNy98B2I3vjOImufctWQOwuZSt33N1JveU1uQZ/oIfjJG0Zmbpj5usMDntWQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1483,7 +1483,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 8.0.0
+      '@dydxprotocol/v4-proto': 9.0.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
@@ -1514,8 +1514,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@8.0.0:
-    resolution: {integrity: sha512-QO4YLuptOH2BhkdKpXOvdSdGCy5IYUPYl/w4Xj3aoTrxCTa4Dp41HBC69ji8dzQ40eTLyCx5K+/+PCcBdZt4iw==}
+  /@dydxprotocol/v4-proto@9.0.0:
+    resolution: {integrity: sha512-2ICtvYx90aYxeIxzWB3Fs3krra/wWw6zf5mxVEplXU51JX/Gtbv/LY5A6WWxl1tPQ1Wl8PUMO8IzN1Y3e8Zhvg==}
     dependencies:
       protobufjs: 6.11.4
     dev: false

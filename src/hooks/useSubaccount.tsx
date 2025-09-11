@@ -160,7 +160,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           };
 
           return await compositeClient.send(
-            subaccountClient.wallet,
+            subaccountClient,
             () => Promise.resolve([msg, ibcMsg]),
             false,
             undefined,
@@ -182,7 +182,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const [subaccountNumber] = useState(0);
 
   const subaccountClient = useMemo(
-    () => (localDydxWallet ? new SubaccountClient(localDydxWallet, subaccountNumber) : undefined),
+    () =>
+      localDydxWallet
+        ? SubaccountClient.forLocalWallet(localDydxWallet, subaccountNumber)
+        : undefined,
     [localDydxWallet, subaccountNumber]
   );
 
@@ -250,7 +253,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!localDydxWallet) {
         return undefined;
       }
-      const subaccountClientForWithdraw = new SubaccountClient(
+      const subaccountClientForWithdraw = SubaccountClient.forLocalWallet(
         localDydxWallet,
         fromSubaccountNumber
       );
@@ -318,13 +321,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet.address) {
+      if (!subaccountClient || !dydxAddress) {
         throw new Error('wallet not initialized');
       }
 
       const response = await compositeClient.validatorClient.post.delegate(
         subaccountClient,
-        subaccountClient.wallet.address,
+        dydxAddress,
         validator,
         parseUnits(amount.toString(), chainTokenDecimals).toString(),
         Method.BroadcastTxCommit
@@ -332,7 +335,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return response;
     },
-    [subaccountClient, compositeClient, chainTokenDecimals]
+    [compositeClient, subaccountClient, dydxAddress, chainTokenDecimals]
   );
 
   const getDelegateFee = useCallback(
@@ -340,12 +343,12 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet?.address) {
+      if (!localDydxWallet?.address || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () =>
           Promise.resolve([
             compositeClient.validatorClient.post.delegateMsg(
@@ -359,7 +362,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const undelegate = useCallback(
@@ -367,7 +370,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -386,7 +389,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.send(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         false,
         compositeClient.validatorClient.post.defaultDydxGasPrice,
@@ -396,7 +399,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const getUndelegateFee = useCallback(
@@ -404,7 +407,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -423,14 +426,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         compositeClient.validatorClient.post.defaultDydxGasPrice
       );
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const withdrawReward = useCallback(
@@ -438,7 +441,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -452,7 +455,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.send(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         false,
         compositeClient.validatorClient.post.defaultGasPrice,
@@ -462,7 +465,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const getWithdrawRewardFee = useCallback(
@@ -470,7 +473,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -484,14 +487,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         compositeClient.validatorClient.post.defaultGasPrice
       );
 
       return tx;
     },
-    [localDydxWallet, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const registerAffiliate = useCallback(
@@ -499,10 +502,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet.address) {
+      if (!localDydxWallet?.address || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
-      if (affiliate === subaccountClient.wallet.address) {
+      if (affiliate === localDydxWallet.address) {
         throw new Error('affiliate can not be the same as referree');
       }
       try {
@@ -516,7 +519,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw error;
       }
     },
-    [subaccountClient, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const latestReferrer = useAppSelector(getLatestReferrer);
@@ -618,7 +621,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     async (params: SubaccountTransferPayload, memo?: string) => {
       try {
         const subaccount = localDydxWallet
-          ? new SubaccountClient(localDydxWallet, params.subaccountNumber)
+          ? SubaccountClient.forLocalWallet(localDydxWallet, params.subaccountNumber)
           : undefined;
 
         if (subaccount == null) {
@@ -659,7 +662,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const createTransferMessage = useCallback(
     (payload: TransferPayload) => {
-      if (subaccountClient == null) {
+      if (subaccountClient == null || !localDydxWallet) {
         throw new Error('local wallet client not initialized');
       }
 
@@ -679,7 +682,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (payload.type === TransferToken.NATIVE) {
         return compositeClient.sendTokenMessage(
-          subaccountClient.wallet,
+          localDydxWallet,
           payload.amount.toString(),
           payload.recipient
         );
@@ -687,7 +690,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       assertNever(payload);
       return undefined;
     },
-    [compositeClient, subaccountClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const simulateTransfer = useCallback(
@@ -713,7 +716,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
 
         const tx = await compositeClient.simulate(
-          subaccountClient.wallet,
+          subaccountClient,
           () => Promise.resolve([message]),
           gasPrice
         );
@@ -764,7 +767,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
 
         const result = await compositeClient.validatorClient.post.send(
-          subaccountClient.wallet,
+          subaccountClient,
           () => Promise.resolve([message]),
           false,
           gasPrice,
@@ -859,15 +862,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     const jsonString = JSON.stringify(subAuth);
     const encodedData = new TextEncoder().encode(jsonString);
 
-    // const creationResult = await compositeClient.addAuthenticator(
-    //   subaccountClient,
-    //   AuthenticatorType.ALL_OF,
-    //   encodedData
-    // );
+    const creationResult = await compositeClient.addAuthenticator(
+      subaccountClient,
+      AuthenticatorType.ALL_OF,
+      encodedData
+    );
 
-    // const parsed = parseToPrimitives(creationResult);
+    const parsed = parseToPrimitives(creationResult);
 
-    // console.log(parsed);
+    console.log(parsed);
     // check if it worked
 
     console.log(
