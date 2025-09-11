@@ -62,8 +62,8 @@ graph TB
     FC --> A1
     FC --> A2
     
-    %% Indexer to contracts
-    IDX --> SC
+    %% Contracts to indexer (data flow)
+    SC --> IDX
     
     %% Contract interactions
     SC --> OR

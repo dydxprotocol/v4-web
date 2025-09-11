@@ -263,20 +263,32 @@ export const useCurrentMarket = () => {
 ### Store Effects System
 
 ```typescript
-// Reactive query management based on state changes
-const createIndexerQueryStoreEffect = (store, config) => {
+// Reactive query management based on state changes with dependency injection
+const createIndexerQueryStoreEffect = (store, queryClient, indexerClient, config) => {
+  let requestId = 0;
+  
   return () => {
     const state = store.getState();
     const selectorData = config.selector(state);
     
     if (selectorData) {
+      const currentRequestId = ++requestId;
       const queryKey = config.getQueryKey(selectorData);
       const queryFn = config.getQueryFn(indexerClient, selectorData);
       
-      // Trigger React Query with dynamic key and function
+      // Trigger React Query with dynamic key and function, guard against stale responses
       queryClient.fetchQuery(queryKey, queryFn)
-        .then(config.onResult)
-        .catch(config.onError);
+        .then((result) => {
+          // Only process if this is still the latest request
+          if (currentRequestId === requestId) {
+            config.onResult(result);
+          }
+        })
+        .catch((error) => {
+          if (currentRequestId === requestId) {
+            config.onError(error);
+          }
+        });
     } else {
       config.onNoQuery?.();
     }
@@ -343,6 +355,13 @@ Real-time data synchronization using WebSocket connections:
 
 ```typescript
 class IndexerWebsocketManager {
+  constructor() {
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.heartbeat = null;
+    this.isConnected = false;
+  }
+  
   // Channel subscription management
   addChannelSubscription({
     channel,
@@ -366,13 +385,34 @@ class IndexerWebsocketManager {
     return () => this.websocket.unsubscribe(subscription);
   }
 
-  // Connection health monitoring
+  // Connection health monitoring with cleanup and backoff
   monitorConnection() {
     this.heartbeat = setInterval(() => {
       if (!this.isConnected) {
         this.reconnect();
       }
     }, 30000);
+  }
+  
+  stopMonitoring() {
+    if (this.heartbeat) {
+      clearInterval(this.heartbeat);
+      this.heartbeat = null;
+    }
+  }
+  
+  reconnect() {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error('Max reconnection attempts reached');
+      return;
+    }
+    
+    const backoffDelay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+    this.reconnectAttempts++;
+    
+    setTimeout(() => {
+      this.connect();
+    }, backoffDelay);
   }
 }
 ```
@@ -598,12 +638,11 @@ export class Vault extends Contract {
 #### **Contract Interaction Pattern**
 
 ```typescript
-// Fuel contract integration
+// Fuel contract integration using connectors (browser-safe)
 const FuelContractManager = {
-  async executeVaultOperation(operation: VaultOperation) {
-    const provider = new Provider('https://testnet.fuel.network/v1/graphql');
-    const wallet = new WalletUnlocked(privateKey, provider);
-    const vault = new Vault(CONTRACT_ID, wallet);
+  async executeVaultOperation(operation: VaultOperation, connectedWallet: Account) {
+    const provider = await connectedWallet.provider();
+    const vault = new Vault(CONTRACT_ID, connectedWallet);
     
     switch (operation.type) {
       case 'increasePosition':

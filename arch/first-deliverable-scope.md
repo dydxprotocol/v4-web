@@ -17,8 +17,8 @@ Allow LPs to deposit funds into the liquidity pool and take part in both the gai
 - **STAR-106**: As a trader, I want to view the current balance of my account so that I can understand my available collateral and make informed trading decisions
 - **STAR-107**: As a trader, I want to open long positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can amplify my gains on price increases
 - **STAR-108**: As a trader, I want to open short positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can profit from price decreases
-- **STAR-109**: As a trader, I want to view my current positions, including size, leverage, PnL, and margin requirements
-- **STAR-110**: As a trader, I want to close my positions partially or fully to realize profits or cut losses
+- **STAR-109**: As a trader, I want to view my current positions, including size, leverage, PnL, and margin requirements so that I can monitor my risk exposure and make informed decisions about managing my trades
+- **STAR-110**: As a trader, I want to close my positions partially or fully so that I can realize profits or cut losses and manage my risk
 - **STAR-111**: As a trader, I want to view real-time price charts and market data for the assets I'm trading
 - **STAR-112**: As a trader, I want to connect my Fuel wallet to the platform to manage my trades
 - **STAR-113**: As a trader, I want to see my trading history and performance metrics

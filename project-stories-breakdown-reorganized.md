@@ -18,8 +18,8 @@
 
 ### [3. Implementation EPIC](#3-implementation-epic)
 - [STAR-113: View Account Balance and Collateral](#star-113-view-account-balance-and-collateral)
-- [STAR-114: Open Long Position](#star-114-open-long-position)
-- [STAR-115: Open Short Position](#star-115-open-short-position)
+- [STAR-107: Open Long Position](#star-107-open-long-position)
+- [STAR-108: Open Short Position](#star-108-open-short-position)
 - [STAR-116: View Current Positions](#star-116-view-current-positions)
 - [STAR-117: Close Positions](#star-117-close-positions)
 - [STAR-118: View Market Data and Charts](#star-118-view-market-data-and-charts)
@@ -232,7 +232,7 @@
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Subsquid processor running and syncing with Fuel testnet and mainnet networks
-  - GraphQL endpoint accessible with proper authentication
+  - GraphQL endpoint publicly accessible (no authentication required)
   - Database configured automatically through Subsquid setup
   - API gateway functionality handled by indexer
   - Event processing lag < 2 seconds
@@ -354,7 +354,7 @@
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Pulumi stacks for each environment
-  - Secure secrets management
+  - Secure secrets management using Pulumi ESC (Environment, Secrets, and Configuration)
   - Automated configuration deployment
   - Environment variable injection for all services
 - **Non-Functional Requirements**:
@@ -434,7 +434,7 @@ sequenceDiagram
   - Dashboard displays total USDC balance with 6 decimal precision
   - Available collateral calculation: total_balance - used_collateral - pending_orders
   - Used collateral breakdown shows allocation per position with percentages
-  - Margin utilization = (used_collateral / total_balance) * 100
+  - Margin utilization = `(used_collateral / total_balance) * 100`
   - Balance updates within 5 seconds of on-chain changes via polling
   - Color-coded margin health: green (0-50%), yellow (50-80%), red (80-100%)
   
@@ -475,7 +475,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Unit tests for calculations, integration tests for data flow, E2E tests for user journey
 
-### STAR-114: Open Long Position
+### STAR-107: Open Long Position
 
 **Name**: Open Long Position
 
@@ -539,7 +539,7 @@ sequenceDiagram
   - Support for ETH, BTC, FUEL, stFUEL with correct decimal precision
   - Position size validation: min $10, max $1,000,000
   - Leverage limits: 2x-20x for BTC/ETH, 2x-10x for FUEL/stFUEL
-  - Real-time liquidation price calculation: entry_price * (1 - 1/leverage + fees)
+  - Real-time liquidation price calculation: `entry_price * (1 - 1/leverage + fees)`
   - Transaction completes within 60 seconds or times out with rollback
   - Position appears in portfolio immediately after confirmation
   
@@ -584,7 +584,7 @@ sequenceDiagram
   - Area of project modified: Test Suite
   - Details: Leverage edge cases, liquidation scenarios, oracle manipulation tests
 
-### STAR-115: Open Short Position
+### STAR-108: Open Short Position
 
 **Name**: Open Short Position
 
@@ -640,8 +640,8 @@ sequenceDiagram
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Short position interface with same assets as long positions
-  - Borrowing cost display: funding_rate * position_size * duration
-  - Short liquidation price: entry_price * (1 + 1/leverage - fees)
+  - Borrowing cost display: `funding_rate * position_size * duration`
+  - Short liquidation price: `entry_price * (1 + 1/leverage - fees)`
   - Funding rate display with 8-hour payment cycles
   - Maximum short interest limits per asset
   - Short positions marked distinctly in portfolio (red indicators)
@@ -727,7 +727,7 @@ sequenceDiagram
 5. Check margin requirements and liquidation prices
 6. View position history and performance metrics
 
-**Prerequisite Stories**: STAR-114, STAR-115
+**Prerequisite Stories**: STAR-107, STAR-108
 
 **Prerequisite Technical Stories**: 
 - Client SDK position data processing
@@ -736,8 +736,8 @@ sequenceDiagram
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Position table with sortable columns: Asset, Side, Size, Leverage, Entry Price, Mark Price, P&L, ROE
-  - Unrealized P&L: (mark_price - entry_price) * size * side_multiplier
-  - ROE (Return on Equity): unrealized_pnl / initial_margin * 100
+  - Unrealized P&L: `(mark_price - entry_price) * size * side_multiplier`
+  - ROE (Return on Equity): `unrealized_pnl / initial_margin * 100`
   - Margin ratio with visual indicators: safe (>50%), warning (20-50%), danger (<20%)
   - Expandable rows showing: entry time, funding paid/received, fees paid, liquidation price
   - Position grouping by asset with aggregate statistics
@@ -829,7 +829,7 @@ sequenceDiagram
   - Close modal with slider for partial close (25%, 50%, 75%, 100%, custom)
   - Exit price estimation
   - Fee breakdown: trading fee, funding fee (if any), network fee
-  - Final P&L calculation: (exit_price - entry_price) * size - total_fees
+  - Final P&L calculation: `(exit_price - entry_price) * size - total_fees`
   - Position closure confirmation within 60 seconds
   - Portfolio automatically updates after closure
   - Transaction history entry created with all details
@@ -1071,7 +1071,7 @@ sequenceDiagram
 4. See trade details: open price, close price, size, fees, PnL
 5. View aggregate performance statistics calculated in Client (bonsai layer)
 
-**Prerequisite Stories**: STAR-114, STAR-115, STAR-110
+**Prerequisite Stories**: STAR-107, STAR-108, STAR-110
 
 **Prerequisite Technical Stories**: 
 - Trade history processing in indexer
@@ -1384,6 +1384,7 @@ sequenceDiagram
   - Withdrawal fee: 0.1% (configurable)
   - 24-hour cooldown period after deposit (configurable)
   - Immediate USDC transfer upon confirmation
+  - **Note**: Detailed withdrawal limits, utilization caps, and cooldown mechanisms will be specified in a follow-up ADR (Architecture Decision Record)
   - Updated pool statistics after withdrawal
   
 - **Non-Functional Requirements**:
@@ -1572,7 +1573,7 @@ sequenceDiagram
 4. Understand the specific issue (insufficient balance, etc.)
 5. Get guidance on how to resolve the problem
 
-**Prerequisite Stories**: STAR-114, STAR-115
+**Prerequisite Stories**: STAR-107, STAR-108
 
 **Prerequisite Technical Stories**: 
 - Client SDK transaction management system
@@ -1667,7 +1668,7 @@ sequenceDiagram
 4. View funding payment history
 5. Factor funding costs into position sizing through Client SDK calculator
 
-**Prerequisite Stories**: STAR-114, STAR-115, STAR-109
+**Prerequisite Stories**: STAR-107, STAR-108, STAR-109
 
 **Prerequisite Technical Stories**: 
 - Funding rate mechanism
@@ -1675,7 +1676,7 @@ sequenceDiagram
 **Acceptance Criteria**:
 - **Functional Requirements**:
   - Funding rate display on position entry form (rate per 8 hours)
-  - Cost calculator in Client (bonsai layer): position_size * funding_rate * (hours_held / 8)
+  - Cost calculator in Client (bonsai layer): `position_size * funding_rate * (hours_held / 8)`
   - Funding direction indicator (pay/receive based on long/short and rate)
   - Break-even calculator including funding costs
   - Accumulated funding display per position
@@ -1764,7 +1765,11 @@ sequenceDiagram
   - Clear visual distinction: Testnet (orange), Mainnet (green)
   - Network switch updates: contract addresses, RPC endpoints, indexer URLs
   - Wallet network validation and auto-switch prompt
-  - Data isolation between networks (no testnet data on mainnet)
+  - Data isolation between networks enforced at storage and API layers:
+    - Separate database schemas/namespaces for testnet vs mainnet
+    - Network-prefixed cache keys in Redis/localStorage
+    - Indexer endpoints completely separate per network
+    - No cross-network data contamination in state management
   - Network preference saved in localStorage
   - URL parameter support for network selection (?network=testnet)
   
