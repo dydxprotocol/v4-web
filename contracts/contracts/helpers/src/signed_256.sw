@@ -40,7 +40,9 @@ impl std::ops::Eq for Signed256 {}
 
 impl std::ops::Ord for Signed256 {
     fn gt(self, other: Self) -> bool {
-        if !self.is_neg && !other.is_neg {
+        if self == other {
+            false
+        } else if !self.is_neg && !other.is_neg {
             self.value > other.value
         } else if !self.is_neg && other.is_neg {
             true
@@ -54,7 +56,9 @@ impl std::ops::Ord for Signed256 {
     }
 
     fn lt(self, other: Self) -> bool {
-        if !self.is_neg && !other.is_neg {
+        if self == other {
+            false
+        } else if !self.is_neg && !other.is_neg {
             self.value < other.value
         } else if !self.is_neg && other.is_neg {
             false
