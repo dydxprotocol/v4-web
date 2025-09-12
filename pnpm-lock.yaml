@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-client-js':
-    specifier: 3.0.1
-    version: 3.0.1
+    specifier: 3.0.2
+    version: 3.0.2
   '@dydxprotocol/v4-localization':
     specifier: 1.1.318
     version: 1.1.318
@@ -1470,8 +1470,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.0.1:
-    resolution: {integrity: sha512-+X10/jiM8efr/v8Ahf2wsRqOsxRa+gkuumH0QRFRyE6ZEQvl9pi5504GHabdbuY8qxbGc3juXXMPjo0EPvLMbA==}
+  /@dydxprotocol/v4-client-js@3.0.2:
+    resolution: {integrity: sha512-J1m/rWfwTiIggFHc2Z79L5MJtc5w1TA2Gm0ZBPg8pxl4A6Hu6XZPf+OcR4Xbtpozdo8a1Cnnje7duLTZPqvZ+A==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
