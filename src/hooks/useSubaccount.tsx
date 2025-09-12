@@ -883,6 +883,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         encodedData
       );
 
+      console.log('made', creationResult);
       const parsed = parseToPrimitives(creationResult);
 
       if ((parsed as IndexedTx | undefined)?.code !== 0) {
