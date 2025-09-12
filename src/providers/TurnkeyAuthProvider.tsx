@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { logBonsaiError } from '@/bonsai/logs';
 import { useMutation } from '@tanstack/react-query';
-import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
+import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
@@ -56,7 +56,7 @@ const useTurnkeyAuthContext = () => {
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
 
-  const { embeddedPublicKey, onboardDydxShared, targetPublicKeys, getUploadAddressPayload } =
+  const { embeddedPublicKey, onboardDydx, targetPublicKeys, getUploadAddressPayload } =
     useTurnkeyWallet();
 
   /* ----------------------------- Sign In ----------------------------- */
@@ -176,11 +176,11 @@ const useTurnkeyAuthContext = () => {
       }
 
       await indexedDbClient?.loginWithSession(session);
-      await onboardDydxShared({ salt, setWalletFromSignature, tkClient: indexedDbClient });
+      await onboardDydx({ salt, setWalletFromSignature, tkClient: indexedDbClient });
       setEmailSignInStatus('success');
       setEmailSignInError(undefined);
     },
-    [onboardDydxShared, indexedDbClient, setWalletFromSignature]
+    [onboardDydx, indexedDbClient, setWalletFromSignature]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
@@ -251,7 +251,7 @@ const useTurnkeyAuthContext = () => {
         }
 
         await indexedDbClient.loginWithSession(session);
-        await onboardDydxShared({ setWalletFromSignature, tkClient: indexedDbClient });
+        await onboardDydx({ setWalletFromSignature, tkClient: indexedDbClient });
         setEmailSignInStatus('success');
       } catch (error) {
         let errorMessage: string | undefined;
@@ -290,7 +290,7 @@ const useTurnkeyAuthContext = () => {
       indexedDbClient,
       targetPublicKeys,
       turnkeyEmailOnboardingData,
-      onboardDydxShared,
+      onboardDydx,
       setWalletFromSignature,
       searchParams,
       setSearchParams,
@@ -365,7 +365,7 @@ const useTurnkeyAuthContext = () => {
   });
 
   const uploadAddress = useCallback(
-    async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient }) => {
+    async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient }) => {
       if (dydxAddress == null) {
         throw new Error('No dydx address provided');
       }
@@ -431,28 +431,18 @@ const useTurnkeyAuthContext = () => {
     );
   }, [sourceAccount.walletInfo]);
 
-  const tkClient = useMemo(() => {
-    return sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey
-      ? sourceAccount.walletInfo.loginMethod === LoginMethod.Email
-        ? authIframeClient
-        : sourceAccount.walletInfo.loginMethod === LoginMethod.OAuth
-          ? indexedDbClient
-          : undefined
-      : undefined;
-  }, [sourceAccount.walletInfo, authIframeClient, indexedDbClient]);
-
   /**
    * @description Side effect to upload the address if it is required and the user has a dydx address.
    * This is triggered after the user has signed in with email or OAuth and has derived their dydx address.
    */
   useEffect(() => {
-    if (tkClient && needsAddressUpload && dydxAddress != null) {
+    if (indexedDbClient && needsAddressUpload && dydxAddress != null) {
       // Set RequiredAddressUpload to false to prevent the upload from being triggered again.
       // If the uploadAddress mutation fails, the requiredAddressUpload flag will be set back to true.
       dispatch(setRequiresAddressUpload(false));
-      uploadAddress({ tkClient });
+      uploadAddress({ tkClient: indexedDbClient });
     }
-  }, [dispatch, dydxAddress, uploadAddress, tkClient, needsAddressUpload]);
+  }, [dispatch, dydxAddress, uploadAddress, indexedDbClient, needsAddressUpload]);
 
   /* ----------------------------- Return Values----------------------------- */
 

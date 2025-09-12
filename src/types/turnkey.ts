@@ -17,11 +17,6 @@ export type UserSession = {
   };
 };
 
-export type PreferredWallet = {
-  userId: string;
-  walletId: string;
-};
-
 export enum LoginMethod {
   Passkey = 'PASSKEY',
   Email = 'EMAIL',

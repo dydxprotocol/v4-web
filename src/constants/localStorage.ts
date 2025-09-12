@@ -9,9 +9,6 @@ export enum LocalStorageKey {
   KeplrCompliance = 'dydx.KeplrCompliance',
   SolDerivedAddresses = 'dydx.SolDerivedAddresses',
 
-  // Turnkey
-  TurnkeyPreferredWallet = 'dydx.TurnkeyPreferredWallet',
-
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',
 
