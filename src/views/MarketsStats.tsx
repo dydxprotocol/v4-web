@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { OnboardingState } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -17,7 +18,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { NewTag } from '@/components/Tag';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
@@ -33,6 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const { className } = props;
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const onboardingState = useAppSelector(getOnboardingState);
 
   const { hasResults: hasNewMarkets } = useMarketsData({
     filter: MarketFilters.NEW,
@@ -51,8 +54,14 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       })
     );
 
-    // Open deposit dialog
-    dispatch(openDialog(DialogTypes.Deposit2()));
+    // Check if user is fully onboarded/connected
+    if (onboardingState === OnboardingState.AccountConnected) {
+      // Open deposit dialog for connected users
+      dispatch(openDialog(DialogTypes.Deposit2()));
+    } else {
+      // Open onboarding dialog for disconnected users
+      dispatch(openDialog(DialogTypes.Onboarding()));
+    }
   };
   return (
     <section
