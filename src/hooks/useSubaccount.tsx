@@ -43,16 +43,6 @@ import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
-export function bigIntToBytes(value: bigint): Uint8Array {
-  const absoluteValue = value < 0 ? value * BigInt(-1) : value;
-  const nonPaddedHexValue = absoluteValue.toString(16);
-  const paddedHexValue =
-    nonPaddedHexValue.length % 2 === 0 ? nonPaddedHexValue : `0${nonPaddedHexValue}`;
-  const numberBytes = Buffer.from(paddedHexValue, 'hex');
-  const signedBytes = Uint8Array.of(value < 0 ? 3 : 2, ...numberBytes);
-  return signedBytes;
-}
-
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
 SubaccountContext.displayName = 'Subaccount';
