@@ -95,7 +95,7 @@ export const AppleAuth = () => {
           }}
           {...props}
         >
-          <div className="row pointer-events-none absolute inset-0 justify-center bg-color-layer-5">
+          <div tw="row pointer-events-none absolute inset-0 justify-center bg-color-layer-5">
             <Icon iconName={isLightMode ? IconName.Apple : IconName.AppleLight} />
           </div>
         </$SocialLoginButton>
