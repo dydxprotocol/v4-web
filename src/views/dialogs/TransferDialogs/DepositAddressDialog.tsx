@@ -66,7 +66,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     if (selectedTab === 'perpetuals') {
       const evmChains = EVM_DEPOSIT_CHAINS.map((chain) => {
         return chain.id;
-      }).filter((chainId) => chainId === polygon.id); // Polygon unsupported for now
+      }).filter((chainId) => chainId !== polygon.id); // Polygon unsupported for now
 
       return [...evmChains, SOLANA_MAINNET_ID];
     }
