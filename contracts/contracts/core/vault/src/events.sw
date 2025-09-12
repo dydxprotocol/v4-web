@@ -10,10 +10,6 @@ pub struct SetGov {
     pub gov: Identity,
 }
 
-pub struct SetRusdContract {
-    pub rusd_contr: ContractId
-}
-
 pub struct SetPaused {
     pub is_paused: bool,
 }
@@ -95,19 +91,17 @@ pub struct SetPricefeedProvider {
     pub pricefeed_provider: ContractId,
 }
 
-pub struct BuyRUSD {
+pub struct AddLiquidity {
     pub account: Identity,
-    pub asset: AssetId,
-    pub asset_amount: u64,
-    pub rusd_amount: u256,
+    pub stable_asset_amount: u64,
+    pub lp_asset_amount: u64,
     pub fee_basis_points: u256,
 }
 
-pub struct SellRUSD {
+pub struct RemoveLiquidity {
     pub account: Identity,
-    pub asset: AssetId,
-    pub asset_amount: u64,
-    pub rusd_amount: u256,
+    pub stable_asset_amount: u64,
+    pub lp_asset_amount: u64,
     pub fee_basis_points: u256,
 }
 

@@ -30,8 +30,6 @@ abi Vault {
     #[storage(read, write)]
     fn initialize(
         gov: Identity,
-        rusd: AssetId,
-        rusd_contr: ContractId,
     );
 
     /*
@@ -282,6 +280,8 @@ abi Vault {
     #[storage(read)]
     fn get_stable_asset() -> AssetId;
 
+    fn get_lp_asset() -> AssetId;
+
     #[storage(read)]
     fn get_position_leverage(
         account: Identity,
@@ -349,12 +349,12 @@ abi Vault {
     ) -> (u256, u256);
 
     #[storage(read)]
-    fn get_buy_rusd_amount(
+    fn get_add_liquidity_amount(
         asset_amount: u64
     ) -> (u256, u256, u256);
 
     #[storage(read)]
-    fn get_sell_rusd_amount(
+    fn get_remove_liquidity_amount(
         rusd_amount: u256
     ) -> (u256, u64, u256);
 
@@ -390,11 +390,11 @@ abi Vault {
 
     #[payable]
     #[storage(read, write)]
-    fn buy_rusd(receiver: Identity) -> u256;
+    fn add_liquidity(receiver: Identity) -> u256;
 
     #[payable]
     #[storage(read, write)]
-    fn sell_rusd(receiver: Identity) -> u256;
+    fn remove_liquidity(receiver: Identity) -> u256;
 
     #[payable]
     #[storage(read, write)]

@@ -155,6 +155,7 @@ dependencies = [
     "core_interfaces",
     "helpers",
     "pausable",
+    "src20",
     "src3",
     "std",
 ]

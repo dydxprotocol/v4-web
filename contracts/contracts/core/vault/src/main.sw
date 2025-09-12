@@ -14,6 +14,7 @@ __     __          _ _
 */
 
 use std::{
+    asset::{mint_to, burn},
     auth::msg_sender,
     block::timestamp,
     call_frames::{
@@ -26,7 +27,8 @@ use std::{
     primitive_conversions::{
         u8::*,
         u64::*,
-    }
+    },
+    string::String,
 };
 use std::hash::*;
 use helpers::{
@@ -38,6 +40,7 @@ use helpers::{
     reentrancy::*,
 };
 use src3::SRC3;
+use src20::{SetDecimalsEvent, SetNameEvent, SetSymbolEvent, SRC20, TotalSupplyEvent};
 use core_interfaces::{
     vault::{
         Vault,
@@ -46,7 +49,6 @@ use core_interfaces::{
     },
     vault_pricefeed::VaultPricefeed,
 };
-use asset_interfaces::rusd::RUSD;
 use pausable::{
     _is_paused as sl_is_paused,
     _pause as sl_pause,
@@ -79,10 +81,6 @@ storage {
 
     // Externals
     router: ContractId = ZERO_CONTRACT,
-    // this is the RUSD contract
-    rusd_contr: ContractId = ZERO_CONTRACT,
-    // this is the RUSD native asset (AssetId::new(rusd_contr, ZERO))
-    rusd: AssetId = ZERO_ASSET,
     pricefeed_provider: ContractId = ZERO_CONTRACT,
 
     /// ---------------------  Fees  ---------------------
@@ -93,7 +91,7 @@ storage {
     tax_basis_points: u64 = 50, // 0.5%
     /// reduced tax for stable assets
     stable_tax_basis_points: u64 = 20, // 0.2%
-    /// charged when minting/burning RLP/RUSD assets
+    /// charged when minting/burning LP assets
     /// helps maintain the stability of the RLP pool and discourage rapid entering and exiting.
     mint_burn_fee_basis_points: u64 = 30, // 0.3%
     /// charged when swapping b/w different assets within the protocol
@@ -163,6 +161,52 @@ storage {
     /// value is total size of all short positions across all users
     global_short_sizes: StorageMap<AssetId, u256> = StorageMap {},
     
+    // SRC20 support - track total supply of the LP asset
+    total_supply: u64 = 0,
+    
+}
+
+impl SRC20 for Contract {
+    #[storage(read)]
+    fn total_assets() -> u64 {
+        1
+    }
+ 
+    #[storage(read)]
+    fn total_supply(asset: AssetId) -> Option<u64> {
+        if asset == AssetId::default() {
+            Some(storage.total_supply.read())
+        } else {
+            None
+        }
+    }
+ 
+    #[storage(read)]
+    fn name(asset: AssetId) -> Option<String> {
+        if asset == AssetId::default() {
+            Some(String::from_ascii_str(from_str_array(LP_ASSET_NAME)))
+        } else {
+            None
+        }
+    }
+ 
+    #[storage(read)]
+    fn symbol(asset: AssetId) -> Option<String> {
+        if asset == AssetId::default() {
+            Some(String::from_ascii_str(from_str_array(LP_ASSET_SYMBOL)))        
+        } else {
+            None
+        }
+    }
+ 
+    #[storage(read)]
+    fn decimals(asset: AssetId) -> Option<u8> {
+        if asset == AssetId::default() {
+            Some(DECIMALS)
+        } else {
+            None
+        }
+    }
 }
 
 impl Pausable for Contract {
@@ -197,23 +241,37 @@ impl Vault for Contract {
     #[storage(read, write)]
     fn initialize(
         gov: Identity,
-        rusd: AssetId,
-        rusd_contr: ContractId,
     ) {
         require(!storage.is_initialized.read(), Error::VaultAlreadyInitialized);
         storage.is_initialized.write(true);
         storage.gov.write(gov);
-
-        require(
-            rusd == AssetId::new(rusd_contr, ZERO),
-            Error::VaultInvalidRUSDAsset
-        );
-
-        storage.rusd.write(rusd);
-        storage.rusd_contr.write(rusd_contr);
+     
+        storage.total_supply.write(0);
+        let lp_asset = AssetId::default();
+        let sender = msg_sender().unwrap();
+        // Emit SRC20 events for LP asset
+        log(SetNameEvent {
+            asset: lp_asset,
+            name: Some(String::from_ascii_str(from_str_array(LP_ASSET_NAME))),
+            sender: sender,
+        });
+        log(SetSymbolEvent {
+            asset: lp_asset,
+            symbol: Some(String::from_ascii_str(from_str_array(LP_ASSET_SYMBOL))),
+            sender: sender,
+        });
+        log(SetDecimalsEvent {
+            asset: lp_asset,
+            decimals: DECIMALS,
+            sender: sender,
+        });
+        log(TotalSupplyEvent {
+            asset: lp_asset,
+            supply: 0,
+            sender: sender,
+        });
 
         log(SetGov { gov });
-        log(SetRusdContract { rusd_contr });
     }
 
     /*
@@ -708,6 +766,10 @@ impl Vault for Contract {
         STABLE_ASSET
     }
 
+    fn get_lp_asset() -> AssetId {
+        AssetId::default()
+    }
+
     #[storage(read)]
     fn get_position_leverage(
         account: Identity,
@@ -838,17 +900,17 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_buy_rusd_amount(
+    fn get_add_liquidity_amount(
         asset_amount: u64
     ) -> (u256, u256, u256) {
-        _get_buy_rusd_amount(asset_amount)
+        _get_add_liquidity_amount(asset_amount)
     }
 
     #[storage(read)]
-    fn get_sell_rusd_amount(
+    fn get_remove_liquidity_amount(
         rusd_amount: u256
     ) -> (u256, u64, u256) {
-        _get_sell_rusd_amount(rusd_amount)
+        _get_remove_liquidity_amount(rusd_amount)
     }
 
     #[storage(read)]
@@ -910,12 +972,12 @@ impl Vault for Contract {
 
     #[payable]
     #[storage(read, write)]
-    fn buy_rusd(receiver: Identity) -> u256 {
+    fn add_liquidity(receiver: Identity) -> u256 {
         sl_require_not_paused();
         
         _begin_non_reentrant(storage.lock);
         
-        let amount_out = _buy_rusd(receiver);
+        let amount_out = _add_liquidity(receiver);
         _end_non_reentrant(storage.lock);
 
         amount_out
@@ -923,12 +985,12 @@ impl Vault for Contract {
 
     #[payable]
     #[storage(read, write)]
-    fn sell_rusd(receiver: Identity) -> u256 {
+    fn remove_liquidity(receiver: Identity) -> u256 {
         sl_require_not_paused();
         
         _begin_non_reentrant(storage.lock);
 
-        let amount_out = _sell_rusd(receiver);
+        let amount_out = _remove_liquidity(receiver);
         _end_non_reentrant(storage.lock);
 
         amount_out
@@ -1187,14 +1249,13 @@ fn _get_redemption_amount(asset: AssetId, rusd_amount: u256) -> u256 {
     let price = _get_max_price(asset);
     let redemption_amount = rusd_amount * PRICE_PRECISION / price;
 
-    let rusd = storage.rusd.read();
-    _adjust_for_decimals(redemption_amount, rusd, asset)
+    _adjust_for_decimals(redemption_amount, AssetId::default(), asset)
 }
 
 #[storage(read)]
 fn _get_target_rusd_amount(asset: AssetId) -> u256 {
-    let supply = abi(RUSD, storage.rusd_contr.read().into()).total_rusd_supply();
-     let weight = storage.asset_weights.get(asset).try_read().unwrap_or(0);
+    let supply = storage.total_supply.read();
+    let weight = storage.asset_weights.get(asset).try_read().unwrap_or(0);
 
     (weight * supply / storage.total_asset_weights.read()).as_u256()
 }
@@ -1205,15 +1266,14 @@ fn _adjust_for_decimals(
     asset_div: AssetId, 
     asset_mul: AssetId
 ) -> u256 {
-    let rusd = storage.rusd.read();
-    let decimals_div = if asset_div == rusd {
-        RUSD_DECIMALS
+    let decimals_div = if asset_div == AssetId::default() {
+        DECIMALS.as_u32()
     } else {
         storage.asset_decimals.get(asset_div).try_read().unwrap_or(0)
     };
 
-    let decimals_mul = if asset_mul == rusd {
-        RUSD_DECIMALS
+    let decimals_mul = if asset_mul == AssetId::default() {
+        DECIMALS.as_u32()
     } else {
         storage.asset_decimals.get(asset_mul).try_read().unwrap_or(0)
     };
@@ -2070,15 +2130,14 @@ fn _withdraw_fees(
 }
 
 #[storage(read)]
-fn _get_buy_rusd_amount(
+fn _get_add_liquidity_amount(
     asset_amount: u64
 ) -> (u256, u256, u256) {
     let asset = STABLE_ASSET;
     let price = _get_min_price(asset);
-    let rusd = storage.rusd.read();
 
     let mut rusd_amount = asset_amount.as_u256() * price / PRICE_PRECISION;
-    rusd_amount = _adjust_for_decimals(rusd_amount, asset, rusd);
+    rusd_amount = _adjust_for_decimals(rusd_amount, asset, AssetId::default());
     require(rusd_amount > 0, Error::VaultInvalidRusdAmount);
 
     let fee_basis_points = _get_fee_basis_points(
@@ -2096,13 +2155,13 @@ fn _get_buy_rusd_amount(
     let amount_after_fees = u64_amount_after_fees.as_u256();
 
     let mut mint_amount = amount_after_fees * price / PRICE_PRECISION;
-    mint_amount = _adjust_for_decimals(mint_amount, asset, rusd);
+    mint_amount = _adjust_for_decimals(mint_amount, asset, AssetId::default());
 
     (mint_amount, amount_after_fees, fee_basis_points)
 }
 
 #[storage(read, write)]
-fn _buy_rusd(
+fn _add_liquidity(
     receiver: Identity,
 ) -> u256 {
  
@@ -2122,8 +2181,8 @@ fn _buy_rusd(
         mint_amount, 
         amount_after_fees, 
         fee_basis_points
-    ) = _get_buy_rusd_amount(asset_amount);
-    // this needs to be called here because _get_buy_rusd_amount is read-only and cannot update state
+    ) = _get_add_liquidity_amount(asset_amount);
+    // this needs to be called here because _get_add_liquidity_amount is read-only and cannot update state
     _collect_swap_fees(
         asset,
         asset_amount,
@@ -2139,18 +2198,22 @@ fn _buy_rusd(
         Error::VaultInvalidMintAmountGtU64Max
     );
 
-    let rusd = abi(SRC3, storage.rusd_contr.read().into());
-    rusd.mint(
-        receiver,
-        Some(DEFAULT_SUB_ID), // this is unused, but required by the interface to meet the SRC3 standard
-        u64::try_from(mint_amount).unwrap(),
-    );
+    let mint_amount_u64 = u64::try_from(mint_amount).unwrap();
+    let new_supply = mint_amount_u64 + storage.total_supply.read();
+    storage.total_supply.write(new_supply);
+ 
+    mint_to(receiver, DEFAULT_SUB_ID, mint_amount_u64);
+ 
+    log(TotalSupplyEvent {
+        asset: AssetId::default(),
+        supply: new_supply,
+        sender: msg_sender().unwrap(),
+    });
 
-    log(BuyRUSD {
+    log(AddLiquidity {
         account: receiver,
-        asset,
-        asset_amount,
-        rusd_amount: mint_amount,
+        stable_asset_amount: asset_amount,
+        lp_asset_amount: mint_amount_u64,
         fee_basis_points,
     });
 
@@ -2158,7 +2221,7 @@ fn _buy_rusd(
 }
 
 #[storage(read)]
-fn _get_sell_rusd_amount(
+fn _get_remove_liquidity_amount(
     rusd_amount: u256
 ) -> (u256, u64, u256) {
     let asset = STABLE_ASSET;
@@ -2184,7 +2247,7 @@ fn _get_sell_rusd_amount(
 }
 
 #[storage(read, write)]
-fn _sell_rusd(
+fn _remove_liquidity(
     receiver: Identity,
 ) -> u256 {
  
@@ -2195,9 +2258,7 @@ fn _sell_rusd(
     );
     let asset = STABLE_ASSET;
 
-    let rusd = storage.rusd.read();
-
-    let rusd_amount = _transfer_in(rusd).as_u256();
+    let rusd_amount = _transfer_in(AssetId::default()).as_u256();
     require(rusd_amount > 0, Error::VaultInvalidRusdAmount);
     
     // require rusd_amount to be less than u64::max
@@ -2212,8 +2273,8 @@ fn _sell_rusd(
         redemption_amount,
         amount_out,
         fee_basis_points
-    ) = _get_sell_rusd_amount(rusd_amount);
-    // this needs to be called here because _get_sell_rusd_amount is read-only and cannot update state
+    ) = _get_remove_liquidity_amount(rusd_amount);
+    // this needs to be called here because _get_remove_liquidity_amount is read-only and cannot update state
     _collect_swap_fees(
         asset, 
         u64::try_from(redemption_amount).unwrap(),
@@ -2224,29 +2285,28 @@ fn _sell_rusd(
     _decrease_rusd_amount(asset, rusd_amount);
     _decrease_pool_amount(asset, redemption_amount);
 
-    let u64_rusd_amount = u64::try_from(rusd_amount).unwrap();
-    let rusd_contr = abi(SRC3, storage.rusd_contr.read().into());
-    rusd_contr.burn{
-        asset_id: rusd.into(),
-        coins: u64_rusd_amount
-    }(
-        DEFAULT_SUB_ID, // this is unused, but required by the interface to meet the SRC3 standard
-        u64_rusd_amount
-    );
+    let burn_amount_u64 = u64::try_from(rusd_amount).unwrap();
+    let new_supply = storage.total_supply.read() - burn_amount_u64;
+    storage.total_supply.write(new_supply);
+    burn(DEFAULT_SUB_ID, burn_amount_u64);
+    log(TotalSupplyEvent {
+        asset: AssetId::default(),
+        supply: new_supply,
+        sender: msg_sender().unwrap(),
+    });
+
+    log(RemoveLiquidity {
+        account: receiver,
+        stable_asset_amount: amount_out,
+        lp_asset_amount: burn_amount_u64,
+        fee_basis_points,
+    });
 
     _transfer_out(
         asset, 
         amount_out, 
         receiver,
     );
-
-    log(SellRUSD {
-        account: receiver,
-        asset,
-        rusd_amount,
-        asset_amount: amount_out,
-        fee_basis_points,
-    });
 
     amount_out.as_u256()
 }
@@ -2265,8 +2325,7 @@ fn _get_swap_amounts(
 
     // adjust rusdAmounts by the same rusdAmount as debt is shifted between the assets
     let mut rusd_amount = amount_in * price_in / PRICE_PRECISION;
-    let rusd = storage.rusd.read();
-    rusd_amount = _adjust_for_decimals(rusd_amount, asset_in, rusd);
+    rusd_amount = _adjust_for_decimals(rusd_amount, asset_in, AssetId::default());
 
     let fee_basis_points = _get_swap_fee_basis_points(
         asset_in, 

@@ -26,8 +26,7 @@ describe("Vault.touch", () => {
     let BNB: Fungible
     let USDC: Fungible
     let BTC: Fungible
-    let RUSD: Rusd
-    let RUSD_ASSET_ID: string // the RUSD fungible asset
+    let LP_ASSET_ID: string // the LP fungible asset
     let vault: Vault
     let vault_user0: Vault
     let vault_user1: Vault
@@ -49,22 +48,19 @@ describe("Vault.touch", () => {
         USDC = await deploy("Fungible", deployer)
         BTC = await deploy("Fungible", deployer)
 
-        /*
-            Vault + Router + RUSD
-        */
         utils = await deploy("Utils", deployer)
         vault = await deploy("Vault", deployer, { STABLE_ASSET: toAsset(USDC) })
         vaultPricefeed = await deploy("VaultPricefeed", deployer)
-        RUSD = await deploy("Rusd", deployer)
+        let RUSD = await deploy("Rusd", deployer)
         timeDistributor = await deploy("TimeDistributor", deployer)
         yieldTracker = await deploy("YieldTracker", deployer)
         
-        attachedContracts = [vault, vaultPricefeed, RUSD]
-        RUSD_ASSET_ID = getAssetId(RUSD)
+        attachedContracts = [vault, vaultPricefeed]
+        LP_ASSET_ID = (await getValue(vault.functions.get_lp_asset())).bits.toString()
 
         await call(RUSD.functions.initialize(toContract(vault), toAddress(user0)))
 
-        await call(vault.functions.initialize(addrToIdentity(deployer), toAsset(RUSD), toContract(RUSD)))
+        await call(vault.functions.initialize(addrToIdentity(deployer)))
         await call(vault.functions.set_pricefeed_provider(toContract(vaultPricefeed)))
         await call(vault.functions.set_liquidator(addrToIdentity(liquidator), true))
 
@@ -106,40 +102,40 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        // console.log((await user0.getBalance(RUSD_ASSET_ID)).toString())
-        const rusdAmount = await user0.getBalance(RUSD_ASSET_ID)
-        expect(rusdAmount.toNumber()).gt(0)
+        // console.log((await user0.getBalance(LP_ASSET_ID)).toString())
+        const sblpAmount = await user0.getBalance(LP_ASSET_ID)
+        expect(sblpAmount.toNumber()).gt(0)
     })
 
     it("remove liquidity", async () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        const rusdAmount = await user0.getBalance(RUSD_ASSET_ID)
+        const sblpAmount = await user0.getBalance(LP_ASSET_ID)
         const usdcAmount = await user0.getBalance(getAssetId(USDC))
         await call(
             vault_user0
-                .functions.sell_rusd(addrToIdentity(user0))
+                .functions.remove_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
-                    forward: [rusdAmount, RUSD_ASSET_ID],
+                    forward: [sblpAmount, LP_ASSET_ID],
                 }),
         )
-        const rusdAmountAfter = await user0.getBalance(RUSD_ASSET_ID)
+        const sblpAmountAfter = await user0.getBalance(LP_ASSET_ID)
         const usdcAmountAfter = await user0.getBalance(getAssetId(USDC))
-        expect(rusdAmountAfter.toNumber()).eq(0)
+        expect(sblpAmountAfter.toNumber()).eq(0)
         expect(usdcAmountAfter.toNumber()).gt(usdcAmount.toNumber())
     })
 
@@ -147,7 +143,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -174,7 +170,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -200,7 +196,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -237,7 +233,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -274,7 +270,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -312,7 +308,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -350,7 +346,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -388,7 +384,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -426,7 +422,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],
@@ -468,7 +464,7 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user0), expandDecimals(40000)))
         await call(
             vault_user0
-                .functions.buy_rusd(addrToIdentity(user0))
+                .functions.add_liquidity(addrToIdentity(user0))
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(40000), getAssetId(USDC)],

@@ -5,6 +5,7 @@ license = "Apache-2.0"
 name = "vault"
 
 [dependencies]
+src20 = "0.8.0"
 src3 = "0.8.0"
 pausable = "0.26.1"
 helpers = { path = "../../helpers" }
