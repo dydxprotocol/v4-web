@@ -816,7 +816,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw new Error('create authenticator operation failed');
       }
 
-      await sleep(500);
+      await sleep(200);
       await appQueryClient.invalidateQueries({
         exact: false,
         queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
