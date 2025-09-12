@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { selectIndexerReady } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { avalanche } from 'viem/chains';
+import { avalanche, polygon } from 'viem/chains';
 
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
@@ -66,7 +66,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     if (selectedTab === 'perpetuals') {
       const evmChains = EVM_DEPOSIT_CHAINS.map((chain) => {
         return chain.id;
-      });
+      }).filter((chainId) => chainId === polygon.id); // Polygon unsupported for now
 
       return [...evmChains, SOLANA_MAINNET_ID];
     }
