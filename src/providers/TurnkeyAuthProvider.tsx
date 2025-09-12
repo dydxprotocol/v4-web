@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { logBonsaiError, logTurnkey } from '@/bonsai/logs';
+import { logBonsaiError } from '@/bonsai/logs';
 import { useMutation } from '@tanstack/react-query';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
@@ -85,7 +85,6 @@ const useTurnkeyAuthContext = () => {
       );
 
       if (loginMethod === LoginMethod.OAuth) {
-        logTurnkey('sendSignInRequest', 'opening email sign in status dialog', { loginMethod });
         dispatch(forceOpenDialog(DialogTypes.EmailSignInStatus({})));
       }
 
@@ -126,7 +125,6 @@ const useTurnkeyAuthContext = () => {
     },
     onError: (error) => {
       selectWallet(undefined);
-      logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
       setEmailSignInStatus('error');
       setEmailSignInError(error.message);
@@ -362,7 +360,6 @@ const useTurnkeyAuthContext = () => {
     },
     onError: (error) => {
       dispatch(setRequiresAddressUpload(true));
-      logTurnkey('useTurnkeyAuth', 'error', error);
       logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
     },
   });

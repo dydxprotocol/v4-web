@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-import { logTurnkey } from '@/bonsai/logs';
+import { logBonsaiError } from '@/bonsai/logs';
 import { decryptExportBundle, generateP256KeyPair, uncompressRawPublicKey } from '@turnkey/crypto';
 import { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
@@ -137,14 +137,12 @@ const useTurnkeyWalletContext = () => {
       const isAuthIframeFlow = tkClient instanceof TurnkeyIframeClient;
 
       if (turnkey == null || tkClient == null) {
-        logTurnkey('fetchUserShared', 'turnkey or tkClient is null', turnkey, tkClient);
         return undefined;
       }
 
       if (isIndexedDbFlow) {
         // Try and get the current user
         const token = await turnkey.getSession();
-        logTurnkey('fetchUserShared', 'token', token);
 
         // If the user is not found, we assume the user is not logged in
         if (!token?.expiry || token.expiry > Date.now()) {
@@ -197,8 +195,6 @@ const useTurnkeyWalletContext = () => {
           },
         };
 
-        logTurnkey('fetchUserFrommAuthIframe', 'userToSet', userToSet);
-
         setTurnkeyUser(userToSet);
 
         return userToSet;
@@ -212,7 +208,6 @@ const useTurnkeyWalletContext = () => {
   const getPrimaryUserWalletsShared = useCallback(
     async (tkClient?: TurnkeyIndexedDbClient | TurnkeyIframeClient) => {
       const user = turnkeyUser ?? (await fetchUserShared(tkClient));
-      logTurnkey('getPrimaryUserWalletsShared', 'user', user);
       const isIndexedDbFlow = tkClient instanceof TurnkeyIndexedDbClient;
       const isAuthIframeFlow = tkClient instanceof TurnkeyIframeClient;
 
@@ -284,7 +279,6 @@ const useTurnkeyWalletContext = () => {
       // we need to fetch the wallets from the server
       const wallets = await getWalletsWithAccounts(user.organization.organizationId);
       setTurnkeyWallets(wallets);
-      logTurnkey('getPrimaryUserWallets', 'no indexedDb Wallets', wallets);
 
       if (wallets.length > 0) {
         setPrimaryTurnkeyWallet(wallets[0]!);
@@ -438,7 +432,6 @@ const useTurnkeyWalletContext = () => {
   const endTurnkeySession = useCallback(async () => {
     try {
       if (walletInfo?.connectorType === ConnectorType.Turnkey) {
-        logTurnkey('endTurnkeySession', 'Ending Turnkey Session', walletInfo);
         await turnkey?.logout();
         clearTurnkeyState();
         await resetAuthIframeClientKey();
@@ -446,7 +439,11 @@ const useTurnkeyWalletContext = () => {
         await initClient();
       }
     } catch (error) {
-      logTurnkey('useTurnkeyWallet', 'endTurnkeySession error', error);
+      logBonsaiError(
+        'endTurnkeySession',
+        'Unsuccessful attempt to clean up Turnkey session',
+        error
+      );
     }
   }, [
     clearTurnkeyState,

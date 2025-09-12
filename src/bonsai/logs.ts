@@ -5,7 +5,6 @@ import { getDurationSinceLastLogMs, log, logInfo } from '@/lib/telemetry';
 import { SharedLogIds } from './logIds';
 
 export const BONSAI_DETAILED_LOGS: boolean = false;
-export const TURNKEY_DEBUG_LOGS: boolean = true;
 
 export function logBonsaiError(source: string, message: string, ...args: any[]) {
   log(`bonsai: ${source}: ${message}`, args[0]?.error, { context: args });
@@ -77,11 +76,4 @@ export function wrapAndLogBonsaiError<T, Args extends any[]>(
       throw error;
     }
   };
-}
-
-export function logTurnkey(source: string, message: string, ...args: any[]) {
-  if (TURNKEY_DEBUG_LOGS) {
-    // eslint-disable-next-line no-console
-    console.log(`turnkey: ${source}: ${message}`, args);
-  }
 }

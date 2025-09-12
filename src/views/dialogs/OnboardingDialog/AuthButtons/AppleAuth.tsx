@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { logTurnkey } from '@/bonsai/logs';
+import { logBonsaiError } from '@/bonsai/logs';
 import AppleSignIn from 'react-apple-signin-auth';
 import { styled } from 'styled-components';
 import { sha256 } from 'viem';
@@ -57,8 +57,6 @@ export const AppleAuth = () => {
       return;
     }
 
-    logTurnkey('AppleAuth', 'Success', data);
-
     signInWithOauth({
       oidcToken: authorization.id_token,
       providerName: 'apple',
@@ -66,7 +64,7 @@ export const AppleAuth = () => {
   };
 
   const handleError = (error: any) => {
-    logTurnkey('AppleAuth', 'Error', error);
+    logBonsaiError('AppleAuth', 'Unsuccessful attempt to sign in with Apple OAuth', error);
   };
 
   if (!clientId || !redirectURI) {

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { logTurnkey } from '@/bonsai/logs';
 import { selectIndexerReady } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
@@ -58,8 +57,6 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       const response = await fetch(`${indexerUrl}/v4/bridging/getDepositAddress/${dydxAddress}`, {
         method: 'GET',
       }).then((res) => res.json());
-
-      logTurnkey('DepositAddressDialog', 'walletsQuery', response);
 
       return response;
     },

@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
-import { logTurnkey } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
@@ -162,7 +161,6 @@ const useAccountsContext = () => {
       });
       const key = { mnemonic, privateKey, publicKey };
       hdKeyManager.setHdkey(wallet.address, key);
-      logTurnkey('setWalletFromSignature', 'walletToSet', wallet);
       setLocalDydxWallet(wallet);
       setHdKey(key);
     },
