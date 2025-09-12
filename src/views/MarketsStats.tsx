@@ -8,6 +8,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
+import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -18,8 +19,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { NewTag } from '@/components/Tag';
 
-import { getOnboardingState } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
@@ -35,7 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const { className } = props;
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const onboardingState = useAppSelector(getOnboardingState);
+  const { openOnboardingDialog, onboardingState, isOnboardingDisabled } = useOnboardingFlow();
 
   const { hasResults: hasNewMarkets } = useMarketsData({
     filter: MarketFilters.NEW,
@@ -59,8 +59,8 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       // Open deposit dialog for connected users
       dispatch(openDialog(DialogTypes.Deposit2()));
     } else {
-      // Open onboarding dialog for disconnected users
-      dispatch(openDialog(DialogTypes.Onboarding()));
+      // Use proper onboarding flow for disconnected users
+      openOnboardingDialog();
     }
   };
   return (
@@ -97,6 +97,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
                 type={ButtonType.Button}
                 tw="relative z-10 w-full border-none bg-color-layer-0 text-color-text-2"
                 onClick={handleFreeDepositClick}
+                state={{ isDisabled: isOnboardingDisabled }}
               >
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
               </Button>
