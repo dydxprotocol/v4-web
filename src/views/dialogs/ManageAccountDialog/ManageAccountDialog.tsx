@@ -123,7 +123,7 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
   const title = {
     default: 'Account Management',
     dydxExport: 'Reveal Secret Phrase',
-    turnkeyExport: 'Reveal SecretPhrase',
+    turnkeyExport: 'Reveal Secret Phrase',
   }[page];
 
   return (
