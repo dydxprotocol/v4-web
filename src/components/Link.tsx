@@ -11,11 +11,12 @@ type ElementProps = {
     event: string;
     meta?: any;
   };
-  children: React.ReactNode;
+  children?: React.ReactNode;
   href?: string;
   onClick?: (e: React.MouseEvent) => void;
   withIcon?: boolean;
   isNewPage?: boolean;
+  iconSize?: string;
 };
 
 type StyleProps = {
@@ -36,6 +37,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       isAccent = false,
       isNewPage = true,
       className,
+      iconSize,
       ...props
     }: ElementProps & StyleProps,
     ref
@@ -60,7 +62,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       {...props}
     >
       {children}
-      {withIcon && <Icon iconName={IconName.LinkOut} />}
+      {withIcon && <Icon size={iconSize} iconName={IconName.LinkOut} />}
     </$A>
   )
 );

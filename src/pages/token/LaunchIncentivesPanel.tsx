@@ -10,6 +10,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
+import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
+import { SEPT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
@@ -32,14 +34,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
-
-// Move to Chaos Labs query once its available
-const SEPT_2025_REWARDS_DETAILS = {
-  season: 6,
-  rewardAmount: '$1M',
-  rebatePercent: '50%',
-  endTime: '2025-09-30T23:59:59.000Z', // end of sept
-};
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
@@ -136,30 +130,31 @@ const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
 
-  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress });
-  const { incentivePoints } = data ?? {};
+  const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
+    dydxAddress,
+    totalUsdRewards: SEPT_2025_REWARDS_DETAILS.rewardAmountUsd,
+  });
 
   return (
     <div tw="flex flex-col justify-between gap-0.75 self-stretch">
       <div
         style={{
-          backgroundImage: `url('/dots-background.svg')`,
+          backgroundImage: `url('/dots-background-3.svg')`,
           backgroundSize: 'cover',
         }}
-        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1.25"
+        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1"
       >
         <div tw="flex flex-col gap-0.5">
           <div tw="text-nowrap font-medium text-color-text-1">
-            {stringGetter({ key: STRING_KEYS.ESTIMATED_POINTS })}
+            {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
           </div>
           <$Points>
             <Output
-              type={OutputType.Number}
-              value={incentivePoints}
+              tw="text-extra font-extra-bold"
+              type={OutputType.Fiat}
+              value={incentiveRewards}
               isLoading={isLoading}
-              fractionDigits={TOKEN_DECIMALS}
             />
-            {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
           </$Points>
         </div>
         <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />
