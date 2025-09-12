@@ -913,7 +913,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   }, [compositeClient, subaccountClient]);
 
   const removeAuthorizedAccount = useCallback(
-    async (idToRemove: Long) => {
+    async (idToRemove: string) => {
       if (subaccountClient == null) {
         throw new Error('local wallet client not initialized');
       }
@@ -951,10 +951,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       const removeEnabled = true;
       if (tradingKeys != null && tradingKeys.length > 0 && removeEnabled) {
         const key = tradingKeys[tradingKeys.length - 1]!;
-        const id = key.id;
-        console.log('removing', id.toString());
-        const res = await removeAuthorizedAccount(Long.fromString(id.toString()));
-        console.log('removed', id.toString(), res);
+        const id = key.id.toString();
+        console.log('removing', id);
+        const res = await removeAuthorizedAccount(id);
+        console.log('removed', id, res);
       }
     });
   }, [removeAuthorizedAccount, tradingKeys]);

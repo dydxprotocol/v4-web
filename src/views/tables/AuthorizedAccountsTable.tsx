@@ -25,9 +25,9 @@ export const AuthorizedAccountsTable = ({ className }: { className?: string }) =
     () => [
       {
         columnKey: 'id',
-        getCellValue: (row) => row.id,
+        getCellValue: (row) => row.id.toString(),
         label: stringGetter({ key: STRING_KEYS.ADDRESS }),
-        renderCell: ({ id }) => <TableCell>{id}</TableCell>,
+        renderCell: ({ id }) => <TableCell>{id.toString()}</TableCell>,
       },
       {
         columnKey: 'type',
@@ -37,7 +37,7 @@ export const AuthorizedAccountsTable = ({ className }: { className?: string }) =
       },
       {
         columnKey: 'config',
-        getCellValue: (row) => row.config,
+        getCellValue: (row) => row.type,
         label: 'config',
         renderCell: ({ config }) => <TableCell>{config}</TableCell>,
       },
@@ -51,7 +51,7 @@ export const AuthorizedAccountsTable = ({ className }: { className?: string }) =
       withOuterBorder
       data={authorizedAccounts.data ?? EMPTY_ARR}
       tableId="authorized-accounts"
-      getRowKey={(row) => row.id}
+      getRowKey={(row) => row.id.toString()}
       label="Authorized Accounts"
       slotEmpty={<div>No authorized accounts</div>}
       defaultSortDescriptor={{
