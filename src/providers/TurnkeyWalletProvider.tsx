@@ -23,10 +23,7 @@ import {
   getTurnkeyPrimaryWallet,
 } from '@/state/walletSelectors';
 
-import {
-  getWalletsWithAccounts,
-  getWalletsWithAccountsFromClient,
-} from '@/lib/turnkey/turnkeyUtils';
+import { getWalletsWithAccountsFromClient } from '@/lib/turnkey/turnkeyUtils';
 
 const TurnkeyWalletContext = createContext<ReturnType<typeof useTurnkeyWalletContext> | undefined>(
   undefined
@@ -180,18 +177,6 @@ const useTurnkeyWalletContext = () => {
           setPrimaryTurnkeyWallet(wallets[0]!);
           return wallets[0]!;
         }
-
-        return null;
-      }
-
-      // This case occurs when the user signs up with a new passkey; since a read-only session is not created for new passkey sign-ups,
-      // we need to fetch the wallets from the server
-      const wallets = await getWalletsWithAccounts(user.organization.organizationId);
-      setTurnkeyWallets(wallets);
-
-      if (wallets.length > 0) {
-        setPrimaryTurnkeyWallet(wallets[0]!);
-        return wallets[0]!;
       }
 
       return null;
