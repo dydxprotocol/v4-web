@@ -12,6 +12,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
@@ -149,12 +150,16 @@ export const RevealPhrase = ({
         whoami.organizationId
       );
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
+      );
       logBonsaiError('exportWallet', 'error', { error });
     } finally {
       setLoading(false);
     }
-  }, [primaryTurnkeyWallet, indexedDbClient, exportIframeClient]);
+  }, [primaryTurnkeyWallet, indexedDbClient, exportIframeClient, stringGetter]);
 
   const ctaButton = useMemo(() => {
     const walletInfo = sourceAccount.walletInfo;
@@ -218,6 +223,7 @@ export const RevealPhrase = ({
   ]);
 
   const phrase = exportWalletType === 'dydx' ? hdKey?.mnemonic : undefined;
+  const theme = useAppThemeAndColorModeContext();
 
   const copyButton = phrase && (
     <CopyButton
@@ -250,6 +256,8 @@ export const RevealPhrase = ({
                   boxSizing: 'border-box',
                   position: 'absolute',
                   inset: 0,
+                  color: theme.textSecondary,
+                  backgroundColor: theme.layer2,
                 }}
               />
 
