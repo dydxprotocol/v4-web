@@ -8,9 +8,10 @@ import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { toBase64, toHex } from '@cosmjs/encoding';
+import { fromBase64, toBase64, toBech32, toHex } from '@cosmjs/encoding';
 import type { EncodeObject } from '@cosmjs/proto-signing';
-import { Method } from '@cosmjs/tendermint-rpc';
+import { IndexedTx } from '@cosmjs/stargate';
+import { Method, rawSecp256k1PubkeyToRawAddress } from '@cosmjs/tendermint-rpc';
 import {
   AuthenticatorType,
   BECH32_PREFIX,
@@ -34,6 +35,7 @@ import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { clearLocalOrders } from '@/state/localOrders';
@@ -45,11 +47,22 @@ import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { log } from '@/lib/telemetry';
+import { sleep } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
+
+export function bigIntToBytes(value: bigint): Uint8Array {
+  const absoluteValue = value < 0 ? value * BigInt(-1) : value;
+  const nonPaddedHexValue = absoluteValue.toString(16);
+  const paddedHexValue =
+    nonPaddedHexValue.length % 2 === 0 ? nonPaddedHexValue : `0${nonPaddedHexValue}`;
+  const numberBytes = Buffer.from(paddedHexValue, 'hex');
+  const signedBytes = Uint8Array.of(value < 0 ? 3 : 2, ...numberBytes);
+  return signedBytes;
+}
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -862,16 +875,31 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     const jsonString = JSON.stringify(subAuth);
     const encodedData = new TextEncoder().encode(jsonString);
 
-    const creationResult = await compositeClient.addAuthenticator(
-      subaccountClient,
-      AuthenticatorType.ALL_OF,
-      encodedData
-    );
+    const doCreation = false;
+    if (doCreation) {
+      const creationResult = await compositeClient.addAuthenticator(
+        subaccountClient,
+        AuthenticatorType.ALL_OF,
+        encodedData
+      );
 
-    const parsed = parseToPrimitives(creationResult);
+      const parsed = parseToPrimitives(creationResult);
 
-    console.log(parsed);
-    // check if it worked
+      if ((parsed as IndexedTx | undefined)?.code !== 0) {
+        throw new Error('create authenticator operation failed');
+      }
+
+      console.log('created key', parsed);
+
+      await sleep(1000);
+
+      appQueryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
+      });
+    } else {
+      console.log('Skipping key creation', AuthenticatorType.ALL_OF, publicKey.value);
+    }
 
     console.log(
       newRandomLocalWallet,
@@ -902,12 +930,31 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const tradingKeys = BonsaiHooks.useAuthorizedAccounts().data;
   useEffect(() => {
     runFn(async () => {
-      console.log('trading keys', tradingKeys);
-      if ((tradingKeys?.length ?? 0) > 0) {
-        const id = tradingKeys![0]!.id;
-        console.log('removing', id, Long.fromString(id));
-        const res = await removeAuthorizedAccount(Long.fromString(id));
-        console.log('removed', id, Long.fromString(id), res);
+      console.log(
+        'trading keys',
+        tradingKeys,
+        tradingKeys?.map(({ config, id }) => {
+          const publicKey = (
+            JSON.parse(new TextDecoder().decode(config)) as any[] | undefined
+          )?.find((t) => t.type === 'SignatureVerification').config as string;
+          const address = toBech32(
+            BECH32_PREFIX,
+            rawSecp256k1PubkeyToRawAddress(fromBase64(publicKey))
+          );
+          return {
+            id,
+            publicKey,
+            address,
+          };
+        })
+      );
+      const removeEnabled = true;
+      if (tradingKeys != null && tradingKeys.length > 0 && removeEnabled) {
+        const key = tradingKeys[tradingKeys.length - 1]!;
+        const id = key.id;
+        console.log('removing', id.toString());
+        const res = await removeAuthorizedAccount(Long.fromString(id.toString()));
+        console.log('removed', id.toString(), res);
       }
     });
   }, [removeAuthorizedAccount, tradingKeys]);

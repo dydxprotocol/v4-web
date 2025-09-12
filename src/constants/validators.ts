@@ -9,7 +9,9 @@ export type ValidatorData = {
 };
 
 export type AccountAuthenticator = {
-  id: string;
+  id: Long;
+
   type: string;
-  config: string;
+
+  config: Uint8Array;
 };
