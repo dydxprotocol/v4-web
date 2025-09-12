@@ -4,24 +4,14 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
-import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
+import { getLazyTradingKeyUtils } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
-import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
-import { fromBase64, toBase64, toBech32, toHex } from '@cosmjs/encoding';
+import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { IndexedTx } from '@cosmjs/stargate';
-import { Method, rawSecp256k1PubkeyToRawAddress } from '@cosmjs/tendermint-rpc';
-import {
-  AuthenticatorType,
-  BECH32_PREFIX,
-  onboarding,
-  SubaccountClient,
-  TYPE_URL_BATCH_CANCEL,
-  TYPE_URL_MSG_CANCEL_ORDER,
-  TYPE_URL_MSG_PLACE_ORDER,
-  type LocalWallet,
-} from '@dydxprotocol/v4-client-js';
+import { Method } from '@cosmjs/tendermint-rpc';
+import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
 import Long from 'long';
 import { formatUnits, parseUnits } from 'viem';
@@ -42,7 +32,6 @@ import { clearLocalOrders } from '@/state/localOrders';
 
 import { track } from '@/lib/analytics/analytics';
 import { assertNever } from '@/lib/assertNever';
-import { mapIfPresent, runFn } from '@/lib/do';
 import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
@@ -808,110 +797,45 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [subaccountClient, compositeClient, createTransferMessage]
   );
 
-  const createAuthorizedAccount = useCallback(async () => {
-    if (subaccountClient == null) {
-      throw new Error('local wallet client not initialized');
-    }
+  const createRandomTradingKeyWallet = useCallback(async () => {
+    return (await getLazyTradingKeyUtils()).createNewRandomDydxWallet();
+  }, []);
 
-    if (compositeClient == null) {
-      throw new Error('Missing compositeClient or localWallet');
-    }
+  const createAuthorizedAccount = useCallback(
+    async (tradingKeyWallet: Awaited<ReturnType<typeof createRandomTradingKeyWallet>>) => {
+      if (tradingKeyWallet == null) {
+        throw new Error('trading key wallet is invalid');
+      }
 
-    const newRandomLocalWallet = await runFn(async () => {
-      const [fullBip39Lib, englishWorldList, lazyLocalWallet] = await Promise.all([
-        import('@scure/bip39'),
-        import('@scure/bip39/wordlists/english'),
-        getLazyLocalWallet(),
-      ]);
-      const mnemonic = fullBip39Lib.generateMnemonic(englishWorldList.wordlist, 128);
-      const { privateKey: privateKeyRaw } = onboarding.deriveHDKeyFromMnemonic(mnemonic);
-      const wallet = await lazyLocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
-      return {
-        privateKeyHex: mapIfPresent(privateKeyRaw, (pk) => `0x${toHex(pk)}`),
-        publicKey: wallet.pubKey,
-        address: wallet.address,
-      };
-    });
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
 
-    const { publicKey } = newRandomLocalWallet;
-    if (publicKey == null) {
-      throw new Error('Unable to find pubKey of generated wallet');
-    }
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
 
-    const wrapAndEncode64 = (s: string): string => toBase64(new TextEncoder().encode(s));
-    const anyOfSubAuth = [
-      {
-        type: AuthenticatorType.MESSAGE_FILTER,
-        config: wrapAndEncode64(TYPE_URL_MSG_PLACE_ORDER),
-      },
-      {
-        type: AuthenticatorType.MESSAGE_FILTER,
-        config: wrapAndEncode64(TYPE_URL_MSG_CANCEL_ORDER),
-      },
-      {
-        type: AuthenticatorType.MESSAGE_FILTER,
-        config: wrapAndEncode64(TYPE_URL_BATCH_CANCEL),
-      },
-    ];
+      const { data, type } = await (
+        await getLazyTradingKeyUtils()
+      ).getAuthorizeNewTradingKeyArguments({
+        generatedWalletPubKey: tradingKeyWallet.publicKey,
+      });
+      const creationResult = await compositeClient.addAuthenticator(subaccountClient, type, data);
 
-    // Nested AnyOf config must be base64(JSON([...])) as on-chain expects []byte
-    const anyOfConfigB64 = wrapAndEncode64(JSON.stringify(anyOfSubAuth));
-
-    const subAuth = [
-      {
-        type: AuthenticatorType.SIGNATURE_VERIFICATION,
-        config: publicKey.value,
-      },
-      {
-        type: AuthenticatorType.ANY_OF,
-        config: anyOfConfigB64,
-      },
-      {
-        type: AuthenticatorType.SUBACCOUNT_FILTER,
-        config: wrapAndEncode64('0'),
-      },
-    ];
-
-    const jsonString = JSON.stringify(subAuth);
-    const encodedData = new TextEncoder().encode(jsonString);
-
-    const doCreation = false;
-    if (doCreation) {
-      const creationResult = await compositeClient.addAuthenticator(
-        subaccountClient,
-        AuthenticatorType.ALL_OF,
-        encodedData
-      );
-
-      console.log('made', creationResult);
-      const parsed = parseToPrimitives(creationResult);
-
-      if ((parsed as IndexedTx | undefined)?.code !== 0) {
+      if ((creationResult as IndexedTx | undefined)?.code !== 0) {
         throw new Error('create authenticator operation failed');
       }
 
-      console.log('created key', parsed);
-
-      await sleep(1000);
-
-      appQueryClient.invalidateQueries({
+      await sleep(500);
+      await appQueryClient.invalidateQueries({
         exact: false,
         queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
       });
-    } else {
-      console.log('Skipping key creation', AuthenticatorType.ALL_OF, publicKey.value);
-    }
 
-    console.log(
-      newRandomLocalWallet,
-      newRandomLocalWallet.address,
-      newRandomLocalWallet.privateKeyHex
-    );
-    return {
-      address: newRandomLocalWallet.address,
-      privateKey: newRandomLocalWallet.privateKeyHex,
-    };
-  }, [compositeClient, subaccountClient]);
+      return tradingKeyWallet;
+    },
+    [compositeClient, subaccountClient]
+  );
 
   const removeAuthorizedAccount = useCallback(
     async (idToRemove: string) => {
@@ -927,43 +851,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     },
     [compositeClient, subaccountClient]
   );
-
-  const tradingKeys = BonsaiHooks.useAuthorizedAccounts().data;
-  useEffect(() => {
-    runFn(async () => {
-      console.log(
-        'trading keys',
-        tradingKeys,
-        tradingKeys?.map(({ config, id }) => {
-          const publicKey = (
-            JSON.parse(new TextDecoder().decode(config)) as any[] | undefined
-          )?.find((t) => t.type === 'SignatureVerification').config as string;
-          const address = toBech32(
-            BECH32_PREFIX,
-            rawSecp256k1PubkeyToRawAddress(fromBase64(publicKey))
-          );
-          return {
-            id,
-            publicKey,
-            address,
-          };
-        })
-      );
-      const removeEnabled = true;
-      if (tradingKeys != null && tradingKeys.length > 0 && removeEnabled) {
-        const key = tradingKeys[tradingKeys.length - 1]!;
-        const id = key.id.toString();
-        console.log('removing', id);
-        const res = await removeAuthorizedAccount(id);
-        console.log('removed', id, res);
-      }
-    });
-  }, [removeAuthorizedAccount, tradingKeys]);
-
-  useEffect(() => {
-    createAuthorizedAccount();
-    return () => {};
-  }, [createAuthorizedAccount, compositeClient, subaccountClient]);
 
   return {
     // Deposit/Withdraw/Faucet Methods
@@ -1001,6 +888,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     withdrawFromMegavault,
 
     // Permissioned Keys
+    createRandomTradingKeyWallet,
     createAuthorizedAccount,
     removeAuthorizedAccount,
   };
