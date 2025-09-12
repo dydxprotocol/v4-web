@@ -791,7 +791,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     return (await getLazyTradingKeyUtils()).createNewRandomDydxWallet();
   }, []);
 
-  const createAuthorizedAccount = useCallback(
+  const authorizeTradingKeyWallet = useCallback(
     async (tradingKeyWallet: Awaited<ReturnType<typeof createRandomTradingKeyWallet>>) => {
       if (tradingKeyWallet == null) {
         throw new Error('trading key wallet is invalid');
@@ -827,7 +827,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, subaccountClient]
   );
 
-  const removeAuthorizedAccount = useCallback(
+  const removeAuthorizedKey = useCallback(
     async (idToRemove: string) => {
       if (subaccountClient == null) {
         throw new Error('local wallet client not initialized');
@@ -879,7 +879,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
     // Permissioned Keys
     createRandomTradingKeyWallet,
-    createAuthorizedAccount,
-    removeAuthorizedAccount,
+    authorizeTradingKeyWallet,
+    removeAuthorizedKey,
   };
 };
