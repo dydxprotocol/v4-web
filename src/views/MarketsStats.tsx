@@ -1,12 +1,14 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
+import { OnboardingState } from '@/constants/account';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
+import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -33,6 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   const { className } = props;
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+  const { openOnboardingDialog, onboardingState, isOnboardingDisabled } = useOnboardingFlow();
 
   const { hasResults: hasNewMarkets } = useMarketsData({
     filter: MarketFilters.NEW,
@@ -51,8 +54,14 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       })
     );
 
-    // Open deposit dialog
-    dispatch(openDialog(DialogTypes.Deposit2()));
+    // Check if user is fully onboarded/connected
+    if (onboardingState === OnboardingState.AccountConnected) {
+      // Open deposit dialog for connected users
+      dispatch(openDialog(DialogTypes.Deposit2()));
+    } else {
+      // Use proper onboarding flow for disconnected users
+      openOnboardingDialog();
+    }
   };
   return (
     <section
@@ -88,6 +97,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
                 type={ButtonType.Button}
                 tw="relative z-10 w-full border-none bg-color-layer-0 text-color-text-2"
                 onClick={handleFreeDepositClick}
+                state={{ isDisabled: isOnboardingDisabled }}
               >
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
               </Button>
