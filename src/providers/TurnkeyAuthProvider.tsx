@@ -313,7 +313,9 @@ const useTurnkeyAuthContext = () => {
         signinMethod: 'email',
         userEmail,
         targetPublicKey: embeddedPublicKey,
-        magicLink: `${globalThis.location.origin}/markets/?token`,
+        magicLink: globalThis.location.search
+          ? `${globalThis.location.href}&token`
+          : `${globalThis.location.href}?token`,
       };
 
       sendSignInRequest({
