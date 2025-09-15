@@ -29,7 +29,7 @@ import { IconButton } from '@/components/IconButton';
 import { stringifyTransactionError } from '@/lib/errors';
 import { truncateAddress } from '@/lib/wallet';
 
-import { AuthorizedAccountInfo, AuthorizedAccountsTable } from '../tables/AuthorizedAccountsTable';
+import { AuthorizedAccountInfo, TradingKeysTable } from '../tables/TradingKeysTable';
 
 type WalletMetadata = Awaited<ReturnType<(typeof tradingKeyUtils)['createNewRandomDydxWallet']>>;
 
@@ -150,7 +150,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
             Generate New API Key
           </Button>
         </div>
-        <AuthorizedAccountsTable onRemoveKey={goToRemovePage} />
+        <TradingKeysTable onRemoveKey={goToRemovePage} />
       </div>
     ),
     Create: ({ wallet, errorStringKey, loading, acknowledged }) => (

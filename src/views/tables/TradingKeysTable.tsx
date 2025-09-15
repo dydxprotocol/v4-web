@@ -31,7 +31,7 @@ export type AuthorizedAccountInfo = ReturnType<
   (typeof tradingKeyUtils)['getAuthorizedTradingKeysMetadata']
 >[number];
 
-export const AuthorizedAccountsTable = ({
+export const TradingKeysTable = ({
   className,
   onRemoveKey,
 }: {
@@ -110,8 +110,8 @@ export const AuthorizedAccountsTable = ({
       data={authorizedAccounts}
       tableId="authorized-accounts"
       getRowKey={(row) => row.id}
-      label="Authorized Accounts"
-      slotEmpty={<div>No authorized accounts</div>}
+      label="API Trading Keys"
+      slotEmpty={<div>No API trading keys found.</div>}
       columns={columns}
       className={className}
     />
