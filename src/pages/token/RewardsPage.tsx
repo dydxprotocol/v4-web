@@ -27,14 +27,13 @@ import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { GeoblockedPanel } from './GeoblockedPanel';
-import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
-import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 const RewardsPage = () => {
@@ -93,8 +92,6 @@ const RewardsPage = () => {
             <StakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
-            <TradingRewardsChartPanel />
-            <GovernancePanel />
             <RewardHistoryPanel />
             <RewardsHelpPanel />
             {legalDisclaimer}
@@ -106,7 +103,7 @@ const RewardsPage = () => {
           <div tw="flex gap-1.5">
             <div tw="flexColumn flex-[2] gap-1.5">
               <LaunchIncentivesPanel />
-              <TradingRewardsChartPanel />
+              <RewardsLeaderboardPanel />
               <RewardHistoryPanel />
             </div>
             <div tw="flexColumn flex-1 gap-1.5">
@@ -114,7 +111,6 @@ const RewardsPage = () => {
               {showStakingRewardPanel && stakingRewardPanel}
               <StakingPanel />
               <UnbondingPanels />
-              <GovernancePanel />
               <RewardsHelpPanel />
               {legalDisclaimer}
             </div>
