@@ -113,8 +113,11 @@ export const MarketsBanners = ({
     <$RebateBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <span tw="mb-0.75 text-large font-extra-bold">
+          <span tw="mr-0.25 rounded-0 px-0.25 text-color-accent">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_SURGE })}
+          </span>
           <span tw="text-color-text-2">
-            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE })}
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_FEES })}
           </span>
         </span>
         <div tw="flex items-center gap-1.5">
@@ -126,14 +129,11 @@ export const MarketsBanners = ({
           >
             {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
           </Button>
-          <span tw="text-color-text-1 font-medium-book">
-            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_SUBTITLE })}
-          </span>
         </div>
       </div>
 
       <img
-        src="/hedgiepercentage1.png"
+        src="/rebate-token.png"
         alt="rebate rewards hedgies"
         tw="h-full object-contain mobile:hidden"
       />
