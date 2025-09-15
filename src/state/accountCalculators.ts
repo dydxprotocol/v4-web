@@ -13,18 +13,17 @@ import {
 import { createAppSelector } from '@/state/appTypes';
 
 import { isNewOrderStatusOpen } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 import { getSubaccountId } from './accountInfoSelectors';
 import { getCurrentMarketId } from './currentMarketSelectors';
 import { getSourceAccount } from './walletSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
-  [getOnboardingState, getDisplayChooseWallet],
-  (onboardingState: OnboardingState, displayChooseWallet: boolean) => {
+  [getOnboardingState, getDisplayChooseWallet, (s, isTurnkeyEnabled: boolean) => isTurnkeyEnabled],
+  (onboardingState: OnboardingState, displayChooseWallet: boolean, isTurnkeyEnabled: boolean) => {
     return {
       [OnboardingState.Disconnected]:
-        displayChooseWallet || !testFlags.enableTurnkey
+        displayChooseWallet || !isTurnkeyEnabled
           ? OnboardingSteps.ChooseWallet
           : OnboardingSteps.SignIn,
       [OnboardingState.WalletConnected]: OnboardingSteps.KeyDerivation,

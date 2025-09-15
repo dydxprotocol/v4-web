@@ -11,6 +11,8 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -30,7 +32,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { testFlags } from '@/lib/testFlags';
@@ -52,10 +54,9 @@ export const OnboardingDialog = ({
   const { selectWallet, sourceAccount } = useAccounts();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const isSimpleUi = useSimpleUiEnabled();
-  const isTurnkeyEnabled = testFlags.enableTurnkey;
   const { dydxAddress } = useAccounts();
 
   const setIsOpen = useCallback(

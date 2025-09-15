@@ -7,6 +7,7 @@ import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -21,8 +22,6 @@ import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { WalletIcon } from '@/components/WalletIcon';
 
-import { testFlags } from '@/lib/testFlags';
-
 export const ChooseWallet = ({
   onChooseWallet,
   onSignInWithSocials,
@@ -35,6 +34,7 @@ export const ChooseWallet = ({
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
   const isSimpleUi = useSimpleUiEnabled();
+  const isTurnkeyEnabled = useEnableTurnkey();
 
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
@@ -116,9 +116,9 @@ export const ChooseWallet = ({
         ))}
       </$Wallets>
 
-      {testFlags.enableTurnkey && alternateOptions}
+      {isTurnkeyEnabled && alternateOptions}
 
-      {!isSimpleUi && !testFlags.enableTurnkey && (
+      {!isSimpleUi && !isTurnkeyEnabled && (
         <$Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.LEARN_ABOUT_WALLETS })}
         </$Link>
