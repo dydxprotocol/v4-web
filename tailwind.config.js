@@ -72,7 +72,7 @@ export default {
     },
     fontFamily: {
       base: 'var(--fontFamily-base)',
-      monospace: 'var(--fontFamily-monospace',
+      monospace: 'var(--fontFamily-monospace)',
     },
     fontSize: {
       tiny: 'var(--fontSize-tiny)',

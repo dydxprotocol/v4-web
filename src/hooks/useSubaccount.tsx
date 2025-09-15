@@ -43,6 +43,8 @@ import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
+const AUTHORIZED_KEY_UPDATE_DELAY = 1500;
+
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
 SubaccountContext.displayName = 'Subaccount';
@@ -810,17 +812,19 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       ).getAuthorizeNewTradingKeyArguments({
         generatedWalletPubKey: tradingKeyWallet.publicKey,
       });
-      const creationResult = await compositeClient.addAuthenticator(subaccountClient, type, data);
+      try {
+        const creationResult = await compositeClient.addAuthenticator(subaccountClient, type, data);
 
-      if ((creationResult as IndexedTx | undefined)?.code !== 0) {
-        throw new Error('create authenticator operation failed');
+        if ((creationResult as IndexedTx | undefined)?.code !== 0) {
+          throw new Error('create authenticator operation failed');
+        }
+      } finally {
+        await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
+        await appQueryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
+        });
       }
-
-      await sleep(200);
-      await appQueryClient.invalidateQueries({
-        exact: false,
-        queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
-      });
 
       return tradingKeyWallet;
     },
@@ -837,7 +841,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw new Error('Missing compositeClient or localWallet');
       }
 
-      return compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+      try {
+        await compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+      } finally {
+        await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
+        await appQueryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
+        });
+      }
     },
     [compositeClient, subaccountClient]
   );

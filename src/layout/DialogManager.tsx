@@ -46,6 +46,7 @@ import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
+import { TradingKeysDialog } from '@/views/dialogs/TradingKeysDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
 import { TransferStatusDialog } from '@/views/dialogs/TransferDialogs/TransferStatusDialog';
@@ -129,6 +130,7 @@ export const DialogManager = React.memo(() => {
     Trade: (args) => <TradeDialog {...args} {...modalProps} />,
     Triggers: (args) => <TriggersDialog {...args} {...modalProps} />,
     Transfer: (args) => <TransferDialog {...args} {...modalProps} />,
+    TradingKeys: (args) => <TradingKeysDialog {...args} {...modalProps} />,
     TransferStatus: (args) => <TransferStatusDialog {...args} {...modalProps} />,
     Unstake: (args) => <UnstakeDialog {...args} {...modalProps} />,
     VaultDepositWithdraw: (args) => <VaultDepositWithdrawDialog {...args} {...modalProps} />,
