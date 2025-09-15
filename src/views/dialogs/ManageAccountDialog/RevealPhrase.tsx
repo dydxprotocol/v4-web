@@ -133,12 +133,10 @@ export const RevealPhrase = ({
         throw new Error('No organization id');
       }
 
-      const whoami = await indexedDbClient.getWhoami({
-        organizationId: primaryTurnkeyWallet.accounts[0].organizationId,
-      });
+      const organizationId = primaryTurnkeyWallet.accounts[0].organizationId;
 
       const exportResponse = await indexedDbClient.exportWallet({
-        organizationId: whoami.organizationId,
+        organizationId,
         walletId: primaryTurnkeyWallet.walletId,
         targetPublicKey: exportIframeClient!.iframePublicKey!,
       });
@@ -147,7 +145,7 @@ export const RevealPhrase = ({
 
       await exportIframeClient.injectWalletExportBundle(
         exportResponse.exportBundle,
-        whoami.organizationId
+        organizationId
       );
     } catch (error) {
       setErrorMessage(
