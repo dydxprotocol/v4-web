@@ -21,7 +21,8 @@ const $MarginAndLeverageButtons = styled.div`
   gap: 0.5rem;
 
   abbr,
-  button {
+  button,
+  span {
     ${layoutMixins.flexExpandToSpace}
     height: 2.25rem;
     flex-basis: 100%;
