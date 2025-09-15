@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types,react/no-unstable-nested-components */
+// above lint rules are being incorrectly applied to unionize match() usages
 import { useState } from 'react';
 
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
@@ -123,7 +124,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
       <div>
         <div tw="mb-1 text-color-text-0 font-base-book">
           API wallets perform actions on behalf of your account without withdrawal permissions. You
-          must still use your account's public address for info requests.
+          must still use your account&apos;s public address for info requests.
         </div>
         <div tw="row mb-1 w-full gap-0.75">
           <div tw="row w-full rounded-0.75 bg-color-layer-1 px-1 py-0.75">

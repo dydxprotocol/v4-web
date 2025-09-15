@@ -43,7 +43,7 @@ import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
 
-const AUTHORIZED_KEY_UPDATE_DELAY = 1500;
+const AUTHORIZED_KEY_UPDATE_DELAY = 1700;
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
