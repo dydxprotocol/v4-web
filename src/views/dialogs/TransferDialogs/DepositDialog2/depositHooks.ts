@@ -101,7 +101,12 @@ export function useDepositSteps({
 
     /* ----- 2. Token allowance checks -------- */
     // Only evm tokens may need token allowance checks
-    const userAddresses = getUserAddressesForRoute(depositRoute, sourceAccount, dydxAddress);
+    const userAddresses = getUserAddressesForRoute(
+      depositRoute,
+      sourceAccount,
+      undefined,
+      dydxAddress
+    );
 
     if (isEvmDepositChainId(depositToken.chainId)) {
       const messages = await skipClient.messages({

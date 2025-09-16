@@ -4,7 +4,6 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 import { type Subaccount } from 'starboard-client-js';
-import { zeroAddress } from 'viem';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -186,7 +185,8 @@ const useAccountsContext = () => {
     // dYdX accounts
     hdKey,
 
-    dydxAddress: `dydx${zeroAddress}` as DydxAddress,
+    // TODO: We'll replace with Connected Fuel Wallet
+    dydxAddress: undefined as any as DydxAddress,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

@@ -65,7 +65,14 @@ export function useWithdrawStep({
       return undefined;
     }
 
-    return getUserAddressesForRoute(withdrawRoute, sourceAccount, dydxAddress, destinationAddress);
+    return getUserAddressesForRoute(
+      withdrawRoute,
+      sourceAccount,
+      dydxAddress,
+      undefined,
+      undefined,
+      destinationAddress
+    );
   }, [dydxAddress, sourceAccount, withdrawRoute, destinationAddress]);
 
   const executeWithdraw = async () => {
