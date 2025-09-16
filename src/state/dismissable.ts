@@ -8,6 +8,8 @@ export interface DismissableState {
   hasSeenUnlimitedAnnouncement: boolean; // deprecated
   hasDismissedPmlBanner: boolean;
   hasDismissedPumpBanner: boolean;
+  hasDismissedSurgeBanner: boolean;
+  hasDismissedRebateBanner: boolean;
 }
 
 const initialState: DismissableState = {
@@ -16,6 +18,8 @@ const initialState: DismissableState = {
   hasSeenUnlimitedAnnouncement: false,
   hasDismissedPmlBanner: false,
   hasDismissedPumpBanner: false,
+  hasDismissedSurgeBanner: false,
+  hasDismissedRebateBanner: false,
 };
 
 export const dismissableSlice = createSlice({
@@ -34,6 +38,12 @@ export const dismissableSlice = createSlice({
     setHasDismissedPumpBanner: (state, action: PayloadAction<boolean>) => {
       state.hasDismissedPumpBanner = action.payload;
     },
+    setHasDismissedSurgeBanner: (state, action: PayloadAction<boolean>) => {
+      state.hasDismissedSurgeBanner = action.payload;
+    },
+    setHasDismissedRebateBanner: (state, action: PayloadAction<boolean>) => {
+      state.hasDismissedRebateBanner = action.payload;
+    },
   },
 });
 
@@ -42,4 +52,6 @@ export const {
   setDismissedAffiliateBanner,
   setHasDismissedPmlBanner,
   setHasDismissedPumpBanner,
+  setHasDismissedSurgeBanner,
+  setHasDismissedRebateBanner,
 } = dismissableSlice.actions;

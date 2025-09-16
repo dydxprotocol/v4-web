@@ -51,7 +51,6 @@ export const useQueryChaosLabsIncentives = ({
         });
 
         return {
-          dydxRewards: thisSeasonResponse.dydxRewards ?? 0,
           incentivePoints: thisSeasonResponse.incentivePoints ?? 0,
           marketMakingIncentivePoints: thisSeasonResponse.marketMakingIncentivePoints ?? 0,
         };

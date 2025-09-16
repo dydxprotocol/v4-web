@@ -33,8 +33,8 @@ dependencies:
     specifier: 2.5.0
     version: 2.5.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.310
-    version: 1.1.310
+    specifier: 1.1.320
+    version: 1.1.320
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.0-dev.0
@@ -1501,8 +1501,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.310:
-    resolution: {integrity: sha512-zwJLdq9WcfFVfNa5uzadbMa1pOtm7udgl2pk3ix17Sk1k8bUKSNpplwd4Tti9YtL5X1+0/+pBcRPXoWF+2cjDg==}
+  /@dydxprotocol/v4-localization@1.1.320:
+    resolution: {integrity: sha512-oO3pcP31OgIxKEBbyyMeU+9fJg3dH85m7in7xJx8jUVEyh0eobgmtuSxoNQei60dEt+/WLGeZlBXIh4b/E5A+w==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.0-dev.0:
@@ -3877,6 +3877,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.3
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -17001,6 +17002,10 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  /napi-wasm@1.1.3:
+    resolution: {integrity: sha512-h/4nMGsHjZDCYmQVNODIrYACVJ+I9KItbG+0si6W/jSjdA9JbWDoU4LLeMXVcEQGHjttI2tuXqDrbGF7qkUHHg==}
+    dev: false
+
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
     peerDependencies:
@@ -20590,7 +20595,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.4
       mime: 3.0.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       pathe: 1.1.2
     dev: false
 
@@ -20746,7 +20751,7 @@ packages:
       listhen: 1.5.5
       lru-cache: 10.2.2
       mri: 1.2.0
-      node-fetch-native: 1.6.6
+      node-fetch-native: 1.6.7
       ofetch: 1.3.4
       ufo: 1.5.4
     transitivePeerDependencies:

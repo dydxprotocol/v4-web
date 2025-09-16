@@ -6,7 +6,7 @@ import { type RootStore } from '@/state/_store';
 import { HeightEntry, setIndexerHeightRaw, setValidatorHeightRaw } from '@/state/raw';
 
 import { assertNever } from '@/lib/assertNever';
-import { promiseWithTimeout } from '@/lib/asyncUtils';
+import { promiseWithTimeout, withRetry } from '@/lib/asyncUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import {
@@ -40,16 +40,22 @@ const heightPollingOptions = {
   refetchOnMount: false,
 };
 
+const manualHeightRetryConfig = { initialDelay: 500, maxRetries: 1 };
+
 const doIndexerHeightQuery = async (
   indexerClient: IndexerClient
 ): Promise<Loadable<HeightEntry>> => {
   const requestTime = new Date().toISOString();
   try {
     const result = await promiseWithTimeout(
-      wrapAndLogBonsaiError(
-        () => indexerClient.utility.getHeight(),
-        SharedLogIds.INDEXER_HEIGHT_INNER
-      )(),
+      withRetry(
+        () =>
+          wrapAndLogBonsaiError(
+            () => indexerClient.utility.getHeight(),
+            SharedLogIds.INDEXER_HEIGHT_INNER
+          )(),
+        manualHeightRetryConfig
+      ),
       requestTimeout
     );
     return loadableLoaded({
@@ -111,10 +117,14 @@ const doValidatorHeightQuery = async (
   const requestTime = new Date().toISOString();
   try {
     const result = await promiseWithTimeout(
-      wrapAndLogBonsaiError(
-        () => compositeClient.validatorClient.get.latestBlock(),
-        SharedLogIds.VALIDATOR_HEIGHT_INNER
-      )(),
+      withRetry(
+        () =>
+          wrapAndLogBonsaiError(
+            () => compositeClient.validatorClient.get.latestBlock(),
+            SharedLogIds.VALIDATOR_HEIGHT_INNER
+          )(),
+        manualHeightRetryConfig
+      ),
       requestTimeout
     );
     return loadableLoaded({

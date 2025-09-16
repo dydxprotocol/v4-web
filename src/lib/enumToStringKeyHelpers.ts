@@ -55,6 +55,9 @@ export function getIndexerOrderTypeStringKey(type: IndexerOrderType): string {
       return STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT;
     case IndexerOrderType.TAKEPROFITMARKET:
       return STRING_KEYS.TAKE_PROFIT_MARKET_SHORT;
+    case IndexerOrderType.TWAP:
+    case IndexerOrderType.TWAPSUBORDER:
+      return STRING_KEYS.TWAP;
     default:
       assertNever(type);
       return STRING_KEYS.LIMIT_ORDER_SHORT;
@@ -89,6 +92,8 @@ export function getIndexerFillTypeStringKey(fillType: SubaccountFillType): strin
       return STRING_KEYS.LIQUIDATED;
     case SubaccountFillType.DELEVERAGED:
       return STRING_KEYS.DELEVERAGED;
+    case SubaccountFillType.TWAP:
+      return STRING_KEYS.TWAP;
     default:
       assertNever(fillType);
       return STRING_KEYS.LIMIT_ORDER_SHORT;

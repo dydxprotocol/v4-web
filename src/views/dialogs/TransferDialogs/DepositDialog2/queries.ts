@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
@@ -18,6 +19,10 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
+
+import { AttemptBigNumber } from '@/lib/numbers';
+
+import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
 export function useBalances() {
   const { sourceAccount, nobleAddress, osmosisAddress, neutronAddress } = useAccounts();
@@ -129,6 +134,28 @@ function networkTypeToBalances(
   throw new Error('Fetching balances for unknown chain');
 }
 
+function undefinedIfTooMuchSlippage(res: Awaited<ReturnType<SkipClient['route']>>) {
+  if (res == null) {
+    return res;
+  }
+  const usdAmountIn = AttemptBigNumber(res.usdAmountIn);
+  const usdAmountOut = AttemptBigNumber(res.usdAmountOut);
+  if (
+    usdAmountIn == null ||
+    usdAmountOut == null ||
+    (usdAmountIn.minus(usdAmountOut).div(usdAmountIn).gte(MAX_ALLOWED_SLIPPAGE_PERCENT) &&
+      usdAmountIn.gte(ALLOW_UNSAFE_BELOW_USD_LIMIT))
+  ) {
+    logBonsaiInfo('getSkipDepositRoutes', 'manually rejected deposit route for too much slippage', {
+      res,
+      usdAmountIn: usdAmountIn?.toNumber(),
+      usdAmountOut: usdAmountOut?.toNumber(),
+    });
+    return undefined;
+  }
+  return res;
+}
+
 async function getSkipDepositRoutes(
   skipClient: SkipClient,
   token: TokenForTransfer,
@@ -147,8 +174,8 @@ async function getSkipDepositRoutes(
   };
 
   const [slow, fast] = await Promise.all([
-    skipClient.route(routeOptions),
-    skipClient.route({ ...routeOptions, goFast: true }),
+    skipClient.route(routeOptions).then(undefinedIfTooMuchSlippage),
+    skipClient.route({ ...routeOptions, goFast: true }).then(undefinedIfTooMuchSlippage),
   ]);
 
   return { slow, fast: fast != null && isInstantDeposit(fast) ? fast : undefined };

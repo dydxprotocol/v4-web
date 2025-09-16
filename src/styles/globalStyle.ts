@@ -33,6 +33,7 @@ export const GlobalStyle = createGlobalStyle`
 
     --color-accent: ${({ theme }) => theme.accent};
     --color-accent-faded: ${({ theme }) => theme.accentFaded};
+    --color-accent-more-faded: ${({ theme }) => theme.accentMoreFaded};
     --color-favorite: ${({ theme }) => theme.favorite};
 
     --color-success: ${({ theme }) => theme.success};

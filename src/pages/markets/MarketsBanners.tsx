@@ -1,12 +1,10 @@
 import { RefObject, useMemo } from 'react';
 
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
-import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -23,8 +21,11 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedPumpBanner } from '@/state/dismissable';
-import { getHasDismissedPmlBanner, getHasDismissedPumpBanner } from '@/state/dismissableSelectors';
+import { setHasDismissedPmlBanner, setHasDismissedRebateBanner } from '@/state/dismissable';
+import {
+  getHasDismissedPmlBanner,
+  getHasDismissedRebateBanner,
+} from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
@@ -41,10 +42,15 @@ export const MarketsBanners = ({
   const launched = useMemo(() => allMarkets.filter((f) => !f.isUnlaunched), [allMarkets]);
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
+  const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
   const dispatch = useAppDispatch();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
+  };
+
+  const onDismissRebateBanner = () => {
+    dispatch(setHasDismissedRebateBanner(true));
   };
 
   const onClickPmlBanner = () => {
@@ -54,6 +60,7 @@ export const MarketsBanners = ({
   };
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
+  const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -102,52 +109,45 @@ export const MarketsBanners = ({
     </$PmlBanner>
   ) : null;
 
-  const hasDismissedPumpBanner = useAppSelector(getHasDismissedPumpBanner);
-  const pumpMarketId = 'PUMP-USD';
-
-  const navigate = useNavigate();
-
-  const onDismissPumpBanner = (e: React.MouseEvent<any>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(setHasDismissedPumpBanner(true));
-  };
-
-  const onClickPumpBanner = () => {
-    navigate(`${AppRoute.Trade}/${pumpMarketId}`);
-  };
-
-  const shouldDisplayPumpBanner = !hasDismissedPumpBanner;
-
-  const pumpBanner = shouldDisplayPumpBanner ? (
-    <$PumpBanner onClick={onClickPumpBanner} role="button" tabIndex={0}>
-      <div tw="mr-auto flex flex-col">
-        <span tw="mb-0.25 text-white font-extra-bold">
-          {stringGetter({
-            key: STRING_KEYS.MARKET_LIVE,
-            params: {
-              MARKET: <span tw="text-color-accent">$PUMP</span>,
-              LEVERAGE: '5',
-            },
-          })}
+  const rebateBanner = shouldDisplayRebateBanner ? (
+    <$RebateBanner>
+      <div tw="mr-auto flex h-full flex-col justify-center">
+        <span tw="mb-0.75 text-large font-extra-bold">
+          <span tw="mr-0.25 rounded-0 px-0.25 text-color-accent">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_SURGE })}
+          </span>
+          <span tw="text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_FEES })}
+          </span>
         </span>
-        <Button action={ButtonAction.Primary} tw="max-w-10">
-          {stringGetter({ key: STRING_KEYS.VIEW_MARKET })}
-        </Button>
+        <div tw="flex items-center gap-1.5">
+          <Button
+            action={ButtonAction.Primary}
+            type={ButtonType.Link}
+            href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=02092025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
+            tw="relative z-10 w-12"
+          >
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
+          </Button>
+        </div>
       </div>
 
-      <img src="/pump-hedgie.png" alt="pump hedgie" tw="mr-2 h-14 mobile:hidden" />
+      <img
+        src="/rebate-token.png"
+        alt="rebate rewards hedgies"
+        tw="h-full object-contain mobile:hidden"
+      />
 
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
         size={ButtonSize.XSmall}
-        onClick={(e: React.MouseEvent<any>) => onDismissPumpBanner(e)}
+        onClick={onDismissRebateBanner}
       />
-    </$PumpBanner>
+    </$RebateBanner>
   ) : null;
 
-  return pumpBanner ?? pmlBanner ?? null;
+  return rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -179,7 +179,8 @@ const $PmlBanner = styled($MarketsPageBanner)`
   height: 8rem;
   img,
   span,
-  button {
+  button,
+  a {
     z-index: 1;
   }
 
@@ -189,15 +190,6 @@ const $PmlBanner = styled($MarketsPageBanner)`
     span {
       font: var(--font-small-book);
     }
-  }
-`;
-
-const $PumpBanner = styled($MarketsPageBanner)`
-  height: 8rem;
-  img,
-  span,
-  button {
-    z-index: 1;
   }
 `;
 
@@ -220,5 +212,39 @@ const $Details = styled(Details)`
 
   > :first-child {
     padding-left: 0;
+  }
+`;
+
+const $RebateBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  background: var(--color-layer-1);
+  position: relative;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 70%;
+    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.2;
+    z-index: 0;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
   }
 `;
