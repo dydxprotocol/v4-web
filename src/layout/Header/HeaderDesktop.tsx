@@ -11,6 +11,7 @@ import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -41,6 +42,7 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 
 export const HeaderDesktop = () => {
+  const { isUrlDataEmpty } = useMobileAppUrl();
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
@@ -210,7 +212,10 @@ export const HeaderDesktop = () => {
 
         <MobileDownloadLinks />
 
-        <VerticalSeparator />
+        {
+          // Do not show separator if there are no mobile download links
+          isUrlDataEmpty || <VerticalSeparator />
+        }
 
         <NotificationsMenu
           slotTrigger={
