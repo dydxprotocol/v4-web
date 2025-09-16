@@ -119,7 +119,7 @@ export function getSkipClient() {
 }
 
 const useSkipClientContext = () => {
-  const { solanaRpcUrl, validators, skip } = useEndpointsConfig();
+  const { validators, skip } = useEndpointsConfig();
   const { compositeClient } = useCompositeClient();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { sourceAccount } = useAccounts();
@@ -169,7 +169,6 @@ const useSkipClientContext = () => {
     compositeClient?.network.validatorConfig.restEndpoint,
     selectedDydxChainId,
     skip,
-    solanaRpcUrl,
     validators,
   ]);
 

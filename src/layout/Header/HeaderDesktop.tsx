@@ -45,7 +45,7 @@ export const HeaderDesktop = () => {
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
-  const { dydxAccounts } = useAccounts();
+  const { address } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
@@ -92,13 +92,13 @@ export const HeaderDesktop = () => {
          *     <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
          *   ),
          * }, */
-            {
-              value: 'MINTSCAN',
-              label: 'Block Explorer',
-              slotBefore: <Icon iconName={IconName.Terminal} />,
-              href: "https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions",
-            },
-          /* {
+        {
+          value: 'MINTSCAN',
+          label: 'Block Explorer',
+          slotBefore: <Icon iconName={IconName.Terminal} />,
+          href: 'https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions',
+        },
+        /* {
 * value: 'MORE',
 * label: stringGetter({ key: STRING_KEYS.MORE }),
 * subitems: [
@@ -200,7 +200,7 @@ export const HeaderDesktop = () => {
                 onClick={() => {
                   dispatch(openDialog(DialogTypes.Deposit2({})));
                 }}
-                state={{ isDisabled: !dydxAccounts }}
+                state={{ isDisabled: !address }}
               >
                 {stringGetter({ key: STRING_KEYS.DEPOSIT })}
               </Button>

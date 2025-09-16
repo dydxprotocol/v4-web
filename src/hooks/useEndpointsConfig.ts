@@ -12,7 +12,6 @@ export interface EndpointsConfig {
   skip: string;
   faucet?: string;
   stakingAPR?: string;
-  solanaRpcUrl: string;
   affiliates?: string;
 }
 
@@ -26,7 +25,6 @@ export const useEndpointsConfig = () => {
     skip: endpointsConfig.skip,
     faucet: endpointsConfig.faucet,
     stakingAPR: endpointsConfig.stakingAPR,
-    solanaRpcUrl: endpointsConfig.solanaRpcUrl,
     affiliatesBaseUrl: endpointsConfig.affiliates,
   };
 };
