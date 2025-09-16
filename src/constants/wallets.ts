@@ -5,15 +5,15 @@ import { type onboarding } from 'starboard-client-js';
 import { STRING_KEYS } from '@/constants/localization';
 
 import {
-    CoinbaseIcon,
-    EmailIcon,
-    FuelWalletIcon,
-    GenericWalletIcon,
-    KeplrIcon,
-    MetaMaskIcon,
-    OkxWalletIcon,
-    PhantomIcon,
-    WalletConnectIcon,
+  CoinbaseIcon,
+  EmailIcon,
+  FuelWalletIcon,
+  GenericWalletIcon,
+  KeplrIcon,
+  MetaMaskIcon,
+  OkxWalletIcon,
+  PhantomIcon,
+  WalletConnectIcon,
 } from '@/icons';
 
 import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
@@ -68,7 +68,6 @@ export enum WalletType {
 
 export enum ConnectorType {
   Injected = 'injected',
-  Coinbase = 'coinbase',
   // Not a real connector type, but a link to download the wallet for those who don't have it installed
   DownloadWallet = 'downloadWallet',
   Coinbase = 'coinbase',
