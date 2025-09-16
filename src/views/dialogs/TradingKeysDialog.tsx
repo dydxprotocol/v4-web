@@ -123,12 +123,13 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
     Main: () => (
       <div>
         <div tw="mb-1 text-color-text-0 font-base-book">
-          API wallets perform actions on behalf of your account without withdrawal permissions. You
-          must still use your account&apos;s public address for info requests.
+          {stringGetter({ key: STRING_KEYS.API_WALLETS_DESCRIPTION })}
         </div>
         <div tw="row mb-1 w-full gap-0.75">
           <div tw="row w-full rounded-0.75 bg-color-layer-1 px-1 py-0.75">
-            <div tw="flex-1 text-color-text-0 font-small-book">Your dYdX Address</div>
+            <div tw="flex-1 text-color-text-0 font-small-book">
+              {stringGetter({ key: STRING_KEYS.YOUR_DYDX_ADDRESS })}
+            </div>
             <div tw="row gap-0.5">
               <$Address>{truncateAddress(dydxAddress)}</$Address>
               <$CopyButton
@@ -147,7 +148,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
             shape={ButtonShape.Pill}
             onClick={goToCreatePage}
           >
-            Generate New API Key
+            {stringGetter({ key: STRING_KEYS.GENERATE_NEW_API_KEY })}
           </Button>
         </div>
         <TradingKeysTable onRemoveKey={goToRemovePage} />
@@ -156,12 +157,15 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
     Create: ({ wallet, errorStringKey, loading, acknowledged }) => (
       <div tw="column gap-1">
         <div tw="text-color-text-0 font-base-book">
-          Authorize this API wallet to trade on your behalf. Before authorizing, remember to save
-          your private key somewhere safe.{' '}
-          <span tw="text-color-text-2">It will no longer be accessible once authorized.</span>
+          {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_WALLET_DESCRIPTION })}{' '}
+          <span tw="text-color-text-2">
+            {stringGetter({ key: STRING_KEYS.PRIVATE_KEY_NO_LONGER_ACCESSIBLE })}
+          </span>
         </div>
         <div tw="row w-full rounded-0.75 bg-color-layer-1 px-1 py-0.75">
-          <div tw="flex-1 text-color-text-0 font-small-book">API Wallet Address</div>
+          <div tw="flex-1 text-color-text-0 font-small-book">
+            {stringGetter({ key: STRING_KEYS.API_WALLET_ADDRESS })}
+          </div>
           <div tw="row gap-0.5">
             <$Address tw="font-small-book">{wallet?.address}</$Address>
             <$CopyButton
@@ -175,7 +179,9 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
           </div>
         </div>
         <div tw="row w-full rounded-0.75 border-solid border-color-layer-5 p-0.625">
-          <div tw="flex-1 text-color-text-0 font-small-book">Private Key</div>
+          <div tw="flex-1 text-color-text-0 font-small-book">
+            {stringGetter({ key: STRING_KEYS.PRIVATE_KEY })}
+          </div>
           <div tw="row gap-0.5">
             <$Address tw="max-w-20 overflow-hidden text-ellipsis font-small-book">
               {wallet?.privateKeyHex}
@@ -197,9 +203,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
             id="ack-private-key"
             label={
               <span tw="select-none">
-                I understand that I will no longer have access to the private key once authorized. I
-                also understand that whoever has access to this key will be able to place trades
-                using the full margin of my account.
+                {stringGetter({ key: STRING_KEYS.API_KEY_AUTHORIZATION_ACKNOWLEDGMENT })}
               </span>
             }
           />
@@ -215,15 +219,19 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
           onClick={authorizeKey}
           state={{ isLoading: loading, isDisabled: !!loading || !acknowledged }}
         >
-          Authorize API Key
+          {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_KEY })}
         </Button>
       </div>
     ),
     Delete: ({ info, loading, errorStringKey }) => (
       <div tw="column gap-1">
         <p>
-          Are you sure you want to delete trading key {info.address}? This key will no longer be
-          authorized to trade on your behalf.
+          {stringGetter({
+            key: STRING_KEYS.CONFIRM_DELETE_TRADING_KEY,
+            params: {
+              ADDRESS: info.address,
+            },
+          })}
         </p>
         {errorStringKey != null && (
           <AlertMessage type={AlertType.Error}>
@@ -236,7 +244,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
             onClick={executeRemoveKey}
             state={{ isLoading: loading, isDisabled: loading }}
           >
-            Remove
+            {stringGetter({ key: STRING_KEYS.REMOVE })}
           </Button>
           <Button onClick={goToMainPage} state={{ isLoading: false, isDisabled: loading }}>
             {stringGetter({ key: STRING_KEYS.CANCEL })}
@@ -252,7 +260,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
       setIsOpen={setIsOpen}
       preventCloseOnOverlayClick
       title={TradingKeyStates.match(pageState, {
-        Main: () => <div>API Trading Keys</div>,
+        Main: () => <div>{stringGetter({ key: STRING_KEYS.API_TRADING_KEYS })}</div>,
         Create: ({ loading }) => (
           <div>
             <IconButton
@@ -262,7 +270,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
               onClick={goToMainPage}
               disabled={loading}
             />
-            New API Trading Key
+            {stringGetter({ key: STRING_KEYS.NEW_API_TRADING_KEY })}
           </div>
         ),
         Delete: ({ loading }) => (
@@ -274,7 +282,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
               onClick={goToMainPage}
               disabled={loading}
             />
-            Remove API Trading Key
+            {stringGetter({ key: STRING_KEYS.REMOVE_API_TRADING_KEY })}
           </div>
         ),
       })}

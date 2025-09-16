@@ -62,7 +62,7 @@ export const TradingKeysTable = ({
       {
         columnKey: 'address',
         getCellValue: (row) => row.address,
-        label: 'API Wallet Address',
+        label: stringGetter({ key: STRING_KEYS.API_WALLET_ADDRESS }),
         renderCell: ({ address }) => (
           <TableCell
             slotRight={
@@ -94,7 +94,7 @@ export const TradingKeysTable = ({
               size={ButtonSize.XSmall}
               onClick={() => onRemoveKey(row)}
             >
-              Remove
+              {stringGetter({ key: STRING_KEYS.REMOVE })}
             </Button>
           </ActionsTableCell>
         ),
@@ -110,8 +110,8 @@ export const TradingKeysTable = ({
       data={authorizedAccounts}
       tableId="authorized-accounts"
       getRowKey={(row) => row.id}
-      label="API Trading Keys"
-      slotEmpty={<div>No API trading keys found.</div>}
+      label={stringGetter({ key: STRING_KEYS.API_TRADING_KEYS })}
+      slotEmpty={<div>{stringGetter({ key: STRING_KEYS.NO_API_TRADING_KEYS_FOUND })}</div>}
       columns={columns}
       className={className}
     />

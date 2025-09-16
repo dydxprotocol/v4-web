@@ -301,8 +301,7 @@ export const AccountMenu = () => {
         {
           value: 'ApiTradingKeys',
           icon: <Icon iconName={IconName.Passkey} />,
-          // TODO
-          label: 'API Trading Keys',
+          label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
           onSelect: () => dispatch(openDialog(DialogTypes.TradingKeys())),
         },
         {
