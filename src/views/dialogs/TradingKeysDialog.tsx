@@ -234,7 +234,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
           {stringGetter({
             key: STRING_KEYS.CONFIRM_DELETE_TRADING_KEY,
             params: {
-              ADDRESS: info.address,
+              ADDRESS: <span tw="text-color-text-2">{info.address}</span>,
             },
           })}
         </p>

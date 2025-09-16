@@ -299,12 +299,6 @@ export const AccountMenu = () => {
           onSelect: () => dispatch(openDialog(DialogTypes.Preferences())),
         },
         {
-          value: 'ApiTradingKeys',
-          icon: <Icon iconName={IconName.Passkey} />,
-          label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
-          onSelect: () => dispatch(openDialog(DialogTypes.TradingKeys())),
-        },
-        {
           value: 'DisplaySettings',
           icon:
             theme === AppTheme.Light ? (
