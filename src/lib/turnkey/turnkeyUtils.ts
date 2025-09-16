@@ -1,6 +1,6 @@
 import type { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 
-import type { TurnkeyWallet, TurnkeyWalletAccount } from '@/types/turnkey';
+import type { TurnkeyWallet } from '@/types/turnkey';
 
 /**
  * Get wallets with accounts from the Turnkey indexedDB client.
@@ -21,16 +21,8 @@ export async function getWalletsWithAccountsFromClient(
         organizationId,
       });
 
-      const accountsWithBalance = await accounts.reduce<Promise<TurnkeyWalletAccount[]>>(
-        async (accPromise, account) => {
-          const acc = await accPromise;
-          // Ensure the account's organizationId matches the provided organizationId
-          if (account.organizationId === organizationId) {
-            acc.push(account);
-          }
-          return acc;
-        },
-        Promise.resolve([])
+      const accountsWithBalance = accounts.filter(
+        (account) => account.organizationId === organizationId
       );
 
       return { ...wallet, accounts: accountsWithBalance };
