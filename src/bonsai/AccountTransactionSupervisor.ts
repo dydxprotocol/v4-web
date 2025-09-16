@@ -494,7 +494,7 @@ export class AccountTransactionSupervisor {
     return (
       taskBuilder({ payload: payloadArg })
         .with<AddSharedContextMiddlewareProps>(
-          addSharedContextMiddleware('AccountTransactionSupervisor/placeOrder', this.shared)
+          addSharedContextMiddleware('AccountTransactionSupervisor/placeOrderWrapper', this.shared)
         )
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         // fully prepare/augment the trade payload
