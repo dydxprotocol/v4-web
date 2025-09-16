@@ -32,6 +32,7 @@ export const SelectMenu = <T extends string>({
   withPortal = true,
   fullWidthPopper = false,
   contentCss,
+  slotTrigger,
   ...props
 }: {
   children: React.ReactNode;
@@ -42,6 +43,7 @@ export const SelectMenu = <T extends string>({
   withBlur?: boolean;
   withPortal?: boolean;
   fullWidthPopper?: boolean;
+  slotTrigger?: React.ReactNode;
 
   // Content CSS Props
   contentCss?: CSSProp;
@@ -56,21 +58,24 @@ export const SelectMenu = <T extends string>({
 }) => {
   return (
     <Root value={value} onValueChange={onValueChange}>
-      <$Trigger className={className} $withBlur={withBlur}>
-        {label ? (
-          <$WithLabel label={label}>
+      {slotTrigger ?? (
+        <SelectMenuTrigger className={className} $withBlur={withBlur}>
+          {label ? (
+            <$WithLabel label={label}>
+              <Value />
+            </$WithLabel>
+          ) : (
             <Value />
-          </$WithLabel>
-        ) : (
-          <Value />
-        )}
-        {React.Children.toArray(children).length > 1 && (
-          <Icon
-            iconName={IconName.Triangle}
-            tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
-          />
-        )}
-      </$Trigger>
+          )}
+          {React.Children.toArray(children).length > 1 && (
+            <Icon
+              iconName={IconName.Triangle}
+              tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
+            />
+          )}
+        </SelectMenuTrigger>
+      )}
+
       {withPortal ? (
         <Portal>
           <$Content {...props} $fullWidthPopper={fullWidthPopper} css={contentCss}>
@@ -94,19 +99,24 @@ export const SelectItem = <T extends string>({
   className,
   value,
   label,
+  withIcon = true,
 }: {
   className?: string;
   value: T;
   label: React.ReactNode;
+  withIcon?: boolean;
 }) => (
   <$Item className={className} value={value}>
     <ItemText>{label}</ItemText>
-    <$ItemIndicator>
-      <CheckIcon />
-    </$ItemIndicator>
+    {withIcon && (
+      <$ItemIndicator>
+        <CheckIcon />
+      </$ItemIndicator>
+    )}
   </$Item>
 );
-const $Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
+
+export const SelectMenuTrigger = styled(Trigger)<{ $withBlur?: boolean }>`
   --select-menu-trigger-maxWidth: ;
   max-width: var(--select-menu-trigger-maxWidth);
   ${popoverMixins.trigger}

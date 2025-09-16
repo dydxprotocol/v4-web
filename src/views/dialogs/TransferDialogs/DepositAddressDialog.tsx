@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { avalanche, polygon } from 'viem/chains';
 
+import { AlertType } from '@/constants/alerts';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,13 +18,17 @@ import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { QrCode } from '@/components/QrCode';
-import { SelectItem, SelectMenu } from '@/components/SelectMenu';
+import { SelectItem, SelectMenu, SelectMenuTrigger } from '@/components/SelectMenu';
 import { TabGroup } from '@/components/TabGroup';
+import { WithLabel } from '@/components/WithLabel';
 
 import { useAppSelector } from '@/state/appTypes';
 
@@ -131,10 +136,10 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
           : 'USDC or ETH';
 
     return (
-      <span tw="block text-center text-color-warning font-small-medium">
+      <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
         Only deposit {assets} on {chainName} network. <br />
         Any other assets sent to this address can result in a loss of funds.
-      </span>
+      </AlertMessage>
     );
   }, [selectedChain]);
 
@@ -203,17 +208,19 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <div tw="flexColumn gap-1">
-        <div>
-          <TabGroup
-            value={selectedTab}
-            onTabChange={setSelectedTab}
-            options={[
-              // TODO(spot): Localize
-              { label: 'Spot', value: 'spot', disabled: true },
-              { label: stringGetter({ key: STRING_KEYS.PERPETUALS }), value: 'perpetuals' },
-            ]}
-          />
-        </div>
+        {false && ( // TODO(spot): Remove false conditional when spot is supported
+          <div>
+            <TabGroup
+              value={selectedTab}
+              onTabChange={setSelectedTab}
+              options={[
+                // TODO(spot): Localize
+                { label: 'Spot', value: 'spot', disabled: true },
+                { label: stringGetter({ key: STRING_KEYS.PERPETUALS }), value: 'perpetuals' },
+              ]}
+            />
+          </div>
+        )}
 
         <SelectMenu
           fullWidthPopper
@@ -221,21 +228,51 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
           tw="h-4 w-full text-color-text-2"
           value={selectedChain}
           onValueChange={setSelectedChain}
-          label={stringGetter({ key: STRING_KEYS.NETWORK })}
+          slotTrigger={
+            <SelectMenuTrigger
+              css={
+                isSimpleUi && {
+                  '--trigger-open-backgroundColor': 'var(--color-layer-2)',
+                }
+              }
+            >
+              <$WithLabel label={stringGetter({ key: STRING_KEYS.NETWORK })}>
+                <div tw="w-full">{CHAIN_INFO[selectedChain]?.name}</div>
+              </$WithLabel>
+              <Icon
+                iconName={IconName.Triangle}
+                tw="h-0.375 min-h-0.375 w-0.625 min-w-0.625 text-color-text-0"
+              />
+            </SelectMenuTrigger>
+          }
           position="popper"
           side="bottom"
           sideOffset={8}
-          css={
-            isSimpleUi && {
-              '--trigger-open-backgroundColor': 'var(--color-layer-2)',
-            }
-          }
           contentCss={{
             '--popover-backgroundColor': 'var(--color-layer-2)',
           }}
         >
           {chains.map((id) => (
-            <SelectItem key={id} value={id.toString()} label={CHAIN_INFO[id]?.name} />
+            <$SelectItem
+              key={id}
+              value={id.toString()}
+              withIcon={false}
+              label={
+                <div tw="row justify-between gap-0.5">
+                  <div tw="flexColumn gap-0.25">
+                    <div>{CHAIN_INFO[id]?.name}</div>
+                    <div tw="text-color-text-0 font-small-book">
+                      {CHAIN_INFO[id]?.gasDenom}, USDC accepted
+                    </div>
+                  </div>
+                  <img
+                    tw="size-1.5 rounded-[50%]"
+                    src={CHAIN_INFO[id]?.icon}
+                    alt={CHAIN_INFO[id]?.name}
+                  />
+                </div>
+              }
+            />
           ))}
         </SelectMenu>
 
@@ -266,4 +303,19 @@ const $AddressCard = styled.div`
   border: 1px solid var(--border-color);
   padding: 1rem;
   gap: 1rem;
+`;
+
+const $WithLabel = styled(WithLabel)`
+  ${formMixins.inputLabel}
+  border-radius: 0;
+
+  > * {
+    ${layoutMixins.textTruncate}
+  }
+`;
+
+const $SelectItem = styled(SelectItem)`
+  span {
+    width: 100%;
+  }
 `;
