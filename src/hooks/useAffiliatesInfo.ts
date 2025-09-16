@@ -39,6 +39,7 @@ export const useAffiliateMetadata = (dydxAddress?: string) => {
           headers: {
             'Content-Type': 'application/json',
           },
+          cache: 'no-store',
         }),
         fetch(`${totalVolumeEndpoint}?address=${encodeURIComponent(dydxAddress)}`, {
           method: 'GET',
