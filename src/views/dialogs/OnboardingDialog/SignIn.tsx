@@ -8,12 +8,14 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -27,6 +29,7 @@ import { GoogleAuth } from './AuthButtons/GoogleAuth';
 
 export const SignIn = ({
   onDisplayChooseWallet,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
   onSubmitEmail,
 }: {
@@ -40,6 +43,7 @@ export const SignIn = ({
   const { authIframeClient } = useTurnkey();
   const { signInWithOtp } = useTurnkeyAuth();
   const appTheme = useAppSelector(getAppTheme);
+  const { tos, privacy } = useURLConfigs();
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -102,7 +106,7 @@ export const SignIn = ({
           <$HorizontalSeparatorFiller $isLightMode={appTheme === AppTheme.Light} />
         </div>
 
-        <$OtherOptionButton
+        {/* <$OtherOptionButton
           type={ButtonType.Button}
           action={ButtonAction.Base}
           size={ButtonSize.BasePlus}
@@ -114,7 +118,7 @@ export const SignIn = ({
           </div>
 
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
-        </$OtherOptionButton>
+        </$OtherOptionButton> */}
 
         <$OtherOptionButton
           type={ButtonType.Button}
@@ -130,6 +134,24 @@ export const SignIn = ({
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
       </div>
+
+      <span tw="text-center font-mini-book">
+        {stringGetter({
+          key: STRING_KEYS.TOS_SHORT,
+          params: {
+            TERMS_LINK: (
+              <Link isAccent isInline href={tos}>
+                {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+              </Link>
+            ),
+            PRIVACY_POLICY_LINK: (
+              <Link isAccent isInline href={privacy}>
+                {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
+              </Link>
+            ),
+          },
+        })}
+      </span>
     </form>
   );
 };

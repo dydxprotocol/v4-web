@@ -25,6 +25,7 @@ import { WalletIcon } from '@/components/WalletIcon';
 export const ChooseWallet = ({
   onChooseWallet,
   onSignInWithSocials,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
@@ -47,7 +48,7 @@ export const ChooseWallet = ({
         <HorizontalSeparatorFiller />
       </div>
 
-      <$OtherOptionButton
+      {/* <$OtherOptionButton
         type={ButtonType.Button}
         action={ButtonAction.Base}
         size={ButtonSize.BasePlus}
@@ -59,7 +60,7 @@ export const ChooseWallet = ({
         </div>
 
         <Icon iconName={IconName.ChevronRight} />
-      </$OtherOptionButton>
+      </$OtherOptionButton> */}
 
       <$OtherOptionButton
         type={ButtonType.Button}

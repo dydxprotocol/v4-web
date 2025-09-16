@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -11,6 +12,7 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
@@ -58,6 +60,7 @@ export const OnboardingDialog = ({
   const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const isSimpleUi = useSimpleUiEnabled();
   const { dydxAddress } = useAccounts();
+  const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -114,7 +117,7 @@ export const OnboardingDialog = ({
     );
   };
 
-  const onChooseWallet = (wallet: WalletInfo) => {
+  const onChooseWallet = debounce((wallet: WalletInfo) => {
     if (wallet.connectorType === ConnectorType.DownloadWallet) {
       window.open(wallet.downloadLink, '_blank');
       return;
@@ -123,7 +126,13 @@ export const OnboardingDialog = ({
       setIsOpenFromDialog(false);
     }
     selectWallet(wallet);
-  };
+  }, 1_000);
+
+  const privyUserOption = Boolean(import.meta.env.VITE_PRIVY_APP_ID) && privyWallet && (
+    <Link isAccent tw="font-small-medium" onClick={() => onChooseWallet(privyWallet)}>
+      Privy User?
+    </Link>
+  );
 
   return (
     <$Dialog
@@ -132,7 +141,12 @@ export const OnboardingDialog = ({
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.SignIn]: {
-            title: stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE }),
+            title: (
+              <div tw="row justify-between">
+                {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
+                {privyUserOption}
+              </div>
+            ),
             description: stringGetter({
               key: STRING_KEYS.SIGN_IN_DESCRIPTION,
             }),
