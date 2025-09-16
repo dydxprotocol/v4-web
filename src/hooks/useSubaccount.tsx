@@ -47,7 +47,8 @@ export const SubaccountProvider = ({ ...props }) => {
   return (
     <SubaccountContext.Provider
       value={useSubaccountContext({
-        localDydxWallet: undefined, // We'll remove this later
+        // TODO: Will be replaced with Fuel connected Wallet
+        localDydxWallet: undefined,
       })}
       {...props}
     />
