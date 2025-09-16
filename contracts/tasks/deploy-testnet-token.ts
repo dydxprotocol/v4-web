@@ -1,27 +1,25 @@
 import { task } from "hardhat/config";
 import { Provider, Wallet, WalletUnlocked } from "fuels"
-import { TestnetTokenFactory } from "../types/TestnetTokenFactory"
-
-const NETWORK = "https://testnet.fuel.network/v1/graphql" //testnet
-// const NETWORK = "http://127.0.0.1:4000/v1/graphql"  // local
-const PRIVATE_KEY = "" // testnet
-// const PRIVATE_KEY = "0x72dd6103daeaed398609a2ec3905f07ae4b5188a698fd1472306488b9e48245d"  // local
 
 task("deploy-testnet-token", "Deploy a token for the testnet")
+  .addPositionalParam("url")
+  .addPositionalParam("privK")
   .addPositionalParam("name")
   .addPositionalParam("symbol")
+  .addPositionalParam("decimals")
   .setAction(async (taskArgs) => {
-    console.log(`Params: name: ${taskArgs.name} symbol: ${taskArgs.symbol}`);
+    const provider = new Provider(taskArgs.url)
+    const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
-    const provider = await Provider.create(NETWORK)
-    const deployer = Wallet.fromPrivateKey(PRIVATE_KEY, provider)
-
-    let tt = await deploy("TestnetToken", deployer, { NAME: taskArgs.name, SYMBOL: taskArgs.symbol })
-    console.log(`Token deployed to: ${tt.id.toString()} ${tt.id.toB256().toString()}`)
+    console.log(`Deploying token named ${taskArgs.name} ${taskArgs.symbol} decimals: ${taskArgs.decimals}`)
+    let tt = await deploy("TestnetToken", deployer, { NAME: taskArgs.name, SYMBOL: taskArgs.symbol, DECIMALS: taskArgs.decimals })
+    const ttAssetId = (await tt.functions.get_asset_id().get()).value
+    console.log(`Token deployed to: contractId: ${tt.id.toString()} assetId: ${ttAssetId.bits}`)
     await call(tt.functions.initialize())
     console.log("Token initialized")
-}
-);
+
+    return [tt.id.toString(), ttAssetId.bits]
+});
 
 async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
   const factory = require(`../types/${contract}Factory`)[`${contract}Factory`]
@@ -30,7 +28,8 @@ async function deploy(contract: string, wallet: WalletUnlocked, configurables: a
   }
 
   const { waitForResult } = await factory.deploy(wallet, configurables ? { configurableConstants: configurables } : undefined)
-  const { contract: contr } = await waitForResult()
+  const result = await waitForResult()
+  const { contract: contr } = result
 
   return contr
 }

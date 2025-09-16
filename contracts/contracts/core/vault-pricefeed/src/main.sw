@@ -73,6 +73,8 @@ storage {
 
     // asset -> pyth pricefeed id
     pyth_pricefeed: StorageMap<AssetId, PriceFeedId> = StorageMap {},
+    // pyth pricefeed id -> asset
+    assets: StorageMap<PriceFeedId, AssetId> = StorageMap {},
     // pyth pricefeed -> price
     prices: StorageMap<PriceFeedId, Price> = StorageMap {},
     // asset -> decimals
@@ -146,10 +148,11 @@ impl VaultPricefeed for Contract {
     ) {
         _only_gov();
         storage.pyth_pricefeed.insert(asset, pyth_pricefeed);
+        storage.assets.insert(pyth_pricefeed, asset);
         storage.decimals.insert(asset, decimals);
         log(SetPythPricefeed { asset, pricefeed_id: pyth_pricefeed, decimals });
     }
-    
+
     /*
           ____ __     ___
          / / / \ \   / (_) _____      __
@@ -163,6 +166,16 @@ impl VaultPricefeed for Contract {
         maximize: bool
     ) -> u256 {
         _get_price(asset, maximize)
+    }
+
+    #[storage(read)]
+    fn get_asset(pyth_pricefeed: PriceFeedId) -> Option<AssetId> {
+        storage.assets.get(pyth_pricefeed).try_read()
+    }
+
+    #[storage(read)]
+    fn get_decimals(asset: AssetId) -> Option<u32> {
+        storage.decimals.get(asset).try_read()
     }
 
     /*

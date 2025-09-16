@@ -9,7 +9,12 @@
         "gen:contract:types": "sh ./utils/generate-contract-types.sh",
         "process:types": "python3 utils/process_types.py",
         "test": "hardhat test",
-        "test:specific": "hardhat test test/core/vault/withdrawCollateral.test.ts"
+        "test:specific": "hardhat test test/core/vault/withdrawCollateral.test.ts",
+        "deploy:testnet:token": "hardhat deploy-testnet-token",
+        "run:node": "hardhat run-node",
+        "deploy:starboard": "hardhat deploy-starboard",
+        "setup:testnet": "hardhat setup-testnet",
+        "prices:feed": "hardhat prices-feed"
     },
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.2.3",

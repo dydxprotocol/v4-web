@@ -63,6 +63,12 @@ abi VaultPricefeed {
         maximize: bool
     ) -> u256;
 
+    #[storage(read)]
+    fn get_asset(pyth_pricefeed: PriceFeedId) -> Option<AssetId>;
+
+    #[storage(read)]
+    fn get_decimals(asset: AssetId) -> Option<u32>;
+
     /*
           ____  ____        _     _ _
          / / / |  _ \ _   _| |__ | (_) ___ 

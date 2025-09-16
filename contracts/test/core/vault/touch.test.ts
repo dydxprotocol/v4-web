@@ -514,6 +514,11 @@ describe("Vault.touch", () => {
         expect(positionAfter.collateral.isZero()).eq(true)
     })
 
+    it("deploy testnet token", async () => {
+        const token = await deploy("TestnetToken", deployer, { NAME: "TstTken", SYMBOL: "ttokn", DECIMALS: 9 })
+        await call(token.functions.initialize())
+    })
+        
     afterEach(async () => {
         launchedNode.cleanup()
     })

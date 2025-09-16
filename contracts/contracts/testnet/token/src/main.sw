@@ -10,6 +10,7 @@ configurable {
     NAME: str[7] = __to_str_array("MyAsset"),
     /// The symbol of the asset minted by this contract.
     SYMBOL: str[5] = __to_str_array("MYTKN"),
+    DECIMALS: u8 = 6,
 }
 
 storage {
@@ -18,7 +19,6 @@ storage {
     initialized: bool = false,
 }
 
-const DECIMALS: u8 = 6;
 const FAUCET_AMOUNT: u64 = 1_000_000_000_000;
 
 abi TestnetToken {
