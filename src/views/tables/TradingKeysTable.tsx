@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import { getLazyTradingKeyUtils } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiHooks } from '@/bonsai/ontology';
-import { type tradingKeyUtils } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import {
@@ -13,6 +11,8 @@ import {
   ButtonType,
 } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
+import { AccountAuthenticator } from '@/constants/validators';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -25,11 +25,7 @@ import { Table, type ColumnDef } from '@/components/Table';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 
-import { runFn } from '@/lib/do';
-
-export type AuthorizedAccountInfo = ReturnType<
-  (typeof tradingKeyUtils)['getAuthorizedTradingKeysMetadata']
->[number];
+export type AuthorizedAccountInfo = AccountAuthenticator;
 
 export const TradingKeysTable = ({
   className,
@@ -39,23 +35,7 @@ export const TradingKeysTable = ({
   onRemoveKey: (info: AuthorizedAccountInfo) => void;
 }) => {
   const stringGetter = useStringGetter();
-  const authorizedAccountsRaw = BonsaiHooks.useAuthorizedAccounts().data;
-  const [authorizedAccounts, setAuthorizedAccounts] = useState<AuthorizedAccountInfo[]>([]);
-
-  useEffect(() => {
-    let dead = false;
-    runFn(async () => {
-      const newVal = (await getLazyTradingKeyUtils()).getAuthorizedTradingKeysMetadata(
-        authorizedAccountsRaw ?? []
-      );
-      if (!dead) {
-        setAuthorizedAccounts(newVal);
-      }
-    });
-    return () => {
-      dead = true;
-    };
-  }, [authorizedAccountsRaw]);
+  const authorizedAccounts = BonsaiHooks.useAuthorizedAccounts().data ?? EMPTY_ARR;
 
   const columns = useMemo<ColumnDef<AuthorizedAccountInfo>[]>(
     () => [

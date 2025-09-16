@@ -154,75 +154,80 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
         <TradingKeysTable onRemoveKey={goToRemovePage} />
       </div>
     ),
-    Create: ({ wallet, errorStringKey, loading, acknowledged }) => (
-      <div tw="column gap-1">
-        <div tw="text-color-text-0 font-base-book">
-          {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_WALLET_DESCRIPTION })}{' '}
-          <span tw="text-color-text-2">
-            {stringGetter({ key: STRING_KEYS.PRIVATE_KEY_NO_LONGER_ACCESSIBLE })}
-          </span>
-        </div>
-        <div tw="row w-full rounded-0.75 bg-color-layer-1 px-1 py-0.75">
-          <div tw="flex-1 text-color-text-0 font-small-book">
-            {stringGetter({ key: STRING_KEYS.API_WALLET_ADDRESS })}
+    Create: ({ wallet, errorStringKey, loading, acknowledged }) => {
+      if (wallet == null) {
+        return <div>{stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR })}</div>;
+      }
+      return (
+        <div tw="column gap-1">
+          <div tw="text-color-text-0 font-base-book">
+            {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_WALLET_DESCRIPTION })}{' '}
+            <span tw="text-color-text-2">
+              {stringGetter({ key: STRING_KEYS.PRIVATE_KEY_NO_LONGER_ACCESSIBLE })}
+            </span>
           </div>
-          <div tw="row gap-0.5">
-            <$Address tw="font-small-book">{wallet?.address}</$Address>
-            <$CopyButton
-              buttonType="icon"
-              value={wallet?.address}
-              shape={ButtonShape.Square}
-              size={ButtonSize.XXSmall}
-              buttonStyle={ButtonStyle.WithoutBackground}
-              action={ButtonAction.Primary}
-            />
+          <div tw="row w-full rounded-0.75 bg-color-layer-1 px-1 py-0.75">
+            <div tw="flex-1 text-color-text-0 font-small-book">
+              {stringGetter({ key: STRING_KEYS.API_WALLET_ADDRESS })}
+            </div>
+            <div tw="row gap-0.5">
+              <$Address tw="font-small-book">{wallet.address}</$Address>
+              <$CopyButton
+                buttonType="icon"
+                value={wallet.address}
+                shape={ButtonShape.Square}
+                size={ButtonSize.XXSmall}
+                buttonStyle={ButtonStyle.WithoutBackground}
+                action={ButtonAction.Primary}
+              />
+            </div>
           </div>
-        </div>
-        <div tw="row w-full rounded-0.75 border-solid border-color-layer-5 p-0.625">
-          <div tw="flex-1 text-color-text-0 font-small-book">
-            {stringGetter({ key: STRING_KEYS.PRIVATE_KEY })}
+          <div tw="row w-full rounded-0.75 border-solid border-color-layer-5 p-0.625">
+            <div tw="flex-1 text-color-text-0 font-small-book">
+              {stringGetter({ key: STRING_KEYS.PRIVATE_KEY })}
+            </div>
+            <div tw="row gap-0.5">
+              <$Address tw="max-w-20 overflow-hidden text-ellipsis font-small-book">
+                {wallet.privateKeyHex}
+              </$Address>
+              <$CopyButton
+                buttonType="icon"
+                value={wallet.privateKeyHex}
+                shape={ButtonShape.Square}
+                size={ButtonSize.XXSmall}
+                buttonStyle={ButtonStyle.WithoutBackground}
+                action={ButtonAction.Primary}
+              />
+            </div>
           </div>
-          <div tw="row gap-0.5">
-            <$Address tw="max-w-20 overflow-hidden text-ellipsis font-small-book">
-              {wallet?.privateKeyHex}
-            </$Address>
-            <$CopyButton
-              buttonType="icon"
-              value={wallet?.privateKeyHex}
-              shape={ButtonShape.Square}
-              size={ButtonSize.XXSmall}
-              buttonStyle={ButtonStyle.WithoutBackground}
-              action={ButtonAction.Primary}
-            />
-          </div>
-        </div>
-        <AlertMessage type={AlertType.Error}>
-          <Checkbox
-            checked={!!acknowledged}
-            onCheckedChange={(checked) => setCreateAcknowledged(checked)}
-            id="ack-private-key"
-            label={
-              <span tw="select-none">
-                {stringGetter({ key: STRING_KEYS.API_KEY_AUTHORIZATION_ACKNOWLEDGMENT })}
-              </span>
-            }
-          />
-        </AlertMessage>
-        {errorStringKey != null && (
           <AlertMessage type={AlertType.Error}>
-            {stringGetter({ key: errorStringKey })}
+            <Checkbox
+              checked={!!acknowledged}
+              onCheckedChange={(checked) => setCreateAcknowledged(checked)}
+              id="ack-private-key"
+              label={
+                <span tw="select-none">
+                  {stringGetter({ key: STRING_KEYS.API_KEY_AUTHORIZATION_ACKNOWLEDGMENT })}
+                </span>
+              }
+            />
           </AlertMessage>
-        )}
-        <Button
-          tw="flex-1"
-          action={ButtonAction.Primary}
-          onClick={authorizeKey}
-          state={{ isLoading: loading, isDisabled: !!loading || !acknowledged }}
-        >
-          {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_KEY })}
-        </Button>
-      </div>
-    ),
+          {errorStringKey != null && (
+            <AlertMessage type={AlertType.Error}>
+              {stringGetter({ key: errorStringKey })}
+            </AlertMessage>
+          )}
+          <Button
+            tw="flex-1"
+            action={ButtonAction.Primary}
+            onClick={authorizeKey}
+            state={{ isLoading: loading, isDisabled: !!loading || !acknowledged }}
+          >
+            {stringGetter({ key: STRING_KEYS.AUTHORIZE_API_KEY })}
+          </Button>
+        </div>
+      );
+    },
     Delete: ({ info, loading, errorStringKey }) => (
       <div tw="column gap-1">
         <p>

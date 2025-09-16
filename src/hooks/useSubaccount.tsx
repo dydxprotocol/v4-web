@@ -818,6 +818,15 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         if ((creationResult as IndexedTx | undefined)?.code !== 0) {
           throw new Error('create authenticator operation failed');
         }
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError(
+          'useSubaccount/authorizeTradingKeyWallet',
+          'Failed to authorize trading key wallet',
+          {
+            parsed,
+          }
+        );
       } finally {
         await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
         await appQueryClient.invalidateQueries({
@@ -843,6 +852,16 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       try {
         await compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError(
+          'useSubaccount/removeAuthorizedKey',
+          'Failed to remove authorized trading key wallet',
+          {
+            parsed,
+            idToRemove,
+          }
+        );
       } finally {
         await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
         await appQueryClient.invalidateQueries({

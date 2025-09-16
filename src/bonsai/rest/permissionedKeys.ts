@@ -8,6 +8,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { isPresent } from '@/lib/typeUtils';
 
+import { getLazyTradingKeyUtils } from '../lib/lazyDynamicLibs';
 import { useCompositeClient } from './lib/useIndexer';
 
 export function useAuthorizedAccounts() {
@@ -23,7 +24,10 @@ export function useAuthorizedAccounts() {
       }
 
       const response = await client.compositeClient.getAuthenticators(address);
-      return response.accountAuthenticators;
+      const parsedResponse = (await getLazyTradingKeyUtils()).getAuthorizedTradingKeysMetadata(
+        response.accountAuthenticators
+      );
+      return parsedResponse;
     },
     staleTime: timeUnits.hour,
     refetchInterval: timeUnits.hour,
