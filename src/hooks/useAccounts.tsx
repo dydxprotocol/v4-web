@@ -2,12 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { usePrivy } from '@privy-io/react-auth';
-import { AES, enc } from 'crypto-js';
 import { type Subaccount } from 'starboard-client-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DydxAddress, PrivateInformation, WalletNetworkType } from '@/constants/wallets';
+import { DydxAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
@@ -88,17 +87,6 @@ const useAccountsContext = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 
-  const decryptSignature = (encryptedSignature: string | undefined) => {
-    const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
-
-    if (!staticEncryptionKey) throw new Error('No decryption key found');
-    if (!encryptedSignature) throw new Error('No signature found');
-
-    const decrypted = AES.decrypt(encryptedSignature, staticEncryptionKey);
-    const signature = decrypted.toString(enc.Utf8);
-    return signature;
-  };
-
   // dYdXClient Onboarding & Account Helpers
   const { indexerClient, getWalletFromSignature } = useDydxClient();
   // dYdX subaccounts
@@ -121,16 +109,6 @@ const useAccountsContext = () => {
   };
 
   const [hdKey, setHdKey] = useState<PrivateInformation>();
-
-  useEffect(() => {
-    (async () => {
-      if (sourceAccount.chain === WalletNetworkType.Evm) {
-        dispatch(setOnboardingState(OnboardingState.AccountConnected));
-      } else {
-        dispatch(setOnboardingState(OnboardingState.Disconnected));
-      }
-    })();
-  }, [isConnectedFuel, sourceAccount, blockedGeo]);
 
   // Onboarding conditions
   const [hasAcknowledgedTerms, saveHasAcknowledgedTerms] = useLocalStorage({
