@@ -1233,7 +1233,7 @@ export class AccountTransactionSupervisor {
                   });
 
                   if (allPlacedConfirmed && allCanceledConfirmed) {
-                    return orders;
+                    return { allConfirmed: true };
                   }
                   return undefined;
                 },
