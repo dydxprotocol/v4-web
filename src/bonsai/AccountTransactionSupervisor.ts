@@ -931,14 +931,8 @@ export class AccountTransactionSupervisor {
     const isMainOrderStateful = calc(() => {
       if (!order.orderPayload) return false;
       const { type, timeInForce } = order.orderPayload;
-
-      // Market orders are always short-term
       if (type === OrderType.MARKET) return false;
-
-      // Limit orders with GTT are stateful
       if (type === OrderType.LIMIT && timeInForce === OrderTimeInForce.GTT) return true;
-
-      // Everything else is short-term
       return false;
     });
 
@@ -1039,8 +1033,7 @@ export class AccountTransactionSupervisor {
             }
 
             // Process trigger payloads
-            // eslint-disable-next-line no-restricted-syntax
-            for (const operationPayload of context.payload.triggersPayloads) {
+            context.payload.triggersPayloads.forEach((operationPayload) => {
               if (operationPayload.cancelPayload?.orderId) {
                 const cancelPayload = this.createCancelOrderPayload(
                   operationPayload.cancelPayload.orderId
@@ -1055,22 +1048,7 @@ export class AccountTransactionSupervisor {
                   currentHeight,
                 });
               }
-            }
-
-            // If no operations to perform, return success
-            if (cancelPayloads.length === 0 && placePayloads.length === 0) {
-              return {
-                result: wrapOperationSuccess(true),
-                success: true,
-                finalContext: {
-                  ...context,
-                  cancelPayloads,
-                  placePayloads,
-                  transferPayload,
-                  currentHeight,
-                },
-              };
-            }
+            });
 
             return next({
               ...context,
@@ -1119,12 +1097,12 @@ export class AccountTransactionSupervisor {
           })
           // Analytics tracking with confirmation events
           .with<{
-            placeConfirmEvents: { [clientId: string]: SimpleEvent<{}> };
+            placeConfirmEvent: SimpleEvent<{}>;
           }>(async (context, next) => {
             const { placePayloads, payload } = context;
 
-            // Track initial events and create confirmation event listeners
-            const placeConfirmEvents: { [clientId: string]: SimpleEvent<{}> } = {};
+            const submitTime = createTimer();
+            const confirmEvent = new SimpleEvent<{}>();
 
             // Track each place order
             placePayloads.forEach((placePayload) => {
@@ -1135,12 +1113,6 @@ export class AccountTransactionSupervisor {
               };
 
               track(AnalyticsEvents.TradePlaceOrder(trackingData));
-
-              const confirmEvent = new SimpleEvent<{}>();
-              placeConfirmEvents[`${placePayload.clientId}`] = confirmEvent;
-
-              const startTime = startTimer();
-              const submitTime = createTimer();
 
               confirmEvent.addListener(() => {
                 track(
@@ -1153,40 +1125,29 @@ export class AccountTransactionSupervisor {
               });
             });
 
-            const overallStartTime = startTimer();
-            const result = await next({ ...context, placeConfirmEvents });
+            const startTime = startTimer();
+            const result = await next({ ...context, placeConfirmEvent: confirmEvent });
+            submitTime.start();
             const unpackedResult = result.result;
 
-            // Mark submit time when operation completes
-            if (isOperationSuccess(unpackedResult)) {
-              Object.values(placeConfirmEvents).forEach((event) => {
-                const listeners = (event as any).listeners;
-                if (listeners?.[0]) {
-                  listeners[0].submitTime?.start();
-                }
-              });
-            }
-
             if (isOperationFailure(unpackedResult)) {
-              // Track failure for each place order
               placePayloads.forEach((placePayload) => {
                 track(
                   AnalyticsEvents.TradePlaceOrderSubmissionFailed({
                     ...placePayload,
                     error: unpackedResult.errorString,
-                    durationMs: overallStartTime.elapsed(),
+                    durationMs: startTime.elapsed(),
                     source: payload.source,
                     volume: placePayload.size * placePayload.price,
                   })
                 );
               });
             } else {
-              // Track success for each place order
               placePayloads.forEach((placePayload) => {
                 track(
                   AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
                     ...placePayload,
-                    durationMs: overallStartTime.elapsed(),
+                    durationMs: startTime.elapsed(),
                     source: payload.source,
                     volume: placePayload.size * placePayload.price,
                   })
@@ -1197,7 +1158,7 @@ export class AccountTransactionSupervisor {
             return result;
           })
           .do(async (context) => {
-            const { cancelPayloads, placePayloads, transferPayload, placeConfirmEvents } = context;
+            const { cancelPayloads, placePayloads, transferPayload, placeConfirmEvent } = context;
 
             const result = await this.wrapOperation(
               context.fnName,
@@ -1209,10 +1170,8 @@ export class AccountTransactionSupervisor {
                   throw new Error('No subaccount ID found');
                 }
 
-                // Create SubaccountInfo for the bulk operation
                 const subaccountInfo = new SubaccountClient(localWallet, subaccountId);
 
-                // Transform cancel payloads to the expected format
                 const cancelRawOrderPayloads = payload.cancelPayloads.map((cancel) => ({
                   subaccountNumber: cancel.subaccountNumber,
                   clientId: cancel.clientId,
@@ -1222,7 +1181,6 @@ export class AccountTransactionSupervisor {
                   goodTilBlockTime: cancel.goodTilBlockTime,
                 }));
 
-                // Prepare transfer payload if needed
                 const transferToSubaccountPayload = payload.transferPayload
                   ? {
                       sourceSubaccountNumber: payload.transferPayload.fromSubaccount,
@@ -1239,7 +1197,6 @@ export class AccountTransactionSupervisor {
                   return true;
                 }
 
-                // Execute bulk operation
                 const tx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
                   subaccountInfo,
                   cancelRawOrderPayloads,
@@ -1282,11 +1239,7 @@ export class AccountTransactionSupervisor {
                 },
                 onTrigger: (success) => {
                   if (success) {
-                    // Trigger confirmation events for placed orders
-                    placePayloads.forEach((placePayload) => {
-                      const event = placeConfirmEvents[`${placePayload.clientId}`];
-                      event?.trigger({});
-                    });
+                    placeConfirmEvent.trigger({});
                   }
                 },
               }
