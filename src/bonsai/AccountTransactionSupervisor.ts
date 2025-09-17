@@ -539,18 +539,7 @@ export class AccountTransactionSupervisor {
           const transferMetadata = { sourceSubaccount, sourceAddress };
 
           const payloadBase = context.payload;
-          const isShortTermOrder = calc(() => {
-            if (payloadBase.type === OrderType.MARKET) {
-              return true;
-            }
-            if (payloadBase.type === OrderType.LIMIT) {
-              if (payloadBase.timeInForce === OrderTimeInForce.GTT) {
-                return false;
-              }
-              return true;
-            }
-            return false;
-          });
+          const isShortTermOrder = isShortTermOrderPayload(payloadBase);
           const payload: PlaceOrderPayload = {
             ...payloadBase,
             currentHeight,
@@ -927,14 +916,8 @@ export class AccountTransactionSupervisor {
   }
 
   public async placeCompoundOrder(order: TradeFormPayload, source: TradeMetadataSource) {
-    // Determine if main order is stateful (long-term/conditional)
-    const isMainOrderStateful = calc(() => {
-      if (!order.orderPayload) return false;
-      const { type, timeInForce } = order.orderPayload;
-      if (type === OrderType.MARKET) return false;
-      if (type === OrderType.LIMIT && timeInForce === OrderTimeInForce.GTT) return true;
-      return false;
-    });
+    const isMainOrderStateful =
+      order.orderPayload != null && isShortTermOrderPayload(order.orderPayload);
 
     // If main order is short-term or doesn't exist, handle it separately
     if (order.orderPayload != null && !isMainOrderStateful) {
@@ -1519,4 +1502,17 @@ class SimpleEvent<T> {
   trigger(data: T): void {
     this.listeners.forEach((listener) => listener(data));
   }
+}
+
+function isShortTermOrderPayload(payload: PlaceOrderPayload) {
+  if (payload.type === OrderType.MARKET) {
+    return true;
+  }
+  if (payload.type === OrderType.LIMIT) {
+    if (payload.timeInForce === OrderTimeInForce.GTT) {
+      return false;
+    }
+    return true;
+  }
+  return false;
 }
