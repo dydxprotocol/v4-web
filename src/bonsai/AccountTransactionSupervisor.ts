@@ -917,7 +917,7 @@ export class AccountTransactionSupervisor {
 
   public async placeCompoundOrder(order: TradeFormPayload, source: TradeMetadataSource) {
     const isMainOrderStateful =
-      order.orderPayload != null && isShortTermOrderPayload(order.orderPayload);
+      order.orderPayload != null && !isShortTermOrderPayload(order.orderPayload);
 
     // If main order is short-term or doesn't exist, handle it separately
     if (order.orderPayload != null && !isMainOrderStateful) {
@@ -1153,7 +1153,7 @@ export class AccountTransactionSupervisor {
                   throw new Error('No subaccount ID found');
                 }
 
-                const subaccountInfo = new SubaccountClient(localWallet, subaccountId);
+                const subaccountInfo = SubaccountClient.forLocalWallet(localWallet, subaccountId);
 
                 const cancelRawOrderPayloads = payload.cancelPayloads.map((cancel) => ({
                   subaccountNumber: cancel.subaccountNumber,
@@ -1508,10 +1508,7 @@ function isShortTermOrderPayload(payload: PlaceOrderPayload) {
   if (payload.type === OrderType.MARKET) {
     return true;
   }
-  if (payload.type === OrderType.LIMIT) {
-    if (payload.timeInForce === OrderTimeInForce.GTT) {
-      return false;
-    }
+  if (payload.type === OrderType.LIMIT && payload.timeInForce === OrderTimeInForce.IOC) {
     return true;
   }
   return false;
