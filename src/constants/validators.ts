@@ -7,3 +7,9 @@ export type ValidatorData = {
   commissionRate: BigNumber;
   website?: string;
 };
+
+export type AccountAuthenticator = {
+  id: string;
+  address: string;
+  publicKey: string;
+};

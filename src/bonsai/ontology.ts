@@ -2,6 +2,7 @@ import { HeightResponse } from '@dydxprotocol/v4-client-js';
 import BigNumber from 'bignumber.js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
+import { AccountAuthenticator } from '@/constants/validators';
 import {
   IndexerFundingPaymentResponseObject,
   IndexerHistoricalBlockTradingReward,
@@ -29,6 +30,7 @@ import {
   useHistoricalTradingRewardsWeekly,
   useTotalTradingRewards,
 } from './rest/historicalTradingRewards';
+import { useAuthorizedAccounts } from './rest/permissionedKeys';
 import {
   StakingDelegationsResult,
   StakingRewards,
@@ -416,6 +418,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
 };
 
 interface BonsaiHooksShape {
+  useAuthorizedAccounts: () => Loadable<AccountAuthenticator[]>;
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
   useDailyCumulativeTradingRewards: () => Loadable<AggregatedTradingReward[]>;
@@ -430,6 +433,7 @@ interface BonsaiHooksShape {
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
+  useAuthorizedAccounts,
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
   useDailyCumulativeTradingRewards,

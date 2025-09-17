@@ -72,6 +72,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         href={href}
         onClick={onClick}
         buttonStyle={buttonStyle}
+        $withoutBackground={buttonStyle === ButtonStyle.WithoutBackground}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} size={iconSize} />
@@ -96,8 +97,10 @@ const withoutBackgroundMixin = css`
   --button-backgroundColor: transparent;
 `;
 
-const $IconButton = styled(Button)`
+const $IconButton = styled(Button)<{ $withoutBackground?: boolean }>`
   ${buttonMixin}
+
+  ${({ $withoutBackground }) => $withoutBackground && withoutBackgroundMixin}
 `;
 
 const $IconToggleButton = styled(ToggleButton)<{ $withoutBackground?: boolean }>`
