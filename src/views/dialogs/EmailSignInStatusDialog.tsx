@@ -180,7 +180,8 @@ export const EmailSignInStatusDialog = ({
 
       <p tw="text-color-text-0">You are now signed in with</p>
       <div tw="row gap-0.5 rounded-[0.75rem] border border-solid border-color-layer-4 bg-color-layer-3 px-1 py-0.5">
-        {icon} <span>{walletInfo.userEmail}</span>
+        {icon}{' '}
+        <span>{walletInfo.providerName === 'apple' ? 'Apple ID' : walletInfo.userEmail}</span>
       </div>
       <Button
         tw="mt-1 w-full"
