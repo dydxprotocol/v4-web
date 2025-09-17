@@ -81,7 +81,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
             }
           );
 
-          const subaccountClient = new SubaccountClient(
+          const subaccountClient = SubaccountClient.forLocalWallet(
             localDydxWallet!,
             parentSubaccountInfo.subaccount
           );
@@ -108,7 +108,10 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
           const { amountToWithdraw, fromSubaccountNumber, usdcBalance, targetAmount } =
             rebalanceAction;
 
-          const subaccountClient = new SubaccountClient(localDydxWallet!, fromSubaccountNumber);
+          const subaccountClient = SubaccountClient.forLocalWallet(
+            localDydxWallet!,
+            fromSubaccountNumber
+          );
 
           logBonsaiInfo(
             'usdcRebalanceLifecycle',

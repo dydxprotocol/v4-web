@@ -64,6 +64,7 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
+        // TODO(spot): Localize
         testFlags.spot && {
           value: 'SPOT',
           label: stringGetter({ key: STRING_KEYS.SPOT }),
@@ -114,6 +115,12 @@ export const HeaderDesktop = () => {
                   )
                 );
               },
+            },
+            {
+              value: 'ApiTradingKeys',
+              slotBefore: <Icon iconName={IconName.Passkey} />,
+              label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
+              onClick: () => dispatch(openDialog(DialogTypes.TradingKeys())),
             },
             {
               value: 'MINTSCAN',
