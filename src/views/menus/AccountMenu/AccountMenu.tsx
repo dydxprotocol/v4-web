@@ -31,7 +31,7 @@ import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { AppleIcon, DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
+import { AppleIcon, AppleLightIcon, DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -136,7 +136,12 @@ export const AccountMenu = () => {
         return <Icon iconComponent={TwitterIcon as ElementType} />;
       }
 
-      return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+      return (
+        <Icon
+          tw="rounded-[0.25rem]"
+          iconComponent={wallets[WalletType.Privy].icon as ElementType}
+        />
+      );
     }
 
     if (
@@ -148,14 +153,22 @@ export const AccountMenu = () => {
       }
 
       if (walletInfo.providerName === 'apple') {
-        return <Icon iconComponent={AppleIcon as ElementType} />;
+        return (
+          <Icon
+            iconComponent={
+              theme === AppTheme.Light
+                ? (AppleIcon as ElementType)
+                : (AppleLightIcon as ElementType)
+            }
+          />
+        );
       }
 
-      return <Icon iconComponent={wallets[WalletType.Privy].icon as ElementType} />;
+      return <Icon iconComponent={wallets[WalletType.Turnkey].icon as ElementType} />;
     }
 
     return <WalletIcon wallet={walletInfo} />;
-  }, [onboardingState, walletInfo, google, discord, twitter]);
+  }, [onboardingState, walletInfo, google, discord, twitter, theme]);
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />

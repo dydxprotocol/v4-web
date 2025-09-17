@@ -13,6 +13,7 @@ import {
   MetaMaskIcon,
   OkxWalletIcon,
   PhantomIcon,
+  PrivyIcon,
   WalletConnectIcon,
 } from '@/icons';
 
@@ -147,8 +148,8 @@ export const wallets = {
   },
   [WalletType.Privy]: {
     type: WalletType.Privy,
-    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
-    icon: EmailIcon,
+    stringKey: STRING_KEYS.PRIVY,
+    icon: PrivyIcon,
   },
   [WalletType.Phantom]: {
     type: WalletType.Phantom,

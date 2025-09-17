@@ -183,7 +183,7 @@ export const RevealPhrase = ({
             dispatch(openDialog(DialogTypes.DisconnectWallet({})));
           }}
         >
-          {stringGetter({ key: STRING_KEYS.DISCONNECT })}
+          {stringGetter({ key: STRING_KEYS.REAUTHENTICATE })}
         </Button>
       );
     }

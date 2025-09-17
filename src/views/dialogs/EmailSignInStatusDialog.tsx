@@ -172,7 +172,9 @@ export const EmailSignInStatusDialog = ({
             backgroundClip: 'text',
           }}
         >
-          {needsAddressUpload ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX }) : 'Welcome back'}
+          {needsAddressUpload
+            ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX })
+            : stringGetter({ key: STRING_KEYS.WELCOME_BACK })}
         </span>
       </div>
 
