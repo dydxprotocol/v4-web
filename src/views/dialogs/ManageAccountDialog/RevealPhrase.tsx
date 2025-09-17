@@ -231,6 +231,21 @@ export const RevealPhrase = ({
     />
   );
 
+  const iframeCss = `
+    iframe {
+        padding: 0.75rem;
+        width: 100%;
+        height: 100%;
+
+        > body {
+          color: ${theme.textSecondary};
+          background-color: ${theme.layer2};
+          font-size: 0.8438rem;
+          font-weight: 450;
+        }
+    }
+  `;
+
   return (
     <div tw="flexColumn gap-1">
       <div tw="flexColumn gap-0.5">
@@ -253,10 +268,10 @@ export const RevealPhrase = ({
                   boxSizing: 'border-box',
                   position: 'absolute',
                   inset: 0,
-                  color: theme.textSecondary,
-                  backgroundColor: theme.layer2,
                 }}
-              />
+              >
+                <style>{iframeCss}</style>
+              </div>
 
               <span
                 tw="font-small-book"
