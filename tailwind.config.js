@@ -159,10 +159,12 @@ export default {
         '.font-tiny-regular': { font: 'var(--font-tiny-regular)' },
         '.font-tiny-book': { font: 'var(--font-tiny-book)' },
         '.font-tiny-medium': { font: 'var(--font-tiny-medium)' },
+        '.font-tiny-bold': { font: 'var(--font-tiny-bold)' },
 
         '.font-mini-regular': { font: 'var(--font-mini-regular)' },
         '.font-mini-book': { font: 'var(--font-mini-book)' },
         '.font-mini-medium': { font: 'var(--font-mini-medium)' },
+        '.font-mini-bold': { font: 'var(--font-mini-bold)' },
 
         '.font-small-regular': { font: 'var(--font-small-regular)' },
         '.font-small-book': { font: 'var(--font-small-book)' },
@@ -193,6 +195,8 @@ export default {
         '.font-extra-large-book': { font: 'var(--font-extra-large-book)' },
         '.font-extra-large-medium': { font: 'var(--font-extra-large-medium)' },
         '.font-extra-large-bold': { font: 'var(--font-extra-large-bold)' },
+
+        '.font-mono': { fontFamily: 'var(--fontFamily-monospace)' },
       });
       addComponents({
         '.row': {

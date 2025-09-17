@@ -1,7 +1,9 @@
+import { logBonsaiError } from '@/bonsai/logs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { WalletInfo, WalletNetworkType } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, WalletNetworkType } from '@/constants/wallets';
+import { TurnkeyEmailOnboardingData, TurnkeyWallet } from '@/types/turnkey';
 
 export type SourceAccount = {
   address?: string;
@@ -18,6 +20,8 @@ export interface WalletState {
     subaccountNumber?: number;
   };
   localWalletNonce?: number;
+  turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
+  turnkeyPrimaryWallet?: TurnkeyWallet;
 }
 
 const initialState: WalletState = {
@@ -32,6 +36,8 @@ const initialState: WalletState = {
     subaccountNumber: 0,
   },
   localWalletNonce: undefined,
+  turnkeyEmailOnboardingData: undefined,
+  turnkeyPrimaryWallet: undefined,
 };
 
 export const walletSlice = createSlice({
@@ -68,6 +74,19 @@ export const walletSlice = createSlice({
 
       state.sourceAccount.encryptedSignature = action.payload;
     },
+    setRequiresAddressUpload: (state, action: PayloadAction<boolean>) => {
+      if (state.sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+        state.sourceAccount.walletInfo.requiresAddressUpload = action.payload;
+      } else {
+        logBonsaiError(
+          'WalletState',
+          'Attempting to set a Turnkey specific property on a non-turnkey wallet',
+          {
+            walletInfo: state.sourceAccount.walletInfo,
+          }
+        );
+      }
+    },
     clearSavedEncryptedSignature: (state) => {
       state.sourceAccount.encryptedSignature = undefined;
     },
@@ -77,6 +96,18 @@ export const walletSlice = createSlice({
     ) => {
       state.localWallet = payload;
     },
+    setTurnkeyEmailOnboardingData: (state, action: PayloadAction<TurnkeyEmailOnboardingData>) => {
+      state.turnkeyEmailOnboardingData = action.payload;
+    },
+    clearTurnkeyEmailOnboardingData: (state) => {
+      state.turnkeyEmailOnboardingData = undefined;
+    },
+    setTurnkeyPrimaryWallet: (state, action: PayloadAction<TurnkeyWallet>) => {
+      state.turnkeyPrimaryWallet = action.payload;
+    },
+    clearTurnkeyPrimaryWallet: (state) => {
+      state.turnkeyPrimaryWallet = undefined;
+    },
     clearSourceAccount: (state) => {
       state.sourceAccount = {
         address: undefined,
@@ -84,6 +115,7 @@ export const walletSlice = createSlice({
         encryptedSignature: undefined,
         walletInfo: undefined,
       };
+      state.turnkeyPrimaryWallet = undefined;
     },
   },
 });
@@ -91,9 +123,14 @@ export const walletSlice = createSlice({
 export const {
   setLocalWalletNonce,
   setSourceAddress,
+  setRequiresAddressUpload,
   setWalletInfo,
   setSavedEncryptedSignature,
   clearSavedEncryptedSignature,
   clearSourceAccount,
   setLocalWallet,
+  setTurnkeyEmailOnboardingData,
+  clearTurnkeyEmailOnboardingData,
+  setTurnkeyPrimaryWallet,
+  clearTurnkeyPrimaryWallet,
 } = walletSlice.actions;

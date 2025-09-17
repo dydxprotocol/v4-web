@@ -20,6 +20,7 @@ export type AdjustIsolatedMarginDialogProps = {
   positionId: SubaccountPosition['uniqueId'];
 };
 export type CheckEmailDialogProps = {
+  userEmail: string;
   onClose: () => void;
 };
 export type ClosePositionDialogProps = {};
@@ -31,8 +32,10 @@ export type ComplianceConfigDialogProps = {};
 export type ConfirmPendingDepositDialogProps = {
   usdcBalance: number;
 };
+export type DepositAddressDialogProps = {};
 export type DisconnectWalletDialogProps = {};
 export type DisplaySettingsDialogProps = {};
+export type EmailSignInStatusDialogProps = {};
 export type ExchangeOfflineDialogProps = { preventClose?: boolean };
 export type ExternalLinkDialogProps = {
   buttonText?: ReactNode;
@@ -47,6 +50,7 @@ export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
+export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
 export type MobileSignInDialogProps = {};
@@ -128,10 +132,12 @@ export const DialogTypes = unionize(
     CoinbaseDepositDialog: ofType<CoinbaseDepositDialogProps>(),
     ConfirmPendingDeposit: ofType<ConfirmPendingDepositDialogProps>(),
     Criteria: ofType<CriteriaDialogProps>(),
+    DepositAddresses: ofType<DepositAddressDialogProps>(),
     /* TODO: rename Deposit2 to Deposit once old deposit flow is deprecated */
     Deposit2: ofType<DepositDialog2Props>(),
     DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
     DisplaySettings: ofType<DisplaySettingsDialogProps>(),
+    EmailSignInStatus: ofType<EmailSignInStatusDialogProps>(),
     ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
     ExternalLink: ofType<ExternalLinkDialogProps>(),
     ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
@@ -140,6 +146,7 @@ export const DialogTypes = unionize(
     GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
+    ManageAccount: ofType<ManageAccountDialogProps>(),
     MnemonicExport: ofType<MnemonicExportDialogProps>(),
     MobileDownload: ofType<MobileDownloadDialogProps>(),
     MobileSignIn: ofType<MobileSignInDialogProps>(),

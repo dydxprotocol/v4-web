@@ -1,12 +1,8 @@
-import { useState } from 'react';
-
 import styled, { css } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
-import { MODERATE_DEBOUNCE_MS } from '@/constants/debounce';
-import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks/useStringGetter';
+import { useCopyValue } from '@/hooks/useCopyValue';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -29,17 +25,7 @@ export const CopyButton = ({
   onCopy,
   ...buttonProps
 }: CopyButtonProps) => {
-  const stringGetter = useStringGetter();
-  const [copied, setCopied] = useState(false);
-
-  const copy = () => {
-    if (!value) return;
-
-    setCopied(true);
-    navigator.clipboard.writeText(value);
-    setTimeout(() => setCopied(false), MODERATE_DEBOUNCE_MS);
-    onCopy?.();
-  };
+  const { copied, copy, tooltipString } = useCopyValue({ value, onCopy });
 
   return buttonType === 'text' ? (
     <$InlineRow onClick={copy} copied={copied}>
@@ -47,9 +33,7 @@ export const CopyButton = ({
       <$Icon $copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
     </$InlineRow>
   ) : buttonType === 'icon' ? (
-    <WithTooltip
-      tooltipString={stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
-    >
+    <WithTooltip tooltipString={tooltipString}>
       <$IconButton
         {...buttonProps}
         copied={copied}
@@ -65,7 +49,7 @@ export const CopyButton = ({
       onClick={copy}
     >
       <Icon iconName={IconName.Copy} />
-      {children ?? stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
+      {children ?? tooltipString}
     </Button>
   );
 };

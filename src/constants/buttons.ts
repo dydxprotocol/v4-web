@@ -33,6 +33,7 @@ export enum ButtonAction {
   Reset = 'Reset',
   SimplePrimary = 'SimplePrimary',
   SimpleSecondary = 'SimpleSecondary',
+  AccentFaded = 'AccentFaded',
 }
 
 export enum ButtonState {

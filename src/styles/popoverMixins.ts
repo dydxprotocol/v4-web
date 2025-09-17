@@ -93,9 +93,9 @@ export const popoverMixins = {
     --popover-margin: 0;
     --popover-width: auto;
     --popover-radius: 0.5em;
-    --popover-backgroundColor: var(--color-layer-3);
-    --popover-textColor: ;
-    --popover-shadow-color: var(--color-border);
+    /* --popover-backgroundColor: ; */
+    /* --popover-textColor: ; */
+    /* --popover-shadow-color: ; */
     --popover-shadow-size: 0;
     --popover-backdrop-filter: saturate(120%) blur(6px);
     --popover-origin: var(--radix-popper-transform-origin);
@@ -112,10 +112,10 @@ export const popoverMixins = {
 
     -webkit-backdrop-filter: var(--popover-backdrop-filter);
     backdrop-filter: var(--popover-backdrop-filter);
-    background-color: var(--popover-backgroundColor);
+    background-color: var(--popover-backgroundColor, var(--color-layer-3));
     /* clip-path: inset(0 round calc(var(--popover-radius))); */
     border-radius: var(--popover-radius);
-    box-shadow: 0 0 0 var(--popover-shadow-size) var(--popover-shadow-color);
+    box-shadow: 0 0 0 var(--popover-shadow-size) var(--popover-shadow-color, var(--color-border));
     border: var(--popover-border);
 
     transform-origin: var(--popover-origin);
@@ -234,7 +234,7 @@ export const popoverMixins = {
       &[data-highlighted] // @radix-ui
       {
         filter: brightness(var(--hover-filter-base));
-        background-color: var(--item-highlighted-backgroundColor);
+        background-color: var(--item-highlighted-backgroundColor, var(--color-layer-2));
         color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
         outline: none;
       }

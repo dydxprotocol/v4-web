@@ -24,6 +24,8 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
+import { useEnableTurnkey } from './useEnableTurnkey';
+import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useReferredBy } from './useReferredBy';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useSimpleUiEnabled } from './useSimpleUiEnabled';
@@ -227,7 +229,8 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.OnboardingStepChanged
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const onboardingState = useAppSelector(getOnboardingState);
   const [hasOnboardingStateChanged, setHasOnboardingStateChanged] = useState(false);
 

@@ -11,7 +11,7 @@
     "^react$",
     "<THIRD_PARTY_MODULES>",
     "^@/(constants|abi|types)(.*)$",
-    "^@/(hooks|contexts)(.*)$",
+    "^@/(hooks|contexts|providers)(.*)$",
     "^@/(styles|icons)(.*)$",
     "^@/(components|views|pages|layout)(.*)$",
     "^@/state(.*)$",

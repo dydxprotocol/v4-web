@@ -20,6 +20,7 @@ import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDial
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
+import { EmailSignInStatusDialog } from '@/views/dialogs/EmailSignInStatusDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
@@ -27,6 +28,7 @@ import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog
 import { GeoComplianceDialog } from '@/views/dialogs/GeoComplianceDialog';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { ManageAccountDialog } from '@/views/dialogs/ManageAccountDialog/ManageAccountDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
@@ -48,6 +50,7 @@ import { TestnetFaucetDialog } from '@/views/dialogs/TestnetFaucetDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TradingKeysDialog } from '@/views/dialogs/TradingKeysDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
+import { DepositAddressDialog } from '@/views/dialogs/TransferDialogs/DepositAddressDialog';
 import { DepositDialog2 } from '@/views/dialogs/TransferDialogs/DepositDialog2/DepositDialog2';
 import { TransferStatusDialog } from '@/views/dialogs/TransferDialogs/TransferStatusDialog';
 import { WithdrawDialog2 } from '@/views/dialogs/TransferDialogs/WithdrawDialog2/WithdrawDialog2';
@@ -60,10 +63,12 @@ import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
+import { selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 export const DialogManager = React.memo(() => {
   const dispatch = useAppDispatch();
   const activeDialog = useAppSelector(getActiveDialog);
+  const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
 
   if (!activeDialog) return null;
 
@@ -91,14 +96,18 @@ export const DialogManager = React.memo(() => {
     CoinbaseDepositDialog: (args) => <CoinbaseDepositDialog {...args} {...modalProps} />,
     ComplianceConfig: (args) => <ComplianceConfigDialog {...args} {...modalProps} />,
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
+    DepositAddresses: (args) => <DepositAddressDialog {...args} {...modalProps} />,
     Deposit2: (args) =>
-      isMainnet ? (
+      isTurnkey ? (
+        <DepositAddressDialog {...args} {...modalProps} />
+      ) : isMainnet ? (
         <DepositDialog2 {...args} {...modalProps} />
       ) : (
         <TestnetFaucetDialog {...modalProps} />
       ),
     DisconnectWallet: (args) => <DisconnectDialog {...args} {...modalProps} />,
     DisplaySettings: (args) => <DisplaySettingsDialog {...args} {...modalProps} />,
+    EmailSignInStatus: (args) => <EmailSignInStatusDialog {...args} {...modalProps} />,
     ExchangeOffline: (args) => <ExchangeOfflineDialog {...args} {...modalProps} />,
     ExternalLink: (args) => <ExternalLinkDialog {...args} {...modalProps} />,
     ExternalNavStride: (args) => <ExternalNavStrideDialog {...args} {...modalProps} />,
@@ -107,6 +116,7 @@ export const DialogManager = React.memo(() => {
     GlobalCommand: (args) => <GlobalCommandDialog {...args} {...modalProps} />,
     Help: (args) => <HelpDialog {...args} {...modalProps} />,
     ExternalNavKeplr: (args) => <ExternalNavKeplrDialog {...args} {...modalProps} />,
+    ManageAccount: (args) => <ManageAccountDialog {...args} {...modalProps} />,
     MnemonicExport: (args) => <MnemonicExportDialog {...args} {...modalProps} />,
     MobileDownload: (args) => <MobileDownloadDialog {...args} {...modalProps} />,
     MobileSignIn: (args) => <MobileSignInDialog {...args} {...modalProps} />,

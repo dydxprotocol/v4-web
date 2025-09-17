@@ -220,6 +220,20 @@ const buttonActionVariants = {
       --button-hover-filter: brightness(var(--hover-filter-variant));
     `,
   },
+  [ButtonAction.AccentFaded]: {
+    [ButtonStyle.Default]: css`
+      --button-textColor: var(--color-accent);
+      --button-backgroundColor: var(--color-accent-faded);
+      --button-border: none;
+      --button-hover-filter: none;
+    `,
+    [ButtonStyle.WithoutBackground]: css`
+      --button-textColor: var(--color-accent);
+      --button-backgroundColor: transparent;
+      --button-border: none;
+      --button-hover-filter: none;
+    `,
+  },
 };
 
 const getDisabledStateForButtonAction = (action?: ButtonAction, buttonStyle?: ButtonStyle) => {

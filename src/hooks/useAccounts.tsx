@@ -22,6 +22,8 @@ import {
   WalletNetworkType,
 } from '@/constants/wallets';
 
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
+
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -55,6 +57,7 @@ const useAccountsContext = () => {
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const { endTurnkeySession } = useTurnkeyWallet();
 
   // Wallet connection
   const {
@@ -78,6 +81,7 @@ const useAccountsContext = () => {
   }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
+
   useEffect(() => {
     const { address } = sourceAccount;
     // wallet accounts switched
@@ -177,6 +181,31 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
+      /**
+       * Handle Turnkey separately since it is an embedded wallet.
+       * There will not be an OnboardingState.WalletConnected state, only AccountConnected or Disconnected.
+       */
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+        if (!hasLocalDydxWallet && sourceAccount.encryptedSignature && !blockedGeo) {
+          try {
+            const signature = decryptSignature(sourceAccount.encryptedSignature);
+            await setWalletFromSignature(signature);
+            dispatch(setOnboardingState(OnboardingState.AccountConnected));
+          } catch (error) {
+            log('useAccounts/decryptSignature', error);
+            dispatch(clearSavedEncryptedSignature());
+          }
+        } else if (hasLocalDydxWallet) {
+          dispatch(setOnboardingState(OnboardingState.AccountConnected));
+        } else {
+          dispatch(setOnboardingState(OnboardingState.Disconnected));
+        }
+        return;
+      }
+
+      /**
+       * Handle Test (dYdX), Cosmos (dYdX), Evm, and Solana wallets
+       */
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         const wallet = new (await getLazyLocalWallet())();
@@ -348,11 +377,19 @@ const useAccountsContext = () => {
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
     setLocalDydxWallet(undefined);
+    setLocalNobleWallet(undefined);
+    setLocalOsmosisWallet(undefined);
+    setLocalNeutronWallet(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
   };
 
   const disconnect = async () => {
+    // Turnkey Signout
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      await endTurnkeySession();
+    }
+
     // Disconnect local wallet
     disconnectLocalDydxWallet();
     selectWallet(undefined);

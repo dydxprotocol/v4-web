@@ -103,3 +103,8 @@ export const SuccessTag = styled(Tag)`
   color: var(--color-success);
   border: solid 1px var(--color-success);
 `;
+
+export const PrivateTag = styled(Tag)`
+  background-color: var(--color-gradient-error);
+  color: var(--color-error);
+`;

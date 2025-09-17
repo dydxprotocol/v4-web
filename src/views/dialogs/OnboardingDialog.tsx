@@ -11,6 +11,8 @@ import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnableTurnkey } from '@/hooks/useEnableTurnkey';
+import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -30,7 +32,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { setDisplayChooseWallet, setOnboardedThisSession } from '@/state/account';
 import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { testFlags } from '@/lib/testFlags';
@@ -52,10 +54,10 @@ export const OnboardingDialog = ({
   const { selectWallet, sourceAccount } = useAccounts();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
-
-  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const isTurnkeyEnabled = useEnableTurnkey();
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
   const isSimpleUi = useSimpleUiEnabled();
-  const isTurnkeyEnabled = testFlags.enableTurnkey;
+  const { dydxAddress } = useAccounts();
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -74,10 +76,10 @@ export const OnboardingDialog = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (!currentOnboardingStep) {
+    if (!currentOnboardingStep || dydxAddress) {
       setIsOpen(false);
     }
-  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow]);
+  }, [currentOnboardingStep, setIsOpen, dispatch, showNewDepositFlow, dydxAddress]);
 
   const setIsOpenFromDialog = (open: boolean) => {
     setIsOpen(open);
@@ -100,11 +102,14 @@ export const OnboardingDialog = ({
     );
   };
 
-  const onSubmitEmail = () => {
+  const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
     setIsOpen(false);
     dispatch(
       openDialog(
-        DialogTypes.CheckEmail({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
+        DialogTypes.CheckEmail({
+          userEmail,
+          onClose: () => dispatch(openDialog(DialogTypes.Onboarding())),
+        })
       )
     );
   };
@@ -136,14 +141,16 @@ export const OnboardingDialog = ({
                 <SignIn
                   onDisplayChooseWallet={onDisplayChooseWallet}
                   onSignInWithPasskey={onSignInWithPasskey}
-                  onSubmitEmail={onSubmitEmail}
+                  onSubmitEmail={({ userEmail }: { userEmail: string }) =>
+                    onSubmitEmail({ userEmail })
+                  }
                 />
               </$Content>
             ),
           },
           [OnboardingSteps.ChooseWallet]: {
             title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })
+              stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })
             ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
@@ -243,7 +250,6 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
   }
 
   --dialog-icon-size: 1.25rem;
-  --dialog-content-paddingBottom: 1rem;
 `;
 
 const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:--color-accent]`;
