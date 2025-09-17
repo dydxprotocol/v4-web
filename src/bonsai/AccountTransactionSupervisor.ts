@@ -216,7 +216,10 @@ export class AccountTransactionSupervisor {
       cancelPayload,
       async ({ compositeClient, localWallet, payload }) => {
         // Create a SubaccountClient using the wallet and subaccount number
-        const subaccountClient = new SubaccountClient(localWallet, payload.subaccountNumber);
+        const subaccountClient = SubaccountClient.forLocalWallet(
+          localWallet,
+          payload.subaccountNumber
+        );
 
         // Initiate the cancellation using cancelRawOrder
         return compositeClient.cancelRawOrder(
@@ -379,7 +382,7 @@ export class AccountTransactionSupervisor {
         const isIsolatedCancel = payload.toSubaccountNumber === 0;
 
         const tx = await compositeClient.transferToSubaccount(
-          new SubaccountClient(localWallet, payload.fromSubaccountNumber),
+          SubaccountClient.forLocalWallet(localWallet, payload.fromSubaccountNumber),
           payload.targetAddress,
           payload.toSubaccountNumber,
           MustBigNumber(payload.amount).toFixed(6),
@@ -433,7 +436,10 @@ export class AccountTransactionSupervisor {
           this.store.dispatch(placeOrderTimeout(clientId.toString()));
         }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
-        const subaccountClientToUse = new SubaccountClient(localWallet, subaccountNumberToUse);
+        const subaccountClientToUse = SubaccountClient.forLocalWallet(
+          localWallet,
+          subaccountNumberToUse
+        );
 
         // Place order
         const tx = await compositeClient.placeOrder(

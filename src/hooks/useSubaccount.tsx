@@ -4,10 +4,12 @@ import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor
 import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
+import { getLazyTradingKeyUtils } from '@/bonsai/lib/lazyDynamicLibs';
 import { wrapOperationFailure, wrapOperationSuccess } from '@/bonsai/lib/operationResult';
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import type { EncodeObject } from '@cosmjs/proto-signing';
+import { IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import { SubaccountClient, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { useMutation } from '@tanstack/react-query';
@@ -23,6 +25,7 @@ import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import { removeLatestReferrer } from '@/state/affiliates';
 import { getLatestReferrer } from '@/state/affiliatesSelector';
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { clearLocalOrders } from '@/state/localOrders';
@@ -33,11 +36,14 @@ import { stringifyTransactionError } from '@/lib/errors';
 import { isTruthy } from '@/lib/isTruthy';
 import { parseToPrimitives } from '@/lib/parseToPrimitives';
 import { log } from '@/lib/telemetry';
+import { sleep } from '@/lib/timeUtils';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useReferredBy } from './useReferredBy';
 import { useTokenConfigs } from './useTokenConfigs';
+
+const AUTHORIZED_KEY_UPDATE_DELAY = 1700;
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -148,7 +154,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           };
 
           return await compositeClient.send(
-            subaccountClient.wallet,
+            subaccountClient,
             () => Promise.resolve([msg, ibcMsg]),
             false,
             undefined,
@@ -170,7 +176,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const [subaccountNumber] = useState(0);
 
   const subaccountClient = useMemo(
-    () => (localDydxWallet ? new SubaccountClient(localDydxWallet, subaccountNumber) : undefined),
+    () =>
+      localDydxWallet
+        ? SubaccountClient.forLocalWallet(localDydxWallet, subaccountNumber)
+        : undefined,
     [localDydxWallet, subaccountNumber]
   );
 
@@ -238,7 +247,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!localDydxWallet) {
         return undefined;
       }
-      const subaccountClientForWithdraw = new SubaccountClient(
+      const subaccountClientForWithdraw = SubaccountClient.forLocalWallet(
         localDydxWallet,
         fromSubaccountNumber
       );
@@ -306,13 +315,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet.address) {
+      if (!subaccountClient || !dydxAddress) {
         throw new Error('wallet not initialized');
       }
 
       const response = await compositeClient.validatorClient.post.delegate(
         subaccountClient,
-        subaccountClient.wallet.address,
+        dydxAddress,
         validator,
         parseUnits(amount.toString(), chainTokenDecimals).toString(),
         Method.BroadcastTxCommit
@@ -320,7 +329,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return response;
     },
-    [subaccountClient, compositeClient, chainTokenDecimals]
+    [compositeClient, subaccountClient, dydxAddress, chainTokenDecimals]
   );
 
   const getDelegateFee = useCallback(
@@ -328,12 +337,12 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet?.address) {
+      if (!localDydxWallet?.address || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () =>
           Promise.resolve([
             compositeClient.validatorClient.post.delegateMsg(
@@ -347,7 +356,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const undelegate = useCallback(
@@ -355,7 +364,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -374,7 +383,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.send(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         false,
         compositeClient.validatorClient.post.defaultDydxGasPrice,
@@ -384,7 +393,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const getUndelegateFee = useCallback(
@@ -392,7 +401,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -411,14 +420,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         compositeClient.validatorClient.post.defaultDydxGasPrice
       );
 
       return tx;
     },
-    [localDydxWallet, compositeClient, chainTokenDecimals]
+    [compositeClient, localDydxWallet, subaccountClient, chainTokenDecimals]
   );
 
   const withdrawReward = useCallback(
@@ -426,7 +435,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -440,7 +449,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.send(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         false,
         compositeClient.validatorClient.post.defaultGasPrice,
@@ -450,7 +459,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return tx;
     },
-    [localDydxWallet, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const getWithdrawRewardFee = useCallback(
@@ -458,7 +467,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!localDydxWallet) {
+      if (!localDydxWallet || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
 
@@ -472,14 +481,14 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         .filter(isTruthy);
 
       const tx = await compositeClient.simulate(
-        localDydxWallet,
+        subaccountClient,
         () => Promise.resolve(msgs),
         compositeClient.validatorClient.post.defaultGasPrice
       );
 
       return tx;
     },
-    [localDydxWallet, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const registerAffiliate = useCallback(
@@ -487,10 +496,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       if (!compositeClient) {
         throw new Error('client not initialized');
       }
-      if (!subaccountClient?.wallet.address) {
+      if (!localDydxWallet?.address || !subaccountClient) {
         throw new Error('wallet not initialized');
       }
-      if (affiliate === subaccountClient.wallet.address) {
+      if (affiliate === localDydxWallet.address) {
         throw new Error('affiliate can not be the same as referree');
       }
       try {
@@ -504,7 +513,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         throw error;
       }
     },
-    [subaccountClient, compositeClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const latestReferrer = useAppSelector(getLatestReferrer);
@@ -606,7 +615,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     async (params: SubaccountTransferPayload, memo?: string) => {
       try {
         const subaccount = localDydxWallet
-          ? new SubaccountClient(localDydxWallet, params.subaccountNumber)
+          ? SubaccountClient.forLocalWallet(localDydxWallet, params.subaccountNumber)
           : undefined;
 
         if (subaccount == null) {
@@ -647,7 +656,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   const createTransferMessage = useCallback(
     (payload: TransferPayload) => {
-      if (subaccountClient == null) {
+      if (subaccountClient == null || !localDydxWallet) {
         throw new Error('local wallet client not initialized');
       }
 
@@ -667,7 +676,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (payload.type === TransferToken.NATIVE) {
         return compositeClient.sendTokenMessage(
-          subaccountClient.wallet,
+          localDydxWallet,
           payload.amount.toString(),
           payload.recipient
         );
@@ -675,7 +684,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       assertNever(payload);
       return undefined;
     },
-    [compositeClient, subaccountClient]
+    [compositeClient, localDydxWallet, subaccountClient]
   );
 
   const simulateTransfer = useCallback(
@@ -701,7 +710,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
 
         const tx = await compositeClient.simulate(
-          subaccountClient.wallet,
+          subaccountClient,
           () => Promise.resolve([message]),
           gasPrice
         );
@@ -752,7 +761,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
 
         const result = await compositeClient.validatorClient.post.send(
-          subaccountClient.wallet,
+          subaccountClient,
           () => Promise.resolve([message]),
           false,
           gasPrice,
@@ -778,6 +787,90 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       }
     },
     [subaccountClient, compositeClient, createTransferMessage]
+  );
+
+  const createRandomTradingKeyWallet = useCallback(async () => {
+    return (await getLazyTradingKeyUtils()).createNewRandomDydxWallet();
+  }, []);
+
+  const authorizeTradingKeyWallet = useCallback(
+    async (tradingKeyWallet: Awaited<ReturnType<typeof createRandomTradingKeyWallet>>) => {
+      if (tradingKeyWallet == null) {
+        throw new Error('trading key wallet is invalid');
+      }
+
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      const { data, type } = await (
+        await getLazyTradingKeyUtils()
+      ).getAuthorizeNewTradingKeyArguments({
+        generatedWalletPubKey: tradingKeyWallet.publicKey,
+      });
+      try {
+        const creationResult = await compositeClient.addAuthenticator(subaccountClient, type, data);
+
+        if ((creationResult as IndexedTx | undefined)?.code !== 0) {
+          throw new Error('create authenticator operation failed');
+        }
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError(
+          'useSubaccount/authorizeTradingKeyWallet',
+          'Failed to authorize trading key wallet',
+          {
+            parsed,
+          }
+        );
+      } finally {
+        await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
+        await appQueryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
+        });
+      }
+
+      return tradingKeyWallet;
+    },
+    [compositeClient, subaccountClient]
+  );
+
+  const removeAuthorizedKey = useCallback(
+    async (idToRemove: string) => {
+      if (subaccountClient == null) {
+        throw new Error('local wallet client not initialized');
+      }
+
+      if (compositeClient == null) {
+        throw new Error('Missing compositeClient or localWallet');
+      }
+
+      try {
+        await compositeClient.removeAuthenticator(subaccountClient, idToRemove);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError(
+          'useSubaccount/removeAuthorizedKey',
+          'Failed to remove authorized trading key wallet',
+          {
+            parsed,
+            idToRemove,
+          }
+        );
+      } finally {
+        await sleep(AUTHORIZED_KEY_UPDATE_DELAY);
+        await appQueryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['validator', 'permissionedKeys', 'authorizedAccounts'],
+        });
+      }
+    },
+    [compositeClient, subaccountClient]
   );
 
   return {
@@ -814,5 +907,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     getVaultAccountInfo,
     depositToMegavault,
     withdrawFromMegavault,
+
+    // Permissioned Keys
+    createRandomTradingKeyWallet,
+    authorizeTradingKeyWallet,
+    removeAuthorizedKey,
   };
 };

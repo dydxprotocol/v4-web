@@ -64,7 +64,7 @@ export function setUpReclaimChildSubaccountBalancesLifecycle(store: RootStore) {
         throw new Error('Parent subaccount wallet is not set');
       }
 
-      const subaccountClient = new SubaccountClient(
+      const subaccountClient = SubaccountClient.forLocalWallet(
         localDydxWallet!,
         childSubaccountFunds.subaccountNumber
       );
