@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { selectIndexerReady } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { avalanche, polygon } from 'viem/chains';
+import { avalanche, mainnet, polygon } from 'viem/chains';
 
 import { AlertType } from '@/constants/alerts';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
@@ -14,6 +14,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCopyValue } from '@/hooks/useCopyValue';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -25,14 +26,23 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { formatNumberOutput, OutputType } from '@/components/Output';
 import { QrCode } from '@/components/QrCode';
 import { SelectItem, SelectMenu, SelectMenuTrigger } from '@/components/SelectMenu';
 import { TabGroup } from '@/components/TabGroup';
 import { WithLabel } from '@/components/WithLabel';
 
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+
+import { calc } from '@/lib/do';
 
 type DepositTab = 'spot' | 'perpetuals';
+
+const MIN_DEPOSIT = 10;
+const MAX_DEPOSIT = 100_000;
+const ETH_MIN_DEPOSIT = 20;
+const ETH_MIN_INSTANT_DEPOSIT = 50;
 
 export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const [selectedChain, setSelectedChain] = useState('1');
@@ -126,30 +136,53 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     };
   }, [depositAddress]);
 
+  const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+
   const warningMessage = useMemo(() => {
-    const chainName = CHAIN_INFO[selectedChain]?.name;
-    const assets =
-      selectedChain === SOLANA_MAINNET_ID
-        ? 'USDC'
-        : selectedChain === avalanche.id.toString()
-          ? 'USDC or AVAX'
-          : 'USDC or ETH';
+    const warningMessageParams = calc(() => {
+      const chainName = CHAIN_INFO[selectedChain]?.name;
+
+      const assets =
+        selectedChain === SOLANA_MAINNET_ID
+          ? 'USDC'
+          : selectedChain === avalanche.id.toString()
+            ? 'USDC'
+            : `USDC ${stringGetter({ key: STRING_KEYS.OR })} ETH`;
+
+      const maxDeposit = formatNumberOutput(MAX_DEPOSIT, OutputType.CompactNumber, {
+        decimalSeparator,
+        groupSeparator,
+        selectedLocale,
+      });
+
+      if (selectedChain === mainnet.id.toString()) {
+        return {
+          ASSETS: assets,
+          NETWORK: CHAIN_INFO[mainnet.id]?.name,
+          MIN_DEPOSIT: ETH_MIN_DEPOSIT,
+          MIN_INSTANT_DEPOSIT: ETH_MIN_INSTANT_DEPOSIT,
+          MAX_DEPOSIT: maxDeposit,
+        };
+      }
+      return {
+        ASSETS: assets,
+        NETWORK: chainName,
+        MIN_DEPOSIT,
+        MIN_INSTANT_DEPOSIT: MIN_DEPOSIT,
+        MAX_DEPOSIT: maxDeposit,
+      };
+    });
 
     return (
       <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
         {stringGetter({
           key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
-          params: {
-            ASSETS: assets,
-            NETWORK: chainName,
-            MIN_DEPOSIT: '20000',
-            MIN_INSTANT_DEPOSIT: '50000',
-            MAX_DEPOSIT: '50000000',
-          },
+          params: warningMessageParams,
         })}
       </AlertMessage>
     );
-  }, [selectedChain, stringGetter]);
+  }, [selectedChain, stringGetter, decimalSeparator, groupSeparator, selectedLocale]);
 
   const { copied, copy } = useCopyValue({ value: depositAddress });
 
@@ -197,6 +230,17 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       </div>
     </$AddressCard>
   );
+
+  const getAcceptedAssets = (id: string | number) => {
+    if (id === SOLANA_MAINNET_ID || id === avalanche.id) {
+      return stringGetter({ key: STRING_KEYS.ACCEPTS_ONLY_USDC });
+    }
+
+    return stringGetter({
+      key: STRING_KEYS.ACCEPTED_ASSETS_AND_USDC,
+      params: { ASSETS: CHAIN_INFO[id]?.gasDenom },
+    });
+  };
 
   return (
     <$Dialog
@@ -268,14 +312,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
                 <div tw="row justify-between gap-0.5">
                   <div tw="flexColumn gap-0.25">
                     <div>{CHAIN_INFO[id]?.name}</div>
-                    <div tw="text-color-text-0 font-small-book">
-                      {stringGetter({
-                        key: STRING_KEYS.ACCEPTED_ASSETS_AND_USDC,
-                        params: {
-                          ASSETS: CHAIN_INFO[id]?.gasDenom,
-                        },
-                      })}
-                    </div>
+                    <div tw="text-color-text-0 font-small-book">{getAcceptedAssets(id)}</div>
                   </div>
                   <img
                     tw="size-1.5 rounded-[50%]"
