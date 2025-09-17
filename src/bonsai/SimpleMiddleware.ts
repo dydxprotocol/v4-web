@@ -70,7 +70,7 @@ function wrapperTaskBuilder<TContext extends {}>(topMiddleware: TopLevelMiddlewa
             } catch (error) {
               // eslint-disable-next-line no-console
               console.error(
-                'Middleware engine threw an errror. Middleware should never throw errors.',
+                'Middleware engine threw an error. Middleware should never throw erors.',
                 error
               );
               return createMiddlewareFailureResult(

@@ -539,18 +539,7 @@ export class AccountTransactionSupervisor {
           const transferMetadata = { sourceSubaccount, sourceAddress };
 
           const payloadBase = context.payload;
-          const isShortTermOrder = calc(() => {
-            if (payloadBase.type === OrderType.MARKET) {
-              return true;
-            }
-            if (payloadBase.type === OrderType.LIMIT) {
-              if (payloadBase.timeInForce === OrderTimeInForce.GTT) {
-                return false;
-              }
-              return true;
-            }
-            return false;
-          });
+          const isShortTermOrder = isShortTermOrderPayload(payloadBase);
           const payload: PlaceOrderPayload = {
             ...payloadBase,
             currentHeight,
@@ -927,37 +916,323 @@ export class AccountTransactionSupervisor {
   }
 
   public async placeCompoundOrder(order: TradeFormPayload, source: TradeMetadataSource) {
-    if (order.orderPayload != null) {
+    const isMainOrderStateful =
+      order.orderPayload != null && !isShortTermOrderPayload(order.orderPayload);
+
+    // If main order is short-term or doesn't exist, handle it separately
+    if (order.orderPayload != null && !isMainOrderStateful) {
       const res = await this.placeOrder(order.orderPayload, source);
       if (isOperationFailure(res)) {
         return res;
       }
     }
-    if (order.triggersPayloads != null && order.triggersPayloads.length > 0) {
-      const operations = await Promise.all(
-        order.triggersPayloads.map(async (operationPayload) => {
-          if (operationPayload.cancelPayload?.orderId) {
-            const res = await this.cancelOrder({
-              orderId: operationPayload.cancelPayload.orderId,
-            });
-            if (isOperationFailure(res)) {
-              return res;
-            }
-          }
-          if (operationPayload.placePayload != null) {
-            const res = await this.placeOrder(operationPayload.placePayload, source);
-            if (isOperationFailure(res)) {
-              return res;
-            }
-          }
-          return wrapOperationSuccess(true);
+
+    // Handle stateful main order + trigger orders together in bulk
+    const hasStatefulOperations = isMainOrderStateful || (order.triggersPayloads?.length ?? 0) > 0;
+
+    if (hasStatefulOperations) {
+      return (
+        taskBuilder({
+          payload: {
+            mainOrderPayload: isMainOrderStateful ? order.orderPayload : undefined,
+            triggersPayloads: order.triggersPayloads ?? [],
+            source,
+          },
         })
+          .with<AddSharedContextMiddlewareProps>(
+            addSharedContextMiddleware(
+              'AccountTransactionSupervisor/executeBulkStatefulOrders',
+              this.shared
+            )
+          )
+          .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
+          // Prepare payloads with current height and collect cancel/place operations
+          .with<{
+            cancelPayloads: CancelOrderPayload[];
+            placePayloads: PlaceOrderPayload[];
+            transferPayload:
+              | { fromSubaccount: number; toSubaccount: number; amount: number; address: string }
+              | undefined;
+            currentHeight: number;
+          }>(async (context, next) => {
+            // Get current height for orders that need it
+            const currentHeight = estimateLiveValidatorHeight(
+              this.store.getState(),
+              BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+            );
+
+            if (currentHeight == null) {
+              return createMiddlewareFailureResult(
+                wrapSimpleError(
+                  context.fnName,
+                  'validator height unknown',
+                  STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
+                ),
+                context
+              );
+            }
+
+            const cancelPayloads: CancelOrderPayload[] = [];
+            const placePayloads: PlaceOrderPayload[] = [];
+            let transferPayload:
+              | { fromSubaccount: number; toSubaccount: number; amount: number; address: string }
+              | undefined;
+
+            // Add main order if it's stateful
+            if (context.payload.mainOrderPayload) {
+              const mainPayload = context.payload.mainOrderPayload;
+
+              // Check if we need a transfer for isolated margin
+              if (
+                mainPayload.transferToSubaccountAmount != null &&
+                mainPayload.transferToSubaccountAmount > 0
+              ) {
+                const sourceSubaccount = getSubaccountId(this.store.getState());
+                const sourceAddress = getUserWalletAddress(this.store.getState());
+
+                if (sourceSubaccount == null || sourceAddress == null) {
+                  return createMiddlewareFailureResult(
+                    wrapSimpleError(
+                      context.fnName,
+                      'unknown parent subaccount number or address',
+                      STRING_KEYS.SOMETHING_WENT_WRONG
+                    ),
+                    context
+                  );
+                }
+
+                transferPayload = {
+                  fromSubaccount: sourceSubaccount,
+                  toSubaccount: mainPayload.subaccountNumber,
+                  amount: mainPayload.transferToSubaccountAmount,
+                  address: sourceAddress,
+                };
+              }
+
+              placePayloads.push({
+                ...mainPayload,
+                currentHeight,
+              });
+            }
+
+            // Process trigger payloads
+            context.payload.triggersPayloads.forEach((operationPayload) => {
+              if (operationPayload.cancelPayload?.orderId) {
+                const cancelPayload = this.createCancelOrderPayload(
+                  operationPayload.cancelPayload.orderId
+                );
+                if (cancelPayload != null) {
+                  cancelPayloads.push(cancelPayload);
+                }
+              }
+              if (operationPayload.placePayload != null) {
+                placePayloads.push({
+                  ...operationPayload.placePayload,
+                  currentHeight,
+                });
+              }
+            });
+
+            return next({
+              ...context,
+              cancelPayloads,
+              placePayloads,
+              transferPayload,
+              currentHeight,
+            });
+          })
+          // Dispatch store updates for submissions
+          .with<{}>(async (context, next) => {
+            // Dispatch place order submissions and set timeouts
+            context.placePayloads.forEach((placePayload) => {
+              this.store.dispatch(
+                placeOrderSubmitted({
+                  marketId: placePayload.marketId,
+                  clientId: `${placePayload.clientId}`,
+                  orderType: placePayload.type,
+                  subaccountNumber: placePayload.subaccountNumber,
+                })
+              );
+
+              // Set timeout for order to be considered failed if not committed
+              setTimeout(() => {
+                this.store.dispatch(placeOrderTimeout(placePayload.clientId.toString()));
+              }, UNCOMMITTED_ORDER_TIMEOUT_MS);
+            });
+
+            const result = await next(context);
+            const unpackedResult = result.result;
+
+            // Handle failures
+            if (isOperationFailure(unpackedResult)) {
+              // Dispatch place order failures
+              context.placePayloads.forEach((placePayload) => {
+                this.store.dispatch(
+                  placeOrderFailed({
+                    clientId: `${placePayload.clientId}`,
+                    errorParams: operationFailureToErrorParams(unpackedResult),
+                  })
+                );
+              });
+            }
+
+            return result;
+          })
+          // Analytics tracking with confirmation events
+          .with<{
+            placeConfirmEvent: SimpleEvent<{}>;
+          }>(async (context, next) => {
+            const { placePayloads, payload } = context;
+
+            const submitTime = createTimer();
+            const confirmEvent = new SimpleEvent<{}>();
+
+            // Track each place order
+            placePayloads.forEach((placePayload) => {
+              const trackingData = {
+                ...placePayload,
+                source: payload.source,
+                volume: placePayload.size * placePayload.price,
+              };
+
+              track(AnalyticsEvents.TradePlaceOrder(trackingData));
+
+              confirmEvent.addListener(() => {
+                track(
+                  AnalyticsEvents.TradePlaceOrderConfirmed({
+                    ...trackingData,
+                    roundtripMs: startTime.elapsed(),
+                    sinceSubmissionMs: submitTime.elapsed(),
+                  })
+                );
+              });
+            });
+
+            const startTime = startTimer();
+            const result = await next({ ...context, placeConfirmEvent: confirmEvent });
+            submitTime.start();
+            const unpackedResult = result.result;
+
+            if (isOperationFailure(unpackedResult)) {
+              placePayloads.forEach((placePayload) => {
+                track(
+                  AnalyticsEvents.TradePlaceOrderSubmissionFailed({
+                    ...placePayload,
+                    error: unpackedResult.errorString,
+                    durationMs: startTime.elapsed(),
+                    source: payload.source,
+                    volume: placePayload.size * placePayload.price,
+                  })
+                );
+              });
+            } else {
+              placePayloads.forEach((placePayload) => {
+                track(
+                  AnalyticsEvents.TradePlaceOrderSubmissionConfirmed({
+                    ...placePayload,
+                    durationMs: startTime.elapsed(),
+                    source: payload.source,
+                    volume: placePayload.size * placePayload.price,
+                  })
+                );
+              });
+            }
+
+            return result;
+          })
+          .do(async (context) => {
+            const { cancelPayloads, placePayloads, transferPayload, placeConfirmEvent } = context;
+
+            const result = await this.wrapOperation(
+              context.fnName,
+              { cancelPayloads, placePayloads, transferPayload },
+              async ({ compositeClient, localWallet, payload }) => {
+                const state = this.store.getState();
+                const subaccountId = getSubaccountId(state);
+                if (subaccountId == null) {
+                  throw new Error('No subaccount ID found');
+                }
+
+                const subaccountInfo = SubaccountClient.forLocalWallet(localWallet, subaccountId);
+
+                const cancelRawOrderPayloads = payload.cancelPayloads.map((cancel) => ({
+                  subaccountNumber: cancel.subaccountNumber,
+                  clientId: cancel.clientId,
+                  orderFlags: cancel.orderFlags,
+                  clobPairId: cancel.clobPairId,
+                  goodTilBlock: cancel.goodTilBlock,
+                  goodTilBlockTime: cancel.goodTilBlockTime,
+                }));
+
+                const transferToSubaccountPayload = payload.transferPayload
+                  ? {
+                      sourceSubaccountNumber: payload.transferPayload.fromSubaccount,
+                      recipientSubaccountNumber: payload.transferPayload.toSubaccount,
+                      transferAmount: MustBigNumber(payload.transferPayload.amount).toFixed(6),
+                    }
+                  : undefined;
+
+                if (
+                  cancelRawOrderPayloads.length === 0 &&
+                  transferToSubaccountPayload == null &&
+                  payload.placePayloads.length === 0
+                ) {
+                  return true;
+                }
+
+                const tx = await compositeClient.bulkCancelAndTransferAndPlaceStatefulOrders(
+                  subaccountInfo,
+                  cancelRawOrderPayloads,
+                  transferToSubaccountPayload,
+                  payload.placePayloads,
+                  TransactionMemo.placeOrder
+                );
+
+                if ((tx as IndexedTx | undefined)?.code !== 0) {
+                  throw new StatefulOrderError(
+                    'Bulk stateful order operation failed to commit.',
+                    tx
+                  );
+                }
+
+                return tx;
+              },
+              {
+                selector: BonsaiCore.account.allOrders.data,
+                validator: (orders) => {
+                  // Check if all placed orders are confirmed
+                  const allPlacedConfirmed = placePayloads.every((payload) =>
+                    orders.find((o) => o.clientId === `${payload.clientId}`)
+                  );
+
+                  // Check if all canceled orders are confirmed canceled
+                  const allCanceledConfirmed = cancelPayloads.every((payload) => {
+                    if (!payload.originalOrder) return true;
+                    const confirmedOrder = orders.find((o) => o.id === payload.originalOrder!.id);
+                    return (
+                      confirmedOrder?.status != null &&
+                      getSimpleOrderStatus(confirmedOrder.status) === OrderStatus.Canceled
+                    );
+                  });
+
+                  if (allPlacedConfirmed && allCanceledConfirmed) {
+                    return { allConfirmed: true };
+                  }
+                  return undefined;
+                },
+                onTrigger: (success) => {
+                  if (success) {
+                    placeConfirmEvent.trigger({});
+                  }
+                },
+              }
+            )();
+
+            return result;
+          })
       );
-      const failure = operations.find(isOperationFailure);
-      if (failure != null) {
-        return failure;
-      }
     }
+
     return wrapOperationSuccess(true);
   }
 
@@ -1227,4 +1502,14 @@ class SimpleEvent<T> {
   trigger(data: T): void {
     this.listeners.forEach((listener) => listener(data));
   }
+}
+
+function isShortTermOrderPayload(payload: PlaceOrderPayload) {
+  if (payload.type === OrderType.MARKET) {
+    return true;
+  }
+  if (payload.type === OrderType.LIMIT && payload.timeInForce === OrderTimeInForce.IOC) {
+    return true;
+  }
+  return false;
 }
