@@ -64,10 +64,9 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
-        // TODO(spot): Localize
         testFlags.spot && {
           value: 'SPOT',
-          label: 'Spot',
+          label: stringGetter({ key: STRING_KEYS.SPOT }),
           href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
         },
         {

@@ -315,7 +315,7 @@ export const AccountMenu = () => {
           isTurnkey && {
             value: 'ManageAccount',
             icon: <Icon iconName={IconName.Gear} />,
-            label: 'Account Management', // TODO(turnkey): Localization
+            label: stringGetter({ key: STRING_KEYS.ACCOUNT_MANAGEMENT }),
             onSelect: () => dispatch(openDialog(DialogTypes.ManageAccount())),
           },
         affiliatesEnabled &&

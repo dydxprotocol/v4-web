@@ -30,7 +30,6 @@ import { getSourceAccount } from '@/state/walletSelectors';
 
 type ExportWalletType = 'turnkey' | 'dydx';
 
-// TODO(turnkey): Localization
 export const RevealPhrase = ({
   closeDialog,
   exportWalletType,
@@ -73,7 +72,7 @@ export const RevealPhrase = ({
         };
       }
 
-      setErrorMessage('Session expired. Please disconnect and login again to reveal your phrase.');
+      setErrorMessage(stringGetter({ key: STRING_KEYS.TURNKEY_SESSION_EXPIRED }));
 
       return {
         session: null,
@@ -239,7 +238,7 @@ export const RevealPhrase = ({
           <AccentTag tw="rounded-[360px] px-0.5 py-0.25 font-tiny-bold">
             {exportWalletType === 'turnkey' ? 'Turnkey' : 'dYdX'}
           </AccentTag>
-          Secret Recovery Phrase
+          {stringGetter({ key: STRING_KEYS.SECRET_RECOVERY_PHRASE })}
         </span>
 
         <div tw="row relative justify-center overflow-hidden rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
@@ -286,8 +285,7 @@ export const RevealPhrase = ({
       </div>
 
       <AlertMessage withAccentText type={AlertType.Error} tw="rounded-0.375">
-        {errorMessage ??
-          'Your recovery key can grant anyone to access your funds. Save it in a secure, private location.'}
+        {errorMessage ?? stringGetter({ key: STRING_KEYS.RECOVERY_PHRASE_WARNING })}
       </AlertMessage>
 
       {ctaButton}

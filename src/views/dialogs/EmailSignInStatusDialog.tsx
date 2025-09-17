@@ -22,7 +22,6 @@ import { getSourceAccount } from '@/state/walletSelectors';
 import { calc } from '@/lib/do';
 import { sleep } from '@/lib/timeUtils';
 
-// TODO(turnkey): Localization
 export const EmailSignInStatusDialog = ({
   setIsOpen,
 }: {
@@ -50,28 +49,33 @@ export const EmailSignInStatusDialog = ({
     [setIsOpen, resetEmailSignInStatus]
   );
 
-  // TODO(turnkey): Localization - Pending Design
   const title = useMemo(
     () =>
       ({
-        loading: 'Logging in...',
-        error: 'Error logging in',
-        success: isTurnkey ? `Logged in with ${walletInfo.userEmail}` : 'Logged in',
-        idle: 'Logging in...',
+        loading: stringGetter({ key: STRING_KEYS.LOGGING_IN }),
+        error: stringGetter({ key: STRING_KEYS.ERROR_LOGGING_IN }),
+        success: isTurnkey
+          ? stringGetter({
+              key: STRING_KEYS.LOGGED_IN_WITH,
+              params: {
+                EMAIL: walletInfo.userEmail,
+              },
+            })
+          : stringGetter({ key: STRING_KEYS.LOGGED_IN }),
+        idle: stringGetter({ key: STRING_KEYS.LOGGING_IN }),
       })[emailSignInStatus],
-    [emailSignInStatus, isTurnkey, walletInfo]
+    [emailSignInStatus, isTurnkey, walletInfo, stringGetter]
   );
 
-  // TODO(turnkey): Localization - Pending Design
   const description = useMemo(
     () =>
       ({
-        loading: 'Please wait while we log you in...',
-        error: emailSignInError ?? 'An error occurred while logging in. Please try again.',
-        success: 'You are now logged in with your email account.',
-        idle: 'Please wait while we log you in...',
+        loading: stringGetter({ key: STRING_KEYS.PLEASE_WAIT_LOGIN }),
+        error: emailSignInError ?? stringGetter({ key: STRING_KEYS.ERROR_WHILE_LOGGING_IN }),
+        success: stringGetter({ key: STRING_KEYS.EMAIL_LOGIN_SUCCESS }),
+        idle: stringGetter({ key: STRING_KEYS.PLEASE_WAIT_LOGIN }),
       })[emailSignInStatus],
-    [emailSignInStatus, emailSignInError]
+    [emailSignInStatus, emailSignInError, stringGetter]
   );
 
   const icon = useMemo(() => {
@@ -190,7 +194,7 @@ export const EmailSignInStatusDialog = ({
         }}
       >
         {needsAddressUpload
-          ? 'Deposit and Start Trading →'
+          ? `${stringGetter({ key: STRING_KEYS.DEPOSIT_AND_TRADE })} →`
           : stringGetter({ key: STRING_KEYS.CONTINUE })}
       </Button>
     </div>

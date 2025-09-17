@@ -137,11 +137,19 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
     return (
       <AlertMessage withAccentText type={AlertType.Warning} tw="font-small-medium">
-        Only deposit {assets} on {chainName} network. <br />
-        Any other assets sent to this address can result in a loss of funds.
+        {stringGetter({
+          key: STRING_KEYS.DEPOSIT_NETWORK_WARNING,
+          params: {
+            ASSETS: assets,
+            NETWORK: chainName,
+            MIN_DEPOSIT: '20000',
+            MIN_INSTANT_DEPOSIT: '50000',
+            MAX_DEPOSIT: '50000000',
+          },
+        })}
       </AlertMessage>
     );
-  }, [selectedChain]);
+  }, [selectedChain, stringGetter]);
 
   const { copied, copy } = useCopyValue({ value: depositAddress });
 
@@ -214,8 +222,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
               value={selectedTab}
               onTabChange={setSelectedTab}
               options={[
-                // TODO(spot): Localize
-                { label: 'Spot', value: 'spot', disabled: true },
+                { label: stringGetter({ key: STRING_KEYS.SPOT }), value: 'spot', disabled: true },
                 { label: stringGetter({ key: STRING_KEYS.PERPETUALS }), value: 'perpetuals' },
               ]}
             />
@@ -262,7 +269,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
                   <div tw="flexColumn gap-0.25">
                     <div>{CHAIN_INFO[id]?.name}</div>
                     <div tw="text-color-text-0 font-small-book">
-                      {CHAIN_INFO[id]?.gasDenom}, USDC accepted
+                      {stringGetter({
+                        key: STRING_KEYS.ACCEPTED_ASSETS_AND_USDC,
+                        params: {
+                          ASSETS: CHAIN_INFO[id]?.gasDenom,
+                        },
+                      })}
                     </div>
                   </div>
                   <img
