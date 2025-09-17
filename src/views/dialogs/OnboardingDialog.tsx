@@ -137,6 +137,11 @@ export const OnboardingDialog = ({
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
+      onBack={
+        isTurnkeyEnabled && currentOnboardingStep === OnboardingSteps.ChooseWallet
+          ? onSignInWithSocials
+          : undefined
+      }
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
@@ -164,7 +169,7 @@ export const OnboardingDialog = ({
           },
           [OnboardingSteps.ChooseWallet]: {
             title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_WALLET })
+              stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
             ) : (
               <div tw="flex items-center gap-0.5">
                 {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
