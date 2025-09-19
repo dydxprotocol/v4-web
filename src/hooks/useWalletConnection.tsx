@@ -16,6 +16,7 @@ import {
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 
+import { DialogTypes } from '@/constants/dialogs';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import { ConnectorType, WalletInfo, WalletNetworkType, WalletType } from '@/constants/wallets';
@@ -25,6 +26,7 @@ import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 import { clearSourceAccount, setSourceAddress, setWalletInfo } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
@@ -159,6 +161,8 @@ export const useWalletConnectionContext = () => {
       if (error !== 'exited_auth_flow') {
         log('useWalletConnection/privy/useLogin', new Error(`Privy: ${error}`));
         setSelectedWalletError('Privy login failed');
+      } else {
+        dispatch(openDialog(DialogTypes.Onboarding()));
       }
     },
   });

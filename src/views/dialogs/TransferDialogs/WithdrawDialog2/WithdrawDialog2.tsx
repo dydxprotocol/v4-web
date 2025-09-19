@@ -30,8 +30,9 @@ import { WithdrawStatus } from './WithdrawStatus';
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const { dydxAddress, sourceAccount } = useAccounts();
   const isPrivy = sourceAccount.walletInfo?.name === WalletType.Privy;
+  const isTurnkey = sourceAccount.walletInfo?.name === WalletType.Turnkey;
   const [destinationAddress, setDestinationAddress] = useState(
-    isPrivy ? '' : sourceAccount.address ?? ''
+    isPrivy || isTurnkey ? '' : sourceAccount.address ?? ''
   );
 
   const { isMobile } = useBreakpoints();

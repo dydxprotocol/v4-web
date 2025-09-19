@@ -3,6 +3,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { DialogProps, ManageAccountDialogProps } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -37,15 +40,15 @@ const ManagementSection = ({
 
 type AccountManagementPage = 'default' | 'dydxExport' | 'turnkeyExport';
 
-// TODO(turnkey): Localization
 export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDialogProps>) => {
+  const stringGetter = useStringGetter();
   const [page, setPage] = useState<AccountManagementPage>('default');
   const turnkeyWalletInfo = useAppSelector(selectTurnkeyWalletInfo);
 
   const emailSection = turnkeyWalletInfo?.userEmail && (
     <ManagementSection
-      title="Email"
-      description="This email was used to generate your on-chain wallet. You will need access for account recovery."
+      title={stringGetter({ key: STRING_KEYS.EMAIL })}
+      description={stringGetter({ key: STRING_KEYS.EMAIL_DESC })}
     >
       <div tw="row rounded-[0.75rem] bg-color-layer-2 px-1 py-0.75">
         <Icon iconName={IconName.EmailStroke} tw="mr-0.75 size-1.25 text-color-text-0" />
@@ -56,8 +59,8 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
 
   const exportSection = (
     <ManagementSection
-      title="Export"
-      description="Your Turnkey seed phrase is used for your deposits & withdrawals. Your dYdX seed phrase secures your perpetuals account on dYdX chain. Make sure to keep both safe and secure."
+      title={stringGetter({ key: STRING_KEYS.EXPORT })}
+      description={stringGetter({ key: STRING_KEYS.EXPORT_PHRASE_DESC })}
     >
       <div tw="flexColumn gap-1">
         <button
@@ -65,8 +68,10 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
           tw="row gap-0.25 rounded-[0.75rem] bg-color-layer-2 px-1 py-0.75"
           onClick={() => setPage('turnkeyExport')}
         >
-          Reveal Turnkey Phrase
-          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">Private</PrivateTag>
+          {stringGetter({ key: STRING_KEYS.REVEAL_TURNKEY_PHRASE })}
+          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">
+            {stringGetter({ key: STRING_KEYS.PRIVATE })}
+          </PrivateTag>
           <Icon
             iconName={IconName.ChevronRight}
             tw="ml-auto text-color-text-0"
@@ -81,8 +86,10 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
           tw="row gap-0.25 rounded-[0.75rem] bg-color-layer-2 px-1 py-0.75"
           onClick={() => setPage('dydxExport')}
         >
-          Reveal dYdX Phrase
-          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">Private</PrivateTag>
+          {stringGetter({ key: STRING_KEYS.REVEAL_DYDX_PHRASE })}
+          <PrivateTag tw="rounded-[360px] px-0.5 font-tiny-bold">
+            {stringGetter({ key: STRING_KEYS.PRIVATE })}
+          </PrivateTag>
           <Icon
             iconName={IconName.ChevronRight}
             tw="ml-auto size-0.5 text-color-text-0"
@@ -121,9 +128,9 @@ export const ManageAccountDialog = ({ setIsOpen }: DialogProps<ManageAccountDial
   }[page];
 
   const title = {
-    default: 'Account Management',
-    dydxExport: 'Reveal Secret Phrase',
-    turnkeyExport: 'Reveal Secret Phrase',
+    default: stringGetter({ key: STRING_KEYS.ACCOUNT_MANAGEMENT }),
+    dydxExport: stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE }),
+    turnkeyExport: stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE }),
   }[page];
 
   return (

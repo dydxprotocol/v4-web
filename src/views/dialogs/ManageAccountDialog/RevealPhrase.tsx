@@ -30,7 +30,6 @@ import { getSourceAccount } from '@/state/walletSelectors';
 
 type ExportWalletType = 'turnkey' | 'dydx';
 
-// TODO(turnkey): Localization
 export const RevealPhrase = ({
   closeDialog,
   exportWalletType,
@@ -73,7 +72,7 @@ export const RevealPhrase = ({
         };
       }
 
-      setErrorMessage('Session expired. Please disconnect and login again to reveal your phrase.');
+      setErrorMessage(stringGetter({ key: STRING_KEYS.TURNKEY_SESSION_EXPIRED }));
 
       return {
         session: null,
@@ -184,7 +183,7 @@ export const RevealPhrase = ({
             dispatch(openDialog(DialogTypes.DisconnectWallet({})));
           }}
         >
-          {stringGetter({ key: STRING_KEYS.DISCONNECT })}
+          {stringGetter({ key: STRING_KEYS.REAUTHENTICATE })}
         </Button>
       );
     }
@@ -232,6 +231,21 @@ export const RevealPhrase = ({
     />
   );
 
+  const iframeCss = `
+    iframe {
+        padding: 0.75rem;
+        width: 100%;
+        height: 100%;
+
+        > body {
+          color: ${theme.textSecondary};
+          background-color: ${theme.layer2};
+          font-size: 0.8438rem;
+          font-weight: 450;
+        }
+    }
+  `;
+
   return (
     <div tw="flexColumn gap-1">
       <div tw="flexColumn gap-0.5">
@@ -239,7 +253,7 @@ export const RevealPhrase = ({
           <AccentTag tw="rounded-[360px] px-0.5 py-0.25 font-tiny-bold">
             {exportWalletType === 'turnkey' ? 'Turnkey' : 'dYdX'}
           </AccentTag>
-          Secret Recovery Phrase
+          {stringGetter({ key: STRING_KEYS.SECRET_RECOVERY_PHRASE })}
         </span>
 
         <div tw="row relative justify-center overflow-hidden rounded-0.75 border border-solid border-color-layer-5 bg-color-layer-2 p-0.75 text-color-text-1">
@@ -254,10 +268,10 @@ export const RevealPhrase = ({
                   boxSizing: 'border-box',
                   position: 'absolute',
                   inset: 0,
-                  color: theme.textSecondary,
-                  backgroundColor: theme.layer2,
                 }}
-              />
+              >
+                <style>{iframeCss}</style>
+              </div>
 
               <span
                 tw="font-small-book"
@@ -286,8 +300,7 @@ export const RevealPhrase = ({
       </div>
 
       <AlertMessage withAccentText type={AlertType.Error} tw="rounded-0.375">
-        {errorMessage ??
-          'Your recovery key can grant anyone to access your funds. Save it in a secure, private location.'}
+        {errorMessage ?? stringGetter({ key: STRING_KEYS.RECOVERY_PHRASE_WARNING })}
       </AlertMessage>
 
       {ctaButton}

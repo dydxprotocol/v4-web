@@ -20,11 +20,13 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { AccentTag } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
 
 export const ChooseWallet = ({
   onChooseWallet,
   onSignInWithSocials,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
@@ -47,7 +49,7 @@ export const ChooseWallet = ({
         <HorizontalSeparatorFiller />
       </div>
 
-      <$OtherOptionButton
+      {/* <$OtherOptionButton
         type={ButtonType.Button}
         action={ButtonAction.Base}
         size={ButtonSize.BasePlus}
@@ -59,7 +61,7 @@ export const ChooseWallet = ({
         </div>
 
         <Icon iconName={IconName.ChevronRight} />
-      </$OtherOptionButton>
+      </$OtherOptionButton> */}
 
       <$OtherOptionButton
         type={ButtonType.Button}
@@ -72,7 +74,12 @@ export const ChooseWallet = ({
           Sign in with Socials
         </div>
 
-        <Icon iconName={IconName.ChevronRight} />
+        <div tw="row gap-0.5">
+          <AccentTag tw="rounded-[0.5rem]" isHighlighted>
+            {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
+          </AccentTag>
+          <Icon iconName={IconName.ChevronRight} />
+        </div>
       </$OtherOptionButton>
     </div>
   );
