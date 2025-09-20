@@ -49,7 +49,7 @@ describe("Vault.touch", () => {
         BTC = await deploy("Fungible", deployer)
 
         utils = await deploy("Utils", deployer)
-        vault = await deploy("Vault", deployer, { STABLE_ASSET: toAsset(USDC) })
+        vault = await deploy("Vault", deployer, { COLLATERAL_ASSET: toAsset(USDC) })
         vaultPricefeed = await deploy("VaultPricefeed", deployer)
         let RUSD = await deploy("Rusd", deployer)
         timeDistributor = await deploy("TimeDistributor", deployer)

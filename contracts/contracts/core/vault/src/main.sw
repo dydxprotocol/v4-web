@@ -66,7 +66,7 @@ const DEFAULT_SUB_ID: SubId = SubId::zero();
 
 configurable {
     /// The stable asset used for collateral in short positions
-    STABLE_ASSET: AssetId = AssetId::zero(),
+    COLLATERAL_ASSET: AssetId = AssetId::zero(),
 }
 
 storage {
@@ -756,8 +756,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_stable_asset() -> AssetId {
-        STABLE_ASSET
+    fn get_collateral_asset() -> AssetId {
+        COLLATERAL_ASSET
     }
 
     fn get_lp_asset() -> AssetId {
@@ -1356,7 +1356,7 @@ fn _validate_liquidation(
     is_long: bool,
     should_raise: bool,
 ) -> (u256, u256) {
-    let collateral_asset = STABLE_ASSET;
+    let collateral_asset = COLLATERAL_ASSET;
     let position_key = _get_position_key(
         account, 
         index_asset, 
@@ -1547,7 +1547,7 @@ fn _get_next_funding_rate(asset: AssetId) -> u256 {
         return 0;
     }
 
-    let funding_rate_factor = if STABLE_ASSET == asset {
+    let funding_rate_factor = if COLLATERAL_ASSET == asset {
         storage.stable_funding_rate_factor.read()
     } else {
         storage.funding_rate_factor.read()
@@ -1859,7 +1859,7 @@ fn _update_cumulative_funding_rate(collateral_asset: AssetId) {
 
 #[storage(read)]
 fn _get_redemption_collateral(asset: AssetId) -> u256 {
-    if STABLE_ASSET == asset {
+    if COLLATERAL_ASSET == asset {
         return _get_pool_amounts(asset);
     }
 
@@ -1894,14 +1894,12 @@ fn _validate_assets(
     index_asset: AssetId,
     _is_long: bool,
 ) {
-    let stable_asset = STABLE_ASSET;
-
     require(
-        collateral_asset == stable_asset,
+        collateral_asset == COLLATERAL_ASSET,
         Error::VaultShortCollateralAssetMustBeStableAsset
     );
     require(
-        index_asset != stable_asset,
+        index_asset != collateral_asset,
         Error::VaultShortIndexAssetMustNotBeStableAsset
     );
     require(
@@ -2063,7 +2061,7 @@ fn _withdraw_fees(
 fn _get_add_liquidity_amount(
     asset_amount: u64
 ) -> (u256, u256, u256) {
-    let asset = STABLE_ASSET;
+    let asset = COLLATERAL_ASSET;
     let price = _get_min_price(asset);
 
     let mut rusd_amount = asset_amount.as_u256() * price / PRICE_PRECISION;
@@ -2100,7 +2098,7 @@ fn _add_liquidity(
         !receiver.is_zero(),
         Error::VaultReceiverCannotBeZero
     );
-    let asset = STABLE_ASSET;
+    let asset = COLLATERAL_ASSET;
 
     let asset_amount = _transfer_in(asset);
     require(asset_amount > 0, Error::VaultInvalidAssetAmount);
@@ -2154,7 +2152,7 @@ fn _add_liquidity(
 fn _get_remove_liquidity_amount(
     rusd_amount: u256
 ) -> (u256, u64, u256) {
-    let asset = STABLE_ASSET;
+    let asset = COLLATERAL_ASSET;
     let redemption_amount = _get_redemption_amount(asset, rusd_amount);
     require(redemption_amount > 0, Error::VaultInvalidRedemptionAmount);
 
@@ -2186,7 +2184,7 @@ fn _remove_liquidity(
         !receiver.is_zero(),
         Error::VaultReceiverCannotBeZero
     );
-    let asset = STABLE_ASSET;
+    let asset = COLLATERAL_ASSET;
 
     let rusd_amount = _transfer_in(AssetId::default()).as_u256();
     require(rusd_amount > 0, Error::VaultInvalidRusdAmount);
@@ -2255,7 +2253,7 @@ fn _increase_position(
     );
 
     _validate_router(account);
-    let collateral_asset = STABLE_ASSET;
+    let collateral_asset = COLLATERAL_ASSET;
     _validate_assets(collateral_asset, index_asset, is_long);
 
     _update_cumulative_funding_rate(collateral_asset);
@@ -2397,7 +2395,7 @@ fn _decrease_position(
         _validate_router(account);
     }
 
-    let collateral_asset = STABLE_ASSET;
+    let collateral_asset = COLLATERAL_ASSET;
     _update_cumulative_funding_rate(collateral_asset);
 
     let position_key = _get_position_key(
@@ -2621,7 +2619,7 @@ fn _liquidate_position(
     is_long: bool,
     fee_receiver: Identity,
 ) {
-    let collateral_asset = STABLE_ASSET;
+    let collateral_asset = COLLATERAL_ASSET;
     require(
         !account.is_zero(),
         Error::VaultAccountCannotBeZero

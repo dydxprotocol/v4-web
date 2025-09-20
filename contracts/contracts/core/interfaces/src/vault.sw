@@ -277,7 +277,7 @@ abi Vault {
     fn get_asset_decimals(asset: AssetId) -> u32;
 
     #[storage(read)]
-    fn get_stable_asset() -> AssetId;
+    fn get_collateral_asset() -> AssetId;
 
     fn get_lp_asset() -> AssetId;
 
