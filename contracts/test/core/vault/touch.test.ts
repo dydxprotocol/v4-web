@@ -78,6 +78,18 @@ describe("Vault.touch", () => {
         await call(vaultPricefeed.functions.set_asset_config(toAsset(BTC), BTC_PRICEFEED_ID, 9))
 
         await call(
+            vault.functions.set_fees(
+                50, // tax_basis_points
+                20, // stable_tax_basis_points
+                30, // mint_burn_fee_basis_points
+                10, // margin_fee_basis_points
+                toUsd(5), // liquidation_fee_usd
+                60 * 60, // min_profit_time
+                false, // has_dynamic_fees
+            ),
+        )
+
+        await call(
             vault.functions.set_funding_rate(
                 8 * 3600, // funding_interval (8 hours)
                 600, // fundingRateFactor

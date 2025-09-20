@@ -94,8 +94,6 @@ storage {
     /// charged when minting/burning LP assets
     /// helps maintain the stability of the RLP pool and discourage rapid entering and exiting.
     mint_burn_fee_basis_points: u64 = 30, // 0.3%
-    /// charged when swapping b/w different assets within the protocol
-    swap_fee_basis_points: u64 = 30, // 0.3%
     /// applied to size of leveraged positions
     margin_fee_basis_points: u64 = 10, // 0.1%
 
@@ -339,7 +337,6 @@ impl Vault for Contract {
         tax_basis_points: u64,
         stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
-        swap_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
         min_profit_time: u64,
@@ -351,7 +348,6 @@ impl Vault for Contract {
             tax_basis_points <= MAX_FEE_BASIS_POINTS &&
             stable_tax_basis_points <= MAX_FEE_BASIS_POINTS &&
             mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
-            swap_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
             margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints
         );
@@ -360,7 +356,6 @@ impl Vault for Contract {
         storage.tax_basis_points.write(tax_basis_points);
         storage.stable_tax_basis_points.write(stable_tax_basis_points);
         storage.mint_burn_fee_basis_points.write(mint_burn_fee_basis_points);
-        storage.swap_fee_basis_points.write(swap_fee_basis_points);
         storage.margin_fee_basis_points.write(margin_fee_basis_points);
         storage.liquidation_fee_usd.write(liquidation_fee_usd);
         storage.min_profit_time.write(min_profit_time);
@@ -370,7 +365,6 @@ impl Vault for Contract {
             tax_basis_points,
             stable_tax_basis_points,
             mint_burn_fee_basis_points,
-            swap_fee_basis_points,
             margin_fee_basis_points,
             liquidation_fee_usd,
             min_profit_time,
@@ -833,11 +827,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_swap_fee_basis_points() -> u64 {
-        storage.swap_fee_basis_points.read()
-    }
-
-    #[storage(read)]
     fn get_margin_fee_basis_points() -> u64 {
         storage.margin_fee_basis_points.read()
     }
@@ -914,15 +903,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_swap_amounts(
-        asset_in: AssetId,
-        amount_in: u256,
-        asset_out: AssetId,
-    ) -> (u256, u64, u256, u256) {
-        _get_swap_amounts(asset_in, amount_in, asset_out)
-    }
-
-    #[storage(read)]
     fn adjust_for_decimals(
         amount: u256, 
         asset_div: AssetId, 
@@ -991,23 +971,6 @@ impl Vault for Contract {
         _begin_non_reentrant(storage.lock);
 
         let amount_out = _remove_liquidity(receiver);
-        _end_non_reentrant(storage.lock);
-
-        amount_out
-    }
-
-    #[payable]
-    #[storage(read, write)]
-    fn swap(
-        asset_in: AssetId,
-        asset_out: AssetId,
-        receiver: Identity
-    ) -> u64 {
-        sl_require_not_paused();
-        
-        _begin_non_reentrant(storage.lock);
-
-        let amount_out = _swap(asset_in, asset_out, receiver);
         _end_non_reentrant(storage.lock);
 
         amount_out
@@ -1209,39 +1172,6 @@ fn _collect_swap_fees(
         fee_usd: _asset_to_usd_min(asset, fee_amount.as_u256()),
         fee_assets: fee_amount,
     });
-}
-
-#[storage(read)]
-fn _get_swap_fee_basis_points(
-    asset_in: AssetId,
-    asset_out: AssetId,
-    rusd_amount: u256,
-) -> u256 {
-    let base_bps = storage.swap_fee_basis_points.read();
-
-    let tax_bps = storage.tax_basis_points.read();
-
-    let fee_basis_points_0 = _get_fee_basis_points(
-        asset_in,
-        rusd_amount,
-        base_bps.as_u256(),
-        tax_bps.as_u256(),
-        true
-    );
-    let fee_basis_points_1 = _get_fee_basis_points(
-        asset_out,
-        rusd_amount,
-        base_bps.as_u256(),
-        tax_bps.as_u256(),
-        false
-    );
-
-    // use the higher of the two fee basis points
-    if fee_basis_points_0 > fee_basis_points_1 {
-        fee_basis_points_0
-    } else {
-        fee_basis_points_1
-    }
 }
 
 #[storage(read)]
@@ -2311,111 +2241,6 @@ fn _remove_liquidity(
     amount_out.as_u256()
 }
 
-#[storage(read)]
-fn _get_swap_amounts(
-    asset_in: AssetId,
-    amount_in: u256,
-    asset_out: AssetId,
-) -> (u256, u64, u256, u256) {
-    let price_in = _get_min_price(asset_in);
-    let price_out = _get_max_price(asset_out);
-
-    let mut amount_out = amount_in * price_in / price_out;
-    amount_out = _adjust_for_decimals(amount_out, asset_in, asset_out);
-
-    // adjust rusdAmounts by the same rusdAmount as debt is shifted between the assets
-    let mut rusd_amount = amount_in * price_in / PRICE_PRECISION;
-    rusd_amount = _adjust_for_decimals(rusd_amount, asset_in, AssetId::default());
-
-    let fee_basis_points = _get_swap_fee_basis_points(
-        asset_in, 
-        asset_out, 
-        rusd_amount,
-    );
-
-    let amount_out_after_fees = _get_after_fee_amount(
-        u64::try_from(amount_out).unwrap(),
-        u64::try_from(fee_basis_points).unwrap()
-    );
-
-    (
-        amount_out,
-        amount_out_after_fees,
-        fee_basis_points,
-        rusd_amount
-    )
-}
-
-#[storage(read, write)]
-fn _swap(
-    asset_in: AssetId,
-    asset_out: AssetId,
-    receiver: Identity,
-) -> u64 {
-    require(
-        !receiver.is_zero(),
-        Error::VaultReceiverCannotBeZero
-    );
-
-    require(
-        _is_asset_whitelisted(asset_in),
-        Error::VaultAssetInNotWhitelisted
-    );
-    require(
-        _is_asset_whitelisted(asset_out),
-        Error::VaultAssetOutNotWhitelisted
-    );
-    require(asset_in != asset_out, Error::VaultAssetsAreEqual);
-
-    _update_cumulative_funding_rate(asset_in);
-    _update_cumulative_funding_rate(asset_out);
-
-    let amount_in = _transfer_in(asset_in).as_u256();
-    require(amount_in > 0, Error::VaultInvalidAmountIn);
-
-    let (
-        amount_out,
-        amount_out_after_fees,
-        fee_basis_points,
-        rusd_amount
-    ) = _get_swap_amounts(
-        asset_in,
-        amount_in,
-        asset_out
-    );
-    // this needs to be called here because `_get_swap_amounts` is read-only and cannot update state
-    _collect_swap_fees(
-        asset_out, 
-        u64::try_from(amount_out).unwrap(),
-        amount_out_after_fees
-    );
-
-    _increase_rusd_amount(asset_in, rusd_amount);
-    _decrease_rusd_amount(asset_out, rusd_amount);
-
-    _increase_pool_amount(asset_in, amount_in);
-    _decrease_pool_amount(asset_out, amount_out);
-
-    _validate_buffer_amount(asset_out);
-
-    _transfer_out(
-        asset_out, 
-        amount_out_after_fees, 
-        receiver,
-    );
-
-    log(Swap {
-        account: receiver,
-        asset_in,
-        asset_out,
-        amount_in,
-        amount_out,
-        amount_out_after_fees,
-        fee_basis_points,
-    });
-
-    amount_out_after_fees
-}
 
 #[storage(read, write)]
 fn _increase_position(

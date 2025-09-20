@@ -80,7 +80,6 @@ abi Vault {
         tax_basis_points: u64,
         stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
-        swap_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
         min_profit_time: u64,
@@ -314,9 +313,6 @@ abi Vault {
     fn get_mint_burn_fee_basis_points() -> u64;
 
     #[storage(read)]
-    fn get_swap_fee_basis_points() -> u64;
-
-    #[storage(read)]
     fn get_margin_fee_basis_points() -> u64;
 
     #[storage(read)]
@@ -359,13 +355,6 @@ abi Vault {
     ) -> (u256, u64, u256);
 
     #[storage(read)]
-    fn get_swap_amounts(
-        asset_in: AssetId,
-        amount_in: u256,
-        asset_out: AssetId,
-    ) -> (u256, u64, u256, u256);
-
-    #[storage(read)]
     fn adjust_for_decimals(
         amount: u256, 
         asset_div: AssetId, 
@@ -395,10 +384,6 @@ abi Vault {
     #[payable]
     #[storage(read, write)]
     fn remove_liquidity(receiver: Identity) -> u256;
-
-    #[payable]
-    #[storage(read, write)]
-    fn swap(asset_in: AssetId, asset_out: AssetId, receiver: Identity) -> u64;
 
     #[payable]
     #[storage(read, write)]
