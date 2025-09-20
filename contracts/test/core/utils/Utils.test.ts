@@ -12,7 +12,7 @@ function convertTai64ToUnixTimestamp(tai64_time: string) {
     return (BigInt(tai64_time) - BigInt(Math.pow(2, 62)) - BigInt(10)).toString()
 }
 
-describe.skip("Utils", () => {
+describe("Utils", () => {
     let priceUpdateSigner: Signer
     let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked

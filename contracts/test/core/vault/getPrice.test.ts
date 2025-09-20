@@ -19,6 +19,7 @@ import { launchNode, getNodeWallets } from "../../utils/node"
 
 use(useChai)
 
+// tests to be replaced with new later, hard to keep them up with massive changes, left to feed AI
 describe.skip("Vault.getPrice", function () {
     let priceUpdateSigner: Signer
     let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>

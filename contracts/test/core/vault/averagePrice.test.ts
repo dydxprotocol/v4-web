@@ -29,6 +29,7 @@ import { BigNumber } from "ethers"
 
 use(useChai)
 
+// tests to be replaced with new later, hard to keep them up with massive changes, left to feed AI
 describe.skip("Vault.averagePrice", () => {
     let attachedContracts: AbstractContract[]
     let priceUpdateSigner: Signer
