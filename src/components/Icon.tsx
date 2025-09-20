@@ -109,6 +109,7 @@ import {
   ShowIcon,
   SocialLoginIcon,
   SocialXIcon,
+  SolIcon,
   SparklesIcon,
   SpeechBubbleIcon,
   StarIcon,
@@ -286,6 +287,7 @@ export enum IconName {
   Withdraw = 'Withdraw',
   XCircle = 'XCircle',
   SocialX = 'SocialX',
+  Sol = 'Sol',
 }
 
 const icons = {
@@ -427,6 +429,7 @@ const icons = {
   [IconName.Withdraw]: WithdrawIcon,
   [IconName.XCircle]: XCircleIcon,
   [IconName.SocialX]: SocialXIcon,
+  [IconName.Sol]: SolIcon,
 } as Record<IconName, ElementType | undefined>;
 
 // we load reward-start async because it's gigantic for some reason
