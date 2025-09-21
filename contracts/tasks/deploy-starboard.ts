@@ -22,7 +22,7 @@ task("deploy-starboard", "Deploy the starboard contracts")
       0, // max_rusd_amount
     ]
 
-    const vault = await deploy("Vault", deployer, { STABLE_ASSET: usdcAsset })
+    const vault = await deploy("Vault", deployer, { COLLATERAL_ASSET: usdcAsset })
     console.log(`Vault deployed to: ${vault.id.toString()} ${vault.id.toB256().toString()}`)
     await call(vault.functions.initialize(deployerIdendity))
     console.log("Vault initialized")

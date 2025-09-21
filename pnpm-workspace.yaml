@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - contracts
+  - indexer
   - ts-sdk
 linkWorkspacePackages: true
 overrides:

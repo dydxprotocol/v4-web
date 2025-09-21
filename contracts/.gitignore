@@ -7,3 +7,5 @@ node_modules
 cache
 /types
 contracts/tmp
+tasks/various.ts
+!deployment.log

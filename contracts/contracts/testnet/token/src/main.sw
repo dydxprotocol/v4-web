@@ -91,17 +91,17 @@ impl TestnetToken for Contract {
 
     #[storage(read, write)]
     fn initialize() {
-        // require(
-        //     !storage.initialized.read(),
-        //     "AlreadyInitialized",
-        // );
-        // storage.initialized.write(true);
-        // let sender = msg_sender().unwrap();
-        // let asset_id = AssetId::default();
-        // log(SetNameEvent{asset: asset_id, name: Some(String::from_ascii_str(from_str_array(NAME))), sender: sender});
-        // log(SetSymbolEvent{asset: asset_id, symbol: Some(String::from_ascii_str(from_str_array(SYMBOL))), sender: sender});
-        // log(SetDecimalsEvent{asset: asset_id, decimals: DECIMALS, sender: sender});
-        // log(TotalSupplyEvent{asset: asset_id, supply: 0, sender: sender});
+        require(
+            !storage.initialized.read(),
+            "AlreadyInitialized",
+        );
+        storage.initialized.write(true);
+        let sender = msg_sender().unwrap();
+        let asset_id = AssetId::default();
+        log(SetNameEvent{asset: asset_id, name: Some(String::from_ascii_str(from_str_array(NAME))), sender: sender});
+        log(SetSymbolEvent{asset: asset_id, symbol: Some(String::from_ascii_str(from_str_array(SYMBOL))), sender: sender});
+        log(SetDecimalsEvent{asset: asset_id, decimals: DECIMALS, sender: sender});
+        log(TotalSupplyEvent{asset: asset_id, supply: 0, sender: sender});
     }
 
     fn get_asset_id() -> AssetId {
