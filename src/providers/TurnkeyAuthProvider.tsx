@@ -7,6 +7,7 @@ import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 import {
@@ -29,6 +30,8 @@ import {
 } from '@/state/wallet';
 import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
+import { track } from '@/lib/analytics/analytics';
+
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
 const TurnkeyAuthContext = createContext<ReturnType<typeof useTurnkeyAuthContext> | undefined>(
@@ -36,6 +39,24 @@ const TurnkeyAuthContext = createContext<ReturnType<typeof useTurnkeyAuthContext
 );
 
 TurnkeyAuthContext.displayName = 'TurnkeyAuth';
+
+type SignInParams =
+  | {
+      body: string;
+      userEmail: string;
+      loginMethod: LoginMethod.Email;
+    }
+  | {
+      body: string;
+      userEmail?: string;
+      loginMethod: LoginMethod.OAuth;
+      providerName: 'google' | 'apple';
+    }
+  | {
+      body: string;
+      userEmail?: string;
+      loginMethod: LoginMethod.Passkey;
+    };
 
 export const TurnkeyAuthProvider = ({ ...props }) => (
   <TurnkeyAuthContext.Provider value={useTurnkeyAuthContext()} {...props} />
@@ -62,18 +83,10 @@ const useTurnkeyAuthContext = () => {
   /* ----------------------------- Sign In ----------------------------- */
 
   const { mutate: sendSignInRequest, status } = useMutation({
-    mutationFn: async ({
-      body,
-      loginMethod,
-      providerName,
-      userEmail,
-    }: {
-      body: string;
-      loginMethod: LoginMethod;
-      providerName?: string;
-      userEmail?: string;
-    }) => {
+    mutationFn: async ({ body, loginMethod, userEmail, ...rest }: SignInParams) => {
+      const providerName = 'providerName' in rest ? rest.providerName : undefined;
       setEmailSignInStatus('loading');
+
       dispatch(
         setWalletInfo({
           connectorType: ConnectorType.Turnkey,
@@ -81,6 +94,12 @@ const useTurnkeyAuthContext = () => {
           userEmail,
           providerName,
           loginMethod,
+        })
+      );
+
+      track(
+        AnalyticsEvents.TurnkeyLoginInitiated({
+          signinMethod: providerName ?? 'email',
         })
       );
 
@@ -123,11 +142,44 @@ const useTurnkeyAuthContext = () => {
           throw new Error('Current unsupported login method');
       }
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       selectWallet(undefined);
       logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
       setEmailSignInStatus('error');
       setEmailSignInError(error.message);
+
+      if (variables.loginMethod === LoginMethod.OAuth) {
+        const providerName = variables.providerName;
+        track(
+          AnalyticsEvents.TurnkeyLoginError({
+            signinMethod: providerName,
+            error: error.message,
+          })
+        );
+      } else if (variables.loginMethod === LoginMethod.Email) {
+        track(
+          AnalyticsEvents.TurnkeyLoginError({
+            signinMethod: 'email',
+            error: error.message,
+          })
+        );
+      }
+    },
+    onSuccess(data, variables) {
+      if (variables.loginMethod === LoginMethod.OAuth) {
+        const providerName = variables.providerName;
+        track(
+          AnalyticsEvents.TurnkeyLoginCompleted({
+            signinMethod: providerName,
+          })
+        );
+      } else if (variables.loginMethod === LoginMethod.Email) {
+        track(
+          AnalyticsEvents.TurnkeyLoginCompleted({
+            signinMethod: 'email',
+          })
+        );
+      }
     },
   });
 
@@ -253,7 +305,19 @@ const useTurnkeyAuthContext = () => {
         await indexedDbClient.loginWithSession(session);
         await onboardDydx({ setWalletFromSignature, tkClient: indexedDbClient });
         setEmailSignInStatus('success');
+        track(
+          AnalyticsEvents.TurnkeyLoginCompleted({
+            signinMethod: 'email',
+          })
+        );
       } catch (error) {
+        track(
+          AnalyticsEvents.TurnkeyLoginError({
+            signinMethod: 'email',
+            error: error.message,
+          })
+        );
+
         let errorMessage: string | undefined;
 
         if (error instanceof Error) {
@@ -360,8 +424,14 @@ const useTurnkeyAuthContext = () => {
       // TODO(turnkey): handle policy returned in response
       return response;
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       dispatch(setRequiresAddressUpload(true));
+      track(
+        AnalyticsEvents.UploadAddressError({
+          dydxAddress: variables.payload.dydxAddress,
+          error: error.message,
+        })
+      );
       logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
     },
   });

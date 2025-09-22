@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { avalanche, mainnet, polygon } from 'viem/chains';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { CHAIN_INFO, EVM_DEPOSIT_CHAINS } from '@/constants/chains';
 import { DepositDialog2Props, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -35,6 +36,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { track } from '@/lib/analytics/analytics';
 import { calc } from '@/lib/do';
 
 type DepositTab = 'spot' | 'perpetuals';
@@ -61,6 +63,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
     data: depositAddresses,
     isLoading: isLoadingDepositAddresses,
     isError: failedToFetchDepositAddresses,
+    error: fetchDepositAddressesError,
   } = useQuery({
     enabled: canQueryForDepositAddresses,
     queryKey: ['turnkeyWallets'],
@@ -76,6 +79,17 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       return response;
     },
   });
+
+  useEffect(() => {
+    if (failedToFetchDepositAddresses && dydxAddress) {
+      track(
+        AnalyticsEvents.TurnkeyFetchDepositAddressError({
+          dydxAddress,
+          error: fetchDepositAddressesError.message,
+        })
+      );
+    }
+  }, [failedToFetchDepositAddresses, fetchDepositAddressesError?.message, dydxAddress]);
 
   const chains = useMemo(() => {
     if (selectedTab === 'perpetuals') {
