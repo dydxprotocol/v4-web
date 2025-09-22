@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -9,6 +10,8 @@ import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { TimeoutButton } from '@/components/TimeoutButton';
+
+import { track } from '@/lib/analytics/analytics';
 
 export const CheckEmailDialog = ({
   userEmail,
@@ -36,6 +39,7 @@ export const CheckEmailDialog = ({
   const [resendCounter, setResendCounter] = useState(0);
 
   const onResend = useCallback(() => {
+    track(AnalyticsEvents.ResendTurnkeyEmailMagicLink({ userEmail }));
     signInWithOtp({ userEmail });
     setResendCounter((prev) => prev + 1);
   }, [signInWithOtp, userEmail]);
