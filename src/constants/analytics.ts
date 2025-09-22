@@ -220,9 +220,7 @@ export const AnalyticsEvents = unionize(
       dydxAddress: string;
       error: string;
     }>(),
-    ResendTurnkeyEmailMagicLink: ofType<{
-      userEmail: string;
-    }>(),
+    TurnkeyResendEmailClick: ofType<{}>(),
 
     // Transfers
     TransferFaucet: ofType<{}>(),

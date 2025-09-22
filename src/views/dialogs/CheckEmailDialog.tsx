@@ -39,7 +39,7 @@ export const CheckEmailDialog = ({
   const [resendCounter, setResendCounter] = useState(0);
 
   const onResend = useCallback(() => {
-    track(AnalyticsEvents.ResendTurnkeyEmailMagicLink({ userEmail }));
+    track(AnalyticsEvents.TurnkeyResendEmailClick({}));
     signInWithOtp({ userEmail });
     setResendCounter((prev) => prev + 1);
   }, [signInWithOtp, userEmail]);
