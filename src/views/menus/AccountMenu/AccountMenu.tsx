@@ -327,7 +327,7 @@ export const AccountMenu = () => {
         onboardingState === OnboardingState.AccountConnected &&
           isTurnkey && {
             value: 'ManageAccount',
-            icon: <Icon iconName={IconName.Gear} />,
+            icon: <Icon iconName={IconName.User} />,
             label: stringGetter({ key: STRING_KEYS.ACCOUNT_MANAGEMENT }),
             onSelect: () => dispatch(openDialog(DialogTypes.ManageAccount())),
           },

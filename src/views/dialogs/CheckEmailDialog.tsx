@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -9,6 +10,8 @@ import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { TimeoutButton } from '@/components/TimeoutButton';
+
+import { track } from '@/lib/analytics/analytics';
 
 export const CheckEmailDialog = ({
   userEmail,
@@ -36,6 +39,7 @@ export const CheckEmailDialog = ({
   const [resendCounter, setResendCounter] = useState(0);
 
   const onResend = useCallback(() => {
+    track(AnalyticsEvents.TurnkeyResendEmailClick({}));
     signInWithOtp({ userEmail });
     setResendCounter((prev) => prev + 1);
   }, [signInWithOtp, userEmail]);
@@ -55,8 +59,12 @@ export const CheckEmailDialog = ({
           {stringGetter({ key: STRING_KEYS.CHECK_EMAIL_TITLE })}
         </span>
         <p tw="text-color-text-0">
-          Open the magic link sent to <span tw="text-color-text-1">&apos;{userEmail}&apos;</span> to
-          complete your sign in
+          {stringGetter({
+            key: STRING_KEYS.OPEN_SENT_MAGIC_LINK,
+            params: {
+              EMAIL: <span tw="text-color-text-1">&apos;{userEmail}&apos;</span>,
+            },
+          })}
         </p>
         <TimeoutButton
           timeoutInSeconds={15}
@@ -74,7 +82,12 @@ export const CheckEmailDialog = ({
           renderCustomCountdown={({ secondsLeft }) => (
             <span tw="row mb-0.25 mt-0.25 h-[2.375rem] gap-0.25 text-color-accent font-base-medium">
               <Icon tw="size-1" iconName={IconName.Clock} />
-              Wait {Math.ceil(secondsLeft)} seconds to resend...
+              {stringGetter({
+                key: STRING_KEYS.WAIT_TO_RESEND_MAGIC_LINK,
+                params: {
+                  SECONDS_LEFT: Math.ceil(secondsLeft),
+                },
+              })}
             </span>
           )}
         >
@@ -84,7 +97,12 @@ export const CheckEmailDialog = ({
 
         {resendCounter > 0 ? (
           <span tw="h-1.25 text-color-text-0 font-base-book">
-            Email resent to <span tw="text-color-text-1">&apos;{userEmail}&apos;</span>
+            {stringGetter({
+              key: STRING_KEYS.SIGN_IN_EMAIL_RESENT,
+              params: {
+                EMAIL: <span tw="text-color-text-1">&apos;{userEmail}&apos;</span>,
+              },
+            })}
           </span>
         ) : (
           <div tw="h-1.25 w-full" />

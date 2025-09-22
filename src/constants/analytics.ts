@@ -201,6 +201,27 @@ export const AnalyticsEvents = unionize(
     }>(),
     OnboardingWalletIsNonDeterministic: ofType<{}>(),
 
+    // Turnkey Onboarding
+    TurnkeyLoginInitiated: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+    }>(),
+    TurnkeyLoginError: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+      error: string;
+    }>(),
+    TurnkeyLoginCompleted: ofType<{
+      signinMethod: 'email' | 'google' | 'apple';
+    }>(),
+    UploadAddressError: ofType<{
+      dydxAddress: string;
+      error: string;
+    }>(),
+    TurnkeyFetchDepositAddressError: ofType<{
+      dydxAddress: string;
+      error: string;
+    }>(),
+    TurnkeyResendEmailClick: ofType<{}>(),
+
     // Transfers
     TransferFaucet: ofType<{}>(),
     TransferFaucetConfirmed: ofType<{
