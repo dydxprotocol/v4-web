@@ -97,7 +97,7 @@ const $ContainerBackground = styled.div`
   min-height: 100%;
   width: 100%;
   min-width: 100%;
-  transform: scale(0.99); // Scale in order to hide outline from '--asset-icon-backgroundColor'
+  transform: scale(0.97); // Scale in order to hide outline from '--asset-icon-backgroundColor'
   background-color: var(--asset-icon-backgroundColor, var(--color-white));
   border-radius: 50%;
 `;
