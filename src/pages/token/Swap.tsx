@@ -12,12 +12,14 @@ import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useDebounce } from '@/hooks/useDebounce';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { getUserAddressesForRoute } from '@/views/dialogs/TransferDialogs/utils';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
@@ -38,8 +40,6 @@ export const Swap = () => {
   const { chainTokenAmount: nativeTokenBalance, usdcAmount: usdcBalance } = useAppSelector(
     BonsaiCore.account.balances.data
   );
-
-  console.log('usdcBalance', usdcBalance);
 
   const tokenBalances = useMemo(() => {
     const dydx = {
@@ -115,26 +115,46 @@ export const Swap = () => {
     return { value, color: 'var(--color-negative)' };
   }, [quote]);
 
+  const notify = useCustomNotification();
+
+  const onSwapComplete = () => {
+    setIsSwapSubmitting(false);
+    appQueryClient.invalidateQueries({
+      queryKey: ['validator', 'accountBalances'],
+      exact: false,
+    });
+    setAmount('');
+    notify({
+      title: 'Swap success',
+      body: 'Your swap was successful',
+    });
+  };
+
   const onSwap = async () => {
-    if (!quote) return;
+    console.log('onSwap called');
+    if (!quote) {
+      console.log('no quote, returning');
+      return;
+    }
 
     setIsSwapSubmitting(true);
-    const userAddresses = getUserAddressesForRoute(
-      quote,
-      // Don't need source account for swaps
-      undefined,
-      nobleAddress,
-      dydxAddress,
-      osmosisAddress,
-      neutronAddress
-    );
     try {
+      const userAddresses = getUserAddressesForRoute(
+        quote,
+        // Don't need source account for swaps
+        undefined,
+        nobleAddress,
+        dydxAddress,
+        osmosisAddress,
+        neutronAddress
+      );
+
       await skipClient.executeRoute({
         route: quote,
         userAddresses,
         onTransactionCompleted: async ({ chainId, txHash, status }) => {
           console.log('TX completed!', chainId, txHash, status);
-          setIsSwapSubmitting(false);
+          onSwapComplete();
         },
         onTransactionBroadcast: async ({ txHash, chainId }) => {
           console.log('tx broadcast:', txHash, chainId);
@@ -144,7 +164,9 @@ export const Swap = () => {
         },
       });
     } catch (e) {
-      console.error('there was an error!', e);
+      notify({
+        title: 'There was an error with your swap',
+      });
     }
   };
 
