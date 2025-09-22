@@ -9,6 +9,7 @@ import tw from 'twin.macro';
 import unionize, { ofType, UnionOf } from 'unionize';
 
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogProps, TradingKeysDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -26,6 +27,7 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
+import { track } from '@/lib/analytics/analytics';
 import { stringifyTransactionError } from '@/lib/errors';
 import { truncateAddress } from '@/lib/wallet';
 
@@ -99,6 +101,7 @@ export const TradingKeysDialog = ({ setIsOpen }: DialogProps<TradingKeysDialogPr
     setPageState(
       TradingKeyStates.Create({ ...pageState.payload, errorStringKey: undefined, loading: true })
     );
+    track(AnalyticsEvents.TradingApiKeyGenerated({}));
     try {
       await authorizeTradingKeyWallet(wallet);
       goToMainPage();

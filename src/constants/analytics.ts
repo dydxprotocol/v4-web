@@ -431,6 +431,8 @@ export const AnalyticsEvents = unionize(
     LaunchMarketTransaction: ofType<{ marketId: string }>(),
     LaunchMarketViewFromTradePage: ofType<{ marketId: string }>(),
 
+    TradingApiKeyGenerated: ofType<{}>(),
+
     // Deposit
     DepositInitiated: ofType<
       Pick<
