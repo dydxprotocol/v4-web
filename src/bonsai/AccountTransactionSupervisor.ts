@@ -925,8 +925,9 @@ export class AccountTransactionSupervisor {
       if (isOperationFailure(res)) {
         return res;
       }
-      // if order is not compound, just do placeOrder so metrics are clean
+      // we continue and execute the trigger orders, if any, as a batch
     } else if (
+      // if order is not compound, just do placeOrder so metrics are clean
       order.orderPayload != null &&
       (order.orderPayload.transferToSubaccountAmount ?? 0) <= 0 &&
       (order.triggersPayloads ?? []).length === 0
