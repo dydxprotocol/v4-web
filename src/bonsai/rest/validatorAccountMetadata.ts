@@ -92,3 +92,24 @@ export function setUpAccountFeeTierQuery(store: RootStore) {
     store.dispatch(setAccountFeeTierRaw(loadableIdle()));
   };
 }
+
+export function setUpCompositeClientAccountCacheQuery(store: RootStore) {
+  return createValidatorQueryStoreEffect(store, {
+    name: 'compositeClientAccountCache',
+    selector: selectParentSubaccountInfo,
+    getQueryKey: (data) => ['compositeClientAccountCache', data.wallet],
+    getQueryFn: (compositeClient, data) => {
+      if (data.wallet == null) {
+        return null;
+      }
+      return async () => {
+        await compositeClient.populateAccountNumberCache(data.wallet!);
+        return true;
+      };
+    },
+    onResult: () => {},
+    onNoQuery: () => {},
+    refetchInterval: timeUnits.hour,
+    staleTime: timeUnits.hour,
+  });
+}
