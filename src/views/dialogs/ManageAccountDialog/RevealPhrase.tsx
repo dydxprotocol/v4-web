@@ -283,6 +283,7 @@ export const RevealPhrase = ({
                 tw="font-small-book"
                 css={{
                   opacity: !isIframeVisible && !loading ? 1 : 0,
+                  pointerEvents: isIframeVisible ? 'none' : 'auto',
                 }}
               >
                 {Array.from({ length: 12 }).map((_, idx) => (
