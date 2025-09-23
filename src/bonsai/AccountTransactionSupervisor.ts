@@ -919,7 +919,7 @@ export class AccountTransactionSupervisor {
     const isMainOrderStateful =
       order.orderPayload != null && !isShortTermOrderPayload(order.orderPayload);
 
-    // If main order is short-term or doesn't exist, handle it separately
+    // If main order is short-term, handle it separately
     if (order.orderPayload != null && !isMainOrderStateful) {
       const res = await this.placeOrder(order.orderPayload, source);
       if (isOperationFailure(res)) {
