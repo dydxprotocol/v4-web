@@ -66,7 +66,7 @@ export enum MarketFilters {
   DEPIN = 'depin',
   GAMING = 'gaming',
   MEMES = 'memes',
-  RWA = 'real-world-assets',
+  RWA = 'tokenized-assets',
   LAUNCHABLE = 'launchable',
 }
 export enum HiddenMarketFilterTags {
