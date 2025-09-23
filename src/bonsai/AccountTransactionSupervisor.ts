@@ -919,12 +919,20 @@ export class AccountTransactionSupervisor {
     const isMainOrderStateful =
       order.orderPayload != null && !isShortTermOrderPayload(order.orderPayload);
 
-    // If main order is short-term or doesn't exist, handle it separately
+    // If main order is short-term, handle it separately
     if (order.orderPayload != null && !isMainOrderStateful) {
       const res = await this.placeOrder(order.orderPayload, source);
       if (isOperationFailure(res)) {
         return res;
       }
+      // we continue and execute the trigger orders, if any, as a batch
+    } else if (
+      // if order is not compound, just do placeOrder so metrics are clean
+      order.orderPayload != null &&
+      (order.orderPayload.transferToSubaccountAmount ?? 0) <= 0 &&
+      (order.triggersPayloads ?? []).length === 0
+    ) {
+      return this.placeOrder(order.orderPayload, source);
     }
 
     // Handle stateful main order + trigger orders together in bulk
