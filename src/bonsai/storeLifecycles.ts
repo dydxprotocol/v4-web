@@ -23,6 +23,7 @@ import {
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
   setUpAccountStatsQuery,
+  setUpCompositeClientAccountCacheQuery,
 } from './rest/validatorAccountMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
@@ -44,6 +45,7 @@ export const storeLifecycles = [
   setUpAccountStatsQuery,
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
+  setUpCompositeClientAccountCacheQuery,
   setUpConfigTiersQuery,
   setUpLocalOrdersOrdersSync,
   setUpGeoQuery,
