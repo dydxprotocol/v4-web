@@ -23,7 +23,9 @@ import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { isValidEmail } from '@/lib/emailUtils';
+import { testFlags } from '@/lib/testFlags';
 
+import { AppleAuth } from './AuthButtons/AppleAuth';
 import { GoogleAuth } from './AuthButtons/GoogleAuth';
 
 export const SignIn = ({
@@ -66,6 +68,7 @@ export const SignIn = ({
     <form onSubmit={onSubmit} tw="flexColumn gap-1.25">
       <div tw="row gap-1">
         <GoogleAuth />
+        {testFlags.enableAppleAuth && <AppleAuth />}
       </div>
 
       <div tw="flexColumn gap-0.75">
