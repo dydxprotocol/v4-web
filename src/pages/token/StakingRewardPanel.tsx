@@ -74,7 +74,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
-          minimumFractionDigits={SMALL_USD_DECIMALS}
+          fractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon logoUrl={usdcImage} symbol="USDC" />
       </$InlineRow>
