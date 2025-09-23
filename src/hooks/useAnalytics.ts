@@ -64,9 +64,9 @@ export const useAnalytics = () => {
   }, [isSimpleUi]);
 
   // AnalyticsUserProperty.Geo
-  const geo = useAppSelector(getGeo) ?? undefined;
+  const geo = useAppSelector(getGeo);
   useEffect(() => {
-    identify(AnalyticsUserProperties.Geo(geo ?? null));
+    identify(AnalyticsUserProperties.Geo(geo.currentCountry ?? null));
   }, [geo]);
 
   useEffect(() => {

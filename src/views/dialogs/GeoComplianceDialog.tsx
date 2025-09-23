@@ -6,8 +6,14 @@ import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, GeoComplianceDialogProps } from '@/constants/dialogs';
-import { COUNTRIES_MAP } from '@/constants/geo';
+import {
+  BLOCKED_COUNTRIES,
+  COUNTRIES_MAP,
+  CountryCodes,
+  OFAC_SANCTIONED_COUNTRIES,
+} from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -22,7 +28,11 @@ import { WithReceipt } from '@/components/WithReceipt';
 
 import { useAppDispatch } from '@/state/appTypes';
 
-import { isBlockedGeo } from '@/lib/compliance';
+export const isBlockedGeo = (geo: string): boolean => {
+  return isMainnet
+    ? [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
+    : false;
+};
 
 const CountrySelector = ({
   label,

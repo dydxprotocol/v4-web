@@ -343,7 +343,21 @@ export interface ComplianceResponse {
   updatedAt?: string;
 }
 
-export type Compliance = ComplianceResponse & { geo?: string };
+export type GeoState = {
+  country: string;
+  region: string;
+  regionCode: string;
+  city: string;
+  timezone: string;
+  ll: [number, number]; // latitude, longitude
+
+  blocked: boolean;
+  whitelisted: boolean; // has precedence over blocked, so blocked: true and whiteslited: true means allowed
+};
+
+export type Compliance = ComplianceResponse & {
+  geo: { currentlyGeoBlocked: boolean; currentCountry?: string };
+};
 
 export type SubaccountPnlEntry = SubaccountPnlTick;
 

@@ -13,7 +13,6 @@ import { SourceAccount } from '@/state/wallet';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
-import { isBlockedGeo } from '@/lib/compliance';
 import { localWalletManager } from '@/lib/hdKeyManager';
 
 import { createStoreEffect } from '../../lib/createStoreEffect';
@@ -51,8 +50,7 @@ const selectNobleTxAuthorizedAccount = createAppSelector(
         ComplianceStatus.CLOSE_ONLY,
         ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
       ].includes(complianceData.status) &&
-      complianceData.geo &&
-      !isBlockedGeo(complianceData.geo);
+      !complianceData.geo.currentlyGeoBlocked;
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;

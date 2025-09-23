@@ -4,7 +4,6 @@ import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
-import { isBlockedGeo } from '@/lib/compliance';
 import { localWalletManager } from '@/lib/hdKeyManager';
 import { MaybeBigNumber } from '@/lib/numbers';
 
@@ -31,8 +30,7 @@ export const selectTxAuthorizedAccount = createAppSelector(
         ComplianceStatus.CLOSE_ONLY,
         ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
       ].includes(complianceData.status) &&
-      complianceData.geo &&
-      !isBlockedGeo(complianceData.geo);
+      complianceData.geo.currentlyGeoBlocked;
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;
