@@ -25,6 +25,8 @@ import { AccentTag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { AppTheme } from '@/state/appUiConfigs';
+import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getSourceAccount } from '@/state/walletSelectors';
 
@@ -221,6 +223,7 @@ export const RevealPhrase = ({
 
   const phrase = exportWalletType === 'dydx' ? hdKey?.mnemonic : undefined;
   const theme = useAppThemeAndColorModeContext();
+  const appTheme = useAppSelector(getAppTheme);
 
   const copyButton = phrase && (
     <CopyButton
@@ -268,6 +271,9 @@ export const RevealPhrase = ({
                   boxSizing: 'border-box',
                   position: 'absolute',
                   inset: 0,
+                  ...(appTheme !== AppTheme.Light
+                    ? { filter: 'invert(1)', mixBlendMode: 'plus-lighter' }
+                    : {}),
                 }}
               >
                 <style>{iframeCss}</style>
