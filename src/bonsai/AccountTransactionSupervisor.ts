@@ -925,10 +925,12 @@ export class AccountTransactionSupervisor {
       if (isOperationFailure(res)) {
         return res;
       }
-    }
-
-    // if order is not compound, just do placeOrder so metrics are clean
-    if (order.orderPayload != null && (order.triggersPayloads ?? []).length === 0) {
+      // if order is not compound, just do placeOrder so metrics are clean
+    } else if (
+      order.orderPayload != null &&
+      (order.orderPayload.transferToSubaccountAmount ?? 0) <= 0 &&
+      (order.triggersPayloads ?? []).length === 0
+    ) {
       return this.placeOrder(order.orderPayload, source);
     }
 
