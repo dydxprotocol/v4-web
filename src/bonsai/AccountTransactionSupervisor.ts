@@ -927,6 +927,11 @@ export class AccountTransactionSupervisor {
       }
     }
 
+    // if order is not compound, just do placeOrder so metrics are clean
+    if (order.orderPayload != null && (order.triggersPayloads ?? []).length === 0) {
+      return this.placeOrder(order.orderPayload, source);
+    }
+
     // Handle stateful main order + trigger orders together in bulk
     const hasStatefulOperations = isMainOrderStateful || (order.triggersPayloads?.length ?? 0) > 0;
 
