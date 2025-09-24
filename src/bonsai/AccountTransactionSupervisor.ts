@@ -1418,6 +1418,7 @@ function bonsaiLoggingMiddleware() {
         payload,
         parsed: result.result.displayInfo,
         errorString: result.result.errorString,
+        error: new Error(result.result.errorString),
         source: context.fnName,
         timeToSubmit: startTime.elapsed(),
       });
