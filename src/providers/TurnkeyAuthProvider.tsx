@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { logBonsaiError } from '@/bonsai/logs';
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
 import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
@@ -145,7 +145,7 @@ const useTurnkeyAuthContext = () => {
     },
     onError: (error, variables) => {
       selectWallet(undefined);
-      logBonsaiError('userTurnkeyAuth', 'Error during sign-in', { error });
+      logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
       setEmailSignInStatus('error');
       setEmailSignInError(error.message);
 
@@ -331,11 +331,13 @@ const useTurnkeyAuthContext = () => {
             errorMessage =
               'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';
           } else {
-            logBonsaiError('handleEmailMagicLink', 'error', { error });
+            logBonsaiError('TurnkeyOnboarding', 'error handling email magic link', { error });
             errorMessage = error.message;
           }
         } else {
-          logBonsaiError('handleEmailMagicLink', 'error', { error });
+          logBonsaiError('TurnkeyOnboarding', 'error handling email magic link - unknown', {
+            error,
+          });
         }
 
         setEmailSignInError(errorMessage ?? 'An unknown error occurred');
@@ -365,28 +367,32 @@ const useTurnkeyAuthContext = () => {
 
   const signInWithOtp = useCallback(
     async ({ userEmail }: { userEmail: string }) => {
-      if (authIframeClient == null) {
-        throw new Error('cannot initialize auth without an iframe');
+      try {
+        if (authIframeClient == null) {
+          throw new Error('cannot initialize auth without an iframe');
+        }
+
+        if (embeddedPublicKey == null) {
+          throw new Error('No target public key found');
+        }
+
+        const inputBody: SignInBody = {
+          signinMethod: 'email',
+          userEmail,
+          targetPublicKey: embeddedPublicKey,
+          magicLink: globalThis.location.search
+            ? `${globalThis.location.href}&token`
+            : `${globalThis.location.href}?token`,
+        };
+
+        sendSignInRequest({
+          body: JSON.stringify(inputBody),
+          loginMethod: LoginMethod.Email,
+          userEmail,
+        });
+      } catch (error) {
+        logBonsaiError('TurnkeyOnboarding', 'Error signing in with email', { error });
       }
-
-      if (embeddedPublicKey == null) {
-        throw new Error('No target public key found');
-      }
-
-      const inputBody: SignInBody = {
-        signinMethod: 'email',
-        userEmail,
-        targetPublicKey: embeddedPublicKey,
-        magicLink: globalThis.location.search
-          ? `${globalThis.location.href}&token`
-          : `${globalThis.location.href}?token`,
-      };
-
-      sendSignInRequest({
-        body: JSON.stringify(inputBody),
-        loginMethod: LoginMethod.Email,
-        userEmail,
-      });
     },
     [sendSignInRequest, authIframeClient, embeddedPublicKey]
   );
@@ -433,25 +439,31 @@ const useTurnkeyAuthContext = () => {
           error: error.message,
         })
       );
-      logBonsaiError('userTurnkeyAuth', 'Error during upload address', { error });
+      logBonsaiError('TurnkeyOnboarding', 'Error posting to upload address', { error });
     },
   });
 
   const uploadAddress = useCallback(
     async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient }) => {
-      if (dydxAddress == null) {
-        throw new Error('No dydx address provided');
-      }
+      try {
+        logBonsaiInfo('TurnkeyOnboarding', 'Attempting to upload address');
 
-      if (tkClient == null) {
-        throw new Error('No tk client provided');
-      }
+        if (dydxAddress == null) {
+          throw new Error('No dydx address provided');
+        }
 
-      const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
-      const result = await sendUploadAddressRequest({ payload });
+        if (tkClient == null) {
+          throw new Error('No tk client provided');
+        }
 
-      if (!result.success) {
-        dispatch(setRequiresAddressUpload(true));
+        const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
+        const result = await sendUploadAddressRequest({ payload });
+
+        if (!result.success) {
+          dispatch(setRequiresAddressUpload(true));
+        }
+      } catch (error) {
+        logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
       }
     },
     [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
@@ -487,6 +499,7 @@ const useTurnkeyAuthContext = () => {
       authIframeClient &&
       emailSignInStatus === 'idle'
     ) {
+      logBonsaiInfo('TurnkeyOnboarding', 'Attempting to handle email magic link');
       handleEmailMagicLink({ token: emailToken });
     }
   }, [
