@@ -10,3 +10,6 @@ export const getSelectedDydxChainId = (state: RootState) =>
 
 export const getMetadataEndpoint = (state: RootState) =>
   ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].endpoints.metadataService;
+
+export const getGeoCheckEnabled = (state: RootState) =>
+  ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].featureFlags.checkForGeo;

@@ -31,7 +31,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
-import { isBlockedGeo } from '@/lib/compliance';
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
@@ -77,7 +76,7 @@ const useAccountsContext = () => {
   const { ready, authenticated } = usePrivy();
 
   const blockedGeo = useMemo(() => {
-    return geo != null && isBlockedGeo(geo) && checkForGeo;
+    return geo.currentlyGeoBlocked && checkForGeo;
   }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);

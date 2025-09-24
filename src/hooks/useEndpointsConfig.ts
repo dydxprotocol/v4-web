@@ -18,6 +18,7 @@ export interface EndpointsConfig {
   solanaRpcUrl: string;
   affiliates?: string;
   spotCandleService?: string;
+  geoV2: string;
 }
 
 export const useEndpointsConfig = () => {
@@ -36,5 +37,6 @@ export const useEndpointsConfig = () => {
     solanaRpcUrl: endpointsConfig.solanaRpcUrl,
     affiliatesBaseUrl: endpointsConfig.affiliates,
     spotCandleService: endpointsConfig.spotCandleService,
+    geoV2: endpointsConfig.geoV2,
   };
 };

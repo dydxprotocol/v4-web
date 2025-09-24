@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 
 import { loadableLoaded } from '@/bonsai/lib/loadable';
-import { ComplianceResponse, ComplianceStatus } from '@/bonsai/types/summaryTypes';
+import { ComplianceResponse, ComplianceStatus, GeoState } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { ComplianceConfigDialogProps, DialogProps } from '@/constants/dialogs';
-import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { MenuGroup } from '@/constants/menus';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -30,17 +29,14 @@ const complianceStatusOptions = [
 
 const setCompliance = (payload: ComplianceResponse) =>
   setLocalAddressScreenV2Raw(loadableLoaded(payload));
-const setGeo = (payload: string) => setComplianceGeoRaw(loadableLoaded(payload));
+const setGeo = (payload: GeoState) => setComplianceGeoRaw(loadableLoaded(payload));
 
 const usePreferenceMenu = () => {
   const dispatch = useAppDispatch();
 
   const complianceStatus = useAppSelector(getComplianceStatus);
   const geo = useAppSelector(getGeo);
-  const geoRestricted = Boolean(
-    geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
-  );
-
+  const geoRestricted = geo.currentlyGeoBlocked;
   const notificationSection = useMemo(
     (): MenuGroup<string, string> => ({
       group: 'status',
@@ -72,7 +68,29 @@ const usePreferenceMenu = () => {
             <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
           ),
           onSelect: () => {
-            dispatch(geoRestricted ? setGeo('JP') : setGeo('US'));
+            dispatch(
+              geoRestricted
+                ? setGeo({
+                    country: 'JP',
+                    region: 'Tokyo',
+                    regionCode: '13',
+                    city: 'Tokyo',
+                    timezone: 'Asia/Tokyo',
+                    ll: [35.6762, 139.6503],
+                    blocked: false,
+                    whitelisted: false,
+                  })
+                : setGeo({
+                    country: 'US',
+                    region: 'California',
+                    regionCode: 'CA',
+                    city: 'Los Angeles',
+                    timezone: 'America/Los_Angeles',
+                    ll: [34.0522, -118.2437],
+                    blocked: true,
+                    whitelisted: false,
+                  })
+            );
           },
         },
       ],

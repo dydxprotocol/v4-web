@@ -11,6 +11,7 @@ import {
   AccountStats,
   ComplianceResponse,
   ConfigTiers,
+  GeoState,
   RewardsParams,
   TokenPriceResponse,
   UserFeeTier,
@@ -60,7 +61,7 @@ export type ComplianceErrors = {
 };
 
 export type ComplianceState = {
-  geo: Loadable<string | undefined>;
+  geo: Loadable<GeoState | undefined>;
   sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
   localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
 };
@@ -198,7 +199,7 @@ export const rawSlice = createSlice({
       setValidatorHeightRaw: (state, action: PayloadAction<Loadable<HeightEntry>>) => {
         appendToHeight(state.heights.validatorHeight, action.payload);
       },
-      setComplianceGeoRaw: (state, action: PayloadAction<Loadable<string | undefined>>) => {
+      setComplianceGeoRaw: (state, action: PayloadAction<Loadable<GeoState | undefined>>) => {
         state.compliance.geo = action.payload;
       },
       setLocalAddressScreenV2Raw: (

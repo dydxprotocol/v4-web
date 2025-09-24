@@ -19,8 +19,6 @@ import {
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { isBlockedGeo } from '@/lib/compliance';
-
 import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
@@ -43,10 +41,7 @@ export const useComplianceState = () => {
       return ComplianceStates.CLOSE_ONLY;
     }
 
-    if (
-      complianceStatus === ComplianceStatus.BLOCKED ||
-      (geo && isBlockedGeo(geo) && checkForGeo)
-    ) {
+    if (complianceStatus === ComplianceStatus.BLOCKED || (geo.currentlyGeoBlocked && checkForGeo)) {
       return ComplianceStates.READ_ONLY;
     }
 
@@ -89,7 +84,7 @@ export const useComplianceState = () => {
           ),
         },
       });
-    } else if (geo && isBlockedGeo(geo) && checkForGeo) {
+    } else if (geo.currentlyGeoBlocked && checkForGeo) {
       message = stringGetter({
         key: STRING_KEYS.BLOCKED_MESSAGE,
         params: {
