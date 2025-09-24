@@ -98,10 +98,12 @@ export const DialogManager = React.memo(() => {
     ConfirmPendingDeposit: (args) => <ConfirmPendingDepositDialog {...args} {...modalProps} />,
     DepositAddresses: (args) => <DepositAddressDialog {...args} {...modalProps} />,
     Deposit2: (args) =>
-      isTurnkey ? (
-        <DepositAddressDialog {...args} {...modalProps} />
-      ) : isMainnet ? (
-        <DepositDialog2 {...args} {...modalProps} />
+      isMainnet ? (
+        isTurnkey ? (
+          <DepositAddressDialog {...args} {...modalProps} />
+        ) : (
+          <DepositDialog2 {...args} {...modalProps} />
+        )
       ) : (
         <TestnetFaucetDialog {...modalProps} />
       ),
