@@ -1,6 +1,7 @@
 import { AMOUNT_SAFE_GAS_FOR_TRANSACTION_USDC } from '@/constants/account';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { getGeoCheckEnabled } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import { getLocalWalletNonce, getSourceAccount } from '@/state/walletSelectors';
 
@@ -21,8 +22,16 @@ export const selectTxAuthorizedAccount = createAppSelector(
     calculateIsAccountViewOnly,
     BonsaiCore.compliance.data,
     getLocalWalletNonce,
+    getGeoCheckEnabled,
   ],
-  (parentSubaccountInfo, sourceAccount, isAccountViewOnly, complianceData, localWalletNonce) => {
+  (
+    parentSubaccountInfo,
+    sourceAccount,
+    isAccountViewOnly,
+    complianceData,
+    localWalletNonce,
+    geoCheckEnabled
+  ) => {
     const isAccountRestrictionFree =
       !isAccountViewOnly &&
       ![
@@ -30,7 +39,7 @@ export const selectTxAuthorizedAccount = createAppSelector(
         ComplianceStatus.CLOSE_ONLY,
         ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
       ].includes(complianceData.status) &&
-      !complianceData.geo.currentlyGeoBlocked;
+      !(complianceData.geo.currentlyGeoBlocked && geoCheckEnabled);
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;
