@@ -301,7 +301,7 @@ const useTurnkeyWalletContext = () => {
       }
     } catch (error) {
       logBonsaiError(
-        'endTurnkeySession',
+        'TurnkeyOnboarding',
         'Unsuccessful attempt to clean up Turnkey session',
         error
       );
