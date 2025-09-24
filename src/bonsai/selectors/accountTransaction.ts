@@ -30,7 +30,7 @@ export const selectTxAuthorizedAccount = createAppSelector(
         ComplianceStatus.CLOSE_ONLY,
         ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY,
       ].includes(complianceData.status) &&
-      complianceData.geo.currentlyGeoBlocked;
+      !complianceData.geo.currentlyGeoBlocked;
 
     if (!parentSubaccountInfo.wallet || !isAccountRestrictionFree || localWalletNonce == null) {
       return undefined;
