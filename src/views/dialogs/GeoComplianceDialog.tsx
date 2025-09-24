@@ -1,21 +1,18 @@
 import { useState } from 'react';
 
+import { logBonsaiError } from '@/bonsai/logs';
 // eslint-disable-next-line no-restricted-imports
 import { ComplianceAction, triggerCompliance } from '@/bonsai/rest/compliance';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogProps, GeoComplianceDialogProps } from '@/constants/dialogs';
-import {
-  BLOCKED_COUNTRIES,
-  COUNTRIES_MAP,
-  CountryCodes,
-  OFAC_SANCTIONED_COUNTRIES,
-} from '@/constants/geo';
+import { COUNTRIES_MAP, CountryCodes } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -28,10 +25,11 @@ import { WithReceipt } from '@/components/WithReceipt';
 
 import { useAppDispatch } from '@/state/appTypes';
 
-export const isBlockedGeo = (geo: string): boolean => {
-  return isMainnet
-    ? [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
-    : false;
+import { runFn } from '@/lib/do';
+import { removeTrailingSlash } from '@/lib/stringifyHelpers';
+
+const isBlockedGeo = (geo: string, restrictedGeos: string[]): boolean => {
+  return isMainnet ? restrictedGeos.includes(geo as CountryCodes) : false;
 };
 
 const CountrySelector = ({
@@ -79,10 +77,27 @@ export const GeoComplianceDialog = ({ setIsOpen }: DialogProps<GeoComplianceDial
 
   const [showForm, setShowForm] = useState(false);
   const { isMobile } = useBreakpoints();
+  const { geoV2 } = useEndpointsConfig();
 
   const submit = async () => {
+    const restrictedGeos = await runFn(async (): Promise<string[]> => {
+      try {
+        const result = (await (await fetch(`${removeTrailingSlash(geoV2)}/restricted`)).json())
+          .restricted.countryCodes;
+
+        if (!Array.isArray(result)) {
+          throw new Error('Expected array of country codes');
+        }
+
+        return result;
+      } catch (error) {
+        logBonsaiError('fetchRestrictedGeos', 'Failed to fetch restricted geos', { error });
+        throw error;
+      }
+    });
+
     const action =
-      residence && isBlockedGeo(COUNTRIES_MAP[residence]!)
+      residence && isBlockedGeo(COUNTRIES_MAP[residence]!, restrictedGeos)
         ? ComplianceAction.INVALID_SURVEY
         : ComplianceAction.VALID_SURVEY;
 
