@@ -1,6 +1,6 @@
 import { SubaccountClient } from '@dydxprotocol/v4-client-js';
 
-import { TransactionMemo } from '@/constants/analytics';
+import { AnalyticsEvents, TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
 import { WalletNetworkType } from '@/constants/wallets';
 
@@ -9,6 +9,7 @@ import { selectShouldAccountRebalanceUsdc } from '@/state/accountSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { createAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { sleep } from '@/lib/timeUtils';
 
 import { createSemaphore, SupersededError } from '../lib/semaphore';
@@ -87,11 +88,43 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
           );
 
           try {
+            track(
+              AnalyticsEvents.RebalanceWalletFundsInitiated({
+                amountToDeposit,
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                targetAmount,
+                isAutoRebalance: true,
+              })
+            );
+
             await compositeClient.depositToSubaccount(
               subaccountClient,
               amountToDeposit,
               TransactionMemo.depositToSubaccount
             );
+
+            track(
+              AnalyticsEvents.RebalanceWalletFundsFinalized({
+                amountToDeposit,
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                targetAmount,
+                isAutoRebalance: true,
+              })
+            );
+          } catch (error) {
+            track(
+              AnalyticsEvents.RebalanceWalletFundsError({
+                amountToDeposit,
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                targetAmount,
+                error: error.message,
+                isAutoRebalance: true,
+              })
+            );
+            throw error;
           } finally {
             await sleep(SLEEP_TIME);
 
@@ -125,12 +158,44 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
           );
 
           try {
+            track(
+              AnalyticsEvents.RebalanceWalletFundsInitiated({
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                amountToWithdraw,
+                targetAmount,
+                isAutoRebalance: true,
+              })
+            );
             await compositeClient.withdrawFromSubaccount(
               subaccountClient,
               amountToWithdraw,
               undefined,
               TransactionMemo.withdrawFromSubaccount
             );
+
+            track(
+              AnalyticsEvents.RebalanceWalletFundsFinalized({
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                amountToWithdraw,
+                targetAmount,
+                isAutoRebalance: true,
+              })
+            );
+          } catch (error) {
+            track(
+              AnalyticsEvents.RebalanceWalletFundsError({
+                amountToWithdraw,
+                subaccountNumber: parentSubaccountInfo.subaccount,
+                balance: usdcBalance,
+                targetAmount,
+                error: error.message,
+                isAutoRebalance: true,
+              })
+            );
+
+            throw error;
           } finally {
             await sleep(SLEEP_TIME);
 
