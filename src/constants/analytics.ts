@@ -482,6 +482,7 @@ export const AnalyticsEvents = unionize(
     >(),
     DepositError: ofType<{ error: string }>(),
     SelectQrDeposit: ofType<{}>(),
+    TurnkeyDepositInitiated: ofType<{}>(),
 
     // Withdraw
     WithdrawInitiated:
@@ -501,6 +502,58 @@ export const AnalyticsEvents = unionize(
     WithdrawSubmitted: ofType<Withdraw>(),
     WithdrawFinalized: ofType<Withdraw>(),
     WithdrawError: ofType<{ error: string }>(),
+
+    // USDC Rebalancing
+    RebalanceWalletFundsInitiated: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+    >(),
+    RebalanceWalletFundsFinalized: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          isAutoRebalance: boolean;
+        }
+    >(),
+    RebalanceWalletFundsError: ofType<
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToDeposit: string;
+          targetAmount: number;
+          error: string;
+          isAutoRebalance: boolean;
+        }
+      | {
+          subaccountNumber: number;
+          balance?: string;
+          amountToWithdraw: string;
+          targetAmount: number;
+          error: string;
+          isAutoRebalance: boolean;
+        }
+    >(),
 
     // Marketing Banner
     MarketingBannerClick: ofType<{

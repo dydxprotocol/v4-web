@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Description } from '@radix-ui/react-dialog';
 import styled from 'styled-components';
 
+import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { ConfirmPendingDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,6 +25,7 @@ import { Output, OutputType } from '@/components/Output';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { track } from '@/lib/analytics/analytics';
 import { log } from '@/lib/telemetry';
 
 export const ConfirmPendingDepositDialog = ({
@@ -47,13 +50,41 @@ export const ConfirmPendingDepositDialog = ({
   const handleDepositToSubaccount = async () => {
     setIsLoading(true);
     try {
+      track(
+        AnalyticsEvents.RebalanceWalletFundsInitiated({
+          amountToDeposit: usdcBalance.toString(),
+          subaccountNumber: 0,
+          balance: usdcBalance.toString(),
+          targetAmount: usdcBalance + AMOUNT_RESERVED_FOR_GAS_USDC,
+          isAutoRebalance: false,
+        })
+      );
       const tx = await deposit(usdcBalance);
+      track(
+        AnalyticsEvents.RebalanceWalletFundsFinalized({
+          amountToDeposit: usdcBalance.toString(),
+          subaccountNumber: 0,
+          balance: usdcBalance.toString(),
+          targetAmount: usdcBalance + AMOUNT_RESERVED_FOR_GAS_USDC,
+          isAutoRebalance: false,
+        })
+      );
       if (tx && dydxAddress) {
         await refetchQuery();
 
         setIsOpen(false);
       }
     } catch (err) {
+      track(
+        AnalyticsEvents.RebalanceWalletFundsError({
+          amountToDeposit: usdcBalance.toString(),
+          subaccountNumber: 0,
+          balance: usdcBalance.toString(),
+          targetAmount: usdcBalance + AMOUNT_RESERVED_FOR_GAS_USDC,
+          error: err.message,
+          isAutoRebalance: false,
+        })
+      );
       log('ConfirmPendingDepositDialog/handleDepositToSubAccount', err);
     }
     setIsLoading(false);

@@ -81,6 +81,11 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   });
 
   useEffect(() => {
+    // Optimistic Deposit Initiated for tracking purposes
+    track(AnalyticsEvents.TurnkeyDepositInitiated({}));
+  }, []);
+
+  useEffect(() => {
     if (failedToFetchDepositAddresses && dydxAddress) {
       track(
         AnalyticsEvents.TurnkeyFetchDepositAddressError({
