@@ -27,6 +27,7 @@ type AddressInputProps = {
   onChange: (newValue: string) => void;
   destinationChain: string;
   onDestinationClicked: () => void;
+  placeholder?: string;
 };
 
 export const AddressInput = ({
@@ -34,6 +35,7 @@ export const AddressInput = ({
   onChange,
   destinationChain,
   onDestinationClicked,
+  placeholder,
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
@@ -67,7 +69,7 @@ export const AddressInput = ({
         <$Input
           onBlur={onBlur}
           onFocus={onFocus}
-          placeholder={sourceAccount.address}
+          placeholder={placeholder}
           value={value}
           onChange={onValueChange}
         />

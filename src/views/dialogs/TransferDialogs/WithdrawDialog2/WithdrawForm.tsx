@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import tw from 'twin.macro';
@@ -9,8 +9,10 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { USDC_DECIMALS, WITHDRAWABLE_ASSETS } from '@/constants/tokens';
+import { WalletType } from '@/constants/wallets';
 
 import { SkipRouteSpeed } from '@/hooks/transfers/skipClient';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -65,13 +67,17 @@ export const WithdrawForm = ({
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
-
+  const { sourceAccount } = useAccounts();
   const [selectedSpeed, setSelectedSpeed] = useState<SkipRouteSpeed>('fast');
   const debouncedAmount = useDebounce(amount);
   const selectedToken = WITHDRAWABLE_ASSETS.find((token) => token.chainId === destinationChain);
   const { freeCollateral, marginUsage, equity } = orEmptyObj(
     useAppSelector(BonsaiCore.account.parentSubaccountSummary.data)
   );
+
+  const isEmbeddedWallet =
+    sourceAccount.walletInfo?.name === WalletType.Privy ||
+    sourceAccount.walletInfo?.name === WalletType.Turnkey;
 
   const {
     data: routes,
@@ -129,6 +135,13 @@ export const WithdrawForm = ({
     !isDebouncedAmountSame ||
     !isValidWithdrawalAddress(destinationAddress, destinationChain);
 
+  const placeholder = useMemo(() => {
+    if (isEmbeddedWallet) {
+      return `${stringGetter({ key: STRING_KEYS.ADDRESS })}...`;
+    }
+    return sourceAccount.address;
+  }, [sourceAccount.address, isEmbeddedWallet, stringGetter]);
+
   const amountOut = formatUnits(BigInt(selectedRoute?.amountOut ?? '0'), USDC_DECIMALS);
   const slippageAmount = AttemptBigNumber(debouncedAmount)?.minus(amountOut);
   const slippagePercent = slippageAmount?.div(debouncedAmount).toNumber() ?? 0;
@@ -167,7 +180,7 @@ export const WithdrawForm = ({
       </WithTooltip>
       {stringGetter({ key: STRING_KEYS.WITHDRAW })}
     </div>
-  ) : showSlippageWarning ? (
+  ) : showSlippageWarning && selectedRoute ? (
     <div tw="row gap-0.5">
       <WithTooltip tooltipString={slippageWarning}>
         <WarningIcon tw="text-color-warning" />
@@ -265,6 +278,7 @@ export const WithdrawForm = ({
         onChange={setDestinationAddress}
         destinationChain={destinationChain}
         onDestinationClicked={onChainSelect}
+        placeholder={placeholder}
       />
       <AmountInput value={amount} onChange={setAmount} />
       <TransferRouteOptions
