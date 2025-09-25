@@ -78,8 +78,13 @@ const useTurnkeyAuthContext = () => {
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
 
-  const { embeddedPublicKey, onboardDydx, targetPublicKeys, getUploadAddressPayload } =
-    useTurnkeyWallet();
+  const {
+    embeddedPublicKey,
+    setIsNewTurnkeyUser,
+    onboardDydx,
+    targetPublicKeys,
+    getUploadAddressPayload,
+  } = useTurnkeyWallet();
 
   /* ----------------------------- Sign In ----------------------------- */
 
@@ -124,6 +129,7 @@ const useTurnkeyAuthContext = () => {
       }
 
       if (response.dydxAddress === '') {
+        setIsNewTurnkeyUser(true);
         dispatch(setRequiresAddressUpload(true));
       }
 
@@ -137,6 +143,7 @@ const useTurnkeyAuthContext = () => {
           }
 
           handleEmailResponse({ userEmail, response });
+          setEmailSignInStatus('idle');
           break;
         case LoginMethod.Passkey: // TODO: handle passkey response
         default:
@@ -306,6 +313,7 @@ const useTurnkeyAuthContext = () => {
         await indexedDbClient.loginWithSession(session);
         await onboardDydx({ setWalletFromSignature, tkClient: indexedDbClient });
         setEmailSignInStatus('success');
+
         track(
           AnalyticsEvents.TurnkeyLoginCompleted({
             signinMethod: 'email',

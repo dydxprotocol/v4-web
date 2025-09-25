@@ -111,11 +111,11 @@ export const OnboardingDialog = ({
 
   const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
     setIsOpen(false);
+
     dispatch(
       openDialog(
         DialogTypes.CheckEmail({
           userEmail,
-          onClose: () => dispatch(openDialog(DialogTypes.Onboarding())),
         })
       )
     );

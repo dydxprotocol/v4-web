@@ -21,7 +21,7 @@ export type AdjustIsolatedMarginDialogProps = {
 };
 export type CheckEmailDialogProps = {
   userEmail: string;
-  onClose: () => void;
+  onClose?: () => void;
 };
 export type ClosePositionDialogProps = {};
 export type CloseAllPositionsConfirmationDialogProps = {};
