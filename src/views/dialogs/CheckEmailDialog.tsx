@@ -19,7 +19,7 @@ export const CheckEmailDialog = ({
   setIsOpen,
 }: {
   userEmail: string;
-  onClose: () => void;
+  onClose?: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
   const stringGetter = useStringGetter();
@@ -30,7 +30,7 @@ export const CheckEmailDialog = ({
       setIsOpen(isOpen);
 
       if (!isOpen) {
-        onClose();
+        onClose?.();
       }
     },
     [onClose, setIsOpen]

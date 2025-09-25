@@ -43,6 +43,7 @@ const useTurnkeyWalletContext = () => {
 
   const [turnkeyUser, setTurnkeyUser] = useState<UserSession>();
   const [turnkeyWallets, setTurnkeyWallets] = useState<TurnkeyWallet[]>();
+  const [isNewTurnkeyUser, setIsNewTurnkeyUser] = useState(false);
   const primaryTurnkeyWallet = useAppSelector(getTurnkeyPrimaryWallet);
 
   const setPrimaryTurnkeyWallet = useCallback(
@@ -288,7 +289,8 @@ const useTurnkeyWalletContext = () => {
     dispatch(clearTurnkeyPrimaryWallet());
     setTurnkeyWallets(undefined);
     setTargetPublicKeys(null);
-  }, []);
+    setIsNewTurnkeyUser(false);
+  }, [dispatch]);
 
   const endTurnkeySession = useCallback(async () => {
     try {
@@ -321,9 +323,11 @@ const useTurnkeyWalletContext = () => {
     primaryTurnkeyWallet,
     embeddedPublicKey,
     targetPublicKeys,
+    isNewTurnkeyUser,
 
     endTurnkeySession,
     onboardDydx,
     getUploadAddressPayload,
+    setIsNewTurnkeyUser,
   };
 };

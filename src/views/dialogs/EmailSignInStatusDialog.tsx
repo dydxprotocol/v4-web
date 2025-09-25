@@ -7,6 +7,7 @@ import { ConnectorType } from '@/constants/wallets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
+import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -29,8 +30,8 @@ export const EmailSignInStatusDialog = ({
 }) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const { emailSignInError, emailSignInStatus, needsAddressUpload, resetEmailSignInStatus } =
-    useTurnkeyAuth();
+  const { isNewTurnkeyUser } = useTurnkeyWallet();
+  const { emailSignInError, emailSignInStatus, resetEmailSignInStatus } = useTurnkeyAuth();
   const sourceAccount = useAppSelector(getSourceAccount);
   const walletInfo = sourceAccount.walletInfo;
   const appTheme = useAppSelector(getAppTheme);
@@ -172,7 +173,7 @@ export const EmailSignInStatusDialog = ({
             backgroundClip: 'text',
           }}
         >
-          {needsAddressUpload
+          {isNewTurnkeyUser
             ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX })
             : stringGetter({ key: STRING_KEYS.WELCOME_BACK })}
         </span>
@@ -190,13 +191,13 @@ export const EmailSignInStatusDialog = ({
         onClick={async () => {
           setIsOpen(false);
 
-          if (needsAddressUpload) {
+          if (isNewTurnkeyUser) {
             await sleep(0);
             dispatch(openDialog(DialogTypes.Deposit2({})));
           }
         }}
       >
-        {needsAddressUpload
+        {isNewTurnkeyUser
           ? `${stringGetter({ key: STRING_KEYS.DEPOSIT_AND_TRADE })} →`
           : stringGetter({ key: STRING_KEYS.CONTINUE })}
       </Button>
