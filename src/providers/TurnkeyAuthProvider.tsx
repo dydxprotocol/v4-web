@@ -143,7 +143,7 @@ const useTurnkeyAuthContext = () => {
           }
 
           handleEmailResponse({ userEmail, response });
-          setEmailSignInStatus('success');
+          setEmailSignInStatus('idle');
           break;
         case LoginMethod.Passkey: // TODO: handle passkey response
         default:
@@ -312,6 +312,8 @@ const useTurnkeyAuthContext = () => {
 
         await indexedDbClient.loginWithSession(session);
         await onboardDydx({ setWalletFromSignature, tkClient: indexedDbClient });
+        setEmailSignInStatus('success');
+
         track(
           AnalyticsEvents.TurnkeyLoginCompleted({
             signinMethod: 'email',
@@ -349,7 +351,6 @@ const useTurnkeyAuthContext = () => {
         setEmailSignInError(errorMessage ?? 'An unknown error occurred');
         setEmailSignInStatus('error');
       } finally {
-        setEmailSignInStatus('success');
         // Clear token from state after it has been consumed
         setEmailToken(undefined);
         // Remove the token from the search params after it has been saved to state
