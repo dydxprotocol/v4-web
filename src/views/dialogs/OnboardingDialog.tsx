@@ -109,7 +109,7 @@ export const OnboardingDialog = ({
     );
   };
 
-  const onSubmitEmail = async ({ userEmail }: { userEmail: string }) => {
+  const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
     setIsOpen(false);
 
     dispatch(
