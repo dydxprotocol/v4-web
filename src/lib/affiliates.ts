@@ -1,3 +1,5 @@
+import { logBonsaiError } from '@/bonsai/logs';
+
 import { AnalyticsEvents } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
@@ -92,7 +94,9 @@ export const updateReferralCode = async (newCode: string) => {
 
     track(AnalyticsEvents.AffiliateReferralCodeUpdated({ newCode }));
   } catch (error) {
-    log('updateReferralCode', error);
+    logBonsaiError('updateReferralCode', 'error trying to update referral code', {
+      error,
+    });
     throw error;
   } finally {
     await appQueryClient.invalidateQueries({ queryKey: ['affiliateMetadata'] });
