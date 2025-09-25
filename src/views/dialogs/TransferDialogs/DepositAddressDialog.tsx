@@ -41,7 +41,7 @@ import { calc } from '@/lib/do';
 
 type DepositTab = 'spot' | 'perpetuals';
 
-const MIN_DEPOSIT = 10;
+const MIN_DEPOSIT = 20;
 const MAX_DEPOSIT = 100_000;
 const ETH_MIN_DEPOSIT = 20;
 const ETH_MIN_INSTANT_DEPOSIT = 50;
