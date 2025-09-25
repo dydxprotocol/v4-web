@@ -145,7 +145,8 @@ export const WithdrawForm = ({
   const amountOut = formatUnits(BigInt(selectedRoute?.amountOut ?? '0'), USDC_DECIMALS);
   const slippageAmount = AttemptBigNumber(debouncedAmount)?.minus(amountOut);
   const slippagePercent = slippageAmount?.div(debouncedAmount).toNumber() ?? 0;
-  const showSlippageWarning = slippagePercent > WITHDRAWAL_SLIPPAGE_WARN_THRESHOLD;
+  const showSlippageWarning =
+    selectedRoute != null && slippagePercent > WITHDRAWAL_SLIPPAGE_WARN_THRESHOLD;
   const slippageWarning = showSlippageWarning
     ? stringGetter({
         key: STRING_KEYS.WITHDRAW_SLIPPAGE_WARNING,
@@ -180,7 +181,7 @@ export const WithdrawForm = ({
       </WithTooltip>
       {stringGetter({ key: STRING_KEYS.WITHDRAW })}
     </div>
-  ) : showSlippageWarning && selectedRoute ? (
+  ) : showSlippageWarning ? (
     <div tw="row gap-0.5">
       <WithTooltip tooltipString={slippageWarning}>
         <WarningIcon tw="text-color-warning" />
