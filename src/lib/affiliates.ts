@@ -8,6 +8,7 @@ import { store } from '@/state/_store';
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
+import { getHdKeyNonce } from '@/state/walletSelectors';
 
 import { track } from './analytics/analytics';
 import { signCompliancePayload } from './compliance';
@@ -34,9 +35,10 @@ export const updateReferralCode = async (newCode: string) => {
     const chainId = getSelectedDydxChainId(state);
     const address = getUserWalletAddress(state);
     const network = getSelectedNetwork(state);
+    const hdKeyNonce = getHdKeyNonce(state);
 
-    if (!address) {
-      throw new Error('No account connected');
+    if (!address || !hdKeyNonce) {
+      throw new Error('No account connected or hdKey not set');
     }
 
     const networkConfig = ENVIRONMENT_CONFIG_MAP[network];
@@ -46,7 +48,7 @@ export const updateReferralCode = async (newCode: string) => {
       throw new Error('No indexer URL available');
     }
 
-    const signingResponse = await signCompliancePayload(address, {
+    const signingResponse = await signCompliancePayload(address, hdKeyNonce, {
       message: newCode,
       action: ReferralAction.UPDATE_CODE,
       status: '',

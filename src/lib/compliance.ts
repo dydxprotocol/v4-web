@@ -87,6 +87,7 @@ const signComplianceSignatureKeplr = async (
 
 export const signCompliancePayload = async (
   address: string,
+  nonce: number,
   params: {
     message: string;
     action: string;
@@ -95,7 +96,7 @@ export const signCompliancePayload = async (
   }
 ): Promise<string> => {
   try {
-    const hdkey = hdKeyManager.getHdkey(address);
+    const hdkey = hdKeyManager.getHdkey(address, nonce);
     if (hdkey?.privateKey && hdkey.publicKey) {
       const { signedMessage, timestamp } = await signComplianceSignature(
         params.message,

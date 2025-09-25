@@ -31,7 +31,8 @@ export const selectTurnkeyWalletInfo = createAppSelector([selectWalletInfo], (wa
   return undefined;
 });
 
-export const getLocalWalletNonce = (state: RootState) => state.wallet.localWalletNonce;
+export const getLocalWalletNonce = (state: RootState) => state.walletEphemeral.localWalletNonce;
+export const getHdKeyNonce = (state: RootState) => state.walletEphemeral.hdKeyNonce;
 
 export const getTurnkeyEmailOnboardingData = (state: RootState) =>
   state.wallet.turnkeyEmailOnboardingData;
