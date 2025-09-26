@@ -414,7 +414,7 @@ const useTurnkeyAuthContext = () => {
   }, [searchParams, setSearchParams]);
 
   /* ----------------------------- Upload Address ----------------------------- */
-  const { mutateAsync: sendUploadAddressRequest } = useMutation({
+  const { mutateAsync: sendUploadAddressRequest, isPending: isUploadingAddress } = useMutation({
     mutationFn: async ({
       payload,
     }: {
@@ -551,6 +551,7 @@ const useTurnkeyAuthContext = () => {
     isLoading: status === 'pending' || emailSignInStatus === 'loading',
     isError: status === 'error' || emailSignInStatus === 'error',
     needsAddressUpload,
+    isUploadingAddress,
     signInWithOauth,
     signInWithOtp,
     resetEmailSignInStatus,
