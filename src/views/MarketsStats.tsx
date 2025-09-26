@@ -83,8 +83,8 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <$FreeDepositBanner>
         <div tw="flex items-center justify-between gap-0.75">
           <div tw="relative z-10 mr-auto flex max-w-10 flex-col">
-            <span tw="mb-0.75 leading-[1.2] font-extra-large-bold">
-              <span tw="mr-0.25 rounded-0 bg-color-layer-1 px-0.25 text-color-accent">
+            <span tw="mb-0.75 !leading-tight font-extra-large-bold">
+              <span tw="mr-0.25 rounded-0 bg-color-text-2 px-0.25 text-color-accent">
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_TITLE_FREE })}
               </span>
               <span tw="text-color-text-2">
@@ -97,7 +97,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
                 type={ButtonType.Button}
                 tw="relative z-10 w-full border-none bg-color-layer-0 text-color-text-2"
                 onClick={handleFreeDepositClick}
-                state={{ isDisabled: isOnboardingDisabled }}
+                state={{ isDisabled: Boolean(isOnboardingDisabled) }}
               >
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
               </Button>
@@ -110,7 +110,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
           <img
             src="/free-deposit-hedgie.png"
             alt="free deposit hedgie"
-            tw="absolute bottom-0 left-7 z-0 h-14 object-contain mobile:hidden"
+            tw="absolute bottom-0 left-6 z-0 h-full object-contain mobile:hidden"
           />
         </div>
       </$FreeDepositBanner>

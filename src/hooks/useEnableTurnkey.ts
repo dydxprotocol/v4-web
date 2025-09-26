@@ -7,6 +7,5 @@ import { useStatsigGateValue } from './useStatsig';
 export const useEnableTurnkey = () => {
   const forcedTurnkey = testFlags.enableTurnkey;
   const turnkeyFF = useStatsigGateValue(StatsigFlags.ffTurnkeyWeb);
-
-  return forcedTurnkey || turnkeyFF;
+  return forcedTurnkey ?? turnkeyFF;
 };
