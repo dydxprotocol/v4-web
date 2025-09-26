@@ -30,6 +30,8 @@ class TestFlags {
         this.queryParams[key.toLowerCase()] = value;
       });
     }
+
+    console.log({ queryParams: this.queryParams });
   }
 
   get displayInitializingMarkets() {

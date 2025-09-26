@@ -64,6 +64,8 @@ export const SignIn = ({
 
   const hasValidEmail = isValidEmail(email);
 
+  console.log({ appleAuth: testFlags.enableAppleAuth });
+
   return (
     <form onSubmit={onSubmit} tw="flexColumn gap-1.25">
       <div tw="row gap-1">
