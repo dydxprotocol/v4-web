@@ -126,6 +126,7 @@ export { default as WithdrawIcon } from './withdraw.svg';
 export { default as XCircleIcon } from './x-circle.svg';
 
 // Wallets
+export { default as SolIcon } from './sol.svg';
 export { default as WalletIcon } from './wallet.svg';
 export { default as AppleIcon } from './wallets/apple.svg';
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
