@@ -507,6 +507,7 @@ const useTurnkeyAuthContext = () => {
       authIframeClient &&
       emailSignInStatus === 'idle'
     ) {
+      track(AnalyticsEvents.TurnkeyLoginEmailToken({}));
       logBonsaiInfo('TurnkeyOnboarding', 'Attempting to handle email magic link');
       handleEmailMagicLink({ token: emailToken });
     }

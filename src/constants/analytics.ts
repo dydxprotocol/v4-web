@@ -205,6 +205,7 @@ export const AnalyticsEvents = unionize(
     TurnkeyLoginInitiated: ofType<{
       signinMethod: 'email' | 'google' | 'apple';
     }>(),
+    TurnkeyLoginEmailToken: ofType<{}>(),
     TurnkeyLoginError: ofType<{
       signinMethod: 'email' | 'google' | 'apple';
       error: string;
