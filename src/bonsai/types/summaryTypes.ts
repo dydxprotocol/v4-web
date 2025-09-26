@@ -58,7 +58,11 @@ export type SubaccountSummaryCore = {
 };
 
 export type SubaccountSummaryDerived = {
+  // clamped at 0
   freeCollateral: BigNumber;
+  // allowed to be negative
+  rawFreeCollateral: BigNumber;
+  // clamped at 0
   equity: BigNumber;
   leverage: BigNumber | null;
   marginUsage: BigNumber | null;

@@ -710,9 +710,23 @@ function validateParentSubaccountMarginUsage(
   // Check if margin usage is invalid
   const isInvalidAfter = equityAfter <= 0 || marginUsageAfter == null || marginUsageAfter >= 1;
   const wasInvalidBefore = equityBefore <= 0 || marginUsageBefore == null || marginUsageBefore >= 1;
+
   // only error if they're going from valid->invalid
   // invalid->invalid is fine and invalid->valid is fine
   if (isInvalidAfter && !wasInvalidBefore) {
+    return simpleValidationError({
+      code: 'INVALID_NEW_ACCOUNT_MARGIN_USAGE',
+      type: ErrorType.error,
+      fields: ['size.size'],
+      titleKey: STRING_KEYS.MODIFY_SIZE_FIELD,
+      textKey: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE,
+    });
+  }
+
+  const rawFreeCollateralBefore = accountBefore.rawFreeCollateral.toNumber();
+  const rawFreeCollateralAfter = accountAfter.rawFreeCollateral.toNumber();
+
+  if (rawFreeCollateralBefore <= 0 && rawFreeCollateralAfter < rawFreeCollateralBefore) {
     return simpleValidationError({
       code: 'INVALID_NEW_ACCOUNT_MARGIN_USAGE',
       type: ErrorType.error,

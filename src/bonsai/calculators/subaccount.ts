@@ -71,6 +71,7 @@ export function calculateParentSubaccountSummary(
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,
+    rawFreeCollateral: parentSummary.rawFreeCollateral,
     parentSubaccountEquity: parentSummary.equity,
     equity: Object.values(summaries)
       .filter(isPresent)
@@ -151,7 +152,8 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
   const { initialRiskTotal, notionalTotal, quoteBalance, valueTotal } = core;
   const equity = BigNumber.max(valueTotal.plus(quoteBalance), BIG_NUMBERS.ZERO);
 
-  const freeCollateral = BigNumber.max(equity.minus(initialRiskTotal), BIG_NUMBERS.ZERO);
+  const rawFreeCollateral = equity.minus(initialRiskTotal);
+  const freeCollateral = BigNumber.max(rawFreeCollateral, BIG_NUMBERS.ZERO);
 
   let leverage = null;
   let marginUsage = null;
@@ -163,6 +165,7 @@ function calculateSubaccountSummaryDerived(core: SubaccountSummaryCore): Subacco
 
   return {
     freeCollateral,
+    rawFreeCollateral,
     equity,
     leverage,
     marginUsage,
