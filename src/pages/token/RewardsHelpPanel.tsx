@@ -40,21 +40,20 @@ export const RewardsHelpPanel = () => {
       <Accordion
         items={[
           {
-            header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
-            content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
-          },
-          {
-            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
+            header: stringGetter({
+              key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_FOR_SURGE_REWARDS_QUESTION,
+            }),
             content: stringGetter({
-              key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
-              params: {
-                HERE_LINK: hereLink(tradingRewardsLearnMore),
-              },
+              key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_FOR_SURGE_REWARDS_ANSWER,
             }),
           },
           {
-            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
-            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_SURGE_REWARDS_WORK_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_SURGE_REWARDS_WORK_ANSWER }),
+          },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_SURGE_REWARDS_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_SURGE_REWARDS_ANSWER }),
           },
           {
             header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
