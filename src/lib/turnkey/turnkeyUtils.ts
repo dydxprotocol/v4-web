@@ -1,5 +1,6 @@
 import type { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import type { TurnkeyWallet } from '@/types/turnkey';
 
 /**
@@ -31,3 +32,23 @@ export async function getWalletsWithAccountsFromClient(
 
   return walletWithAccounts;
 }
+
+export const parseTurnkeyError = (message: string, stringGetter: StringGetterFunction): string => {
+  if (message.includes('User has already registered using this email')) {
+    return stringGetter({ key: STRING_KEYS.USER_ALREADY_HAS_TURNKEY });
+  }
+
+  if (
+    message.includes('unable to decrypt bundle using embedded key') ||
+    message.includes('Organization ID is not available') ||
+    message.includes('Unauthenticated desc') ||
+    message.includes('Organization ID was not found')
+  ) {
+    return stringGetter({ key: STRING_KEYS.INVALID_TURNKEY_EMAIL_LINK });
+  }
+
+  return stringGetter({
+    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+    params: { ERROR_MESSAGE: message },
+  });
+};

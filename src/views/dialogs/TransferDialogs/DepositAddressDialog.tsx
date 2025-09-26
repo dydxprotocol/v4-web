@@ -18,6 +18,7 @@ import { useCopyValue } from '@/hooks/useCopyValue';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
@@ -58,6 +59,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const indexerReady = useAppSelector(selectIndexerReady);
 
   const canQueryForDepositAddresses = dydxAddress != null && indexerReady;
+  const { isUploadingAddress } = useTurnkeyAuth();
 
   const {
     data: depositAddresses,
@@ -205,50 +207,51 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
   const { copied, copy } = useCopyValue({ value: depositAddress });
 
-  const addressCard = isLoadingDepositAddresses ? (
-    <$AddressCard>
-      <div tw="mx-auto flex size-[155px] items-center justify-center">
-        <LoadingSpace />
-      </div>
-    </$AddressCard>
-  ) : failedToFetchDepositAddresses ? (
-    <$AddressCard>
-      <div tw="mx-auto flex h-[155px] flex-col items-center justify-center gap-1">
-        <Icon iconName={IconName.Warning} tw="size-2 text-color-error" />
-        <span tw="text-color-text-0">
-          {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
-        </span>
-      </div>
-    </$AddressCard>
-  ) : (
-    <$AddressCard onClick={copy} tabIndex={0} role="button">
-      <div tw="flexColumn min-w-0 justify-between">
-        <img
-          tw="size-2.25 rounded-[50%]"
-          src={CHAIN_INFO[selectedChain]?.icon}
-          alt={CHAIN_INFO[selectedChain]?.name}
-        />
-        {addressRepresentation && depositAddress ? (
-          <div tw="row ml-[-0.5rem] cursor-pointer items-end gap-0.125 rounded-[6px] p-0.5 hover:bg-color-layer-1">
-            <div tw="min-w-0 whitespace-normal break-words text-justify">
-              <span tw="text-color-text-2">{addressRepresentation.firstPart}</span>
-              <span tw="text-color-text-0">{addressRepresentation.middlePart}</span>
-              <span tw="text-color-text-2">{addressRepresentation.lastPart}</span>
+  const addressCard =
+    isUploadingAddress || isLoadingDepositAddresses ? (
+      <$AddressCard>
+        <div tw="mx-auto flex size-[155px] items-center justify-center">
+          <LoadingSpace />
+        </div>
+      </$AddressCard>
+    ) : failedToFetchDepositAddresses ? (
+      <$AddressCard>
+        <div tw="mx-auto flex h-[155px] flex-col items-center justify-center gap-1">
+          <Icon iconName={IconName.Warning} tw="size-2 text-color-error" />
+          <span tw="text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })}
+          </span>
+        </div>
+      </$AddressCard>
+    ) : (
+      <$AddressCard onClick={copy} tabIndex={0} role="button">
+        <div tw="flexColumn min-w-0 justify-between">
+          <img
+            tw="size-2.25 rounded-[50%]"
+            src={CHAIN_INFO[selectedChain]?.icon}
+            alt={CHAIN_INFO[selectedChain]?.name}
+          />
+          {addressRepresentation && depositAddress ? (
+            <div tw="row ml-[-0.5rem] cursor-pointer items-end gap-0.125 rounded-[6px] p-0.5 hover:bg-color-layer-1">
+              <div tw="min-w-0 whitespace-normal break-words text-justify">
+                <span tw="text-color-text-2">{addressRepresentation.firstPart}</span>
+                <span tw="text-color-text-0">{addressRepresentation.middlePart}</span>
+                <span tw="text-color-text-2">{addressRepresentation.lastPart}</span>
+              </div>
+              {copied ? (
+                <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
+              ) : (
+                <Icon iconName={IconName.Copy} tw="text-color-accent" />
+              )}
             </div>
-            {copied ? (
-              <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
-            ) : (
-              <Icon iconName={IconName.Copy} tw="text-color-accent" />
-            )}
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
 
-      <div tw="flex size-[155px] min-w-[155px]">
-        {depositAddress && <QrCode hasLogo tw="size-full" value={depositAddress} />}
-      </div>
-    </$AddressCard>
-  );
+        <div tw="flex size-[155px] min-w-[155px]">
+          {depositAddress && <QrCode hasLogo tw="size-full" value={depositAddress} />}
+        </div>
+      </$AddressCard>
+    );
 
   const getAcceptedAssets = (id: string | number) => {
     if (id === SOLANA_MAINNET_ID || id === avalanche.id) {

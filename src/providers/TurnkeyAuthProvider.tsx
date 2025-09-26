@@ -10,6 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletType } from '@/constants/wallets';
 import {
   GoogleIdTokenPayload,
@@ -20,7 +21,9 @@ import {
 } from '@/types/turnkey';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog, openDialog } from '@/state/dialogs';
 import {
@@ -32,6 +35,7 @@ import {
 import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import { track } from '@/lib/analytics/analytics';
+import { parseTurnkeyError } from '@/lib/turnkey/turnkeyUtils';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -67,6 +71,7 @@ export const useTurnkeyAuth = () => useContext(TurnkeyAuthContext)!;
 
 const useTurnkeyAuthContext = () => {
   const dispatch = useAppDispatch();
+  const stringGetter = useStringGetter();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
@@ -125,12 +130,16 @@ const useTurnkeyAuthContext = () => {
       if (response.errors && Array.isArray(response.errors)) {
         // Handle API-reported errors
         const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
-        throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
+        throw new Error(`Backend Error: ${errorMsg}`);
       }
 
       if (response.dydxAddress === '') {
         setIsNewTurnkeyUser(true);
         dispatch(setRequiresAddressUpload(true));
+      }
+
+      if (loginMethod === LoginMethod.OAuth && response.alreadyExists) {
+        throw new Error('User has already registered using this email');
       }
 
       switch (loginMethod) {
@@ -154,7 +163,7 @@ const useTurnkeyAuthContext = () => {
       selectWallet(undefined);
       logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
       setEmailSignInStatus('error');
-      setEmailSignInError(error.message);
+      setEmailSignInError(parseTurnkeyError(error.message, stringGetter));
 
       if (variables.loginMethod === LoginMethod.OAuth) {
         const providerName = variables.providerName;
@@ -179,12 +188,6 @@ const useTurnkeyAuthContext = () => {
         track(
           AnalyticsEvents.TurnkeyLoginCompleted({
             signinMethod: providerName,
-          })
-        );
-      } else if (variables.loginMethod === LoginMethod.Email) {
-        track(
-          AnalyticsEvents.TurnkeyLoginCompleted({
-            signinMethod: 'email',
           })
         );
       }
@@ -330,25 +333,21 @@ const useTurnkeyAuthContext = () => {
         let errorMessage: string | undefined;
 
         if (error instanceof Error) {
-          if (
-            error.message.includes('unable to decrypt bundle using embedded key') ||
-            error.message.includes('Organization ID is not available') ||
-            error.message.includes('Unauthenticated desc') ||
-            error.message.includes('Organization ID was not found')
-          ) {
-            errorMessage =
-              'Your email link has expired or you are using a different device/browser than the one used to sign in. Please try again.';
-          } else {
-            logBonsaiError('TurnkeyOnboarding', 'error handling email magic link', { error });
-            errorMessage = error.message;
-          }
+          errorMessage = parseTurnkeyError(error.message, stringGetter);
+          logBonsaiError('TurnkeyOnboarding', 'error handling email magic link', { error });
         } else {
           logBonsaiError('TurnkeyOnboarding', 'error handling email magic link - unknown', {
             error,
           });
         }
 
-        setEmailSignInError(errorMessage ?? 'An unknown error occurred');
+        setEmailSignInError(
+          errorMessage ??
+            stringGetter({
+              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+              params: { ERROR_MESSAGE: stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }) },
+            })
+        );
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
@@ -370,6 +369,7 @@ const useTurnkeyAuthContext = () => {
       searchParams,
       setSearchParams,
       dispatch,
+      stringGetter,
     ]
   );
 
@@ -414,7 +414,7 @@ const useTurnkeyAuthContext = () => {
   }, [searchParams, setSearchParams]);
 
   /* ----------------------------- Upload Address ----------------------------- */
-  const { mutateAsync: sendUploadAddressRequest } = useMutation({
+  const { mutateAsync: sendUploadAddressRequest, isPending: isUploadingAddress } = useMutation({
     mutationFn: async ({
       payload,
     }: {
@@ -448,6 +448,9 @@ const useTurnkeyAuthContext = () => {
         })
       );
       logBonsaiError('TurnkeyOnboarding', 'Error posting to upload address', { error });
+    },
+    onSuccess: () => {
+      appQueryClient.invalidateQueries({ queryKey: ['turnkeyWallets'] });
     },
   });
 
@@ -548,6 +551,7 @@ const useTurnkeyAuthContext = () => {
     isLoading: status === 'pending' || emailSignInStatus === 'loading',
     isError: status === 'error' || emailSignInStatus === 'error',
     needsAddressUpload,
+    isUploadingAddress,
     signInWithOauth,
     signInWithOtp,
     resetEmailSignInStatus,
