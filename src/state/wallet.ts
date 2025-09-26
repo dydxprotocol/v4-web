@@ -19,7 +19,6 @@ export interface WalletState {
     address?: string;
     subaccountNumber?: number;
   };
-  localWalletNonce?: number;
   turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
   turnkeyPrimaryWallet?: TurnkeyWallet;
 }
@@ -35,7 +34,6 @@ const initialState: WalletState = {
     address: undefined,
     subaccountNumber: 0,
   },
-  localWalletNonce: undefined,
   turnkeyEmailOnboardingData: undefined,
   turnkeyPrimaryWallet: undefined,
 };
@@ -44,9 +42,6 @@ export const walletSlice = createSlice({
   name: 'wallet',
   initialState,
   reducers: {
-    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
-      state.localWalletNonce = action.payload;
-    },
     setSourceAddress: (
       state,
       action: PayloadAction<{ address: string; chain: WalletNetworkType }>
@@ -120,8 +115,30 @@ export const walletSlice = createSlice({
   },
 });
 
+export interface WalletEphemeralState {
+  localWalletNonce?: number;
+  hdKeyNonce?: number;
+}
+
+const initialEphemeralState: WalletEphemeralState = {
+  localWalletNonce: undefined,
+  hdKeyNonce: undefined,
+};
+
+export const walletEphemeralSlice = createSlice({
+  name: 'walletEphemeral',
+  initialState: initialEphemeralState,
+  reducers: {
+    setLocalWalletNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.localWalletNonce = action.payload;
+    },
+    setHdKeyNonce: (state, action: PayloadAction<number | undefined>) => {
+      state.hdKeyNonce = action.payload;
+    },
+  },
+});
+
 export const {
-  setLocalWalletNonce,
   setSourceAddress,
   setRequiresAddressUpload,
   setWalletInfo,
@@ -134,3 +151,5 @@ export const {
   setTurnkeyPrimaryWallet,
   clearTurnkeyPrimaryWallet,
 } = walletSlice.actions;
+
+export const { setLocalWalletNonce, setHdKeyNonce } = walletEphemeralSlice.actions;

@@ -13,6 +13,7 @@ import {
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
 } from '@/state/raw';
+import { getHdKeyNonce } from '@/state/walletSelectors';
 
 import { signCompliancePayload } from '@/lib/compliance';
 import { mapIfPresent } from '@/lib/do';
@@ -62,9 +63,10 @@ export function setUpIndexerSourceAddressScreenV2Query(store: RootStore) {
 }
 
 const selectChainIdAndLocalAddress = createAppSelector(
-  [getSelectedDydxChainId, getUserWalletAddress, getSelectedNetwork],
-  (chainId, address, network) => ({
+  [getSelectedDydxChainId, getUserWalletAddress, getSelectedNetwork, getHdKeyNonce],
+  (chainId, address, network, hdKeyNonce) => ({
     chainId,
+    hdKeyNonce,
     address,
     network,
   })
@@ -81,12 +83,14 @@ const COMPLIANCE_PAYLOAD_MESSAGE = 'Verify account ownership';
 async function updateCompliance({
   chainId,
   address,
+  hdKeyNonce,
   network,
   status,
   action,
 }: {
   chainId: DydxChainId;
   address: string;
+  hdKeyNonce: number;
   network: DydxNetwork;
   status: ComplianceStatus;
   action: ComplianceAction;
@@ -104,7 +108,7 @@ async function updateCompliance({
     chainId,
   };
 
-  const signingResponse = await signCompliancePayload(address, payload);
+  const signingResponse = await signCompliancePayload(address, hdKeyNonce, payload);
   if (!signingResponse) {
     return { status: ComplianceStatus.UNKNOWN };
   }
@@ -163,8 +167,8 @@ export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
       address,
       network,
     ],
-    getQueryFn: (indexerClient, { chainId, address, network }) => {
-      if (address == null) {
+    getQueryFn: (indexerClient, { chainId, address, network, hdKeyNonce }) => {
+      if (address == null || hdKeyNonce == null) {
         return null;
       }
       return async (): Promise<ComplianceResponse> => {
@@ -179,6 +183,7 @@ export function setUpIndexerLocalAddressScreenV2Query(store: RootStore) {
 
         const updateResult = updateCompliance({
           address,
+          hdKeyNonce,
           chainId,
           network,
           status: firstScreenResult.status,
@@ -211,15 +216,17 @@ export const triggerCompliance = (action: ComplianceAction) => {
       const currentLocalScreenStatus = selectRawLocalAddressScreenV2(state).data?.status;
       const chainId = getSelectedDydxChainId(state);
       const address = getUserWalletAddress(state);
+      const hdKeyNonce = getHdKeyNonce(state);
       const network = getSelectedNetwork(state);
 
-      if (!address || !currentLocalScreenStatus) {
+      if (!address || !currentLocalScreenStatus || !hdKeyNonce) {
         throw new Error('TriggerCompliance: No account connected or screen status not loaded');
       }
 
       const result = await updateCompliance({
         chainId,
         address,
+        hdKeyNonce,
         network,
         status: currentLocalScreenStatus,
         action,
