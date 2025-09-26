@@ -45,9 +45,12 @@ import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPos
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
+import { VipTelegramNotification } from '@/views/notifications/VipTelegramNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
+  getIsAccountConnected,
+  getSubaccountEquity,
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
   selectShouldAccountRebalanceUsdc,
@@ -85,6 +88,7 @@ import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
+import { useLoadedVaultAccount } from './vaultsHooks';
 
 export const notificationTypes: NotificationTypeConfig[] = [
   {
@@ -1172,6 +1176,73 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (notificationId === CosmosWalletNotificationTypes.CancelOrphanedTriggers) {
           dispatch(openDialog(DialogTypes.CancelOrphanedTriggers()));
         }
+      };
+    },
+  },
+  {
+    type: NotificationType.VipTelegram,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const isConnected = useAppSelector(getIsAccountConnected);
+      const equity = useAppSelector(getSubaccountEquity, shallowEqual);
+      const { data: vaultAccount } = useLoadedVaultAccount();
+      const vaultBalance = vaultAccount?.balanceUsdc;
+
+      useEffect(() => {
+        if (!isConnected) {
+          return;
+        }
+
+        if (sessionStorage.getItem('vip-telegram-notification-shown')) {
+          return;
+        }
+
+        const totalValue = equity != null ? equity + (vaultBalance ?? 0) : undefined;
+        if (totalValue == null || totalValue < 50000) {
+          return;
+        }
+
+        const title = stringGetter({
+          key: STRING_KEYS.YOURE_INVITED,
+          fallback: "You're Invited",
+        });
+        const body = stringGetter({
+          key: STRING_KEYS.VIP_TELEGRAM_BODY,
+          fallback:
+            'Private Telegram Group for VIP traders. Enjoy white glove service, special incentives and competitions',
+        });
+
+        if (!title || !body) {
+          return;
+        }
+
+        sessionStorage.setItem('vip-telegram-notification-shown', 'true');
+
+        trigger({
+          id: `vip-telegram-invitation-${Date.now()}`,
+          displayData: {
+            title,
+            body,
+            renderCustomBody: ({ isToast, notification }) => (
+              <VipTelegramNotification
+                isToast={isToast}
+                notification={notification}
+                portfolioValue={totalValue}
+                telegramUrl="https://t.me/+NLOpf5jiAEVjODFh"
+              />
+            ),
+            groupKey: NotificationType.VipTelegram,
+            toastSensitivity: 'foreground',
+            toastDuration: 15000,
+          },
+          updateKey: ['vip-telegram-invitation'],
+        });
+      }, [equity, isConnected, stringGetter, trigger, vaultBalance]);
+    },
+
+    useNotificationAction: () => {
+      return () => {
+        // Optional: track analytics when user clicks
       };
     },
   },

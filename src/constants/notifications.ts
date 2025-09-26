@@ -22,6 +22,7 @@ export enum NotificationType {
   FillWithNoOrder = 'FillWithNoOrder',
   Order = 'Order',
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
+  VipTelegram = 'VipTelegram',
 }
 
 export enum NotificationCategoryPreferences {
@@ -55,6 +56,7 @@ export const NotificationTypeCategory: {
   [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.VipTelegram]: NotificationCategoryPreferences.General,
 };
 
 export const SingleSessionNotificationTypes = [

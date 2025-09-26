@@ -97,7 +97,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
                 type={ButtonType.Button}
                 tw="relative z-10 w-full border-none bg-color-layer-0 text-color-text-2"
                 onClick={handleFreeDepositClick}
-                state={{ isDisabled: isOnboardingDisabled }}
+                state={{ isDisabled: Boolean(isOnboardingDisabled) }}
               >
                 {stringGetter({ key: STRING_KEYS.FREE_DEPOSIT_BANNER_CTA })}
               </Button>
