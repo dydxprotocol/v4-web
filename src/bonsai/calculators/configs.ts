@@ -74,7 +74,7 @@ export function calculateEquityTiers(
 
   const statefuls = payload.statefulOrderEquityTiers;
   const statefulOrderEquityTiers: EquityTierSummary[] = statefuls
-    .map((cur, index) => createEquityTier(cur, shortTerms[index + 1]))
+    .map((cur, index) => createEquityTier(cur, statefuls[index + 1]))
     .filter(isTruthy);
 
   return {

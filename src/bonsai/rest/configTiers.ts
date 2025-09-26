@@ -28,6 +28,7 @@ export function setUpConfigTiersQuery(store: RootStore) {
           mapLoadableData(queryResultToLoadable(results), (data) => {
             const equity = parseToPrimitives(data[0]).equityTierLimitConfig;
             const fees = parseToPrimitives(data[1]).params;
+            console.log(equity, fees);
             return {
               equityTiers: equity,
               feeTiers: fees,
