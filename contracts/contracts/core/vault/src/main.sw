@@ -123,8 +123,8 @@ storage {
     last_funding_times: StorageMap<AssetId, u64> = StorageMap {},
     // tracks all open Positions
     positions: StorageMap<b256, Position> = StorageMap {},
-    // tracks amount of fees per asset
-    fee_reserves: StorageMap<AssetId, u256> = StorageMap {},
+    // tracks amount of fees (in collateral asset)
+    fee_reserve: u256 = 0,
     /// tracks average entry price for all short positions of each Asset
     /// value is weighted average at which all short positions for that asset were opened.
     global_short_average_prices: StorageMap<AssetId, u256> = StorageMap {},
@@ -507,12 +507,11 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn withdraw_fees(
-        asset: AssetId,
         receiver: Identity
     ) -> u64 {
         _only_gov();
 
-        _withdraw_fees(asset, receiver)
+        _withdraw_fees(receiver)
     }
 
     #[storage(read)]
@@ -676,8 +675,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_fee_reserves(asset: AssetId) -> u256 {
-        storage.fee_reserves.get(asset).try_read().unwrap_or(0)
+    fn get_fee_reserve() -> u256 {
+        storage.fee_reserve.try_read().unwrap_or(0)
     }
     
     #[storage(read)]
@@ -1124,12 +1123,10 @@ fn _write_last_funding_time(
 
 #[storage(write)]
 fn _write_fee_reserve(
-    asset: AssetId, 
     fee_reserve: u256
 ) {
-    storage.fee_reserves.insert(asset, fee_reserve);
+    storage.fee_reserve.write(fee_reserve);
     log(WriteFeeReserve {
-        asset,
         fee_reserve,
     });
 }
@@ -1158,19 +1155,16 @@ fn _get_after_fee_amount(
 
 #[storage(read, write)]
 fn _collect_swap_fees(
-    asset: AssetId, 
     amount: u64, 
     after_fee_amount: u64, 
 ) {
     let fee_amount = amount - after_fee_amount;
 
-    let fee_reserve = _get_fee_reserves(asset);
-    _write_fee_reserve(asset, fee_reserve + fee_amount.as_u256());
+    let fee_reserve = _get_fee_reserve();
+    _write_fee_reserve(fee_reserve + fee_amount.as_u256());
 
     log(CollectSwapFees {
-        asset,
-        fee_usd: _asset_to_usd_min(asset, fee_amount.as_u256()),
-        fee_assets: fee_amount,
+        fee_amount,
     });
 }
 
@@ -1306,8 +1300,8 @@ fn _get_buffer_amounts(asset: AssetId) -> u256 {
 }
 
 #[storage(read)]
-fn _get_fee_reserves(asset: AssetId) -> u256 {
-    storage.fee_reserves.get(asset).try_read().unwrap_or(0)
+fn _get_fee_reserve() -> u256 {
+    storage.fee_reserve.try_read().unwrap_or(0)
 }
 
 #[storage(read)]
@@ -2018,12 +2012,10 @@ fn _collect_margin_fees(
     fee_usd = position_fee + funding_fee;
 
     fee_assets = _usd_to_asset_min(collateral_asset, fee_usd);
-    let new_fee_reserve =  _get_fee_reserves(collateral_asset) + fee_assets;
-    _write_fee_reserve(collateral_asset, new_fee_reserve);
+    let new_fee_reserve =  _get_fee_reserve() + fee_assets;
+    _write_fee_reserve(new_fee_reserve);
 
     log(CollectMarginFees {
-        asset: collateral_asset,
-        fee_usd,
         fee_assets,
     });
 
@@ -2032,24 +2024,22 @@ fn _collect_margin_fees(
 
 #[storage(read, write)]
 fn _withdraw_fees(
-    asset: AssetId,
     receiver: Identity,
 ) -> u64 {
-    let amount = u64::try_from(_get_fee_reserves(asset)).unwrap();
+    let amount = u64::try_from(_get_fee_reserve()).unwrap();
     if amount == 0 {
         return 0;
     }
 
-    storage.fee_reserves.remove(asset);
+    storage.fee_reserve.write(0);
 
     _transfer_out(
-        asset,
+        COLLATERAL_ASSET,
         u64::try_from(amount).unwrap(),
         receiver,
     );
 
     log(WithdrawFees {
-        asset,
         receiver,
         amount
     });
@@ -2112,7 +2102,6 @@ fn _add_liquidity(
     ) = _get_add_liquidity_amount(asset_amount);
     // this needs to be called here because _get_add_liquidity_amount is read-only and cannot update state
     _collect_swap_fees(
-        asset,
         asset_amount,
         u64::try_from(amount_after_fees).unwrap()
     );
@@ -2204,7 +2193,6 @@ fn _remove_liquidity(
     ) = _get_remove_liquidity_amount(rusd_amount);
     // this needs to be called here because _get_remove_liquidity_amount is read-only and cannot update state
     _collect_swap_fees(
-        asset, 
         u64::try_from(redemption_amount).unwrap(),
         amount_out
     );
@@ -2671,13 +2659,10 @@ fn _liquidate_position(
 
     let fee_assets = _usd_to_asset_min(collateral_asset, margin_fees);
     _write_fee_reserve(
-        collateral_asset, 
-        _get_fee_reserves(collateral_asset) + fee_assets
+        _get_fee_reserve() + fee_assets
     );
 
     log(CollectMarginFees {
-        asset: collateral_asset,
-        fee_usd: margin_fees,
         fee_assets,
     });
 

@@ -62,7 +62,6 @@ pub struct WritePosition {
 }
 
 pub struct WriteFeeReserve {
-    pub asset: AssetId,
     pub fee_reserve: u256,
 }
 
@@ -105,9 +104,7 @@ pub struct RemoveLiquidity {
 }
 
 pub struct CollectSwapFees {
-    pub asset: AssetId,
-    pub fee_usd: u256,
-    pub fee_assets: u64,
+    pub fee_amount: u64,
 }
 
 pub struct DirectPoolDeposit {
@@ -116,7 +113,6 @@ pub struct DirectPoolDeposit {
 }
 
 pub struct WithdrawFees {
-    pub asset: AssetId,
     pub receiver: Identity,
     pub amount: u64
 }
@@ -179,8 +175,6 @@ pub struct UpdatePnl {
 }
 
 pub struct CollectMarginFees {
-    pub asset: AssetId,
-    pub fee_usd: u256,
     pub fee_assets: u256,
 }
 

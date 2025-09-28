@@ -90,13 +90,12 @@ abi Vault {
     fn set_funding_rate(
         funding_interval: u64, 
         funding_rate_factor: u64, 
-        stable_funding_rate_factor: u64
+        stable_funding_rate_factor: u64,
     );
 
     #[storage(read, write)]
     fn withdraw_fees(
-        asset: AssetId, 
-        receiver: Identity
+        receiver: Identity,
     ) -> u64;
 
     #[storage(read, write)]
@@ -232,7 +231,7 @@ abi Vault {
     fn get_pool_amounts(asset: AssetId) -> u256;
 
     #[storage(read)]
-    fn get_fee_reserves(asset: AssetId) -> u256;
+    fn get_fee_reserve() -> u256;
 
     #[storage(read)]
     fn get_reserved_amount(asset: AssetId) -> u256;
