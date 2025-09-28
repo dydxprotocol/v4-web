@@ -113,8 +113,6 @@ storage {
 
     // allows customisation of index composition
     asset_weights: StorageMap<AssetId, u64> = StorageMap {},
-    // allows setting a max amount of RUSD debt for an asset
-    max_rusd_amounts: StorageMap<AssetId, u256> = StorageMap {},
 
     // allows specification of an amount to exclude from swaps
     // can be used to ensure a certain amount of liquidity is available for leverage positions
@@ -137,9 +135,6 @@ storage {
     funding_interval: u64 = 8 * 3600, // 8 hours
     funding_rate_factor: u64 = 0,
     stable_funding_rate_factor: u64 = 0,
-
-    // tracks amount of RUSD debt for each supported asset
-    rusd_amounts: StorageMap<AssetId, u256> = StorageMap {},
 
     // tracks the number of received tokens that can be used for leverage
     // tracked separately to exclude funds that are deposited 
@@ -309,16 +304,6 @@ impl Vault for Contract {
     }
 
     #[storage(write)]
-    fn set_max_rusd_amount(
-        asset: AssetId, 
-        max_rusd_amount: u256
-    ) {
-        _only_gov();
-        storage.max_rusd_amounts.insert(asset, max_rusd_amount);
-        log(SetMaxRusdAmount { asset, max_rusd_amount });
-    }
-
-    #[storage(write)]
     fn set_pricefeed_provider(pricefeed_provider: ContractId) {
         _only_gov();
         storage.pricefeed_provider.write(pricefeed_provider);
@@ -414,7 +399,6 @@ impl Vault for Contract {
         asset_decimals: u32,
         asset_weight: u64,
         min_profit_bps: u64,
-        max_rusd_amount: u256,
     ) {
         _only_gov();
 
@@ -432,7 +416,6 @@ impl Vault for Contract {
         storage.asset_decimals.insert(asset, asset_decimals);
         storage.asset_weights.insert(asset, asset_weight);
         storage.min_profit_basis_points.insert(asset, min_profit_bps);
-        storage.max_rusd_amounts.insert(asset, max_rusd_amount);
 
         storage.total_asset_weights.write(total_asset_weights + asset_weight);
 
@@ -441,7 +424,6 @@ impl Vault for Contract {
             asset_decimals,
             asset_weight,
             min_profit_bps,
-            max_rusd_amount,
         });
     }
 
@@ -462,7 +444,6 @@ impl Vault for Contract {
         storage.asset_decimals.remove(asset);
         storage.asset_weights.remove(asset);
         storage.min_profit_basis_points.remove(asset);
-        storage.max_rusd_amounts.remove(asset);
 
         storage.whitelisted_asset_count.write(storage.whitelisted_asset_count.read() - 1);
 
@@ -491,18 +472,6 @@ impl Vault for Contract {
             router,
             is_active
         });
-    }
-
-    #[storage(write)]
-    fn set_rusd_amount(asset: AssetId, amount: u256) {
-        _only_gov();
-
-        let rusd_amount = storage.rusd_amounts.get(asset).try_read().unwrap_or(0);
-        if amount > rusd_amount {
-            _increase_rusd_amount(asset, amount - rusd_amount);
-        } else {
-            _decrease_rusd_amount(asset, rusd_amount - amount);
-        }
     }
 
     #[storage(read, write)]
@@ -685,16 +654,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_rusd_amount(asset: AssetId) -> u256 {
-        storage.rusd_amounts.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
-    fn get_max_rusd_amounts(asset: AssetId) -> u256 {
-        storage.max_rusd_amounts.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
     fn get_buffer_amounts(asset: AssetId) -> u256 {
         storage.buffer_amounts.get(asset).try_read().unwrap_or(0)
     }
@@ -706,10 +665,9 @@ impl Vault for Contract {
 
     #[storage(read)]
     fn get_redemption_amount(
-        asset: AssetId, 
-        rusd_amount: u256
+        lp_asset_amount: u256
     ) -> u256 {
-        _get_redemption_amount(asset, rusd_amount)
+        _get_redemption_amount(lp_asset_amount)
     }
 
     #[storage(read)]
@@ -791,18 +749,12 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_fee_basis_points(
         asset: AssetId,
-        rusd_delta: u256,
+        lp_asset_delta: u256,
         fee_basis_points: u256,
         tax_basis_points: u256,
         increment: bool
     ) -> u256 {
-        _get_fee_basis_points(
-            asset,
-            rusd_delta,
-            fee_basis_points,
-            tax_basis_points,
-            increment,
-        )
+        fee_basis_points
     }
 
     #[storage(read)]
@@ -838,11 +790,6 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_has_dynamic_fees() -> bool {
         storage.has_dynamic_fees.read()
-    }
-
-    #[storage(read)]
-    fn get_target_rusd_amount(asset: AssetId) -> u256 {
-        _get_target_rusd_amount(asset)
     }
 
     #[storage(read)]
@@ -896,9 +843,9 @@ impl Vault for Contract {
 
     #[storage(read)]
     fn get_remove_liquidity_amount(
-        rusd_amount: u256
+        lp_asset_amount: u256
     ) -> (u256, u64, u256) {
-        _get_remove_liquidity_amount(rusd_amount)
+        _get_remove_liquidity_amount(lp_asset_amount)
     }
 
     #[storage(read)]
@@ -1169,19 +1116,12 @@ fn _collect_swap_fees(
 }
 
 #[storage(read)]
-fn _get_redemption_amount(asset: AssetId, rusd_amount: u256) -> u256 {
-    let price = _get_max_price(asset);
-    let redemption_amount = rusd_amount * PRICE_PRECISION / price;
+fn _get_redemption_amount(lp_asset_amount: u256) -> u256 {
+    let collateral_asset = COLLATERAL_ASSET;
+    let price = _get_max_price(collateral_asset);
+    let redemption_amount = lp_asset_amount * PRICE_PRECISION / price;
 
-    _adjust_for_decimals(redemption_amount, AssetId::default(), asset)
-}
-
-#[storage(read)]
-fn _get_target_rusd_amount(asset: AssetId) -> u256 {
-    let supply = storage.total_supply.read();
-    let weight = storage.asset_weights.get(asset).try_read().unwrap_or(0);
-
-    (weight * supply / storage.total_asset_weights.read()).as_u256()
+    _adjust_for_decimals(redemption_amount, AssetId::default(), collateral_asset)
 }
 
 #[storage(read)]
@@ -1312,11 +1252,6 @@ fn _get_reserved_amount(asset: AssetId) -> u256 {
 #[storage(read)]
 fn _get_global_short_sizes(asset: AssetId) -> u256 {
     storage.global_short_sizes.get(asset).try_read().unwrap_or(0)
-}
-
-#[storage(read)]
-fn _get_rusd_amount(asset: AssetId) -> u256 {
-    storage.rusd_amounts.get(asset).try_read().unwrap_or(0)
 }
 
 #[storage(read)]
@@ -1594,74 +1529,6 @@ fn _get_position_delta(
     )
 }
 
-// cases to consider
-// 1. `initial_amount` is far from `target_amount`, action increases balance slightly => high rebate
-// 2. `initial_amount` is far from `target_amount`, action increases balance largely => high rebate
-// 3. `initial_amount` is close to `target_amount`, action increases balance slightly => low rebate
-// 4. `initial_amount` is far from `target_amount`, action reduces balance slightly => high tax
-// 5. `initial_amount` is far from `target_amount`, action reduces balance largely => high tax
-// 6. `initial_amount` is close to `target_amount`, action reduces balance largely => low tax
-// 7. `initial_amount` is above `target_amount`, nextAmount is below `target_amount` and vice versa
-// 8. a large swap should have similar fees as the same trade split into multiple smaller swaps
-#[storage(read)]
-fn _get_fee_basis_points(
-    asset: AssetId,
-    rusd_delta: u256,
-    fee_basis_points: u256,
-    tax_basis_points: u256,
-    should_increment: bool
-) -> u256 {
-    if !storage.has_dynamic_fees.read() {
-        return fee_basis_points;
-    }
-
-    let initial_amount = _get_rusd_amount(asset);
-    let mut next_amount = initial_amount + rusd_delta;
-    if !should_increment {
-        next_amount = if rusd_delta > initial_amount {
-            0
-        } else {
-            initial_amount - rusd_delta
-        };
-    }
-
-    let target_amount = _get_target_rusd_amount(asset);
-    if target_amount == 0 {
-        return fee_basis_points;
-    }
-
-    let initial_diff = if initial_amount > target_amount {
-        initial_amount - target_amount
-    } else {
-        target_amount - initial_amount
-    };
-
-    let next_diff = if next_amount > target_amount {
-        next_amount - target_amount
-    } else {
-        target_amount - next_amount
-    };
-
-    // action improves relative asset balance
-    if next_diff < initial_diff {
-        let rebate_bps = tax_basis_points * initial_diff / target_amount;
-        return if rebate_bps > fee_basis_points {
-            0
-        } else {
-            fee_basis_points - rebate_bps
-        };
-    }
-
-    let mut avg_diff = (initial_diff + next_diff) / 2;
-    if avg_diff > target_amount {
-        avg_diff = target_amount;
-    }
-
-    let tax_bps = tax_basis_points * avg_diff / target_amount;
-    
-    fee_basis_points + tax_bps
-}
-
 #[storage(read, write)]
 fn _increase_pool_amount(asset: AssetId, amount: u256) {
     let new_pool_amount = _get_pool_amounts(asset) + amount;
@@ -1689,34 +1556,6 @@ fn _decrease_pool_amount(asset: AssetId, amount: u256) {
         _get_reserved_amount(asset) <= new_pool_amount,
         Error::VaultReserveExceedsPool
     );
-}
-
-#[storage(read, write)]
-fn _increase_rusd_amount(asset: AssetId, amount: u256) {
-    let new_rusd_amount = _get_rusd_amount(asset) + amount;
-    storage.rusd_amounts.insert(asset, new_rusd_amount);
-    log(WriteRusdAmount { asset, rusd_amount: new_rusd_amount });
-
-    let max_rusd_amount = storage.max_rusd_amounts.get(asset).try_read().unwrap_or(0);
-    if max_rusd_amount != 0 {
-        require(new_rusd_amount <= max_rusd_amount, Error::VaultMaxRusdExceeded);
-    }
-}
-
-#[storage(read, write)]
-fn _decrease_rusd_amount(asset: AssetId, amount: u256) {
-    let value = _get_rusd_amount(asset);
-    // since RUSD can be minted using multiple assets
-    // it is possible for the RUSD debt for a single asset to be less than zero
-    // the RUSD debt is capped to zero for this case
-    if value <= amount {
-        let _ = storage.rusd_amounts.remove(asset);
-        log(WriteRusdAmount { asset, rusd_amount: 0 });
-    } else {
-        let new_rusd_amount = value - amount;
-        storage.rusd_amounts.insert(asset, new_rusd_amount);
-        log(WriteRusdAmount { asset, rusd_amount: new_rusd_amount });
-    }
 }
 
 #[storage(read, write)]
@@ -2054,17 +1893,7 @@ fn _get_add_liquidity_amount(
     let asset = COLLATERAL_ASSET;
     let price = _get_min_price(asset);
 
-    let mut rusd_amount = asset_amount.as_u256() * price / PRICE_PRECISION;
-    rusd_amount = _adjust_for_decimals(rusd_amount, asset, AssetId::default());
-    require(rusd_amount > 0, Error::VaultInvalidRusdAmount);
-
-    let fee_basis_points = _get_fee_basis_points(
-        asset,
-        rusd_amount,
-        storage.mint_burn_fee_basis_points.read().as_u256(),
-        storage.tax_basis_points.read().as_u256(),
-        true
-    );
+    let fee_basis_points = storage.mint_burn_fee_basis_points.read().as_u256();
 
     let u64_amount_after_fees = _get_after_fee_amount(
         asset_amount, 
@@ -2106,10 +1935,9 @@ fn _add_liquidity(
         u64::try_from(amount_after_fees).unwrap()
     );
 
-    _increase_rusd_amount(asset, mint_amount);
     _increase_pool_amount(asset, amount_after_fees);
 
-    // require rusd_amount to be less than u64::max
+    // require amount to be less than u64::max
     require(
         mint_amount < u64::max().as_u256(),
         Error::VaultInvalidMintAmountGtU64Max
@@ -2139,19 +1967,12 @@ fn _add_liquidity(
 
 #[storage(read)]
 fn _get_remove_liquidity_amount(
-    rusd_amount: u256
+    lp_asset_amount: u256
 ) -> (u256, u64, u256) {
-    let asset = COLLATERAL_ASSET;
-    let redemption_amount = _get_redemption_amount(asset, rusd_amount);
+    let redemption_amount = _get_redemption_amount(lp_asset_amount);
     require(redemption_amount > 0, Error::VaultInvalidRedemptionAmount);
 
-    let fee_basis_points = _get_fee_basis_points(
-        asset,
-        rusd_amount,
-        storage.mint_burn_fee_basis_points.read().as_u256(),
-        storage.tax_basis_points.read().as_u256(),
-        false
-    );
+    let fee_basis_points = storage.mint_burn_fee_basis_points.read().as_u256();
     
     let u64_redemption_amount = u64::try_from(redemption_amount).unwrap();
     let amount_out = _get_after_fee_amount(
@@ -2175,12 +1996,12 @@ fn _remove_liquidity(
     );
     let asset = COLLATERAL_ASSET;
 
-    let rusd_amount = _transfer_in(AssetId::default()).as_u256();
-    require(rusd_amount > 0, Error::VaultInvalidRusdAmount);
+    let lp_asset_amount = _transfer_in(AssetId::default()).as_u256();
+    require(lp_asset_amount > 0, Error::VaultInvalidRusdAmount);
     
-    // require rusd_amount to be less than u64::max
+    // require amount to be less than u64::max
     require(
-        rusd_amount < u64::max().as_u256(),
+        lp_asset_amount < u64::max().as_u256(),
         Error::VaultInvalidRUSDBurnAmountGtU64Max
     );
 
@@ -2190,7 +2011,7 @@ fn _remove_liquidity(
         redemption_amount,
         amount_out,
         fee_basis_points
-    ) = _get_remove_liquidity_amount(rusd_amount);
+    ) = _get_remove_liquidity_amount(lp_asset_amount);
     // this needs to be called here because _get_remove_liquidity_amount is read-only and cannot update state
     _collect_swap_fees(
         u64::try_from(redemption_amount).unwrap(),
@@ -2198,10 +2019,9 @@ fn _remove_liquidity(
     );
     require(amount_out > 0, Error::VaultInvalidAmountOut);
 
-    _decrease_rusd_amount(asset, rusd_amount);
     _decrease_pool_amount(asset, redemption_amount);
 
-    let burn_amount_u64 = u64::try_from(rusd_amount).unwrap();
+    let burn_amount_u64 = u64::try_from(lp_asset_amount).unwrap();
     let new_supply = storage.total_supply.read() - burn_amount_u64;
     storage.total_supply.write(new_supply);
     burn(DEFAULT_SUB_ID, burn_amount_u64);

@@ -64,12 +64,6 @@ abi Vault {
     );
 
     #[storage(write)]
-    fn set_max_rusd_amount(
-        asset: AssetId, 
-        max_rusd_amount: u256
-    );
-
-    #[storage(write)]
     fn set_max_global_short_size(
         asset: AssetId, 
         max_global_short_size: u256
@@ -104,7 +98,6 @@ abi Vault {
         asset_decimals: u32,
         asset_weight: u64,
         min_profit_bps: u64,
-        max_rusd_amount: u256,
     );
 
     #[storage(read, write)]
@@ -118,12 +111,6 @@ abi Vault {
 
     #[storage(write)]
     fn set_router(router: ContractId);
-
-    #[storage(write)]
-    fn set_rusd_amount(
-        asset: AssetId, 
-        amount: u256
-    );
 
     #[storage(read)]
     fn upgrade_vault(
@@ -237,12 +224,6 @@ abi Vault {
     fn get_reserved_amount(asset: AssetId) -> u256;
 
     #[storage(read)]
-    fn get_rusd_amount(asset: AssetId) -> u256;
-
-    #[storage(read)]
-    fn get_max_rusd_amounts(asset: AssetId) -> u256;
-
-    #[storage(read)]
     fn get_buffer_amounts(asset: AssetId) -> u256;
 
     #[storage(read)]
@@ -250,8 +231,7 @@ abi Vault {
 
     #[storage(read)]
     fn get_redemption_amount(
-        asset: AssetId, 
-        rusd_amount: u256
+        lp_asset_amount: u256,
     ) -> u256; 
 
     #[storage(read)]
@@ -293,7 +273,7 @@ abi Vault {
     #[storage(read)]
     fn get_fee_basis_points(
         asset: AssetId,
-        rusd_delta: u256,
+        lp_asset_delta: u256,
         fee_basis_points: u256,
         tax_basis_points: u256,
         increment: bool
@@ -319,9 +299,6 @@ abi Vault {
 
     #[storage(read)]
     fn get_has_dynamic_fees() -> bool;
-
-    #[storage(read)]
-    fn get_target_rusd_amount(asset: AssetId) -> u256;
 
     #[storage(read)]
     fn get_utilization(asset: AssetId) -> u256;
@@ -350,7 +327,7 @@ abi Vault {
 
     #[storage(read)]
     fn get_remove_liquidity_amount(
-        rusd_amount: u256
+        lp_asset_amount: u256
     ) -> (u256, u64, u256);
 
     #[storage(read)]

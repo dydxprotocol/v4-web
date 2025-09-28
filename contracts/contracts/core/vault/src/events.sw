@@ -29,16 +29,10 @@ pub struct SetAssetConfig {
     pub asset_decimals: u32,
     pub asset_weight: u64,
     pub min_profit_bps: u64,
-    pub max_rusd_amount: u256,
 }
 
 pub struct ClearAssetConfig {
     pub asset: AssetId,
-}
-
-pub struct SetMaxRusdAmount {
-    pub asset: AssetId,
-    pub max_rusd_amount: u256,
 }
 
 pub struct SetFees {
@@ -202,11 +196,6 @@ pub struct UpdateGlobalShortSize {
 pub struct WritePoolAmount {
     pub asset: AssetId,
     pub pool_amount: u256,
-}
-
-pub struct WriteRusdAmount {
-    pub asset: AssetId,
-    pub rusd_amount: u256,
 }
 
 pub struct WriteReservedAmount {

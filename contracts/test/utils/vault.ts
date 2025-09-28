@@ -8,7 +8,7 @@ export async function validateVaultBalance(expect: any, vault: Vault, token: Fun
     // const provider = await Provider.create("http://127.0.0.1:4000/v1/graphql")
 
     const poolAmount = (await vault.functions.get_pool_amounts(toAsset(token)).get()).value
-    const feeReserve = (await vault.functions.get_fee_reserves(toAsset(token)).get()).value
+    const feeReserve = (await vault.functions.get_fee_reserve().get()).value
     // const balance = (await provider.getContractBalance(toContract(vault).bits, toAsset(token).bits)).toString()
     const balance = (await vault.getBalance(toAsset(token).bits)).toString()
     // let amount = poolAmount.add(feeReserve)
@@ -23,53 +23,48 @@ export const BTC_MAX_LEVERAGE = 50 * 10_000
 export const ETH_MAX_LEVERAGE = 50 * 10_000
 export const BNB_MAX_LEVERAGE = 50 * 10_000
 
-export function getUsdcConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
+export function getUsdcConfig(fungible: Fungible): [{ bits: string }, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
-        0, // max_rusd_amount
     ]
 }
 
 // https://cumsum.wordpress.com/2021/08/28/typescript-a-spread-argument-must-either-have-a-tuple-type-or-be-passed-to-a-rest-parameter/
-export function getDaiConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
+export function getDaiConfig(fungible: Fungible): [{ bits: string }, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
-        0, // max_rusd_amount
     ]
 }
 
-export function getBtcConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
+export function getBtcConfig(fungible: Fungible): [{ bits: string }, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
-        0, // max_rusd_amount
     ]
 }
 
-export function getEthConfig(fungible: Fungible): [{ bits: string }, number, number, number, number] {
+export function getEthConfig(fungible: Fungible): [{ bits: string }, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
-        0, // max_rusd_amount
     ]
 }
 
-export function getBnbConfig(fungible: Fungible): [{ bits: string }, number, number, number, number | string] {
+export function getBnbConfig(fungible: Fungible): [{ bits: string }, number, number, number] {
     return [
         toAsset(fungible), // asset
         9, // asset_decimals
         10000, // asset_weight
         75, // min_profit_bps
-        0, // max_rusd_amount
     ]
 }
