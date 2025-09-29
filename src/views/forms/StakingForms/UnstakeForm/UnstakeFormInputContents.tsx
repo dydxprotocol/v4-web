@@ -103,7 +103,7 @@ export const UnstakeFormInputContents = ({
               key: 'amount',
               label: (
                 <span tw="inlineRow">
-                  {stringGetter({ key: STRING_KEYS.UNSTAKED_BALANCE })}
+                  {stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}
                   <Tag>{chainTokenLabel}</Tag>
                 </span>
               ),
