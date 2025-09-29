@@ -8,7 +8,7 @@ import {
   lastSuccessfulWebsocketRequestByOrigin,
 } from '@/constants/analytics';
 import { DialogTypesTypes } from '@/constants/dialogs';
-import { WalletInfo } from '@/constants/wallets';
+import { ConnectorType, WalletInfo } from '@/constants/wallets';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
@@ -102,6 +102,17 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(AnalyticsUserProperties.Network(selectedNetwork));
   }, [selectedNetwork]);
+
+  // AnalyticsUserProperty.UserId
+  useEffect(() => {
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
+      identify(AnalyticsUserProperties.UserId(null));
+    } else if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      identify(AnalyticsUserProperties.UserId(sourceAccount.walletInfo.userEmail ?? null));
+    } else {
+      identify(AnalyticsUserProperties.UserId(sourceAccount.address ?? null));
+    }
+  }, [sourceAccount]);
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
