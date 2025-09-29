@@ -76,5 +76,6 @@ export function useSwapQuote(
     staleTime: 15 * timeUnits.second,
     // Don't auto-retry because some errors are legitimate
     retry: 0,
+    // placeholderData: (prev) => prev,
   });
 }
