@@ -44,6 +44,8 @@ type LayerColors = {
   layer5: string;
   layer6: string;
   layer7: string;
+
+  layer3Faded: string;
 };
 
 type BorderColors = {
