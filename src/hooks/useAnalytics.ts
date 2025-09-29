@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocation } from 'react-router-dom';
 
@@ -104,15 +104,21 @@ export const useAnalytics = () => {
   }, [selectedNetwork]);
 
   // AnalyticsUserProperty.UserId
-  useEffect(() => {
+  const analyticsUserId: string | null = useMemo(() => {
     if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
-      identify(AnalyticsUserProperties.UserId(null));
-    } else if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-      identify(AnalyticsUserProperties.UserId(sourceAccount.walletInfo.userEmail ?? null));
-    } else {
-      identify(AnalyticsUserProperties.UserId(sourceAccount.address ?? null));
+      return null;
     }
+
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      return sourceAccount.walletInfo.userEmail ?? null;
+    }
+
+    return sourceAccount.address ?? null;
   }, [sourceAccount.address, sourceAccount.walletInfo]);
+
+  useEffect(() => {
+    identify(AnalyticsUserProperties.UserId(analyticsUserId));
+  }, [analyticsUserId]);
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
