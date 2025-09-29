@@ -112,7 +112,7 @@ export const useAnalytics = () => {
     } else {
       identify(AnalyticsUserProperties.UserId(sourceAccount.address ?? null));
     }
-  }, [sourceAccount]);
+  }, [sourceAccount.address, sourceAccount.walletInfo]);
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {

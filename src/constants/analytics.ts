@@ -200,6 +200,8 @@ export const AnalyticsEvents = unionize(
       state: OnboardingState;
       step?: OnboardingSteps;
     }>(),
+    OnboardingSignInWithWalletClick: ofType<{}>(),
+    OnboardingSignInWithSocialsClick: ofType<{}>(),
     OnboardingAccountDerived: ofType<{
       hasPreviousTransactions: boolean;
     }>(),
