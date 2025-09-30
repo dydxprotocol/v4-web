@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
@@ -38,6 +39,7 @@ import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics/analytics';
 import { testFlags } from '@/lib/testFlags';
 
 import { LanguageSelector } from '../menus/LanguageSelector';
@@ -93,10 +95,12 @@ export const OnboardingDialog = ({
   );
 
   const onDisplayChooseWallet = () => {
+    track(AnalyticsEvents.OnboardingSignInWithWalletClick());
     dispatch(setDisplayChooseWallet(true));
   };
 
   const onSignInWithSocials = () => {
+    track(AnalyticsEvents.OnboardingSignInWithSocialsClick());
     dispatch(setDisplayChooseWallet(false));
   };
 

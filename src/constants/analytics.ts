@@ -84,6 +84,10 @@ export const AnalyticsUserProperties = unionize(
 
     // validators
     BonsaiValidatorUrl: ofType<string | null>(),
+
+    // User
+    UserId: ofType<string | null>(),
+    IsNewUser: ofType<boolean | null>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
@@ -106,6 +110,8 @@ export const AnalyticsUserPropertyLoggableTypes = {
   AffiliateAddress: 'affiliateAddress',
   BonsaiValidatorUrl: 'bonsaiValidator',
   CustomFlags: 'customFlags',
+  UserId: 'userId',
+  IsNewUser: 'isNewUser',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
@@ -196,6 +202,8 @@ export const AnalyticsEvents = unionize(
       state: OnboardingState;
       step?: OnboardingSteps;
     }>(),
+    OnboardingSignInWithWalletClick: ofType<{}>(),
+    OnboardingSignInWithSocialsClick: ofType<{}>(),
     OnboardingAccountDerived: ofType<{
       hasPreviousTransactions: boolean;
     }>(),

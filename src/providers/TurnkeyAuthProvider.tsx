@@ -8,7 +8,7 @@ import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
 
-import { AnalyticsEvents } from '@/constants/analytics';
+import { AnalyticsEvents, AnalyticsUserProperties } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletType } from '@/constants/wallets';
@@ -34,7 +34,7 @@ import {
 } from '@/state/wallet';
 import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
-import { track } from '@/lib/analytics/analytics';
+import { identify, track } from '@/lib/analytics/analytics';
 import { parseTurnkeyError } from '@/lib/turnkey/turnkeyUtils';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
@@ -135,7 +135,10 @@ const useTurnkeyAuthContext = () => {
 
       if (response.dydxAddress === '') {
         setIsNewTurnkeyUser(true);
+        identify(AnalyticsUserProperties.IsNewUser(true));
         dispatch(setRequiresAddressUpload(true));
+      } else {
+        identify(AnalyticsUserProperties.IsNewUser(false));
       }
 
       if (loginMethod === LoginMethod.OAuth && response.alreadyExists) {
