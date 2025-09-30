@@ -4,13 +4,13 @@ import { log } from 'console';
 import { AES } from 'crypto-js';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
-import { AnalyticsEvents } from '@/constants/analytics';
+import { AnalyticsEvents, AnalyticsUserProperties } from '@/constants/analytics';
 import { DydxAddress } from '@/constants/wallets';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { setSavedEncryptedSignature } from '@/state/wallet';
 
-import { track } from '@/lib/analytics/analytics';
+import { identify, track } from '@/lib/analytics/analytics';
 import { parseWalletError } from '@/lib/wallet';
 
 import { useAccounts } from '../useAccounts';
@@ -119,6 +119,7 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
         track(AnalyticsEvents.OnboardingAccountDerived({ hasPreviousTransactions }));
 
         if (!hasPreviousTransactions) {
+          identify(AnalyticsUserProperties.IsNewUser(true));
           setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
 
           // Second signature
@@ -134,6 +135,8 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
               'Your wallet does not support deterministic signing. Please switch to a different wallet provider.'
             );
           }
+        } else {
+          identify(AnalyticsUserProperties.IsNewUser(false));
         }
       } catch (err) {
         setDerivationStatus(EvmDerivedAccountStatus.NotDerived);
