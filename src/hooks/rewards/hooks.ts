@@ -119,7 +119,7 @@ export const useChaosLabsUsdRewards = ({
       ),
       points?.totalFees,
       (pointRewards, feesPaid) => {
-        return pointRewards + feesPaid * SEPT_2025_REWARDS_DETAILS.rebateFraction;
+        return pointRewards + feesPaid;
       }
     ),
     isLoading: totalPointsLoading || pointsLoading,
