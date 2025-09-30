@@ -109,6 +109,7 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     let dead = false;
+
     runFn(async () => {
       if (dead) return;
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
@@ -122,6 +123,9 @@ export const useAnalytics = () => {
             'SHA-256',
             new TextEncoder().encode(normalizedEmail)
           );
+
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          if (dead) return;
 
           setAnalyticsUserId(
             Array.from(new Uint8Array(hashedEmail))
