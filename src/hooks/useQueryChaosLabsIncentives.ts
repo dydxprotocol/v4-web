@@ -19,7 +19,7 @@ export const useQueryChaosLabsIncentives = ({
   dydxAddress?: DydxAddress;
   season?: number;
 }) => {
-  return useQuery<ChaosLabsIncentivesResponse | undefined, Error>({
+  return useQuery({
     enabled: !!dydxAddress,
     queryKey: ['launch_incentives_rewards', dydxAddress, season],
     queryFn: wrapAndLogError(
