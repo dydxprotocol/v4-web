@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
-import { ButtonAction, ButtonState } from '@/constants/buttons';
+import { OnboardingState } from '@/constants/account';
+import { ButtonAction, ButtonSize, ButtonState } from '@/constants/buttons';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
@@ -28,8 +29,10 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 import { getUserAddressesForRoute } from '@/views/dialogs/TransferDialogs/utils';
 
+import { getOnboardingState } from '@/state/accountSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 
@@ -51,6 +54,7 @@ export const Swap = () => {
   const [amount, setAmount] = useState('');
   const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
   const [isSwapSubmitting, setIsSwapSubmitting] = useState(false);
+  const onboardingState = useAppSelector(getOnboardingState);
 
   const { chainTokenAmount: nativeTokenBalance, usdcAmount: usdcBalance } = useAppSelector(
     BonsaiCore.account.balances.data
@@ -279,7 +283,9 @@ export const Swap = () => {
         </div>
       </div>
 
-      {error ? (
+      {onboardingState !== OnboardingState.AccountConnected ? (
+        <OnboardingTriggerButton size={ButtonSize.BasePlus} />
+      ) : error ? (
         <div tw="flex h-3 justify-center rounded-0.75 border border-solid border-color-layer-4 p-0.75">
           <div tw="flex items-center gap-0.5 leading-5">
             <WarningFilled tw="h-[15.6px] w-[17.3px] text-red" />
