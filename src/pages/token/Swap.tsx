@@ -56,8 +56,6 @@ export const Swap = () => {
     BonsaiCore.account.balances.data
   );
 
-  console.log('usdc balance here', usdcBalance);
-
   const tokenBalances = useMemo(() => {
     const dydx = {
       rawBalance: nativeTokenBalance ? parseUnits(nativeTokenBalance, DYDX_DECIMALS) : undefined,
@@ -258,7 +256,7 @@ export const Swap = () => {
               <CardHolderIcon />
               {tokenBalances.outputBalance.formatted ? (
                 <Output
-                  value={tokenBalances.inputBalance.formatted}
+                  value={tokenBalances.outputBalance.formatted}
                   type={OutputType.CompactNumber}
                   slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
                 />
@@ -338,7 +336,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
         <div tw="flex items-center gap-0.375">
           <div>Price impact</div>
           {/* TODO: add copy for price impact helper text */}
-          <WithTooltip tooltipString="asdf">
+          <WithTooltip tooltipString="Price impact helper text here">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
           </WithTooltip>
         </div>
@@ -355,7 +353,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
         <div tw="flex items-center gap-0.375">
           <div>Max slippage</div>
           {/* TODO: add copy for slippage helper text */}
-          <WithTooltip tooltipString="asdf">
+          <WithTooltip tooltipString="Slippage helper text here">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
           </WithTooltip>
         </div>
