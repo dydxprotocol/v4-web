@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useLocation } from 'react-router-dom';
 
@@ -19,6 +19,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
+import { runFn } from '@/lib/do';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -104,16 +105,34 @@ export const useAnalytics = () => {
   }, [selectedNetwork]);
 
   // AnalyticsUserProperty.UserId
-  const analyticsUserId: string | null = useMemo(() => {
-    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
-      return null;
-    }
+  const [analyticsUserId, setAnalyticsUserId] = useState<string | null>(null);
 
-    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-      return sourceAccount.walletInfo.userEmail ?? null;
-    }
+  useEffect(() => {
+    runFn(async () => {
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
+        setAnalyticsUserId(null);
+      }
 
-    return sourceAccount.address ?? null;
+      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+        if (sourceAccount.walletInfo.userEmail && typeof globalThis.crypto !== 'undefined') {
+          const normalizedEmail = sourceAccount.walletInfo.userEmail.trim().toLowerCase();
+          const hashedEmail = await globalThis.crypto.subtle.digest(
+            'SHA-256',
+            new TextEncoder().encode(normalizedEmail)
+          );
+
+          setAnalyticsUserId(
+            Array.from(new Uint8Array(hashedEmail))
+              .map((b) => b.toString(16).padStart(2, '0'))
+              .join('')
+          );
+
+          return;
+        }
+      }
+
+      setAnalyticsUserId(sourceAccount.address ?? null);
+    });
   }, [sourceAccount.address, sourceAccount.walletInfo]);
 
   useEffect(() => {
