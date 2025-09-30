@@ -6,6 +6,7 @@ import { DydxAddress } from '@/constants/wallets';
 import { useAppSelector } from '@/state/appTypes';
 
 import { wrapAndLogError } from '@/lib/asyncUtils';
+import { mapIfPresent } from '@/lib/do';
 
 import { useQueryChaosLabsIncentives } from '../useQueryChaosLabsIncentives';
 import {
@@ -110,10 +111,16 @@ export const useChaosLabsUsdRewards = ({
   });
 
   return {
-    data: pointsToEstimatedDollarRewards(
-      points?.incentivePoints,
-      totalPoints?.totalPoints,
-      totalUsdRewards
+    data: mapIfPresent(
+      pointsToEstimatedDollarRewards(
+        points?.incentivePoints,
+        totalPoints?.totalPoints,
+        totalUsdRewards
+      ),
+      points?.totalFees,
+      (pointRewards, feesPaid) => {
+        return pointRewards + feesPaid;
+      }
     ),
     isLoading: totalPointsLoading || pointsLoading,
   };
