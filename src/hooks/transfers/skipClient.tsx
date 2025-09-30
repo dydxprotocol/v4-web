@@ -143,7 +143,6 @@ const useSkipClientContext = () => {
       },
       getCosmosSigner: async (chainId: string) => {
         if (sourceAccount.chain !== WalletNetworkType.Cosmos) {
-          console.log('localDydxWallet', localDydxWallet);
           if (!localDydxWallet?.offlineSigner) {
             throw new Error('no cosmos wallet connected');
           }
