@@ -108,7 +108,9 @@ export const useAnalytics = () => {
   const [analyticsUserId, setAnalyticsUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    let dead = false;
     runFn(async () => {
+      if (dead) return;
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         setAnalyticsUserId(null);
       }
@@ -133,6 +135,10 @@ export const useAnalytics = () => {
 
       setAnalyticsUserId(sourceAccount.address ?? null);
     });
+
+    return () => {
+      dead = true;
+    };
   }, [sourceAccount.address, sourceAccount.walletInfo]);
 
   useEffect(() => {
