@@ -7,6 +7,7 @@ import tw from 'twin.macro';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
@@ -43,7 +44,8 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
     dispatch(markLaunchIncentivesSeen());
   }, [dispatch]);
 
-  const isSept2025Rewards = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+  const isSept2025RewardsBase = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+  const isSept2025Rewards = isDev ? true : isSept2025RewardsBase;
   if (isSept2025Rewards) {
     return <September2025RewardsPanel />;
   }
@@ -142,7 +144,7 @@ const Sept2025RewardsPanel = () => {
           backgroundImage: `url('/dots-background-3.svg')`,
           backgroundSize: 'cover',
         }}
-        tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1"
+        tw="bg-color-accent-more-faded flex gap-4 rounded-0.75 border border-solid border-color-accent-faded p-1"
       >
         <div tw="flex flex-col gap-0.5">
           <div tw="text-nowrap font-medium text-color-text-1">

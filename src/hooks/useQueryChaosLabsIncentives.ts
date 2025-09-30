@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { DateTime } from 'luxon';
 
 import type { DydxAddress } from '@/constants/wallets';
 
@@ -6,9 +7,9 @@ import { wrapAndLogError } from '@/lib/asyncUtils';
 import { calc } from '@/lib/do';
 
 type ChaosLabsIncentivesResponse = {
-  dydxRewards: number;
   incentivePoints: number;
   marketMakingIncentivePoints: number;
+  totalFees: number;
 };
 
 export const useQueryChaosLabsIncentives = ({
@@ -22,7 +23,7 @@ export const useQueryChaosLabsIncentives = ({
     enabled: !!dydxAddress,
     queryKey: ['launch_incentives_rewards', dydxAddress, season],
     queryFn: wrapAndLogError(
-      async () => {
+      async (): Promise<ChaosLabsIncentivesResponse | undefined> => {
         if (!dydxAddress) return undefined;
 
         // If season is defined, fetch for a specific season
@@ -42,17 +43,27 @@ export const useQueryChaosLabsIncentives = ({
           return undefined;
         }
 
-        const thisSeasonResponse = await calc(async () => {
-          return (
-            await fetch(
-              `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${currentSeason}`
-            )
-          ).json();
-        });
+        const [thisSeasonResponse, thisSeasonFees] = await Promise.all([
+          calc(async () => {
+            return (
+              await fetch(
+                `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${currentSeason}`
+              )
+            ).json();
+          }),
+          calc(async () => {
+            return (
+              await fetch(
+                `https://cloud.chaoslabs.co/query/api/dydx/fees/${dydxAddress}?month=${DateTime.utc().toFormat('yyyy-MM')}`
+              )
+            ).json();
+          }),
+        ]);
 
         return {
           incentivePoints: thisSeasonResponse.incentivePoints ?? 0,
           marketMakingIncentivePoints: thisSeasonResponse.marketMakingIncentivePoints ?? 0,
+          totalFees: thisSeasonFees.data?.[0]?.total_fees ?? 0,
         };
       },
       'LaunchIncentives/fetchPoints',
