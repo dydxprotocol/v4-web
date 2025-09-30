@@ -47,6 +47,7 @@ function getTokenLabel(token: 'usdc' | 'dydx') {
   return token === 'usdc' ? 'USDC' : 'dYdX';
 }
 
+const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const Swap = () => {
   const { skipClient } = useSkipClient();
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
@@ -186,6 +187,7 @@ export const Swap = () => {
       await skipClient.executeRoute({
         route: quote,
         userAddresses,
+        slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
         onTransactionCompleted: async ({ chainId, txHash, status }) => {
           console.log('TX completed!', chainId, txHash, status);
           onSwapComplete();
@@ -364,7 +366,11 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
           </WithTooltip>
         </div>
         <div>
-          <Output tw="inline" value="0.005" type={OutputType.Percent} />
+          <Output
+            tw="inline"
+            value={Number(SWAP_SLIPPAGE_PERCENT) / 100}
+            type={OutputType.Percent}
+          />
         </div>
       </div>
     </div>
