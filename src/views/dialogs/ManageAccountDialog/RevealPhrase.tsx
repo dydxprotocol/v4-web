@@ -235,7 +235,7 @@ export const RevealPhrase = ({
   );
 
   const iframeCss = `
-    iframe {
+    #${TurnkeyExportIframeContainerId} > iframe {
         padding: 0.75rem;
         width: 100%;
         height: 100%;
