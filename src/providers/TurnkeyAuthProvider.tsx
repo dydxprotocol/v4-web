@@ -85,6 +85,7 @@ const useTurnkeyAuthContext = () => {
 
   const {
     embeddedPublicKey,
+    endTurnkeySession,
     setIsNewTurnkeyUser,
     onboardDydx,
     targetPublicKeys,
@@ -164,9 +165,14 @@ const useTurnkeyAuthContext = () => {
     },
     onError: (error, variables) => {
       selectWallet(undefined);
-      logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
       setEmailSignInStatus('error');
-      setEmailSignInError(parseTurnkeyError(error.message, stringGetter));
+      const { errorMessage, shouldLog } = parseTurnkeyError(error.message, stringGetter);
+      setEmailSignInError(errorMessage);
+      endTurnkeySession();
+
+      if (shouldLog) {
+        logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
+      }
 
       if (variables.loginMethod === LoginMethod.OAuth) {
         const providerName = variables.providerName;
@@ -336,8 +342,16 @@ const useTurnkeyAuthContext = () => {
         let errorMessage: string | undefined;
 
         if (error instanceof Error) {
-          errorMessage = parseTurnkeyError(error.message, stringGetter);
-          logBonsaiError('TurnkeyOnboarding', 'error handling email magic link', { error });
+          const { errorMessage: message, shouldLog } = parseTurnkeyError(
+            error.message,
+            stringGetter
+          );
+
+          if (shouldLog) {
+            logBonsaiError('TurnkeyOnboarding', 'error handling email magic link', { error });
+          }
+
+          errorMessage = message;
         } else {
           logBonsaiError('TurnkeyOnboarding', 'error handling email magic link - unknown', {
             error,
@@ -351,6 +365,8 @@ const useTurnkeyAuthContext = () => {
               params: { ERROR_MESSAGE: stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }) },
             })
         );
+
+        endTurnkeySession();
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
@@ -373,6 +389,7 @@ const useTurnkeyAuthContext = () => {
       setSearchParams,
       dispatch,
       stringGetter,
+      endTurnkeySession,
     ]
   );
 
