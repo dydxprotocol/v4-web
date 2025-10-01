@@ -33,9 +33,18 @@ export async function getWalletsWithAccountsFromClient(
   return walletWithAccounts;
 }
 
-export const parseTurnkeyError = (message: string, stringGetter: StringGetterFunction): string => {
+export const parseTurnkeyError = (
+  message: string,
+  stringGetter: StringGetterFunction
+): {
+  errorMessage: string;
+  shouldLog: boolean;
+} => {
   if (message.includes('User has already registered using this email')) {
-    return stringGetter({ key: STRING_KEYS.USER_ALREADY_HAS_TURNKEY });
+    return {
+      errorMessage: stringGetter({ key: STRING_KEYS.USER_ALREADY_HAS_TURNKEY }),
+      shouldLog: false,
+    };
   }
 
   if (
@@ -44,11 +53,17 @@ export const parseTurnkeyError = (message: string, stringGetter: StringGetterFun
     message.includes('Unauthenticated desc') ||
     message.includes('Organization ID was not found')
   ) {
-    return stringGetter({ key: STRING_KEYS.INVALID_TURNKEY_EMAIL_LINK });
+    return {
+      errorMessage: stringGetter({ key: STRING_KEYS.INVALID_TURNKEY_EMAIL_LINK }),
+      shouldLog: false,
+    };
   }
 
-  return stringGetter({
-    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-    params: { ERROR_MESSAGE: message },
-  });
+  return {
+    errorMessage: stringGetter({
+      key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+      params: { ERROR_MESSAGE: message },
+    }),
+    shouldLog: true,
+  };
 };
