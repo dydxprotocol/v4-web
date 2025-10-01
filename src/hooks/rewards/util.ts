@@ -24,5 +24,5 @@ export const OCT_2025_REWARDS_DETAILS = {
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
   rebatePercent: '100%',
-  endTime: '2025-10-31T23:59:59.000Z', // end of sept
+  endTime: '2025-10-31T23:59:59.000Z', // end of month
 };

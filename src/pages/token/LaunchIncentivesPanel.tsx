@@ -150,9 +150,17 @@ const Sept2025RewardsPanel = () => {
         tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1"
       >
         <div tw="flex flex-col gap-0.5">
-          <div tw="text-nowrap font-medium text-color-text-1">
-            {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
-          </div>
+          <WithTooltip
+            tooltipString={stringGetter({
+              key: STRING_KEYS.SURGE_EST_AMOUNT_TOOLTIP,
+            })}
+            slotTrigger={
+              <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
+                <div>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</div>
+                <Icon iconName={IconName.InfoStroke} />
+              </div>
+            }
+          />
           <$Points>
             <Output
               tw="text-extra font-extra-bold"
