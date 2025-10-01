@@ -112,7 +112,7 @@ export const MarketsBanners = ({
   const rebateBanner = shouldDisplayRebateBanner ? (
     <$RebateBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
-        <span tw="mb-0.75 text-large font-extra-bold">
+        <span tw="mb-0.75 text-large font-extra-large-bold">
           <span tw="mr-0.25 rounded-0 px-0.25 text-color-accent">
             {stringGetter({ key: STRING_KEYS.REBATE_BANNER_TITLE_SURGE })}
           </span>
@@ -127,15 +127,18 @@ export const MarketsBanners = ({
             href="https://dydx.trade/DYDX?utm_source=markets&utm_medium=markets-banner&utm_campaign=02092025-markets-surge-banner-dydx&utm_term=&utm_content=surge-banner"
             tw="relative z-10 w-12"
           >
-            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_CTA })}
+            {stringGetter({ key: STRING_KEYS.GET_STARTED })}
           </Button>
+          <span tw="text-color-text-2 font-base-book">
+            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_SUBTITLE })}
+          </span>
         </div>
       </div>
 
       <img
-        src="/rebate-token.png"
+        src="/hedgiepercentage.png"
         alt="rebate rewards hedgies"
-        tw="h-full object-contain mobile:hidden"
+        tw="absolute right-0 top-0 h-full object-contain mobile:hidden"
       />
 
       <IconButton
@@ -231,12 +234,11 @@ const $RebateBanner = styled($MarketsPageBanner)`
     content: '';
     position: absolute;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 70%;
-    background: radial-gradient(ellipse at center bottom, var(--color-accent) 0%, transparent 70%);
-    opacity: 0.2;
+    right: 0;
+    width: 80%;
+    height: 130%;
+    background: radial-gradient(ellipse at bottom right, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.6;
     z-index: 0;
   }
 
