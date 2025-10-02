@@ -12,7 +12,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
-import { SEPT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
@@ -86,8 +86,8 @@ const September2025RewardsPanel = () => {
                   {stringGetter({
                     key: STRING_KEYS.SURGE_HEADLINE_SEP_2025,
                     params: {
-                      REWARD_AMOUNT: SEPT_2025_REWARDS_DETAILS.rewardAmount,
-                      REBATE_PERCENT: SEPT_2025_REWARDS_DETAILS.rebatePercent,
+                      REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
+                      REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
                     },
                   })}
                 </span>
@@ -100,7 +100,10 @@ const September2025RewardsPanel = () => {
               <span tw="text-color-text-0">
                 {stringGetter({
                   key: STRING_KEYS.SURGE_BODY_SEP_2025,
-                  params: { REWARD_AMOUNT: '$1M', REBATE_PERCENT: '50%' },
+                  params: {
+                    REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
+                    REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
+                  },
                 })}{' '}
                 <Link href="https://www.dydx.xyz/surge" isInline>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
@@ -114,11 +117,11 @@ const September2025RewardsPanel = () => {
               <div tw="text-color-accent">
                 {stringGetter({
                   key: STRING_KEYS.SURGE_COUNTDOWN,
-                  params: { SURGE_SEASON: SEPT_2025_REWARDS_DETAILS.season },
+                  params: { SURGE_SEASON: OCT_2025_REWARDS_DETAILS.season },
                 })}
                 :
               </div>
-              <MinutesCountdown endTime={SEPT_2025_REWARDS_DETAILS.endTime} />
+              <MinutesCountdown endTime={OCT_2025_REWARDS_DETAILS.endTime} />
             </div>
           </div>
         </div>
@@ -134,7 +137,7 @@ const Sept2025RewardsPanel = () => {
 
   const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
     dydxAddress,
-    totalUsdRewards: SEPT_2025_REWARDS_DETAILS.rewardAmountUsd,
+    totalUsdRewards: OCT_2025_REWARDS_DETAILS.rewardAmountUsd,
   });
 
   return (
@@ -147,9 +150,17 @@ const Sept2025RewardsPanel = () => {
         tw="flex gap-4 rounded-0.75 border border-solid border-color-accent-faded bg-color-accent-more-faded p-1"
       >
         <div tw="flex flex-col gap-0.5">
-          <div tw="text-nowrap font-medium text-color-text-1">
-            {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
-          </div>
+          <WithTooltip
+            tooltipString={stringGetter({
+              key: STRING_KEYS.SURGE_EST_AMOUNT_TOOLTIP,
+            })}
+            slotTrigger={
+              <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
+                <Icon iconName={IconName.InfoStroke} />
+              </div>
+            }
+          />
           <$Points>
             <Output
               tw="text-extra font-extra-bold"

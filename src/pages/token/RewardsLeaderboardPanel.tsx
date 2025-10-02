@@ -6,7 +6,7 @@ import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
-import { SEPT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -84,7 +84,7 @@ export const RewardsLeaderboardPanel = () => {
     }));
 
     exportCSV(csvRows, {
-      filename: `rewards-leaderboard-season-${SEPT_2025_REWARDS_DETAILS.season}`,
+      filename: `rewards-leaderboard-season-${OCT_2025_REWARDS_DETAILS.season}`,
       columnHeaders: [
         {
           key: 'rank',
