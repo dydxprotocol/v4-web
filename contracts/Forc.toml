@@ -2,8 +2,10 @@
 members = [
     "contracts/mocks/fungible",
     "contracts/mocks/mock-pricefeed",
+    "contracts/mocks/stork-mock",
 
     "contracts/core/vault-pricefeed",
+    "contracts/core/pricefeed-wrapper",
     "contracts/core/vault",
     
     "contracts/core/shorts-tracker",

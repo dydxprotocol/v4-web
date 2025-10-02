@@ -22,8 +22,8 @@ abi ShortsTracker {
     #[storage(read, write)]
     fn update_global_short_data(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         is_long: bool,
         size_delta: u256,
         mark_price: u256,
@@ -32,7 +32,7 @@ abi ShortsTracker {
 
     #[storage(read, write)]
     fn set_init_data(
-        assets: Vec<AssetId>,
+        assets: Vec<b256>,
         average_prices: Vec<u256>,
     );
 
@@ -47,13 +47,13 @@ abi ShortsTracker {
     fn is_global_short_data_ready() -> bool;
 
     #[storage(read)]
-    fn get_global_short_average_prices(asset: AssetId) -> u256;
+    fn get_global_short_average_prices(asset: b256) -> u256;
 
     #[storage(read)]
     fn get_next_global_short_data(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         next_price: u256,
         size_delta: u256,
         is_increase: bool
@@ -77,8 +77,8 @@ abi ShortsTracker {
     #[storage(read)]
     fn get_realized_pnl(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         size_delta: u256,
         is_increase: bool 
     ) -> Signed256;

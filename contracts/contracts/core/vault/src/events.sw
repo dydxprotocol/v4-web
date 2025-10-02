@@ -25,14 +25,14 @@ pub struct SetApprovedRouter {
 }
 
 pub struct SetAssetConfig {
-    pub asset: AssetId,
+    pub asset: b256,
     pub asset_decimals: u32,
     pub asset_weight: u64,
     pub min_profit_bps: u64,
 }
 
 pub struct ClearAssetConfig {
-    pub asset: AssetId,
+    pub asset: b256,
 }
 
 pub struct SetFees {
@@ -40,13 +40,13 @@ pub struct SetFees {
     pub stable_tax_basis_points: u64,
     pub mint_burn_fee_basis_points: u64,
     pub margin_fee_basis_points: u64,
-    pub liquidation_fee_usd: u256,
+    pub liquidation_fee: u256,
     pub min_profit_time: u64,
     pub has_dynamic_fees: bool
 }
 
 pub struct WriteLastFundingTime {
-    pub asset: AssetId,
+    pub asset: b256,
     pub last_funding_time: u64,
 }
 
@@ -60,12 +60,12 @@ pub struct WriteFeeReserve {
 }
 
 pub struct WriteGlobalShortAveragePrice {
-    pub asset: AssetId,
+    pub asset: b256,
     pub global_short_average_price: u256,
 }
 
 pub struct SetMaxGlobalShortSize {
-    pub asset: AssetId,
+    pub asset: b256,
     pub max_global_short_size: u256,
 }
 
@@ -75,7 +75,7 @@ pub struct SetLiquidator {
 }
 
 pub struct SetBufferAmount {
-    pub asset: AssetId,
+    pub asset: b256,
     pub buffer_amount: u256,
 }
 
@@ -87,23 +87,18 @@ pub struct AddLiquidity {
     pub account: Identity,
     pub stable_asset_amount: u64,
     pub lp_asset_amount: u64,
-    pub fee_basis_points: u256,
+    pub fee_basis_points: u64,
 }
 
 pub struct RemoveLiquidity {
     pub account: Identity,
     pub stable_asset_amount: u64,
     pub lp_asset_amount: u64,
-    pub fee_basis_points: u256,
+    pub fee_basis_points: u64,
 }
 
 pub struct CollectSwapFees {
     pub fee_amount: u64,
-}
-
-pub struct DirectPoolDeposit {
-    pub asset: AssetId,
-    pub amount: u256,
 }
 
 pub struct WithdrawFees {
@@ -114,14 +109,14 @@ pub struct WithdrawFees {
 pub struct RegisterPositionByKey {
     pub position_key: b256,
     pub account: Identity,
-    pub index_asset: AssetId,
+    pub index_asset: b256,
     pub is_long: bool
 }
 
 pub struct IncreasePosition {
     pub key: b256,
     pub account: Identity,
-    pub index_asset: AssetId,
+    pub index_asset: b256,
     pub collateral_delta: u256,
     pub size_delta: u256,
     pub is_long: bool,
@@ -132,7 +127,7 @@ pub struct IncreasePosition {
 pub struct DecreasePosition {
     pub key: b256,
     pub account: Identity,
-    pub index_asset: AssetId,
+    pub index_asset: b256,
     pub collateral_delta: u256,
     pub size_delta: u256,
     pub is_long: bool,
@@ -146,18 +141,16 @@ pub struct ClosePosition {
     pub collateral: u256,
     pub average_price: u256,
     pub entry_funding_rate: u256,
-    pub reserve_amount: u256,
     pub realized_pnl: Signed256,
 }
 
 pub struct LiquidatePosition {
     pub key: b256,
     pub account: Identity,
-    pub index_asset: AssetId,
+    pub index_asset: b256,
     pub is_long: bool,
     pub size: u256,
     pub collateral: u256,
-    pub reserve_amount: u256,
     pub realized_pnl: Signed256,
     pub mark_price: u256,
 }
@@ -179,32 +172,32 @@ pub struct SetFundingRateInfo {
 }
 
 pub struct SetMaxLeverage {
-    pub asset: AssetId,
+    pub asset: b256,
     pub max_leverage: u256,
 }
 
 pub struct UpdateFundingRate {
-    pub asset: AssetId,
+    pub asset: b256,
     pub funding_rate: u256,
 }
 
 pub struct UpdateGlobalShortSize {
-    pub asset: AssetId,
+    pub asset: b256,
     pub global_short_size: u256
 }
 
 pub struct WritePoolAmount {
-    pub asset: AssetId,
+    pub asset: b256,
     pub pool_amount: u256,
 }
 
 pub struct WriteReservedAmount {
-    pub asset: AssetId,
+    pub asset: b256,
     pub reserved_amount: u256,
 }
 
 pub struct WriteGuaranteedAmount {
-    pub asset: AssetId,
+    pub asset: b256,
     pub guaranteed_amount: u256,
 }
 

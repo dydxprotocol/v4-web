@@ -5,13 +5,18 @@ import { launchNode, getNodeWallets } from "../../utils/node"
 import { deploy, getBalance, getValue, getValStr, formatObj, call } from "../../utils/utils"
 import { getAssetId, toAsset } from "../../utils/asset"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import { Fungible, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault } from "../../../types"
+import { Fungible, TimeDistributor, Rusd, Utils, VaultPricefeed, YieldTracker, Vault, StorkMock, PricefeedWrapper } from "../../../types"
 import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
 import { BNB_PRICEFEED_ID, BTC_PRICEFEED_ID, USDC_PRICEFEED_ID, getUpdatePriceDataCall } from "../../utils/mock-pyth"
 import { BTC_MAX_LEVERAGE, getBtcConfig, validateVaultBalance, getUsdcConfig } from "../../utils/vault"
 import { asStr, expandDecimals, toNormalizedPrice, toPrice, toUsd } from "../../utils/units"
 
 use(useChai)
+
+const COLLATERAL_ASSET = "0x7416a56f222e196d0487dce8a1a8003936862e7a15092a91898d69fa8bce290c"
+const BNB_ASSET = "0x1bc6d6279e196b1fa7b94a792d57a47433858940c1b3500f2a5e69640cd12ef4"
+const USDC_ASSET = "0x7416a56f222e196d0487dce8a1a8003936862e7a15092a91898d69fa8bce290c"
+const BTC_ASSET = "0x7404e3d104ea7841c3d9e6fd20adfe99b4ad586bc08d8f3bd3afef894cf184de"
 
 describe("Vault.touch", () => {
     let attachedContracts: AbstractContract[]
@@ -27,13 +32,12 @@ describe("Vault.touch", () => {
     let USDC: Fungible
     let BTC: Fungible
     let LP_ASSET_ID: string // the LP fungible asset
+    let storkMock: StorkMock
+    let pricefeedWrapper: PricefeedWrapper
     let vault: Vault
     let vault_user0: Vault
     let vault_user1: Vault
     let vault_liquidator: Vault
-    let vaultPricefeed: VaultPricefeed
-    let timeDistributor: TimeDistributor
-    let yieldTracker: YieldTracker
 
     beforeEach(async () => {
         launchedNode = await launchNode()
@@ -49,33 +53,16 @@ describe("Vault.touch", () => {
         BTC = await deploy("Fungible", deployer)
 
         utils = await deploy("Utils", deployer)
-        vault = await deploy("Vault", deployer, { COLLATERAL_ASSET: toAsset(USDC) })
-        vaultPricefeed = await deploy("VaultPricefeed", deployer)
-        let RUSD = await deploy("Rusd", deployer)
-        timeDistributor = await deploy("TimeDistributor", deployer)
-        yieldTracker = await deploy("YieldTracker", deployer)
+        storkMock = await deploy("StorkMock", deployer)
+        pricefeedWrapper = await deploy("PricefeedWrapper", deployer, { STORK_CONTRACT: toContract(storkMock) })
+
+        vault = await deploy("Vault", deployer, { COLLATERAL_ASSET_ID: toAsset(USDC), COLLATERAL_ASSET: COLLATERAL_ASSET, COLLATERAL_ASSET_DECIMALS: 9, PRICEFEED_WRAPPER: toContract(pricefeedWrapper) })
         
-        attachedContracts = [vault, vaultPricefeed]
+        attachedContracts = [vault, storkMock, pricefeedWrapper]
         LP_ASSET_ID = (await getValue(vault.functions.get_lp_asset())).bits.toString()
 
-        await call(RUSD.functions.initialize(toContract(vault), toAddress(user0)))
-
         await call(vault.functions.initialize(addrToIdentity(deployer)))
-        await call(vault.functions.set_pricefeed_provider(toContract(vaultPricefeed)))
         await call(vault.functions.set_liquidator(addrToIdentity(liquidator), true))
-
-        await call(yieldTracker.functions.initialize(toContract(RUSD)))
-        await call(yieldTracker.functions.set_time_distributor(toContract(timeDistributor)))
-        await call(timeDistributor.functions.initialize())
-        await call(timeDistributor.functions.set_distribution([contrToIdentity(yieldTracker)], [1000], [toAsset(BNB)]))
-
-        await call(BNB.functions.mint(contrToIdentity(timeDistributor), 5000))
-        await call(RUSD.functions.set_yield_trackers([{ bits: contrToIdentity(yieldTracker).ContractId?.bits as string }]))
-
-        await call(vaultPricefeed.functions.initialize(addrToIdentity(deployer), toAddress(deployer)))
-        await call(vaultPricefeed.functions.set_asset_config(toAsset(BNB), BNB_PRICEFEED_ID, 9))
-        await call(vaultPricefeed.functions.set_asset_config(toAsset(USDC), USDC_PRICEFEED_ID, 9))
-        await call(vaultPricefeed.functions.set_asset_config(toAsset(BTC), BTC_PRICEFEED_ID, 9))
 
         await call(
             vault.functions.set_fees(
@@ -83,7 +70,7 @@ describe("Vault.touch", () => {
                 20, // stable_tax_basis_points
                 30, // mint_burn_fee_basis_points
                 10, // margin_fee_basis_points
-                toUsd(5), // liquidation_fee_usd
+                expandDecimals(5), // liquidation_fee_usd
                 60 * 60, // min_profit_time
                 false, // has_dynamic_fees
             ),
@@ -101,13 +88,13 @@ describe("Vault.touch", () => {
         vault_user1 = new Vault(vault.id.toAddress(), user1)
         vault_liquidator = new Vault(vault.id.toAddress(), liquidator)
 
-        await call(getUpdatePriceDataCall(toAsset(USDC), toPrice(1), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(USDC_ASSET, toPrice(1, 18)))
 
-        await call(vault.functions.set_asset_config(...getUsdcConfig(USDC)))
-        await call(vault.functions.set_asset_config(...getBtcConfig(BTC)))
-        await call(vault.functions.set_max_leverage(toAsset(BTC), BTC_MAX_LEVERAGE))
+        await call(vault.functions.set_asset_config(...getUsdcConfig()))
+        await call(vault.functions.set_asset_config(...getBtcConfig()))
+        await call(vault.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE))
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(40000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(40000, 18)))
     })
 
     it("add liquidity", async () => {
@@ -165,13 +152,13 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(100), true)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(100), true)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, true).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
         expect(!position.size.isZero()).eq(true)
         expect(!position.collateral.isZero()).eq(true)
@@ -192,13 +179,13 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(100), false)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(100), false)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, false).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
         expect(!position.size.isZero()).eq(true)
         expect(!position.collateral.isZero()).eq(true)
@@ -218,18 +205,18 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(100), true)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(100), true)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, true).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
         const usdcAmount = await user1.getBalance(getAssetId(USDC))
         await call(
             vault_user1
-                .functions.decrease_position(addrToIdentity(user1), toAsset(BTC), position.collateral.div(2), position.size.div(2), true, addrToIdentity(user1))
+                .functions.decrease_position(addrToIdentity(user1), BTC_ASSET, position.collateral.div(2), position.size.div(2), true, addrToIdentity(user1))
                 .addContracts(attachedContracts),
         )
         const positionAfter = (await vault.functions.get_position_by_key(positionKey).get()).value
@@ -255,18 +242,18 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(100), false)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(100), false)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, false).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
         const usdcAmount = await user1.getBalance(getAssetId(USDC))
         await call(
             vault_user1
-                .functions.decrease_position(addrToIdentity(user1), toAsset(BTC), position.collateral.div(2), position.size.div(2), false, addrToIdentity(user1))
+                .functions.decrease_position(addrToIdentity(user1), BTC_ASSET, position.collateral.div(2), position.size.div(2), false, addrToIdentity(user1))
                 .addContracts(attachedContracts),
         )
         const positionAfter = (await vault.functions.get_position_by_key(positionKey).get()).value
@@ -292,23 +279,23 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), true)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), true)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(400), getAssetId(USDC)],
                 }),
         )
 
-        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), BTC_ASSET, true).get()).value
         // 10_000 leverage base point
         expect(leverage.toNumber()).gte(25_000)
         expect(leverage.toNumber()).lt(26_000)
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, true).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(48000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(48000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(true)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -330,23 +317,23 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), true)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), true)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(400), getAssetId(USDC)],
                 }),
         )
 
-        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), BTC_ASSET, true).get()).value
         // 10_000 leverage base point
         expect(leverage.toNumber()).gte(25_000)
         expect(leverage.toNumber()).lt(26_000)
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, true).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(32000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(32000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(false)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -368,23 +355,23 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), false)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), false)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(400), getAssetId(USDC)],
                 }),
         )
 
-        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), BTC_ASSET, false).get()).value
         // 10_000 leverage base point
         expect(leverage.toNumber()).gte(25_000)
         expect(leverage.toNumber()).lt(26_000)
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, false).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(48000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(48000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(false)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -406,23 +393,23 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), false)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), false)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(400), getAssetId(USDC)],
                 }),
         )
 
-        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const leverage = (await vault.functions.get_position_leverage(addrToIdentity(user1), BTC_ASSET, false).get()).value
         // 10_000 leverage base point
         expect(leverage.toNumber()).gte(25_000)
         expect(leverage.toNumber()).lt(26_000)
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, false).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(32000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(32000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(true)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -444,27 +431,27 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), true)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), true)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
 
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, true).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(35000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(35000, 18)))
 
-        const validate_liquidation = (await vault.functions.validate_liquidation(addrToIdentity(user1), toAsset(BTC), true, false).get()).value
+        const validate_liquidation = (await vault.functions.validate_liquidation(addrToIdentity(user1), BTC_ASSET, true, false).get()).value
         expect(validate_liquidation[0].toNumber()).eq(1)
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), true).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(false)
         expect(position_delta[1].gt(position.collateral)).eq(true)
 
         await call(
             vault_liquidator
-                .functions.liquidate_position(addrToIdentity(user1), toAsset(BTC), true, addrToIdentity(liquidator))
+                .functions.liquidate_position(addrToIdentity(user1), BTC_ASSET, true, addrToIdentity(liquidator))
                 .addContracts(attachedContracts),
         )
         const positionAfter = (await vault.functions.get_position_by_key(positionKey).get()).value
@@ -486,27 +473,27 @@ describe("Vault.touch", () => {
         await call(USDC.functions.mint(addrToIdentity(user1), expandDecimals(40000)))
         await call(
             vault_user1
-                .functions.increase_position(addrToIdentity(user1), toAsset(BTC), toUsd(1000), false)
+                .functions.increase_position(addrToIdentity(user1), BTC_ASSET, expandDecimals(1000), false)
                 .addContracts(attachedContracts)
                 .callParams({
                     forward: [expandDecimals(100), getAssetId(USDC)],
                 }),
         )
 
-        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const positionKey = (await vault.functions.get_position_key(addrToIdentity(user1), BTC_ASSET, false).get()).value
         const position = (await vault.functions.get_position_by_key(positionKey).get()).value
 
-        await call(getUpdatePriceDataCall(toAsset(BTC), toPrice(45000), vaultPricefeed, priceUpdateSigner))
+        await call(storkMock.functions.update_price(BTC_ASSET, toPrice(45000, 18)))
 
-        const validate_liquidation = (await vault.functions.validate_liquidation(addrToIdentity(user1), toAsset(BTC), false, false).get()).value
+        const validate_liquidation = (await vault.functions.validate_liquidation(addrToIdentity(user1), BTC_ASSET, false, false).get()).value
         expect(validate_liquidation[0].toNumber()).eq(1)
-        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), toAsset(BTC), false).get()).value
+        const position_delta = (await vault.functions.get_position_delta(addrToIdentity(user1), BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(false)
         expect(position_delta[1].gt(position.collateral)).eq(true)
 
         await call(
             vault_liquidator
-                .functions.liquidate_position(addrToIdentity(user1), toAsset(BTC), false, addrToIdentity(liquidator))
+                .functions.liquidate_position(addrToIdentity(user1), BTC_ASSET, false, addrToIdentity(liquidator))
                 .addContracts(attachedContracts),
         )
         const positionAfter = (await vault.functions.get_position_by_key(positionKey).get()).value

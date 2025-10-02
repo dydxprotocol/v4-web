@@ -33,7 +33,7 @@ pub enum Error {
     VaultInvalidPositionSize: (),
     VaultInvalidLiquidator: (),
 
-    VaultInvalidLiquidationFeeUsd: (),
+    VaultInvalidLiquidationFee: (),
     VaultInvalidFeeBasisPoints: (),
 
     VaultEmptyPosition: (),

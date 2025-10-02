@@ -19,7 +19,7 @@ pub struct Position {
 
 pub struct PositionKey {
     pub account: Identity,
-    pub index_asset: AssetId,
+    pub index_asset: b256,
     pub is_long: bool,
 }
 
@@ -48,24 +48,21 @@ abi Vault {
         is_active: bool
     );
 
-    #[storage(write)]
-    fn set_pricefeed_provider(pricefeed_provider: ContractId);
-
      #[storage(write)]
     fn set_max_leverage(
-        asset: AssetId,
+        asset: b256,
         max_leverage: u256
     );
 
     #[storage(write)]
     fn set_buffer_amount(
-        asset: AssetId, 
+        asset: b256, 
         buffer_amount: u256
     );
 
     #[storage(write)]
     fn set_max_global_short_size(
-        asset: AssetId, 
+        asset: b256, 
         max_global_short_size: u256
     );
 
@@ -94,14 +91,14 @@ abi Vault {
 
     #[storage(read, write)]
     fn set_asset_config(
-        asset: AssetId,
+        asset: b256,
         asset_decimals: u32,
         asset_weight: u64,
         min_profit_bps: u64,
     );
 
     #[storage(read, write)]
-    fn clear_asset_config(asset: AssetId);
+    fn clear_asset_config(asset: b256);
 
     #[storage(write)]
     fn set_approved_router(
@@ -128,20 +125,20 @@ abi Vault {
     */
     fn get_position_key(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
     ) -> b256;
 
     #[storage(read)]
     fn get_position_delta(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
     ) -> (bool, u256);
 
     #[storage(read)]
     fn get_delta(
-        index_asset: AssetId,
+        index_asset: b256,
         size: u256,
         average_price: u256,
         is_long: bool,
@@ -150,14 +147,12 @@ abi Vault {
 
     #[storage(read)]
     fn get_entry_funding_rate(
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool 
     ) -> u256;
 
     #[storage(read)]
     fn get_funding_fee(
-        collateral_asset: AssetId,
         size: u256,
         entry_funding_rate: u256
     ) -> u256;
@@ -168,92 +163,71 @@ abi Vault {
     #[storage(read)]
     fn get_position_fee(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
         size_delta: u256,
     ) -> u256;
 
     #[storage(read)]
-    fn get_global_short_sizes(asset: AssetId) -> u256;
+    fn get_global_short_sizes(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_global_short_average_prices(asset: AssetId) -> u256;
+    fn get_global_short_average_prices(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_guaranteed_usd(asset: AssetId) -> u256;
+    fn get_guaranteed_usd(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_max_price(asset: AssetId) -> u256;
+    fn get_max_price(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_min_price(asset: AssetId) -> u256;
-
-    #[storage(read)]
-    fn asset_to_usd_min(
-        asset: AssetId, 
-        asset_amount: u256
-    ) -> u256;
+    fn get_min_price(asset: b256) -> u256;
 
     #[storage(read)]
     fn usd_to_asset_max(
-        asset: AssetId, 
+        asset: b256, 
         usd_amount: u256
     ) -> u256;
 
     #[storage(read)]
     fn usd_to_asset_min(
-        asset: AssetId, 
+        asset: b256, 
         usd_amount: u256
     ) -> u256;
 
     #[storage(read)]
     fn usd_to_asset(
-        asset: AssetId, 
+        asset: b256, 
         usd_amount: u256, 
         price: u256
     ) -> u256;
 
     #[storage(read)]
-    fn get_pool_amounts(asset: AssetId) -> u256;
+    fn get_pool_amounts(asset: b256) -> u256;
 
     #[storage(read)]
     fn get_fee_reserve() -> u256;
 
     #[storage(read)]
-    fn get_reserved_amount(asset: AssetId) -> u256;
+    fn get_reserved_amount(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_buffer_amounts(asset: AssetId) -> u256;
+    fn get_buffer_amounts(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_asset_weights(asset: AssetId) -> u64;
-
-    #[storage(read)]
-    fn get_redemption_amount(
-        lp_asset_amount: u256,
-    ) -> u256; 
-
-    #[storage(read)]
-    fn get_redemption_collateral(asset: AssetId) -> u256;
-
-    #[storage(read)]
-    fn get_redemption_collateral_usd(asset: AssetId) -> u256;
-    
-    #[storage(read)]
-    fn get_pricefeed_provider() -> ContractId;
+    fn get_asset_weights(asset: b256) -> u64;
 
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64;
 
     #[storage(read)]
-    fn get_whitelisted_asset_by_index(index: u64) -> AssetId;
+    fn get_whitelisted_asset_by_index(index: u64) -> b256;
 
     #[storage(read)]
-    fn is_asset_whitelisted(asset: AssetId) -> bool;
+    fn is_asset_whitelisted(asset: b256) -> bool;
 
     #[storage(read)]
-    fn get_asset_decimals(asset: AssetId) -> u32;
+    fn get_asset_decimals(asset: b256) -> u32;
 
     #[storage(read)]
     fn get_collateral_asset() -> AssetId;
@@ -263,16 +237,16 @@ abi Vault {
     #[storage(read)]
     fn get_position_leverage(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
     ) -> u256;
 
     #[storage(read)]
-    fn get_cumulative_funding_rate(asset: AssetId) -> u256;
+    fn get_cumulative_funding_rate() -> u256;
 
     #[storage(read)]
     fn get_fee_basis_points(
-        asset: AssetId,
+        asset: b256,
         lp_asset_delta: u256,
         fee_basis_points: u256,
         tax_basis_points: u256,
@@ -280,7 +254,7 @@ abi Vault {
     ) -> u256;
 
     #[storage(read)]
-    fn get_liquidation_fee_usd() -> u256;
+    fn get_liquidation_fee() -> u256;
 
     #[storage(read)]
     fn get_tax_basis_points() -> u64;
@@ -301,13 +275,10 @@ abi Vault {
     fn get_has_dynamic_fees() -> bool;
 
     #[storage(read)]
-    fn get_utilization(asset: AssetId) -> u256;
+    fn get_next_funding_rate(asset: b256) -> u256;
 
     #[storage(read)]
-    fn get_next_funding_rate(asset: AssetId) -> u256;
-
-    #[storage(read)]
-    fn get_global_short_delta(asset: AssetId) -> (bool, u256);
+    fn get_global_short_delta(asset: b256) -> (bool, u256);
 
     #[storage(read)]
     fn is_liquidator(account: Identity) -> bool;
@@ -315,7 +286,7 @@ abi Vault {
     #[storage(read)]
     fn validate_liquidation(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
         should_raise: bool,
     ) -> (u256, u256);
@@ -323,20 +294,13 @@ abi Vault {
     #[storage(read)]
     fn get_add_liquidity_amount(
         asset_amount: u64
-    ) -> (u256, u256, u256);
+    ) -> (u64, u64, u64);
 
     #[storage(read)]
     fn get_remove_liquidity_amount(
-        lp_asset_amount: u256
-    ) -> (u256, u64, u256);
+        lp_asset_amount: u64
+    ) -> (u64, u64, u64);
 
-    #[storage(read)]
-    fn adjust_for_decimals(
-        amount: u256, 
-        asset_div: AssetId, 
-        asset_mul: AssetId
-    ) -> u256;
-    
     /*
           ____  ____        _     _ _
          / / / |  _ \ _   _| |__ | (_) ___ 
@@ -345,27 +309,21 @@ abi Vault {
       /_/_/    |_|    \__,_|_.__/|_|_|\___|
     */
     #[storage(read, write)]
-    fn update_cumulative_funding_rate(collateral_asset: AssetId);
-
-    /// deposit into the pool without minting RUSD tokens
-    /// useful in allowing the pool to become over-collaterised
-    #[payable]
-    #[storage(read, write)]
-    fn direct_pool_deposit(asset: AssetId);
+    fn update_cumulative_funding_rate();
 
     #[payable]
     #[storage(read, write)]
-    fn add_liquidity(receiver: Identity) -> u256;
+    fn add_liquidity(receiver: Identity) -> u64;
 
     #[payable]
     #[storage(read, write)]
-    fn remove_liquidity(receiver: Identity) -> u256;
+    fn remove_liquidity(receiver: Identity) -> u64;
 
     #[payable]
     #[storage(read, write)]
     fn increase_position(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         size_delta: u256,
         is_long: bool 
     );
@@ -373,7 +331,7 @@ abi Vault {
     #[storage(read, write)]
     fn decrease_position(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         collateral_delta: u256,
         size_delta: u256,
         is_long: bool,
@@ -383,7 +341,7 @@ abi Vault {
     #[storage(read, write)]
     fn liquidate_position(
         account: Identity,
-        index_asset: AssetId,
+        index_asset: b256,
         is_long: bool,
         fee_receiver: Identity
     );

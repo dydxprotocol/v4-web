@@ -2,11 +2,15 @@ import { WalletUnlocked } from 'fuels';
 import { DeployContractConfig, launchTestNode, LaunchTestNodeReturn } from 'fuels/test-utils';
 
 export async function launchNode() : Promise<LaunchTestNodeReturn<DeployContractConfig[]>> {
-  const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode({
+  const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode(
+    {
       walletsConfig: {
         count: 5, // Number of wallets you want
       },
-    })
+    }
+  )
+    console.log("launched", launched)
+    
 
     return launched
 }

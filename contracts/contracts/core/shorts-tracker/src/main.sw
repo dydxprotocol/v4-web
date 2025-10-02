@@ -37,12 +37,12 @@ storage {
 
     // data: StorageMap<b256, b256> = StorageMap {},
     is_handler: StorageMap<Identity, bool> = StorageMap {},
-    global_short_average_prices: StorageMap<AssetId, u256> = StorageMap {},
+    global_short_average_prices: StorageMap<b256, u256> = StorageMap {},
 }
 
 // Event
 struct GlobalShortDataUpdated {
-    asset: AssetId,
+    asset: b256,
     global_short_size: u256,
     global_short_average_price: u256
 }
@@ -76,8 +76,8 @@ impl ShortsTracker for Contract {
     #[storage(read, write)]
     fn update_global_short_data(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         is_long: bool,
         size_delta: u256,
         mark_price: u256,
@@ -113,7 +113,7 @@ impl ShortsTracker for Contract {
 
     #[storage(read, write)]
     fn set_init_data(
-        assets: Vec<AssetId>,
+        assets: Vec<b256>,
         average_prices: Vec<u256>,
     ) {
         _only_gov();
@@ -145,15 +145,15 @@ impl ShortsTracker for Contract {
     }
 
     #[storage(read)]
-    fn get_global_short_average_prices(asset: AssetId) -> u256 {
+    fn get_global_short_average_prices(asset: b256) -> u256 {
         storage.global_short_average_prices.get(asset).try_read().unwrap_or(0)
     }
 
     #[storage(read)]
     fn get_next_global_short_data(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         next_price: u256,
         size_delta: u256,
         is_increase: bool
@@ -201,8 +201,8 @@ impl ShortsTracker for Contract {
     #[storage(read)]
     fn get_realized_pnl(
         account: Identity,
-        collateral_asset: AssetId,
-        index_asset: AssetId,
+        collateral_asset: b256,
+        index_asset: b256,
         size_delta: u256,
         is_increase: bool 
     ) -> Signed256 {
@@ -240,8 +240,8 @@ fn _only_handler() {
 #[storage(read)]
 fn _get_next_global_short_data(
     account: Identity,
-    collateral_asset: AssetId,
-    index_asset: AssetId,
+    collateral_asset: b256,
+    index_asset: b256,
     next_price: u256,
     size_delta: u256,
     is_increase: bool
@@ -360,8 +360,8 @@ fn _get_next_delta(
 #[storage(read)]
 fn _get_realized_pnl(
     account: Identity,
-    collateral_asset: AssetId,
-    index_asset: AssetId,
+    collateral_asset: b256,
+    index_asset: b256,
     size_delta: u256,
     is_increase: bool 
 ) -> Signed256 {

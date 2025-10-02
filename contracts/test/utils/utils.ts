@@ -1,4 +1,4 @@
-import { AbstractAddress, Provider, WalletUnlocked } from "fuels"
+import { Provider, WalletUnlocked } from "fuels"
 import { Fungible, Utils } from "../../types"
 import { getAssetId, toAsset } from "./asset"
 import { toContract } from "./account"
@@ -11,8 +11,14 @@ export async function deploy(contract: string, wallet: WalletUnlocked, configura
         throw new Error(`Could not find factory for contract ${contract}`)
     }
 
-    const { waitForResult } = await factory.deploy(wallet, configurables ? { configurableConstants: configurables } : undefined)
-    const { contract: contr } = await waitForResult()
+    const txParams = {
+        gasLimit: 5000000,
+    };
+
+    const deployResult = await factory.deploy(wallet, configurables ? { configurableConstants: configurables } : undefined, txParams)
+    const { waitForResult } = deployResult
+    const deployedResult = await waitForResult()
+    const { contract: contr } = deployedResult
 
     return contr
 }

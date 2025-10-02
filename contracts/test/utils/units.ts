@@ -18,7 +18,8 @@ export function toNormalizedPrice(value: number): string {
 }
 
 export function toPrice(value: number, decimals: number = 9): string {
-    return parseInt((value * Math.pow(10, decimals)) as any).toString()
+    const v = BigInt(value) * (BigInt(10) ** BigInt(decimals))
+    return v.toString()
 }
 
 export function expandDecimals(num: string | number, decimals: number = 9): string {

@@ -1,0 +1,9 @@
+[project]
+authors = ["lukaszglen"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "stork-mock"
+
+[dependencies]
+signed_int = "0.26.1"
+stork_sway_sdk = "0.0.4"

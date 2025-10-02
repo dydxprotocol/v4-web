@@ -18,7 +18,7 @@ dependencies = [
 
 [[package]]
 name = "core_interfaces"
-source = "path+from-root-695D6AEEAEEED3C2"
+source = "path+from-root-B13D3383E17FE97A"
 dependencies = [
     "helpers",
     "pyth_interface",
@@ -73,6 +73,16 @@ source = "registry+pausable?0.26.1#QmapdwdUETu3aWXa5xnjdsgqDWhh9WnGkYQcBi7UqfWsr
 dependencies = ["std"]
 
 [[package]]
+name = "pricefeed_wrapper"
+source = "member"
+dependencies = [
+    "core_interfaces",
+    "signed_int",
+    "std",
+    "stork_sway_sdk",
+]
+
+[[package]]
 name = "pyth_interface"
 source = "git+https://github.com/pyth-network/pyth-crosschain?tag=pyth-lazer-agent-v0.4.1#2a543d4b8719c7d0b3dad40f982c121307647815"
 dependencies = ["std"]
@@ -99,6 +109,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "signed_int"
+version = "0.26.1"
+source = "registry+signed_int?0.26.1#QmWB8r7jN9bE1sVUJzQoTCbsTXyL6qB55mSfeicd6EtoAo!"
+dependencies = ["std"]
+
+[[package]]
 name = "src20"
 version = "0.8.0"
 source = "registry+src20?0.8.0#QmSwYjybtdvSF3Ey9RncVUUaFaWsizSBNgAtY9JoyaAHvh!"
@@ -120,6 +136,24 @@ dependencies = ["std"]
 name = "std"
 version = "0.69.1"
 source = "registry+std?0.69.1#QmbPunScay4xpfHKpxQ71dFKXSiyJuPP8P8YhgX5Dkmzm9!"
+
+[[package]]
+name = "stork-mock"
+source = "member"
+dependencies = [
+    "signed_int",
+    "std",
+    "stork_sway_sdk",
+]
+
+[[package]]
+name = "stork_sway_sdk"
+version = "0.0.4"
+source = "registry+stork_sway_sdk?0.0.4#QmY8PmuK1DxJidEFv5tB4roBC3kBH6LitSpY5NqGgeFtz1!"
+dependencies = [
+    "signed_int",
+    "std",
+]
 
 [[package]]
 name = "testnet-token"
