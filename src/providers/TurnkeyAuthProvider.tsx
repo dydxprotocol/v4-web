@@ -27,7 +27,6 @@ import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog, openDialog } from '@/state/dialogs';
 import {
-  clearTurnkeyEmailOnboardingData,
   setRequiresAddressUpload,
   setTurnkeyEmailOnboardingData,
   setWalletInfo,
@@ -374,8 +373,6 @@ const useTurnkeyAuthContext = () => {
         // Remove the token from the search params after it has been saved to state
         searchParams.delete('token');
         setSearchParams(searchParams);
-        // Clear email sign in data
-        dispatch(clearTurnkeyEmailOnboardingData());
       }
     },
     [
@@ -387,7 +384,6 @@ const useTurnkeyAuthContext = () => {
       setWalletFromSignature,
       searchParams,
       setSearchParams,
-      dispatch,
       stringGetter,
       endTurnkeySession,
     ]
