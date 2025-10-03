@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -47,7 +47,8 @@ export const EmailSignInStatusDialog = ({
 
   // Use cached turnkeyEmailOnboardingData to determine if we should show the welcome content
   // turnkeyEmailOnboardingData is cleared after handling, so we only want initial state
-  const [showWelcomeContent] = useState(hasNoUploadedAddress || isNewTurnkeyUser);
+  const showWelcomeContentRef = useRef(hasNoUploadedAddress || isNewTurnkeyUser);
+  const showWelcomeContent = showWelcomeContentRef.current;
 
   const setIsOpenInner = useCallback(
     (isOpen: boolean) => {
