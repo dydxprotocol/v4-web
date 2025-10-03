@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { SHA256 } from 'crypto-js';
 import { useLocation } from 'react-router-dom';
 
 import {
@@ -19,7 +20,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
-import { runFn } from '@/lib/do';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -108,41 +108,20 @@ export const useAnalytics = () => {
   const [analyticsUserId, setAnalyticsUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    let dead = false;
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
+      setAnalyticsUserId(null);
+    }
 
-    runFn(async () => {
-      if (dead) return;
-      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
-        setAnalyticsUserId(null);
+    if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
+      if (sourceAccount.walletInfo.userEmail) {
+        const normalizedEmail = sourceAccount.walletInfo.userEmail.trim().toLowerCase();
+        const hashedEmail = SHA256(normalizedEmail).toString();
+        setAnalyticsUserId(hashedEmail);
+        return;
       }
+    }
 
-      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-        if (sourceAccount.walletInfo.userEmail && typeof globalThis.crypto !== 'undefined') {
-          const normalizedEmail = sourceAccount.walletInfo.userEmail.trim().toLowerCase();
-          const hashedEmail = await globalThis.crypto.subtle.digest(
-            'SHA-256',
-            new TextEncoder().encode(normalizedEmail)
-          );
-
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (dead) return;
-
-          setAnalyticsUserId(
-            Array.from(new Uint8Array(hashedEmail))
-              .map((b) => b.toString(16).padStart(2, '0'))
-              .join('')
-          );
-
-          return;
-        }
-      }
-
-      setAnalyticsUserId(sourceAccount.address ?? null);
-    });
-
-    return () => {
-      dead = true;
-    };
+    setAnalyticsUserId(sourceAccount.address ?? null);
   }, [sourceAccount.address, sourceAccount.walletInfo]);
 
   useEffect(() => {
