@@ -39,7 +39,6 @@ import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
-import { MigratePanel } from './token/MigratePanel';
 import { StakingPanel } from './token/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
@@ -186,8 +185,6 @@ const Profile = () => {
         tw="[grid-area:help]"
       />
 
-      <MigratePanel tw="[grid-area:migrate]" />
-
       <StakingPanel tw="[grid-area:staking]" />
 
       <$RewardsPanel
@@ -280,7 +277,6 @@ const $MobileProfileLayout = styled.div`
     'header header'
     'actions actions'
     'settings help'
-    'migrate migrate'
     'staking staking'
     'rewards fees'
     'history history'
@@ -293,7 +289,6 @@ const $MobileProfileLayout = styled.div`
       'header header'
       'actions actions'
       'settings help'
-      'migrate migrate'
       'staking staking'
       'rewards fees'
       'history history'
