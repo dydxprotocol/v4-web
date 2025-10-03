@@ -9,10 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -23,12 +21,10 @@ import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
-import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
-import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
@@ -41,7 +37,7 @@ const RewardsPage = () => {
   const navigate = useNavigate();
 
   const { complianceState } = useComplianceState();
-  const { isTablet, isNotTablet } = useBreakpoints();
+  const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();
 
@@ -52,17 +48,6 @@ const RewardsPage = () => {
     (a) => a.amount
   );
 
-  const ethereumChainId = useEnvConfig('ethereumChainId');
-  const chainId = Number(ethereumChainId);
-  // v3 token is only on mainnet
-  const { balance: tokenBalance } = useAccountBalance({
-    addressOrDenom: chainId === 1 ? import.meta.env.VITE_V3_TOKEN_ADDRESS : undefined,
-    chainId: 1,
-    isCosmosChain: false,
-  });
-
-  const showMigratePanel =
-    import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && MustBigNumber(tokenBalance).gt(0);
   const showGeoblockedPanel = complianceState !== ComplianceStates.FULL_ACCESS;
   const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel;
 
@@ -99,7 +84,6 @@ const RewardsPage = () => {
         </div>
       ) : (
         <$DetachedSection>
-          {showMigratePanel && <MigratePanel />}
           <div tw="flex gap-1.5">
             <div tw="flexColumn flex-[2] gap-1.5">
               <LaunchIncentivesPanel />
