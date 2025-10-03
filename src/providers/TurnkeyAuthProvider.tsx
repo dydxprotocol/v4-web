@@ -162,12 +162,12 @@ const useTurnkeyAuthContext = () => {
           throw new Error('Current unsupported login method');
       }
     },
-    onError: (error, variables) => {
+    onError: async (error, variables) => {
       selectWallet(undefined);
       setEmailSignInStatus('error');
       const { errorMessage, shouldLog } = parseTurnkeyError(error.message, stringGetter);
       setEmailSignInError(errorMessage);
-      endTurnkeySession();
+      await endTurnkeySession();
 
       if (shouldLog) {
         logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
@@ -365,7 +365,7 @@ const useTurnkeyAuthContext = () => {
             })
         );
 
-        endTurnkeySession();
+        await endTurnkeySession();
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
