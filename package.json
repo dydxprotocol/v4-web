@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "cp ./template.html ./index.html && vite",
+    "dev:mainnet": "VITE_NETWORK_MODE=MAINNET pnpm run dev",
     "graph": "nx graph --groupByFolder",
     "build": "pnpm run build:ts-sdk && pnpm run build:set-last-commit-and-tag && pnpm run build:generate-entry-points && tsc && NODE_OPTIONS='--max-old-space-size=6144' vite build",
     "build:ts-sdk": "pnpm --filter starboard-client-js run build",
