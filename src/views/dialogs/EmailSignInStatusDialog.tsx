@@ -1,9 +1,10 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType } from '@/constants/wallets';
+import { LoginMethod } from '@/types/turnkey';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
@@ -18,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme, getChartDotBackground } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getSourceAccount } from '@/state/walletSelectors';
+import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import { calc } from '@/lib/do';
 import { sleep } from '@/lib/timeUtils';
@@ -38,6 +39,16 @@ export const EmailSignInStatusDialog = ({
   const isLightMode = appTheme === AppTheme.Light;
   const isTurnkey = walletInfo?.connectorType === ConnectorType.Turnkey;
   const chartDotBackground = useAppSelector(getChartDotBackground);
+  const turnkeyEmailOnboardingData = useAppSelector(getTurnkeyEmailOnboardingData);
+  const hasNoUploadedAddress =
+    walletInfo?.connectorType === ConnectorType.Turnkey &&
+    walletInfo.loginMethod === LoginMethod.Email &&
+    !turnkeyEmailOnboardingData?.dydxAddress;
+
+  // Use cached turnkeyEmailOnboardingData to determine if we should show the welcome content
+  // turnkeyEmailOnboardingData is cleared after handling, so we only want initial state
+  const showWelcomeContentRef = useRef(hasNoUploadedAddress || isNewTurnkeyUser);
+  const showWelcomeContent = showWelcomeContentRef.current;
 
   const setIsOpenInner = useCallback(
     (isOpen: boolean) => {
@@ -173,7 +184,7 @@ export const EmailSignInStatusDialog = ({
             backgroundClip: 'text',
           }}
         >
-          {isNewTurnkeyUser
+          {showWelcomeContent
             ? stringGetter({ key: STRING_KEYS.WELCOME_DYDX })
             : stringGetter({ key: STRING_KEYS.WELCOME_BACK })}
         </span>
@@ -191,13 +202,13 @@ export const EmailSignInStatusDialog = ({
         onClick={async () => {
           setIsOpen(false);
 
-          if (isNewTurnkeyUser) {
+          if (showWelcomeContent) {
             await sleep(0);
             dispatch(openDialog(DialogTypes.Deposit2({})));
           }
         }}
       >
-        {isNewTurnkeyUser
+        {showWelcomeContent
           ? `${stringGetter({ key: STRING_KEYS.DEPOSIT_AND_TRADE })} →`
           : stringGetter({ key: STRING_KEYS.CONTINUE })}
       </Button>
