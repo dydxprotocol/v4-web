@@ -17,6 +17,8 @@ storage {
 abi StorkMock {
     #[storage(write)]
     fn update_price(id: b256, price_value: u256);
+    #[storage(write)]
+    fn update_negative_price(id: b256, price_value: u256);
 }
 
 impl StorkMock for Contract {
@@ -36,6 +38,30 @@ impl StorkMock for Contract {
         let price_value_i128 = match I128::try_from(price_value_u128) {
             Some(value) => value,
             None => panic "price_value_i128 overflow",
+        };
+        let price = TemporalNumericValue {
+            timestamp_ns: timestamp(),
+            quantized_value: price_value_i128,
+        };
+        storage.prices.insert(id, price);
+    }
+
+    #[storage(write)]
+    fn update_negative_price(id: b256, price_value: u256) {
+        // 2 ** 64 = 18446744073709551616u256
+        let price_value_lower: u64 = match <u64 as TryFrom<u256>>::try_from(price_value % 18446744073709551616u256) {
+            Some(value) => value,
+            None => panic "price_value_lower overflow",
+        };
+        // 2 ** 64 = 18446744073709551616u256
+        let price_value_upper: u64 = match <u64 as TryFrom<u256>>::try_from(price_value / 18446744073709551616u256) {
+            Some(value) => value,
+            None => panic "price_value_upper overflow",
+        };
+        let price_value_u128 = U128::from((price_value_upper, price_value_lower));
+        let price_value_i128 = match I128::neg_try_from(price_value_u128) {
+            Some(value) => value,
+            None => panic "price_value_i128 underflow",
         };
         let price = TemporalNumericValue {
             timestamp_ns: timestamp(),
