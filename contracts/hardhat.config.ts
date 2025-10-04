@@ -7,6 +7,7 @@ import "./tasks/run-node";
 import "./tasks/deploy-starboard";
 import "./tasks/setup-testnet";
 import "./tasks/prices-feed";
+import "./tasks/deploy-stork-mock";
 
 module.exports = {
     defaultNetwork: "hardhat",

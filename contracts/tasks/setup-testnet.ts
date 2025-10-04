@@ -1,13 +1,18 @@
 import { task } from "hardhat/config";
 import { Provider, Wallet, WalletUnlocked } from "fuels"
-import { VaultPricefeed } from "../types/VaultPricefeed"
 import { Vault as VaultContract } from "../types/Vault"
 
 task("setup-testnet", "Setup asset configuration for the testnet")
   .addPositionalParam("url")
   .addPositionalParam("privK")
-  .addPositionalParam("priceSignerAddress")
+  .addPositionalParam("storkContractAddress")
   .setAction(async (taskArgs, hre) => {
+
+    const usdcPricefeedId = "0x0000000000000000000000000000000000000000000000000000000000000069"
+    const btcPricefeedId = "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+    const bnbPricefeedId = "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
+    const ethPricefeedId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
+
     const provider = new Provider(taskArgs.url)
     const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
@@ -18,16 +23,6 @@ task("setup-testnet", "Setup asset configuration for the testnet")
       symbol: "sUSDC", 
       decimals: "6"
     })
-
-    const [vaultAddress, vaultPricefeedAddress] = await hre.run("deploy-starboard", {
-      url: taskArgs.url, 
-      privK: taskArgs.privK, 
-      priceSigner: taskArgs.priceSignerAddress, 
-      usdcAssetId: USDCAssetId, 
-      usdcDecimals: "6"
-    })
-    const vaultPricefeed = new VaultPricefeed(vaultPricefeedAddress, deployer)
-    const vault = new VaultContract(vaultAddress, deployer)
 
     const [BTCAddress, BTCAssetId] = await hre.run("deploy-testnet-token", {
       url: taskArgs.url, 
@@ -51,45 +46,19 @@ task("setup-testnet", "Setup asset configuration for the testnet")
       decimals: "9"
     })
 
-    const btcPricefeedId = "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
-    const bnbPricefeedId = "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
-    const ethPricefeedId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
+    const [vaultAddress, pricefeedWrapperAddress] = await hre.run("deploy-starboard", {
+      url: taskArgs.url, 
+      privK: taskArgs.privK,
+      usdcAssetId: USDCAssetId,
+      usdcPricefeedId: usdcPricefeedId,
+      usdcDecimals: "6",
+      storkContract: taskArgs.storkContractAddress,
+    })
+    const vault = new VaultContract(vaultAddress, deployer)
 
-    const btcAsset = {bits: BTCAssetId}
-    const bnbAsset = {bits: BNBAssetId}
-    const ethAsset = {bits: ETHAssetId}
-
-    await call(vaultPricefeed.functions.set_asset_config(btcAsset, btcPricefeedId, 9))
-    await call(vaultPricefeed.functions.set_asset_config(bnbAsset, bnbPricefeedId, 9))
-    await call(vaultPricefeed.functions.set_asset_config(ethAsset, ethPricefeedId, 9))
-
-    const btcConfig = [
-      btcAsset, // asset
-      9, // asset_decimals,
-      10000, // asset_weight
-      75, // min_profit_bps
-      0, // max_rusd_amount
-    ]
-
-    const bnbConfig = [
-      bnbAsset, // asset
-      9, // asset_decimals
-      10000, // asset_weight
-      75, // min_profit_bps
-      0, // max_rusd_amount
-    ]
-
-    const ethConfig = [
-      ethAsset, // asset
-      9, // asset_decimals
-      10000, // asset_weight
-      75, // min_profit_bps
-      0, // max_rusd_amount
-    ]
-
-    await call(vault.functions.set_asset_config(...btcConfig))
-    await call(vault.functions.set_asset_config(...bnbConfig))
-    await call(vault.functions.set_asset_config(...ethConfig))
+    await call(vault.functions.set_asset_config(btcPricefeedId, 9))
+    await call(vault.functions.set_asset_config(bnbPricefeedId, 9))
+    await call(vault.functions.set_asset_config(ethPricefeedId, 9))
 
     console.log("Setup complete")
 });

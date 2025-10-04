@@ -4,38 +4,34 @@ import { Provider, Wallet, WalletUnlocked } from "fuels"
 task("deploy-starboard", "Deploy the starboard contracts")
   .addPositionalParam("url")
   .addPositionalParam("privK")
-  .addPositionalParam("priceSigner")
   .addPositionalParam("usdcAssetId")
+  .addPositionalParam("usdcPricefeedId")
   .addPositionalParam("usdcDecimals")
+  .addPositionalParam("storkContract")
   .setAction(async (taskArgs) => {
     const provider = new Provider(taskArgs.url)
     const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
     const deployerIdendity = { Address: { bits: deployer.address.toHexString() } }
-    const priceSignerAddress = { bits: taskArgs.priceSigner }
-    const usdcAsset = { bits: taskArgs.usdcAssetId }
+    const storkContract = { bits: taskArgs.storkContract }
     const usdcConfig = [
-      usdcAsset, // asset
+      taskArgs.usdcPricefeedId, // asset
       taskArgs.usdcDecimals, // asset_decimals
-      10000, // asset_weight
-      75, // min_profit_bps
-      0, // max_rusd_amount
     ]
 
-    const vault = await deploy("Vault", deployer, { COLLATERAL_ASSET: usdcAsset })
+    const pricefeedWrapper = await deploy("PricefeedWrapper", deployer, { STORK_CONTRACT: storkContract })
+    console.log(`PricefeedWrapper deployed to: ${pricefeedWrapper.id.toString()} ${pricefeedWrapper.id.toB256().toString()}`)
+
+    const vault = await deploy("Vault", deployer, {
+      COLLATERAL_ASSET_ID: { bits: taskArgs.usdcAssetId },
+      COLLATERAL_ASSET: taskArgs.usdcPricefeedId,
+      COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
+      PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
+    })
     console.log(`Vault deployed to: ${vault.id.toString()} ${vault.id.toB256().toString()}`)
     await call(vault.functions.initialize(deployerIdendity))
     console.log("Vault initialized")
 
-    const vaultPricefeed = await deploy("VaultPricefeed", deployer)
-    console.log(`VaultPricefeed deployed to: ${vaultPricefeed.id.toString()} ${vaultPricefeed.id.toB256().toString()}`)
-    await call(vaultPricefeed.functions.initialize(deployerIdendity, priceSignerAddress))
-    console.log("VaultPricefeed initialized")
-
-    const usdcPricefeedId = "0x41283d3f78ccb459a24e5f1f1b9f5a72a415a26ff9ce0391a6878f4cda6b477b"
-    await call(vaultPricefeed.functions.set_asset_config(usdcAsset, usdcPricefeedId, taskArgs.usdcDecimals))
-    const vaultPricefeedContract = { bits: vaultPricefeed.id.toHexString() }
-    await call(vault.functions.set_pricefeed_provider(vaultPricefeedContract))
     await call(vault.functions.set_liquidator(deployerIdendity, true))
     await call(
       vault.functions.set_funding_rate(
@@ -47,7 +43,7 @@ task("deploy-starboard", "Deploy the starboard contracts")
     await call(vault.functions.set_asset_config(...usdcConfig))
     console.log("Deployment done")
 
-    return [vault.id.toString(), vaultPricefeed.id.toString()]
+    return [vault.id.toString(), pricefeedWrapper.id.toString()]
 });
 
 async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {

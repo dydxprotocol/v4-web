@@ -14,7 +14,8 @@
         "run:node": "hardhat run-node",
         "deploy:starboard": "hardhat deploy-starboard",
         "setup:testnet": "hardhat setup-testnet",
-        "prices:feed": "hardhat prices-feed"
+        "prices:feed": "hardhat prices-feed",
+        "deploy:stork-mock": "hardhat deploy-stork-mock"
     },
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.2.3",
