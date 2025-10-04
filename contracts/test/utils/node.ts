@@ -9,10 +9,7 @@ export async function launchNode() : Promise<LaunchTestNodeReturn<DeployContract
       },
     }
   )
-    console.log("launched", launched)
-    
-
-    return launched
+  return launched
 }
 
 export function getNodeWallets(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>) : WalletUnlocked[] {

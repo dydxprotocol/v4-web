@@ -68,13 +68,9 @@ abi Vault {
 
     #[storage(read, write)]
     fn set_fees(
-        tax_basis_points: u64,
-        stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
-        min_profit_time: u64,
-        has_dynamic_fees: bool,
     );
 
     #[storage(read, write)]
@@ -93,8 +89,6 @@ abi Vault {
     fn set_asset_config(
         asset: b256,
         asset_decimals: u32,
-        asset_weight: u64,
-        min_profit_bps: u64,
     );
 
     #[storage(read, write)]
@@ -108,13 +102,6 @@ abi Vault {
 
     #[storage(write)]
     fn set_router(router: ContractId);
-
-    #[storage(read)]
-    fn upgrade_vault(
-        new_vault: ContractId, 
-        asset: AssetId, 
-        amount: u64
-    );
 
     /*
           ____ __     ___
@@ -184,25 +171,6 @@ abi Vault {
     fn get_min_price(asset: b256) -> u256;
 
     #[storage(read)]
-    fn usd_to_asset_max(
-        asset: b256, 
-        usd_amount: u256
-    ) -> u256;
-
-    #[storage(read)]
-    fn usd_to_asset_min(
-        asset: b256, 
-        usd_amount: u256
-    ) -> u256;
-
-    #[storage(read)]
-    fn usd_to_asset(
-        asset: b256, 
-        usd_amount: u256, 
-        price: u256
-    ) -> u256;
-
-    #[storage(read)]
     fn get_pool_amounts(asset: b256) -> u256;
 
     #[storage(read)]
@@ -213,9 +181,6 @@ abi Vault {
 
     #[storage(read)]
     fn get_buffer_amounts(asset: b256) -> u256;
-
-    #[storage(read)]
-    fn get_asset_weights(asset: b256) -> u64;
 
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64;
@@ -249,7 +214,6 @@ abi Vault {
         asset: b256,
         lp_asset_delta: u256,
         fee_basis_points: u256,
-        tax_basis_points: u256,
         increment: bool
     ) -> u256;
 
@@ -257,22 +221,10 @@ abi Vault {
     fn get_liquidation_fee() -> u256;
 
     #[storage(read)]
-    fn get_tax_basis_points() -> u64;
-
-    #[storage(read)]
-    fn get_stable_tax_basis_points() -> u64;
-
-    #[storage(read)]
     fn get_mint_burn_fee_basis_points() -> u64;
 
     #[storage(read)]
     fn get_margin_fee_basis_points() -> u64;
-
-    #[storage(read)]
-    fn get_min_profit_time() -> u64;
-
-    #[storage(read)]
-    fn get_has_dynamic_fees() -> bool;
 
     #[storage(read)]
     fn get_next_funding_rate(asset: b256) -> u256;

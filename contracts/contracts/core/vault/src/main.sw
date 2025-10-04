@@ -81,9 +81,6 @@ storage {
     is_initialized: bool = false,
     lock: bool = false,
     
-    has_dynamic_fees: bool = false,
-    min_profit_time: u64 = 0,
-
     // Externals
     router: ContractId = ZERO_CONTRACT,
 
@@ -91,17 +88,11 @@ storage {
     /// charged when liquidating a position
     /// denominated in collateral asset
     liquidation_fee: u256 = 0u256,
-    /// general tax applied to all assets to generate protocol revenue
-    tax_basis_points: u64 = 50, // 0.5%
-    /// reduced tax for stable assets
-    stable_tax_basis_points: u64 = 20, // 0.2%
     /// charged when minting/burning LP assets
     /// helps maintain the stability of the RLP pool and discourage rapid entering and exiting.
     mint_burn_fee_basis_points: u64 = 30, // 0.3%
     /// applied to size of leveraged positions
     margin_fee_basis_points: u64 = 10, // 0.1%
-
-    total_asset_weights: u64 = 0,
 
     // Misc
     approved_routers: StorageMap<Identity, StorageMap<Identity, bool>> = StorageMap {},
@@ -114,10 +105,6 @@ storage {
     whitelisted_assets: StorageMap<b256, bool> = StorageMap {},
     // TODO only for the collateral asset
     asset_decimals: StorageMap<b256, u32> = StorageMap {},
-    min_profit_basis_points: StorageMap<b256, u64> = StorageMap {},
-
-    // allows customisation of index composition
-    asset_weights: StorageMap<b256, u64> = StorageMap {},
 
     // allows specification of an amount to exclude from swaps
     // can be used to ensure a certain amount of liquidity is available for leverage positions
@@ -322,41 +309,27 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn set_fees(
-        tax_basis_points: u64,
-        stable_tax_basis_points: u64,
         mint_burn_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee: u256,
-        min_profit_time: u64,
-        has_dynamic_fees: bool,
     ) {
         _only_gov();
 
         require(
-            tax_basis_points <= MAX_FEE_BASIS_POINTS &&
-            stable_tax_basis_points <= MAX_FEE_BASIS_POINTS &&
             mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
             margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints
         );
         require(liquidation_fee <= MAX_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)), Error::VaultInvalidLiquidationFee);
 
-        storage.tax_basis_points.write(tax_basis_points);
-        storage.stable_tax_basis_points.write(stable_tax_basis_points);
         storage.mint_burn_fee_basis_points.write(mint_burn_fee_basis_points);
         storage.margin_fee_basis_points.write(margin_fee_basis_points);
         storage.liquidation_fee.write(liquidation_fee);
-        storage.min_profit_time.write(min_profit_time);
-        storage.has_dynamic_fees.write(has_dynamic_fees);
  
         log(SetFees {
-            tax_basis_points,
-            stable_tax_basis_points,
             mint_burn_fee_basis_points,
             margin_fee_basis_points,
             liquidation_fee,
-            min_profit_time,
-            has_dynamic_fees
         });
     }
 
@@ -400,8 +373,6 @@ impl Vault for Contract {
     fn set_asset_config(
         asset: b256,
         asset_decimals: u32,
-        asset_weight: u64,
-        min_profit_bps: u64,
     ) {
         _only_gov();
 
@@ -411,22 +382,12 @@ impl Vault for Contract {
             storage.all_whitelisted_assets.push(asset);
         }
 
-        let total_asset_weights = 
-            storage.total_asset_weights.read() - 
-            storage.asset_weights.get(asset).try_read().unwrap_or(0);
-
         storage.whitelisted_assets.insert(asset, true);
         storage.asset_decimals.insert(asset, asset_decimals);
-        storage.asset_weights.insert(asset, asset_weight);
-        storage.min_profit_basis_points.insert(asset, min_profit_bps);
-
-        storage.total_asset_weights.write(total_asset_weights + asset_weight);
 
         log(SetAssetConfig {
             asset,
             asset_decimals,
-            asset_weight,
-            min_profit_bps,
         });
     }
 
@@ -439,14 +400,8 @@ impl Vault for Contract {
             Error::VaultAssetNotWhitelisted
         );
 
-        // `asset_weights` is guaranteed to have a value, hence no need to gracefully unwrap
-        let prev_asset_weight = storage.asset_weights.get(asset).read();
-        storage.total_asset_weights.write(storage.total_asset_weights.read() - prev_asset_weight);
-
         storage.whitelisted_assets.remove(asset);
         storage.asset_decimals.remove(asset);
-        storage.asset_weights.remove(asset);
-        storage.min_profit_basis_points.remove(asset);
 
         storage.whitelisted_asset_count.write(storage.whitelisted_asset_count.read() - 1);
 
@@ -484,19 +439,6 @@ impl Vault for Contract {
         _only_gov();
 
         _withdraw_fees(receiver)
-    }
-
-    #[storage(read)]
-    fn upgrade_vault(new_vault: ContractId, asset: AssetId, amount: u64) {
-        _only_gov();
-
-        transfer_assets(
-            asset,
-            Identity::ContractId(new_vault),
-            amount
-        );
-
-        log(UpgradeVault { new_vault, asset, amount });
     }
 
     /*
@@ -616,21 +558,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn usd_to_asset_max(asset: b256, usd_amount: u256) -> u256 {
-        _usd_to_asset_max(asset, usd_amount)
-    }
-
-    #[storage(read)]
-    fn usd_to_asset_min(asset: b256, usd_amount: u256) -> u256 {
-        _usd_to_asset_min(asset, usd_amount)
-    }
-
-    #[storage(read)]
-    fn usd_to_asset(asset: b256, usd_amount: u256, price: u256) -> u256 {
-        _usd_to_asset(asset, usd_amount, price)
-    }
-
-    #[storage(read)]
     fn get_pool_amounts(asset: b256) -> u256 {
         storage.pool_amounts.get(asset).try_read().unwrap_or(0)
     }
@@ -648,11 +575,6 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_buffer_amounts(asset: b256) -> u256 {
         storage.buffer_amounts.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
-    fn get_asset_weights(asset: b256) -> u64 {
-        storage.asset_weights.get(asset).try_read().unwrap_or(0)
     }
 
     #[storage(read)]
@@ -718,7 +640,6 @@ impl Vault for Contract {
         asset: b256,
         lp_asset_delta: u256,
         fee_basis_points: u256,
-        tax_basis_points: u256,
         increment: bool
     ) -> u256 {
         fee_basis_points
@@ -730,16 +651,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_tax_basis_points() -> u64 {
-        storage.tax_basis_points.read()
-    }
-
-    #[storage(read)]
-    fn get_stable_tax_basis_points() -> u64 {
-        storage.stable_tax_basis_points.read()
-    }
-
-    #[storage(read)]
     fn get_mint_burn_fee_basis_points() -> u64 {
         storage.mint_burn_fee_basis_points.read()
     }
@@ -747,16 +658,6 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_margin_fee_basis_points() -> u64 {
         storage.margin_fee_basis_points.read()
-    }
-
-    #[storage(read)]
-    fn get_min_profit_time() -> u64 {
-        storage.min_profit_time.read()
-    }
-
-    #[storage(read)]
-    fn get_has_dynamic_fees() -> bool {
-        storage.has_dynamic_fees.read()
     }
 
     #[storage(read)]
@@ -879,7 +780,6 @@ impl Vault for Contract {
             size_delta,
             is_long,
             receiver,
-            true
         );
 
         _end_non_reentrant(storage.lock);
@@ -925,22 +825,11 @@ fn _only_gov() {
  
 
 fn _transfer_in(asset: AssetId) -> u64 {
-    let amount = msg_amount();
-    if amount > 0 {
-        require(
-            msg_asset_id() == asset,
-            Error::VaultInvalidAssetForwarded
-        );
-
-        // transfer assets to the Vault
-        transfer_assets(
-            asset,
-            Identity::ContractId(ContractId::this()),
-            amount
-        );
-    }
-
-    amount
+    require(
+        msg_asset_id() == asset,
+        Error::VaultInvalidAssetForwarded
+    );
+    msg_amount()
 }
 
 fn _transfer_out(
@@ -1036,45 +925,6 @@ fn _collect_swap_fees(
 }
 
 #[storage(read)]
-fn _usd_to_asset_max(asset: b256, usd_amount: u256) -> u256 {
-    if usd_amount == 0 {
-        return 0;
-    }
-
-    // TODO price function changed
-    // @notice this is CORRECT (asset_max -> get_min_price)
-    let price = _get_min_price(asset);
-
-    _usd_to_asset(asset, usd_amount, price)
-}
-
-#[storage(read)]
-fn _usd_to_asset_min(asset: b256, usd_amount: u256) -> u256 {
-    if usd_amount == 0 {
-        return 0;
-    }
-
-    // TODO price function changed
-    // @notice this is CORRECT (asset_min -> get_max_price)
-    let price = _get_max_price(asset);
-
-    _usd_to_asset(asset, usd_amount, price)
-}
-
-#[storage(read)]
-fn _usd_to_asset(asset: b256, usd_amount: u256, price: u256) -> u256 {
-    require(price != 0, Error::VaultPriceQueriedIsZero);
-
-    if usd_amount == 0 {
-        return 0;
-    }
-
-    let decimals = storage.asset_decimals.get(asset).try_read().unwrap_or(0);
-
-    (usd_amount * 10.pow(decimals).as_u256()) / price
-}
-
-#[storage(read)]
 /// price in the collateral
 fn _get_max_price(asset: b256) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
@@ -1160,7 +1010,6 @@ fn _validate_liquidation(
     is_long: bool,
     should_raise: bool,
 ) -> (u256, u256) {
-    let collateral_asset = COLLATERAL_ASSET;
     let position_key = _get_position_key(
         account, 
         index_asset, 
@@ -1235,6 +1084,7 @@ fn _validate_liquidation(
     return (0, margin_fees);
 }
 
+// TODO do we need this?
 #[storage(read)]
 fn _get_global_short_delta(asset: b256) -> (bool, u256) {
     let size = _get_global_short_sizes(asset);
@@ -1267,41 +1117,20 @@ fn _get_delta(
 ) -> (bool, u256) {
     require(average_price > 0, Error::VaultInvalidAveragePrice);
 
-    // TODO price function changed
     let price = if is_long {
         _get_min_price(index_asset)
     } else {
         _get_max_price(index_asset)
     };
 
-    let price_delta = if average_price > price {
-        average_price - price
+    let (has_profit, price_delta) = if price > average_price {
+        (is_long, price - average_price)
     } else {
-        price - average_price
+        (!is_long, average_price - price)
     };
 
-    let mut delta = size * price_delta / average_price;
-
-    let mut has_profit = false;
-    if is_long {
-        has_profit = price > average_price;
-    } else {
-        has_profit = average_price > price;
-    }
-
-    // if the minProfitTime has passed then there will be no min profit threshold
-    // the min profit threshold helps to prevent front-running issues
-    let min_bps = if get_unix_timestamp() > last_increased_time + storage.min_profit_time.read() {
-        0
-    } else {
-        storage.min_profit_basis_points.get(index_asset).try_read().unwrap_or(0)
-    };
-
-    if has_profit
-        && (delta * BASIS_POINTS_DIVISOR.as_u256()) <= (size * min_bps.as_u256())
-    {
-        delta = 0;
-    }
+    // TODO overflow check
+    let delta = size * price_delta / average_price;
 
     (has_profit, delta)
 }
@@ -1602,12 +1431,11 @@ fn _get_next_average_price(
     );
 
     let next_size = size + size_delta;
-    let mut divisor = 0;
-    if is_long {
-        divisor = if has_profit { next_size + delta } else { next_size - delta }
+    let divisor = if is_long {
+        if has_profit { next_size + delta } else { next_size - delta }
     } else {
-        divisor = if has_profit { next_size - delta } else { next_size + delta }
-    }
+        if has_profit { next_size - delta } else { next_size + delta }
+    };
 
     next_price * next_size / divisor
 }
@@ -1673,7 +1501,7 @@ fn _collect_margin_fees(
     _write_fee_reserve(new_fee_reserve);
 
     log(CollectMarginFees {
-        fee_assets,
+        margin_fees: fee_assets,
     });
 
     fee_assets
@@ -1872,7 +1700,6 @@ fn _increase_position(
     );
 
     _validate_router(account);
-    let collateral_asset = COLLATERAL_ASSET;
     _validate_assets(index_asset, is_long);
 
     _update_cumulative_funding_rate();
@@ -1939,7 +1766,7 @@ fn _increase_position(
         is_long
     );
     position.size = position.size + size_delta;
-    position.last_increased_time = get_unix_timestamp();
+    position.last_increased_time = timestamp();
 
     require(
         position.size > 0,
@@ -1996,18 +1823,12 @@ fn _decrease_position(
     size_delta: u256,
     is_long: bool,
     receiver: Identity,
-    should_validate_router: bool,
 ) -> u256 {
     require(
         !account.is_zero(),
         Error::VaultAccountCannotBeZero
     );
 
-    if should_validate_router {
-        _validate_router(account);
-    }
-
-    let collateral_asset = COLLATERAL_ASSET;
     _update_cumulative_funding_rate();
 
     let position_key = _get_position_key(
@@ -2022,7 +1843,7 @@ fn _decrease_position(
 
     let collateral = position.collateral;
 
-    let (usd_out, usd_out_after_fee) = _reduce_collateral(
+    let (collateral_out, collateral_out_after_fee) = _reduce_collateral(
         account,
         index_asset,
         collateral_delta,
@@ -2062,10 +1883,8 @@ fn _decrease_position(
             size_delta,
             is_long,
             price,
-            fee: usd_out - usd_out_after_fee,
+            fee: collateral_out - collateral_out_after_fee,
         });
-
-        _write_position(position_key, position);
     } else {
         let price = if is_long {
             _get_min_price(index_asset)
@@ -2081,7 +1900,7 @@ fn _decrease_position(
             size_delta,
             is_long,
             price,
-            fee: usd_out - usd_out_after_fee,
+            fee: collateral_out - collateral_out_after_fee,
         });
         log(ClosePosition {
             key: position_key,
@@ -2098,27 +1917,20 @@ fn _decrease_position(
             position_key,
             position: Position::default(),
         });
-        position = _get_position_by_key(position_key);
     }
 
     _decrease_global_short_size(index_asset, size_delta);
 
-    if usd_out > 0 {
-        let amount_out_after_fees = _usd_to_asset_min(collateral_asset, usd_out_after_fee);
- 
+    if collateral_out_after_fee > 0 {
         // @TODO: potential revert here
         _transfer_out(
             COLLATERAL_ASSET_ID, 
-            u64::try_from(amount_out_after_fees).unwrap(), 
+            u64::try_from(collateral_out_after_fee).unwrap(), 
             receiver,
         );
-        
-        _write_position(position_key, position);
-
-        return amount_out_after_fees;
     }
 
-    0
+    collateral_out_after_fee
 }
 
 #[storage(read, write)]
@@ -2157,51 +1969,52 @@ fn _reduce_collateral(
     let adjusted_delta = size_delta * delta / position.size;
 
     // transfer profits out
-    let mut usd_out = 0;
+    let mut collateral_out = 0;
     if adjusted_delta > 0 {
         if has_profit {
-            usd_out = adjusted_delta;
+            collateral_out = adjusted_delta;
             position.realized_pnl = position.realized_pnl + Signed256::from(adjusted_delta);
 
-            // pay out realized profits from the pool amount for short positions
-            let token_amount = _usd_to_asset_min(collateral_asset, adjusted_delta);
-            _decrease_pool_amount(token_amount);
+            // TODO is this correct?
+            _decrease_pool_amount(adjusted_delta);
         } else {
             position.collateral = position.collateral - adjusted_delta;
+
+            position.realized_pnl = position.realized_pnl - Signed256::from(adjusted_delta);
 
             // transfer realized losses to the pool for short positions
             // realized losses for long positions are not transferred here as
             // _increasePoolAmount was already called in increasePosition for longs
-            let token_amount = _usd_to_asset_min(collateral_asset, adjusted_delta);
-            _increase_pool_amount(token_amount);
-
-            position.realized_pnl = position.realized_pnl - Signed256::from(adjusted_delta);
+            // TODO is this correct?
+            _increase_pool_amount(adjusted_delta);
         }
     }
 
     // reduce the position's collateral by _collateralDelta
     // transfer _collateralDelta out
     if collateral_delta > 0 {
-        usd_out += collateral_delta;
+        collateral_out += collateral_delta;
         position.collateral = position.collateral - collateral_delta;
     }
 
+    // TODO maybe combine this with the above? to enable position closure?
     // if the position will be closed, then transfer the remaining collateral out
     if position.size == size_delta {
-        usd_out += position.collateral;
+        collateral_out += position.collateral;
 
         position.collateral = 0;
     }
 
     // if the usdOut is more than the fee then deduct the fee from the usdOut directly
     // else deduct the fee from the position's collateral
-    let mut usd_out_after_fee = usd_out;
-    if usd_out > fee {
-        usd_out_after_fee = usd_out - fee;
+    let mut collateral_out_after_fee = collateral_out;
+    if collateral_out >= fee {
+        collateral_out_after_fee = collateral_out - fee;
     } else {
+        collateral_out_after_fee = 0;
         // @notice: in some cases when a position is opened for too long, and when attempting to close this, collateral is ZERO (see above), so subtracting fee throws
         // an ArithmeticOverflow
-        position.collateral = position.collateral - fee;
+        position.collateral = position.collateral - (fee - collateral_out);
     }
 
     _write_position(position_key, position);
@@ -2211,7 +2024,7 @@ fn _reduce_collateral(
         has_profit,
         delta: adjusted_delta,
     });
-    (usd_out, usd_out_after_fee)
+    (collateral_out, collateral_out_after_fee)
 }
 
 #[storage(read, write)]
@@ -2264,19 +2077,9 @@ fn _liquidate_position(
             position.size,
             is_long,
             account,
-            false,
         );
         return;
     }
-
-    let fee_assets = _usd_to_asset_min(collateral_asset, margin_fees);
-    _write_fee_reserve(
-        _get_fee_reserve() + fee_assets
-    );
-
-    log(CollectMarginFees {
-        fee_assets,
-    });
 
     let mark_price = if is_long {
         _get_min_price(index_asset)
@@ -2295,26 +2098,43 @@ fn _liquidate_position(
         mark_price,
     });
 
-    if margin_fees < position.collateral {
-        let remaining_collateral = position.collateral - margin_fees;
-        _increase_pool_amount(
-            _usd_to_asset_min(collateral_asset, remaining_collateral)
-        );
-    }
-
     _decrease_global_short_size(index_asset, position.size);
 
     storage.positions.remove(position_key);
 
-    let liquidation_fee = storage.liquidation_fee.try_read().unwrap_or(0);
+    let mut remaining_collateral = position.collateral;
+    let mut liquidation_fee = storage.liquidation_fee.try_read().unwrap_or(0);
+    if liquidation_fee > remaining_collateral {
+        liquidation_fee = remaining_collateral;
+    }
+    remaining_collateral = remaining_collateral - liquidation_fee;
+    let available_margin_fees = if margin_fees > remaining_collateral {
+        remaining_collateral
+    } else {
+        margin_fees
+    };
+    remaining_collateral = remaining_collateral - available_margin_fees;
 
-    // pay the fee receiver using the pool, we assume that in general the liquidated amount should be sufficient to cover
-    // the liquidation fees
-    _decrease_pool_amount(liquidation_fee);
-    _transfer_out(
-        COLLATERAL_ASSET_ID, 
-        // @TODO: potential revert here
-        u64::try_from(liquidation_fee).unwrap(),
-        fee_receiver,
-    );
+    if available_margin_fees > 0 {
+        _write_fee_reserve(
+            _get_fee_reserve() + available_margin_fees
+        );
+    }
+    log(CollectMarginFees {
+        margin_fees: available_margin_fees,
+    });
+
+    if remaining_collateral > 0 {
+        _increase_pool_amount(remaining_collateral);
+    }
+
+    // pay the fee receiver using the pool
+    if liquidation_fee > 0 {
+        _transfer_out(
+            COLLATERAL_ASSET_ID, 
+            // @TODO: potential revert here
+            u64::try_from(liquidation_fee).unwrap(),
+            fee_receiver,
+        );
+    }
 }

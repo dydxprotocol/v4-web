@@ -27,8 +27,6 @@ pub struct SetApprovedRouter {
 pub struct SetAssetConfig {
     pub asset: b256,
     pub asset_decimals: u32,
-    pub asset_weight: u64,
-    pub min_profit_bps: u64,
 }
 
 pub struct ClearAssetConfig {
@@ -36,13 +34,9 @@ pub struct ClearAssetConfig {
 }
 
 pub struct SetFees {
-    pub tax_basis_points: u64,
-    pub stable_tax_basis_points: u64,
     pub mint_burn_fee_basis_points: u64,
     pub margin_fee_basis_points: u64,
     pub liquidation_fee: u256,
-    pub min_profit_time: u64,
-    pub has_dynamic_fees: bool
 }
 
 pub struct WriteLastFundingTime {
@@ -162,7 +156,7 @@ pub struct UpdatePnl {
 }
 
 pub struct CollectMarginFees {
-    pub fee_assets: u256,
+    pub margin_fees: u256,
 }
 
 pub struct SetFundingRateInfo {
@@ -199,10 +193,4 @@ pub struct WriteReservedAmount {
 pub struct WriteGuaranteedAmount {
     pub asset: b256,
     pub guaranteed_amount: u256,
-}
-
-pub struct UpgradeVault {
-    pub new_vault: ContractId,
-    pub asset: AssetId,
-    pub amount: u64,
 }

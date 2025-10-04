@@ -66,13 +66,9 @@ describe("Vault.touch", () => {
 
         await call(
             vault.functions.set_fees(
-                50, // tax_basis_points
-                20, // stable_tax_basis_points
                 30, // mint_burn_fee_basis_points
                 10, // margin_fee_basis_points
                 expandDecimals(5), // liquidation_fee_usd
-                60 * 60, // min_profit_time
-                false, // has_dynamic_fees
             ),
         )
 
