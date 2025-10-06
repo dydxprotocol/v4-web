@@ -162,6 +162,7 @@ const useAccountsContext = () => {
       hdKeyManager.setHdkey(wallet.address, key);
       setLocalDydxWallet(wallet);
       setHdKey(key);
+      return wallet.address;
     },
     [getWalletFromSignature]
   );

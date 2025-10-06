@@ -192,7 +192,7 @@ const useTurnkeyWalletContext = () => {
       tkClient,
     }: {
       salt?: string;
-      setWalletFromSignature: (signature: string) => Promise<void>;
+      setWalletFromSignature: (signature: string) => Promise<string | undefined>;
       tkClient?: TurnkeyIndexedDbClient;
     }) => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
@@ -231,7 +231,8 @@ const useTurnkeyWalletContext = () => {
         dispatch(setSavedEncryptedSignature(encryptedSignature));
       }
 
-      await setWalletFromSignature(signature);
+      const dydxAddress = await setWalletFromSignature(signature);
+      return dydxAddress;
     },
     [
       dispatch,
