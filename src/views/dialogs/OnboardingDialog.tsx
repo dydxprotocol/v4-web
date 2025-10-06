@@ -278,10 +278,10 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
       width &&
       css`
         --dialog-width: ${width};
+        --dialog-header-backgroundColor: var(--color-layer-3);
       `}
   }
 
-  --dialog-header-backgroundColor: var(--color-layer-3);
   --dialog-icon-size: 1.25rem;
 `;
 
