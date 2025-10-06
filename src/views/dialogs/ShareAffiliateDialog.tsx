@@ -74,7 +74,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const affiliateInputRef = useRef<HTMLInputElement>(null);
-  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   const maxEarning = maxEarningData?.maxEarning;
 
@@ -150,19 +149,12 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     updateReferralCodeMutate(editableReferralCode);
   }, [editableReferralCode, updateReferralCodeMutate]);
 
-  const handleCancelEdit = useCallback(
-    (e?: React.FocusEvent<HTMLInputElement>) => {
-      if (e?.relatedTarget === confirmButtonRef.current) {
-        return;
-      }
-
-      setEditableReferralCode(data?.metadata?.referralCode ?? '');
-      setIsEditMode(false);
-      setUpdateError(null);
-      setValidationError(null);
-    },
-    [data?.metadata?.referralCode]
-  );
+  const handleCancelEdit = useCallback(() => {
+    setEditableReferralCode(data?.metadata?.referralCode ?? '');
+    setIsEditMode(false);
+    setUpdateError(null);
+    setValidationError(null);
+  }, [data?.metadata?.referralCode]);
 
   const handleReferralInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
@@ -273,9 +265,9 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             action={ButtonAction.Destroy}
             shape={ButtonShape.Square}
             state={{ isDisabled: isUpdatingReferralCode }}
+            onClick={handleCancelEdit}
           />
           <IconButton
-            ref={confirmButtonRef}
             iconName={IconName.Check}
             size={ButtonSize.Small}
             onClick={handleConfirmEdit}
@@ -294,6 +286,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
   }, [
     affiliatesUrl,
     editableReferralCode.length,
+    handleCancelEdit,
     handleConfirmEdit,
     isEditMode,
     isUpdatingReferralCode,
@@ -334,7 +327,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
                   disabled={!isEditMode}
                   $backgroundColorOverride="transparent"
                   $withEllipsis
-                  onBlur={handleCancelEdit}
                 />
               </div>
               <ActionButtonsElement />

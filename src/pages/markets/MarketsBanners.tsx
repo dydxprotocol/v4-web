@@ -129,9 +129,6 @@ export const MarketsBanners = ({
           >
             {stringGetter({ key: STRING_KEYS.GET_STARTED })}
           </Button>
-          <span tw="text-color-text-2 font-base-book">
-            {stringGetter({ key: STRING_KEYS.REBATE_BANNER_SUBTITLE })}
-          </span>
         </div>
       </div>
 

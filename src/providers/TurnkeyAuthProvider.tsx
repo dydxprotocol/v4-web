@@ -27,7 +27,6 @@ import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog, openDialog } from '@/state/dialogs';
 import {
-  clearTurnkeyEmailOnboardingData,
   setRequiresAddressUpload,
   setTurnkeyEmailOnboardingData,
   setWalletInfo,
@@ -163,12 +162,12 @@ const useTurnkeyAuthContext = () => {
           throw new Error('Current unsupported login method');
       }
     },
-    onError: (error, variables) => {
+    onError: async (error, variables) => {
       selectWallet(undefined);
       setEmailSignInStatus('error');
       const { errorMessage, shouldLog } = parseTurnkeyError(error.message, stringGetter);
       setEmailSignInError(errorMessage);
-      endTurnkeySession();
+      await endTurnkeySession();
 
       if (shouldLog) {
         logBonsaiError('TurnkeyOnboarding', 'Error during sign-in', { error });
@@ -366,7 +365,7 @@ const useTurnkeyAuthContext = () => {
             })
         );
 
-        endTurnkeySession();
+        await endTurnkeySession();
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
@@ -374,8 +373,6 @@ const useTurnkeyAuthContext = () => {
         // Remove the token from the search params after it has been saved to state
         searchParams.delete('token');
         setSearchParams(searchParams);
-        // Clear email sign in data
-        dispatch(clearTurnkeyEmailOnboardingData());
       }
     },
     [
@@ -387,7 +384,6 @@ const useTurnkeyAuthContext = () => {
       setWalletFromSignature,
       searchParams,
       setSearchParams,
-      dispatch,
       stringGetter,
       endTurnkeySession,
     ]
@@ -460,7 +456,6 @@ const useTurnkeyAuthContext = () => {
       return response;
     },
     onError: (error, variables) => {
-      dispatch(setRequiresAddressUpload(true));
       track(
         AnalyticsEvents.UploadAddressError({
           dydxAddress: variables.payload.dydxAddress,
@@ -494,7 +489,11 @@ const useTurnkeyAuthContext = () => {
           dispatch(setRequiresAddressUpload(true));
         }
       } catch (error) {
-        logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
+        if ((error.message ?? '').includes('Dydx address already uploaded')) {
+          dispatch(setRequiresAddressUpload(false));
+        } else {
+          logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
+        }
       }
     },
     [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
