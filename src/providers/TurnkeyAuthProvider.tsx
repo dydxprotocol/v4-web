@@ -456,7 +456,6 @@ const useTurnkeyAuthContext = () => {
       return response;
     },
     onError: (error, variables) => {
-      dispatch(setRequiresAddressUpload(true));
       track(
         AnalyticsEvents.UploadAddressError({
           dydxAddress: variables.payload.dydxAddress,
@@ -490,7 +489,11 @@ const useTurnkeyAuthContext = () => {
           dispatch(setRequiresAddressUpload(true));
         }
       } catch (error) {
-        logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
+        if ((error.message ?? '').includes('Dydx address already uploaded')) {
+          dispatch(setRequiresAddressUpload(false));
+        } else {
+          logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
+        }
       }
     },
     [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
