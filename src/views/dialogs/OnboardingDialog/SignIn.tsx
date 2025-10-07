@@ -4,19 +4,27 @@ import { logBonsaiError } from '@/bonsai/logs';
 import { useTurnkey } from '@turnkey/sdk-react';
 import styled, { css } from 'styled-components';
 
+import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
 
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
+import breakpoints from '@/styles/breakpoints';
+
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
+import { WalletIcon } from '@/components/WalletIcon';
 
 import { useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/appUiConfigs';
@@ -30,10 +38,12 @@ import { GoogleAuth } from './AuthButtons/GoogleAuth';
 
 export const SignIn = ({
   onDisplayChooseWallet,
+  onChooseWallet,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
   onSubmitEmail,
 }: {
+  onChooseWallet: (wallet: WalletInfo) => void;
   onDisplayChooseWallet: () => void;
   onSignInWithPasskey: () => void;
   onSubmitEmail: ({ userEmail }: { userEmail: string }) => void;
@@ -45,6 +55,8 @@ export const SignIn = ({
   const { signInWithOtp } = useTurnkeyAuth();
   const appTheme = useAppSelector(getAppTheme);
   const { tos, privacy } = useURLConfigs();
+  const displayedWallets = useDisplayedWallets();
+  const { selectedWallet, selectedWalletError } = useAccounts();
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,6 +75,25 @@ export const SignIn = ({
   );
 
   const hasValidEmail = isValidEmail(email);
+
+  const walletError = selectedWallet && selectedWalletError && (
+    <$AlertMessage type={AlertType.Error}>
+      <h4>
+        {stringGetter({
+          key: STRING_KEYS.COULD_NOT_CONNECT,
+          params: {
+            WALLET:
+              selectedWallet.connectorType === ConnectorType.Injected
+                ? selectedWallet.name
+                : stringGetter({
+                    key: wallets[selectedWallet.name as keyof typeof wallets].stringKey,
+                  }),
+          },
+        })}
+      </h4>
+      {selectedWalletError}
+    </$AlertMessage>
+  );
 
   return (
     <form onSubmit={onSubmit} tw="flexColumn gap-1.25">
@@ -121,6 +152,23 @@ export const SignIn = ({
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton> */}
 
+        {displayedWallets
+          .filter((wallet) => wallet.connectorType === ConnectorType.Injected)
+          .map((wallet) => (
+            <$OtherOptionButton
+              key={wallet.name}
+              type={ButtonType.Button}
+              action={ButtonAction.Base}
+              size={ButtonSize.BasePlus}
+              onClick={() => onChooseWallet(wallet)}
+            >
+              <div tw="row gap-0.5">
+                <WalletIcon wallet={wallet} />
+                {wallet.name}
+              </div>
+            </$OtherOptionButton>
+          ))}
+
         <$OtherOptionButton
           type={ButtonType.Button}
           action={ButtonAction.Base}
@@ -129,12 +177,14 @@ export const SignIn = ({
         >
           <div tw="row gap-0.5">
             <Icon iconName={IconName.Wallet2} />
-            {stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })}
+            {stringGetter({ key: STRING_KEYS.VIEW_MORE_WALLETS })}
           </div>
 
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton>
       </div>
+
+      {walletError}
 
       <span tw="text-center font-mini-book">
         {stringGetter({
@@ -193,7 +243,17 @@ const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)<{ $isLightM
 
 const $OtherOptionButton = styled(Button)`
   width: 100%;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   justify-content: space-between;
   --icon-size: 1rem;
+
+  @media ${breakpoints.tablet} {
+    border-radius: 1rem;
+  }
+`;
+
+const $AlertMessage = styled(AlertMessage)`
+  h4 {
+    font: var(--font-small-medium);
+  }
 `;
