@@ -15,6 +15,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
+import breakpoints from '@/styles/breakpoints';
+
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
@@ -241,9 +243,13 @@ const $HorizontalSeparatorFiller = styled(HorizontalSeparatorFiller)<{ $isLightM
 
 const $OtherOptionButton = styled(Button)`
   width: 100%;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   justify-content: space-between;
   --icon-size: 1rem;
+
+  @media ${breakpoints.tablet} {
+    border-radius: 1rem;
+  }
 `;
 
 const $AlertMessage = styled(AlertMessage)`
