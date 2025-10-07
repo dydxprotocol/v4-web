@@ -6,7 +6,6 @@ import { AccountAuthenticator } from '@/constants/validators';
 import {
   IndexerFundingPaymentResponseObject,
   IndexerHistoricalBlockTradingReward,
-  IndexerHistoricalTradingRewardAggregation,
 } from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
@@ -24,12 +23,6 @@ import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { useFundingPayments } from './rest/fundingPayments';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
-import {
-  useDailyCumulativeTradingRewards,
-  useHistoricalTradingRewards,
-  useHistoricalTradingRewardsWeekly,
-  useTotalTradingRewards,
-} from './rest/historicalTradingRewards';
 import { useAuthorizedAccounts } from './rest/permissionedKeys';
 import {
   StakingDelegationsResult,
@@ -112,7 +105,6 @@ import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from './types/rawTypes';
 import {
   AccountBalances,
-  AggregatedTradingReward,
   AllAssetData,
   ApiState,
   AssetData,
@@ -421,11 +413,7 @@ interface BonsaiHooksShape {
   useAuthorizedAccounts: () => Loadable<AccountAuthenticator[]>;
   useCurrentMarketHistoricalFunding: () => Loadable<HistoricalFundingObject[]>;
   useCurrentMarketLiveTrades: () => Loadable<IndexerWsTradesUpdateObject>;
-  useDailyCumulativeTradingRewards: () => Loadable<AggregatedTradingReward[]>;
-  useHistoricalTradingRewards: () => Loadable<IndexerHistoricalTradingRewardAggregation[]>;
-  useHistoricalTradingRewardsWeekly: () => Loadable<BigNumber>;
   useParentSubaccountHistoricalPnls: () => Loadable<SubaccountPnlTick[]>;
-  useTotalTradingRewards: () => Loadable<BigNumber>;
   useStakingRewards: () => Loadable<StakingRewards>;
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
   useStakingDelegations: () => Loadable<StakingDelegationsResult>;
@@ -436,13 +424,9 @@ export const BonsaiHooks: BonsaiHooksShape = {
   useAuthorizedAccounts,
   useCurrentMarketHistoricalFunding,
   useCurrentMarketLiveTrades: useCurrentMarketTradesValue,
-  useDailyCumulativeTradingRewards,
-  useHistoricalTradingRewards,
   useFundingPayments,
-  useHistoricalTradingRewardsWeekly,
   useParentSubaccountHistoricalPnls,
   useStakingRewards,
-  useTotalTradingRewards,
   useUnbondingDelegations,
   useStakingDelegations,
 };

@@ -25,7 +25,6 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
-import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
 import { StakingPanel } from './StakingPanel';
@@ -77,7 +76,6 @@ const RewardsPage = () => {
             <StakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
-            <RewardHistoryPanel />
             <RewardsHelpPanel />
             {legalDisclaimer}
           </$DetachedSection>
@@ -88,7 +86,6 @@ const RewardsPage = () => {
             <div tw="flexColumn flex-[2] gap-1.5">
               <LaunchIncentivesPanel />
               <RewardsLeaderboardPanel />
-              <RewardHistoryPanel />
             </div>
             <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
