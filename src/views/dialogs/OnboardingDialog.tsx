@@ -170,6 +170,7 @@ export const OnboardingDialog = ({
             children: (
               <$Content>
                 <SignIn
+                  onChooseWallet={onChooseWallet}
                   onDisplayChooseWallet={onDisplayChooseWallet}
                   onSignInWithPasskey={onSignInWithPasskey}
                   onSubmitEmail={({ userEmail }: { userEmail: string }) =>
@@ -278,6 +279,10 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
       css`
         --dialog-width: ${width};
       `}
+  }
+
+  @media ${breakpoints.notTablet} {
+    --dialog-header-backgroundColor: var(--color-layer-3);
   }
 
   --dialog-icon-size: 1.25rem;
