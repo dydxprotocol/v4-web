@@ -175,7 +175,7 @@ export const SignIn = ({
         >
           <div tw="row gap-0.5">
             <Icon iconName={IconName.Wallet2} />
-            {stringGetter({ key: STRING_KEYS.OTHER_WALLET })}
+            {stringGetter({ key: STRING_KEYS.VIEW_MORE_WALLETS })}
           </div>
 
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
