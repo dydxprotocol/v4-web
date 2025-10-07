@@ -13,6 +13,7 @@ import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountOrder } from '@/bonsai/types/summaryTypes';
 import { IndexedTx } from '@cosmjs/stargate';
+import { Method } from '@cosmjs/tendermint-rpc';
 import {
   CompositeClient,
   LocalWallet,
@@ -31,6 +32,7 @@ import {
   TransactionMemo,
 } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
   POST_TRANSFER_PLACE_ORDER_DELAY,
@@ -79,6 +81,12 @@ interface TransactionSupervisorShared {
   compositeClientManager: typeof CompositeClientManager;
   stateNotifier: StateConditionNotifier;
 }
+
+const selectOrdersAndFills = createAppSelector(
+  BonsaiCore.account.allOrders.data,
+  BonsaiCore.account.fills.data,
+  (orders, fills) => ({ orders, fills })
+);
 
 interface CancelOrderPayload {
   clientId: number;
@@ -407,6 +415,9 @@ export class AccountTransactionSupervisor {
   }
 
   private async executePlaceOrder(payload: PlaceOrderPayload): Promise<OperationResult<any>> {
+    const totalTimer = startTimer();
+    const afterSubmitTimer = createTimer();
+
     const placeOrderResult = await this.wrapOperation(
       'AccountTransactionSupervisor/placeOrder',
       payload,
@@ -459,7 +470,8 @@ export class AccountTransactionSupervisor {
           marketInfo ?? undefined,
           currentHeight ?? undefined,
           goodTilBlock ?? undefined,
-          memo
+          memo,
+          Method.BroadcastTxSync
         );
 
         if ((tx as IndexedTx | undefined)?.code !== 0) {
@@ -486,6 +498,43 @@ export class AccountTransactionSupervisor {
           clientId: `${payload.clientId}`,
           errorParams: operationFailureToErrorParams(placeOrderResult),
         })
+      );
+    }
+
+    // Log market order fills
+    if (isOperationSuccess(placeOrderResult) && payload.type === OrderType.MARKET) {
+      afterSubmitTimer.start();
+      this.shared.stateNotifier.notifyWhenTrue(
+        selectOrdersAndFills,
+        ({ orders, fills }) => {
+          const matchingOrder = orders.find((order) => order.clientId === `${payload.clientId}`);
+          if (matchingOrder?.id == null) {
+            return undefined;
+          }
+
+          const matchingFill = fills.find((fill) => fill.orderId === matchingOrder.id);
+          if (matchingFill != null) {
+            return { order: matchingOrder, fill: matchingFill };
+          }
+
+          return undefined;
+        },
+        (result) => {
+          if (result != null) {
+            logBonsaiInfo('AccountTransactionSupervisor/placeOrder', 'Market order filled', {
+              payload,
+              order: purgeBigNumbers(result.order),
+              fill: purgeBigNumbers(result.fill),
+              totalTimeToFill: totalTimer.elapsed(),
+              timeToFillAfterSubmit: afterSubmitTimer.elapsed(),
+            });
+          } else {
+            logBonsaiInfo('AccountTransactionSupervisor/placeOrder', 'Market order never filled', {
+              payload,
+            });
+          }
+        },
+        10 * timeUnits.second
       );
     }
 
@@ -1193,7 +1242,8 @@ export class AccountTransactionSupervisor {
                   cancelRawOrderPayloads,
                   transferToSubaccountPayload,
                   payload.placePayloads,
-                  TransactionMemo.placeOrder
+                  TransactionMemo.placeOrder,
+                  Method.BroadcastTxSync
                 );
 
                 if ((tx as IndexedTx | undefined)?.code !== 0) {

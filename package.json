@@ -54,7 +54,7 @@
     "@cosmjs/stargate": "^0.32.1",
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@datadog/browser-logs": "^5.23.3",
-    "@dydxprotocol/v4-client-js": "3.0.3",
+    "@dydxprotocol/v4-client-js": "3.0.5",
     "@dydxprotocol/v4-localization": "1.1.334",
     "@dydxprotocol/v4-proto": "^7.0.0-dev.0",
     "@emotion/is-prop-valid": "^1.3.0",
