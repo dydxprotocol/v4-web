@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.23.3
   '@dydxprotocol/v4-client-js':
-    specifier: 3.0.3
-    version: 3.0.3
+    specifier: 3.0.5
+    version: 3.0.5
   '@dydxprotocol/v4-localization':
     specifier: 1.1.332
     version: 1.1.332
@@ -1160,6 +1160,7 @@ packages:
 
   /@cosmjs/crypto@0.27.1:
     resolution: {integrity: sha512-vbcxwSt99tIYJg8Spp00wc3zx72qx+pY3ozGuBN8gAvySnagK9dQ/jHwtWQWdammmdD6oW+75WfIHZ+gNa+Ybg==}
+    deprecated: This uses elliptic for cryptographic operations, which contains several security-relevant bugs. To what degree this affects your application is something you need to carefully investigate. See https://github.com/cosmos/cosmjs/issues/1708 for further pointers. Starting with version 0.34.0 the cryptographic library has been replaced. However, private keys might still be at risk.
     dependencies:
       '@cosmjs/encoding': 0.27.1
       '@cosmjs/math': 0.27.1
@@ -1175,6 +1176,7 @@ packages:
 
   /@cosmjs/crypto@0.31.3:
     resolution: {integrity: sha512-vRbvM9ZKR2017TO73dtJ50KxoGcFzKtKI7C8iO302BQ5p+DuB+AirUg1952UpSoLfv5ki9O416MFANNg8UN/EQ==}
+    deprecated: This uses elliptic for cryptographic operations, which contains several security-relevant bugs. To what degree this affects your application is something you need to carefully investigate. See https://github.com/cosmos/cosmjs/issues/1708 for further pointers. Starting with version 0.34.0 the cryptographic library has been replaced. However, private keys might still be at risk.
     dependencies:
       '@cosmjs/encoding': 0.31.3
       '@cosmjs/math': 0.31.3
@@ -1494,8 +1496,8 @@ packages:
       '@datadog/browser-core': 5.23.3
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.0.3:
-    resolution: {integrity: sha512-1g0gTHVsEd/GDPeXIGwBfyznAghI4rQm6aO2g1lYuKYOcP2M7UzPhAV0a5ehzqsKyI3eYzsMgeSwX71k38Es0g==}
+  /@dydxprotocol/v4-client-js@3.0.5:
+    resolution: {integrity: sha512-QwMcjSvDKiTxq5o7azHSQdQWQY80pcQAdvepqQaTueZ+Xy0xb5Kd9Ikw6pHW/Cv3TN+BUoX/vL8+ega9uL5nsA==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
