@@ -32,6 +32,7 @@ import {
   TransactionMemo,
 } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 import {
   MARKET_ORDER_MAX_SLIPPAGE,
   POST_TRANSFER_PLACE_ORDER_DELAY,
@@ -521,15 +522,19 @@ export class AccountTransactionSupervisor {
         (result) => {
           if (result != null) {
             logBonsaiInfo('AccountTransactionSupervisor/placeOrder', 'Market order filled', {
-              payload: purgeBigNumbers(payload),
+              payload,
               order: purgeBigNumbers(result.order),
               fill: purgeBigNumbers(result.fill),
               totalTimeToFill: totalTimer.elapsed(),
               timeToFillAfterSubmit: afterSubmitTimer.elapsed(),
             });
+          } else {
+            logBonsaiInfo('AccountTransactionSupervisor/placeOrder', 'Market order never filled', {
+              payload,
+            });
           }
         },
-        10000
+        10 * timeUnits.second
       );
     }
 
