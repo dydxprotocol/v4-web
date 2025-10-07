@@ -13,6 +13,8 @@ import { MAX_SUBACCOUNT_NUMBER, NUM_PARENT_SUBACCOUNTS } from '@/constants/accou
 import { MAJOR_MARKETS } from '@/constants/markets';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
+import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
 import {
@@ -888,14 +890,22 @@ function divideIfNonZeroElse(numerator: number, denominator: number, backup: num
 const RATE_LOST_TO_REV_SHARES = 0.4; // megavault and ops
 const MAX_POSSIBLE_TAKER_REV_SHARE = 0.5; // affiliates
 
+const IS_FEE_REBATE_TIME: boolean = true;
+const FEE_REBATE_PERCENT = OCT_2025_REWARDS_DETAILS.rebateFraction;
+
 function calculateTakerReward(
   usdcSize: number | undefined,
   fee: number | undefined,
   rewardsParams: RewardParamsSummary | undefined,
   feeTiers: FeeTierSummary[] | undefined
 ): number | undefined {
-  const feeMultiplier = rewardsParams?.feeMultiplier;
   const tokenPrice = rewardsParams?.tokenPrice;
+  if (IS_FEE_REBATE_TIME) {
+    return fee != null && tokenPrice != null && tokenPrice > 0
+      ? (fee * FEE_REBATE_PERCENT) / tokenPrice
+      : undefined;
+  }
+  const feeMultiplier = rewardsParams?.feeMultiplier;
   const notional = usdcSize;
   const maxMakerRebate = findMaxMakerRebate(feeTiers);
 
@@ -921,8 +931,13 @@ function calculateMakerReward(
   fee: number | undefined,
   rewardsParams: RewardParamsSummary | undefined
 ): number | undefined {
-  const feeMultiplier = rewardsParams?.feeMultiplier;
   const tokenPrice = rewardsParams?.tokenPrice;
+  if (IS_FEE_REBATE_TIME) {
+    return fee != null && tokenPrice != null && tokenPrice > 0
+      ? (fee * FEE_REBATE_PERCENT) / tokenPrice
+      : undefined;
+  }
+  const feeMultiplier = rewardsParams?.feeMultiplier;
 
   if (fee != null && feeMultiplier != null && tokenPrice != null && fee > 0.0 && tokenPrice > 0.0) {
     return (fee * feeMultiplier * RATE_LOST_TO_REV_SHARES) / tokenPrice;
