@@ -1,8 +1,7 @@
-import { logBonsaiError } from '@/bonsai/logs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { ConnectorType, WalletInfo, WalletNetworkType } from '@/constants/wallets';
+import { WalletInfo, WalletNetworkType } from '@/constants/wallets';
 import { TurnkeyEmailOnboardingData, TurnkeyWallet } from '@/types/turnkey';
 
 export type SourceAccount = {
@@ -69,19 +68,6 @@ export const walletSlice = createSlice({
 
       state.sourceAccount.encryptedSignature = action.payload;
     },
-    setRequiresAddressUpload: (state, action: PayloadAction<boolean>) => {
-      if (state.sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-        state.sourceAccount.walletInfo.requiresAddressUpload = action.payload;
-      } else {
-        logBonsaiError(
-          'WalletState',
-          'Attempting to set a Turnkey specific property on a non-turnkey wallet',
-          {
-            walletInfo: state.sourceAccount.walletInfo,
-          }
-        );
-      }
-    },
     clearSavedEncryptedSignature: (state) => {
       state.sourceAccount.encryptedSignature = undefined;
     },
@@ -140,7 +126,6 @@ export const walletEphemeralSlice = createSlice({
 
 export const {
   setSourceAddress,
-  setRequiresAddressUpload,
   setWalletInfo,
   setSavedEncryptedSignature,
   clearSavedEncryptedSignature,

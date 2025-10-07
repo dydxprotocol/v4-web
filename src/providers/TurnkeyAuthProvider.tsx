@@ -26,11 +26,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog, openDialog } from '@/state/dialogs';
-import {
-  setRequiresAddressUpload,
-  setTurnkeyEmailOnboardingData,
-  setWalletInfo,
-} from '@/state/wallet';
+import { setTurnkeyEmailOnboardingData, setWalletInfo } from '@/state/wallet';
 import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
@@ -74,7 +70,7 @@ const useTurnkeyAuthContext = () => {
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
-  const { dydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
+  const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
   const [emailSignInError, setEmailSignInError] = useState<string>();
@@ -90,6 +86,71 @@ const useTurnkeyAuthContext = () => {
     targetPublicKeys,
     getUploadAddressPayload,
   } = useTurnkeyWallet();
+
+  /* ----------------------------- Upload Address ----------------------------- */
+
+  const { mutateAsync: sendUploadAddressRequest, isPending: isUploadingAddress } = useMutation({
+    mutationFn: async ({
+      payload,
+    }: {
+      payload: { dydxAddress: string; signature: string };
+    }): Promise<{ success: boolean }> => {
+      const body = JSON.stringify(payload);
+
+      const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body,
+      }).then((res) => res.json());
+
+      if (response.errors && Array.isArray(response.errors)) {
+        const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
+        throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
+      }
+
+      // TODO(turnkey): handle policy returned in response
+      return response;
+    },
+    onError: (error, variables) => {
+      track(
+        AnalyticsEvents.UploadAddressError({
+          dydxAddress: variables.payload.dydxAddress,
+          error: error.message,
+        })
+      );
+      logBonsaiError('TurnkeyOnboarding', 'Error posting to upload address', { error });
+    },
+    onSuccess: () => {
+      appQueryClient.invalidateQueries({ queryKey: ['turnkeyWallets'] });
+    },
+  });
+
+  const uploadAddress = useCallback(
+    async ({
+      tkClient,
+      dydxAddress,
+    }: {
+      tkClient?: TurnkeyIndexedDbClient;
+      dydxAddress: string;
+    }) => {
+      try {
+        logBonsaiInfo('TurnkeyOnboarding', 'Attempting to upload address');
+
+        if (tkClient == null) {
+          throw new Error('No tk client provided');
+        }
+
+        const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
+        await sendUploadAddressRequest({ payload });
+      } catch (error) {
+        logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
+      }
+    },
+    [getUploadAddressPayload, sendUploadAddressRequest]
+  );
 
   /* ----------------------------- Sign In ----------------------------- */
 
@@ -136,7 +197,6 @@ const useTurnkeyAuthContext = () => {
       if (response.dydxAddress === '') {
         setIsNewTurnkeyUser(true);
         identify(AnalyticsUserProperties.IsNewUser(true));
-        dispatch(setRequiresAddressUpload(true));
       } else {
         identify(AnalyticsUserProperties.IsNewUser(false));
       }
@@ -239,7 +299,7 @@ const useTurnkeyAuthContext = () => {
 
   const handleOauthResponse = useCallback(
     async ({ response }: { response: TurnkeyOAuthResponse }) => {
-      const { session, salt } = response;
+      const { session, salt, dydxAddress: uploadedDydxAddress } = response;
       if (session == null) {
         throw new Error('useTurnkeyAuth: No session found');
       } else if (salt == null) {
@@ -247,11 +307,29 @@ const useTurnkeyAuthContext = () => {
       }
 
       await indexedDbClient?.loginWithSession(session);
-      await onboardDydx({ salt, setWalletFromSignature, tkClient: indexedDbClient });
+      const derivedDydxAddress = await onboardDydx({
+        salt,
+        setWalletFromSignature,
+        tkClient: indexedDbClient,
+      });
+
+      if (uploadedDydxAddress === '' && derivedDydxAddress) {
+        try {
+          await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
+        } catch (uploadAddressError) {
+          if (
+            uploadAddressError instanceof Error &&
+            !uploadAddressError.message.includes('Dydx address already uploaded')
+          ) {
+            throw uploadAddressError;
+          }
+        }
+      }
+
       setEmailSignInStatus('success');
       setEmailSignInError(undefined);
     },
-    [onboardDydx, indexedDbClient, setWalletFromSignature]
+    [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
@@ -302,7 +380,8 @@ const useTurnkeyAuthContext = () => {
           throw new Error('No public key found');
         }
 
-        const { organizationId } = turnkeyEmailOnboardingData ?? {};
+        const { organizationId, dydxAddress: uploadedDydxAddress } =
+          turnkeyEmailOnboardingData ?? {};
 
         if (!organizationId) {
           throw new Error('Organization ID was not found');
@@ -322,7 +401,24 @@ const useTurnkeyAuthContext = () => {
         }
 
         await indexedDbClient.loginWithSession(session);
-        await onboardDydx({ setWalletFromSignature, tkClient: indexedDbClient });
+        const derivedDydxAddress = await onboardDydx({
+          setWalletFromSignature,
+          tkClient: indexedDbClient,
+        });
+
+        if (derivedDydxAddress && uploadedDydxAddress === '') {
+          try {
+            await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
+          } catch (uploadAddressError) {
+            if (
+              uploadAddressError instanceof Error &&
+              !uploadAddressError.message.includes('Dydx address already uploaded')
+            ) {
+              throw uploadAddressError;
+            }
+          }
+        }
+
         setEmailSignInStatus('success');
 
         track(
@@ -386,6 +482,7 @@ const useTurnkeyAuthContext = () => {
       setSearchParams,
       stringGetter,
       endTurnkeySession,
+      uploadAddress,
     ]
   );
 
@@ -429,76 +526,6 @@ const useTurnkeyAuthContext = () => {
     setEmailSignInError(undefined);
   }, [searchParams, setSearchParams]);
 
-  /* ----------------------------- Upload Address ----------------------------- */
-  const { mutateAsync: sendUploadAddressRequest, isPending: isUploadingAddress } = useMutation({
-    mutationFn: async ({
-      payload,
-    }: {
-      payload: { dydxAddress: string; signature: string };
-    }): Promise<{ success: boolean }> => {
-      const body = JSON.stringify(payload);
-
-      const response = await fetch(`${indexerUrl}/v4/turnkey/uploadAddress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body,
-      }).then((res) => res.json());
-
-      if (response.errors && Array.isArray(response.errors)) {
-        const errorMsg = response.errors.map((e: { msg: string }) => e.msg).join(', ');
-        throw new Error(`useTurnkeyAuth: Backend Error: ${errorMsg}`);
-      }
-
-      // TODO(turnkey): handle policy returned in response
-      return response;
-    },
-    onError: (error, variables) => {
-      track(
-        AnalyticsEvents.UploadAddressError({
-          dydxAddress: variables.payload.dydxAddress,
-          error: error.message,
-        })
-      );
-      logBonsaiError('TurnkeyOnboarding', 'Error posting to upload address', { error });
-    },
-    onSuccess: () => {
-      appQueryClient.invalidateQueries({ queryKey: ['turnkeyWallets'] });
-    },
-  });
-
-  const uploadAddress = useCallback(
-    async ({ tkClient }: { tkClient?: TurnkeyIndexedDbClient }) => {
-      try {
-        logBonsaiInfo('TurnkeyOnboarding', 'Attempting to upload address');
-
-        if (dydxAddress == null) {
-          throw new Error('No dydx address provided');
-        }
-
-        if (tkClient == null) {
-          throw new Error('No tk client provided');
-        }
-
-        const payload = await getUploadAddressPayload({ dydxAddress, tkClient });
-        const result = await sendUploadAddressRequest({ payload });
-
-        if (!result.success) {
-          dispatch(setRequiresAddressUpload(true));
-        }
-      } catch (error) {
-        if ((error.message ?? '').includes('Dydx address already uploaded')) {
-          dispatch(setRequiresAddressUpload(false));
-        } else {
-          logBonsaiError('TurnkeyOnboarding', 'Error uploading address', { error });
-        }
-      }
-    },
-    [dispatch, dydxAddress, getUploadAddressPayload, sendUploadAddressRequest]
-  );
-
   /* ----------------------------- Side Effects ----------------------------- */
 
   /**
@@ -509,14 +536,21 @@ const useTurnkeyAuthContext = () => {
     const turnkeyOnboardingToken = searchParams.get('token');
     const hasEncryptedSignature = sourceAccount.encryptedSignature != null;
 
-    if (turnkeyOnboardingToken && dydxAddress != null) {
+    if (turnkeyOnboardingToken && connectedDydxAddress != null) {
       searchParams.delete('token');
       setSearchParams(searchParams);
     } else if (turnkeyOnboardingToken && !hasEncryptedSignature) {
       setEmailToken(turnkeyOnboardingToken);
       dispatch(openDialog(DialogTypes.EmailSignInStatus({})));
     }
-  }, [searchParams, dispatch, sourceAccount, dydxAddress, resetEmailSignInStatus, setSearchParams]);
+  }, [
+    searchParams,
+    dispatch,
+    sourceAccount,
+    connectedDydxAddress,
+    resetEmailSignInStatus,
+    setSearchParams,
+  ]);
 
   /**
    * @description Side effect triggered after the email token is saved to state.
@@ -547,19 +581,6 @@ const useTurnkeyAuthContext = () => {
       sourceAccount.walletInfo.requiresAddressUpload
     );
   }, [sourceAccount.walletInfo]);
-
-  /**
-   * @description Side effect to upload the address if it is required and the user has a dydx address.
-   * This is triggered after the user has signed in with email or OAuth and has derived their dydx address.
-   */
-  useEffect(() => {
-    if (indexedDbClient && needsAddressUpload && dydxAddress != null) {
-      // Set RequiredAddressUpload to false to prevent the upload from being triggered again.
-      // If the uploadAddress mutation fails, the requiredAddressUpload flag will be set back to true.
-      dispatch(setRequiresAddressUpload(false));
-      uploadAddress({ tkClient: indexedDbClient });
-    }
-  }, [dispatch, dydxAddress, uploadAddress, indexedDbClient, needsAddressUpload]);
 
   /* ----------------------------- Return Values----------------------------- */
 
