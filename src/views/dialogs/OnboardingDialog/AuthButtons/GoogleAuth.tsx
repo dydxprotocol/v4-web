@@ -8,6 +8,8 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
 
+import breakpoints from '@/styles/breakpoints';
+
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 
@@ -88,8 +90,12 @@ export const GoogleAuth = () => {
 
 const $SocialLoginButton = styled(Button)`
   width: 100%;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   --icon-size: 1.5rem;
   overflow: hidden;
   position: relative;
+
+  @media ${breakpoints.tablet} {
+    border-radius: 1rem;
+  }
 `;
