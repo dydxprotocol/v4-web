@@ -1,5 +1,7 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
+import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+
 export const tradeTooltips = {
   'account-leverage': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_TITLE }),
@@ -141,7 +143,13 @@ export const tradeTooltips = {
   }),
   'max-reward-sept-2025': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_BODY }),
+    body: stringGetter({
+      key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_BODY,
+      params: {
+        REWARD_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercentNumeric,
+        REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
+      },
+    }),
   }),
   'max-withdraw': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_TITLE }),
