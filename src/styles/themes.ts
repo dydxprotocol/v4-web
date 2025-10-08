@@ -110,6 +110,7 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple0,
   accentFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green1,
@@ -182,6 +183,7 @@ const LightThemeBase: () => ThemeColorBase = () => ({
 
   accent: ColorToken.Purple0,
   accentFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity16),
+  accentMoreFaded: generateFadedColorVariant(ColorToken.Purple0, OpacityToken.Opacity8),
   favorite: ColorToken.Yellow0,
 
   success: ColorToken.Green5,

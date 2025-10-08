@@ -5,7 +5,7 @@
   "type": "module",
   "license": "AGPL-3.0",
   "engines": {
-    "node": "=20"
+    "node": "=22"
   },
   "scripts": {
     "dev": "cp ./template.html ./index.html && vite",
@@ -90,7 +90,7 @@
     "@react-types/shared": "^3.18.1",
     "@react-types/table": "^3.6.1",
     "@reduxjs/toolkit": "^2.2.5",
-    "@skip-go/client": "1.1.7",
+    "@skip-go/client": "1.5.8",
     "@solana/web3.js": "^1.93.0",
     "@statsig/js-client": "1.4.0",
     "@statsig/react-bindings": "1.4.0",
@@ -160,9 +160,9 @@
     "@types/crypto-js": "^4.1.1",
     "@types/luxon": "^3.3.0",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.3.1",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.2.6",
+    "@types/node": "^22.7.5",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
     "@types/react-window": "^1.8.8",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
