@@ -211,7 +211,7 @@
     "ts-node": "^10.9.2",
     "ts-patch": "^3.3.0",
     "tsx": "^4.7.1",
-    "typescript": "^5.7.2",
+    "typescript": "^5.9.3",
     "url-polyfill": "^1.1.12",
     "util": "^0.12.5",
     "vite": "^7.1.9",
