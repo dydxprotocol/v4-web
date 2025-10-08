@@ -14,7 +14,5 @@ members = [
     "contracts/assets/rusd",
     "contracts/assets/time-distributor",
 
-    "contracts/utils",
-
     "contracts/testnet/token",
 ]

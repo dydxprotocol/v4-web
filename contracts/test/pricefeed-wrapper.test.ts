@@ -1,24 +1,23 @@
-import { expect, use } from "chai"
-import { useChai } from "../../utils/chai"
-import { AbstractContract, Provider, Signer, Wallet, WalletUnlocked, AssetId, DateTime } from "fuels"
+import { describe, it, expect } from 'vitest';
+import { AbstractContract, Signer, WalletUnlocked, DateTime } from "fuels"
 import { BN } from "fuels"
-import { launchNode, getNodeWallets } from "../../utils/node"
-import { deploy, getBalance, getValue, getValStr, formatObj, call } from "../../utils/utils"
-import { getAssetId, toAsset } from "../../utils/asset"
+import { launchNode, getNodeWallets } from "./node"
+import { call } from "./utils"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import { PricefeedWrapper, StorkMock } from "../../../types"
-import { addrToIdentity, contrToIdentity, toAddress, toContract } from "../../utils/account"
-import { asStr, expandDecimals, toNormalizedPrice, toPrice, toUsd } from "../../utils/units"
+import { PricefeedWrapper, StorkMock, PricefeedWrapperFactory, StorkMockFactory } from "../types"
 
-use(useChai)
 
 const BTC_ASSET = "0x7404e3d104ea7841c3d9e6fd20adfe99b4ad586bc08d8f3bd3afef894cf184de"
 const USDC_ASSET = "0x7416a56f222e196d0487dce8a1a8003936862e7a15092a91898d69fa8bce290c"
 const ETH_ASSET = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
+function toPrice(value: number, decimals: number = 9): string {
+    const v = BigInt(value) * (BigInt(10) ** BigInt(decimals))
+    return v.toString()
+}
+
 describe("PricefeedWrapper", () => {
     let attachedContracts: AbstractContract[]
-    let priceUpdateSigner: Signer
     let launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>
     let deployer: WalletUnlocked
     let user0: WalletUnlocked
@@ -29,17 +28,20 @@ describe("PricefeedWrapper", () => {
     beforeEach(async () => {
         launchedNode = await launchNode()
         ;[ deployer, user0, user1 ] = getNodeWallets(launchedNode)
-          
-        priceUpdateSigner = new Signer(deployer.privateKey)
 
         // Deploy StorkMock contract first
-        storkMock = await deploy("StorkMock", deployer)
-        
+        const { waitForResult: waitForResultStorkMock } = await StorkMockFactory.deploy(deployer)
+        const { contract: _storkMock } = await waitForResultStorkMock()
+        storkMock = _storkMock
+    
         // Deploy PricefeedWrapper with StorkMock as dependency
-        pricefeedWrapper = await deploy("PricefeedWrapper", deployer, { 
-            STORK_CONTRACT: toContract(storkMock) 
-        })
-        
+        const { waitForResult: waitForResultPricefeedWrapper } = await PricefeedWrapperFactory.deploy(deployer, { configurableConstants: { 
+            STORK_CONTRACT: { bits: storkMock.id.b256Address },
+        }} )
+        const { contract: _pricefeedWrapper } = await waitForResultPricefeedWrapper()
+        pricefeedWrapper = _pricefeedWrapper
+    
+
         attachedContracts = [storkMock, pricefeedWrapper]
     })
 
@@ -248,7 +250,7 @@ describe("PricefeedWrapper", () => {
             const nonExistentFeed = "0x1234567890123456789012345678901234567890123456789012345678901234"
             
             // "" for panic error
-            await expect(pricefeedWrapper.functions.price(nonExistentFeed).get()).to.be.revertedWith("")
+            await expect(pricefeedWrapper.functions.price(nonExistentFeed).get()).rejects.toThrowError("The transaction reverted with reason")
         })
 
         it("should revert when price is too stale", async () => {
@@ -276,7 +278,7 @@ describe("PricefeedWrapper", () => {
               latestBlockTimestamp + 150 * 1000
             );      
             
-            await expect(pricefeedWrapper.functions.price(BTC_ASSET).get()).to.be.revertedWith("PricefeedWrapperStaledPrice")            
+            await expect(pricefeedWrapper.functions.price(BTC_ASSET).get()).rejects.toThrowError("PricefeedWrapperStaledPrice")            
         })
     })
 

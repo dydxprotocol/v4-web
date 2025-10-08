@@ -173,15 +173,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "utils"
-source = "member"
-dependencies = [
-    "core_interfaces",
-    "helpers",
-    "std",
-]
-
-[[package]]
 name = "vault"
 source = "member"
 dependencies = [
