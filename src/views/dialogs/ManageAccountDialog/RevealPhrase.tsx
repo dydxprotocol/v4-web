@@ -296,10 +296,10 @@ export const RevealPhrase = ({
 
           {exportWalletType === 'dydx' && (
             <span tw="font-small-book">
-              {phrase
-                ?.split(' ')
+              {phrase?.split(' ').map((word, idx) => (
                 // eslint-disable-next-line react/no-array-index-key
-                .map((word, idx) => <span key={idx}>{showPhrase ? `${word} ` : '***** '}</span>)}
+                <span key={idx}>{showPhrase ? `${word} ` : '***** '}</span>
+              ))}
             </span>
           )}
           {copyButton}

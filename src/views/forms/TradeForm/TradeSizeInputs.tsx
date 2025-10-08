@@ -152,7 +152,7 @@ export const TradeSizeInputs = () => {
           ? tradeValues.size.value.value
           : tradeValues.size == null || tradeValues.size.value.value === ''
             ? ''
-            : AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? '',
+            : (AttemptBigNumber(effectiveSizes.size)?.toFixed(decimals) ?? ''),
     },
     [DisplayUnit.Fiat]: {
       onInput: onUSDCInput,
@@ -164,7 +164,7 @@ export const TradeSizeInputs = () => {
           ? tradeValues.size.value.value
           : tradeValues.size == null || tradeValues.size.value.value === ''
             ? ''
-            : AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? '',
+            : (AttemptBigNumber(effectiveSizes.usdcSize)?.toFixed(USD_DECIMALS) ?? ''),
     },
   }[displayUnit];
 

@@ -121,7 +121,7 @@ export const SimpleTradeSteps = ({
           totalFilled: orderFromClientId.totalFilled,
           price:
             orderFromClientId.type === IndexerOrderType.MARKET
-              ? averageFillPriceForOrder ?? null
+              ? (averageFillPriceForOrder ?? null)
               : orderFromClientId.price,
           type: orderFromClientId.type,
           marketId: orderFromClientId.marketId,

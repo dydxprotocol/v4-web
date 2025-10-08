@@ -515,7 +515,7 @@ function getPositionIdToUseForTrade(
   }
 
   const allPositions = Object.values(rawParentSubaccountData?.childSubaccounts ?? {}).flatMap(
-    (o) => (o != null ? o.openPerpetualPositions[marketId] ?? [] : [])
+    (o) => (o != null ? (o.openPerpetualPositions[marketId] ?? []) : [])
   );
   const positionToUse = orderBy(
     allPositions.filter(
