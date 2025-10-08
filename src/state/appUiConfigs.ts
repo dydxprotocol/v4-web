@@ -38,6 +38,7 @@ export interface AppUIConfigsState {
   displayUnit: DisplayUnit;
   shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
+  spotFavorites: string[];
   horizontalPanelHeightPx: number;
   tablePageSizes: { [tableKey: string]: number };
   simpleUI: {
@@ -54,6 +55,7 @@ export const initialState: AppUIConfigsState = {
   displayUnit: DisplayUnit.Asset,
   shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
+  spotFavorites: [],
   horizontalPanelHeightPx: 288,
   tablePageSizes: {},
   simpleUI: {
@@ -120,6 +122,20 @@ export const appUiConfigsSlice = createSlice({
       const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
       state.favoritedMarkets = newFavoritedMarkets;
     },
+    favoriteSpotToken: (
+      state: AppUIConfigsState,
+      { payload: tokenAddress }: PayloadAction<string>
+    ) => {
+      const currentFavoritedTokens = state.spotFavorites;
+      const newFavoritedTokens = [...currentFavoritedTokens, tokenAddress];
+      state.spotFavorites = newFavoritedTokens;
+    },
+    unfavoriteSpotToken: (
+      state: AppUIConfigsState,
+      { payload: tokenAddress }: PayloadAction<string>
+    ) => {
+      state.spotFavorites = state.spotFavorites.filter((id) => id !== tokenAddress);
+    },
     setTablePageSize: (
       state: AppUIConfigsState,
       { payload: { pageSize, tableId } }: PayloadAction<{ tableId: string; pageSize: number }>
@@ -154,4 +170,6 @@ export const {
   setTablePageSize,
   setSimpleUISortMarketsBy,
   setSimpleUISortPositionsBy,
+  favoriteSpotToken,
+  unfavoriteSpotToken,
 } = appUiConfigsSlice.actions;

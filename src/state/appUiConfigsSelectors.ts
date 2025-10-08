@@ -52,6 +52,7 @@ export const getShouldHideLaunchableMarkets = (state: RootState) =>
   state.appUiConfigs.shouldHideLaunchableMarkets;
 
 export const getFavoritedMarkets = (state: RootState) => state.appUiConfigs.favoritedMarkets;
+export const getSpotFavorites = (state: RootState) => state.appUiConfigs.spotFavorites;
 
 export const getHorizontalPanelHeightPx = (state: RootState) =>
   state.appUiConfigs.horizontalPanelHeightPx;
@@ -59,6 +60,11 @@ export const getHorizontalPanelHeightPx = (state: RootState) =>
 export const getIsMarketFavorited = createAppSelector(
   [getFavoritedMarkets, (s: RootState, marketId: string) => marketId],
   (favoritedMarkets, marketId) => favoritedMarkets.includes(marketId)
+);
+
+export const getIsSpotTokenFavorited = createAppSelector(
+  [getSpotFavorites, (_, tokenAddress: string) => tokenAddress],
+  (favorited, tokenAddress) => favorited.includes(tokenAddress)
 );
 
 export const getSavedTablePageSize = createAppSelector(
