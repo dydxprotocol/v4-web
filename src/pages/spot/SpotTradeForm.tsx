@@ -129,6 +129,7 @@ export const SpotTradeForm = () => {
 
   return (
     <SpotTabs
+      tw="p-1"
       disabled={isSubmitting}
       value={tradeType}
       onValueChange={(v) => {
