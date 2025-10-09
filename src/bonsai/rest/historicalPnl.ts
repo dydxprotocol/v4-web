@@ -80,7 +80,7 @@ export function useParentSubaccountHistoricalPnls() {
             if (
               allResults.length > 0 &&
               new Date(allResults.at(-1)!.createdAt).getTime() <
-                new Date().getTime() - timeUnits.day * MAX_TIME_DAYS
+                Date.now() - timeUnits.day * MAX_TIME_DAYS
             ) {
               break;
             }
