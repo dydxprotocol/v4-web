@@ -558,21 +558,6 @@ export class AccountTransactionSupervisor {
           transferMetadata: { sourceSubaccount: number; sourceAddress: string };
           isShortTermOrder: boolean;
         }>(async (context, next) => {
-          const currentHeight = estimateLiveValidatorHeight(
-            this.store.getState(),
-            BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
-          );
-          if (currentHeight == null) {
-            return createMiddlewareFailureResult(
-              wrapSimpleError(
-                context.fnName,
-                'validator height unknown',
-                STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
-              ),
-              context
-            );
-          }
-
           const sourceSubaccount = getSubaccountId(this.store.getState());
           const sourceAddress = getUserWalletAddress(this.store.getState());
           if (sourceSubaccount == null || sourceAddress == null) {
@@ -587,15 +572,8 @@ export class AccountTransactionSupervisor {
           }
           const transferMetadata = { sourceSubaccount, sourceAddress };
 
-          const payloadBase = context.payload;
-          const isShortTermOrder = isShortTermOrderPayload(payloadBase);
-          const payload: PlaceOrderPayload = {
-            ...payloadBase,
-            currentHeight,
-            goodTilBlock: isShortTermOrder
-              ? currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
-              : undefined,
-          };
+          const payload = context.payload;
+          const isShortTermOrder = isShortTermOrderPayload(payload);
           const trackingMetadata: TradeAdditionalMetadata = {
             source,
             volume: payload.size * payload.price,
@@ -702,7 +680,34 @@ export class AccountTransactionSupervisor {
               if (isOperationFailure(subaccountTransferResult)) {
                 throw new WrappedOperationFailureError(subaccountTransferResult);
               }
-              const placeOrderResult = await this.executePlaceOrder(innerPayload);
+
+              // we must calculate block height as late as possible for max accuracy
+              const currentHeight = estimateLiveValidatorHeight(
+                this.store.getState(),
+                BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+              );
+              if (currentHeight == null) {
+                return createMiddlewareFailureResult(
+                  wrapSimpleError(
+                    context.fnName,
+                    'validator height unknown',
+                    STRING_KEYS.UNKNOWN_VALIDATOR_HEIGHT
+                  ),
+                  context
+                );
+              }
+              const goodTilBlock = context.isShortTermOrder
+                ? currentHeight +
+                  SHORT_TERM_ORDER_DURATION -
+                  SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
+                : undefined;
+
+              const placeOrderResult = await this.executePlaceOrder({
+                ...innerPayload,
+                currentHeight,
+                goodTilBlock,
+              });
+
               if (isOperationFailure(placeOrderResult)) {
                 throw new WrappedOperationFailureError(placeOrderResult);
               }
