@@ -2,6 +2,7 @@ contract;
 
 use stork_sway_sdk::interface::{Stork, TemporalNumericValueInput};
 use stork_sway_sdk::temporal_numeric_value::TemporalNumericValue;
+use stork_sway_sdk::events::StorkEvent;
 use std::string::String;
 use std::vm::evm::evm_address::EvmAddress;
 use std::block::timestamp;
@@ -44,6 +45,8 @@ impl StorkMock for Contract {
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
+        let event = StorkEvent::ValueUpdate((id, price));
+        log(event);
     }
 
     #[storage(write)]
@@ -68,6 +71,8 @@ impl StorkMock for Contract {
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
+        let event = StorkEvent::ValueUpdate((id, price));
+        log(event);
     }
 }
 

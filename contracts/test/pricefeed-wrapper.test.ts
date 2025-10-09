@@ -1,15 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { AbstractContract, Signer, WalletUnlocked, DateTime } from "fuels"
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { AbstractContract, WalletUnlocked, DateTime } from "fuels"
 import { BN } from "fuels"
 import { launchNode, getNodeWallets } from "./node"
-import { call } from "./utils"
+import { call, BTC_ASSET, USDC_ASSET, ETH_ASSET } from "./utils"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { PricefeedWrapper, StorkMock, PricefeedWrapperFactory, StorkMockFactory } from "../types"
-
-
-const BTC_ASSET = "0x7404e3d104ea7841c3d9e6fd20adfe99b4ad586bc08d8f3bd3afef894cf184de"
-const USDC_ASSET = "0x7416a56f222e196d0487dce8a1a8003936862e7a15092a91898d69fa8bce290c"
-const ETH_ASSET = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 function toPrice(value: number, decimals: number = 9): string {
     const v = BigInt(value) * (BigInt(10) ** BigInt(decimals))
