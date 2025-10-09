@@ -1,14 +1,12 @@
-import { task } from "hardhat/config";
-import { Provider, Wallet, WalletUnlocked } from "fuels"
+import { Provider, Wallet } from "fuels"
+import { call, getArgs } from "./utils";
+import { PricefeedWrapperFactory, VaultFactory } from "../types";
 
-task("deploy-starboard", "Deploy the starboard contracts")
-  .addPositionalParam("url")
-  .addPositionalParam("privK")
-  .addPositionalParam("usdcAssetId")
-  .addPositionalParam("usdcPricefeedId")
-  .addPositionalParam("usdcDecimals")
-  .addPositionalParam("storkContract")
-  .setAction(async (taskArgs) => {
+if (require.main === module) {
+  deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"]))
+}
+
+export async function deployStarboard(taskArgs: any) {
     const provider = new Provider(taskArgs.url)
     const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
@@ -19,15 +17,19 @@ task("deploy-starboard", "Deploy the starboard contracts")
       taskArgs.usdcDecimals, // asset_decimals
     ]
 
-    const pricefeedWrapper = await deploy("PricefeedWrapper", deployer, { STORK_CONTRACT: storkContract })
+    const { waitForResult: waitForResultPricefeedWrapper } = await PricefeedWrapperFactory.deploy(deployer, { configurableConstants: { 
+        STORK_CONTRACT: storkContract,
+    }})
+    const { contract: pricefeedWrapper } = await waitForResultPricefeedWrapper()
     console.log(`PricefeedWrapper deployed to: ${pricefeedWrapper.id.toString()} ${pricefeedWrapper.id.toB256().toString()}`)
 
-    const vault = await deploy("Vault", deployer, {
-      COLLATERAL_ASSET_ID: { bits: taskArgs.usdcAssetId },
-      COLLATERAL_ASSET: taskArgs.usdcPricefeedId,
-      COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
-      PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
-    })
+    const { waitForResult: waitForResultVault } = await VaultFactory.deploy(deployer, { configurableConstants: { 
+        COLLATERAL_ASSET_ID: { bits: taskArgs.usdcAssetId },
+        COLLATERAL_ASSET: taskArgs.usdcPricefeedId,
+        COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
+        PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
+      }})
+    const { contract: vault } = await waitForResultVault()
     console.log(`Vault deployed to: ${vault.id.toString()} ${vault.id.toB256().toString()}`)
     await call(vault.functions.initialize(deployerIdendity))
     console.log("Vault initialized")
@@ -40,30 +42,8 @@ task("deploy-starboard", "Deploy the starboard contracts")
           600, // stableFundingRateFactor
       ),
     )
-    await call(vault.functions.set_asset_config(...usdcConfig))
+    await call(vault.functions.set_asset_config(taskArgs.usdcPricefeedId, taskArgs.usdcDecimals))
     console.log("Deployment done")
 
     return [vault.id.toString(), pricefeedWrapper.id.toString()]
-});
-
-async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
-  const factory = require(`../types/${contract}Factory`)[`${contract}Factory`]
-  if (!factory) {
-      throw new Error(`Could not find factory for contract ${contract}`)
-  }
-
-  const { waitForResult } = await factory.deploy(wallet, configurables ? { configurableConstants: configurables } : undefined)
-  const result = await waitForResult()
-  const { contract: contr } = result
-
-  return contr
-}
-
-async function call(fnCall: any) {
-  const { gasUsed } = await fnCall.getTransactionCost()
-  // console.log("gasUsed", gasUsed.toString())
-  const gasLimit = gasUsed.mul("6").div("5").toString()
-
-  const { waitForResult } = await fnCall.txParams({ gasLimit }).call()
-  return await waitForResult()
 }

@@ -1,22 +1,22 @@
-import { task } from "hardhat/config";
-import { Provider, Wallet, WalletUnlocked } from "fuels"
+import { Provider, Wallet } from "fuels"
 import { Vault as VaultContract } from "../types/Vault"
+import { call, getArgs } from "./utils";
+import { deployTestnetToken } from "./deploy-testnet-token";
+import { deployStarboard } from "./deploy-starboard";
 
-task("setup-testnet", "Setup asset configuration for the testnet")
-  .addPositionalParam("url")
-  .addPositionalParam("privK")
-  .addPositionalParam("storkContractAddress")
-  .setAction(async (taskArgs, hre) => {
+if (require.main === module) {
+    setupTestnet(getArgs(["url", "privK", "storkContractAddress"]))
+}
+
+async function setupTestnet(taskArgs: any) {
+    console.log("Setup asset configuration for the testnet")
 
     const usdcPricefeedId = "0x0000000000000000000000000000000000000000000000000000000000000069"
     const btcPricefeedId = "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
     const bnbPricefeedId = "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
     const ethPricefeedId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
 
-    const provider = new Provider(taskArgs.url)
-    const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
-
-    const [USDCAddress, USDCAssetId] = await hre.run("deploy-testnet-token", {
+    const [USDCAddress, USDCAssetId] = await deployTestnetToken({
       url: taskArgs.url, 
       privK: taskArgs.privK, 
       name: "mckUSDC", 
@@ -24,21 +24,21 @@ task("setup-testnet", "Setup asset configuration for the testnet")
       decimals: "6"
     })
 
-    const [BTCAddress, BTCAssetId] = await hre.run("deploy-testnet-token", {
+    const [BTCAddress, BTCAssetId] = await deployTestnetToken({
       url: taskArgs.url, 
       privK: taskArgs.privK, 
       name: "mockBTC", 
       symbol: "sbBTC", 
       decimals: "9"
     })
-    const [BNBAddress, BNBAssetId] = await hre.run("deploy-testnet-token", {
+    const [BNBAddress, BNBAssetId] = await deployTestnetToken({
       url: taskArgs.url, 
       privK: taskArgs.privK, 
       name: "mockBNB", 
       symbol: "sbBNB", 
       decimals: "9"
     })
-    const [ETHAddress, ETHAssetId] = await hre.run("deploy-testnet-token", {
+    const [ETHAddress, ETHAssetId] = await deployTestnetToken({
       url: taskArgs.url, 
       privK: taskArgs.privK, 
       name: "mockETH", 
@@ -46,7 +46,8 @@ task("setup-testnet", "Setup asset configuration for the testnet")
       decimals: "9"
     })
 
-    const [vaultAddress, pricefeedWrapperAddress] = await hre.run("deploy-starboard", {
+    console.log("usdc setup", USDCAssetId)
+    const [vaultAddress, pricefeedWrapperAddress] = await deployStarboard({
       url: taskArgs.url, 
       privK: taskArgs.privK,
       usdcAssetId: USDCAssetId,
@@ -54,6 +55,10 @@ task("setup-testnet", "Setup asset configuration for the testnet")
       usdcDecimals: "6",
       storkContract: taskArgs.storkContractAddress,
     })
+
+    // it is important to instantiate the wallet after deployment
+    const provider = new Provider(taskArgs.url)
+    const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
     const vault = new VaultContract(vaultAddress, deployer)
 
     await call(vault.functions.set_asset_config(btcPricefeedId, 9))
@@ -61,26 +66,4 @@ task("setup-testnet", "Setup asset configuration for the testnet")
     await call(vault.functions.set_asset_config(ethPricefeedId, 9))
 
     console.log("Setup complete")
-});
-
-async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
-  const factory = require(`../types/${contract}Factory`)[`${contract}Factory`]
-  if (!factory) {
-      throw new Error(`Could not find factory for contract ${contract}`)
-  }
-
-  const { waitForResult } = await factory.deploy(wallet, configurables ? { configurableConstants: configurables } : undefined)
-  const result = await waitForResult()
-  const { contract: contr } = result
-
-  return contr
-}
-
-async function call(fnCall: any) {
-  const { gasUsed } = await fnCall.getTransactionCost()
-  // console.log("gasUsed", gasUsed.toString())
-  const gasLimit = gasUsed.mul("6").div("5").toString()
-
-  const { waitForResult } = await fnCall.txParams({ gasLimit }).call()
-  return await waitForResult()
 }

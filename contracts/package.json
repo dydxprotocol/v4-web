@@ -4,17 +4,18 @@
     "main": "node.js",
     "license": "Apache-2.0",
     "scripts": {
-        "build": "forc build --release --log-level 4",
         "clean": "forc clean",
+        "build": "forc build --release --log-level 4",
         "gen:types": "fuels typegen -i ./contracts/**/*-abi.json -o ./types",
         "test": "vitest run",
-        "watch": "vitest",
-        "deploy:testnet:token": "hardhat deploy-testnet-token",
-        "run:node": "hardhat run-node",
-        "deploy:starboard": "hardhat deploy-starboard",
-        "setup:testnet": "hardhat setup-testnet",
-        "prices:feed": "hardhat prices-feed",
-        "deploy:stork-mock": "hardhat deploy-stork-mock"
+        "test:watch": "vitest",
+        "run:node": "ts-node tasks/run-node.ts",
+        "deploy:testnet:token": "ts-node tasks/deploy-testnet-token.ts",
+        "deploy:starboard": "ts-node tasks/deploy-starboard.ts",
+        "deploy:stork-mock": "ts-node tasks/deploy-stork-mock.ts",
+        "setup:testnet": "ts-node tasks/setup-testnet.ts",
+        "prices:feed": "ts-node tasks/prices-feed.ts",
+        "faucet": "ts-node tasks/faucet.ts"
     },
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.2.3",
@@ -29,7 +30,7 @@
         "husky": "8.0.3",
         "patch-package": "8.0.0",
         "prettier": "3.1.0",
-        "ts-node": "^9.1.1",
+        "ts-node": "^10.9.2",
         "typescript": "^4.1.5"
     },
     "dependencies": {

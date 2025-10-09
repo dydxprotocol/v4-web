@@ -1,12 +1,14 @@
-import { task } from "hardhat/config";
 import { Provider, Wallet } from "fuels"
 import { TestnetToken } from "../types/TestnetToken"
+import { call, getArgs } from "./utils"
 
-task("faucet", "Call faucet")
-  .addPositionalParam("url")
-  .addPositionalParam("privK")
-  .addPositionalParam("token")
-  .setAction(async (taskArgs) => {
+if (require.main === module) {
+    faucet(getArgs(["url", "privK", "token"]))
+}
+
+async function faucet(taskArgs: any) {
+    console.log("Call faucet")
+
     const provider = new Provider(taskArgs.url)
     const wallet = Wallet.fromPrivateKey(taskArgs.privK, provider)
     const token = new TestnetToken(taskArgs.token, wallet)
@@ -21,12 +23,3 @@ task("faucet", "Call faucet")
 
     console.log(`Faucet called`)
   }
-);
-
-async function call(fnCall: any) {
-  const { gasUsed } = await fnCall.getTransactionCost()
-  const gasLimit = gasUsed.mul("6").div("5").toString()
-
-  const { waitForResult } = await fnCall.txParams({ gasLimit }).call()
-  return await waitForResult()
-}

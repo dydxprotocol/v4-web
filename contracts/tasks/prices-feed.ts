@@ -1,14 +1,16 @@
-import { task } from "hardhat/config";
 import { Provider, Wallet } from "fuels"
 import { BigNumberCoder, hexlify, sha256, Signer, StructCoder } from "fuels"
 import { VaultPricefeed,  } from "../types/VaultPricefeed";
 import { PriceMessage as PriceMessageType } from "../types";
+import { call, getArgs } from "./utils";
 
-task("prices-feed", "Fetch prices and feed to vault pricefeed")
-  .addPositionalParam("url")
-  .addPositionalParam("priceSignerPrivK")
-  .addPositionalParam("vaultPricefeedAddress")
-  .setAction(async (taskArgs) => {
+if (require.main === module) {
+    pricesFeed(getArgs(["url", "priceSignerPrivK", "vaultPricefeedAddress"]))
+}
+
+async function pricesFeed(taskArgs: any) {
+    console.log("Fetch prices and feed to vault pricefeed")
+
     const provider = new Provider(taskArgs.url)
     const wallet = Wallet.fromPrivateKey(taskArgs.priceSignerPrivK, provider)
     const vaultPricefeed = new VaultPricefeed(taskArgs.vaultPricefeedAddress, wallet)
@@ -35,6 +37,9 @@ task("prices-feed", "Fetch prices and feed to vault pricefeed")
       const exponent = priceData.price.expo
       const timestamp = priceData.price.publish_time
       let { value: assetId } = await vaultPricefeed.functions.get_asset('0x' + pricefeedId).get()
+      if (!assetId) {
+        throw new Error(`Asset ID not found for ${pricefeedId}`)
+      }
       let { value: decimals } = await vaultPricefeed.functions.get_decimals(assetId).get()
       const priceInput = Math.floor(price * 10 **(decimals + exponent))
       const priceMessage: PriceMessageType = {
@@ -51,12 +56,3 @@ task("prices-feed", "Fetch prices and feed to vault pricefeed")
 
     console.log(`Prices fetched`)
   }
-);
-
-async function call(fnCall: any) {
-  const { gasUsed } = await fnCall.getTransactionCost()
-  const gasLimit = gasUsed.mul("6").div("5").toString()
-
-  const { waitForResult } = await fnCall.txParams({ gasLimit }).call()
-  return await waitForResult()
-}

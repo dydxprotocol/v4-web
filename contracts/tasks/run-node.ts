@@ -1,6 +1,7 @@
-import { task } from "hardhat/config";
+// @ts-nocheck
+// there is a problem with the optional arguments in the launchTestNode function
 import { WalletUnlocked } from 'fuels';
-import { DeployContractConfig, launchTestNode, LaunchTestNodeReturn } from 'fuels/test-utils';
+import { DeployContractConfig, launchTestNode, LaunchTestNodeOptions, LaunchTestNodeReturn } from 'fuels/test-utils';
 import readline from "readline";
 
 // URL: http://127.0.0.1:4000/v1/graphql
@@ -11,9 +12,13 @@ import readline from "readline";
 // Liquidator: 0xa5675fc7eb0657940fc73f6ec6c5265c045065ddac62e12e1174da030f3868b3 0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088
 // PriceSigner: 0xb19556cb693d7850d0e75d05a6e2e4c9ed5691d9e5bc54a7d43ee6eed3ad5fe3 0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b
 
-task("run-node", "Run a node for the testnet")
-  .setAction(async (taskArgs) => {
+if (require.main === module) {
+    runNode()
+}
+
+async function runNode() {
     console.log(`Running node`)
+    
     const launchedNode = await launchNode()
     // const[ deployer, user0, user1, liquidator, priceSigner ] = getNodeWallets(launchedNode)
     const originWallet = getNodeWallet(launchedNode)
@@ -60,18 +65,20 @@ task("run-node", "Run a node for the testnet")
         resolve(ans);
     }))
     launchedNode.cleanup()
-});
+}
 
 async function launchNode() : Promise<LaunchTestNodeReturn<DeployContractConfig[]>> {
     // is there a way to pass private keys?
-    const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode({
+    const launchOptions: Partial<LaunchTestNodeOptions<DeployContractConfig[]>> = {
         walletsConfig: {
           count: 1, // Number of wallets you want
         },
         nodeOptions: {
-            port: 4000,
+            port: "4000",
           },        
-      })
+    }
+    const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode(launchOptions)
+
   
       return launched
   }
