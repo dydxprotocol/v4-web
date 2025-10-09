@@ -397,9 +397,9 @@ const $Popover = styled(Popover)`
   flex-direction: column;
 
   height: calc(
-    100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height) - var(
-        --restriction-warning-currentHeight
-      )
+    100vh - var(--page-header-height) - var(--market-info-row-height) - var(
+        --page-footer-height
+      ) - var(--restriction-warning-currentHeight)
   );
 
   width: var(--marketsDropdown-openWidth);

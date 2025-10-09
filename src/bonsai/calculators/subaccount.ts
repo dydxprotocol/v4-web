@@ -209,7 +209,7 @@ function calculateDerivedPositionCore(
   const marginMode = isParentSubaccount(position.subaccountNumber) ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
     market != null
-      ? getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO
+      ? (getMarketEffectiveInitialMarginForMarket(market) ?? BIG_NUMBERS.ZERO)
       : BIG_NUMBERS.ZERO;
   const effectiveMmf = MaybeBigNumber(market?.maintenanceMarginFraction) ?? BIG_NUMBERS.ZERO;
 

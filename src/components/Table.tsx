@@ -78,6 +78,8 @@ type NonSortableColumnDef = {
   allowsSorting: false;
 };
 
+export type SelectedKey = 'all' | Iterable<string | number> | undefined;
+
 export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
   label: React.ReactNode;
@@ -155,7 +157,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   className,
   style,
 }: AllTableProps<TableRowData>) => {
-  const [selectedKeys, setSelectedKeys] = useState(new Set<Key>());
+  const [selectedKeys, setSelectedKeys] = useState<SelectedKey>(new Set());
 
   const { currentPage, pageSize, pages, setCurrentPage, setPageSize } = useTablePagination({
     initialPageSize,
@@ -184,8 +186,8 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
         return 0;
       }
 
-      const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
-      const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
+      const first = isCustomRow(a) ? 0 : column.getCellValue(a);
+      const second = isCustomRow(b) ? 0 : column.getCellValue(b);
       const sortDirectionAsNumber = sortDirection === 'descending' ? -1 : 1;
 
       // Pinned check: show items that are isPinned first
@@ -208,11 +210,11 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
       return (
         // Compare the items by the sorted column
-        (Number.isNaN(Number(first))
+        (Number.isNaN(Number(first!))
           ? // String
             collator.compare(String(first), String(second))
           : // Number
-            MustBigNumber(first).comparedTo(MustBigNumber(second))) *
+            (MustBigNumber(first).comparedTo(MustBigNumber(second)) ?? 0)) *
         // Flip the direction if descending order is specified.
         sortDirectionAsNumber
       );
@@ -227,7 +229,9 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     [getRowKey]
   );
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(defaultSortDescriptor ?? {});
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>(
+    defaultSortDescriptor ?? ({} as SortDescriptor)
+  );
   const items = useMemo(() => {
     return sortDescriptor.column
       ? [...data].sort((a, b) => sortFn(a, b, sortDescriptor.column, sortDescriptor.direction))
@@ -334,8 +338,8 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   onSortChange?: (descriptor: SortDescriptor) => void;
   selectionMode: 'multiple' | 'single';
   selectionBehavior: 'replace' | 'toggle';
-  selectedKeys: Set<Key>;
-  setSelectedKeys: (selectedKeys: Set<Key>) => void;
+  selectedKeys: SelectedKey;
+  setSelectedKeys: (selectedKeys: SelectedKey) => void;
   getRowAttributes?: (
     rowData: TableRowData,
     rowIndex?: number
@@ -376,10 +380,12 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     ...props,
     showSelectionCheckboxes: selectionMode === 'multiple' && selectionBehavior !== 'replace',
   });
+
   const state: typeof baseState = {
     ...baseState,
     sort: (columnKey, direction) => {
-      const { column: currentColumnKey, direction: currentDirection } = baseState.sortDescriptor;
+      const { column: currentColumnKey, direction: currentDirection } =
+        baseState.sortDescriptor ?? {};
       // first time touching this column sort
       if (direction == null && (columnKey !== currentColumnKey || currentDirection == null)) {
         return baseState.sort(columnKey, firstClickSortDirection);
@@ -594,9 +600,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
         {(column.props.allowsSorting ?? true) && (
           <SortIcon
             sortDirection={
-              state.sortDescriptor.column === column.key
-                ? state.sortDescriptor.direction ?? 'none'
-                : 'none'
+              state.sortDescriptor?.column === column.key ? state.sortDescriptor.direction : 'none'
             }
           />
         )}
@@ -981,11 +985,8 @@ const $Tbody = styled.tbody<TableStyleProps>`
       }
 
       tr {
-        background: linear-gradient(
-            270deg,
-            var(--table-row-gradient-to-color) -32.39%,
-            transparent 100%
-          ),
+        background:
+          linear-gradient(270deg, var(--table-row-gradient-to-color) -32.39%, transparent 100%),
           var(--table-row-default-gradient);
 
         @supports (background: -webkit-named-image(i)) {

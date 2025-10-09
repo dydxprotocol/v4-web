@@ -120,7 +120,7 @@ const Profile = () => {
         <$ProfileIcon />
         <div>
           <h1 tw="font-extra-medium">
-            {isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}
+            {isConnected ? (ensName ?? truncateAddress(dydxAddress)) : '-'}
           </h1>
           {isConnected && sourceAccount.walletInfo ? (
             <$SubHeader>

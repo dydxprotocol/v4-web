@@ -81,7 +81,7 @@ export const Tabs = <TabItemsValue extends string>({
       <$List $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
         {items.map((item) =>
           !item.subitems ? (
-            item.customTrigger ?? (
+            (item.customTrigger ?? (
               <$Trigger
                 key={item.value}
                 value={item.value}
@@ -93,7 +93,7 @@ export const Tabs = <TabItemsValue extends string>({
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
               </$Trigger>
-            )
+            ))
           ) : (
             <$DropdownSelectMenu
               key={item.value ?? item.label}

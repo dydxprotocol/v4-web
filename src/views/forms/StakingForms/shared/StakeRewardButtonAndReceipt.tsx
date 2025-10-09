@@ -140,7 +140,7 @@ export const StakeRewardButtonAndReceipt = ({
           {!canAccountTrade ? (
             <OnboardingTriggerButton size={buttonSize} tw="w-full" />
           ) : (
-            errorToDisplay?.slotButton ?? (
+            (errorToDisplay?.slotButton ?? (
               <$Button
                 action={ButtonAction.Primary}
                 type={isForm ? ButtonType.Submit : ButtonType.Button}
@@ -158,7 +158,7 @@ export const StakeRewardButtonAndReceipt = ({
               >
                 {buttonText}
               </$Button>
-            )
+            ))
           )}
         </WithTooltip>
       </$WithDetailsReceipt>

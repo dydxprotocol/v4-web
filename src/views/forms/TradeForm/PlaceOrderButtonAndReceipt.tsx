@@ -308,7 +308,7 @@ export const PlaceOrderButtonAndReceipt = ({
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
         ? STRING_KEYS.PREVIEW_ORDER
-        : actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+        : (actionStringKey ?? STRING_KEYS.UNAVAILABLE),
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
       showValidatorError: true,
