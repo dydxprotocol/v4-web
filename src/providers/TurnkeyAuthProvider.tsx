@@ -461,7 +461,6 @@ const useTurnkeyAuthContext = () => {
             })
         );
 
-        await endTurnkeySession();
         setEmailSignInStatus('error');
       } finally {
         // Clear token from state after it has been consumed
@@ -481,7 +480,6 @@ const useTurnkeyAuthContext = () => {
       searchParams,
       setSearchParams,
       stringGetter,
-      endTurnkeySession,
       uploadAddress,
     ]
   );
