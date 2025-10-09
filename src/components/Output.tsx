@@ -176,7 +176,7 @@ export function formatNumberOutput(
     const precisionVal = minimumFractionDigits
       ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
       : val;
-    const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
+    const dp = minimumFractionDigits ? (precisionVal.decimalPlaces() ?? numDigits) : numDigits;
     return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
   };
 

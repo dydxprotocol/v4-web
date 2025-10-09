@@ -86,8 +86,8 @@ export const selectHasNonExpiredPendingWithdraws = createAppSelector(
   [selectParentSubaccountInfo, getTransfersByAddress],
   (parentSubaccountInfo, transfersByAddress) => {
     const pendingWithdraws = parentSubaccountInfo.wallet
-      ? transfersByAddress[parentSubaccountInfo.wallet as DydxAddress]?.filter(isWithdraw) ??
-        EMPTY_ARR
+      ? (transfersByAddress[parentSubaccountInfo.wallet as DydxAddress]?.filter(isWithdraw) ??
+        EMPTY_ARR)
       : EMPTY_ARR;
 
     const idleTimes = pendingWithdraws.reduce<number[]>((acc, w) => {

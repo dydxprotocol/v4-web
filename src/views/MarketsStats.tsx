@@ -161,11 +161,8 @@ const $FreeDepositBanner = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: radial-gradient(
-        circle at 20% 20%,
-        rgba(255, 255, 255, 0.1) 1px,
-        transparent 1px
-      ),
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
       radial-gradient(circle at 60% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
       radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
     background-size:

@@ -194,7 +194,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   useEffect(() => {
     // hack: if we are zoomed all the way in, it's probably because there was no data before, let's use default
     const zoomDomainToUse =
-      zoomDomain === minZoomDomain ? defaultZoomDomain : zoomDomain ?? defaultZoomDomain ?? null;
+      zoomDomain === minZoomDomain ? defaultZoomDomain : (zoomDomain ?? defaultZoomDomain ?? null);
 
     if (zoomDomainToUse) {
       const clampedZoomDomain = getClampedZoomDomain(zoomDomainToUse);
@@ -414,7 +414,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                             size={
                               childSeries.getGlyphSize
                                 ? (datum) => childSeries.getGlyphSize?.({ datum, zoom }) ?? 0
-                                : childSeries.glyphSize ?? 0
+                                : (childSeries.glyphSize ?? 0)
                             }
                           />
                         )}
@@ -495,7 +495,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           </EventEmitterProvider>
         </DataProvider>
       ) : (
-        slotEmpty ?? null
+        (slotEmpty ?? null)
       )}
 
       {children}

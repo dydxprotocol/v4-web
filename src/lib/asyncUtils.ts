@@ -33,8 +33,11 @@ export function wrapNullable<T>(data: T | undefined): { data: T | undefined } {
 
 export function mapNullableQueryResult<T>(
   res: Omit<UseQueryResult<{ data: T }>, 'refetch'>
-): Omit<UseQueryResult<T | undefined>, 'refetch'> {
-  return { ...res, data: res.data?.data };
+): Omit<UseQueryResult<T | undefined>, 'refetch' | 'promise'> {
+  return {
+    ...res,
+    data: res.data?.data,
+  };
 }
 
 export function promiseWithTimeout<T>(

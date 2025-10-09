@@ -10,7 +10,7 @@
 
 ## Prerequisites
 
-- Node.js version 18 and `pnpm` installed on your system
+- Node.js version 22 and `pnpm` installed on your system
 - Wallet Connect account
 
 For deploying with Vercel, create an account with [Vercel](https://vercel.com/signup) if you don't have one already.

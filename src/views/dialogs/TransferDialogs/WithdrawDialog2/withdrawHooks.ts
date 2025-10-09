@@ -130,17 +130,21 @@ export function useWithdrawStep({
         getCosmosSigner,
         route: withdrawRoute,
         userAddresses,
-        beforeMsg: {
-          msg: JSON.stringify({
-            sender: {
-              owner: dydxAddress,
-              number: 0,
+        appendCosmosMsgs: {
+          [withdrawRoute.sourceAssetChainId]: [
+            {
+              msg: JSON.stringify({
+                sender: {
+                  owner: dydxAddress,
+                  number: 0,
+                },
+                recipient: dydxAddress,
+                assetId: USDC_ASSET_ID,
+                quantums: withdrawRoute.amountIn,
+              }),
+              msgTypeUrl: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
             },
-            recipient: dydxAddress,
-            assetId: USDC_ASSET_ID,
-            quantums: withdrawRoute.amountIn,
-          }),
-          msgTypeUrl: TYPE_URL_MSG_WITHDRAW_FROM_SUBACCOUNT,
+          ],
         },
         onTransactionSigned: async () => {
           onWithdrawSigned(withdrawId);
