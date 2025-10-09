@@ -51,7 +51,8 @@ export const parseTurnkeyError = (
     message.includes('unable to decrypt bundle using embedded key') ||
     message.includes('Organization ID is not available') ||
     message.includes('Unauthenticated desc') ||
-    message.includes('Organization ID was not found')
+    message.includes('Organization ID was not found') ||
+    message.includes('could not find public key in organization')
   ) {
     return {
       errorMessage: stringGetter({ key: STRING_KEYS.INVALID_TURNKEY_EMAIL_LINK }),

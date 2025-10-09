@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ConnectorType, WalletInfo, wallets } from '@/constants/wallets';
+import { ConnectorType, WalletInfo, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
@@ -153,7 +153,12 @@ export const SignIn = ({
         </$OtherOptionButton> */}
 
         {displayedWallets
-          .filter((wallet) => wallet.connectorType === ConnectorType.Injected)
+          .filter(
+            (wallet) =>
+              wallet.connectorType === ConnectorType.Injected ||
+              wallet.name === WalletType.WalletConnect2 ||
+              wallet.name === WalletType.Phantom
+          )
           .map((wallet) => (
             <$OtherOptionButton
               key={wallet.name}
@@ -164,7 +169,9 @@ export const SignIn = ({
             >
               <div tw="row gap-0.5">
                 <WalletIcon wallet={wallet} />
-                {wallet.name}
+                {wallet.connectorType === ConnectorType.Injected
+                  ? wallet.name
+                  : stringGetter({ key: wallets[wallet.name as keyof typeof wallets].stringKey })}
               </div>
             </$OtherOptionButton>
           ))}

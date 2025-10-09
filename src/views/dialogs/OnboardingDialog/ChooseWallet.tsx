@@ -78,7 +78,7 @@ export const ChooseWallet = ({
           <AccentTag tw="rounded-[0.5rem]" isHighlighted>
             {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
           </AccentTag>
-          <Icon iconName={IconName.ChevronRight} />
+          <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </div>
       </$OtherOptionButton>
     </div>
