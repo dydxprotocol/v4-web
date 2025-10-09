@@ -18,17 +18,9 @@
         "faucet": "ts-node tasks/faucet.ts"
     },
     "devDependencies": {
-        "@nomiclabs/hardhat-ethers": "^2.2.3",
-        "@nomiclabs/hardhat-waffle": "^2.0.1",
-        "@types/mocha": "^8.2.0",
-        "@types/node": "^14.14.28",
-        "chai": "^4.3.0",
-        "chai-bn": "^0.2.1",
+        "@types/node": "20.3.1",
         "dotenv": "^8.2.0",
-        "ethers": "^5.0.31",
-        "hardhat": "2.22.5",
         "husky": "8.0.3",
-        "patch-package": "8.0.0",
         "prettier": "3.1.0",
         "ts-node": "^10.9.2",
         "typescript": "^4.1.5"
