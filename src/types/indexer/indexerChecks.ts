@@ -2,11 +2,11 @@ import typia from 'typia';
 
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
-  IndexerHistoricalPnlResponse,
   IndexerHistoricalTradingRewardAggregationsResponse,
   IndexerOrderbookResponseObject,
   IndexerParentSubaccountTransferResponse,
   IndexerPerpetualMarketResponse,
+  IndexerPnlResponse,
   IndexerTradeResponse,
 } from './indexerApiGen';
 import {
@@ -54,6 +54,6 @@ export const isParentSubaccountBlockRewardResponse =
   typia.createAssert<IndexerHistoricalBlockTradingRewardsResponse>();
 export const isPerpetualMarketSparklineResponse =
   typia.createAssert<IndexerSparklineResponseObject>();
-export const isIndexerHistoricalPnlResponse = typia.createAssert<IndexerHistoricalPnlResponse>();
+export const isIndexerHistoricalPnlResponse = typia.createAssert<IndexerPnlResponse>();
 export const isIndexerHistoricalTradingRewardAggregationResponse =
   typia.createAssert<IndexerHistoricalTradingRewardAggregationsResponse>();
