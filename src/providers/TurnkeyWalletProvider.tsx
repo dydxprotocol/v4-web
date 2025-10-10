@@ -8,7 +8,13 @@ import { AES } from 'crypto-js';
 import { hashMessage, hashTypedData, toHex } from 'viem';
 
 import { ConnectorType, getSignTypedDataForTurnkey } from '@/constants/wallets';
-import { HashFunction, PayloadEncoding, TurnkeyWallet, UserSession } from '@/types/turnkey';
+import {
+  AddressFormat,
+  HashFunction,
+  PayloadEncoding,
+  TurnkeyWallet,
+  UserSession,
+} from '@/types/turnkey';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -169,14 +175,14 @@ const useTurnkeyWalletContext = () => {
       }
 
       if (tkClient && isIndexedDbFlow) {
-        const wallets = await getWalletsWithAccountsFromClient(
+        const walletsWithAccounts = await getWalletsWithAccountsFromClient(
           tkClient,
           user.organization.organizationId
         );
 
-        if (wallets.length > 0) {
-          setPrimaryTurnkeyWallet(wallets[0]!);
-          return wallets[0]!;
+        if (walletsWithAccounts.length > 0) {
+          setPrimaryTurnkeyWallet(walletsWithAccounts[0]!);
+          return walletsWithAccounts[0]!;
         }
       }
 
@@ -197,7 +203,11 @@ const useTurnkeyWalletContext = () => {
     }) => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
 
-      if (selectedTurnkeyWallet == null || selectedTurnkeyWallet.accounts[0] == null) {
+      const ethAccount = selectedTurnkeyWallet?.accounts.find(
+        (account) => account.addressFormat === AddressFormat.Ethereum
+      );
+
+      if (selectedTurnkeyWallet == null || ethAccount == null) {
         throw new Error('Selected turnkey wallet is not available');
       }
 
@@ -215,8 +225,8 @@ const useTurnkeyWalletContext = () => {
       const digest = hashTypedData(typedData);
 
       const response = await tkClient.signRawPayload({
-        signWith: selectedTurnkeyWallet.accounts[0].address,
-        organizationId: selectedTurnkeyWallet.accounts[0].organizationId,
+        signWith: ethAccount.address,
+        organizationId: ethAccount.organizationId,
         payload: digest,
         encoding: PayloadEncoding.Hexadecimal,
         hashFunction: HashFunction.NoOp,

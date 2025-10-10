@@ -1,7 +1,6 @@
 import type { TurnkeyIframeClient, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
-import type { TurnkeyWallet } from '@/types/turnkey';
 
 /**
  * Get wallets with accounts from the Turnkey indexedDB client.
@@ -12,7 +11,7 @@ import type { TurnkeyWallet } from '@/types/turnkey';
 export async function getWalletsWithAccountsFromClient(
   tkClient: TurnkeyIndexedDbClient | TurnkeyIframeClient,
   organizationId: string
-): Promise<TurnkeyWallet[]> {
+) {
   const { wallets } = await tkClient.getWallets({ organizationId });
 
   const walletWithAccounts = await Promise.all(
@@ -22,11 +21,11 @@ export async function getWalletsWithAccountsFromClient(
         organizationId,
       });
 
-      const accountsWithBalance = accounts.filter(
+      const accountsForWallet = accounts.filter(
         (account) => account.organizationId === organizationId
       );
 
-      return { ...wallet, accounts: accountsWithBalance };
+      return { ...wallet, accounts: accountsForWallet };
     })
   );
 

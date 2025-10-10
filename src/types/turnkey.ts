@@ -35,6 +35,11 @@ export enum PayloadEncoding {
   TextUTF8 = 'PAYLOAD_ENCODING_TEXT_UTF8',
 }
 
+export enum AddressFormat {
+  Ethereum = 'ADDRESS_FORMAT_ETHEREUM',
+  Solana = 'ADDRESS_FORMAT_SOLANA',
+}
+
 export type SignRawPayloadResult = TurnkeyApiTypes['v1SignRawPayloadResult'];
 
 export type GoogleIdTokenPayload = {
