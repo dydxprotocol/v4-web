@@ -263,7 +263,11 @@ const useTurnkeyWalletContext = () => {
     }): Promise<{ dydxAddress: string; signature: string }> => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
 
-      if (selectedTurnkeyWallet == null || selectedTurnkeyWallet.accounts[0] == null) {
+      const ethAccount = selectedTurnkeyWallet?.accounts.find(
+        (account) => account.addressFormat === AddressFormat.Ethereum
+      );
+
+      if (selectedTurnkeyWallet == null || ethAccount == null) {
         throw new Error('Selected turnkey wallet is not available');
       }
 
@@ -274,8 +278,8 @@ const useTurnkeyWalletContext = () => {
       const payload = hashMessage(dydxAddress);
 
       const response = await tkClient.signRawPayload({
-        signWith: selectedTurnkeyWallet.accounts[0].address,
-        organizationId: selectedTurnkeyWallet.accounts[0].organizationId,
+        signWith: ethAccount.address,
+        organizationId: ethAccount.organizationId,
         payload,
         encoding: PayloadEncoding.Hexadecimal,
         hashFunction: HashFunction.NoOp,
