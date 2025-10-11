@@ -3,5 +3,4 @@ library;
 
 pub mod vault;
 pub mod vault_pricefeed;
-pub mod shorts_tracker;
 pub mod pricefeed_wrapper;

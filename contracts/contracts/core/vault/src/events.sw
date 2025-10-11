@@ -53,16 +53,6 @@ pub struct WriteFeeReserve {
     pub fee_reserve: u256,
 }
 
-pub struct WriteGlobalShortAveragePrice {
-    pub asset: b256,
-    pub global_short_average_price: u256,
-}
-
-pub struct SetMaxGlobalShortSize {
-    pub asset: b256,
-    pub max_global_short_size: u256,
-}
-
 pub struct SetLiquidator {
     pub liquidator: Identity,
     pub is_active: bool,
@@ -111,30 +101,34 @@ pub struct IncreasePosition {
     pub key: b256,
     pub account: Identity,
     pub index_asset: b256,
+    pub is_long: bool,
     pub collateral_delta: u256,
     pub size_delta: u256,
-    pub is_long: bool,
     pub price: u256,
-    pub fee: u256,
+    pub average_price: u256,
+    pub position_fee: u256,
+    pub funding_rate: u256,
+    pub funding_rate_has_profit: bool,
+    pub cumulative_funding_rate: u256,
 }
 
 pub struct DecreasePosition {
     pub key: b256,
     pub account: Identity,
     pub index_asset: b256,
+    pub is_long: bool,
     pub collateral_delta: u256,
     pub size_delta: u256,
-    pub is_long: bool,
     pub price: u256,
-    pub fee: u256,
+    pub average_price: u256,
+    pub position_fee: u256,
+    pub funding_rate: u256,
+    pub funding_rate_has_profit: bool,
+    pub cumulative_funding_rate: u256,
 }
 
 pub struct ClosePosition {
     pub key: b256,
-    pub size: u256,
-    pub collateral: u256,
-    pub average_price: u256,
-    pub entry_funding_rate: u256,
     pub realized_pnl: Signed256,
 }
 
@@ -143,10 +137,13 @@ pub struct LiquidatePosition {
     pub account: Identity,
     pub index_asset: b256,
     pub is_long: bool,
-    pub size: u256,
     pub collateral: u256,
-    pub realized_pnl: Signed256,
+    pub size: u256,
     pub mark_price: u256,
+    pub position_fee: u256,
+    pub funding_rate: u256,
+    pub funding_rate_has_profit: bool,
+    pub cumulative_funding_rate: u256,
 }
 
 pub struct UpdatePnl {
@@ -193,4 +190,11 @@ pub struct WriteReservedAmount {
 pub struct WriteGuaranteedAmount {
     pub asset: b256,
     pub guaranteed_amount: u256,
+}
+
+pub struct UpdateFundingInfo {
+    pub asset: b256,
+    pub total_short_sizes: u256,
+    pub total_long_sizes: u256,
+    pub cumulative_funding_rate: u256,
 }

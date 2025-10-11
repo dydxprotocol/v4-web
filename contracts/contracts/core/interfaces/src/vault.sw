@@ -11,7 +11,7 @@ pub struct Position {
     pub size: u256,
     pub collateral: u256,
     pub average_price: u256,
-    pub entry_funding_rate: u256,
+    pub cumulative_funding_rate: u256,
     pub reserve_amount: u256,
     pub realized_pnl: Signed256,
     pub last_increased_time: u64
@@ -60,24 +60,11 @@ abi Vault {
         buffer_amount: u256
     );
 
-    #[storage(write)]
-    fn set_max_global_short_size(
-        asset: b256, 
-        max_global_short_size: u256
-    );
-
     #[storage(read, write)]
     fn set_fees(
         mint_burn_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
-    );
-
-    #[storage(read, write)]
-    fn set_funding_rate(
-        funding_interval: u64, 
-        funding_rate_factor: u64, 
-        stable_funding_rate_factor: u64,
     );
 
     #[storage(read, write)]
@@ -133,18 +120,6 @@ abi Vault {
     ) -> (bool, u256);
 
     #[storage(read)]
-    fn get_entry_funding_rate(
-        index_asset: b256,
-        is_long: bool 
-    ) -> u256;
-
-    #[storage(read)]
-    fn get_funding_fee(
-        size: u256,
-        entry_funding_rate: u256
-    ) -> u256;
-
-    #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position;
 
     #[storage(read)]
@@ -154,12 +129,6 @@ abi Vault {
         is_long: bool,
         size_delta: u256,
     ) -> u256;
-
-    #[storage(read)]
-    fn get_global_short_sizes(asset: b256) -> u256;
-
-    #[storage(read)]
-    fn get_global_short_average_prices(asset: b256) -> u256;
 
     #[storage(read)]
     fn get_guaranteed_usd(asset: b256) -> u256;
@@ -207,9 +176,6 @@ abi Vault {
     ) -> u256;
 
     #[storage(read)]
-    fn get_cumulative_funding_rate() -> u256;
-
-    #[storage(read)]
     fn get_fee_basis_points(
         asset: b256,
         lp_asset_delta: u256,
@@ -225,12 +191,6 @@ abi Vault {
 
     #[storage(read)]
     fn get_margin_fee_basis_points() -> u64;
-
-    #[storage(read)]
-    fn get_next_funding_rate(asset: b256) -> u256;
-
-    #[storage(read)]
-    fn get_global_short_delta(asset: b256) -> (bool, u256);
 
     #[storage(read)]
     fn is_liquidator(account: Identity) -> bool;
@@ -260,8 +220,6 @@ abi Vault {
        / / /   |  __/| |_| | |_) | | | (__ 
       /_/_/    |_|    \__,_|_.__/|_|_|\___|
     */
-    #[storage(read, write)]
-    fn update_cumulative_funding_rate();
 
     #[payable]
     #[storage(read, write)]
@@ -288,7 +246,7 @@ abi Vault {
         size_delta: u256,
         is_long: bool,
         receiver: Identity
-    ) -> u256;
+    );
 
     #[storage(read, write)]
     fn liquidate_position(
@@ -313,7 +271,7 @@ impl Position {
             size: 0,
             collateral: 0,
             average_price: 0,
-            entry_funding_rate: 0,
+            cumulative_funding_rate: 0,
             reserve_amount: 0,
             realized_pnl: Signed256::from(0),
             last_increased_time: 0,

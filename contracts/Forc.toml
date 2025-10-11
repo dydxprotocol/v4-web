@@ -8,8 +8,6 @@ members = [
     "contracts/core/pricefeed-wrapper",
     "contracts/core/vault",
     
-    "contracts/core/shorts-tracker",
-
     "contracts/assets/yield-tracker",
     "contracts/assets/rusd",
     "contracts/assets/time-distributor",

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AbstractContract, WalletUnlocked } from "fuels"
 import { launchNode, getNodeWallets } from "./node"
 import { 
@@ -91,14 +91,6 @@ describe("Vault.touch", () => {
                 30, // mint_burn_fee_basis_points
                 10, // margin_fee_basis_points
                 expandDecimals(5), // liquidation_fee_usd
-            ),
-        )
-
-        await call(
-            vault.functions.set_funding_rate(
-                8 * 3600, // funding_interval (8 hours)
-                600, // fundingRateFactor
-                600, // stableFundingRateFactor
             ),
         )
 

@@ -100,15 +100,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "shorts-tracker"
-source = "member"
-dependencies = [
-    "core_interfaces",
-    "helpers",
-    "std",
-]
-
-[[package]]
 name = "signed_int"
 version = "0.26.1"
 source = "registry+signed_int?0.26.1#QmWB8r7jN9bE1sVUJzQoTCbsTXyL6qB55mSfeicd6EtoAo!"
