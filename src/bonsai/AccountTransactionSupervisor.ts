@@ -574,6 +574,18 @@ export class AccountTransactionSupervisor {
 
           const payload = context.payload;
           const isShortTermOrder = isShortTermOrderPayload(payload);
+
+          // these properties are calculated for logging purposes only here
+          // do NOT use for order submission because they will be stale by the time we are submitting
+          const currentHeight = estimateLiveValidatorHeight(
+            this.store.getState(),
+            BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION
+          );
+          const goodTilBlock =
+            isShortTermOrder && currentHeight != null
+              ? currentHeight + SHORT_TERM_ORDER_DURATION - SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
+              : undefined;
+
           const trackingMetadata: TradeAdditionalMetadata = {
             source,
             volume: payload.size * payload.price,
@@ -581,7 +593,11 @@ export class AccountTransactionSupervisor {
 
           return next({
             ...context,
-            payload,
+            payload: {
+              ...payload,
+              goodTilBlock,
+              currentHeight,
+            },
             trackingMetadata,
             transferMetadata,
             isShortTermOrder,
