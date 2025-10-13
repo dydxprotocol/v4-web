@@ -167,16 +167,6 @@ pub struct SetMaxLeverage {
     pub max_leverage: u256,
 }
 
-pub struct UpdateFundingRate {
-    pub asset: b256,
-    pub funding_rate: u256,
-}
-
-pub struct UpdateGlobalShortSize {
-    pub asset: b256,
-    pub global_short_size: u256
-}
-
 pub struct WritePoolAmount {
     pub asset: b256,
     pub pool_amount: u256,
@@ -196,5 +186,6 @@ pub struct UpdateFundingInfo {
     pub asset: b256,
     pub total_short_sizes: u256,
     pub total_long_sizes: u256,
-    pub cumulative_funding_rate: u256,
+    pub long_cumulative_funding_rate: u256,
+    pub short_cumulative_funding_rate: u256,
 }

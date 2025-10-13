@@ -77,7 +77,8 @@ configurable {
 struct FundingInfo {
     total_short_sizes: u256,
     total_long_sizes: u256,
-    cumulative_funding_rate: u256,
+    long_cumulative_funding_rate: u256,
+    short_cumulative_funding_rate: u256,
     last_funding_time: u64,
 }
 
@@ -1842,22 +1843,23 @@ fn _calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, posi
         None => return (0, true),
     };
     let now = timestamp();
-    let current_cumulative_funding_rate = _calculate_cumulative_funding_rate(funding_info, now);
+    let (current_long_cumulative_funding_rate, current_short_cumulative_funding_rate) = 
+        _calculate_cumulative_funding_rate(funding_info, now);
 
     let (has_profit, funding_rate_with_precision) = if (is_long) {
-        if (current_cumulative_funding_rate > position_cumulative_funding_rate) {
-            (false, current_cumulative_funding_rate - position_cumulative_funding_rate)
+        if (current_long_cumulative_funding_rate > position_cumulative_funding_rate) {
+            (false, current_long_cumulative_funding_rate - position_cumulative_funding_rate)
         } else {
-            (true, position_cumulative_funding_rate - current_cumulative_funding_rate)
+            (true, position_cumulative_funding_rate - current_long_cumulative_funding_rate)
         }
     } else {
-        if (current_cumulative_funding_rate < position_cumulative_funding_rate) {
-            (false, position_cumulative_funding_rate - current_cumulative_funding_rate)
+        if (current_short_cumulative_funding_rate < position_cumulative_funding_rate) {
+            (false, position_cumulative_funding_rate - current_short_cumulative_funding_rate)
         } else {
-            (true, current_cumulative_funding_rate - position_cumulative_funding_rate)
+            (true, current_short_cumulative_funding_rate - position_cumulative_funding_rate)
         }
     };
-    (funding_rate_with_precision / FUNDING_RATE_PRECISION, has_profit)
+    (funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION, has_profit)
 }
 
 #[storage(read, write)]
@@ -1865,13 +1867,16 @@ fn _increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        cumulative_funding_rate: 0,
+        long_cumulative_funding_rate: 2u256 ** 255,
+        short_cumulative_funding_rate: 2u256 ** 255,
         last_funding_time: 0,
     });
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {
-        funding_info.cumulative_funding_rate = _calculate_cumulative_funding_rate(funding_info, now);
+        let (long_cumulative_funding_rate, short_cumulative_funding_rate) = _calculate_cumulative_funding_rate(funding_info, now);
+        funding_info.long_cumulative_funding_rate = long_cumulative_funding_rate;
+        funding_info.short_cumulative_funding_rate = short_cumulative_funding_rate;
     }
     if (is_long) {
         funding_info.total_long_sizes = funding_info.total_long_sizes + size;
@@ -1884,9 +1889,14 @@ fn _increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
         asset,
         total_short_sizes: funding_info.total_short_sizes,
         total_long_sizes: funding_info.total_long_sizes,
-        cumulative_funding_rate: funding_info.cumulative_funding_rate,
+        long_cumulative_funding_rate: funding_info.long_cumulative_funding_rate,
+        short_cumulative_funding_rate: funding_info.short_cumulative_funding_rate,
     });
-    funding_info.cumulative_funding_rate
+    if is_long {
+        funding_info.long_cumulative_funding_rate
+    } else {
+        funding_info.short_cumulative_funding_rate
+    }
 }
 
 #[storage(read, write)]
@@ -1894,13 +1904,16 @@ fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        cumulative_funding_rate: 0,
+        long_cumulative_funding_rate: 2u256 ** 255,
+        short_cumulative_funding_rate: 2u256 ** 255,
         last_funding_time: 0,
     });
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {
-        funding_info.cumulative_funding_rate = _calculate_cumulative_funding_rate(funding_info, now);
+        let (long_cumulative_funding_rate, short_cumulative_funding_rate) = _calculate_cumulative_funding_rate(funding_info, now);
+        funding_info.long_cumulative_funding_rate = long_cumulative_funding_rate;
+        funding_info.short_cumulative_funding_rate = short_cumulative_funding_rate;
     }
     // TODO underflow check
     if (is_long) {
@@ -1914,9 +1927,14 @@ fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
         asset,
         total_short_sizes: funding_info.total_short_sizes,
         total_long_sizes: funding_info.total_long_sizes,
-        cumulative_funding_rate: funding_info.cumulative_funding_rate,
+        long_cumulative_funding_rate: funding_info.long_cumulative_funding_rate,
+        short_cumulative_funding_rate: funding_info.short_cumulative_funding_rate,
     });
-    funding_info.cumulative_funding_rate
+    if is_long {
+        funding_info.long_cumulative_funding_rate
+    } else {
+        funding_info.short_cumulative_funding_rate
+    }
 }
 
 #[storage(read, write)]
@@ -1924,13 +1942,16 @@ fn _update_funding_info(asset: b256) {
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        cumulative_funding_rate: 0,
+        long_cumulative_funding_rate: 2u256 ** 255,
+        short_cumulative_funding_rate: 2u256 ** 255,
         last_funding_time: 0,
     });
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {
-        funding_info.cumulative_funding_rate = _calculate_cumulative_funding_rate(funding_info, now);
+        let (long_cumulative_funding_rate, short_cumulative_funding_rate) = _calculate_cumulative_funding_rate(funding_info, now);
+        funding_info.long_cumulative_funding_rate = long_cumulative_funding_rate;
+        funding_info.short_cumulative_funding_rate = short_cumulative_funding_rate;
     }
     funding_info.last_funding_time = now;
     storage::fund.funding_info.insert(asset, funding_info);
@@ -1938,11 +1959,40 @@ fn _update_funding_info(asset: b256) {
         asset,
         total_short_sizes: funding_info.total_short_sizes,
         total_long_sizes: funding_info.total_long_sizes,
-        cumulative_funding_rate: funding_info.cumulative_funding_rate,
+        long_cumulative_funding_rate: funding_info.long_cumulative_funding_rate,
+        short_cumulative_funding_rate: funding_info.short_cumulative_funding_rate,
     });
 }
 
 // TODO implement
-fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> u256 {
-    return 0;
+fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256) {
+    let time_delta = now - funding_info.last_funding_time;
+    // from_long means that longs are in excess and pay shorts
+    let (from_long, size_delta) = if funding_info.total_long_sizes > funding_info.total_short_sizes {
+        (true, funding_info.total_long_sizes - funding_info.total_short_sizes)
+    } else {
+        (false, funding_info.total_short_sizes - funding_info.total_long_sizes)
+    };
+    let total_funding_rate_delta = time_delta.as_u256() * size_delta * FUNDING_RATE_PRECISION * FUNDING_RATE_FACTOR / FUNDING_RATE_FACTOR_BASE;
+    let long_cumulative_funding_rate_delta = if funding_info.total_long_sizes == 0 {
+        0
+    } else {
+        total_funding_rate_delta / funding_info.total_long_sizes
+    };
+    let short_cumulative_funding_rate_delta = if funding_info.total_short_sizes == 0 {
+        0
+    } else {
+        total_funding_rate_delta / funding_info.total_short_sizes
+    };
+    if from_long {
+        (
+            funding_info.long_cumulative_funding_rate + long_cumulative_funding_rate_delta,
+            funding_info.short_cumulative_funding_rate - short_cumulative_funding_rate_delta
+        )
+    } else {
+        (
+            funding_info.long_cumulative_funding_rate - long_cumulative_funding_rate_delta,
+            funding_info.short_cumulative_funding_rate + short_cumulative_funding_rate_delta
+        )
+    }
 }
