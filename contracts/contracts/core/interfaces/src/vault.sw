@@ -54,12 +54,6 @@ abi Vault {
         max_leverage: u256
     );
 
-    #[storage(write)]
-    fn set_buffer_amount(
-        asset: b256, 
-        buffer_amount: u256
-    );
-
     #[storage(read, write)]
     fn set_fees(
         mint_burn_fee_basis_points: u64,
@@ -131,9 +125,6 @@ abi Vault {
     ) -> u256;
 
     #[storage(read)]
-    fn get_guaranteed_usd(asset: b256) -> u256;
-
-    #[storage(read)]
     fn get_max_price(asset: b256) -> u256;
 
     #[storage(read)]
@@ -144,12 +135,6 @@ abi Vault {
 
     #[storage(read)]
     fn get_fee_reserve() -> u256;
-
-    #[storage(read)]
-    fn get_reserved_amount(asset: b256) -> u256;
-
-    #[storage(read)]
-    fn get_buffer_amounts(asset: b256) -> u256;
 
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64;

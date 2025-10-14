@@ -1,27 +1,8 @@
 [[package]]
-name = "asset"
-version = "0.26.1"
-source = "registry+asset?0.26.1#QmRX3CYxadKPi2pz7aFNoHmTrEYK7TfBv3D8mzDmvcniAQ!"
-dependencies = [
-    "src20",
-    "src7",
-    "std",
-]
-
-[[package]]
-name = "asset_interfaces"
-source = "path+from-root-1B6596007668D2B9"
-dependencies = [
-    "helpers",
-    "std",
-]
-
-[[package]]
 name = "core_interfaces"
 source = "path+from-root-B13D3383E17FE97A"
 dependencies = [
     "helpers",
-    "pyth_interface",
     "std",
 ]
 
@@ -50,23 +31,6 @@ source = "path+from-root-A53CDECCD463BB5B"
 dependencies = ["std"]
 
 [[package]]
-name = "mock-pricefeed"
-source = "member"
-dependencies = [
-    "helpers",
-    "mock_interfaces",
-    "std",
-]
-
-[[package]]
-name = "mock_interfaces"
-source = "path+from-root-31481B2BEA49490C"
-dependencies = [
-    "helpers",
-    "std",
-]
-
-[[package]]
 name = "pausable"
 version = "0.26.1"
 source = "registry+pausable?0.26.1#QmapdwdUETu3aWXa5xnjdsgqDWhh9WnGkYQcBi7UqfWsrL!"
@@ -80,23 +44,6 @@ dependencies = [
     "signed_int",
     "std",
     "stork_sway_sdk",
-]
-
-[[package]]
-name = "pyth_interface"
-source = "git+https://github.com/pyth-network/pyth-crosschain?tag=pyth-lazer-agent-v0.4.1#2a543d4b8719c7d0b3dad40f982c121307647815"
-dependencies = ["std"]
-
-[[package]]
-name = "rusd"
-source = "member"
-dependencies = [
-    "asset",
-    "asset_interfaces",
-    "helpers",
-    "src20",
-    "src3",
-    "std",
 ]
 
 [[package]]
@@ -115,12 +62,6 @@ dependencies = ["std"]
 name = "src3"
 version = "0.8.0"
 source = "registry+src3?0.8.0#QmWZt1NRQHid4p5cmFMG11n1tnRfNSgWGXUWDgojt9hjzs!"
-dependencies = ["std"]
-
-[[package]]
-name = "src7"
-version = "0.8.0"
-source = "registry+src7?0.8.0#QmbDHPdbKzpRg31bxNNLHQ6pyreH2GjHiXjnR7aKoNC2Y5!"
 dependencies = ["std"]
 
 [[package]]
@@ -155,42 +96,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "time-distributor"
-source = "member"
-dependencies = [
-    "asset_interfaces",
-    "helpers",
-    "std",
-]
-
-[[package]]
 name = "vault"
 source = "member"
 dependencies = [
-    "asset_interfaces",
     "core_interfaces",
     "helpers",
     "pausable",
     "src20",
     "src3",
-    "std",
-]
-
-[[package]]
-name = "vault-pricefeed"
-source = "member"
-dependencies = [
-    "core_interfaces",
-    "helpers",
-    "pyth_interface",
-    "std",
-]
-
-[[package]]
-name = "yield-tracker"
-source = "member"
-dependencies = [
-    "asset_interfaces",
-    "helpers",
     "std",
 ]

@@ -34,7 +34,6 @@ use std::hash::*;
 use helpers::{
     signed_256::*,
     transfer::transfer_assets,
-    time::get_unix_timestamp,
     utils::*,
     zero::*,
     reentrancy::*,
@@ -114,9 +113,6 @@ storage {
         whitelisted_assets: StorageMap<b256, bool> = StorageMap {},
         asset_decimals: StorageMap<b256, u32> = StorageMap {},
 
-        // allows specification of an amount to exclude from swaps
-        // can be used to ensure a certain amount of liquidity is available for leverage positions
-        buffer_amounts: StorageMap<b256, u256> = StorageMap {},
         // tracks all open Positions
         positions: StorageMap<b256, Position> = StorageMap {},
         // tracks amount of fees (in collateral asset)
@@ -126,17 +122,6 @@ storage {
         // tracked separately to exclude funds that are deposited 
         // as margin collateral
         pool_amounts: StorageMap<b256, u256> = StorageMap {},
-        // tracks the amount of USD that is "guaranteed" by opened leverage positions
-        // this value is used to calculate the redemption values for selling of RUSD
-        // this is an estimated amount, it is possible for the actual guaranteed value to be lower
-        // in the case of sudden price decreases, the guaranteed value should be corrected
-        // after liquidations are carried out
-        guaranteed_usd: StorageMap<b256, u256> = StorageMap {},
-        // tracks the number of tokens reserved for open leverage positions
-        reserved_amounts: StorageMap<b256, u256> = StorageMap {},
-        /// tracks the total size of all short positions for each Asset
-        /// value is total size of all short positions across all users
-        global_short_sizes: StorageMap<b256, u256> = StorageMap {},
     },
 
     fund {
@@ -285,16 +270,6 @@ impl Vault for Contract {
         _only_gov();
         storage::vault.is_liquidator.insert(liquidator, is_active);
         log(SetLiquidator { liquidator, is_active });
-    }
-
-    #[storage(write)]
-    fn set_buffer_amount(
-        asset: b256, 
-        buffer_amount: u256
-    ) {
-        _only_gov();
-        storage::vault.buffer_amounts.insert(asset, buffer_amount);
-        log(SetBufferAmount { asset, buffer_amount });
     }
 
     #[storage(write)]
@@ -473,11 +448,6 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_guaranteed_usd(asset: b256) -> u256 {
-        storage::vault.guaranteed_usd.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
     fn get_max_price(asset: b256) -> u256 {
         _get_max_price(asset)
     }
@@ -497,16 +467,6 @@ impl Vault for Contract {
         storage::vault.fee_reserve.try_read().unwrap_or(0)
     }
     
-    #[storage(read)]
-    fn get_reserved_amount(asset: b256) -> u256 {
-        storage::vault.reserved_amounts.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
-    fn get_buffer_amounts(asset: b256) -> u256 {
-        storage::vault.buffer_amounts.get(asset).try_read().unwrap_or(0)
-    }
-
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64 {
         storage::vault.all_whitelisted_assets.len()
@@ -753,14 +713,6 @@ fn _transfer_out(
     );
 }
 
-#[storage(read)]
-fn _validate_buffer_amount(asset: b256) {
-    require(
-        _get_pool_amounts(asset) >= _get_buffer_amounts(asset),
-        Error::VaultPoolAmountLtBuffer
-    );
-}
-
 #[storage(write)]
 fn _write_position(
     position_key: b256, 
@@ -842,18 +794,8 @@ fn _get_pool_amounts(asset: b256) -> u256 {
 }
 
 #[storage(read)]
-fn _get_buffer_amounts(asset: b256) -> u256 {
-    storage::vault.buffer_amounts.get(asset).try_read().unwrap_or(0)
-}
-
-#[storage(read)]
 fn _get_fee_reserve() -> u256 {
     storage::vault.fee_reserve.try_read().unwrap_or(0)
-}
-
-#[storage(read)]
-fn _get_reserved_amount(asset: b256) -> u256 {
-    storage::vault.reserved_amounts.get(asset).try_read().unwrap_or(0)
 }
 
 fn _get_position_key(
@@ -1040,11 +982,6 @@ fn _decrease_pool_amount(amount: u256) {
     let new_pool_amount = pool_amount - amount;
     storage::vault.pool_amounts.insert(asset, new_pool_amount);
     log(WritePoolAmount { asset, pool_amount: new_pool_amount });
-
-    require(
-        _get_reserved_amount(asset) <= new_pool_amount,
-        Error::VaultReserveExceedsPool
-    );
 }
 
 #[storage(read)]

@@ -58,11 +58,6 @@ pub struct SetLiquidator {
     pub is_active: bool,
 }
 
-pub struct SetBufferAmount {
-    pub asset: b256,
-    pub buffer_amount: u256,
-}
-
 pub struct SetPricefeedProvider {
     pub pricefeed_provider: ContractId,
 }

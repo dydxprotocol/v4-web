@@ -67,9 +67,7 @@ pub enum Error {
     VaultMaxLeverageExceeded: (),
     VaultPoolAmountExceeded: (),
 
-    VaultReserveExceedsPool: (),
     VaultInvalidIncrease: (),
-    VaultInsufficientReserve: (),
 
     VaultAccountCannotBeZero: (),
     VaultCollateralAssetNotWhitelisted: (),

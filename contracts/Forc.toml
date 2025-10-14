@@ -1,16 +1,10 @@
 [workspace]
 members = [
     "contracts/mocks/fungible",
-    "contracts/mocks/mock-pricefeed",
     "contracts/mocks/stork-mock",
 
-    "contracts/core/vault-pricefeed",
     "contracts/core/pricefeed-wrapper",
     "contracts/core/vault",
-    
-    "contracts/assets/yield-tracker",
-    "contracts/assets/rusd",
-    "contracts/assets/time-distributor",
 
     "contracts/testnet/token",
 ]
