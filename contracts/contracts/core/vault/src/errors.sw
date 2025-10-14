@@ -54,7 +54,8 @@ pub enum Error {
 
     VaultDecimalsAreZero: (),
     VaultPriceQueriedIsZero: (),
-
+    VaultInvalidMaxLeverage: (),
+    
     VaultReceiverCannotBeZero: (),
 
     VaultInvalidRusdAmount: (),

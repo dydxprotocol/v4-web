@@ -335,6 +335,7 @@ impl Vault for Contract {
     #[storage(write)]
     fn set_max_leverage(asset: b256, max_leverage: u256) {
         _only_gov();
+        require(max_leverage <= MAX_LEVERAGE, Error::VaultInvalidMaxLeverage);
         storage::vault.max_leverage.insert(asset, max_leverage);
         log(SetMaxLeverage { asset, max_leverage });
     }
@@ -1867,8 +1868,8 @@ fn _increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255,
-        short_cumulative_funding_rate: 2u256 ** 255,
+        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
+        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
         last_funding_time: 0,
     });
     let now = timestamp();
@@ -1904,8 +1905,8 @@ fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255,
-        short_cumulative_funding_rate: 2u256 ** 255,
+        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
+        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
         last_funding_time: 0,
     });
     let now = timestamp();
@@ -1942,8 +1943,8 @@ fn _update_funding_info(asset: b256) {
     let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
         total_short_sizes: 0,
         total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255,
-        short_cumulative_funding_rate: 2u256 ** 255,
+        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
+        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
         last_funding_time: 0,
     });
     let now = timestamp();
