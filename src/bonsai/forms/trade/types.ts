@@ -245,6 +245,7 @@ export type TradeFormSummary = {
 export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+  selectedMarketLeverages: { [marketId: string]: number };
 
   currentTradeMarketOpenOrders: SubaccountOrder[]; // todo remove maybe
   allOpenOrders: SubaccountOrder[];

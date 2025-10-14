@@ -17,7 +17,7 @@ import {
   getDisplayableTickerFromMarket,
 } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 
 import { MarketsData } from '../types/rawTypes';
 import {
@@ -164,4 +164,56 @@ export function createMarketSummary(
     }),
     isTruthy
   );
+}
+
+/**
+ * Calculate the effective selected leverage for a market.
+ * Returns user-selected leverage if set, otherwise calculates max leverage from IMF only (ignoring OIMF).
+ */
+export function calculateEffectiveSelectedLeverage({
+  userSelectedLeverage,
+  initialMarginFraction,
+}: {
+  userSelectedLeverage: number | undefined;
+  initialMarginFraction: string | number | BigNumber | null | undefined;
+}): number {
+  // Return user-selected leverage if it exists
+  if (userSelectedLeverage != null) {
+    return userSelectedLeverage;
+  }
+
+  // Otherwise calculate from IMF only (ignoring OIMF as requested)
+  const imf = MaybeBigNumber(initialMarginFraction);
+  if (imf != null) {
+    return BIG_NUMBERS.ONE.div(imf).toNumber();
+  }
+
+  // Fallback
+  return 1;
+}
+
+/**
+ * Calculate the effective selected leverage for a market, returning BigNumber.
+ * Returns user-selected leverage if set, otherwise calculates max leverage from IMF only (ignoring OIMF).
+ */
+export function calculateEffectiveSelectedLeverageBigNumber({
+  userSelectedLeverage,
+  initialMarginFraction,
+}: {
+  userSelectedLeverage: number | undefined;
+  initialMarginFraction: string | number | BigNumber | null | undefined;
+}): BigNumber {
+  // Return user-selected leverage if it exists
+  if (userSelectedLeverage != null) {
+    return MustBigNumber(userSelectedLeverage);
+  }
+
+  // Otherwise calculate from IMF only (ignoring OIMF as requested)
+  const imf = MaybeBigNumber(initialMarginFraction);
+  if (imf != null) {
+    return BIG_NUMBERS.ONE.div(imf);
+  }
+
+  // Fallback
+  return BIG_NUMBERS.ONE;
 }

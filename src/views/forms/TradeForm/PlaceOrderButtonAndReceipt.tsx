@@ -25,7 +25,7 @@ import { Button } from '@/components/Button';
 import { DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -89,7 +89,6 @@ export const PlaceOrderButtonAndReceipt = ({
   );
   const {
     liquidationPrice,
-    leverage,
     notional: notionalTotal,
     adjustedImf,
     marginValueMaintenance,
@@ -217,31 +216,6 @@ export const PlaceOrderButtonAndReceipt = ({
           </WithTooltip>
         ),
         value: renderMarginValue(),
-      },
-      {
-        key: 'position-leverage',
-        label: (
-          <WithTooltip tooltip="position-leverage" side="right">
-            {stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE })}
-          </WithTooltip>
-        ),
-        value: (
-          <DiffOutput
-            useGrouping
-            type={OutputType.Multiple}
-            value={leverage?.toNumber()}
-            newValue={postOrderPositionData.leverage}
-            withDiff={
-              areInputsFilled &&
-              getDoubleValuesHasDiff(
-                leverage?.toNumber(),
-                postOrderPositionData.leverage?.toNumber() ??
-                  (summary.tradeInfo.isPositionClosed ? 0 : undefined)
-              )
-            }
-            showSign={ShowSign.None}
-          />
-        ),
       },
       {
         key: 'fee',

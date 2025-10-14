@@ -45,7 +45,11 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
         )
       }
     >
-      <Output type={OutputType.Fiat} value={position.marginValueInitial} showSign={ShowSign.None} />
+      <Output
+        type={OutputType.Fiat}
+        value={position.marginValueInitialFromSelectedLeverage}
+        showSign={ShowSign.None}
+      />
     </TableCell>
   );
 };

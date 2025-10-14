@@ -76,6 +76,7 @@ import {
   selectRawIndexerHeightDataLoading,
   selectRawMarketsData,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeveragesData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
@@ -93,8 +94,10 @@ import {
   selectCurrentMarketAssetId,
   selectCurrentMarketAssetLogoUrl,
   selectCurrentMarketAssetName,
+  selectCurrentMarketEffectiveSelectedLeverage,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
+  selectEffectiveSelectedMarketLeverage,
   selectMarketSummaryById,
   StablePerpetualMarketSummary,
 } from './selectors/summary';
@@ -292,6 +295,7 @@ interface BonsaiRawShape {
   // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
   // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  selectedMarketLeverages: BasicSelector<{ [marketId: string]: number } | undefined>;
   currentMarket: BasicSelector<RecordValueType<MarketsData> | undefined>;
   // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
@@ -300,6 +304,7 @@ interface BonsaiRawShape {
 export const BonsaiRaw: BonsaiRawShape = {
   parentSubaccountBase: selectRawParentSubaccountData,
   parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  selectedMarketLeverages: selectRawSelectedMarketLeveragesData,
   currentMarket: selectCurrentMarketInfoRaw,
   allMarkets: selectRawMarketsData,
 };
@@ -314,6 +319,7 @@ interface BonsaiHelpersShape {
     assetId: BasicSelector<string | undefined>;
     assetLogo: BasicSelector<string | undefined>;
     assetName: BasicSelector<string | undefined>;
+    effectiveSelectedLeverage: BasicSelector<number>;
 
     account: {
       buyingPower: BasicSelector<BigNumber | undefined>;
@@ -346,6 +352,7 @@ interface BonsaiHelpersShape {
       PerpetualMarketSummary | undefined,
       [string | undefined]
     >;
+    selectEffectiveSelectedMarketLeverage: BasicSelector<number, [string | undefined]>;
   };
   forms: {
     deposit: {
@@ -371,6 +378,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     assetId: selectCurrentMarketAssetId,
     assetLogo: selectCurrentMarketAssetLogoUrl,
     assetName: selectCurrentMarketAssetName,
+    effectiveSelectedLeverage: selectCurrentMarketEffectiveSelectedLeverage,
     orderbook: {
       selectGroupedData: selectCurrentMarketOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
@@ -397,6 +405,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   },
   markets: {
     selectMarketSummaryById,
+    selectEffectiveSelectedMarketLeverage,
   },
   forms: {
     deposit: {

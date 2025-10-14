@@ -48,6 +48,7 @@ import {
 } from '../../lib/enumToStringKeyHelpers';
 import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsLeverageCell } from './PositionsTable/PositionsLeverageCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
 
@@ -219,13 +220,15 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Leverage]: {
         columnKey: 'leverage',
-        getCellValue: (row) => row.leverage?.toNumber(),
+        getCellValue: (row) => row.effectiveSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ leverage }) => (
-          <TableCell>
-            <Output type={OutputType.Multiple} value={leverage} showSign={ShowSign.None} />
-          </TableCell>
+        isActionable: true,
+        renderCell: ({ effectiveSelectedLeverage, market }) => (
+          <PositionsLeverageCell
+            marketId={market}
+            effectiveSelectedLeverage={effectiveSelectedLeverage}
+          />
         ),
       },
       [PositionsTableColumnKey.Type]: {
@@ -275,7 +278,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.marginValueInitial.toNumber(),
+        getCellValue: (row) => row.marginValueInitialFromSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,

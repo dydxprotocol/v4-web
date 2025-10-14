@@ -70,7 +70,12 @@ export function calculateTradeSummary(
     accountData.rawParentSubaccountData,
     rawMarkets,
     (rawParentSubaccountData, markets) =>
-      getRelevantAccountDetails(rawParentSubaccountData, markets, positionIdToUse)
+      getRelevantAccountDetails(
+        rawParentSubaccountData,
+        markets,
+        accountData.selectedMarketLeverages,
+        positionIdToUse
+      )
   );
 
   const fieldStates = getTradeFormFieldStates(state, accountData, baseAccount);
@@ -128,6 +133,7 @@ export function calculateTradeSummary(
         getRelevantAccountDetails(
           applyOperationsToSubaccount(rawParentSubaccountData, operations),
           markets,
+          accountData.selectedMarketLeverages,
           getPositionUniqueId(stateMarketId, tradeInfo.subaccountNumber)
         )
     );
@@ -493,15 +499,26 @@ function calculateTradeFormOptions(
 function getRelevantAccountDetails(
   rawParentSubaccountData: ParentSubaccountDataBase,
   rawRelevantMarkets: MarketsData,
+  selectedMarketLeverages: { [marketId: string]: number },
   positionUniqueId?: PositionUniqueId
 ): TradeAccountDetails {
-  const account = calculateParentSubaccountSummary(rawParentSubaccountData, rawRelevantMarkets);
-  const positions = calculateParentSubaccountPositions(rawParentSubaccountData, rawRelevantMarkets);
+  const account = calculateParentSubaccountSummary(
+    rawParentSubaccountData,
+    rawRelevantMarkets,
+    selectedMarketLeverages
+  );
+  const positions = calculateParentSubaccountPositions(
+    rawParentSubaccountData,
+    rawRelevantMarkets,
+    selectedMarketLeverages
+  );
   const position = positions.find(
     (p) => positionUniqueId != null && p.uniqueId === positionUniqueId
   );
   const subaccountSummaries = mapValues(rawParentSubaccountData.childSubaccounts, (subaccount) =>
-    subaccount != null ? calculateSubaccountSummary(subaccount, rawRelevantMarkets) : subaccount
+    subaccount != null
+      ? calculateSubaccountSummary(subaccount, rawRelevantMarkets, selectedMarketLeverages)
+      : subaccount
   );
   return { position, account, subaccountSummaries };
 }
