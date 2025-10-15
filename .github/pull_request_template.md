@@ -1,79 +1,27 @@
-<!-- Featured screenshots/recordings -->
+## Summary
 
-<!-- Overall purpose of the PR -->
+<!-- Briefly describe the purpose of this PR and what it changes. -->
 
----
+## Demo
 
-<!-- Reorder/delete the following sections accordingly: -->
+<!-- Recording of user interaction with web interface (if applicable) -->
 
-## Views
+## Checklist
 
-- New: `<ViewComponentName>`
-  - <!-- explain features of new view component -->
-  -
+### Branch & Commit Hygiene
+- [ ] I’ve rebased my branch onto `main` **before** creating this PR.
+- [ ] My commit messages follow [conventional commits spec](https://www.conventionalcommits.org/en/).
+    - [ ] My commit/branch includes the Jira issue number
+- [ ] My commits are [atomic commits](https://www.notion.so/charthouse/Atomic-Commits-26c6cc81430480f5a744d2b3a62e0cba?source=copy_link).
 
-- `<ViewComponentName>`
-  - <!-- explain changes to existing view component -->
-  - New: ``
-  - Rename: `→`
-  -
+### Testing
+- [ ] I’ve added automated tests to cover my changes (using mocks when applicable).
 
-## Components
+### Documentation
+- [ ] I’ve updated documentation if my change requires it.
 
-- New: `<ComponentName>`
-  - <!-- explain features of new design system component (props, CSS params, style variants, etc.) -->
-  -
+## Verification
 
-- `<ComponentName>`
-  - <!-- explain changes to existing design system component (props, CSS params, style variants, etc.) -->
-  - New: ``
-  - Rename: `→`
-  -
+<!-- Steps to test for PR reviewer. -->
 
-## Styles/Mixins
-
-- `styles/_____`
-  - <!-- explain changes to CSS styles/mixins -->
-  - New: ``
-  - Rename: `→`
-  -
-
-## Constants/Types
-
-- `constants/_____`
-  - <!-- explain changes to constants/types -->
-  -
-
-## Functions/Clients
-
-- `lib/_____`
-  - <!-- explain changes to client or library functions/methods -->
-  -
-
-## Hooks
-
-- `hooks/_____`
-  - <!-- explain changes to React hooks -->
-  -
-
-## State
-
-- `state/_____`
-  - <!-- explain changes to Redux logic -->
-  -
-
-## Packages
-
-- `package-name`
-  - <!-- explain changes to packages -->
-  - updated: v** -> v**
-
-## Workflows
-
-- `workflow-name.yml`
-  - <!-- explain changes to workflows in GitHub Actions -->
-  -
-
----
-
-<!-- Additional screenshots/recordings, before/after comparisons, testing instructions etc. -->
+## Additional Notes
