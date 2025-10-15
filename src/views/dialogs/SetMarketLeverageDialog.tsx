@@ -108,6 +108,9 @@ export const SetMarketLeverageDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useDisappearingValue<string>(undefined);
 
+  const leverageNumber = MaybeBigNumber(leverageInputValue)?.toNumber();
+  const isBelowMinimum = leverageNumber != null && leverageNumber < minLeverage;
+
   const onSliderDrag = ([newLeverage]: number[]) => {
     const newLeverageString = mapIfPresent(newLeverage, (lev) => MustBigNumber(lev).toFixed(0));
     if (newLeverageString) {
@@ -124,6 +127,12 @@ export const SetMarketLeverageDialog = ({
 
   const onSave = async (e?: React.FormEvent) => {
     e?.preventDefault();
+
+    // Don't allow saving if below minimum
+    if (isBelowMinimum) {
+      return;
+    }
+
     setErrorMessage(undefined);
     setIsLoading(true);
 
@@ -175,7 +184,7 @@ export const SetMarketLeverageDialog = ({
             <div tw="w-full">
               <$LeverageSlider
                 label="MarketLeverage"
-                min={minLeverage}
+                min={1}
                 max={maxLeverage}
                 step={1}
                 value={MustBigNumber(leverageInputValue).abs().toNumber()}
@@ -197,13 +206,27 @@ export const SetMarketLeverageDialog = ({
           </$LeverageInputContainer>
         </div>
 
+        {isBelowMinimum && (
+          <AlertMessage type={AlertType.Error}>
+            {stringGetter({
+              fallback: `Minimum leverage for this position is ${minLeverage}×. Setting leverage below this would bring your free collateral below zero.`,
+            })}
+          </AlertMessage>
+        )}
+
         {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
 
         <Button
           type={ButtonType.Submit}
           tw="w-full"
           action={ButtonAction.Primary}
-          state={isLoading ? ButtonState.Loading : ButtonState.Default}
+          state={
+            isBelowMinimum
+              ? ButtonState.Disabled
+              : isLoading
+                ? ButtonState.Loading
+                : ButtonState.Default
+          }
         >
           {stringGetter({ key: STRING_KEYS.SAVE, fallback: 'Save' })}
         </Button>

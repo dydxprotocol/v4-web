@@ -36,7 +36,7 @@ export const TradeBoxOrderView = () => {
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
   return (
-    <div>
+    <div tw="flex flex-col gap-0">
       <$MarginAndLeverageButtons />
       <TradeSideTabs
         sharedContent={
