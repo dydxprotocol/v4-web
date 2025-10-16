@@ -74,8 +74,6 @@ const $InputContainer = styled.div`
   --input-height: 3.5rem;
   --input-backgroundColor: none;
 
-  padding: 0 var(--form-input-paddingX);
-
   @media ${breakpoints.tablet} {
     --input-height: 4rem;
   }
@@ -86,7 +84,7 @@ const $InnerInputContainer = styled.div`
   --input-backgroundColor: var(--color-layer-4);
   --input-borderColor: none;
   --input-height: 2.25rem;
-  --input-width: 5rem;
+  --input-width: 4rem;
 
   margin-left: 0.25rem;
 
