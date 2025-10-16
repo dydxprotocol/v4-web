@@ -17,6 +17,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
 import { OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -86,13 +87,14 @@ export const AccountInfoSection = () => {
 
   const withdrawButton = (
     <Button
+      tw="px-1"
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
-      shape={ButtonShape.Rectangle}
+      shape={ButtonShape.Square}
       size={ButtonSize.XSmall}
-      action={ButtonAction.Primary}
+      action={ButtonAction.Base}
     >
-      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+      <Icon size="0.75rem" iconName={IconName.Withdraw} />
     </Button>
   );
 
