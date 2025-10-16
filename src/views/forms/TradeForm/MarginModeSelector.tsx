@@ -124,7 +124,7 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
 
   const leverageButton = (
     <Button
-      size={ButtonSize.Small}
+      size={ButtonSize.XSmall}
       slotRight={<Icon iconName={IconName.Pencil} tw="text-color-accent" />}
       onClick={() =>
         currentMarket != null
@@ -142,7 +142,7 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
     </Button>
   );
   return (
-    <div tw="row w-full justify-between gap-0.5">
+    <div tw="row h-2.5 w-full justify-between gap-0.5">
       {selectorWithTooltip}
       {leverageButton}
     </div>
