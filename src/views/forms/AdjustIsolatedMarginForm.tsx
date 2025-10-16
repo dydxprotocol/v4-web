@@ -40,7 +40,7 @@ import { FormInput } from '@/components/FormInput';
 import { GradientCard } from '@/components/GradientCard';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -160,15 +160,26 @@ export const AdjustIsolatedMarginForm = ({
     return errors.some((e) => e.type === ErrorType.error);
   }, [errors]);
 
-  const { crossFreeCollateral, crossMarginUsage, positionMargin, liquidationPrice } =
-    summary.accountBefore;
+  const {
+    crossFreeCollateral,
+    crossMarginUsage,
+    positionLeverage,
+    positionMargin,
+    liquidationPrice,
+  } = summary.accountBefore;
   const {
     crossFreeCollateral: crossFreeCollateralUpdated,
     crossMarginUsage: crossMarginUsageUpdated,
+    positionLeverage: positionLeverageUpdated,
     positionMargin: positionMarginUpdated,
     liquidationPrice: liquidationPriceUpdated,
   } = summary.accountAfter;
-  const { freeCollateralDiffOutput, marginUsageDiffOutput, positionMarginDiffOutput } = useMemo(
+  const {
+    freeCollateralDiffOutput,
+    marginUsageDiffOutput,
+    positionMarginDiffOutput,
+    leverageDiffOutput,
+  } = useMemo(
     () => ({
       freeCollateralDiffOutput: renderDiffOutput({
         withDiff:
@@ -189,12 +200,21 @@ export const AdjustIsolatedMarginForm = ({
         newValue: positionMarginUpdated,
         type: OutputType.Fiat,
       }),
+      leverageDiffOutput: renderDiffOutput({
+        withDiff: !!positionLeverageUpdated && positionLeverage !== positionLeverageUpdated,
+        value: positionLeverage,
+        newValue: positionLeverageUpdated,
+        type: OutputType.Multiple,
+        showSign: ShowSign.None,
+      }),
     }),
     [
       crossFreeCollateral,
       crossFreeCollateralUpdated,
       crossMarginUsage,
       crossMarginUsageUpdated,
+      positionLeverage,
+      positionLeverageUpdated,
       positionMargin,
       positionMarginUpdated,
     ]
@@ -223,6 +243,11 @@ export const AdjustIsolatedMarginForm = ({
               label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
               value: positionMarginDiffOutput,
             },
+            {
+              key: 'leverage',
+              label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+              value: leverageDiffOutput,
+            },
           ],
         }
       : {
@@ -233,6 +258,11 @@ export const AdjustIsolatedMarginForm = ({
               key: 'margin',
               label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
               value: positionMarginDiffOutput,
+            },
+            {
+              key: 'leverage',
+              label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+              value: leverageDiffOutput,
             },
           ],
           receiptItems: [

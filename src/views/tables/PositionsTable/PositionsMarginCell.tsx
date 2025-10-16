@@ -50,6 +50,22 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
         value={position.marginValueInitialFromSelectedLeverage}
         showSign={ShowSign.None}
       />
+      {position.marginMode === 'ISOLATED' &&
+        position.effectiveSelectedLeverage
+          .minus(position.leverage ?? 0)
+          .abs()
+          .gt(1) && (
+          <div tw="row">
+            (
+            <Output
+              type={OutputType.Multiple}
+              fractionDigits={0}
+              value={position.leverage}
+              showSign={ShowSign.None}
+            />
+            )
+          </div>
+        )}
     </TableCell>
   );
 };
