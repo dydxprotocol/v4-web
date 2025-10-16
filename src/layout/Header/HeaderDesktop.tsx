@@ -193,36 +193,38 @@ export const HeaderDesktop = () => {
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
           complianceState === ComplianceStates.FULL_ACCESS && (
-            <>
-              <Button
-                tw="mr-[0.5em]"
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                action={
-                  !availableBalance || availableBalance > 0
-                    ? ButtonAction.Secondary
-                    : ButtonAction.Primary
-                }
-                onClick={() => {
-                  dispatch(openDialog(DialogTypes.Deposit2({})));
-                }}
-                state={{ isDisabled: !dydxAccounts }}
-              >
-                {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-              </Button>
-              <VerticalSeparator />
-            </>
+            <Button
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              action={
+                !availableBalance || availableBalance > 0
+                  ? ButtonAction.Secondary
+                  : ButtonAction.Primary
+              }
+              onClick={() => {
+                dispatch(openDialog(DialogTypes.Deposit2({})));
+              }}
+              state={{ isDisabled: !dydxAccounts }}
+            >
+              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+            </Button>
           )}
 
-        <MobileDownloadLinks />
+        {onboardingState === OnboardingState.AccountConnected ? (
+          <$IconButton
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.Mobile}
+            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
+          />
+        ) : (
+          <MobileDownloadLinks />
+        )}
 
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
           onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         />
-
-        <VerticalSeparator />
 
         <NotificationsMenu
           slotTrigger={
@@ -232,8 +234,6 @@ export const HeaderDesktop = () => {
             />
           }
         />
-
-        <VerticalSeparator />
 
         <AccountMenu />
       </$NavAfter>
@@ -316,7 +316,7 @@ const $NavAfter = styled.div`
   justify-self: end;
   padding: 0 0.75rem;
 
-  gap: 0.5rem;
+  gap: 1rem;
 
   a {
     color: var(--color-text-1);
