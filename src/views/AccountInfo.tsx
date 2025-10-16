@@ -64,7 +64,4 @@ const $DisconnectedAccountInfoContainer = styled.div`
 
 const $AccountInfoSectionContainer = styled.div`
   ${layoutMixins.column}
-
-  height: var(--account-info-section-height);
-  min-height: var(--account-info-section-height);
 `;
