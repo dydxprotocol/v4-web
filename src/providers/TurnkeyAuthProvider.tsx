@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
@@ -77,6 +85,7 @@ const useTurnkeyAuthContext = () => {
   const [emailSignInStatus, setEmailSignInStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
+  const processedEmailTokenRef = useRef<string | null>(null);
 
   const {
     embeddedPublicKey,
@@ -484,6 +493,13 @@ const useTurnkeyAuthContext = () => {
     ]
   );
 
+  const handleEmailMagicLinkRef = useRef(handleEmailMagicLink);
+
+  // Update the ref whenever handleEmailMagicLink changes
+  useEffect(() => {
+    handleEmailMagicLinkRef.current = handleEmailMagicLink;
+  }, [handleEmailMagicLink]);
+
   const signInWithOtp = useCallback(
     async ({ userEmail }: { userEmail: string }) => {
       try {
@@ -522,6 +538,7 @@ const useTurnkeyAuthContext = () => {
     setEmailToken(undefined);
     setEmailSignInStatus('idle');
     setEmailSignInError(undefined);
+    processedEmailTokenRef.current = null;
   }, [searchParams, setSearchParams]);
 
   /* ----------------------------- Side Effects ----------------------------- */
@@ -559,19 +576,15 @@ const useTurnkeyAuthContext = () => {
       emailToken &&
       targetPublicKeys?.publicKey &&
       authIframeClient &&
-      emailSignInStatus === 'idle'
+      emailSignInStatus === 'idle' &&
+      processedEmailTokenRef.current !== emailToken
     ) {
+      processedEmailTokenRef.current = emailToken;
       track(AnalyticsEvents.TurnkeyLoginEmailToken({}));
       logBonsaiInfo('TurnkeyOnboarding', 'Attempting to handle email magic link');
-      handleEmailMagicLink({ token: emailToken });
+      handleEmailMagicLinkRef.current({ token: emailToken });
     }
-  }, [
-    emailToken,
-    targetPublicKeys?.publicKey,
-    authIframeClient,
-    handleEmailMagicLink,
-    emailSignInStatus,
-  ]);
+  }, [emailToken, targetPublicKeys?.publicKey, authIframeClient, emailSignInStatus]);
 
   const needsAddressUpload = useMemo(() => {
     return (
