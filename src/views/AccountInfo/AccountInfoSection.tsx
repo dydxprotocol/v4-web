@@ -87,7 +87,6 @@ export const AccountInfoSection = () => {
 
   const withdrawButton = (
     <Button
-      tw="px-1"
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Square}
@@ -99,7 +98,7 @@ export const AccountInfoSection = () => {
   );
 
   const depositWithdrawRow = (
-    <div tw="inlineRow gap-0.5 self-stretch px-1">
+    <div tw="inlineRow gap-0.75 pt-0.5">
       {complianceState === ComplianceStates.FULL_ACCESS && depositButton}
       {withdrawButton}
     </div>
@@ -182,7 +181,6 @@ export const AccountInfoSection = () => {
 
 const $Details = styled(Details)`
   font: var(--font-mini-book);
-  padding: 0 1rem;
 
   > * {
     padding: 0 0 0.5rem;
@@ -199,8 +197,7 @@ const $Details = styled(Details)`
 const $Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 1rem 1rem;
 `;
 
 const $StackContainer = styled.div<{ $isTablet: boolean }>`
