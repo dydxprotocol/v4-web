@@ -99,7 +99,7 @@ interface CancelOrderPayload {
   originalOrder: ConvertBigNumberToNumber<SubaccountOrder> | undefined;
 }
 
-const BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION = 0.9;
+const BLOCK_TIME_BIAS_FOR_SHORT_TERM_ESTIMATION = 1;
 export const SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN = 5;
 
 export class AccountTransactionSupervisor {
