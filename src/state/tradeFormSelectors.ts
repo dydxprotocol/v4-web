@@ -58,7 +58,7 @@ const getTradeFormInputData = createAppSelector(
   ): TradeFormInputData => ({
     rawParentSubaccountData,
     rawRelevantMarkets,
-    selectedMarketLeverages: selectedMarketLeverages ?? {},
+    rawSelectedMarketLeverages: selectedMarketLeverages ?? {},
 
     currentTradeMarketOpenOrders,
     allOpenOrders,
@@ -135,7 +135,6 @@ export const getClosePositionFormSummary = createAppSelector(
 
         // let these default
         marginMode: undefined,
-        targetLeverage: undefined,
         postOnly: undefined,
         triggerPrice: undefined,
         execution: undefined,

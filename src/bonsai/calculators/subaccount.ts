@@ -43,12 +43,12 @@ import {
 export function calculateParentSubaccountPositions(
   parent: ParentSubaccountDataBase,
   markets: MarketsData,
-  selectedMarketLeverages: { [marketId: string]: number }
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): SubaccountPosition[] {
   return Object.values(parent.childSubaccounts)
     .filter(isPresent)
     .flatMap((child) => {
-      const subaccount = calculateSubaccountSummary(child, markets, selectedMarketLeverages);
+      const subaccount = calculateSubaccountSummary(child, markets, rawSelectedMarketLeverages);
       return orderBy(
         Object.values(child.openPerpetualPositions)
           .filter(isPresent)
@@ -58,7 +58,7 @@ export function calculateParentSubaccountPositions(
               subaccount,
               perp,
               markets[perp.market],
-              selectedMarketLeverages
+              rawSelectedMarketLeverages
             )
           ),
         [(f) => f.createdAt],
@@ -70,11 +70,11 @@ export function calculateParentSubaccountPositions(
 export function calculateParentSubaccountSummary(
   parent: ParentSubaccountDataBase,
   markets: MarketsData,
-  selectedMarketLeverages: { [marketId: string]: number }
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): GroupedSubaccountSummary {
   const summaries = mapValues(parent.childSubaccounts, (subaccount) =>
     subaccount != null
-      ? calculateSubaccountSummary(subaccount, markets, selectedMarketLeverages)
+      ? calculateSubaccountSummary(subaccount, markets, rawSelectedMarketLeverages)
       : subaccount
   );
   const parentSummary = summaries[parent.parentSubaccount];
@@ -104,9 +104,13 @@ export const calculateSubaccountSummary = weakMapMemoize(
   (
     subaccountData: ChildSubaccountData,
     markets: MarketsData,
-    selectedMarketLeverages: { [marketId: string]: number }
+    rawSelectedMarketLeverages: { [marketId: string]: number }
   ): SubaccountSummary => {
-    const core = calculateSubaccountSummaryCore(subaccountData, markets, selectedMarketLeverages);
+    const core = calculateSubaccountSummaryCore(
+      subaccountData,
+      markets,
+      rawSelectedMarketLeverages
+    );
     return {
       ...core,
       ...calculateSubaccountSummaryDerived(core),
@@ -118,7 +122,7 @@ export const calculateSubaccountSummary = weakMapMemoize(
 function calculateSubaccountSummaryCore(
   subaccountData: ChildSubaccountData,
   markets: MarketsData,
-  selectedMarketLeverages: { [marketId: string]: number }
+  rawSelectedMarketLeverages: { [marketId: string]: number }
 ): SubaccountSummaryCore {
   const quoteBalance = calc(() => {
     const usdcPosition = subaccountData.assetPositions.USDC;
@@ -142,7 +146,7 @@ function calculateSubaccountSummaryCore(
         notional: positionNotional,
         initialRiskFromSelectedLeverage: positionInitialRisk,
         maintenanceRisk: positionMaintenanceRisk,
-      } = calculateDerivedPositionCore(getBnPosition(position), market, selectedMarketLeverages);
+      } = calculateDerivedPositionCore(getBnPosition(position), market, rawSelectedMarketLeverages);
       return {
         valueTotal: acc.valueTotal.plus(positionValue),
         notionalTotal: acc.notionalTotal.plus(positionNotional),
@@ -195,10 +199,10 @@ function calculateSubaccountPosition(
   subaccountSummary: SubaccountSummary,
   position: IndexerPerpetualPositionResponseObject,
   market: IndexerWsBaseMarketObject | undefined,
-  selectedMarketLeverages?: { [marketId: string]: number }
+  rawSelectedMarketLeverages?: { [marketId: string]: number }
 ): SubaccountPosition {
   const bnPosition = getBnPosition(position);
-  const core = calculateDerivedPositionCore(bnPosition, market, selectedMarketLeverages);
+  const core = calculateDerivedPositionCore(bnPosition, market, rawSelectedMarketLeverages);
   return {
     ...bnPosition,
     ...core,
@@ -222,10 +226,31 @@ function getBnPosition(position: IndexerPerpetualPositionResponseObject): Subacc
   };
 }
 
+export function calculateEffectiveMarketImfFromSelectedLeverage({
+  rawSelectedLeverage,
+  initialMarginFraction,
+  effectiveInitialMarginFraction,
+}: {
+  rawSelectedLeverage: number | undefined;
+  initialMarginFraction: BigNumber | undefined;
+  effectiveInitialMarginFraction: BigNumber | undefined;
+}) {
+  const effectiveSelectedLeverage = calculateEffectiveSelectedLeverageBigNumber({
+    userSelectedLeverage: rawSelectedLeverage,
+    initialMarginFraction,
+  });
+  const imfFromSelectedLeverage = BIG_NUMBERS.ONE.div(effectiveSelectedLeverage);
+  const adjustedImfFromSelectedLeverage = BigNumber.max(
+    imfFromSelectedLeverage,
+    effectiveInitialMarginFraction ?? 0
+  );
+  return { adjustedImfFromSelectedLeverage, effectiveSelectedLeverage };
+}
+
 function calculateDerivedPositionCore(
   position: SubaccountPositionBase,
   market: IndexerWsBaseMarketObject | undefined,
-  selectedMarketLeverages?: { [marketId: string]: number }
+  rawSelectedMarketLeverages?: { [marketId: string]: number }
 ): SubaccountPositionDerivedCore {
   const marginMode = isParentSubaccount(position.subaccountNumber) ? 'CROSS' : 'ISOLATED';
   const effectiveImf =
@@ -243,13 +268,12 @@ function calculateDerivedPositionCore(
   const notional = unsignedSize.times(oracle);
   const value = signedSize.times(oracle);
 
-  const effectiveSelectedLeverage = calculateEffectiveSelectedLeverageBigNumber({
-    userSelectedLeverage: selectedMarketLeverages?.[position.market],
-    initialMarginFraction: market?.initialMarginFraction,
-  });
-
-  const imfFromSelectedLeverage = BIG_NUMBERS.ONE.div(effectiveSelectedLeverage);
-  const adjustedImfFromSelectedLeverage = BigNumber.max(imfFromSelectedLeverage, effectiveImf);
+  const { adjustedImfFromSelectedLeverage, effectiveSelectedLeverage } =
+    calculateEffectiveMarketImfFromSelectedLeverage({
+      rawSelectedLeverage: rawSelectedMarketLeverages?.[position.market],
+      initialMarginFraction: MaybeBigNumber(market?.initialMarginFraction),
+      effectiveInitialMarginFraction: effectiveImf,
+    });
   const initialRiskFromSelectedLeverage = notional.times(adjustedImfFromSelectedLeverage);
 
   return {

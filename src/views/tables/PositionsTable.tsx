@@ -106,7 +106,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ marketSummary, leverage, signedSize, side }) => (
+        renderCell: ({ marketSummary, effectiveSelectedLeverage, signedSize, side }) => (
           <TableCell
             stacked
             slotLeft={
@@ -131,7 +131,7 @@ const getPositionsTableColumnDef = ({
               <span tw="text-color-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
-                value={leverage}
+                value={effectiveSelectedLeverage}
                 showSign={ShowSign.None}
               />
             </div>
@@ -399,7 +399,7 @@ const getPositionsTableColumnDef = ({
           market,
           marketSummary,
           assetId,
-          leverage,
+          effectiveSelectedLeverage,
           side,
           entryPrice,
           updatedUnrealizedPnl: unrealizedPnl,
@@ -408,7 +408,7 @@ const getPositionsTableColumnDef = ({
             marketId={market}
             assetId={assetId}
             side={side}
-            leverage={leverage}
+            leverage={effectiveSelectedLeverage}
             oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)}
             entryPrice={entryPrice}
             unrealizedPnl={unrealizedPnl}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MarginMode, TradeFormSummary } from '@/bonsai/forms/trade/types';
+import { TradeFormSummary } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -36,12 +36,10 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
-import { nullIfZero } from '@/lib/numbers';
-import { calculateCrossPositionMargin, getDoubleValuesHasDiff } from '@/lib/tradeData';
+import { getDoubleValuesHasDiff } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
@@ -87,17 +85,11 @@ export const PlaceOrderButtonAndReceipt = ({
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const {
-    liquidationPrice,
-    notional: notionalTotal,
-    adjustedImf,
-    marginValueMaintenance,
-  } = orEmptyObj(summary.accountDetailsBefore?.position);
+  const { liquidationPrice, marginValueInitialFromSelectedLeverage } = orEmptyObj(
+    summary.accountDetailsBefore?.position
+  );
 
   const postOrderPositionData = orEmptyObj(summary.accountDetailsAfter?.position);
-
-  const tradeValues = useAppSelector(getTradeFormValues);
-  const { marginMode } = tradeValues;
 
   const [isReceiptOpen, setIsReceiptOpen] = useState(true);
 
@@ -111,43 +103,17 @@ export const PlaceOrderButtonAndReceipt = ({
   const areInputsFilled = tradePayload != null;
 
   const renderMarginValue = () => {
-    if (marginMode === MarginMode.CROSS) {
-      const currentCrossMargin = nullIfZero(
-        calculateCrossPositionMargin({
-          notionalTotal: notionalTotal?.toNumber(),
-          adjustedImf: adjustedImf?.toNumber(),
-        })
-      );
-
-      const postOrderCrossMargin = nullIfZero(
-        calculateCrossPositionMargin({
-          notionalTotal: postOrderPositionData.notional?.toNumber(),
-          adjustedImf: postOrderPositionData.adjustedImf?.toNumber(),
-        })
-      );
-
-      return (
-        <DiffOutput
-          useGrouping
-          type={OutputType.Fiat}
-          value={currentCrossMargin}
-          newValue={postOrderCrossMargin}
-          withDiff={areInputsFilled && currentCrossMargin !== postOrderCrossMargin}
-        />
-      );
-    }
-
     return (
       <DiffOutput
         useGrouping
         type={OutputType.Fiat}
-        value={marginValueMaintenance}
-        newValue={postOrderPositionData.marginValueMaintenance}
+        value={marginValueInitialFromSelectedLeverage}
+        newValue={postOrderPositionData.marginValueInitialFromSelectedLeverage}
         withDiff={
           areInputsFilled &&
           getDoubleValuesHasDiff(
-            marginValueMaintenance?.toNumber(),
-            postOrderPositionData.marginValueMaintenance?.toNumber() ??
+            marginValueInitialFromSelectedLeverage?.toNumber(),
+            postOrderPositionData.marginValueInitialFromSelectedLeverage?.toNumber() ??
               (summary.tradeInfo.isPositionClosed ? 0 : undefined)
           )
         }

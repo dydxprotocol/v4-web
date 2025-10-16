@@ -73,7 +73,7 @@ export function calculateTradeSummary(
       getRelevantAccountDetails(
         rawParentSubaccountData,
         markets,
-        accountData.selectedMarketLeverages,
+        accountData.rawSelectedMarketLeverages,
         positionIdToUse
       )
   );
@@ -133,7 +133,7 @@ export function calculateTradeSummary(
         getRelevantAccountDetails(
           applyOperationsToSubaccount(rawParentSubaccountData, operations),
           markets,
-          accountData.selectedMarketLeverages,
+          accountData.rawSelectedMarketLeverages,
           getPositionUniqueId(stateMarketId, tradeInfo.subaccountNumber)
         )
     );
@@ -307,7 +307,6 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       size: undefined,
       reduceOnly: undefined,
       marginMode: undefined,
-      targetLeverage: undefined,
       limitPrice: undefined,
       postOnly: undefined,
       timeInForce: undefined,
@@ -322,15 +321,13 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       executionOptions: [],
       timeInForceOptions: [],
       goodTilUnitOptions: [],
-      showLeverage: false,
-      showAmountClose: false,
+      showAllocationSlider: false,
       showTriggerOrders: false,
       triggerOrdersChecked: false,
 
       needsMarginMode: false,
       needsSize: false,
       needsLimitPrice: false,
-      needsTargetLeverage: false,
       needsTriggerPrice: false,
       needsGoodTil: false,
       needsReduceOnly: false,
@@ -343,7 +340,6 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       showSize: false,
       showReduceOnly: false,
       showMarginMode: false,
-      showTargetLeverage: false,
       showLimitPrice: false,
       showPostOnly: false,
       showTimeInForce: false,
@@ -364,8 +360,6 @@ export function getErrorTradeSummary(marketId?: string | undefined): TradeFormSu
       subaccountNumber: 0,
       transferToSubaccountAmount: 0,
       payloadPrice: undefined,
-      minimumSignedLeverage: 0,
-      maximumSignedLeverage: 0,
       slippage: undefined,
       fee: undefined,
       total: undefined,
@@ -456,7 +450,6 @@ function calculateTradeFormOptions(
     timeInForceOptions,
     goodTilUnitOptions,
 
-    needsTargetLeverage: isFieldStateRelevant(fields.targetLeverage),
     needsMarginMode: isFieldStateRelevant(fields.marginMode),
     needsSize: isFieldStateRelevant(fields.size),
     needsLimitPrice: isFieldStateRelevant(fields.limitPrice),
@@ -467,16 +460,12 @@ function calculateTradeFormOptions(
     needsTimeInForce: isFieldStateRelevant(fields.timeInForce),
     needsExecution: isFieldStateRelevant(fields.execution),
 
-    showLeverage: orderType === TradeFormType.MARKET && isCross && (!reduceOnly || !isDecreasing),
-    showAmountClose: orderType === TradeFormType.MARKET && !!reduceOnly && isDecreasing,
+    showAllocationSlider:
+      orderType === TradeFormType.MARKET && (isCross || (!!reduceOnly && isDecreasing)),
     showTriggerOrders:
       isFieldStateEnabled(fields.takeProfitOrder) && isFieldStateEnabled(fields.stopLossOrder),
     triggerOrdersChecked:
       fields.takeProfitOrder.effectiveValue != null || fields.stopLossOrder.effectiveValue != null,
-
-    showTargetLeverage:
-      isFieldStateEnabled(fields.targetLeverage) &&
-      (orderType !== TradeFormType.MARKET || !reduceOnly),
 
     showMarginMode: isFieldStateEnabled(fields.marginMode),
     showSize: isFieldStateEnabled(fields.size),
@@ -499,25 +488,25 @@ function calculateTradeFormOptions(
 function getRelevantAccountDetails(
   rawParentSubaccountData: ParentSubaccountDataBase,
   rawRelevantMarkets: MarketsData,
-  selectedMarketLeverages: { [marketId: string]: number },
+  rawSelectedMarketLeverages: { [marketId: string]: number },
   positionUniqueId?: PositionUniqueId
 ): TradeAccountDetails {
   const account = calculateParentSubaccountSummary(
     rawParentSubaccountData,
     rawRelevantMarkets,
-    selectedMarketLeverages
+    rawSelectedMarketLeverages
   );
   const positions = calculateParentSubaccountPositions(
     rawParentSubaccountData,
     rawRelevantMarkets,
-    selectedMarketLeverages
+    rawSelectedMarketLeverages
   );
   const position = positions.find(
     (p) => positionUniqueId != null && p.uniqueId === positionUniqueId
   );
   const subaccountSummaries = mapValues(rawParentSubaccountData.childSubaccounts, (subaccount) =>
     subaccount != null
-      ? calculateSubaccountSummary(subaccount, rawRelevantMarkets, selectedMarketLeverages)
+      ? calculateSubaccountSummary(subaccount, rawRelevantMarkets, rawSelectedMarketLeverages)
       : subaccount
   );
   return { position, account, subaccountSummaries };

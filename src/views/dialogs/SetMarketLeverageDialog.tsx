@@ -209,7 +209,7 @@ export const SetMarketLeverageDialog = ({
         {isBelowMinimum && (
           <AlertMessage type={AlertType.Error}>
             {stringGetter({
-              fallback: `Minimum leverage for this position is ${minLeverage}×. Setting leverage below this would bring your free collateral below zero.`,
+              fallback: `Minimum leverage for this position is ${minLeverage}×. Setting leverage below this would bring your available balance below zero.`,
             })}
           </AlertMessage>
         )}

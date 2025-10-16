@@ -177,19 +177,10 @@ export function calculateEffectiveSelectedLeverage({
   userSelectedLeverage: number | undefined;
   initialMarginFraction: string | number | BigNumber | null | undefined;
 }): number {
-  // Return user-selected leverage if it exists
-  if (userSelectedLeverage != null) {
-    return userSelectedLeverage;
-  }
-
-  // Otherwise calculate from IMF only (ignoring OIMF as requested)
-  const imf = MaybeBigNumber(initialMarginFraction);
-  if (imf != null) {
-    return BIG_NUMBERS.ONE.div(imf).toNumber();
-  }
-
-  // Fallback
-  return 1;
+  return calculateEffectiveSelectedLeverageBigNumber({
+    userSelectedLeverage,
+    initialMarginFraction,
+  }).toNumber();
 }
 
 /**
@@ -205,7 +196,7 @@ export function calculateEffectiveSelectedLeverageBigNumber({
 }): BigNumber {
   // Return user-selected leverage if it exists
   if (userSelectedLeverage != null) {
-    return MustBigNumber(userSelectedLeverage);
+    return MaybeBigNumber(userSelectedLeverage) ?? BIG_NUMBERS.ONE;
   }
 
   // Otherwise calculate from IMF only (ignoring OIMF as requested)
