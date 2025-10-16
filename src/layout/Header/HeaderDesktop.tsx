@@ -211,19 +211,15 @@ export const HeaderDesktop = () => {
             </Button>
           )}
 
-        {onboardingState === OnboardingState.AccountConnected && (
+        {onboardingState === OnboardingState.AccountConnected ? (
           <$IconButton
             shape={ButtonShape.Rectangle}
             iconName={IconName.Mobile}
-            onClick={() =>
-              dispatch(
-                openDialog(DialogTypes.MobileSignIn({ skipWaiting: true, initialShowQr: true }))
-              )
-            }
+            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
           />
+        ) : (
+          <MobileDownloadLinks />
         )}
-
-        <MobileDownloadLinks />
 
         <$IconButton
           shape={ButtonShape.Rectangle}
