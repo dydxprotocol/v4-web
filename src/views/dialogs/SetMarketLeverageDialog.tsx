@@ -23,13 +23,12 @@ import { Slider } from '@/components/Slider';
 import { AccentTag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setSelectedMarketLeverage } from '@/state/raw';
 
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
+import { saveMarketLeverage } from '@/lib/leverageHelpers';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
-import { sleep } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 export const SetMarketLeverageDialog = ({
@@ -143,10 +142,7 @@ export const SetMarketLeverageDialog = ({
         throw new Error('Invalid leverage value');
       }
 
-      // Simulate network delay
-      await sleep(1000);
-
-      dispatch(setSelectedMarketLeverage({ marketId, leverage: leverageBN.toNumber() }));
+      await saveMarketLeverage({ dispatch, marketId, leverage: leverageBN.toNumber() });
       setIsOpen(false);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Failed to save leverage');
