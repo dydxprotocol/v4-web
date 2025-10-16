@@ -49,6 +49,7 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
 };
 const $DisconnectedAccountInfoContainer = styled.div`
   margin: auto;
+  padding: 1rem;
 
   ${layoutMixins.column}
   justify-items: center;
