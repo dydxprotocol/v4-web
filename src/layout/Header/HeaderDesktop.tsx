@@ -201,6 +201,7 @@ export const HeaderDesktop = () => {
               }}
               state={{ isDisabled: !dydxAccounts }}
             >
+              <Icon iconName={IconName.Deposit2} size="1rem" />
               <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
             </Button>
           )}
