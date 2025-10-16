@@ -215,7 +215,11 @@ export const HeaderDesktop = () => {
           <$IconButton
             shape={ButtonShape.Rectangle}
             iconName={IconName.Mobile}
-            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
+            onClick={() =>
+              dispatch(
+                openDialog(DialogTypes.MobileSignIn({ skipWaiting: true, initialShowQr: true }))
+              )
+            }
           />
         )}
 

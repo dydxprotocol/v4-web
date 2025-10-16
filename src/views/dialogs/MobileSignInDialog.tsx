@@ -72,11 +72,12 @@ const MobileQrCode = ({
 export const MobileSignInDialog = ({
   setIsOpen,
   skipWaiting = false,
+  initialShowQr = false,
 }: DialogProps<MobileSignInDialogProps>) => {
   const [currentState, setCurrentState] = useState(
     skipWaiting ? MobileSignInState.Scanning : MobileSignInState.Waiting
   );
-  const [isScanning, setIsScanning] = useState(false);
+  const [isScanning, setIsScanning] = useState(initialShowQr);
   const stringGetter = useStringGetter();
 
   // Generate a random 6 digit encryptionKey
