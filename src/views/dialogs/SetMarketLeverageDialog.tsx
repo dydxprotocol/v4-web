@@ -166,7 +166,7 @@ export const SetMarketLeverageDialog = ({
             <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="[--asset-icon-size:1.5rem]" />
             <span tw="text-color-text-2 font-base-medium">{displayableTicker}</span>
             <AccentTag tw="font-small-medium">
-              MAX
+              {stringGetter({ key: STRING_KEYS.MAX }).toLocaleUpperCase()}
               <Output
                 tw="ml-0.25"
                 type={OutputType.Multiple}
