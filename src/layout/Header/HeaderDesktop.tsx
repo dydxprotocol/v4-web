@@ -194,7 +194,6 @@ export const HeaderDesktop = () => {
         {onboardingState === OnboardingState.AccountConnected &&
           complianceState === ComplianceStates.FULL_ACCESS && (
             <Button
-              tw="mr-[0.5em]"
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
               action={
@@ -317,7 +316,7 @@ const $NavAfter = styled.div`
   justify-self: end;
   padding: 0 0.75rem;
 
-  gap: 1.25rem;
+  gap: 1rem;
 
   a {
     color: var(--color-text-1);
