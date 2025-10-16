@@ -78,10 +78,10 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
       shape={ButtonShape.Rectangle}
-      size={ButtonSize.XSmall}
+      size={ButtonSize.Small}
       action={ButtonAction.Primary}
     >
-      {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+      <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
     </Button>
   );
 
@@ -90,15 +90,15 @@ export const AccountInfoSection = () => {
       state={{ isDisabled: !dydxAccounts }}
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Square}
-      size={ButtonSize.XSmall}
+      size={ButtonSize.Small}
       action={ButtonAction.Base}
     >
-      <Icon size="0.75rem" iconName={IconName.Withdraw} />
+      <Icon size="1rem" iconName={IconName.Withdraw} />
     </Button>
   );
 
   const depositWithdrawRow = (
-    <div tw="inlineRow gap-0.75 pt-0.5">
+    <div tw="inlineRow gap-0.5 pt-0.25">
       {complianceState === ComplianceStates.FULL_ACCESS && depositButton}
       {withdrawButton}
     </div>
