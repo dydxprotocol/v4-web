@@ -129,6 +129,8 @@ const DUMMY_TOKENS: SpotMarketToken[] = [
   },
 ];
 
+// TODO: spot localization
+
 const SpotPage = () => {
   const { symbol } = useParams<{ symbol: string }>();
 

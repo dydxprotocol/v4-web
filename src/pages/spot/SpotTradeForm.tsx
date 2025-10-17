@@ -3,8 +3,10 @@ import { useMemo, useRef, useState } from 'react';
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 
 import { ButtonAction, ButtonState } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useSpotForm } from '@/hooks/useSpotForm';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 
@@ -13,13 +15,10 @@ import { SpotFormInput } from './SpotFormInput';
 import { SpotTabs, SpotTabVariant } from './SpotTabs';
 
 export const SpotTradeForm = () => {
-  // Use the spot form hook for Redux-managed state
+  const stringGetter = useStringGetter();
   const form = useSpotForm();
 
-  // Local UI state (not in Redux)
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Quick options state
   const [quickOptionsState, setQuickOptionsState] = useState({
     [SpotSide.SELL]: {
       [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
@@ -153,18 +152,20 @@ export const SpotTradeForm = () => {
             }}
             state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
           >
-            {form.state.side === SpotSide.BUY ? 'Buy' : 'Sell'}
+            {form.state.side === SpotSide.BUY
+              ? stringGetter({ key: STRING_KEYS.BUY })
+              : stringGetter({ key: STRING_KEYS.SELL })}
           </Button>
         </div>
       }
       items={[
         {
-          label: 'Buy',
+          label: stringGetter({ key: STRING_KEYS.BUY }),
           value: SpotSide.BUY,
           variant: SpotTabVariant.Buy,
         },
         {
-          label: 'Sell',
+          label: stringGetter({ key: STRING_KEYS.SELL }),
           value: SpotSide.SELL,
           variant: SpotTabVariant.Sell,
         },

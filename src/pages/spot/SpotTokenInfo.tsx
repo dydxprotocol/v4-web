@@ -31,6 +31,8 @@ type SpotTokenInfoProps = {
   className?: string;
 };
 
+// TODO: spot localization
+
 export const SpotTokenInfo = ({
   links,
   items,

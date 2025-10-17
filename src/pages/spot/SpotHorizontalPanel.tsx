@@ -18,6 +18,8 @@ type SpotHorizontalPanelProps = {
   onSellAction?: SpotHoldingsTableProps['onSellAction'];
 };
 
+// TODO: spot localization
+
 export const SpotHorizontalPanel = ({
   data,
   isOpen = true,

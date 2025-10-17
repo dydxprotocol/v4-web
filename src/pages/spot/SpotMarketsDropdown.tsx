@@ -31,6 +31,8 @@ type SpotMarketsDropdownProps = {
   className?: string;
 };
 
+// TODO: spot localization
+
 export const SpotMarketsDropdown = ({
   current,
   searchResults,

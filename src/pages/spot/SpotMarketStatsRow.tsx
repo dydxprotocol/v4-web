@@ -11,6 +11,8 @@ type SpotMarketStatsRowProps = {
   stats: SpotMarketToken;
 };
 
+// TODO: spot localization
+
 export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
   const items: DetailsItem[] = [
     {
