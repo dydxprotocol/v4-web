@@ -12,7 +12,7 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import { SpotTokenMetadataResponse } from '@/clients/spotApi';
+import { TokenInfo } from '@/clients/spotApi';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
@@ -227,7 +227,7 @@ interface BonsaiCoreShape {
       loading: BasicSelector<LoadableStatus>;
     };
     tokenMetadata: {
-      data: BasicSelector<SpotTokenMetadataResponse | undefined>;
+      data: BasicSelector<TokenInfo | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
   };

@@ -7,7 +7,7 @@ import {
   selectRawTokenMetadataLoading,
 } from './base';
 
-export const selectSolPrice = createAppSelector([selectRawSolPrice], (solPrice) => solPrice);
+export const selectSolPrice = createAppSelector([selectRawSolPrice], (solPrice) => solPrice?.price);
 
 export const selectSolPriceLoading = createAppSelector(
   [selectRawSolPriceLoading],
@@ -16,7 +16,7 @@ export const selectSolPriceLoading = createAppSelector(
 
 export const selectTokenMetadata = createAppSelector(
   [selectRawTokenMetadata],
-  (tokenMetadata) => tokenMetadata
+  (tokenMetadata) => tokenMetadata?.tokenInfo
 );
 
 export const selectTokenMetadataLoading = createAppSelector(

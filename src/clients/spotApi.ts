@@ -6,29 +6,31 @@ export type SpotTokenPriceResponse = {
   price: number;
 };
 
+export type TokenInfo = {
+  priceUSD: number;
+  priceSOL: number;
+  marketCapUSD: number;
+  marketCapSOL: number;
+  pricePercentChange1h: number;
+  token1hPriceChange: string;
+  pricePercentChange24h: number;
+  token24hPriceChange: string;
+  volumeUSD: number;
+  tokenVolume: string;
+  liquidityUSD: number;
+  liquiditySOL: number;
+  tokenLiquidity: string;
+  token24hBuys: number;
+  token24hSells: number;
+  isPump: boolean;
+  bondingCurveProgress: number;
+  tokenFDV: string;
+  isGraduating: boolean;
+  tokenDexUrl: string;
+};
+
 export type SpotTokenMetadataResponse = {
-  tokenInfo: {
-    priceUSD: number;
-    priceSOL: number;
-    marketCapUSD: number;
-    marketCapSOL: number;
-    pricePercentChange1h: number;
-    token1hPriceChange: string;
-    pricePercentChange24h: number;
-    token24hPriceChange: string;
-    volumeUSD: number;
-    tokenVolume: string;
-    liquidityUSD: number;
-    liquiditySOL: number;
-    tokenLiquidity: string;
-    token24hBuys: number;
-    token24hSells: number;
-    isPump: boolean;
-    bondingCurveProgress: number;
-    tokenFDV: string;
-    isGraduating: boolean;
-    tokenDexUrl: string;
-  };
+  tokenInfo: TokenInfo;
 };
 
 export class SpotApiClient {
@@ -42,15 +44,15 @@ export class SpotApiClient {
     this.host = host;
   }
 
-  _get(endpoint: string) {
-    return simpleFetch(`${this.host}/${endpoint}`);
+  _get<T>(endpoint: string) {
+    return simpleFetch<T>(`${this.host}/${endpoint}`);
   }
 
-  async getTokenPrice(mint: string): Promise<SpotTokenPriceResponse> {
-    return this._get(`tokens/price?mint=${mint}`);
+  async getTokenPrice(mint: string) {
+    return this._get<SpotTokenPriceResponse>(`tokens/price?mint=${mint}`);
   }
 
-  async getTokenMetadata(mint: string): Promise<SpotTokenMetadataResponse> {
-    return this._get(`tokens/info?mint=${mint}`);
+  async getTokenMetadata(mint: string) {
+    return this._get<SpotTokenMetadataResponse>(`tokens/info?mint=${mint}`);
   }
 }
