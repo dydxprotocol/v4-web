@@ -33,7 +33,7 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
-import { SpotTokenMetadataResponse } from '@/clients/spotApi';
+import { SpotTokenMetadataResponse, SpotTokenPriceResponse } from '@/clients/spotApi';
 import { calc } from '@/lib/do';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
@@ -106,7 +106,7 @@ export interface RawDataState {
     price: Loadable<TokenPriceResponse | undefined>;
   };
   spot: {
-    solPrice: Loadable<number | undefined>;
+    solPrice: Loadable<SpotTokenPriceResponse | undefined>;
     tokenMetadata: Loadable<SpotTokenMetadataResponse | undefined>;
   };
 }
@@ -262,7 +262,7 @@ export const rawSlice = createSlice({
       ) => {
         state.markets.selectedMarketLeverages = action.payload;
       },
-      setSolPrice: (state, action: PayloadAction<Loadable<number | undefined>>) => {
+      setSolPrice: (state, action: PayloadAction<Loadable<SpotTokenPriceResponse | undefined>>) => {
         state.spot.solPrice = action.payload;
       },
       setTokenMetadata: (
