@@ -69,3 +69,9 @@ export const selectRawGeo = (state: RootState) => state.raw.compliance.geo;
 
 export const selectRawRewardParams = (state: RootState) => state.raw.rewards.data.data;
 export const selectRawRewardPrice = (state: RootState) => state.raw.rewards.price.data;
+
+export const selectRawSolPrice = (state: RootState) => state.raw.spot.solPrice.data;
+export const selectRawSolPriceLoading = (state: RootState) => state.raw.spot.solPrice.status;
+export const selectRawTokenMetadata = (state: RootState) => state.raw.spot.tokenMetadata.data;
+export const selectRawTokenMetadataLoading = (state: RootState) =>
+  state.raw.spot.tokenMetadata.status;
