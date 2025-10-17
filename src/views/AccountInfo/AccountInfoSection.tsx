@@ -207,7 +207,7 @@ const $Details = styled(Details)`
     clip-path: none;
 
     > * {
-      padding: 1.25rem 1.875rem;
+      padding: 1rem 1.875rem;
     }
   }
 `;
