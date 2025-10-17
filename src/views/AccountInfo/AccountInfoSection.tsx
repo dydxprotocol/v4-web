@@ -2,7 +2,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import BigNumber from 'bignumber.js';
 import styled, { css } from 'styled-components';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,9 +17,9 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
 import { OutputType } from '@/components/Output';
-import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
@@ -72,38 +72,52 @@ export const AccountInfoSection = () => {
   const isPostOrderBalanceNegative =
     availableBalancePost != null && MustBigNumber(availableBalancePost).lt(0);
 
-  const withdrawButton = (
-    <$Button
-      state={{ isDisabled: !dydxAccounts }}
-      onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
-      shape={ButtonShape.Rectangle}
-      size={ButtonSize.XSmall}
-      buttonStyle={ButtonStyle.WithoutBackground}
-      action={ButtonAction.Primary}
-    >
-      {stringGetter({ key: STRING_KEYS.WITHDRAW })}
-    </$Button>
-  );
-
   const depositButton = (
-    <$Button
-      state={{ isDisabled: !dydxAccounts }}
+    <Button
+      tw="flex-1"
       onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
       shape={ButtonShape.Rectangle}
-      size={ButtonSize.XSmall}
-      buttonStyle={ButtonStyle.WithoutBackground}
+      size={ButtonSize.Small}
       action={ButtonAction.Primary}
     >
-      {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-    </$Button>
+      <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
+    </Button>
   );
 
-  const depositWithdrawRow = (
-    <div tw="inlineRow gap-0.5 self-stretch">
-      <$WithSeparators layout="row" withSeparators>
-        {complianceState === ComplianceStates.FULL_ACCESS && depositButton}
-        {withdrawButton}
-      </$WithSeparators>
+  const withdrawIconButton = (
+    <Button
+      onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
+      shape={ButtonShape.Square}
+      size={ButtonSize.Small}
+      action={ButtonAction.Base}
+    >
+      <Icon size="1rem" iconName={IconName.Withdraw} />
+    </Button>
+  );
+
+  const withdrawTextButton = (
+    <Button
+      tw="flex-1"
+      onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
+      shape={ButtonShape.Rectangle}
+      size={ButtonSize.Small}
+      action={ButtonAction.Base}
+    >
+      <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.WITHDRAW })}</span>
+      <Icon size="1rem" iconName={IconName.Withdraw} />
+    </Button>
+  );
+
+  const depositWithdrawRow = dydxAccounts && (
+    <div tw="inlineRow gap-0.75 pt-0.25">
+      {complianceState === ComplianceStates.FULL_ACCESS ? (
+        <>
+          {depositButton}
+          {withdrawIconButton}
+        </>
+      ) : (
+        withdrawTextButton
+      )}
     </div>
   );
 
@@ -174,20 +188,16 @@ export const AccountInfoSection = () => {
 
   return (
     <$Container>
-      <header tw="spacedRow px-1 py-0 font-small-book">
-        <span>{stringGetter({ key: STRING_KEYS.YOUR_ACCOUNT })}</span>
-        {depositWithdrawRow}
-      </header>
       <$StackContainer $isTablet={isTablet}>
         <$Details items={detailItems} layout="column" withOverflow={false} isLoading={isLoading} />
       </$StackContainer>
+      {depositWithdrawRow}
     </$Container>
   );
 };
 
 const $Details = styled(Details)`
   font: var(--font-mini-book);
-  padding: 0 1rem;
 
   > * {
     padding: 0 0 0.5rem;
@@ -197,15 +207,14 @@ const $Details = styled(Details)`
     clip-path: none;
 
     > * {
-      padding: 1.25rem 1.875rem;
+      padding: 1rem 1.875rem;
     }
   }
 `;
 const $Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 1rem 1rem;
 `;
 
 const $StackContainer = styled.div<{ $isTablet: boolean }>`
@@ -216,16 +225,4 @@ const $StackContainer = styled.div<{ $isTablet: boolean }>`
     css`
       flex: 1;
     `}
-`;
-
-const $WithSeparators = styled(WithSeparators)`
-  --separatorHeight-padding: 0.5rem;
-`;
-
-const $Button = styled(Button)`
-  --button-padding: 0;
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;
