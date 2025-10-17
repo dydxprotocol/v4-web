@@ -1045,7 +1045,7 @@ function getTransferAmountFromTargetLeverage(
 
   // Return the maximum of the naive transfer and the adjusted transfer amount
   return Math.max(
-    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size,
+    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size + 1,
     naiveTransferAmount
   );
 }

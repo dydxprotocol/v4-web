@@ -17,7 +17,7 @@ export const MarginAndLeverageButtons = ({ className }: StyleProps) => {
 };
 
 const $MarginAndLeverageButtons = styled.div`
-  height: 2.5rem;
+  height: 2.625rem;
   display: flex;
   gap: 0.5rem;
 

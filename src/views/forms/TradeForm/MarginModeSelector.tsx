@@ -125,6 +125,7 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
   const leverageButton = (
     <Button
       size={ButtonSize.XSmall}
+      tw="[--button-backgroundColor:--color-layer-4] [--button-border:none]"
       slotRight={<Icon iconName={IconName.Pencil} tw="text-color-accent" />}
       onClick={() =>
         currentMarket != null

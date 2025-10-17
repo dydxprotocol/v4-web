@@ -4,6 +4,7 @@ import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
+import BigNumber from 'bignumber.js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';

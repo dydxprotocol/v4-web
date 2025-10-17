@@ -109,6 +109,12 @@ export const SetMarketLeverageDialog = ({
 
   const leverageNumber = MaybeBigNumber(leverageInputValue)?.toNumber();
   const isBelowMinimum = leverageNumber != null && leverageNumber < minLeverage;
+  const hasLeverageChanged =
+    leverageNumber != null &&
+    leverageNumber !== MaybeBigNumber(effectiveSelectedLeverage)?.toNumber();
+  const isIncreasingLeverage =
+    leverageNumber != null &&
+    leverageNumber > (MaybeBigNumber(effectiveSelectedLeverage)?.toNumber() ?? 0);
 
   const onSliderDrag = ([newLeverage]: number[]) => {
     const newLeverageString = mapIfPresent(newLeverage, (lev) => MustBigNumber(lev).toFixed(0));
@@ -158,9 +164,9 @@ export const SetMarketLeverageDialog = ({
       title={stringGetter({
         fallback: 'Set Market Leverage',
       })}
-      tw="[--dialog-width:25rem]"
+      tw="[--dialog-header-paddingBottom:1.5rem] [--dialog-width:25rem]"
     >
-      <form onSubmit={onSave} tw="flexColumn gap-1">
+      <form onSubmit={onSave} tw="flexColumn gap-1.5">
         <div>
           <div tw="flex items-center gap-0.5">
             <AssetIcon logoUrl={logoUrl} symbol={assetId} tw="[--asset-icon-size:1.5rem]" />
@@ -205,7 +211,15 @@ export const SetMarketLeverageDialog = ({
         {isBelowMinimum && (
           <AlertMessage type={AlertType.Error}>
             {stringGetter({
-              fallback: `Minimum leverage for this position is ${minLeverage}×. Setting leverage below this would bring your available balance below zero.`,
+              fallback: `Minimum leverage for this position is ${minLeverage}×. Insufficient margin available to decrease leverage further. Add more margin to decrease leverage.`,
+            })}
+          </AlertMessage>
+        )}
+
+        {!isBelowMinimum && isIncreasingLeverage && (
+          <AlertMessage type={AlertType.Warning}>
+            {stringGetter({
+              fallback: 'Setting a higher leverage could increase liquidation risk.',
             })}
           </AlertMessage>
         )}
@@ -217,7 +231,7 @@ export const SetMarketLeverageDialog = ({
           tw="w-full"
           action={ButtonAction.Primary}
           state={
-            isBelowMinimum
+            isBelowMinimum || !hasLeverageChanged
               ? ButtonState.Disabled
               : isLoading
                 ? ButtonState.Loading
