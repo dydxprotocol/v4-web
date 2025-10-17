@@ -256,7 +256,7 @@ const $InnerInputContainer = styled.div`
   --input-backgroundColor: var(--color-layer-4);
   --input-borderColor: none;
   --input-height: 2.25rem;
-  --input-width: 5rem;
+  --input-width: 4rem;
 
   margin-left: 0.25rem;
 
