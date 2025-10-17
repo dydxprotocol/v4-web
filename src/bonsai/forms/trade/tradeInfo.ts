@@ -142,6 +142,7 @@ export function calculateTradeInfo(
               trade,
               calculated.summary?.size?.size ?? 0,
               calculated.summary?.averageFillPrice ?? 0,
+              calculated.marketOrder?.totalFees ?? 0,
               subaccountToUse,
               accountData.rawParentSubaccountData?.parentSubaccount,
               baseAccount?.position,
@@ -252,6 +253,7 @@ export function calculateTradeInfo(
               trade,
               inputSummary.size.size ?? 0,
               price ?? 0,
+              totalFees ?? 0,
               subaccountToUse,
               accountData.rawParentSubaccountData?.parentSubaccount,
               baseAccount?.position,
@@ -320,6 +322,7 @@ export function calculateTradeInfo(
               trade,
               inputSummary.size?.size ?? 0,
               price ?? 0,
+              totalFees ?? 0,
               subaccountToUse,
               accountData.rawParentSubaccountData?.parentSubaccount,
               baseAccount?.position,
@@ -884,6 +887,7 @@ function calculateIsolatedTransferAmount(
   trade: TradeForm,
   tradeSize: number,
   tradePrice: number,
+  tradeFees: number,
   subaccountToUse: number,
   parentSubaccount: number | undefined,
   existingPosition: SubaccountPosition | undefined,
@@ -906,6 +910,7 @@ function calculateIsolatedTransferAmount(
       trade,
       tradeSize,
       tradePrice,
+      tradeFees,
       existingPosition,
       tradeMarketSummary,
       rawSelectedMarketLeverages
@@ -931,6 +936,7 @@ function calculateIsolatedMarginTransferAmount(
   trade: TradeForm,
   tradeSize: number,
   tradePrice: number,
+  tradeFees: number,
   existingPosition: SubaccountPosition | undefined,
   tradeMarketSummary: PerpetualMarketSummary | undefined,
   rawSelectedMarketLeverages: { [marketId: string]: number }
@@ -975,6 +981,7 @@ function calculateIsolatedMarginTransferAmount(
     side,
     estOraclePriceAtExecution,
     tradePrice,
+    tradeFees,
     marketMaxLeverage,
     positionSizeDifference
   );
@@ -1001,6 +1008,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
   side: OrderSide,
   estOraclePriceAtExecution: number,
   price: number,
+  fees: number,
   maxMarketLeverage: number,
   positionSizeDifference: number
 ): number | undefined {
@@ -1015,6 +1023,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
 
   const amount = getTransferAmountFromTargetLeverage(
     price,
+    fees,
     estOraclePriceAtExecution,
     side,
     positionSizeDifference,
@@ -1028,6 +1037,7 @@ function calculateIsolatedMarginTransferAmountFromValues(
 
 function getTransferAmountFromTargetLeverage(
   price: number,
+  fees: number,
   estOraclePriceAtExecution: number,
   side: OrderSide,
   size: number,
@@ -1037,7 +1047,7 @@ function getTransferAmountFromTargetLeverage(
     return 0;
   }
 
-  const naiveTransferAmount = (price * size) / targetLeverage;
+  const naiveTransferAmount = (price * size) / targetLeverage + fees;
 
   // Calculate price difference for immediate PnL impact
   const priceDiff =
@@ -1045,7 +1055,7 @@ function getTransferAmountFromTargetLeverage(
 
   // Return the maximum of the naive transfer and the adjusted transfer amount
   return Math.max(
-    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size,
+    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size + fees,
     naiveTransferAmount
   );
 }
