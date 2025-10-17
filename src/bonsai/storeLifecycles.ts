@@ -19,6 +19,7 @@ import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
 import { setUpRewardsParamsQuery, setUpRewardsTokenPriceQuery } from './rest/rewards';
 import { setUpSparklinesQuery } from './rest/sparklines';
+import { setUpSolPriceQuery, setUpTokenMetadataQuery } from './rest/spot';
 import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
@@ -60,6 +61,8 @@ export const storeLifecycles = [
   setUpNobleBalanceSweepLifecycle,
   setUpRewardsParamsQuery,
   setUpRewardsTokenPriceQuery,
+  setUpSolPriceQuery,
+  setUpTokenMetadataQuery,
   setUpCancelOrphanedTriggerOrdersLifecycle,
   setUpReclaimChildSubaccountBalancesLifecycle,
   setUpMarketsFeeDiscountQuery,

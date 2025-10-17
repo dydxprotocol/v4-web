@@ -33,6 +33,7 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
+import { SpotTokenMetadataResponse } from '@/clients/spotApi';
 import { calc } from '@/lib/do';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
@@ -104,6 +105,10 @@ export interface RawDataState {
     data: Loadable<RewardsParams | undefined>;
     price: Loadable<TokenPriceResponse | undefined>;
   };
+  spot: {
+    solPrice: Loadable<number | undefined>;
+    tokenMetadata: Loadable<SpotTokenMetadataResponse | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -142,6 +147,10 @@ const initialState: RawDataState = {
   rewards: {
     data: loadableIdle(),
     price: loadableIdle(),
+  },
+  spot: {
+    solPrice: loadableIdle(),
+    tokenMetadata: loadableIdle(),
   },
 };
 
@@ -253,6 +262,15 @@ export const rawSlice = createSlice({
       ) => {
         state.markets.selectedMarketLeverages = action.payload;
       },
+      setSolPrice: (state, action: PayloadAction<Loadable<number | undefined>>) => {
+        state.spot.solPrice = action.payload;
+      },
+      setTokenMetadata: (
+        state,
+        action: PayloadAction<Loadable<SpotTokenMetadataResponse | undefined>>
+      ) => {
+        state.spot.tokenMetadata = action.payload;
+      },
     }),
     // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
@@ -340,4 +358,6 @@ export const {
   setRewardsTokenPrice,
   setSelectedMarketLeverage,
   setSelectedMarketLeverages,
+  setSolPrice,
+  setTokenMetadata,
 } = rawSlice.actions;
