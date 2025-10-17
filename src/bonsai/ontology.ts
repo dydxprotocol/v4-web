@@ -12,10 +12,12 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
+import { SpotTokenMetadataResponse } from '@/clients/spotApi';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
 import { AdjustIsolatedMarginFormFns } from './forms/adjustIsolatedMargin';
+import { SpotFormFns } from './forms/spot';
 import { TradeFormFns } from './forms/trade/trade';
 import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
@@ -88,6 +90,12 @@ import {
   selectCurrentMarketOrderbook,
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
+import {
+  selectSolPrice,
+  selectSolPriceLoading,
+  selectTokenMetadata,
+  selectTokenMetadataLoading,
+} from './selectors/spot';
 import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
@@ -213,6 +221,16 @@ interface BonsaiCoreShape {
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
   rewardParams: { data: BasicSelector<RewardParamsSummary> };
+  spot: {
+    solPrice: {
+      data: BasicSelector<number | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tokenMetadata: {
+      data: BasicSelector<SpotTokenMetadataResponse | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+  };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -296,6 +314,16 @@ export const BonsaiCore: BonsaiCoreShape = {
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
   rewardParams: { data: selectRewardsSummary },
+  spot: {
+    solPrice: {
+      data: selectSolPrice,
+      loading: selectSolPriceLoading,
+    },
+    tokenMetadata: {
+      data: selectTokenMetadata,
+      loading: selectTokenMetadataLoading,
+    },
+  },
 };
 
 interface BonsaiRawShape {
@@ -447,4 +475,5 @@ export const BonsaiForms = {
   TriggerOrdersFormFns,
   AdjustIsolatedMarginFormFns,
   TransferFormFns,
+  SpotFormFns,
 };

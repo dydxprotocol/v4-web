@@ -502,7 +502,7 @@ export const Output = ({
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
-          $polarity={
+          polarity={
             withPolarityColor
               ? isNegative
                 ? NumberSign.Negative
@@ -565,22 +565,21 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
       --output-afterString: ')';
     `}
 `;
-const $Number = styled($Text)<{ withBaseFont?: boolean; $polarity?: NumberSign }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean; polarity?: NumberSign }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`
       font-feature-settings: var(--fontFeature-monoNumbers);
     `}
 
-  ${({ $polarity }) =>
-    $polarity === NumberSign.Positive &&
-    css`
-      color: var(--color-positive) !important;
-    `}
-
-  ${({ $polarity }) =>
-    $polarity === NumberSign.Negative &&
-    css`
-      color: var(--color-negative) !important;
-    `}
+  ${({ polarity }) =>
+    polarity === NumberSign.Positive
+      ? css`
+          color: var(--color-positive) !important;
+        `
+      : polarity === NumberSign.Negative
+        ? css`
+            color: var(--color-negative) !important;
+          `
+        : ''}
 `;

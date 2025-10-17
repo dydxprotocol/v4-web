@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
 
+import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
+
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -129,6 +131,7 @@ const DUMMY_TOKENS: SpotMarketToken[] = [
 
 const SpotPage = () => {
   const { symbol } = useParams<{ symbol: string }>();
+
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
 
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
@@ -150,6 +153,8 @@ const SpotPage = () => {
   const handlePositionSell = () => {
     // Sell dialog or navigate
   };
+
+  useCurrentSpotToken();
 
   return (
     <$SpotLayout tradeLayout={tradeLayout} isHorizontalOpen={isHorizontalOpen}>
@@ -176,31 +181,31 @@ const SpotPage = () => {
           items={[
             {
               key: 'holders',
-              iconName: IconName.Positions,
+              iconName: IconName.UserGroup,
               label: 'Holders',
               value: <Output type={OutputType.CompactNumber} value={123123} />,
             },
             {
               key: 'top10',
-              iconName: IconName.Position,
+              iconName: IconName.User2,
               label: 'Top 10',
               value: <Output type={OutputType.Percent} value={0.0424} />,
             },
             {
               key: 'devHolding',
-              iconName: IconName.Gear,
+              iconName: IconName.ChefHat,
               label: 'Dev Holding',
               value: <Output type={OutputType.Percent} value={0.0123} />,
             },
             {
               key: 'snipers',
-              iconName: IconName.Viewfinder,
+              iconName: IconName.Scope,
               label: 'Snipers',
               value: <Output type={OutputType.Percent} value={0.0124} />,
             },
             {
               key: 'bundlers',
-              iconName: IconName.Shield,
+              iconName: IconName.Ghost,
               label: 'Bundlers',
               value: <Output type={OutputType.Percent} value={0.0424} />,
             },

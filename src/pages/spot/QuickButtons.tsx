@@ -5,12 +5,19 @@ import styled, { css } from 'styled-components';
 
 import { Icon, IconName } from '@/components/Icon';
 
+type ValidationConfig = {
+  min?: number;
+  max?: number;
+  decimalScale?: number;
+};
+
 type QuickButtonProps = {
   options: string[];
   onSelect?: (value: string) => void;
   onOptionsEdit?: (options: string[]) => void;
   currentValue?: string;
   disabled?: boolean;
+  validation?: ValidationConfig;
 };
 
 export const QuickButtons = ({
@@ -19,6 +26,7 @@ export const QuickButtons = ({
   onOptionsEdit,
   currentValue,
   disabled,
+  validation,
 }: QuickButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState<string[]>(options);
@@ -29,18 +37,27 @@ export const QuickButtons = ({
   };
 
   const handleConfirmEdit = () => {
-    const uniqueValues = editValues.map((value, i) => {
-      const isUnique = !options.includes(value) || options.indexOf(value) === i;
-      const isValid = !Number.isNaN(parseFloat(value));
+    const validatedValues = editValues.map((value, i) => {
+      const numValue = parseFloat(value);
 
-      if (isUnique && isValid) {
-        return value;
+      if (Number.isNaN(numValue)) {
+        return options[i]!;
       }
 
-      return options[i]!;
+      let clamped = numValue;
+      if (validation?.min !== undefined) clamped = Math.max(clamped, validation.min);
+      if (validation?.max !== undefined) clamped = Math.min(clamped, validation.max);
+      const clampedString = clamped.toString();
+
+      const isDuplicate = options.includes(clampedString) && options.indexOf(clampedString) !== i;
+      if (isDuplicate) {
+        return options[i]!;
+      }
+
+      return clampedString;
     });
 
-    onOptionsEdit?.(uniqueValues);
+    onOptionsEdit?.(validatedValues);
     setIsEditing(false);
   };
 
@@ -61,7 +78,7 @@ export const QuickButtons = ({
           <$InputQuickButtonContainer key={option}>
             <$QuickButtonInput
               allowNegative={false}
-              decimalScale={2}
+              decimalScale={validation?.decimalScale ?? 2}
               disabled={disabled}
               value={editValues[i]}
               onChange={(e) => handleInputChange(i, e.target.value)}
