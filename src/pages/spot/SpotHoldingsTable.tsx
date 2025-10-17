@@ -38,6 +38,8 @@ export enum SpotHoldingsTableColumnKey {
   Actions = 'Actions',
 }
 
+// TODO: spot localization
+
 const getColumnDef = ({
   key,
   width,

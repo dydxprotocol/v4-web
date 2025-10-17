@@ -77,6 +77,8 @@ export type SpotFormInputProps = {
   };
 } & InputProps;
 
+// TODO: spot localization
+
 export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
   (
     {
