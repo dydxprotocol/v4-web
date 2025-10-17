@@ -314,7 +314,7 @@ function validateTriggerOrderPayloadForEquityTiers(
     inputData.rawParentSubaccountData,
     inputData.rawRelevantMarkets,
     (subaccountData, markets) =>
-      calculateChildSubaccountSummaries(subaccountData, markets)[
+      calculateChildSubaccountSummaries(subaccountData, markets, inputData.selectedMarketLeverages)[
         `${subaccountToUse}`
       ]?.equity.toNumber()
   );

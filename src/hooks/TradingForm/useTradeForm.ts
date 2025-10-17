@@ -4,6 +4,7 @@ import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
 import { logBonsaiInfo } from '@/bonsai/logs';
+import BigNumber from 'bignumber.js';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';
@@ -20,8 +21,10 @@ import { getCurrentTradePageForm } from '@/state/tradeFormSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { useDisappearingValue } from '@/lib/disappearingValue';
+import { runFn } from '@/lib/do';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { isTruthy } from '@/lib/isTruthy';
+import { saveMarketLeverage } from '@/lib/leverageHelpers';
 import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 
 import { ConnectionErrorType, useApiState } from '../useApiState';
@@ -77,7 +80,7 @@ export const useTradeForm = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  const { errors: tradeErrors, summary } = fullFormSummary;
+  const { errors: tradeErrors, summary, inputData } = fullFormSummary;
   const tradeFormInputValues = summary.effectiveTrade;
   const { marketId } = tradeFormInputValues;
   const isClosePosition = source === TradeFormSource.ClosePositionForm;
@@ -115,6 +118,26 @@ export const useTradeForm = ({
     if (payload == null || tradePayload == null || hasValidationErrors) {
       return;
     }
+
+    // Auto-save effective leverage if it differs significantly from the raw selected leverage
+    runFn(() => {
+      // these values only exist when not closing a position, but that's fine.
+      const impliedMarket = summary.accountDetailsAfter?.position?.market;
+      const impliedLeverage = summary.accountDetailsAfter?.position?.effectiveSelectedLeverage;
+      if (impliedMarket && impliedLeverage) {
+        const rawSelectedLeverage = inputData?.rawSelectedMarketLeverages[impliedMarket];
+
+        if (rawSelectedLeverage == null) {
+          // Fire and forget - don't await to keep order placement fast
+          saveMarketLeverage({
+            dispatch,
+            marketId: impliedMarket,
+            leverage: impliedLeverage.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN).toNumber(),
+          });
+        }
+      }
+    });
+
     onPlaceOrder?.(tradePayload);
     track(
       AnalyticsEvents.TradePlaceOrderClick({

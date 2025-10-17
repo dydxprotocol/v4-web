@@ -28,7 +28,6 @@ const getMinimumRequiredFields = (
     reduceOnly: undefined,
     side: undefined,
     size: undefined,
-    targetLeverage: undefined,
     timeInForce: undefined,
     triggerPrice: undefined,
     stopLossOrder: undefined,
@@ -103,11 +102,6 @@ export const tradeFormReducer = createVanillaReducer({
       size: OrderSizeInputs.AVAILABLE_PERCENT({ value }),
     }),
 
-    setSizeLeverageSigned: (state, value: string) => ({
-      ...state,
-      size: OrderSizeInputs.SIGNED_POSITION_LEVERAGE({ value }),
-    }),
-
     // Price related actions
     setLimitPrice: (state, limitPrice: string) => ({
       ...state,
@@ -143,11 +137,6 @@ export const tradeFormReducer = createVanillaReducer({
     setGoodTilTime: (state, goodTil: { duration: string; unit: TimeUnit }) => ({
       ...state,
       goodTil,
-    }),
-
-    setTargetLeverage: (state, targetLeverage: string) => ({
-      ...state,
-      targetLeverage,
     }),
 
     showTriggers: (state) => ({

@@ -425,15 +425,17 @@ const $ToggleGroup = styled(ToggleGroup)`
 function useForm() {
   const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
   const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
+  const selectedMarketLeverages = useAppSelector(BonsaiRaw.selectedMarketLeverages);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
 
   const inputs = useMemo(
     () => ({
       rawParentSubaccountData,
       rawRelevantMarkets,
+      selectedMarketLeverages: selectedMarketLeverages ?? {},
       canViewAccount,
     }),
-    [canViewAccount, rawParentSubaccountData, rawRelevantMarkets]
+    [canViewAccount, rawParentSubaccountData, rawRelevantMarkets, selectedMarketLeverages]
   );
 
   return useFormValues(BonsaiForms.AdjustIsolatedMarginFormFns, inputs);
