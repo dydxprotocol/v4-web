@@ -637,6 +637,9 @@ importers:
       bn.js:
         specifier: ^5.2.0
         version: 5.2.1
+      concat:
+        specifier: ^1.0.3
+        version: 1.0.3
       fuels:
         specifier: 0.101.3
         version: 0.101.3(vitest@3.0.9)
@@ -6295,7 +6298,7 @@ packages:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
-      '@scure/base': 1.1.9
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.12
       '@types/lodash': 4.17.20
       debug: 4.4.1(supports-color@5.5.0)
@@ -19422,6 +19425,14 @@ packages:
 
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+
+  /concat@1.0.3:
+    resolution: {integrity: sha512-f/ZaH1aLe64qHgTILdldbvyfGiGF4uzeo9IuXUloIOLQzFmIPloy9QbZadNsuVv0j5qbKQvQb/H/UYf2UsKTpw==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dependencies:
+      commander: 2.20.3
+    dev: false
 
   /confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}

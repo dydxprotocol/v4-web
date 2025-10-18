@@ -7,4 +7,5 @@ members = [
     "contracts/core/vault",
 
     "contracts/testnet/token",
+    "contracts/vault-expose",
 ]

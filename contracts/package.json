@@ -5,7 +5,10 @@
     "license": "Apache-2.0",
     "scripts": {
         "clean": "forc clean",
-        "build": "forc build --release --log-level 4",
+        "build:vault-expose-1": "ts-node -e 'require(\"fs\").cpSync(\"contracts/core/vault/src/\", \"contracts/vault-expose/src/\", {recursive: true});'",
+        "build:vault-expose-2": "ts-node -e 'const concat = require(\"concat\"); concat([\"contracts/vault-expose/src/main.sw\", \"contracts/vault-expose/vault-expose.txt\"], \"contracts/vault-expose/src/main.sw\")'",
+        "build:contracts": "forc build --release --log-level 4",
+        "build": "pnpm build:vault-expose-1 && pnpm pnpm build:vault-expose-2 && pnpm build:contracts",
         "gen:types": "fuels typegen -i ./contracts/**/*-abi.json -o ./types",
         "test": "vitest run",
         "test:watch": "vitest",
@@ -27,6 +30,7 @@
     },
     "dependencies": {
         "bn.js": "^5.2.0",
+        "concat": "^1.0.3",
         "fuels": "0.101.3"
     }
 }

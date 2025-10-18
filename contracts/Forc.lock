@@ -106,3 +106,15 @@ dependencies = [
     "src3",
     "std",
 ]
+
+[[package]]
+name = "vault-expose"
+source = "member"
+dependencies = [
+    "core_interfaces",
+    "helpers",
+    "pausable",
+    "src20",
+    "src3",
+    "std",
+]

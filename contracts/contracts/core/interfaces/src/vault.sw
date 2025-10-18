@@ -23,6 +23,14 @@ pub struct PositionKey {
     pub is_long: bool,
 }
 
+pub struct FundingInfo {
+    pub total_short_sizes: u256,
+    pub total_long_sizes: u256,
+    pub long_cumulative_funding_rate: u256,
+    pub short_cumulative_funding_rate: u256,
+    pub last_funding_time: u64,
+}
+
 abi Vault {
     /// Get the revision of the contract
     fn get_revision() -> u8;
@@ -197,6 +205,11 @@ abi Vault {
     fn get_remove_liquidity_amount(
         lp_asset_amount: u64
     ) -> (u64, u64, u64);
+
+    #[storage(read)]
+    fn get_funding_info(
+        asset: b256,
+    ) -> FundingInfo;
 
     /*
           ____  ____        _     _ _

@@ -1,4 +1,5 @@
-import { getMintedAssetId, WalletUnlocked } from "fuels"
+import { getMintedAssetId, WalletUnlocked, DateTime } from "fuels"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 
 // export async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
 //     const factory = require(`../types/${contract}Factory.ts`)[`${contract}Factory`]
@@ -93,4 +94,23 @@ export function getAssetId(
 ): string {
     const id = typeof fungibleContract === "string" ? fungibleContract : fungibleContract.id.toHexString()
     return getMintedAssetId(id, sub_id)
+}
+
+export async function moveBlockchainTime(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>, seconds: number) {
+    const { provider: providerWithCustomTimestamp } = launchedNode;
+
+    const latestBlock = await providerWithCustomTimestamp.getBlock('latest');
+    if (!latestBlock) {
+      throw new Error('No latest block');
+    }
+    const latestBlockTimestamp = DateTime.fromTai64(
+      latestBlock.time
+    ).toUnixMilliseconds();
+    
+    // Produce 3 new blocks, setting the timestamp to latest + seconds * 1000ms
+    const newBlockHeight = await providerWithCustomTimestamp.produceBlocks(
+      3,
+      latestBlockTimestamp + seconds * 1000
+    );      
+
 }

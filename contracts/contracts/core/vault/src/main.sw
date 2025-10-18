@@ -44,7 +44,8 @@ use core_interfaces::{
     vault::{
         Vault,
         Position,
-        PositionKey
+        PositionKey,
+        FundingInfo,
     },
     pricefeed_wrapper::PricefeedWrapper,
 };
@@ -71,14 +72,6 @@ configurable {
     COLLATERAL_ASSET_DECIMALS: u32 = 0,
     /// The pricefeed provider contract used to get the price of the collateral asset
     PRICEFEED_WRAPPER: ContractId = ZERO_CONTRACT,
-}
-
-struct FundingInfo {
-    total_short_sizes: u256,
-    total_long_sizes: u256,
-    long_cumulative_funding_rate: u256,
-    short_cumulative_funding_rate: u256,
-    last_funding_time: u64,
 }
 
 storage {
@@ -577,6 +570,13 @@ impl Vault for Contract {
         lp_asset_amount: u64
     ) -> (u64, u64, u64) {
         _get_remove_liquidity_amount(lp_asset_amount)
+    }
+
+    #[storage(read)]
+    fn get_funding_info(
+        asset: b256,
+    ) -> FundingInfo {
+        _get_funding_info(asset)
     }
 
     /*
@@ -1772,7 +1772,24 @@ fn _liquidate_position(
     }
 }
 
-// TODO should funding_rate be u64?
+/// `long_cumulative_funding_rate` and `short_cumulative_funding_rate`
+/// are aggregated over time since the market creation (in seconds)
+/// per one asset (per one token of the asset)
+/// with the precision of `FUNDING_RATE_PRECISION`,
+/// the starting value is `2**255`,
+/// if the cumulative funding rate increases, the positions pays funding rate to the other side,
+/// if the cumulative funding rate decreases, the positions receives funding rate from the other side.
+#[storage(read)]
+fn _get_funding_info(asset: b256) -> FundingInfo {
+    storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
+        total_short_sizes: 0,
+        total_long_sizes: 0,
+        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
+        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
+        last_funding_time: 0,
+    })
+}
+
 #[storage(read)]
 fn _calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, position_cumulative_funding_rate: u256) -> (u256, bool) {
     let funding_info = storage::fund.funding_info.get(asset).try_read();
@@ -1791,10 +1808,10 @@ fn _calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, posi
             (true, position_cumulative_funding_rate - current_long_cumulative_funding_rate)
         }
     } else {
-        if (current_short_cumulative_funding_rate < position_cumulative_funding_rate) {
-            (false, position_cumulative_funding_rate - current_short_cumulative_funding_rate)
+        if (current_short_cumulative_funding_rate > position_cumulative_funding_rate) {
+            (false, current_short_cumulative_funding_rate - position_cumulative_funding_rate)
         } else {
-            (true, current_short_cumulative_funding_rate - position_cumulative_funding_rate)
+            (true, position_cumulative_funding_rate - current_short_cumulative_funding_rate)
         }
     };
     (funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION, has_profit)
@@ -1802,13 +1819,7 @@ fn _calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, posi
 
 #[storage(read, write)]
 fn _increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> u256 {
-    let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
-        total_short_sizes: 0,
-        total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        last_funding_time: 0,
-    });
+    let mut funding_info = _get_funding_info(asset);
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {
@@ -1839,13 +1850,7 @@ fn _increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
 
 #[storage(read, write)]
 fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> u256 {
-    let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
-        total_short_sizes: 0,
-        total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        last_funding_time: 0,
-    });
+    let mut funding_info = _get_funding_info(asset);
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {
@@ -1877,13 +1882,7 @@ fn _decrease_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> 
 
 #[storage(read, write)]
 fn _update_funding_info(asset: b256) {
-    let mut funding_info = storage::fund.funding_info.get(asset).try_read().unwrap_or(FundingInfo {
-        total_short_sizes: 0,
-        total_long_sizes: 0,
-        long_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        short_cumulative_funding_rate: 2u256 ** 255, // zero for signed simulating
-        last_funding_time: 0,
-    });
+    let mut funding_info = _get_funding_info(asset);
     let now = timestamp();
     // calculate new cumulative funding rate before modifying funding info
     if (funding_info.last_funding_time > 0) {

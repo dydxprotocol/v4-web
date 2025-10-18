@@ -1,0 +1,12 @@
+[project]
+authors = ["lukasz-glen"]
+entry = "main.sw"
+license = "Apache-2.0"
+name = "vault-expose"
+
+[dependencies]
+src20 = "0.8.0"
+src3 = "0.8.0"
+pausable = "0.26.1"
+helpers = { path = "../helpers" }
+core_interfaces = { path = "../core/interfaces" }
