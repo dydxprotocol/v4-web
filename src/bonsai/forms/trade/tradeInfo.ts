@@ -73,7 +73,8 @@ export function calculateTradeInfo(
             trade,
             baseAccount,
             accountData,
-            subaccountToUse
+            // we force simulate against parent subaccount regardless of actual subaccount we're using
+            accountData.rawParentSubaccountData?.parentSubaccount ?? 0
           );
           const calculatedMaxUsdc = mapIfPresent(
             calculatedMaxTrade?.usdcSize,
@@ -284,10 +285,12 @@ export function calculateTradeInfo(
           const price = AttemptNumber(trade.limitPrice);
           const inputSummary = calculateLimitOrderInputSummary(
             trade.size,
+            trade.side,
             trade.limitPrice,
             trade.reduceOnly,
             AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
-            baseAccount
+            baseAccount,
+            accountData
           );
 
           const totalFees = mapIfPresent(
@@ -353,7 +356,6 @@ interface TradeInputMarketOrder {
 
   size?: number;
   usdcSize?: number;
-  leverageSigned?: number;
 
   worstPrice?: number;
   filled: boolean;
@@ -388,7 +390,6 @@ function calculateMarketOrder(
       averageFillPrice: marketOrder?.averagePrice,
       worstFillPrice: marketOrder?.worstPrice,
       size: {
-        leverageSigned: marketOrder?.leverageSigned,
         size: marketOrder?.size,
         usdcSize: marketOrder?.usdcSize,
       },
@@ -524,12 +525,6 @@ function simulateMarketOrder(
       size: 0,
       usdcSize: 0,
       totalFees: 0,
-      leverageSigned:
-        existingPosition != null
-          ? (existingPosition.leverage ?? BIG_NUMBERS.ZERO)
-              .times(existingPosition.value.div(existingPosition.value.abs()))
-              .toNumber()
-          : 0,
       averagePrice: undefined,
       worstPrice: undefined,
     };
@@ -637,12 +632,6 @@ function simulateMarketOrder(
     usdcSize: totalCostWithoutFees,
 
     totalFees: totalCost - totalCostWithoutFees,
-    leverageSigned:
-      equity <= 0
-        ? undefined
-        : ((existingPosition?.value.toNumber() ?? 0) +
-            totalSize * oraclePrice * operationMultipler) /
-          equity,
     worstPrice: orderbookRows.at(-1)?.price,
     filled,
   };
@@ -714,11 +703,8 @@ function calculateEffectiveSizeTarget(
           type: 'size' as const,
         };
       }
-      // we don't support target leverage for isolated positions mainly because reverse engineering
-      // tranferred collateral amount is impossible under current definitions
-      if (trade.marginMode === MarginMode.ISOLATED) {
-        return undefined;
-      }
+      // we do the same for isolated and cross, which is only an approximation
+      // we also aren't accounting for fees properly
       const usdcTarget = MustBigNumber(maxTradeUsdc).times(
         BigNumber.min(percent, MAX_LEVERAGE_BUFFER_PERCENT)
       );
@@ -753,28 +739,57 @@ function calculateEffectiveSizeTarget(
 
 function calculateLimitOrderInputSummary(
   size: OrderSizeInput | undefined,
+  side: OrderSide | undefined,
   limitPrice: string | undefined,
   reduceOnly: boolean | undefined,
   marketStepSize: number | undefined,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  baseAccount: TradeAccountDetails | undefined
+  baseAccount: TradeAccountDetails | undefined,
+  accountData: TradeFormInputData
 ): TradeInputSummary {
   const price = MustNumber(limitPrice);
+  const targetLeverage = calc(() => {
+    const effectiveImf = accountData.currentTradeMarketSummary?.effectiveInitialMarginFraction ?? 0;
+    const marketMaxLeverage = 1 / (effectiveImf === 0 ? 1 : effectiveImf);
+    const effectiveTargetLeverage = calculateEffectiveSelectedLeverage({
+      userSelectedLeverage:
+        accountData.currentTradeMarketSummary?.ticker != null
+          ? accountData.rawSelectedMarketLeverages[accountData.currentTradeMarketSummary.ticker]
+          : undefined,
+      initialMarginFraction: accountData.currentTradeMarketSummary?.initialMarginFraction,
+    });
+    return Math.min(effectiveTargetLeverage, marketMaxLeverage * MAX_LEVERAGE_BUFFER_PERCENT);
+  });
+
   const effectiveSize = toStepSize(
     size != null
       ? OrderSizeInputs.match(size, {
-          // only reduce only
           AVAILABLE_PERCENT: ({ value }) => {
-            if (!reduceOnly) {
-              return 0.0;
-            }
             const percent = AttemptBigNumber(value);
             if (percent == null) {
               return 0.0;
             }
-            return baseAccount?.position?.unsignedSize.times(percent).toNumber() ?? 0.0;
+            const isDecreasingOrFlipping =
+              baseAccount?.position != null &&
+              ((side === OrderSide.BUY &&
+                baseAccount.position.side === IndexerPositionSide.SHORT) ||
+                (side === OrderSide.SELL &&
+                  baseAccount.position.side === IndexerPositionSide.LONG));
+
+            if (reduceOnly && isDecreasingOrFlipping) {
+              return baseAccount.position?.unsignedSize.times(percent).toNumber() ?? 0.0;
+            }
+            // we do the same for isolated and cross, which is only an approximation
+            // we also aren't accounting for fees properly
+            const crossFree = baseAccount?.account?.freeCollateral.toNumber() ?? 0;
+            const maxOrderUsdc = crossFree * targetLeverage;
+            const maxSpendSize = divideIfNonZeroElse(MustNumber(maxOrderUsdc), price, 0);
+            if (isDecreasingOrFlipping) {
+              return percent.times(
+                maxSpendSize + (baseAccount.position?.unsignedSize.toNumber() ?? 0)
+              );
+            }
+            return percent.times(maxSpendSize);
           },
-          // not supported
           SIZE: ({ value }) => AttemptNumber(value) ?? 0.0,
           USDC_SIZE: ({ value }) => divideIfNonZeroElse(MustNumber(value), price, 0),
         })
@@ -786,8 +801,6 @@ function calculateLimitOrderInputSummary(
     averageFillPrice: price,
     worstFillPrice: price,
     size: {
-      // not supported
-      leverageSigned: undefined,
       size: effectiveSize,
       usdcSize: effectiveSize * price,
     },
@@ -928,8 +941,9 @@ function getShouldTransferCollateral(
   const isIsolatedOrder =
     trade.marginMode === MarginMode.ISOLATED && subaccountToUse !== parentSubaccount;
   const isReduceOnly = trade.reduceOnly ?? false;
-  const isIncreasingSize = getPositionSizeDifference(trade, tradeSize, existingPosition) > 0;
-  return isIsolatedOrder && isIncreasingSize && !isReduceOnly;
+  const isIncreasingOrCrossing =
+    getIncreasingPositionAmount(trade, tradeSize, existingPosition) > 0;
+  return isIsolatedOrder && isIncreasingOrCrossing && !isReduceOnly;
 }
 
 function calculateIsolatedMarginTransferAmount(
@@ -959,7 +973,7 @@ function calculateIsolatedMarginTransferAmount(
   const targetLeverage =
     AttemptNumber(effectiveTargetLeverage) ?? Math.min(DEFAULT_TARGET_LEVERAGE, marketMaxLeverage);
 
-  const positionSizeDifference = getPositionSizeDifference(trade, tradeSize, existingPosition);
+  const positionIncreasingAmount = getIncreasingPositionAmount(trade, tradeSize, existingPosition);
 
   const estOraclePriceAtExecution = calc(() => {
     switch (trade.type) {
@@ -983,24 +997,37 @@ function calculateIsolatedMarginTransferAmount(
     tradePrice,
     tradeFees,
     marketMaxLeverage,
-    positionSizeDifference
+    tradeSize,
+    positionIncreasingAmount,
+    trade.type === TradeFormType.LIMIT || trade.type === TradeFormType.TRIGGER_LIMIT
   );
 }
 
-function getPositionSizeDifference(
+function getIncreasingPositionAmount(
   trade: TradeForm,
   tradeSize: number,
   existingPosition: SubaccountPosition | undefined
-) {
-  const baseTradeSizeSigned = tradeSize * (trade.side === OrderSide.SELL ? -1 : 1);
-  const positionSizeBefore = existingPosition?.signedSize.toNumber() ?? 0;
-  const positionSizeAfterNotAccountingForReduceOnly = positionSizeBefore + baseTradeSizeSigned;
-  const positionSizeAfter =
-    trade.reduceOnly && positionSizeBefore * positionSizeAfterNotAccountingForReduceOnly <= 0
-      ? 0
-      : positionSizeAfterNotAccountingForReduceOnly;
-  const positionSizeDifference = Math.abs(positionSizeAfter) - Math.abs(positionSizeBefore);
-  return positionSizeDifference;
+): number {
+  const side = trade.side;
+
+  if (side == null) {
+    return 0;
+  }
+  if (existingPosition == null) {
+    return tradeSize;
+  }
+
+  const positionSide = existingPosition.side;
+  const positionSize = existingPosition.unsignedSize.toNumber();
+
+  const isSameSide =
+    (side === OrderSide.BUY && positionSide === IndexerPositionSide.LONG) ||
+    (side === OrderSide.SELL && positionSide === IndexerPositionSide.SHORT);
+
+  if (isSameSide) {
+    return tradeSize;
+  }
+  return Math.max(0, tradeSize - positionSize);
 }
 
 function calculateIsolatedMarginTransferAmountFromValues(
@@ -1010,7 +1037,9 @@ function calculateIsolatedMarginTransferAmountFromValues(
   price: number,
   fees: number,
   maxMarketLeverage: number,
-  positionSizeDifference: number
+  orderSize: number,
+  positionIncreasingSize: number,
+  ignoreSlippageAndOracleDrift: boolean
 ): number | undefined {
   const adjustedTargetLeverage = Math.min(
     targetLeverage,
@@ -1026,8 +1055,10 @@ function calculateIsolatedMarginTransferAmountFromValues(
     fees,
     estOraclePriceAtExecution,
     side,
-    positionSizeDifference,
-    adjustedTargetLeverage
+    orderSize,
+    positionIncreasingSize,
+    adjustedTargetLeverage,
+    ignoreSlippageAndOracleDrift
   );
   if (amount <= 0) {
     return undefined;
@@ -1035,27 +1066,37 @@ function calculateIsolatedMarginTransferAmountFromValues(
   return amount;
 }
 
+const SLIPPAGE_BUFFER = 0.005;
+const ORACLE_BUFFER = 0.005;
 function getTransferAmountFromTargetLeverage(
   price: number,
   fees: number,
   estOraclePriceAtExecution: number,
   side: OrderSide,
-  size: number,
-  targetLeverage: number
+  orderSize: number,
+  increasingSize: number,
+  targetLeverage: number,
+  ignoreSlippageAndOracleDrift: boolean
 ): number {
-  if (targetLeverage === 0) {
+  if (targetLeverage === 0 || increasingSize <= 0 || orderSize <= 0) {
     return 0;
   }
 
-  const naiveTransferAmount = (price * size) / targetLeverage + fees;
+  const slippageBuffer = ignoreSlippageAndOracleDrift ? 0 : SLIPPAGE_BUFFER;
+  const oracleBuffer = ignoreSlippageAndOracleDrift ? 0 : ORACLE_BUFFER;
 
-  // Calculate price difference for immediate PnL impact
-  const priceDiff =
-    side === OrderSide.BUY ? price - estOraclePriceAtExecution : estOraclePriceAtExecution - price;
+  const IMF = 1 / targetLeverage;
 
-  // Return the maximum of the naive transfer and the adjusted transfer amount
-  return Math.max(
-    (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size + fees,
-    naiveTransferAmount
-  );
+  // maximize margin requirement by adding buffer to oracle
+  const margin = increasingSize * (estOraclePriceAtExecution * (1 + oracleBuffer)) * IMF;
+  // maximize fees by adding buffer to fill price
+  const feesAtFillPriceWithBuffer = fees * (1 + slippageBuffer);
+
+  // maximize slippage in each case by adding/removing buffer from actual expectations
+  const slippageLoss =
+    side === OrderSide.BUY
+      ? orderSize * (price * (1 + slippageBuffer) - estOraclePriceAtExecution * (1 - oracleBuffer))
+      : orderSize * (estOraclePriceAtExecution * (1 + oracleBuffer) - price * (1 - slippageBuffer));
+
+  return margin + feesAtFillPriceWithBuffer + slippageLoss;
 }

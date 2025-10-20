@@ -111,7 +111,7 @@ export function getTradeFormFieldStates(
   function defaultSizeIfSizeInputIsInvalid(states: TradeFormFieldStates) {
     if (
       states.size.effectiveValue?.type === 'AVAILABLE_PERCENT' &&
-      states.reduceOnly.effectiveValue !== true
+      states.type.effectiveValue === TradeFormType.TRIGGER_MARKET
     ) {
       states.size.effectiveValue = defaults.size;
     }

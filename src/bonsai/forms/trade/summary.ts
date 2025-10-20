@@ -17,7 +17,7 @@ import { weakMapMemoize } from 'reselect';
 
 import { TransactionMemo } from '@/constants/analytics';
 import { timeUnits } from '@/constants/time';
-import { IndexerPerpetualPositionStatus, IndexerPositionSide } from '@/types/indexer/indexerApiGen';
+import { IndexerPerpetualPositionStatus } from '@/types/indexer/indexerApiGen';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -422,7 +422,7 @@ const memoizedMergeMarkets = weakMapMemoize(
 function calculateTradeFormOptions(
   orderType: TradeFormType | undefined,
   fields: TradeFormFieldStates,
-  baseAccount: TradeAccountDetails | undefined
+  _baseAccount: TradeAccountDetails | undefined
 ): TradeFormOptions {
   const executionOptions: SelectionOption<ExecutionType>[] = orderType
     ? matchOrderType(orderType, {
@@ -433,16 +433,6 @@ function calculateTradeFormOptions(
         [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
       })
     : emptyExecutionOptions;
-
-  const isCross =
-    fields.marginMode.effectiveValue == null ||
-    fields.marginMode.effectiveValue === MarginMode.CROSS;
-
-  const tradeSide = fields.side.effectiveValue;
-  const reduceOnly = fields.reduceOnly.effectiveValue;
-  const isDecreasing =
-    (baseAccount?.position?.side === IndexerPositionSide.LONG && tradeSide === OrderSide.SELL) ||
-    (baseAccount?.position?.side === IndexerPositionSide.SHORT && tradeSide === OrderSide.BUY);
 
   const options: TradeFormOptions = {
     orderTypeOptions,
@@ -460,8 +450,7 @@ function calculateTradeFormOptions(
     needsTimeInForce: isFieldStateRelevant(fields.timeInForce),
     needsExecution: isFieldStateRelevant(fields.execution),
 
-    showAllocationSlider:
-      orderType === TradeFormType.MARKET && (isCross || (!!reduceOnly && isDecreasing)),
+    showAllocationSlider: orderType !== TradeFormType.TRIGGER_MARKET,
     showTriggerOrders:
       isFieldStateEnabled(fields.takeProfitOrder) && isFieldStateEnabled(fields.stopLossOrder),
     triggerOrdersChecked:

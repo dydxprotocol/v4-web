@@ -178,7 +178,6 @@ export type TradeFormOptions = {
 export type TradeSizeSummary = {
   size: number | undefined;
   usdcSize: number | undefined;
-  leverageSigned: number | undefined;
 };
 
 export type TradeInputSummary = {
