@@ -1555,6 +1555,7 @@ fn _get_funding_info(asset: b256) -> FundingInfo {
     })
 }
 
+/// returns funding rate and whether the position has profit
 #[storage(read)]
 fn _calculate_funding_rate(
     asset: b256,
@@ -1588,10 +1589,16 @@ fn _calculate_funding_rate(
             (true, position_cumulative_funding_rate - current_short_cumulative_funding_rate)
         }
     };
-    (
-        funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION,
-        has_profit,
-    )
+    if has_profit {
+        // round down if the position has profit
+        (funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION, true)
+    } else {
+        // ruound up if the position has losses
+        (
+            (funding_rate_with_precision * position_size + FUNDING_RATE_PRECISION - 1) / FUNDING_RATE_PRECISION,
+            false,
+        )
+    }
 }
 
 #[storage(read, write)]
@@ -1678,8 +1685,9 @@ fn _update_funding_info(asset: b256) {
     });
 }
 
+/// returns new longs and shorts cumulative funding rates
 fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256) {
-    let time_delta = now - funding_info.last_funding_time;
+    let time_delta = (now - funding_info.last_funding_time).as_u256();
     // from_long means that longs are in excess and pay shorts
     let (from_long, size_delta) = if funding_info.total_long_sizes > funding_info.total_short_sizes
     {
@@ -1687,7 +1695,7 @@ fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u
     } else {
         (false, funding_info.total_short_sizes - funding_info.total_long_sizes)
     };
-    let total_funding_rate_delta = time_delta.as_u256() * size_delta * FUNDING_RATE_PRECISION * FUNDING_RATE_FACTOR / FUNDING_RATE_FACTOR_BASE;
+    let total_funding_rate_delta = time_delta * size_delta * FUNDING_RATE_PRECISION * FUNDING_RATE_FACTOR / FUNDING_RATE_FACTOR_BASE;
     let long_cumulative_funding_rate_delta = if funding_info.total_long_sizes == 0 {
         0
     } else {

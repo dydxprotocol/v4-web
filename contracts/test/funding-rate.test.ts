@@ -337,7 +337,7 @@ describe("Vault.funding_rate", () => {
             expect(shortRes[0].toNumber()).lt(20)
         })
 
-        it("no funding for long when open interest is balanced in aggregation", async () => {
+        it("no funding for longs when open interest is balanced in aggregation", async () => {
             const size = expandDecimals(5, 8)
             const sizeTest = expandDecimals(1, 8)
             await call(vaultExpose.functions.increase_and_update_funding_info(BTC_ASSET, size, true))
@@ -356,7 +356,7 @@ describe("Vault.funding_rate", () => {
             expect(longRes[0].toNumber()).lt(20)
         })
 
-        it("no funding for short when open interest is balanced in aggregation", async () => {
+        it("no funding for shorts when open interest is balanced in aggregation", async () => {
             const size = expandDecimals(5, 8)
             const sizeTest = expandDecimals(1, 8)
             await call(vaultExpose.functions.increase_and_update_funding_info(BTC_ASSET, size, false))
