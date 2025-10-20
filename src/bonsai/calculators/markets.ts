@@ -201,7 +201,7 @@ export function calculateEffectiveSelectedLeverageBigNumber({
 
   // Otherwise calculate from IMF only (ignoring OIMF as requested)
   const imf = MaybeBigNumber(initialMarginFraction);
-  if (imf != null) {
+  if (imf != null && !imf.isZero()) {
     return BIG_NUMBERS.ONE.div(imf);
   }
 
