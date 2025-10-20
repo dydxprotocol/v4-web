@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 
+import { parseTransactionError } from '@/bonsai/lib/extractErrors';
+import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
@@ -105,7 +107,7 @@ export const SetMarketLeverageDialog = ({
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useDisappearingValue<string>(undefined);
+  const [errorMessageRaw, setErrorMessageRaw] = useDisappearingValue<string>(undefined);
 
   const leverageNumber = MaybeBigNumber(leverageInputValue)?.toNumber();
   const isBelowMinimum = leverageNumber != null && leverageNumber < minLeverage;
@@ -115,6 +117,14 @@ export const SetMarketLeverageDialog = ({
   const isIncreasingLeverage =
     leverageNumber != null &&
     leverageNumber > (MaybeBigNumber(effectiveSelectedLeverage)?.toNumber() ?? 0);
+
+  const errorMessage = useMemo(() => {
+    if (errorMessageRaw != null) {
+      const parsingResult = parseTransactionError('SetMarketLeverage', errorMessageRaw);
+      return stringGetter({ key: parsingResult?.stringKey ?? STRING_KEYS.UNKNOWN_ERROR });
+    }
+    return undefined;
+  }, [errorMessageRaw, stringGetter]);
 
   const onSliderDrag = ([newLeverage]: number[]) => {
     const newLeverageString = mapIfPresent(newLeverage, (lev) => MustBigNumber(lev).toFixed(0));
@@ -130,15 +140,15 @@ export const SetMarketLeverageDialog = ({
     }
   };
 
-  const onSave = async (e?: React.FormEvent) => {
-    e?.preventDefault();
+  const onSave = async (formEvent?: React.FormEvent) => {
+    formEvent?.preventDefault();
 
     // Don't allow saving if below minimum
     if (isBelowMinimum) {
       return;
     }
 
-    setErrorMessage(undefined);
+    setErrorMessageRaw(undefined);
     setIsLoading(true);
 
     try {
@@ -148,10 +158,24 @@ export const SetMarketLeverageDialog = ({
         throw new Error('Invalid leverage value');
       }
 
-      await saveMarketLeverage({ dispatch, marketId, leverage: leverageBN.toNumber() });
-      setIsOpen(false);
+      // TODO: This is currently a dummy transaction that just saves to local state.
+      // When this becomes a real chain transaction, it should return an OperationResult
+      // and the error handling pattern below will work correctly.
+      const result = await saveMarketLeverage({
+        dispatch,
+        marketId,
+        leverage: leverageBN.toNumber(),
+      });
+
+      if (isOperationSuccess(result)) {
+        setIsOpen(false);
+      } else if (isOperationFailure(result)) {
+        setErrorMessageRaw(result.errorString);
+      }
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to save leverage');
+      if (error?.message != null && typeof error.message === 'string') {
+        setErrorMessageRaw(error.message);
+      }
     } finally {
       setIsLoading(false);
     }
