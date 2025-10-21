@@ -33,6 +33,7 @@ export function calculateAllMarkets(markets: MarketsData | undefined): MarketsIn
   if (markets == null) {
     return markets;
   }
+
   return mapValues(markets, calculateMarket);
 }
 
