@@ -2,7 +2,6 @@ import type { DydxAddress, EvmAddress } from './wallets';
 import { SolAddress } from './wallets';
 
 export enum OnboardingSteps {
-  SignIn = 'SignIn',
   ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
 }

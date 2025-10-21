@@ -40,12 +40,17 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { track } from '@/lib/analytics/analytics';
+import { assertNever } from '@/lib/assertNever';
+import { calc } from '@/lib/do';
 import { testFlags } from '@/lib/testFlags';
 
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
+import { MobileQrScanner } from './OnboardingDialog/MobileQrScanner';
 import { SignIn } from './OnboardingDialog/SignIn';
+
+type ChooseWalletDisplayType = 'signin' | 'wallets' | 'qr';
 
 export const OnboardingDialog = ({
   setIsOpen: setIsOpenRaw,
@@ -60,10 +65,11 @@ export const OnboardingDialog = ({
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
   const isTurnkeyEnabled = useEnableTurnkey();
-  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
+  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep);
   const isSimpleUi = useSimpleUiEnabled();
   const { dydxAddress } = useAccounts();
   const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
+  const [chooseWalletDisplay, setChooseWalletDisplay] = useState<ChooseWalletDisplayType>('signin');
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -96,12 +102,16 @@ export const OnboardingDialog = ({
 
   const onDisplayChooseWallet = () => {
     track(AnalyticsEvents.OnboardingSignInWithWalletClick());
-    dispatch(setDisplayChooseWallet(true));
+    setChooseWalletDisplay('wallets');
   };
 
   const onSignInWithSocials = () => {
     track(AnalyticsEvents.OnboardingSignInWithSocialsClick());
-    dispatch(setDisplayChooseWallet(false));
+    setChooseWalletDisplay('signin');
+  };
+
+  const onSyncWithDesktop = () => {
+    setChooseWalletDisplay('qr');
   };
 
   const onSignInWithPasskey = () => {
@@ -146,6 +156,92 @@ export const OnboardingDialog = ({
     </Link>
   );
 
+  const chooseWalletContent = calc(() => {
+    switch (chooseWalletDisplay) {
+      case 'signin': {
+        return {
+          title: (
+            <div tw="row justify-between">
+              {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
+              {privyUserOption}
+            </div>
+          ),
+          description: stringGetter({
+            key: STRING_KEYS.SIGN_IN_DESCRIPTION,
+          }),
+          content: (
+            <SignIn
+              onChooseWallet={onChooseWallet}
+              onDisplayChooseWallet={onDisplayChooseWallet}
+              onSignInWithPasskey={onSignInWithPasskey}
+              onSyncWithDesktop={onSyncWithDesktop}
+              onSubmitEmail={({ userEmail }: { userEmail: string }) => onSubmitEmail({ userEmail })}
+            />
+          ),
+        };
+      }
+      case 'wallets': {
+        return {
+          title: isTurnkeyEnabled ? (
+            stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
+          ) : (
+            <div tw="flex items-center gap-0.5">
+              {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
+              <$WithTooltip
+                tw="text-color-text-0"
+                tooltipString={stringGetter({
+                  key: STRING_KEYS.WALLET_DEFINITION,
+                  params: {
+                    ABOUT_WALLETS_LINK: (
+                      <Link href={walletLearnMore} withIcon isInline>
+                        {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
+                      </Link>
+                    ),
+                  },
+                })}
+              >
+                <$QuestionIcon iconName={IconName.QuestionMark} />
+              </$WithTooltip>
+            </div>
+          ),
+          description: isTurnkeyEnabled
+            ? stringGetter({ key: STRING_KEYS.SIGN_IN_DESCRIPTION })
+            : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
+          content: (
+            <ChooseWallet
+              onChooseWallet={onChooseWallet}
+              onSignInWithSocials={onSignInWithSocials}
+              onSignInWithPasskey={onSignInWithPasskey}
+            />
+          ),
+          hasFooterBorder: true,
+          slotFooter: !isSimpleUi && !isTurnkeyEnabled && (
+            <$Footer>
+              <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
+                <h3 tw="text-color-text-2 font-medium-book">
+                  {stringGetter({ key: STRING_KEYS.SELECT_LANGUAGE })}
+                </h3>
+                {stringGetter({ key: STRING_KEYS.CHOOSE_PREFERRED_LANGUAGE })}
+              </div>
+              <$LanguageSelector />
+            </$Footer>
+          ),
+        };
+      }
+      case 'qr': {
+        return {
+          title: 'Scan QR Code',
+          description:
+            'Scan the QR code shown on your desktop with the camera on your mobile device to sync wallets',
+          content: <MobileQrScanner />,
+        };
+      }
+      default:
+        assertNever(chooseWalletDisplay);
+        return null;
+    }
+  });
+
   return (
     <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
@@ -156,77 +252,11 @@ export const OnboardingDialog = ({
       }
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
+        chooseWalletContent &&
         {
-          [OnboardingSteps.SignIn]: {
-            title: (
-              <div tw="row justify-between">
-                {stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE })}
-                {privyUserOption}
-              </div>
-            ),
-            description: stringGetter({
-              key: STRING_KEYS.SIGN_IN_DESCRIPTION,
-            }),
-            children: (
-              <$Content>
-                <SignIn
-                  onChooseWallet={onChooseWallet}
-                  onDisplayChooseWallet={onDisplayChooseWallet}
-                  onSignInWithPasskey={onSignInWithPasskey}
-                  onSubmitEmail={({ userEmail }: { userEmail: string }) =>
-                    onSubmitEmail({ userEmail })
-                  }
-                />
-              </$Content>
-            ),
-          },
           [OnboardingSteps.ChooseWallet]: {
-            title: isTurnkeyEnabled ? (
-              stringGetter({ key: STRING_KEYS.SIGN_IN_WITH_WALLET })
-            ) : (
-              <div tw="flex items-center gap-0.5">
-                {stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET })}
-                <$WithTooltip
-                  tw="text-color-text-0"
-                  tooltipString={stringGetter({
-                    key: STRING_KEYS.WALLET_DEFINITION,
-                    params: {
-                      ABOUT_WALLETS_LINK: (
-                        <Link href={walletLearnMore} withIcon isInline>
-                          {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
-                        </Link>
-                      ),
-                    },
-                  })}
-                >
-                  <$QuestionIcon iconName={IconName.QuestionMark} />
-                </$WithTooltip>
-              </div>
-            ),
-            description: isTurnkeyEnabled
-              ? stringGetter({ key: STRING_KEYS.SIGN_IN_DESCRIPTION })
-              : stringGetter({ key: STRING_KEYS.SELECT_WALLET_FROM_OPTIONS }),
-            children: (
-              <$Content>
-                <ChooseWallet
-                  onChooseWallet={onChooseWallet}
-                  onSignInWithSocials={onSignInWithSocials}
-                  onSignInWithPasskey={onSignInWithPasskey}
-                />
-              </$Content>
-            ),
-            hasFooterBorder: true,
-            slotFooter: !isSimpleUi && !isTurnkeyEnabled && (
-              <$Footer>
-                <div tw="flex flex-col gap-0.5 text-color-text-0 font-small-medium">
-                  <h3 tw="text-color-text-2 font-medium-book">
-                    {stringGetter({ key: STRING_KEYS.SELECT_LANGUAGE })}
-                  </h3>
-                  {stringGetter({ key: STRING_KEYS.CHOOSE_PREFERRED_LANGUAGE })}
-                </div>
-                <$LanguageSelector />
-              </$Footer>
-            ),
+            ...chooseWalletContent,
+            children: <$Content>{chooseWalletContent.content}</$Content>,
           },
           [OnboardingSteps.KeyDerivation]: {
             slotIcon: isSimpleUi

@@ -10,7 +10,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ConnectorType, WalletInfo, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useCameraDetection } from '@/hooks/useCameraDetection';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
@@ -41,11 +43,13 @@ export const SignIn = ({
   onChooseWallet,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSignInWithPasskey,
+  onSyncWithDesktop,
   onSubmitEmail,
 }: {
   onChooseWallet: (wallet: WalletInfo) => void;
   onDisplayChooseWallet: () => void;
   onSignInWithPasskey: () => void;
+  onSyncWithDesktop: () => void;
   onSubmitEmail: ({ userEmail }: { userEmail: string }) => void;
 }) => {
   const stringGetter = useStringGetter();
@@ -57,6 +61,8 @@ export const SignIn = ({
   const { tos, privacy } = useURLConfigs();
   const displayedWallets = useDisplayedWallets();
   const { selectedWallet, selectedWalletError } = useAccounts();
+  const isSimpleUi = useSimpleUiEnabled();
+  const { hasCamera } = useCameraDetection();
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -151,6 +157,20 @@ export const SignIn = ({
 
           <Icon tw="text-color-layer-7" iconName={IconName.ChevronRight} />
         </$OtherOptionButton> */}
+
+        {isSimpleUi && hasCamera && (
+          <$OtherOptionButton
+            type={ButtonType.Button}
+            action={ButtonAction.Base}
+            size={ButtonSize.BasePlus}
+            onClick={onSyncWithDesktop}
+          >
+            <div tw="row gap-0.5">
+              <Icon iconName={IconName.Qr} />
+              {stringGetter({ key: STRING_KEYS.SYNC_WITH_DESKTOP })}
+            </div>
+          </$OtherOptionButton>
+        )}
 
         {displayedWallets
           .filter(
