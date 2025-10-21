@@ -178,6 +178,7 @@ export type TradeFormOptions = {
 export type TradeSizeSummary = {
   size: number | undefined;
   usdcSize: number | undefined;
+  allocationPercent: number | undefined;
 };
 
 export type TradeInputSummary = {

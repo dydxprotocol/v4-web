@@ -225,14 +225,12 @@ export function calculateTradeInfo(
                 Math.abs(orderSize - positionSize) < stepSize / 2
             ) ?? false;
 
-          const inputSummary = {
+          const inputSummary: TradeInputSummary = {
             size: {
               size,
               usdcSize,
               // not supported
-              leverageSigned: undefined,
-              // not supported
-              balancePercent: undefined,
+              allocationPercent: undefined,
             },
             averageFillPrice: price,
             worstFillPrice: price,
@@ -252,7 +250,7 @@ export function calculateTradeInfo(
             total,
             transferToSubaccountAmount: calculateIsolatedTransferAmount(
               trade,
-              inputSummary.size.size ?? 0,
+              inputSummary.size?.size ?? 0,
               price ?? 0,
               totalFees ?? 0,
               subaccountToUse,
@@ -392,6 +390,31 @@ function calculateMarketOrder(
       size: {
         size: marketOrder?.size,
         usdcSize: marketOrder?.usdcSize,
+        allocationPercent: calc(() => {
+          const isDecreasingOrFlipping =
+            baseAccount?.position != null &&
+            ((trade.side === OrderSide.BUY &&
+              baseAccount.position.side === IndexerPositionSide.SHORT) ||
+              (trade.side === OrderSide.SELL &&
+                baseAccount.position.side === IndexerPositionSide.LONG));
+          const isReduceOnly = !!trade.reduceOnly;
+
+          if (isReduceOnly && isDecreasingOrFlipping) {
+            // Case 1: reversal of size-based calculation
+            return mapIfPresent(
+              marketOrder?.size,
+              baseAccount.position?.unsignedSize.toNumber(),
+              (size, positionSize) => size / positionSize
+            );
+          }
+          // Case 2: reversal of usdc-based calculation
+          return mapIfPresent(
+            marketOrder?.usdcSize,
+            marketOrder?.totalFees,
+            maxTradeUsdc,
+            (sizeUsdc, fees, maxTotal) => (sizeUsdc + fees) / maxTotal
+          );
+        }),
       },
     },
   };
@@ -803,6 +826,33 @@ function calculateLimitOrderInputSummary(
     size: {
       size: effectiveSize,
       usdcSize: effectiveSize * price,
+      allocationPercent: calc(() => {
+        const isDecreasingOrFlipping =
+          baseAccount?.position != null &&
+          ((side === OrderSide.BUY && baseAccount.position.side === IndexerPositionSide.SHORT) ||
+            (side === OrderSide.SELL && baseAccount.position.side === IndexerPositionSide.LONG));
+
+        if (reduceOnly && isDecreasingOrFlipping) {
+          // Case 1: reversal of size-based calculation for reduce-only
+          return mapIfPresent(
+            baseAccount.position?.unsignedSize.toNumber(),
+            (positionSize) => effectiveSize / positionSize
+          );
+        }
+
+        const crossFree = baseAccount?.account?.freeCollateral.toNumber() ?? 0;
+        const maxOrderUsdc = crossFree * targetLeverage;
+        const maxSpendSize = divideIfNonZeroElse(MustNumber(maxOrderUsdc), price, 0);
+
+        if (isDecreasingOrFlipping) {
+          // Case 2: reversal of size-based calculation for decreasing/flipping
+          const denominator = maxSpendSize + (baseAccount?.position?.unsignedSize.toNumber() ?? 0);
+          return denominator !== 0 ? effectiveSize / denominator : undefined;
+        }
+
+        // Case 3: reversal of size-based calculation for increasing
+        return maxSpendSize !== 0 ? effectiveSize / maxSpendSize : undefined;
+      }),
     },
   };
 }

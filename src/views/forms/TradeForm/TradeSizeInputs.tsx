@@ -185,7 +185,7 @@ export const TradeSizeInputs = () => {
       }
       slotRight={inputToggleButton()}
       type={inputConfig.type}
-      value={inputConfig.value ?? ''}
+      value={inputConfig.value}
     />
   );
 
@@ -194,19 +194,13 @@ export const TradeSizeInputs = () => {
       {sizeInput}
       {showAllocationSlider && (
         <AllocationSlider
-          allocationPercentInput={(tradeValues.size != null &&
-          OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
-            ? AttemptBigNumber(tradeValues.size.value.value)
-            : AttemptBigNumber(
-                mapIfPresent(
-                  effectiveSizes.size,
-                  tradeSummary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
-                  (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
-                )
-              )
-          )
-            ?.times(100)
-            .toFixed(0)}
+          allocationPercentInput={
+            tradeValues.size != null && OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+              ? (AttemptBigNumber(tradeValues.size.value.value)?.times(100).toFixed(0) ?? '')
+              : tradeValues.size == null || tradeValues.size.value.value === ''
+                ? ''
+                : (AttemptBigNumber(effectiveSizes.allocationPercent)?.times(100).toFixed(0) ?? '')
+          }
           setAllocationInput={(value: string | undefined) => {
             dispatch(
               tradeFormActions.setSizeAvailablePercent(
