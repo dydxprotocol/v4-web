@@ -2,7 +2,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
-import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import {
+  BECH32_PREFIX,
+  type LocalWallet,
+  NOBLE_BECH32_PREFIX,
+  type Subaccount,
+} from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
 
@@ -152,6 +157,37 @@ const useAccountsContext = () => {
   const nobleAddress = localNobleWallet?.address;
   const osmosisAddress = localOsmosisWallet?.address;
   const neutronAddress = localNeutronWallet?.address;
+
+  const setWalletFromMobileQrCode = useCallback(
+    async (encryptedPayload: string, encryptionKey: string) => {
+      let decryptedPayload: string;
+
+      try {
+        decryptedPayload = AES.decrypt(encryptedPayload, encryptionKey).toString(enc.Utf8);
+      } catch (err) {
+        throw new Error('Failed to decrypt payload');
+      }
+
+      if (!decryptedPayload) throw new Error('Failed to decrypt payload');
+
+      const {
+        mnemonic,
+        cosmosAddress,
+        pubkeyHex, // Buffer.from(publicKey).toString('hex'),
+        privkeyHex, // Buffer.from(privateKey).toString('hex'),
+      } = JSON.parse(decryptedPayload);
+
+      const privateKey = new Uint8Array(Buffer.from(privkeyHex, 'hex'));
+      const publicKey = new Uint8Array(Buffer.from(pubkeyHex, 'hex'));
+
+      const key = { mnemonic, privateKey, publicKey };
+      hdKeyManager.setHdkey(cosmosAddress, key);
+      setLocalDydxWallet(await (await getLazyLocalWallet()).fromMnemonic(mnemonic, BECH32_PREFIX));
+      setHdKey(key);
+      return cosmosAddress;
+    },
+    []
+  );
 
   const setWalletFromSignature = useCallback(
     async (signature: string) => {
@@ -410,6 +446,7 @@ const useAccountsContext = () => {
     publicClientWagmi,
 
     setWalletFromSignature,
+    setWalletFromMobileQrCode,
 
     // dYdX accounts
     hdKey,
