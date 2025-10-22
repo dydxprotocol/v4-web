@@ -71,12 +71,15 @@ export function useDepositTokenBalances() {
       // TODO: log when there are no decimals? this shouldnt happen
       .filter((balance) => balance.decimals);
 
-    const [a, b] = partition(
+    const [unsortedWithBalances, unsortedWithoutBalances] = partition(
       allBalances,
       (balance) => parseUnits(balance.amount, balance.decimals!) > 0
     );
 
-    return [orderBy(a, ({ valueUSD }) => valueUSD, ['desc']), b];
+    return [
+      orderBy(unsortedWithBalances, ({ valueUSD }) => valueUSD, ['desc']),
+      unsortedWithoutBalances,
+    ];
   }, [data]);
 
   return { isLoading, withBalances, noBalances };
