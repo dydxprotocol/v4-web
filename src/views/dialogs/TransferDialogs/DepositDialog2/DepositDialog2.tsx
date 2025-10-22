@@ -21,7 +21,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { SourceAccount } from '@/state/wallet';
 
-import { DepositFormContent, DepositFormState } from './DepositForms/DepositFormContainer';
+import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
 import { useDepositTokenBalances } from './queries';
 
 function getDefaultToken(

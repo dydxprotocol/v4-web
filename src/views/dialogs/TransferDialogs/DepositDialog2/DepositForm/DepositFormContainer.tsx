@@ -8,10 +8,10 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useAppDispatch } from '@/state/appTypes';
 import { addDeposit, Deposit } from '@/state/transfers';
 
-import { DepositForm } from '../DepositForm';
-import { DepositStatus } from '../DepositStatus';
-import { QrDeposit } from '../QrDeposit';
-import { TokenSelect } from '../TokenSelect';
+import { DepositForm } from './DepositForm';
+import { DepositStatus } from './DepositStatus';
+import { QrDeposit } from './QrDeposit';
+import { TokenSelect } from './TokenSelect';
 
 export type DepositFormState = 'form' | 'token-select' | 'qr-deposit';
 

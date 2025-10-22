@@ -11,7 +11,7 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { isDeposit, isWithdraw } from '@/state/transfers';
 import { selectTransfer } from '@/state/transfersSelectors';
 
-import { DepositStatus } from './DepositDialog2/DepositStatus';
+import { DepositStatus } from './DepositDialog2/DepositForm/DepositStatus';
 import { WithdrawStatus } from './WithdrawDialog2/WithdrawStatus';
 
 export const TransferStatusDialog = ({

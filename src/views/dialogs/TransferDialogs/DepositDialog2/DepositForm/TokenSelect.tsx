@@ -18,8 +18,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { track } from '@/lib/analytics/analytics';
 
-import { getTokenSymbol } from '../utils';
-import { useDepositTokenBalances } from './queries';
+import { getTokenSymbol } from '../../utils';
+import { useDepositTokenBalances } from '../queries';
 
 export const TokenSelect = ({
   disabled,
