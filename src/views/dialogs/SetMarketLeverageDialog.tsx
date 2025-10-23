@@ -155,7 +155,7 @@ export const SetMarketLeverageDialog = ({
       const leverageBN = MaybeBigNumber(leverageInputValue);
 
       if (leverageBN == null || leverageBN.lt(minLeverage) || leverageBN.gt(maxLeverage)) {
-        throw new Error('Invalid leverage value');
+        throw new Error(stringGetter({ key: STRING_KEYS.INVALID_LEVERAGE_VALUE }));
       }
 
       // TODO: This is currently a dummy transaction that just saves to local state.
@@ -185,9 +185,7 @@ export const SetMarketLeverageDialog = ({
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title={stringGetter({
-        fallback: 'Set Market Leverage',
-      })}
+      title={stringGetter({ key: STRING_KEYS.SET_MARKET_LEVERAGE })}
       tw="[--dialog-header-paddingBottom:1.5rem] [--dialog-width:25rem]"
     >
       <form onSubmit={onSave} tw="flexColumn gap-1.5">
@@ -235,16 +233,15 @@ export const SetMarketLeverageDialog = ({
         {isBelowMinimum && (
           <AlertMessage type={AlertType.Error}>
             {stringGetter({
-              fallback: `Minimum leverage for this position is ${minLeverage}×. Insufficient margin available to decrease leverage further. Add more margin to decrease leverage.`,
+              key: STRING_KEYS.MINIMUM_LEVERAGE_ERROR,
+              params: { MIN_LEVERAGE: minLeverage },
             })}
           </AlertMessage>
         )}
 
         {!isBelowMinimum && isIncreasingLeverage && (
           <AlertMessage type={AlertType.Warning}>
-            {stringGetter({
-              fallback: 'Setting a higher leverage could increase liquidation risk.',
-            })}
+            {stringGetter({ key: STRING_KEYS.SETTING_HIGHER_LEVERAGE_WARNING })}
           </AlertMessage>
         )}
 
@@ -262,7 +259,7 @@ export const SetMarketLeverageDialog = ({
                 : ButtonState.Default
           }
         >
-          {stringGetter({ key: STRING_KEYS.SAVE, fallback: 'Save' })}
+          {stringGetter({ key: STRING_KEYS.SAVE })}
         </Button>
       </form>
     </Dialog>

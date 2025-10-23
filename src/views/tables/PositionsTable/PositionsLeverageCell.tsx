@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -27,7 +28,7 @@ export const PositionsLeverageCell = ({ marketId, effectiveSelectedLeverage }: E
   return (
     <TableCell
       slotRight={
-        <WithTooltip tooltipString={stringGetter({ fallback: 'Edit leverage' })}>
+        <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.EDIT_LEVERAGE })}>
           <$EditButton
             key="edit-leverage"
             tw="mt-0.125"
