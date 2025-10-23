@@ -12,7 +12,7 @@ import ConnectingLine from '@/icons/connecting-line.svg';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { DepositStep } from './depositHooks';
+import { DepositStep } from '../depositHooks';
 
 type DepositStepsProps = {
   steps: DepositStep[];
