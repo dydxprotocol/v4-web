@@ -1,4 +1,4 @@
-import { getMintedAssetId, WalletUnlocked, DateTime } from "fuels"
+import { getMintedAssetId, WalletUnlocked, DateTime, BN } from "fuels"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 
 // export async function deploy(contract: string, wallet: WalletUnlocked, configurables: any = undefined) {
@@ -39,6 +39,19 @@ export async function call(fnCall: any) {
 }
 
 export type AddressIdentity = { Address: { bits: string } }
+
+// this form is good for vitest, because it allows to await the promise
+export async function call2(fnCall: any) {
+    return fnCall.getTransactionCost().then(({ gasUsed }: { gasUsed: BN }) => {
+        const gasLimit = gasUsed.mul("6").div("5").toString()
+        return fnCall
+            .txParams({ gasLimit })
+            .call()
+            .then(({ waitForResult }: { waitForResult: any }) => {
+                return waitForResult()
+            })
+    })
+}
 
 export function walletToAddressIdentity(wallet: WalletUnlocked): AddressIdentity {
     return { Address: { bits: wallet.address.toHexString() } }
