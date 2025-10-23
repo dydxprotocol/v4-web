@@ -33,8 +33,8 @@ dependencies:
     specifier: 3.0.7
     version: 3.0.7
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.334
-    version: 1.1.334
+    specifier: 1.1.339
+    version: 1.1.339
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -1217,7 +1217,6 @@ packages:
 
   /@cosmjs/crypto@0.27.1:
     resolution: {integrity: sha512-vbcxwSt99tIYJg8Spp00wc3zx72qx+pY3ozGuBN8gAvySnagK9dQ/jHwtWQWdammmdD6oW+75WfIHZ+gNa+Ybg==}
-    deprecated: This uses elliptic for cryptographic operations, which contains several security-relevant bugs. To what degree this affects your application is something you need to carefully investigate. See https://github.com/cosmos/cosmjs/issues/1708 for further pointers. Starting with version 0.34.0 the cryptographic library has been replaced. However, private keys might still be at risk.
     dependencies:
       '@cosmjs/encoding': 0.27.1
       '@cosmjs/math': 0.27.1
@@ -1690,8 +1689,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.334:
-    resolution: {integrity: sha512-ZojkqUidZBC8KmMOdkF3AjehYw1EZmJ0RFRYgTW9acrwmg1gW4Avu9RH5fddnsK3EPoEd8vUOgRvPpTs1Yk68g==}
+  /@dydxprotocol/v4-localization@1.1.339:
+    resolution: {integrity: sha512-bY2QclA5KkonC1/GQPMkEckqDQF8+6Sw8nnGxG1HPaT1BcJG9Rs20oYS91Y9I+EcMCljblJrsAeC4WxG2LFmXA==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
