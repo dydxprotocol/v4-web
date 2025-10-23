@@ -480,6 +480,26 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
+    fn get_position_funding_rate(
+        account: Identity,
+        index_asset: b256,
+        is_long: bool,
+    ) -> (u256, bool) {
+        let position_key = _get_position_key(
+            account, 
+            index_asset, 
+            is_long
+        );
+        let position = _get_position_by_key(position_key);
+        require(
+            position.collateral > 0,
+            Error::VaultInvalidPosition
+        );
+
+        _calculate_funding_rate(index_asset, position.size, is_long, position.cumulative_funding_rate)
+    }
+
+    #[storage(read)]
     fn get_fee_basis_points(
         asset: b256,
         lp_asset_delta: u256,
@@ -727,6 +747,10 @@ fn _get_position_key(account: Identity, index_asset: b256, is_long: bool) -> b25
     })
 }
 
+/// return value:
+/// 0: no liquidation needed
+/// 1: losses exceed collateral
+/// 2: max leverage exceeded
 #[storage(read)]
 fn _validate_liquidation(
     account: Identity,
@@ -738,7 +762,11 @@ fn _validate_liquidation(
 
     let position = _get_position_by_key(position_key);
 
+    require(position.size > 0, Error::VaultEmptyPosition);
+
     let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+
+    let liquidation_fee = storage::vault.liquidation_fee.read();
 
     let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
 
@@ -752,8 +780,7 @@ fn _validate_liquidation(
     );
 
     let mut available_collateral = position.collateral;
-    // does not include liquidation fee
-    let mut losses_and_fees = position_fee;
+    let mut losses_and_fees = position_fee + liquidation_fee;
 
     if has_profit {
         available_collateral = available_collateral + pnl_delta;
@@ -1422,14 +1449,6 @@ fn _liquidate_position(
 
     let (liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, false);
     require(liquidation_state != 0, Error::VaultCannotBeLiquidated);
-
-    if liquidation_state == 2 {
-        // max leverage exceeded but there is collateral remaining after deducting losses 
-        // so decreasePosition instead
-        _decrease_position(account, index_asset, 0, position.size, is_long, account);
-        // TODO liquidation event should be logged
-        return;
-    }
 
     let mut position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
