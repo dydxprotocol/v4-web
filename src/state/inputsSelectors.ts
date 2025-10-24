@@ -56,6 +56,7 @@ const getTriggersFormInputData = createAppSelector(
     BonsaiCore.configs.equityTiers,
     BonsaiRaw.parentSubaccountBase,
     BonsaiRaw.parentSubaccountRelevantMarkets,
+    BonsaiRaw.selectedMarketLeverages,
   ],
   (
     existingTriggerOrders,
@@ -64,7 +65,8 @@ const getTriggersFormInputData = createAppSelector(
     allOpenOrders,
     equityTiers,
     rawParentSubaccountData,
-    rawRelevantMarkets
+    rawRelevantMarkets,
+    selectedMarketLeverages
   ): TriggerOrderInputData => ({
     existingTriggerOrders,
     market,
@@ -73,6 +75,7 @@ const getTriggersFormInputData = createAppSelector(
     allOpenOrders,
     rawParentSubaccountData,
     rawRelevantMarkets,
+    selectedMarketLeverages: selectedMarketLeverages ?? {},
   })
 );
 

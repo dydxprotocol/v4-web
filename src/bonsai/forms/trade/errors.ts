@@ -298,20 +298,6 @@ function validateFieldsBasic(
     );
   }
 
-  if (options.needsTargetLeverage) {
-    const targetLeverage = AttemptNumber(state.targetLeverage) ?? 0;
-    if (targetLeverage <= 0) {
-      errors.push(
-        simpleValidationError({
-          code: 'REQUIRED_TARGET_LEVERAGE',
-          type: ErrorType.error,
-          fields: ['targetLeverage'],
-          titleKey: STRING_KEYS.MODIFY_TARGET_LEVERAGE,
-        })
-      );
-    }
-  }
-
   return errors;
 }
 

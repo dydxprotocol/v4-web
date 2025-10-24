@@ -37,12 +37,10 @@ import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelect
 
 import { getDisplayableAssetFromBaseAsset } from '@/lib/assetUtils';
 import { mapIfPresent } from '@/lib/do';
-import { AttemptBigNumber, MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MaybeBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { AmountCloseInput } from './AmountCloseInput';
-import { MarketLeverageInput } from './MarketLeverageInput';
-import { TargetLeverageInput } from './TargetLeverageInput';
+import { AllocationSlider } from './AllocationSlider';
 
 export const TradeSizeInputs = () => {
   const dispatch = useAppDispatch();
@@ -59,7 +57,7 @@ export const TradeSizeInputs = () => {
 
   const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
 
-  const { showLeverage, showTargetLeverage, showAmountClose } = tradeSummary.options;
+  const { showAllocationSlider } = tradeSummary.options;
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -187,47 +185,23 @@ export const TradeSizeInputs = () => {
       }
       slotRight={inputToggleButton()}
       type={inputConfig.type}
-      value={inputConfig.value ?? ''}
+      value={inputConfig.value}
     />
   );
 
   return (
-    <div tw="flexColumn gap-[--form-input-gap]">
+    <div tw="flexColumn">
       {sizeInput}
-      {showLeverage && (
-        <MarketLeverageInput
-          leftLeverage={tradeSummary.tradeInfo.minimumSignedLeverage}
-          rightLeverage={tradeSummary.tradeInfo.maximumSignedLeverage}
-          leverageInputValue={
-            tradeValues.size != null &&
-            OrderSizeInputs.is.SIGNED_POSITION_LEVERAGE(tradeValues.size)
-              ? tradeValues.size.value.value
-              : effectiveSizes.leverageSigned != null
-                ? MustBigNumber(effectiveSizes.leverageSigned).toString(10)
-                : MustBigNumber(tradeSummary.tradeInfo.minimumSignedLeverage).toString(10)
+      {showAllocationSlider && (
+        <AllocationSlider
+          allocationPercentInput={
+            tradeValues.size != null && OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+              ? (AttemptBigNumber(tradeValues.size.value.value)?.times(100).toFixed(0) ?? '')
+              : tradeValues.size == null || tradeValues.size.value.value === ''
+                ? ''
+                : (AttemptBigNumber(effectiveSizes.allocationPercent)?.times(100).toFixed(0) ?? '')
           }
-          setLeverageInputValue={(value: string) => {
-            dispatch(tradeFormActions.setSizeLeverageSigned(value));
-          }}
-        />
-      )}
-      {showTargetLeverage && <TargetLeverageInput />}
-      {showAmountClose && (
-        <AmountCloseInput
-          amountClosePercentInput={(tradeValues.size != null &&
-          OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
-            ? AttemptBigNumber(tradeValues.size.value.value)
-            : AttemptBigNumber(
-                mapIfPresent(
-                  effectiveSizes.size,
-                  tradeSummary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
-                  (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
-                )
-              )
-          )
-            ?.times(100)
-            .toFixed(0)}
-          setAmountCloseInput={(value: string | undefined) => {
+          setAllocationInput={(value: string | undefined) => {
             dispatch(
               tradeFormActions.setSizeAvailablePercent(
                 mapIfPresent(value, (v) => MaybeBigNumber(v)?.div(100).toFixed(2)) ?? ''
