@@ -21,10 +21,15 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedRebateBanner } from '@/state/dismissable';
+import {
+  setHasDismissedPmlBanner,
+  setHasDismissedRebateBanner,
+  setHasDismissedWorldSeriesBanner,
+} from '@/state/dismissable';
 import {
   getHasDismissedPmlBanner,
   getHasDismissedRebateBanner,
+  getHasDismissedWorldSeriesBanner,
 } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
@@ -43,6 +48,7 @@ export const MarketsBanners = ({
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
   const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
+  const hasDismissedWorldSeriesBanner = useAppSelector(getHasDismissedWorldSeriesBanner);
   const dispatch = useAppDispatch();
 
   const onDismissPmlBanner = () => {
@@ -53,6 +59,10 @@ export const MarketsBanners = ({
     dispatch(setHasDismissedRebateBanner(true));
   };
 
+  const onDismissWorldSeriesBanner = () => {
+    dispatch(setHasDismissedWorldSeriesBanner(true));
+  };
+
   const onClickPmlBanner = () => {
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
@@ -61,6 +71,7 @@ export const MarketsBanners = ({
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
   const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
+  const shouldDisplayWorldSeriesBanner = !hasDismissedWorldSeriesBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -147,7 +158,40 @@ export const MarketsBanners = ({
     </$RebateBanner>
   ) : null;
 
-  return rebateBanner ?? pmlBanner ?? null;
+  const worldSeriesBanner = shouldDisplayWorldSeriesBanner ? (
+    <$WorldSeriesBanner>
+      <div tw="mr-auto flex h-full flex-col justify-center">
+        <span tw="mb-0.75 text-large text-color-text-2 font-extra-large-bold">
+          {stringGetter({ key: STRING_KEYS.WORLD_SERIES_BANNER_TITLE })}
+        </span>
+        <div tw="flex items-center gap-1.5">
+          <Button
+            action={ButtonAction.Primary}
+            type={ButtonType.Link}
+            href="https://dydx.trade/trade/DODGERSWIN-USD?utm_source=markets&utm_medium=ui&utm_campaign=22102025-markets-dodgers-banner-trade&utm_term=&utm_content=dodgers-markets-banner"
+            tw="relative z-10 w-12"
+          >
+            {stringGetter({ key: STRING_KEYS.GET_STARTED })}
+          </Button>
+        </div>
+      </div>
+
+      <img
+        src="/world-series.png"
+        alt="World Series baseball graphics"
+        tw="absolute right-0 top-0 h-full object-contain mobile:hidden"
+      />
+
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissWorldSeriesBanner}
+      />
+    </$WorldSeriesBanner>
+  ) : null;
+
+  return worldSeriesBanner ?? rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -237,6 +281,28 @@ const $RebateBanner = styled($MarketsPageBanner)`
     background: radial-gradient(ellipse at bottom right, var(--color-accent) 0%, transparent 70%);
     opacity: 0.6;
     z-index: 0;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
+  }
+`;
+
+const $WorldSeriesBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  background: var(--color-layer-0);
+  position: relative;
+  margin-bottom: 1rem;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
   }
 
   @media ${breakpoints.mobile} {
