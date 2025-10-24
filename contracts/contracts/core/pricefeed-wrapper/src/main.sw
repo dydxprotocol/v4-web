@@ -26,6 +26,8 @@ impl PricefeedWrapper for Contract {
 
         // the code below calculates
         // price_value = abs(price.quantized_value)
+        // we support negative prices this way, because negative prices simply denote a reversed direction
+        // still tradable
         let price_indent = I128::indent();
         let price_underlying = price.quantized_value.underlying();
         let price_value: U128 = if price_underlying >= price_indent {

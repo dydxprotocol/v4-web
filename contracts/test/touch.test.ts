@@ -305,7 +305,7 @@ describe("Vault.touch", () => {
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(48000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, true).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(true)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -343,7 +343,7 @@ describe("Vault.touch", () => {
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(32000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, true).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(false)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -381,7 +381,7 @@ describe("Vault.touch", () => {
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(48000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, false).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(false)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -419,7 +419,7 @@ describe("Vault.touch", () => {
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(32000, 18)))
 
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, false).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(true)
         // * 0.95 for fees
         // * 0.2 for the price jump
@@ -455,7 +455,7 @@ describe("Vault.touch", () => {
 
         const validate_liquidation = (await vault.functions.validate_liquidation(user1Identity, BTC_ASSET, true, false).get()).value
         expect(validate_liquidation[0].toNumber()).eq(1)
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, true).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, true).get()).value
         expect(position_delta[0]).eq(false)
         expect(position_delta[1].gt(position.collateral)).eq(true)
 
@@ -497,7 +497,7 @@ describe("Vault.touch", () => {
 
         const validate_liquidation = (await vault.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()).value
         expect(validate_liquidation[0].toNumber()).eq(1)
-        const position_delta = (await vault.functions.get_position_delta(user1Identity, BTC_ASSET, false).get()).value
+        const position_delta = (await vault.functions.get_position_pnl(user1Identity, BTC_ASSET, false).get()).value
         expect(position_delta[0]).eq(false)
         expect(position_delta[1].gt(position.collateral)).eq(true)
 

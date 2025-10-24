@@ -3,9 +3,9 @@ library;
 
 pub enum Error {
     VaultAlreadyInitialized: (),
-    VaultInvalidRUSDAsset: (),
+    // VaultInvalidRUSDAsset: (), // UNUSED
     VaultForbiddenNotGov: (),
-    VaultForbiddenNotManager: (),
+    // VaultForbiddenNotManager: (), // UNUSED
     VaultInvalidMsgCaller: (),
 
     VaultSizeExceeded: (),
@@ -13,22 +13,22 @@ pub enum Error {
 
     VaultInsufficientCollateralForFees: (),
 
-    VaultPoolAmountLtBuffer: (),
+    // VaultPoolAmountLtBuffer: (), // UNUSED
     VaultCollateralShouldBeWithdrawn: (),
     VaultSizeMustBeMoreThanCollateral: (),
 
     VaultCannotBeLiquidated: (),
 
-    VaultInvalidFundingRateFactor: (),
-    VaultInvalidStableFundingRateFactor: (),
+    // VaultInvalidFundingRateFactor: (), // UNUSED
+    // VaultInvalidStableFundingRateFactor: (), // UNUSED
 
     VaultAssetNotWhitelisted: (),
-    VaultAssetIsNotStableAsset: (),
+    // VaultAssetIsNotStableAsset: (), // UNUSED
     VaultInvalidAssetAmount: (),
     VaultInvalidRedemptionAmount: (),
 
     VaultInvalidPosition: (),
-    VaultInvalidAmountIn: (),
+    // VaultInvalidAmountIn: (), // UNUSED
     VaultInvalidAmountOut: (),
     VaultInvalidPositionSize: (),
     VaultInvalidLiquidator: (),
@@ -38,22 +38,22 @@ pub enum Error {
 
     VaultEmptyPosition: (),
 
-    VaultAssetInNotWhitelisted: (),
-    VaultAssetOutNotWhitelisted: (),
-    VaultAssetsAreEqual: (),
+    // VaultAssetInNotWhitelisted: (), // UNUSED
+    // VaultAssetOutNotWhitelisted: (), // UNUSED
+    // VaultAssetsAreEqual: (), // UNUSED
     
-    VaultLongCollateralIndexAssetsMismatch: (),
-    VaultLongCollateralAssetMustNotBeStableAsset: (),
+    // VaultLongCollateralIndexAssetsMismatch: (), // UNUSED
+    // VaultLongCollateralAssetMustNotBeStableAsset: (), // UNUSED
 
-    VaultShortCollateralAssetMustBeStableAsset: (),
+    // VaultShortCollateralAssetMustBeStableAsset: (), // UNUSED
     VaultShortIndexAssetMustNotBeStableAsset: (),
-    VaultShortIndexAssetNotShortable: (),
+    // VaultShortIndexAssetNotShortable: (), // UNUSED
 
     VaultInvalidMintAmountGtU64Max: (),
     VaultInvalidRUSDBurnAmountGtU64Max: (),
 
-    VaultDecimalsAreZero: (),
-    VaultPriceQueriedIsZero: (),
+    // VaultDecimalsAreZero: (), // UNUSED
+    // VaultPriceQueriedIsZero: (), // UNUSED
     VaultInvalidMaxLeverage: (),
     
     VaultReceiverCannotBeZero: (),
@@ -62,18 +62,18 @@ pub enum Error {
 
     VaultInvalidAssetForwarded: (),
 
-    VaultMaxRusdExceeded: (),
-    VaultMaxShortsExceeded: (),
+    // VaultMaxRusdExceeded: (), // UNUSED
+    // VaultMaxShortsExceeded: (), // UNUSED
     VaultMaxLeverageExceeded: (),
     VaultPoolAmountExceeded: (),
 
     VaultInvalidIncrease: (),
 
     VaultAccountCannotBeZero: (),
-    VaultCollateralAssetNotWhitelisted: (),
+    // VaultCollateralAssetNotWhitelisted: (), // UNUSED
 
     VaultInvalidAveragePrice: (),
     VaultLossesExceedCollateral: (),
-    VaultFeesExceedCollateral: (),
-    VaultLiquidationFeesExceedCollateral: (),
+    // VaultFeesExceedCollateral: (), // UNUSED
+    // VaultLiquidationFeesExceedCollateral: (), // UNUSED
 }

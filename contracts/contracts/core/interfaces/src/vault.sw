@@ -106,14 +106,14 @@ abi Vault {
     ) -> b256;
 
     #[storage(read)]
-    fn get_position_delta(
+    fn get_position_pnl(
         account: Identity,
         index_asset: b256,
         is_long: bool,
     ) -> (bool, u256);
 
     #[storage(read)]
-    fn get_delta(
+    fn get_pnl(
         index_asset: b256,
         size: u256,
         average_price: u256,
@@ -234,7 +234,7 @@ abi Vault {
         index_asset: b256,
         size_delta: u256,
         is_long: bool 
-    );
+    ) -> (u256, u256);
 
     #[storage(read, write)]
     fn decrease_position(
@@ -244,7 +244,7 @@ abi Vault {
         size_delta: u256,
         is_long: bool,
         receiver: Identity
-    );
+    ) -> (u256, u256, u256);
 
     #[storage(read, write)]
     fn liquidate_position(

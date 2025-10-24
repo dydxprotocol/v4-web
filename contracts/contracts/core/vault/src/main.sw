@@ -2,7 +2,6 @@
 contract;
 
 mod events;
-mod constants;
 mod errors;
 
 /*
@@ -57,12 +56,25 @@ use pausable::{
     Pausable
 };
 use events::*;
-use constants::*;
 use errors::*;
 
 // revision of the contract
 const REVISION: u8 = 6u8;
 const DEFAULT_SUB_ID: SubId = SubId::zero();
+
+const BASIS_POINTS_DIVISOR: u64 = 10_000;
+const FUNDING_RATE_PRECISION: u256 = 1_000_000_000_000_000_000;
+const FUNDING_RATE_FACTOR_BASE: u256 = 1_000_000_000;
+const FUNDING_RATE_INTERVAL: u64 = 1; // 1 second
+const FUNDING_RATE_FACTOR: u256 = 23; // 23 / 1_000_000_000 gives 2 promiles a day
+const PRICE_PRECISION: u256 = 1000000000000000000u256; // 10 ** 18;
+const MIN_LEVERAGE: u64 = 10_000; // 1x
+const MAX_LEVERAGE: u256 = 1_000_000_000; // 100_000x
+const MAX_FEE_BASIS_POINTS: u64 = 500; // 5%
+const DEFAULT_LIQUIDATION_FEE: u256 = 5; // 5 USDC (without decimals)
+const MAX_LIQUIDATION_FEE: u256 = 5; // 100 USDC (without decimals)
+const LP_ASSET_NAME: str[18] = __to_str_array("StarBoard LP Token");
+const LP_ASSET_SYMBOL: str[4] = __to_str_array("SBLP");
 
 configurable {
     /// The stable asset used for collateral in short positions
@@ -391,12 +403,12 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_position_delta(
+    fn get_position_pnl(
         account: Identity,
         index_asset: b256,
         is_long: bool,
     ) -> (bool, u256) {
-        _get_position_delta(
+        _get_position_pnl(
             account,
             index_asset,
             is_long
@@ -404,14 +416,14 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_delta(
+    fn get_pnl(
         index_asset: b256,
         size: u256,
         average_price: u256,
         is_long: bool,
         last_increased_time: u64,
     ) -> (bool, u256) {
-        _get_delta(
+        _get_pnl(
             index_asset,
             size,
             average_price,
@@ -613,6 +625,7 @@ impl Vault for Contract {
         amount_out
     }
 
+    // returns the position's collateral after the update and fees, and the current price
     #[payable]
     #[storage(read, write)]
     fn increase_position(
@@ -620,16 +633,20 @@ impl Vault for Contract {
         index_asset: b256,
         size_delta: u256,
         is_long: bool,
-    ) {
+    ) -> (u256, u256) {
         sl_require_not_paused();
         
         _begin_non_reentrant(storage::vault.lock);
 
-        _increase_position(account, index_asset, size_delta, is_long);
+        let (new_collateral, price) = _increase_position(account, index_asset, size_delta, is_long);
         
         _end_non_reentrant(storage::vault.lock);
+
+        (new_collateral, price)
     }
 
+    // returns the position's collateral after the update and fees, the current price, 
+    // and the collateral paid out to the receiver
     #[storage(read, write)]
     fn decrease_position(
         account: Identity,
@@ -638,13 +655,13 @@ impl Vault for Contract {
         size_delta: u256,
         is_long: bool,
         receiver: Identity
-    ) {
+    ) -> (u256, u256, u256) {
         sl_require_not_paused();
         
         _begin_non_reentrant(storage::vault.lock);
 
         _validate_router(account);
-        _decrease_position(
+        let (new_collateral, price, paid_out_collateral) = _decrease_position(
             account,
             index_asset,
             collateral_delta,
@@ -654,6 +671,8 @@ impl Vault for Contract {
         );
 
         _end_non_reentrant(storage::vault.lock);
+
+        (new_collateral, price, paid_out_collateral)
     }
 
     #[storage(read, write)]
@@ -758,8 +777,9 @@ fn _collect_swap_fees(
     });
 }
 
+/// price in the usd
+/// max/min prices express the spread, to be provided in the future
 #[storage(read)]
-/// price in the collateral
 fn _get_max_price(asset: b256) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
     let collateral_asset_price = pricefeed_wrapper.price(COLLATERAL_ASSET);
@@ -768,6 +788,8 @@ fn _get_max_price(asset: b256) -> u256 {
     asset_price * PRICE_PRECISION / collateral_asset_price
 }
 
+/// price in the usd
+/// max/min prices express the spread, to be provided in the future
 #[storage(read)]
 fn _get_min_price(asset: b256) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
@@ -833,7 +855,7 @@ fn _validate_liquidation(
         position.size,
     );
 
-    let (has_profit, pnl_delta) = _get_delta(
+    let (has_profit, pnl_delta) = _get_pnl(
         index_asset,
         position.size,
         position.average_price,
@@ -888,12 +910,12 @@ fn _validate_liquidation(
 }
 
 #[storage(read)]
-fn _get_delta(
+fn _get_pnl(
     index_asset: b256,
     size: u256,
     average_price: u256,
     is_long: bool,
-    last_increased_time: u64
+    _last_increased_time: u64
 ) -> (bool, u256) {
     require(average_price > 0, Error::VaultInvalidAveragePrice);
 
@@ -923,19 +945,17 @@ fn _get_position_fee(
     size_delta: u256,
 ) -> u256 {
 
-    // TODO make fee u64
     if size_delta == 0 {
         return 0;
     }
 
-    let mut after_fee_usd = size_delta * (BASIS_POINTS_DIVISOR - storage::vault.margin_fee_basis_points.read()).as_u256();
-    after_fee_usd = after_fee_usd / BASIS_POINTS_DIVISOR.as_u256();
+    let margin_fee_basis_points = storage::vault.margin_fee_basis_points.try_read().unwrap_or(0).as_u256();
 
-    size_delta - after_fee_usd
+    size_delta * margin_fee_basis_points / BASIS_POINTS_DIVISOR.as_u256()
 }
 
 #[storage(read)]
-fn _get_position_delta(
+fn _get_position_pnl(
     account: Identity,
     index_asset: b256,
     is_long: bool,
@@ -949,7 +969,7 @@ fn _get_position_delta(
 
     let position = _get_position_by_key(position_key);
 
-    _get_delta(
+    _get_pnl(
         index_asset,
         position.size,
         position.average_price,
@@ -999,21 +1019,6 @@ fn _validate_router(account: Identity) {
     );
 }
 
-#[storage(read)]
-fn _validate_assets(
-    index_asset: b256,
-    _is_long: bool,
-) {
-    require(
-        index_asset != COLLATERAL_ASSET,
-        Error::VaultShortIndexAssetMustNotBeStableAsset
-    );
-    require(
-        _is_asset_whitelisted(index_asset),
-        Error::VaultAssetNotWhitelisted
-    );
-}
-
 fn _validate_position(size: u256, collateral: u256) {
     if size == 0 {
         require(
@@ -1029,6 +1034,9 @@ fn _validate_position(size: u256, collateral: u256) {
     );
 }
 
+// calculates the next average price for a position
+// that is the weighted average of prices at the time of position increase with size coefficient
+// in other words this is the average price that assets are bought or sold at
 // for longs:  next_average_price = (next_price * next_size) / (next_size + delta)
 // for shorts: next_average_price = (next_price * next_size) / (next_size - delta)
 #[storage(read)]
@@ -1042,7 +1050,7 @@ fn _get_next_average_price(
     last_increased_time: u64,
 ) -> u256 {
 
-    let (has_profit, delta) = _get_delta(
+    let (has_profit, delta) = _get_pnl(
         index_asset,
         size,
         average_price,
@@ -1262,14 +1270,22 @@ fn _increase_position(
     index_asset: b256,
     size_delta: u256,
     is_long: bool,
-) {
+) -> (u256, u256) {
     require(
         !account.is_zero(),
         Error::VaultAccountCannotBeZero
     );
 
     _validate_router(account);
-    _validate_assets(index_asset, is_long);
+
+    require(
+        index_asset != COLLATERAL_ASSET,
+        Error::VaultShortIndexAssetMustNotBeStableAsset
+    );
+    require(
+        _is_asset_whitelisted(index_asset),
+        Error::VaultAssetNotWhitelisted
+    );
 
     let position_key = _get_position_key(
         account, 
@@ -1370,7 +1386,7 @@ fn _increase_position(
 
     _write_position(position_key, position);
 
-    let (_liquidation_state, _feft_collateral) = _validate_liquidation(
+    let (_liquidation_state, _left_collateral) = _validate_liquidation(
         account,
         index_asset,
         is_long,
@@ -1392,6 +1408,8 @@ fn _increase_position(
         funding_rate_has_profit,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
+
+    (position.collateral, price)
 }
 
 #[storage(read, write)]
@@ -1402,7 +1420,7 @@ fn _decrease_position(
     size_delta: u256,
     is_long: bool,
     receiver: Identity,
-) {
+) -> (u256, u256, u256) {
     require(
         !account.is_zero(),
         Error::VaultAccountCannotBeZero
@@ -1429,7 +1447,7 @@ fn _decrease_position(
         size_delta,
     );
 
-    let (has_profit, pnl_delta) = _get_delta(
+    let (has_profit, pnl_delta) = _get_pnl(
         index_asset,
         size_delta,
         position.average_price,
@@ -1509,6 +1527,12 @@ fn _decrease_position(
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, size_delta, is_long);
 
 
+    let price = if is_long {
+        _get_min_price(index_asset)
+    } else {
+        _get_max_price(index_asset)
+    };
+
     if position.size != size_delta {
         position.size = position.size - size_delta;
 
@@ -1531,12 +1555,6 @@ fn _decrease_position(
             true
         );
 
-        let price = if is_long {
-            _get_min_price(index_asset)
-        } else {
-            _get_max_price(index_asset)
-        };
-
         log(DecreasePosition {
             key: position_key,
             account,
@@ -1552,12 +1570,6 @@ fn _decrease_position(
             cumulative_funding_rate: new_cumulative_funding_rate,
         });
     } else {
-        let price = if is_long {
-            _get_min_price(index_asset)
-        } else {
-            _get_max_price(index_asset)
-        };
-
         log(DecreasePosition {
             key: position_key,
             account,
@@ -1593,6 +1605,8 @@ fn _decrease_position(
             receiver,
         );
     }
+
+    (position.collateral, price, collateral_out_after_fee)
 }
 
 
@@ -1658,7 +1672,7 @@ fn _liquidate_position(
         position.size,
     );
 
-    let (mut has_profit, mut pnl_delta) = _get_delta(
+    let (mut has_profit, mut pnl_delta) = _get_pnl(
         index_asset,
         position.size,
         position.average_price,

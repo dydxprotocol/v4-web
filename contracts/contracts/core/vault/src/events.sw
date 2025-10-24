@@ -39,11 +39,6 @@ pub struct SetFees {
     pub liquidation_fee: u256,
 }
 
-pub struct WriteLastFundingTime {
-    pub asset: b256,
-    pub last_funding_time: u64,
-}
-
 pub struct WritePosition {
     pub position_key: b256,
     pub position: Position
@@ -56,10 +51,6 @@ pub struct WriteFeeReserve {
 pub struct SetLiquidator {
     pub liquidator: Identity,
     pub is_active: bool,
-}
-
-pub struct SetPricefeedProvider {
-    pub pricefeed_provider: ContractId,
 }
 
 pub struct AddLiquidity {
@@ -147,16 +138,6 @@ pub struct UpdatePnl {
     pub delta: u256,
 }
 
-pub struct CollectMarginFees {
-    pub margin_fees: u256,
-}
-
-pub struct SetFundingRateInfo {
-    pub funding_interval: u64,
-    pub funding_rate_factor: u64,
-    pub stable_funding_rate_factor: u64
-}
-
 pub struct SetMaxLeverage {
     pub asset: b256,
     pub max_leverage: u256,
@@ -165,16 +146,6 @@ pub struct SetMaxLeverage {
 pub struct WritePoolAmount {
     pub asset: b256,
     pub pool_amount: u256,
-}
-
-pub struct WriteReservedAmount {
-    pub asset: b256,
-    pub reserved_amount: u256,
-}
-
-pub struct WriteGuaranteedAmount {
-    pub asset: b256,
-    pub guaranteed_amount: u256,
 }
 
 pub struct UpdateFundingInfo {
