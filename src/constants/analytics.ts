@@ -1,6 +1,6 @@
 import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
-import { ApiStatus } from '@/bonsai/types/summaryTypes';
+import { ApiStatus, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import { type SupportedLocale } from '@dydxprotocol/v4-localization';
 import { RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
@@ -309,6 +309,16 @@ export const AnalyticsEvents = unionize(
           sinceSubmissionMs: number | undefined;
         }
     >(),
+    TradeMarketOrderFilled: ofType<{
+      roundtripMs: number;
+      sinceSubmissionMs: number | undefined;
+      volume: number;
+      size: number;
+      price: number;
+      fill: SubaccountFill;
+      order: PlaceOrderPayload;
+      source: TradeMetadataSource;
+    }>(),
 
     TradeCancelOrderClick: ofType<{ orderId: string }>(),
     TradeCancelOrder: ofType<{ orderId: string }>(),
@@ -602,7 +612,8 @@ export type TradeMetadataSource =
   | 'TradeForm'
   | 'TriggersForm'
   | 'SimpleTriggersForm'
-  | 'TradingViewChart';
+  | 'TradingViewChart'
+  | 'CloseAllPositionsButton';
 
 export type TradeAdditionalMetadata = {
   source: TradeMetadataSource;
