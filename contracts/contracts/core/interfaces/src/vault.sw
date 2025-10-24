@@ -118,7 +118,6 @@ abi Vault {
         size: u256,
         average_price: u256,
         is_long: bool,
-        last_increased_time: u64
     ) -> (bool, u256);
 
     #[storage(read)]

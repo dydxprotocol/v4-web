@@ -218,7 +218,7 @@ impl Vault for Contract {
         storage::vault.is_initialized.write(true);
         storage::vault.gov.write(gov);
 
-        if storage::vault.liquidation_fee.try_read().unwrap_or(0) == 0 {
+        if storage::vault.liquidation_fee.read() == 0 {
             // cannot initialize in the storage section because of the configurable
             storage::vault.liquidation_fee.write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
         }
@@ -421,14 +421,12 @@ impl Vault for Contract {
         size: u256,
         average_price: u256,
         is_long: bool,
-        last_increased_time: u64,
     ) -> (bool, u256) {
         _get_pnl(
             index_asset,
             size,
             average_price,
             is_long,
-            last_increased_time
         )
     }
 
@@ -860,7 +858,6 @@ fn _validate_liquidation(
         position.size,
         position.average_price,
         is_long,
-        position.last_increased_time
     );
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
@@ -915,7 +912,6 @@ fn _get_pnl(
     size: u256,
     average_price: u256,
     is_long: bool,
-    _last_increased_time: u64
 ) -> (bool, u256) {
     require(average_price > 0, Error::VaultInvalidAveragePrice);
 
@@ -974,7 +970,6 @@ fn _get_position_pnl(
         position.size,
         position.average_price,
         is_long,
-        position.last_increased_time
     )
 }
 
@@ -1047,7 +1042,6 @@ fn _get_next_average_price(
     is_long: bool,
     next_price: u256,
     size_delta: u256,
-    last_increased_time: u64,
 ) -> u256 {
 
     let (has_profit, delta) = _get_pnl(
@@ -1055,7 +1049,6 @@ fn _get_next_average_price(
         size,
         average_price,
         is_long,
-        last_increased_time
     );
 
     let next_size = size + size_delta;
@@ -1325,7 +1318,6 @@ fn _increase_position(
             is_long,
             price,
             size_delta,
-            position.last_increased_time,
         )
     };
 
@@ -1452,7 +1444,6 @@ fn _decrease_position(
         size_delta,
         position.average_price,
         is_long,
-        position.last_increased_time
     );
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
@@ -1677,7 +1668,6 @@ fn _liquidate_position(
         position.size,
         position.average_price,
         is_long,
-        position.last_increased_time
     );
 
     let (mut funding_rate, mut funding_rate_has_profit) = _calculate_funding_rate(
@@ -1915,7 +1905,6 @@ fn _update_funding_info(asset: b256) {
     });
 }
 
-// TODO implement
 fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256) {
     let time_delta = now - funding_info.last_funding_time;
     // from_long means that longs are in excess and pay shorts
