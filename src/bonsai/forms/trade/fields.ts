@@ -244,6 +244,21 @@ export function getTradeFormFieldStates(
         // Execution is fixed for stop market
         forceValueAndDisable(result.execution, ExecutionType.IOC);
         return result;
+      case TradeFormType.TWAP:
+        // TODO: BONSAI - Implement full TWAP field visibility logic
+        // For now, make basic fields visible similar to LIMIT
+        makeVisible(result, [
+          'size',
+          'side',
+          'marketId',
+          'marginMode',
+          'reduceOnly',
+          'limitPrice',
+        ]);
+        defaultSizeIfSizeInputIsInvalid(result);
+        setMarginMode(result);
+        targetLeverageVisibleIfIsolated(result);
+        return result;
       default:
         assertNever(type);
         return result;

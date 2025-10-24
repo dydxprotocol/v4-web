@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
+import { OrderSizeInputs, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
@@ -26,6 +26,7 @@ import { InputType } from '@/components/Input';
 import { OutputType, formatNumberOutput } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
+import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -53,6 +54,11 @@ export const TradeSizeInputs = () => {
   const tradeValues = useAppSelector(getTradeFormValues);
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
 
+  // TODO: BONSAI - Remove local state, use tradeFormValues from selector once TWAP fields added
+  const [twapRunningTimeHours, setTwapRunningTimeHours] = useState('');
+  const [twapRunningTimeMinutes, setTwapRunningTimeMinutes] = useState('');
+  const [twapFrequencySeconds, setTwapFrequencySeconds] = useState('');
+
   const { stepSizeDecimals, assetId, displayableAsset } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -60,6 +66,8 @@ export const TradeSizeInputs = () => {
   const effectiveSizes = orEmptyObj(tradeSummary.tradeInfo.inputSummary.size);
 
   const { showLeverage, showTargetLeverage, showAmountClose } = tradeSummary.options;
+
+  const isTwapOrder = tradeValues.type === TradeFormType.TWAP;
 
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
@@ -212,6 +220,51 @@ export const TradeSizeInputs = () => {
         />
       )}
       {showTargetLeverage && <TargetLeverageInput />}
+      {isTwapOrder && (
+        <>
+          <div>
+            <div tw="text-color-text-1 font-mini-book mb-0.5">Running Time</div> {/* TODO: STRING_KEY.RUNNING_TIME */}
+            <$TwapInputsRow>
+              <FormInput
+                id="twap-hours"
+                type={InputType.Number}
+                decimals={0}
+                label="Hours" // TODO: STRING_KEY.HOURS
+                onChange={({ value }) => {
+                  // TODO: BONSAI - dispatch(tradeFormActions.setTwapRunningTimeHours(value))
+                  setTwapRunningTimeHours(value);
+                }}
+                value={twapRunningTimeHours}
+              />
+              <FormInput
+                id="twap-minutes"
+                type={InputType.Number}
+                decimals={0}
+                label="Minutes" // TODO: STRING_KEY.MINUTES
+                onChange={({ value }) => {
+                  // TODO: BONSAI - dispatch(tradeFormActions.setTwapRunningTimeMinutes(value))
+                  setTwapRunningTimeMinutes(value);
+                }}
+                value={twapRunningTimeMinutes}
+              />
+            </$TwapInputsRow>
+          </div>
+          <div>
+            <div tw="text-color-text-1 font-mini-book mb-0.5">Frequency</div> {/* TODO: STRING_KEY.FREQUENCY */}
+            <FormInput
+              id="twap-frequency"
+              type={InputType.Number}
+              decimals={0}
+              label="Seconds" // TODO: STRING_KEY.SECONDS
+              onChange={({ value }) => {
+                // TODO: BONSAI - dispatch(tradeFormActions.setTwapFrequencySeconds(value))
+                setTwapFrequencySeconds(value);
+              }}
+              value={twapFrequencySeconds}
+            />
+          </div>
+        </>
+      )}
       {showAmountClose && (
         <AmountCloseInput
           amountClosePercentInput={(tradeValues.size != null &&
@@ -255,3 +308,8 @@ const $ToggleButton = styled(ToggleButton)`
 `;
 
 const $Conversion = tw.div`inline-flex`;
+
+const $TwapInputsRow = styled.div`
+  ${layoutMixins.gridEqualColumns}
+  gap: var(--form-input-gap);
+`;

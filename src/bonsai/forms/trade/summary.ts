@@ -431,6 +431,7 @@ function calculateTradeFormOptions(
 
         [TradeFormType.MARKET]: () => iocOnlyExecutionOptions,
         [TradeFormType.TRIGGER_MARKET]: () => iocOnlyExecutionOptions,
+        [TradeFormType.TWAP]: () => emptyExecutionOptions, // TODO: BONSAI - Define TWAP execution options
       })
     : emptyExecutionOptions;
 
@@ -618,6 +619,9 @@ export function tradeFormTypeToOrderType(
         return OrderType.TAKE_PROFIT_LIMIT;
       }
       return OrderType.STOP_LIMIT;
+    case TradeFormType.TWAP:
+      // TODO: BONSAI - Determine correct OrderType for TWAP (may need to check v4-client-js)
+      return OrderType.MARKET;
     default:
       assertNever(tradeFormType);
       return OrderType.MARKET;

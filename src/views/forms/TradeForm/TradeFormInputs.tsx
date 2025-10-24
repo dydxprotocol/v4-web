@@ -2,18 +2,13 @@ import { Ref, useEffect, useState } from 'react';
 
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { NumberFormatValues, SourceInfo } from 'react-number-format';
-import styled from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { InputErrorData, TradeBoxKeys } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { formMixins } from '@/styles/formMixins';
-
-import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
@@ -25,6 +20,8 @@ import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelect
 
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
+
+import { LimitPriceInput } from './LimitPriceInput';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
@@ -46,7 +43,10 @@ export const TradeFormInputs = () => {
   const tradeSummary = useAppSelector(getTradeFormSummary).summary;
   const { showLimitPrice, showTriggerPrice } = tradeSummary.options;
   const tradeFormValues = useAppSelector(getTradeFormValues);
-  const { limitPrice, triggerPrice, marketId, type } = tradeFormValues;
+  const { triggerPrice, marketId, type } = tradeFormValues;
+
+  // For TWAP orders, limit price is shown in AdvancedTradeOptions instead
+  const isTwapOrder = type === 'TWAP';
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
@@ -71,21 +71,6 @@ export const TradeFormInputs = () => {
     setHasSetMidMarketLimit(true);
   }, [dispatch, midMarketPrice, showLimitPrice, tickSizeDecimals, marketId, hasSetMidMarketLimit]);
 
-  const onMidMarketPriceClick = () => {
-    if (!midMarketPrice) return;
-    dispatch(
-      tradeFormActions.setLimitPrice(
-        MustBigNumber(midMarketPrice).toFixed(tickSizeDecimals ?? USD_DECIMALS)
-      )
-    );
-  };
-
-  const midMarketPriceButton = (
-    <$MidPriceButton onClick={onMidMarketPriceClick} size={ButtonSize.XSmall}>
-      {stringGetter({ key: STRING_KEYS.MID_MARKET_PRICE_SHORT })}
-    </$MidPriceButton>
-  );
-
   const tradeFormInputs: TradeBoxInputConfig[] = [];
   if (showTriggerPrice) {
     tradeFormInputs.push({
@@ -107,55 +92,35 @@ export const TradeFormInputs = () => {
     });
   }
 
-  if (showLimitPrice) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.LimitPrice,
-      inputType: InputType.Currency,
-      label: (
-        <>
-          <WithTooltip tooltip="limit-price" side="right">
-            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(tradeFormActions.setLimitPrice(value));
-      },
-      value: limitPrice ?? '',
-      decimals: tickSizeDecimals ?? USD_DECIMALS,
-      slotRight: midMarketPrice ? midMarketPriceButton : undefined,
-    });
-  }
-
-  return tradeFormInputs.map(
-    ({
-      key,
-      inputType,
-      label,
-      onChange,
-      onInput,
-      validationConfig,
-      value,
-      decimals,
-      slotRight,
-    }) => (
-      <FormInput
-        key={key}
-        id={key}
-        type={inputType}
-        label={label}
-        onChange={onChange}
-        onInput={onInput}
-        validationConfig={validationConfig}
-        value={value}
-        decimals={decimals}
-        slotRight={slotRight}
-      />
-    )
+  return (
+    <>
+      {tradeFormInputs.map(
+        ({
+          key,
+          inputType,
+          label,
+          onChange,
+          onInput,
+          validationConfig,
+          value,
+          decimals,
+          slotRight,
+        }) => (
+          <FormInput
+            key={key}
+            id={key}
+            type={inputType}
+            label={label}
+            onChange={onChange}
+            onInput={onInput}
+            validationConfig={validationConfig}
+            value={value}
+            decimals={decimals}
+            slotRight={slotRight}
+          />
+        )
+      )}
+      {showLimitPrice && !isTwapOrder && <LimitPriceInput />}
+    </>
   );
 };
-
-const $MidPriceButton = styled(Button)`
-  ${formMixins.inputInnerButton}
-`;

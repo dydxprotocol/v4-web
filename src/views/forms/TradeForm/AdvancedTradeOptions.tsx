@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { ExecutionType, TimeInForce, TimeUnit } from '@/bonsai/forms/trade/types';
+import { ExecutionType, TimeInForce, TimeUnit, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
@@ -31,6 +31,7 @@ import { getTradeFormSummary, getTradeFormValues } from '@/state/tradeFormSelect
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { LimitPriceInput } from './LimitPriceInput';
 import { TradeTriggerOrderInputs } from './TradeTriggerInput';
 
 export const AdvancedTradeOptions = () => {
@@ -46,8 +47,21 @@ export const AdvancedTradeOptions = () => {
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce, stopLossOrder, takeProfitOrder } =
-    inputTradeData;
+  const {
+    execution,
+    goodTil,
+    postOnly,
+    reduceOnly,
+    timeInForce,
+    stopLossOrder,
+    takeProfitOrder,
+    type,
+    limitPrice,
+  } = inputTradeData;
+
+  // TODO: BONSAI - Remove local state, use tradeFormValues from selector once TWAP fields added
+  const [twapLimitPriceEnabled, setTwapLimitPriceEnabled] = useState(false);
+
   const { stopLossOrder: stopLossSummary, takeProfitOrder: takeProfitSummary } = orEmptyObj(
     currentTradeFormSummary.triggersSummary
   );
@@ -59,6 +73,7 @@ export const AdvancedTradeOptions = () => {
     showReduceOnly,
     showPostOnly,
     showGoodTil,
+    showLimitPrice,
 
     showPostOnlyTooltip,
     showReduceOnlyTooltip,
@@ -71,6 +86,8 @@ export const AdvancedTradeOptions = () => {
 
   const shouldShowPostOnly = showPostOnly || showPostOnlyTooltip;
   const shouldShowReduceOnly = showReduceOnly || showReduceOnlyTooltip;
+
+  const isTwapOrder = type === TradeFormType.TWAP;
 
   const needsExecution =
     (executionOptions.length > 0 && execution != null) ||
@@ -85,7 +102,7 @@ export const AdvancedTradeOptions = () => {
     }
   }, [complianceState, dispatch]);
 
-  const necessary = needsTimeRow || needsExecution || needsTriggers;
+  const necessary = needsTimeRow || needsExecution || needsTriggers || isTwapOrder;
   if (!necessary) {
     return undefined;
   }
@@ -223,6 +240,23 @@ export const AdvancedTradeOptions = () => {
               />
             )}
           </>
+        )}
+        {isTwapOrder && showLimitPrice && (
+          <div tw="column gap-0.5">
+            <Checkbox
+              checked={twapLimitPriceEnabled}
+              onCheckedChange={(checked) => {
+                // TODO: BONSAI - dispatch(tradeFormActions.setTwapLimitPriceEnabled(checked))
+                setTwapLimitPriceEnabled(checked);
+                if (!checked) {
+                  dispatch(tradeFormActions.setLimitPrice(''));
+                }
+              }}
+              id="twap-limit-price-enabled"
+              label="Limit Price (Optional)" // TODO: STRING_KEY.LIMIT_PRICE_OPTIONAL
+            />
+            {twapLimitPriceEnabled && <LimitPriceInput />}
+          </div>
         )}
         {needsTriggers && (
           <div tw="column gap-0.5">

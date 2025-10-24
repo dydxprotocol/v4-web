@@ -43,7 +43,19 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
           <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
         ) : undefined,
     }));
-    return allItems;
+
+    // TODO: BONSAI - Remove this hardcoded TWAP item once fully integrated
+    // TODO: STRING_KEY.TWAP
+    const twapItem: MenuItem<TradeFormType> = {
+      value: TradeFormType.TWAP,
+      label: 'TWAP',
+      slotBefore:
+        showAssetIcon && selectedTradeType === TradeFormType.TWAP ? (
+          <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
+        ) : undefined,
+    };
+
+    return [...allItems, twapItem];
   }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions, selectedTradeType]);
 
   const asSubItems = useMemo((): Array<MenuItem<TradeFormType>> => {

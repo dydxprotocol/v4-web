@@ -76,6 +76,7 @@ export enum TradeFormType {
   LIMIT = 'LIMIT',
   TRIGGER_MARKET = 'TRIGGER_MARKET',
   TRIGGER_LIMIT = 'TRIGGER_LIMIT',
+  TWAP = 'TWAP',
 }
 
 type OrderMatcher<T> = {

@@ -327,6 +327,66 @@ export function calculateTradeInfo(
                 ),
           };
         });
+      case TradeFormType.TWAP:
+        // TODO: BONSAI - Implement proper TWAP fee/slippage calculation
+        return calc(() => {
+          const price = AttemptNumber(trade.limitPrice);
+          const inputSummary = calculateLimitOrderInputSummary(
+            trade.size,
+            trade.limitPrice,
+            trade.reduceOnly,
+            AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+            baseAccount
+          );
+
+          const feeRate = accountData.userFeeStats.takerFeeRate;
+          const totalFees = mapIfPresent(
+            feeRate,
+            inputSummary.size?.usdcSize,
+            (fee, usdc) => fee * usdc
+          );
+
+          return {
+            subaccountNumber: subaccountToUse,
+            minimumSignedLeverage: leverageLimits.minLeverage.toNumber(),
+            maximumSignedLeverage: leverageLimits.maxLeverage.toNumber(),
+            slippage: 0,
+            indexSlippage: 0,
+            filled: true,
+            feeRate,
+            inputSummary,
+            fee: totalFees,
+            payloadPrice: price,
+            isPositionClosed:
+              mapIfPresent(
+                inputSummary.size?.size,
+                baseAccount?.position?.unsignedSize.toNumber(),
+                baseAccount?.position?.side,
+                trade.side,
+                AttemptNumber(accountData.currentTradeMarketSummary?.stepSize),
+                (filled, size, positionSide, orderSide, stepSize) =>
+                  ((positionSide === IndexerPositionSide.LONG && orderSide === OrderSide.SELL) ||
+                    (positionSide === IndexerPositionSide.SHORT && orderSide === OrderSide.BUY)) &&
+                  Math.abs(filled - size) < stepSize / 2
+              ) ?? false,
+            total: calculateOrderTotal(inputSummary.size?.usdcSize, totalFees, trade.side),
+            transferToSubaccountAmount: calculateIsolatedTransferAmount(
+              trade,
+              inputSummary.size?.size ?? 0,
+              price ?? 0,
+              subaccountToUse,
+              accountData.rawParentSubaccountData?.parentSubaccount,
+              baseAccount?.position,
+              accountData.currentTradeMarketSummary
+            ),
+            reward: calculateTakerReward(
+              inputSummary.size?.usdcSize,
+              totalFees,
+              accountData.rewardParams,
+              accountData.feeTiers
+            ),
+          };
+        });
       default:
         assertNever(trade.type);
         throw new Error('invalid trade type');
@@ -1046,6 +1106,9 @@ function calculateIsolatedMarginTransferAmount(
         return tradePrice;
       case TradeFormType.TRIGGER_MARKET:
         return MustNumber(trade.triggerPrice);
+      case TradeFormType.TWAP:
+        // TODO: BONSAI - Use limitPrice if enabled, else oraclePrice
+        return tradePrice ?? oraclePrice;
       default:
         assertNever(trade.type);
         return 0;
