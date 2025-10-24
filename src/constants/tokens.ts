@@ -25,6 +25,8 @@ export const DYDX_CHAIN_USDC_DENOM =
 export const USDC_DECIMALS = 6;
 export const ETH_DECIMALS = 18;
 
+export const SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112';
+
 export type TokenForTransfer = {
   chainId: string;
   decimals: number;

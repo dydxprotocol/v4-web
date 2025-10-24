@@ -67,6 +67,7 @@ import { TurnkeyAuthProvider } from './providers/TurnkeyAuthProvider';
 import { TurnkeyWalletProvider } from './providers/TurnkeyWalletProvider';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
+import { setCurrentPath } from './state/app';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
@@ -104,12 +105,18 @@ const Content = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
+
+  // Track current path in Redux for conditional polling
+  useEffect(() => {
+    dispatch(setCurrentPath(location.pathname));
+  }, [location.pathname, dispatch]);
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
