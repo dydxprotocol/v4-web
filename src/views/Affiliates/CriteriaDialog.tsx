@@ -1,62 +1,45 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
-import { formatUnits } from 'viem';
 
-import {
-  DEFAULT_AFFILIATES_EARN_PER_MONTH_USD,
-  DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD,
-} from '@/constants/affiliates';
+import { DEFAULT_AFFILIATES_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { CriteriaDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { BorderStatCell, StatCell } from './StatBox';
+import { StatCell } from './StatBox';
 
 interface ITierDefinition {
   tier: number | 'vip';
-  requirements: { referredVol?: number; staked?: number };
+  requirements: { referredVol?: number };
   affiliateEarnRate: string;
 }
 
 const TIERS: ITierDefinition[] = [
   {
     tier: 0,
-    requirements: { staked: 0, referredVol: 0 },
-    affiliateEarnRate: '5.0%',
+    requirements: { referredVol: 0 },
+    affiliateEarnRate: '30.0%',
   },
   {
     tier: 1,
-    requirements: { staked: 200, referredVol: 1000000 },
-    affiliateEarnRate: '10.0%',
+    requirements: { referredVol: 1_000_000 },
+    affiliateEarnRate: '40.0%',
   },
   {
     tier: 2,
-    requirements: { staked: 1000, referredVol: 5000000 },
-    affiliateEarnRate: '12.5%',
-  },
-  {
-    tier: 3,
-    requirements: { staked: 5000, referredVol: 25000000 },
-    affiliateEarnRate: '15.0%',
-  },
-  {
-    tier: 'vip',
-    requirements: { staked: undefined, referredVol: undefined },
+    requirements: { referredVol: 10_000_000 },
     affiliateEarnRate: '50.0%',
   },
 ];
@@ -64,16 +47,14 @@ const TIERS: ITierDefinition[] = [
 export const CriteriaDialog = ({
   setIsOpen,
   accountStats,
-  stakedAmount,
   userTier,
 }: DialogProps<CriteriaDialogProps>) => {
   const { dydxAddress } = useAccounts();
-  const { affiliateProgram } = useURLConfigs();
-  const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   const stringGetter = useStringGetter();
 
-  const currentUserTierIdx = TIERS.findIndex((tier) => tier.tier === userTier);
+  const currentUserTierIdx =
+    userTier === 'vip' ? TIERS.length - 1 : TIERS.findIndex((tier) => tier.tier === userTier);
 
   const currentUserTier = TIERS[currentUserTierIdx];
 
@@ -116,50 +97,25 @@ export const CriteriaDialog = ({
               : stringGetter({
                   key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
                   params: {
-                    VIP_VALUE: (
-                      <span tw="text-color-text-1">
-                        ${DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD.toLocaleString()}
-                      </span>
-                    ),
+                    VIP_VALUE: null,
                     REGULAR_VALUE: (
                       <span tw="text-color-text-1">
                         ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
                       </span>
                     ),
-                    APPLY_HERE: (
-                      <Link isInline href={affiliateProgram}>
-                        <span tw="text-color-accent">
-                          {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
-                        </span>
-                      </Link>
-                    ),
-                  },
+                    APPLY_HERE: null,
+                  }, // TODO (Jared): Update string
                 })}
           </div>
 
           {dydxAddress && (
             <div tw="my-1 flex">
-              <BorderStatCell
+              <StatCell
                 tw="pr-1"
-                border={['right']}
                 title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
                 outputType={OutputType.CompactFiat}
                 value={accountStats?.affiliateReferredTotalVolume}
               />
-              <StatCell tw="px-1" title={stringGetter({ key: STRING_KEYS.STAKED_BALANCE })}>
-                <div tw="flex items-center">
-                  <Output
-                    type={OutputType.Asset}
-                    value={
-                      stakedAmount
-                        ? formatUnits(stakedAmount, chainTokenDecimals).toString()
-                        : undefined
-                    }
-                    fractionDigits={2}
-                  />
-                  <Tag tw="ml-0.25">{chainTokenLabel}</Tag>
-                </div>
-              </StatCell>
             </div>
           )}
         </div>
@@ -178,8 +134,6 @@ const CriteriaTable = ({
   tiers: ITierDefinition[];
 }) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgram } = useURLConfigs();
-  const { chainTokenLabel } = useTokenConfigs();
 
   const columns: ColumnDef<ITierDefinition>[] = [
     {
@@ -204,25 +158,7 @@ const CriteriaTable = ({
       allowsSorting: false,
 
       renderCell: ({ tier, requirements }) =>
-        tier === 'vip' && userTier !== 'vip' ? (
-          <$TableCell>
-            <Tag tw="bg-color-layer-5 p-0.5 text-small text-color-text-1">
-              <div tw="flex flex-col gap-x-0.25 notTablet:flex-row">
-                {stringGetter({
-                  key: STRING_KEYS.BY_APPLICATION_ONLY,
-                })}
-                <div tw="flex flex-row">
-                  <Link href={affiliateProgram}>
-                    <span tw="capitalize text-color-accent">
-                      {stringGetter({ key: STRING_KEYS.APPLY_HERE })}
-                    </span>
-                  </Link>
-                  !
-                </div>
-              </div>
-            </Tag>
-          </$TableCell>
-        ) : tier === 'vip' && userTier === 'vip' ? (
+        tier === 'vip' && userTier !== 'vip' ? null : tier === 'vip' && userTier === 'vip' ? (
           <$TableCell tw="text-color-text-2">
             {stringGetter({
               key: STRING_KEYS.YOURE_A_VIP,
@@ -231,7 +167,7 @@ const CriteriaTable = ({
               },
             })}
           </$TableCell>
-        ) : !requirements.referredVol && !requirements.staked ? (
+        ) : !requirements.referredVol ? (
           <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
         ) : (
           <$TableCell stacked>
@@ -243,22 +179,6 @@ const CriteriaTable = ({
                 <p tw="text-small text-color-text-0">
                   {stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
                 </p>
-              </div>
-              <div tw="text-color-text-0">
-                {stringGetter({ key: STRING_KEYS.OR }).toUpperCase()}
-              </div>
-              <div>
-                <div tw="flex flex-row gap-x-0.5 notTablet:flex-col">
-                  <div tw="flex items-center text-color-text-1">
-                    <Output type={OutputType.CompactFiat} value={requirements.staked} />+
-                  </div>
-                  <div tw="flex items-center">
-                    <p tw="text-small text-color-text-0">
-                      {stringGetter({ key: STRING_KEYS.STAKED })}
-                    </p>
-                    <Tag tw="ml-0.25 w-fit">{chainTokenLabel}</Tag>
-                  </div>
-                </div>
               </div>
             </div>
           </$TableCell>
@@ -274,11 +194,7 @@ const CriteriaTable = ({
       ),
       renderCell: ({ tier, affiliateEarnRate }) => (
         <$TableCell tw="w-full items-center justify-between">
-          {tier === 'vip' ? (
-            <span tw="text-color-success">{affiliateEarnRate}</span>
-          ) : (
-            affiliateEarnRate
-          )}
+          {affiliateEarnRate}
           {userTier?.toString().toLowerCase() === tier.toString().toLowerCase() && (
             <Tag tw="bg-color-accent">
               <span tw="text-color-text-2">{stringGetter({ key: STRING_KEYS.YOU })}</span>

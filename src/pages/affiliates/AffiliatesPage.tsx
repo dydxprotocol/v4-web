@@ -13,11 +13,8 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import { AffiliateProgressCard } from '@/views/Affiliates/cards/AffiliateProgressCard';
 import { AffiliateStatsCard } from '@/views/Affiliates/cards/AffiliateStatsCard';
-import { ProgramStatusCard } from '@/views/Affiliates/cards/ProgramStatusCard';
 import { AffiliatesBanner } from '@/views/AffiliatesBanner';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
-
-import { bytesToBigInt } from '@/lib/numbers';
 
 export const AffiliatesPage = () => {
   const { dydxAddress } = useAccounts();
@@ -34,9 +31,6 @@ export const AffiliatesPage = () => {
         affiliateMetadata.totalVolume > AFFILIATES_REQUIRED_VOLUME_USD),
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
-    stakedDydx: affiliateMetadata?.affiliateInfo?.stakedAmount
-      ? bytesToBigInt(affiliateMetadata.affiliateInfo.stakedAmount)
-      : undefined,
   };
 
   return (
@@ -64,11 +58,9 @@ export const AffiliatesPage = () => {
                 <AffiliateStatsCard
                   currentAffiliateTier={userStatus.currentAffiliateTier}
                   isVip={userStatus.isVip}
-                  stakedDydx={userStatus.stakedDydx}
                   accountStats={accountStats}
                 />
               )}
-              <ProgramStatusCard isVip={!!userStatus.isVip} />
             </section>
           </>
         )}

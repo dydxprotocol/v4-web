@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 
 import styled from 'styled-components';
 
-import { DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -12,8 +11,6 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
-import { Output, OutputType } from '@/components/Output';
 
 interface IProgramCardProps {
   isVip: boolean;
@@ -22,8 +19,7 @@ interface IProgramCardProps {
 export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { affiliateProgram, vipsChannel, affiliateProgramSupportEmail, affiliateProgramFaq } =
-    useURLConfigs();
+  const { vipsChannel, affiliateProgramSupportEmail } = useURLConfigs();
 
   const title: ReactNode = isVip
     ? stringGetter({ key: STRING_KEYS.PROGRAM_CARD_TITLE_VIP })
@@ -45,25 +41,11 @@ export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
       {stringGetter({
         key: STRING_KEYS.PROGRAM_CARD_BODY,
         params: {
-          VIP_VALUE: (
-            <Output
-              tw="inline text-color-text-2"
-              type={OutputType.Fiat}
-              value={DEFAULT_AFFILIATES_VIP_EARN_PER_MONTH_USD}
-              fractionDigits={0}
-            />
-          ),
+          VIP_VALUE: null, // TODO(Jared): UPDATE STRING
         },
-      })}{' '}
-      <Link href={affiliateProgramFaq} isInline>
-        {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-      </Link>
+      })}
     </p>
   );
-
-  const buttonText = isVip
-    ? stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })
-    : stringGetter({ key: STRING_KEYS.APPLY_NOW });
 
   return (
     <div tw="w-full rounded-0.625 bg-color-layer-3 notTablet:w-4/12">
@@ -78,16 +60,7 @@ export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
           </$Header>
           <div>{body}</div>
 
-          {!isVip ? (
-            <Button
-              tw="w-full"
-              action={ButtonAction.Base}
-              type={ButtonType.Link}
-              href={affiliateProgram}
-            >
-              {buttonText}
-            </Button>
-          ) : (
+          {isVip && (
             <div tw="flex gap-1">
               <Button
                 tw="w-full"
@@ -95,7 +68,7 @@ export const ProgramStatusCard = ({ isVip = false }: IProgramCardProps) => {
                 type={ButtonType.Link}
                 href={`mailto:${affiliateProgramSupportEmail}`}
               >
-                {buttonText}
+                {stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })}
               </Button>
               <Button
                 tw="w-full"

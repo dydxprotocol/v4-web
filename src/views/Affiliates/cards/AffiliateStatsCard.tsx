@@ -178,13 +178,11 @@ interface IAffiliateStatsProps {
   accountStats?: IAffiliateStats;
   isVip: boolean;
   currentAffiliateTier?: number;
-  stakedDydx?: bigint;
 }
 
 export const AffiliateStatsCard = ({
   accountStats,
   isVip,
-  stakedDydx,
   currentAffiliateTier,
 }: IAffiliateStatsProps) => {
   const { isNotTablet } = useBreakpoints();
@@ -196,7 +194,6 @@ export const AffiliateStatsCard = ({
         DialogTypes.Criteria({
           userTier: isVip ? 'vip' : currentAffiliateTier,
           accountStats,
-          stakedAmount: stakedDydx,
         })
       )
     );

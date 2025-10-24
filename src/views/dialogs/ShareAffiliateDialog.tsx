@@ -11,13 +11,7 @@ import {
 } from '@/constants/affiliates';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonStyle,
-  ButtonType,
-} from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogProps, ShareAffiliateDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { ColorToken } from '@/constants/styles/base';
@@ -60,7 +54,7 @@ const copyBlobToClipboard = async (blob: Blob | null) => {
 
 export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDialogProps>) => {
   const stringGetter = useStringGetter();
-  const { affiliateProgramFaq, affiliateProgram } = useURLConfigs();
+  const { affiliateProgramFaq } = useURLConfigs();
   const { dydxAddress } = useAccounts();
   const {
     affiliateMetadataQuery: { data },
@@ -89,7 +83,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     },
   });
 
-  const [{ isLoading: isCopying }, , ref] = useToBlob<HTMLDivElement>({
+  const [, , ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
     onSuccess: copyBlobToClipboard,
   });
@@ -360,18 +354,6 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
             </div>
           )}
           <div tw="flex gap-1">
-            <Button
-              action={ButtonAction.Base}
-              slotLeft={<Icon iconName={IconName.Rocket} />}
-              state={{
-                isLoading: isCopying,
-              }}
-              tw="flex-1"
-              type={ButtonType.Link}
-              href={affiliateProgram}
-            >
-              {stringGetter({ key: STRING_KEYS.BECOME_A_VIP })}
-            </Button>
             <Button
               action={ButtonAction.Base}
               slotLeft={<Icon iconName={IconName.SocialX} />}
