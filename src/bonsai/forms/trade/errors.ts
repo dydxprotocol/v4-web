@@ -389,6 +389,7 @@ function validateAdvancedTradeConditions(
   } else if (
     state.type === TradeFormType.LIMIT ||
     state.type === TradeFormType.TRIGGER_LIMIT ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     state.type === TradeFormType.TRIGGER_MARKET ||
     state.type === TradeFormType.TWAP
   ) {
