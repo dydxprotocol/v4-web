@@ -211,15 +211,18 @@ describe("Vault.funding_rate", () => {
             // for long, we use the half of the size to calculate the funding rate
             const long_funding_rate_response = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeLongHalf, true, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
             const short_funding_rate_response = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeShort, false, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            const long_funding_rate = long_funding_rate_response[0].toString()
-            const short_funding_rate = short_funding_rate_response[0].toString()
+            const long_funding_rate = long_funding_rate_response[0].toNumber()
+            const short_funding_rate = short_funding_rate_response[0].toNumber()
             const is_profit_long = long_funding_rate_response[1]
             const is_profit_short = short_funding_rate_response[1]
 
-            const expected_funding_rate_long = BigInt(sizeLongHalf) / BigInt(2) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION)
-            const expected_funding_rate_short = BigInt(sizeShort) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION)
-            expect(long_funding_rate).toBe(expected_funding_rate_long.toString())
-            expect(short_funding_rate).toBe(expected_funding_rate_short.toString())
+            const expected_funding_rate_long = Number(BigInt(sizeLongHalf) / BigInt(2) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION))
+            const expected_funding_rate_short = Number(BigInt(sizeShort) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION))
+            // it may be that a second elapses between two calls and the result is not exactly equal
+            expect(long_funding_rate).gt(expected_funding_rate_long - 20)
+            expect(long_funding_rate).lt(expected_funding_rate_long + 20)
+            expect(short_funding_rate).gt(expected_funding_rate_short - 20)
+            expect(short_funding_rate).lt(expected_funding_rate_short + 20)
             expect(is_profit_long).toBe(false)
             expect(is_profit_short).toBe(true)
         })
@@ -235,15 +238,18 @@ describe("Vault.funding_rate", () => {
             // for short, we use the half of the size to calculate the funding rate
             const short_funding_rate_response = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeShortHalf, false, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
             const long_funding_rate_response = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeLong, true, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            const long_funding_rate = long_funding_rate_response[0].toString()
-            const short_funding_rate = short_funding_rate_response[0].toString()
+            const long_funding_rate = long_funding_rate_response[0].toNumber()
+            const short_funding_rate = short_funding_rate_response[0].toNumber()
             const is_profit_long = long_funding_rate_response[1]
             const is_profit_short = short_funding_rate_response[1]
 
-            const expected_funding_rate_short = BigInt(sizeShortHalf) / BigInt(2) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION)
-            const expected_funding_rate_long = BigInt(sizeLong) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION)
-            expect(long_funding_rate).toBe(expected_funding_rate_long.toString())
-            expect(short_funding_rate).toBe(expected_funding_rate_short.toString())
+            const expected_funding_rate_short = Number(BigInt(sizeShortHalf) / BigInt(2) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION))
+            const expected_funding_rate_long = Number(BigInt(sizeLong) * BigInt(FUNDING_RATE_PRECISION) * BigInt(86400) * BigInt(FUNDING_RATE_FACTOR) / BigInt(FUNDING_RATE_FACTOR_BASE) / BigInt(FUNDING_RATE_PRECISION))
+            // it may be that a second elapses between two calls and the result is not exactly equal
+            expect(long_funding_rate).gt(expected_funding_rate_long - 20)
+            expect(long_funding_rate).lt(expected_funding_rate_long + 20)
+            expect(short_funding_rate).gt(expected_funding_rate_short - 20)
+            expect(short_funding_rate).lt(expected_funding_rate_short + 20)
             expect(is_profit_long).toBe(true)
             expect(is_profit_short).toBe(false)
         })
@@ -255,8 +261,9 @@ describe("Vault.funding_rate", () => {
             await moveBlockchainTime(launchedNode, 86400)
             const longRes = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, size, true, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
             const shortRes = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, size, false, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            expect(longRes[0].toString()).toBe("0")
-            expect(shortRes[0].toString()).toBe("0")
+            // it may be that a second elapses between two calls and the result is not exactly 0
+            expect(longRes[0].toNumber()).lt(20)
+            expect(shortRes[0].toNumber()).lt(20)
         })
 
         it("no funding for long when open interest is balanced in aggregation", async () => {
@@ -270,7 +277,8 @@ describe("Vault.funding_rate", () => {
             await call(vaultExpose.functions.increase_and_update_funding_info(BTC_ASSET, size, false))
             await moveBlockchainTime(launchedNode, 86400)
             const longRes = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeTest, true, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            expect(longRes[0].toString()).toBe("0")
+            // it may be that a second elapses between two calls and the result is not exactly 0
+            expect(longRes[0].toNumber()).lt(20)
         })
 
         it("no funding for short when open interest is balanced in aggregation", async () => {
@@ -284,7 +292,8 @@ describe("Vault.funding_rate", () => {
             await call(vaultExpose.functions.increase_and_update_funding_info(BTC_ASSET, size, true))
             await moveBlockchainTime(launchedNode, 86400)
             const shortRes = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, sizeTest, false, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            expect(shortRes[0].toString()).toBe("0")
+            // it may be that a second elapses between two calls and the result is not exactly 0
+            expect(shortRes[0].toNumber()).lt(20)
         })
     })
 
@@ -337,8 +346,9 @@ describe("Vault.funding_rate", () => {
             await call(vaultExpose.functions.increase_and_update_funding_info(BTC_ASSET, expandDecimals(1, 8), true))
             await call(vaultExpose.functions.decrease_and_update_funding_info(BTC_ASSET, expandDecimals(1, 8), true))
             const funding_rate_response = (await vaultExpose.functions.calculate_funding_rate(BTC_ASSET, expandDecimals(1, 8), true, NEUTRAL_CUMULATIVE_FUNDING_RATE).get()).value
-            const funding_rate = funding_rate_response[0].toString()
-            expect(funding_rate).toBe("0")
+            const funding_rate = funding_rate_response[0].toNumber()
+            // it may be that a second elapses between two calls and the result is not exactly 0
+            expect(funding_rate).lt(20)
         })
     })
 
