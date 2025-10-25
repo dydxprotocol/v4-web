@@ -96,8 +96,6 @@ export default defineConfig(({ mode }) => ({
       '**/apps/indexer/**', // Exclude indexer tests (Unstable)
       '**/ts-sdk/__tests__/modules/client/**', // Exclude API tests (endpoints)
       '**/ts-sdk/__tests__/modules/onboarding.test.ts', // Exclude onboarding tests (non-fuel related, we removed dydx deps)
-      'contracts/**',
-      'indexer/**',
     ],
     environment: 'jsdom',
   },
