@@ -4,56 +4,48 @@ contract;
 mod events;
 mod errors;
 
-/*
-__     __          _ _   
-\ \   / /_ _ _   _| | |_ 
- \ \ / / _` | | | | | __|
-  \ V / (_| | |_| | | |_ 
-   \_/ \__,_|\__,_|_|\__|
-*/
+// Vault contract
 
 use std::{
-    asset::{mint_to, burn},
+    asset::{
+        burn,
+        mint_to,
+        transfer,
+    },
     auth::msg_sender,
     block::timestamp,
     call_frames::{
         msg_asset_id,
     },
     context::*,
-    revert::require,
-    storage::storage_vec::*,
     math::*,
     primitive_conversions::{
-        u8::*,
         u64::*,
+        u8::*,
     },
+    revert::require,
+    storage::storage_vec::*,
     string::String,
 };
 use std::hash::*;
-use helpers::{
-    signed_256::*,
-    transfer::transfer_assets,
-    utils::*,
-    zero::*,
-    reentrancy::*,
-};
+use helpers::{reentrancy::*, signed_256::*, utils::*, zero::*};
 use src3::SRC3;
 use src20::{SetDecimalsEvent, SetNameEvent, SetSymbolEvent, SRC20, TotalSupplyEvent};
 use core_interfaces::{
+    pricefeed_wrapper::PricefeedWrapper,
     vault::{
-        Vault,
+        FundingInfo,
         Position,
         PositionKey,
-        FundingInfo,
+        Vault,
     },
-    pricefeed_wrapper::PricefeedWrapper,
 };
 use pausable::{
     _is_paused as sl_is_paused,
     _pause as sl_pause,
     _unpause as sl_unpause,
+    Pausable,
     require_not_paused as sl_require_not_paused,
-    Pausable
 };
 use events::*;
 use errors::*;
@@ -93,49 +85,41 @@ storage {
         gov: Identity = ZERO_IDENTITY,
         is_initialized: bool = false,
         lock: bool = false,
-        
         // Externals
         router: ContractId = ZERO_CONTRACT,
-
         /// ---------------------  Fees  ---------------------
         /// charged when liquidating a position
         /// denominated in collateral asset
         liquidation_fee: u256 = 0u256,
         /// charged when minting/burning LP assets
         /// helps maintain the stability of the RLP pool and discourage rapid entering and exiting.
-        mint_burn_fee_basis_points: u64 = 30, // 0.3%
+        /// 0.3% by default
+        mint_burn_fee_basis_points: u64 = 30,
         /// applied to size of leveraged positions
-        margin_fee_basis_points: u64 = 10, // 0.1%
-
+        /// 0.1% by default
+        margin_fee_basis_points: u64 = 10,
         // Misc
         approved_routers: StorageMap<Identity, StorageMap<Identity, bool>> = StorageMap {},
         is_liquidator: StorageMap<Identity, bool> = StorageMap {},
         max_leverage: StorageMap<b256, u256> = StorageMap {},
-
         whitelisted_asset_count: u64 = 0,
         all_whitelisted_assets: StorageVec<b256> = StorageVec {},
-
         whitelisted_assets: StorageMap<b256, bool> = StorageMap {},
         asset_decimals: StorageMap<b256, u32> = StorageMap {},
-
         // tracks all open Positions
         positions: StorageMap<b256, Position> = StorageMap {},
         // tracks amount of fees (in collateral asset)
         fee_reserve: u256 = 0,
-
         // tracks the number of received tokens that can be used for leverage
         // tracked separately to exclude funds that are deposited 
         // as margin collateral
         pool_amounts: StorageMap<b256, u256> = StorageMap {},
     },
-
     fund {
         funding_info: StorageMap<b256, FundingInfo> = StorageMap {},
     },
-    
     // SRC20 support - track total supply of the LP asset
     total_supply: u64 = 0,
-    
 }
 
 impl SRC20 for Contract {
@@ -143,7 +127,7 @@ impl SRC20 for Contract {
     fn total_assets() -> u64 {
         1
     }
- 
+
     #[storage(read)]
     fn total_supply(asset: AssetId) -> Option<u64> {
         if asset == AssetId::default() {
@@ -152,7 +136,7 @@ impl SRC20 for Contract {
             None
         }
     }
- 
+
     #[storage(read)]
     fn name(asset: AssetId) -> Option<String> {
         if asset == AssetId::default() {
@@ -161,16 +145,16 @@ impl SRC20 for Contract {
             None
         }
     }
- 
+
     #[storage(read)]
     fn symbol(asset: AssetId) -> Option<String> {
         if asset == AssetId::default() {
-            Some(String::from_ascii_str(from_str_array(LP_ASSET_SYMBOL)))        
+            Some(String::from_ascii_str(from_str_array(LP_ASSET_SYMBOL)))
         } else {
             None
         }
     }
- 
+
     #[storage(read)]
     fn decimals(asset: AssetId) -> Option<u8> {
         if asset == AssetId::default() {
@@ -190,9 +174,11 @@ impl Pausable for Contract {
     #[storage(write)]
     fn pause() {
         _only_gov();
-        
+
         sl_pause();
-        log(SetPaused { is_paused: true });
+        log(SetPaused {
+            is_paused: true,
+        });
     }
 
     #[storage(write)]
@@ -200,7 +186,9 @@ impl Pausable for Contract {
         _only_gov();
 
         sl_unpause();
-        log(SetPaused { is_paused: false });
+        log(SetPaused {
+            is_paused: false,
+        });
     }
 }
 
@@ -211,16 +199,21 @@ impl Vault for Contract {
     }
 
     #[storage(read, write)]
-    fn initialize(
-        gov: Identity,
-    ) {
-        require(!storage::vault.is_initialized.read(), Error::VaultAlreadyInitialized);
+    fn initialize(gov: Identity) {
+        require(
+            !storage::vault
+                .is_initialized
+                .read(),
+            Error::VaultAlreadyInitialized,
+        );
         storage::vault.is_initialized.write(true);
         storage::vault.gov.write(gov);
 
         if storage::vault.liquidation_fee.read() == 0 {
             // cannot initialize in the storage section because of the configurable
-            storage::vault.liquidation_fee.write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
+            storage::vault
+                .liquidation_fee
+                .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
         }
 
         storage.total_supply.write(0);
@@ -251,13 +244,7 @@ impl Vault for Contract {
         log(SetGov { gov });
     }
 
-    /*
-          ____     _       _           _       
-         / / /    / \   __| |_ __ ___ (_)_ __  
-        / / /    / _ \ / _` | '_ ` _ \| | '_ \ 
-       / / /    / ___ \ (_| | | | | | | | | | |
-      /_/_/    /_/   \_\__,_|_| |_| |_|_|_| |_|                         
-    */
+    // ---------------------  Admin  ---------------------
     #[storage(write)]
     fn set_gov(gov: Identity) {
         _only_gov();
@@ -265,16 +252,14 @@ impl Vault for Contract {
         log(SetGov { gov })
     }
 
-    
-
     #[storage(write)]
-    fn set_liquidator(
-        liquidator: Identity, 
-        is_active: bool
-    ) {
+    fn set_liquidator(liquidator: Identity, is_active: bool) {
         _only_gov();
         storage::vault.is_liquidator.insert(liquidator, is_active);
-        log(SetLiquidator { liquidator, is_active });
+        log(SetLiquidator {
+            liquidator,
+            is_active,
+        });
     }
 
     #[storage(write)]
@@ -293,16 +278,23 @@ impl Vault for Contract {
         _only_gov();
 
         require(
-            mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS &&
-            margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
-            Error::VaultInvalidFeeBasisPoints
+            mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS && margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
+            Error::VaultInvalidFeeBasisPoints,
         );
-        require(liquidation_fee <= MAX_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)), Error::VaultInvalidLiquidationFee);
+        require(
+            liquidation_fee <= MAX_LIQUIDATION_FEE * (10u256
+                    .pow(COLLATERAL_ASSET_DECIMALS)),
+            Error::VaultInvalidLiquidationFee,
+        );
 
-        storage::vault.mint_burn_fee_basis_points.write(mint_burn_fee_basis_points);
-        storage::vault.margin_fee_basis_points.write(margin_fee_basis_points);
+        storage::vault
+            .mint_burn_fee_basis_points
+            .write(mint_burn_fee_basis_points);
+        storage::vault
+            .margin_fee_basis_points
+            .write(margin_fee_basis_points);
         storage::vault.liquidation_fee.write(liquidation_fee);
- 
+
         log(SetFees {
             mint_burn_fee_basis_points,
             margin_fee_basis_points,
@@ -317,20 +309,23 @@ impl Vault for Contract {
         _only_gov();
         require(max_leverage <= MAX_LEVERAGE, Error::VaultInvalidMaxLeverage);
         storage::vault.max_leverage.insert(asset, max_leverage);
-        log(SetMaxLeverage { asset, max_leverage });
+        log(SetMaxLeverage {
+            asset,
+            max_leverage,
+        });
     }
 
     // TODO exclude the collateral asset
     #[storage(read, write)]
-    fn set_asset_config(
-        asset: b256,
-        asset_decimals: u32,
-    ) {
+    fn set_asset_config(asset: b256, asset_decimals: u32) {
         _only_gov();
 
         // increment token count for the first time
-        if !storage::vault.whitelisted_assets.get(asset).try_read().unwrap_or(false) {
-            storage::vault.whitelisted_asset_count.write(storage::vault.whitelisted_asset_count.read() + 1);
+        if !storage::vault.whitelisted_assets.get(asset).try_read().unwrap_or(false)
+        {
+            storage::vault
+                .whitelisted_asset_count
+                .write(storage::vault.whitelisted_asset_count.read() + 1);
             storage::vault.all_whitelisted_assets.push(asset);
         }
 
@@ -348,71 +343,53 @@ impl Vault for Contract {
         _only_gov();
 
         require(
-            storage::vault.whitelisted_assets.get(asset).try_read().unwrap_or(false),
-            Error::VaultAssetNotWhitelisted
+            storage::vault
+                .whitelisted_assets
+                .get(asset)
+                .try_read()
+                .unwrap_or(false),
+            Error::VaultAssetNotWhitelisted,
         );
 
         storage::vault.whitelisted_assets.remove(asset);
         storage::vault.asset_decimals.remove(asset);
 
-        storage::vault.whitelisted_asset_count.write(storage::vault.whitelisted_asset_count.read() - 1);
+        storage::vault
+            .whitelisted_asset_count
+            .write(storage::vault.whitelisted_asset_count.read() - 1);
 
         log(ClearAssetConfig { asset });
     }
 
     #[storage(write)]
-    fn set_approved_router(
-        router: Identity,
-        is_active: bool
-    ) {
+    fn set_approved_router(router: Identity, is_active: bool) {
         let account = get_sender();
-        storage::vault.approved_routers.get(account).insert(router, is_active);
-        log(SetApprovedRouter { 
+        storage::vault
+            .approved_routers
+            .get(account)
+            .insert(router, is_active);
+        log(SetApprovedRouter {
             account,
             router,
-            is_active
+            is_active,
         });
     }
 
     #[storage(read, write)]
-    fn withdraw_fees(
-        receiver: Identity
-    ) -> u64 {
+    fn withdraw_fees(receiver: Identity) -> u64 {
         _only_gov();
 
         _withdraw_fees(receiver)
     }
 
-    /*
-          ____ __     ___
-         / / / \ \   / (_) _____      __
-        / / /   \ \ / /| |/ _ \ \ /\ / /
-       / / /     \ V / | |  __/\ V  V /
-      /_/_/       \_/  |_|\___| \_/\_/
-    */
-    fn get_position_key(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> b256 {
-        _get_position_key(
-            account,
-            index_asset,
-            is_long
-        )
+    // ---------------------  View  ---------------------
+    fn get_position_key(account: Identity, index_asset: b256, is_long: bool) -> b256 {
+        _get_position_key(account, index_asset, is_long)
     }
 
     #[storage(read)]
-    fn get_position_pnl(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> (bool, u256) {
-        _get_position_pnl(
-            account,
-            index_asset,
-            is_long
-        )
+    fn get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bool, u256) {
+        _get_position_pnl(account, index_asset, is_long)
     }
 
     #[storage(read)]
@@ -422,12 +399,7 @@ impl Vault for Contract {
         average_price: u256,
         is_long: bool,
     ) -> (bool, u256) {
-        _get_pnl(
-            index_asset,
-            size,
-            average_price,
-            is_long,
-        )
+        _get_pnl(index_asset, size, average_price, is_long)
     }
 
     #[storage(read)]
@@ -442,12 +414,7 @@ impl Vault for Contract {
         is_long: bool,
         size_delta: u256,
     ) -> u256 {
-        _get_position_fee(
-            account,
-            index_asset,
-            is_long,
-            size_delta
-        )
+        _get_position_fee(account, index_asset, is_long, size_delta)
     }
 
     #[storage(read)]
@@ -469,7 +436,7 @@ impl Vault for Contract {
     fn get_fee_reserve() -> u256 {
         storage::vault.fee_reserve.try_read().unwrap_or(0)
     }
-    
+
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64 {
         storage::vault.all_whitelisted_assets.len()
@@ -504,21 +471,10 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_position_leverage(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> u256 {
-        let position_key = _get_position_key(
-            account, 
-            index_asset, 
-            is_long
-        );
+    fn get_position_leverage(account: Identity, index_asset: b256, is_long: bool) -> u256 {
+        let position_key = _get_position_key(account, index_asset, is_long);
         let position = _get_position_by_key(position_key);
-        require(
-            position.collateral > 0,
-            Error::VaultInvalidPosition
-        );
+        require(position.collateral > 0, Error::VaultInvalidPosition);
 
         position.size * BASIS_POINTS_DIVISOR.as_u256() / position.collateral
     }
@@ -528,7 +484,7 @@ impl Vault for Contract {
         asset: b256,
         lp_asset_delta: u256,
         fee_basis_points: u256,
-        increment: bool
+        increment: bool,
     ) -> u256 {
         fee_basis_points
     }
@@ -560,50 +516,32 @@ impl Vault for Contract {
         is_long: bool,
         should_raise: bool,
     ) -> (u256, u256) {
-        _validate_liquidation(
-            account,
-            index_asset,
-            is_long,
-            should_raise
-        )
+        _validate_liquidation(account, index_asset, is_long, should_raise)
     }
 
     #[storage(read)]
-    fn get_add_liquidity_amount(
-        asset_amount: u64
-    ) -> (u64, u64, u64) {
+    fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
         _get_add_liquidity_amount(asset_amount)
     }
 
     #[storage(read)]
-    fn get_remove_liquidity_amount(
-        lp_asset_amount: u64
-    ) -> (u64, u64, u64) {
+    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64) {
         _get_remove_liquidity_amount(lp_asset_amount)
     }
 
     #[storage(read)]
-    fn get_funding_info(
-        asset: b256,
-    ) -> FundingInfo {
+    fn get_funding_info(asset: b256) -> FundingInfo {
         _get_funding_info(asset)
     }
 
-    /*
-          ____  ____        _     _ _
-         / / / |  _ \ _   _| |__ | (_) ___ 
-        / / /  | |_) | | | | '_ \| | |/ __|
-       / / /   |  __/| |_| | |_) | | | (__ 
-      /_/_/    |_|    \__,_|_.__/|_|_|\___|
-    */
-
+    // ---------------------  Public  ---------------------
     #[payable]
     #[storage(read, write)]
     fn add_liquidity(receiver: Identity) -> u64 {
         sl_require_not_paused();
-        
+
         _begin_non_reentrant(storage::vault.lock);
-        
+
         let amount_out = _add_liquidity(receiver);
         _end_non_reentrant(storage::vault.lock);
 
@@ -614,7 +552,7 @@ impl Vault for Contract {
     #[storage(read, write)]
     fn remove_liquidity(receiver: Identity) -> u64 {
         sl_require_not_paused();
-        
+
         _begin_non_reentrant(storage::vault.lock);
 
         let amount_out = _remove_liquidity(receiver);
@@ -633,13 +571,12 @@ impl Vault for Contract {
         is_long: bool,
     ) -> (u256, u256) {
         sl_require_not_paused();
-        
+
         _begin_non_reentrant(storage::vault.lock);
 
         let (new_collateral, price) = _increase_position(account, index_asset, size_delta, is_long);
-        
-        _end_non_reentrant(storage::vault.lock);
 
+        _end_non_reentrant(storage::vault.lock);
         (new_collateral, price)
     }
 
@@ -652,10 +589,10 @@ impl Vault for Contract {
         collateral_delta: u256,
         size_delta: u256,
         is_long: bool,
-        receiver: Identity
+        receiver: Identity,
     ) -> (u256, u256, u256) {
         sl_require_not_paused();
-        
+
         _begin_non_reentrant(storage::vault.lock);
 
         _validate_router(account);
@@ -669,7 +606,6 @@ impl Vault for Contract {
         );
 
         _end_non_reentrant(storage::vault.lock);
-
         (new_collateral, price, paid_out_collateral)
     }
 
@@ -678,63 +614,41 @@ impl Vault for Contract {
         account: Identity,
         index_asset: b256,
         is_long: bool,
-        fee_receiver: Identity
+        fee_receiver: Identity,
     ) {
         sl_require_not_paused();
-        
+
         _begin_non_reentrant(storage::vault.lock);
-        
-        _liquidate_position(
-            account, 
-            index_asset, 
-            is_long, 
-            fee_receiver
-        );
-        
+
+        _liquidate_position(account, index_asset, is_long, fee_receiver);
+
         _end_non_reentrant(storage::vault.lock);
     }
 }
 
-/*
-    ____  ___       _                        _ 
-   / / / |_ _|_ __ | |_ ___ _ __ _ __   __ _| |
-  / / /   | || '_ \| __/ _ \ '__| '_ \ / _` | |
- / / /    | || | | | ||  __/ |  | | | | (_| | |
-/_/_/    |___|_| |_|\__\___|_|  |_| |_|\__,_|_|
-*/
+// ---------------------  Internal  ---------------------
 
 #[storage(read)]
 fn _only_gov() {
-    require(get_sender() == storage::vault.gov.read(), Error::VaultForbiddenNotGov);
+    require(
+        get_sender() == storage::vault
+            .gov
+            .read(),
+        Error::VaultForbiddenNotGov,
+    );
 }
 
- 
-
 fn _transfer_in(asset: AssetId) -> u64 {
-    require(
-        msg_asset_id() == asset,
-        Error::VaultInvalidAssetForwarded
-    );
+    require(msg_asset_id() == asset, Error::VaultInvalidAssetForwarded);
     msg_amount()
 }
 
-fn _transfer_out(
-    asset: AssetId, 
-    amount: u64, 
-    receiver: Identity,
-) {
-    transfer_assets(
-        asset,
-        receiver,
-        amount
-    );
+fn _transfer_out(asset: AssetId, amount: u64, receiver: Identity) {
+    transfer(receiver, asset, amount);
 }
 
 #[storage(write)]
-fn _write_position(
-    position_key: b256, 
-    position: Position
-) {
+fn _write_position(position_key: b256, position: Position) {
     storage::vault.positions.insert(position_key, position);
     log(WritePosition {
         position_key,
@@ -743,36 +657,24 @@ fn _write_position(
 }
 
 #[storage(write)]
-fn _write_fee_reserve(
-    fee_reserve: u256
-) {
+fn _write_fee_reserve(fee_reserve: u256) {
     storage::vault.fee_reserve.write(fee_reserve);
-    log(WriteFeeReserve {
-        fee_reserve,
-    });
+    log(WriteFeeReserve { fee_reserve });
 }
 
 //TODO: add overflow check
-fn _get_after_fee_amount(
-    amount: u64, 
-    fee_basis_points: u64, 
-) -> u64 {
+fn _get_after_fee_amount(amount: u64, fee_basis_points: u64) -> u64 {
     amount * (BASIS_POINTS_DIVISOR - fee_basis_points) / BASIS_POINTS_DIVISOR
 }
 
 #[storage(read, write)]
-fn _collect_swap_fees(
-    amount: u64, 
-    after_fee_amount: u64, 
-) {
+fn _collect_swap_fees(amount: u64, after_fee_amount: u64) {
     let fee_amount = amount - after_fee_amount;
 
     let fee_reserve = _get_fee_reserve();
     _write_fee_reserve(fee_reserve + fee_amount.as_u256());
 
-    log(CollectSwapFees {
-        fee_amount,
-    });
+    log(CollectSwapFees { fee_amount });
 }
 
 /// price in the usd
@@ -804,8 +706,7 @@ fn _is_asset_whitelisted(asset: b256) -> bool {
 
 #[storage(read)]
 fn _get_position_by_key(position_key: b256) -> Position {
-    storage::vault.positions
-        .get(position_key).try_read().unwrap_or(Position::default())
+    storage::vault.positions.get(position_key).try_read().unwrap_or(Position::default())
 }
 
 #[storage(read)]
@@ -818,11 +719,7 @@ fn _get_fee_reserve() -> u256 {
     storage::vault.fee_reserve.try_read().unwrap_or(0)
 }
 
-fn _get_position_key(
-    account: Identity,
-    index_asset: b256,
-    is_long: bool,
-) -> b256 {
+fn _get_position_key(account: Identity, index_asset: b256, is_long: bool) -> b256 {
     keccak256(PositionKey {
         account,
         index_asset,
@@ -837,36 +734,22 @@ fn _validate_liquidation(
     is_long: bool,
     should_raise: bool,
 ) -> (u256, u256) {
-    let position_key = _get_position_key(
-        account, 
-        index_asset, 
-        is_long
-    );
+    let position_key = _get_position_key(account, index_asset, is_long);
 
     let position = _get_position_by_key(position_key);
 
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
-    let position_fee = _get_position_fee(
-        account,
-        index_asset,
-        is_long,
-        position.size,
-    );
-
-    let (has_profit, pnl_delta) = _get_pnl(
-        index_asset,
-        position.size,
-        position.average_price,
-        is_long,
-    );
+    let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
-        position.size,
+        position
+            .size,
         is_long,
-        position.cumulative_funding_rate,
+        position
+            .cumulative_funding_rate,
     );
-
 
     let mut available_collateral = position.collateral;
     // does not include liquidation fee
@@ -877,13 +760,12 @@ fn _validate_liquidation(
     } else {
         losses_and_fees = losses_and_fees + pnl_delta;
     }
-    
+
     if funding_rate_has_profit {
         available_collateral = available_collateral + funding_rate;
     } else {
         losses_and_fees = losses_and_fees + funding_rate;
     }
-
 
     if losses_and_fees > available_collateral {
         if should_raise {
@@ -929,7 +811,6 @@ fn _get_pnl(
 
     // TODO overflow check
     let delta = size * price_delta / average_price;
-
     (has_profit, delta)
 }
 
@@ -940,7 +821,6 @@ fn _get_position_fee(
     _is_long: bool,
     size_delta: u256,
 ) -> u256 {
-
     if size_delta == 0 {
         return 0;
     }
@@ -951,26 +831,12 @@ fn _get_position_fee(
 }
 
 #[storage(read)]
-fn _get_position_pnl(
-    account: Identity,
-    index_asset: b256,
-    is_long: bool,
-) -> (bool, u256) {
-
-    let position_key = _get_position_key(
-        account, 
-        index_asset, 
-        is_long
-    );
+fn _get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bool, u256) {
+    let position_key = _get_position_key(account, index_asset, is_long);
 
     let position = _get_position_by_key(position_key);
 
-    _get_pnl(
-        index_asset,
-        position.size,
-        position.average_price,
-        is_long,
-    )
+    _get_pnl(index_asset, position.size, position.average_price, is_long)
 }
 
 #[storage(read, write)]
@@ -978,13 +844,17 @@ fn _increase_pool_amount(amount: u256) {
     let asset = COLLATERAL_ASSET;
     let new_pool_amount = _get_pool_amounts(asset) + amount;
     storage::vault.pool_amounts.insert(asset, new_pool_amount);
-    log(WritePoolAmount { asset, pool_amount: new_pool_amount });
+    log(WritePoolAmount {
+        asset,
+        pool_amount: new_pool_amount,
+    });
 
     let balance = balance_of(ContractId::this(), COLLATERAL_ASSET_ID);
 
     require(
-        new_pool_amount <= balance.as_u256(), 
-        Error::VaultInvalidIncrease
+        new_pool_amount <= balance
+            .as_u256(),
+        Error::VaultInvalidIncrease,
     );
 }
 
@@ -996,37 +866,40 @@ fn _decrease_pool_amount(amount: u256) {
 
     let new_pool_amount = pool_amount - amount;
     storage::vault.pool_amounts.insert(asset, new_pool_amount);
-    log(WritePoolAmount { asset, pool_amount: new_pool_amount });
+    log(WritePoolAmount {
+        asset,
+        pool_amount: new_pool_amount,
+    });
 }
 
 #[storage(read)]
 fn _validate_router(account: Identity) {
     let sender = get_sender();
 
-    if sender == account || sender == Identity::ContractId(storage::vault.router.read()) {
+    if sender == account
+        || sender == Identity::ContractId(storage::vault.router.read())
+    {
         return;
     }
 
     require(
-        storage::vault.approved_routers.get(account).get(sender)
-            .try_read().unwrap_or(false),
-        Error::VaultInvalidMsgCaller
+        storage::vault
+            .approved_routers
+            .get(account)
+            .get(sender)
+            .try_read()
+            .unwrap_or(false),
+        Error::VaultInvalidMsgCaller,
     );
 }
 
 fn _validate_position(size: u256, collateral: u256) {
     if size == 0 {
-        require(
-            collateral == 0,
-            Error::VaultCollateralShouldBeWithdrawn
-        );
+        require(collateral == 0, Error::VaultCollateralShouldBeWithdrawn);
         return;
     }
 
-    require(
-        size >= collateral,
-        Error::VaultSizeMustBeMoreThanCollateral
-    );
+    require(size >= collateral, Error::VaultSizeMustBeMoreThanCollateral);
 }
 
 // calculates the next average price for a position
@@ -1043,19 +916,21 @@ fn _get_next_average_price(
     next_price: u256,
     size_delta: u256,
 ) -> u256 {
-
-    let (has_profit, delta) = _get_pnl(
-        index_asset,
-        size,
-        average_price,
-        is_long,
-    );
+    let (has_profit, delta) = _get_pnl(index_asset, size, average_price, is_long);
 
     let next_size = size + size_delta;
     let divisor = if is_long {
-        if has_profit { next_size + delta } else { next_size - delta }
+        if has_profit {
+            next_size + delta
+        } else {
+            next_size - delta
+        }
     } else {
-        if has_profit { next_size - delta } else { next_size + delta }
+        if has_profit {
+            next_size - delta
+        } else {
+            next_size + delta
+        }
     };
 
     next_price * next_size / divisor
@@ -1068,23 +943,16 @@ fn _collect_position_fee(
     is_long: bool,
     size_delta: u256,
 ) -> u256 {
-    let position_fee = _get_position_fee(
-        account,
-        index_asset,
-        is_long,
-        size_delta
-    );
+    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
-    let new_fee_reserve =  _get_fee_reserve() + position_fee;
+    let new_fee_reserve = _get_fee_reserve() + position_fee;
     _write_fee_reserve(new_fee_reserve);
 
     position_fee
 }
 
 #[storage(read, write)]
-fn _withdraw_fees(
-    receiver: Identity,
-) -> u64 {
+fn _withdraw_fees(receiver: Identity) -> u64 {
     let amount = u64::try_from(_get_fee_reserve()).unwrap();
     if amount == 0 {
         return 0;
@@ -1094,57 +962,40 @@ fn _withdraw_fees(
 
     _transfer_out(
         COLLATERAL_ASSET_ID,
-        u64::try_from(amount).unwrap(),
+        u64::try_from(amount)
+            .unwrap(),
         receiver,
     );
 
     log(WithdrawFees {
         receiver,
-        amount
+        amount,
     });
 
     amount
 }
 
 #[storage(read)]
-fn _get_add_liquidity_amount(
-    asset_amount: u64
-) -> (u64, u64, u64) {
+fn _get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
     let fee_basis_points = storage::vault.mint_burn_fee_basis_points.try_read().unwrap_or(0);
 
-    let amount_after_fees = _get_after_fee_amount(
-        asset_amount, 
-        fee_basis_points,
-    );
+    let amount_after_fees = _get_after_fee_amount(asset_amount, fee_basis_points);
 
     //TODO: it is 1:1 lp assets to collateral assets now
     let mint_amount = amount_after_fees;
-
     (mint_amount, amount_after_fees, fee_basis_points)
 }
 
 #[storage(read, write)]
-fn _add_liquidity(
-    receiver: Identity,
-) -> u64 {
-    require(
-        !receiver.is_zero(),
-        Error::VaultReceiverCannotBeZero
-    );
+fn _add_liquidity(receiver: Identity) -> u64 {
+    require(!receiver.is_zero(), Error::VaultReceiverCannotBeZero);
 
     let asset_amount = _transfer_in(COLLATERAL_ASSET_ID);
     require(asset_amount > 0, Error::VaultInvalidAssetAmount);
 
-    let (
-        mint_amount, 
-        amount_after_fees, 
-        fee_basis_points
-    ) = _get_add_liquidity_amount(asset_amount);
+    let (mint_amount, amount_after_fees, fee_basis_points) = _get_add_liquidity_amount(asset_amount);
     // this needs to be called here because _get_add_liquidity_amount is read-only and cannot update state
-    _collect_swap_fees(
-        asset_amount,
-        amount_after_fees
-    );
+    _collect_swap_fees(asset_amount, amount_after_fees);
 
     _increase_pool_amount(amount_after_fees.as_u256());
 
@@ -1152,15 +1003,15 @@ fn _add_liquidity(
     // require amount to be less than u64::max
     require(
         mint_amount < u64::max(),
-        Error::VaultInvalidMintAmountGtU64Max
+        Error::VaultInvalidMintAmountGtU64Max,
     );
     require(mint_amount > 0, "mint_amount is 0");
 
     let new_supply = mint_amount + storage.total_supply.read();
     storage.total_supply.write(new_supply);
- 
+
     mint_to(receiver, DEFAULT_SUB_ID, mint_amount);
- 
+
     log(TotalSupplyEvent {
         asset: AssetId::default(),
         supply: new_supply,
@@ -1178,54 +1029,36 @@ fn _add_liquidity(
 }
 
 #[storage(read)]
-fn _get_remove_liquidity_amount(
-    lp_asset_amount: u64
-) -> (u64, u64, u64) {
+fn _get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64) {
     //TODO: it is 1:1 lp assets to collateral assets now
     let redemption_amount = lp_asset_amount;
 
     require(redemption_amount > 0, Error::VaultInvalidRedemptionAmount);
 
     let fee_basis_points = storage::vault.mint_burn_fee_basis_points.try_read().unwrap_or(0);
-    
-    let amount_out = _get_after_fee_amount(
-        redemption_amount, 
-        fee_basis_points,
-    );
-    require(amount_out > 0, Error::VaultInvalidAmountOut);
 
+    let amount_out = _get_after_fee_amount(redemption_amount, fee_basis_points);
+    require(amount_out > 0, Error::VaultInvalidAmountOut);
     (redemption_amount, amount_out, fee_basis_points)
 }
 
 #[storage(read, write)]
-fn _remove_liquidity(
-    receiver: Identity,
-) -> u64 {
-    require(
-        !receiver.is_zero(),
-        Error::VaultReceiverCannotBeZero
-    );
+fn _remove_liquidity(receiver: Identity) -> u64 {
+    require(!receiver.is_zero(), Error::VaultReceiverCannotBeZero);
 
     let lp_asset_amount = _transfer_in(AssetId::default());
     require(lp_asset_amount > 0, Error::VaultInvalidRusdAmount);
-    
+
     // TODO does it make sense?
     // require amount to be less than u64::max
     require(
         lp_asset_amount < u64::max(),
-        Error::VaultInvalidRUSDBurnAmountGtU64Max
+        Error::VaultInvalidRUSDBurnAmountGtU64Max,
     );
 
-    let (
-        redemption_amount,
-        amount_out,
-        fee_basis_points
-    ) = _get_remove_liquidity_amount(lp_asset_amount);
+    let (redemption_amount, amount_out, fee_basis_points) = _get_remove_liquidity_amount(lp_asset_amount);
     // this needs to be called here because _get_remove_liquidity_amount is read-only and cannot update state
-    _collect_swap_fees(
-        redemption_amount,
-        amount_out
-    );
+    _collect_swap_fees(redemption_amount, amount_out);
     require(amount_out > 0, Error::VaultInvalidAmountOut);
 
     _decrease_pool_amount(redemption_amount.as_u256());
@@ -1247,15 +1080,10 @@ fn _remove_liquidity(
         fee_basis_points,
     });
 
-    _transfer_out(
-        COLLATERAL_ASSET_ID, 
-        amount_out, 
-        receiver,
-    );
+    _transfer_out(COLLATERAL_ASSET_ID, amount_out, receiver);
 
     amount_out
 }
-
 
 #[storage(read, write)]
 fn _increase_position(
@@ -1264,33 +1092,27 @@ fn _increase_position(
     size_delta: u256,
     is_long: bool,
 ) -> (u256, u256) {
-    require(
-        !account.is_zero(),
-        Error::VaultAccountCannotBeZero
-    );
+    require(!account.is_zero(), Error::VaultAccountCannotBeZero);
 
     _validate_router(account);
 
     require(
         index_asset != COLLATERAL_ASSET,
-        Error::VaultShortIndexAssetMustNotBeStableAsset
+        Error::VaultShortIndexAssetMustNotBeStableAsset,
     );
     require(
         _is_asset_whitelisted(index_asset),
-        Error::VaultAssetNotWhitelisted
+        Error::VaultAssetNotWhitelisted,
     );
 
-    let position_key = _get_position_key(
-        account, 
-        index_asset, 
-        is_long
-    );
+    let position_key = _get_position_key(account, index_asset, is_long);
 
     let mut position = _get_position_by_key(position_key);
 
     require(
-        position.size > 0 || size_delta > 0,
-        Error::VaultInvalidPositionSize
+        position
+            .size > 0 || size_delta > 0,
+        Error::VaultInvalidPositionSize,
     );
 
     if position.size == 0 {
@@ -1298,13 +1120,16 @@ fn _increase_position(
         log(RegisterPositionByKey {
             position_key,
             account,
-            index_asset, 
-            is_long
+            index_asset,
+            is_long,
         });
     }
 
-
-    let price = if is_long { _get_max_price(index_asset) } else { _get_min_price(index_asset) };
+    let price = if is_long {
+        _get_max_price(index_asset)
+    } else {
+        _get_min_price(index_asset)
+    };
 
     position.average_price = if position.size == 0 {
         price
@@ -1313,49 +1138,48 @@ fn _increase_position(
     } else {
         _get_next_average_price(
             index_asset,
-            position.size,
-            position.average_price,
+            position
+                .size,
+            position
+                .average_price,
             is_long,
             price,
             size_delta,
         )
     };
 
-
-    let position_fee = _collect_position_fee(
-        account,
-        index_asset,
-        is_long,
-        size_delta,
-    );
+    let position_fee = _collect_position_fee(account, index_asset, is_long, size_delta);
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
-        position.size,
+        position
+            .size,
         is_long,
-        position.cumulative_funding_rate,
+        position
+            .cumulative_funding_rate,
     );
 
     // TODO make collateral u64?
     let collateral_delta = _transfer_in(COLLATERAL_ASSET_ID).as_u256();
 
-
     position.collateral = position.collateral + collateral_delta;
-    
+
     if funding_rate_has_profit {
         // TODO in some crazy situations funding rate can be greater than the total supply of collateral asset
         position.collateral = position.collateral + funding_rate;
     } else {
         require(
-            position.collateral >= funding_rate,
-            Error::VaultInsufficientCollateralForFees
+            position
+                .collateral >= funding_rate,
+            Error::VaultInsufficientCollateralForFees,
         );
         position.collateral = position.collateral - funding_rate;
     }
 
     require(
-        position.collateral >= position_fee,
-        Error::VaultInsufficientCollateralForFees
+        position
+            .collateral >= position_fee,
+        Error::VaultInsufficientCollateralForFees,
     );
     position.collateral = position.collateral - position_fee;
 
@@ -1365,10 +1189,11 @@ fn _increase_position(
 
     // TODO collateral may be high because of funding rate, maybe excess should be returned to the user?
     require(
-        position.size >= position.collateral,
-        Error::VaultSizeMustBeMoreThanCollateral
+        position
+            .size >= position
+            .collateral,
+        Error::VaultSizeMustBeMoreThanCollateral,
     );
-
 
     // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
     // validates the average_price. If not for this position write, it would receive a stale avg price (could be 0)
@@ -1378,13 +1203,7 @@ fn _increase_position(
 
     _write_position(position_key, position);
 
-    let (_liquidation_state, _left_collateral) = _validate_liquidation(
-        account,
-        index_asset,
-        is_long,
-        true 
-    );
-
+    let (_liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, true);
 
     log(IncreasePosition {
         key: position_key,
@@ -1400,7 +1219,6 @@ fn _increase_position(
         funding_rate_has_profit,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
-
     (position.collateral, price)
 }
 
@@ -1413,46 +1231,32 @@ fn _decrease_position(
     is_long: bool,
     receiver: Identity,
 ) -> (u256, u256, u256) {
-    require(
-        !account.is_zero(),
-        Error::VaultAccountCannotBeZero
-    );
-    
+    require(!account.is_zero(), Error::VaultAccountCannotBeZero);
 
-    let position_key = _get_position_key(
-        account, 
-        index_asset, 
-        is_long
-    );
+    let position_key = _get_position_key(account, index_asset, is_long);
 
     let mut position = _get_position_by_key(position_key);
 
     require(position.size > 0, Error::VaultEmptyPosition);
     require(position.size >= size_delta, Error::VaultSizeExceeded);
-    require(position.collateral >= collateral_delta, Error::VaultCollateralExceeded);
-
-
-    let position_fee = _collect_position_fee(
-        account,
-        index_asset,
-        is_long,
-        size_delta,
+    require(
+        position
+            .collateral >= collateral_delta,
+        Error::VaultCollateralExceeded,
     );
 
-    let (has_profit, pnl_delta) = _get_pnl(
-        index_asset,
-        size_delta,
-        position.average_price,
-        is_long,
-    );
+    let position_fee = _collect_position_fee(account, index_asset, is_long, size_delta);
+
+    let (has_profit, pnl_delta) = _get_pnl(index_asset, size_delta, position.average_price, is_long);
 
     let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
-        position.size,
+        position
+            .size,
         is_long,
-        position.cumulative_funding_rate,
+        position
+            .cumulative_funding_rate,
     );
-
 
     if pnl_delta > 0 {
         if has_profit {
@@ -1466,7 +1270,6 @@ fn _decrease_position(
         has_profit,
         delta: pnl_delta,
     });
-
 
     let mut adjusted_collateral = position.collateral;
 
@@ -1482,14 +1285,14 @@ fn _decrease_position(
 
     require(
         adjusted_collateral >= position_fee,
-        Error::VaultInsufficientCollateralForFees
+        Error::VaultInsufficientCollateralForFees,
     );
     adjusted_collateral = adjusted_collateral - position_fee;
 
     if !has_profit {
         require(
             adjusted_collateral >= pnl_delta,
-            Error::VaultInsufficientCollateralForFees // TODO good error message?
+            Error::VaultInsufficientCollateralForFees, // TODO good error message?
         );
         adjusted_collateral = adjusted_collateral - pnl_delta;
     }
@@ -1497,7 +1300,7 @@ fn _decrease_position(
     if !funding_rate_has_profit {
         require(
             adjusted_collateral >= funding_rate,
-            Error::VaultInsufficientCollateralForFees // TODO good error message?
+            Error::VaultInsufficientCollateralForFees, // TODO good error message?
         );
         adjusted_collateral = adjusted_collateral - funding_rate;
     }
@@ -1506,7 +1309,8 @@ fn _decrease_position(
     if position.size == size_delta {
         collateral_out_after_fee = adjusted_collateral;
         position.collateral = 0;
-    } else if adjusted_collateral > position.collateral - collateral_delta {
+    } else if adjusted_collateral > position.collateral - collateral_delta
+    {
         collateral_out_after_fee = adjusted_collateral - (position.collateral - collateral_delta);
         position.collateral = position.collateral - collateral_delta;
     } else {
@@ -1514,9 +1318,7 @@ fn _decrease_position(
         position.collateral = adjusted_collateral;
     }
 
-
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, size_delta, is_long);
-
 
     let price = if is_long {
         _get_min_price(index_asset)
@@ -1536,15 +1338,9 @@ fn _decrease_position(
         // update storage because the above changes are ignored by call to other fn `validate_liquidation`
         // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
         // validates the max_leverage. If not for this position write, it would receive an incorrect max_leverage error
-        
         _write_position(position_key, position);
-        
-        let (_liquidation_state, _left_collateral) = _validate_liquidation(
-            account,
-            index_asset,
-            is_long,
-            true
-        );
+
+        let (_liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, true);
 
         log(DecreasePosition {
             key: position_key,
@@ -1591,15 +1387,14 @@ fn _decrease_position(
     if collateral_out_after_fee > 0 {
         // @TODO: potential revert here
         _transfer_out(
-            COLLATERAL_ASSET_ID, 
-            u64::try_from(collateral_out_after_fee).unwrap(), 
+            COLLATERAL_ASSET_ID,
+            u64::try_from(collateral_out_after_fee)
+                .unwrap(),
             receiver,
         );
     }
-
     (position.collateral, price, collateral_out_after_fee)
 }
-
 
 #[storage(read, write)]
 fn _liquidate_position(
@@ -1608,77 +1403,48 @@ fn _liquidate_position(
     is_long: bool,
     fee_receiver: Identity,
 ) {
-    require(
-        !account.is_zero(),
-        Error::VaultAccountCannotBeZero
-    );
+    require(!account.is_zero(), Error::VaultAccountCannotBeZero);
 
     require(
-        storage::vault.is_liquidator.get(get_sender()).try_read().unwrap_or(false),
-        Error::VaultInvalidLiquidator
+        storage::vault
+            .is_liquidator
+            .get(get_sender())
+            .try_read()
+            .unwrap_or(false),
+        Error::VaultInvalidLiquidator,
     );
 
-    let position_key = _get_position_key(
-        account, 
-        index_asset, 
-        is_long
-    );
+    let position_key = _get_position_key(account, index_asset, is_long);
 
     let position = _get_position_by_key(position_key);
 
     require(position.size > 0, Error::VaultEmptyPosition);
 
-
-    let (liquidation_state, _left_collateral) = _validate_liquidation(
-        account,
-        index_asset,
-        is_long,
-        false 
-    );
-    require(
-        liquidation_state != 0,
-        Error::VaultCannotBeLiquidated
-    );
+    let (liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, false);
+    require(liquidation_state != 0, Error::VaultCannotBeLiquidated);
 
     if liquidation_state == 2 {
         // max leverage exceeded but there is collateral remaining after deducting losses 
         // so decreasePosition instead
-        _decrease_position(
-            account,
-            index_asset,
-            0,
-            position.size,
-            is_long,
-            account,
-        );
+        _decrease_position(account, index_asset, 0, position.size, is_long, account);
         // TODO liquidation event should be logged
         return;
     }
 
+    let mut position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
-    let mut position_fee = _get_position_fee(
-        account,
-        index_asset,
-        is_long,
-        position.size,
-    );
-
-    let (mut has_profit, mut pnl_delta) = _get_pnl(
-        index_asset,
-        position.size,
-        position.average_price,
-        is_long,
-    );
+    let (mut has_profit, mut pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
 
     let (mut funding_rate, mut funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
-        position.size,
+        position
+            .size,
         is_long,
-        position.cumulative_funding_rate,
+        position
+            .cumulative_funding_rate,
     );
 
     let mut liquidation_fee = storage::vault.liquidation_fee.try_read().unwrap_or(0);
-
 
     // recalculate losses and fees
     // in the order of priority
@@ -1724,9 +1490,7 @@ fn _liquidate_position(
         available_collateral = available_collateral - position_fee;
     }
 
-
     // TODO should we handle somehow the funding rate?
-
     log(UpdatePnl {
         key: position_key,
         has_profit,
@@ -1734,20 +1498,17 @@ fn _liquidate_position(
     });
 
     if position_fee > 0 {
-        let new_fee_reserve =  _get_fee_reserve() + position_fee;
+        let new_fee_reserve = _get_fee_reserve() + position_fee;
         _write_fee_reserve(new_fee_reserve);
     }
 
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, position.size, is_long);
 
-
     let mark_price = if is_long {
         _get_min_price(index_asset)
     } else {
         _get_max_price(index_asset)
-    }; 
-
-
+    };
     log(LiquidatePosition {
         key: position_key,
         account,
@@ -1764,13 +1525,13 @@ fn _liquidate_position(
 
     storage::vault.positions.remove(position_key);
 
-
     // pay the fee receiver using the pool
     if liquidation_fee > 0 {
         _transfer_out(
-            COLLATERAL_ASSET_ID, 
+            COLLATERAL_ASSET_ID,
             // @TODO: potential revert here
-            u64::try_from(liquidation_fee).unwrap(),
+            u64::try_from(liquidation_fee)
+                .unwrap(),
             fee_receiver,
         );
     }
@@ -1795,30 +1556,42 @@ fn _get_funding_info(asset: b256) -> FundingInfo {
 }
 
 #[storage(read)]
-fn _calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, position_cumulative_funding_rate: u256) -> (u256, bool) {
+fn _calculate_funding_rate(
+    asset: b256,
+    position_size: u256,
+    is_long: bool,
+    position_cumulative_funding_rate: u256,
+) -> (u256, bool) {
     let funding_info = storage::fund.funding_info.get(asset).try_read();
     let funding_info = match funding_info {
         Some(funding_info) => funding_info,
         None => return (0, true),
     };
     let now = timestamp();
-    let (current_long_cumulative_funding_rate, current_short_cumulative_funding_rate) = 
-        _calculate_cumulative_funding_rate(funding_info, now);
+    let (current_long_cumulative_funding_rate, current_short_cumulative_funding_rate) = _calculate_cumulative_funding_rate(funding_info, now);
 
     let (has_profit, funding_rate_with_precision) = if (is_long) {
-        if (current_long_cumulative_funding_rate > position_cumulative_funding_rate) {
+        if (current_long_cumulative_funding_rate > position_cumulative_funding_rate)
+        {
             (false, current_long_cumulative_funding_rate - position_cumulative_funding_rate)
         } else {
             (true, position_cumulative_funding_rate - current_long_cumulative_funding_rate)
         }
     } else {
-        if (current_short_cumulative_funding_rate > position_cumulative_funding_rate) {
-            (false, current_short_cumulative_funding_rate - position_cumulative_funding_rate)
+        if (current_short_cumulative_funding_rate > position_cumulative_funding_rate)
+        {
+            (
+                false,
+                current_short_cumulative_funding_rate - position_cumulative_funding_rate,
+            )
         } else {
             (true, position_cumulative_funding_rate - current_short_cumulative_funding_rate)
         }
     };
-    (funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION, has_profit)
+    (
+        funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION,
+        has_profit,
+    )
 }
 
 #[storage(read, write)]
@@ -1908,7 +1681,8 @@ fn _update_funding_info(asset: b256) {
 fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256) {
     let time_delta = now - funding_info.last_funding_time;
     // from_long means that longs are in excess and pay shorts
-    let (from_long, size_delta) = if funding_info.total_long_sizes > funding_info.total_short_sizes {
+    let (from_long, size_delta) = if funding_info.total_long_sizes > funding_info.total_short_sizes
+    {
         (true, funding_info.total_long_sizes - funding_info.total_short_sizes)
     } else {
         (false, funding_info.total_short_sizes - funding_info.total_long_sizes)
@@ -1927,12 +1701,12 @@ fn _calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u
     if from_long {
         (
             funding_info.long_cumulative_funding_rate + long_cumulative_funding_rate_delta,
-            funding_info.short_cumulative_funding_rate - short_cumulative_funding_rate_delta
+            funding_info.short_cumulative_funding_rate - short_cumulative_funding_rate_delta,
         )
     } else {
         (
             funding_info.long_cumulative_funding_rate - long_cumulative_funding_rate_delta,
-            funding_info.short_cumulative_funding_rate + short_cumulative_funding_rate_delta
+            funding_info.short_cumulative_funding_rate + short_cumulative_funding_rate_delta,
         )
     }
 }

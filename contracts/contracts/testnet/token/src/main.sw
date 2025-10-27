@@ -36,7 +36,7 @@ impl SRC20 for Contract {
     fn total_assets() -> u64 {
         1
     }
- 
+
     #[storage(read)]
     fn total_supply(asset: AssetId) -> Option<u64> {
         if asset == AssetId::default() {
@@ -45,7 +45,7 @@ impl SRC20 for Contract {
             None
         }
     }
- 
+
     #[storage(read)]
     fn name(asset: AssetId) -> Option<String> {
         if asset == AssetId::default() {
@@ -54,7 +54,7 @@ impl SRC20 for Contract {
             None
         }
     }
- 
+
     #[storage(read)]
     fn symbol(asset: AssetId) -> Option<String> {
         if asset == AssetId::default() {
@@ -63,7 +63,7 @@ impl SRC20 for Contract {
             None
         }
     }
- 
+
     #[storage(read)]
     fn decimals(asset: AssetId) -> Option<u8> {
         if asset == AssetId::default() {
@@ -77,31 +77,45 @@ impl SRC20 for Contract {
 impl TestnetToken for Contract {
     #[storage(read, write)]
     fn faucet() {
-        require(
-            storage.initialized.read(),
-            "NotInitialized",
-        );
+        require(storage.initialized.read(), "NotInitialized");
         let mut _total_supply = storage.total_supply.read();
         _total_supply += FAUCET_AMOUNT;
         storage.total_supply.write(_total_supply);
         let to = msg_sender().unwrap();
-        log(TotalSupplyEvent{asset: AssetId::default(), supply: _total_supply, sender: to});
+        log(TotalSupplyEvent {
+            asset: AssetId::default(),
+            supply: _total_supply,
+            sender: to,
+        });
         mint_to(to, DEFAULT_SUB_ID, FAUCET_AMOUNT);
     }
 
     #[storage(read, write)]
     fn initialize() {
-        require(
-            !storage.initialized.read(),
-            "AlreadyInitialized",
-        );
+        require(!storage.initialized.read(), "AlreadyInitialized");
         storage.initialized.write(true);
         let sender = msg_sender().unwrap();
         let asset_id = AssetId::default();
-        log(SetNameEvent{asset: asset_id, name: Some(String::from_ascii_str(from_str_array(NAME))), sender: sender});
-        log(SetSymbolEvent{asset: asset_id, symbol: Some(String::from_ascii_str(from_str_array(SYMBOL))), sender: sender});
-        log(SetDecimalsEvent{asset: asset_id, decimals: DECIMALS, sender: sender});
-        log(TotalSupplyEvent{asset: asset_id, supply: 0, sender: sender});
+        log(SetNameEvent {
+            asset: asset_id,
+            name: Some(String::from_ascii_str(from_str_array(NAME))),
+            sender: sender,
+        });
+        log(SetSymbolEvent {
+            asset: asset_id,
+            symbol: Some(String::from_ascii_str(from_str_array(SYMBOL))),
+            sender: sender,
+        });
+        log(SetDecimalsEvent {
+            asset: asset_id,
+            decimals: DECIMALS,
+            sender: sender,
+        });
+        log(TotalSupplyEvent {
+            asset: asset_id,
+            supply: 0,
+            sender: sender,
+        });
     }
 
     fn get_asset_id() -> AssetId {

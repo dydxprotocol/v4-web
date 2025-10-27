@@ -3,10 +3,7 @@ library;
 
 use std::hash::*;
 
-use helpers::{
-    signed_256::*,
-};
-
+use helpers::signed_256::*;
 pub struct Position {
     pub size: u256,
     pub collateral: u256,
@@ -14,15 +11,13 @@ pub struct Position {
     pub cumulative_funding_rate: u256,
     pub reserve_amount: u256,
     pub realized_pnl: Signed256,
-    pub last_increased_time: u64
+    pub last_increased_time: u64,
 }
-
 pub struct PositionKey {
     pub account: Identity,
     pub index_asset: b256,
     pub is_long: bool,
 }
-
 pub struct FundingInfo {
     pub total_short_sizes: u256,
     pub total_long_sizes: u256,
@@ -30,16 +25,11 @@ pub struct FundingInfo {
     pub short_cumulative_funding_rate: u256,
     pub last_funding_time: u64,
 }
-
 abi Vault {
     /// Get the revision of the contract
     fn get_revision() -> u8;
-    
     #[storage(read, write)]
-    fn initialize(
-        gov: Identity,
-    );
-
+    fn initialize(gov: Identity);
     /*
           ____     _       _           _       
          / / /    / \   __| |_ __ ___ (_)_ __  
@@ -49,49 +39,26 @@ abi Vault {
     */
     #[storage(write)]
     fn set_gov(gov: Identity);
-
     #[storage(write)]
-    fn set_liquidator(
-        liquidator: Identity, 
-        is_active: bool
-    );
-
-     #[storage(write)]
-    fn set_max_leverage(
-        asset: b256,
-        max_leverage: u256
-    );
-
+    fn set_liquidator(liquidator: Identity, is_active: bool);
+    #[storage(write)]
+    fn set_max_leverage(asset: b256, max_leverage: u256);
     #[storage(read, write)]
     fn set_fees(
         mint_burn_fee_basis_points: u64,
         margin_fee_basis_points: u64,
         liquidation_fee_usd: u256,
     );
-
     #[storage(read, write)]
-    fn withdraw_fees(
-        receiver: Identity,
-    ) -> u64;
-
+    fn withdraw_fees(receiver: Identity) -> u64;
     #[storage(read, write)]
-    fn set_asset_config(
-        asset: b256,
-        asset_decimals: u32,
-    );
-
+    fn set_asset_config(asset: b256, asset_decimals: u32);
     #[storage(read, write)]
     fn clear_asset_config(asset: b256);
-
     #[storage(write)]
-    fn set_approved_router(
-        router: Identity, 
-        is_active: bool
-    );
-
+    fn set_approved_router(router: Identity, is_active: bool);
     #[storage(write)]
     fn set_router(router: ContractId);
-
     /*
           ____ __     ___
          / / / \ \   / (_) _____      __
@@ -99,19 +66,9 @@ abi Vault {
        / / /     \ V / | |  __/\ V  V /
       /_/_/       \_/  |_|\___| \_/\_/
     */
-    fn get_position_key(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> b256;
-
+    fn get_position_key(account: Identity, index_asset: b256, is_long: bool) -> b256;
     #[storage(read)]
-    fn get_position_pnl(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> (bool, u256);
-
+    fn get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bool, u256);
     #[storage(read)]
     fn get_pnl(
         index_asset: b256,
@@ -119,10 +76,8 @@ abi Vault {
         average_price: u256,
         is_long: bool,
     ) -> (bool, u256);
-
     #[storage(read)]
     fn get_position_by_key(position_key: b256) -> Position;
-
     #[storage(read)]
     fn get_position_fee(
         account: Identity,
@@ -130,63 +85,42 @@ abi Vault {
         is_long: bool,
         size_delta: u256,
     ) -> u256;
-
     #[storage(read)]
     fn get_max_price(asset: b256) -> u256;
-
     #[storage(read)]
     fn get_min_price(asset: b256) -> u256;
-
     #[storage(read)]
     fn get_pool_amounts(asset: b256) -> u256;
-
     #[storage(read)]
     fn get_fee_reserve() -> u256;
-
     #[storage(read)]
     fn get_all_whitelisted_assets_length() -> u64;
-
     #[storage(read)]
     fn get_whitelisted_asset_by_index(index: u64) -> b256;
-
     #[storage(read)]
     fn is_asset_whitelisted(asset: b256) -> bool;
-
     #[storage(read)]
     fn get_asset_decimals(asset: b256) -> u32;
-
     #[storage(read)]
     fn get_collateral_asset() -> AssetId;
-
     fn get_lp_asset() -> AssetId;
-
     #[storage(read)]
-    fn get_position_leverage(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> u256;
-
+    fn get_position_leverage(account: Identity, index_asset: b256, is_long: bool) -> u256;
     #[storage(read)]
     fn get_fee_basis_points(
         asset: b256,
         lp_asset_delta: u256,
         fee_basis_points: u256,
-        increment: bool
+        increment: bool,
     ) -> u256;
-
     #[storage(read)]
     fn get_liquidation_fee() -> u256;
-
     #[storage(read)]
     fn get_mint_burn_fee_basis_points() -> u64;
-
     #[storage(read)]
     fn get_margin_fee_basis_points() -> u64;
-
     #[storage(read)]
     fn is_liquidator(account: Identity) -> bool;
-
     #[storage(read)]
     fn validate_liquidation(
         account: Identity,
@@ -194,22 +128,12 @@ abi Vault {
         is_long: bool,
         should_raise: bool,
     ) -> (u256, u256);
-
     #[storage(read)]
-    fn get_add_liquidity_amount(
-        asset_amount: u64
-    ) -> (u64, u64, u64);
-
+    fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64);
     #[storage(read)]
-    fn get_remove_liquidity_amount(
-        lp_asset_amount: u64
-    ) -> (u64, u64, u64);
-
+    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64);
     #[storage(read)]
-    fn get_funding_info(
-        asset: b256,
-    ) -> FundingInfo;
-
+    fn get_funding_info(asset: b256) -> FundingInfo;
     /*
           ____  ____        _     _ _
          / / / |  _ \ _   _| |__ | (_) ___ 
@@ -217,24 +141,20 @@ abi Vault {
        / / /   |  __/| |_| | |_) | | | (__ 
       /_/_/    |_|    \__,_|_.__/|_|_|\___|
     */
-
     #[payable]
     #[storage(read, write)]
     fn add_liquidity(receiver: Identity) -> u64;
-
     #[payable]
     #[storage(read, write)]
     fn remove_liquidity(receiver: Identity) -> u64;
-
     #[payable]
     #[storage(read, write)]
     fn increase_position(
         account: Identity,
         index_asset: b256,
         size_delta: u256,
-        is_long: bool 
+        is_long: bool,
     ) -> (u256, u256);
-
     #[storage(read, write)]
     fn decrease_position(
         account: Identity,
@@ -242,18 +162,16 @@ abi Vault {
         collateral_delta: u256,
         size_delta: u256,
         is_long: bool,
-        receiver: Identity
+        receiver: Identity,
     ) -> (u256, u256, u256);
-
     #[storage(read, write)]
     fn liquidate_position(
         account: Identity,
         index_asset: b256,
         is_long: bool,
-        fee_receiver: Identity
+        fee_receiver: Identity,
     );
 }
-
 impl Hash for PositionKey {
     fn hash(self, ref mut state: Hasher) {
         self.account.hash(state);
@@ -261,7 +179,6 @@ impl Hash for PositionKey {
         self.is_long.hash(state);
     }
 }
-
 impl Position {
     pub fn default() -> Self {
         Position {

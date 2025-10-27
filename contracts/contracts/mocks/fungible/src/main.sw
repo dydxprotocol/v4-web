@@ -5,13 +5,18 @@ mod errors;
 
 use std::{
     asset::*,
+    call_frames::{
+        msg_asset_id,
+    },
     context::*,
-    call_frames::{msg_asset_id},
-    context::{this_balance, balance_of},
+    context::{
+        balance_of,
+        this_balance,
+    },
     hash::{
         Hash,
         sha256,
-    }, 
+    },
     revert::require,
     storage::storage_string::*,
     string::String,
@@ -29,22 +34,20 @@ storage {
     symbol: StorageString = StorageString {},
     decimals: u8 = 9,
     /// The total number of coins minted.
-    total_supply: u64 = 0
+    total_supply: u64 = 0,
 }
 
 impl FungibleAsset for Contract {
     #[storage(read, write)]
-    fn initialize(
-        name: String,
-        symbol: String,
-        decimals: u8
-    ) {
+    fn initialize(name: String, symbol: String, decimals: u8) {
         require(
-            !storage.initialized.read(),
-            Error::FungibleAlreadyInitialized
+            !storage
+                .initialized
+                .read(),
+            Error::FungibleAlreadyInitialized,
         );
         storage.initialized.write(true);
-        
+
         storage.name.write_slice(name);
         storage.symbol.write_slice(symbol);
         storage.decimals.write(decimals);
@@ -109,7 +112,9 @@ impl FungibleAsset for Contract {
         );
 
         // If we pass the check above, we can assume it is safe to unwrap.
-        storage.total_supply.write(storage.total_supply.read() - amount);
+        storage
+            .total_supply
+            .write(storage.total_supply.read() - amount);
 
         burn(SUB_ID, amount);
     }

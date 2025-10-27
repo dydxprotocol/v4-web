@@ -6,22 +6,17 @@ use stork_sway_sdk::events::StorkEvent;
 use std::string::String;
 use std::vm::evm::evm_address::EvmAddress;
 use std::block::timestamp;
-use std::{
-    u128::U128,
-};
+use std::u128::U128;
 use signed_int::i128::I128;
-
 storage {
     prices: StorageMap<b256, TemporalNumericValue> = StorageMap {},
 }
-
 abi StorkMock {
     #[storage(write)]
     fn update_price(id: b256, price_value: u256);
     #[storage(write)]
     fn update_negative_price(id: b256, price_value: u256);
 }
-
 impl StorkMock for Contract {
     #[storage(write)]
     fn update_price(id: b256, price_value: u256) {
@@ -48,7 +43,6 @@ impl StorkMock for Contract {
         let event = StorkEvent::ValueUpdate((id, price));
         log(event);
     }
-
     #[storage(write)]
     fn update_negative_price(id: b256, price_value: u256) {
         // 2 ** 64 = 18446744073709551616u256
@@ -75,7 +69,6 @@ impl StorkMock for Contract {
         log(event);
     }
 }
-
 impl Stork for Contract {
     #[storage(read)]
     fn get_temporal_numeric_value_unchecked_v1(id: b256) -> TemporalNumericValue {
@@ -84,7 +77,6 @@ impl Stork for Contract {
             None => panic "temporal numeric value not found",
         }
     }
-
     #[storage(read, write)]
     fn initialize(
         _initial_owner: Identity,
@@ -93,17 +85,14 @@ impl Stork for Contract {
     ) {
         panic "unimplemented";
     }
-
     #[storage(read)]
     fn single_update_fee_in_wei() -> u64 {
         panic "unimplemented";
     }
-
     #[storage(read)]
     fn stork_public_key() -> EvmAddress {
         panic "unimplemented";
     }
-
     fn verify_stork_signature_v1(
         _stork_pubkey: EvmAddress,
         _id: b256,
@@ -117,36 +106,29 @@ impl Stork for Contract {
     ) -> bool {
         panic "unimplemented";
     }
-
     #[storage(read, write), payable]
     fn update_temporal_numeric_values_v1(_update_data: Vec<TemporalNumericValueInput>) {
         panic "unimplemented";
     }
-
     #[storage(read)]
     fn get_update_fee_v1(_update_data: Vec<TemporalNumericValueInput>) -> u64 {
         panic "unimplemented";
     }
-
     fn version() -> String {
         panic "unimplemented";
     }
-
     #[storage(read, write)]
     fn update_single_update_fee_in_wei(_single_update_fee_in_wei: u64) {
         panic "unimplemented";
     }
-
     #[storage(read, write)]
     fn update_stork_public_key(_stork_public_key: EvmAddress) {
         panic "unimplemented";
     }
-
     #[storage(read, write)]
     fn propose_owner(_new_owner: Address) {
         panic "unimplemented";
     }
-
     #[storage(read, write)]
     fn accept_ownership() {
         panic "unimplemented";

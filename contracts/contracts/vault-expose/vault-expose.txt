@@ -1,7 +1,11 @@
-
 abi VaultExpose {
     #[storage(read)]
-    fn calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, position_cumulative_funding_rate: u256) -> (u256, bool);
+    fn calculate_funding_rate(
+        asset: b256,
+        position_size: u256,
+        is_long: bool,
+        position_cumulative_funding_rate: u256,
+    ) -> (u256, bool);
 
     #[storage(read, write)]
     fn increase_and_update_funding_info(asset: b256, size: u256, is_long: bool) -> u256;
@@ -17,8 +21,18 @@ abi VaultExpose {
 
 impl VaultExpose for Contract {
     #[storage(read)]
-    fn calculate_funding_rate(asset: b256, position_size: u256, is_long: bool, position_cumulative_funding_rate: u256) -> (u256, bool) {
-        _calculate_funding_rate(asset, position_size, is_long, position_cumulative_funding_rate)
+    fn calculate_funding_rate(
+        asset: b256,
+        position_size: u256,
+        is_long: bool,
+        position_cumulative_funding_rate: u256,
+    ) -> (u256, bool) {
+        _calculate_funding_rate(
+            asset,
+            position_size,
+            is_long,
+            position_cumulative_funding_rate,
+        )
     }
 
     #[storage(read, write)]

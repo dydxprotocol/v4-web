@@ -1,23 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 library;
 
-use std::{
-    hash::{
-        Hash,
-        sha256,
-    },
-    revert::require,
-    storage::storage_string::*,
-    string::String,
-};
+use std::{hash::{Hash, sha256}, revert::require, storage::storage_string::*, string::String};
 
 abi FungibleAsset {
     #[storage(read, write)]
-    fn initialize(
-        name: String,
-        symbol: String,
-        decimals: u8
-    );
+    fn initialize(name: String, symbol: String, decimals: u8);
 
     /*
            ____  ____  ____   ____ ____   ___  
@@ -32,7 +20,7 @@ abi FungibleAsset {
 
     #[storage(read)]
     fn symbol() -> String;
-    
+
     #[storage(read)]
     fn decimals() -> u8;
 

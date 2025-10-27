@@ -1,11 +1,11 @@
 [workspace]
 members = [
-    "contracts/mocks/fungible",
-    "contracts/mocks/stork-mock",
+  "contracts/mocks/fungible",
+  "contracts/mocks/stork-mock",
 
-    "contracts/core/pricefeed-wrapper",
-    "contracts/core/vault",
+  "contracts/core/pricefeed-wrapper",
+  "contracts/core/vault",
 
-    "contracts/testnet/token",
-    "contracts/vault-expose",
+  "contracts/testnet/token",
+  "contracts/vault-expose",
 ]

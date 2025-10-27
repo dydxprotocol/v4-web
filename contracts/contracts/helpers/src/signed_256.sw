@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 library;
 
-/*
-    From: https://github.com/compolabs/sway-lend/blob/sway-v0.46/contracts/market/src/i256.sw
-*/
+//
+//   From: https://github.com/compolabs/sway-lend/blob/sway-v0.46/contracts/market/src/i256.sw
+//
 
 pub struct Signed256 {
     pub value: u256,
@@ -13,8 +13,8 @@ pub struct Signed256 {
 impl From<u256> for Signed256 {
     fn from(value: u256) -> Self {
         Self {
-            value, 
-            is_neg: false
+            value,
+            is_neg: false,
         }
     }
 }
@@ -32,7 +32,7 @@ impl std::ops::PartialEq for Signed256 {
             true
         } else {
             self.value == other.value && self.is_neg == other.is_neg
-        }    
+        }
     }
 }
 
@@ -70,7 +70,7 @@ impl std::ops::Ord for Signed256 {
             revert(0)
         }
     }
-} 
+}
 
 impl Signed256 {
     /// Initializes a new, zeroed Signed256.
@@ -79,10 +79,7 @@ impl Signed256 {
     }
 
     pub fn from_u256(value: u256, is_neg: bool) -> Self {
-        Self {
-            value, 
-            is_neg
-        }
+        Self { value, is_neg }
     }
 
     pub fn ge(self, other: Self) -> bool {
@@ -152,20 +149,27 @@ impl std::ops::Add for Signed256 {
 impl std::ops::Subtract for Signed256 {
     /// Subtract a Signed256 from a Signed256. Panics of overflow.
     fn subtract(self, other: Self) -> Self {
-        if self == other { Self::new() }
-        else if !self.is_neg && !other.is_neg && self.value > other.value {
+        if self == other {
+            Self::new()
+        } else if !self.is_neg
+            && !other.is_neg
+            && self.value > other.value
+        {
             Self::from(self.value - other.value)
-        } else if !self.is_neg && !other.is_neg && self.value < other.value  {
+        } else if !self.is_neg
+            && !other.is_neg
+            && self.value < other.value
+        {
             Self::neg_from(other.value - self.value)
         } else if self.is_neg && other.is_neg && self.value > other.value {
             Self::neg_from(self.value - other.value)
-        } else if self.is_neg && other.is_neg && self.value < other.value  {
+        } else if self.is_neg && other.is_neg && self.value < other.value {
             Self::from(other.value - self.value)
-        } else if !self.is_neg && other.is_neg{
+        } else if !self.is_neg && other.is_neg {
             Self::from(self.value + other.value)
         } else if self.is_neg && !other.is_neg {
             Self::neg_from(self.value + other.value)
-        }  else {
+        } else {
             require(false, Error::Signed256SubtractionOverflow);
             revert(0);
         }
@@ -175,11 +179,11 @@ impl std::ops::Subtract for Signed256 {
 impl std::ops::Multiply for Signed256 {
     /// Multiply a Signed256 with a Signed256. Panics of overflow.
     fn multiply(self, other: Self) -> Self {
-        if self.value == 0 || other.value == 0{
+        if self.value == 0 || other.value == 0 {
             Self::new()
         } else if !self.is_neg == !other.is_neg {
             Self::from(self.value * other.value)
-        } else if !self.is_neg != !other.is_neg{
+        } else if !self.is_neg != !other.is_neg {
             Self::neg_from(self.value * other.value)
         } else {
             require(false, Error::Signed256MultiplicationOverflow);

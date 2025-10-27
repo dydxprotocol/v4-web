@@ -6,10 +6,8 @@ pub enum Error {
     FungibleNameAlreadySet: (),
     FungibleSymbolAlreadySet: (),
     FungibleDecimalsAlreadySet: (),
-
     FungibleBurnInsufficientAssetForwarded: (),
     FungibleBurnInsufficientAmountForwarded: (),
-
     FungibleInsufficientAssetForwarded: (),
     FungibleInsufficientAmountForwarded: (),
 }

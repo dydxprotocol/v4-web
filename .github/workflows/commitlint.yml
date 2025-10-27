@@ -34,3 +34,7 @@ jobs:
       - name: ESLint
         run: |
           pnpm lint
+
+      - name: SwayLint
+        run: |
+          forc fmt --check --path contracts
