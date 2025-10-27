@@ -29,26 +29,23 @@ export const BTC_MAX_LEVERAGE = 50 * 10_000
 export const ETH_MAX_LEVERAGE = 50 * 10_000
 export const BNB_MAX_LEVERAGE = 50 * 10_000
 
-
 export async function call(fnCall: any) {
     const { gasUsed } = await fnCall.getTransactionCost()
     // console.log("gasUsed", gasUsed.toString())
     const gasLimit = gasUsed.mul("6").div("5").toString()
 
     const { waitForResult } = await fnCall.txParams({ gasLimit }).call()
-    return await waitForResult()
+    return waitForResult()
 }
 
-export type AddressIdentity = {
-    Address: { bits: string }
-}
+export type AddressIdentity = { Address: { bits: string } }
 
 export function walletToAddressIdentity(wallet: WalletUnlocked): AddressIdentity {
     return { Address: { bits: wallet.address.toHexString() } }
 }
 
 export function expandDecimals(value: number, decimals: number = 9): string {
-    const v = BigInt(value) * (BigInt(10) ** BigInt(decimals))
+    const v = BigInt(value) * BigInt(10) ** BigInt(decimals)
     return v.toString()
 }
 
@@ -97,20 +94,14 @@ export function getAssetId(
 }
 
 export async function moveBlockchainTime(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>, seconds: number) {
-    const { provider: providerWithCustomTimestamp } = launchedNode;
+    const { provider: providerWithCustomTimestamp } = launchedNode
 
-    const latestBlock = await providerWithCustomTimestamp.getBlock('latest');
+    const latestBlock = await providerWithCustomTimestamp.getBlock("latest")
     if (!latestBlock) {
-      throw new Error('No latest block');
+        throw new Error("No latest block")
     }
-    const latestBlockTimestamp = DateTime.fromTai64(
-      latestBlock.time
-    ).toUnixMilliseconds();
-    
-    // Produce 3 new blocks, setting the timestamp to latest + seconds * 1000ms
-    const newBlockHeight = await providerWithCustomTimestamp.produceBlocks(
-      3,
-      latestBlockTimestamp + seconds * 1000
-    );      
+    const latestBlockTimestamp = DateTime.fromTai64(latestBlock.time).toUnixMilliseconds()
 
+    // Produce 3 new blocks, setting the timestamp to latest + seconds * 1000ms
+    await providerWithCustomTimestamp.produceBlocks(3, latestBlockTimestamp + seconds * 1000)
 }

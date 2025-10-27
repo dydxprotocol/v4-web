@@ -7,19 +7,24 @@ if (require.main === module) {
 }
 
 async function faucet(taskArgs: any) {
+    // eslint-disable-next-line no-console
     console.log("Call faucet")
 
     const provider = new Provider(taskArgs.url)
     const wallet = Wallet.fromPrivateKey(taskArgs.privK, provider)
     const token = new TestnetToken(taskArgs.token, wallet)
 
-    let { value: assetId } = await token.functions.get_asset_id().get()
+    const { value: assetId } = await token.functions.get_asset_id().get()
+    // eslint-disable-next-line no-console
     console.log(`Asset ID: ${assetId.bits.toString()}`)
-    let beforeBalance = await wallet.getBalance(assetId.bits.toString())
+    const beforeBalance = await wallet.getBalance(assetId.bits.toString())
+    // eslint-disable-next-line no-console
     console.log(`Before Balance: ${beforeBalance.toString()}`)
     await call(token.functions.faucet())
-    let afterBalance = await wallet.getBalance(assetId.bits.toString())
+    const afterBalance = await wallet.getBalance(assetId.bits.toString())
+    // eslint-disable-next-line no-console
     console.log(`After Balance: ${afterBalance.toString()}`)
 
+    // eslint-disable-next-line no-console
     console.log(`Faucet called`)
-  }
+}

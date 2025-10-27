@@ -8,11 +8,13 @@
         "build:vault-expose-1": "ts-node -e 'require(\"fs\").cpSync(\"contracts/core/vault/src/\", \"contracts/vault-expose/src/\", {recursive: true});'",
         "build:vault-expose-2": "ts-node -e 'const concat = require(\"concat\"); concat([\"contracts/vault-expose/src/main.sw\", \"contracts/vault-expose/vault-expose.txt\"], \"contracts/vault-expose/src/main.sw\")'",
         "build:contracts": "forc build --release --log-level 4",
-	"build:pre": "pnpm build:vault-expose-1 && pnpm pnpm build:vault-expose-2",
+	    "build:pre": "pnpm build:vault-expose-1 && pnpm pnpm build:vault-expose-2",
         "build": "pnpm build:pre && pnpm build:contracts",
         "gen:types": "fuels typegen -i ./contracts/**/*-abi.json -o ./types",
         "test": "vitest run",
         "test:watch": "vitest",
+        "lint": "eslint --ext .ts,.tsx test/ tasks/",
+	    "fix-lint": "eslint --fix --ext .ts,.tsx test/ tasks/",
         "run:node": "ts-node tasks/run-node.ts",
         "deploy:testnet:token": "ts-node tasks/deploy-testnet-token.ts",
         "deploy:starboard": "ts-node tasks/deploy-starboard.ts",
@@ -32,6 +34,7 @@
     "dependencies": {
         "bn.js": "^5.2.0",
         "concat": "^1.0.3",
-        "fuels": "0.101.3"
+        "fuels": "0.101.3",
+	"vitest": "1.4.0"
     }
 }

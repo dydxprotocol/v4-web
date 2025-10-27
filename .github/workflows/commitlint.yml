@@ -48,5 +48,6 @@ jobs:
 
       - name: ESLint
         run: |
+          pnpm --filter starboard/contracts lint
           pnpm lint
 

@@ -1,8 +1,8 @@
 // @ts-nocheck
 // there is a problem with the optional arguments in the launchTestNode function
-import { WalletUnlocked } from 'fuels';
-import { DeployContractConfig, launchTestNode, LaunchTestNodeOptions, LaunchTestNodeReturn } from 'fuels/test-utils';
-import readline from "readline";
+import { WalletUnlocked } from "fuels"
+import { DeployContractConfig, launchTestNode, LaunchTestNodeOptions, LaunchTestNodeReturn } from "fuels/test-utils"
+import readline from "readline"
 
 // URL: http://127.0.0.1:4000/v1/graphql
 // prefunded wallets (privK, address)
@@ -17,84 +17,78 @@ if (require.main === module) {
 }
 
 async function runNode() {
+    // eslint-disable-next-line no-console
     console.log(`Running node`)
-    
+
     const launchedNode = await launchNode()
     // const[ deployer, user0, user1, liquidator, priceSigner ] = getNodeWallets(launchedNode)
     const originWallet = getNodeWallet(launchedNode)
 
-    const baseAssetId = await launchedNode.provider.getBaseAssetId();
-    const originBalance = await originWallet.getBalance(baseAssetId);
+    const baseAssetId = await launchedNode.provider.getBaseAssetId()
+    const originBalance = await originWallet.getBalance(baseAssetId)
     let response = await originWallet.transfer(
         "0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6",
         originBalance.div(10),
-        baseAssetId
-    );
-    await response.waitForResult();
+        baseAssetId,
+    )
+    await response.waitForResult()
     response = await originWallet.transfer(
         "0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770",
         originBalance.div(10),
-        baseAssetId
-    );
-    await response.waitForResult();
+        baseAssetId,
+    )
+    await response.waitForResult()
     response = await originWallet.transfer(
         "0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c",
         originBalance.div(10),
-        baseAssetId
-    );
-    await response.waitForResult();
+        baseAssetId,
+    )
+    await response.waitForResult()
     response = await originWallet.transfer(
         "0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088",
         originBalance.div(10),
-        baseAssetId
-    );
-    await response.waitForResult();
+        baseAssetId,
+    )
+    await response.waitForResult()
     response = await originWallet.transfer(
         "0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b",
         originBalance.div(10),
-        baseAssetId
-    );
-    await response.waitForResult();
-    
+        baseAssetId,
+    )
+    await response.waitForResult()
+
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
-    });
-    await new Promise(resolve => rl.question('Press Enter to stop node', ans => {
-        rl.close();
-        resolve(ans);
-    }))
+        output: process.stdout,
+    })
+    await new Promise((resolve) => {
+        rl.question("Press Enter to stop node", (ans) => {
+            rl.close()
+            resolve(ans)
+        })
+    })
     launchedNode.cleanup()
 }
 
-async function launchNode() : Promise<LaunchTestNodeReturn<DeployContractConfig[]>> {
+async function launchNode(): Promise<LaunchTestNodeReturn<DeployContractConfig[]>> {
     // is there a way to pass private keys?
     const launchOptions: Partial<LaunchTestNodeOptions<DeployContractConfig[]>> = {
         walletsConfig: {
-          count: 1, // Number of wallets you want
+            count: 1, // Number of wallets you want
         },
         nodeOptions: {
             port: "4000",
-          },        
+        },
     }
     const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode(launchOptions)
 
-  
-      return launched
-  }
-  
-  function getNodeWallets(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>) : WalletUnlocked[] {
-    const {
-      wallets: [deployer, user0, user1, liquidator, priceSigner ],
-    } = launchedNode
-
-    return [ deployer, user0, user1, liquidator, priceSigner ]
+    return launched
 }
 
-function getNodeWallet(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>) : WalletUnlocked {
+function getNodeWallet(launchedNode: LaunchTestNodeReturn<DeployContractConfig[]>): WalletUnlocked {
     const {
-      wallets: [originWallet],
+        wallets: [originWallet],
     } = launchedNode
 
-    return  originWallet
+    return originWallet
 }

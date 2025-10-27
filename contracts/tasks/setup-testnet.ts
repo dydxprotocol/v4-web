@@ -1,14 +1,15 @@
 import { Provider, Wallet } from "fuels"
 import { Vault as VaultContract } from "../types/Vault"
-import { call, getArgs } from "./utils";
-import { deployTestnetToken } from "./deploy-testnet-token";
-import { deployStarboard } from "./deploy-starboard";
+import { call, getArgs } from "./utils"
+import { deployTestnetToken } from "./deploy-testnet-token"
+import { deployStarboard } from "./deploy-starboard"
 
 if (require.main === module) {
     setupTestnet(getArgs(["url", "privK", "storkContractAddress"]))
 }
 
 async function setupTestnet(taskArgs: any) {
+    // eslint-disable-next-line no-console
     console.log("Setup asset configuration for the testnet")
 
     const usdcPricefeedId = "0x0000000000000000000000000000000000000000000000000000000000000069"
@@ -16,44 +17,50 @@ async function setupTestnet(taskArgs: any) {
     const bnbPricefeedId = "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
     const ethPricefeedId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
 
-    const [USDCAddress, USDCAssetId] = await deployTestnetToken({
-      url: taskArgs.url, 
-      privK: taskArgs.privK, 
-      name: "mckUSDC", 
-      symbol: "sUSDC", 
-      decimals: "6"
+    const [, USDCAssetId] = await deployTestnetToken({
+        // [USDCAddress, USDCAssetId]
+        url: taskArgs.url,
+        privK: taskArgs.privK,
+        name: "mckUSDC",
+        symbol: "sUSDC",
+        decimals: "6",
     })
 
-    const [BTCAddress, BTCAssetId] = await deployTestnetToken({
-      url: taskArgs.url, 
-      privK: taskArgs.privK, 
-      name: "mockBTC", 
-      symbol: "sbBTC", 
-      decimals: "9"
+    await deployTestnetToken({
+        // [BTCAddress, BTCAssetId]
+        url: taskArgs.url,
+        privK: taskArgs.privK,
+        name: "mockBTC",
+        symbol: "sbBTC",
+        decimals: "9",
     })
-    const [BNBAddress, BNBAssetId] = await deployTestnetToken({
-      url: taskArgs.url, 
-      privK: taskArgs.privK, 
-      name: "mockBNB", 
-      symbol: "sbBNB", 
-      decimals: "9"
+    await deployTestnetToken({
+        // [BNBAddress, BNBAssetId]
+        url: taskArgs.url,
+        privK: taskArgs.privK,
+        name: "mockBNB",
+        symbol: "sbBNB",
+        decimals: "9",
     })
-    const [ETHAddress, ETHAssetId] = await deployTestnetToken({
-      url: taskArgs.url, 
-      privK: taskArgs.privK, 
-      name: "mockETH", 
-      symbol: "sbETH", 
-      decimals: "9"
+    await deployTestnetToken({
+        // [ETHAddress, ETHAssetId]
+        url: taskArgs.url,
+        privK: taskArgs.privK,
+        name: "mockETH",
+        symbol: "sbETH",
+        decimals: "9",
     })
 
+    // eslint-disable-next-line no-console
     console.log("usdc setup", USDCAssetId)
-    const [vaultAddress, pricefeedWrapperAddress] = await deployStarboard({
-      url: taskArgs.url, 
-      privK: taskArgs.privK,
-      usdcAssetId: USDCAssetId,
-      usdcPricefeedId: usdcPricefeedId,
-      usdcDecimals: "6",
-      storkContract: taskArgs.storkContractAddress,
+    const [vaultAddress] = await deployStarboard({
+        // [vaultAddress, pricefeedWrapperAddress]
+        url: taskArgs.url,
+        privK: taskArgs.privK,
+        usdcAssetId: USDCAssetId,
+        usdcPricefeedId,
+        usdcDecimals: "6",
+        storkContract: taskArgs.storkContractAddress,
     })
 
     // it is important to instantiate the wallet after deployment
@@ -65,5 +72,6 @@ async function setupTestnet(taskArgs: any) {
     await call(vault.functions.set_asset_config(bnbPricefeedId, 9))
     await call(vault.functions.set_asset_config(ethPricefeedId, 9))
 
+    // eslint-disable-next-line no-console
     console.log("Setup complete")
 }
