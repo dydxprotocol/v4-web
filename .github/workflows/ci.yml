@@ -13,6 +13,16 @@ jobs:
     - name: Set up pnpm
       uses: dydxprotocol/setup-pnpm@v2.0.0
 
+    - name: Install forc
+      shell: bash
+      run: |
+        curl https://install.fuel.network | sh
+        echo "$HOME/.fuelup/bin:${GITHUB_PATH}" >> $GITHUB_PATH
+        export PATH="${HOME}/.fuelup/bin:${PATH}"
+        fuelup update
+        fuelup toolchain install mainnet
+        fuelup default mainnet
+
     - name: Set up Node
       uses: actions/setup-node@v3
       with:
@@ -22,6 +32,8 @@ jobs:
     - run: |
         pnpm install --ignore-scripts --frozen-lockfile
         pnpm run build:ts-sdk
+        pnpm --filter starboard/contracts build
+        pnpm --filter starboard/contracts gen:types
         tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
     - run: pnpm exec vitest run
