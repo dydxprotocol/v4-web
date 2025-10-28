@@ -14,7 +14,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { cardBasedTableMixins } from '@/styles/tableMixins';
 
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { Output, OutputType } from '@/components/Output';
@@ -214,6 +214,7 @@ export const AffiliatesLeaderboard = () => {
           onChangeFilter={setFilter}
         />
         <$Table
+          withOuterBorder
           withInnerBorders
           data={affiliates ?? EMPTY_ARR}
           tableId="affiliate-leaderboard"
@@ -228,11 +229,7 @@ export const AffiliatesLeaderboard = () => {
 };
 
 const $Table = styled(Table)<AllTableProps<any>>`
-  ${tradeViewMixins.horizontalTable}
-
-  th {
-    background: var(--color-layer-2);
-  }
+  ${cardBasedTableMixins}
 `;
 
 const $AccountOutput = tw(Output)`font-base-medium text-color-text-1`;

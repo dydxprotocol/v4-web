@@ -14,7 +14,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -368,7 +368,7 @@ export const FillsTable = forwardRef(
   }
 );
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;
 const $InlineRow = tw.div`inlineRow`;
 const $Side = styled.span<{ side: Nullable<IndexerOrderSide> }>`
