@@ -12,6 +12,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -22,6 +24,8 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+
+import { EditAffiliateInput } from './EditAffiliateInput';
 
 enum AffiliatesTableType {
   Leaderboard = 'leaderboard',
@@ -48,6 +52,10 @@ export const AffiliatesPage = () => {
     );
   };
 
+  const openShareDialog = () => {
+    dispatch(openDialog(DialogTypes.ShareAffiliate({})));
+  };
+
   const userStatus = {
     isAffiliate:
       Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
@@ -56,6 +64,8 @@ export const AffiliatesPage = () => {
     isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
     currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
   };
+
+  const showAffiliateDetails = userStatus.isAffiliate ?? userStatus.isVip;
 
   const myReferralStats = dydxAddress && (
     <div tw="flexColumn w-full gap-1">
@@ -104,10 +114,11 @@ export const AffiliatesPage = () => {
     </div>
   );
 
-  const newAffiliatesPage = (
-    <>
+  const affiliateTitleSection = (
+    <div tw="row justify-between gap-0.5">
       <div tw="flexColumn gap-0.5">
-        <span tw="text-color-text-2 font-base-bold">
+        <span tw="row gap-0.5 text-color-text-2 font-medium-bold">
+          <Icon tw="size-1.5" iconName={IconName.Users} />
           {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM })}
         </span>
         <div tw="flexColumn font-small-book">
@@ -120,18 +131,36 @@ export const AffiliatesPage = () => {
           </Link>
         </div>
       </div>
-      {!dydxAddress && <ConnectWallet />}
-      {affiliateMetadata == null ? (
-        <div tw="flex min-h-4 flex-1 items-center justify-center rounded-0.625 bg-color-layer-3">
-          <LoadingSpinner />
-        </div>
-      ) : !userStatus.isAffiliate && !userStatus.isVip ? (
-        <AffiliateProgressCard
-          tw="flex-1 bg-color-layer-3"
-          volume={affiliateMetadata.totalVolume}
+
+      {showAffiliateDetails && (
+        <EditAffiliateInput
+          tw="w-1/2"
+          slotRight={
+            <Button onClick={openShareDialog}>{stringGetter({ key: STRING_KEYS.SHARE })}</Button>
+          }
         />
+      )}
+    </div>
+  );
+
+  const newAffiliatesPage = (
+    <>
+      {affiliateTitleSection}
+      {dydxAddress ? (
+        affiliateMetadata == null ? (
+          <div tw="flex min-h-4 flex-1 items-center justify-center rounded-0.625 bg-color-layer-3">
+            <LoadingSpinner />
+          </div>
+        ) : !userStatus.isAffiliate && !userStatus.isVip ? (
+          <AffiliateProgressCard
+            tw="flex-1 bg-color-layer-3"
+            volume={affiliateMetadata.totalVolume}
+          />
+        ) : (
+          myReferralStats
+        )
       ) : (
-        myReferralStats
+        <ConnectWallet />
       )}
     </>
   );
@@ -142,19 +171,19 @@ export const AffiliatesPage = () => {
       {
         label: stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD }),
         value: AffiliatesTableType.Leaderboard,
-        content: <AffiliatesLeaderboard tw="pt-0.5" />,
+        content: <AffiliatesLeaderboard />,
       },
       {
         label: 'My Referrals',
         value: AffiliatesTableType.MyReferrals,
-        content: <AffiliatesLeaderboard tw="pt-0.5" />,
+        content: <AffiliatesLeaderboard />,
       },
     ];
   }, [stringGetter]);
 
   const tableTabs = (
     <Tabs
-      withInnerBorder={false}
+      tw="gap-1.25"
       dividerStyle="underline"
       value={tableType}
       onValueChange={setTableType}
