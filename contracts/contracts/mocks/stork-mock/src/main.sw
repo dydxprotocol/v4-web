@@ -35,8 +35,11 @@ impl StorkMock for Contract {
             Some(value) => value,
             None => panic "price_value_i128 overflow",
         };
+        // magic constant: TAI64 to UTC, 10^9 for nanoseconds
+        // the constant may slightly change in years
+        let timestamp_ns = (timestamp() - 4611686018427387941u64) * 1000000000u64;
         let price = TemporalNumericValue {
-            timestamp_ns: timestamp(),
+            timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
@@ -60,8 +63,11 @@ impl StorkMock for Contract {
             Some(value) => value,
             None => panic "price_value_i128 underflow",
         };
+        // magic constant: TAI64 to UTC, 10^9 for nanoseconds
+        // the constant may slightly change in years
+        let timestamp_ns = (timestamp() - 4611686018427387941u64) * 1000000000u64;
         let price = TemporalNumericValue {
-            timestamp_ns: timestamp(),
+            timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
