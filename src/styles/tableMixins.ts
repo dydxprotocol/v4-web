@@ -98,10 +98,10 @@ export const cardBasedTableMixins = css`
   --tableStickyRow-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
   --table-header-height: 3.1875rem;
+  --border-spacing: 0;
 
   // Override border color
   --color-border: var(--color-layer-2);
-  --border-spacing: 0;
 
   th {
     font: var(--font-base-medium);

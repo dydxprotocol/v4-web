@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 import styled from 'styled-components';
 
 import { AFFILIATES_REQUIRED_VOLUME_USD } from '@/constants/affiliates';
@@ -13,12 +15,18 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { Tabs } from '@/components/Tabs';
 import { AffiliatesLeaderboard } from '@/views/Affiliates/AffiliatesLeaderboard';
 import { AffiliateProgressCard } from '@/views/Affiliates/cards/AffiliateProgressCard';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+
+enum AffiliatesTableType {
+  Leaderboard = 'leaderboard',
+  MyReferrals = 'my-referrals',
+}
 
 export const AffiliatesPage = () => {
   const { dydxAddress } = useAccounts();
@@ -128,11 +136,39 @@ export const AffiliatesPage = () => {
     </>
   );
 
+  const [tableType, setTableType] = useState(AffiliatesTableType.Leaderboard);
+  const tabItems = useMemo(() => {
+    return [
+      {
+        label: stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD }),
+        value: AffiliatesTableType.Leaderboard,
+        content: <AffiliatesLeaderboard tw="pt-0.5" />,
+      },
+      {
+        label: 'My Referrals',
+        value: AffiliatesTableType.MyReferrals,
+        content: <AffiliatesLeaderboard tw="pt-0.5" />,
+      },
+    ];
+  }, [stringGetter]);
+
+  const tableTabs = (
+    <Tabs
+      withInnerBorder={false}
+      dividerStyle="underline"
+      value={tableType}
+      onValueChange={setTableType}
+      items={tabItems}
+      withTransitions={false}
+    />
+  );
+
   return (
     <$Page tw="flex flex-col gap-1">
-      <$Section tw="flex flex-col gap-1 px-1 pt-1">{newAffiliatesPage}</$Section>
-
-      <AffiliatesLeaderboard />
+      <$Section tw="flex flex-col gap-1 px-1 pt-1">
+        {newAffiliatesPage}
+        {tableTabs}
+      </$Section>
     </$Page>
   );
 };
