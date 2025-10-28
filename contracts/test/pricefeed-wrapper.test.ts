@@ -50,7 +50,9 @@ describe("PricefeedWrapper", () => {
                 throw new Error("No latest block")
             }
             const { time: timeLastBlockProduced } = block
-            expect(checkPrice.timestamp_ns.toString()).to.equal(timeLastBlockProduced.toString())
+            const latestBlockUTCTimestamp = DateTime.fromTai64(timeLastBlockProduced).toUnixMilliseconds()
+            const priceTimestamp = checkPrice.timestamp_ns.div(1000000) // convert nanoseconds to milliseconds
+            expect(priceTimestamp.toString()).to.equal(latestBlockUTCTimestamp.toString())
             const quantizedValue = checkPrice.quantized_value
             const underlying = quantizedValue.underlying
             // 2 ** 64 = 18446744073709551616
@@ -77,7 +79,9 @@ describe("PricefeedWrapper", () => {
                 throw new Error("No latest block")
             }
             const { time: timeLastBlockProduced } = block
-            expect(checkPrice.timestamp_ns.toString()).to.equal(timeLastBlockProduced.toString())
+            const latestBlockUTCTimestamp = DateTime.fromTai64(timeLastBlockProduced).toUnixMilliseconds()
+            const priceTimestamp = checkPrice.timestamp_ns.div(1000000) // convert nanoseconds to milliseconds
+            expect(priceTimestamp.toString()).to.equal(latestBlockUTCTimestamp.toString())
             const quantizedValue = checkPrice.quantized_value
             const underlying = quantizedValue.underlying
             // 2 ** 64 = 18446744073709551616
