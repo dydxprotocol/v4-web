@@ -57,19 +57,13 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
       {stringGetter({
         key: STRING_KEYS.BLOCKED_BANNER_MESSAGE_SHORT,
         params: {
-          CONTACT_SUPPORT_LINK: (
-            <Link href={help} isInline>
-              {stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })}
+          TERMS_OF_USE_LINK: (
+            <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
+              {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
             </Link>
           ),
         },
-      })}{' '}
-      <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
-        {stringGetter({
-          key: STRING_KEYS.LEARN_MORE,
-        })}{' '}
-        →
-      </Link>
+      })}
     </span>
   ) : (
     <span>{complianceMessage}</span>
