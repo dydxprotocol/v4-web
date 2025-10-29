@@ -5,11 +5,11 @@ import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
-import { createMarketSummary } from '../calculators/markets';
+import { calculateEffectiveSelectedLeverage, createMarketSummary } from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
-import { selectRawAssets, selectRawMarkets } from './base';
+import { selectRawAssets, selectRawMarkets, selectRawSelectedMarketLeveragesData } from './base';
 import { selectAllMarketsInfo, selectSparkLinesData } from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
@@ -96,4 +96,27 @@ export const selectMarketSummaryById = createAppSelector(
     }
     return allSummaries?.[marketId];
   }
+);
+
+/**
+ * Get the effective selected leverage for a market.
+ * Returns user-selected leverage if set, otherwise calculates max leverage from IMF only (ignoring OIMF).
+ */
+export const selectEffectiveSelectedMarketLeverage = createAppSelector(
+  [
+    selectRawSelectedMarketLeveragesData,
+    selectMarketSummaryById,
+    (_s, marketId: string | undefined) => marketId,
+  ],
+  (leverages, marketSummary, marketId) => {
+    return calculateEffectiveSelectedLeverage({
+      userSelectedLeverage: marketId ? leverages?.[marketId] : undefined,
+      initialMarginFraction: marketSummary?.initialMarginFraction,
+    });
+  }
+);
+
+export const selectCurrentMarketEffectiveSelectedLeverage = createAppSelector(
+  [(state) => state, getCurrentMarketIdIfTradeable],
+  (state, marketId) => selectEffectiveSelectedMarketLeverage(state, marketId)
 );

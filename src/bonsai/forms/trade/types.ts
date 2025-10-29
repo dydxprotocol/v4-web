@@ -58,14 +58,12 @@ export type GoodUntilTime = {
 type SizeInput = { value: string };
 type UsdcSizeInput = { value: string };
 type AvailablePercentInput = { value: string };
-type SignedLeverageInput = { value: string };
 
 export const OrderSizeInputs = unionize(
   {
     SIZE: ofType<SizeInput>(),
     USDC_SIZE: ofType<UsdcSizeInput>(),
     AVAILABLE_PERCENT: ofType<AvailablePercentInput>(),
-    SIGNED_POSITION_LEVERAGE: ofType<SignedLeverageInput>(),
   },
   { tag: 'type' as const, value: 'value' as const }
 );
@@ -106,7 +104,6 @@ export type TradeForm = {
 
   // isolated
   marginMode: MarginMode | undefined;
-  targetLeverage: string | undefined;
 
   // Limit order fields
   limitPrice: string | undefined;
@@ -148,9 +145,7 @@ export type TradeFormOptions = {
   timeInForceOptions: SelectionOption<TimeInForce>[];
   goodTilUnitOptions: SelectionOption<TimeUnit>[];
 
-  showLeverage: boolean;
-  showAmountClose: boolean;
-
+  showAllocationSlider: boolean;
   showTriggerOrders: boolean;
   triggerOrdersChecked: boolean;
 
@@ -158,7 +153,6 @@ export type TradeFormOptions = {
   needsSize: boolean;
   needsReduceOnly: boolean;
   needsMarginMode: boolean;
-  needsTargetLeverage: boolean;
   needsLimitPrice: boolean;
   needsPostOnly: boolean;
   needsTimeInForce: boolean;
@@ -170,7 +164,6 @@ export type TradeFormOptions = {
   showSize: boolean;
   showReduceOnly: boolean;
   showMarginMode: boolean;
-  showTargetLeverage: boolean;
   showLimitPrice: boolean;
   showPostOnly: boolean;
   showTimeInForce: boolean;
@@ -185,7 +178,7 @@ export type TradeFormOptions = {
 export type TradeSizeSummary = {
   size: number | undefined;
   usdcSize: number | undefined;
-  leverageSigned: number | undefined;
+  allocationPercent: number | undefined;
 };
 
 export type TradeInputSummary = {
@@ -205,11 +198,6 @@ export type TradeSummary = {
   subaccountNumber: number;
   transferToSubaccountAmount: number;
   payloadPrice: number | undefined;
-
-  // minimum is essentially the current position leverage or zero
-  minimumSignedLeverage: number;
-  // maximum is how far the current order side can push leverage
-  maximumSignedLeverage: number;
 
   slippage: number | undefined;
   fee: number | undefined;
@@ -245,6 +233,7 @@ export type TradeFormSummary = {
 export type TradeFormInputData = {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+  rawSelectedMarketLeverages: { [marketId: string]: number };
 
   currentTradeMarketOpenOrders: SubaccountOrder[]; // todo remove maybe
   allOpenOrders: SubaccountOrder[];
