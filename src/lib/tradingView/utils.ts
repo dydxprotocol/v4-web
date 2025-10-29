@@ -219,10 +219,10 @@ export const getWidgetOptions = (
   ];
 
   const disabledFeaturesForSimpleUi: TradingTerminalFeatureset[] = [
-    'header_widget',
     'left_toolbar',
     'display_market_status',
     'legend_widget',
+    'header_resolutions',
   ];
 
   const disabledFeatures: TradingTerminalFeatureset[] = [
