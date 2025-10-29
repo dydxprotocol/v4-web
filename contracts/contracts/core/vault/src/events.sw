@@ -108,6 +108,7 @@ pub struct LiquidatePosition {
     pub position_fee: u256,
     pub funding_rate: u256,
     pub funding_rate_has_profit: bool,
+    pub liquidation_fee: u256,
     pub cumulative_funding_rate: u256,
 }
 pub struct UpdatePnl {
