@@ -802,9 +802,9 @@ describe("Vault.funding_rate", () => {
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
             )
-            const updatePNLLog = tx.logs[tx.logs.length - 4]
-            expect(updatePNLLog.has_profit).eq(false)
-            expect(updatePNLLog.delta.toString()).eq(expandDecimals(80))
+            const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+            expect(liquidatePositionLog.pnl_delta_has_profit).eq(false)
+            expect(liquidatePositionLog.pnl_delta.toString()).eq(expandDecimals(80))
         })
 
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
@@ -1156,9 +1156,9 @@ describe("Vault.funding_rate", () => {
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
             )
-            const updatePNLLog = tx.logs[tx.logs.length - 4]
-            expect(updatePNLLog.has_profit).eq(false)
-            expect(updatePNLLog.delta.toString()).eq(expandDecimals(80))
+            const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+            expect(liquidatePositionLog.pnl_delta_has_profit).eq(false)
+            expect(liquidatePositionLog.pnl_delta.toString()).eq(expandDecimals(80))
         })
 
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
