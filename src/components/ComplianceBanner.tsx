@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize, ButtonStyle, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
@@ -18,9 +17,6 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
-
 import { AlertMessage } from './AlertMessage';
 import { Button } from './Button';
 import { IconName } from './Icon';
@@ -30,7 +26,6 @@ import { Link } from './Link';
 export const ComplianceBanner = ({ className }: { className?: string }) => {
   const [showLess, setShowLess] = useState(false);
   const complianceBannerRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
     useComplianceState();
@@ -77,13 +72,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   const action =
     complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY ? (
-      <Button
-        tw="w-fit"
-        size={isTablet ? ButtonSize.XSmall : ButtonSize.Small}
-        onClick={() => {
-          dispatch(openDialog(DialogTypes.GeoCompliance()));
-        }}
-      >
+      <Button tw="w-fit" size={isTablet ? ButtonSize.XSmall : ButtonSize.Small} onClick={() => {}}>
         {stringGetter({ key: STRING_KEYS.ACTION_REQUIRED })} →
       </Button>
     ) : null;
