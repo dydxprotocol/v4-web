@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import {
@@ -86,6 +86,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly,
   showClosePositionAction,
   navigateToOrders,
+  navigateToMarket,
   isSinglePosition,
   isTablet,
 }: {
@@ -95,6 +96,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
+  navigateToMarket: (market: string) => void;
   isSinglePosition: boolean;
   isTablet: boolean;
 }) => ({
@@ -105,6 +107,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
+        isActionable: true,
         renderCell: ({ marketSummary, leverage, signedSize, side }) => (
           <TableCell
             stacked
@@ -151,6 +154,7 @@ const getPositionsTableColumnDef = ({
           </TableColumnHeader>
         ),
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
+        isActionable: true,
         renderCell: ({ entryPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -172,6 +176,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'combinedPnl',
         getCellValue: (row) => row.updatedUnrealizedPnl.toNumber(),
         label: stringGetter({ key: STRING_KEYS.PNL }),
+        isActionable: true,
         renderCell: ({ updatedUnrealizedPnl, updatedUnrealizedPnlPercent }) => {
           return !isTablet ? (
             <TableCell>
@@ -213,8 +218,14 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marketSummary?.displayableTicker,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ marketSummary }) => {
-          return <MarketSummaryTableCell marketSummary={marketSummary} />;
+        isActionable: true,
+        renderCell: ({ market, marketSummary }) => {
+          return (
+            <MarketSummaryTableCell
+              marketSummary={marketSummary}
+              onClick={() => navigateToMarket(market)}
+            />
+          );
         },
       },
       [PositionsTableColumnKey.Leverage]: {
@@ -233,6 +244,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marginMode,
         label: stringGetter({ key: STRING_KEYS.TYPE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
         renderCell: ({ marginMode }) => (
           <TableCell>
             <Tag>{stringGetter({ key: getMarginModeStringKey(marginMode) })}</Tag>
@@ -246,6 +258,7 @@ const getPositionsTableColumnDef = ({
         },
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
         renderCell: ({ signedSize, stepSizeDecimals }) => {
           return (
             <TableCell>
@@ -265,6 +278,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notional.toNumber(),
         label: stringGetter({ key: STRING_KEYS.VALUE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
         renderCell: ({ notional }) => {
           return (
             <TableCell>
@@ -302,6 +316,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'oracle',
         getCellValue: (row) => row.oraclePrice,
         label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED }),
+        isActionable: true,
         renderCell: ({ oraclePrice, tickSizeDecimals }) => (
           <TableCell>
             <Output
@@ -317,6 +332,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'liquidation',
         getCellValue: (row) => row.liquidationPrice?.toNumber(),
         label: stringGetter({ key: STRING_KEYS.LIQUIDATION }),
+        isActionable: true,
         renderCell: ({ liquidationPrice, tickSizeDecimals }) => (
           <TableCell>
             <Output
@@ -333,6 +349,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.netFunding.toNumber(),
         label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT }),
         hideOnBreakpoint: MediaQueryKeys.isTablet,
+        isActionable: true,
         renderCell: ({ netFunding }) => {
           return (
             <TableCell>
@@ -498,6 +515,18 @@ export const PositionsTable = forwardRef(
       [positions, tpslOrdersByPositionUniqueId, marketSummaries]
     );
 
+    const navigateToMarket = useCallback(
+      (market: string) => {
+        if (!currentMarket) {
+          navigate(`${AppRoute.Trade}/${market}`, {
+            state: { from: currentRoute },
+          });
+          onNavigate?.();
+        }
+      },
+      [currentMarket]
+    );
+
     return (
       <$Table
         key={currentMarket ?? 'positions'}
@@ -512,21 +541,12 @@ export const PositionsTable = forwardRef(
             isAccountViewOnly,
             showClosePositionAction,
             navigateToOrders,
+            navigateToMarket,
             isSinglePosition: positionsData.length === 1,
             isTablet,
           })
         )}
         getRowKey={(row: PositionTableRow) => row.uniqueId}
-        onRowAction={
-          currentMarket
-            ? undefined
-            : (id, row) => {
-                navigate(`${AppRoute.Trade}/${row.market}`, {
-                  state: { from: currentRoute },
-                });
-                onNavigate?.();
-              }
-        }
         getRowAttributes={(row: PositionTableRow) => ({
           'data-side': row.side,
         })}

@@ -6,12 +6,17 @@ import { TableCell } from './TableCell';
 
 export const MarketSummaryTableCell = ({
   marketSummary,
+  onClick,
 }: {
   marketSummary?: PerpetualMarketSummary;
+  onClick?: () => void;
 }) => {
   return (
     <TableCell
       tw="font-bold text-color-text-2"
+      css={{
+        cursor: onClick ? 'pointer' : undefined,
+      }}
       slotLeft={
         <AssetIcon
           tw="[--asset-icon-size:1.25rem] tablet:[--asset-icon-size:2.25rem]"
@@ -19,6 +24,7 @@ export const MarketSummaryTableCell = ({
           symbol={marketSummary?.assetId}
         />
       }
+      onClick={onClick}
     >
       {marketSummary?.displayableAsset ?? ''}
     </TableCell>
