@@ -1,0 +1,783 @@
+{
+  "programType": "contract",
+  "specVersion": "1.1",
+  "encodingVersion": "1",
+  "concreteTypes": [
+    {
+      "type": "()",
+      "concreteTypeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+    },
+    {
+      "type": "b256",
+      "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+    },
+    {
+      "type": "bool",
+      "concreteTypeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+      "metadataTypeId": 1
+    },
+    {
+      "type": "enum stork_sway_sdk::events::StorkEvent",
+      "concreteTypeId": "5a53bb2dd5fdf498df0233d9317f6c4235a9448fb63f5201eda779999df4ec0c",
+      "metadataTypeId": 2
+    },
+    {
+      "type": "str",
+      "concreteTypeId": "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a"
+    },
+    {
+      "type": "struct signed_int::i128::I128",
+      "concreteTypeId": "ee4f613105299613c09709aa25fa5118e9a5afeef8e4f1c5871bd4f234631df1",
+      "metadataTypeId": 5
+    },
+    {
+      "type": "struct std::address::Address",
+      "concreteTypeId": "f597b637c3b0f588fb8d7086c6f4735caa3122b85f0423b82e489f9bb58e2308",
+      "metadataTypeId": 6
+    },
+    {
+      "type": "struct std::string::String",
+      "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c",
+      "metadataTypeId": 10
+    },
+    {
+      "type": "struct std::vec::Vec<struct stork_sway_sdk::interface::TemporalNumericValueInput>",
+      "concreteTypeId": "e67278f564f3da524afebc87950681dff66e11946370df7f4c68b5f01329590b",
+      "metadataTypeId": 13,
+      "typeArguments": [
+        "672654baba0e998dd82f818c92c2b544c9275ee09007b0f65f59195a94a916d6"
+      ]
+    },
+    {
+      "type": "struct std::vm::evm::evm_address::EvmAddress",
+      "concreteTypeId": "05a44d8c3e00faf7ed545823b7a2b32723545d8715d87a0ab3cf65904948e8d2",
+      "metadataTypeId": 14
+    },
+    {
+      "type": "struct stork_sway_sdk::interface::TemporalNumericValueInput",
+      "concreteTypeId": "672654baba0e998dd82f818c92c2b544c9275ee09007b0f65f59195a94a916d6",
+      "metadataTypeId": 15
+    },
+    {
+      "type": "struct stork_sway_sdk::temporal_numeric_value::TemporalNumericValue",
+      "concreteTypeId": "6972e006137b782c482ffc099e21cc55fce9151a2096dd6582df22c9dc81bd9c",
+      "metadataTypeId": 16
+    },
+    {
+      "type": "u256",
+      "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+    },
+    {
+      "type": "u64",
+      "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+    },
+    {
+      "type": "u8",
+      "concreteTypeId": "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
+    }
+  ],
+  "metadataTypes": [
+    {
+      "type": "(_, _)",
+      "metadataTypeId": 0,
+      "components": [
+        {
+          "name": "__tuple_element",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "__tuple_element",
+          "typeId": 16
+        }
+      ]
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "metadataTypeId": 1,
+      "components": [
+        {
+          "name": "Address",
+          "typeId": 6
+        },
+        {
+          "name": "ContractId",
+          "typeId": 9
+        }
+      ]
+    },
+    {
+      "type": "enum stork_sway_sdk::events::StorkEvent",
+      "metadataTypeId": 2,
+      "components": [
+        {
+          "name": "ValueUpdate",
+          "typeId": 0
+        }
+      ]
+    },
+    {
+      "type": "generic T",
+      "metadataTypeId": 3
+    },
+    {
+      "type": "raw untyped ptr",
+      "metadataTypeId": 4
+    },
+    {
+      "type": "struct signed_int::i128::I128",
+      "metadataTypeId": 5,
+      "components": [
+        {
+          "name": "underlying",
+          "typeId": 11
+        }
+      ]
+    },
+    {
+      "type": "struct std::address::Address",
+      "metadataTypeId": 6,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        }
+      ]
+    },
+    {
+      "type": "struct std::bytes::Bytes",
+      "metadataTypeId": 7,
+      "components": [
+        {
+          "name": "buf",
+          "typeId": 8
+        },
+        {
+          "name": "len",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ]
+    },
+    {
+      "type": "struct std::bytes::RawBytes",
+      "metadataTypeId": 8,
+      "components": [
+        {
+          "name": "ptr",
+          "typeId": 4
+        },
+        {
+          "name": "cap",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ]
+    },
+    {
+      "type": "struct std::contract_id::ContractId",
+      "metadataTypeId": 9,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        }
+      ]
+    },
+    {
+      "type": "struct std::string::String",
+      "metadataTypeId": 10,
+      "components": [
+        {
+          "name": "bytes",
+          "typeId": 7
+        }
+      ]
+    },
+    {
+      "type": "struct std::u128::U128",
+      "metadataTypeId": 11,
+      "components": [
+        {
+          "name": "upper",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        },
+        {
+          "name": "lower",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ]
+    },
+    {
+      "type": "struct std::vec::RawVec",
+      "metadataTypeId": 12,
+      "components": [
+        {
+          "name": "ptr",
+          "typeId": 4
+        },
+        {
+          "name": "cap",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ],
+      "typeParameters": [
+        3
+      ]
+    },
+    {
+      "type": "struct std::vec::Vec",
+      "metadataTypeId": 13,
+      "components": [
+        {
+          "name": "buf",
+          "typeId": 12,
+          "typeArguments": [
+            {
+              "name": "",
+              "typeId": 3
+            }
+          ]
+        },
+        {
+          "name": "len",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ],
+      "typeParameters": [
+        3
+      ]
+    },
+    {
+      "type": "struct std::vm::evm::evm_address::EvmAddress",
+      "metadataTypeId": 14,
+      "components": [
+        {
+          "name": "bits",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        }
+      ]
+    },
+    {
+      "type": "struct stork_sway_sdk::interface::TemporalNumericValueInput",
+      "metadataTypeId": 15,
+      "components": [
+        {
+          "name": "temporal_numeric_value",
+          "typeId": 16
+        },
+        {
+          "name": "id",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "publisher_merkle_root",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "value_compute_alg_hash",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "r",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "s",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "v",
+          "typeId": "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
+        }
+      ]
+    },
+    {
+      "type": "struct stork_sway_sdk::temporal_numeric_value::TemporalNumericValue",
+      "metadataTypeId": 16,
+      "components": [
+        {
+          "name": "timestamp_ns",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        },
+        {
+          "name": "quantized_value",
+          "typeId": 5
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "update_negative_price",
+      "inputs": [
+        {
+          "name": "id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "price_value",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "update_price",
+      "inputs": [
+        {
+          "name": "id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "price_value",
+          "concreteTypeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "accept_ownership",
+      "inputs": [],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_temporal_numeric_value_unchecked_v1",
+      "inputs": [
+        {
+          "name": "id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        }
+      ],
+      "output": "6972e006137b782c482ffc099e21cc55fce9151a2096dd6582df22c9dc81bd9c",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_update_fee_v1",
+      "inputs": [
+        {
+          "name": "_update_data",
+          "concreteTypeId": "e67278f564f3da524afebc87950681dff66e11946370df7f4c68b5f01329590b"
+        }
+      ],
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "inputs": [
+        {
+          "name": "_initial_owner",
+          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
+        },
+        {
+          "name": "_stork_public_key",
+          "concreteTypeId": "05a44d8c3e00faf7ed545823b7a2b32723545d8715d87a0ab3cf65904948e8d2"
+        },
+        {
+          "name": "_single_update_fee_in_wei",
+          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "propose_owner",
+      "inputs": [
+        {
+          "name": "_new_owner",
+          "concreteTypeId": "f597b637c3b0f588fb8d7086c6f4735caa3122b85f0423b82e489f9bb58e2308"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "single_update_fee_in_wei",
+      "inputs": [],
+      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stork_public_key",
+      "inputs": [],
+      "output": "05a44d8c3e00faf7ed545823b7a2b32723545d8715d87a0ab3cf65904948e8d2",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "update_single_update_fee_in_wei",
+      "inputs": [
+        {
+          "name": "_single_update_fee_in_wei",
+          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "update_stork_public_key",
+      "inputs": [
+        {
+          "name": "_stork_public_key",
+          "concreteTypeId": "05a44d8c3e00faf7ed545823b7a2b32723545d8715d87a0ab3cf65904948e8d2"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "update_temporal_numeric_values_v1",
+      "inputs": [
+        {
+          "name": "_update_data",
+          "concreteTypeId": "e67278f564f3da524afebc87950681dff66e11946370df7f4c68b5f01329590b"
+        }
+      ],
+      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        },
+        {
+          "name": "payable",
+          "arguments": []
+        }
+      ]
+    },
+    {
+      "name": "verify_stork_signature_v1",
+      "inputs": [
+        {
+          "name": "_stork_pubkey",
+          "concreteTypeId": "05a44d8c3e00faf7ed545823b7a2b32723545d8715d87a0ab3cf65904948e8d2"
+        },
+        {
+          "name": "_id",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "_recv_time",
+          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        },
+        {
+          "name": "_quantized_value",
+          "concreteTypeId": "ee4f613105299613c09709aa25fa5118e9a5afeef8e4f1c5871bd4f234631df1"
+        },
+        {
+          "name": "_publisher_merkle_root",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "_value_compute_alg_hash",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "_r",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "_s",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "_v",
+          "concreteTypeId": "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
+        }
+      ],
+      "output": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903",
+      "attributes": null
+    },
+    {
+      "name": "version",
+      "inputs": [],
+      "output": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c",
+      "attributes": null
+    }
+  ],
+  "loggedTypes": [
+    {
+      "logId": "10098701174489624218",
+      "concreteTypeId": "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a"
+    },
+    {
+      "logId": "6508751692018611352",
+      "concreteTypeId": "5a53bb2dd5fdf498df0233d9317f6c4235a9448fb63f5201eda779999df4ec0c"
+    }
+  ],
+  "messagesTypes": [],
+  "configurables": [],
+  "errorCodes": {
+    "18446744069414584320": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 51,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_lower overflow"
+    },
+    "18446744069414584321": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 56,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_upper overflow"
+    },
+    "18446744069414584322": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 61,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_i128 underflow"
+    },
+    "18446744069414584323": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 26,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_lower overflow"
+    },
+    "18446744069414584324": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 31,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_upper overflow"
+    },
+    "18446744069414584325": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 36,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "price_value_i128 overflow"
+    },
+    "18446744069414584326": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 134,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584327": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 77,
+        "column": 21
+      },
+      "logId": null,
+      "msg": "temporal numeric value not found"
+    },
+    "18446744069414584328": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 115,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584329": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 86,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584330": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 130,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584331": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 90,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584332": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 94,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584333": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 122,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584334": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 126,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584335": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 111,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584336": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 107,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    },
+    "18446744069414584337": {
+      "pos": {
+        "pkg": "stork-mock",
+        "file": "src/main.sw",
+        "line": 118,
+        "column": 9
+      },
+      "logId": null,
+      "msg": "unimplemented"
+    }
+  }
+}
