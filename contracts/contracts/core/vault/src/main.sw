@@ -1535,6 +1535,7 @@ fn _liquidate_position(
         position_fee,
         funding_rate,
         funding_rate_has_profit,
+        liquidation_fee,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
 
