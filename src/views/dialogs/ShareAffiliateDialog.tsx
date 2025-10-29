@@ -128,7 +128,7 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
       {dydxAddress && !data?.isEligible && <AffiliateProgress volume={data?.totalVolume} />}
       {dydxAddress && data?.isEligible && (
         <div tw="column gap-1">
-          <EditAffiliateInput />
+          <$EditAffiliateInput />
           {affiliatesUrl && (
             <div
               ref={(domNode) => {
@@ -175,6 +175,10 @@ export const ShareAffiliateDialog = ({ setIsOpen }: DialogProps<ShareAffiliateDi
     </Dialog>
   );
 };
+
+const $EditAffiliateInput = styled(EditAffiliateInput)`
+  --edit-affiliate-input-bgColor: var(--color-layer-2);
+`;
 
 const $QrCode = styled(QrCode)`
   width: 7rem;

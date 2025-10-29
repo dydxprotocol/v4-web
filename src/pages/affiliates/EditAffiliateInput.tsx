@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
+import styled from 'styled-components';
+import tw from 'twin.macro';
 
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -28,9 +30,11 @@ import { track } from '@/lib/analytics/analytics';
 export const EditAffiliateInput = ({
   className,
   slotRight,
+  withAlertMessage = true,
 }: {
   className?: string;
   slotRight?: React.ReactNode;
+  withAlertMessage?: boolean;
 }) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
@@ -219,7 +223,7 @@ export const EditAffiliateInput = ({
 
   return (
     <div className={className} tw="column gap-0.75">
-      <div tw="row gap-1 rounded-0.5 bg-color-layer-3 p-0.75">
+      <$InputContainer>
         <div tw="flex-1">
           <div tw="text-small text-color-text-0">
             {stringGetter({ key: STRING_KEYS.AFFILIATE_LINK })}
@@ -236,7 +240,13 @@ export const EditAffiliateInput = ({
         </div>
         <ActionButtonsElement />
         {slotRight}
-      </div>
+      </$InputContainer>
+      {withAlertMessage && <AlertMessageElement />}
     </div>
   );
 };
+
+const $InputContainer = styled.div`
+  ${tw`row gap-1 rounded-0.5 p-0.75`}
+  background-color: var(--edit-affiliate-input-bgColor, var(--color-layer-3));
+`;

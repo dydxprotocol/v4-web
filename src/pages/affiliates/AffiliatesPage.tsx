@@ -29,7 +29,7 @@ import { EditAffiliateInput } from './EditAffiliateInput';
 
 enum AffiliatesTableType {
   Leaderboard = 'leaderboard',
-  MyReferrals = 'my-referrals',
+  // MyReferrals = 'my-referrals', // TODO: My Referral Endpoint not implemented yet
 }
 
 export const AffiliatesPage = () => {
@@ -138,6 +138,7 @@ export const AffiliatesPage = () => {
           slotRight={
             <Button onClick={openShareDialog}>{stringGetter({ key: STRING_KEYS.SHARE })}</Button>
           }
+          withAlertMessage={false}
         />
       )}
     </div>
@@ -171,11 +172,6 @@ export const AffiliatesPage = () => {
       {
         label: stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD }),
         value: AffiliatesTableType.Leaderboard,
-        content: <AffiliatesLeaderboard />,
-      },
-      {
-        label: 'My Referrals',
-        value: AffiliatesTableType.MyReferrals,
         content: <AffiliatesLeaderboard />,
       },
     ];
