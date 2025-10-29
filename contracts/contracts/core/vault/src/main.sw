@@ -1555,7 +1555,7 @@ fn _get_funding_info(asset: b256) -> FundingInfo {
     })
 }
 
-/// returns funding rate and whether the position has profit
+/// returns the funding rate value and the flag whether it is a profit or loss
 #[storage(read)]
 fn _calculate_funding_rate(
     asset: b256,
