@@ -1593,7 +1593,7 @@ fn _calculate_funding_rate(
         // round down if the position has profit
         (funding_rate_with_precision * position_size / FUNDING_RATE_PRECISION, true)
     } else {
-        // ruound up if the position has losses
+        // round up if the position has losses
         (
             (funding_rate_with_precision * position_size + FUNDING_RATE_PRECISION - 1) / FUNDING_RATE_PRECISION,
             false,
