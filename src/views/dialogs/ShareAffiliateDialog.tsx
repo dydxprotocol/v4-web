@@ -24,7 +24,7 @@ import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { QrCode } from '@/components/QrCode';
-import { EditAffiliateInput } from '@/pages/affiliates/EditAffiliateInput';
+import { EditAffiliateInput } from '@/views/Affiliates/EditAffiliateInput';
 
 import { track } from '@/lib/analytics/analytics';
 import { triggerTwitterIntent } from '@/lib/twitter';

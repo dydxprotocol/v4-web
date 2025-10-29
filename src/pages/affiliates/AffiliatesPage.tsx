@@ -25,7 +25,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { EditAffiliateInput } from './EditAffiliateInput';
+import { EditAffiliateInput } from '../../views/Affiliates/EditAffiliateInput';
 
 enum AffiliatesTableType {
   Leaderboard = 'leaderboard',
