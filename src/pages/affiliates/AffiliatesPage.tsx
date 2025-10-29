@@ -41,6 +41,19 @@ export const AffiliatesPage = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
+  const userStatus = affiliateMetadata?.affiliateInfo?.isWhitelisted
+    ? {
+        isAffiliate: true,
+        currentAffiliateTier: 2,
+      }
+    : {
+        isAffiliate:
+          Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
+          (affiliateMetadata?.totalVolume &&
+            affiliateMetadata.totalVolume > AFFILIATES_REQUIRED_VOLUME_USD),
+        currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
+      };
+
   const toggleCriteria = () => {
     dispatch(
       openDialog(
@@ -56,16 +69,7 @@ export const AffiliatesPage = () => {
     dispatch(openDialog(DialogTypes.ShareAffiliate({})));
   };
 
-  const userStatus = {
-    isAffiliate:
-      Boolean(affiliateMetadata?.metadata?.isAffiliate) ||
-      (affiliateMetadata?.totalVolume &&
-        affiliateMetadata.totalVolume > AFFILIATES_REQUIRED_VOLUME_USD),
-    isVip: affiliateMetadata?.affiliateInfo?.isWhitelisted ?? false,
-    currentAffiliateTier: affiliateMetadata?.affiliateInfo?.tier ?? undefined,
-  };
-
-  const showAffiliateDetails = userStatus.isAffiliate ?? userStatus.isVip;
+  const showAffiliateDetails = userStatus.isAffiliate;
 
   const myReferralStats = dydxAddress && (
     <div tw="flexColumn w-full gap-1">
@@ -152,7 +156,7 @@ export const AffiliatesPage = () => {
           <div tw="flex min-h-4 flex-1 items-center justify-center rounded-0.625 bg-color-layer-3">
             <LoadingSpinner />
           </div>
-        ) : !userStatus.isAffiliate && !userStatus.isVip ? (
+        ) : !userStatus.isAffiliate ? (
           <AffiliateProgressCard
             tw="flex-1 bg-color-layer-3"
             volume={affiliateMetadata.totalVolume}

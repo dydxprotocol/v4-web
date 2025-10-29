@@ -21,7 +21,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { StatCell } from './StatBox';
 
 interface ITierDefinition {
-  tier: number | 'vip';
+  tier: number;
   requirements: { referredVol?: number };
   affiliateEarnRate: string;
 }
@@ -50,12 +50,8 @@ export const CriteriaDialog = ({
   userTier,
 }: DialogProps<CriteriaDialogProps>) => {
   const { dydxAddress } = useAccounts();
-
   const stringGetter = useStringGetter();
-
-  const currentUserTierIdx =
-    userTier === 'vip' ? TIERS.length - 1 : TIERS.findIndex((tier) => tier.tier === userTier);
-
+  const currentUserTierIdx = TIERS.findIndex((tier) => tier.tier === userTier);
   const currentUserTier = TIERS[currentUserTierIdx];
 
   return (
@@ -66,46 +62,30 @@ export const CriteriaDialog = ({
       title={
         !dydxAddress
           ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
-          : userTier === 'vip'
-            ? stringGetter({
-                key: STRING_KEYS.YOURE_A_VIP,
-                params: {
-                  VIP: (
-                    <span tw="text-color-success">{stringGetter({ key: STRING_KEYS.VIP })}</span>
-                  ),
-                },
-              })
-            : stringGetter({
-                key: STRING_KEYS.YOUR_TIER,
-                params: {
-                  TIER: currentUserTier?.tier,
-                },
-              })
+          : stringGetter({
+              key: STRING_KEYS.YOUR_TIER,
+              params: {
+                TIER: currentUserTier?.tier,
+              },
+            })
       }
       hasHeaderBlur={false}
     >
       <$Container tw="flex flex-col gap-y-1">
         <div tw="flex flex-col gap-y-1 px-1 notTablet:p-0">
           <div tw="text-color-text-0">
-            {userTier === 'vip'
-              ? stringGetter({
-                  key: STRING_KEYS.PROGRAM_CARD_BODY_VIP,
-                  params: {
-                    VIP: stringGetter({ key: STRING_KEYS.VIP_AFFILIATE }),
-                  },
-                })
-              : stringGetter({
-                  key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
-                  params: {
-                    VIP_VALUE: null,
-                    REGULAR_VALUE: (
-                      <span tw="text-color-text-1">
-                        ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
-                      </span>
-                    ),
-                    APPLY_HERE: null,
-                  }, // TODO (Jared): Update string
-                })}
+            {stringGetter({
+              key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
+              params: {
+                VIP_VALUE: null,
+                REGULAR_VALUE: (
+                  <span tw="text-color-text-1">
+                    ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
+                  </span>
+                ),
+                APPLY_HERE: null,
+              }, // TODO (Jared): Update string
+            })}
           </div>
 
           {dydxAddress && (
@@ -126,13 +106,7 @@ export const CriteriaDialog = ({
   );
 };
 
-const CriteriaTable = ({
-  userTier,
-  tiers,
-}: {
-  userTier?: number | 'vip';
-  tiers: ITierDefinition[];
-}) => {
+const CriteriaTable = ({ userTier, tiers }: { userTier?: number; tiers: ITierDefinition[] }) => {
   const stringGetter = useStringGetter();
 
   const columns: ColumnDef<ITierDefinition>[] = [
@@ -142,13 +116,7 @@ const CriteriaTable = ({
       label: stringGetter({ key: STRING_KEYS.TIER }),
       renderCell: ({ tier }) => (
         <$TableCell stacked>
-          <div tw="flex items-center">
-            {tier.toString().toLowerCase() === 'vip' ? (
-              <span tw="text-color-success">{tier.toString().toUpperCase()}</span>
-            ) : (
-              tier.toString().toUpperCase()
-            )}
-          </div>
+          <div tw="flex items-center">{tier.toString().toUpperCase()}</div>
         </$TableCell>
       ),
     },
@@ -157,17 +125,8 @@ const CriteriaTable = ({
       label: stringGetter({ key: STRING_KEYS.REQUIREMENTS }),
       allowsSorting: false,
 
-      renderCell: ({ tier, requirements }) =>
-        tier === 'vip' && userTier !== 'vip' ? null : tier === 'vip' && userTier === 'vip' ? (
-          <$TableCell tw="text-color-text-2">
-            {stringGetter({
-              key: STRING_KEYS.YOURE_A_VIP,
-              params: {
-                VIP: <>{stringGetter({ key: STRING_KEYS.VIP })}!</>,
-              },
-            })}
-          </$TableCell>
-        ) : !requirements.referredVol ? (
+      renderCell: ({ requirements }) =>
+        !requirements.referredVol ? (
           <$TableCell stacked>{stringGetter({ key: STRING_KEYS.NONE })}</$TableCell>
         ) : (
           <$TableCell stacked>
@@ -207,7 +166,7 @@ const CriteriaTable = ({
 
   return (
     <$Table
-      affiliateTierIdx={userTier === 'vip' ? 4 : userTier}
+      affiliateTierIdx={userTier}
       withInnerBorders
       withOuterBorder
       tableId="criteria"
