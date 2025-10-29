@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { DEFAULT_AFFILIATES_EARN_PER_MONTH_USD } from '@/constants/affiliates';
 import { CriteriaDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -73,21 +72,6 @@ export const CriteriaDialog = ({
     >
       <$Container tw="flex flex-col gap-y-1">
         <div tw="flex flex-col gap-y-1 px-1 notTablet:p-0">
-          <div tw="text-color-text-0">
-            {stringGetter({
-              key: STRING_KEYS.CRITERIA_MODAL_VIP_DISCLAIMER,
-              params: {
-                VIP_VALUE: null,
-                REGULAR_VALUE: (
-                  <span tw="text-color-text-1">
-                    ${DEFAULT_AFFILIATES_EARN_PER_MONTH_USD.toLocaleString()}
-                  </span>
-                ),
-                APPLY_HERE: null,
-              }, // TODO (Jared): Update string
-            })}
-          </div>
-
           {dydxAddress && (
             <div tw="my-1 flex">
               <StatCell
