@@ -1,13 +1,14 @@
 import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { ArrowDownIcon } from '@radix-ui/react-icons';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonSize, ButtonState } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
@@ -16,10 +17,11 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useDebounce } from '@/hooks/useDebounce';
 
-import ArrowIcon from '@/icons/arrow.svg';
+import { RefreshIcon } from '@/icons';
 import CardHolderIcon from '@/icons/card-holder.svg';
 import CaretDown from '@/icons/caret-down.svg';
 import DydxLogo from '@/icons/dydx-protocol.svg';
+import GasIcon from '@/icons/gas.svg';
 import UsdcLogo from '@/icons/usdc.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
 
@@ -209,8 +211,8 @@ export const Swap = () => {
 
   return (
     <div tw="flex flex-col gap-1">
-      <div tw="flex flex-col gap-0.25">
-        <div tw="relative flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1">
+      <div tw="relative flex flex-col gap-0.25">
+        <div tw="flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1">
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">From</div>
             <div tw="flex items-center gap-0.375 text-color-layer-7 font-small-medium">
@@ -238,22 +240,16 @@ export const Swap = () => {
             />
             <TokenLogo token={inputToken} />
           </div>
-
-          <div
-            tw="absolute bottom-0 left-[50%] rounded-0.75 bg-color-layer-3 p-0.25 hover:opacity-90"
-            style={{ transform: 'translateX(-50%) translateY(50%)' }}
-          >
-            <button
-              onClick={onSwitchTokens}
-              aria-label="Switch"
-              type="button"
-              style={{ transform: 'rotate(90deg)' }}
-              tw="flex items-center justify-center rounded-0.5 bg-color-accent-faded p-0.375"
-            >
-              <ArrowIcon tw="h-1.25 w-1.25 text-color-accent" />
-            </button>
-          </div>
         </div>
+
+        <$SwapButton
+          tw="absolute left-1/2 top-1/2 rounded-0.75 border-4 border-color-layer-3 bg-color-layer-4 p-0.5"
+          shape={ButtonShape.Square}
+          action={ButtonAction.Base}
+          onClick={onSwitchTokens}
+        >
+          <ArrowDownIcon tw="h-1.25 w-1.25" />
+        </$SwapButton>
 
         <div tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1">
           <div tw="flex justify-between">
@@ -323,7 +319,13 @@ export const Swap = () => {
         }
         items={[
           {
-            header: <ExchangeRate usdcPerDydx={usdcPerDydx} priceImpact={priceImpact} />,
+            header: (
+              <ExchangeRate
+                selectedToken={inputToken}
+                usdcPerDydx={usdcPerDydx}
+                priceImpact={priceImpact}
+              />
+            ),
             content: (
               <QuoteDetails isLoading={isLoading || isPlaceholderData} priceImpact={priceImpact} />
             ),
@@ -380,50 +382,51 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
 const ExchangeRate = ({
   usdcPerDydx,
   priceImpact,
+  selectedToken,
 }: {
   usdcPerDydx?: number;
   priceImpact?: number;
+  selectedToken: 'usdc' | 'dydx';
 }) => {
-  if (!priceImpact && !usdcPerDydx) {
-    return <LoadingDots />;
-  }
+  const exchangeRate = useMemo(() => {
+    return selectedToken === 'dydx' ? usdcPerDydx : 1 / (usdcPerDydx ?? 1);
+  }, [selectedToken, usdcPerDydx]);
+  const nonSelectedToken = selectedToken === 'dydx' ? 'usdc' : 'dydx';
 
-  if (!priceImpact || priceImpact < 0.5) {
-    return (
-      <div tw="font-medium text-color-text-1">
-        <Output
-          tw="inline"
-          value={usdcPerDydx}
-          type={OutputType.CompactNumber}
-          slotLeft="1 dYdX = "
-          slotRight=" USDC"
-        />
+  return !usdcPerDydx ? (
+    <LoadingDots />
+  ) : (
+    <div tw="flex w-full justify-between text-small">
+      <div tw="flex items-center gap-0.25">
+        {priceImpact && priceImpact >= 0.5 ? (
+          <>
+            <WarningFilled tw="text-color-warning" />
+            <Output
+              tw="text-color-warning"
+              value={priceImpact}
+              type={OutputType.CompactNumber}
+              slotLeft="High price impact ("
+              slotRight="%)"
+            />
+          </>
+        ) : (
+          <>
+            <RefreshIcon />
+            <Output
+              value={exchangeRate}
+              type={OutputType.CompactNumber}
+              slotLeft={`1 ${getTokenLabel(selectedToken)} = `}
+              slotRight={` ${getTokenLabel(nonSelectedToken)}`}
+            />
+          </>
+        )}
       </div>
-    );
-  }
-
-  return (
-    <div>
-      <WarningFilled tw="text-color-warning" />
-      <div>High price impact ({priceImpact / 100})</div>
+      <div tw="flex items-center gap-0.25">
+        <GasIcon />
+        <Output value={0} type={OutputType.CompactNumber} slotLeft="$" />
+      </div>
     </div>
   );
-
-  //   if (value > 0.0001) {
-  //   return { value, color: 'var(--color-positive)' };
-  // }
-
-  // if (value > 0.005) {
-  //   return { value, color: 'var(--color-text-1)' };
-  // }
-
-  // if (value > -0.05) {
-  //   return { value, color: 'var(--color-warning)' };
-  // }
-
-  // return { value, color: 'var(--color-negative)' };
-
-  return null;
 };
 
 const $Input = styled.input<{ hasError?: boolean; $isLoading: boolean }>`
@@ -438,6 +441,10 @@ const $Input = styled.input<{ hasError?: boolean; $isLoading: boolean }>`
 const $Accordion = styled(Accordion)`
   --accordion-paddingX: 0rem;
   --accordion-paddingY: 0rem;
+`;
+
+const $SwapButton = styled(Button)`
+  transform: translate(-50%, -50%);
 `;
 
 const TokenLogo = ({ token }: { token: 'usdc' | 'dydx' }) => {
