@@ -35,7 +35,7 @@ import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
-import { StakingPanel } from './token/StakingPanel';
+import { SwapAndStakingPanel } from './token/SwapAndStakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -179,7 +179,7 @@ const Profile = () => {
         tw="[grid-area:help]"
       />
 
-      <StakingPanel tw="[grid-area:staking]" />
+      <SwapAndStakingPanel tw="[grid-area:staking]" />
 
       <Panel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
