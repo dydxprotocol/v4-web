@@ -2,7 +2,6 @@ import { Content, Header, Item, Root, Trigger } from '@radix-ui/react-accordion'
 import styled, { keyframes } from 'styled-components';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from './Icon';
 
@@ -73,7 +72,9 @@ const $Icon = styled.div`
 `;
 
 const $Trigger = styled(Trigger)<{ $triggerRotation?: number }>`
-  ${layoutMixins.spacedRow}
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: var(--accordion-paddingY) var(--accordion-paddingX);
   gap: 0.5rem;
