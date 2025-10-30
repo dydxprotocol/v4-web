@@ -11,7 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { useLoadedVaultAccountTransfers } from '@/hooks/vaultsHooks';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
@@ -163,7 +163,7 @@ export const VaultTransactionsTable = ({
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
   min-width: auto;

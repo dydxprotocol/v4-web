@@ -17,7 +17,7 @@ import {
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -270,7 +270,7 @@ export const FundingPaymentsTable = forwardRef<HTMLDivElement, ElementProps & St
 );
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;
 
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`

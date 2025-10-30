@@ -10,7 +10,7 @@ import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
@@ -185,5 +185,5 @@ export const TransferHistoryTable = ({
   );
 };
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;

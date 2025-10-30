@@ -17,7 +17,7 @@ import { useLoadedVaultPositions } from '@/hooks/vaultsHooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
@@ -248,7 +248,7 @@ export const VaultPositionsTable = ({ className }: { className?: string }) => {
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 
   @media ${breakpoints.tablet} {
     table {
