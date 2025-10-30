@@ -2,7 +2,6 @@ import { Content, Header, Item, Root, Trigger } from '@radix-ui/react-accordion'
 import styled, { keyframes } from 'styled-components';
 
 import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from './Icon';
 
@@ -14,19 +13,25 @@ export type AccordionItem = {
 export type AccordionProps = {
   items: AccordionItem[];
   className?: string;
+  triggerIcon?: React.ReactNode;
+  triggerRotation?: number;
 };
 
-export const Accordion = ({ items, className }: AccordionProps) => (
+export const Accordion = ({ items, className, triggerIcon, triggerRotation }: AccordionProps) => (
   <$Root className={className} type="single" collapsible>
     {items.map(({ header, content }, idx) => (
       // eslint-disable-next-line react/no-array-index-key
       <Item key={idx} value={idx.toString()}>
         <Header>
-          <$Trigger>
+          <$Trigger $triggerRotation={triggerRotation}>
             {header}
-            <$Icon>
-              <Icon iconName={IconName.Plus} size="1.125em" />
-            </$Icon>
+            <$IconWrapper>
+              {triggerIcon ?? (
+                <$Icon>
+                  <Icon iconName={IconName.Plus} size="1.125em" />
+                </$Icon>
+              )}
+            </$IconWrapper>
           </$Trigger>
         </Header>
         <$Content>{content}</$Content>
@@ -34,6 +39,7 @@ export const Accordion = ({ items, className }: AccordionProps) => (
     ))}
   </$Root>
 );
+
 const $Root = styled(Root)`
   --accordion-paddingY: 1rem;
   --accordion-paddingX: 1rem;
@@ -46,6 +52,8 @@ const $Root = styled(Root)`
     border-bottom: var(--border-width) solid var(--border-color);
   }
 `;
+
+const $IconWrapper = styled.div``;
 
 const $Icon = styled.div`
   display: inline-flex;
@@ -63,8 +71,10 @@ const $Icon = styled.div`
   font: var(--font-small-book);
 `;
 
-const $Trigger = styled(Trigger)`
-  ${layoutMixins.spacedRow}
+const $Trigger = styled(Trigger)<{ $triggerRotation?: number }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: var(--accordion-paddingY) var(--accordion-paddingX);
   gap: 0.5rem;
@@ -73,19 +83,19 @@ const $Trigger = styled(Trigger)`
   text-align: start;
 
   &:hover {
-    ${$Icon} {
+    ${$IconWrapper} {
       color: var(--color-text-2);
       filter: brightness(var(--hover-filter-base));
     }
   }
 
-  svg {
+  ${$IconWrapper} {
     color: var(--color-text-0);
     transition: transform 0.3s var(--ease-out-expo);
   }
 
-  &[data-state='open'] svg {
-    transform: rotate(45deg);
+  &[data-state='open'] ${$IconWrapper} {
+    transform: ${({ $triggerRotation }) => `rotate(${$triggerRotation ?? 45}deg)`};
   }
 `;
 
