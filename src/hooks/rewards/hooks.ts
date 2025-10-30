@@ -15,7 +15,7 @@ import {
   pointsToEstimatedDydxRewards,
 } from './util';
 
-export type ChaosLabsLeaderboardItem = {
+export type ChaosLabsPointsItem = {
   rank: number;
   account: DydxAddress;
   accountLabel: string;
@@ -49,7 +49,7 @@ async function getChaosLabsPointsDistribution() {
     }),
   });
   const parsedRes = (await res.json()) as {
-    data: { incentivesLeaderboard: ChaosLabsLeaderboardItem[] };
+    data: { incentivesLeaderboard: ChaosLabsPointsItem[] };
   };
 
   return parsedRes.data.incentivesLeaderboard;
@@ -124,4 +124,55 @@ export const useChaosLabsUsdRewards = ({
     ),
     isLoading: totalPointsLoading || pointsLoading,
   };
+};
+
+export type ChaosLabsPnlItem = {
+  address: string;
+  pnl: number;
+  startOfThisWeekPnlSnapshot: {
+    equity: string;
+    totalPnl: string;
+  };
+  volume: number;
+  position: number;
+  dollarReward: number;
+};
+
+async function getChaosLabsPnlDistribution() {
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-clc`,
+    {
+      method: 'GET',
+    }
+  );
+  const parsedRes = (await res.json()) as {
+    data: ChaosLabsPnlItem[];
+  };
+
+  return parsedRes.data;
+}
+
+export function useChaosLabsPnlDistribution() {
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
+
+  const { data: pnlItems, isLoading: pnlItemsLoading } = useQuery({
+    queryKey: ['chaoslabs/pnls'],
+    queryFn: wrapAndLogError(
+      () => getChaosLabsPnlDistribution(),
+      'LaunchIncentives/fetchPnls',
+      true
+    ),
+  });
+
+  return {
+    isLoading: pnlItemsLoading || !dydxPrice,
+    data: pnlItems,
+  };
+}
+
+export type ChaosLabsLeaderboardItem = {
+  rank: number;
+  account: string;
+  estimatedDydxRewards: number;
+  pnl: number;
 };

@@ -319,8 +319,8 @@ const MinutesCountdown = ({ endTime }: { endTime: string }) => {
 
   const formattedMsLeft = useMemo(() => {
     return Duration.fromMillis(msLeft)
-      .shiftTo('days', 'hours', 'minutes')
-      .toFormat('d:hh:mm', { floor: true });
+      .shiftTo('days', 'hours', 'minutes', 'seconds')
+      .toFormat("d'd' h'h' m'm' s's'", { floor: true });
   }, [msLeft]);
 
   return <div>{formattedMsLeft}</div>;

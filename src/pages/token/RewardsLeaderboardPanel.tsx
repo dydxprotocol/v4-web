@@ -1,20 +1,20 @@
-import { ReactNode, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
+import {
+  ChaosLabsLeaderboardItem,
+  useChaosLabsPnlDistribution,
+  useChaosLabsPointsDistribution,
+} from '@/hooks/rewards/hooks';
 import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import BadgeRank1 from '@/icons/badge-rank-1.svg';
-import BadgeRank2 from '@/icons/badge-rank-2.svg';
-import BadgeRank3 from '@/icons/badge-rank-3.svg';
+import { TrophyIcon } from '@/icons';
 
-import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -28,40 +28,17 @@ import { truncateAddress } from '@/lib/wallet';
 export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
+  PNL = 'PNL',
   Rewards = 'Rewards',
 }
 
-const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactNode }) => {
-  return (
-    <div tw="flex gap-0.5">
-      {icon}
-      <div tw="flex flex-col gap-0.125">
-        <div tw="flex items-center text-small font-medium text-color-text-1">
-          <div> {truncateAddress(item.account)}</div>
-          <CopyButton
-            buttonType="icon"
-            value={item.account}
-            buttonStyle={ButtonStyle.WithoutBackground}
-          />
-        </div>
-
-        <Output
-          tw="text-large font-bold text-color-text-2"
-          value={item.estimatedDydxRewards}
-          type={OutputType.CompactNumber}
-          slotRight={
-            <div tw="mb-0.125 ml-0.5 self-end text-small font-medium text-color-text-0">dYdX</div>
-          }
-        />
-      </div>
-    </div>
-  );
-};
-
 export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
-  const { data, isLoading } = useChaosLabsPointsDistribution();
+  const { isLoading: isLoadingTopPoints } = useChaosLabsPointsDistribution();
+  const { data: topPnls, isLoading: isLoadingTopPnls } = useChaosLabsPnlDistribution();
   const { dydxAddress } = useAccounts();
+
+  const isLoading = isLoadingTopPnls || isLoadingTopPoints;
 
   const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.rank, []);
 
@@ -74,8 +51,27 @@ export const RewardsLeaderboardPanel = () => {
       })
   );
 
+  const data = (topPnls ?? []).reduce((acc, entry) => {
+    return [
+      ...acc,
+      {
+        rank: entry.position,
+        account: entry.address,
+        estimatedDydxRewards: entry.dollarReward,
+        pnl: +entry.startOfThisWeekPnlSnapshot.totalPnl,
+      },
+    ];
+  }, [] as ChaosLabsLeaderboardItem[]);
+
+  // const data = (topPoints ?? []).map((p) => ({
+  //   rank: p.rank,
+  //   account: p.account,
+  //   estimatedDydxRewards: p.estimatedDydxRewards,
+  //   pnl: 1000,
+  // }));
+
   const onDownload = () => {
-    if (!data) return;
+    if (data.length === 0) return;
 
     const csvRows = data.map((item) => ({
       rank: item.rank,
@@ -102,8 +98,6 @@ export const RewardsLeaderboardPanel = () => {
     });
   };
 
-  const [first, second, third] = (data ?? []).slice(0, 3);
-
   return (
     <$Panel>
       <div tw="flex flex-col gap-1">
@@ -118,15 +112,10 @@ export const RewardsLeaderboardPanel = () => {
           </button>
         </div>
 
-        <div tw="flex items-center justify-between gap-2 px-1.5 py-0.5 pr-2">
-          {first && <Top3Item icon={<BadgeRank1 />} item={first} />}
-          {second && <Top3Item icon={<BadgeRank2 />} item={second} />}
-          {third && <Top3Item icon={<BadgeRank3 />} item={third} />}
-        </div>
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
             label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-            data={data ?? []}
+            data={data}
             tableId="trading-rewards"
             getRowKey={getRowKey}
             columns={columns}
@@ -238,6 +227,9 @@ const getRewardsLeaderboardTableColumnDef = ({
                 {rank}
               </div>
             </div>
+            {rank === 1 && <TrophyIcon tw="size-1.5 text-[#e5c346]" />}
+            {rank === 2 && <TrophyIcon tw="size-1.5 text-[#c9c9cb]" />}
+            {rank === 3 && <TrophyIcon tw="size-1.5 text-[#c37b3f]" />}
             {account === dydxAddress && (
               <div tw="flex items-center justify-center rounded-20 border border-solid border-color-accent px-0.5">
                 <span tw="text-small font-medium text-color-accent">
@@ -274,6 +266,23 @@ const getRewardsLeaderboardTableColumnDef = ({
           </div>
         ),
       },
+      [RewardsLeaderboardTableColumns.PNL]: {
+        columnKey: RewardsLeaderboardTableColumns.PNL,
+        getCellValue: (row) => row.pnl,
+        label: (
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.PNL })}
+          </div>
+        ),
+        renderCell: ({ pnl }) => (
+          <Output
+            css={{ color: pnl >= 0 ? 'var(--color-positive)' : 'var(--color-negative)' }}
+            tw="text-small font-medium"
+            type={OutputType.Fiat}
+            value={pnl}
+          />
+        ),
+      },
       [RewardsLeaderboardTableColumns.Rewards]: {
         columnKey: RewardsLeaderboardTableColumns.Rewards,
         getCellValue: (row) => row.estimatedDydxRewards,
@@ -284,10 +293,9 @@ const getRewardsLeaderboardTableColumnDef = ({
         ),
         renderCell: ({ estimatedDydxRewards, account }) => (
           <Output
-            slotRight=" DYDX"
             css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
             tw="text-small font-medium"
-            type={OutputType.Number}
+            type={OutputType.Fiat}
             value={estimatedDydxRewards}
           />
         ),
