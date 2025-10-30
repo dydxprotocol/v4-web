@@ -35,7 +35,6 @@ import { truncateAddress } from '@/lib/wallet';
 
 import { GovernancePanel } from './token/GovernancePanel';
 import { LaunchIncentivesPanel } from './token/LaunchIncentivesPanel';
-import { MigratePanel } from './token/MigratePanel';
 import { SwapAndStakingPanel } from './token/SwapAndStakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
@@ -179,8 +178,6 @@ const Profile = () => {
         onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         tw="[grid-area:help]"
       />
-
-      <MigratePanel tw="[grid-area:migrate]" />
 
       <SwapAndStakingPanel tw="[grid-area:staking]" />
 
