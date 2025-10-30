@@ -107,7 +107,6 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        isActionable: true,
         renderCell: ({ marketSummary, leverage, signedSize, side }) => (
           <TableCell
             stacked
@@ -154,7 +153,6 @@ const getPositionsTableColumnDef = ({
           </TableColumnHeader>
         ),
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
-        isActionable: true,
         renderCell: ({ entryPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -176,7 +174,6 @@ const getPositionsTableColumnDef = ({
         columnKey: 'combinedPnl',
         getCellValue: (row) => row.updatedUnrealizedPnl.toNumber(),
         label: stringGetter({ key: STRING_KEYS.PNL }),
-        isActionable: true,
         renderCell: ({ updatedUnrealizedPnl, updatedUnrealizedPnlPercent }) => {
           return !isTablet ? (
             <TableCell>
@@ -218,7 +215,6 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marketSummary?.displayableTicker,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        isActionable: true,
         renderCell: ({ market, marketSummary }) => {
           return (
             <MarketSummaryTableCell
@@ -244,7 +240,6 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marginMode,
         label: stringGetter({ key: STRING_KEYS.TYPE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        isActionable: true,
         renderCell: ({ marginMode }) => (
           <TableCell>
             <Tag>{stringGetter({ key: getMarginModeStringKey(marginMode) })}</Tag>
@@ -258,7 +253,6 @@ const getPositionsTableColumnDef = ({
         },
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        isActionable: true,
         renderCell: ({ signedSize, stepSizeDecimals }) => {
           return (
             <TableCell>
@@ -278,7 +272,6 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notional.toNumber(),
         label: stringGetter({ key: STRING_KEYS.VALUE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        isActionable: true,
         renderCell: ({ notional }) => {
           return (
             <TableCell>
@@ -316,7 +309,6 @@ const getPositionsTableColumnDef = ({
         columnKey: 'oracle',
         getCellValue: (row) => row.oraclePrice,
         label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED }),
-        isActionable: true,
         renderCell: ({ oraclePrice, tickSizeDecimals }) => (
           <TableCell>
             <Output
@@ -332,7 +324,6 @@ const getPositionsTableColumnDef = ({
         columnKey: 'liquidation',
         getCellValue: (row) => row.liquidationPrice?.toNumber(),
         label: stringGetter({ key: STRING_KEYS.LIQUIDATION }),
-        isActionable: true,
         renderCell: ({ liquidationPrice, tickSizeDecimals }) => (
           <TableCell>
             <Output
@@ -349,7 +340,6 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.netFunding.toNumber(),
         label: stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT }),
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        isActionable: true,
         renderCell: ({ netFunding }) => {
           return (
             <TableCell>

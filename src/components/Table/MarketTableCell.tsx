@@ -14,9 +14,6 @@ export const MarketSummaryTableCell = ({
   return (
     <TableCell
       tw="font-bold text-color-text-2"
-      css={{
-        cursor: onClick ? 'pointer' : undefined,
-      }}
       slotLeft={
         <AssetIcon
           tw="[--asset-icon-size:1.25rem] tablet:[--asset-icon-size:2.25rem]"

@@ -23,7 +23,18 @@ export const TableCell = ({
   stackedWithSecondaryStyling?: boolean;
   onClick?: MouseEventHandler<HTMLDivElement>;
 }) => (
-  <$CellContent isHighlighted={isHighlighted} className={className} onClick={onClick}>
+  <$CellContent
+    isHighlighted={isHighlighted}
+    className={className}
+    onClick={onClick}
+    css={
+      onClick
+        ? {
+            cursor: 'pointer',
+          }
+        : undefined
+    }
+  >
     {slotLeft}
     {!!stacked || stackedWithSecondaryStyling ? (
       <$Column stackedWithSecondaryStyling={stackedWithSecondaryStyling}>{children}</$Column>
