@@ -156,6 +156,7 @@ export interface IndexerCompositeFillObject {
   clientMetadata?: string | null;
   subaccountNumber?: number;
   market?: string;
+  closedPnl?: string;
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {
