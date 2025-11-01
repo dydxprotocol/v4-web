@@ -75,7 +75,9 @@ export const RewardsLeaderboardPanel = () => {
     <$Panel>
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
-          <div tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.LEADERBOARD })}</div>
+          <div tw="font-medium-bold">
+            {stringGetter({ key: STRING_KEYS.SURGE_LEADERBOARD_TITLE })}
+          </div>
           <button
             onClick={onDownload}
             type="button"
