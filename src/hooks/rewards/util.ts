@@ -28,3 +28,9 @@ export const OCT_2025_REWARDS_DETAILS = {
   rebateFraction: 0.5,
   endTime: '2025-11-30T23:59:59.000Z', // end of month
 };
+
+export const NOV_2025_COMPETITION_DETAILS = {
+  rewardAmount: '$250k',
+  rewardAmountUsd: 250_000,
+  endTime: '2025-11-30T23:59:59.000Z', // end of month
+};

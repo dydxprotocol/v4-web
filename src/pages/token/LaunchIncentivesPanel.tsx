@@ -84,7 +84,7 @@ const September2025RewardsPanel = () => {
                 </span>{' '}
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.SURGE_HEADLINE_SEP_2025,
+                    key: STRING_KEYS.SURGE_HEADLINE_NOV_2025,
                     params: {
                       REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
                       REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
@@ -99,7 +99,7 @@ const September2025RewardsPanel = () => {
             <span>
               <span tw="text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.SURGE_BODY_SEP_2025,
+                  key: STRING_KEYS.SURGE_BODY_NOV_2025,
                   params: {
                     REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
                     REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
@@ -156,7 +156,7 @@ const Sept2025RewardsPanel = () => {
             })}
             slotTrigger={
               <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
-                {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_MONTHLY_REWARD })}
                 <Icon iconName={IconName.InfoStroke} />
               </div>
             }

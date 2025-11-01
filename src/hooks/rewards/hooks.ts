@@ -173,6 +173,12 @@ export function useChaosLabsPnlDistribution() {
 export type ChaosLabsLeaderboardItem = {
   rank: number;
   account: string;
-  estimatedDydxRewards: number;
+  estimatedDydxRewards: string | number;
+};
+
+export type ChaosLabsCompetitionItem = {
+  rank: number;
+  account: string;
+  dollarReward: number;
   pnl: number;
 };
