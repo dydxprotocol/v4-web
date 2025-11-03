@@ -14,7 +14,7 @@ import { FundingChart } from '@/views/charts/FundingChart';
 import { ChartSelector } from '@/views/charts/TradingView/ChartSelector';
 import { TvChartLaunchable } from '@/views/charts/TradingView/TvChartLaunchable';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 /* import { tradeFormActions } from '@/state/tradeForm'; */

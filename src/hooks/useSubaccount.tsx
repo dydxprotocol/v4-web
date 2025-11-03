@@ -92,7 +92,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         amount: number;
       }) => {
         try {
-          return await compositeClient?.depositToSubaccount(
+          if (!compositeClient) return undefined;
+          return compositeClient.depositToSubaccount(
             subaccountClient,
             amount.toFixed(usdcDecimals),
             TransactionMemo.depositToSubaccount
@@ -111,7 +112,8 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         amount: number;
       }) => {
         try {
-          return await compositeClient?.withdrawFromSubaccount(
+          if (!compositeClient) return undefined;
+          return compositeClient.withdrawFromSubaccount(
             subaccountClient,
             amount.toFixed(usdcDecimals),
             undefined,
@@ -151,7 +153,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             },
           };
 
-          return await compositeClient.send(
+          return compositeClient.send(
             subaccountClient.wallet,
             () => Promise.resolve([msg, ibcMsg]),
             false,

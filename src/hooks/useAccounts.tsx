@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { usePrivy } from '@privy-io/react-auth';
 import { type Subaccount } from 'starboard-client-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -10,7 +9,6 @@ import { DydxAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSourceAccount } from '@/state/walletSelectors';
 

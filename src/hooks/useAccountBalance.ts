@@ -4,16 +4,14 @@ import BigNumber from 'bignumber.js';
 import { erc20Abi, formatUnits } from 'viem';
 import { useBalance, useReadContracts } from 'wagmi';
 
-import { EvmAddress, SolAddress, WalletNetworkType } from '@/constants/wallets';
+import { EvmAddress, WalletNetworkType } from '@/constants/wallets';
 
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { isNativeDenom } from '@/lib/assetUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
-import { useEndpointsConfig } from './useEndpointsConfig';
 import { useEnvConfig } from './useEnvConfig';
 import { useTokenConfigs } from './useTokenConfigs';
 

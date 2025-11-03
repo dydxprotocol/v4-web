@@ -7,15 +7,11 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { BellStrokeIcon } from '@/icons';
 import { LogoShortIcon } from '@/icons/logo-short';
@@ -36,7 +32,6 @@ import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -44,18 +39,12 @@ import { isTruthy } from '@/lib/isTruthy';
 export const HeaderDesktop = () => {
   const { isUrlDataEmpty } = useMobileAppUrl();
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useAppDispatch();
-  const { chainTokenLabel } = useTokenConfigs();
   const { address } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
   const availableBalance = useAppSelector(getSubaccountFreeCollateral);
-
-  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
-
-  const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
     {

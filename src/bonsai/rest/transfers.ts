@@ -26,7 +26,7 @@ export function setUpTransfersQuery(store: RootStore) {
       }
       return async () => {
         try {
-          return await indexerClient.account.getParentSubaccountNumberTransfers(
+          return indexerClient.account.getParentSubaccountNumberTransfers(
             data.wallet!,
             data.subaccount!
           );

@@ -23,14 +23,9 @@ type AddressInputProps = {
   value: string;
   onChange: (newValue: string) => void;
   destinationChain: string;
-  onDestinationClicked: () => void;
 };
 
-export const AddressInput = ({
-  value,
-  onChange,
-  destinationChain,
-}: AddressInputProps) => {
+export const AddressInput = ({ value, onChange, destinationChain }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
   const [isFocused, setIsFocused] = useState(false);

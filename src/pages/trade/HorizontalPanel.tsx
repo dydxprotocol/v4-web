@@ -23,23 +23,13 @@ import {
 } from '@/pages/funding/FundingPaymentsTable';
 import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import {
-  calculateIsAccountViewOnly,
-  calculateShouldRenderActionsInPositionsTable,
-} from '@/state/accountCalculators';
-import {
-  createGetOpenOrdersCount,
-  createGetUnseenFillsCount,
-  createGetUnseenOpenOrdersCount,
-  createGetUnseenOrderHistoryCount,
-} from '@/state/accountSelectors';
+import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
+import { createGetUnseenFillsCount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
-import { getHasUncommittedOrders } from '@/state/localOrdersSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
@@ -77,28 +67,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   const currentMarketId = useAppSelector(getCurrentMarketId);
 
   const areFillsLoading = useAppSelector(BonsaiCore.account.fills.loading) === 'pending';
-  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const shouldRenderTriggers = useShouldShowTriggers();
   const shouldRenderActions = useAppSelectorWithArgs(calculateShouldRenderActionsInPositionsTable);
-  const isWaitingForOrderToIndex = useAppSelector(getHasUncommittedOrders);
-  const areOrdersLoading = useAppSelector(BonsaiCore.account.openOrders.loading) === 'pending';
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
-  const numUnseenOrderHistory = useAppSelectorWithArgs(
-    createGetUnseenOrderHistoryCount,
-    showCurrentMarket ? currentMarketId : undefined
-  );
-  const orderHistoryTagNumber = shortenNumberForDisplay(numUnseenOrderHistory);
-
-  const openOrdersCount = useAppSelectorWithArgs(
-    createGetOpenOrdersCount,
-    showCurrentMarket ? currentMarketId : undefined
-  );
-  const unseenOpenOrdersCount = useAppSelectorWithArgs(
-    createGetUnseenOpenOrdersCount,
-    showCurrentMarket ? currentMarketId : undefined
-  );
-  const ordersTagNumber = shortenNumberForDisplay(openOrdersCount);
 
   const numTotalPositions = (
     useAppSelector(BonsaiCore.account.parentSubaccountPositions.data) ?? EMPTY_ARR
@@ -110,7 +82,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
   );
   const fillsTagNumber = shortenNumberForDisplay(numUnseenFills);
 
-  const hasUnseenOrderUpdates = unseenOpenOrdersCount > 0;
   const hasUnseenFillUpdates = numUnseenFills > 0;
 
   const initialPageSize = 20;

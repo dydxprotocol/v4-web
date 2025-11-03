@@ -1,7 +1,6 @@
 import tw from 'twin.macro';
 
 import { ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -9,9 +8,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { CoinbaseBrandIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
-
-import { useAppDispatch } from '@/state/appTypes';
-import { closeDialog, openDialog } from '@/state/dialogs';
 
 import { DepositStep } from './depositHooks';
 
@@ -24,7 +20,6 @@ export const OtherDepositOptions = ({
   depositSteps?: DepositStep[];
   onClose: () => void;
 }) => {
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const otherOptionsDisabled = Boolean(depositSteps?.length ?? awaitingWalletAction);

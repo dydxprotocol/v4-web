@@ -9,12 +9,10 @@ import { STRING_KEYS } from '@/constants/localization';
 import { EVM_GAS_RESERVE_AMOUNT, TOKEN_DECIMALS } from '@/constants/numbers';
 import { ETH_DECIMALS, TokenForTransfer } from '@/constants/tokens';
 
-import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { Icon } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
 import { isNativeTokenDenom } from '../utils';
@@ -23,7 +21,6 @@ export type AmountInputProps = {
   value: string;
   onChange: (newValue: string) => void;
   token: TokenForTransfer;
-  onTokenClick: () => void;
   tokenBalance: { raw?: string; formatted?: string };
   error?: Error | null;
 };
@@ -35,13 +32,7 @@ function escapeRegExp(string: string): string {
 
 const GAS_RESERVE_AMOUNT = parseUnits(EVM_GAS_RESERVE_AMOUNT.toString(), ETH_DECIMALS);
 
-export const AmountInput = ({
-  value,
-  onChange,
-  token,
-  tokenBalance,
-  error,
-}: AmountInputProps) => {
+export const AmountInput = ({ value, onChange, token, tokenBalance, error }: AmountInputProps) => {
   const stringGetter = useStringGetter();
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
@@ -136,4 +127,3 @@ const $Input = styled.input<{ hasError?: boolean }>`
   ${({ hasError }) => hasError && tw`text-color-error`}
   background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
 `;
-

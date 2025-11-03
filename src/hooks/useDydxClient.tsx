@@ -107,7 +107,7 @@ const useDydxClientContext = () => {
     async (resolution: PnlTickInterval = PnlTickInterval.day) => {
       try {
         if (!indexerClient) return undefined;
-        return await indexerClient.vault.getMegavaultHistoricalPnl(resolution);
+        return indexerClient.vault.getMegavaultHistoricalPnl(resolution);
       } catch (error) {
         log('useDydxClient/getMegavaultHistoricalPnl', error);
         return undefined;
@@ -119,7 +119,7 @@ const useDydxClientContext = () => {
   const getMegavaultPositions = useCallback(async () => {
     try {
       if (!indexerClient) return undefined;
-      return await indexerClient.vault.getMegavaultPositions();
+      return indexerClient.vault.getMegavaultPositions();
     } catch (error) {
       log('useDydxClient/getMegavaultPositions', error);
       return undefined;
@@ -129,7 +129,7 @@ const useDydxClientContext = () => {
   const getVaultsHistoricalPnl = useCallback(async () => {
     try {
       if (!indexerClient) return undefined;
-      return await indexerClient.vault.getVaultsHistoricalPnl();
+      return indexerClient.vault.getVaultsHistoricalPnl();
     } catch (error) {
       log('useDydxClient/getVaultsHistoricalPnl', error);
       return undefined;
@@ -145,7 +145,7 @@ const useDydxClientContext = () => {
     ) => {
       try {
         if (!indexerClient) return undefined;
-        return await indexerClient.account.getTransfersBetween(
+        return indexerClient.account.getTransfersBetween(
           sourceAddress,
           sourceSubaccountNumber,
           recipientAddress,
