@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { OnboardingSteps } from '@/constants/account';
-import { DialogProps, OnboardingDialogProps } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, OnboardingDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { StatsigFlags } from '@/constants/statsig';
 import { ConnectorType, WalletInfo, WalletType } from '@/constants/wallets';
@@ -21,7 +21,7 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { IconName } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { WithTooltip } from '@/components/WithTooltip';
 

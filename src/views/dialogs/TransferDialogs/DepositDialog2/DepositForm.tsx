@@ -50,7 +50,7 @@ import { DepositStep, useDepositSteps } from './depositHooks';
 import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 
 export const DepositForm = ({
-  onTokenSelect,
+  onTokenSelect: _onTokenSelect,
   amount,
   setAmount,
   token,
@@ -386,7 +386,6 @@ export const DepositForm = ({
       value={amount}
       onChange={setAmount}
       token={token}
-      onTokenClick={onTokenSelect}
       error={error}
     />
   );

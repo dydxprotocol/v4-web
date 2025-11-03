@@ -40,7 +40,7 @@ export const WithdrawForm = ({
   destinationAddress,
   setDestinationAddress,
   destinationChain,
-  onChainSelect,
+  onChainSelect: _onChainSelect,
   onWithdraw,
   onWithdrawBroadcastUpdate,
   onWithdrawSigned,
@@ -220,7 +220,6 @@ export const WithdrawForm = ({
         value={destinationAddress}
         onChange={setDestinationAddress}
         destinationChain={destinationChain}
-        onDestinationClicked={onChainSelect}
       />
       <AmountInput value={amount} onChange={setAmount} />
       <TransferRouteOptions
