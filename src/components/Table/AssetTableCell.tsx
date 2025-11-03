@@ -30,6 +30,7 @@ interface AssetTableCellProps {
         | 'isUnlaunched'
         | 'id'
         | 'marketFeeDiscount'
+        | 'displayId'
       >
     | null
     | undefined;
@@ -48,6 +49,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
     effectiveInitialMarginFraction,
     isUnlaunched,
     marketFeeDiscount,
+    displayId,
   } = orEmptyObj(configs);
 
   const maxLeverage =
@@ -72,7 +74,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
           <$Asset stacked={stacked} truncateAssetName={truncateAssetName}>
             {name}
           </$Asset>
-          <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} />
+          <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} symbol={displayId} />
           <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
         </div>
         {children}

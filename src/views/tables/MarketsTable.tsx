@@ -61,23 +61,25 @@ export const MarketsTable = forwardRef(
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  logo,
+                  displayId,
                   initialMarginFraction,
-                  name,
                   isUnlaunched,
-                  volume24h,
+                  logo,
                   marketFeeDiscount,
+                  name,
+                  volume24h,
                 }) => (
                   <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
                     <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
                     <AssetTableCell
                       tw="overflow-auto"
                       configs={{
+                        id,
                         effectiveInitialMarginFraction,
-                        logo,
+                        displayId,
                         initialMarginFraction,
                         isUnlaunched,
-                        id,
+                        logo,
                         marketFeeDiscount,
                       }}
                       name={name}
@@ -141,21 +143,23 @@ export const MarketsTable = forwardRef(
                   id,
                   assetId,
                   effectiveInitialMarginFraction,
-                  logo,
+                  displayId,
                   initialMarginFraction,
-                  name,
                   isUnlaunched,
+                  logo,
                   marketFeeDiscount,
+                  name,
                 }) => (
                   <div tw="flex items-center gap-0.25">
                     <FavoriteButton marketId={id} />
                     <AssetTableCell
                       configs={{
                         id,
+                        displayId,
                         effectiveInitialMarginFraction,
-                        logo,
                         initialMarginFraction,
                         isUnlaunched,
+                        logo,
                         marketFeeDiscount,
                       }}
                       name={name}

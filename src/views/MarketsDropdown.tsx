@@ -85,7 +85,6 @@ const MarketsDropdownContent = ({
             isUnlaunched,
             effectiveInitialMarginFraction,
             initialMarginFraction,
-            marketFeeDiscount,
           }: MarketData) => (
             <div tw="flex items-center gap-0.25">
               <FavoriteButton marketId={id} />
@@ -105,7 +104,6 @@ const MarketsDropdownContent = ({
                   />
                 )}
               </Tag>
-              <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} />
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </div>
           ),
@@ -163,6 +161,14 @@ const MarketsDropdownContent = ({
           label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
           renderCell: (row: MarketData) => (
             <$Output type={OutputType.CompactFiat} value={row.marketCap} />
+          ),
+        },
+        {
+          columnKey: 'incentives',
+          getCellValue: (row: MarketData) => row.marketFeeDiscount,
+          label: stringGetter({ key: STRING_KEYS.INCENTIVES }),
+          renderCell: (row: MarketData) => (
+            <TradeFeeDiscountTag marketFeeDiscount={row.marketFeeDiscount} symbol={row.displayId} />
           ),
         },
       ].filter(isTruthy) satisfies ColumnDef<MarketData>[],

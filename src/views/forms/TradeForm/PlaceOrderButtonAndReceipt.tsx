@@ -85,7 +85,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
 
   const id = useAppSelector(BonsaiHelpers.currentMarket.assetId);
-  const { tickSizeDecimals } = orEmptyObj(
+  const { tickSizeDecimals, displayableTicker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
   const marketFeeDiscount = useAppSelector(
@@ -255,7 +255,7 @@ export const PlaceOrderButtonAndReceipt = ({
             <WithTooltip tooltip="fee" side="right">
               {stringGetter({ key: STRING_KEYS.FEE })}
             </WithTooltip>
-            <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} />
+            <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} symbol={displayableTicker} />
           </span>
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
