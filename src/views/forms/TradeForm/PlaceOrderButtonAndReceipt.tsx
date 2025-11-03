@@ -28,6 +28,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithSeparators } from '@/components/Separator';
 import { ToggleButton } from '@/components/ToggleButton';
+import { TradeFeeDiscountTag } from '@/components/TradeFeeDiscountTag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -87,6 +88,10 @@ export const PlaceOrderButtonAndReceipt = ({
   const { tickSizeDecimals } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
+  const marketFeeDiscount = useAppSelector(
+    BonsaiHelpers.currentMarket.marketInfo
+  )?.marketFeeDiscount;
+
   const {
     liquidationPrice,
     leverage,
@@ -246,9 +251,12 @@ export const PlaceOrderButtonAndReceipt = ({
       {
         key: 'fee',
         label: (
-          <WithTooltip tooltip="fee" side="right">
-            {stringGetter({ key: STRING_KEYS.FEE })}
-          </WithTooltip>
+          <span tw="row gap-0.25">
+            <WithTooltip tooltip="fee" side="right">
+              {stringGetter({ key: STRING_KEYS.FEE })}
+            </WithTooltip>
+            <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} />
+          </span>
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
       },

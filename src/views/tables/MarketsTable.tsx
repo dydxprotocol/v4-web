@@ -66,6 +66,7 @@ export const MarketsTable = forwardRef(
                   name,
                   isUnlaunched,
                   volume24h,
+                  marketFeeDiscount,
                 }) => (
                   <div tw="flex items-center gap-0.25 mobile:max-w-[50vw] mobile:overflow-hidden">
                     <FavoriteButton marketId={id} tw="ml-[-0.5rem]" />
@@ -77,6 +78,7 @@ export const MarketsTable = forwardRef(
                         initialMarginFraction,
                         isUnlaunched,
                         id,
+                        marketFeeDiscount,
                       }}
                       name={name}
                       symbol={assetId}
@@ -143,6 +145,7 @@ export const MarketsTable = forwardRef(
                   initialMarginFraction,
                   name,
                   isUnlaunched,
+                  marketFeeDiscount,
                 }) => (
                   <div tw="flex items-center gap-0.25">
                     <FavoriteButton marketId={id} />
@@ -153,6 +156,7 @@ export const MarketsTable = forwardRef(
                         logo,
                         initialMarginFraction,
                         isUnlaunched,
+                        marketFeeDiscount,
                       }}
                       name={name}
                       symbol={assetId}

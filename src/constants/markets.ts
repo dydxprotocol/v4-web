@@ -43,6 +43,7 @@ export type MarketData = {
   marketCap: Nullable<number>;
   sectorTags: Nullable<string[]>;
   isFavorite: boolean;
+  marketFeeDiscount?: number;
 };
 
 export enum MarketSorting {
