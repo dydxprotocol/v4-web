@@ -5,9 +5,11 @@
   "type": "module",
   "license": "AGPL-3.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
+  "packageManager": "pnpm@8.6.6",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "cp ./template.html ./index.html && vite",
     "dev:mainnet": "VITE_NETWORK_MODE=MAINNET pnpm run dev",
     "graph": "nx graph --groupByFolder",

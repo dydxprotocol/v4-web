@@ -24,7 +24,7 @@
 
 ## Prerequisites
 
-- Node.js v18,
+- Node.js v18 (we recommend using [nvm](https://github.com/nvm-sh/nvm) for easy version management)
 - `pnpm`
 - Docker
 - Wallet Connect account
@@ -55,13 +55,58 @@ cd v4-web
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 ```
 
-## 3: Run indexer
+### 3. Install Node.js v18
+
+This project requires Node.js v18. We use **nvm** for Node version management:
+
+```bash
+# Install nvm if you haven't already
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Install and use Node.js v18 (reads from .nvmrc)
+nvm install
+nvm use
+```
+
+> 💡 **Tip:** Enable auto-switching so Node version changes automatically when you enter the repo. Add this to your `~/.bashrc` or `~/.zshrc`:
+> ```bash
+> # Auto-switch Node version based on .nvmrc
+> autoload -U add-zsh-hook
+> load-nvmrc() {
+>   local node_version="$(nvm version)"
+>   local nvmrc_path="$(nvm_find_nvmrc)"
+>   if [ -n "$nvmrc_path" ]; then
+>     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+>     if [ "$nvmrc_node_version" = "N/A" ]; then
+>       nvm install
+>     elif [ "$nvmrc_node_version" != "$node_version" ]; then
+>       nvm use
+>     fi
+>   fi
+> }
+> add-zsh-hook chpwd load-nvmrc
+> load-nvmrc
+> ```
+
+**Alternative tools:**
+- [fnm](https://github.com/Schniz/fnm) (faster Rust-based alternative - auto-reads `.node-version`)
+- pnpm can also manage Node, but nvm is our recommended approach
+
+### 4. Install dependencies
+
+```bash
+pnpm install
+```
+
+## Part 2: Running the application
+
+### 5. Run indexer
 
 ```bash
 pnpm nx dev indexer
 ```
 
-## 3: Run web app
+### 6. Run web app
 
 ```bash
 pnpm dev

@@ -9,6 +9,25 @@ We love your input! We want to make contributing to this project as easy and tra
 ## We Develop with Github
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
+## Development Environment
+
+### Node.js Version
+This project requires **Node.js v18**. The repo includes `.nvmrc` and `.node-version` files for easy version management:
+
+- **Using nvm (recommended):**
+  ```bash
+  nvm use  # Automatically reads .nvmrc
+  ```
+
+- **Using fnm:**
+  ```bash
+  fnm use  # Automatically reads .node-version
+  ```
+
+Both tools will auto-switch to Node v18 when you `cd` into the repo (with shell integration enabled).
+
+This ensures consistency with our CI/CD pipeline which runs on Node.js v18.
+
 ## We Use [Github Flow](https://guides.github.com/introduction/flow/index.html), So All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase (we use [Github Flow](https://guides.github.com/introduction/flow/index.html)). We actively welcome your pull requests:
 
