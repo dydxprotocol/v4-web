@@ -20,11 +20,17 @@ export function pointsToEstimatedDollarRewards(
 
 // Move to Chaos Labs query once its available
 export const OCT_2025_REWARDS_DETAILS = {
-  season: 7,
+  season: 8,
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
-  rebatePercent: '100%',
-  rebatePercentNumeric: '100',
-  rebateFraction: 1,
-  endTime: '2025-10-31T23:59:59.000Z', // end of month
+  rebatePercent: '50%',
+  rebatePercentNumeric: '50',
+  rebateFraction: 0.5,
+  endTime: '2025-11-30T23:59:59.000Z', // end of month
+};
+
+export const NOV_2025_COMPETITION_DETAILS = {
+  rewardAmount: '$250k',
+  rewardAmountUsd: 250_000,
+  endTime: '2025-11-30T23:59:59.000Z', // end of month
 };
