@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.0.7
-    version: 3.0.7
+    specifier: 3.1.0
+    version: 3.1.0
   '@dydxprotocol/v4-localization':
     specifier: 1.1.339
     version: 1.1.339
@@ -1217,6 +1217,7 @@ packages:
 
   /@cosmjs/crypto@0.27.1:
     resolution: {integrity: sha512-vbcxwSt99tIYJg8Spp00wc3zx72qx+pY3ozGuBN8gAvySnagK9dQ/jHwtWQWdammmdD6oW+75WfIHZ+gNa+Ybg==}
+    deprecated: This uses elliptic for cryptographic operations, which contains several security-relevant bugs. To what degree this affects your application is something you need to carefully investigate. See https://github.com/cosmos/cosmjs/issues/1708 for further pointers. Starting with version 0.34.0 the cryptographic library has been replaced. However, private keys might still be at risk.
     dependencies:
       '@cosmjs/encoding': 0.27.1
       '@cosmjs/math': 0.27.1
@@ -1658,8 +1659,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.0.7:
-    resolution: {integrity: sha512-zSNMstCW8BR//BmbbGQZyXdXH/3d1j+ASO4cjsEssiWNVIlS8IT5E//D3Q36c3blabJB3ONadvBJmrvkiRV8pA==}
+  /@dydxprotocol/v4-client-js@3.1.0:
+    resolution: {integrity: sha512-jWmnGLaBNXy6HpAiOMcDr2NdrW/K3Hhj4rAY67i9ZHElPlKFRt93GIU9PUVnA5DfQZzZjjAini0ww5eTaYlPkQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1668,7 +1669,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.0.0
+      '@dydxprotocol/v4-proto': 9.4.0-rc.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -1699,8 +1700,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@9.0.0:
-    resolution: {integrity: sha512-2ICtvYx90aYxeIxzWB3Fs3krra/wWw6zf5mxVEplXU51JX/Gtbv/LY5A6WWxl1tPQ1Wl8PUMO8IzN1Y3e8Zhvg==}
+  /@dydxprotocol/v4-proto@9.4.0-rc.0:
+    resolution: {integrity: sha512-1vtvGAdX2U6PWiDEYbNA253fB4m53eAQsmC/4hquy7rRGTam/33YdrKKDPtGCIByFbXSt/P9pegg+F4HZ7MrBQ==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -3961,7 +3962,7 @@ packages:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
-      '@scure/base': 1.1.9
+      '@scure/base': 1.2.6
       '@types/debug': 4.1.12
       '@types/lodash': 4.17.20
       debug: 4.4.3(supports-color@8.1.1)
@@ -16830,7 +16831,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -17334,7 +17335,7 @@ packages:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -21120,10 +21121,10 @@ packages:
         optional: true
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
-      '@noble/curves': 1.8.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.6.2
-      '@scure/bip39': 1.5.4
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
       abitype: 1.0.8(typescript@5.9.3)
       eventemitter3: 5.0.1
       typescript: 5.9.3
@@ -21335,7 +21336,7 @@ packages:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -22000,7 +22001,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -23519,7 +23520,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color

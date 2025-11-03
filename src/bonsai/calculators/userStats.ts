@@ -2,10 +2,11 @@ import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { AccountStats, UserFeeTier, UserStats } from '../types/summaryTypes';
+import { AccountStats, UserFeeTier, UserStakingTier, UserStats } from '../types/summaryTypes';
 
 export function calculateUserStats(
   feeTier: UserFeeTier | undefined,
+  stakingTier: UserStakingTier | undefined,
   accountStats: AccountStats | undefined
 ): UserStats {
   const state: UserStats = {};

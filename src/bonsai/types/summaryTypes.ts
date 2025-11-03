@@ -5,7 +5,6 @@ import {
   PricesModule,
   RewardsModule,
 } from '@dydxprotocol/v4-client-js';
-import { type BigNumber } from 'bignumber.js';
 
 import {
   IndexerAPITimeInForce,
@@ -273,16 +272,25 @@ export type PerpetualMarketSummaries = {
   [marketId: string]: PerpetualMarketSummary;
 };
 
+export type PerpetualMarketFeeDiscount = NonNullable<
+  ToPrimitives<FeeTierModule.QueryAllMarketFeeDiscountParamsResponse['params']>
+>;
+
 export type UserFeeTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserFeeTierResponse['tier']>>;
+export type UserStakingTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserStakingTierResponse>>;
 export type EquityTiers = NonNullable<
   ToPrimitives<ClobModule.QueryEquityTierLimitConfigurationResponse['equityTierLimitConfig']>
 >;
 export type FeeTiers = NonNullable<
   ToPrimitives<FeeTierModule.QueryPerpetualFeeParamsResponse['params']>
 >;
+export type StakingTiers = NonNullable<
+  ToPrimitives<FeeTierModule.QueryStakingTiersResponse['stakingTiers']>
+>;
 export type ConfigTiers = {
   feeTiers: FeeTiers | undefined;
   equityTiers: EquityTiers | undefined;
+  stakingTiers: StakingTiers | undefined;
 };
 
 export type RewardsParams = NonNullable<ToPrimitives<RewardsModule.QueryParamsResponse['params']>>;
@@ -314,6 +322,7 @@ export interface EquityTiersSummary {
 
 export interface UserStats {
   feeTierId?: string;
+  stakingTierId?: string;
   makerFeeRate?: number;
   takerFeeRate?: number;
   makerVolume30D?: number;

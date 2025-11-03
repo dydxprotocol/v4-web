@@ -5,6 +5,7 @@ import { calculateAllMarkets, formatSparklineData } from '../calculators/markets
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import {
   selectRawMarketsData,
+  selectRawMarketsFeeDiscounts,
   selectRawOrderbooks,
   selectRawSparklines,
   selectRawSparklinesData,
@@ -12,6 +13,11 @@ import {
 
 export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (markets) =>
   calculateAllMarkets(markets)
+);
+
+export const selectMarketsFeeDiscounts = createAppSelector(
+  [selectRawMarketsFeeDiscounts],
+  (feeDiscounts) => feeDiscounts
 );
 
 export const selectSparklinesLoading = createAppSelector(
