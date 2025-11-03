@@ -2,6 +2,7 @@ import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { ArrowDownIcon } from '@radix-ui/react-icons';
+import { capitalize } from 'lodash';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -58,6 +59,8 @@ export const Swap = () => {
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
   const [mode, setMode] = useState<SwapMode>('exact-in');
   const [amount, setAmount] = useState('');
+  const [isToInputFocused, setIsToInputFocused] = useState(false);
+  const [isFromInputFocused, setIsFromInputFocused] = useState(false);
   const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
   const [isSwapSubmitting, setIsSwapSubmitting] = useState(false);
   const onboardingState = useAppSelector(getOnboardingState);
@@ -224,7 +227,7 @@ export const Swap = () => {
   return (
     <div tw="flex flex-col gap-1">
       <div tw="relative flex flex-col gap-0.25">
-        <div tw="flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1">
+        <$FromContainer $isFocused={isFromInputFocused} tw="flex flex-col gap-0.25 rounded-0.5 p-1">
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">From</div>
             <div tw="flex items-center gap-0.375 text-color-layer-7 font-small-medium">
@@ -249,10 +252,12 @@ export const Swap = () => {
               placeholder="0"
               value={from}
               onChange={onValueChange('exact-in')}
+              onFocus={() => setIsFromInputFocused(true)}
+              onBlur={() => setIsFromInputFocused(false)}
             />
             <TokenLogo token={inputToken} />
           </div>
-        </div>
+        </$FromContainer>
 
         <$SwapButton
           tw="absolute left-1/2 top-1/2 rounded-0.75 border-4 border-color-layer-3 bg-color-layer-4 p-0.5"
@@ -263,7 +268,10 @@ export const Swap = () => {
           <ArrowDownIcon tw="h-1.25 w-1.25" />
         </$SwapButton>
 
-        <div tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1">
+        <$ToContainer
+          $isFocused={isToInputFocused}
+          tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1"
+        >
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">To</div>
             <div tw="flex items-center gap-0.375 text-color-layer-7 font-small-medium">
@@ -287,10 +295,12 @@ export const Swap = () => {
               placeholder="0"
               value={to}
               onChange={onValueChange('exact-out')}
+              onFocus={() => setIsToInputFocused(true)}
+              onBlur={() => setIsToInputFocused(false)}
             />
             <TokenLogo token={otherToken(inputToken)} />
           </div>
-        </div>
+        </$ToContainer>
       </div>
 
       {onboardingState !== OnboardingState.AccountConnected ? (
@@ -299,9 +309,7 @@ export const Swap = () => {
         <div tw="flex h-3 justify-center rounded-0.75 border border-solid border-color-layer-4 p-0.75">
           <div tw="flex items-center gap-0.5 leading-5">
             <WarningFilled tw="h-[15.6px] w-[17.3px] text-red" />
-            <div tw="text-base text-color-text-0">
-              {stringGetter({ key: STRING_KEYS.REWARDS.NO_AVAILABLE_ROUTES })}
-            </div>
+            <div tw="text-base text-color-text-0">{capitalize(error.message)}</div>
           </div>
         </div>
       ) : (
@@ -365,7 +373,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
         <div tw="flex items-center gap-0.375">
           <div>{stringGetter({ key: STRING_KEYS.PRICE_IMPACT })}</div>
           {/* TODO: add copy for price impact helper text */}
-          <WithTooltip tooltipString="Price impact helper text here">
+          <WithTooltip tooltip="price-impact">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
           </WithTooltip>
         </div>
@@ -381,8 +389,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
       <div tw="flex items-center justify-between gap-0.5">
         <div tw="flex items-center gap-0.375">
           <div>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</div>
-          {/* TODO: add copy for slippage helper text */}
-          <WithTooltip tooltipString="Slippage helper text here">
+          <WithTooltip tooltip="max-slippage">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
           </WithTooltip>
         </div>
@@ -421,7 +428,7 @@ const ExchangeRate = ({
     <div tw="flex w-full justify-between text-small">
       <div tw="flex items-center gap-0.25">
         {priceImpact && priceImpact >= 0.5 ? (
-          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.PRICE_IMPACT_HELPER_TEXT })}>
+          <WithTooltip tooltip="price-impact-warning">
             <WarningFilled tw="text-color-warning" />
             <Output
               tw="text-color-warning"
@@ -450,6 +457,14 @@ const ExchangeRate = ({
     </div>
   );
 };
+
+const $FromContainer = styled.div<{ $isFocused: boolean }>`
+  ${({ $isFocused }) => ($isFocused ? tw`bg-color-layer-5` : tw`bg-color-layer-4`)};
+`;
+
+const $ToContainer = styled.div<{ $isFocused: boolean }>`
+  ${({ $isFocused }) => ($isFocused ? tw`bg-color-layer-2` : tw`bg-color-layer-3`)};
+`;
 
 const $Input = styled.input<{ hasError?: boolean; $isLoading: boolean }>`
   flex: 1;
