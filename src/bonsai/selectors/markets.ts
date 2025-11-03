@@ -1,7 +1,11 @@
 import { createAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
-import { calculateAllMarkets, formatSparklineData } from '../calculators/markets';
+import {
+  calculateAllMarkets,
+  calculateMarketsFeeDiscounts,
+  formatSparklineData,
+} from '../calculators/markets';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import {
   selectRawMarketsData,
@@ -17,7 +21,7 @@ export const selectAllMarketsInfo = createAppSelector([selectRawMarketsData], (m
 
 export const selectMarketsFeeDiscounts = createAppSelector(
   [selectRawMarketsFeeDiscounts],
-  (feeDiscounts) => feeDiscounts
+  (feeDiscounts) => calculateMarketsFeeDiscounts(feeDiscounts)
 );
 
 export const selectSparklinesLoading = createAppSelector(

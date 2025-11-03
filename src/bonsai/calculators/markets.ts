@@ -3,7 +3,7 @@ import { mapValues, orderBy, pickBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/constants/markets';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { QUANTUM_MULTIPLIER, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerSparklineTimePeriod } from '@/types/indexer/indexerApiGen';
 import {
@@ -18,12 +18,15 @@ import {
 } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
+import { objectFromEntries } from '@/lib/objectHelpers';
 
 import { MarketsData } from '../types/rawTypes';
 import {
   AllAssetData,
+  AllPerpetualMarketsFeeDiscounts,
   MarketInfo,
   MarketsInfo,
+  PerpetualMarketFeeDiscount,
   PerpetualMarketSparklines,
   PerpetualMarketSummaries,
 } from '../types/summaryTypes';
@@ -128,6 +131,7 @@ export function createMarketSummary(
   markets: MarketsInfo | undefined,
   sparklines: PerpetualMarketSparklines | undefined,
   assetInfo: AllAssetData | undefined,
+  marketFeeDiscounts: AllPerpetualMarketsFeeDiscounts | undefined,
   listOfFavorites: string[]
 ): PerpetualMarketSummaries | undefined {
   if (markets == null) {
@@ -153,6 +157,9 @@ export function createMarketSummary(
 
       const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData, market);
 
+      const feeData = marketFeeDiscounts?.[market.clobPairId];
+      const marketFeeDiscount = feeData && feeData.isApplicable ? feeData.feeDiscount : undefined;
+
       return {
         ...market,
         ...formattedAssetData,
@@ -160,8 +167,36 @@ export function createMarketSummary(
         isNew,
         isFavorite: listOfFavorites.includes(market.ticker),
         isUnlaunched: false,
+        marketFeeDiscount,
       };
     }),
     isTruthy
   );
+}
+
+export function calculateMarketsFeeDiscounts(
+  feeDiscounts: PerpetualMarketFeeDiscount | undefined
+): AllPerpetualMarketsFeeDiscounts | undefined {
+  if (feeDiscounts == null) return undefined;
+
+  const now = Date.now();
+
+  const discountEntries = objectFromEntries(
+    feeDiscounts.map((discount) => {
+      return [
+        discount.clobPairId,
+        {
+          ...discount,
+          isApplicable:
+            discount.startTime != null &&
+            discount.endTime != null &&
+            now >= new Date(discount.startTime).getTime() &&
+            now <= new Date(discount.endTime).getTime(),
+          feeDiscount: MustBigNumber(discount.chargePpm).div(QUANTUM_MULTIPLIER).toNumber(),
+        },
+      ];
+    })
+  );
+
+  return discountEntries;
 }

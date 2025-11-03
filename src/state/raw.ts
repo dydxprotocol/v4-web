@@ -71,7 +71,7 @@ export type ComplianceState = {
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
-    feeDiscounts: Loadable<PerpetualMarketFeeDiscount>;
+    feeDiscounts: Loadable<PerpetualMarketFeeDiscount | undefined>;
     assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
     sparklines: Loadable<{
@@ -264,7 +264,7 @@ export const rawSlice = createSlice({
     },
     setMarketsFeeDiscountsRaw: (
       state,
-      action: PayloadAction<Loadable<PerpetualMarketFeeDiscount>>
+      action: PayloadAction<Loadable<PerpetualMarketFeeDiscount | undefined>>
     ) => {
       state.markets.feeDiscounts = action.payload;
     },

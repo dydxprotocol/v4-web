@@ -17,6 +17,13 @@ export function calculateUserStats(
     state.takerFeeRate = MustBigNumber(feeTier.takerFeePpm).div(QUANTUM_MULTIPLIER).toNumber();
   }
 
+  if (stakingTier) {
+    state.stakingTierId = stakingTier.feeTierName;
+    state.stakingTierDiscount = stakingTier.discountPpm
+      ? MustBigNumber(stakingTier.discountPpm).div(QUANTUM_MULTIPLIER).toNumber()
+      : undefined;
+  }
+
   if (accountStats) {
     state.makerVolume30D = MustBigNumber(accountStats.makerNotional)
       .div(QUANTUM_MULTIPLIER)

@@ -266,6 +266,7 @@ export type PerpetualMarketSummary = MarketInfo &
     spotVolume24h: number | null;
     isFavorite: boolean;
     isUnlaunched: boolean;
+    marketFeeDiscount: number | undefined;
   };
 
 export type PerpetualMarketSummaries = {
@@ -327,6 +328,20 @@ export interface UserStats {
   takerFeeRate?: number;
   makerVolume30D?: number;
   takerVolume30D?: number;
+  stakingTierDiscount?: number;
+}
+
+export interface PerpetualMarketFee {
+  clobPairId: number;
+  chargePpm: number;
+  startTime?: string;
+  endTime?: string;
+  isApplicable: boolean;
+  feeDiscount: number;
+}
+
+export interface AllPerpetualMarketsFeeDiscounts {
+  [clobPairId: string]: PerpetualMarketFee;
 }
 
 export type AccountBalances = {

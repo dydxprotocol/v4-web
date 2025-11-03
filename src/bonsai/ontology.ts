@@ -81,10 +81,7 @@ import {
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
 import { selectEquityTiers, selectFeeTiers, selectStakingTiers } from './selectors/configs';
-import {
-  selectCurrentMarketOrderbookLoading,
-  selectMarketsFeeDiscounts,
-} from './selectors/markets';
+import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
   selectCurrentMarketDepthChart,
   selectCurrentMarketMidPrice,
@@ -118,7 +115,6 @@ import {
   FeeTierSummary,
   GroupedSubaccountSummary,
   PendingIsolatedPosition,
-  PerpetualMarketFeeDiscount,
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
   RewardParamsSummary,
@@ -197,7 +193,6 @@ interface BonsaiCoreShape {
       data: BasicSelector<AllAssetData | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
-    marketFeeDiscounts: BasicSelector<PerpetualMarketFeeDiscount | undefined>;
   };
   network: {
     indexerHeight: {
@@ -281,7 +276,6 @@ export const BonsaiCore: BonsaiCoreShape = {
       data: selectAllAssetsInfo,
       loading: selectAllAssetsInfoLoading,
     },
-    marketFeeDiscounts: selectMarketsFeeDiscounts,
   },
   network: {
     indexerHeight: {

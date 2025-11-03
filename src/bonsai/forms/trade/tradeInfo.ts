@@ -81,6 +81,11 @@ export function calculateTradeInfo(
             subaccountToUse
           )?.leverageSigned;
 
+          const totalFeesAfterDiscounts = calculateTradeFeeAfterDiscounts(
+            accountData,
+            calculated.marketOrder?.totalFees
+          );
+
           return {
             inputSummary: calculated.summary ?? {
               size: undefined,
@@ -103,10 +108,10 @@ export function calculateTradeInfo(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
             ),
-            fee: calculated.marketOrder?.totalFees,
+            fee: totalFeesAfterDiscounts,
             total: calculateOrderTotal(
               calculated.marketOrder?.usdcSize,
-              calculated.marketOrder?.totalFees,
+              totalFeesAfterDiscounts,
               trade.side
             ),
             filled: calculated.marketOrder?.filled ?? false,
@@ -201,7 +206,10 @@ export function calculateTradeInfo(
           const size = calculated.marketOrder?.size;
           const usdcSize = mapIfPresent(price, size, (p, s) => p * s);
           const feeRate = accountData.userFeeStats.takerFeeRate ?? 0;
-          const totalFees = mapIfPresent(usdcSize, (u) => u * feeRate);
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(usdcSize, (u) => u * feeRate)
+          );
 
           const isPositionClosed =
             mapIfPresent(
@@ -278,10 +286,9 @@ export function calculateTradeInfo(
             baseAccount
           );
 
-          const totalFees = mapIfPresent(
-            feeRate,
-            inputSummary.size?.usdcSize,
-            (fee, usdc) => fee * usdc
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(feeRate, inputSummary.size?.usdcSize, (fee, usdc) => fee * usdc)
           );
 
           return {
@@ -1130,4 +1137,23 @@ function getTransferAmountFromTargetLeverage(
     (estOraclePriceAtExecution * size) / targetLeverage + priceDiff * size,
     naiveTransferAmount
   );
+}
+
+function calculateTradeFeeAfterDiscounts(
+  accountData: TradeFormInputData,
+  feeUsdc: number | undefined
+) {
+  const marketFeeDiscount = accountData.currentTradeMarketSummary?.marketFeeDiscount;
+  const stakingTierDiscount = accountData.userFeeStats.stakingTierDiscount;
+
+  if (feeUsdc == null) return undefined;
+
+  const feeAfterMarketDiscount = marketFeeDiscount != null ? feeUsdc * marketFeeDiscount : feeUsdc;
+
+  const finalFeeUsdc =
+    stakingTierDiscount != null && feeAfterMarketDiscount > 0
+      ? feeAfterMarketDiscount * (1 - stakingTierDiscount)
+      : feeAfterMarketDiscount;
+
+  return finalFeeUsdc;
 }
