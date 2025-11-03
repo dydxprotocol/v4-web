@@ -9,6 +9,7 @@ import { formatUnits, parseUnits } from 'viem';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
@@ -16,13 +17,14 @@ import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { RefreshIcon } from '@/icons';
 import CardHolderIcon from '@/icons/card-holder.svg';
 import CaretDown from '@/icons/caret-down.svg';
 import DydxLogo from '@/icons/dydx-protocol.svg';
 import GasIcon from '@/icons/gas.svg';
-import UsdcLogo from '@/icons/usdc.svg';
+import UsdcLogo from '@/icons/usdc-inverted.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
 
 import { Accordion } from '@/components/Accordion';
@@ -34,11 +36,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 import { getUserAddressesForRoute } from '@/views/dialogs/TransferDialogs/utils';
 
-import { getOnboardingState } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppSelector } from '@/state/appTypes';
 
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
+import { BIG_NUMBERS } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
@@ -58,19 +61,19 @@ export const Swap = () => {
   const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
   const [isSwapSubmitting, setIsSwapSubmitting] = useState(false);
   const onboardingState = useAppSelector(getOnboardingState);
+  const stringGetter = useStringGetter();
 
-  const { chainTokenAmount: nativeTokenBalance, usdcAmount: usdcBalance } = useAppSelector(
-    BonsaiCore.account.balances.data
-  );
+  const usdcBalance = useAppSelector(getSubaccountFreeCollateral);
+  const { chainTokenAmount: nativeTokenBalance } = useAppSelector(BonsaiCore.account.balances.data);
 
   const tokenBalances = useMemo(() => {
     const dydx = {
       rawBalance: nativeTokenBalance ? parseUnits(nativeTokenBalance, DYDX_DECIMALS) : undefined,
-      formatted: nativeTokenBalance,
+      formatted: nativeTokenBalance ?? '0',
     };
     const usdc = {
-      rawBalance: usdcBalance ? parseUnits(usdcBalance, USDC_DECIMALS) : undefined,
-      formatted: usdcBalance,
+      rawBalance: usdcBalance ? parseUnits(`${usdcBalance}`, USDC_DECIMALS) : undefined,
+      formatted: usdcBalance ?? '0',
     };
 
     if (inputToken === 'usdc') {
@@ -153,6 +156,15 @@ export const Swap = () => {
 
     return quote.swapPriceImpactPercent ? Number(quote.swapPriceImpactPercent) : undefined;
   }, [quote, amount]);
+
+  const gas = useMemo(() => {
+    return (
+      quote?.estimatedFees?.reduce(
+        (acc, fee) => acc.plus(fee.usdAmount ?? '0'),
+        BIG_NUMBERS.ZERO
+      ) ?? BIG_NUMBERS.ZERO
+    );
+  }, [quote]);
 
   const notify = useCustomNotification();
 
@@ -287,7 +299,9 @@ export const Swap = () => {
         <div tw="flex h-3 justify-center rounded-0.75 border border-solid border-color-layer-4 p-0.75">
           <div tw="flex items-center gap-0.5 leading-5">
             <WarningFilled tw="h-[15.6px] w-[17.3px] text-red" />
-            <div tw="text-base text-color-text-0">No available routes</div>
+            <div tw="text-base text-color-text-0">
+              {stringGetter({ key: STRING_KEYS.REWARDS.NO_AVAILABLE_ROUTES })}
+            </div>
           </div>
         </div>
       ) : (
@@ -305,7 +319,9 @@ export const Swap = () => {
           action={ButtonAction.Primary}
         >
           <div tw="text-base leading-5">
-            {hasSufficientBalance ? 'Swap' : 'Insufficient balance'}
+            {hasSufficientBalance
+              ? stringGetter({ key: STRING_KEYS.SWAP })
+              : stringGetter({ key: STRING_KEYS.INSUFFICIENT_BALANCE })}
           </div>
         </Button>
       )}
@@ -321,6 +337,7 @@ export const Swap = () => {
           {
             header: (
               <ExchangeRate
+                gas={gas}
                 selectedToken={inputToken}
                 usdcPerDydx={usdcPerDydx}
                 priceImpact={priceImpact}
@@ -337,6 +354,8 @@ export const Swap = () => {
 };
 
 const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoading: boolean }) => {
+  const stringGetter = useStringGetter();
+
   return (
     <div
       tw="flex flex-col gap-0.5 py-0.625 leading-5 text-color-text-0 font-small-medium"
@@ -344,7 +363,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
     >
       <div tw="flex items-center justify-between gap-0.5">
         <div tw="flex items-center gap-0.375">
-          <div>Price impact</div>
+          <div>{stringGetter({ key: STRING_KEYS.PRICE_IMPACT })}</div>
           {/* TODO: add copy for price impact helper text */}
           <WithTooltip tooltipString="Price impact helper text here">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
@@ -361,7 +380,7 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
 
       <div tw="flex items-center justify-between gap-0.5">
         <div tw="flex items-center gap-0.375">
-          <div>Max slippage</div>
+          <div>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</div>
           {/* TODO: add copy for slippage helper text */}
           <WithTooltip tooltipString="Slippage helper text here">
             <Icon iconName={IconName.HelpCircle} tw="h-0.625 w-0.625" />
@@ -383,11 +402,14 @@ const ExchangeRate = ({
   usdcPerDydx,
   priceImpact,
   selectedToken,
+  gas,
 }: {
   usdcPerDydx?: number;
   priceImpact?: number;
   selectedToken: 'usdc' | 'dydx';
+  gas: BigNumber;
 }) => {
+  const stringGetter = useStringGetter();
   const exchangeRate = useMemo(() => {
     return selectedToken === 'dydx' ? usdcPerDydx : 1 / (usdcPerDydx ?? 1);
   }, [selectedToken, usdcPerDydx]);
@@ -399,16 +421,16 @@ const ExchangeRate = ({
     <div tw="flex w-full justify-between text-small">
       <div tw="flex items-center gap-0.25">
         {priceImpact && priceImpact >= 0.5 ? (
-          <>
+          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.PRICE_IMPACT_HELPER_TEXT })}>
             <WarningFilled tw="text-color-warning" />
             <Output
               tw="text-color-warning"
               value={priceImpact}
               type={OutputType.CompactNumber}
-              slotLeft="High price impact ("
+              slotLeft={`${stringGetter({ key: STRING_KEYS.HIGH_PRICE_IMPACT })} (`}
               slotRight="%)"
             />
-          </>
+          </WithTooltip>
         ) : (
           <>
             <RefreshIcon />
@@ -423,7 +445,7 @@ const ExchangeRate = ({
       </div>
       <div tw="flex items-center gap-0.25">
         <GasIcon />
-        <Output value={0} type={OutputType.CompactNumber} slotLeft="$" />
+        <Output value={gas} type={OutputType.CompactNumber} slotLeft="$" />
       </div>
     </div>
   );
