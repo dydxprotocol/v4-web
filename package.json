@@ -136,7 +136,10 @@
     "unionize": "^3.1.0",
     "use-latest": "^1.2.1",
     "viem": "^2.22.17",
-    "wagmi": "^2.14.9"
+    "wagmi": "^2.14.9",
+    "@keplr-wallet/types": "^0.12.188",
+    "@react-types/table": "^3.6.1",
+    "twin.macro": "^3.4.1"
   },
   "devDependencies": {
     "@apollo/server": "^4.9.5",
@@ -144,11 +147,9 @@
     "@babel/core": "^7.23.9",
     "@commitlint/cli": "^19.0.3",
     "@commitlint/config-conventional": "^19.0.3",
-    "@keplr-wallet/types": "^0.12.188",
     "@ladle/react": "^4.0.2",
     "@react-types/grid": "^3.1.8",
     "@react-types/shared": "^3.18.1",
-    "@react-types/table": "^3.6.1",
     "@ryoppippi/unplugin-typia": "npm:@jsr/ryoppippi__unplugin-typia@^1.1.0",
     "@scalar/cli": "^1.3.2",
     "@subsquid/batch-processor": "^0.0.0",
@@ -226,7 +227,6 @@
     "ts-node": "^10.9.2",
     "ts-patch": "^3.3.0",
     "tsx": "^4.7.1",
-    "twin.macro": "^3.4.1",
     "typeorm": "^0.3.20",
     "typescript": "^5.7.2",
     "unist-util-visit": "^5.0.0",
