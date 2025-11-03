@@ -8,8 +8,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
-import { NOV_2025_COMPETITION_DETAILS, OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
+import { NOV_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useNow } from '@/hooks/useNow';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
@@ -105,11 +105,9 @@ const September2025RewardsPanel = () => {
 const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
+  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
 
-  const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
-    dydxAddress,
-    totalUsdRewards: OCT_2025_REWARDS_DETAILS.rewardAmountUsd,
-  });
+  const userReward = topPnls?.find((entry) => entry.address === dydxAddress)?.dollarReward ?? 0;
 
   return (
     <div tw="flex flex-col justify-between gap-0.75 self-stretch">
@@ -136,7 +134,7 @@ const Sept2025RewardsPanel = () => {
             <Output
               tw="text-extra font-extra-bold"
               type={OutputType.Fiat}
-              value={incentiveRewards}
+              value={userReward}
               isLoading={isLoading}
             />
           </$Points>
