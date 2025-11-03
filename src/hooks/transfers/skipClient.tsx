@@ -185,7 +185,6 @@ const useSkipClientContext = () => {
           if (chainId === getSolanaChainId()) return solanaRpcUrl;
           const evmRpcUrls = RPCUrlsByChainId[chainId];
           if (evmRpcUrls?.length) return evmRpcUrls[0]!;
-          if (chainId === 'dydx-mainnet-1') return 'https://dydx-rpc.publicnode.com:443';
           throw new Error(`Error: no rpc endpoint found for chainId: ${chainId}`);
         },
       },
