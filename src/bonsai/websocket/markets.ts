@@ -133,9 +133,7 @@ export function setUpMarkets(store: RootStore) {
         setMarkets(val);
       } else if (hasData && lastSetHadData) {
         // Don't overwrite the transformed data with raw websocket data
-        console.log(
-          'Websocket received market updates, but keeping transformed data from REST call'
-        );
+        // Websocket received market updates, but keeping transformed data from REST call
         // Optionally, you could merge specific updates here instead of ignoring them completely
       }
     });

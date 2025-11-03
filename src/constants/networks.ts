@@ -20,7 +20,7 @@ if (VITE_NETWORK_MODE && !NETWORK_MODE) {
 }
 
 // If no mode is set and we are in dev, default to TESTNET
-const finalNetworkMode = NETWORK_MODE || (isDev ? 'TESTNET' : 'MAINNET');
+const finalNetworkMode = NETWORK_MODE ?? (isDev ? 'TESTNET' : 'MAINNET');
 
 // Select the appropriate deployment based on network mode
 export const AVAILABLE_ENVIRONMENTS = environments.deployments[finalNetworkMode];

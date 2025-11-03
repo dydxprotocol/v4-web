@@ -91,7 +91,7 @@ export const useFuelWallet = () => {
           dispatch(setOnboardingState(OnboardingState.Disconnected));
         }
       } catch (err) {
-        console.error('Error checking Fuel connection:', err);
+        // Error checking Fuel connection
         setIsConnected(false);
         setAddress(undefined);
         // Reset onboarding state on error
@@ -176,7 +176,7 @@ export const useFuelWallet = () => {
       // Reset onboarding state when disconnecting
       dispatch(setOnboardingState(OnboardingState.Disconnected));
     } catch (err) {
-      console.error('Error disconnecting from Fuel wallet:', err);
+      // Error disconnecting from Fuel wallet
       setError(err instanceof Error ? err.message : 'Failed to disconnect from Fuel wallet');
     }
   }, [fuel, dispatch]);
@@ -188,7 +188,7 @@ export const useFuelWallet = () => {
       const accounts = await fuel.accounts();
       return accounts || [];
     } catch (err) {
-      console.error('Error getting Fuel accounts:', err);
+      // Error getting Fuel accounts
       return [];
     }
   }, [fuel, isConnected]);

@@ -32,7 +32,7 @@ export const TvChartWidgetSimple = () => {
 
   // Convert market ID to TradingView symbol format
   const tradingViewSymbol = useMemo(() => {
-    return MARKET_SYMBOL_MAP[currentMarketId] || currentMarketId;
+    return MARKET_SYMBOL_MAP[currentMarketId] ?? currentMarketId;
   }, [currentMarketId]);
 
   // Map app theme to TradingView theme
@@ -52,7 +52,7 @@ export const TvChartWidgetSimple = () => {
 
   // Map resolution to widget interval
   const widgetInterval = useMemo(() => {
-    return RESOLUTION_TO_WIDGET_INTERVAL[currentResolution] || '1D';
+    return RESOLUTION_TO_WIDGET_INTERVAL[currentResolution] ?? '1D';
   }, [currentResolution]);
 
   const onResolutionChange = useCallback((resolution: ResolutionString) => {

@@ -109,6 +109,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({
     script.async = true;
     script.onload = () => {
       if (window.TradingView && containerRef.current) {
+        // eslint-disable-next-line new-cap
         const widget = new window.TradingView.widget({
           symbol,
           width,

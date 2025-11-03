@@ -30,8 +30,6 @@ export const useDisplayedWallets = (): WalletInfo[] => {
   const isSimpleUi = useSimpleUiEnabled();
 
   return useMemo(() => {
-    const isPhantomDetected = Boolean(window.phantom?.solana);
-    const isKeplrDetected = Boolean(window.keplr);
     const isCoinbaseDetected =
       Boolean(window.ethereum?.isCoinbaseWallet || window.ethereum?.isCoinbaseBrowser) ||
       injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === COINBASE_MIPD_RDNS) !== -1;

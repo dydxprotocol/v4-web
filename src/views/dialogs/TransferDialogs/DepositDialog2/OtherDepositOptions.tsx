@@ -28,10 +28,6 @@ export const OtherDepositOptions = ({
   const stringGetter = useStringGetter();
 
   const otherOptionsDisabled = Boolean(depositSteps?.length ?? awaitingWalletAction);
-  const onBack = () => {
-    dispatch(openDialog(DialogTypes.Deposit2({})));
-    dispatch(closeDialog());
-  };
 
   return (
     <div tw="mt-[0.75rem] flex flex-col gap-1" css={otherOptionsDisabled && tw`opacity-50`}>

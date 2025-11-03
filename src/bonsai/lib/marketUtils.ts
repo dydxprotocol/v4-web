@@ -14,7 +14,7 @@ type SummaryMarkets = Record<string, any>; // define a proper interface if avail
 
 export function transformMarkets(markets: RawMarkets): SummaryMarkets {
   const out: SummaryMarkets = {};
-  for (const [marketId, market] of Object.entries(markets)) {
+  Object.entries(markets).forEach(([marketId, market]) => {
     const asset = market.ticker.split('-')[0];
     const oraclePrice = parseFloat(market.oraclePrice ?? '0');
     out[marketId] = {
@@ -27,7 +27,7 @@ export function transformMarkets(markets: RawMarkets): SummaryMarkets {
       // NOTE: pick one naming convention; see next comment about percent vs price
       priceChange24h: parseFloat(market.priceChange24H) ?? 0,
       percentChange24h:
-        calculatePriceChangePercent(market.priceChange24H, market.oraclePrice.toString() || '0') ||
+        calculatePriceChangePercent(market.priceChange24H, market.oraclePrice.toString() ?? '0') ??
         0,
       stepSizeDecimals: countDecimalsFromString(market.stepSize),
       tickSizeDecimals: countDecimalsFromString(market.tickSize),
@@ -49,7 +49,7 @@ export function transformMarkets(markets: RawMarkets): SummaryMarkets {
       marketCap: null,
       status: market.status,
     };
-  }
+  });
   return out;
 }
 

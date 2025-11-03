@@ -35,7 +35,6 @@ const useAccountsContext = () => {
   const dispatch = useAppDispatch();
   const geo = useAppSelector(getGeo);
   const { checkForGeo } = useEnvFeatures();
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   // Wallet connection
   const {
@@ -68,17 +67,11 @@ const useAccountsContext = () => {
     }
   }, [isConnectedFuel, fuelAddress, onboardingState, dispatch]);
 
-  const { ready, authenticated } = usePrivy();
-
   const blockedGeo = useMemo(() => {
     return geo != null && isBlockedGeo(geo) && checkForGeo;
   }, [geo, checkForGeo]);
 
-  const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
   useEffect(() => {
-    const { address } = sourceAccount;
-
-    setPreviousAddress(address);
     // We only want to set the source wallet address if the address changes
     // OR when our connection state changes.
     // The address can be cached via local storage, so it won't change when we reconnect
@@ -88,7 +81,7 @@ const useAccountsContext = () => {
   }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 
   // dYdXClient Onboarding & Account Helpers
-  const { indexerClient, getWalletFromSignature } = useDydxClient();
+  const { indexerClient } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
@@ -108,7 +101,7 @@ const useAccountsContext = () => {
     }
   };
 
-  const [hdKey, setHdKey] = useState<PrivateInformation>();
+  const [hdKey] = useState<PrivateInformation>();
 
   // Onboarding conditions
   const [hasAcknowledgedTerms, saveHasAcknowledgedTerms] = useLocalStorage({

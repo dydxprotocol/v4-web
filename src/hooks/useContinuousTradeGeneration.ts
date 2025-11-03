@@ -307,7 +307,7 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
       return;
     }
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 30; i += 1) {
       try {
         // Use a reasonable price range for demo purposes
         const basePrice = 100 + Math.random() * 1900; // Random price between $100-$2000
@@ -332,7 +332,7 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
 
         setTradesGenerated((prev) => prev + 1);
       } catch (error) {
-        console.error(`Error generating initial trade ${i + 1}:`, error);
+        // Error generating initial trade
       }
     }
 
@@ -369,7 +369,7 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
 
       setTradesGenerated((prev) => prev + 1);
     } catch (error) {
-      console.error('Error generating trade:', error);
+      // Error generating trade
     }
   }, [websocket, currentMarketId, tickSizeDecimals, isRunning]);
 

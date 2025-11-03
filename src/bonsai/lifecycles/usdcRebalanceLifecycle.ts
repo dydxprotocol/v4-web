@@ -59,7 +59,7 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
       }
 
       async function rebalanceWalletFunds() {
-        const { localDydxWallet, parentSubaccountInfo, sourceAccount, rebalanceAction } = data!;
+        const { localDydxWallet, parentSubaccountInfo, rebalanceAction } = data!;
 
         if (rebalanceAction == null) return;
 

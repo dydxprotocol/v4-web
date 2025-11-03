@@ -39,12 +39,10 @@ export const AmountInput = ({
   value,
   onChange,
   token,
-  onTokenClick,
   tokenBalance,
   error,
 }: AmountInputProps) => {
   const stringGetter = useStringGetter();
-  const { sourceAccount } = useAccounts();
 
   const onValueChange: EventHandler<SyntheticInputEvent> = (e) => {
     if (!numericValueRegex.test(escapeRegExp(e.target.value))) {
@@ -139,17 +137,3 @@ const $Input = styled.input<{ hasError?: boolean }>`
   background-color: var(--deposit-dialog-amount-bgColor, var(--color-layer-4));
 `;
 
-const $TokenButton = styled.button`
-  ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
-
-  --asset-icon-chain-icon-borderColor: var(--color-layer-5);
-
-  @media ${breakpoints.tablet} {
-    border-color: transparent;
-  }
-`;
-
-const $CaretIcon = styled(Icon)`
-  transform: rotate(-90deg);
-  color: var(--color-text-0);
-`;

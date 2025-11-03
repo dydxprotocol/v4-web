@@ -30,7 +30,6 @@ export const AddressInput = ({
   value,
   onChange,
   destinationChain,
-  onDestinationClicked,
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
@@ -93,19 +92,4 @@ const $WithdrawAmountInputContainer = styled.div<{ isSimpleUi?: boolean }>`
 const $Input = styled.input`
   ${tw`flex-1 text-ellipsis text-large font-medium outline-none`}
   background-color: var(--withdraw-dialog-amount-bgColor, var(--color-layer-4));
-`;
-
-const $ChainButton = styled.button.attrs({
-  type: 'button',
-})`
-  ${tw`flex items-center gap-0.75 rounded-0.75 border border-solid border-color-layer-6 bg-color-layer-5 px-0.5 py-0.375`}
-
-  @media ${breakpoints.tablet} {
-    border-color: transparent;
-  }
-`;
-
-const $CaretIcon = styled(Icon)`
-  transform: rotate(-90deg);
-  color: var(--color-text-0);
 `;

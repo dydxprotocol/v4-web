@@ -40,25 +40,22 @@ export const useAccountBalance = ({
   usdcBalance: number;
   refetchQuery: (options?: RefetchOptions) => Promise<QueryObserverResult>;
 } => {
-  const { sourceAccount, dydxAddress } = useAccounts();
+  const { sourceAccount } = useAccounts();
 
   const { chainTokenAmount: nativeTokenCoinBalance, usdcAmount: usdcCoinBalance } = useAppSelector(
     BonsaiCore.account.balances.data
   );
 
-  const { chainTokenDenom, usdcDecimals } = useTokenConfigs();
+  const { chainTokenDenom } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = BonsaiHooks.useStakingDelegations().data?.balances;
-  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { validators } = useEndpointsConfig();
   const isSolanaChain = sourceAccount.chain === WalletNetworkType.Solana;
 
   const evmAddress =
     sourceAccount.chain === WalletNetworkType.Evm
       ? (sourceAccount.address as EvmAddress)
       : undefined;
-  const solAddress = isSolanaChain ? (sourceAccount.address as SolAddress) : undefined;
 
   const isEVMnativeToken = isNativeDenom(addressOrDenom);
 

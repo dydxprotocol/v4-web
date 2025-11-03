@@ -23,7 +23,6 @@ import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
@@ -57,7 +56,6 @@ import { WalletActions } from './WalletActions';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
-  const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
@@ -66,9 +64,9 @@ export const AccountMenu = () => {
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const isKeplr = useAppSelector(selectIsKeplrConnected);
 
-  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
+  const { usdcBalance } = useAccountBalance();
 
-  const { usdcImage, usdcLabel, chainTokenImage, chainTokenLabel } = useTokenConfigs();
+  const { usdcImage, usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
   const { debugCompliance } = useEnvFeatures();
@@ -142,7 +140,7 @@ export const AccountMenu = () => {
                 {walletInfo && walletInfo.name !== WalletType.Keplr ? (
                   'Fuel Address'
                 ) : (
-                  <$label>"Fuel Address"</$label>
+                  <$label>&quot;Fuel Address&quot;</$label>
                 )}
                 <$Address>{truncateAddress(dydxAddress)}</$Address>
               </$Column>

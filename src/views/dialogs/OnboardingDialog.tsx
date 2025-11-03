@@ -41,12 +41,11 @@ export const OnboardingDialog = ({
   setIsOpen: setIsOpenRaw,
 }: DialogProps<OnboardingDialogProps>) => {
   const dispatch = useAppDispatch();
-  const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
 
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
   const { walletLearnMore } = useURLConfigs();
-  const { sourceAccount, selectWallet } = useAccounts();
+  const { selectWallet } = useAccounts();
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
 
@@ -215,8 +214,6 @@ const $Dialog = styled(Dialog)<{ width?: string }>`
   --dialog-icon-size: 1.25rem;
   --dialog-content-paddingBottom: 1rem;
 `;
-
-const $Ring = tw(Ring)`w-1.25 h-1.25 [--ring-color:--color-accent]`;
 
 const $WithTooltip = styled(WithTooltip)`
   a {

@@ -18,7 +18,7 @@ export const TvChartWidget = () => {
 
   // Convert market ID to TradingView symbol format
   const tradingViewSymbol = useMemo(() => {
-    return MARKET_SYMBOL_MAP[currentMarketId] || currentMarketId;
+    return MARKET_SYMBOL_MAP[currentMarketId] ?? currentMarketId;
   }, [currentMarketId]);
 
   // Map app theme to TradingView theme

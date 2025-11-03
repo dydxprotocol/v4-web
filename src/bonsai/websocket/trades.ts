@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
 import { orderBy } from 'lodash';
 
 import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
@@ -10,7 +9,6 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { mergeById } from '@/lib/mergeById';
-import { orEmptyObj } from '@/lib/typeUtils';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { logBonsaiError, logBonsaiInfo } from '../logs';

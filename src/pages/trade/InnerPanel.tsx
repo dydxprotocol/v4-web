@@ -32,7 +32,6 @@ enum Tab {
 export const InnerPanel = ({ launchableMarketId }: { launchableMarketId?: string }) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
-  const dispatch = useAppDispatch();
 
   const [value, setValue] = useState(Tab.Price);
 

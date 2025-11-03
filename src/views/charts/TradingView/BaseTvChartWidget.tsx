@@ -39,7 +39,7 @@ export const BaseTvChartWidget = ({
       '240': '240', // 4 hours
       '1D': 'D', // 1 day
     } as const;
-    return intervalMap[resolution] || 'D';
+    return intervalMap[resolution] ?? 'D';
   };
 
   const onResolutionChange = useCallback((resolution: ResolutionString) => {
@@ -89,6 +89,7 @@ export const BaseTvChartWidget = ({
         width="100%"
         height="100%"
         timezone="Etc/UTC"
+        // eslint-disable-next-line react/style-prop-object
         style="1"
         locale="en"
         enable_publishing={false}
