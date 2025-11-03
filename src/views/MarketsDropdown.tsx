@@ -127,7 +127,7 @@ const MarketsDropdownContent = ({
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ percentChange24h }: MarketData) => (
             <div tw="inlineRow">
-              {!percentChange24h ? (
+              {percentChange24h == null ? (
                 <$Output type={OutputType.Text} value={null} />
               ) : (
                 <$PriceChangeOutput

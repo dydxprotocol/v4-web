@@ -1,9 +1,9 @@
 import { RefObject } from 'react';
 
 export const MarketsBanners = ({
-  _marketsTableRef,
+  marketsTableRef: _marketsTableRef,
 }: {
-  _marketsTableRef?: RefObject<HTMLElement>;
+  marketsTableRef?: RefObject<HTMLElement>;
 }) => {
   // NOTE: Banners disabled for demo
   return null;

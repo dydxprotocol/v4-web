@@ -140,7 +140,7 @@ export const AccountMenu = () => {
                 {walletInfo && walletInfo.name !== WalletType.Keplr ? (
                   'Fuel Address'
                 ) : (
-                  <$label>&quot;Fuel Address&quot;</$label>
+                  <$label>Fuel Address</$label>
                 )}
                 <$Address>{truncateAddress(dydxAddress)}</$Address>
               </$Column>

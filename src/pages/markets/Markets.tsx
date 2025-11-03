@@ -26,7 +26,7 @@ const Markets = () => {
   return (
     <$Page>
       <$HeaderSection>
-        <MarketsBanners _marketsTableRef={marketsTableRef} />
+        <MarketsBanners marketsTableRef={marketsTableRef} />
         <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
 

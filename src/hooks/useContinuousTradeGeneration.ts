@@ -299,6 +299,7 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
     if (enabled && websocket && currentMarketId && !isRunning) {
       startGeneration();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, websocket, currentMarketId, isRunning]);
 
   // Generate initial batch of 30 trades
@@ -332,7 +333,10 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
 
         setTradesGenerated((prev) => prev + 1);
       } catch (error) {
-        // Error generating initial trade
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Error generating initial trade:', error);
+        }
       }
     }
 
@@ -369,7 +373,10 @@ export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled:
 
       setTradesGenerated((prev) => prev + 1);
     } catch (error) {
-      // Error generating trade
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Error generating trade:', error);
+      }
     }
   }, [websocket, currentMarketId, tickSizeDecimals, isRunning]);
 
