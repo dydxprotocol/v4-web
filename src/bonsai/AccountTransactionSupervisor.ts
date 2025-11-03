@@ -61,7 +61,13 @@ import { calc } from '@/lib/do';
 import { operationFailureToErrorParams, wrapSimpleError } from '@/lib/errorHelpers';
 import { StatefulOrderError, stringifyTransactionError } from '@/lib/errors';
 import { localWalletManager } from '@/lib/hdKeyManager';
-import { AttemptBigNumber, AttemptNumber, MAX_INT_ROUGHLY, MustBigNumber } from '@/lib/numbers';
+import {
+  AttemptBigNumber,
+  AttemptNumber,
+  MAX_INT_ROUGHLY,
+  MustBigNumber,
+  MustNumber,
+} from '@/lib/numbers';
 import { parseToPrimitives, ToPrimitives } from '@/lib/parseToPrimitives';
 import { ConvertBigNumberToNumber, purgeBigNumbers } from '@/lib/purgeBigNumber';
 import { createTimer, startTimer } from '@/lib/simpleTimer';
@@ -414,7 +420,10 @@ export class AccountTransactionSupervisor {
     return result;
   }
 
-  private async executePlaceOrder(payload: PlaceOrderPayload): Promise<OperationResult<any>> {
+  private async executePlaceOrder(
+    payload: PlaceOrderPayload,
+    source: TradeMetadataSource
+  ): Promise<OperationResult<any>> {
     const totalTimer = startTimer();
     const afterSubmitTimer = createTimer();
 
@@ -527,7 +536,22 @@ export class AccountTransactionSupervisor {
               fill: purgeBigNumbers(result.fill),
               totalTimeToFill: totalTimer.elapsed(),
               timeToFillAfterSubmit: afterSubmitTimer.elapsed(),
+              source,
             });
+            track(
+              AnalyticsEvents.TradeMarketOrderFilled({
+                order: payload,
+                roundtripMs: totalTimer.elapsed(),
+                sinceSubmissionMs: afterSubmitTimer.elapsed(),
+                volume: MustBigNumber(result.fill.size)
+                  .times(result.fill.price ?? 0)
+                  .toNumber(),
+                size: MustNumber(result.fill.size),
+                price: MustNumber(result.fill.price),
+                fill: result.fill,
+                source,
+              })
+            );
           } else {
             logBonsaiInfo('AccountTransactionSupervisor/placeOrder', 'Market order never filled', {
               payload,
@@ -718,11 +742,14 @@ export class AccountTransactionSupervisor {
                   SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN
                 : undefined;
 
-              const placeOrderResult = await this.executePlaceOrder({
-                ...innerPayload,
-                currentHeight,
-                goodTilBlock,
-              });
+              const placeOrderResult = await this.executePlaceOrder(
+                {
+                  ...innerPayload,
+                  currentHeight,
+                  goodTilBlock,
+                },
+                source
+              );
 
               if (isOperationFailure(placeOrderResult)) {
                 throw new WrappedOperationFailureError(placeOrderResult);
@@ -798,7 +825,9 @@ export class AccountTransactionSupervisor {
           )
         );
 
-        const results = await Promise.all(closePayloads.map((p) => this.executePlaceOrder(p)));
+        const results = await Promise.all(
+          closePayloads.map((p) => this.executePlaceOrder(p, 'CloseAllPositionsButton'))
+        );
 
         if (results.every(isOperationSuccess)) {
           return wrapOperationSuccess({
