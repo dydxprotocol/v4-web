@@ -1,25 +1,34 @@
-import { ResolutionString } from 'public/tradingview/charting_library';
 import { useCallback, useMemo, useState } from 'react';
+
+import { ResolutionString } from 'public/tradingview/charting_library';
 import styled from 'styled-components';
 
-import { DEFAULT_WIDGET_SETTINGS, MARKET_SYMBOL_MAP, RESOLUTION_TO_WIDGET_INTERVAL } from '@/constants/chartConfig';
+import {
+  DEFAULT_WIDGET_SETTINGS,
+  MARKET_SYMBOL_MAP,
+  RESOLUTION_TO_WIDGET_INTERVAL,
+} from '@/constants/chartConfig';
 import { DEFAULT_MARKETID } from '@/constants/markets';
+
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import TradingViewWidget from '@/components/TradingViewWidget/TradingViewWidget';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import TradingViewWidget from '@/components/TradingViewWidget/TradingViewWidget';
 import { ResolutionSelector } from './ResolutionSelector';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const TvChartWidgetSimple = () => {
   const currentMarketId: string = useAppSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
   const isSimpleUi = useSimpleUiEnabled();
   const appTheme = useAppSelector(getAppTheme);
-  const [currentResolution, setCurrentResolution] = useState<ResolutionString>('1D' as ResolutionString);
+  const [currentResolution, setCurrentResolution] = useState<ResolutionString>(
+    '1D' as ResolutionString
+  );
 
   // Convert market ID to TradingView symbol format
   const tradingViewSymbol = useMemo(() => {
@@ -37,7 +46,7 @@ export const TvChartWidgetSimple = () => {
         return 'dark';
     }
   }, [appTheme]);
-  
+
   // Ensure we're using the dark theme for proper candle visibility
   const effectiveTheme = widgetTheme === 'dark' ? 'dark' : 'light';
 
@@ -45,8 +54,6 @@ export const TvChartWidgetSimple = () => {
   const widgetInterval = useMemo(() => {
     return RESOLUTION_TO_WIDGET_INTERVAL[currentResolution] || '1D';
   }, [currentResolution]);
-  
-
 
   const onResolutionChange = useCallback((resolution: ResolutionString) => {
     setCurrentResolution(resolution);
@@ -68,7 +75,7 @@ export const TvChartWidgetSimple = () => {
             toolbar_bg={widgetTheme === 'dark' ? '#2a2e39' : '#f8f9fa'}
           />
         </$ChartContainer>
-        
+
         <ResolutionSelector
           isLaunchable={false}
           onResolutionChange={onResolutionChange}
@@ -80,7 +87,7 @@ export const TvChartWidgetSimple = () => {
 
   return (
     <$ChartContainer>
-            <TradingViewWidget
+      <TradingViewWidget
         symbol={tradingViewSymbol}
         theme={effectiveTheme}
         interval={widgetInterval}
@@ -100,26 +107,26 @@ const $ChartContainer = styled.div`
   user-select: none;
   height: 100%;
   width: 100%;
-  
+
   /* Match the original chart styling */
   > div {
     height: 100%;
     width: 100%;
   }
-  
+
   /* Remove any default margins/padding that might cause gaps */
   iframe {
     border: none;
     margin: 0;
     padding: 0;
   }
-  
+
   /* Ensure TradingView widget fills container completely */
   .tradingview-widget-container {
     height: 100% !important;
     width: 100% !important;
   }
-  
+
   /* Remove any default TradingView margins */
   .tradingview-widget-container > div {
     margin: 0 !important;

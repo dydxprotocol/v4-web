@@ -10,17 +10,17 @@ import { promiseWithTimeout } from '@/lib/asyncUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import {
-    Loadable,
-    loadableError,
-    loadableIdle,
-    loadableLoaded,
-    loadablePending,
+  Loadable,
+  loadableError,
+  loadableIdle,
+  loadableLoaded,
+  loadablePending,
 } from '../lib/loadable';
 import { SharedLogIds } from '../logIds';
 import { wrapAndLogBonsaiError } from '../logs';
 import {
-    createIndexerQueryStoreEffect,
-    createValidatorQueryStoreEffect,
+  createIndexerQueryStoreEffect,
+  createValidatorQueryStoreEffect,
 } from './lib/indexerQueryStoreEffect';
 import { queryResultToLoadable } from './lib/queryResultToLoadable';
 

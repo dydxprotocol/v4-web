@@ -47,340 +47,336 @@ import { MarketFilter } from './MarketFilter';
 import { FavoriteButton } from './tables/MarketsTable/FavoriteButton';
 
 const MarketsDropdownContent = ({
-    closeDropdown,
-    onRowAction,
+  closeDropdown,
+  onRowAction,
 }: {
-    closeDropdown: () => void;
-    onRowAction?: (market: Key) => void;
+  closeDropdown: () => void;
+  onRowAction?: (market: Key) => void;
 }) => {
-    const dispatch = useAppDispatch();
-    const filter: MarketFilters = useAppSelector(getMarketFilter);
-    const stringGetter = useStringGetter();
-    const [searchFilter, setSearchFilter] = useState<string>();
-    const featureFlags = useAllStatsigGateValues();
+  const dispatch = useAppDispatch();
+  const filter: MarketFilters = useAppSelector(getMarketFilter);
+  const stringGetter = useStringGetter();
+  const [searchFilter, setSearchFilter] = useState<string>();
+  const featureFlags = useAllStatsigGateValues();
 
-    const setFilter = (newFilter: MarketFilters) => {
-        dispatch(setMarketFilter(newFilter));
-    };
+  const setFilter = (newFilter: MarketFilters) => {
+    dispatch(setMarketFilter(newFilter));
+  };
 
-    const { filteredMarkets, marketFilters } = useMarketsData({
-        filter,
-        searchFilter,
-        forceHideUnlaunchedMarkets: true,
-    });
+  const { filteredMarkets, marketFilters } = useMarketsData({
+    filter,
+    searchFilter,
+    forceHideUnlaunchedMarkets: true,
+  });
 
-    const columns = useMemo(
-        () =>
-            [
-                {
-                    columnKey: 'market',
-                    getCellValue: (row: MarketData) => row.displayId,
-                    label: stringGetter({ key: STRING_KEYS.MARKET }),
-                    renderCell: ({
-                        id,
-                        assetId,
-                        displayId,
-                        logo,
-                        isNew,
-                        isUnlaunched,
-                        effectiveInitialMarginFraction,
-                        initialMarginFraction,
-                    }: MarketData) => (
-                        <div tw="flex items-center gap-0.25">
-                            <FavoriteButton marketId={id} />
-                            <$AssetIcon logoUrl={logo} symbol={assetId} />
-                            <h2>{displayId}</h2>
-                            <Tag>
-                                {isUnlaunched ? (
-                                    stringGetter({ key: STRING_KEYS.LAUNCHABLE })
-                                ) : (
-                                    <Output
-                                        type={OutputType.Multiple}
-                                        value={calculateMarketMaxLeverage({
-                                            effectiveInitialMarginFraction,
-                                            initialMarginFraction,
-                                        })}
-                                        fractionDigits={0}
-                                    />
-                                )}
-                            </Tag>
-                            {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
-                        </div>
-                    ),
-                },
-                {
-                    columnKey: 'oraclePrice',
-                    getCellValue: (row: MarketData) => row.oraclePrice,
-                    label: stringGetter({ key: STRING_KEYS.PRICE }),
-                    renderCell: ({ oraclePrice, tickSizeDecimals }: MarketData) => (
-                        <$Output
-                            withSubscript
-                            type={OutputType.Fiat}
-                            value={oraclePrice}
-                            fractionDigits={tickSizeDecimals}
-                        />
-                    ),
-                },
-                {
-                    columnKey: 'priceChange24HPercent',
-                    getCellValue: (row: MarketData) => row.percentChange24h,
-                    label: stringGetter({ key: STRING_KEYS._24H }),
-                    renderCell: ({ percentChange24h }: MarketData) => (
-                        <div tw="inlineRow">
-                            {!percentChange24h ? (
-                                <$Output type={OutputType.Text} value={null} />
-                            ) : (
-                                <$PriceChangeOutput
-                                    type={OutputType.Percent}
-                                    value={percentChange24h}
-                                    isNegative={MustBigNumber(percentChange24h).isNegative()}
-                                />
-                            )}
-                        </div>
-                    ),
-                },
-                {
-                    columnKey: 'volume24H',
-                    getCellValue: (row: MarketData) => row.volume24h,
-                    label: stringGetter({ key: STRING_KEYS.VOLUME }),
-                    renderCell: (row: MarketData) => (
-                        <$Output type={OutputType.CompactFiat} value={row.volume24h} />
-                    ),
-                },
-                {
-                    columnKey: 'spotVolume24H',
-                    getCellValue: (row: MarketData) => row.spotVolume24h,
-                    label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
-                    renderCell: (row: MarketData) => (
-                        <$Output type={OutputType.CompactFiat} value={row.spotVolume24h} />
-                    ),
-                },
-                {
-                    columnKey: 'marketCap',
-                    getCellValue: (row: MarketData) => row.marketCap,
-                    label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
-                    renderCell: (row: MarketData) => (
-                        <$Output type={OutputType.CompactFiat} value={row.marketCap} />
-                    ),
-                },
-            ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
-        [stringGetter]
-    );
-
-    const slotBottom = useMemo(() => {
-        if (filter === MarketFilters.PREDICTION_MARKET) {
-            return (
-                <div tw="p-1 text-color-text-0 font-small-medium">
-                    {stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}
-                </div>
-            );
-        }
-
-        return null;
-    }, [filter, stringGetter]);
-
-    const [hasSeenElectionBannerTrumpWin, setHasSeenElectionBannerTrupmWin] = useLocalStorage({
-        key: LocalStorageKey.HasSeenElectionBannerTRUMPWIN,
-        defaultValue: false,
-    });
-
-    const slotTop = useMemo(() => {
-        const currentDate = new Date();
-
-        if (
-            !hasSeenElectionBannerTrumpWin &&
-            featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
-            currentDate < new Date('2024-11-06T23:59:59')
-        ) {
-            return (
-                <$MarketDropdownBanner>
-                    <$FlagGradient />
-                    <Link
-                        to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}
-                        onClick={() => {
-                            closeDropdown();
-                        }}
-                    >
-                        🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
-                    </Link>
-                    <IconButton
-                        tw="[--button-icon-size:0.8em]"
-                        onClick={() => setHasSeenElectionBannerTrupmWin(true)}
-                        iconName={IconName.Close}
-                        buttonStyle={ButtonStyle.WithoutBackground}
-                    />
-                </$MarketDropdownBanner>
-            );
-        }
-
-        return null;
-    }, [
-        setHasSeenElectionBannerTrupmWin,
-        hasSeenElectionBannerTrumpWin,
-        stringGetter,
-        closeDropdown,
-        featureFlags,
-    ]);
-
-    return (
-        <>
-            <$Toolbar>
-                <MarketFilter
-                    selectedFilter={filter}
-                    filters={marketFilters}
-                    onChangeFilter={setFilter}
-                    onSearchTextChange={setSearchFilter}
+  const columns = useMemo(
+    () =>
+      [
+        {
+          columnKey: 'market',
+          getCellValue: (row: MarketData) => row.displayId,
+          label: stringGetter({ key: STRING_KEYS.MARKET }),
+          renderCell: ({
+            id,
+            assetId,
+            displayId,
+            logo,
+            isNew,
+            isUnlaunched,
+            effectiveInitialMarginFraction,
+            initialMarginFraction,
+          }: MarketData) => (
+            <div tw="flex items-center gap-0.25">
+              <FavoriteButton marketId={id} />
+              <$AssetIcon logoUrl={logo} symbol={assetId} />
+              <h2>{displayId}</h2>
+              <Tag>
+                {isUnlaunched ? (
+                  stringGetter({ key: STRING_KEYS.LAUNCHABLE })
+                ) : (
+                  <Output
+                    type={OutputType.Multiple}
+                    value={calculateMarketMaxLeverage({
+                      effectiveInitialMarginFraction,
+                      initialMarginFraction,
+                    })}
+                    fractionDigits={0}
+                  />
+                )}
+              </Tag>
+              {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
+            </div>
+          ),
+        },
+        {
+          columnKey: 'oraclePrice',
+          getCellValue: (row: MarketData) => row.oraclePrice,
+          label: stringGetter({ key: STRING_KEYS.PRICE }),
+          renderCell: ({ oraclePrice, tickSizeDecimals }: MarketData) => (
+            <$Output
+              withSubscript
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
+          ),
+        },
+        {
+          columnKey: 'priceChange24HPercent',
+          getCellValue: (row: MarketData) => row.percentChange24h,
+          label: stringGetter({ key: STRING_KEYS._24H }),
+          renderCell: ({ percentChange24h }: MarketData) => (
+            <div tw="inlineRow">
+              {!percentChange24h ? (
+                <$Output type={OutputType.Text} value={null} />
+              ) : (
+                <$PriceChangeOutput
+                  type={OutputType.Percent}
+                  value={percentChange24h}
+                  isNegative={MustBigNumber(percentChange24h).isNegative()}
                 />
-            </$Toolbar>
-            {slotTop}
-            <$ScrollArea>
-                <$Table
-                    withInnerBorders
-                    data={filteredMarkets}
-                    tableId="markets-dropdown"
-                    getRowKey={(row: MarketData) => row.id}
-                    getIsRowPinned={(row: MarketData) => row.isFavorite}
-                    onRowAction={onRowAction}
-                    defaultSortDescriptor={{
-                        column: 'volume24H',
-                        direction: 'descending',
-                    }}
-                    label={stringGetter({ key: STRING_KEYS.MARKETS })}
-                    columns={columns}
-                    initialPageSize={50}
-                    paginationBehavior="paginate"
-                    shouldResetOnTotalRowsChange
-                    slotEmpty={
-                        <$MarketNotFound>
-                            {filter === MarketFilters.NEW && !searchFilter ? (
-                                <h2>
-                                    {stringGetter({
-                                        key: STRING_KEYS.QUERY_NOT_FOUND,
-                                        params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
-                                    })}
-                                </h2>
-                            ) : (
-                                <>
-                                    <h2>
-                                        {stringGetter({
-                                            key: STRING_KEYS.QUERY_NOT_FOUND,
-                                            params: { QUERY: searchFilter ?? '' },
-                                        })}
-                                    </h2>
-                                    <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
-                                </>
-                            )}
-                        </$MarketNotFound>
-                    }
-                />
-                {slotBottom}
-            </$ScrollArea>
-        </>
-    );
+              )}
+            </div>
+          ),
+        },
+        {
+          columnKey: 'volume24H',
+          getCellValue: (row: MarketData) => row.volume24h,
+          label: stringGetter({ key: STRING_KEYS.VOLUME }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.volume24h} />
+          ),
+        },
+        {
+          columnKey: 'spotVolume24H',
+          getCellValue: (row: MarketData) => row.spotVolume24h,
+          label: stringGetter({ key: STRING_KEYS.SPOT_VOLUME_24H }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.spotVolume24h} />
+          ),
+        },
+        {
+          columnKey: 'marketCap',
+          getCellValue: (row: MarketData) => row.marketCap,
+          label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
+          renderCell: (row: MarketData) => (
+            <$Output type={OutputType.CompactFiat} value={row.marketCap} />
+          ),
+        },
+      ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
+    [stringGetter]
+  );
+
+  const slotBottom = useMemo(() => {
+    if (filter === MarketFilters.PREDICTION_MARKET) {
+      return (
+        <div tw="p-1 text-color-text-0 font-small-medium">
+          {stringGetter({ key: STRING_KEYS.PREDICTION_MARKET_DESC })}
+        </div>
+      );
+    }
+
+    return null;
+  }, [filter, stringGetter]);
+
+  const [hasSeenElectionBannerTrumpWin, setHasSeenElectionBannerTrupmWin] = useLocalStorage({
+    key: LocalStorageKey.HasSeenElectionBannerTRUMPWIN,
+    defaultValue: false,
+  });
+
+  const slotTop = useMemo(() => {
+    const currentDate = new Date();
+
+    if (
+      !hasSeenElectionBannerTrumpWin &&
+      featureFlags[StatsigFlags.ffShowPredictionMarketsUi] &&
+      currentDate < new Date('2024-11-06T23:59:59')
+    ) {
+      return (
+        <$MarketDropdownBanner>
+          <$FlagGradient />
+          <Link
+            to={`${AppRoute.Trade}/${PREDICTION_MARKET.TRUMPWIN}`}
+            onClick={() => {
+              closeDropdown();
+            }}
+          >
+            🇺🇸 {stringGetter({ key: STRING_KEYS.TRADE_US_PRESIDENTIAL_ELECTION })} →
+          </Link>
+          <IconButton
+            tw="[--button-icon-size:0.8em]"
+            onClick={() => setHasSeenElectionBannerTrupmWin(true)}
+            iconName={IconName.Close}
+            buttonStyle={ButtonStyle.WithoutBackground}
+          />
+        </$MarketDropdownBanner>
+      );
+    }
+
+    return null;
+  }, [
+    setHasSeenElectionBannerTrupmWin,
+    hasSeenElectionBannerTrumpWin,
+    stringGetter,
+    closeDropdown,
+    featureFlags,
+  ]);
+
+  return (
+    <>
+      <$Toolbar>
+        <MarketFilter
+          selectedFilter={filter}
+          filters={marketFilters}
+          onChangeFilter={setFilter}
+          onSearchTextChange={setSearchFilter}
+        />
+      </$Toolbar>
+      {slotTop}
+      <$ScrollArea>
+        <$Table
+          withInnerBorders
+          data={filteredMarkets}
+          tableId="markets-dropdown"
+          getRowKey={(row: MarketData) => row.id}
+          getIsRowPinned={(row: MarketData) => row.isFavorite}
+          onRowAction={onRowAction}
+          defaultSortDescriptor={{
+            column: 'volume24H',
+            direction: 'descending',
+          }}
+          label={stringGetter({ key: STRING_KEYS.MARKETS })}
+          columns={columns}
+          initialPageSize={50}
+          paginationBehavior="paginate"
+          shouldResetOnTotalRowsChange
+          slotEmpty={
+            <$MarketNotFound>
+              {filter === MarketFilters.NEW && !searchFilter ? (
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                  })}
+                </h2>
+              ) : (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: searchFilter ?? '' },
+                    })}
+                  </h2>
+                  <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+                </>
+              )}
+            </$MarketNotFound>
+          }
+        />
+        {slotBottom}
+      </$ScrollArea>
+    </>
+  );
 };
 
 export const MarketsDropdown = memo(
-    ({
-        currentMarketId,
-        launchableMarketId,
-        logoUrl = '',
-    }: {
-        currentMarketId?: string;
-        launchableMarketId?: string;
-        logoUrl: Nullable<string>;
-    }) => {
-        const [isOpen, setIsOpen] = useState(false);
-        const stringGetter = useStringGetter();
-        const navigate = useNavigate();
-        const launchableAsset = useAppSelectorWithArgs(
-            BonsaiHelpers.assets.selectAssetInfo,
-            mapIfPresent(launchableMarketId, getAssetFromMarketId)
-        );
+  ({
+    currentMarketId,
+    launchableMarketId,
+    logoUrl = '',
+  }: {
+    currentMarketId?: string;
+    launchableMarketId?: string;
+    logoUrl: Nullable<string>;
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const stringGetter = useStringGetter();
+    const navigate = useNavigate();
+    const launchableAsset = useAppSelectorWithArgs(
+      BonsaiHelpers.assets.selectAssetInfo,
+      mapIfPresent(launchableMarketId, getAssetFromMarketId)
+    );
 
-        const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
+    const triggerBackground = currentMarketId === PREDICTION_MARKET.TRUMPWIN && <$TriggerFlag />;
 
-        useEffect(() => {
-            // listen for '/' key to open the dropdown
-            const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.key !== '/' || !event.target) return;
+    useEffect(() => {
+      // listen for '/' key to open the dropdown
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== '/' || !event.target) return;
 
-                const isTextInput = elementIsTextInput(event.target as HTMLElement);
+        const isTextInput = elementIsTextInput(event.target as HTMLElement);
 
-                if (!isTextInput) {
-                    event.preventDefault();
-                    setIsOpen(true);
-                }
-            };
+        if (!isTextInput) {
+          event.preventDefault();
+          setIsOpen(true);
+        }
+      };
 
-            window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keydown', handleKeyDown);
 
-            return () => {
-                window.removeEventListener('keydown', handleKeyDown);
-            };
-        }, []);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }, []);
 
-        const isFavoritedMarket = useAppSelectorWithArgs(getIsMarketFavorited, currentMarketId ?? '');
+    const isFavoritedMarket = useAppSelectorWithArgs(getIsMarketFavorited, currentMarketId ?? '');
 
-        return (
-            <$Popover
-                open={isOpen}
-                noBlur
-                onOpenChange={setIsOpen}
-                sideOffset={1}
-                slotTrigger={
-                    <>
-                        {triggerBackground}
-                        <$TriggerContainer $isOpen={isOpen}>
-                            <div tw="spacedRow gap-0.625">
-                                {launchableAsset ? (
-                                    <>
-                                        <img
-                                            src={launchableAsset.logo ?? undefined}
-                                            alt={launchableAsset.name}
-                                            tw="h-[1em] w-auto rounded-[50%]"
-                                        />
+    return (
+      <$Popover
+        open={isOpen}
+        noBlur
+        onOpenChange={setIsOpen}
+        sideOffset={1}
+        slotTrigger={
+          <>
+            {triggerBackground}
+            <$TriggerContainer $isOpen={isOpen}>
+              <div tw="spacedRow gap-0.625">
+                {launchableAsset ? (
+                  <>
+                    <img
+                      src={launchableAsset.logo ?? undefined}
+                      alt={launchableAsset.name}
+                      tw="h-[1em] w-auto rounded-[50%]"
+                    />
 
-                                        <div tw="flex flex-col text-start">
-                                            <span tw="font-mini-book">
-                                                {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
-                                            </span>
-                                            <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
-                                                {currentMarketId}
-                                            </h2>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div tw="flex items-center gap-0.25">
-                                        <$AssetIconWithStar>
-                                            {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
-                                            <$AssetIcon
-                                                logoUrl={logoUrl}
-                                                symbol={currentMarketId}
-                                                tw="mr-0.25"
-                                            />
-                                        </$AssetIconWithStar>
-                                        <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
-                                    </div>
-                                )}
-                            </div>
-                            <p tw="row gap-0.5 text-color-text-0 font-small-book">
-                                <DropdownIcon isOpen={isOpen} />
-                            </p>
-                        </$TriggerContainer>
-                    </>
-                }
-                triggerType={TriggerType.MarketDropdown}
-            >
-                <MarketsDropdownContent
-                    closeDropdown={() => setIsOpen(false)}
-                    onRowAction={(market: Key) => {
-                        navigate(`${AppRoute.Trade}/${market}`);
-                        setIsOpen(false);
-                    }}
-                />
-            </$Popover>
-        );
-    }
+                    <div tw="flex flex-col text-start">
+                      <span tw="font-mini-book">
+                        {stringGetter({ key: STRING_KEYS.NOT_LAUNCHED })}
+                      </span>
+                      <h2 tw="mt-[-0.25rem] text-color-text-2 font-medium-medium">
+                        {currentMarketId}
+                      </h2>
+                    </div>
+                  </>
+                ) : (
+                  <div tw="flex items-center gap-0.25">
+                    <$AssetIconWithStar>
+                      {isFavoritedMarket && <$FavoriteStatus iconName={IconName.Star} />}
+                      <$AssetIcon logoUrl={logoUrl} symbol={currentMarketId} tw="mr-0.25" />
+                    </$AssetIconWithStar>
+                    <h2 tw="text-color-text-2 font-medium-medium">{currentMarketId}</h2>
+                  </div>
+                )}
+              </div>
+              <p tw="row gap-0.5 text-color-text-0 font-small-book">
+                <DropdownIcon isOpen={isOpen} />
+              </p>
+            </$TriggerContainer>
+          </>
+        }
+        triggerType={TriggerType.MarketDropdown}
+      >
+        <MarketsDropdownContent
+          closeDropdown={() => setIsOpen(false)}
+          onRowAction={(market: Key) => {
+            navigate(`${AppRoute.Trade}/${market}`);
+            setIsOpen(false);
+          }}
+        />
+      </$Popover>
+    );
+  }
 );
 
 const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
@@ -502,12 +498,12 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const $Output = styled(Output) <{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);
 `;
 
-const $PriceChangeOutput = styled(Output) <{ isNegative?: boolean }>`
+const $PriceChangeOutput = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
 

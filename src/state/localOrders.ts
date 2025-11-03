@@ -7,13 +7,13 @@ import { OrderType } from 'starboard-client-js';
 
 import { DEFAULT_SOMETHING_WENT_WRONG_ERROR_PARAMS, ErrorParams } from '@/constants/errors';
 import {
-    CANCEL_ALL_ORDERS_KEY,
-    CancelOrderStatuses,
-    LocalCancelAllData,
-    LocalCancelOrderData,
-    LocalCloseAllPositionsData,
-    LocalPlaceOrderData,
-    PlaceOrderStatuses,
+  CANCEL_ALL_ORDERS_KEY,
+  CancelOrderStatuses,
+  LocalCancelAllData,
+  LocalCancelOrderData,
+  LocalCloseAllPositionsData,
+  LocalPlaceOrderData,
+  PlaceOrderStatuses,
 } from '@/constants/trade';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';

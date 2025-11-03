@@ -19,9 +19,9 @@ import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 import { Icon, IconName } from '@/components/Icon';
 
 import {
-    getCurrentMarketOrders,
-    getCurrentMarketPositionData,
-    getIsAccountConnected,
+  getCurrentMarketOrders,
+  getCurrentMarketPositionData,
+  getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
@@ -32,9 +32,9 @@ import { track } from '@/lib/analytics/analytics';
 import { operationFailureToErrorParams } from '@/lib/errorHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import {
-    canModifyOrderTypeFromChart,
-    createPlaceOrderPayloadFromExistingOrder,
-    getOrderModificationError,
+  canModifyOrderTypeFromChart,
+  createPlaceOrderPayloadFromExistingOrder,
+  getOrderModificationError,
 } from '@/lib/orderModification';
 import { isNewOrderStatusOpen } from '@/lib/orders';
 import { getChartLineColors } from '@/lib/tradingView/utils';

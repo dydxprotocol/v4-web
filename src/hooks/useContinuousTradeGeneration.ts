@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { orderBy } from 'lodash';
 
-import { isWsTradesResponse, isWsTradesUpdateResponses } from '../types/indexer/indexerChecks';
-import { IndexerWsTradesUpdateObject } from '../types/indexer/indexerManual';
-
-import { useAppSelector } from '../state/appTypes';
-import { getCurrentMarketIdIfTradeable } from '../state/currentMarketSelectors';
-
-import { mergeById } from '../lib/mergeById';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../bonsai/lib/loadable';
 import { logBonsaiError, logBonsaiInfo } from '../bonsai/logs';
 import { selectWebsocketUrl } from '../bonsai/socketSelectors';
-import { makeWsValueManager, subscribeToWsValue } from '../bonsai/websocket/lib/indexerValueManagerHelpers';
+import {
+  makeWsValueManager,
+  subscribeToWsValue,
+} from '../bonsai/websocket/lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from '../bonsai/websocket/lib/indexerWebsocket';
 import { IndexerWebsocketManager } from '../bonsai/websocket/lib/indexerWebsocketManager';
 import { WebsocketDerivedValue } from '../bonsai/websocket/lib/websocketDerivedValue';
-import { BonsaiHelpers } from '@/bonsai/ontology';
-import { orEmptyObj } from '@/lib/typeUtils';
+import { mergeById } from '../lib/mergeById';
+import { useAppSelector } from '../state/appTypes';
+import { getCurrentMarketIdIfTradeable } from '../state/currentMarketSelectors';
+import { isWsTradesResponse, isWsTradesUpdateResponses } from '../types/indexer/indexerChecks';
+import { IndexerWsTradesUpdateObject } from '../types/indexer/indexerManual';
 
 // Type definitions for fake message injection
 export interface FakeTradeData {
@@ -75,9 +76,9 @@ function tradesWebsocketValueCreator(
         // Handle case where we're injecting fake trades without base data
         if (startingValue == null) {
           // Check if this is a fake trade injection
-          const isFakeInjection = baseUpdates.some(update =>
-            update.type === 'fake_injection' ||
-            (update as any).type === 'fake_injection'
+          const isFakeInjection = baseUpdates.some(
+            (update) =>
+              update.type === 'fake_injection' || (update as any).type === 'fake_injection'
           );
 
           if (isFakeInjection) {
@@ -102,7 +103,7 @@ function tradesWebsocketValueCreator(
         logBonsaiInfo('TradesTracker', 'Received trades update', {
           marketId,
           updatesCount: updates.length,
-          updateDetails: updates.map(u => ({
+          updateDetails: updates.map((u) => ({
             tradesCount: u.trades.length,
             firstTrade: u.trades[0],
             lastTrade: u.trades[u.trades.length - 1],
@@ -281,10 +282,7 @@ export function createSampleTrade(
  * @param enabled - Whether continuous generation is enabled (default: true for auto-start)
  * @returns Object with control functions and status
  */
-export function useContinuousTradeGeneration(
-  intervalMs: number = 1000,
-  enabled: boolean = true
-) {
+export function useContinuousTradeGeneration(intervalMs: number = 1000, enabled: boolean = true) {
   const [isRunning, setIsRunning] = useState(false);
   const [tradesGenerated, setTradesGenerated] = useState(0);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -332,8 +330,7 @@ export function useContinuousTradeGeneration(
         // Inject the fake trade
         injectFakeTrade(websocket, trade, currentMarketId);
 
-        setTradesGenerated(prev => prev + 1);
-
+        setTradesGenerated((prev) => prev + 1);
       } catch (error) {
         console.error(`Error generating initial trade ${i + 1}:`, error);
       }
@@ -370,8 +367,7 @@ export function useContinuousTradeGeneration(
       // Inject the fake trade
       injectFakeTrade(websocket, trade, currentMarketId);
 
-      setTradesGenerated(prev => prev + 1);
-
+      setTradesGenerated((prev) => prev + 1);
     } catch (error) {
       console.error('Error generating trade:', error);
     }

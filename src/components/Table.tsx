@@ -599,7 +599,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
           <SortIcon
             sortDirection={
               state.sortDescriptor?.column === column.key
-                ? state.sortDescriptor?.direction ?? 'none'
+                ? state.sortDescriptor.direction ?? 'none'
                 : 'none'
             }
           />

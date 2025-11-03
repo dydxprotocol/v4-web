@@ -95,12 +95,12 @@ export const BaseTvChartWidget = ({
         allow_symbol_change={false}
         hide_top_toolbar={false}
         hide_legend={false}
-        save_image={true}
+        save_image
         studies={['Volume@tv-basicstudies']}
         disabled_features={['use_localstorage_for_settings']}
         enabled_features={['study_templates']}
         onChartReady={handleWidgetReady}
-        autosize={true}
+        autosize
       />
     </$PriceChart>
   );

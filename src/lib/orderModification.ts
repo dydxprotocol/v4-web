@@ -6,9 +6,9 @@ import { OrderExecution, OrderSide, OrderTimeInForce, OrderType } from 'starboar
 
 import { TransactionMemo } from '@/constants/analytics';
 import {
-    IndexerAPITimeInForce,
-    IndexerOrderSide,
-    IndexerOrderType,
+  IndexerAPITimeInForce,
+  IndexerOrderSide,
+  IndexerOrderType,
 } from '@/types/indexer/indexerApiGen';
 
 import { store } from '@/state/_store';
@@ -17,11 +17,11 @@ import { assertNever } from './assertNever';
 import { calc } from './do';
 import { AttemptNumber, MAX_INT_ROUGHLY } from './numbers';
 import {
-    isLimitOrderTypeNew,
-    isMarketOrderTypeNew,
-    isSellOrderNew,
-    isStopLossOrderNew,
-    isTakeProfitOrderNew,
+  isLimitOrderTypeNew,
+  isMarketOrderTypeNew,
+  isSellOrderNew,
+  isStopLossOrderNew,
+  isTakeProfitOrderNew,
 } from './orders';
 
 const ORDER_TYPES_MODIFICATION_ENABLED = [

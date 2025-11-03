@@ -64,7 +64,7 @@ export const MobileTopPanel = ({
       icon: IconName.Coins,
     },
     {
-              content: <ChartSelector />,
+      content: <ChartSelector />,
       forceMount: true,
       label: stringGetter({ key: STRING_KEYS.PRICE }),
       value: Tab.Price,

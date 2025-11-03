@@ -22,8 +22,8 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { getDisplayableAssetFromTicker } from '@/lib/assetUtils';
 import {
-    getIndexerOrderTypeStringKey,
-    getPositionSideStringKeyFromOrderSide,
+  getIndexerOrderTypeStringKey,
+  getPositionSideStringKeyFromOrderSide,
 } from '@/lib/enumToStringKeyHelpers';
 import { MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';

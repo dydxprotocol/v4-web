@@ -23,8 +23,8 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import {
-    StakeRewardButtonAndReceipt,
-    type StakeButtonAlert,
+  StakeRewardButtonAndReceipt,
+  type StakeButtonAlert,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { useAppSelector } from '@/state/appTypes';

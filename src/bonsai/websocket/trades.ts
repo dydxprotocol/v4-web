@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { BonsaiHelpers } from '@/bonsai/ontology';
 import { orderBy } from 'lodash';
 
 import { isWsTradesResponse, isWsTradesUpdateResponses } from '@/types/indexer/indexerChecks';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
-import { BonsaiHelpers } from '@/bonsai/ontology';
-import { orEmptyObj } from '@/lib/typeUtils';
 import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketIdIfTradeable } from '@/state/currentMarketSelectors';
 
 import { mergeById } from '@/lib/mergeById';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { Loadable, loadableIdle, loadableLoaded, loadablePending } from '../lib/loadable';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
@@ -75,9 +75,9 @@ function tradesWebsocketValueCreator(
         // Handle case where we're injecting fake trades without base data
         if (startingValue == null) {
           // Check if this is a fake trade injection
-          const isFakeInjection = baseUpdates.some(update =>
-            update.type === 'fake_injection' ||
-            (update as any).type === 'fake_injection'
+          const isFakeInjection = baseUpdates.some(
+            (update) =>
+              update.type === 'fake_injection' || (update as any).type === 'fake_injection'
           );
 
           if (isFakeInjection) {
@@ -102,7 +102,7 @@ function tradesWebsocketValueCreator(
         logBonsaiInfo('TradesTracker', 'Received trades update', {
           marketId,
           updatesCount: updates.length,
-          updateDetails: updates.map(u => ({
+          updateDetails: updates.map((u) => ({
             tradesCount: u.trades.length,
             firstTrade: u.trades[0],
             lastTrade: u.trades[u.trades.length - 1],
@@ -274,4 +274,3 @@ export function createSampleTrade(
     market: marketId,
   };
 }
-

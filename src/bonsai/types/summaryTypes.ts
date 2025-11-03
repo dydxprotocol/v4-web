@@ -1,23 +1,23 @@
 import { type BigNumber } from 'bignumber.js';
 import {
-    ClobModule,
-    ComplianceReason,
-    FeeTierModule,
-    PricesModule,
-    RewardsModule,
+  ClobModule,
+  ComplianceReason,
+  FeeTierModule,
+  PricesModule,
+  RewardsModule,
 } from 'starboard-client-js';
 
 import {
-    IndexerAPITimeInForce,
-    IndexerOrderSide,
-    IndexerOrderType,
-    IndexerPerpetualPositionResponseObject,
-    IndexerTransferResponseObject,
+  IndexerAPITimeInForce,
+  IndexerOrderSide,
+  IndexerOrderType,
+  IndexerPerpetualPositionResponseObject,
+  IndexerTransferResponseObject,
 } from '@/types/indexer/indexerApiGen';
 import {
-    IndexerCompositeFillObject,
-    IndexerWsBaseMarketObject,
-    IndexerWsTradeResponseObject,
+  IndexerCompositeFillObject,
+  IndexerWsBaseMarketObject,
+  IndexerWsTradeResponseObject,
 } from '@/types/indexer/indexerManual';
 
 import { ToPrimitives } from '@/lib/parseToPrimitives';

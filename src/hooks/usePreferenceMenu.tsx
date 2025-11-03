@@ -16,8 +16,8 @@ import { Switch } from '@/components/Switch';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import {
-    OtherPreference,
-    setDefaultToAllMarketsInPositionsOrdersFills,
+  OtherPreference,
+  setDefaultToAllMarketsInPositionsOrdersFills,
 } from '@/state/appUiConfigs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/appUiConfigsSelectors';
 import { setSelectedTradeLayout } from '@/state/layout';

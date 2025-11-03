@@ -147,9 +147,9 @@ export const MarketsBanners = ({
     </$PumpBanner>
   ) : null;
 
-    /* NOTE: disabled for demo */
-    /* return pumpBanner ?? pmlBanner ?? null; */
-    return null;
+  /* NOTE: disabled for demo */
+  /* return pumpBanner ?? pmlBanner ?? null; */
+  return null;
 };
 
 const $MarketsPageBanner = styled.div`

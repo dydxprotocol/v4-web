@@ -115,8 +115,8 @@ export const useAccountBalance = ({
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount).toNumber();
 
-  let queryStatus = evmNative.status;
-  let isQueryFetching = evmNative.isFetching;
+  const queryStatus = evmNative.status;
+  const isQueryFetching = evmNative.isFetching;
 
   return {
     balance: balance?.toString(),

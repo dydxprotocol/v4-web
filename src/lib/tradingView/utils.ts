@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon';
 import {
-    ChartPropertiesOverrides,
-    Timezone,
-    TradingTerminalFeatureset,
-    TradingTerminalWidgetOptions,
+  ChartPropertiesOverrides,
+  Timezone,
+  TradingTerminalFeatureset,
+  TradingTerminalWidgetOptions,
 } from 'public/tradingview/charting_library';
 import { OrderSide } from 'starboard-client-js';
 

@@ -1,6 +1,6 @@
 /**
  * Chart Configuration
- * 
+ *
  * This file controls which chart implementation to use throughout the app.
  * Set USE_WIDGET_CHARTS to true to use the new TradingView widget-based charts,
  * or false to use the original charting library charts.
@@ -24,9 +24,9 @@ export const MARKET_SYMBOL_MAP: Record<string, string> = {
   'DELTA-USD': 'SET:DELTA',
   'BTC-USD': 'CRYPTOCAP:BTC',
   'ETH-USD': 'CRYPTOCAP:ETH',
-  'AAPL': 'NASDAQ:AAPL',
-  'MSFT': 'NASDAQ:MSFT',
-  'GOOGL': 'NASDAQ:GOOGL',
+  AAPL: 'NASDAQ:AAPL',
+  MSFT: 'NASDAQ:MSFT',
+  GOOGL: 'NASDAQ:GOOGL',
   // Add more mappings as needed
 };
 
@@ -34,7 +34,7 @@ export const MARKET_SYMBOL_MAP: Record<string, string> = {
  * Resolution mapping from TradingView charting library to widget intervals
  * Based on TradingView widget documentation:
  * - Ticks: xT (1T — one tick)
- * - Seconds: xS (1S — one second) 
+ * - Seconds: xS (1S — one second)
  * - Minutes: x (1 — one minute)
  * - Hours: x minutes (60 — one hour)
  * - Days: xD (1D — one day)
@@ -43,16 +43,16 @@ export const MARKET_SYMBOL_MAP: Record<string, string> = {
  * - Years: xM months (12M — one year)
  */
 export const RESOLUTION_TO_WIDGET_INTERVAL: Record<string, string> = {
-  '1': '1',      // 1 minute
-  '5': '5',      // 5 minutes
-  '15': '15',    // 15 minutes
-  '30': '30',    // 30 minutes
-  '60': '60',    // 1 hour
-  '240': '240',  // 4 hours
-  '1D': '1D',    // 1 day
-  '1W': '1W',    // 1 week
-  '1M': '1M',    // 1 month
-  '12M': '12M',  // 1 year
+  '1': '1', // 1 minute
+  '5': '5', // 5 minutes
+  '15': '15', // 15 minutes
+  '30': '30', // 30 minutes
+  '60': '60', // 1 hour
+  '240': '240', // 4 hours
+  '1D': '1D', // 1 day
+  '1W': '1W', // 1 week
+  '1M': '1M', // 1 month
+  '12M': '12M', // 1 year
 };
 
 /**

@@ -1,9 +1,11 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import { FuelWalletConnector } from '@fuels/connectors';
 import { Fuel } from 'fuels';
-import { useCallback, useEffect, useState } from 'react';
 
 import { OnboardingState } from '@/constants/account';
 import { ConnectorType, WalletNetworkType, WalletType } from '@/constants/wallets';
+
 import { setOnboardingState } from '@/state/account';
 import { useAppDispatch } from '@/state/appTypes';
 import { clearSourceAccount, setSourceAddress, setWalletInfo } from '@/state/wallet';
@@ -26,9 +28,7 @@ export const useFuelWallet = () => {
   // Initialize Fuel instance
   useEffect(() => {
     const fuelInstance = new Fuel({
-      connectors: [
-        new FuelWalletConnector(),
-      ],
+      connectors: [new FuelWalletConnector()],
     });
     setFuel(fuelInstance);
   }, []);
@@ -60,17 +60,21 @@ export const useFuelWallet = () => {
             setIsConnected(true);
             setAddress(accountAddress);
 
-            dispatch(setSourceAddress({
-              address: accountAddress,
-              chain: WalletNetworkType.Evm
-            }));
+            dispatch(
+              setSourceAddress({
+                address: accountAddress,
+                chain: WalletNetworkType.Evm,
+              })
+            );
 
-            dispatch(setWalletInfo({
-              connectorType: ConnectorType.Injected,
-              name: WalletType.FuelWallet,
-              icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwRkY4OCIvPgo8cGF0aCBkPSJNOCAxMkM4IDEwLjg5NTQgOC44OTU0MyAxMCAxMCAxMEgyMkMyMy4xMDQ2IDEwIDI0IDEwLjg5NTQgMjQgMTJWMjBDMjQgMjEuMTA0NiAyMy4xMDQ2IDIyIDIyIDIySDEwQzguODk1NDMgMjIgOCAyMS4xMDQ2IDggMjBWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgMTZDMjQgMTQuODk1NCAyMy4xMDQ2IDE0IDIyIDE0SDI2QzI3LjEwNDYgMTQgMjggMTQuODk1NCAyOCAxNlYxNkMyOCAxNy4xMDQ2IDI3LjEwNDYgMTggMjYgMThIMjJDMjMuMTA0NiAxOCAyNCAxNy4xMDQ2IDI0IDE2WiIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMiIgZmlsbD0iIzAwRkY4OCIvPgo8L3N2Zz4K',
-              rdns: 'fuel-wallet',
-            } as FuelWalletInfo));
+            dispatch(
+              setWalletInfo({
+                connectorType: ConnectorType.Injected,
+                name: WalletType.FuelWallet,
+                icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwRkY4OCIvPgo8cGF0aCBkPSJNOCAxMkM4IDEwLjg5NTQgOC44OTU0MyAxMCAxMCAxMEgyMkMyMy4xMDQ2IDEwIDI0IDEwLjg5NTQgMjQgMTJWMjBDMjQgMjEuMTA0NiAyMy4xMDQ2IDIyIDIyIDIySDEwQzguODk1NDMgMjIgOCAyMS4xMDQ2IDggMjBWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgMTZDMjQgMTQuODk1NCAyMy4xMDQ2IDE0IDIyIDE0SDI2QzI3LjEwNDYgMTQgMjggMTQuODk1NCAyOCAxNlYxNkMyOCAxNy4xMDQ2IDI3LjEwNDYgMTggMjYgMThIMjJDMjMuMTA0NiAxOCAyNCAxNy4xMDQ2IDI0IDE2WiIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMiIgZmlsbD0iIzAwRkY4OCIvPgo8L3N2Zz4K',
+                rdns: 'fuel-wallet',
+              } as FuelWalletInfo)
+            );
 
             // For Fuel wallet, skip key derivation and go directly to AccountConnected
             dispatch(setOnboardingState(OnboardingState.AccountConnected));
@@ -134,17 +138,21 @@ export const useFuelWallet = () => {
           setIsConnected(true);
           setAddress(accountAddress);
 
-          dispatch(setSourceAddress({
-            address: accountAddress,
-            chain: WalletNetworkType.Evm
-          }));
+          dispatch(
+            setSourceAddress({
+              address: accountAddress,
+              chain: WalletNetworkType.Evm,
+            })
+          );
 
-          dispatch(setWalletInfo({
-            connectorType: ConnectorType.Injected,
-            name: WalletType.FuelWallet,
-            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwRkY4OCIvPgo8cGF0aCBkPSJNOCAxMkM4IDEwLjg5NTQgOC44OTU0MyAxMCAxMCAxMEgyMkMyMy4xMDQ2IDEwIDI0IDEwLjg5NTQgMjQgMTJWMjBDMjQgMjEuMTA0NiAyMy4xMDQ2IDIyIDIyIDIySDEwQzguODk1NDMgMjIgOCAyMS4xMDQ2IDggMjBWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgMTZDMjQgMTQuODk1NCAyMy4xMDQ2IDE0IDIyIDE0SDI2QzI3LjEwNDYgMTQgMjggMTQuODk1NCAyOCAxNlYxNkMyOCAxNy4xMDQ2IDI3LjEwNDYgMTggMjYgMThIMjJDMjMuMTA0NiAxOCAyNCAxNy4xMDQ2IDI0IDE2WiIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMiIgZmlsbD0iIzAwRkY4OCIvPgo8L3N2Zz4K',
-            rdns: 'fuel-wallet',
-          } as FuelWalletInfo));
+          dispatch(
+            setWalletInfo({
+              connectorType: ConnectorType.Injected,
+              name: WalletType.FuelWallet,
+              icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwRkY4OCIvPgo8cGF0aCBkPSJNOCAxMkM4IDEwLjg5NTQgOC44OTU0MyAxMCAxMCAxMEgyMkMyMy4xMDQ2IDEwIDI0IDEwLjg5NTQgMjQgMTJWMjBDMjQgMjEuMTA0NiAyMy4xMDQ2IDIyIDIyIDIySDEwQzguODk1NDMgMjIgOCAyMS4xMDQ2IDggMjBWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgMTZDMjQgMTQuODk1NCAyMy4xMDQ2IDE0IDIyIDE0SDI2QzI3LjEwNDYgMTQgMjggMTQuODk1NCAyOCAxNlYxNkMyOCAxNy4xMDQ2IDI3LjEwNDYgMTggMjYgMThIMjJDMjMuMTA0NiAxOCAyNCAxNy4xMDQ2IDI0IDE2WiIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMiIgZmlsbD0iIzAwRkY4OCIvPgo8L3N2Zz4K',
+              rdns: 'fuel-wallet',
+            } as FuelWalletInfo)
+          );
 
           // For Fuel wallet, skip key derivation and go directly to AccountConnected
           dispatch(setOnboardingState(OnboardingState.AccountConnected));

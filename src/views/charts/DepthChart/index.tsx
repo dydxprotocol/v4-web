@@ -5,24 +5,24 @@ import { curveStepAfter } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { Point } from '@visx/point';
 import {
-    AreaSeries,
-    Axis,
-    DataProvider,
-    EventEmitterProvider,
-    Grid,
-    LineSeries,
-    buildChartTheme,
-    darkTheme,
-    type EventHandlerParams,
+  AreaSeries,
+  Axis,
+  DataProvider,
+  EventEmitterProvider,
+  Grid,
+  LineSeries,
+  buildChartTheme,
+  darkTheme,
+  type EventHandlerParams,
 } from '@visx/xychart';
 import { OrderSide } from 'starboard-client-js';
 import styled, { keyframes } from 'styled-components';
 
 import {
-    DepthChartDatum,
-    DepthChartPoint,
-    DepthChartSeries,
-    SERIES_KEY_FOR_ORDER_SIDE,
+  DepthChartDatum,
+  DepthChartPoint,
+  DepthChartSeries,
+  SERIES_KEY_FOR_ORDER_SIDE,
 } from '@/constants/charts';
 import { StringGetterFunction } from '@/constants/localization';
 

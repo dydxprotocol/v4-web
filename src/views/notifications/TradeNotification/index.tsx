@@ -14,8 +14,8 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIconNew } from '@/views/OrderStatusIcon';
 
 import {
-    getIndexerOrderTypeStringKey,
-    getOrderStatusStringKey,
+  getIndexerOrderTypeStringKey,
+  getOrderStatusStringKey,
 } from '@/lib/enumToStringKeyHelpers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { orEmptyObj } from '@/lib/typeUtils';

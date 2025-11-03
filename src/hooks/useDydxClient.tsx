@@ -5,12 +5,12 @@ import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndexer';
 import type { ResolutionString } from 'public/tradingview/charting_library';
 import {
-    BECH32_PREFIX,
-    FaucetClient,
-    PnlTickInterval,
-    SelectedGasDenom,
-    onboarding,
-    type ProposalStatus,
+  BECH32_PREFIX,
+  FaucetClient,
+  PnlTickInterval,
+  SelectedGasDenom,
+  onboarding,
+  type ProposalStatus,
 } from 'starboard-client-js';
 
 import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';

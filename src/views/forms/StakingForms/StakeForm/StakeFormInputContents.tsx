@@ -25,8 +25,8 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import {
-    StakeButtonAlert,
-    StakeRewardButtonAndReceipt,
+  StakeButtonAlert,
+  StakeRewardButtonAndReceipt,
 } from '@/views/forms/StakingForms/shared/StakeRewardButtonAndReceipt';
 
 import { track } from '@/lib/analytics/analytics';

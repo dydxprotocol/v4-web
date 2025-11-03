@@ -5,7 +5,7 @@ import {
   isIndexerPerpetualMarketResponse,
   isWsBasePerpetualMarketObject,
   isWsMarketUpdateResponses,
-  isWsPerpetualMarketResponse
+  isWsPerpetualMarketResponse,
 } from '@/types/indexer/indexerChecks';
 
 import { type RootStore } from '@/state/_store';
@@ -16,6 +16,7 @@ import { calc } from '@/lib/do';
 import { AppStartupTimer } from '../appStartupTimer';
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { Loadable, loadableLoaded, loadablePending } from '../lib/loadable';
+import { transformMarkets } from '../lib/marketUtils';
 import { logBonsaiError, wrapAndLogBonsaiError } from '../logs';
 import { createIndexerStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import { selectWebsocketUrl } from '../socketSelectors';
@@ -23,7 +24,6 @@ import { MarketsData } from '../types/rawTypes';
 import { makeWsValueManager, subscribeToWsValue } from './lib/indexerValueManagerHelpers';
 import { IndexerWebsocket } from './lib/indexerWebsocket';
 import { WebsocketDerivedValue } from './lib/websocketDerivedValue';
-import { transformMarkets } from '../lib/marketUtils';
 
 function marketsWebsocketValueCreator(websocket: IndexerWebsocket) {
   return new WebsocketDerivedValue<Loadable<MarketsData>>(
@@ -133,7 +133,9 @@ export function setUpMarkets(store: RootStore) {
         setMarkets(val);
       } else if (hasData && lastSetHadData) {
         // Don't overwrite the transformed data with raw websocket data
-        console.log("Websocket received market updates, but keeping transformed data from REST call");
+        console.log(
+          'Websocket received market updates, but keeping transformed data from REST call'
+        );
         // Optionally, you could merge specific updates here instead of ignoring them completely
       }
     });

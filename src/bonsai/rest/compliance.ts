@@ -9,9 +9,9 @@ import { appQueryClient } from '@/state/appQueryClient';
 import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import {
-    ComplianceErrors,
-    setLocalAddressScreenV2Raw,
-    setSourceAddressScreenV2Raw,
+  ComplianceErrors,
+  setLocalAddressScreenV2Raw,
+  setSourceAddressScreenV2Raw,
 } from '@/state/raw';
 
 import { signCompliancePayload } from '@/lib/compliance';

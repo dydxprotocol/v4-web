@@ -134,7 +134,7 @@ export const AccountMenu = () => {
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
             <$AddressRow>
               <AssetIcon
-                logoUrl={'https://verified-assets.fuel.network/images/fuel.svg'}
+                logoUrl="https://verified-assets.fuel.network/images/fuel.svg"
                 symbol={chainTokenLabel}
                 tw="z-[2] [--asset-icon-size:1.75rem]"
               />
@@ -147,7 +147,7 @@ export const AccountMenu = () => {
                 <$Address>{truncateAddress(dydxAddress)}</$Address>
               </$Column>
               <$CopyButton buttonType="icon" value={address} shape={ButtonShape.Square} />
-              <WithTooltip tooltipString={'Fuel Block Explorer'}>
+              <WithTooltip tooltipString="Fuel Block Explorer">
                 <$IconButton
                   action={ButtonAction.Base}
                   href={`https://app.fuel.network/account/${address}/transactions`}

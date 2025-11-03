@@ -19,6 +19,7 @@ import {
 import { isTruthy } from '@/lib/isTruthy';
 import { MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
 
+import { calculatePriceChangePercent } from '../lib/marketUtils';
 import { MarketsData } from '../types/rawTypes';
 import {
   AllAssetData,
@@ -28,7 +29,6 @@ import {
   PerpetualMarketSummaries,
 } from '../types/summaryTypes';
 import { formatAssetDataForPerpetualMarketSummary } from './assets';
-import { calculatePriceChangePercent } from '../lib/marketUtils';
 
 export function calculateAllMarkets(markets: MarketsData | undefined): MarketsInfo | undefined {
   if (markets == null) {
@@ -135,7 +135,7 @@ export function createMarketSummary(
         recentMarketIdsByClobPairId.has(market.ticker) ||
         Boolean(
           (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
-          SEVEN_DAY_SPARKLINE_ENTRIES
+            SEVEN_DAY_SPARKLINE_ENTRIES
         );
 
       const assetData = assetInfo?.[market.assetId];

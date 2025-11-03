@@ -1,12 +1,15 @@
-import { useContinuousTradeGeneration } from '@/hooks/useContinuousTradeGeneration';
-import { Tabs } from '@/components/Tabs';
-import { TradeLayouts } from '@/constants/layout';
-import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks/useStringGetter';
-import { LiveTrades } from '@/views/tables/LiveTrades';
 import { useState } from 'react';
+
 import styled from 'styled-components';
 
+import { TradeLayouts } from '@/constants/layout';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useContinuousTradeGeneration } from '@/hooks/useContinuousTradeGeneration';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { Tabs } from '@/components/Tabs';
+import { LiveTrades } from '@/views/tables/LiveTrades';
 
 enum Tab {
   Orderbook = 'Orderbook',
@@ -22,7 +25,6 @@ const HISTOGRAM_SIDES_BY_LAYOUT = {
 export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) => {
   const stringGetter = useStringGetter();
   const [value, setValue] = useState(Tab.Trades);
-
 
   // Continuous trade generation - starts automatically (no UI needed)
   useContinuousTradeGeneration(1000, true); // 1 second interval, auto-start enabled

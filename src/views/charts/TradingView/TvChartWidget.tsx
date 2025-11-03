@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 
-import { DEFAULT_MARKETID } from '@/constants/markets';
 import { MARKET_SYMBOL_MAP } from '@/constants/chartConfig';
+import { DEFAULT_MARKETID } from '@/constants/markets';
+
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 
 import { useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
+import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { BaseTvChartWidget } from './BaseTvChartWidget';
 
@@ -33,10 +34,6 @@ export const TvChartWidget = () => {
   }, [appTheme]);
 
   return (
-    <BaseTvChartWidget
-      symbol={tradingViewSymbol}
-      isSimpleUi={isSimpleUi}
-      theme={widgetTheme}
-    />
+    <BaseTvChartWidget symbol={tradingViewSymbol} isSimpleUi={isSimpleUi} theme={widgetTheme} />
   );
 };

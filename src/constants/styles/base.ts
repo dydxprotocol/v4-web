@@ -77,8 +77,7 @@ export enum ColorToken {
   GluonGrey = '#1B1B1E',
   SlateGrey = '#262626',
   DustyGrey = '#878787',
-  Snow = '#FBFBFB'
-
+  Snow = '#FBFBFB',
 }
 
 /** Maps opacity to corresponding hex value */
