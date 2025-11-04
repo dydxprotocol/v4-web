@@ -697,9 +697,8 @@ const $TableWrapper = styled.div<{
 
   overflow: clip;
 
-  ${({ isEmpty, withOuterBorder }) =>
+  ${({ withOuterBorder }) =>
     withOuterBorder &&
-    isEmpty &&
     css`
       ${layoutMixins.withOuterBorderClipped}
     `}
