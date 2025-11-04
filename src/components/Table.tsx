@@ -30,7 +30,6 @@ import styled, { css } from 'styled-components';
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useTablePagination } from '@/hooks/useTablePagination';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -115,7 +114,6 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
 
 export type TableStyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows?: boolean; // TODO: CT-662
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
@@ -146,7 +144,6 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   initialPageSize = 10,
   paginationBehavior = 'paginate',
   hideHeader = false,
-  withGradientCardRows = false,
   withFocusStickyRows = false,
   withOuterBorder = false,
   withInnerBorders = false,
@@ -253,7 +250,6 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
       className={className}
       style={style}
       isEmpty={isEmpty}
-      withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
     >
       {!isEmpty ? (
@@ -275,7 +271,6 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
               ))
           }
           hideHeader={hideHeader}
-          withGradientCardRows={withGradientCardRows}
           withFocusStickyRows={withFocusStickyRows}
           withOuterBorder={withOuterBorder}
           withInnerBorders={withInnerBorders}
@@ -351,7 +346,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   firstClickSortDirection?: 'ascending' | 'descending';
 
   hideHeader?: boolean;
-  withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
@@ -367,7 +361,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     numColumns,
     paginationRow,
     hideHeader,
-    withGradientCardRows,
     withFocusStickyRows,
     withOuterBorder,
     withInnerBorders,
@@ -411,15 +404,10 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
       ref={ref}
       {...gridProps}
       hideHeader={hideHeader}
-      withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
     >
-      <TableHeadRowGroup
-        hidden={hideHeader}
-        withGradientCardRows={withGradientCardRows}
-        withInnerBorders={withInnerBorders}
-      >
+      <TableHeadRowGroup hidden={hideHeader} withInnerBorders={withInnerBorders}>
         {collection.headerRows.map((headerRow) => (
           <TableHeaderRow
             key={headerRow.key}
@@ -427,23 +415,21 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
             state={state}
             withScrollSnapRows={withScrollSnapRows}
           >
-            {[...headerRow.childNodes].map((column) => (
-              <TableColumnHeader
-                key={column.key}
-                column={column}
-                state={state}
-                withScrollSnapColumns={withScrollSnapColumns}
-              />
-            ))}
+            {[...headerRow.childNodes].map((column) => {
+              return (
+                <TableColumnHeader
+                  key={column.key}
+                  column={column}
+                  state={state}
+                  withScrollSnapColumns={withScrollSnapColumns}
+                />
+              );
+            })}
           </TableHeaderRow>
         ))}
       </TableHeadRowGroup>
 
-      <TableBodyRowGroup
-        withGradientCardRows={withGradientCardRows}
-        withInnerBorders={withInnerBorders}
-        withOuterBorder={withOuterBorder}
-      >
+      <TableBodyRowGroup withInnerBorders={withInnerBorders} withOuterBorder={withOuterBorder}>
         {[...collection.body.childNodes].map((row) =>
           (row.value as CustomRowConfig | null)?.slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
@@ -508,22 +494,15 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
 const TableHeadRowGroup = ({
   children,
   hidden,
-  withGradientCardRows,
   withInnerBorders,
 }: { children: React.ReactNode } & {
   hidden?: boolean;
-  withGradientCardRows?: boolean;
   withInnerBorders?: boolean;
 }) => {
   const { rowGroupProps } = useTableRowGroup();
 
   return (
-    <$Thead
-      {...rowGroupProps}
-      hidden={hidden}
-      withGradientCardRows={withGradientCardRows}
-      withInnerBorders={withInnerBorders}
-    >
+    <$Thead {...rowGroupProps} hidden={hidden} withInnerBorders={withInnerBorders}>
       {children}
     </$Thead>
   );
@@ -531,7 +510,6 @@ const TableHeadRowGroup = ({
 
 const TableBodyRowGroup = ({
   children,
-  withGradientCardRows,
   withInnerBorders,
   withOuterBorder,
 }: { children: React.ReactNode } & TableStyleProps) => {
@@ -540,7 +518,6 @@ const TableBodyRowGroup = ({
   return (
     <$Tbody
       {...rowGroupProps}
-      withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
       withOuterBorder={withOuterBorder}
     >
@@ -597,7 +574,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
     >
       <$Row>
         {column.rendered}
-        {(column.props.allowsSorting ?? true) && (
+        {(column.props?.allowsSorting ?? true) && (
           <SortIcon
             sortDirection={
               state.sortDescriptor?.column === column.key ? state.sortDescriptor.direction : 'none'
@@ -693,7 +670,6 @@ const TableCell = <TableRowData extends BaseTableRowData>({
 
 const $TableWrapper = styled.div<{
   isEmpty: boolean;
-  withGradientCardRows?: boolean;
   withOuterBorder: boolean;
 }>`
   // Params
@@ -721,9 +697,9 @@ const $TableWrapper = styled.div<{
 
   overflow: clip;
 
-  ${({ isEmpty, withGradientCardRows, withOuterBorder }) =>
+  ${({ isEmpty, withOuterBorder }) =>
     withOuterBorder &&
-    (!withGradientCardRows || isEmpty) &&
+    isEmpty &&
     css`
       ${layoutMixins.withOuterBorderClipped}
     `}
@@ -744,7 +720,6 @@ const $Empty = styled.div<{ withOuterBorder: boolean }>`
 
 type StyledTableStyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
   withSolidHeader?: boolean;
@@ -783,24 +758,6 @@ const $Table = styled.table<StyledTableStyleProps>`
       // Compensate for outer <table> border (hidden and omitted from scroll with overflow: clip; on <TableWrapper>)
       margin: calc(-1 * var(--border-width)) 0;
     `}
-
-  ${({ withGradientCardRows }) =>
-    withGradientCardRows &&
-    css`
-      border-spacing: 0 0.75rem;
-
-      // Use negative margin and 0 padding on 'th' element, so that border-spacing
-      // doesn't affect the header row's height
-      margin: -0.75rem clamp(0rem, 1rem - var(--contentContainerPage-paddingLeft, 0rem), 1rem) 0;
-
-      th {
-        padding: 0;
-      }
-    `}
-  
-  @media ${breakpoints.tablet} {
-    min-height: 6.25rem;
-  }
 `;
 
 const $Tr = styled.tr<{
@@ -908,9 +865,8 @@ const $Thead = styled.thead<TableStyleProps>`
   color: var(--tableStickyRow-textColor);
   background-color: var(--tableStickyRow-backgroundColor);
 
-  ${({ withInnerBorders, withGradientCardRows }) =>
+  ${({ withInnerBorders }) =>
     withInnerBorders &&
-    !withGradientCardRows &&
     css`
       ${layoutMixins.withInnerHorizontalBorders}
     `}
@@ -939,9 +895,8 @@ const $Tbody = styled.tbody<TableStyleProps>`
     display: table-row;
   }
 
-  ${({ withInnerBorders, withGradientCardRows }) =>
+  ${({ withInnerBorders }) =>
     withInnerBorders &&
-    !withGradientCardRows &&
     css`
       ${layoutMixins.withInnerHorizontalBorders}
 
@@ -964,47 +919,6 @@ const $Tbody = styled.tbody<TableStyleProps>`
 
       tr:first-of-type {
         box-shadow: none;
-      }
-    `}
-
-  ${({ withGradientCardRows }) =>
-    withGradientCardRows &&
-    css`
-      --table-row-default-gradient: linear-gradient(
-        342.62deg,
-        var(--color-gradient-base-0) -9.23%,
-        var(--color-gradient-base-1) 110.36%
-      );
-
-      --table-row-gradient-to-color: transparent;
-      --tableCell-borderRadius: ;
-
-      &:before,
-      &:after {
-        content: none;
-      }
-
-      tr {
-        background:
-          linear-gradient(270deg, var(--table-row-gradient-to-color) -32.39%, transparent 100%),
-          var(--table-row-default-gradient);
-
-        @supports (background: -webkit-named-image(i)) {
-          background: var(--table-row-gradient-to-color);
-        }
-
-        td:first-child {
-          --tableCell-borderRadius: 1rem 0 0 1rem;
-        }
-
-        td:last-child {
-          --tableCell-borderRadius: 0 1rem 1rem 0;
-        }
-
-        td {
-          height: 4.25rem;
-          border-radius: var(--tableCell-borderRadius);
-        }
       }
     `}
 `;
