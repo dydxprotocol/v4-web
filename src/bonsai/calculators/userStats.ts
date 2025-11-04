@@ -24,7 +24,10 @@ export function calculateUserStats(
     const makerFeeRate = MustBigNumber(feeTier.makerFeePpm).div(QUANTUM_MULTIPLIER).toNumber();
     const takerFeeRate = MustBigNumber(feeTier.takerFeePpm).div(QUANTUM_MULTIPLIER).toNumber();
 
-    // Apply Staking Tier Discount
+    // Apply Staking Tier Discount to the base fee rates.
+    // Note: Staking tier discounts are applied first to the base fee rates here.
+    // Market-specific discounts (if any) are applied later to the final fee amount
+    // in the calculateTradeFeeAfterDiscounts function.
     const makerFeeAfterStakingTierDiscount = makerFeeRate * (1 - (state.stakingTierDiscount ?? 0));
     const takerFeeAfterStakingTierDiscount = takerFeeRate * (1 - (state.stakingTierDiscount ?? 0));
 
