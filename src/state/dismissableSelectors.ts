@@ -18,5 +18,5 @@ export const getHasDismissedSurgeBanner = (state: RootState) =>
 export const getHasDismissedRebateBanner = (state: RootState) =>
   state.dismissable.hasDismissedRebateBanner;
 
-export const getHasDismissedWorldSeriesBanner = (state: RootState) =>
-  state.dismissable.hasDismissedWorldSeriesBanner;
+export const getHasDismissedTradingLeagueBanner = (state: RootState) =>
+  state.dismissable.hasDismissedTradingLeagueBanner;
