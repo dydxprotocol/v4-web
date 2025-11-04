@@ -65,7 +65,7 @@ export const MarketsTable = forwardRef(
                   initialMarginFraction,
                   isUnlaunched,
                   logo,
-                  marketFeeDiscount,
+                  marketFeeDiscountMultiplier,
                   name,
                   volume24h,
                 }) => (
@@ -80,7 +80,7 @@ export const MarketsTable = forwardRef(
                         initialMarginFraction,
                         isUnlaunched,
                         logo,
-                        marketFeeDiscount,
+                        marketFeeDiscountMultiplier,
                       }}
                       name={name}
                       symbol={assetId}
@@ -147,7 +147,7 @@ export const MarketsTable = forwardRef(
                   initialMarginFraction,
                   isUnlaunched,
                   logo,
-                  marketFeeDiscount,
+                  marketFeeDiscountMultiplier,
                   name,
                 }) => (
                   <div tw="flex items-center gap-0.25">
@@ -160,7 +160,7 @@ export const MarketsTable = forwardRef(
                         initialMarginFraction,
                         isUnlaunched,
                         logo,
-                        marketFeeDiscount,
+                        marketFeeDiscountMultiplier,
                       }}
                       name={name}
                       symbol={assetId}

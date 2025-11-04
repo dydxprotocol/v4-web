@@ -266,7 +266,7 @@ export type PerpetualMarketSummary = MarketInfo &
     spotVolume24h: number | null;
     isFavorite: boolean;
     isUnlaunched: boolean;
-    marketFeeDiscount: number | undefined;
+    marketFeeDiscountMultiplier: number | undefined;
   };
 
 export type PerpetualMarketSummaries = {
@@ -337,7 +337,7 @@ export interface PerpetualMarketFee {
   startTime?: string;
   endTime?: string;
   isApplicable: boolean;
-  feeDiscount: number;
+  feeDiscountMultiplier: number;
 }
 
 export interface AllPerpetualMarketsFeeDiscounts {

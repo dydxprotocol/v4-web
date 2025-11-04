@@ -88,9 +88,9 @@ export const PlaceOrderButtonAndReceipt = ({
   const { tickSizeDecimals, displayableTicker } = orEmptyObj(
     useAppSelector(BonsaiHelpers.currentMarket.stableMarketInfo)
   );
-  const marketFeeDiscount = useAppSelector(
+  const marketFeeDiscountMultiplier = useAppSelector(
     BonsaiHelpers.currentMarket.marketInfo
-  )?.marketFeeDiscount;
+  )?.marketFeeDiscountMultiplier;
 
   const {
     liquidationPrice,
@@ -255,7 +255,10 @@ export const PlaceOrderButtonAndReceipt = ({
             <WithTooltip tooltip="fee" side="right">
               {stringGetter({ key: STRING_KEYS.FEE })}
             </WithTooltip>
-            <TradeFeeDiscountTag marketFeeDiscount={marketFeeDiscount} symbol={displayableTicker} />
+            <TradeFeeDiscountTag
+              marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
+              symbol={displayableTicker}
+            />
           </span>
         ),
         value: <Output type={OutputType.Fiat} value={fee} useGrouping />,

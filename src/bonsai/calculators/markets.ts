@@ -158,7 +158,8 @@ export function createMarketSummary(
       const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData, market);
 
       const feeData = marketFeeDiscounts?.[market.clobPairId];
-      const marketFeeDiscount = feeData && feeData.isApplicable ? feeData.feeDiscount : undefined;
+      const marketFeeDiscountMultiplier =
+        feeData && feeData.isApplicable ? feeData.feeDiscountMultiplier : undefined;
 
       return {
         ...market,
@@ -167,7 +168,7 @@ export function createMarketSummary(
         isNew,
         isFavorite: listOfFavorites.includes(market.ticker),
         isUnlaunched: false,
-        marketFeeDiscount,
+        marketFeeDiscountMultiplier,
       };
     }),
     isTruthy
@@ -183,16 +184,19 @@ export function calculateMarketsFeeDiscounts(
 
   const discountEntries = objectFromEntries(
     feeDiscounts.map((discount) => {
+      const startTimeMs =
+        discount.startTime != null ? new Date(discount.startTime).getTime() : null;
+      const endTimeMs = discount.endTime != null ? new Date(discount.endTime).getTime() : null;
+
       return [
         discount.clobPairId,
         {
           ...discount,
           isApplicable:
-            discount.startTime != null &&
-            discount.endTime != null &&
-            now >= new Date(discount.startTime).getTime() &&
-            now <= new Date(discount.endTime).getTime(),
-          feeDiscount: MustBigNumber(discount.chargePpm).div(QUANTUM_MULTIPLIER).toNumber(),
+            startTimeMs != null && endTimeMs != null && now >= startTimeMs && now < endTimeMs,
+          feeDiscountMultiplier: MustBigNumber(discount.chargePpm)
+            .div(QUANTUM_MULTIPLIER)
+            .toNumber(),
         },
       ];
     })

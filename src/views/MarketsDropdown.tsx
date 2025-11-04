@@ -165,10 +165,13 @@ const MarketsDropdownContent = ({
         },
         {
           columnKey: 'incentives',
-          getCellValue: (row: MarketData) => row.marketFeeDiscount,
+          getCellValue: (row: MarketData) => row.marketFeeDiscountMultiplier,
           label: stringGetter({ key: STRING_KEYS.INCENTIVES }),
           renderCell: (row: MarketData) => (
-            <TradeFeeDiscountTag marketFeeDiscount={row.marketFeeDiscount} symbol={row.displayId} />
+            <TradeFeeDiscountTag
+              marketFeeDiscountMultiplier={row.marketFeeDiscountMultiplier}
+              symbol={row.displayId}
+            />
           ),
         },
       ].filter(isTruthy) satisfies ColumnDef<MarketData>[],
