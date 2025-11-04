@@ -162,7 +162,7 @@ export const MarketsBanners = ({
     <$TradingLeagueBanner>
       <div tw="mr-auto flex h-full flex-col justify-center">
         <div tw="mb-0.75 flex items-center gap-1">
-          <span tw="text-large text-color-text-2 font-extra-large-bold">
+          <span tw="text-large text-white font-extra-large-bold">
             {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_TITLE })}
           </span>
           <$ActiveTag>{stringGetter({ key: STRING_KEYS.ACTIVE })}</$ActiveTag>
@@ -176,7 +176,7 @@ export const MarketsBanners = ({
           >
             {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_CTA })}
           </Button>
-          <span tw="text-color-text-1 font-base-book">
+          <span tw="text-white font-base-book">
             {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_SUBTITLE })}
           </span>
         </div>
