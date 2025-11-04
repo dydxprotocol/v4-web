@@ -51,7 +51,7 @@ export const CompetitionLeaderboardPanel = () => {
         rank: entry.position,
         account: entry.address,
         dollarReward: entry.dollarReward,
-        pnl: +entry.startOfThisWeekPnlSnapshot.totalPnl,
+        pnl: +entry.pnl,
       },
     ];
   }, [] as ChaosLabsCompetitionItem[]);
