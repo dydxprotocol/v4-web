@@ -183,15 +183,17 @@ export function calculateMarketsFeeDiscounts(
 
   const discountEntries = objectFromEntries(
     feeDiscounts.map((discount) => {
+      const startTimeMs = discount.startTime != null ? new Date(discount.startTime).getTime() : null;
+      const endTimeMs = discount.endTime != null ? new Date(discount.endTime).getTime() : null;
       return [
         discount.clobPairId,
         {
           ...discount,
           isApplicable:
-            discount.startTime != null &&
-            discount.endTime != null &&
-            now >= new Date(discount.startTime).getTime() &&
-            now <= new Date(discount.endTime).getTime(),
+            startTimeMs != null &&
+            endTimeMs != null &&
+            now >= startTimeMs &&
+            now <= endTimeMs,
           feeDiscount: MustBigNumber(discount.chargePpm).div(QUANTUM_MULTIPLIER).toNumber(),
         },
       ];
