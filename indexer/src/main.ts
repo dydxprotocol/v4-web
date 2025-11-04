@@ -15,14 +15,13 @@ export const GATEWAY_URL = process.env.GATEWAY_URL ?? "";
 export const GRAPHQL_URL = process.env.GRAPHQL_URL ?? "";
 export const VAULT_PRICEFEED_ADDRESS = process.env.VAULT_PRICEFEED_ADDRESS ?? "";
 export const VAULT_ADDRESS = process.env.VAULT_ADDRESS ?? "";
-export const FROM_BLOCK = process.env.FROM_BLOCK ?? "1";
+export const FROM_BLOCK = process.env.FROM_BLOCK ?? "";
 
-if (!GATEWAY_URL || !GRAPHQL_URL || !VAULT_PRICEFEED_ADDRESS || !VAULT_ADDRESS) {
+if (!GRAPHQL_URL || !VAULT_PRICEFEED_ADDRESS || !VAULT_ADDRESS) {
   throw new Error('Environment variables not set');
 }
 
-const dataSource = new DataSourceBuilder()
-    .setGateway(GATEWAY_URL)
+let dataSourceBuilder = new DataSourceBuilder()
     .setGraphql({
         url: GRAPHQL_URL,
         strideConcurrency: 3,
@@ -47,8 +46,17 @@ const dataSource = new DataSourceBuilder()
         ],
         transaction: true,
     })
-    .setBlockRange({from: parseInt(FROM_BLOCK)})
-    .build()
+    
+
+if (GATEWAY_URL) {
+    dataSourceBuilder = dataSourceBuilder.setGateway(GATEWAY_URL)
+}
+
+if (FROM_BLOCK) {
+    dataSourceBuilder = dataSourceBuilder.setBlockRange({from: parseInt(FROM_BLOCK)})
+}
+
+const dataSource = dataSourceBuilder.build()
 
 const database = new TypeormDatabase()
 
@@ -413,6 +421,7 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
 
 
 run(dataSource, database, async ctx => {
+    console.log("Indexer run started")
     let blocks = ctx.blocks.map(augmentBlock)
 
     for (let block of blocks) {

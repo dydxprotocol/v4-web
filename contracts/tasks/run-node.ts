@@ -56,6 +56,7 @@ async function runNode() {
         baseAssetId,
     )
     await response.waitForResult()
+    console.log("Node is up")
 
     const rl = readline.createInterface({
         input: process.stdin,
