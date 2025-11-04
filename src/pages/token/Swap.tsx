@@ -9,7 +9,13 @@ import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonStyle,
+} from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
@@ -76,7 +82,7 @@ export const Swap = () => {
     };
     const usdc = {
       rawBalance: usdcBalance ? parseUnits(`${usdcBalance}`, USDC_DECIMALS) : undefined,
-      formatted: usdcBalance ?? '0',
+      formatted: usdcBalance ? `${usdcBalance}` : '0',
     };
 
     if (inputToken === 'usdc') {
@@ -106,6 +112,15 @@ export const Swap = () => {
 
     setMode(m);
     setAmount(e.target.value.toString());
+  };
+
+  const setMaxAmount = (m: SwapMode) => {
+    if (m === 'exact-in') {
+      setAmount(tokenBalances.inputBalance.formatted);
+    } else {
+      setAmount(tokenBalances.outputBalance.formatted);
+    }
+    setMode(m);
   };
 
   const debouncedAmount = useDebounce(amount);
@@ -171,7 +186,7 @@ export const Swap = () => {
 
   const notify = useCustomNotification();
 
-  const onSwapComplete = () => {
+  const onSwapComplete = (txHash: string) => {
     setIsSwapSubmitting(false);
     appQueryClient.invalidateQueries({
       queryKey: ['validator', 'accountBalances'],
@@ -179,8 +194,8 @@ export const Swap = () => {
     });
     setAmount('');
     notify({
-      title: 'Swap success',
-      body: 'Your swap was successful',
+      title: stringGetter({ key: STRING_KEYS.SUCCESS }),
+      body: stringGetter({ key: STRING_KEYS.SWAP_SUCCESS, params: { TX_HASH: txHash } }),
     });
   };
 
@@ -205,21 +220,16 @@ export const Swap = () => {
         route: quote,
         userAddresses,
         slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
-        onTransactionCompleted: async ({ chainId, txHash, status }) => {
-          console.log('TX completed!', chainId, txHash, status);
-          onSwapComplete();
+        onTransactionCompleted: async ({ txHash }) => {
+          onSwapComplete(txHash);
         },
-        onTransactionBroadcast: async ({ txHash, chainId }) => {
-          console.log('tx broadcast:', txHash, chainId);
-        },
-        onTransactionSigned: async () => {
-          console.log('tx signed');
-        },
+        onTransactionBroadcast: async () => {},
+        onTransactionSigned: async () => {},
       });
     } catch (e) {
       setIsSwapSubmitting(false);
       notify({
-        title: 'There was an error with your swap',
+        title: stringGetter({ key: STRING_KEYS.SWAP_ERROR }),
       });
     }
   };
@@ -230,7 +240,11 @@ export const Swap = () => {
         <$FromContainer $isFocused={isFromInputFocused} tw="flex flex-col gap-0.25 rounded-0.5 p-1">
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">From</div>
-            <div tw="flex items-center gap-0.375 text-color-layer-7 font-small-medium">
+            <Button
+              buttonStyle={ButtonStyle.WithoutBackground}
+              tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
+              onClick={() => setMaxAmount('exact-in')}
+            >
               <CardHolderIcon />
               {tokenBalances.inputBalance.formatted ? (
                 <Output
@@ -241,7 +255,7 @@ export const Swap = () => {
               ) : (
                 `- ${getTokenLabel(inputToken)}`
               )}
-            </div>
+            </Button>
           </div>
 
           <div tw="flex items-center justify-between gap-0.5">
@@ -274,7 +288,11 @@ export const Swap = () => {
         >
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">To</div>
-            <div tw="flex items-center gap-0.375 text-color-layer-7 font-small-medium">
+            <Button
+              onClick={() => setMaxAmount('exact-out')}
+              buttonStyle={ButtonStyle.WithoutBackground}
+              tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
+            >
               <CardHolderIcon />
               {tokenBalances.outputBalance.formatted ? (
                 <Output
@@ -285,7 +303,7 @@ export const Swap = () => {
               ) : (
                 `- ${getTokenLabel(otherToken(inputToken))}`
               )}
-            </div>
+            </Button>
           </div>
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
