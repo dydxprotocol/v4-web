@@ -81,11 +81,6 @@ export function calculateTradeInfo(
             subaccountToUse
           )?.leverageSigned;
 
-          const totalFeesAfterDiscounts = calculateTradeFeeAfterDiscounts(
-            accountData,
-            calculated.marketOrder?.totalFees
-          );
-
           return {
             inputSummary: calculated.summary ?? {
               size: undefined,
@@ -108,10 +103,10 @@ export function calculateTradeInfo(
               calculated.marketOrder?.worstPrice,
               orderbookBase?.midPrice
             ),
-            fee: totalFeesAfterDiscounts,
+            fee: calculated.marketOrder?.totalFees,
             total: calculateOrderTotal(
               calculated.marketOrder?.usdcSize,
-              totalFeesAfterDiscounts,
+              calculated.marketOrder?.totalFees,
               trade.side
             ),
             filled: calculated.marketOrder?.filled ?? false,
@@ -446,6 +441,7 @@ function createMarketOrder(
         effectiveSizeTarget,
         orderbook,
         accountData.userFeeStats.takerFeeRate ?? 0,
+        accountData.currentTradeMarketSummary?.marketFeeDiscount,
         oraclePrice,
         equity,
         freeCollateral,
@@ -462,6 +458,7 @@ function simulateMarketOrder(
   effectiveSizeTargetBase: SizeTarget,
   orderbook: CanvasOrderbookLine[],
   feeRate: number,
+  marketFeeDiscount: number | undefined,
   oraclePrice: number,
   subaccountEquity: number,
   subaccountFreeCollateral: number,
@@ -483,6 +480,9 @@ function simulateMarketOrder(
     subaccountEquity - subaccountFreeCollateral - (existingPosition?.initialRisk.toNumber() ?? 0);
   const orderbookRows: OrderbookUsage[] = [];
   let filled = false;
+
+  const feeRateAfterMarketDiscount =
+    marketFeeDiscount == null ? feeRate : feeRate * marketFeeDiscount;
 
   if (orderbook.length === 0) {
     return {
@@ -513,13 +513,15 @@ function simulateMarketOrder(
 
     let sizeToTake = 0;
     const sizeEquityImpact =
-      oraclePrice * operationMultipler - rowPrice * feeRate - rowPrice * operationMultipler;
+      oraclePrice * operationMultipler -
+      rowPrice * feeRateAfterMarketDiscount -
+      rowPrice * operationMultipler;
 
     if (effectiveSizeTarget.type === 'size') {
       sizeToTake = effectiveSizeTarget.target - totalSize;
     } else if (effectiveSizeTarget.type === 'usdc') {
       const maxSizeForRemainingUsdc =
-        (effectiveSizeTarget.target - totalCost) / (rowPrice * (1 + feeRate));
+        (effectiveSizeTarget.target - totalCost) / (rowPrice * (1 + feeRateAfterMarketDiscount));
       sizeToTake = maxSizeForRemainingUsdc;
     } else if (effectiveSizeTarget.type === 'leverage') {
       const targetLeverage = effectiveSizeTarget.target;
@@ -614,7 +616,7 @@ function simulateMarketOrder(
     } else {
       totalSize += sizeToTake;
       totalCostWithoutFees += sizeToTake * rowPrice;
-      totalCost += sizeToTake * rowPrice + sizeToTake * rowPrice * feeRate;
+      totalCost += sizeToTake * rowPrice + sizeToTake * rowPrice * feeRateAfterMarketDiscount;
       thisPositionValue += sizeToTake * operationMultipler * oraclePrice;
       equity +=
         // update to notional
@@ -622,7 +624,7 @@ function simulateMarketOrder(
         // update to quote for cost
         sizeToTake * operationMultipler * -1 * rowPrice +
         // update to quote for fees
-        sizeToTake * rowPrice * feeRate * -1;
+        sizeToTake * rowPrice * feeRateAfterMarketDiscount * -1;
       orderbookRows.push({ price: rowPrice, size: sizeToTake });
     }
   }
@@ -1144,16 +1146,9 @@ function calculateTradeFeeAfterDiscounts(
   feeUsdc: number | undefined
 ) {
   const marketFeeDiscount = accountData.currentTradeMarketSummary?.marketFeeDiscount;
-  const stakingTierDiscount = accountData.userFeeStats.stakingTierDiscount;
 
   if (feeUsdc == null) return undefined;
 
   const feeAfterMarketDiscount = marketFeeDiscount != null ? feeUsdc * marketFeeDiscount : feeUsdc;
-
-  const finalFeeUsdc =
-    stakingTierDiscount != null && feeAfterMarketDiscount > 0
-      ? feeAfterMarketDiscount * (1 - stakingTierDiscount)
-      : feeAfterMarketDiscount;
-
-  return finalFeeUsdc;
+  return feeAfterMarketDiscount;
 }
