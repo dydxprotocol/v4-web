@@ -10,31 +10,31 @@ import { AccentTag } from './Tag';
 import { WithTooltip } from './WithTooltip';
 
 export const TradeFeeDiscountTag = ({
-  marketFeeDiscount,
+  marketFeeDiscountMultiplier,
   symbol,
 }: {
-  marketFeeDiscount?: number;
+  marketFeeDiscountMultiplier?: number;
   symbol: Nullable<string>;
 }) => {
   const stringGetter = useStringGetter();
 
   const tagContent = useMemo(() => {
-    if (marketFeeDiscount == null) {
+    if (marketFeeDiscountMultiplier == null) {
       return null;
     }
 
-    if (marketFeeDiscount === 0) {
+    if (marketFeeDiscountMultiplier === 0) {
       return stringGetter({ key: STRING_KEYS.FEE_FREE });
     }
 
     return stringGetter({ key: STRING_KEYS.FEE_DISCOUNT });
-  }, [marketFeeDiscount, stringGetter]);
+  }, [marketFeeDiscountMultiplier, stringGetter]);
 
-  if (marketFeeDiscount == null || tagContent == null) {
+  if (marketFeeDiscountMultiplier == null || tagContent == null) {
     return null;
   }
 
-  const discountPercent = (1 - marketFeeDiscount) * 100;
+  const discountPercent = (1 - marketFeeDiscountMultiplier) * 100;
 
   return (
     <WithTooltip

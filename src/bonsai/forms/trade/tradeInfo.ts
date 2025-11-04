@@ -441,7 +441,7 @@ function createMarketOrder(
         effectiveSizeTarget,
         orderbook,
         accountData.userFeeStats.takerFeeRate ?? 0,
-        accountData.currentTradeMarketSummary?.marketFeeDiscount,
+        accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier,
         oraclePrice,
         equity,
         freeCollateral,
@@ -458,7 +458,7 @@ function simulateMarketOrder(
   effectiveSizeTargetBase: SizeTarget,
   orderbook: CanvasOrderbookLine[],
   feeRate: number,
-  marketFeeDiscount: number | undefined,
+  marketDiscountMultiplier: number | undefined,
   oraclePrice: number,
   subaccountEquity: number,
   subaccountFreeCollateral: number,
@@ -482,7 +482,7 @@ function simulateMarketOrder(
   let filled = false;
 
   const feeRateAfterMarketDiscount =
-    marketFeeDiscount == null ? feeRate : feeRate * marketFeeDiscount;
+    marketDiscountMultiplier == null ? feeRate : feeRate * marketDiscountMultiplier;
 
   if (orderbook.length === 0) {
     return {
@@ -1145,10 +1145,12 @@ function calculateTradeFeeAfterDiscounts(
   accountData: TradeFormInputData,
   feeUsdc: number | undefined
 ) {
-  const marketFeeDiscount = accountData.currentTradeMarketSummary?.marketFeeDiscount;
+  const marketDiscountMultiplier =
+    accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier;
 
   if (feeUsdc == null) return undefined;
 
-  const feeAfterMarketDiscount = marketFeeDiscount != null ? feeUsdc * marketFeeDiscount : feeUsdc;
+  const feeAfterMarketDiscount =
+    marketDiscountMultiplier != null ? feeUsdc * marketDiscountMultiplier : feeUsdc;
   return feeAfterMarketDiscount;
 }
