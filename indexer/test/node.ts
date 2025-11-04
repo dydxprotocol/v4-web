@@ -3,6 +3,14 @@ import { DeployContractConfig, launchTestNode, LaunchTestNodeReturn } from "fuel
 
 export async function launchNode(): Promise<LaunchTestNodeReturn<DeployContractConfig[]>> {
     const launched: LaunchTestNodeReturn<DeployContractConfig[]> = await launchTestNode({
+        nodeOptions: {
+            snapshotConfig: {
+                stateConfig: {
+                    coins: [],
+                    messages: [],
+                },
+            },
+        },
         walletsConfig: {
             count: 5, // Number of wallets you want
         },
