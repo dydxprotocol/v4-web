@@ -7,6 +7,12 @@ import { formatUnits } from 'viem';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { USDC_DECIMALS } from '@/constants/tokens';
 
+import { useCustomNotification } from '@/hooks/useCustomNotification';
+
+import CheckCircleIcon from '@/icons/check-circle.svg';
+
+import { Link } from '@/components/Link';
+
 import { store } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch } from '@/state/appTypes';
@@ -23,6 +29,7 @@ import { useAppSelectorWithArgs } from './useParameterizedSelector';
 export function useUpdateTransfers() {
   const { dydxAddress } = useAccounts();
   const dispatch = useAppDispatch();
+  const notify = useCustomNotification();
   const { skipClient } = useSkipClient();
 
   const pendingTransfers = useAppSelectorWithArgs(selectPendingTransfers, dydxAddress);
@@ -108,6 +115,30 @@ export function useUpdateTransfers() {
                   finalAmountUsd: finalAmount,
                 })
               );
+              notify({
+                slotTitleLeft: <CheckCircleIcon />,
+                title: 'Deposit Successful',
+                body: `${finalAmount} ${token.denom} has been deposited`,
+                renderActionSlot: () => (
+                  <Link href={transfer.explorerLink} isAccent>
+                    View Transaction →
+                  </Link>
+                ),
+                // actionDescription: 'View Transaction',
+                // renderActionSlot: () => (
+                //   <Link href={deposit.explorerLink} isAccent>
+                //     View Transaction
+                //   </Link>
+                // ),
+                // slotTitleLeft: <$SmallIcon iconName={IconName.CheckCircle} />,
+                // title: stringGetter({ key: STRING_KEYS.DEPOSIT_SUCCESSFUL }),
+                // body: stringGetter({
+                //   key: STRING_KEYS.DEPOSIT_SUCCESSFUL_BODY,
+                //   params: {
+                //     AMOUNT: finalAmount
+                //   }
+                // }),
+              });
 
               appQueryClient.invalidateQueries({
                 queryKey: ['validator', 'accountBalances'],
