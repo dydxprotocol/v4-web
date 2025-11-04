@@ -189,7 +189,7 @@ const PortfolioPage = () => {
             items={[
               {
                 group: 'views',
-                groupLabel: stringGetter({ key: STRING_KEYS.VIEWS }),
+                groupLabel: stringGetter({ key: STRING_KEYS.ACCOUNT }),
                 items: [
                   {
                     value: PortfolioRoute.Overview,
@@ -236,6 +236,22 @@ const PortfolioPage = () => {
                     href: PortfolioRoute.Orders,
                   },
                   {
+                    value: PortfolioRoute.History,
+                    slotBefore: (
+                      <$IconContainer>
+                        <Icon iconName={IconName.History} />
+                      </$IconContainer>
+                    ),
+                    label: stringGetter({ key: STRING_KEYS.HISTORY }),
+                    href: PortfolioRoute.History,
+                  },
+                ],
+              },
+              {
+                group: 'configs',
+                groupLabel: stringGetter({ key: STRING_KEYS.OTHER }),
+                items: [
+                  {
                     value: PortfolioRoute.Fees,
                     slotBefore: (
                       <$IconContainer>
@@ -254,16 +270,6 @@ const PortfolioPage = () => {
                     ),
                     label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
                     href: PortfolioRoute.EquityTiers,
-                  },
-                  {
-                    value: PortfolioRoute.History,
-                    slotBefore: (
-                      <$IconContainer>
-                        <Icon iconName={IconName.History} />
-                      </$IconContainer>
-                    ),
-                    label: stringGetter({ key: STRING_KEYS.HISTORY }),
-                    href: PortfolioRoute.History,
                   },
                 ],
               },

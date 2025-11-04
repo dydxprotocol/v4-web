@@ -560,6 +560,8 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
   const { focusProps } = useFocusRing();
 
+  console.log(column);
+
   return (
     <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
