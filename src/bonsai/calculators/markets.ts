@@ -193,7 +193,7 @@ export function calculateMarketsFeeDiscounts(
         {
           ...discount,
           isApplicable:
-            startTimeMs != null && endTimeMs != null && now >= startTimeMs && now <= endTimeMs,
+            startTimeMs != null && endTimeMs != null && now >= startTimeMs && now < endTimeMs,
           feeDiscountMultiplier: MustBigNumber(discount.chargePpm)
             .div(QUANTUM_MULTIPLIER)
             .toNumber(),
