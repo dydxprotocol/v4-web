@@ -4,6 +4,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { clamp } from '@/lib/math';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { Nullable } from '@/lib/typeUtils';
 
 import { AccentTag } from './Tag';
@@ -34,14 +36,16 @@ export const TradeFeeDiscountTag = ({
     return null;
   }
 
-  const discountPercent = (1 - marketFeeDiscountMultiplier) * 100;
+  const discountPercent = BIG_NUMBERS.ONE.minus(marketFeeDiscountMultiplier).times(100);
+  const discountDecimalPlaces = discountPercent.decimalPlaces();
+  const numDecimals = discountDecimalPlaces != null ? clamp(discountDecimalPlaces, 0, 2) : 0;
 
   return (
     <WithTooltip
       tooltip="market-fee-discount"
       stringParams={{
         SYMBOL: symbol ?? '',
-        DISCOUNT_PERCENT: discountPercent.toFixed(),
+        DISCOUNT_PERCENT: discountPercent.toFixed(numDecimals),
       }}
     >
       <AccentTag>{tagContent}</AccentTag>
