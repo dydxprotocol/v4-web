@@ -1,4 +1,5 @@
 import { setUpCancelOrphanedTriggerOrdersLifecycle } from './lifecycles/cancelTriggerOrdersLifecycle';
+import { setUpDepositNotificationLifecycle } from './lifecycles/depositNotificationLifecycle';
 import { setUpLocalOrdersOrdersSync } from './lifecycles/localOrders';
 import { setUpNobleBalanceSweepLifecycle } from './lifecycles/nobleBalanceSweepLifecycle';
 import { setUpReclaimChildSubaccountBalancesLifecycle } from './lifecycles/reclaimChildSubaccountBalancesLifecycle';
@@ -58,4 +59,5 @@ export const storeLifecycles = [
   setUpRewardsTokenPriceQuery,
   setUpCancelOrphanedTriggerOrdersLifecycle,
   setUpReclaimChildSubaccountBalancesLifecycle,
+  setUpDepositNotificationLifecycle,
 ] as const;
