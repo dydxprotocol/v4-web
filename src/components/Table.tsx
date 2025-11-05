@@ -270,13 +270,30 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     []
   );
 
-  const leafShownColumns = useMemo(() => {
-    const out: ColumnDef<TableRowData>[] = [];
-    const walk = (cols: ColumnDef<TableRowData>[]) => {
-      cols.forEach((c) => (c.childColumns?.length ? walk(c.childColumns) : out.push(c)));
+  /**
+   * | column header 1 | column header 2 |
+   * | header A  | header B  | Header C  |
+   * @returns column defs when nested columns are considered and whether the columnDefs are nested
+   */
+  const { leafColumns, hasNestedColumns } = useMemo(() => {
+    const allColumns: ColumnDef<TableRowData>[] = [];
+    let hasChildColumns: boolean = false;
+
+    const findAndAppendColumns = (cols: ColumnDef<TableRowData>[]) => {
+      cols.forEach((c) => {
+        if (c.childColumns?.length) {
+          hasChildColumns = true;
+          findAndAppendColumns(c.childColumns);
+        } else {
+          allColumns.push(c);
+        }
+      });
     };
-    walk(shownColumns);
-    return out;
+    findAndAppendColumns(shownColumns);
+    return {
+      leafColumns: allColumns,
+      hasNestedColumns: hasChildColumns,
+    };
   }, [shownColumns]);
 
   return (
@@ -310,7 +327,8 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           withInnerBorders={withInnerBorders}
           withScrollSnapColumns={withScrollSnapColumns}
           withScrollSnapRows={withScrollSnapRows}
-          numColumns={leafShownColumns.length}
+          numColumns={leafColumns.length}
+          hasNestedColumns={hasNestedColumns}
           firstClickSortDirection={firstClickSortDirection}
           paginationRow={
             shouldPaginate ? (
@@ -326,52 +344,33 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           }
         >
           <TableHeader columns={shownColumns}>
-            {(column) =>
-              column.childColumns?.length ? (
-                // Group column: make it a parent with nested Column children
-                <Column
-                  key={column.columnKey}
-                  title={column.label} // parent renders only a header
-                  allowsSorting={false} // groups shouldn't sort
-                >
-                  {column.childColumns.map((child) => (
-                    <Column
-                      key={child.columnKey}
-                      isRowHeader={child.isRowHeader ?? true}
-                      allowsSorting={child.allowsSorting ?? true}
-                      allowsResizing={child.allowsResizing}
-                      width={child.width}
-                    >
-                      {child.label}
-                      {child.tag && <Tag>{child.tag}</Tag>}
-                    </Column>
-                  ))}
-                </Column>
-              ) : (
-                <Column
-                  isRowHeader={column.isRowHeader ?? true}
-                  key={column.columnKey}
-                  allowsSorting={column.allowsSorting ?? true}
-                  allowsResizing={column.allowsResizing}
-                  width={column.width}
-                >
-                  {column.label}
-                  {column.tag && <Tag>{column.tag}</Tag>}
-                </Column>
-              )
-            }
+            {(column) => (
+              <Column
+                isRowHeader={column.isRowHeader ?? true}
+                key={column.columnKey}
+                allowsSorting={column.allowsSorting ?? true}
+                allowsResizing={column.allowsResizing}
+                width={column.width}
+                childColumns={column.childColumns}
+              >
+                {column.label}
+                {column.tag && <Tag>{column.tag}</Tag>}
+              </Column>
+            )}
           </TableHeader>
 
           <TableBody items={bodyListItems}>
-            {(item) => (
-              <Row key={internalGetRowKey(item)}>
-                {(columnKey) => (
-                  <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
-                    {renderCell(item, columnKey, columns)}
-                  </Cell>
-                )}
-              </Row>
-            )}
+            {(item) => {
+              return (
+                <Row key={internalGetRowKey(item)}>
+                  {(columnKey) => (
+                    <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
+                      {renderCell(item, columnKey, columns)}
+                    </Cell>
+                  )}
+                </Row>
+              );
+            }}
           </TableBody>
         </TableRoot>
       ) : (
@@ -400,6 +399,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   paginationRow?: React.ReactNode;
   firstClickSortDirection?: 'ascending' | 'descending';
 
+  hasNestedColumns?: boolean;
   hideHeader?: boolean;
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
@@ -415,6 +415,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     onRowAction,
     numColumns,
     paginationRow,
+    hasNestedColumns,
     hideHeader,
     withFocusStickyRows,
     withOuterBorder,
@@ -454,7 +455,10 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     ref
   );
 
-  const rows = React.useMemo(() => Array.from(collection.body.childNodes), [collection]);
+  const rows = React.useMemo(
+    () => Array.from(collection.body.childNodes),
+    [collection.body.childNodes]
+  );
 
   return (
     <$Table
@@ -494,6 +498,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               state={state}
               onRowAction={onRowAction}
               getRowAttributes={getRowAttributes}
+              hasNestedColumns={hasNestedColumns}
               withFocusStickyRows={withFocusStickyRows}
               withScrollSnapRows={withScrollSnapRows}
             />
@@ -561,6 +566,7 @@ const TableRowContent = <TableRowData extends BaseTableRowData>({
   state,
   onRowAction,
   getRowAttributes,
+  hasNestedColumns,
   withFocusStickyRows,
   withScrollSnapRows,
 }: {
@@ -571,12 +577,43 @@ const TableRowContent = <TableRowData extends BaseTableRowData>({
     rowData: TableRowData,
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
+  hasNestedColumns?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const cells = useMemo(() => {
-    return Array.from(state.collection.getChildren?.(row.key) ?? []);
-  }, [row.key, state.collection]);
+  const cells = Array.from(row.childNodes);
+
+  // The initial cells on first render
+  const initialCells = useMemo(() => {
+    return cells;
+  }, [row.key]);
+
+  /**
+   * This is pretty jank, but for some reason when you have a columnDef where there are nested columns (childColumns prop) the table API clears `cells` after the first render.
+   * This is a workaround to ensure that we can display table cells for nested columns without the `collection` lib clearing it between renders.
+   */
+  const tableCellData = hasNestedColumns ? initialCells : cells;
+
+  const tableCells = (
+    <>
+      {tableCellData.map((cellData) => {
+        return (
+          <TableCell
+            key={cellData.key}
+            cell={cellData}
+            state={state}
+            isActionable={
+              (
+                (cellData as GridNode<TableRowData>).column?.value as
+                  | ColumnDef<TableRowData>
+                  | undefined
+              )?.isActionable ?? onRowAction === undefined
+            }
+          />
+        );
+      })}
+    </>
+  );
 
   return (
     <TableRow
@@ -588,22 +625,7 @@ const TableRowContent = <TableRowData extends BaseTableRowData>({
       withFocusStickyRows={withFocusStickyRows}
       withScrollSnapRows={withScrollSnapRows}
     >
-      {cells.map((cell) => {
-        return (
-          <TableCell
-            key={cell.key}
-            cell={cell}
-            state={state}
-            isActionable={
-              (
-                (cell as GridNode<TableRowData>).column?.value as
-                  | ColumnDef<TableRowData>
-                  | undefined
-              )?.isActionable ?? onRowAction === undefined
-            }
-          />
-        );
-      })}
+      {tableCells}
     </TableRow>
   );
 };

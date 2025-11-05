@@ -46,14 +46,13 @@ export const StakingTierTable = () => {
       {
         columnKey: 'tier',
         label: ' ',
-        isRowHeader: false,
         allowsSorting: false,
+        isRowHeader: false,
         childColumns: [
           {
             columnKey: 'fee-tier',
             label: stringGetter({ key: STRING_KEYS.FEE_TIERS }),
             allowsSorting: false,
-            colspan: 1,
             isRowHeader: true,
             renderCell: (row: StakingTier) => (
               <$TextRow tw="gap-0.5">
