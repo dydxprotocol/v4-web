@@ -65,8 +65,13 @@ export enum FillsTableColumnKey {
 const calculateClosedPnl = (fill: FillTableRow) => {
   const fee = parseFloat(fill.fee ?? '0');
 
+  // Old fills are not supported so we show -- instead of 0
+  if (fill.positionSizeBefore === undefined) {
+    return '--';
+  }
+
   // No position before = opening trade, only fees realize
-  if (!fill.positionSizeBefore || fill.positionSizeBefore === 0) {
+  if (fill.positionSizeBefore === 0) {
     return -fee;
   }
 
@@ -255,11 +260,17 @@ const getFillsTableColumnDef = ({
         columnKey: 'closedPnl',
         getCellValue: (row) => calculateClosedPnl(row),
         label: stringGetter({ key: STRING_KEYS.CLOSED_PNL }),
-        renderCell: (row) => (
-          <TableCell>
-            <Output type={OutputType.Fiat} value={calculateClosedPnl(row)} />
-          </TableCell>
-        ),
+        renderCell: (row) => {
+          const closedPnl = calculateClosedPnl(row);
+          return (
+            <TableCell>
+              <Output
+                type={closedPnl === '--' ? OutputType.Text : OutputType.Fiat}
+                value={closedPnl}
+              />
+            </TableCell>
+          );
+        },
       },
       [FillsTableColumnKey.Type]: {
         columnKey: 'type',
