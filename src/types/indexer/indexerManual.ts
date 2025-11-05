@@ -19,6 +19,7 @@ import {
   IndexerPerpetualMarketStatus,
   IndexerPerpetualMarketType,
   IndexerPerpetualPositionResponseObject,
+  IndexerPositionSide,
   IndexerTradeResponseObject,
   IndexerTransferResponseObject,
 } from './indexerApiGen';
@@ -156,7 +157,9 @@ export interface IndexerCompositeFillObject {
   clientMetadata?: string | null;
   subaccountNumber?: number;
   market?: string;
-  closedPnl?: string;
+  positionSideBefore?: IndexerPositionSide;
+  positionSizeBefore?: number;
+  entryPriceBefore?: number;
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {

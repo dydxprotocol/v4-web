@@ -62,6 +62,41 @@ export enum FillsTableColumnKey {
   PriceFee = 'Price-Fee',
 }
 
+const calculateClosedPnl = (fill: FillTableRow) => {
+  const fee = parseFloat(fill.fee ?? '0');
+
+  // No position before = opening trade, only fees realize
+  if (!fill.positionSizeBefore || fill.positionSizeBefore === 0) {
+    return -fee;
+  }
+
+  // Check if position is reducing (opposite side)
+  const isReducing =
+    (fill.positionSideBefore === 'LONG' && fill.side === 'SELL') ||
+    (fill.positionSideBefore === 'SHORT' && fill.side === 'BUY');
+
+  if (!isReducing) {
+    // Position increasing (same side), only fees realize
+    return -fee;
+  }
+
+  const size = parseFloat(fill.size ?? '0');
+  const price = parseFloat(fill.price ?? '0');
+
+  // Position reducing - cap closing amount to actual position size
+  const closingAmount = Math.min(size, fill.positionSizeBefore);
+
+  // Calculate P&L only on the closing portion
+  let closingPnl: number;
+  if (fill.positionSideBefore === 'LONG') {
+    closingPnl = (price - fill.entryPriceBefore!) * closingAmount;
+  } else {
+    closingPnl = (fill.entryPriceBefore! - price) * closingAmount;
+  }
+
+  return closingPnl - fee;
+};
+
 export type FillTableRow = {
   marketSummary: Nullable<PerpetualMarketSummary>;
   stepSizeDecimals: number;
@@ -218,11 +253,11 @@ const getFillsTableColumnDef = ({
       },
       [FillsTableColumnKey.ClosedPnl]: {
         columnKey: 'closedPnl',
-        getCellValue: (row) => row.fee,
+        getCellValue: (row) => calculateClosedPnl(row),
         label: stringGetter({ key: STRING_KEYS.CLOSED_PNL }),
-        renderCell: ({ fee }) => (
+        renderCell: (row) => (
           <TableCell>
-            <Output type={OutputType.Fiat} value={Number(fee ?? '0') * 20} />
+            <Output type={OutputType.Fiat} value={calculateClosedPnl(row)} />
           </TableCell>
         ),
       },
