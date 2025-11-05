@@ -15,6 +15,7 @@ import {
   ButtonSize,
   ButtonState,
   ButtonStyle,
+  ButtonType,
 } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
@@ -78,11 +79,11 @@ export const Swap = () => {
   const tokenBalances = useMemo(() => {
     const dydx = {
       rawBalance: nativeTokenBalance ? parseUnits(nativeTokenBalance, DYDX_DECIMALS) : undefined,
-      formatted: nativeTokenBalance ?? '0',
+      formatted: Number(nativeTokenBalance ?? 0).toFixed(2),
     };
     const usdc = {
       rawBalance: usdcBalance ? parseUnits(`${usdcBalance}`, USDC_DECIMALS) : undefined,
-      formatted: usdcBalance ? `${usdcBalance}` : '0',
+      formatted: Number(usdcBalance ?? 0).toFixed(2),
     };
 
     if (inputToken === 'usdc') {
@@ -163,8 +164,9 @@ export const Swap = () => {
     const quotedToken = mode === 'exact-in' ? otherToken(inputToken) : inputToken;
     const quotedTokenDecimals = quotedToken === 'dydx' ? DYDX_DECIMALS : USDC_DECIMALS;
     const quotedTokenAmount = mode === 'exact-in' ? quote.amountOut : quote.amountIn;
+    const formattedQuotedTokenAmount = formatUnits(BigInt(quotedTokenAmount), quotedTokenDecimals);
 
-    return formatUnits(BigInt(quotedTokenAmount), quotedTokenDecimals);
+    return Number(formattedQuotedTokenAmount).toFixed(2);
   }, [quote, inputToken, mode, amount]);
 
   const [from, to] = mode === 'exact-in' ? [amount, quotedAmount] : [quotedAmount, amount];
@@ -195,7 +197,21 @@ export const Swap = () => {
     setAmount('');
     notify({
       title: stringGetter({ key: STRING_KEYS.SUCCESS }),
-      body: stringGetter({ key: STRING_KEYS.SWAP_SUCCESS, params: { TX_HASH: txHash } }),
+      body: stringGetter({
+        key: STRING_KEYS.TRANSACTION_HASH,
+        params: {
+          TX_HASH: (
+            <Button
+              tw="p-0"
+              buttonStyle={ButtonStyle.WithoutBackground}
+              type={ButtonType.Link}
+              onClick={() => navigator.clipboard.writeText(txHash)}
+            >
+              {txHash}
+            </Button>
+          ),
+        },
+      }),
     });
   };
 
@@ -237,7 +253,10 @@ export const Swap = () => {
   return (
     <div tw="flex flex-col gap-1">
       <div tw="relative flex flex-col gap-0.25">
-        <$FromContainer $isFocused={isFromInputFocused} tw="flex flex-col gap-0.25 rounded-0.5 p-1">
+        <$InputContainer
+          $isFocused={isFromInputFocused}
+          tw="flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1"
+        >
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">From</div>
             <Button
@@ -271,7 +290,7 @@ export const Swap = () => {
             />
             <TokenLogo token={inputToken} />
           </div>
-        </$FromContainer>
+        </$InputContainer>
 
         <$SwapButton
           tw="absolute left-1/2 top-1/2 rounded-0.75 border-4 border-color-layer-3 bg-color-layer-4 p-0.5"
@@ -282,7 +301,7 @@ export const Swap = () => {
           <ArrowDownIcon tw="h-1.25 w-1.25" />
         </$SwapButton>
 
-        <$ToContainer
+        <$InputContainer
           $isFocused={isToInputFocused}
           tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1"
         >
@@ -318,7 +337,7 @@ export const Swap = () => {
             />
             <TokenLogo token={otherToken(inputToken)} />
           </div>
-        </$ToContainer>
+        </$InputContainer>
       </div>
 
       {onboardingState !== OnboardingState.AccountConnected ? (
@@ -353,7 +372,7 @@ export const Swap = () => {
       )}
 
       <$Accordion
-        triggerRotation={90}
+        triggerRotation={180}
         triggerIcon={
           <div tw="flex items-center">
             <CaretDown tw="h-0.375 text-color-text-0" />
@@ -476,12 +495,11 @@ const ExchangeRate = ({
   );
 };
 
-const $FromContainer = styled.div<{ $isFocused: boolean }>`
-  ${({ $isFocused }) => ($isFocused ? tw`bg-color-layer-5` : tw`bg-color-layer-4`)};
-`;
-
-const $ToContainer = styled.div<{ $isFocused: boolean }>`
-  ${({ $isFocused }) => ($isFocused ? tw`bg-color-layer-2` : tw`bg-color-layer-3`)};
+const $InputContainer = styled.div<{ $isFocused: boolean }>`
+  ${({ $isFocused }) => $isFocused && 'background-color: rgba(255, 255, 255, 0.03);'};
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
 `;
 
 const $Input = styled.input<{ hasError?: boolean; $isLoading: boolean }>`
