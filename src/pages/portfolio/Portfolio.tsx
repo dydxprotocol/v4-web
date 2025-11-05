@@ -49,7 +49,7 @@ const Positions = lazy(() =>
   import('./Positions').then((module) => ({ default: module.Positions }))
 );
 const Orders = lazy(() => import('./Orders').then((module) => ({ default: module.Orders })));
-const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
+const Fees = lazy(() => import('./Fees/Fees').then((module) => ({ default: module.Fees })));
 const EquityTiers = lazy(() =>
   import('./EquityTiers').then((module) => ({ default: module.EquityTiers }))
 );

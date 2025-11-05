@@ -2,13 +2,13 @@ import { useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { StakingTiers } from '@/bonsai/types/summaryTypes';
-import styled from 'styled-components';
-import tw from 'twin.macro';
+import styled, { css } from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
+import { useStakingTierLevel } from '@/hooks/useStakingTierLevel';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -27,10 +27,10 @@ type StakingTier = StakingTiers[number];
 
 export const StakingTierTable = () => {
   const stringGetter = useStringGetter();
-  const feeTiers = useAppSelector(BonsaiCore.configs.feeTiers);
-  const userFeeTier = useAppSelector(BonsaiCore.account.stats.data).feeTierId;
+  const userFeeTier = useAppSelector(BonsaiCore.account.stats.data).stakingTierId;
   const stakingTiers = useAppSelector(BonsaiCore.configs.stakingTiers);
   const { chainTokenDecimals, chainTokenDenom } = useTokenConfigs();
+  const currentStakingDiscountLevel: number | undefined = useStakingTierLevel();
 
   const calculateMinStakedTokens = useCallback(
     (minStakedBaseTokens?: string) => {
@@ -58,7 +58,7 @@ export const StakingTierTable = () => {
               <$TextRow tw="gap-0.5">
                 <Output type={OutputType.Text} value={row.feeTierName} tw="text-color-text-0" />
                 {row.feeTierName === userFeeTier && (
-                  <Tag size={TagSize.Medium} tw="text-color-text-1">
+                  <Tag size={TagSize.Medium} tw="text-color-accent">
                     {stringGetter({ key: STRING_KEYS.YOU })}
                   </Tag>
                 )}
@@ -69,7 +69,7 @@ export const StakingTierTable = () => {
       },
       {
         columnKey: 'level1',
-        label: 'Level 1',
+        label: <$LevelLabel isHighlighted={currentStakingDiscountLevel === 1}>Level 1</$LevelLabel>,
         allowsSorting: false,
         align: 'center' as const,
         isRowHeader: false,
@@ -79,16 +79,16 @@ export const StakingTierTable = () => {
             label: 'Stake Requirements',
             allowsSorting: false,
             isRowHeader: true,
-            renderCell: ({ levels: [level1] }: StakingTier) => (
-              <div tw="flex flex-col">
-                <div tw="flex flex-row justify-end gap-0.25">
-                  <$HighlightOutput
-                    type={OutputType.Asset}
-                    value={calculateMinStakedTokens(level1?.minStakedBaseTokens)}
-                    fractionDigits={0}
-                  />
-                  <span tw="text-color-text-1">{chainTokenDenom}</span>
-                </div>
+            renderCell: ({ feeTierName, levels: [level1] }: StakingTier) => (
+              <div tw="flex justify-end">
+                <$HighlightOutput
+                  tw="gap-0.25"
+                  type={OutputType.Asset}
+                  isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 1}
+                  value={calculateMinStakedTokens(level1?.minStakedBaseTokens)}
+                  slotRight={<span>{chainTokenDenom}</span>}
+                  fractionDigits={0}
+                />
               </div>
             ),
           },
@@ -97,10 +97,10 @@ export const StakingTierTable = () => {
             label: stringGetter({ key: STRING_KEYS.DISCOUNT }),
             allowsSorting: false,
             isRowHeader: true,
-            renderCell: ({ levels: [level1] }: StakingTier) => (
+            renderCell: ({ feeTierName, levels: [level1] }: StakingTier) => (
               <$HighlightOutput
                 type={OutputType.Percent}
-                fractionDigits={0}
+                isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 1}
                 value={MustBigNumber(level1?.feeDiscountPpm).div(QUANTUM_MULTIPLIER)}
               />
             ),
@@ -109,7 +109,7 @@ export const StakingTierTable = () => {
       },
       {
         columnKey: 'level2',
-        label: 'Level 2',
+        label: <$LevelLabel isHighlighted={currentStakingDiscountLevel === 2}>Level 2</$LevelLabel>,
         allowsSorting: false,
         align: 'center' as const,
         isRowHeader: false,
@@ -119,16 +119,16 @@ export const StakingTierTable = () => {
             label: 'Stake Requirements',
             allowsSorting: false,
             isRowHeader: true,
-            renderCell: ({ levels: [, level2] }: StakingTier) => (
-              <div tw="flex flex-col">
-                <div tw="flex flex-row justify-end gap-0.25">
-                  <$HighlightOutput
-                    type={OutputType.Asset}
-                    value={calculateMinStakedTokens(level2?.minStakedBaseTokens)}
-                    fractionDigits={0}
-                  />
-                  <span tw="text-color-text-1">{chainTokenDenom}</span>
-                </div>
+            renderCell: ({ feeTierName, levels: [, level2] }: StakingTier) => (
+              <div tw="flex justify-end">
+                <$HighlightOutput
+                  tw="gap-0.25"
+                  type={OutputType.Asset}
+                  isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 2}
+                  value={calculateMinStakedTokens(level2?.minStakedBaseTokens)}
+                  slotRight={<span>{chainTokenDenom}</span>}
+                  fractionDigits={0}
+                />
               </div>
             ),
           },
@@ -137,10 +137,10 @@ export const StakingTierTable = () => {
             label: stringGetter({ key: STRING_KEYS.DISCOUNT }),
             allowsSorting: false,
             isRowHeader: true,
-            renderCell: ({ levels: [, level2] }: StakingTier) => (
+            renderCell: ({ feeTierName, levels: [, level2] }: StakingTier) => (
               <$HighlightOutput
                 type={OutputType.Percent}
-                fractionDigits={0}
+                isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 2}
                 value={MustBigNumber(level2?.feeDiscountPpm).div(QUANTUM_MULTIPLIER)}
               />
             ),
@@ -148,7 +148,13 @@ export const StakingTierTable = () => {
         ],
       },
     ] satisfies ColumnDef<StakingTier>[];
-  }, [stringGetter, chainTokenDenom, calculateMinStakedTokens, userFeeTier]);
+  }, [
+    stringGetter,
+    chainTokenDenom,
+    calculateMinStakedTokens,
+    userFeeTier,
+    currentStakingDiscountLevel,
+  ]);
 
   return (
     <$StakingTierTable
@@ -200,6 +206,12 @@ const $TextRow = styled.div`
   gap: 0.25rem;
 `;
 
-const $HighlightOutput = tw(Output)`text-color-text-1`;
+const $HighlightOutput = styled(Output)<{ isHighlighted?: boolean }>`
+  color: ${({ isHighlighted }) => (isHighlighted ? 'var(--color-accent)' : 'var(--color-text-1)')};
+`;
 
-// Notes
+const $LevelLabel = styled.span<{ isHighlighted: boolean }>`
+  ${({ isHighlighted }) => css`
+    color: ${isHighlighted ? 'var(--color-accent)' : 'var(--color-text-0)'};
+  `}
+`;

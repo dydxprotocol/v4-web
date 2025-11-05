@@ -37,6 +37,8 @@ export const FeeTierTable = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
 
   const userFeeTier = userStats.feeTierId;
+  const makerFeeRate = userStats.makerFeeRate;
+  const takerFeeRate = userStats.takerFeeRate;
 
   const AdditionalConditions = useCallback(
     (conditions: {
@@ -141,25 +143,64 @@ export const FeeTierTable = () => {
             columnKey: 'maker',
             label: stringGetter({ key: STRING_KEYS.MAKER }),
             allowsSorting: false,
-            renderCell: ({ maker }) => (
-              <$HighlightOutput
-                type={OutputType.SmallPercent}
-                value={maker}
-                fractionDigits={FEE_DECIMALS}
-              />
-            ),
+            renderCell: ({ tier, maker }) => {
+              if (tier === userFeeTier && maker !== makerFeeRate) {
+                return (
+                  <span>
+                    <Output
+                      tw="text-color-text-0 line-through"
+                      type={OutputType.SmallPercent}
+                      value={maker}
+                      fractionDigits={FEE_DECIMALS}
+                    />{' '}
+                    <Output
+                      tw="text-color-accent"
+                      type={OutputType.SmallPercent}
+                      value={makerFeeRate}
+                    />
+                  </span>
+                );
+              }
+
+              return (
+                <$HighlightOutput
+                  type={OutputType.SmallPercent}
+                  value={maker}
+                  fractionDigits={FEE_DECIMALS}
+                />
+              );
+            },
           },
           {
             columnKey: 'taker',
             label: stringGetter({ key: STRING_KEYS.TAKER }),
             allowsSorting: false,
-            renderCell: ({ taker }) => (
-              <$HighlightOutput
-                type={OutputType.SmallPercent}
-                value={taker}
-                fractionDigits={FEE_DECIMALS}
-              />
-            ),
+            renderCell: ({ tier, taker }) => {
+              if (tier === userFeeTier && taker !== takerFeeRate) {
+                return (
+                  <span>
+                    <Output
+                      tw="text-color-text-0 line-through"
+                      type={OutputType.SmallPercent}
+                      value={taker}
+                      fractionDigits={FEE_DECIMALS}
+                    />{' '}
+                    <Output
+                      tw="text-color-accent"
+                      type={OutputType.SmallPercent}
+                      value={takerFeeRate}
+                    />
+                  </span>
+                );
+              }
+              return (
+                <$HighlightOutput
+                  type={OutputType.SmallPercent}
+                  value={taker}
+                  fractionDigits={FEE_DECIMALS}
+                />
+              );
+            },
           },
         ] satisfies Array<false | ColumnDef<FeeTierSummary>>
       ).filter(isTruthy)}
