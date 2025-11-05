@@ -13,7 +13,7 @@ import {
 import { type GridNode } from '@react-types/grid';
 import type { Node, SortDescriptor, SortDirection } from '@react-types/shared';
 import { type ColumnSize, type TableCollection } from '@react-types/table';
-import { isFunction } from 'lodash';
+import { flatMap, isFunction } from 'lodash';
 import {
   mergeProps,
   useCollator,
@@ -33,6 +33,7 @@ import { useTablePagination } from '@/hooks/useTablePagination';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { objectFromEntries } from '@/lib/objectHelpers';
 
 import { SortIcon } from './SortIcon';
 import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
@@ -81,12 +82,13 @@ export type SelectedKey = 'all' | Iterable<string | number> | undefined;
 
 export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
-  label: React.ReactNode;
+  label: NonNullable<React.ReactNode>;
   tag?: React.ReactNode;
   colspan?: number;
   childColumns?: ColumnDef<TableRowData>[];
+  isRowHeader?: boolean;
   allowsResizing?: boolean;
-  renderCell: (row: TableRowData) => React.ReactNode;
+  renderCell?: (row: TableRowData) => React.ReactNode;
   isActionable?: boolean;
   hideOnBreakpoint?: MediaQueryKeys;
   width?: ColumnSize;
@@ -245,6 +247,38 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
         : items,
     [currentPage, items, pageSize, shouldPaginate]
   );
+
+  const renderCell = useCallback(
+    (
+      item: TableRowData | CustomRowConfig,
+      columnKey: string | number,
+      allColumns: ColumnDef<TableRowData>[]
+    ) => {
+      if (isTableRowData(item)) {
+        const columnMapByKey = objectFromEntries(
+          [...allColumns, ...flatMap(allColumns, (column) => column.childColumns ?? [])].map(
+            (column) => [column.columnKey, column]
+          )
+        );
+
+        const maybeRenderColumn = columnMapByKey[columnKey];
+        return maybeRenderColumn?.renderCell?.(item) ?? null;
+      }
+
+      return null;
+    },
+    []
+  );
+
+  const leafShownColumns = useMemo(() => {
+    const out: ColumnDef<TableRowData>[] = [];
+    const walk = (cols: ColumnDef<TableRowData>[]) => {
+      cols.forEach((c) => (c.childColumns?.length ? walk(c.childColumns) : out.push(c)));
+    };
+    walk(shownColumns);
+    return out;
+  }, [shownColumns]);
+
   return (
     <$TableWrapper
       className={className}
@@ -276,7 +310,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           withInnerBorders={withInnerBorders}
           withScrollSnapColumns={withScrollSnapColumns}
           withScrollSnapRows={withScrollSnapRows}
-          numColumns={shownColumns.length}
+          numColumns={leafShownColumns.length}
           firstClickSortDirection={firstClickSortDirection}
           paginationRow={
             shouldPaginate ? (
@@ -292,18 +326,40 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           }
         >
           <TableHeader columns={shownColumns}>
-            {(column) => (
-              <Column
-                key={column.columnKey}
-                childColumns={column.childColumns}
-                allowsSorting={column.allowsSorting ?? true}
-                allowsResizing={column.allowsResizing}
-                width={column.width}
-              >
-                {column.label}
-                {column.tag && <Tag>{column.tag}</Tag>}
-              </Column>
-            )}
+            {(column) =>
+              column.childColumns?.length ? (
+                // Group column: make it a parent with nested Column children
+                <Column
+                  key={column.columnKey}
+                  title={column.label} // parent renders only a header
+                  allowsSorting={false} // groups shouldn't sort
+                >
+                  {column.childColumns.map((child) => (
+                    <Column
+                      key={child.columnKey}
+                      isRowHeader={child.isRowHeader ?? true}
+                      allowsSorting={child.allowsSorting ?? true}
+                      allowsResizing={child.allowsResizing}
+                      width={child.width}
+                    >
+                      {child.label}
+                      {child.tag && <Tag>{child.tag}</Tag>}
+                    </Column>
+                  ))}
+                </Column>
+              ) : (
+                <Column
+                  isRowHeader={column.isRowHeader ?? true}
+                  key={column.columnKey}
+                  allowsSorting={column.allowsSorting ?? true}
+                  allowsResizing={column.allowsResizing}
+                  width={column.width}
+                >
+                  {column.label}
+                  {column.tag && <Tag>{column.tag}</Tag>}
+                </Column>
+              )
+            }
           </TableHeader>
 
           <TableBody items={bodyListItems}>
@@ -311,8 +367,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
               <Row key={internalGetRowKey(item)}>
                 {(columnKey) => (
                   <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
-                    {isTableRowData(item) &&
-                      columns.find((column) => column.columnKey === columnKey)?.renderCell(item)}
+                    {renderCell(item, columnKey, columns)}
                   </Cell>
                 )}
               </Row>
@@ -399,6 +454,8 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     ref
   );
 
+  const rows = React.useMemo(() => Array.from(collection.body.childNodes), [collection]);
+
   return (
     <$Table
       ref={ref}
@@ -409,29 +466,19 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     >
       <TableHeadRowGroup hidden={hideHeader} withInnerBorders={withInnerBorders}>
         {collection.headerRows.map((headerRow) => (
-          <TableHeaderRow
+          <TableHeaderRowContent
             key={headerRow.key}
-            item={headerRow}
+            headerRow={headerRow}
             state={state}
             withScrollSnapRows={withScrollSnapRows}
-          >
-            {[...headerRow.childNodes].map((column) => {
-              return (
-                <TableColumnHeader
-                  key={column.key}
-                  column={column}
-                  state={state}
-                  withScrollSnapColumns={withScrollSnapColumns}
-                />
-              );
-            })}
-          </TableHeaderRow>
+            withScrollSnapColumns={withScrollSnapColumns}
+          />
         ))}
       </TableHeadRowGroup>
 
       <TableBodyRowGroup withInnerBorders={withInnerBorders} withOuterBorder={withOuterBorder}>
-        {[...collection.body.childNodes].map((row) =>
-          (row.value as CustomRowConfig | null)?.slotCustomRow ? (
+        {rows.map((row) => {
+          return (row.value as CustomRowConfig | null)?.slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
               item: row,
               state,
@@ -441,36 +488,19 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
               children: null,
             })
           ) : (
-            <TableRow
+            <TableRowContent
               key={row.key}
-              item={row}
+              row={row}
               state={state}
-              hasRowAction={!!onRowAction}
-              {...getRowAttributes?.(row.value!)}
+              onRowAction={onRowAction}
+              getRowAttributes={getRowAttributes}
               withFocusStickyRows={withFocusStickyRows}
               withScrollSnapRows={withScrollSnapRows}
-            >
-              {[...row.childNodes].map(
-                (cell) => (
-                  <TableCell
-                    key={cell.key}
-                    cell={cell}
-                    state={state}
-                    isActionable={
-                      (
-                        (cell as GridNode<TableRowData>).column?.value as
-                          | ColumnDef<TableRowData>
-                          | undefined
-                      )?.isActionable ?? onRowAction === undefined
-                    }
-                  />
-                )
-                // )
-              )}
-            </TableRow>
-          )
-        )}
+            />
+          );
+        })}
       </TableBodyRowGroup>
+
       {paginationRow && (
         <$Tfoot>
           <tr
@@ -526,6 +556,98 @@ const TableBodyRowGroup = ({
   );
 };
 
+const TableRowContent = <TableRowData extends BaseTableRowData>({
+  row,
+  state,
+  onRowAction,
+  getRowAttributes,
+  withFocusStickyRows,
+  withScrollSnapRows,
+}: {
+  row: TableCollection<TableRowData>['rows'][number];
+  state: TableState<TableRowData>;
+  onRowAction?: (key: Key) => void;
+  getRowAttributes?: (
+    rowData: TableRowData,
+    rowIndex?: number
+  ) => Record<string, string | number | Record<string, string | number>>;
+  withFocusStickyRows?: boolean;
+  withScrollSnapRows?: boolean;
+}) => {
+  const cells = useMemo(() => {
+    return Array.from(state.collection.getChildren?.(row.key) ?? []);
+  }, [row.key, state.collection]);
+
+  return (
+    <TableRow
+      key={row.key}
+      item={row}
+      state={state}
+      hasRowAction={!!onRowAction}
+      {...getRowAttributes?.(row.value!)}
+      withFocusStickyRows={withFocusStickyRows}
+      withScrollSnapRows={withScrollSnapRows}
+    >
+      {cells.map((cell) => {
+        return (
+          <TableCell
+            key={cell.key}
+            cell={cell}
+            state={state}
+            isActionable={
+              (
+                (cell as GridNode<TableRowData>).column?.value as
+                  | ColumnDef<TableRowData>
+                  | undefined
+              )?.isActionable ?? onRowAction === undefined
+            }
+          />
+        );
+      })}
+    </TableRow>
+  );
+};
+
+const TableHeaderRowContent = <TableRowData extends BaseTableRowData>({
+  headerRow,
+  state,
+  withScrollSnapRows,
+  withScrollSnapColumns,
+}: {
+  headerRow: TableCollection<TableRowData>['headerRows'][number];
+  state: TableState<TableRowData>;
+  withScrollSnapRows?: boolean;
+  withScrollSnapColumns?: boolean;
+}) => {
+  const columns = useMemo(() => {
+    return Array.from(headerRow.childNodes);
+  }, [headerRow]);
+
+  return (
+    <TableHeaderRow
+      key={headerRow.key}
+      item={headerRow}
+      state={state}
+      withScrollSnapRows={withScrollSnapRows}
+    >
+      {columns.map((column) => {
+        if (column.type === 'placeholder') {
+          return <th aria-label="placeholder" key={column.key} role="columnheader" />;
+        }
+
+        return (
+          <TableColumnHeader
+            key={column.key}
+            column={column}
+            state={state}
+            withScrollSnapColumns={withScrollSnapColumns}
+          />
+        );
+      })}
+    </TableHeaderRow>
+  );
+};
+
 const TableHeaderRow = <TableRowData extends BaseTableRowData>({
   item,
   state,
@@ -560,12 +682,9 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
   const { focusProps } = useFocusRing();
 
-  console.log(column);
-
   return (
     <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
-      // data-focused={isFocusVisible || undefined}
       style={{
         width: column.props?.width,
         textAlign: (column.value as any)?.align,
@@ -660,12 +779,9 @@ const TableCell = <TableRowData extends BaseTableRowData>({
           : gridCellProps,
         focusProps
       )}
-      // data-focused={isFocusVisible || undefined}
       ref={ref}
     >
-      {/* <Styled.Row> */}
       {cell.rendered}
-      {/* </Styled.Row> */}
     </$Td>
   );
 };
