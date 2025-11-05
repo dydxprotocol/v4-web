@@ -5,7 +5,6 @@ import {
   PricesModule,
   RewardsModule,
 } from '@dydxprotocol/v4-client-js';
-import { type BigNumber } from 'bignumber.js';
 
 import {
   IndexerAPITimeInForce,
@@ -193,6 +192,7 @@ export enum SubaccountFillType {
 export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   marginMode: MarginMode;
   type: SubaccountFillType | undefined;
+  closedPnl?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
