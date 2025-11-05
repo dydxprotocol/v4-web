@@ -11,7 +11,7 @@ import {
 import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useMutation } from '@tanstack/react-query';
-import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
+import { SessionType, TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'react-router-dom';
@@ -77,7 +77,7 @@ const useTurnkeyAuthContext = () => {
   const stringGetter = useStringGetter();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
-  const { indexedDbClient, authIframeClient } = useTurnkey();
+  const { indexedDbClient, authIframeClient, passkeyClient } = useTurnkey();
   const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
@@ -226,7 +226,9 @@ const useTurnkeyAuthContext = () => {
           handleEmailResponse({ userEmail, response });
           setEmailSignInStatus('idle');
           break;
-        case LoginMethod.Passkey: // TODO: handle passkey response
+        case LoginMethod.Passkey:
+          handlePasskeyResponse({ response });
+          break;
         default:
           throw new Error('Current unsupported login method');
       }
@@ -340,6 +342,50 @@ const useTurnkeyAuthContext = () => {
     },
     [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
   );
+
+  const handlePasskeyResponse = async ({ response }: { response: TurnkeyOAuthResponse }) => {
+    const { salt, dydxAddress: uploadedDydxAddress } = response as {
+      salt?: string;
+      dydxAddress?: string;
+    };
+
+    if (!passkeyClient) {
+      throw new Error('Passkey client is not available');
+    }
+    await indexedDbClient!.resetKeyPair();
+    const pubKey = await indexedDbClient!.getPublicKey();
+    if (!pubKey) {
+      throw new Error('No public key available for passkey session');
+    }
+    // Authenticate with the user's passkey for the returned sub-organization
+    await passkeyClient.loginWithPasskey({
+      sessionType: SessionType.READ_WRITE,
+      publicKey: pubKey,
+      expirationSeconds: (60 * 15).toString(), // 15 minutes
+      organizationId: '18af402a-684a-488d-a054-3c5c688eb7d5',
+    });
+    const derivedDydxAddress = await onboardDydx({
+      salt,
+      setWalletFromSignature,
+      tkClient: indexedDbClient,
+    });
+
+    if (uploadedDydxAddress === '' && derivedDydxAddress) {
+      try {
+        await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
+      } catch (uploadAddressError) {
+        if (
+          uploadAddressError instanceof Error &&
+          !uploadAddressError.message.includes('Dydx address already uploaded')
+        ) {
+          throw uploadAddressError;
+        }
+      }
+    }
+
+    setEmailSignInStatus('success');
+    setEmailSignInError(undefined);
+  };
 
   /* ----------------------------- Email Sign In ----------------------------- */
 
@@ -541,6 +587,43 @@ const useTurnkeyAuthContext = () => {
     processedEmailTokenRef.current = null;
   }, [searchParams, setSearchParams]);
 
+  /* ----------------------------- Passkey Sign In ----------------------------- */
+
+  const signInWithPasskey = useCallback(async () => {
+    try {
+      if (!passkeyClient) {
+        throw new Error('Passkey client is not available');
+      }
+
+      const { encodedChallenge: challenge, attestation } = await passkeyClient.createUserPasskey({
+        publicKey: {
+          user: {
+            name: 'test.dydx.com',
+            displayName: 'wallet.dydx.com',
+          },
+        },
+      });
+
+      const bodyWithAttestation: SignInBody = {
+        signinMethod: 'passkey',
+        challenge,
+        attestation: {
+          transports: attestation.transports,
+          attestationObject: attestation.attestationObject,
+          clientDataJson: attestation.clientDataJson,
+          credentialId: attestation.credentialId,
+        },
+      };
+
+      sendSignInRequest({
+        body: JSON.stringify(bodyWithAttestation),
+        loginMethod: LoginMethod.Passkey,
+      });
+    } catch (error) {
+      logBonsaiError('TurnkeyOnboarding', 'Error signing in with passkey', { error });
+    }
+  }, [passkeyClient, sendSignInRequest]);
+
   /* ----------------------------- Side Effects ----------------------------- */
 
   /**
@@ -605,6 +688,7 @@ const useTurnkeyAuthContext = () => {
     isUploadingAddress,
     signInWithOauth,
     signInWithOtp,
+    signInWithPasskey,
     resetEmailSignInStatus,
   };
 };

@@ -201,8 +201,7 @@ const useTurnkeyWalletContext = () => {
       setWalletFromSignature: (signature: string) => Promise<string | undefined>;
       tkClient?: TurnkeyIndexedDbClient;
     }) => {
-      const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
-
+      const selectedTurnkeyWallet = await getPrimaryUserWallets(tkClient);
       const ethAccount = selectedTurnkeyWallet?.accounts.find(
         (account) => account.addressFormat === AddressFormat.Ethereum
       );
