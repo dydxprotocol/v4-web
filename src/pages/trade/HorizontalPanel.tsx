@@ -150,6 +150,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
             PositionsTableColumnKey.Size,
             PositionsTableColumnKey.Value,
             PositionsTableColumnKey.PnL,
+            PositionsTableColumnKey.RealizedPnL,
             PositionsTableColumnKey.Margin,
             PositionsTableColumnKey.AverageOpen,
             PositionsTableColumnKey.Oracle,
