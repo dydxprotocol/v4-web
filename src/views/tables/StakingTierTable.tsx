@@ -51,7 +51,7 @@ export const StakingTierTable = () => {
         childColumns: [
           {
             columnKey: 'fee-tier',
-            label: stringGetter({ key: STRING_KEYS.FEE_TIERS }),
+            label: stringGetter({ key: STRING_KEYS.FEE_TIER }),
             allowsSorting: false,
             isRowHeader: true,
             renderCell: (row: StakingTier) => (
@@ -69,14 +69,18 @@ export const StakingTierTable = () => {
       },
       {
         columnKey: 'level1',
-        label: <$LevelLabel isHighlighted={currentStakingDiscountLevel === 1}>Level 1</$LevelLabel>,
+        label: (
+          <$LevelLabel isHighlighted={currentStakingDiscountLevel === 1}>
+            {stringGetter({ key: STRING_KEYS.LEVEL_N, params: { LEVEL: 1 } })}
+          </$LevelLabel>
+        ),
         allowsSorting: false,
         align: 'center' as const,
         isRowHeader: false,
         childColumns: [
           {
             columnKey: 'level-1-stake-requirements',
-            label: 'Stake Requirements',
+            label: stringGetter({ key: STRING_KEYS.STAKE_REQUIREMENTS }),
             allowsSorting: false,
             isRowHeader: true,
             renderCell: ({ feeTierName, levels: [level1] }: StakingTier) => (
@@ -109,14 +113,18 @@ export const StakingTierTable = () => {
       },
       {
         columnKey: 'level2',
-        label: <$LevelLabel isHighlighted={currentStakingDiscountLevel === 2}>Level 2</$LevelLabel>,
+        label: (
+          <$LevelLabel isHighlighted={currentStakingDiscountLevel === 2}>
+            {stringGetter({ key: STRING_KEYS.LEVEL_N, params: { LEVEL: 2 } })}
+          </$LevelLabel>
+        ),
         allowsSorting: false,
         align: 'center' as const,
         isRowHeader: false,
         childColumns: [
           {
             columnKey: 'level-2-stake-requirements',
-            label: 'Stake Requirements',
+            label: stringGetter({ key: STRING_KEYS.STAKE_REQUIREMENTS }),
             allowsSorting: false,
             isRowHeader: true,
             renderCell: ({ feeTierName, levels: [, level2] }: StakingTier) => (

@@ -27,7 +27,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
@@ -69,7 +68,6 @@ export const FeePageHeader = () => {
     <div tw="flex flex-row gap-1">
       <$FeesDetails
         layout="rowColumns"
-        hasReceivedFeeTierBonus={hasReceivedFeeTierBonus}
         withSeparators
         items={[
           {
@@ -99,14 +97,13 @@ export const FeePageHeader = () => {
 
       <$FeesDetails
         layout="rowColumns"
-        hasReceivedFeeTierBonus={hasReceivedFeeTierBonus}
         withSeparators
         items={[
           {
             key: 'fee-tier',
             label: (
               <$CardLabel>
-                {stringGetter({ key: STRING_KEYS.FEE_TIERS })}{' '}
+                {stringGetter({ key: STRING_KEYS.FEE_TIER })}{' '}
                 {hasReceivedFeeTierBonus && (
                   <WithTooltip
                     tooltipString={stringGetter({
@@ -121,7 +118,14 @@ export const FeePageHeader = () => {
                 )}
               </$CardLabel>
             ),
-            value: `Fee Tier ${userFeeTier ?? feeTierOne?.tier}`,
+            value: (
+              <span>
+                {stringGetter({
+                  key: STRING_KEYS.FEE_TIER_N,
+                  params: { TIER: userFeeTier ?? feeTierOne?.tier },
+                })}
+              </span>
+            ),
           },
           {
             key: 'volume',
@@ -133,13 +137,12 @@ export const FeePageHeader = () => {
             ),
             value: <Output type={OutputType.Fiat} value={volume} />,
           },
-        ].filter(isTruthy)}
+        ]}
       />
 
       <div tw="flex flex-row">
         <$FeesDetails
           layout="rowColumns"
-          hasReceivedFeeTierBonus={hasReceivedFeeTierBonus}
           withSeparators
           tw="rounded-r-0 pr-0"
           items={[
@@ -147,17 +150,25 @@ export const FeePageHeader = () => {
               key: 'staking-tier',
               label: stringGetter({ key: STRING_KEYS.STAKING_TIER }),
               value: currentStakingDiscountLevel
-                ? `Level ${currentStakingDiscountLevel}`
+                ? stringGetter({
+                    key: STRING_KEYS.LEVEL_N,
+                    params: { LEVEL: currentStakingDiscountLevel },
+                  })
                 : stringGetter({ key: STRING_KEYS.NONE }),
             },
             {
               key: 'staking-discount',
               label: stringGetter({ key: STRING_KEYS.STAKING_FEE_DISCOUNT }),
-              value: `${formatNumberOutput(stakingTierDiscountPercent, OutputType.Percent, {
-                decimalSeparator,
-                groupSeparator,
-                selectedLocale,
-              })} off fees`,
+              value: stringGetter({
+                key: STRING_KEYS.PERCENT_OFF_FEES,
+                params: {
+                  PERCENT: formatNumberOutput(stakingTierDiscountPercent, OutputType.Percent, {
+                    decimalSeparator,
+                    groupSeparator,
+                    selectedLocale,
+                  }),
+                },
+              }),
             },
             {
               key: 'staked-dydx',
@@ -185,7 +196,7 @@ export const FeePageHeader = () => {
             state={{ isDisabled: dydxAddress == null }}
           >
             <Icon iconName={IconName.Deposit2} />
-            Stake more
+            {stringGetter({ key: STRING_KEYS.STAKE_MORE })}
           </Button>
         </div>
       </div>
@@ -193,7 +204,7 @@ export const FeePageHeader = () => {
   );
 };
 
-const $FeesDetails = styled(Details)<{ hasReceivedFeeTierBonus?: boolean }>`
+const $FeesDetails = styled(Details)`
   --separatorHeight-padding: 0rem;
   border-radius: 0.625rem;
   padding: 1rem 0.5rem;
