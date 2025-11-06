@@ -31,6 +31,7 @@ import { AppTheme } from '@/state/appUiConfigs';
 import { getAppTheme } from '@/state/appUiConfigsSelectors';
 
 import { isValidEmail } from '@/lib/emailUtils';
+import { testFlags } from '@/lib/testFlags';
 
 import { AppleAuth } from './AuthButtons/AppleAuth';
 import { GoogleAuth } from './AuthButtons/GoogleAuth';
