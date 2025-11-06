@@ -27,6 +27,7 @@ import {
   calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
+import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
@@ -275,5 +276,5 @@ export const selectAccountNobleWalletAddress = createAppSelector(
 
 export const selectAccountStakingTier = createAppSelector(
   [selectRawAccountStakingTierData],
-  (stakingTier) => stakingTier
+  (stakingTier) => calculateAccountStakingTier(stakingTier)
 );

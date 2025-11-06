@@ -123,7 +123,7 @@ import {
   SubaccountOrder,
   SubaccountPosition,
   SubaccountTransfer,
-  UserStakingTier,
+  UserStakingTierSummary,
   UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -180,7 +180,7 @@ interface BonsaiCoreShape {
       data: BasicSelector<string | undefined>;
     };
     stakingTier: {
-      data: BasicSelector<UserStakingTier | undefined>;
+      data: BasicSelector<UserStakingTierSummary | undefined>;
     };
   };
   markets: {
