@@ -40,6 +40,7 @@ import {
   selectAccountFillsLoading,
   selectAccountOrders,
   selectAccountOrdersLoading,
+  selectAccountStakingTier,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
@@ -79,7 +80,7 @@ import {
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
-import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
+import { selectEquityTiers, selectFeeTiers, selectStakingTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
   selectCurrentMarketDepthChart,
@@ -117,10 +118,12 @@ import {
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
   RewardParamsSummary,
+  StakingTiers,
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
   SubaccountTransfer,
+  UserStakingTier,
   UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -176,6 +179,9 @@ interface BonsaiCoreShape {
     nobleUsdcBalance: {
       data: BasicSelector<string | undefined>;
     };
+    stakingTier: {
+      data: BasicSelector<UserStakingTier | undefined>;
+    };
   };
   markets: {
     currentMarketId: BasicSelector<string | undefined>;
@@ -203,6 +209,7 @@ interface BonsaiCoreShape {
   configs: {
     feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
+    stakingTiers: BasicSelector<StakingTiers | undefined>;
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
   rewardParams: { data: BasicSelector<RewardParamsSummary> };
@@ -255,6 +262,9 @@ export const BonsaiCore: BonsaiCoreShape = {
     nobleUsdcBalance: {
       data: selectAccountNobleUsdcBalance,
     },
+    stakingTier: {
+      data: selectAccountStakingTier,
+    },
   },
   markets: {
     currentMarketId: getCurrentMarketId,
@@ -282,6 +292,7 @@ export const BonsaiCore: BonsaiCoreShape = {
   configs: {
     equityTiers: selectEquityTiers,
     feeTiers: selectFeeTiers,
+    stakingTiers: selectStakingTiers,
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
   rewardParams: { data: selectRewardsSummary },

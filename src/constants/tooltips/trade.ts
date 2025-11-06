@@ -137,6 +137,10 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_BODY }),
   }),
+  'market-fee-discount': ({ stringGetter, stringParams }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MARKET_FEE_DISCOUNT_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MARKET_FEE_DISCOUNT_BODY, params: stringParams }),
+  }),
   'max-reward': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_BODY }),

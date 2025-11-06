@@ -475,7 +475,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
                         (cell as GridNode<TableRowData>).column?.value as
                           | ColumnDef<TableRowData>
                           | undefined
-                      )?.isActionable
+                      )?.isActionable ?? onRowAction === undefined
                     }
                   />
                 )
