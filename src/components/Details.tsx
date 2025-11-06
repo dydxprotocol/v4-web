@@ -103,18 +103,16 @@ export const Details = ({
           ({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon, slotRight }) => (
             <Fragment key={key}>
               <DetailItem
-                {...{
-                  key,
-                  tooltip,
-                  tooltipParams,
-                  label,
-                  value,
-                  withTooltipIcon,
-                  justifyItems,
-                  layout,
-                  withOverflow,
-                  slotRight,
-                }}
+                key={key}
+                tooltip={tooltip}
+                tooltipParams={tooltipParams}
+                label={label}
+                value={value}
+                withTooltipIcon={withTooltipIcon}
+                justifyItems={justifyItems}
+                layout={layout}
+                withOverflow={withOverflow}
+                slotRight={slotRight}
               />
               {subitems && showSubitems && layout === 'column' && (
                 <$SubDetails

@@ -21,10 +21,15 @@ import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedRebateBanner } from '@/state/dismissable';
+import {
+  setHasDismissedPmlBanner,
+  setHasDismissedRebateBanner,
+  setHasDismissedTradingLeagueBanner,
+} from '@/state/dismissable';
 import {
   getHasDismissedPmlBanner,
   getHasDismissedRebateBanner,
+  getHasDismissedTradingLeagueBanner,
 } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
@@ -43,6 +48,7 @@ export const MarketsBanners = ({
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
   const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
+  const hasDismissedTradingLeagueBanner = useAppSelector(getHasDismissedTradingLeagueBanner);
   const dispatch = useAppDispatch();
 
   const onDismissPmlBanner = () => {
@@ -53,6 +59,10 @@ export const MarketsBanners = ({
     dispatch(setHasDismissedRebateBanner(true));
   };
 
+  const onDismissTradingLeagueBanner = () => {
+    dispatch(setHasDismissedTradingLeagueBanner(true));
+  };
+
   const onClickPmlBanner = () => {
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
@@ -61,6 +71,7 @@ export const MarketsBanners = ({
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
   const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
+  const shouldDisplayTradingLeagueBanner = !hasDismissedTradingLeagueBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -147,7 +158,46 @@ export const MarketsBanners = ({
     </$RebateBanner>
   ) : null;
 
-  return rebateBanner ?? pmlBanner ?? null;
+  const tradingLeagueBanner = shouldDisplayTradingLeagueBanner ? (
+    <$TradingLeagueBanner>
+      <div tw="mr-auto flex h-full flex-col justify-center">
+        <div tw="mb-0.75 flex items-center gap-1">
+          <span tw="text-large text-white font-extra-large-bold">
+            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_TITLE })}
+          </span>
+          <$ActiveTag>{stringGetter({ key: STRING_KEYS.ACTIVE })}</$ActiveTag>
+        </div>
+        <div tw="flex items-center gap-1.5">
+          <Button
+            action={ButtonAction.Primary}
+            type={ButtonType.Link}
+            href="https://dydx.trade/dydx?utm_source=markets&utm_medium=ui&utm_campaign=01112025-markets-leagues-dydx&utm_term=&utm_content=markets-banner"
+            tw="relative z-10 w-12"
+          >
+            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_CTA })}
+          </Button>
+          <span tw="text-white font-base-book">
+            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_SUBTITLE })}
+          </span>
+        </div>
+      </div>
+
+      <img
+        src="/trading-league.png"
+        alt="Trading League trophy"
+        tw="relative right-8 top-0 my-2 h-[90%] object-contain mobile:hidden"
+      />
+
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissTradingLeagueBanner}
+      />
+    </$TradingLeagueBanner>
+  ) : null;
+
+  return tradingLeagueBanner ?? rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -246,4 +296,36 @@ const $RebateBanner = styled($MarketsPageBanner)`
       font: var(--font-small-book);
     }
   }
+`;
+
+const $TradingLeagueBanner = styled($MarketsPageBanner)`
+  height: 8rem;
+  background: url('/TradingLeagueBanner.png') center center / cover no-repeat;
+  position: relative;
+  margin-bottom: 1rem;
+
+  img,
+  span,
+  button,
+  a {
+    z-index: 1;
+  }
+
+  @media ${breakpoints.mobile} {
+    height: 8rem;
+
+    span {
+      font: var(--font-small-book);
+    }
+  }
+`;
+
+const $ActiveTag = styled.span`
+  border-radius: 99rem;
+  border: 1px solid;
+  border-color: color-mix(in srgb, var(--color-positive) 40%, transparent);
+  background-color: color-mix(in srgb, var(--color-positive) 5%, transparent);
+  padding: 0.25rem 0.75rem;
+  color: var(--color-positive);
+  font: var(--font-small-book);
 `;

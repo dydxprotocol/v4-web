@@ -19,7 +19,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
-import { getTokenSymbol, isNativeTokenDenom } from '../utils';
+import { getTokenSymbol, isNativeTokenDenom } from '../../utils';
 
 export type AmountInputProps = {
   value: string;

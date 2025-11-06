@@ -10,7 +10,7 @@ import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
 import { selectRawAssets, selectRawMarkets } from './base';
-import { selectAllMarketsInfo, selectSparkLinesData } from './markets';
+import { selectAllMarketsInfo, selectMarketsFeeDiscounts, selectSparkLinesData } from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
   [selectRawMarkets, selectRawAssets],
@@ -18,9 +18,15 @@ export const selectAllMarketSummariesLoading = createAppSelector(
 );
 
 export const selectAllMarketSummaries = createAppSelector(
-  [selectAllMarketsInfo, selectSparkLinesData, selectAllAssetsInfo, getFavoritedMarkets],
-  (markets, sparklines, assetInfo, favorites) =>
-    createMarketSummary(markets, sparklines, assetInfo, favorites)
+  [
+    selectAllMarketsInfo,
+    selectSparkLinesData,
+    selectAllAssetsInfo,
+    selectMarketsFeeDiscounts,
+    getFavoritedMarkets,
+  ],
+  (markets, sparklines, assetInfo, marketFeeDiscounts, favorites) =>
+    createMarketSummary(markets, sparklines, assetInfo, marketFeeDiscounts, favorites)
 );
 
 export const selectCurrentMarketInfo = createAppSelector(
