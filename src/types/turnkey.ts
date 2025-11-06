@@ -67,15 +67,15 @@ export type SignInBody =
       // initiating the flow and handling multi-step server responses.
       challenge?: string;
       attestation?: {
-        transports: Array<
+        transports?: Array<
           | 'AUTHENTICATOR_TRANSPORT_BLE'
           | 'AUTHENTICATOR_TRANSPORT_INTERNAL'
           | 'AUTHENTICATOR_TRANSPORT_NFC'
           | 'AUTHENTICATOR_TRANSPORT_USB'
           | 'AUTHENTICATOR_TRANSPORT_HYBRID'
         >;
-        attestationObject: string; // base64url
-        clientDataJson: string; // base64url
+        attestationObject?: string; // base64url
+        clientDataJson?: string; // base64url
         credentialId: string; // base64url
       };
     };

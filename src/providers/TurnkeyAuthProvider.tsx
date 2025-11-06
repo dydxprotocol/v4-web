@@ -587,11 +587,8 @@ const useTurnkeyAuthContext = () => {
       // dummy body used to get salt.
       const bodyWithAttestation: SignInBody = {
         signinMethod: 'passkey',
-        challenge: 'dummy',
+        challenge: credentialId,
         attestation: {
-          transports: ['AUTHENTICATOR_TRANSPORT_INTERNAL'],
-          attestationObject: 'dummy',
-          clientDataJson: 'dummy',
           credentialId,
         },
       };
