@@ -204,7 +204,13 @@ export const EmailSignInStatusDialog = ({
 
           if (showWelcomeContent) {
             await sleep(0);
-            dispatch(openDialog(DialogTypes.Deposit2({})));
+            dispatch(
+              openDialog(
+                DialogTypes.SetupPasskey({
+                  onClose: () => dispatch(openDialog(DialogTypes.Deposit2({}))),
+                })
+              )
+            );
           }
         }}
       >
