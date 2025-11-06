@@ -439,7 +439,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
 };
 
@@ -455,7 +454,6 @@ export const PositionsTable = forwardRef(
       initialPageSize,
       onNavigate,
       navigateToOrders,
-      withGradientCardRows,
       withOuterBorder,
     }: ElementProps & StyleProps,
     _ref
@@ -547,7 +545,6 @@ export const PositionsTable = forwardRef(
           </>
         }
         initialPageSize={initialPageSize}
-        withGradientCardRows={withGradientCardRows}
         withOuterBorder={withOuterBorder}
         withInnerBorders
         withScrollSnapColumns

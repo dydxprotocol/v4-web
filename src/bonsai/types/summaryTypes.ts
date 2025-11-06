@@ -279,6 +279,12 @@ export type PerpetualMarketFeeDiscount = NonNullable<
 
 export type UserFeeTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserFeeTierResponse['tier']>>;
 export type UserStakingTier = NonNullable<ToPrimitives<FeeTierModule.QueryUserStakingTierResponse>>;
+export interface UserStakingTierSummary {
+  feeTierName: string;
+  discountPercent: number | undefined;
+  stakedBaseTokens: string | undefined;
+}
+
 export type EquityTiers = NonNullable<
   ToPrimitives<ClobModule.QueryEquityTierLimitConfigurationResponse['equityTierLimitConfig']>
 >;

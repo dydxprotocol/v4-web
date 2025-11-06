@@ -1,8 +1,30 @@
+import { formatUnits } from 'viem/utils';
+
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { AccountStats, UserFeeTier, UserStakingTier, UserStats } from '../types/summaryTypes';
+import {
+  AccountStats,
+  UserFeeTier,
+  UserStakingTier,
+  UserStakingTierSummary,
+  UserStats,
+} from '../types/summaryTypes';
+
+export const calculateAccountStakingTier = (
+  stakingTier: UserStakingTier | undefined
+): UserStakingTierSummary | undefined => {
+  if (!stakingTier) {
+    return undefined;
+  }
+
+  return {
+    feeTierName: stakingTier.feeTierName,
+    discountPercent: MustBigNumber(stakingTier.discountPpm).div(QUANTUM_MULTIPLIER).toNumber(),
+    stakedBaseTokens: formatUnits(BigInt(stakingTier.stakedBaseTokens), 18),
+  };
+};
 
 export function calculateUserStats(
   feeTier: UserFeeTier | undefined,
