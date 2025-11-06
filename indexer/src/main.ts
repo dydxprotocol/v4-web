@@ -72,9 +72,9 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
     const [asset, value] = log.ValueUpdate;
     const price: Price = new Price({
         id: receipt.id,
-        asset: asset.bits,
+        asset: asset,
         price: value.quantized_value.toString(),
-        timestamp: value.timestamp_ns.toNumber(),
+        timestamp: value.timestamp_ns / 1000000000,
     })
     await ctx.store.insert(price)
 }
