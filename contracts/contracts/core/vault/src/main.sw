@@ -480,23 +480,19 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_position_funding_rate(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> (u256, bool) {
-        let position_key = _get_position_key(
-            account, 
-            index_asset, 
-            is_long
-        );
+    fn get_position_funding_rate(account: Identity, index_asset: b256, is_long: bool) -> (u256, bool) {
+        let position_key = _get_position_key(account, index_asset, is_long);
         let position = _get_position_by_key(position_key);
-        require(
-            position.collateral > 0,
-            Error::VaultInvalidPosition
-        );
+        require(position.collateral > 0, Error::VaultInvalidPosition);
 
-        _calculate_funding_rate(index_asset, position.size, is_long, position.cumulative_funding_rate)
+        _calculate_funding_rate(
+            index_asset,
+            position
+                .size,
+            is_long,
+            position
+                .cumulative_funding_rate,
+        )
     }
 
     #[storage(read)]

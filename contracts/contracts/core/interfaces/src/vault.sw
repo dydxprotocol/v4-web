@@ -107,11 +107,7 @@ abi Vault {
     #[storage(read)]
     fn get_position_leverage(account: Identity, index_asset: b256, is_long: bool) -> u256;
     #[storage(read)]
-    fn get_position_funding_rate(
-        account: Identity,
-        index_asset: b256,
-        is_long: bool,
-    ) -> (u256, bool);
+    fn get_position_funding_rate(account: Identity, index_asset: b256, is_long: bool) -> (u256, bool);
 
     #[storage(read)]
     fn get_fee_basis_points(
