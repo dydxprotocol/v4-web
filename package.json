@@ -45,7 +45,7 @@
     "commitlint": "commitlint --edit",
     "wdio": "wdio run ./wdio.conf.ts"
   },
-  "packageManager": "pnpm@8.6.6",
+  "packageManager": "pnpm@8.15.9+sha512.499434c9d8fdd1a2794ebf4552b3b25c0a633abcee5bb15e7b5de90f32f47b513aca98cd5cfd001c31f0db454bc3804edccd578501e4ca293a6816166bbd9f81",
   "dependencies": {
     "@cosmjs/amino": "^0.32.1",
     "@cosmjs/crypto": "^0.32.1",
@@ -55,7 +55,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@datadog/browser-logs": "^5.23.3",
     "@dydxprotocol/v4-client-js": "3.0.7",
-    "@dydxprotocol/v4-localization": "1.1.346",
+    "@dydxprotocol/v4-localization": "1.1.350",
     "@dydxprotocol/v4-proto": "^7.0.0-dev.0",
     "@emotion/is-prop-valid": "^1.3.0",
     "@hugocxl/react-to-image": "^0.0.9",

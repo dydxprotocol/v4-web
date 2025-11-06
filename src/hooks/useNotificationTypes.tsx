@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-// import { selectParentSubaccountSummary } from '@/bonsai/selectors/account';
-// eslint-disable-next-line no-restricted-imports
 // eslint-disable-next-line no-restricted-imports
 import { selectAccountBalances, selectAccountNobleUsdcBalance } from '@/bonsai/selectors/balances';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
@@ -1034,37 +1032,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.DepositNotificationLifecycle,
     useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
       const { dydxAddress } = useAccounts();
       const nobleBalance = useAppSelector(selectAccountNobleUsdcBalance);
       const { usdcAmount } = useAppSelector(selectAccountBalances);
 
-      // Use refs to track previous values across renders
+      // refs to track previous values across renders
       const prevNobleBalanceRef = useRef<string | undefined>(undefined);
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
-      const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
       const NOTIFICATION_DEBOUNCE = 3000; // 3 seconds
-
-      // Set up faster polling for Noble balance when component mounts
-      useEffect(() => {
-        if (!dydxAddress) return;
-
-        // Poll Noble balance every 10 seconds instead of 60
-        pollingIntervalRef.current = setInterval(() => {
-          appQueryClient.invalidateQueries({
-            queryKey: ['nobleBalances'],
-            exact: false,
-          });
-        }, 10000); // 10 seconds
-
-        // eslint-disable-next-line consistent-return
-        return () => {
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-          }
-        };
-      }, [dydxAddress]);
 
       // Stage 1: Watch for Noble balance increases (QR deposit received)
       useEffect(() => {
@@ -1085,11 +1063,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         if (prevBN && currBN && currBN.gt(prevBN)) {
           const diff = currBN.minus(prevBN);
-
-          // eslint-disable-next-line no-console
-          console.log('Stage 1: Noble balance increased!', diff.toFixed(2));
-
-          // Only trigger if increase is significant and we haven't triggered recently
           if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
               id: `deposit-noble-${Date.now()}`,
@@ -1099,6 +1072,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 slotTitleLeft: <Icon iconName={IconName.Signal} />,
                 title: 'Deposit Detected',
                 body: 'Your deposit will arrive in ~30 seconds.',
+                // TODO: figure this out -- where do we get the explorer link from?
+                // actionDescription: 'View Transaction',
+                // renderActionSlot: () => (
+                //   <Link href={deposit.explorerLink} isAccent>
+                //     View Transaction
+                //   </Link>
+                // ),
               },
             });
             lastNotificationTimeRef.current = now;
@@ -1115,22 +1095,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
         const now = Date.now();
         const prevWallet = prevWalletBalanceRef.current;
 
-        // Initialize on first run
         if (!prevWallet) {
           prevWalletBalanceRef.current = usdcAmount;
           return;
         }
 
-        // Check if balance increased
         const prevBN = MaybeBigNumber(prevWallet);
         const currBN = MaybeBigNumber(usdcAmount);
 
         if (prevBN && currBN && currBN.gt(prevBN)) {
           const diff = currBN.minus(prevBN);
-
-          // eslint-disable-next-line no-console
-          console.log('Stage 2: Subaccount balance increased!', diff.toFixed(2));
-
           // Only trigger if increase is significant and we haven't triggered recently
           if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
@@ -1139,8 +1113,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                 groupKey: `deposit-${now}`,
                 icon: <Icon iconName={IconName.CheckCircle} />,
-                title: 'Deposit Confirmed',
-                body: `${diff.toFixed(2)} USDC has been deposited.`,
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
+                body: stringGetter({ 
+                  key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY, 
+                  params: { 
+                    AMOUNT: diff.toFixed(2), 
+                    ASSET: 'USDC' 
+                  }
+                }),
                 toastSensitivity: 'foreground',
               },
             });
