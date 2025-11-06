@@ -1,6 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+// import { selectParentSubaccountSummary } from '@/bonsai/selectors/account';
+// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports
+import { selectAccountBalances, selectAccountNobleUsdcBalance } from '@/bonsai/selectors/balances';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
@@ -52,6 +56,7 @@ import {
   selectReclaimableChildSubaccountFunds,
   selectShouldAccountRebalanceUsdc,
 } from '@/state/accountSelectors';
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import {
@@ -72,7 +77,7 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
@@ -1024,6 +1029,130 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({ id: notification.id, displayData: notification.displayData });
         });
       }, [customNotifications, trigger]);
+    },
+  },
+  {
+    type: NotificationType.DepositNotificationLifecycle,
+    useTrigger: ({ trigger }) => {
+      const { dydxAddress } = useAccounts();
+      const nobleBalance = useAppSelector(selectAccountNobleUsdcBalance);
+      const { usdcAmount } = useAppSelector(selectAccountBalances);
+
+      // Use refs to track previous values across renders
+      const prevNobleBalanceRef = useRef<string | undefined>(undefined);
+      const prevWalletBalanceRef = useRef<string | undefined>(undefined);
+      const lastNotificationTimeRef = useRef<number>(0);
+      const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+      const NOTIFICATION_DEBOUNCE = 3000; // 3 seconds
+
+      // Set up faster polling for Noble balance when component mounts
+      useEffect(() => {
+        if (!dydxAddress) return;
+
+        // Poll Noble balance every 10 seconds instead of 60
+        pollingIntervalRef.current = setInterval(() => {
+          appQueryClient.invalidateQueries({
+            queryKey: ['nobleBalances'],
+            exact: false,
+          });
+        }, 10000); // 10 seconds
+
+        // eslint-disable-next-line consistent-return
+        return () => {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+          }
+        };
+      }, [dydxAddress]);
+
+      // Stage 1: Watch for Noble balance increases (QR deposit received)
+      useEffect(() => {
+        if (!dydxAddress || !nobleBalance) return;
+
+        const now = Date.now();
+        const prevNoble = prevNobleBalanceRef.current;
+
+        // Initialize on first run
+        if (!prevNoble) {
+          prevNobleBalanceRef.current = nobleBalance;
+          return;
+        }
+
+        // Check if balance increased
+        const prevBN = MaybeBigNumber(prevNoble);
+        const currBN = MaybeBigNumber(nobleBalance);
+
+        if (prevBN && currBN && currBN.gt(prevBN)) {
+          const diff = currBN.minus(prevBN);
+
+          // eslint-disable-next-line no-console
+          console.log('Stage 1: Noble balance increased!', diff.toFixed(2));
+
+          // Only trigger if increase is significant and we haven't triggered recently
+          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+            trigger({
+              id: `deposit-noble-${Date.now()}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                groupKey: `deposit-${Date.now()}`,
+                slotTitleLeft: <Icon iconName={IconName.Signal} />,
+                title: 'Deposit Detected',
+                body: 'Your deposit will arrive in ~30 seconds.',
+              },
+            });
+            lastNotificationTimeRef.current = now;
+          }
+        }
+
+        prevNobleBalanceRef.current = nobleBalance;
+      }, [dydxAddress, nobleBalance, trigger]);
+
+      // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
+      useEffect(() => {
+        if (!dydxAddress || !usdcAmount) return;
+
+        const now = Date.now();
+        const prevWallet = prevWalletBalanceRef.current;
+
+        // Initialize on first run
+        if (!prevWallet) {
+          prevWalletBalanceRef.current = usdcAmount;
+          return;
+        }
+
+        // Check if balance increased
+        const prevBN = MaybeBigNumber(prevWallet);
+        const currBN = MaybeBigNumber(usdcAmount);
+
+        if (prevBN && currBN && currBN.gt(prevBN)) {
+          const diff = currBN.minus(prevBN);
+
+          // eslint-disable-next-line no-console
+          console.log('Stage 2: Subaccount balance increased!', diff.toFixed(2));
+
+          // Only trigger if increase is significant and we haven't triggered recently
+          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+            trigger({
+              id: `deposit-wallet-${now}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                groupKey: `deposit-${now}`,
+                icon: <Icon iconName={IconName.CheckCircle} />,
+                title: 'Deposit Confirmed',
+                body: `${diff.toFixed(2)} USDC has been deposited.`,
+                toastSensitivity: 'foreground',
+              },
+            });
+            lastNotificationTimeRef.current = now;
+          }
+        }
+
+        prevWalletBalanceRef.current = usdcAmount;
+      }, [dydxAddress, usdcAmount, trigger]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
   {

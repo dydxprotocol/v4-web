@@ -4,11 +4,6 @@ import { TokenForTransfer } from '@/constants/tokens';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useCustomNotification } from '@/hooks/useCustomNotification';
-
-import SignalIcon from '@/icons/signal.svg';
-
-import { Link } from '@/components/Link';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { addDeposit, Deposit } from '@/state/transfers';
@@ -38,8 +33,6 @@ export const DepositFormContent = ({
   const dispatch = useAppDispatch();
   const { dydxAddress } = useAccounts();
   const { isMobile } = useBreakpoints();
-  const notify = useCustomNotification();
-  // const stringGetter = useStringGetter();
 
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState<TokenForTransfer>(defaultToken);
@@ -55,18 +48,6 @@ export const DepositFormContent = ({
 
     setCurrentDeposit({ txHash: deposit.txHash, chainId: deposit.chainId });
     dispatch(addDeposit({ deposit, dydxAddress }));
-
-    notify({
-      slotTitleLeft: <SignalIcon />,
-      title: 'Deposit Detected', // TODO: add to v4-localization --> stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_BODY }),
-      body: 'Your deposit will arrive in ~30 sec',
-      actionDescription: 'View Transaction',
-      renderActionSlot: () => (
-        <Link href={deposit.explorerLink} isAccent>
-          View Transaction
-        </Link>
-      ),
-    });
   };
 
   return (
