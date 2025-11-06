@@ -94,6 +94,7 @@ const useTurnkeyAuthContext = () => {
     onboardDydx,
     targetPublicKeys,
     getUploadAddressPayload,
+    fetchCredentialId,
   } = useTurnkeyWallet();
 
   /* ----------------------------- Upload Address ----------------------------- */
@@ -352,18 +353,6 @@ const useTurnkeyAuthContext = () => {
     if (!passkeyClient) {
       throw new Error('Passkey client is not available');
     }
-    await indexedDbClient!.resetKeyPair();
-    const pubKey = await indexedDbClient!.getPublicKey();
-    if (!pubKey) {
-      throw new Error('No public key available for passkey session');
-    }
-    // Authenticate with the user's passkey for the returned sub-organization
-    await passkeyClient.loginWithPasskey({
-      sessionType: SessionType.READ_WRITE,
-      publicKey: pubKey,
-      expirationSeconds: (60 * 15).toString(), // 15 minutes
-      organizationId: '18af402a-684a-488d-a054-3c5c688eb7d5',
-    });
     const derivedDydxAddress = await onboardDydx({
       salt,
       setWalletFromSignature,
@@ -589,29 +578,39 @@ const useTurnkeyAuthContext = () => {
 
   /* ----------------------------- Passkey Sign In ----------------------------- */
 
-  const signInWithPasskey = useCallback(async () => {
+  const signInWithPasskey = async () => {
     try {
       if (!passkeyClient) {
         throw new Error('Passkey client is not available');
       }
 
-      const { encodedChallenge: challenge, attestation } = await passkeyClient.createUserPasskey({
-        publicKey: {
-          user: {
-            name: 'test.dydx.com',
-            displayName: 'wallet.dydx.com',
-          },
-        },
+      await indexedDbClient!.resetKeyPair();
+      const pubKey = await indexedDbClient!.getPublicKey();
+      if (!pubKey) {
+        throw new Error('No public key available for passkey session');
+      }
+      // Authenticate with the user's passkey for the returned sub-organization
+      await passkeyClient.loginWithPasskey({
+        sessionType: SessionType.READ_WRITE,
+        publicKey: pubKey,
+        expirationSeconds: (60 * 15).toString(), // 15 minutes
+        organizationId: '18af402a-684a-488d-a054-3c5c688eb7d5',
       });
 
+      const credentialId = await fetchCredentialId(indexedDbClient);
+      if (!credentialId) {
+        throw new Error('No user found');
+      }
+
+      // dummy body used to get salt.
       const bodyWithAttestation: SignInBody = {
         signinMethod: 'passkey',
-        challenge,
+        challenge: 'dummy',
         attestation: {
-          transports: attestation.transports,
-          attestationObject: attestation.attestationObject,
-          clientDataJson: attestation.clientDataJson,
-          credentialId: attestation.credentialId,
+          transports: ['AUTHENTICATOR_TRANSPORT_INTERNAL'],
+          attestationObject: 'dummy',
+          clientDataJson: 'dummy',
+          credentialId,
         },
       };
 
@@ -622,7 +621,7 @@ const useTurnkeyAuthContext = () => {
     } catch (error) {
       logBonsaiError('TurnkeyOnboarding', 'Error signing in with passkey', { error });
     }
-  }, [passkeyClient, sendSignInRequest]);
+  };
 
   /* ----------------------------- Side Effects ----------------------------- */
 
