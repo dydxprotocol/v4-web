@@ -577,7 +577,6 @@ const useTurnkeyAuthContext = () => {
         sessionType: SessionType.READ_WRITE,
         publicKey: pubKey,
         expirationSeconds: (60 * 15).toString(), // 15 minutes
-        organizationId: '18af402a-684a-488d-a054-3c5c688eb7d5',
       });
 
       const credentialId = await fetchCredentialId(indexedDbClient);
