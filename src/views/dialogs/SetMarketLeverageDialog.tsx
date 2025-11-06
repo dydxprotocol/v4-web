@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
+import { SubaccountClient } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -10,6 +11,7 @@ import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
 import { DialogProps, SetMarketLeverageDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAccounts } from '@/hooks/useAccounts';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -39,6 +41,8 @@ export const SetMarketLeverageDialog = ({
 }: DialogProps<SetMarketLeverageDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
+
+  const { dydxAddress, localDydxWallet } = useAccounts();
 
   const marketData = useAppSelectorWithArgs(
     BonsaiHelpers.markets.selectMarketSummaryById,
@@ -119,6 +123,7 @@ export const SetMarketLeverageDialog = ({
     leverageNumber > (MaybeBigNumber(effectiveSelectedLeverage)?.toNumber() ?? 0);
 
   const errorMessage = useMemo(() => {
+    console.log(errorMessageRaw);
     if (errorMessageRaw != null) {
       const parsingResult = parseTransactionError('SetMarketLeverage', errorMessageRaw);
       return stringGetter({ key: parsingResult?.stringKey ?? STRING_KEYS.UNKNOWN_ERROR });
@@ -161,10 +166,12 @@ export const SetMarketLeverageDialog = ({
       // TODO: This is currently a dummy transaction that just saves to local state.
       // When this becomes a real chain transaction, it should return an OperationResult
       // and the error handling pattern below will work correctly.
+      const subaccountInfo = SubaccountClient.forLocalWallet(localDydxWallet!);
       const result = await saveMarketLeverage({
         dispatch,
         marketId,
         leverage: leverageBN.toNumber(),
+        subaccountInfo,
       });
 
       if (isOperationSuccess(result)) {
