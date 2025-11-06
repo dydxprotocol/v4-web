@@ -61,7 +61,6 @@ export enum PositionsTableColumnKey {
   Size = 'Size',
   Value = 'Value',
   PnL = 'PnL',
-  RealizedPnL = 'RealizedPnL',
   Margin = 'Margin',
   AverageOpen = 'AverageOpen',
   Oracle = 'Oracle',
@@ -205,32 +204,6 @@ const getPositionsTableColumnDef = ({
                 isNegative={MustBigNumber(updatedUnrealizedPnl).isNegative()}
                 type={OutputType.Fiat}
                 value={updatedUnrealizedPnl}
-                showSign={ShowSign.Both}
-              />
-            </TableCell>
-          );
-        },
-      },
-      [PositionsTableColumnKey.RealizedPnL]: {
-        columnKey: 'realizedPnl',
-        getCellValue: (row) => row.realizedPnl.toNumber(),
-        label: stringGetter({ key: STRING_KEYS.REALIZED_PNL }),
-        renderCell: ({ realizedPnl }) => {
-          return !isTablet ? (
-            <TableCell>
-              <$OutputSigned
-                sign={getNumberSign(realizedPnl)}
-                type={OutputType.Fiat}
-                value={realizedPnl}
-                showSign={ShowSign.Negative}
-              />
-            </TableCell>
-          ) : (
-            <TableCell stacked>
-              <$HighlightOutput
-                isNegative={MustBigNumber(realizedPnl).isNegative()}
-                type={OutputType.Fiat}
-                value={realizedPnl}
                 showSign={ShowSign.Both}
               />
             </TableCell>
