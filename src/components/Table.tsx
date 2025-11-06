@@ -886,7 +886,7 @@ const $Table = styled.table<StyledTableStyleProps>`
   ${({ withInnerBorders, hideHeader }) =>
     withInnerBorders &&
     css`
-      border-spacing: 0 var(--border-width);
+      border-spacing: 0 var(--border-spacing, var(--border-width));
       --stickyArea1-topGap: var(--border-width);
 
       ${hideHeader &&
