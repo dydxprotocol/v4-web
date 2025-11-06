@@ -10,14 +10,13 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Details } from '@/components/Details';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 import { AllTableProps, ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { StatCell } from './StatBox';
 
 interface ITierDefinition {
   tier: number;
@@ -58,31 +57,37 @@ export const CriteriaDialog = ({
       isOpen
       setIsOpen={setIsOpen}
       placement={DialogPlacement.Default}
-      title={
-        !dydxAddress
-          ? stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })
-          : stringGetter({
-              key: STRING_KEYS.YOUR_TIER,
-              params: {
-                TIER: currentUserTier?.tier,
-              },
-            })
-      }
+      title={<span>{stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS })}</span>}
       hasHeaderBlur={false}
     >
       <$Container tw="flex flex-col gap-y-1">
-        <div tw="flex flex-col gap-y-1 px-1 notTablet:p-0">
-          {dydxAddress && (
-            <div tw="my-1 flex">
-              <StatCell
-                tw="pr-1"
-                title={stringGetter({ key: STRING_KEYS.VOLUME_REFERRED })}
-                outputType={OutputType.CompactFiat}
-                value={accountStats?.affiliateReferredTotalVolume}
-              />
-            </div>
-          )}
-        </div>
+        <$Details
+          layout="rowColumns"
+          withSeparators
+          items={[
+            {
+              key: 'tier',
+              label: stringGetter({ key: STRING_KEYS.AFFILIATE_TIER }),
+              value: (
+                <span>
+                  {dydxAddress
+                    ? currentUserTier?.tier.toString().toUpperCase()
+                    : stringGetter({ key: STRING_KEYS.NONE })}
+                </span>
+              ),
+            },
+            {
+              key: 'volume-referred',
+              label: stringGetter({ key: STRING_KEYS.VOLUME_REFERRED }),
+              value: (
+                <Output
+                  type={OutputType.CompactFiat}
+                  value={accountStats?.affiliateReferredTotalVolume}
+                />
+              ),
+            },
+          ]}
+        />
 
         <CriteriaTable tiers={TIERS} userTier={userTier} />
       </$Container>
@@ -177,6 +182,18 @@ const $Dialog = styled(Dialog)`
     margin: auto;
     max-width: 560px;
     --dialog-paddingX: 1.5rem;
+  }
+`;
+
+const $Details = styled(Details)`
+  > :first-child {
+    padding-left: 0.5rem;
+  }
+
+  --details-value-font: var(--font-base-bold);
+
+  dt {
+    font: var(--font-small-book);
   }
 `;
 

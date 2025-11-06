@@ -9,6 +9,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAffiliatesInfo } from '@/hooks/useAffiliatesInfo';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -37,6 +38,7 @@ export const AffiliatesPage = () => {
   const { affiliateStatsQuery, affiliateMetadataQuery } = useAffiliatesInfo(dydxAddress);
   const { data: accountStats } = affiliateStatsQuery;
   const { data: affiliateMetadata } = affiliateMetadataQuery;
+  const { affiliateProgramFaq } = useURLConfigs();
 
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
@@ -73,7 +75,9 @@ export const AffiliatesPage = () => {
 
   const myReferralStats = dydxAddress && (
     <div tw="flexColumn w-full gap-1">
-      <span tw="text-color-text-1 font-base-bold">My Referral Stats</span>
+      <span tw="text-color-text-1 font-base-bold">
+        {stringGetter({ key: STRING_KEYS.MY_REFERRAL_STATS })}
+      </span>
 
       <div tw="row flex-1 gap-0.75">
         <$StatBox>
@@ -130,7 +134,7 @@ export const AffiliatesPage = () => {
             {stringGetter({ key: STRING_KEYS.AFFILIATES_PROGRAM_DESCRIPTION })}{' '}
           </span>
 
-          <Link isInline isAccent>
+          <Link isInline isAccent href={affiliateProgramFaq}>
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
           </Link>
         </div>
@@ -148,7 +152,7 @@ export const AffiliatesPage = () => {
     </div>
   );
 
-  const newAffiliatesPage = (
+  const affiliateStatsSection = (
     <>
       {affiliateTitleSection}
       {dydxAddress ? (
@@ -165,7 +169,7 @@ export const AffiliatesPage = () => {
           myReferralStats
         )
       ) : (
-        <ConnectWallet />
+        <AffiliateEmptyState toggleCriteria={toggleCriteria} />
       )}
     </>
   );
@@ -195,7 +199,7 @@ export const AffiliatesPage = () => {
   return (
     <$Page tw="flex flex-col gap-1">
       <$Section tw="flex flex-col gap-1 px-1 pt-1">
-        {newAffiliatesPage}
+        {affiliateStatsSection}
         {tableTabs}
       </$Section>
     </$Page>
@@ -229,13 +233,27 @@ const $StatLabel = styled.span`
   font: var(--font-base-medium);
 `;
 
-const ConnectWallet = () => {
+const AffiliateEmptyState = ({ toggleCriteria }: { toggleCriteria: () => void }) => {
   const stringGetter = useStringGetter();
 
   return (
     <div tw="h-full rounded-0.625 bg-color-layer-3">
       <div tw="flex flex-col items-center justify-center gap-y-1 px-4 py-2 text-center">
-        <p>{stringGetter({ key: STRING_KEYS.AFFILIATE_CONNECT_WALLET })}</p>
+        <span>
+          {stringGetter({ key: STRING_KEYS.AFFILIATE_CONNECT_WALLET })}{' '}
+          <Link
+            isInline
+            href="#"
+            isAccent
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleCriteria();
+            }}
+          >
+            {stringGetter({ key: STRING_KEYS.AFFILIATE_TIERS_CRITERIA })} →
+          </Link>
+        </span>
         <OnboardingTriggerButton />
       </div>
     </div>
