@@ -69,7 +69,7 @@ const useTurnkeyAuthContext = () => {
   const stringGetter = useStringGetter();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
-  const { indexedDbClient, authIframeClient, passkeyClient } = useTurnkey();
+  const { indexedDbClient, authIframeClient, passkeyClient, turnkey } = useTurnkey();
   const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
@@ -572,6 +572,39 @@ const useTurnkeyAuthContext = () => {
 
   /* ----------------------------- Passkey Sign In ----------------------------- */
 
+  const registerPasskey = useCallback(async () => {
+    try {
+      if (!passkeyClient || !indexedDbClient || !turnkey) {
+        throw new Error('Passkey client is not available');
+      }
+
+      const passkey = await passkeyClient.createUserPasskey({
+        rp: {
+          id: 'dydx.trade',
+          name: '2FA Passkey',
+        },
+      });
+
+      const session = await turnkey.getSession();
+      if (!session || !passkey?.encodedChallenge || !passkey?.attestation) {
+        throw new Error('No session found');
+      }
+
+      await indexedDbClient.addUserAuth({
+        userId: session.userId,
+        authenticators: [
+          {
+            authenticatorName: 'Passkey',
+            challenge: passkey.encodedChallenge,
+            attestation: passkey.attestation,
+          },
+        ],
+      });
+    } catch (error) {
+      logBonsaiError('TurnkeyOnboarding', 'Error registering passkey', { error });
+    }
+  }, [passkeyClient, indexedDbClient, turnkey]);
+
   const signInWithPasskey = useCallback(async () => {
     try {
       if (!passkeyClient) {
@@ -682,6 +715,7 @@ const useTurnkeyAuthContext = () => {
     signInWithOauth,
     signInWithOtp,
     signInWithPasskey,
+    registerPasskey,
     resetEmailSignInStatus,
   };
 };

@@ -2,6 +2,8 @@ import { ReactNode, useCallback, useMemo } from 'react';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 
+import { useTurnkeyAuth } from '@/providers/TurnkeyAuthProvider';
+
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
@@ -13,6 +15,8 @@ export const SetupPasskeyDialog = ({
   onClose: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
+  const { registerPasskey } = useTurnkeyAuth();
+
   const modifiedSetIsOpen = useCallback(
     (isOpen: boolean) => {
       setIsOpen(isOpen);
@@ -83,6 +87,10 @@ export const SetupPasskeyDialog = ({
             css={{
               color: 'var(--dialog-backgroundColor, var(--text-color-text-0))',
             }}
+            onClick={() => {
+              registerPasskey();
+              modifiedSetIsOpen(false);
+            }}
           >
             <Icon tw="size-1.5" iconName={IconName.Passkey} />
             <span>Setup Passkey</span>
@@ -93,6 +101,7 @@ export const SetupPasskeyDialog = ({
             type={ButtonType.Button}
             action={ButtonAction.Navigation}
             size={ButtonSize.BasePlus}
+            onClick={() => modifiedSetIsOpen(false)}
           >
             Skip
           </Button>
