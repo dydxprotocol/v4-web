@@ -12,6 +12,7 @@ import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import { CHAIN_INFO } from '@/constants/chains';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
@@ -1097,14 +1098,21 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 },
               }),
               toastSensitivity: 'foreground',
-              // TODO: figure this out -- where do we get the explorer link from?
-              // actionDescription: 'View Transaction',
-              // renderActionSlot: () =>
-              //   newDeposits[0]?.explorerLink && (
-              //     <Link href={newDeposits[0]?.explorerLink} isAccent>
-              //       View Transaction
-              //     </Link>
-              //   ),
+              actionDescription: 'View Transaction',
+              renderActionSlot: () => {
+                const chainInfo = CHAIN_INFO[newDeposits[0]!.chain_id];
+                return (
+                  chainInfo?.explorerBaseUrl &&
+                  newDeposits[0]?.transaction_hash && (
+                    <Link
+                      href={`${chainInfo.explorerBaseUrl}/tx/${newDeposits[0]!.transaction_hash}`}
+                      isAccent
+                    >
+                      View Transaction
+                    </Link>
+                  )
+                );
+              },
             },
             updateKey: [newDeposits],
           });
