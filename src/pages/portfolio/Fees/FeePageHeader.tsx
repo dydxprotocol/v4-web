@@ -35,6 +35,8 @@ export const FeePageHeader = () => {
   const stringGetter = useStringGetter();
   const userStats = useAppSelector(BonsaiCore.account.stats.data);
   const feeTiers = useAppSelector(BonsaiCore.configs.feeTiers);
+  const stakingTiers = useAppSelector(BonsaiCore.configs.stakingTiers);
+  const hasStakingTiers = stakingTiers != null && stakingTiers.length > 0;
   const { referredBy } = useSubaccount();
   const { dydxAddress } = useAccounts();
   const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
@@ -63,6 +65,69 @@ export const FeePageHeader = () => {
   const onStakeMore = () => {
     dispatch(openDialog(DialogTypes.Stake()));
   };
+
+  const stakingTierDetails = hasStakingTiers ? (
+    <div tw="flex flex-row">
+      <$FeesDetails
+        layout="rowColumns"
+        withSeparators
+        tw="rounded-r-0 pr-0"
+        items={[
+          {
+            key: 'staking-tier',
+            label: stringGetter({ key: STRING_KEYS.STAKING_TIER }),
+            value: currentStakingDiscountLevel
+              ? stringGetter({
+                  key: STRING_KEYS.LEVEL_N,
+                  params: { LEVEL: currentStakingDiscountLevel },
+                })
+              : stringGetter({ key: STRING_KEYS.NONE }),
+          },
+          {
+            key: 'staking-discount',
+            label: stringGetter({ key: STRING_KEYS.STAKING_FEE_DISCOUNT }),
+            value: stringGetter({
+              key: STRING_KEYS.PERCENT_OFF_FEES,
+              params: {
+                PERCENT: formatNumberOutput(stakingTierDiscountPercent, OutputType.Percent, {
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                }),
+              },
+            }),
+          },
+          {
+            key: 'staked-dydx',
+            label: stringGetter({ key: STRING_KEYS.STAKED_DYDX }),
+            value: (
+              <Output
+                tw="row gap-0.25"
+                type={OutputType.Asset}
+                value={stakedTokens}
+                fractionDigits={2}
+                slotLeft={stakedTokens ? <AssetIcon symbol="DYDX" /> : undefined}
+              />
+            ),
+          },
+        ]}
+      />
+      <div tw="row rounded-[0.625rem] rounded-l-0 bg-color-layer-3 pr-1.5">
+        <Button
+          shape={ButtonShape.Pill}
+          action={ButtonAction.Primary}
+          css={{
+            color: dydxAddress == null ? 'var(--color-text-0)' : 'var(--color-layer-0)',
+          }}
+          onClick={onStakeMore}
+          state={{ isDisabled: dydxAddress == null }}
+        >
+          <Icon iconName={IconName.Deposit2} />
+          {stringGetter({ key: STRING_KEYS.STAKE_MORE })}
+        </Button>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div tw="flex flex-row gap-1">
@@ -140,66 +205,7 @@ export const FeePageHeader = () => {
         ]}
       />
 
-      <div tw="flex flex-row">
-        <$FeesDetails
-          layout="rowColumns"
-          withSeparators
-          tw="rounded-r-0 pr-0"
-          items={[
-            {
-              key: 'staking-tier',
-              label: stringGetter({ key: STRING_KEYS.STAKING_TIER }),
-              value: currentStakingDiscountLevel
-                ? stringGetter({
-                    key: STRING_KEYS.LEVEL_N,
-                    params: { LEVEL: currentStakingDiscountLevel },
-                  })
-                : stringGetter({ key: STRING_KEYS.NONE }),
-            },
-            {
-              key: 'staking-discount',
-              label: stringGetter({ key: STRING_KEYS.STAKING_FEE_DISCOUNT }),
-              value: stringGetter({
-                key: STRING_KEYS.PERCENT_OFF_FEES,
-                params: {
-                  PERCENT: formatNumberOutput(stakingTierDiscountPercent, OutputType.Percent, {
-                    decimalSeparator,
-                    groupSeparator,
-                    selectedLocale,
-                  }),
-                },
-              }),
-            },
-            {
-              key: 'staked-dydx',
-              label: stringGetter({ key: STRING_KEYS.STAKED_DYDX }),
-              value: (
-                <Output
-                  tw="row gap-0.25"
-                  type={OutputType.Asset}
-                  value={stakedTokens}
-                  fractionDigits={2}
-                  slotLeft={stakedTokens ? <AssetIcon symbol="DYDX" /> : undefined}
-                />
-              ),
-            },
-          ]}
-        />
-        <div tw="row rounded-[0.625rem] rounded-l-0 bg-color-layer-3 pr-1.5">
-          <Button
-            shape={ButtonShape.Pill}
-            action={ButtonAction.Primary}
-            css={{
-              color: dydxAddress == null ? 'var(--color-text-0)' : 'var(--color-layer-0)',
-            }}
-            onClick={onStakeMore}
-            state={{ isDisabled: dydxAddress == null }}
-          >
-            <Icon iconName={IconName.Deposit2} />
-            {stringGetter({ key: STRING_KEYS.STAKE_MORE })}
-          </Button>
-        </div>
-      </div>
+      {stakingTierDetails}
     </div>
   );
 };
