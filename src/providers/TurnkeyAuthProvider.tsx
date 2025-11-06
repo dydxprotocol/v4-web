@@ -335,37 +335,48 @@ const useTurnkeyAuthContext = () => {
     [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
   );
 
-  const handlePasskeyResponse = async ({ response }: { response: TurnkeyOAuthResponse }) => {
-    const { salt, dydxAddress: uploadedDydxAddress } = response as {
-      salt?: string;
-      dydxAddress?: string;
-    };
+  const handlePasskeyResponse = useCallback(
+    async ({ response }: { response: TurnkeyOAuthResponse }) => {
+      const { salt, dydxAddress: uploadedDydxAddress } = response as {
+        salt?: string;
+        dydxAddress?: string;
+      };
 
-    if (!passkeyClient) {
-      throw new Error('Passkey client is not available');
-    }
-    const derivedDydxAddress = await onboardDydx({
-      salt,
-      setWalletFromSignature,
-      tkClient: indexedDbClient,
-    });
+      if (!passkeyClient) {
+        throw new Error('Passkey client is not available');
+      }
+      const derivedDydxAddress = await onboardDydx({
+        salt,
+        setWalletFromSignature,
+        tkClient: indexedDbClient,
+      });
 
-    if (uploadedDydxAddress === '' && derivedDydxAddress) {
-      try {
-        await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
-      } catch (uploadAddressError) {
-        if (
-          uploadAddressError instanceof Error &&
-          !uploadAddressError.message.includes('Dydx address already uploaded')
-        ) {
-          throw uploadAddressError;
+      if (uploadedDydxAddress === '' && derivedDydxAddress) {
+        try {
+          await uploadAddress({ tkClient: indexedDbClient, dydxAddress: derivedDydxAddress });
+        } catch (uploadAddressError) {
+          if (
+            uploadAddressError instanceof Error &&
+            !uploadAddressError.message.includes('Dydx address already uploaded')
+          ) {
+            throw uploadAddressError;
+          }
         }
       }
-    }
 
-    setEmailSignInStatus('success');
-    setEmailSignInError(undefined);
-  };
+      setEmailSignInStatus('success');
+      setEmailSignInError(undefined);
+    },
+    [
+      onboardDydx,
+      indexedDbClient,
+      setWalletFromSignature,
+      uploadAddress,
+      setEmailSignInStatus,
+      setEmailSignInError,
+      passkeyClient,
+    ]
+  );
 
   /* ----------------------------- Email Sign In ----------------------------- */
 
@@ -561,7 +572,7 @@ const useTurnkeyAuthContext = () => {
 
   /* ----------------------------- Passkey Sign In ----------------------------- */
 
-  const signInWithPasskey = async () => {
+  const signInWithPasskey = useCallback(async () => {
     try {
       if (!passkeyClient) {
         throw new Error('Passkey client is not available');
@@ -600,7 +611,7 @@ const useTurnkeyAuthContext = () => {
     } catch (error) {
       logBonsaiError('TurnkeyOnboarding', 'Error signing in with passkey', { error });
     }
-  };
+  }, [passkeyClient, indexedDbClient, fetchCredentialId, sendSignInRequest]);
 
   /* ----------------------------- Side Effects ----------------------------- */
 
