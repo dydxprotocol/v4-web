@@ -22,6 +22,7 @@ import { openDialog } from '@/state/dialogs';
 import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletSelectors';
 
 import { calc } from '@/lib/do';
+import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
 
 export const EmailSignInStatusDialog = ({
@@ -204,13 +205,15 @@ export const EmailSignInStatusDialog = ({
 
           if (showWelcomeContent) {
             await sleep(0);
-            dispatch(
-              openDialog(
-                DialogTypes.SetupPasskey({
-                  onClose: () => dispatch(openDialog(DialogTypes.Deposit2({}))),
-                })
-              )
-            );
+            if (testFlags.enablePasskeyAuth) {
+              dispatch(
+                openDialog(
+                  DialogTypes.SetupPasskey({
+                    onClose: () => dispatch(openDialog(DialogTypes.Deposit2({}))),
+                  })
+                )
+              );
+            }
           }
         }}
       >
