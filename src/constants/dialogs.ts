@@ -112,7 +112,7 @@ export type WithdrawFromSubaccountDialogProps = {};
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: bigint;
-  userTier?: number | 'vip';
+  userTier?: number;
 };
 export type CoinbaseDepositDialogProps = {
   onBack?: () => void;

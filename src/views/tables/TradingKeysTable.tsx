@@ -17,7 +17,7 @@ import { AccountAuthenticator } from '@/constants/validators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
@@ -99,7 +99,7 @@ export const TradingKeysTable = ({
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
   --tableStickyRow-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
   --computed-radius: 1rem;
