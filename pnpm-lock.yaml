@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.1.1
-    version: 3.1.1
+    specifier: 3.0.7
+    version: 3.0.7
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.350
-    version: 1.1.350
+    specifier: 1.1.346
+    version: 1.1.346
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -1659,8 +1659,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.1.1:
-    resolution: {integrity: sha512-ZSAN030x+LBei1lbdJ4TLSFLXNlqI99+LIq1TO2soeircH3TZr/UzJR2TArrj0fmQQBTPto7qqVdQRQacvPCng==}
+  /@dydxprotocol/v4-client-js@3.0.7:
+    resolution: {integrity: sha512-zSNMstCW8BR//BmbbGQZyXdXH/3d1j+ASO4cjsEssiWNVIlS8IT5E//D3Q36c3blabJB3ONadvBJmrvkiRV8pA==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1669,7 +1669,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.4.0-rc.0
+      '@dydxprotocol/v4-proto': 9.0.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -1690,8 +1690,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.350:
-    resolution: {integrity: sha512-2Jv4zvGNNqhFasJbFhNmJjWmiVtZIL5dk9J75SZlIdxgNO05PmSnSK9MjfSPAdJodwWv0AiaJpy7osSLDacTrg==}
+  /@dydxprotocol/v4-localization@1.1.346:
+    resolution: {integrity: sha512-GFEb0wA+dP73SLjYRw94fWqE4VPyLZGdeYuHVi+OwttSHsmFT8utbNgU1d5E52LxSGa4tcGQ9qcWIgwAHU2rHA==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
@@ -1700,8 +1700,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@9.4.0-rc.0:
-    resolution: {integrity: sha512-1vtvGAdX2U6PWiDEYbNA253fB4m53eAQsmC/4hquy7rRGTam/33YdrKKDPtGCIByFbXSt/P9pegg+F4HZ7MrBQ==}
+  /@dydxprotocol/v4-proto@9.0.0:
+    resolution: {integrity: sha512-2ICtvYx90aYxeIxzWB3Fs3krra/wWw6zf5mxVEplXU51JX/Gtbv/LY5A6WWxl1tPQ1Wl8PUMO8IzN1Y3e8Zhvg==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -3962,7 +3962,7 @@ packages:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
+      '@scure/base': 1.1.9
       '@types/debug': 4.1.12
       '@types/lodash': 4.17.20
       debug: 4.4.3(supports-color@8.1.1)
@@ -16831,7 +16831,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.3.4
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -17335,7 +17335,7 @@ packages:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -21121,10 +21121,10 @@ packages:
         optional: true
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
-      '@noble/curves': 1.9.7
+      '@noble/curves': 1.8.1
       '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.9.3)
       eventemitter3: 5.0.1
       typescript: 5.9.3
@@ -21336,7 +21336,7 @@ packages:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.3.4
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -22001,7 +22001,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.3.4
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -23520,7 +23520,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.3.4
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color

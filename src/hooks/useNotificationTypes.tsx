@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 // eslint-disable-next-line no-restricted-imports
-import { selectAccountBalances, selectAccountNobleUsdcBalance } from '@/bonsai/selectors/balances';
+import { useDepositStatus } from '@/bonsai/rest/depositStatus';
+// eslint-disable-next-line no-restricted-imports
+import { selectAccountBalances } from '@/bonsai/selectors/balances';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
@@ -1033,59 +1035,82 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { dydxAddress } = useAccounts();
-      const nobleBalance = useAppSelector(selectAccountNobleUsdcBalance);
       const { usdcAmount } = useAppSelector(selectAccountBalances);
 
+      const depositStatus = useDepositStatus();
+
       // refs to track previous values across renders
-      const prevNobleBalanceRef = useRef<string | undefined>(undefined);
+      const prevDepositIdsRef = useRef<Set<string>>(new Set());
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
 
-      const NOTIFICATION_DEBOUNCE = 3000; // 3 seconds
+      const NOTIFICATION_DEBOUNCE = 10000; // 10 seconds
 
-      // Stage 1: Watch for Noble balance increases (QR deposit received)
+      // Stage 1: Watch for deposit from backend
       useEffect(() => {
-        if (!dydxAddress || !nobleBalance) return;
+        if (!dydxAddress || !depositStatus.data?.deposits.results) return;
 
+        const incomingDeposits = depositStatus.data.deposits.results;
         const now = Date.now();
-        const prevNoble = prevNobleBalanceRef.current;
 
-        // Initialize on first run
-        if (!prevNoble) {
-          prevNobleBalanceRef.current = nobleBalance;
-          return;
+        const recentDeposits = incomingDeposits.filter((deposit) => {
+          // Handle both timestamp formats
+          const depositTimestamp =
+            typeof deposit.created_at === 'number'
+              ? deposit.created_at
+              : new Date(deposit.created_at).getTime();
+
+          const depositAge = now - depositTimestamp;
+
+          return depositAge >= 0 && depositAge <= 2 * timeUnits.minute;
+        });
+
+        if (recentDeposits.length === 0) return;
+
+        const prevDepositIds = prevDepositIdsRef.current;
+
+        const newDeposits = recentDeposits.filter((deposit) => !prevDepositIds.has(deposit.id));
+
+        if (newDeposits.length === 0) return;
+
+        newDeposits.forEach((deposit) => {
+          prevDepositIds.add(deposit.id);
+        });
+
+        if (now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+          trigger({
+            id: `deposit-noble-${Date.now()}`,
+            displayData: {
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
+              groupKey: `deposit-${Date.now()}`,
+              slotTitleLeft: (
+                <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
+              ),
+              title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
+              body: stringGetter({
+                key: STRING_KEYS.DEPOSIT_DETECTED_BODY,
+                params: {
+                  AMOUNT: newDeposits
+                    .reduce((acc, deposit) => acc.plus(deposit.amount), BIG_NUMBERS.ZERO)
+                    .toFixed(2),
+                  ASSET: 'USDC',
+                },
+              }),
+              toastSensitivity: 'foreground',
+              // TODO: figure this out -- where do we get the explorer link from?
+              // actionDescription: 'View Transaction',
+              // renderActionSlot: () =>
+              //   newDeposits[0]?.explorerLink && (
+              //     <Link href={newDeposits[0]?.explorerLink} isAccent>
+              //       View Transaction
+              //     </Link>
+              //   ),
+            },
+            updateKey: [newDeposits],
+          });
+          lastNotificationTimeRef.current = now;
         }
-
-        // Check if balance increased
-        const prevBN = MaybeBigNumber(prevNoble);
-        const currBN = MaybeBigNumber(nobleBalance);
-
-        if (prevBN && currBN && currBN.gt(prevBN)) {
-          const diff = currBN.minus(prevBN);
-          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
-            trigger({
-              id: `deposit-noble-${Date.now()}`,
-              displayData: {
-                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                groupKey: `deposit-${Date.now()}`,
-                slotTitleLeft: <Icon iconName={IconName.Signal} />,
-                title: 'Deposit Detected',
-                body: 'Your deposit will arrive in ~30 seconds.',
-                // TODO: figure this out -- where do we get the explorer link from?
-                // actionDescription: 'View Transaction',
-                // renderActionSlot: () => (
-                //   <Link href={deposit.explorerLink} isAccent>
-                //     View Transaction
-                //   </Link>
-                // ),
-              },
-            });
-            lastNotificationTimeRef.current = now;
-          }
-        }
-
-        prevNobleBalanceRef.current = nobleBalance;
-      }, [dydxAddress, nobleBalance, trigger]);
+      }, [dydxAddress, trigger, depositStatus, stringGetter]);
 
       // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
       useEffect(() => {
@@ -1109,9 +1134,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
             trigger({
               id: `deposit-wallet-${now}`,
               displayData: {
-                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
                 groupKey: `deposit-${now}`,
-                icon: <Icon iconName={IconName.CheckCircle} />,
+                icon: <Icon iconName={IconName.CheckCircle} size="1.25rem" />,
                 title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
                 body: stringGetter({
                   key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
@@ -1128,7 +1153,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         prevWalletBalanceRef.current = usdcAmount;
-      }, [dydxAddress, usdcAmount, trigger]);
+      }, [dydxAddress, usdcAmount, trigger, stringGetter]);
+
+      // Clean up old deposit IDs every couple minutes to prevent memory bloat
+      useEffect(() => {
+        const cleanupInterval = setInterval(() => {
+          const now = Date.now();
+          const recentDeposits = depositStatus.data?.deposits.results.filter((deposit) => {
+            return now - new Date(deposit.created_at).getTime() <= 240000; // Keep IDs for deposits in last 4 minutes
+          });
+          prevDepositIdsRef.current = new Set(recentDeposits?.map((d) => d.id) ?? []);
+        }, 240000); // Clean up every 4 minutes
+
+        return () => clearInterval(cleanupInterval);
+      }, [depositStatus]);
     },
     useNotificationAction: () => {
       return () => {};
