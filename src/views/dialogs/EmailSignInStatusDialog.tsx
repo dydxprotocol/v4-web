@@ -69,11 +69,11 @@ export const EmailSignInStatusDialog = ({
         error: stringGetter({ key: STRING_KEYS.ERROR_LOGGING_IN }),
         success: isTurnkey
           ? stringGetter({
-            key: STRING_KEYS.LOGGED_IN_WITH,
-            params: {
-              EMAIL: walletInfo.userEmail,
-            },
-          })
+              key: STRING_KEYS.LOGGED_IN_WITH,
+              params: {
+                EMAIL: walletInfo.userEmail,
+              },
+            })
           : stringGetter({ key: STRING_KEYS.LOGGED_IN }),
         idle: stringGetter({ key: STRING_KEYS.LOGGING_IN }),
       })[emailSignInStatus],
@@ -96,17 +96,17 @@ export const EmailSignInStatusDialog = ({
       const iconStyles =
         emailSignInStatus === 'success'
           ? {
-            width: '1rem',
-            height: '1rem',
-            minWidth: '1rem',
-            minHeight: '1rem',
-          }
+              width: '1rem',
+              height: '1rem',
+              minWidth: '1rem',
+              minHeight: '1rem',
+            }
           : {
-            width: '2rem',
-            height: '2rem',
-            minWidth: '2rem',
-            minHeight: '2rem',
-          };
+              width: '2rem',
+              height: '2rem',
+              minWidth: '2rem',
+              minHeight: '2rem',
+            };
 
       if (isTurnkey) {
         const { providerName } = walletInfo;
