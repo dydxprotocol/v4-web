@@ -7,6 +7,7 @@
     "apply:migration": "squid-typeorm-migration apply",
     "build": "rm -rf lib && tsc",
     "start": "node -r dotenv/config lib/main.js",
+    "populate:events": "ts-node e2e/populate-events.ts",
     "start:ci": "node -r dotenv/config lib/main.js dotenv_config_path=.env.ci",
     "test": "vitest run"
   },

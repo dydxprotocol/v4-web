@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $# -ne 1 ]; then
+    echo "Usage: ./e2e/run.sh <populate-events-script>"
+    exit 1
+fi
+
 echo "Starting the fuel node"
 FUEL_NODE_OUT=`(pnpm --filter starboard/contracts run:node 2>&1 &) | grep -m 1 "Node is up" | wc -l`
 if [ "$FUEL_NODE_OUT" -ne "1" ]; then
@@ -37,6 +42,9 @@ if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" 
     exit 1
 fi
 
+echo "Populating events"
+ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
+echo "Events populated"
 
 echo "Launch Postgres database to store the data"
 docker compose up -d
@@ -61,7 +69,6 @@ else
     VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} pnpm start:ci 2>&1 | tee indexer.log > /dev/null &
     SQD_INDEXER_PID=$!
     SQD_INDEXER_OUT=`tail -f -n +1 indexer.log | grep -m 1 "Indexer run started" | wc -l`
-    echo SQD_INDEXER_OUT $SQD_INDEXER_OUT $SQD_INDEXER_PID
     if [ "$SQD_INDEXER_OUT" -ne "1" ]; then
         echo "squid indexer failed to start"
         cat indexer.log
@@ -72,10 +79,13 @@ else
         cat indexer.log
         EXIT_CODE=1
     fi
+
+    sleep 5
     
     echo "APPLIED"
 fi
 
+##################### closing #########################################################
 
 echo "clean up the squid indexer"
 kill $SQD_INDEXER_PID
