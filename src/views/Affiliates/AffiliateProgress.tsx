@@ -24,7 +24,6 @@ export const AffiliateProgress = ({ volume }: { volume?: number }) => {
               },
             })}
           </li>
-
           <li>
             {stringGetter({
               key: STRING_KEYS.REFEREE_BENEFITS,
