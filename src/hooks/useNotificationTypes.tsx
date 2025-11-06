@@ -54,7 +54,6 @@ import {
   selectReclaimableChildSubaccountFunds,
   selectShouldAccountRebalanceUsdc,
 } from '@/state/accountSelectors';
-import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import {
@@ -1114,12 +1113,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 groupKey: `deposit-${now}`,
                 icon: <Icon iconName={IconName.CheckCircle} />,
                 title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
-                body: stringGetter({ 
-                  key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY, 
-                  params: { 
-                    AMOUNT: diff.toFixed(2), 
-                    ASSET: 'USDC' 
-                  }
+                body: stringGetter({
+                  key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
+                  params: {
+                    AMOUNT: diff.toFixed(2),
+                    ASSET: 'USDC',
+                  },
                 }),
                 toastSensitivity: 'foreground',
               },
