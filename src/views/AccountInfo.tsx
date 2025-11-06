@@ -49,6 +49,7 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
 };
 const $DisconnectedAccountInfoContainer = styled.div`
   margin: auto;
+  padding: 1rem;
 
   ${layoutMixins.column}
   justify-items: center;
@@ -64,7 +65,4 @@ const $DisconnectedAccountInfoContainer = styled.div`
 
 const $AccountInfoSectionContainer = styled.div`
   ${layoutMixins.column}
-
-  height: var(--account-info-section-height);
-  min-height: var(--account-info-section-height);
 `;

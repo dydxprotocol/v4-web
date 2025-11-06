@@ -43,11 +43,11 @@ import { MustBigNumber, MustNumber } from '@/lib/numbers';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 import { orEmptyObj } from '@/lib/typeUtils';
 
-import { getTokenSymbol } from '../utils';
+import { getTokenSymbol } from '../../utils';
+import { DepositStep, useDepositSteps } from '../depositHooks';
+import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from '../queries';
 import { AmountInput } from './AmountInput';
 import { DepositSteps } from './DepositSteps';
-import { DepositStep, useDepositSteps } from './depositHooks';
-import { isInstantDeposit, useBalance, useDepositDeltas, useDepositRoutes } from './queries';
 
 export const DepositForm = ({
   onTokenSelect,

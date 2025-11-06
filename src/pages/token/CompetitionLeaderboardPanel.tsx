@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
+import { ChaosLabsCompetitionItem, useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
 import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -24,15 +24,16 @@ import { truncateAddress } from '@/lib/wallet';
 export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
+  PNL = 'PNL',
   Rewards = 'Rewards',
 }
 
-export const RewardsLeaderboardPanel = () => {
+export const CompetitionLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
-  const { data, isLoading } = useChaosLabsPointsDistribution();
+  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
   const { dydxAddress } = useAccounts();
 
-  const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.rank, []);
+  const getRowKey = useCallback((row: ChaosLabsCompetitionItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -43,13 +44,26 @@ export const RewardsLeaderboardPanel = () => {
       })
   );
 
+  const data = (topPnls ?? []).reduce((acc, entry) => {
+    return [
+      ...acc,
+      {
+        rank: entry.position,
+        account: entry.address,
+        dollarReward: entry.dollarReward,
+        pnl: +entry.pnl,
+      },
+    ];
+  }, [] as ChaosLabsCompetitionItem[]);
+
   const onDownload = () => {
-    if (!data) return;
+    if (data.length === 0) return;
 
     const csvRows = data.map((item) => ({
       rank: item.rank,
       address: item.account,
-      estimatedRewards: item.estimatedDydxRewards,
+      pnl: item.pnl,
+      dollarRewards: item.dollarReward,
     }));
 
     exportCSV(csvRows, {
@@ -64,8 +78,12 @@ export const RewardsLeaderboardPanel = () => {
           displayLabel: stringGetter({ key: STRING_KEYS.TRADER }),
         },
         {
-          key: 'estimatedRewards',
-          displayLabel: stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS }),
+          key: 'pnl',
+          displayLabel: stringGetter({ key: STRING_KEYS.PNL }),
+        },
+        {
+          key: 'dollarReward',
+          displayLabel: stringGetter({ key: STRING_KEYS.REWARDS }),
         },
       ],
     });
@@ -76,7 +94,7 @@ export const RewardsLeaderboardPanel = () => {
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
           <div tw="font-medium-bold">
-            {stringGetter({ key: STRING_KEYS.SURGE_LEADERBOARD_TITLE })}
+            {stringGetter({ key: STRING_KEYS.COMPETITION_LEADERBOARD_TITLE })}
           </div>
           <button
             onClick={onDownload}
@@ -90,7 +108,7 @@ export const RewardsLeaderboardPanel = () => {
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
             label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-            data={data ?? []}
+            data={data}
             tableId="trading-rewards"
             getRowKey={getRowKey}
             columns={columns}
@@ -184,7 +202,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsLeaderboardItem> => ({
+}): ColumnDef<ChaosLabsCompetitionItem> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -241,24 +259,40 @@ const getRewardsLeaderboardTableColumnDef = ({
           </div>
         ),
       },
-      [RewardsLeaderboardTableColumns.Rewards]: {
-        columnKey: RewardsLeaderboardTableColumns.Rewards,
-        getCellValue: (row) => row.estimatedDydxRewards,
+      [RewardsLeaderboardTableColumns.PNL]: {
+        columnKey: RewardsLeaderboardTableColumns.PNL,
+        getCellValue: (row) => row.pnl,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
+            {stringGetter({ key: STRING_KEYS.PNL })}
           </div>
         ),
-        renderCell: ({ estimatedDydxRewards, account }) => (
+        renderCell: ({ pnl }) => (
           <Output
-            slotRight=" DYDX"
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            css={{ color: pnl >= 0 ? 'var(--color-positive)' : 'var(--color-negative)' }}
             tw="text-small font-medium"
-            type={OutputType.Number}
-            value={estimatedDydxRewards}
+            type={OutputType.Fiat}
+            value={pnl}
           />
         ),
       },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsLeaderboardItem>>
+      [RewardsLeaderboardTableColumns.Rewards]: {
+        columnKey: RewardsLeaderboardTableColumns.Rewards,
+        getCellValue: (row) => row.dollarReward,
+        label: (
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.PRIZE })}
+          </div>
+        ),
+        renderCell: ({ dollarReward, account }) => (
+          <Output
+            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            tw="text-small font-medium"
+            type={OutputType.Fiat}
+            value={dollarReward}
+          />
+        ),
+      },
+    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsCompetitionItem>>
   )[key],
 });

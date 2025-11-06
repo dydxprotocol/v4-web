@@ -60,9 +60,16 @@ export const MarketsCompactTable = ({
               logo,
               initialMarginFraction,
               name,
+              displayId,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
+                configs={{
+                  logo,
+                  effectiveInitialMarginFraction,
+                  initialMarginFraction,
+                  id,
+                  displayId,
+                }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName
@@ -136,9 +143,16 @@ export const MarketsCompactTable = ({
               logo,
               initialMarginFraction,
               name,
+              displayId,
             }: MarketData) => (
               <AssetTableCell
-                configs={{ logo, effectiveInitialMarginFraction, initialMarginFraction, id }}
+                configs={{
+                  logo,
+                  effectiveInitialMarginFraction,
+                  initialMarginFraction,
+                  id,
+                  displayId,
+                }}
                 name={name}
                 symbol={assetId}
                 truncateAssetName

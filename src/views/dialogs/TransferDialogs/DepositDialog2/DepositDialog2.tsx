@@ -7,7 +7,7 @@ import { DepositDialog2Props, DialogProps, DialogTypes } from '@/constants/dialo
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
+import { TokenBalance, TokenForTransfer, USDC_ADDRESSES, USDC_DECIMALS } from '@/constants/tokens';
 import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -15,21 +15,29 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { addDeposit, Deposit } from '@/state/transfers';
 import { SourceAccount } from '@/state/wallet';
 
-import { DepositForm } from './DepositForm';
-import { DepositStatus } from './DepositStatus';
-import { QrDeposit } from './QrDeposit';
-import { TokenSelect } from './TokenSelect';
+import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
+import { useDepositTokenBalances } from './queries';
 
-function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
+function getDefaultToken(
+  sourceAccount: SourceAccount,
+  highestBalance?: TokenBalance
+): TokenForTransfer {
   if (!sourceAccount.chain) throw new Error('No user chain detected');
 
-  // TODO(deposit2.0): Use user's biggest balance as the default token
+  if (highestBalance && highestBalance.decimals != null) {
+    return {
+      chainId: highestBalance.chainId,
+      decimals: highestBalance.decimals,
+      denom: highestBalance.denom,
+    };
+  }
+
   if (sourceAccount.chain === WalletNetworkType.Evm) {
     return {
       chainId: mainnet.id.toString(),
@@ -53,15 +61,11 @@ function getDefaultToken(sourceAccount: SourceAccount): TokenForTransfer {
   };
 }
 
-type DepositFormState = 'form' | 'token-select' | 'qr-deposit';
-
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const dispatch = useAppDispatch();
-  const { sourceAccount, dydxAddress } = useAccounts();
-
-  const [amount, setAmount] = useState('');
-  const [token, setToken] = useState<TokenForTransfer>(getDefaultToken(sourceAccount));
-  const [currentDeposit, setCurrentDeposit] = useState<{ txHash: string; chainId: string }>();
+  const { sourceAccount } = useAccounts();
+  const { isLoading: isLoadingBalances, withBalances } = useDepositTokenBalances();
+  const highestBalance = withBalances.at(0);
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
@@ -77,20 +81,8 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     } satisfies Record<DepositFormState, string>
   )[formState];
 
-  const onDeposit = (deposit: Deposit) => {
-    if (!dydxAddress) return;
-
-    setCurrentDeposit({ txHash: deposit.txHash, chainId: deposit.chainId });
-    dispatch(addDeposit({ deposit, dydxAddress }));
-  };
-
   const onShowForm = () => {
     setFormState('form');
-    tokenSelectRef.current?.scroll({ top: 0 });
-  };
-
-  const onShowQrDeposit = () => {
-    setFormState('qr-deposit');
     tokenSelectRef.current?.scroll({ top: 0 });
   };
 
@@ -120,64 +112,19 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       title={dialogTitle}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      {currentDeposit && (
-        <DepositStatus
-          onClose={() => setIsOpen(false)}
-          txHash={currentDeposit.txHash}
-          chainId={currentDeposit.chainId}
-        />
-      )}
-
-      {!currentDeposit && (
-        <div tw="h-full w-full overflow-hidden">
-          <div tw="flex h-full w-[300%]">
-            <div
-              tw="w-[33.33%]"
-              css={{
-                marginLeft:
-                  formState === 'form' ? 0 : formState === 'token-select' ? '-33.33%' : '-66.66%',
-                transition: 'margin 500ms',
-              }}
-            >
-              <DepositForm
-                onDeposit={onDeposit}
-                amount={amount}
-                setAmount={setAmount}
-                token={token}
-                onTokenSelect={() => setFormState('token-select')}
-              />
-            </div>
-
-            <div
-              ref={tokenSelectRef}
-              tw="w-[33.33%] overflow-scroll"
-              css={{
-                pointerEvents: formState !== 'token-select' ? 'none' : undefined,
-                height: formState !== 'token-select' ? 0 : '100%',
-                maxHeight: isMobile ? undefined : '30rem',
-              }}
-            >
-              <TokenSelect
-                disabled={formState !== 'token-select'}
-                onQrDeposit={onShowQrDeposit}
-                token={token}
-                setToken={setToken}
-                onBack={onShowForm}
-              />
-            </div>
-
-            <div
-              tw="w-[33.33%] overflow-scroll"
-              css={{
-                pointerEvents: formState !== 'qr-deposit' ? 'none' : undefined,
-                height: formState !== 'qr-deposit' ? 0 : '100%',
-                maxHeight: isMobile ? undefined : '30rem',
-              }}
-            >
-              <QrDeposit disabled={formState !== 'qr-deposit'} />
-            </div>
-          </div>
+      {isLoadingBalances ? (
+        <div tw="flex h-full w-full items-center justify-center overflow-hidden">
+          <LoadingSpace tw="my-4" />
         </div>
+      ) : (
+        <DepositFormContent
+          defaultToken={getDefaultToken(sourceAccount, highestBalance)}
+          formState={formState}
+          setFormState={setFormState}
+          setIsOpen={setIsOpen}
+          tokenSelectRef={tokenSelectRef}
+          onShowForm={onShowForm}
+        />
       )}
     </$Dialog>
   );

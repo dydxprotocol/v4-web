@@ -1,3 +1,5 @@
+import { MouseEventHandler } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { tableMixins } from '@/styles/tableMixins';
@@ -10,6 +12,7 @@ export const TableCell = ({
   stacked,
   stackedWithSecondaryStyling = stacked,
   isHighlighted,
+  onClick,
 }: {
   className?: string;
   children?: React.ReactNode;
@@ -18,8 +21,20 @@ export const TableCell = ({
   stacked?: boolean;
   isHighlighted?: boolean;
   stackedWithSecondaryStyling?: boolean;
+  onClick?: MouseEventHandler<HTMLDivElement>;
 }) => (
-  <$CellContent isHighlighted={isHighlighted} className={className}>
+  <$CellContent
+    isHighlighted={isHighlighted}
+    className={className}
+    onClick={onClick}
+    css={
+      onClick
+        ? {
+            cursor: 'pointer',
+          }
+        : undefined
+    }
+  >
     {slotLeft}
     {!!stacked || stackedWithSecondaryStyling ? (
       <$Column stackedWithSecondaryStyling={stackedWithSecondaryStyling}>{children}</$Column>

@@ -33,7 +33,7 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
-import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
+import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -49,8 +49,6 @@ export const HeaderDesktop = () => {
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
-
-  const availableBalance = useAppSelector(getSubaccountFreeCollateral);
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
@@ -193,36 +191,36 @@ export const HeaderDesktop = () => {
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
           complianceState === ComplianceStates.FULL_ACCESS && (
-            <>
-              <Button
-                tw="mr-[0.5em]"
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                action={
-                  !availableBalance || availableBalance > 0
-                    ? ButtonAction.Secondary
-                    : ButtonAction.Primary
-                }
-                onClick={() => {
-                  dispatch(openDialog(DialogTypes.Deposit2({})));
-                }}
-                state={{ isDisabled: !dydxAccounts }}
-              >
-                {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-              </Button>
-              <VerticalSeparator />
-            </>
+            <Button
+              tw="mr-[0.5em]"
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              action={ButtonAction.Primary}
+              onClick={() => {
+                dispatch(openDialog(DialogTypes.Deposit2({})));
+              }}
+              state={{ isDisabled: !dydxAccounts }}
+            >
+              <Icon iconName={IconName.Deposit2} size="1rem" />
+              <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
+            </Button>
           )}
 
-        <MobileDownloadLinks />
+        {onboardingState === OnboardingState.AccountConnected ? (
+          <$IconButton
+            shape={ButtonShape.Rectangle}
+            iconName={IconName.Mobile}
+            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
+          />
+        ) : (
+          <MobileDownloadLinks />
+        )}
 
         <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
           onClick={() => dispatch(openDialog(DialogTypes.Help()))}
         />
-
-        <VerticalSeparator />
 
         <NotificationsMenu
           slotTrigger={
@@ -232,8 +230,6 @@ export const HeaderDesktop = () => {
             />
           }
         />
-
-        <VerticalSeparator />
 
         <AccountMenu />
       </$NavAfter>
@@ -316,7 +312,7 @@ const $NavAfter = styled.div`
   justify-self: end;
   padding: 0 0.75rem;
 
-  gap: 0.5rem;
+  gap: 1rem;
 
   a {
     color: var(--color-text-1);
