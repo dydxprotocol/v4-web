@@ -29,6 +29,7 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
+import { TradeFeeDiscountTag } from '@/components/TradeFeeDiscountTag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
@@ -160,6 +161,17 @@ const MarketsDropdownContent = ({
           label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
           renderCell: (row: MarketData) => (
             <$Output type={OutputType.CompactFiat} value={row.marketCap} />
+          ),
+        },
+        {
+          columnKey: 'incentives',
+          getCellValue: (row: MarketData) => row.marketFeeDiscountMultiplier,
+          label: stringGetter({ key: STRING_KEYS.INCENTIVES }),
+          renderCell: (row: MarketData) => (
+            <TradeFeeDiscountTag
+              marketFeeDiscountMultiplier={row.marketFeeDiscountMultiplier}
+              symbol={row.displayId}
+            />
           ),
         },
       ].filter(isTruthy) satisfies ColumnDef<MarketData>[],

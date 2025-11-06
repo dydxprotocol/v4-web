@@ -17,7 +17,7 @@ import { selectDeposit } from '@/state/transfersSelectors';
 
 import { truncateAddress } from '@/lib/wallet';
 
-import { getTokenSymbol } from '../utils';
+import { getTokenSymbol } from '../../utils';
 
 type DepositStatusProps = {
   txHash: string;

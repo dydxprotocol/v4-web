@@ -1,9 +1,7 @@
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 import BigNumber from 'bignumber.js';
-import { partition } from 'lodash';
 import styled, { css } from 'styled-components';
-import { parseUnits } from 'viem';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { CHAIN_INFO } from '@/constants/chains';
@@ -20,8 +18,8 @@ import { Output, OutputType } from '@/components/Output';
 
 import { track } from '@/lib/analytics/analytics';
 
-import { getTokenSymbol } from '../utils';
-import { useBalances } from './queries';
+import { getTokenSymbol } from '../../utils';
+import { useDepositTokenBalances } from '../queries';
 
 export const TokenSelect = ({
   disabled,
@@ -38,31 +36,7 @@ export const TokenSelect = ({
   setToken: Dispatch<SetStateAction<TokenForTransfer>>;
 }) => {
   const stringGetter = useStringGetter();
-  const { isLoading, data } = useBalances();
-
-  const [withBalances, noBalances] = useMemo(() => {
-    if (!data || !data.chains) return [[], []];
-
-    const allBalances: TokenBalance[] = Object.keys(data.chains)
-      .map((chainId) => {
-        const denomToBalance = data.chains?.[chainId]?.denoms;
-        return denomToBalance
-          ? Object.entries(denomToBalance).map(([denom, balance]) => ({
-              chainId,
-              amount: balance.amount,
-              formattedAmount: balance.formattedAmount,
-              denom,
-              decimals: balance.decimals,
-              valueUSD: balance.valueUsd,
-            }))
-          : [];
-      })
-      .flat()
-      // TODO: log when there are no decimals? this shouldnt happen
-      .filter((balance) => balance.decimals);
-
-    return partition(allBalances, (balance) => parseUnits(balance.amount, balance.decimals!) > 0);
-  }, [data]);
+  const { isLoading, withBalances, noBalances } = useDepositTokenBalances();
 
   const onTokenClick = (newToken: TokenForTransfer) => () => {
     setToken(newToken);

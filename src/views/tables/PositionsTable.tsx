@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import {
@@ -22,7 +22,7 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -86,6 +86,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly,
   showClosePositionAction,
   navigateToOrders,
+  navigateToMarket,
   isSinglePosition,
   isTablet,
 }: {
@@ -95,6 +96,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
+  navigateToMarket: (market: string) => void;
   isSinglePosition: boolean;
   isTablet: boolean;
 }) => ({
@@ -213,8 +215,13 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marketSummary?.displayableTicker,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ marketSummary }) => {
-          return <MarketSummaryTableCell marketSummary={marketSummary} />;
+        renderCell: ({ market, marketSummary }) => {
+          return (
+            <MarketSummaryTableCell
+              marketSummary={marketSummary}
+              onClick={() => navigateToMarket(market)}
+            />
+          );
         },
       },
       [PositionsTableColumnKey.Leverage]: {
@@ -432,7 +439,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
 };
 
@@ -448,7 +454,6 @@ export const PositionsTable = forwardRef(
       initialPageSize,
       onNavigate,
       navigateToOrders,
-      withGradientCardRows,
       withOuterBorder,
     }: ElementProps & StyleProps,
     _ref
@@ -498,6 +503,18 @@ export const PositionsTable = forwardRef(
       [positions, tpslOrdersByPositionUniqueId, marketSummaries]
     );
 
+    const navigateToMarket = useCallback(
+      (market: string) => {
+        if (!currentMarket) {
+          navigate(`${AppRoute.Trade}/${market}`, {
+            state: { from: currentRoute },
+          });
+          onNavigate?.();
+        }
+      },
+      [currentMarket]
+    );
+
     return (
       <$Table
         key={currentMarket ?? 'positions'}
@@ -512,21 +529,12 @@ export const PositionsTable = forwardRef(
             isAccountViewOnly,
             showClosePositionAction,
             navigateToOrders,
+            navigateToMarket,
             isSinglePosition: positionsData.length === 1,
             isTablet,
           })
         )}
         getRowKey={(row: PositionTableRow) => row.uniqueId}
-        onRowAction={
-          currentMarket
-            ? undefined
-            : (id, row) => {
-                navigate(`${AppRoute.Trade}/${row.market}`, {
-                  state: { from: currentRoute },
-                });
-                onNavigate?.();
-              }
-        }
         getRowAttributes={(row: PositionTableRow) => ({
           'data-side': row.side,
         })}
@@ -537,7 +545,6 @@ export const PositionsTable = forwardRef(
           </>
         }
         initialPageSize={initialPageSize}
-        withGradientCardRows={withGradientCardRows}
         withOuterBorder={withOuterBorder}
         withInnerBorders
         withScrollSnapColumns
@@ -549,7 +556,7 @@ export const PositionsTable = forwardRef(
 );
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 
   tr {
     &:after {

@@ -1,8 +1,7 @@
-import { ReactNode, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
@@ -10,11 +9,8 @@ import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import BadgeRank1 from '@/icons/badge-rank-1.svg';
-import BadgeRank2 from '@/icons/badge-rank-2.svg';
-import BadgeRank3 from '@/icons/badge-rank-3.svg';
+import { TrophyIcon } from '@/icons';
 
-import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -30,33 +26,6 @@ export enum RewardsLeaderboardTableColumns {
   Trader = 'Trader',
   Rewards = 'Rewards',
 }
-
-const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactNode }) => {
-  return (
-    <div tw="flex gap-0.5">
-      {icon}
-      <div tw="flex flex-col gap-0.125">
-        <div tw="flex items-center text-small font-medium text-color-text-1">
-          <div> {truncateAddress(item.account)}</div>
-          <CopyButton
-            buttonType="icon"
-            value={item.account}
-            buttonStyle={ButtonStyle.WithoutBackground}
-          />
-        </div>
-
-        <Output
-          tw="text-large font-bold text-color-text-2"
-          value={item.estimatedDydxRewards}
-          type={OutputType.CompactNumber}
-          slotRight={
-            <div tw="mb-0.125 ml-0.5 self-end text-small font-medium text-color-text-0">dYdX</div>
-          }
-        />
-      </div>
-    </div>
-  );
-};
 
 export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
@@ -102,13 +71,13 @@ export const RewardsLeaderboardPanel = () => {
     });
   };
 
-  const [first, second, third] = (data ?? []).slice(0, 3);
-
   return (
     <$Panel>
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
-          <div tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.LEADERBOARD })}</div>
+          <div tw="font-medium-bold">
+            {stringGetter({ key: STRING_KEYS.SURGE_LEADERBOARD_TITLE })}
+          </div>
           <button
             onClick={onDownload}
             type="button"
@@ -118,11 +87,6 @@ export const RewardsLeaderboardPanel = () => {
           </button>
         </div>
 
-        <div tw="flex items-center justify-between gap-2 px-1.5 py-0.5 pr-2">
-          {first && <Top3Item icon={<BadgeRank1 />} item={first} />}
-          {second && <Top3Item icon={<BadgeRank2 />} item={second} />}
-          {third && <Top3Item icon={<BadgeRank3 />} item={third} />}
-        </div>
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
             label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
@@ -238,6 +202,9 @@ const getRewardsLeaderboardTableColumnDef = ({
                 {rank}
               </div>
             </div>
+            {rank === 1 && <TrophyIcon tw="size-1.5 text-[#e5c346]" />}
+            {rank === 2 && <TrophyIcon tw="size-1.5 text-[#c9c9cb]" />}
+            {rank === 3 && <TrophyIcon tw="size-1.5 text-[#c37b3f]" />}
             {account === dydxAddress && (
               <div tw="flex items-center justify-center rounded-20 border border-solid border-color-accent px-0.5">
                 <span tw="text-small font-medium text-color-accent">

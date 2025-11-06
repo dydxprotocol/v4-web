@@ -22,9 +22,11 @@ import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
+  setUpAccountStakingTierQuery,
   setUpAccountStatsQuery,
   setUpCompositeClientAccountCacheQuery,
 } from './rest/validatorAccountMetadata';
+import { setUpMarketsFeeDiscountQuery } from './rest/validatorMarketsMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
 import { setUpParentSubaccount } from './websocket/parentSubaccount';
@@ -58,4 +60,6 @@ export const storeLifecycles = [
   setUpRewardsTokenPriceQuery,
   setUpCancelOrphanedTriggerOrdersLifecycle,
   setUpReclaimChildSubaccountBalancesLifecycle,
+  setUpMarketsFeeDiscountQuery,
+  setUpAccountStakingTierQuery,
 ] as const;

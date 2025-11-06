@@ -20,6 +20,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { SUPPORTED_COSMOS_CHAINS } from '@/constants/graz';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import { ConnectorType, WalletInfo, WalletNetworkType, WalletType } from '@/constants/wallets';
+import { AddressFormat } from '@/types/turnkey';
 
 import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
@@ -88,9 +89,13 @@ export const useWalletConnectionContext = () => {
     if (!walletInfo) return;
 
     if (walletInfo.connectorType === ConnectorType.Turnkey && primaryTurnkeyWallet) {
-      if (primaryTurnkeyWallet.accounts[0] == null) {
+      const ethAccount = primaryTurnkeyWallet.accounts.find(
+        (account) => account.addressFormat === AddressFormat.Ethereum
+      );
+
+      if (ethAccount == null) {
         logBonsaiError('useWalletConnection', 'setSourceAddress side effect', {
-          error: new Error(`No accounts for ${primaryTurnkeyWallet.walletId}`),
+          error: new Error(`No Ethereum account for ${primaryTurnkeyWallet.walletId}`),
         });
 
         return;
@@ -98,7 +103,7 @@ export const useWalletConnectionContext = () => {
 
       dispatch(
         setSourceAddress({
-          address: primaryTurnkeyWallet.accounts[0].address,
+          address: ethAccount.address,
           chain: WalletNetworkType.Evm,
         })
       );

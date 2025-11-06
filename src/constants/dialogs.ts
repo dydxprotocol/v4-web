@@ -53,7 +53,7 @@ export type ExternalNavKeplrDialogProps = {};
 export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
-export type MobileSignInDialogProps = {};
+export type MobileSignInDialogProps = { skipWaiting?: boolean };
 export type OnboardingDialogProps = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
@@ -112,7 +112,7 @@ export type WithdrawFromSubaccountDialogProps = {};
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: bigint;
-  userTier?: number | 'vip';
+  userTier?: number;
 };
 export type CoinbaseDepositDialogProps = {
   onBack?: () => void;
