@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
-// eslint-disable-next-line no-restricted-imports
-import { useDepositStatus } from '@/bonsai/rest/depositStatus';
-// eslint-disable-next-line no-restricted-imports
-import { selectAccountBalances } from '@/bonsai/selectors/balances';
+import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
@@ -1036,9 +1032,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { dydxAddress } = useAccounts();
-      const { usdcAmount } = useAppSelector(selectAccountBalances);
+      const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
 
-      const depositStatus = useDepositStatus();
+      const depositStatus = useAppSelector(BonsaiHooks.useDepositStatus);
 
       // refs to track previous values across renders
       const prevDepositIdsRef = useRef<Set<string>>(new Set());
