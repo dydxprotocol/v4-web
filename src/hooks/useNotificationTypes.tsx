@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 
-import { BonsaiCore, BonsaiHooks } from '@/bonsai/ontology';
+import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
@@ -81,6 +81,7 @@ import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
+import { useDepositStatus } from './useDepositStatus';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -1028,26 +1029,26 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.DepositNotificationLifecycle,
+    type: NotificationType.DepositAddressEvents,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { dydxAddress } = useAccounts();
       const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
 
-      const depositStatus = useAppSelector(BonsaiHooks.useDepositStatus);
+      const { data: depositStatus } = useDepositStatus();
 
       // refs to track previous values across renders
       const prevDepositIdsRef = useRef<Set<string>>(new Set());
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
 
-      const NOTIFICATION_DEBOUNCE = 10000; // 10 seconds
+      const NOTIFICATION_DEBOUNCE = 5 * timeUnits.second; // 5 seconds
 
       // Stage 1: Watch for deposit from backend
       useEffect(() => {
-        if (!dydxAddress || !depositStatus.data?.deposits.results) return;
+        if (!dydxAddress || !depositStatus?.deposits.results) return;
 
-        const incomingDeposits = depositStatus.data.deposits.results;
+        const incomingDeposits = depositStatus.deposits.results;
         const now = Date.now();
 
         const recentDeposits = incomingDeposits.filter((deposit) => {
@@ -1114,6 +1115,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
           lastNotificationTimeRef.current = now;
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [dydxAddress, trigger, depositStatus, stringGetter]);
 
       // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
@@ -1157,17 +1159,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
 
         prevWalletBalanceRef.current = usdcAmount;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [dydxAddress, usdcAmount, trigger, stringGetter]);
 
       // Clean up old deposit IDs every couple minutes to prevent memory bloat
       useEffect(() => {
         const cleanupInterval = setInterval(() => {
           const now = Date.now();
-          const recentDeposits = depositStatus.data?.deposits.results.filter((deposit) => {
-            return now - new Date(deposit.created_at).getTime() <= 240000; // Keep IDs for deposits in last 4 minutes
+          const recentDeposits = depositStatus?.deposits.results.filter((deposit) => {
+            return now - new Date(deposit.created_at).getTime() <= 4 * timeUnits.minute; // Keep IDs for deposits in last 4 minutes
           });
           prevDepositIdsRef.current = new Set(recentDeposits?.map((d) => d.id) ?? []);
-        }, 240000); // Clean up every 4 minutes
+        }, 4 * timeUnits.minute); // Clean up every 4 minutes
 
         return () => clearInterval(cleanupInterval);
       }, [depositStatus]);

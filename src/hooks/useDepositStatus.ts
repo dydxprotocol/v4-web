@@ -1,0 +1,55 @@
+import { selectIndexerUrl } from '@/bonsai/socketSelectors';
+import { useQuery } from '@tanstack/react-query';
+
+import { timeUnits } from '@/constants/time';
+
+import { useAppSelector } from '@/state/appTypes';
+
+import { useAccounts } from './useAccounts';
+
+export type DepositStatusResponse = {
+  address: string;
+  deposits: {
+    results: {
+      id: string;
+      transaction_hash: string;
+      chain_id: string;
+      amount: string;
+      created_at: Date;
+      from_address: string;
+    }[];
+    total: number;
+  };
+};
+
+export const useDepositStatus = () => {
+  const { dydxAddress } = useAccounts();
+  const indexerUrl = useAppSelector(selectIndexerUrl);
+
+  return useQuery({
+    enabled: !!dydxAddress && Boolean(indexerUrl),
+    queryKey: ['depositStatus', dydxAddress],
+    queryFn: async (): Promise<DepositStatusResponse> => {
+      if (!indexerUrl || !dydxAddress) {
+        return { address: dydxAddress ?? '', deposits: { results: [], total: 0 } };
+      }
+
+      try {
+        const response = await fetch(`${indexerUrl}/v4/bridging/getDeposits/${dydxAddress}`, {
+          method: 'GET',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch deposit status: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        // Gracefully handle errors - return empty deposits
+        return { address: dydxAddress, deposits: { results: [], total: 0 } };
+      }
+    },
+    refetchInterval: 5 * timeUnits.second, // Poll every 5 seconds
+    staleTime: 1 * timeUnits.minute, // not necessarily needed, but good to have
+  });
+};

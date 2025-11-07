@@ -20,7 +20,6 @@ import { TradeFormFns } from './forms/trade/trade';
 import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
 import { Loadable, LoadableStatus } from './lib/loadable';
-import { DepositStatusResponse, useDepositStatus } from './rest/depositStatus';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { useFundingPayments } from './rest/fundingPayments';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
@@ -419,7 +418,6 @@ interface BonsaiHooksShape {
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
   useStakingDelegations: () => Loadable<StakingDelegationsResult>;
   useFundingPayments: () => Loadable<IndexerFundingPaymentResponseObject[]>;
-  useDepositStatus: () => Loadable<DepositStatusResponse | undefined>;
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
@@ -431,7 +429,6 @@ export const BonsaiHooks: BonsaiHooksShape = {
   useStakingRewards,
   useUnbondingDelegations,
   useStakingDelegations,
-  useDepositStatus,
 };
 
 export const BonsaiForms = {
