@@ -3,9 +3,9 @@ import { HeightResponse } from 'starboard-client-js';
 
 import { GroupingMultiplier } from '@/constants/orderbook';
 import {
-  IndexerFundingPaymentResponseObject,
-  IndexerHistoricalBlockTradingReward,
-  IndexerHistoricalTradingRewardAggregation,
+    IndexerFundingPaymentResponseObject,
+    IndexerHistoricalBlockTradingReward,
+    IndexerHistoricalTradingRewardAggregation,
 } from '@/types/indexer/indexerApiGen';
 import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 
@@ -19,89 +19,100 @@ import { AdjustIsolatedMarginFormFns } from './forms/adjustIsolatedMargin';
 import { TradeFormFns } from './forms/trade/trade';
 import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
+import {
+    useAggregateFundingInfo,
+    useAllPositionsFundingAnalysis,
+    useBreakEvenWithFunding,
+    useCompleteFundingAnalysis,
+    useCurrentMarketFundingRate,
+    useFundingCosts,
+    useFundingProjections,
+    useFundingRateInfo,
+    useTradeFundingCost,
+} from './hooks/useFundingCalculator';
 import { Loadable, LoadableStatus } from './lib/loadable';
 import { useCurrentMarketHistoricalFunding } from './rest/funding';
 import { useFundingPayments } from './rest/fundingPayments';
 import { SubaccountPnlTick, useParentSubaccountHistoricalPnls } from './rest/historicalPnl';
 import {
-  useDailyCumulativeTradingRewards,
-  useHistoricalTradingRewards,
-  useHistoricalTradingRewardsWeekly,
-  useTotalTradingRewards,
+    useDailyCumulativeTradingRewards,
+    useHistoricalTradingRewards,
+    useHistoricalTradingRewardsWeekly,
+    useTotalTradingRewards,
 } from './rest/historicalTradingRewards';
 import {
-  StakingDelegationsResult,
-  StakingRewards,
-  UnbondingDelegation,
-  useStakingDelegations,
-  useStakingRewards,
-  useUnbondingDelegations,
+    StakingDelegationsResult,
+    StakingRewards,
+    UnbondingDelegation,
+    useStakingDelegations,
+    useStakingRewards,
+    useUnbondingDelegations,
 } from './rest/staking';
 import {
-  getCurrentMarketAccountFills,
-  selectAccountBlockRewardsLoading,
-  selectAccountBlockTradingRewards,
-  selectAccountFills,
-  selectAccountFillsLoading,
-  selectAccountOrders,
-  selectAccountOrdersLoading,
-  selectAccountTransfers,
-  selectAccountTransfersLoading,
-  selectChildSubaccountSummaries,
-  selectCurrentMarketBuyingPower,
-  selectCurrentMarketInfoRaw,
-  selectCurrentMarketOpenOrders,
-  selectCurrentMarketOrderHistory,
-  selectOpenOrders,
-  selectOrderHistory,
-  selectParentSubaccountOpenPositions,
-  selectParentSubaccountOpenPositionsLoading,
-  selectParentSubaccountSummary,
-  selectParentSubaccountSummaryLoading,
-  selectRelevantMarketsData,
-  selectUnopenedIsolatedPositions,
+    getCurrentMarketAccountFills,
+    selectAccountBlockRewardsLoading,
+    selectAccountBlockTradingRewards,
+    selectAccountFills,
+    selectAccountFillsLoading,
+    selectAccountOrders,
+    selectAccountOrdersLoading,
+    selectAccountTransfers,
+    selectAccountTransfersLoading,
+    selectChildSubaccountSummaries,
+    selectCurrentMarketBuyingPower,
+    selectCurrentMarketInfoRaw,
+    selectCurrentMarketOpenOrders,
+    selectCurrentMarketOrderHistory,
+    selectOpenOrders,
+    selectOrderHistory,
+    selectParentSubaccountOpenPositions,
+    selectParentSubaccountOpenPositionsLoading,
+    selectParentSubaccountSummary,
+    selectParentSubaccountSummaryLoading,
+    selectRelevantMarketsData,
+    selectUnopenedIsolatedPositions,
 } from './selectors/account';
 import {
-  selectParentSubaccountSummaryDeposit,
-  selectParentSubaccountSummaryWithdrawal,
+    selectParentSubaccountSummaryDeposit,
+    selectParentSubaccountSummaryWithdrawal,
 } from './selectors/accountActions';
 import {
-  selectApiState,
-  selectLatestIndexerHeight,
-  selectLatestValidatorHeight,
+    selectApiState,
+    selectLatestIndexerHeight,
+    selectLatestValidatorHeight,
 } from './selectors/apiStatus';
 import {
-  selectAllAssetsInfo,
-  selectAllAssetsInfoLoading,
-  selectAssetInfo,
-  selectAssetLogo,
+    selectAllAssetsInfo,
+    selectAllAssetsInfoLoading,
+    selectAssetInfo,
+    selectAssetLogo,
 } from './selectors/assets';
 import { selectAccountBalances, selectAccountNobleUsdcBalance } from './selectors/balances';
 import {
-  selectRawIndexerHeightDataLoading,
-  selectRawMarketsData,
-  selectRawParentSubaccountData,
-  selectRawValidatorHeightDataLoading,
+    selectRawIndexerHeightDataLoading,
+    selectRawMarketsData,
+    selectRawParentSubaccountData,
+    selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
 import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
-  selectCurrentMarketDepthChart,
-  selectCurrentMarketMidPrice,
-  selectCurrentMarketOrderbook,
+    selectCurrentMarketDepthChart,
+    selectCurrentMarketMidPrice,
+    selectCurrentMarketOrderbook,
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
-  selectAllMarketSummaries,
-  selectAllMarketSummariesLoading,
-  selectCurrentMarketAssetId,
-  selectCurrentMarketAssetLogoUrl,
-  selectCurrentMarketAssetName,
-  selectCurrentMarketInfo,
-  selectCurrentMarketInfoStable,
-  selectMarketSummaryById,
-  StablePerpetualMarketSummary,
+    selectAllMarketSummaries,
+    selectAllMarketSummariesLoading,
+    selectCurrentMarketAssetId,
+    selectCurrentMarketAssetLogoUrl,
+    selectCurrentMarketAssetName,
+    selectCurrentMarketInfo,
+    selectCurrentMarketInfoStable,
+    selectMarketSummaryById,
+    StablePerpetualMarketSummary,
 } from './selectors/summary';
 import { selectUserStats } from './selectors/userStats';
 import { selectClientInitializationError } from './socketSelectors';
@@ -109,25 +120,25 @@ import { DepositUsdcProps, WithdrawUsdcProps } from './types/operationTypes';
 import { DepthChartData, OrderbookProcessedData } from './types/orderbookTypes';
 import { MarketsData, ParentSubaccountDataBase } from './types/rawTypes';
 import {
-  AccountBalances,
-  AggregatedTradingReward,
-  AllAssetData,
-  ApiState,
-  AssetData,
-  ChildSubaccountSummaries,
-  Compliance,
-  EquityTiersSummary,
-  FeeTierSummary,
-  GroupedSubaccountSummary,
-  PendingIsolatedPosition,
-  PerpetualMarketSummaries,
-  PerpetualMarketSummary,
-  RewardParamsSummary,
-  SubaccountFill,
-  SubaccountOrder,
-  SubaccountPosition,
-  SubaccountTransfer,
-  UserStats,
+    AccountBalances,
+    AggregatedTradingReward,
+    AllAssetData,
+    ApiState,
+    AssetData,
+    ChildSubaccountSummaries,
+    Compliance,
+    EquityTiersSummary,
+    FeeTierSummary,
+    GroupedSubaccountSummary,
+    PendingIsolatedPosition,
+    PerpetualMarketSummaries,
+    PerpetualMarketSummary,
+    RewardParamsSummary,
+    SubaccountFill,
+    SubaccountOrder,
+    SubaccountPosition,
+    SubaccountTransfer,
+    UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
 
@@ -427,6 +438,17 @@ interface BonsaiHooksShape {
   useUnbondingDelegations: () => Loadable<UnbondingDelegation[]>;
   useStakingDelegations: () => Loadable<StakingDelegationsResult>;
   useFundingPayments: () => Loadable<IndexerFundingPaymentResponseObject[]>;
+  
+  // Funding Calculator Hooks
+  useFundingRateInfo: typeof useFundingRateInfo;
+  useFundingCosts: typeof useFundingCosts;
+  useFundingProjections: typeof useFundingProjections;
+  useBreakEvenWithFunding: typeof useBreakEvenWithFunding;
+  useCompleteFundingAnalysis: typeof useCompleteFundingAnalysis;
+  useAllPositionsFundingAnalysis: typeof useAllPositionsFundingAnalysis;
+  useCurrentMarketFundingRate: typeof useCurrentMarketFundingRate;
+  useTradeFundingCost: typeof useTradeFundingCost;
+  useAggregateFundingInfo: typeof useAggregateFundingInfo;
 }
 
 export const BonsaiHooks: BonsaiHooksShape = {
@@ -441,6 +463,17 @@ export const BonsaiHooks: BonsaiHooksShape = {
   useTotalTradingRewards,
   useUnbondingDelegations,
   useStakingDelegations,
+  
+  // Funding Calculator Hooks
+  useFundingRateInfo,
+  useFundingCosts,
+  useFundingProjections,
+  useBreakEvenWithFunding,
+  useCompleteFundingAnalysis,
+  useAllPositionsFundingAnalysis,
+  useCurrentMarketFundingRate,
+  useTradeFundingCost,
+  useAggregateFundingInfo,
 };
 
 export const BonsaiForms = {
