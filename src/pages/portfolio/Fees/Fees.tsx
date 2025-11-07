@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -15,6 +16,10 @@ import { Tabs } from '@/components/Tabs';
 import { FeeTierTable } from '@/views/tables/FeeTierTable';
 import { StakingTierTable } from '@/views/tables/StakingTierTable';
 
+import { useAppSelector } from '@/state/appTypes';
+
+import { isTruthy } from '@/lib/isTruthy';
+
 import { FeePageHeader } from './FeePageHeader';
 
 enum TabValues {
@@ -26,6 +31,8 @@ export const Fees = () => {
   const stringGetter = useStringGetter();
   const { isNotTablet } = useBreakpoints();
   const [tabValue, setTabValue] = useState<TabValues>(TabValues.Fees);
+  const stakingTiers = useAppSelector(BonsaiCore.configs.stakingTiers);
+  const hasStakingTiers = stakingTiers != null && stakingTiers.length > 0;
 
   return (
     <AttachedExpandingSection>
@@ -49,7 +56,7 @@ export const Fees = () => {
                 </$TableContainer>
               ),
             },
-            {
+            hasStakingTiers && {
               value: TabValues.Staking,
               label: stringGetter({ key: STRING_KEYS.STAKING_TIERS }),
               content: (
@@ -58,7 +65,7 @@ export const Fees = () => {
                 </$TableContainer>
               ),
             },
-          ]}
+          ].filter(isTruthy)}
         />
       </div>
     </AttachedExpandingSection>
