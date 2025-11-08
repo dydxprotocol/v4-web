@@ -1,9 +1,22 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-    echo "Usage: ./e2e/run.sh <populate-events-script>"
+if [ $# -eq 0 ]; then
+    echo "Usage: ./e2e/run.sh <populate-events-script> <optional i>"
+    echo "i - interactive mode, waits for CTRL-C before shutting down"
     exit 1
 fi
+
+INTERACTIVE=0
+ii=1
+for arg in "$@"
+do
+    if [ $ii -gt 1 ]; then
+        if [ $arg = "i" ]; then
+            INTERACTIVE=1
+        fi
+    fi
+    ii=$(($ii+1))
+done
 
 echo "Starting the fuel node"
 FUEL_NODE_OUT=`(pnpm --filter starboard/contracts run:node 2>&1 &) | grep -m 1 "Node is up" | wc -l`
@@ -12,6 +25,7 @@ if [ "$FUEL_NODE_OUT" -ne "1" ]; then
     exit 1
 fi
 
+# cannot use FUEL_NODE_PID=$!, use walkaround to get the process id
 FUEL_NODE_PID=`pgrep -A "fuel-core"`
 if [ -z "$FUEL_NODE_PID" ]; then
     echo "fuel node process is down"
@@ -19,6 +33,7 @@ if [ -z "$FUEL_NODE_PID" ]; then
 fi
 
 echo "Deploying Mocked Stork contract"
+# priv key is hardcoded, taken form the fuel node starting script
 OUTPUT=`pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a"`
 echo "$OUTPUT"
 MOCK_STORK_CONTRACT=`echo "$OUTPUT" | grep "Mocked Stork deployed to" |  awk '{print $NF}'`
@@ -66,23 +81,53 @@ if [ $? -ne 0 ]; then
 else
     echo "Starting the squid indexer"
     # weird but it works this way, there were problems with redirecting logs
-    VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} pnpm start:ci 2>&1 | tee indexer.log > /dev/null &
-    SQD_INDEXER_PID=$!
-    SQD_INDEXER_OUT=`tail -f -n +1 indexer.log | grep -m 1 "Indexer run started" | wc -l`
+    # theindexerstoppedunexpectedly is the guardian to indicate that the indexer stopped unexpectedly
+    # we want the indexer log for the post processing
+    { VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm start:ci 2>&1 | tee indexer.log > /dev/null; echo "theindexerstoppedunexpectedly" >> indexer.log; } &    
+    sleep 1
+
+    # there is doouble grep, first greps also the guardian in order to stop the tailing if the indexer stopped unexpectedly,
+    # second grep is to check if the indexer actually started
+    SQD_INDEXER_OUT=`tail -f -n +1 indexer.log | grep -m 1 "Indexer run started\|theindexerstoppedunexpectedly" | grep "Indexer run started" | wc -l`
     if [ "$SQD_INDEXER_OUT" -ne "1" ]; then
         echo "squid indexer failed to start"
         cat indexer.log
         EXIT_CODE=1
     fi
+
+    # cannot use SQD_INDEXER_PID=$!, use walkaround to get the process id
+    SQD_INDEXER_PNPM_PID=`pgrep -A -n pnpm`
+    # this is bad, but I have no clue how to improve it
+    # pnpm starts the indexer the way that killing pnpm process does not kill the indexer process
+    # now we check if pnpm process is 'pnpm start:ci' and the indexer process in newer
+    # NOTE: this depends on how the indexer is started by pnpm, and this is a bad practice
+    SQD_INDEXER_PID=`pgrep -A -n node`
+    # need to check if pnpm process is the process that started the indexer
+    # tr is the trick because /proc/PID/cmdline is a null-whitespace string
+    SQD_INDEXER_PID_CHECK=`cat /proc/$SQD_INDEXER_PNPM_PID/cmdline | tr '\0' ' ' | grep "pnpm start:ci" | wc -l`
+    if [ "$SQD_INDEXER_PID_CHECK" -ne 1 ]; then
+        SQD_INDEXER_PID=""
+    elif [ -z "$SQD_INDEXER_PID" ]; then
+        SQD_INDEXER_PID=""
+    elif [ "$SQD_INDEXER_PNPM_PID" -gt "$SQD_INDEXER_PID" ]; then
+        SQD_INDEXER_PID=""
+    fi
+
     if [ -z "$SQD_INDEXER_PID" ]; then
         echo "squid indexer process is down"
         cat indexer.log
         EXIT_CODE=1
     fi
 
-    sleep 5
-    
-    echo "APPLIED"
+    if [ $EXIT_CODE -eq 0 ]; then
+        if [ $INTERACTIVE -eq 1 ]; then
+            echo "Waiting for CTRL-C"
+            (trap exit SIGINT; sleep 999d)
+            echo "doing on"
+        else
+            sleep 5
+        fi
+    fi
 fi
 
 ##################### closing #########################################################

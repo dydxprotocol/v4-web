@@ -2,7 +2,7 @@ import {run} from '@subsquid/batch-processor'
 import {augmentBlock, Block, Receipt} from '@subsquid/fuel-objects'
 import {DataSourceBuilder, FieldSelection} from '@subsquid/fuel-stream'
 import {TypeormDatabase} from '@subsquid/typeorm-store'
-import { Interface } from 'fuels';
+import { Interface, BN } from 'fuels';
 import {Price, PositionKey, Position, TotalPosition, Liquidity, TotalLiquidity, PositionChange} from './model/generated'
 import priceOracleAbi from './abis/stork-mock-abi.json'
 import vaultAbi from './abis/vault-abi.json'
@@ -16,6 +16,7 @@ export const GRAPHQL_URL = process.env.GRAPHQL_URL ?? "";
 export const VAULT_PRICEFEED_ADDRESS = process.env.VAULT_PRICEFEED_ADDRESS ?? "";
 export const VAULT_ADDRESS = process.env.VAULT_ADDRESS ?? "";
 export const FROM_BLOCK = process.env.FROM_BLOCK ?? "";
+export const E2E_TEST_LOG = (process.env.E2E_TEST_LOG ?? "0") == "1"; // 0 - no log, 1 - log
 
 if (!GRAPHQL_URL || !VAULT_PRICEFEED_ADDRESS || !VAULT_ADDRESS) {
   throw new Error('Environment variables not set');
@@ -70,10 +71,15 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
     const logs = priceOracleInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
     const [asset, value] = log.ValueUpdate;
+    const underlying = value.quantized_value.underlying;
+    const priceValue = underlying.upper.mul(new BN("18446744073709551616"))
+        .add(underlying.lower)
+        .sub(new BN("170141183460469231731687303715884105728"))
+        .abs();
     const price: Price = new Price({
         id: receipt.id,
         asset: asset,
-        price: value.quantized_value.toString(),
+        price: priceValue.toString(),
         timestamp: value.timestamp_ns / 1000000000,
     })
     await ctx.store.insert(price)
@@ -421,7 +427,10 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
 
 
 run(dataSource, database, async ctx => {
-    console.log("Indexer run started")
+    if (E2E_TEST_LOG) {
+        // E2E test log indicating that the indexer started successfully
+        console.log("Indexer run started")
+    }
     let blocks = ctx.blocks.map(augmentBlock)
 
     for (let block of blocks) {
