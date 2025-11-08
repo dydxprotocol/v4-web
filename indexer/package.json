@@ -2,13 +2,13 @@
   "name": "starboard/indexer",
   "version": "1.0.0",
   "scripts": {
-    "gen:model": "npx squid-typeorm-codegen",
+    "build": "rm -rf lib && tsc",
+    "gen:model": "squid-typeorm-codegen",
     "gen:migration": "squid-typeorm-migration generate",
     "apply:migration": "squid-typeorm-migration apply",
-    "build": "rm -rf lib && tsc",
-    "start": "node -r dotenv/config lib/main.js",
+    "start": "ts-node -r dotenv/config src/main.ts",
     "populate:events": "ts-node e2e/populate-events.ts",
-    "start:ci": "node -r dotenv/config lib/main.js dotenv_config_path=.env.ci",
+    "start:ci": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.ci",
     "test": "vitest run"
   },
   "dependencies": {
