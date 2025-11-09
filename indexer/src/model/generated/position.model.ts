@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
 import {PositionKey} from "./positionKey.model"
 import {PositionChange} from "./_positionChange"
 
@@ -15,11 +15,11 @@ export class Position {
     @ManyToOne_(() => PositionKey, {nullable: true})
     positionKey!: PositionKey
 
-    @StringColumn_({nullable: false})
-    collateralAmout!: string
+    @BigIntColumn_({nullable: false})
+    collateralAmout!: bigint
 
-    @StringColumn_({nullable: false})
-    size!: string
+    @BigIntColumn_({nullable: false})
+    size!: bigint
 
     @IntColumn_({nullable: false})
     timestamp!: number
@@ -30,21 +30,21 @@ export class Position {
     @Column_("varchar", {length: 9, nullable: false})
     change!: PositionChange
 
-    @StringColumn_({nullable: false})
-    collateralTransferred!: string
+    @BigIntColumn_({nullable: false})
+    collateralTransferred!: bigint
 
-    @StringColumn_({nullable: false})
-    positionFee!: string
+    @BigIntColumn_({nullable: false})
+    positionFee!: bigint
 
-    @StringColumn_({nullable: false})
-    fundingRate!: string
+    @BigIntColumn_({nullable: false})
+    fundingRate!: bigint
 
-    @StringColumn_({nullable: false})
-    pnlDelta!: string
+    @BigIntColumn_({nullable: false})
+    pnlDelta!: bigint
 
-    @StringColumn_({nullable: false})
-    realizedFundingRate!: string
+    @BigIntColumn_({nullable: false})
+    realizedFundingRate!: bigint
 
-    @StringColumn_({nullable: false})
-    realizedPnl!: string
+    @BigIntColumn_({nullable: false})
+    realizedPnl!: bigint
 }
