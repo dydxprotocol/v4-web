@@ -2,7 +2,7 @@ type Price @entity {
   id: ID!
   asset: String! @index
   timestamp: Int! @index
-  price: String!
+  price: BigInt!
 }
 
 type Liquidity @entity {
@@ -38,24 +38,24 @@ enum PositionChange {
 type Position @entity {
   id: ID!
   positionKey: PositionKey!
-  collateralAmout: String!
-  size: String!
+  collateralAmout: BigInt!
+  size: BigInt!
   timestamp: Int!
   latest: Boolean!
   change: PositionChange!
-  collateralTransferred: String!
-  positionFee: String!
-  fundingRate: String!
-  pnlDelta: String!
-  realizedFundingRate: String!
-  realizedPnl: String!
+  collateralTransferred: BigInt!
+  positionFee: BigInt!
+  fundingRate: BigInt!
+  pnlDelta: BigInt!
+  realizedFundingRate: BigInt!
+  realizedPnl: BigInt!
 }
 
 type TotalPosition @entity {
   id: ID!
   indexAssetId: String! @index
   isLong: Boolean!
-  collateralAmout: String!
-  size: String!
+  collateralAmout: BigInt!
+  size: BigInt!
   lastTimestamp: Int!
 }

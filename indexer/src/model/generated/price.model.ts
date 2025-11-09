@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class Price {
@@ -17,6 +17,6 @@ export class Price {
     @IntColumn_({nullable: false})
     timestamp!: number
 
-    @StringColumn_({nullable: false})
-    price!: string
+    @BigIntColumn_({nullable: false})
+    price!: bigint
 }

@@ -79,7 +79,7 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
     const price: Price = new Price({
         id: receipt.id,
         asset: asset,
-        price: priceValue.toString(),
+        price: priceValue,
         timestamp: value.timestamp_ns / 1000000000,
     })
     await ctx.store.insert(price)
@@ -201,7 +201,6 @@ async function handleIncreasePosition(receipt: Receipt<{receipt: {rb: true, data
     const fundingRateHasProfit = log.funding_rate_has_profit == true
     const fundingRateRawStr = log.funding_rate.toString()
     const fundingRate = fundingRateHasProfit ? BigInt(fundingRateRawStr) : -BigInt(fundingRateRawStr)
-    const fundingRateStr = fundingRate.toString()
 
     const currentPosition: Position = await ctx.store.findOne(Position, { where: { positionKey: positionKey, latest: true }})
     let collateral;
@@ -211,10 +210,10 @@ async function handleIncreasePosition(receipt: Receipt<{receipt: {rb: true, data
     if (currentPosition) {
         currentPosition.latest = false
         await ctx.store.upsert(currentPosition)
-        collateral = BigInt(currentPosition.collateralAmout)
-        size = BigInt(currentPosition.size)
-        realizedFundingRate = BigInt(currentPosition.fundingRate)
-        realizedPnl = BigInt(currentPosition.pnlDelta)
+        collateral = currentPosition.collateralAmout
+        size = currentPosition.size
+        realizedFundingRate = currentPosition.realizedFundingRate
+        realizedPnl = currentPosition.realizedPnl
     } else {
         collateral = BigInt(0)
         size = BigInt(0)
@@ -227,24 +226,24 @@ async function handleIncreasePosition(receipt: Receipt<{receipt: {rb: true, data
     const position: Position = new Position({
         id: receipt.id,
         positionKey: positionKey,
-        collateralAmout: collateral.toString(),
-        size: size.toString(),
+        collateralAmout: collateral,
+        size: size,
         timestamp: getUTCBlockTime(block),
         latest: true,
         change: PositionChange.INCREASE,
-        collateralTransferred: collateralDeltaStr,
-        positionFee: positionFeeStr,
-        fundingRate: fundingRateStr,
-        pnlDelta: "0",
-        realizedFundingRate: realizedFundingRate.toString(),
-        realizedPnl: realizedPnl.toString(),
+        collateralTransferred: collateralDelta,
+        positionFee: positionFee,
+        fundingRate: fundingRate,
+        pnlDelta: BigInt(0),
+        realizedFundingRate: realizedFundingRate,
+        realizedPnl: realizedPnl,
     })
     await ctx.store.insert(position)
 
     let totalPosition: TotalPosition = await ctx.store.findOne(TotalPosition, { where: { indexAssetId: log.index_asset.bits, isLong: log.is_long }})
     if (totalPosition) {
-        totalPosition.collateralAmout = (BigInt(totalPosition.collateralAmout) + collateralDelta + fundingRate - positionFee).toString()
-        totalPosition.size = (BigInt(totalPosition.size) + sizeDelta).toString()
+        totalPosition.collateralAmout = totalPosition.collateralAmout + collateralDelta + fundingRate - positionFee
+        totalPosition.size = totalPosition.size + sizeDelta
         totalPosition.lastTimestamp = getUTCBlockTime(block)
         await ctx.store.upsert(totalPosition)
     } else {
@@ -252,8 +251,8 @@ async function handleIncreasePosition(receipt: Receipt<{receipt: {rb: true, data
             id: receipt.id, // another value?
             indexAssetId: log.index_asset.bits,
             isLong: log.is_long,
-            collateralAmout: collateral.toString(),
-            size: size.toString(),
+            collateralAmout: collateral,
+            size: size,
             lastTimestamp: getUTCBlockTime(block),
         })
         await ctx.store.insert(totalPosition)
@@ -279,11 +278,9 @@ async function handleDecreasePosition(receipt: Receipt<{receipt: {rb: true, data
     const fundingRateHasProfit = log.funding_rate_has_profit == true
     const fundingRateRawStr = log.funding_rate.toString()
     const fundingRate = fundingRateHasProfit ? BigInt(fundingRateRawStr) : -BigInt(fundingRateRawStr)
-    const fundingRateStr = fundingRate.toString()
     const pnlDeltaHasProfit = log.pnl_delta_has_profit == true
     const pnlDeltaRawStr = log.pnl_delta.toString()
     const pnlDelta = pnlDeltaHasProfit ? BigInt(pnlDeltaRawStr) : -BigInt(pnlDeltaRawStr)
-    const pnlDeltaStr = pnlDelta.toString()
 
     const currentPosition: Position = await ctx.store.findOne(Position, { where: { positionKey: positionKey, latest: true }})
     if (!currentPosition) {
@@ -292,10 +289,10 @@ async function handleDecreasePosition(receipt: Receipt<{receipt: {rb: true, data
     currentPosition.latest = false
     await ctx.store.upsert(currentPosition)
 
-    let collateral = BigInt(currentPosition.collateralAmout)
-    const size = BigInt(currentPosition.size) - sizeDelta
-    const realizedFundingRate = BigInt(currentPosition.realizedFundingRate) + fundingRate
-    const realizedPnl = BigInt(currentPosition.realizedPnl) + pnlDelta
+    let collateral = currentPosition.collateralAmout
+    const size = currentPosition.size - sizeDelta
+    const realizedFundingRate = currentPosition.realizedFundingRate + fundingRate
+    const realizedPnl = currentPosition.realizedPnl + pnlDelta
 
     collateral = collateral + fundingRate + pnlDelta - positionFee
     let collateralTransferred
@@ -316,17 +313,17 @@ async function handleDecreasePosition(receipt: Receipt<{receipt: {rb: true, data
     const position: Position = new Position({
         id: receipt.id,
         positionKey: positionKey,
-        collateralAmout: collateral.toString(),
-        size: size.toString(),
+        collateralAmout: collateral,
+        size: size,
         timestamp: getUTCBlockTime(block),
         latest: true,
         change: PositionChange.DECREASE,
-        collateralTransferred: collateralTransferred.toString(),
-        positionFee: positionFeeStr,
-        fundingRate: fundingRateStr,
-        pnlDelta: pnlDeltaStr,
-        realizedFundingRate: realizedFundingRate.toString(),
-        realizedPnl: realizedPnl.toString(),
+        collateralTransferred: collateralTransferred,
+        positionFee: positionFee,
+        fundingRate: fundingRate,
+        pnlDelta: pnlDelta,
+        realizedFundingRate: realizedFundingRate,
+        realizedPnl: realizedPnl,
     })
     await ctx.store.insert(position)
 
@@ -335,8 +332,8 @@ async function handleDecreasePosition(receipt: Receipt<{receipt: {rb: true, data
         throw new Error('Total position not found')
     }
     const collateralDiff = BigInt(currentPosition.collateralAmout) - collateral
-    totalPosition.collateralAmout = (BigInt(totalPosition.collateralAmout) - collateralDiff).toString()
-    totalPosition.size = (BigInt(totalPosition.size) - sizeDelta).toString()
+    totalPosition.collateralAmout = totalPosition.collateralAmout - collateralDiff
+    totalPosition.size = totalPosition.size - sizeDelta
     totalPosition.lastTimestamp = getUTCBlockTime(block)
     await ctx.store.upsert(totalPosition)
 }
@@ -374,17 +371,15 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
     const collateralDelta = BigInt(collateralDeltaStr)
     const sizeDelta = BigInt(sizeDeltaStr)
     const positionFeeStr = log.position_fee.toString()
-    // const positionFee = BigInt(positionFeeStr)
+    const positionFee = BigInt(positionFeeStr)
     const liquidationFeeStr = log.liquidation_fee.toString()
-    // const liquidationFee = BigInt(liquidationFeeStr)
+    const liquidationFee = BigInt(liquidationFeeStr)
     const fundingRateHasProfit = log.funding_rate_has_profit == true
     const fundingRateRawStr = log.funding_rate.toString()
     const fundingRate = fundingRateHasProfit ? BigInt(fundingRateRawStr) : -BigInt(fundingRateRawStr)
-    const fundingRateStr = fundingRate.toString()
     const pnlDeltaHasProfit = log.pnl_delta_has_profit == true
     const pnlDeltaRawStr = log.pnl_delta.toString()
     const pnlDelta = pnlDeltaHasProfit ? BigInt(pnlDeltaRawStr) : -BigInt(pnlDeltaRawStr)
-    const pnlDeltaStr = pnlDelta.toString()
 
     const currentPosition: Position = await ctx.store.findOne(Position, { where: { positionKey: positionKey, latest: true }})
     if (!currentPosition) {
@@ -393,24 +388,24 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
     currentPosition.latest = false
     await ctx.store.upsert(currentPosition)
 
-    const realizedFundingRate = BigInt(currentPosition.realizedFundingRate) + fundingRate
-    const realizedPnl = BigInt(currentPosition.realizedPnl) + pnlDelta
-    // must be: BigInt(currentPosition.collateralAmout) == collateralDelta
-    // must be: BigInt(currentPosition.size) == sizeDelta
+    const realizedFundingRate = currentPosition.realizedFundingRate + fundingRate
+    const realizedPnl = currentPosition.realizedPnl + pnlDelta
+    // must be: currentPosition.collateralAmout == collateralDelta
+    // must be: currentPosition.size == sizeDelta
     const position: Position = new Position({
         id: receipt.id,
         positionKey: positionKey,
-        collateralAmout: "0",
-        size: "0",
+        collateralAmout: BigInt(0),
+        size: BigInt(0),
         timestamp: getUTCBlockTime(block),
         latest: true,
         change: PositionChange.LIQUIDATE,
-        collateralTransferred: liquidationFeeStr,
-        positionFee: positionFeeStr,
-        fundingRate: fundingRateStr,
-        pnlDelta: pnlDeltaStr,
-        realizedFundingRate: realizedFundingRate.toString(),
-        realizedPnl: realizedPnl.toString(),
+        collateralTransferred: liquidationFee,
+        positionFee: positionFee,
+        fundingRate: fundingRate,
+        pnlDelta: pnlDelta,
+        realizedFundingRate: realizedFundingRate,
+        realizedPnl: realizedPnl,
     })
     // verify empty position
     await ctx.store.insert(position)
@@ -419,8 +414,8 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
     if (!totalPosition) {
         throw new Error('Total position not found')
     }
-    totalPosition.collateralAmout = (BigInt(totalPosition.collateralAmout) - collateralDelta).toString() // TODO
-    totalPosition.size = (BigInt(totalPosition.size) - sizeDelta).toString()
+    totalPosition.collateralAmout = totalPosition.collateralAmout - collateralDelta //TODO
+    totalPosition.size = totalPosition.size - sizeDelta
     totalPosition.lastTimestamp = getUTCBlockTime(block)
     await ctx.store.upsert(totalPosition)
 }

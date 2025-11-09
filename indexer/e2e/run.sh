@@ -123,7 +123,6 @@ else
         if [ $INTERACTIVE -eq 1 ]; then
             echo "Waiting for CTRL-C"
             (trap exit SIGINT; sleep 999d)
-            echo "doing on"
         else
             sleep 5
         fi

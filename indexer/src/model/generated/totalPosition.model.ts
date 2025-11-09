@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BooleanColumn as BooleanColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class TotalPosition {
@@ -16,11 +16,11 @@ export class TotalPosition {
     @BooleanColumn_({nullable: false})
     isLong!: boolean
 
-    @StringColumn_({nullable: false})
-    collateralAmout!: string
+    @BigIntColumn_({nullable: false})
+    collateralAmout!: bigint
 
-    @StringColumn_({nullable: false})
-    size!: string
+    @BigIntColumn_({nullable: false})
+    size!: bigint
 
     @IntColumn_({nullable: false})
     lastTimestamp!: number
