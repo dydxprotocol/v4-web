@@ -27,16 +27,26 @@ pnpm apply:migration
 
 # Run indexer
 node -r dotenv/config lib/main.js
+# or (this does not require the project to be build)
+pnpm start
 
-# Run API
-npx squid-graphql-server
+# Run API, update db connection params
+pnpm exec postgraphile -c "postgres://postgres:postgres@localhost:23751/postgres" --enhance-graphiql
 
 # Erase the indexer data
 docker compose down -v
 
-# Checkout indexed logs
-docker exec "$(basename "$(pwd)")-db-1" psql -U postgres \
-  -c "SELECT id, logs_count, found_at FROM contract ORDER BY logs_count desc LIMIT 10"
+# Checkout the indexer
+docker exec "indexer-db-1" psql -U postgres \
+  -c "select * from migrations"
+
+# Checkout out recent prices
+docker exec "indexer-db-1" psql -U postgres \
+  -c "select * from price order by timestamp desc limit 12"
+
+# Checkout out recent positions
+docker exec "indexer-db-1" psql -U postgres \
+  -c "select * from position order by timestamp desc limit 12;"
 ```
 
 ## E2E Tests
@@ -90,3 +100,14 @@ It is also possible to send additional transactions that emit events,
 but an additional code to watch the indexer sync would be required.
 The script is vitest compatible. It is excluded in a normal run.
 Here a dedicated mode `indexer-e2e` is used to execute the script with vitest.
+
+## Migrations
+
+**NOTICE.** Important when changing the schema and generating migrations scripts.
+
+Some functionalities are enable through db views.
+Views are not generated from the schema, they are provided with custom migrations scripts.
+See `db/migrations/1762648930785-Data.js` for instance.
+Such scripts are marked with the comment `// NON GENERATED MIGRATION`.
+In case the schema is changed, views may need to be updated as well - it must be done manually.
+
