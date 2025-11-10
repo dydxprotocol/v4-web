@@ -57,7 +57,8 @@ export const usePortfolioValues = ({
         ? MustBigNumber(activeDatum.totalPnl)
         : MustBigNumber(latestVisibleDatum.totalPnl);
 
-      pnlDiffPercent = pnlDiff.div(MustBigNumber(latestVisibleDatum.netTransfers));
+      const netTransfers = MustBigNumber(latestVisibleDatum.netTransfers);
+      pnlDiffPercent = netTransfers.isZero() ? 0 : pnlDiff.div(netTransfers);
 
       return {
         pnlDiff: pnlDiff.toFixed(4),
