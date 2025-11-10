@@ -46,6 +46,7 @@ export const TradeBoxOrderView = () => {
             onValueChange={onTradeTypeChange}
             dividerStyle="underline"
             disabled={!allowChangingOrderType}
+            fullWidthTabs
             sharedContent={
               <$Container>
                 <TradeForm />
@@ -70,12 +71,4 @@ const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
 const $OrderTypeTabs = styled(Tabs)`
   --tabs-height: 2.125rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
-
-  > * > header > div {
-    width: 100%;
-    > button {
-      width: 33%;
-      padding: 0;
-    }
-  }
 ` as typeof Tabs;
