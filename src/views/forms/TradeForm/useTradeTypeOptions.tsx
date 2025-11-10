@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { TradeFormType } from '@/bonsai/forms/trade/types';
+import { validTradeFormTypes } from '@/bonsai/forms/trade/validTradeFormTypes';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { shallowEqual } from 'react-redux';
 
@@ -33,16 +34,19 @@ export const useTradeTypeOptions = (opts?: { showAssetIcon?: boolean; showAll?: 
   );
 
   const allTradeTypeItems = useMemo((): Array<MenuItem<TradeFormType>> | undefined => {
-    const allItems = typeOptions.map(({ value, stringKey }) => ({
-      value,
-      label: stringGetter({
-        key: stringKey,
-      }),
-      slotBefore:
-        showAssetIcon && selectedTradeType === value ? (
-          <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
-        ) : undefined,
-    }));
+    const allItems = typeOptions
+      .filter(({ value }) => validTradeFormTypes.includes(value))
+
+      .map(({ value, stringKey }) => ({
+        value,
+        label: stringGetter({
+          key: stringKey,
+        }),
+        slotBefore:
+          showAssetIcon && selectedTradeType === value ? (
+            <AssetIcon logoUrl={imageUrl} symbol={currentAssetId} />
+          ) : undefined,
+      }));
     return allItems;
   }, [currentAssetId, imageUrl, showAssetIcon, stringGetter, typeOptions, selectedTradeType]);
 
