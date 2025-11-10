@@ -23,12 +23,14 @@ export interface SubaccountPnlTick {
   equity: number;
   totalPnl: number;
   createdAtMilliseconds: number;
+  netTransfers: number;
 }
 
 function toPnlPoint(tick: IndexerPnlResponseObject): SubaccountPnlTick {
   return {
     equity: MustNumber(tick.equity),
     totalPnl: MustNumber(tick.totalPnl),
+    netTransfers: MustNumber(tick.netTransfers),
     createdAtMilliseconds: new Date(tick.createdAt).getTime(),
   };
 }

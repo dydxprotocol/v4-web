@@ -51,6 +51,7 @@ export type PnlDatum = {
   equity: number;
   totalPnl: number;
   createdAt: number;
+  netTransfers: number;
 };
 
 const PNL_TIME_RESOLUTION = 1 * timeUnits.hour;
@@ -106,6 +107,7 @@ export const PnlChart = ({
               createdAtMilliseconds: now,
               equity,
               totalPnl: equity - (lastPnlTick.equity ?? 0) + (lastPnlTick.totalPnl ?? 0),
+              netTransfers: lastPnlTick.netTransfers ?? 0,
             },
           ]
             .filter(isTruthy)
@@ -115,6 +117,7 @@ export const PnlChart = ({
                 subaccountId: subaccountId ?? 0,
                 equity: Number(datum.equity),
                 totalPnl: Number(datum.totalPnl),
+                netTransfers: Number(datum.netTransfers),
                 createdAt: new Date(datum.createdAtMilliseconds).getTime(),
                 side: {
                   [-1]: PnlSide.Loss,
