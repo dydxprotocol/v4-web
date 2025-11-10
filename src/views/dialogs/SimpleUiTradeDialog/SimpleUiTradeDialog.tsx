@@ -15,7 +15,6 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
-import { DropdownMenuTrigger, SimpleUiDropdownMenu } from '@/components/SimpleUiDropdownMenu';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closePositionFormActions } from '@/state/closePositionForm';
@@ -151,33 +150,9 @@ export const SimpleUiTradeDialog = ({
                 </div>
               </div>
 
-              <SimpleUiDropdownMenu
-                withPortal={false}
-                items={[
-                  {
-                    value: TradeFormType.MARKET,
-                    active: selectedTradeType === TradeFormType.MARKET,
-                    label: stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT }),
-                    onSelect: () => onTradeTypeChange(TradeFormType.MARKET),
-                  },
-                  {
-                    value: TradeFormType.LIMIT,
-                    active: selectedTradeType === TradeFormType.LIMIT,
-                    label: stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT }),
-                    onSelect: () => onTradeTypeChange(TradeFormType.LIMIT),
-                  },
-                ]}
-              >
-                <DropdownMenuTrigger
-                  tw="bg-[var(--simpleUi-dialog-secondaryColor)]"
-                  shape={ButtonShape.Pill}
-                  size={ButtonSize.Base}
-                >
-                  {selectedTradeType === TradeFormType.MARKET
-                    ? stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })
-                    : stringGetter({ key: STRING_KEYS.LIMIT_ORDER_SHORT })}
-                </DropdownMenuTrigger>
-              </SimpleUiDropdownMenu>
+              <span tw="text-color-text-2 font-medium-bold">
+                {stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}
+              </span>
             </>
           );
         }
