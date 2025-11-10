@@ -136,31 +136,32 @@ export const StakeRewardButtonAndReceipt = ({
       <$WithDetailsReceipt detailItems={detailItems} isForm={isForm} className={className}>
         <WithTooltip
           tooltipString={shouldDisplayErrorAsWarning() ? errorToDisplay?.message : undefined}
-        >
-          {!canAccountTrade ? (
-            <OnboardingTriggerButton size={buttonSize} tw="w-full" />
-          ) : (
-            (errorToDisplay?.slotButton ?? (
-              <$Button
-                action={ButtonAction.Primary}
-                type={isForm ? ButtonType.Submit : ButtonType.Button}
-                size={buttonSize}
-                onClick={onClick}
-                slotLeft={
-                  shouldDisplayErrorAsWarning() ? (
-                    <Icon iconName={IconName.Warning} tw="text-color-warning" />
-                  ) : undefined
-                }
-                state={{
-                  isLoading,
-                  isDisabled: errorToDisplay?.type === AlertType.Error || gasFee === undefined,
-                }}
-              >
-                {buttonText}
-              </$Button>
-            ))
-          )}
-        </WithTooltip>
+          slotTrigger={
+            !canAccountTrade ? (
+              <OnboardingTriggerButton size={buttonSize} tw="w-full" />
+            ) : (
+              (errorToDisplay?.slotButton ?? (
+                <$Button
+                  action={ButtonAction.Primary}
+                  type={isForm ? ButtonType.Submit : ButtonType.Button}
+                  size={buttonSize}
+                  onClick={onClick}
+                  slotLeft={
+                    shouldDisplayErrorAsWarning() ? (
+                      <Icon iconName={IconName.Warning} tw="text-color-warning" />
+                    ) : undefined
+                  }
+                  state={{
+                    isLoading,
+                    isDisabled: errorToDisplay?.type === AlertType.Error || gasFee === undefined,
+                  }}
+                >
+                  {buttonText}
+                </$Button>
+              ))
+            )
+          }
+        />
       </$WithDetailsReceipt>
     </>
   );

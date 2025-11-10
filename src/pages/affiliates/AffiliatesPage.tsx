@@ -180,14 +180,18 @@ export const AffiliatesPage = () => {
       {
         label: stringGetter({ key: STRING_KEYS.AFFILIATES_LEADERBOARD }),
         value: AffiliatesTableType.Leaderboard,
-        content: <AffiliatesLeaderboard />,
+        content: (
+          <$TableContainer>
+            <AffiliatesLeaderboard />
+          </$TableContainer>
+        ),
       },
     ];
   }, [stringGetter]);
 
   const tableTabs = (
     <Tabs
-      tw="gap-1.25"
+      tw="gap-1"
       dividerStyle="underline"
       value={tableType}
       onValueChange={setTableType}
@@ -205,6 +209,12 @@ export const AffiliatesPage = () => {
     </$Page>
   );
 };
+
+const $TableContainer = styled.div`
+  ${layoutMixins.contentContainer}
+  ${layoutMixins.stickyArea3}
+  padding: var(--border-width);
+`;
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
