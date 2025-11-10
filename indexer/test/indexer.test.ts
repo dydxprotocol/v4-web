@@ -88,10 +88,7 @@ describe("Indexer", () => {
     })
 
     it("should work", { timeout: 30_000 },async () => {
-        await compose.upAll()
-        // child_process.execSync('pnpm apply:migration')
         console.log("works")
-        await compose.downAll()
     })
 
     afterEach(async () => {
