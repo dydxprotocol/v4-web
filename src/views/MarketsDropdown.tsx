@@ -85,6 +85,7 @@ const MarketsDropdownContent = ({
             isUnlaunched,
             effectiveInitialMarginFraction,
             initialMarginFraction,
+            marketFeeDiscountMultiplier,
           }: MarketData) => (
             <div tw="flex items-center gap-0.25">
               <FavoriteButton marketId={id} />
@@ -104,6 +105,10 @@ const MarketsDropdownContent = ({
                   />
                 )}
               </Tag>
+              <TradeFeeDiscountTag
+                marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
+                symbol={displayId}
+              />
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </div>
           ),
@@ -161,17 +166,6 @@ const MarketsDropdownContent = ({
           label: stringGetter({ key: STRING_KEYS.MARKET_CAP }),
           renderCell: (row: MarketData) => (
             <$Output type={OutputType.CompactFiat} value={row.marketCap} />
-          ),
-        },
-        {
-          columnKey: 'incentives',
-          getCellValue: (row: MarketData) => row.marketFeeDiscountMultiplier,
-          label: stringGetter({ key: STRING_KEYS.INCENTIVES }),
-          renderCell: (row: MarketData) => (
-            <TradeFeeDiscountTag
-              marketFeeDiscountMultiplier={row.marketFeeDiscountMultiplier}
-              symbol={row.displayId}
-            />
           ),
         },
       ].filter(isTruthy) satisfies ColumnDef<MarketData>[],

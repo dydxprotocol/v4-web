@@ -74,11 +74,11 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
           <$Asset stacked={stacked} truncateAssetName={truncateAssetName}>
             {name}
           </$Asset>
+          <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
           <TradeFeeDiscountTag
             marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
             symbol={displayId}
           />
-          <Tag>{isUnlaunched ? stringGetter({ key: STRING_KEYS.LAUNCHABLE }) : maxLeverage}</Tag>
         </div>
         {children}
       </$TableCellContent>

@@ -8,7 +8,7 @@ import { clamp } from '@/lib/math';
 import { BIG_NUMBERS } from '@/lib/numbers';
 import { Nullable } from '@/lib/typeUtils';
 
-import { AccentTag } from './Tag';
+import { OutlinedAccentTag } from './Tag';
 import { WithTooltip } from './WithTooltip';
 
 export const TradeFeeDiscountTag = ({
@@ -26,7 +26,7 @@ export const TradeFeeDiscountTag = ({
     }
 
     if (marketFeeDiscountMultiplier === 0) {
-      return stringGetter({ key: STRING_KEYS.FEE_FREE });
+      return stringGetter({ key: STRING_KEYS.NO_FEES });
     }
 
     return stringGetter({ key: STRING_KEYS.FEE_DISCOUNT });
@@ -47,8 +47,9 @@ export const TradeFeeDiscountTag = ({
         SYMBOL: symbol ?? '',
         DISCOUNT_PERCENT: discountPercent.toFixed(numDecimals),
       }}
+      withUnderline={false}
     >
-      <AccentTag>{tagContent}</AccentTag>
+      <OutlinedAccentTag>{tagContent}</OutlinedAccentTag>
     </WithTooltip>
   );
 };
