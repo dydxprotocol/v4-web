@@ -1,5 +1,6 @@
 import { RefObject, useMemo } from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -18,6 +19,7 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
@@ -51,6 +53,7 @@ export const MarketsBanners = ({
   const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
   const hasDismissedNoFeeBanner = useAppSelector(getHasDismissedNoFeeBanner);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
@@ -68,6 +71,10 @@ export const MarketsBanners = ({
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const onClickNoFeeBanner = () => {
+    navigate(`${AppRoute.Trade}/BTC-USD`);
   };
 
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
@@ -168,20 +175,15 @@ export const MarketsBanners = ({
         tw="pointer-events-none absolute right-7 h-[200%] object-contain"
       />
       <div tw="z-[1] ml-1 mr-auto flex flex-col items-start">
-        <span tw="text-large text-white font-extra-large-bold">
+        <span tw="text-large text-white font-extra-bold">
           <span tw="mr-0.25 rounded-[0.25rem] bg-color-accent px-0.25">
             {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE_ACCENT })}
           </span>{' '}
           {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE })}
         </span>
-        <$BannerLink
-          action={ButtonAction.Navigation}
-          size={ButtonSize.Medium}
-          type={ButtonType.Link}
-          href={`${AppRoute.Trade}/BTC-USD`}
-        >
+        <Link isAccent onClick={onClickNoFeeBanner} tw="font-base-medium">
           {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_CTA })} →
-        </$BannerLink>
+        </Link>
       </div>
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
@@ -302,10 +304,4 @@ const $NoFeeBanner = styled($MarketsPageBanner)`
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-`;
-
-const $BannerLink = styled(Button)`
-  --button-textColor: var(--color-accent);
-  --button-height: unset;
-  --button-padding: 0;
 `;
