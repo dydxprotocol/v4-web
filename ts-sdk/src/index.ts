@@ -17,3 +17,20 @@ export { SubaccountInfo as SubaccountClient, SubaccountInfo } from './clients/su
 export { ValidatorClient } from './clients/validator-client';
 export { encodeJson, ByteArrayEncoding } from './lib/helpers';
 export { NetworkOptimizer } from './network_optimizer';
+
+export { FuelClient } from './clients/fuel-client';
+export type {
+  FuelClientConfig,
+  LiquidityPreview,
+  LiquidityDepositParams,
+  LiquidityDepositResult,
+} from './clients/fuel-client';
+
+export { LiquidityClient } from './clients/liquidity-client';
+export type {
+  LiquidityClientConfig,
+  PoolStatisticsExtended,
+  UserLiquidityPosition,
+} from './clients/liquidity-client';
+
+export * from './clients/types/contracts';
