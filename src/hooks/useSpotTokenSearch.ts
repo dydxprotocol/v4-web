@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { timeUnits } from '@/constants/time';
 
-import { SpotHeaderToken } from '@/pages/spot/SpotHeader';
+import { SpotHeaderToken } from '@/pages/spot/types';
 
 import { searchSpotTokens } from '@/clients/spotApi';
 
