@@ -131,7 +131,7 @@ const SpotPage = () => {
             { icon: IconName.CoinMarketCap, url: '3' },
             { icon: IconName.SocialX, url: '4' },
           ]}
-          contractAddress="WIFgzYxgkMtFGzGYAzm72rnWC9eFsEhSUvBdtpump"
+          contractAddress={symbol!}
           createdAt={Date.now() - 21 * 24 * 60 * 60 * 1000}
           items={[
             {
