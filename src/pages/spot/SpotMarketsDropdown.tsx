@@ -22,7 +22,7 @@ import { getSpotFavorites } from '@/state/appUiConfigsSelectors';
 
 import { truncateAddress } from '@/lib/wallet';
 
-import { SpotHeaderToken } from './SpotHeader';
+import { SpotHeaderToken } from './types';
 
 type SpotMarketsDropdownProps = {
   current: SpotHeaderToken;

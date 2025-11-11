@@ -20,11 +20,12 @@ import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { SpotHeader, SpotHeaderToken } from './SpotHeader';
+import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
 import { SpotHorizontalPanel } from './SpotHorizontalPanel';
 import { SpotTokenInfo } from './SpotTokenInfo';
 import { SpotTradeForm } from './SpotTradeForm';
+import { SpotHeaderToken } from './types';
 
 // TODO: spot localization
 

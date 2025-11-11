@@ -5,7 +5,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 
-import { SpotHeaderToken } from './SpotHeader';
+import { SpotHeaderToken } from './types';
 
 type SpotMarketStatsRowProps = {
   stats: SpotHeaderToken;
