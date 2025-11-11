@@ -1,6 +1,8 @@
 import { ElementType, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
@@ -23,6 +25,7 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
@@ -67,11 +70,13 @@ export const AccountMenu = () => {
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  const spotEnabled = useEnableSpot();
   const dispatch = useAppDispatch();
   const onboardingState = useAppSelector(getOnboardingState);
   const freeCollateral = useAppSelector(getSubaccountFreeCollateral);
   const isKeplr = useAppSelector(selectIsKeplrConnected);
   const isTurnkey = useAppSelector(selectIsTurnkeyConnected);
+  const spotWalletData = useAppSelector(BonsaiCore.spot.walletPositions.data);
 
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
 
@@ -83,6 +88,8 @@ export const AccountMenu = () => {
     sourceAccount: { walletInfo, address },
     dydxAddress,
     hdKey,
+    solanaAddress,
+    canDeriveSolanaWallet,
   } = useAccounts();
   const { registerAffiliate } = useSubaccount();
 
@@ -182,7 +189,7 @@ export const AccountMenu = () => {
               <AssetIcon
                 logoUrl={chainTokenImage}
                 symbol={chainTokenLabel}
-                tw="z-[2] [--asset-icon-size:1.75rem]"
+                tw="z-[1] [--asset-icon-size:1.75rem]"
               />
               <$Column>
                 {walletInfo && walletInfo.name !== WalletType.Keplr ? (
@@ -203,11 +210,33 @@ export const AccountMenu = () => {
                 />
               </WithTooltip>
             </$AddressRow>
+            {walletInfo && canDeriveSolanaWallet && spotEnabled && (
+              <$AddressRow>
+                <div tw="relative flex justify-center rounded-[50%] bg-[#303045] text-[1rem] leading-[0]">
+                  <Icon iconName={IconName.AddressConnector} tw="absolute top-[-1.625rem] h-1.75" />
+                  <Icon iconName={IconName.Sol} size="1.75rem" tw="z-[1]" />
+                </div>
+                <$Column>
+                  <$label>Spot Address</$label>
+                  <$Address>{truncateAddress(solanaAddress, '')}</$Address>
+                </$Column>
+                <$CopyButton buttonType="icon" value={solanaAddress} shape={ButtonShape.Square} />
+                <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
+                  <$IconButton
+                    action={ButtonAction.Base}
+                    href={`https://solscan.io/account/${solanaAddress}`}
+                    iconName={IconName.LinkOut}
+                    shape={ButtonShape.Square}
+                    type={ButtonType.Link}
+                  />
+                </WithTooltip>
+              </$AddressRow>
+            )}
             {walletInfo &&
               walletInfo.name !== WalletType.Privy &&
               walletInfo.name !== WalletType.Keplr && (
                 <$AddressRow>
-                  <div tw="relative z-[1] rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
+                  <div tw="relative rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
                     <Icon
                       iconName={IconName.AddressConnector}
                       tw="absolute top-[-1.625rem] h-1.75"
@@ -287,6 +316,24 @@ export const AccountMenu = () => {
                   withOnboarding
                 />
               </div>
+              {canDeriveSolanaWallet && spotEnabled && (
+                <div>
+                  <div>
+                    <$label>
+                      Spot Sol Balance
+                      <Icon iconName={IconName.Sol} size="1rem" />
+                    </$label>
+                    <$BalanceOutput
+                      type={OutputType.Asset}
+                      value={
+                        spotWalletData?.solBalance
+                          ? spotWalletData.solBalance / LAMPORTS_PER_SOL
+                          : 0
+                      }
+                    />
+                  </div>
+                </div>
+              )}
             </$Balances>
             {showConfirmPendingDeposit && (
               <$ConfirmPendingDeposit>

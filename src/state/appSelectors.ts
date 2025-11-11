@@ -15,5 +15,8 @@ export const getMetadataEndpoint = (state: RootState) =>
 export const getSpotApiEndpoint = (state: RootState) =>
   ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].endpoints.spotApi;
 
+export const getSpotCandleServiceEndpoint = (state: RootState) =>
+  ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].endpoints.spotCandleService;
+
 export const getGeoCheckEnabled = (state: RootState) =>
   ENVIRONMENT_CONFIG_MAP[getSelectedNetwork(state)].featureFlags.checkForGeo;

@@ -33,8 +33,10 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
-import { SpotTokenMetadataResponse, SpotTokenPriceResponse } from '@/clients/spotApi';
+import { SpotApiTokenMetadataResponse, SpotApiTokenPriceResponse } from '@/clients/spotApi';
+import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
 import { calc } from '@/lib/do';
+import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
@@ -106,8 +108,11 @@ export interface RawDataState {
     price: Loadable<TokenPriceResponse | undefined>;
   };
   spot: {
-    solPrice: Loadable<SpotTokenPriceResponse | undefined>;
-    tokenMetadata: Loadable<SpotTokenMetadataResponse | undefined>;
+    solPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
+    currentTokenCandles: Loadable<SpotCandleServiceCandleObject[]>;
+    walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
   };
 }
 
@@ -151,6 +156,9 @@ const initialState: RawDataState = {
   spot: {
     solPrice: loadableIdle(),
     tokenMetadata: loadableIdle(),
+    currentTokenCandles: loadableIdle(),
+    tokenPrice: loadableIdle(),
+    walletPositions: loadableIdle(),
   },
 };
 
@@ -262,14 +270,32 @@ export const rawSlice = createSlice({
       ) => {
         state.markets.selectedMarketLeverages = action.payload;
       },
-      setSolPrice: (state, action: PayloadAction<Loadable<SpotTokenPriceResponse | undefined>>) => {
+      setSpotSolPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
         state.spot.solPrice = action.payload;
       },
-      setTokenMetadata: (
+      setSpotTokenPrice: (
         state,
-        action: PayloadAction<Loadable<SpotTokenMetadataResponse | undefined>>
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.tokenPrice = action.payload;
+      },
+      setSpotTokenMetadata: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenMetadataResponse | undefined>>
       ) => {
         state.spot.tokenMetadata = action.payload;
+      },
+      setSpotCandles: (state, action: PayloadAction<Loadable<SpotCandleServiceCandleObject[]>>) => {
+        state.spot.currentTokenCandles = action.payload;
+      },
+      setSpotWalletPositions: (
+        state,
+        action: PayloadAction<Loadable<SpotApiWsWalletPositionsUpdate | undefined>>
+      ) => {
+        state.spot.walletPositions = action.payload;
       },
     }),
     // orderbook is throttled separately for fine-grained control
@@ -358,6 +384,9 @@ export const {
   setRewardsTokenPrice,
   setSelectedMarketLeverage,
   setSelectedMarketLeverages,
-  setSolPrice,
-  setTokenMetadata,
+  setSpotSolPrice,
+  setSpotTokenPrice,
+  setSpotTokenMetadata,
+  setSpotCandles,
+  setSpotWalletPositions,
 } = rawSlice.actions;

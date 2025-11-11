@@ -6,12 +6,29 @@ import { VerticalSeparator } from '@/components/Separator';
 
 import { SpotMarketStatsRow } from './SpotMarketStatsRow';
 import { SpotMarketsDropdown } from './SpotMarketsDropdown';
-import { SpotMarketToken } from './types';
 
-type SpotHeaderProps = {
-  currentToken: SpotMarketToken;
-  searchResults: SpotMarketToken[];
-  onTokenSelect: (token: SpotMarketToken) => void;
+export interface SpotHeaderToken {
+  tokenAddress: string;
+  name: string;
+  symbol: string;
+  logoUrl?: string | null;
+  volume24hUsd?: number;
+  priceUsd?: number;
+  marketCapUsd?: number;
+  change24hPercent?: number;
+  fdvUsd?: number;
+  liquidityUsd?: number;
+  circulatingSupply?: number;
+  totalSupply?: number;
+  buys24hUsd?: number;
+  sells24hUsd?: number;
+}
+
+export type SpotHeaderProps = {
+  currentToken: SpotHeaderToken;
+  searchResults: SpotHeaderToken[];
+  isSearchLoading?: boolean;
+  onTokenSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
   className?: string;
 };
@@ -19,6 +36,7 @@ type SpotHeaderProps = {
 export const SpotHeader = ({
   currentToken,
   searchResults,
+  isSearchLoading,
   onTokenSelect,
   onSearchTextChange,
   className,
@@ -28,6 +46,7 @@ export const SpotHeader = ({
       <SpotMarketsDropdown
         current={currentToken}
         searchResults={searchResults}
+        isSearchLoading={isSearchLoading}
         onSelect={onTokenSelect}
         onSearchTextChange={onSearchTextChange}
       />

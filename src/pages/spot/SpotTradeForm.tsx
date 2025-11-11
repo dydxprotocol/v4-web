@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
+import { BonsaiCore } from '@/bonsai/ontology';
 
 import { ButtonAction, ButtonState } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -9,6 +10,9 @@ import { useSpotForm } from '@/hooks/useSpotForm';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
+import { ValidationAlertMessage } from '@/components/ValidationAlert';
+
+import { useAppSelector } from '@/state/appTypes';
 
 import { QuickButtons } from './QuickButtons';
 import { SpotFormInput } from './SpotFormInput';
@@ -17,8 +21,10 @@ import { SpotTabs, SpotTabVariant } from './SpotTabs';
 export const SpotTradeForm = () => {
   const stringGetter = useStringGetter();
   const form = useSpotForm();
+  const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [quickOptionsState, setQuickOptionsState] = useState({
     [SpotSide.SELL]: {
       [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
@@ -46,111 +52,83 @@ export const SpotTradeForm = () => {
       : { min: 0, decimalScale: 2 };
   }, [form.state.side, form.state.sellInputType]);
 
-  const handleInputTypeChange = (side: SpotSide, type: SpotBuyInputType | SpotSellInputType) => {
-    if (side === SpotSide.BUY) {
-      const newType = type as SpotBuyInputType;
-
-      // Use summary values to convert between input types
-      const newSize =
-        newType === SpotBuyInputType.USD
-          ? (form.summary.estimatedUsdCost?.toString() ?? '')
-          : (form.summary.estimatedSolCost?.toString() ?? '');
-
-      form.actions.setBuyInputType(newType);
-      form.actions.setSize(newSize);
-    } else {
-      const newType = type as SpotSellInputType;
-
-      // Use summary values to convert between input types
-      let newSize = '';
-      if (newType === SpotSellInputType.SOL) {
-        newSize = form.summary.estimatedSolCost?.toString() ?? '';
-      } else if (newType === SpotSellInputType.PERCENT) {
-        // Calculate percent from estimated token amount
-        if (form.summary.estimatedTokenAmount && form.inputData.userTokenBalance) {
-          const percent =
-            (form.summary.estimatedTokenAmount / form.inputData.userTokenBalance) * 100;
-          newSize = percent.toString();
-        }
+  const handleQuickOptionsChange = useCallback(
+    (newOptions: string[]) => {
+      if (form.state.side === SpotSide.BUY) {
+        setQuickOptionsState((prev) => ({
+          ...prev,
+          [SpotSide.BUY]: {
+            ...prev[SpotSide.BUY],
+            [form.state.buyInputType]: newOptions,
+          },
+        }));
+      } else {
+        setQuickOptionsState((prev) => ({
+          ...prev,
+          [SpotSide.SELL]: {
+            ...prev[SpotSide.SELL],
+            [form.state.sellInputType]: newOptions,
+          },
+        }));
       }
-
-      form.actions.setSellInputType(newType);
-      form.actions.setSize(newSize);
-    }
-  };
-
-  const handleQuickOptionsChange = (newOptions: string[]) => {
-    if (form.state.side === SpotSide.BUY) {
-      setQuickOptionsState((prev) => ({
-        ...prev,
-        [SpotSide.BUY]: {
-          ...prev[SpotSide.BUY],
-          [form.state.buyInputType]: newOptions,
-        },
-      }));
-    } else {
-      setQuickOptionsState((prev) => ({
-        ...prev,
-        [SpotSide.SELL]: {
-          ...prev[SpotSide.SELL],
-          [form.state.sellInputType]: newOptions,
-        },
-      }));
-    }
-  };
-
-  const inputRef = useRef<HTMLInputElement>(null);
+    },
+    [form.state.buyInputType, form.state.sellInputType, form.state.side]
+  );
 
   return (
     <SpotTabs
       tw="p-1"
-      disabled={isSubmitting}
+      disabled={form.isPending}
       value={form.state.side}
       onValueChange={(v) => {
         form.actions.setSide(v as SpotSide);
-        // Size is cleared by the reducer when switching sides
       }}
       sharedContent={
         <div tw="flex flex-1 flex-col gap-0.75">
           <SpotFormInput
             ref={inputRef}
             value={form.state.size}
-            disabled={isSubmitting}
+            disabled={form.isPending}
             onInput={({ formattedValue }: { formattedValue: string }) =>
               form.actions.setSize(formattedValue)
             }
             balances={{
-              sol: form.inputData.userSolBalance,
-              token: form.inputData.userTokenBalance,
+              sol: form.inputData.userSolBalance ?? 0,
+              token: form.inputData.userTokenBalance ?? 0,
             }}
             inputType={
               form.state.side === SpotSide.BUY ? form.state.buyInputType : form.state.sellInputType
             }
-            onInputTypeChange={handleInputTypeChange}
+            onInputTypeChange={form.handleInputTypeChange}
             side={form.state.side}
-            tokenAmount={form.summary.estimatedTokenAmount ?? 0}
-            tokenSymbol={form.inputData.tokenSymbol}
+            tokenAmount={form.summary.amounts?.token ?? 0}
+            tokenSymbol={tokenMetadata?.symbol ?? ''}
           />
           <QuickButtons
             options={quickOptions}
-            onSelect={(val: string) => form.actions.setSize(val)}
+            onSelect={(val) => form.actions.setSize(val)}
             onOptionsEdit={handleQuickOptionsChange}
             currentValue={form.state.size}
-            disabled={isSubmitting}
+            disabled={form.isPending}
             validation={validationConfig}
           />
+          {form.primaryAlert != null &&
+            (form.primaryAlert.resources.text?.stringKey != null ||
+              form.primaryAlert.resources.text?.fallback != null) && (
+              <ValidationAlertMessage error={form.primaryAlert} />
+            )}
           <Button
             tw="mt-auto"
             action={form.state.side === SpotSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-            onClick={() => {
-              setIsSubmitting(true);
-              // TODO: Implement actual API call with form.summary.payload
-              setTimeout(() => {
-                setIsSubmitting(false);
-                form.actions.reset();
-              }, 1000);
-            }}
-            state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+            onClick={form.submitTransaction}
+            disabled={!form.canSubmit}
+            state={
+              form.isPending
+                ? ButtonState.Loading
+                : !form.canSubmit
+                  ? ButtonState.Disabled
+                  : ButtonState.Default
+            }
           >
             {form.state.side === SpotSide.BUY
               ? stringGetter({ key: STRING_KEYS.BUY })

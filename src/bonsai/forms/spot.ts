@@ -1,5 +1,8 @@
-import { calc } from '@/lib/do';
-import { AttemptBigNumber } from '@/lib/numbers';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+import { SpotApiCreateTransactionRequest, SpotApiSide, SpotApiTradeRoute } from '@/clients/spotApi';
+import { calc, mapIfPresent } from '@/lib/do';
+import { AttemptNumber } from '@/lib/numbers';
 
 import { createForm, createVanillaReducer } from '../lib/forms';
 import { ErrorType, simpleValidationError, ValidationError } from '../lib/validationErrors';
@@ -57,203 +60,118 @@ const reducer = createVanillaReducer({
   },
 });
 
-// Input data that will come from API or hardcoded sources
 export interface SpotFormInputData {
-  tokenSymbol: string;
-  tokenPriceUsd: number | undefined; // Price of the token in USD
-  solPriceUsd: number | undefined; // Price of SOL in USD
-  userSolBalance: number | undefined; // User's SOL balance
-  userTokenBalance: number | undefined; // User's token balance
+  tokenPriceUsd: number | undefined;
+  solPriceUsd: number | undefined;
+  userSolBalance: number | undefined;
+  userTokenBalance: number | undefined;
+  tokenMint: string | undefined;
+  decimals: number | undefined;
+  pairAddress: string | undefined;
+  tradeRoute: SpotApiTradeRoute | undefined;
+  solanaAddress: string | undefined;
 }
 
-// Payload that will be sent to the API
-export interface SpotTradePayload {
-  side: SpotSide;
-  tokenSymbol: string;
-  // For BUY orders
-  solAmount?: number; // Amount of SOL to spend
-  usdAmount?: number; // Amount of USD worth of SOL to spend
-  // For SELL orders
-  tokenAmount?: number; // Amount of token to sell
-  sellPercent?: number; // Percentage of balance to sell
+export interface SpotAmounts {
+  sol: number;
+  token: number;
+  usd: number;
+  percent: number | undefined;
 }
 
 export interface SpotSummaryData {
-  estimatedTokenAmount: number | undefined; // Estimated tokens to receive (BUY) or sell (SELL)
-  estimatedSolCost: number | undefined; // Estimated SOL cost for the trade
-  estimatedUsdCost: number | undefined; // Estimated USD value of the trade
-  payload: SpotTradePayload | undefined;
+  amounts: SpotAmounts | undefined;
+  payload: SpotApiCreateTransactionRequest | undefined;
 }
 
 function calculateSummary(state: SpotFormState, inputData: SpotFormInputData): SpotSummaryData {
-  const parsedSize = AttemptBigNumber(state.size);
+  const parsedSize = AttemptNumber(state.size);
 
-  // Calculate estimates based on input
-  const { estimatedTokenAmount, estimatedSolCost, estimatedUsdCost } = calc(() => {
-    if (!parsedSize || !inputData.tokenPriceUsd || !inputData.solPriceUsd) {
-      return {
-        estimatedTokenAmount: undefined,
-        estimatedSolCost: undefined,
-        estimatedUsdCost: undefined,
-      };
+  const amounts: SpotAmounts | undefined = calc(() =>
+    mapIfPresent(
+      parsedSize,
+      inputData.tokenPriceUsd,
+      inputData.solPriceUsd,
+      (size, tokenUsdPrice, solUsdPrice): SpotAmounts => {
+        if (state.side === SpotSide.BUY) {
+          if (state.buyInputType === SpotBuyInputType.SOL) {
+            const sol = size;
+            const usd = sol * solUsdPrice;
+            const token = usd / tokenUsdPrice;
+            return { sol, usd, token, percent: undefined };
+          }
+
+          const usd = size;
+          const sol = usd / solUsdPrice;
+          const token = usd / tokenUsdPrice;
+          return { sol, usd, token, percent: undefined };
+        }
+
+        if (state.sellInputType === SpotSellInputType.SOL) {
+          const sol = size;
+          const usd = sol * solUsdPrice;
+          const token = usd / tokenUsdPrice;
+          const percent =
+            inputData.userTokenBalance != null && inputData.userTokenBalance > 0
+              ? (token / inputData.userTokenBalance) * 100
+              : undefined;
+          return { sol, usd, token, percent };
+        }
+
+        const percent = size;
+        const token = (percent / 100) * (inputData.userTokenBalance ?? 0);
+        const usd = token * tokenUsdPrice;
+        const sol = usd / solUsdPrice;
+        return { sol, usd, token, percent };
+      }
+    )
+  );
+
+  const payload = calc((): SpotApiCreateTransactionRequest | undefined => {
+    if (state.side === SpotSide.BUY) {
+      return mapIfPresent(
+        amounts?.sol,
+        inputData.tokenMint,
+        inputData.solanaAddress,
+        inputData.pairAddress,
+        inputData.tradeRoute,
+        (solAmount, tokenMint, solanaAddress, pairAddress, tradeRoute) => {
+          const inAmount = Math.floor(solAmount * LAMPORTS_PER_SOL).toString();
+          return {
+            account: solanaAddress,
+            tokenMint,
+            side: SpotApiSide.BUY,
+            inAmount,
+            pool: pairAddress,
+            tradeRoute,
+          };
+        }
+      );
     }
 
-    if (state.side === SpotSide.BUY) {
-      if (state.buyInputType === SpotBuyInputType.SOL) {
-        // User entered SOL amount
-        const solAmount = parsedSize.toNumber();
-        const usdValue = solAmount * inputData.solPriceUsd;
-        const tokenAmount = usdValue / inputData.tokenPriceUsd;
-
+    return mapIfPresent(
+      amounts?.token,
+      inputData.tokenMint,
+      inputData.solanaAddress,
+      inputData.pairAddress,
+      inputData.tradeRoute,
+      inputData.decimals,
+      (tokenAmount, tokenMint, solanaAddress, pairAddress, tradeRoute, decimals) => {
+        const inAmount = Math.floor(tokenAmount * decimals).toString();
         return {
-          estimatedTokenAmount: tokenAmount,
-          estimatedSolCost: solAmount,
-          estimatedUsdCost: usdValue,
+          account: solanaAddress,
+          tokenMint,
+          side: SpotApiSide.SELL,
+          inAmount,
+          pool: pairAddress,
+          tradeRoute,
         };
       }
-
-      // User entered USD amount
-      const usdValue = parsedSize.toNumber();
-      const solAmount = usdValue / inputData.solPriceUsd;
-      const tokenAmount = usdValue / inputData.tokenPriceUsd;
-
-      return {
-        estimatedTokenAmount: tokenAmount,
-        estimatedSolCost: solAmount,
-        estimatedUsdCost: usdValue,
-      };
-    }
-
-    if (state.sellInputType === SpotSellInputType.SOL) {
-      // User entered SOL amount to receive
-      const solAmount = parsedSize.toNumber();
-      const usdValue = solAmount * inputData.solPriceUsd;
-      const tokenAmount = usdValue / inputData.tokenPriceUsd;
-
-      return {
-        estimatedTokenAmount: tokenAmount,
-        estimatedSolCost: solAmount,
-        estimatedUsdCost: usdValue,
-      };
-    }
-
-    // User entered percentage
-    const percent = parsedSize.toNumber();
-    const tokenAmount = (percent / 100) * (inputData.userTokenBalance ?? 0);
-    const usdValue = tokenAmount * inputData.tokenPriceUsd;
-    const solAmount = usdValue / inputData.solPriceUsd;
-
-    return {
-      estimatedTokenAmount: tokenAmount,
-      estimatedSolCost: solAmount,
-      estimatedUsdCost: usdValue,
-    };
+    );
   });
 
-  // Build payload for API
-  const payload = calc((): SpotTradePayload | undefined => {
-    if (!parsedSize || parsedSize.lte(0) || !inputData.tokenPriceUsd || !inputData.solPriceUsd) {
-      return undefined;
-    }
-
-    const basePayload = {
-      side: state.side,
-      tokenSymbol: inputData.tokenSymbol,
-    };
-
-    if (state.side === SpotSide.BUY) {
-      if (state.buyInputType === SpotBuyInputType.SOL) {
-        return {
-          ...basePayload,
-          solAmount: parsedSize.toNumber(),
-        };
-      }
-
-      return {
-        ...basePayload,
-        usdAmount: parsedSize.toNumber(),
-      };
-    }
-
-    if (state.sellInputType === SpotSellInputType.SOL) {
-      return {
-        ...basePayload,
-        tokenAmount: estimatedTokenAmount,
-      };
-    }
-
-    return {
-      ...basePayload,
-      sellPercent: parsedSize.toNumber(),
-      tokenAmount: estimatedTokenAmount,
-    };
-  });
-
-  return {
-    estimatedTokenAmount,
-    estimatedSolCost,
-    estimatedUsdCost,
-    payload,
-  };
+  return { amounts, payload };
 }
-
-class SpotFormValidationErrors {
-  sizeEmpty(): ValidationError {
-    return simpleValidationError({
-      code: 'SIZE_EMPTY',
-      type: ErrorType.error,
-      fields: ['size'],
-    });
-  }
-
-  invalidSize(): ValidationError {
-    return simpleValidationError({
-      code: 'INVALID_SIZE',
-      type: ErrorType.error,
-      fields: ['size'],
-    });
-  }
-
-  insufficientSolBalance(): ValidationError {
-    return simpleValidationError({
-      code: 'INSUFFICIENT_SOL_BALANCE',
-      type: ErrorType.error,
-      fields: ['size'],
-    });
-  }
-
-  insufficientTokenBalance(): ValidationError {
-    return simpleValidationError({
-      code: 'INSUFFICIENT_TOKEN_BALANCE',
-      type: ErrorType.error,
-      fields: ['size'],
-    });
-  }
-
-  invalidPercent(): ValidationError {
-    return simpleValidationError({
-      code: 'INVALID_PERCENT',
-      type: ErrorType.error,
-      fields: ['size'],
-    });
-  }
-
-  missingPriceData(): ValidationError {
-    return simpleValidationError({
-      code: 'MISSING_PRICE_DATA',
-      type: ErrorType.error,
-    });
-  }
-
-  noPayload(): ValidationError {
-    return simpleValidationError({
-      code: 'MISSING_PAYLOAD',
-      type: ErrorType.error,
-    });
-  }
-}
-
-const errors = new SpotFormValidationErrors();
 
 export function getErrors(
   state: SpotFormState,
@@ -262,48 +180,107 @@ export function getErrors(
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
 
-  const size = AttemptBigNumber(state.size);
+  const parsedSize = AttemptNumber(state.size);
 
-  // Check if size is empty or invalid
-  if (size == null || size.lte(0)) {
-    validationErrors.push(errors.sizeEmpty());
-    return validationErrors; // Return early if size is invalid
-  }
-
-  // Check if price data is available
-  if (!inputData.tokenPriceUsd || !inputData.solPriceUsd) {
-    validationErrors.push(errors.missingPriceData());
+  if (parsedSize == null || parsedSize <= 0) {
+    validationErrors.push(
+      simpleValidationError({
+        code: 'SPOT_AMOUNT_EMPTY',
+        type: ErrorType.error,
+        fields: ['size'],
+        titleFallback: 'Enter Amount',
+      })
+    );
     return validationErrors;
   }
 
-  // Validate based on side and input type
+  if (
+    inputData.tokenPriceUsd == null ||
+    inputData.solPriceUsd == null ||
+    inputData.tokenMint == null ||
+    inputData.pairAddress == null ||
+    inputData.tradeRoute == null ||
+    inputData.solanaAddress == null ||
+    inputData.decimals == null
+  ) {
+    validationErrors.push(
+      simpleValidationError({
+        code: 'SPOT_MISSING_DATA',
+        type: ErrorType.error,
+        titleFallback: 'Missing Data',
+        textFallback: 'Market data is loading. Please wait...',
+      })
+    );
+    return validationErrors;
+  }
+
   if (state.side === SpotSide.BUY) {
-    // Check if user has sufficient SOL balance
-    if (summary.estimatedSolCost != null && inputData.userSolBalance != null) {
-      if (summary.estimatedSolCost > inputData.userSolBalance) {
-        validationErrors.push(errors.insufficientSolBalance());
-      }
-    }
-  } else if (state.side === SpotSide.SELL) {
-    if (state.sellInputType === SpotSellInputType.PERCENT) {
-      // Validate percentage is between 0 and 100
-      const percent = size.toNumber();
-      if (percent < 0 || percent > 100) {
-        validationErrors.push(errors.invalidPercent());
-      }
+    const requiredSol = summary.amounts?.sol;
+    const availableSol = inputData.userSolBalance;
+
+    if (requiredSol != null && availableSol != null && requiredSol > availableSol) {
+      validationErrors.push(
+        simpleValidationError({
+          code: 'SPOT_INSUFFICIENT_SOL',
+          type: ErrorType.error,
+          fields: ['size'],
+          titleFallback: 'Insufficient Balance',
+          textFallback: 'Insufficient SOL balance for this purchase',
+        })
+      );
     }
 
-    // Check if user has sufficient token balance
-    if (summary.estimatedTokenAmount != null && inputData.userTokenBalance != null) {
-      if (summary.estimatedTokenAmount > inputData.userTokenBalance) {
-        validationErrors.push(errors.insufficientTokenBalance());
-      }
+    if (availableSol != null && availableSol < 0.01) {
+      validationErrors.push(
+        simpleValidationError({
+          code: 'SPOT_LOW_SOL_FOR_FEES',
+          type: ErrorType.warning,
+          titleFallback: 'Low SOL Balance',
+          textFallback: 'Your SOL balance is low. You may not have enough for transaction fees.',
+        })
+      );
+    }
+  } else {
+    const requiredToken = summary.amounts?.token;
+    const availableToken = inputData.userTokenBalance;
+
+    if (requiredToken != null && availableToken != null && requiredToken > availableToken) {
+      validationErrors.push(
+        simpleValidationError({
+          code: 'SPOT_INSUFFICIENT_TOKEN',
+          type: ErrorType.error,
+          fields: ['size'],
+          titleFallback: 'Insufficient Balance',
+          textFallback: 'Insufficient token balance for this sale',
+        })
+      );
     }
   }
 
-  // Check if payload was generated
-  if (!summary.payload) {
-    validationErrors.push(errors.noPayload());
+  if (state.side === SpotSide.SELL && state.sellInputType === SpotSellInputType.PERCENT) {
+    if (parsedSize > 100) {
+      validationErrors.push(
+        simpleValidationError({
+          code: 'SPOT_PERCENT_TOO_HIGH',
+          type: ErrorType.error,
+          fields: ['size'],
+          titleFallback: 'Invalid Percent',
+          textFallback: 'Percent must be 100 or less',
+        })
+      );
+    }
+  }
+
+  const minUsdAmount = 0.1; // Minimum $0.10 USD
+  if (summary.amounts?.usd != null && summary.amounts.usd < minUsdAmount) {
+    validationErrors.push(
+      simpleValidationError({
+        code: 'SPOT_AMOUNT_TOO_SMALL',
+        type: ErrorType.warning,
+        titleFallback: 'Amount Too Small',
+        textFallback: 'Trade amount is very small. Consider increasing the amount.',
+      })
+    );
   }
 
   return validationErrors;

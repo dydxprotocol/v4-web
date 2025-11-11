@@ -37,7 +37,6 @@ import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 
-import { testFlags } from '@/lib/testFlags';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
@@ -53,6 +52,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useEnableSpot } from './hooks/useEnableSpot';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
@@ -114,6 +114,7 @@ const Content = () => {
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
+  const isSpotEnabled = useEnableSpot();
 
   // Track current path in Redux for conditional polling
   useEffect(() => {
@@ -208,7 +209,7 @@ const Content = () => {
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
 
-              {testFlags.spot && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
+              {isSpotEnabled && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
