@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -207,5 +207,5 @@ export const SpotHoldingsTable = ({
 };
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;
