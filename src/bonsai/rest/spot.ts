@@ -7,10 +7,10 @@ import { type RootStore } from '@/state/_store';
 import { appQueryClient } from '@/state/appQueryClient';
 import { getCurrentPath, getSpotApiEndpoint } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { setSolPrice, setTokenMetadata } from '@/state/raw';
+import { setSpotSolPrice, setSpotTokenMetadata, setSpotTokenPrice } from '@/state/raw';
 import { getCurrentSpotToken } from '@/state/spot';
 
-import { SpotApiClient } from '@/clients/spotApi';
+import { getSpotTokenMetadata, getSpotTokenUsdPrice } from '@/clients/spotApi';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { loadableIdle } from '../lib/loadable';
@@ -31,26 +31,26 @@ const getSpotApiEndpointWhenOnSpotPage = createAppSelector(
 export function setUpTokenMetadataQuery(store: RootStore) {
   return createStoreEffect(store, getSpotApiEndpointWhenOnSpotPage, (params) => {
     if (!params) {
-      store.dispatch(setTokenMetadata(loadableIdle()));
+      store.dispatch(setSpotTokenMetadata(loadableIdle()));
       return () => {};
     }
 
     const { endpoint, currentSpotToken } = params;
-    const spotApiClient = new SpotApiClient(endpoint);
 
     const observer = new QueryObserver(appQueryClient, {
       queryKey: ['spot', 'tokenMetadata', currentSpotToken],
       queryFn: wrapAndLogBonsaiError(
-        () => spotApiClient.getTokenMetadata(currentSpotToken),
+        () => getSpotTokenMetadata(endpoint, currentSpotToken),
         'tokenMetadata'
       ),
-      retry: 5,
+      refetchInterval: timeUnits.minute * 5,
+      staleTime: timeUnits.minute * 5,
       retryDelay: (attempt) => timeUnits.second * 3 * 2 ** attempt,
     });
 
     const unsubscribe = safeSubscribeObserver(observer, (result) => {
       try {
-        store.dispatch(setTokenMetadata(queryResultToLoadable(result)));
+        store.dispatch(setSpotTokenMetadata(queryResultToLoadable(result)));
       } catch (e) {
         logBonsaiError(
           'setUpTokenMetadataQuery',
@@ -62,7 +62,7 @@ export function setUpTokenMetadataQuery(store: RootStore) {
     });
 
     return () => {
-      store.dispatch(setTokenMetadata(loadableIdle()));
+      store.dispatch(setSpotTokenMetadata(loadableIdle()));
       unsubscribe();
     };
   });
@@ -71,34 +71,69 @@ export function setUpTokenMetadataQuery(store: RootStore) {
 export function setUpSolPriceQuery(store: RootStore) {
   return createStoreEffect(store, getSpotApiEndpointWhenOnSpotPage, (params) => {
     if (!params) {
-      store.dispatch(setSolPrice(loadableIdle()));
+      store.dispatch(setSpotSolPrice(loadableIdle()));
       return () => {};
     }
 
-    const spotApiClient = new SpotApiClient(params.endpoint);
-
     const observer = new QueryObserver(appQueryClient, {
-      queryKey: ['spot', 'solPrice'],
+      queryKey: ['spotTokenPrice', SOL_MINT_ADDRESS],
       queryFn: wrapAndLogBonsaiError(
-        () => spotApiClient.getTokenPrice(SOL_MINT_ADDRESS),
+        () => getSpotTokenUsdPrice(params.endpoint, SOL_MINT_ADDRESS),
         'solPrice'
       ),
       refetchInterval: timeUnits.second * 10,
       staleTime: timeUnits.second * 10,
-      retry: 5,
-      retryDelay: (attempt) => timeUnits.second * 3 * 2 ** attempt,
+      retry: true,
     });
 
     const unsubscribe = safeSubscribeObserver(observer, (result) => {
       try {
-        store.dispatch(setSolPrice(queryResultToLoadable(result)));
+        store.dispatch(setSpotSolPrice(queryResultToLoadable(result)));
       } catch (e) {
         logBonsaiError('setUpSolPriceQuery', 'Error handling result from react query', e, result);
       }
     });
 
     return () => {
-      store.dispatch(setSolPrice(loadableIdle()));
+      store.dispatch(setSpotSolPrice(loadableIdle()));
+      unsubscribe();
+    };
+  });
+}
+
+export function setUpSpotTokenPriceQuery(store: RootStore) {
+  return createStoreEffect(store, getSpotApiEndpointWhenOnSpotPage, (params) => {
+    if (!params) {
+      store.dispatch(setSpotTokenPrice(loadableIdle()));
+      return () => {};
+    }
+
+    const observer = new QueryObserver(appQueryClient, {
+      queryKey: ['spotTokenPrice', params.currentSpotToken],
+      queryFn: wrapAndLogBonsaiError(
+        () => getSpotTokenUsdPrice(params.endpoint, params.currentSpotToken),
+        'tokenPrice'
+      ),
+      refetchInterval: timeUnits.second * 10,
+      staleTime: timeUnits.second * 10,
+      retry: true,
+    });
+
+    const unsubscribe = safeSubscribeObserver(observer, (result) => {
+      try {
+        store.dispatch(setSpotTokenPrice(queryResultToLoadable(result)));
+      } catch (e) {
+        logBonsaiError(
+          'setUpSpotTokenPriceQuery',
+          'Error handling result from react query',
+          e,
+          result
+        );
+      }
+    });
+
+    return () => {
+      store.dispatch(setSpotTokenPrice(loadableIdle()));
       unsubscribe();
     };
   });

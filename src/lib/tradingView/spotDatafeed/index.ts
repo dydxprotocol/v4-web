@@ -1,13 +1,18 @@
 import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/charting_library';
 
-import { getSpotCandleData } from './candleService';
-import { subscribeToSpotStream, unsubscribeFromSpotStream } from './streaming';
-import { SpotCandleServiceQuery } from './types';
+import { getSpotCandleData, SpotCandleServiceQuery } from '@/clients/spotCandleService';
+import {
+  subscribeToSpotCandles,
+  unsubscribeFromSpotStream,
+} from '@/lib/streaming/spotCandleStreaming';
+
 import {
   createSpotSymbolInfo,
   resolutionToSpotInterval,
   SPOT_SUPPORTED_RESOLUTIONS,
+  transformSpotCandleForChart,
+  transformSpotCandlesForChart,
 } from './utils';
 
 const configurationData: DatafeedConfiguration = {
@@ -65,14 +70,15 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
         to: toMs,
       };
 
-      const bars = await wrapAndLogBonsaiError(
+      const candles = await wrapAndLogBonsaiError(
         () => getSpotCandleData(spotApiUrl, query),
         'getSpotCandleData'
       )();
 
-      if (bars.length === 0) {
+      if (candles.length === 0) {
         onHistoryCallback([], { noData: true });
       } else {
+        const bars = transformSpotCandlesForChart(candles);
         onHistoryCallback(bars, { noData: false });
       }
     } catch (error) {
@@ -83,8 +89,20 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
 
   subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID) => {
     if (!symbolInfo.ticker) return;
+
     const token = symbolInfo.ticker;
-    subscribeToSpotStream(spotApiUrl, token, resolution, onRealtimeCallback, subscriberUID);
+    const interval = resolutionToSpotInterval(resolution);
+
+    subscribeToSpotCandles(
+      spotApiUrl,
+      token,
+      interval,
+      (candle) => {
+        const bar = transformSpotCandleForChart(candle);
+        onRealtimeCallback(bar);
+      },
+      subscriberUID
+    );
   },
 
   unsubscribeBars: (subscriberUID) => {

@@ -12,7 +12,12 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import { TokenInfo } from '@/clients/spotApi';
+import { SpotApiTokenInfoObject } from '@/clients/spotApi';
+import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
+import {
+  SpotApiWsWalletPositionObject,
+  SpotApiWsWalletPositionsUpdate,
+} from '@/lib/streaming/walletPositionsStreaming';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
@@ -91,10 +96,19 @@ import {
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
-  selectSolPrice,
-  selectSolPriceLoading,
-  selectTokenMetadata,
-  selectTokenMetadataLoading,
+  selectLatestSpotCandle,
+  selectSpotCandlePrice,
+  selectSpotCandles,
+  selectSpotCandlesLoading,
+  selectSpotPositions,
+  selectSpotSolPrice,
+  selectSpotSolPriceLoading,
+  selectSpotTokenMetadata,
+  selectSpotTokenMetadataLoading,
+  selectSpotTokenPrice,
+  selectSpotTokenPriceLoading,
+  selectSpotWalletPositions,
+  selectSpotWalletPositionsLoading,
 } from './selectors/spot';
 import {
   selectAllMarketSummaries,
@@ -226,9 +240,24 @@ interface BonsaiCoreShape {
       data: BasicSelector<number | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
-    tokenMetadata: {
-      data: BasicSelector<TokenInfo | undefined>;
+    tokenPrice: {
+      data: BasicSelector<number | undefined>;
       loading: BasicSelector<LoadableStatus>;
+    };
+    tokenMetadata: {
+      data: BasicSelector<SpotApiTokenInfoObject | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    candles: {
+      data: BasicSelector<SpotCandleServiceCandleObject[]>;
+      loading: BasicSelector<LoadableStatus>;
+      latestCandle: BasicSelector<SpotCandleServiceCandleObject | undefined>;
+      currentPrice: BasicSelector<number | undefined>;
+    };
+    walletPositions: {
+      data: BasicSelector<SpotApiWsWalletPositionsUpdate | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+      positions: BasicSelector<SpotApiWsWalletPositionObject[]>;
     };
   };
 }
@@ -316,12 +345,27 @@ export const BonsaiCore: BonsaiCoreShape = {
   rewardParams: { data: selectRewardsSummary },
   spot: {
     solPrice: {
-      data: selectSolPrice,
-      loading: selectSolPriceLoading,
+      data: selectSpotSolPrice,
+      loading: selectSpotSolPriceLoading,
+    },
+    tokenPrice: {
+      data: selectSpotTokenPrice,
+      loading: selectSpotTokenPriceLoading,
     },
     tokenMetadata: {
-      data: selectTokenMetadata,
-      loading: selectTokenMetadataLoading,
+      data: selectSpotTokenMetadata,
+      loading: selectSpotTokenMetadataLoading,
+    },
+    candles: {
+      data: selectSpotCandles,
+      loading: selectSpotCandlesLoading,
+      latestCandle: selectLatestSpotCandle,
+      currentPrice: selectSpotCandlePrice,
+    },
+    walletPositions: {
+      data: selectSpotWalletPositions,
+      loading: selectSpotWalletPositionsLoading,
+      positions: selectSpotPositions,
     },
   },
 };

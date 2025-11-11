@@ -14,7 +14,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
-export type SpotHoldingRow = {
+export interface SpotPositionItem {
   tokenAddress: string;
   tokenName: string;
   tokenSymbol: string;
@@ -26,7 +26,7 @@ export type SpotHoldingRow = {
   soldAmount?: number;
   soldUsd?: number;
   pnlUsd?: number;
-};
+}
 
 export enum SpotHoldingsTableColumnKey {
   Token = 'Token',
@@ -47,8 +47,8 @@ const getColumnDef = ({
 }: {
   key: SpotHoldingsTableColumnKey;
   width?: ColumnSize;
-  onSellAction?: (row: SpotHoldingRow) => void;
-}): ColumnDef<SpotHoldingRow> => ({
+  onSellAction?: (row: SpotPositionItem) => void;
+}): ColumnDef<SpotPositionItem> => ({
   width,
   ...(
     {
@@ -151,16 +151,16 @@ const getColumnDef = ({
           </TableCell>
         ),
       },
-    } satisfies Record<SpotHoldingsTableColumnKey, ColumnDef<SpotHoldingRow>>
+    } satisfies Record<SpotHoldingsTableColumnKey, ColumnDef<SpotPositionItem>>
   )[key],
 });
 
 export type SpotHoldingsTableProps = {
-  data: SpotHoldingRow[];
+  data: SpotPositionItem[];
   columnKeys?: SpotHoldingsTableColumnKey[];
   columnWidths?: Partial<Record<SpotHoldingsTableColumnKey, ColumnSize>>;
-  onRowAction?: (row: SpotHoldingRow) => void;
-  onSellAction?: (row: SpotHoldingRow) => void;
+  onRowAction?: (row: SpotPositionItem) => void;
+  onSellAction?: (row: SpotPositionItem) => void;
 };
 
 export const SpotHoldingsTable = ({
@@ -171,7 +171,6 @@ export const SpotHoldingsTable = ({
     SpotHoldingsTableColumnKey.Bought,
     SpotHoldingsTableColumnKey.Sold,
     SpotHoldingsTableColumnKey.PnL,
-    SpotHoldingsTableColumnKey.TpSl,
     SpotHoldingsTableColumnKey.Actions,
   ],
   columnWidths,

@@ -4,12 +4,10 @@ import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/sp
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { PERCENT_DECIMALS, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Input, InputProps, InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
 import { TabGroup, TabOption } from '@/components/TabGroup';
@@ -141,12 +139,12 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
                 type={OutputType.Asset}
                 slotRight={side === SpotSide.BUY ? ' SOL' : ` ${tokenSymbol}`}
               />
-              <IconButton
+              {/* <IconButton
                 iconName={IconName.PlusCircle}
                 buttonStyle={ButtonStyle.WithoutBackground}
                 size={ButtonSize.XXSmall}
                 action={ButtonAction.Primary}
-              />
+              /> */}
             </div>
           </div>
           <div tw="row gap-[0.5rem]">

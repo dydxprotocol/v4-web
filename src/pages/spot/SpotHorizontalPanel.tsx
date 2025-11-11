@@ -7,11 +7,11 @@ import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import {
   SpotHoldingsTable,
   SpotHoldingsTableProps,
-  type SpotHoldingRow,
+  type SpotPositionItem,
 } from './SpotHoldingsTable';
 
 type SpotHorizontalPanelProps = {
-  data: SpotHoldingRow[];
+  data: SpotPositionItem[];
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
   onRowAction?: SpotHoldingsTableProps['onRowAction'];

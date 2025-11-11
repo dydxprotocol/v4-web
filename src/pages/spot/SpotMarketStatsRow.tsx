@@ -5,10 +5,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 
-import { SpotMarketToken } from './types';
+import { SpotHeaderToken } from './SpotHeader';
 
 type SpotMarketStatsRowProps = {
-  stats: SpotMarketToken;
+  stats: SpotHeaderToken;
 };
 
 // TODO: spot localization
@@ -23,7 +23,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     {
       key: 'price',
       label: 'Price',
-      value: <Output type={OutputType.SmallFiat} value={stats.markPriceUsd} />,
+      value: <Output type={OutputType.SmallFiat} value={stats.priceUsd} />,
     },
     {
       key: 'fdv',
@@ -47,11 +47,11 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     },
     {
       key: 'change',
-      label: '% Change',
+      label: '% Change 24h',
       value: (
         <Output
           type={OutputType.Percent}
-          value={stats.percentChange24h}
+          value={stats.change24hPercent}
           showSign={ShowSign.Both}
           withPolarityColor
         />
@@ -59,12 +59,12 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     },
     {
       key: 'volume',
-      label: 'Volume',
+      label: 'Volume 24h',
       value: <Output type={OutputType.CompactFiat} value={stats.volume24hUsd} />,
     },
     {
       key: 'buys',
-      label: 'Buys',
+      label: 'Buys 24h',
       value: (
         <Output
           type={OutputType.CompactFiat}
@@ -76,7 +76,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     },
     {
       key: 'sells',
-      label: 'Sells',
+      label: 'Sells 24h',
       value: (
         <Output
           type={OutputType.CompactFiat}

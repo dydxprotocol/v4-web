@@ -8,6 +8,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
 import { SearchInput } from '@/components/SearchInput';
@@ -21,12 +22,13 @@ import { getSpotFavorites } from '@/state/appUiConfigsSelectors';
 
 import { truncateAddress } from '@/lib/wallet';
 
-import { SpotMarketToken } from './types';
+import { SpotHeaderToken } from './SpotHeader';
 
 type SpotMarketsDropdownProps = {
-  current: SpotMarketToken;
-  searchResults: SpotMarketToken[];
-  onSelect: (token: SpotMarketToken) => void;
+  current: SpotHeaderToken;
+  searchResults: SpotHeaderToken[];
+  isSearchLoading?: boolean;
+  onSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
   className?: string;
 };
@@ -36,6 +38,7 @@ type SpotMarketsDropdownProps = {
 export const SpotMarketsDropdown = ({
   current,
   searchResults,
+  isSearchLoading,
   onSelect,
   onSearchTextChange,
   className,
@@ -74,7 +77,7 @@ export const SpotMarketsDropdown = ({
         },
         {
           columnKey: 'price',
-          getCellValue: (row: SpotMarketToken) => row.priceUsd ?? 0,
+          getCellValue: (row: SpotHeaderToken) => row.priceUsd ?? 0,
           label: 'Price',
           renderCell: ({ priceUsd }) => <Output type={OutputType.Fiat} value={priceUsd} />,
         },
@@ -94,7 +97,7 @@ export const SpotMarketsDropdown = ({
             </TableCell>
           ),
         },
-      ] satisfies ColumnDef<SpotMarketToken>[],
+      ] satisfies ColumnDef<SpotHeaderToken>[],
     []
   );
 
@@ -132,23 +135,33 @@ export const SpotMarketsDropdown = ({
           <$SearchInput placeholder="Search markets" onTextChange={onSearchTextChange} />
         </$Toolbar>
         <$ScrollArea>
-          <$Table
-            withInnerBorders
-            data={searchResults}
-            tableId="spot-markets-dropdown"
-            getRowKey={(row) => row.tokenAddress}
-            onRowAction={(_, row) => {
-              onSelect(row);
-              setIsOpen(false);
-            }}
-            defaultSortDescriptor={{ column: 'volume24h', direction: 'descending' }}
-            label="Spot"
-            columns={columns}
-            initialPageSize={50}
-            paginationBehavior="paginate"
-            shouldResetOnTotalRowsChange
-            getIsRowPinned={(row) => favoritedSet.has(row.tokenAddress)}
-          />
+          {isSearchLoading ? (
+            <LoadingSpace id="spot-token-search-loading" />
+          ) : (
+            <$Table
+              withInnerBorders
+              data={searchResults}
+              tableId="spot-markets-dropdown"
+              getRowKey={(row) => row.tokenAddress}
+              onRowAction={(_, row) => {
+                onSelect(row);
+                setIsOpen(false);
+              }}
+              defaultSortDescriptor={{ column: 'volume24h', direction: 'descending' }}
+              label="Spot"
+              columns={columns}
+              initialPageSize={50}
+              paginationBehavior="paginate"
+              shouldResetOnTotalRowsChange
+              getIsRowPinned={(row) => favoritedSet.has(row.tokenAddress)}
+              slotEmpty={
+                <>
+                  <Icon iconName={IconName.Coins} tw="text-[3em]" />
+                  <h4>Failed to find a matching token...</h4>
+                </>
+              }
+            />
+          )}
         </$ScrollArea>
       </div>
     </$Popover>
