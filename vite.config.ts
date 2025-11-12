@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => ({
   publicDir: 'public',
   test: {
     globals: true,
-    exclude: [
+    exclude: mode === 'indexer-e2e' ? [] : [ // the indexer e2e always specifies a single file from e2e, no need to exclude
       '**/node_modules/**',
       '**/dist/**',
       '**/cypress/**',
