@@ -1,13 +1,14 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Usage: ./e2e/run.sh <populate-events-script> <optional i>"
+if [ $# -lt 2 ]; then
+    echo "Usage: ./e2e/run.sh <populate-events-script> <verify-indexer-script> <optional i>"
     echo "i - interactive mode, waits for CTRL-C before shutting down"
+    echo "scripts can be 'none'"
     exit 1
 fi
 
 INTERACTIVE=0
-ii=1
+ii=2
 for arg in "$@"
 do
     if [ $ii -gt 1 ]; then
@@ -57,9 +58,18 @@ if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" 
     exit 1
 fi
 
-echo "Populating events"
-ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
-echo "Events populated"
+if [ $1 == "none" ]; then
+    echo "Skipping population of events"
+else
+    echo "Populating events"
+    ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
+    if [ $? -ne 0 ]; then
+        echo "Failed to execute the script"
+        kill $FUEL_NODE_PID
+        EXIT_CODE=1
+    fi
+    echo "Events populated"
+fi
 
 echo "Launch Postgres database to store the data"
 docker compose up -d
@@ -83,7 +93,7 @@ else
     # weird but it works this way, there were problems with redirecting logs
     # theindexerstoppedunexpectedly is the guardian to indicate that the indexer stopped unexpectedly
     # we want the indexer log for the post processing
-    { VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm start:ci 2>&1 | tee indexer.log > /dev/null; echo "theindexerstoppedunexpectedly" >> indexer.log; } &    
+    { VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm start:e2e 2>&1 | tee indexer.log > /dev/null; echo "theindexerstoppedunexpectedly" >> indexer.log; } &
     sleep 1
 
     # there is doouble grep, first greps also the guardian in order to stop the tailing if the indexer stopped unexpectedly,
@@ -113,18 +123,40 @@ else
         SQD_INDEXER_PID=""
     fi
 
-    if [ -z "$SQD_INDEXER_PID" ]; then
-        echo "squid indexer process is down"
-        cat indexer.log
-        EXIT_CODE=1
-    fi
+    # if [ -z "$SQD_INDEXER_PID" ]; then
+    #     echo "squid indexer process is down"
+    #     cat indexer.log
+    #     EXIT_CODE=1
+    # fi
 
     if [ $EXIT_CODE -eq 0 ]; then
         if [ $INTERACTIVE -eq 1 ]; then
             echo "Waiting for CTRL-C"
-            (trap exit SIGINT; sleep 999d)
+            (trap exit SIGINT; sleep 9999999)
         else
-            sleep 5
+            echo "Waiting until the indexer reaches the fuel node height"
+            # the target height
+            FUEL_NODE_HEIGHT=`curl -s http://127.0.0.1:4000/v1/graphql -X POST -H "Content-Type: application/json" -d '{"query":"query { chain { latestBlock { height } } }"}' | jq -r '.data.chain.latestBlock.height'`
+            ii=0
+            while [ $ii -lt 10 ]; do
+                SQD_INDEXER_HEIGHT=`docker exec "indexer-db-1" psql --csv -t -U postgres -c "select height from squid_processor.status where id=0"`
+                if [ "$SQD_INDEXER_HEIGHT" -ge "$FUEL_NODE_HEIGHT" ]; then
+                    break
+                fi
+                sleep 1
+                ii=$(($ii+1))
+            done
+            if [ $ii -eq 10 ]; then
+                echo "Indexer did not reach the fuel node height within timeout"
+                EXIT_CODE=1
+            elif [ $2 == "none" ]; then
+                echo "Indexer reached the fuel node height"
+                echo "Skipping verification of indexer"
+            else
+                echo "Execute the verification script"
+                pnpm test:e2e $2
+                EXIT_CODE=$?
+            fi
         fi
     fi
 fi

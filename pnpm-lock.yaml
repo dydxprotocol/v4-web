@@ -700,6 +700,9 @@ importers:
       '@subsquid/typeorm-store':
         specifier: ^1.5.1
         version: 1.5.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.20)
+      '@types/pg':
+        specifier: ^8.15.6
+        version: 8.15.6
       docker-compose:
         specifier: ^1.3.0
         version: 1.3.0
@@ -12720,6 +12723,14 @@ packages:
     resolution: {integrity: sha512-uRwJqmiXmh9++aSu1VNEn3iIxWOhd8AHXNSdlaLfdAAdSTY9jYVeGWnzejM3dvrkbqE3/hyQkQQ29IFATEGlew==}
     dependencies:
       '@types/node': 20.3.1
+    dev: false
+
+  /@types/pg@8.15.6:
+    resolution: {integrity: sha512-NoaMtzhxOrubeL/7UZuNTrejB4MPAJ0RpxZqXQf2qXuVlTPuG6Y8p4u9dKRaue4yjmC7ZhzVO2/Yyyn25znrPQ==}
+    dependencies:
+      '@types/node': 20.3.1
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
     dev: false
 
   /@types/prettier@2.7.3:
@@ -34122,6 +34133,7 @@ packages:
 
   /ts-node@10.9.2(@types/node@22.7.5)(typescript@5.6.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
+    hasBin: true
     peerDependencies:
       '@swc/core': '>=1.2.50'
       '@swc/wasm': '>=1.2.50'
@@ -35448,7 +35460,7 @@ packages:
   /vite@5.4.20(@types/node@20.3.1):
     resolution: {integrity: sha512-j3lYzGC3P+B5Yfy/pfKNgVEg4+UtcIJcVRt2cDjIOmhLourAqPqf8P7acgxeiSgUB7E3p2P8/3gNIgDLpwzs4g==}
     engines: {node: ^18.0.0 || >=20.0.0}
->>>>>>> f2c2c062 (test(indexer): e2e tests)
+    hasBin: true
     peerDependencies:
       '@types/node': ^18.0.0 || >=20.0.0
       less: '*'
@@ -35525,6 +35537,7 @@ packages:
   /vite@5.4.21(@types/node@22.7.5):
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
     engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
     peerDependencies:
       '@types/node': ^18.0.0 || >=20.0.0
       less: '*'
@@ -35615,6 +35628,7 @@ packages:
   /vitest@1.4.0(@types/node@20.3.1)(jsdom@24.1.0):
     resolution: {integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw==}
     engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/node': ^18.0.0 || >=20.0.0
@@ -35671,6 +35685,7 @@ packages:
   /vitest@1.4.0(@types/node@22.7.5)(jsdom@24.1.0):
     resolution: {integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw==}
     engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/node': ^18.0.0 || >=20.0.0
