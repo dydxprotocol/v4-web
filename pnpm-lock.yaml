@@ -1690,13 +1690,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
-  /@dydxprotocol/v4-localization@1.1.352:
-    resolution: {integrity: sha512-LnbpsXdBKnMMotrHIldkbm+TE6tJ2YJc/HNNG/AI0vwRjgaakyrrwC1FgL2cJp/IfEqSLdhYEIj181eXOzY7Sg==}
-=======
   /@dydxprotocol/v4-localization@1.1.355:
     resolution: {integrity: sha512-/rzH7Xc2ZMEQfxsywDAeg1LrkApqNJvs8ayobxA/HZI0NvHGgmkTXjORFALGNzEtPjAUzXzJCVO3EXSrsmeWMg==}
->>>>>>> main
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
