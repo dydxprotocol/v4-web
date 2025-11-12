@@ -27,11 +27,17 @@ if [ "$FUEL_NODE_OUT" -ne "1" ]; then
 fi
 
 # cannot use FUEL_NODE_PID=$!, use walkaround to get the process id
-FUEL_NODE_PID=`pgrep -A "fuel-core"`
-if [ -z "$FUEL_NODE_PID" ]; then
+# it is assumed that the fuel node is started with 'node' and it is the only such subprocess
+FUEL_NODE_PID=`pgrep -n node`
+if [ $FUEL_NODE_PID -lt $$ ]; then
     echo "fuel node process is down"
     exit 1
 fi
+
+ps
+echo $FUEL_NODE_PID
+echo $$
+ps aux
 
 echo "Deploying Mocked Stork contract"
 # priv key is hardcoded, taken form the fuel node starting script
@@ -106,28 +112,12 @@ else
     fi
 
     # cannot use SQD_INDEXER_PID=$!, use walkaround to get the process id
-    SQD_INDEXER_PNPM_PID=`pgrep -A -n pnpm`
-    # this is bad, but I have no clue how to improve it
-    # pnpm starts the indexer the way that killing pnpm process does not kill the indexer process
-    # now we check if pnpm process is 'pnpm start:ci' and the indexer process in newer
-    # NOTE: this depends on how the indexer is started by pnpm, and this is a bad practice
-    SQD_INDEXER_PID=`pgrep -A -n node`
-    # need to check if pnpm process is the process that started the indexer
-    # tr is the trick because /proc/PID/cmdline is a null-whitespace string
-    SQD_INDEXER_PID_CHECK=`cat /proc/$SQD_INDEXER_PNPM_PID/cmdline | tr '\0' ' ' | grep "pnpm start:ci" | wc -l`
-    if [ "$SQD_INDEXER_PID_CHECK" -ne 1 ]; then
-        SQD_INDEXER_PID=""
-    elif [ -z "$SQD_INDEXER_PID" ]; then
-        SQD_INDEXER_PID=""
-    elif [ "$SQD_INDEXER_PNPM_PID" -gt "$SQD_INDEXER_PID" ]; then
-        SQD_INDEXER_PID=""
+    # it is assumed that the indexer is started with 'node' and it is the only such subprocess alive after the fuel node
+    SQD_INDEXER_PID=`pgrep -n node`
+    if [ $SQD_INDEXER_PID -le $FUEL_NODE_PID ]; then
+        echo "indexer process is down"
+        EXIT_CODE=1
     fi
-
-    # if [ -z "$SQD_INDEXER_PID" ]; then
-    #     echo "squid indexer process is down"
-    #     cat indexer.log
-    #     EXIT_CODE=1
-    # fi
 
     if [ $EXIT_CODE -eq 0 ]; then
         if [ $INTERACTIVE -eq 1 ]; then
@@ -178,7 +168,8 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "clean up the fuel node"
-kill $FUEL_NODE_PID
+# kill is not enough, node spawns a subprocess
+pkill -P $FUEL_NODE_PID
 if [ $? -ne 0 ]; then
     echo "Failed to down the fuel node"
     EXIT_CODE=1
