@@ -5,10 +5,23 @@ import { deployTestnetToken } from "./deploy-testnet-token"
 import { deployStarboard } from "./deploy-starboard"
 
 if (require.main === module) {
-    setupTestnet(getArgs(["url", "privK", "storkContractAddress"]))
+    // this is a walkaround
+    // sometimes the script hangs after the deployment of the vault
+    // it hangs when everything is done, no code left to execute
+    // debug shows multiple threads stuck on futex
+    // it may be because multiple providers and wallets are instantiated within the same process
+    // with a single provider/wallet scripts this is not observed
+    // process..exit() enforces an exit
+    setupTestnet(getArgs(["url", "privK", "storkContractAddress"])).then(() => {
+        process.exit(0)
+    }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        process.exit(1)
+    })
 }
 
-async function setupTestnet(taskArgs: any) {
+export async function setupTestnet(taskArgs: Record<string, string>) {
     // eslint-disable-next-line no-console
     console.log("Setup asset configuration for the testnet")
 
