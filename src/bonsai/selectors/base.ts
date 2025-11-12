@@ -6,6 +6,8 @@ export const selectRawAccountState = (state: RootState) => state.raw.account;
 
 export const selectRawMarkets = (state: RootState) => state.raw.markets.allMarkets;
 export const selectRawMarketsData = (state: RootState) => state.raw.markets.allMarkets.data;
+export const selectRawMarketsFeeDiscounts = (state: RootState) =>
+  state.raw.markets.feeDiscounts.data;
 export const selectRawAssetsData = (state: RootState) => state.raw.markets.assets.data;
 export const selectRawAssets = (state: RootState) => state.raw.markets.assets;
 export const selectRawSparklines = (state: RootState) => state.raw.markets.sparklines;
@@ -53,8 +55,12 @@ export const selectRawValidatorHeight = (state: RootState) => state.raw.heights.
 
 export const selectRawConfigFeeTiers = (state: RootState) => state.raw.configs.data?.feeTiers;
 export const selectRawConfigEquityTiers = (state: RootState) => state.raw.configs.data?.equityTiers;
+export const selectRawConfigStakingTiers = (state: RootState) =>
+  state.raw.configs.data?.stakingTiers;
 
 export const selectRawAccountFeeTierData = (state: RootState) => state.raw.account.feeTier.data;
+export const selectRawAccountStakingTierData = (state: RootState) =>
+  state.raw.account.stakingTier.data;
 export const selectRawAccountStatsData = (state: RootState) => state.raw.account.stats.data;
 
 export const selectRawAccountBalancesData = (state: RootState) => state.raw.account.balances.data;

@@ -27,11 +27,13 @@ import {
   calculateUnopenedIsolatedPositions,
 } from '../calculators/subaccount';
 import { calculateTransfers } from '../calculators/transfers';
+import { calculateAccountStakingTier } from '../calculators/userStats';
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { selectParentSubaccountInfo } from '../socketSelectors';
 import { SubaccountTransfer } from '../types/summaryTypes';
 import { selectLatestIndexerHeight, selectLatestValidatorHeight } from './apiStatus';
 import {
+  selectRawAccountStakingTierData,
   selectRawBlockTradingRewardsLiveData,
   selectRawBlockTradingRewardsRest,
   selectRawBlockTradingRewardsRestData,
@@ -270,4 +272,9 @@ export const selectAccountNobleWalletAddress = createAppSelector(
 
     return nobleWalletAddress;
   }
+);
+
+export const selectAccountStakingTier = createAppSelector(
+  [selectRawAccountStakingTierData],
+  (stakingTier) => calculateAccountStakingTier(stakingTier)
 );

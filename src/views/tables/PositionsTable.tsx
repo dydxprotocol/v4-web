@@ -22,7 +22,7 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -439,7 +439,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
 };
 
@@ -455,7 +454,6 @@ export const PositionsTable = forwardRef(
       initialPageSize,
       onNavigate,
       navigateToOrders,
-      withGradientCardRows,
       withOuterBorder,
     }: ElementProps & StyleProps,
     _ref
@@ -547,7 +545,6 @@ export const PositionsTable = forwardRef(
           </>
         }
         initialPageSize={initialPageSize}
-        withGradientCardRows={withGradientCardRows}
         withOuterBorder={withOuterBorder}
         withInnerBorders
         withScrollSnapColumns
@@ -559,7 +556,7 @@ export const PositionsTable = forwardRef(
 );
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 
   tr {
     &:after {
