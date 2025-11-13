@@ -81,7 +81,8 @@ import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
-import { useDepositStatus } from './useDepositStatus';
+import { useDepositAddress } from './useDepositAddress';
+import { DepositStatusResponse, useDepositStatus } from './useDepositStatus';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -1036,31 +1037,29 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
 
       const { data: depositStatus } = useDepositStatus();
+      const { depositAddresses } = useDepositAddress();
 
       // refs to track previous values across renders
       const prevDepositIdsRef = useRef<Set<string>>(new Set());
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
+      const sessionStartTimestampRef = useRef<number>(Date.now());
+      const newDepositsRef = useRef<DepositStatusResponse['deposits']['results']>([]);
 
       const NOTIFICATION_DEBOUNCE = 5 * timeUnits.second; // 5 seconds
 
-      // Stage 1: Watch for deposit from backend
+      // Stage 1: Watch for deposits from backend and update refs
       useEffect(() => {
-        if (!dydxAddress || !depositStatus?.deposits.results) return;
+        if (!dydxAddress || !depositStatus?.deposits.results || !depositAddresses) return;
 
         const incomingDeposits = depositStatus.deposits.results;
         const now = Date.now();
+        const sessionDuration = now - sessionStartTimestampRef.current;
 
         const recentDeposits = incomingDeposits.filter((deposit) => {
-          // Handle both timestamp formats
-          const depositTimestamp =
-            typeof deposit.created_at === 'number'
-              ? deposit.created_at
-              : new Date(deposit.created_at).getTime();
+          const depositAge = now - new Date(deposit.created_at).getTime();
 
-          const depositAge = now - depositTimestamp;
-
-          return depositAge >= 0 && depositAge <= 2 * timeUnits.minute;
+          return depositAge >= 0 && depositAge <= sessionDuration;
         });
 
         if (recentDeposits.length === 0) return;
@@ -1069,58 +1068,71 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         const newDeposits = recentDeposits.filter((deposit) => !prevDepositIds.has(deposit.id));
 
-        if (newDeposits.length === 0) return;
-
-        newDeposits.forEach((deposit) => {
-          prevDepositIds.add(deposit.id);
-        });
-
-        if (now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
-          trigger({
-            id: `deposit-noble-${Date.now()}`,
-            displayData: {
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
-              groupKey: `deposit-${Date.now()}`,
-              slotTitleLeft: (
-                <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
-              ),
-              title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
-              body: stringGetter({
-                key: STRING_KEYS.DEPOSIT_DETECTED_BODY,
-                params: {
-                  AMOUNT: newDeposits
-                    .reduce((acc, deposit) => acc.plus(deposit.amount), BIG_NUMBERS.ZERO)
-                    .toFixed(2),
-                  ASSET: 'USDC',
-                },
-              }),
-              toastSensitivity: 'foreground',
-              actionDescription: 'View Transaction',
-              renderActionSlot: () => {
-                const chainInfo = CHAIN_INFO[newDeposits[0]!.chain_id];
-                return (
-                  chainInfo?.explorerBaseUrl &&
-                  newDeposits[0]?.transaction_hash && (
-                    <Link
-                      href={`${chainInfo.explorerBaseUrl}/tx/${newDeposits[0]!.transaction_hash}`}
-                      isAccent
-                    >
-                      View Transaction
-                    </Link>
-                  )
-                );
-              },
-            },
-            updateKey: [newDeposits],
-          });
-          lastNotificationTimeRef.current = now;
+        if (newDeposits.length === 0) {
+          newDepositsRef.current = [];
+          return;
         }
+
+        newDepositsRef.current.push(
+          ...newDeposits.toSorted(
+            (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          )
+        );
+      }, [dydxAddress, depositStatus, depositAddresses]);
+
+      useEffect(() => {
+        if (newDepositsRef.current.length === 0) return;
+
+        const now = Date.now();
+        newDepositsRef.current.forEach((deposit) => {
+          if (
+            now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE &&
+            !prevDepositIdsRef.current.has(deposit.id)
+          ) {
+            trigger({
+              id: `deposit-${deposit.id}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
+                groupKey: 'DepositAddressEvents',
+                slotTitleLeft: (
+                  <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
+                ),
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
+                body: stringGetter({
+                  key: STRING_KEYS.DEPOSIT_DETECTED_BODY,
+                  params: {
+                    AMOUNT: Number(deposit.amount).toFixed(2),
+                    ASSET: 'USDC',
+                  },
+                }),
+                toastSensitivity: 'foreground',
+                actionDescription: stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION }),
+                renderActionSlot: () => {
+                  const chainInfo = CHAIN_INFO[deposit.chain_id];
+                  return (
+                    chainInfo?.explorerBaseUrl && (
+                      <Link
+                        href={`${chainInfo.explorerBaseUrl}/tx/${deposit.transaction_hash}`}
+                        isAccent
+                      >
+                        {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
+                      </Link>
+                    )
+                  );
+                },
+              },
+              updateKey: [deposit.id],
+            });
+            prevDepositIdsRef.current.add(deposit.id);
+            lastNotificationTimeRef.current = now;
+          }
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [dydxAddress, trigger, depositStatus, stringGetter]);
+      }, [newDepositsRef.current, trigger, stringGetter]);
 
       // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
       useEffect(() => {
-        if (!dydxAddress || !usdcAmount) return;
+        if (!usdcAmount) return;
 
         const now = Date.now();
         const prevWallet = prevWalletBalanceRef.current;
@@ -1130,18 +1142,21 @@ export const notificationTypes: NotificationTypeConfig[] = [
           return;
         }
 
-        const prevBN = MaybeBigNumber(prevWallet);
-        const currBN = MaybeBigNumber(usdcAmount);
+        const prevWalletBalanceBN = MaybeBigNumber(prevWallet);
+        const usdcBalanceBN = MaybeBigNumber(usdcAmount);
 
-        if (prevBN && currBN && currBN.gt(prevBN)) {
-          const diff = currBN.minus(prevBN);
-          // Only trigger if increase is significant and we haven't triggered recently
-          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+        if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
+          const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
+          const matchingDeposit = newDepositsRef.current.find(
+            (deposit) => Number(deposit.amount).toFixed(2) === diff.toFixed(2)
+          );
+
+          if (now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
-              id: `deposit-wallet-${now}`,
+              id: `deposit-${matchingDeposit?.id}`,
               displayData: {
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
-                groupKey: `deposit-${now}`,
+                groupKey: 'DepositAddressEvents',
                 icon: <Icon iconName={IconName.CheckCircle} size="1.25rem" />,
                 title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
                 body: stringGetter({
@@ -1153,24 +1168,34 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 }),
                 toastSensitivity: 'foreground',
               },
+              updateKey: [matchingDeposit?.id],
             });
             lastNotificationTimeRef.current = now;
+          }
+
+          if (matchingDeposit) {
+            newDepositsRef.current = newDepositsRef.current.filter(
+              (deposit) => deposit.id !== matchingDeposit.id
+            );
           }
         }
 
         prevWalletBalanceRef.current = usdcAmount;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [dydxAddress, usdcAmount, trigger, stringGetter]);
+      }, [usdcAmount, trigger, stringGetter]);
 
-      // Clean up old deposit IDs every couple minutes to prevent memory bloat
+      // Clean up old deposit IDs every ten minutes to prevent memory bloat
       useEffect(() => {
         const cleanupInterval = setInterval(() => {
           const now = Date.now();
           const recentDeposits = depositStatus?.deposits.results.filter((deposit) => {
-            return now - new Date(deposit.created_at).getTime() <= 4 * timeUnits.minute; // Keep IDs for deposits in last 4 minutes
+            // Keep IDs for deposits from the last half hour
+            return (
+              now - new Date(deposit.created_at).getTime() <= 30 * timeUnits.minute // 30 minutes
+            );
           });
           prevDepositIdsRef.current = new Set(recentDeposits?.map((d) => d.id) ?? []);
-        }, 4 * timeUnits.minute); // Clean up every 4 minutes
+        }, 10 * timeUnits.minute); // Clean up every 10 minutes
 
         return () => clearInterval(cleanupInterval);
       }, [depositStatus]);

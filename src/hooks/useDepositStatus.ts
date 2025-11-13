@@ -6,6 +6,7 @@ import { timeUnits } from '@/constants/time';
 import { useAppSelector } from '@/state/appTypes';
 
 import { useAccounts } from './useAccounts';
+import { useDepositAddress } from './useDepositAddress';
 
 export type DepositStatusResponse = {
   address: string;
@@ -24,11 +25,15 @@ export type DepositStatusResponse = {
 
 export const useDepositStatus = () => {
   const { dydxAddress } = useAccounts();
+  const { depositAddresses, isLoadingDepositAddresses } = useDepositAddress();
   const indexerUrl = useAppSelector(selectIndexerUrl);
 
+  const canQueryForDepositStatus =
+    !!dydxAddress && Boolean(indexerUrl) && !!depositAddresses && !isLoadingDepositAddresses;
+
   return useQuery({
-    enabled: !!dydxAddress && Boolean(indexerUrl),
-    queryKey: ['depositStatus', dydxAddress],
+    enabled: canQueryForDepositStatus,
+    queryKey: ['depositStatus', dydxAddress, ...Object.values(depositAddresses ?? {})],
     queryFn: async (): Promise<DepositStatusResponse> => {
       if (!indexerUrl || !dydxAddress) {
         return { address: dydxAddress ?? '', deposits: { results: [], total: 0 } };
@@ -50,6 +55,5 @@ export const useDepositStatus = () => {
       }
     },
     refetchInterval: 5 * timeUnits.second, // Poll every 5 seconds
-    staleTime: 1 * timeUnits.minute, // not necessarily needed, but good to have
   });
 };
