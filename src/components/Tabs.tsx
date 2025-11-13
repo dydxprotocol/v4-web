@@ -175,10 +175,10 @@ const $Root = styled(Root)<{
   $withInnerBorder?: boolean;
 }>`
   /* Overrides */
-  --trigger-backgroundColor: var(--color-layer-2);
+  --trigger-backgroundColor: var(--color-layer-1);
   --trigger-textColor: var(--color-text-0);
 
-  --trigger-active-backgroundColor: var(--color-layer-1);
+  --trigger-active-backgroundColor: var(--color-layer-1) !important;
   --trigger-active-textColor: var(--color-text-2);
   --trigger-hover-textColor: var(--trigger-active-textColor);
   --trigger-active-underlineColor: var(--color-accent);
@@ -197,7 +197,7 @@ const $Root = styled(Root)<{
   overscroll-behavior: contain;
 
   ${layoutMixins.stickyArea0}
-  --stickyArea0-background: var(--color-layer-2);
+  --stickyArea0-background: var(--color-layer-1);
   --stickyArea0-topGap: var(--border-width);
 
   --activeTab-zIndex: 1;
@@ -403,7 +403,7 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)<{
 export const MobileTabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;
   --trigger-active-backgroundColor: transparent;
-  --tableStickyRow-backgroundColor: var(--color-layer-2);
+  --tableStickyRow-backgroundColor: var(--color-layer-1);
   --trigger-font: var(--font-extra-book);
 
   padding-bottom: 1rem;

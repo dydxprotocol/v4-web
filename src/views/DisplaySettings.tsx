@@ -51,10 +51,6 @@ export const DisplaySettings = ({ className }: { className?: string }) => {
             label: STRING_KEYS.LIGHT,
           },
           {
-            themeSetting: AppTheme.Classic,
-            label: STRING_KEYS.CLASSIC_DARK,
-          },
-          {
             themeSetting: AppThemeSystemSetting.System,
             label: STRING_KEYS.SYSTEM,
           },

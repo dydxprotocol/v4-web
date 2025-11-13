@@ -7,7 +7,6 @@ import { DisplayUnit } from '@/constants/trade';
 import { track } from '@/lib/analytics/analytics';
 
 export enum AppTheme {
-  Classic = 'Classic',
   Dark = 'Dark',
   Light = 'Light',
 }

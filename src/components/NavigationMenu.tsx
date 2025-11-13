@@ -539,16 +539,6 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
   ${$List}[data-orientation="menu"] ${$List}[data-orientation="menu"] > ${$ListItem}:first-child > & {
     border-top-left-radius: 0;
   }
-
-  ${({ $dividerStyling }) =>
-    $dividerStyling === 'underline' &&
-    css`
-      &[data-state='checked'], // @radix-ui
-      &[aria-current='page'] // <a>
-      {
-        box-shadow: inset 0 -2px 0 var(--color-accent);
-      }
-    `}
 ` as typeof NavItemTypeTemp;
 
 const $Icon = styled(Icon)`

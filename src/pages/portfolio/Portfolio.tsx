@@ -30,7 +30,7 @@ import { WithSidebar } from '@/components/WithSidebar';
 import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
 import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
-import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
+// import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
@@ -91,7 +91,7 @@ const PortfolioPage = () => {
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route path={HistoryRoute.Trades} element={<TradeHistoryList />} />
           <Route path={HistoryRoute.Transfers} element={<AccountHistoryList />} />
-          <Route path={HistoryRoute.VaultTransfers} element={<VaultTransferList />} />
+          {/* <Route path={HistoryRoute.VaultTransfers} element={<VaultTransferList />} /> */}
           <Route path={HistoryRoute.Payments} element={<FundingHistoryList />} />
         </Route>
         <Route
@@ -184,7 +184,7 @@ const PortfolioPage = () => {
   ) : (
     <WithSidebar
       sidebar={
-        <div tw="flexColumn h-full justify-between">
+        <div tw="flexColumn h-full justify-between bg-color-layer-1">
           <NavigationMenu
             items={[
               {
@@ -274,7 +274,7 @@ const PortfolioPage = () => {
                 ],
               },
             ]}
-            tw="p-0.5 pt-0"
+            tw="bg-color-layer-1 p-0.5 pt-0"
           />
           {onboardingState === OnboardingState.AccountConnected && (
             <$Footer>

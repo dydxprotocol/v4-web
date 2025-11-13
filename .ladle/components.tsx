@@ -40,7 +40,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 const providers = [wrapProvider(LocaleProvider), wrapProvider(AppThemeAndColorModeProvider)];
 
 export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(AppTheme.Classic);
+  const [theme, setTheme] = useState(AppTheme.Dark);
   const [colorMode, setColorMode] = useState(AppColorMode.GreenUp);
 
   useEffect(() => {
@@ -69,10 +69,6 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
         <h4>Active Theme:</h4>
         <SelectMenu value={theme} onValueChange={setTheme}>
           {[
-            {
-              value: AppTheme.Classic,
-              label: 'Default theme',
-            },
             {
               value: AppThemeSystemSetting.System,
               label: 'System theme',

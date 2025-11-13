@@ -194,6 +194,8 @@ const $TradeLayout = styled.article<{
 
   > section {
     contain: strict;
+    border-radius: 0.75rem;
+    overflow: hidden;
   }
 `;
 

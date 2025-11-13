@@ -43,7 +43,6 @@ export const useCurrentAppThemeSetting = () => {
     switch (themeSetting) {
       case AppThemeSystemSetting.System:
         return systemPreference;
-      case AppTheme.Classic:
       case AppTheme.Dark:
       case AppTheme.Light:
         return themeSetting;

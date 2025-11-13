@@ -59,6 +59,10 @@ export const TradeSideTabs = ({ sharedContent, className }: ElementProps & Style
 const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: OrderSide });
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
+  border-top-right-radius: 0.75rem;
+  border-top-left-radius: 0.75rem;
+  overflow: hidden;
+
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
       ? css`

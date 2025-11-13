@@ -7,13 +7,12 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { StatsigFlags } from '@/constants/statsig';
 
+// import { StatsigFlags } from '@/constants/statsig';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
+// import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { BellStrokeIcon } from '@/icons';
@@ -30,7 +29,6 @@ import { VerticalSeparator } from '@/components/Separator';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
-import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
 import { getOnboardingState } from '@/state/accountSelectors';
@@ -43,14 +41,13 @@ import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
+  const { documentation } = useURLConfigs();
   const dispatch = useAppDispatch();
-  const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
-  const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
+  // const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
@@ -78,20 +75,20 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
         },
+        // {
+        //   value: 'VAULT',
+        //   label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
+        //   href: AppRoute.Vault,
+        // },
+        // affiliatesEnabled && {
+        //   value: 'REFERRALS',
+        //   label: stringGetter({ key: STRING_KEYS.REFERRALS }),
+        //   href: AppRoute.Referrals,
+        // },
         {
-          value: 'VAULT',
-          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
-          href: AppRoute.Vault,
-        },
-        affiliatesEnabled && {
-          value: 'REFERRALS',
-          label: stringGetter({ key: STRING_KEYS.REFERRALS }),
-          href: AppRoute.Referrals,
-        },
-        {
-          value: chainTokenLabel,
-          label: chainTokenLabel,
-          href: `/${chainTokenLabel}`,
+          value: 'REWARDS',
+          label: 'Rewards', // TODO: Localize
+          href: AppRoute.Rewards,
           slotAfter: !hasSeenLaunchIncentives && (
             <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
           ),
@@ -114,24 +111,24 @@ export const HeaderDesktop = () => {
                 );
               },
             },
-            {
-              value: 'ApiTradingKeys',
-              slotBefore: <Icon iconName={IconName.Passkey} />,
-              label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
-              onClick: () => dispatch(openDialog(DialogTypes.TradingKeys())),
-            },
-            {
-              value: 'MINTSCAN',
-              slotBefore: <Icon iconName={IconName.Mintscan} />,
-              label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
-              href: mintscanBase,
-            },
-            {
-              value: 'COMMUNITY',
-              slotBefore: <Icon iconName={IconName.Discord} />,
-              label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-              href: community,
-            },
+            // {
+            //   value: 'ApiTradingKeys',
+            //   slotBefore: <Icon iconName={IconName.Passkey} />,
+            //   label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
+            //   onClick: () => dispatch(openDialog(DialogTypes.TradingKeys())),
+            // },
+            // {
+            //   value: 'MINTSCAN',
+            //   slotBefore: <Icon iconName={IconName.Mintscan} />,
+            //   label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
+            //   href: mintscanBase,
+            // },
+            // {
+            //   value: 'COMMUNITY',
+            //   slotBefore: <Icon iconName={IconName.Discord} />,
+            //   label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
+            //   href: community,
+            // },
             {
               value: 'TERMS_OF_USE',
               slotBefore: <Icon iconName={IconName.File} />,
@@ -144,20 +141,20 @@ export const HeaderDesktop = () => {
               label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
               href: AppRoute.Privacy,
             },
-            {
-              value: 'HELP',
-              slotBefore: <Icon iconName={IconName.HelpCircle} />,
-              label: stringGetter({ key: STRING_KEYS.HELP }),
-              onClick: () => {
-                dispatch(openDialog(DialogTypes.Help()));
-              },
-            },
-            {
-              value: 'STATS',
-              slotBefore: <Icon iconName={IconName.FundingChart} />,
-              label: stringGetter({ key: STRING_KEYS.STATISTICS }),
-              href: exchangeStats,
-            },
+            // {
+            //   value: 'HELP',
+            //   slotBefore: <Icon iconName={IconName.HelpCircle} />,
+            //   label: stringGetter({ key: STRING_KEYS.HELP }),
+            //   onClick: () => {
+            //     dispatch(openDialog(DialogTypes.Help()));
+            //   },
+            // },
+            // {
+            //   value: 'STATS',
+            //   slotBefore: <Icon iconName={IconName.FundingChart} />,
+            //   label: stringGetter({ key: STRING_KEYS.STATISTICS }),
+            //   href: exchangeStats,
+            // },
           ],
         },
       ].filter(isTruthy),
@@ -177,7 +174,6 @@ export const HeaderDesktop = () => {
           <Icon iconName={IconName.Translate} size="1.25em" />
         </$LanguageSelector>
         <VerticalSeparator />
-        <NetworkSelectMenu sideOffset={16} />
       </$NavBefore>
 
       <VerticalSeparator />
@@ -193,15 +189,14 @@ export const HeaderDesktop = () => {
           complianceState === ComplianceStates.FULL_ACCESS && (
             <Button
               tw="mr-[0.5em]"
-              shape={ButtonShape.Pill}
+              shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
-              action={ButtonAction.Primary}
+              action={ButtonAction.AccentFaded}
               onClick={() => {
                 dispatch(openDialog(DialogTypes.Deposit2({})));
               }}
               state={{ isDisabled: !dydxAccounts }}
             >
-              <Icon iconName={IconName.Deposit2} size="1rem" />
               <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
             </Button>
           )}
@@ -239,13 +234,13 @@ export const HeaderDesktop = () => {
 const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
-  --logo-width: 3.5rem;
+  --logo-width: 4rem;
 
   ${layoutMixins.container}
   ${layoutMixins.stickyHeader}
   ${layoutMixins.scrollSnapItem}
   backdrop-filter: none;
-  background-color: var(--color-layer-2);
+  background-color: var(--color-layer-0);
   height: var(--page-currentHeaderHeight);
 
   grid-area: Header;
@@ -272,7 +267,7 @@ const $Header = styled.header`
 `;
 
 const $NavigationScrollBar = styled.div`
-  ${layoutMixins.scrollAreaFade}
+  /* ${layoutMixins.scrollAreaFade} */
 `;
 
 const $NavigationMenu = styled(NavigationMenu)`
@@ -299,10 +294,10 @@ const $LogoLink = styled(Link)`
   display: flex;
   align-self: stretch;
 
-  > svg {
+  > div {
     margin: auto;
     width: auto;
-    height: 45%;
+    height: 69%;
   }
 `;
 

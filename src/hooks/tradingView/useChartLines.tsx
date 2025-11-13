@@ -42,7 +42,7 @@ import { getChartLineColors } from '@/lib/tradingView/utils';
 import { useCustomNotification } from '../useCustomNotification';
 import { useStringGetter } from '../useStringGetter';
 
-const CHART_LINE_FONT = 'bold 10px Satoshi';
+const CHART_LINE_FONT = 'bold 10px Instrument Sans';
 
 /**
  * @description Hook to handle drawing chart lines

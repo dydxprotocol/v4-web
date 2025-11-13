@@ -96,7 +96,7 @@ export const useDrawOrderbook = ({
 
       if (ctx) {
         ctx.scale(currentRatio, currentRatio);
-        ctx.font = '12px Satoshi';
+        ctx.font = '12px Instrument Sans';
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
         ctx.imageSmoothingQuality = 'high';

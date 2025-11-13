@@ -79,7 +79,7 @@ const $TradeBox = styled.section`
 `;
 
 const $Dialog = styled(Dialog)`
-  --dialog-backgroundColor: var(--color-layer-2);
+  --dialog-backgroundColor: var(--color-layer-0);
 
   --dialog-paddingX: 1.25rem;
 

@@ -270,7 +270,7 @@ const $TradeForm = styled.form`
   gap: 0.75rem;
 
   ${layoutMixins.stickyArea1}
-  --stickyArea1-background: var(--color-layer-2);
+  --stickyArea1-background: var(--color-layer-1);
   --stickyArea1-paddingBottom: var(--tradeBox-content-paddingBottom);
 
   padding: var(--tradeBox-content-paddingTop) var(--tradeBox-content-paddingRight)
