@@ -1,11 +1,18 @@
 import { useMemo } from 'react';
 
+import { formatUnits } from 'viem';
+
+import { ButtonStyle } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
+
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ErrorExclamationIcon } from '@/icons';
 import ExchangeIcon from '@/icons/exchange.svg';
 
-import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+import { Button } from '@/components/Button';
+import { LoadingDots } from '@/components/Loading/LoadingDots';
 // eslint-disable-next-line import/no-cycle
 import { Notification, type NotificationProps } from '@/components/Notification';
 
@@ -22,41 +29,99 @@ export const SwapNotification = ({
 }: SwapNotificationProps & NotificationProps) => {
   const stringGetter = useStringGetter();
 
+  const [inputToken, outputToken] = useMemo(() => {
+    const inputTokenLabel = swap.route.sourceAssetDenom === 'adydx' ? 'dYdX' : 'USDC';
+    const outputTokenLabel = inputTokenLabel === 'dYdX' ? 'USDC' : 'dYdX';
+    return [inputTokenLabel, outputTokenLabel];
+  }, [swap.route.sourceAssetDenom]);
+
   const [icon, title] = useMemo(() => {
     switch (swap.status) {
       case 'pending':
       case 'pending-transfer':
-        return [<LoadingSpinner tw="h-1 w-1" key="loading-icon" />, 'Swapping'];
+        return [
+          <LoadingDots key="loading-icon" />,
+          stringGetter({ key: STRING_KEYS.SWAP_PENDING }),
+        ];
       case 'success':
-        return [<ExchangeIcon key="success-icon" />, stringGetter({ key: 'SWAP_SUCCESS' })];
+        return [
+          <ExchangeIcon key="success-icon" />,
+          stringGetter({ key: STRING_KEYS.SWAP_SUCCESS }),
+        ];
       case 'error':
-        return [<ErrorExclamationIcon key="error-icon" />, 'Error swapping tokens'];
+        return [
+          <ErrorExclamationIcon key="error-icon" />,
+          stringGetter({ key: STRING_KEYS.SWAP_ERROR }),
+        ];
       default:
-        return [null, ''];
+        return [<ExchangeIcon key="loading-icon" />, ''];
     }
   }, [swap.status, stringGetter]);
 
   const description = useMemo(() => {
+    const inputAmount = Number(
+      formatUnits(
+        BigInt(swap.route.amountIn),
+        inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
+      )
+    );
+    const outputAmount = Number(
+      formatUnits(
+        BigInt(swap.route.amountOut),
+        inputToken === 'dydx' ? USDC_DECIMALS : DYDX_DECIMALS
+      )
+    );
+    const inputLabel = `${inputAmount.toFixed(2)} ${inputToken}`;
+    const outputLabel = `${outputAmount.toFixed(2)} ${outputToken}`;
     switch (swap.status) {
       case 'pending':
       case 'pending-transfer':
-        return `Swapping `;
+        return (
+          <span>
+            {stringGetter({
+              key: STRING_KEYS.SWAP_PENDING_DESCRIPTION,
+              params: { INPUT_TOKEN: inputLabel, OUTPUT_TOKEN: outputLabel },
+            })}
+          </span>
+        );
       case 'success':
-        return `Successfully swapped `;
-      case 'error':
-        return 'Unable to swap tokens at this time. Please try again.';
+        return (
+          <div tw="flex flex-wrap">
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.SWAP_SUCCESS_DESCRIPTION,
+                params: { INPUT_LABEL: inputLabel, OUTPUT_LABEL: outputLabel },
+              })}
+            </span>
+            <Button
+              tw="h-fit p-0 text-color-accent font-small-book"
+              buttonStyle={ButtonStyle.WithoutBackground}
+              onClick={() => window.open(`https://www.mintscan.io/dydx/tx/${swap.txHash}`)}
+            >
+              {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
+            </Button>
+          </div>
+        );
       default:
-        return '';
+        return null;
     }
-  }, [swap]);
+  }, [
+    inputToken,
+    outputToken,
+    stringGetter,
+    swap.route.amountIn,
+    swap.route.amountOut,
+    swap.status,
+    swap.txHash,
+  ]);
 
   return (
     <Notification
       isToast={isToast}
       notification={notification}
-      slotTitle={title}
       slotIcon={icon}
-      slotDescription={<span>{description}</span>}
+      slotTitle={title}
+      slotCustomContent={description}
     />
   );
 };

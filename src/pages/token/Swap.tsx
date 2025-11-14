@@ -182,65 +182,6 @@ export const Swap = () => {
     );
   }, [quote]);
 
-  // const onSwapComplete = (txHash: string) => {
-  //   appQueryClient.invalidateQueries({
-  //     queryKey: ['validator', 'accountBalances'],
-  //     exact: false,
-  //   });
-  //   setAmount('');
-  //   const inputTokenLabel = getTokenLabel(inputToken);
-  //   const outputTokenLabel = getTokenLabel(otherToken(inputToken));
-  //   const inputAmount = Number(
-  //     formatUnits(
-  //       BigInt(quote?.amountIn ?? '0'),
-  //       inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
-  //     )
-  //   );
-  //   const outputAmount = Number(
-  //     formatUnits(
-  //       BigInt(quote?.amountOut ?? '0'),
-  //       inputToken === 'dydx' ? USDC_DECIMALS : DYDX_DECIMALS
-  //     )
-  //   );
-  //   const inputLabel = `${inputAmount.toFixed(2)} ${inputTokenLabel}`;
-  //   const outputLabel = `${outputAmount.toFixed(2)} ${outputTokenLabel}`;
-  //   notify(
-  //     {
-  //       title: stringGetter({ key: STRING_KEYS.SWAP_SUCCESS }),
-  //       renderCustomBody({ isToast, notification }) {
-  //         return (
-  //           <Toast
-  //             isToast={isToast}
-  //             notification={notification}
-  //             slotTitle={<span tw="text-color-success">Swap Success</span>}
-  //             slotIcon={<ExchangeIcon />}
-  //             slotDescription={
-  //               <div tw="flex flex-wrap">
-  //                 <span>
-  //                   {stringGetter({
-  //                     key: STRING_KEYS.SWAP_SUCCESS_DESCRIPTION,
-  //                     params: { INPUT_LABEL: inputLabel, OUTPUT_LABEL: outputLabel },
-  //                   })}
-  //                 </span>
-  //                 <Button
-  //                   tw="h-fit p-0 text-color-accent font-small-book"
-  //                   buttonStyle={ButtonStyle.WithoutBackground}
-  //                   onClick={() => window.open(`https://www.mintscan.io/dydx/tx/${txHash}`)}
-  //                 >
-  //                   View Transaction
-  //                 </Button>
-  //               </div>
-  //             }
-  //           />
-  //         );
-  //       },
-  //     },
-  //     {
-  //       id: `swap`,
-  //     }
-  //   );
-  // };
-
   const onSwap = async () => {
     if (!quote) {
       return;
