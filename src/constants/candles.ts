@@ -1,6 +1,6 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
-import { SpotCandleServiceInterval } from '@/lib/tradingView/spotDatafeed/types';
+import { SpotCandleServiceInterval } from '@/clients/spotCandleService';
 
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { STRING_KEYS } from './localization';

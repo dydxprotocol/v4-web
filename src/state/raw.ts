@@ -33,7 +33,10 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
+import { SpotApiTokenMetadataResponse, SpotApiTokenPriceResponse } from '@/clients/spotApi';
+import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
 import { calc } from '@/lib/do';
+import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
@@ -103,6 +106,13 @@ export interface RawDataState {
     data: Loadable<RewardsParams | undefined>;
     price: Loadable<TokenPriceResponse | undefined>;
   };
+  spot: {
+    solPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
+    currentTokenCandles: Loadable<SpotCandleServiceCandleObject[]>;
+    walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
@@ -139,6 +149,13 @@ const initialState: RawDataState = {
   rewards: {
     data: loadableIdle(),
     price: loadableIdle(),
+  },
+  spot: {
+    solPrice: loadableIdle(),
+    tokenMetadata: loadableIdle(),
+    currentTokenCandles: loadableIdle(),
+    tokenPrice: loadableIdle(),
+    walletPositions: loadableIdle(),
   },
 };
 
@@ -235,6 +252,33 @@ export const rawSlice = createSlice({
       ) => {
         state.rewards.price = action.payload;
       },
+      setSpotSolPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.solPrice = action.payload;
+      },
+      setSpotTokenPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.tokenPrice = action.payload;
+      },
+      setSpotTokenMetadata: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenMetadataResponse | undefined>>
+      ) => {
+        state.spot.tokenMetadata = action.payload;
+      },
+      setSpotCandles: (state, action: PayloadAction<Loadable<SpotCandleServiceCandleObject[]>>) => {
+        state.spot.currentTokenCandles = action.payload;
+      },
+      setSpotWalletPositions: (
+        state,
+        action: PayloadAction<Loadable<SpotApiWsWalletPositionsUpdate | undefined>>
+      ) => {
+        state.spot.walletPositions = action.payload;
+      },
     }),
     // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
@@ -320,4 +364,9 @@ export const {
   setSourceAddressScreenV2Raw,
   setRewardsParams,
   setRewardsTokenPrice,
+  setSpotSolPrice,
+  setSpotTokenPrice,
+  setSpotTokenMetadata,
+  setSpotCandles,
+  setSpotWalletPositions,
 } = rawSlice.actions;

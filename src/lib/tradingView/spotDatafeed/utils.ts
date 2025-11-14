@@ -1,16 +1,17 @@
 import { DateTime } from 'luxon';
 import type {
-  Bar,
   LibrarySymbolInfo,
   ResolutionString,
   Timezone,
 } from 'public/tradingview/charting_library';
 
-import { RESOLUTION_TO_SPOT_INTERVAL_MAP } from '@/constants/candles';
+import { RESOLUTION_TO_SPOT_INTERVAL_MAP, TradingViewBar } from '@/constants/candles';
 
+import {
+  SpotCandleServiceCandleObject,
+  SpotCandleServiceInterval,
+} from '@/clients/spotCandleService';
 import { objectKeys } from '@/lib/objectHelpers';
-
-import { SpotCandleData, SpotCandleServiceInterval } from './types';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
@@ -25,7 +26,9 @@ export const resolutionToSpotInterval = (
 export const SPOT_SUPPORTED_RESOLUTIONS = objectKeys(RESOLUTION_TO_SPOT_INTERVAL_MAP);
 
 // Transform single candle item for chart consumption
-export const transformSpotCandleForChart = (candle: SpotCandleData): Bar => {
+export const transformSpotCandleForChart = (
+  candle: SpotCandleServiceCandleObject
+): TradingViewBar => {
   return {
     time: candle.t * 1000, // Convert to milliseconds
     open: candle.o,
@@ -37,7 +40,9 @@ export const transformSpotCandleForChart = (candle: SpotCandleData): Bar => {
 };
 
 // Transform array of candle data for chart consumption
-export const transformSpotCandlesForChart = (candles: SpotCandleData[]): Bar[] => {
+export const transformSpotCandlesForChart = (
+  candles: SpotCandleServiceCandleObject[]
+): TradingViewBar[] => {
   return candles.map(transformSpotCandleForChart);
 };
 

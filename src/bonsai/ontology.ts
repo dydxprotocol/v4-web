@@ -12,10 +12,17 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
+import { SpotApiTokenInfoObject } from '@/clients/spotApi';
+import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
+import {
+  SpotApiWsWalletPositionObject,
+  SpotApiWsWalletPositionsUpdate,
+} from '@/lib/streaming/walletPositionsStreaming';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
 import { AdjustIsolatedMarginFormFns } from './forms/adjustIsolatedMargin';
+import { SpotFormFns } from './forms/spot';
 import { TradeFormFns } from './forms/trade/trade';
 import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
@@ -88,6 +95,21 @@ import {
   selectCurrentMarketOrderbook,
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
+import {
+  selectLatestSpotCandle,
+  selectSpotCandlePrice,
+  selectSpotCandles,
+  selectSpotCandlesLoading,
+  selectSpotPositions,
+  selectSpotSolPrice,
+  selectSpotSolPriceLoading,
+  selectSpotTokenMetadata,
+  selectSpotTokenMetadataLoading,
+  selectSpotTokenPrice,
+  selectSpotTokenPriceLoading,
+  selectSpotWalletPositions,
+  selectSpotWalletPositionsLoading,
+} from './selectors/spot';
 import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
@@ -213,6 +235,31 @@ interface BonsaiCoreShape {
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
   rewardParams: { data: BasicSelector<RewardParamsSummary> };
+  spot: {
+    solPrice: {
+      data: BasicSelector<number | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tokenPrice: {
+      data: BasicSelector<number | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tokenMetadata: {
+      data: BasicSelector<SpotApiTokenInfoObject | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    candles: {
+      data: BasicSelector<SpotCandleServiceCandleObject[]>;
+      loading: BasicSelector<LoadableStatus>;
+      latestCandle: BasicSelector<SpotCandleServiceCandleObject | undefined>;
+      currentPrice: BasicSelector<number | undefined>;
+    };
+    walletPositions: {
+      data: BasicSelector<SpotApiWsWalletPositionsUpdate | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+      positions: BasicSelector<SpotApiWsWalletPositionObject[]>;
+    };
+  };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -296,6 +343,31 @@ export const BonsaiCore: BonsaiCoreShape = {
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
   rewardParams: { data: selectRewardsSummary },
+  spot: {
+    solPrice: {
+      data: selectSpotSolPrice,
+      loading: selectSpotSolPriceLoading,
+    },
+    tokenPrice: {
+      data: selectSpotTokenPrice,
+      loading: selectSpotTokenPriceLoading,
+    },
+    tokenMetadata: {
+      data: selectSpotTokenMetadata,
+      loading: selectSpotTokenMetadataLoading,
+    },
+    candles: {
+      data: selectSpotCandles,
+      loading: selectSpotCandlesLoading,
+      latestCandle: selectLatestSpotCandle,
+      currentPrice: selectSpotCandlePrice,
+    },
+    walletPositions: {
+      data: selectSpotWalletPositions,
+      loading: selectSpotWalletPositionsLoading,
+      positions: selectSpotPositions,
+    },
+  },
 };
 
 interface BonsaiRawShape {
@@ -447,4 +519,5 @@ export const BonsaiForms = {
   TriggerOrdersFormFns,
   AdjustIsolatedMarginFormFns,
   TransferFormFns,
+  SpotFormFns,
 };

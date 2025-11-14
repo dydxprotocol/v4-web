@@ -20,8 +20,9 @@ export interface ErrorResources {
 }
 
 export interface ErrorString {
-  stringKey: string;
+  stringKey?: string;
   params?: { [key: string]: ErrorParam };
+  fallback?: string;
 }
 
 export interface ErrorParam {
@@ -74,6 +75,8 @@ interface SimpleValidationErrorParams {
   fields?: string[];
   titleKey?: string;
   textKey?: string;
+  titleFallback?: string;
+  textFallback?: string;
   titleParams?: { [key: string]: ErrorParam };
   textParams?: { [key: string]: ErrorParam };
   learnMoreUrlKey?: keyof (typeof LINKS_CONFIG_MAP)[keyof typeof LINKS_CONFIG_MAP];
@@ -85,6 +88,8 @@ export function simpleValidationError({
   fields,
   titleKey,
   textKey,
+  titleFallback,
+  textFallback,
   textParams,
   titleParams,
   learnMoreUrlKey,
@@ -98,18 +103,22 @@ export function simpleValidationError({
     linkText: null,
     resources: {
       learnMoreUrlKey,
-      title: titleKey
-        ? {
-            stringKey: titleKey,
-            params: titleParams,
-          }
-        : undefined,
-      text: textKey
-        ? {
-            stringKey: textKey,
-            params: textParams,
-          }
-        : undefined,
+      title:
+        titleKey != null || titleFallback != null
+          ? {
+              stringKey: titleKey,
+              params: titleParams,
+              fallback: titleFallback,
+            }
+          : undefined,
+      text:
+        textKey != null || textFallback != null
+          ? {
+              stringKey: textKey,
+              params: textParams,
+              fallback: textFallback,
+            }
+          : undefined,
       action: null,
     },
   };

@@ -4,6 +4,7 @@ import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
+import { Keypair } from '@solana/web3.js';
 import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -32,6 +33,7 @@ import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
+import { deriveSolanaKeypairFromMnemonic } from '@/lib/solanaWallet';
 import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
@@ -135,6 +137,7 @@ const useAccountsContext = () => {
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [localOsmosisWallet, setLocalOsmosisWallet] = useState<LocalWallet>();
   const [localNeutronWallet, setLocalNeutronWallet] = useState<LocalWallet>();
+  const [localSolanaKeypair, setLocalSolanaKeypair] = useState<Keypair>();
 
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
@@ -145,9 +148,18 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
+  const canDeriveSolanaWallet = useMemo(() => {
+    return sourceAccount.chain !== WalletNetworkType.Cosmos;
+  }, [sourceAccount.chain]);
+
+  const solanaAddress = useMemo(
+    () => localSolanaKeypair?.publicKey.toBase58(),
+    [localSolanaKeypair]
+  );
+
   useEffect(() => {
-    dispatch(setLocalWallet({ address: dydxAddress, subaccountNumber: 0 }));
-  }, [dispatch, dydxAddress]);
+    dispatch(setLocalWallet({ address: dydxAddress, solanaAddress, subaccountNumber: 0 }));
+  }, [dispatch, dydxAddress, solanaAddress]);
 
   const nobleAddress = localNobleWallet?.address;
   const osmosisAddress = localOsmosisWallet?.address;
@@ -172,12 +184,12 @@ const useAccountsContext = () => {
   const hasLocalDydxWallet = Boolean(localDydxWallet);
 
   useEffect(() => {
-    if (localDydxWallet && localNobleWallet) {
-      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
+    if (localDydxWallet && localNobleWallet && localSolanaKeypair) {
+      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet, localSolanaKeypair);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet, localNobleWallet]);
+  }, [localDydxWallet, localNobleWallet, localSolanaKeypair]);
 
   useEffect(() => {
     (async () => {
@@ -287,6 +299,8 @@ const useAccountsContext = () => {
       let nobleWallet: LocalWallet | undefined;
       let osmosisWallet: LocalWallet | undefined;
       let neutronWallet: LocalWallet | undefined;
+      let solanaKeypair: Keypair | undefined;
+
       if (hdKey?.mnemonic) {
         nobleWallet = await (
           await getLazyLocalWallet()
@@ -297,6 +311,7 @@ const useAccountsContext = () => {
         neutronWallet = await (
           await getLazyLocalWallet()
         ).fromMnemonic(hdKey.mnemonic, NEUTRON_BECH32_PREFIX);
+        solanaKeypair = deriveSolanaKeypairFromMnemonic(hdKey.mnemonic);
       }
 
       try {
@@ -326,12 +341,15 @@ const useAccountsContext = () => {
         if (neutronWallet !== undefined) {
           setLocalNeutronWallet(neutronWallet);
         }
+        if (solanaKeypair !== undefined) {
+          setLocalSolanaKeypair(solanaKeypair);
+        }
       } catch (error) {
         log('useAccounts/setCosmosWallets', error);
       }
     };
     setCosmosWallets();
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
+  }, [hdKey?.mnemonic, getCosmosOfflineSigner, canDeriveSolanaWallet]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -380,6 +398,7 @@ const useAccountsContext = () => {
     setLocalNobleWallet(undefined);
     setLocalOsmosisWallet(undefined);
     setLocalNeutronWallet(undefined);
+    setLocalSolanaKeypair(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
   };
@@ -420,6 +439,11 @@ const useAccountsContext = () => {
     nobleAddress,
     osmosisAddress,
     neutronAddress,
+
+    // Solana spot accounts
+    solanaAddress,
+    localSolanaKeypair,
+    canDeriveSolanaWallet,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

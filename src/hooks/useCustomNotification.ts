@@ -6,7 +6,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { addCustomNotification } from '@/state/notifications';
 
 type CustomNoticationOptions = {
-  id: string;
+  id?: string;
   toastDuration?: number;
 };
 

@@ -1,7 +1,38 @@
 import { logBonsaiError } from '@/bonsai/logs';
 
-import { SpotCandleData, SpotCandleServiceQuery } from './types';
-import { transformSpotCandlesForChart } from './utils';
+import { simpleFetch } from '@/lib/simpleFetch';
+
+export type SpotCandleServiceInterval =
+  | '1S'
+  | '5S'
+  | '15S'
+  | '30S'
+  | '1'
+  | '5'
+  | '15'
+  | '30'
+  | '60'
+  | '240'
+  | '720'
+  | '1D'
+  | '7D';
+
+export interface SpotCandleServiceCandleObject {
+  t: number; // timestamp
+  o: number; // open
+  h: number; // high
+  l: number; // low
+  c: number; // close
+  v: number; // volume
+  v_usd: number; // volume in USD
+}
+
+export type SpotCandleServiceQuery = {
+  token: string;
+  interval: SpotCandleServiceInterval;
+  from: string | number; // ISO 8601 or UNIX milliseconds
+  to?: string | number; // ISO 8601 or UNIX milliseconds
+};
 
 export class SpotCandleServiceClient {
   private host: string;
@@ -22,27 +53,15 @@ export class SpotCandleServiceClient {
       });
     }
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
+    return simpleFetch<T>(url.toString());
   }
 
   async getCandles(params: SpotCandleServiceQuery) {
-    const response = await this._get<SpotCandleData[]>(`ohlcv/${params.token}`, {
+    return this._get<SpotCandleServiceCandleObject[]>(`ohlcv/${params.token}`, {
       interval: params.interval,
       from: params.from.toString(),
       ...(params.to && { to: params.to.toString() }),
     });
-
-    return transformSpotCandlesForChart(response);
   }
 
   get url() {

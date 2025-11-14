@@ -18,6 +18,7 @@ import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
 import { setUpRewardsParamsQuery, setUpRewardsTokenPriceQuery } from './rest/rewards';
 import { setUpSparklinesQuery } from './rest/sparklines';
+import { setUpSolPriceQuery, setUpSpotTokenPriceQuery, setUpTokenMetadataQuery } from './rest/spot';
 import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
@@ -30,6 +31,14 @@ import { setUpMarketsFeeDiscountQuery } from './rest/validatorMarketsMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
 import { setUpParentSubaccount } from './websocket/parentSubaccount';
+import { setUpSpotWalletPositions } from './websocket/spot';
+
+const spotLifeCycles = [
+  setUpSolPriceQuery,
+  setUpSpotTokenPriceQuery,
+  setUpSpotWalletPositions,
+  setUpTokenMetadataQuery,
+];
 
 export const storeLifecycles = [
   alwaysUseCurrentNetworkClient,
@@ -62,4 +71,5 @@ export const storeLifecycles = [
   setUpReclaimChildSubaccountBalancesLifecycle,
   setUpMarketsFeeDiscountQuery,
   setUpAccountStakingTierQuery,
+  ...spotLifeCycles,
 ] as const;
