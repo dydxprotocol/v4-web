@@ -74,7 +74,6 @@ export type SubaccountSummary = SubaccountSummaryCore &
 
 export type GroupedSubaccountSummary = SubaccountSummaryDerived & {
   parentSubaccountEquity: BigNumber;
-  subaccountNumber: number;
 };
 // includes parent but it's the basic summary, not aggregated in any way
 export type ChildSubaccountSummaries = Record<string, SubaccountSummary>;

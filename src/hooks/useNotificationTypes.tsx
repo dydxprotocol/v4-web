@@ -988,7 +988,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             displayData: {
               icon: null,
               title: stringGetter({ key: STRING_KEYS.SWAP }),
-              groupKey: swap.id,
+              groupKey: NotificationType.Swap,
               toastSensitivity: 'background',
               toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
               renderCustomBody: ({ isToast, notification }) => (

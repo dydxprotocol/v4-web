@@ -3,18 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { parseUnits } from 'viem';
 
 import { timeUnits } from '@/constants/time';
-import { DYDX_CHAIN_DYDX_DENOM } from '@/constants/tokens';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { SkipClient, useSkipClient } from '../transfers/skipClient';
 import { TokenConfigsResult, useTokenConfigs } from '../useTokenConfigs';
-
-export const DYDX_TOKEN = {
-  denom: DYDX_CHAIN_DYDX_DENOM,
-  decimals: 18,
-};
 
 const SWAP_VENUES = [
   { chainId: 'osmosis-1', name: 'osmosis-poolmanager' },
@@ -76,6 +70,5 @@ export function useSwapQuote(
     staleTime: 15 * timeUnits.second,
     // Don't auto-retry because some errors are legitimate
     retry: 0,
-    // placeholderData: (prev) => prev,
   });
 }

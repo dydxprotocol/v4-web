@@ -103,7 +103,7 @@ export const SwapNotification = ({
             <Button
               tw="h-fit p-0 text-color-accent font-small-book"
               buttonStyle={ButtonStyle.WithoutBackground}
-              onClick={() => window.open(`https://www.mintscan.io/dydx/tx/${swap.txHash}`)}
+              href={`https://www.mintscan.io/dydx/tx/${swap.txHash}`}
             >
               {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
             </Button>

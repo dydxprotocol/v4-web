@@ -2,12 +2,18 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { Panel } from '@/components/Panel';
 
 import { StakingPanel } from './StakingPanel';
 import { Swap } from './Swap';
 
 export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
+  const stringGetter = useStringGetter();
+
   const [selectedTab, setSelectedTab] = useState<'swap' | 'stake'>('swap');
   return (
     <Panel
@@ -19,14 +25,14 @@ export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
             $isSelected={selectedTab === 'swap'}
             type="button"
           >
-            Swap
+            {stringGetter({ key: STRING_KEYS.SWAP })}
           </$HeaderButton>
           <$HeaderButton
             onClick={() => setSelectedTab('stake')}
             $isSelected={selectedTab === 'stake'}
             type="button"
           >
-            Stake
+            {stringGetter({ key: STRING_KEYS.STAKE })}
           </$HeaderButton>
         </$Header>
       }

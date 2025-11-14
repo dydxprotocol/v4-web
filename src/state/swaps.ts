@@ -28,7 +28,9 @@ export const swapsSlice = createSlice({
     },
     updateSwap: (state, action: PayloadAction<{ swap: Partial<Swap> & { id: string } }>) => {
       const { swap } = action.payload;
-      state.swaps = state.swaps.map((s) => (s.id === swap.id ? { ...s, ...swap } : s));
+      state.swaps = state.swaps.map((s) =>
+        s.id === swap.id ? { ...s, ...swap, updatedAt: Date.now() } : s
+      );
     },
   },
 });
