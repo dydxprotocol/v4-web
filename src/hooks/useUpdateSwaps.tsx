@@ -82,12 +82,23 @@ export const useUpdateSwaps = () => {
         route,
         userAddresses,
         slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
-        onTransactionCompleted: async ({ txHash }) => {
-          logBonsaiInfo('useUpdateSwaps', 'Swap completed', {
-            txHash,
-            swapId: swap.id,
-          });
-          dispatch(updateSwap({ swap: { id: swap.id, txHash, status: 'success' } }));
+        onTransactionCompleted: async ({ txHash, status }) => {
+          const errorStates = ['STATE_COMPLETED_ERROR', 'STATE_ABANDONED', 'STATE_PENDING_ERROR'];
+          if (status?.state && errorStates.includes(status.state)) {
+            logBonsaiError('useUpdateSwaps', 'Error executing swap', {
+              txHash,
+              swapId: swap.id,
+              error: status.error,
+              state: status.state,
+            });
+            dispatch(updateSwap({ swap: { ...swap, txHash, status: 'error' } }));
+          } else {
+            logBonsaiInfo('useUpdateSwaps', 'Swap completed', {
+              txHash,
+              swapId: swap.id,
+            });
+            dispatch(updateSwap({ swap: { id: swap.id, txHash, status: 'success' } }));
+          }
         },
         onTransactionBroadcast: async () => {},
         onTransactionSigned: async () => {},
