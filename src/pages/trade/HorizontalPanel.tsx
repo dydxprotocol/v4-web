@@ -437,6 +437,7 @@ const $DragHandle = styled.div`
 `;
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
+  background-color: var(--color-layer-0);
   * {
     background-color: var(--color-layer-0);
   }
