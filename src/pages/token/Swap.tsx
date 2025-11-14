@@ -220,6 +220,7 @@ export const Swap = () => {
 
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
+              disabled={hasPendingSwap}
               tw="bg-[unset] font-large-bold"
               $isLoading={mode === 'exact-out' && (isLoading || isPlaceholderData)}
               type="text"
@@ -270,6 +271,7 @@ export const Swap = () => {
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
               tw="bg-[unset] font-large-bold"
+              disabled={hasPendingSwap}
               $isLoading={mode === 'exact-in' && (isLoading || isPlaceholderData)}
               type="text"
               placeholder="0"
