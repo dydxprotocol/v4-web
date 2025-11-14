@@ -41,10 +41,10 @@ export const log = (location: string, error?: Error, metadata?: object) => {
 export const logInfo = (location: string, metadata?: object) => {
   lastLogTime = Date.now();
 
-  if (isDev) {
-    // eslint-disable-next-line no-console
-    console.log('telemetry/logInfo:', { location, metadata });
-  }
+  // if (isDev) {
+  // }
+  // eslint-disable-next-line no-console
+  console.log('telemetry/logInfo:', { location, metadata });
 
   dd.info(`[Info] ${location}`, metadata);
 };
