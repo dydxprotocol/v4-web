@@ -53,17 +53,12 @@ export const useUpdateSwaps = () => {
       if (!parentSubaccountSummary) {
         throw new Error('Parent subaccount not found');
       }
-      const subaccountNumber = parentSubaccountSummary.subaccountNumber;
       if (availableSubaccountBalance < amountRequired) {
         throw new Error('Insufficeient USDC balance in subaccount');
       }
-      const tx = await withdraw(
-        Number(formatUnits(amountRequired, USDC_DECIMALS)),
-        subaccountNumber
-      );
+      const tx = await withdraw(Number(formatUnits(amountRequired, USDC_DECIMALS)), 0);
       logBonsaiInfo('useUpdateSwaps', 'Withdrawing from subaccount', {
         usdcAmount: formatUnits(amountRequired, USDC_DECIMALS),
-        subaccountNumber,
         tx,
       });
     },

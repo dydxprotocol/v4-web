@@ -68,7 +68,6 @@ export function calculateParentSubaccountSummary(
     throw new Error('Parent subaccount not found in ParentSubaccountData');
   }
   return {
-    subaccountNumber: parentSummary.subaccountNumber,
     marginUsage: parentSummary.marginUsage,
     leverage: parentSummary.leverage,
     freeCollateral: parentSummary.freeCollateral,

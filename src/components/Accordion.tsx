@@ -25,13 +25,11 @@ export const Accordion = ({ items, className, triggerIcon, triggerRotation }: Ac
         <Header>
           <$Trigger $triggerRotation={triggerRotation}>
             {header}
-            <$IconWrapper>
-              {triggerIcon ?? (
-                <$Icon>
-                  <Icon iconName={IconName.Plus} size="1.125em" />
-                </$Icon>
-              )}
-            </$IconWrapper>
+            {triggerIcon ?? (
+              <$Icon>
+                <Icon iconName={IconName.Plus} size="1.125em" />
+              </$Icon>
+            )}
           </$Trigger>
         </Header>
         <$Content>{content}</$Content>
@@ -52,8 +50,6 @@ const $Root = styled(Root)`
     border-bottom: var(--border-width) solid var(--border-color);
   }
 `;
-
-const $IconWrapper = styled.div``;
 
 const $Icon = styled.div`
   display: inline-flex;
@@ -83,18 +79,18 @@ const $Trigger = styled(Trigger)<{ $triggerRotation?: number }>`
   text-align: start;
 
   &:hover {
-    ${$IconWrapper} {
+    ${$Icon} {
       color: var(--color-text-2);
       filter: brightness(var(--hover-filter-base));
     }
   }
 
-  ${$IconWrapper} {
+  ${$Icon} {
     color: var(--color-text-0);
     transition: transform 0.3s var(--ease-out-expo);
   }
 
-  &[data-state='open'] ${$IconWrapper} {
+  &[data-state='open'] ${$Icon} {
     transform: ${({ $triggerRotation }) => `rotate(${$triggerRotation ?? 45}deg)`};
   }
 `;

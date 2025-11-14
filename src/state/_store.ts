@@ -72,6 +72,7 @@ const persistConfig = {
     'dismissable',
     'tradingView',
     'transfers',
+    'swaps',
     'wallet',
     'appUiConfigs',
     'accountUiMemory',
