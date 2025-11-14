@@ -1,0 +1,158 @@
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+
+import { logBonsaiError, logBonsaiInfo } from '@/bonsai/logs';
+import { BonsaiCore } from '@/bonsai/ontology';
+import { formatUnits, parseUnits } from 'viem';
+
+import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { USDC_DECIMALS } from '@/constants/tokens';
+
+import { useSkipClient } from '@/hooks/transfers/skipClient';
+import { useAccounts } from '@/hooks/useAccounts';
+
+import { getUserAddressesForRoute } from '@/views/dialogs/TransferDialogs/utils';
+
+import { getSubaccount, getSubaccountFreeCollateral } from '@/state/accountSelectors';
+import { appQueryClient } from '@/state/appQueryClient';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getPendingSwaps } from '@/state/swapSelectors';
+import { Swap, updateSwap } from '@/state/swaps';
+
+import { useSubaccount } from './useSubaccount';
+
+const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
+
+export const useUpdateSwaps = () => {
+  const { withdraw } = useSubaccount();
+  const dispatch = useAppDispatch();
+  const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { skipClient } = useSkipClient();
+
+  const pendingSwaps = useAppSelector(getPendingSwaps);
+  const parentSubaccountSummary = useAppSelector(getSubaccount);
+  const parentSubaccountBalance = useAppSelector(getSubaccountFreeCollateral);
+  const accountUsdcBalance = useAppSelector(BonsaiCore.account.balances.data).usdcAmount;
+
+  const swapToCallback = useRef<{ [key: string]: boolean }>({});
+  const withdrawToCallback = useRef<{ [key: string]: boolean }>({});
+
+  const reservedForGas = parseUnits(`${AMOUNT_RESERVED_FOR_GAS_USDC}`, USDC_DECIMALS);
+
+  const availableAccountBalance = useMemo(() => {
+    if (!accountUsdcBalance) return BigInt(0);
+    return parseUnits(accountUsdcBalance, USDC_DECIMALS);
+  }, [accountUsdcBalance]);
+
+  const availableSubaccountBalance = useMemo(() => {
+    if (!parentSubaccountBalance) return BigInt(0);
+    return parseUnits(`${parentSubaccountBalance}`, USDC_DECIMALS) - reservedForGas;
+  }, [parentSubaccountBalance, reservedForGas]);
+
+  const withdrawUsdcFromSubaccount = useCallback(
+    async (amountRequired: bigint) => {
+      if (!parentSubaccountSummary) {
+        throw new Error('Parent subaccount not found');
+      }
+      const subaccountNumber = parentSubaccountSummary.subaccountNumber;
+      if (availableSubaccountBalance < amountRequired) {
+        throw new Error('Insufficeient USDC balance in subaccount');
+      }
+      const tx = await withdraw(
+        Number(formatUnits(amountRequired, USDC_DECIMALS)),
+        subaccountNumber
+      );
+      logBonsaiInfo('useUpdateSwaps', 'Withdrawing from subaccount', {
+        usdcAmount: formatUnits(amountRequired, USDC_DECIMALS),
+        subaccountNumber,
+        tx,
+      });
+    },
+    [availableSubaccountBalance, parentSubaccountSummary, withdraw]
+  );
+
+  const executeSwap = useCallback(
+    async (swap: Swap) => {
+      const { route } = swap;
+      const userAddresses = getUserAddressesForRoute(
+        route,
+        // Don't need source account for swaps
+        undefined,
+        nobleAddress,
+        dydxAddress,
+        osmosisAddress,
+        neutronAddress
+      );
+
+      await skipClient.executeRoute({
+        route,
+        userAddresses,
+        slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
+        onTransactionCompleted: async ({ txHash }) => {
+          logBonsaiInfo('useUpdateSwaps', 'Swap completed', {
+            txHash,
+            swapId: swap.id,
+          });
+          dispatch(updateSwap({ swap: { id: swap.id, txHash, status: 'success' } }));
+        },
+        onTransactionBroadcast: async () => {},
+        onTransactionSigned: async () => {},
+      });
+    },
+    [dispatch, dydxAddress, neutronAddress, nobleAddress, osmosisAddress, skipClient]
+  );
+
+  useEffect(() => {
+    if (!pendingSwaps.length) return;
+
+    for (let i = 0; i < pendingSwaps.length; i += 1) {
+      const swap = pendingSwaps[i]!;
+      const { route, status } = swap;
+      const inputAmount = BigInt(route.amountIn);
+      const inputIsDydx = route.sourceAssetDenom === 'adydx';
+      if (status === 'pending') {
+        // If swapping USDC to DyDx, USDC has to be moved from the subaccount to the account before the swap
+        if (!inputIsDydx && availableAccountBalance < inputAmount) {
+          if (withdrawToCallback.current[swap.id]) continue;
+          withdrawToCallback.current[swap.id] = true;
+          withdrawUsdcFromSubaccount(inputAmount)
+            .catch((error) => {
+              logBonsaiError('useUpdateSwaps', 'Error withdrawing from subaccount', {
+                error,
+              });
+              dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
+            })
+            .then(() => {
+              dispatch(updateSwap({ swap: { ...swap, status: 'pending-transfer' } }));
+            });
+        } else {
+          if (swapToCallback.current[swap.id]) continue;
+          swapToCallback.current[swap.id] = true;
+          executeSwap(swap)
+            .catch((error) => {
+              logBonsaiError('useUpdateSwaps', 'Error executing swap', {
+                error,
+                swapId: swap.id,
+              });
+              dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
+            })
+            .then(() => {
+              appQueryClient.invalidateQueries({
+                queryKey: ['validator', 'accountBalances'],
+                exact: false,
+              });
+            });
+        }
+      } else if (status === 'pending-transfer' && availableAccountBalance > inputAmount) {
+        logBonsaiInfo('useUpdateSwaps', 'Balance transfer from subaccount completed');
+        dispatch(updateSwap({ swap: { ...swap, status: 'pending' } }));
+      }
+    }
+  }, [
+    availableAccountBalance,
+    availableSubaccountBalance,
+    dispatch,
+    executeSwap,
+    pendingSwaps,
+    withdrawUsdcFromSubaccount,
+  ]);
+};

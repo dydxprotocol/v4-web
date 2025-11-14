@@ -15,22 +15,18 @@ import {
   ButtonSize,
   ButtonState,
   ButtonStyle,
-  ButtonType,
 } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
-import { useSkipClient } from '@/hooks/transfers/skipClient';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCustomNotification } from '@/hooks/useCustomNotification';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { RefreshIcon } from '@/icons';
 import CardHolderIcon from '@/icons/card-holder.svg';
 import CaretDown from '@/icons/caret-down.svg';
 import DydxLogo from '@/icons/dydx-protocol.svg';
+import ExchangeIcon from '@/icons/exchange.svg';
 import GasIcon from '@/icons/gas.svg';
 import UsdcLogo from '@/icons/usdc-inverted.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
@@ -42,11 +38,11 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
-import { getUserAddressesForRoute } from '@/views/dialogs/TransferDialogs/utils';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
-import { appQueryClient } from '@/state/appQueryClient';
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { selectHasPendingSwaps } from '@/state/swapSelectors';
+import { addSwap } from '@/state/swaps';
 
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
 import { BIG_NUMBERS } from '@/lib/numbers';
@@ -62,28 +58,28 @@ function getTokenLabel(token: 'usdc' | 'dydx') {
 
 const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const Swap = () => {
-  const { skipClient } = useSkipClient();
+  const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
+
+  const parentSubaccountUsdcBalance = useAppSelector(getSubaccountFreeCollateral);
+  const hasPendingSwap = useAppSelector(selectHasPendingSwaps);
+  const onboardingState = useAppSelector(getOnboardingState);
+  const { chainTokenAmount: nativeTokenBalance } = useAppSelector(BonsaiCore.account.balances.data);
+
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
   const [mode, setMode] = useState<SwapMode>('exact-in');
   const [amount, setAmount] = useState('');
   const [isToInputFocused, setIsToInputFocused] = useState(false);
   const [isFromInputFocused, setIsFromInputFocused] = useState(false);
-  const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
-  const [isSwapSubmitting, setIsSwapSubmitting] = useState(false);
-  const onboardingState = useAppSelector(getOnboardingState);
-  const stringGetter = useStringGetter();
-
-  const usdcBalance = useAppSelector(getSubaccountFreeCollateral);
-  const { chainTokenAmount: nativeTokenBalance } = useAppSelector(BonsaiCore.account.balances.data);
 
   const tokenBalances = useMemo(() => {
     const dydx = {
-      rawBalance: nativeTokenBalance ? parseUnits(nativeTokenBalance, DYDX_DECIMALS) : undefined,
-      formatted: Number(nativeTokenBalance ?? 0).toFixed(2),
+      rawBalance: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
+      formatted: Math.max(0, Number(nativeTokenBalance ?? 0)).toFixed(2),
     };
     const usdc = {
-      rawBalance: usdcBalance ? parseUnits(`${usdcBalance}`, USDC_DECIMALS) : undefined,
-      formatted: Number(usdcBalance ?? 0).toFixed(2),
+      rawBalance: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
+      formatted: Math.max(0, parentSubaccountUsdcBalance ?? 0).toFixed(2),
     };
 
     if (inputToken === 'usdc') {
@@ -99,7 +95,7 @@ export const Swap = () => {
       dydx,
       usdc,
     };
-  }, [nativeTokenBalance, usdcBalance, inputToken]);
+  }, [nativeTokenBalance, parentSubaccountUsdcBalance, inputToken]);
 
   const onSwitchTokens = () => {
     setInputToken(inputToken === 'usdc' ? 'dydx' : 'usdc');
@@ -186,68 +182,71 @@ export const Swap = () => {
     );
   }, [quote]);
 
-  const notify = useCustomNotification();
-
-  const onSwapComplete = (txHash: string) => {
-    setIsSwapSubmitting(false);
-    appQueryClient.invalidateQueries({
-      queryKey: ['validator', 'accountBalances'],
-      exact: false,
-    });
-    setAmount('');
-    notify({
-      title: stringGetter({ key: STRING_KEYS.SUCCESS }),
-      body: stringGetter({
-        key: STRING_KEYS.TRANSACTION_HASH,
-        params: {
-          TX_HASH: (
-            <Button
-              tw="p-0"
-              buttonStyle={ButtonStyle.WithoutBackground}
-              type={ButtonType.Link}
-              onClick={() => navigator.clipboard.writeText(txHash)}
-            >
-              {txHash}
-            </Button>
-          ),
-        },
-      }),
-    });
-  };
+  // const onSwapComplete = (txHash: string) => {
+  //   appQueryClient.invalidateQueries({
+  //     queryKey: ['validator', 'accountBalances'],
+  //     exact: false,
+  //   });
+  //   setAmount('');
+  //   const inputTokenLabel = getTokenLabel(inputToken);
+  //   const outputTokenLabel = getTokenLabel(otherToken(inputToken));
+  //   const inputAmount = Number(
+  //     formatUnits(
+  //       BigInt(quote?.amountIn ?? '0'),
+  //       inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
+  //     )
+  //   );
+  //   const outputAmount = Number(
+  //     formatUnits(
+  //       BigInt(quote?.amountOut ?? '0'),
+  //       inputToken === 'dydx' ? USDC_DECIMALS : DYDX_DECIMALS
+  //     )
+  //   );
+  //   const inputLabel = `${inputAmount.toFixed(2)} ${inputTokenLabel}`;
+  //   const outputLabel = `${outputAmount.toFixed(2)} ${outputTokenLabel}`;
+  //   notify(
+  //     {
+  //       title: stringGetter({ key: STRING_KEYS.SWAP_SUCCESS }),
+  //       renderCustomBody({ isToast, notification }) {
+  //         return (
+  //           <Toast
+  //             isToast={isToast}
+  //             notification={notification}
+  //             slotTitle={<span tw="text-color-success">Swap Success</span>}
+  //             slotIcon={<ExchangeIcon />}
+  //             slotDescription={
+  //               <div tw="flex flex-wrap">
+  //                 <span>
+  //                   {stringGetter({
+  //                     key: STRING_KEYS.SWAP_SUCCESS_DESCRIPTION,
+  //                     params: { INPUT_LABEL: inputLabel, OUTPUT_LABEL: outputLabel },
+  //                   })}
+  //                 </span>
+  //                 <Button
+  //                   tw="h-fit p-0 text-color-accent font-small-book"
+  //                   buttonStyle={ButtonStyle.WithoutBackground}
+  //                   onClick={() => window.open(`https://www.mintscan.io/dydx/tx/${txHash}`)}
+  //                 >
+  //                   View Transaction
+  //                 </Button>
+  //               </div>
+  //             }
+  //           />
+  //         );
+  //       },
+  //     },
+  //     {
+  //       id: `swap`,
+  //     }
+  //   );
+  // };
 
   const onSwap = async () => {
     if (!quote) {
       return;
     }
-
-    setIsSwapSubmitting(true);
-    try {
-      const userAddresses = getUserAddressesForRoute(
-        quote,
-        // Don't need source account for swaps
-        undefined,
-        nobleAddress,
-        dydxAddress,
-        osmosisAddress,
-        neutronAddress
-      );
-
-      await skipClient.executeRoute({
-        route: quote,
-        userAddresses,
-        slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
-        onTransactionCompleted: async ({ txHash }) => {
-          onSwapComplete(txHash);
-        },
-        onTransactionBroadcast: async () => {},
-        onTransactionSigned: async () => {},
-      });
-    } catch (e) {
-      setIsSwapSubmitting(false);
-      notify({
-        title: stringGetter({ key: STRING_KEYS.SWAP_ERROR }),
-      });
-    }
+    const swapId = `swap-${crypto.randomUUID()}`;
+    dispatch(addSwap({ swap: { id: swapId, route: quote, status: 'pending' } }));
   };
 
   return (
@@ -355,7 +354,7 @@ export const Swap = () => {
           state={
             !quote || !hasSufficientBalance
               ? ButtonState.Disabled
-              : isSwapSubmitting
+              : hasPendingSwap
                 ? ButtonState.Loading
                 : ButtonState.Default
           }
@@ -477,7 +476,7 @@ const ExchangeRate = ({
           </WithTooltip>
         ) : (
           <>
-            <RefreshIcon />
+            <ExchangeIcon />
             <Output
               value={exchangeRate}
               type={OutputType.CompactNumber}

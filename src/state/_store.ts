@@ -27,6 +27,7 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { swapsSlice } from './swaps';
 import { tradeFormSlice } from './tradeForm';
 import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
 import { tradingViewSlice } from './tradingView';
@@ -53,6 +54,7 @@ const reducers = {
   perpetuals: perpetualsSlice.reducer,
   tradingView: tradingViewSlice.reducer,
   transfers: transfersSlice.reducer,
+  swaps: swapsSlice.reducer,
   vaults: vaultsSlice.reducer,
   wallet: walletSlice.reducer,
   walletEphemeral: walletEphemeralSlice.reducer,
