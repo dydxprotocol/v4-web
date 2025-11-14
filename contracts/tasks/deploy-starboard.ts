@@ -3,7 +3,13 @@ import { call, getArgs } from "./utils"
 import { PricefeedWrapperFactory, VaultFactory } from "../types"
 
 if (require.main === module) {
-    deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"]))
+    deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"])).then(() => {
+        process.exit(0)
+    }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        process.exit(1)
+    })
 }
 
 export async function deployStarboard(taskArgs: any) {
@@ -17,6 +23,7 @@ export async function deployStarboard(taskArgs: any) {
         configurableConstants: {
             STORK_CONTRACT: storkContract,
         },
+        salt: "0x8000000000000000000000000000000000000000000000000000000000000000",
     })
     const { contract: pricefeedWrapper } = await waitForResultPricefeedWrapper()
     // eslint-disable-next-line no-console
@@ -29,6 +36,7 @@ export async function deployStarboard(taskArgs: any) {
             COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
             PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
         },
+        salt: "0x8000000000000000000000000000000000000000000000000000000000000001"
     })
     const { contract: vault } = await waitForResultVault()
     // eslint-disable-next-line no-console

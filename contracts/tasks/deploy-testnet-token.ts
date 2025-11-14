@@ -3,7 +3,13 @@ import { getArgs, call } from "./utils"
 import { TestnetTokenFactory } from "../types"
 
 if (require.main === module) {
-    deployTestnetToken(getArgs(["url", "privK", "name", "symbol", "decimals"]))
+    deployTestnetToken(getArgs(["url", "privK", "name", "symbol", "decimals"])).then(() => {
+        process.exit(0)
+    }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        process.exit(1)
+    })
 }
 
 export async function deployTestnetToken(taskArgs: any) {
@@ -22,6 +28,7 @@ export async function deployTestnetToken(taskArgs: any) {
             SYMBOL: taskArgs.symbol,
             DECIMALS: taskArgs.decimals,
         },
+        salt: "0x8000000000000000000000000000000000000000000000000000000000000000",
     })
     const { contract: tt } = await waitForResultTestnetToken()
 

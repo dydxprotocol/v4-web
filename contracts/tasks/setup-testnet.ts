@@ -5,7 +5,13 @@ import { deployTestnetToken } from "./deploy-testnet-token"
 import { deployStarboard } from "./deploy-starboard"
 
 if (require.main === module) {
-    setupTestnet(getArgs(["url", "privK", "storkContractAddress"]))
+    setupTestnet(getArgs(["url", "privK", "storkContractAddress"])).then(() => {
+        process.exit(0)
+    }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        process.exit(1)
+    })
 }
 
 async function setupTestnet(taskArgs: any) {
