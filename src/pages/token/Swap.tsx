@@ -200,6 +200,7 @@ export const Swap = () => {
           <div tw="flex justify-between">
             <div tw="text-color-text-0 font-small-medium">From</div>
             <Button
+              disabled={hasPendingSwap}
               buttonStyle={ButtonStyle.WithoutBackground}
               tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
               onClick={() => setMaxAmount('exact-in')}
@@ -237,6 +238,7 @@ export const Swap = () => {
           shape={ButtonShape.Square}
           action={ButtonAction.Base}
           onClick={onSwitchTokens}
+          disabled={hasPendingSwap}
         >
           <ArrowDownIcon tw="h-1.25 w-1.25" />
         </$SwapButton>
@@ -249,6 +251,7 @@ export const Swap = () => {
             <div tw="text-color-text-0 font-small-medium">To</div>
             <Button
               onClick={() => setMaxAmount('exact-out')}
+              disabled={hasPendingSwap}
               buttonStyle={ButtonStyle.WithoutBackground}
               tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
             >
@@ -299,7 +302,7 @@ export const Swap = () => {
                 ? ButtonState.Loading
                 : ButtonState.Default
           }
-          disabled={!quote || !hasSufficientBalance}
+          disabled={!quote || !hasSufficientBalance || hasPendingSwap}
           onClick={onSwap}
           action={ButtonAction.Primary}
         >
