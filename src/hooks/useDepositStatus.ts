@@ -23,13 +23,13 @@ export type DepositStatusResponse = {
   };
 };
 
-export const useDepositStatus = () => {
+export const useDepositStatus = ({ enabled }: { enabled: boolean } = { enabled: false }) => {
   const { dydxAddress } = useAccounts();
-  const { depositAddresses, isLoadingDepositAddresses } = useDepositAddress();
+  const { depositAddresses } = useDepositAddress();
   const indexerUrl = useAppSelector(selectIndexerUrl);
 
   const canQueryForDepositStatus =
-    !!dydxAddress && Boolean(indexerUrl) && !!depositAddresses && !isLoadingDepositAddresses;
+    enabled && !!dydxAddress && Boolean(indexerUrl) && !!depositAddresses;
 
   return useQuery({
     enabled: canQueryForDepositStatus,
