@@ -35,40 +35,47 @@ export const SwapNotification = ({
     return [inputTokenLabel, outputTokenLabel];
   }, [swap.route.sourceAssetDenom]);
 
-  const [icon, title] = useMemo(() => {
+  const icon = useMemo(() => {
     switch (swap.status) {
       case 'pending':
       case 'pending-transfer':
-        return [
-          <LoadingDots key="loading-icon" />,
-          stringGetter({ key: STRING_KEYS.SWAP_PENDING }),
-        ];
+        return <LoadingDots />;
       case 'success':
-        return [
-          <ExchangeIcon key="success-icon" />,
-          stringGetter({ key: STRING_KEYS.SWAP_SUCCESS }),
-        ];
+        return <ExchangeIcon />;
       case 'error':
-        return [
-          <ErrorExclamationIcon key="error-icon" />,
-          stringGetter({ key: STRING_KEYS.SWAP_ERROR }),
-        ];
+        return <ErrorExclamationIcon />;
       default:
-        return [<ExchangeIcon key="loading-icon" />, ''];
+        return null;
     }
-  }, [swap.status, stringGetter]);
+  }, [swap.status]);
+
+  const title = useMemo(() => {
+    switch (swap.status) {
+      case 'pending':
+      case 'pending-transfer':
+        return <span>{stringGetter({ key: STRING_KEYS.SWAP_PENDING })}</span>;
+      case 'success':
+        return (
+          <span tw="text-color-success">{stringGetter({ key: STRING_KEYS.SWAP_SUCCESS })}</span>
+        );
+      case 'error':
+        return <span>{stringGetter({ key: STRING_KEYS.SWAP_ERROR })}</span>;
+      default:
+        return null;
+    }
+  }, [stringGetter, swap.status]);
 
   const description = useMemo(() => {
     const inputAmount = Number(
       formatUnits(
         BigInt(swap.route.amountIn),
-        inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
+        swap.route.sourceAssetDenom === 'adydx' ? DYDX_DECIMALS : USDC_DECIMALS
       )
     );
     const outputAmount = Number(
       formatUnits(
         BigInt(swap.route.amountOut),
-        inputToken === 'dydx' ? USDC_DECIMALS : DYDX_DECIMALS
+        swap.route.sourceAssetDenom === 'adydx' ? USDC_DECIMALS : DYDX_DECIMALS
       )
     );
     const inputLabel = `${inputAmount.toFixed(2)} ${inputToken}`;
@@ -80,7 +87,7 @@ export const SwapNotification = ({
           <span>
             {stringGetter({
               key: STRING_KEYS.SWAP_PENDING_DESCRIPTION,
-              params: { INPUT_TOKEN: inputLabel, OUTPUT_TOKEN: outputLabel },
+              params: { INPUT_LABEL: inputLabel, OUTPUT_LABEL: outputLabel },
             })}
           </span>
         );
@@ -111,6 +118,7 @@ export const SwapNotification = ({
     stringGetter,
     swap.route.amountIn,
     swap.route.amountOut,
+    swap.route.sourceAssetDenom,
     swap.status,
     swap.txHash,
   ]);

@@ -986,6 +986,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({
             id: swap.id,
             displayData: {
+              icon: null,
               title: stringGetter({ key: STRING_KEYS.SWAP }),
               groupKey: swap.id,
               toastSensitivity: 'background',
