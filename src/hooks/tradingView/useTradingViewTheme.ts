@@ -53,9 +53,6 @@ export const useTradingViewTheme = ({
           if (isIFrame(frame) && frame.contentWindow) {
             const innerHtml = frame.contentWindow.document.documentElement;
             switch (appTheme) {
-              case AppTheme.Classic:
-                innerHtml.classList.remove('theme-dark', 'theme-light');
-                break;
               case AppTheme.Dark:
                 innerHtml.classList.remove('theme-light');
                 innerHtml.classList.add('theme-dark');

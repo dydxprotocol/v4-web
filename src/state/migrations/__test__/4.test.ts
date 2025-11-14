@@ -6,7 +6,7 @@ import { migration4, PersistAppStateV4 } from '../4';
 const v3State: PersistAppStateV3 = {
   _persist: { version: 3, rehydrated: true },
   appUiConfigs: {
-    appThemeSetting: V3AppTheme.Classic,
+    appThemeSetting: V3AppTheme.Dark,
     appColorMode: V3AppColorMode.GreenUp,
     hasSeenLaunchIncentives: false,
     defaultToAllMarketsInPositionsOrdersFills: true,
@@ -18,7 +18,7 @@ const v3State: PersistAppStateV3 = {
 const v4State: PersistAppStateV4 = {
   _persist: { version: 4, rehydrated: true },
   appUiConfigs: {
-    appThemeSetting: V3AppTheme.Classic,
+    appThemeSetting: V3AppTheme.Dark,
     appColorMode: V3AppColorMode.GreenUp,
     hasSeenLaunchIncentives: false,
     defaultToAllMarketsInPositionsOrdersFills: true,

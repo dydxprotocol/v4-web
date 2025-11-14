@@ -50,7 +50,7 @@ interface V3AppUIConfigsState {
 }
 
 const v3AppUiConfigsInitialState: V3AppUiConfigs = {
-  appThemeSetting: V3AppTheme.Classic,
+  appThemeSetting: V3AppTheme.Dark,
   appColorMode: V3AppColorMode.GreenUp,
   hasSeenLaunchIncentives: false,
   defaultToAllMarketsInPositionsOrdersFills: true,

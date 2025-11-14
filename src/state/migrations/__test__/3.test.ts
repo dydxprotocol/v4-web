@@ -22,7 +22,7 @@ const V2_STATE: V2State = {
 const updatedState: PersistAppStateV3 = {
   _persist: { version: 3, rehydrated: true },
   appUiConfigs: {
-    appThemeSetting: V3AppTheme.Classic,
+    appThemeSetting: V3AppTheme.Dark,
     appColorMode: V3AppColorMode.GreenUp,
     hasSeenLaunchIncentives: false,
     defaultToAllMarketsInPositionsOrdersFills: true,
