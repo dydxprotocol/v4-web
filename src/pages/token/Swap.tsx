@@ -9,15 +9,9 @@ import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { OnboardingState } from '@/constants/account';
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonState,
-  ButtonStyle,
-} from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
+import { DYDX_CHAIN_DYDX_DENOM, DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -74,11 +68,11 @@ export const Swap = () => {
 
   const tokenBalances = useMemo(() => {
     const dydx = {
-      rawBalance: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
+      rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
       formatted: Math.max(0, Number(nativeTokenBalance ?? 0)).toFixed(2),
     };
     const usdc = {
-      rawBalance: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
+      rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
       formatted: Math.max(0, parentSubaccountUsdcBalance ?? 0).toFixed(2),
     };
 
@@ -132,19 +126,19 @@ export const Swap = () => {
   const hasSufficientBalance = useMemo(() => {
     if (!quote || !amount) return true;
 
-    const inputAmount = parseUnits(
+    const inputAmountBigInt = parseUnits(
       quote.amountIn,
-      quote.sourceAssetDenom === 'adydx' ? DYDX_DECIMALS : USDC_DECIMALS
+      quote.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM ? DYDX_DECIMALS : USDC_DECIMALS
     );
-    const inputBalance =
-      quote.sourceAssetDenom === 'adydx'
-        ? tokenBalances.dydx?.rawBalance
-        : tokenBalances.usdc?.rawBalance;
+    const inputBalanceBigInt =
+      quote.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM
+        ? tokenBalances.dydx?.rawBalanceBigInt
+        : tokenBalances.usdc?.rawBalanceBigInt;
 
-    if (!inputBalance) return true;
+    if (!inputBalanceBigInt) return true;
 
-    return inputBalance <= inputAmount;
-  }, [quote, amount, tokenBalances.dydx?.rawBalance, tokenBalances.usdc?.rawBalance]);
+    return inputBalanceBigInt <= inputAmountBigInt;
+  }, [quote, amount, tokenBalances.dydx?.rawBalanceBigInt, tokenBalances.usdc?.rawBalanceBigInt]);
 
   const { data: priceQuote } = useSwapQuote('dydx', '1', 'exact-in');
 
@@ -297,14 +291,10 @@ export const Swap = () => {
       ) : (
         <Button
           tw="h-3 p-0.75"
-          state={
-            !quote || !hasSufficientBalance
-              ? ButtonState.Disabled
-              : hasPendingSwap
-                ? ButtonState.Loading
-                : ButtonState.Default
-          }
-          disabled={!quote || !hasSufficientBalance || hasPendingSwap}
+          state={{
+            isDisabled: !quote || !hasSufficientBalance,
+            isLoading: hasPendingSwap || isLoading,
+          }}
           onClick={onSwap}
           action={ButtonAction.Primary}
         >
@@ -360,11 +350,14 @@ const QuoteDetails = ({ priceImpact, isLoading }: { priceImpact?: number; isLoad
           </WithTooltip>
         </div>
         <div>
-          {priceImpact ? (
-            <Output tw="inline" value={priceImpact / 100} type={OutputType.Percent} />
-          ) : (
-            '-'
-          )}
+          <Output
+            css={{
+              display: isLoading ? 'flex' : 'inline',
+            }}
+            isLoading={isLoading}
+            value={priceImpact ? priceImpact / 100 : null}
+            type={OutputType.Percent}
+          />
         </div>
       </div>
 

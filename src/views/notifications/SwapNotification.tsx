@@ -4,7 +4,7 @@ import { formatUnits } from 'viem';
 
 import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
+import { DYDX_CHAIN_DYDX_DENOM, DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
@@ -32,7 +32,7 @@ export const SwapNotification = ({
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const [inputToken, outputToken] = useMemo(() => {
-    const inputTokenLabel = swap.route.sourceAssetDenom === 'adydx' ? 'dYdX' : 'USDC';
+    const inputTokenLabel = swap.route.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM ? 'dYdX' : 'USDC';
     const outputTokenLabel = inputTokenLabel === 'dYdX' ? 'USDC' : 'dYdX';
     return [inputTokenLabel, outputTokenLabel];
   }, [swap.route.sourceAssetDenom]);
@@ -65,13 +65,13 @@ export const SwapNotification = ({
       default:
         return null;
     }
-  }, [outputToken, stringGetter, swap.status]);
+  }, [stringGetter, swap.status]);
 
   const description = useMemo(() => {
     const inputAmount = Number(
       formatUnits(
         BigInt(swap.route.amountIn),
-        swap.route.sourceAssetDenom === 'adydx' ? DYDX_DECIMALS : USDC_DECIMALS
+        swap.route.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM ? DYDX_DECIMALS : USDC_DECIMALS
       )
     );
     const inputLabel = `${inputAmount.toFixed(2)} ${inputToken}`;

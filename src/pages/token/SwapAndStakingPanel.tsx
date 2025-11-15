@@ -8,7 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Panel } from '@/components/Panel';
 
-import { StakingPanel } from './StakingPanel';
+import { Stake } from './Stake';
 import { Swap } from './Swap';
 
 export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
@@ -38,7 +38,7 @@ export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
       }
     >
       {selectedTab === 'swap' && <Swap />}
-      {selectedTab === 'stake' && <StakingPanel />}
+      {selectedTab === 'stake' && <Stake />}
     </Panel>
   );
 };

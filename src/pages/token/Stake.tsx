@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -15,23 +15,18 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
-import { Toolbar } from '@/components/Toolbar';
 import { WithTooltip } from '@/components/WithTooltip';
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-export const StakingPanel = () => {
+export const Stake = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
@@ -40,7 +35,7 @@ export const StakingPanel = () => {
 
   const { complianceState } = useComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
-  const { chainTokenImage, chainTokenLabel } = useTokenConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
   const { protocolStaking } = useURLConfigs();
 
   const showStakingActions = canAccountTrade && complianceState === ComplianceStates.FULL_ACCESS;
@@ -67,27 +62,6 @@ export const StakingPanel = () => {
 
   return (
     <div tw="flexColumn gap-0.75">
-      <$Header>
-        <$Title>
-          <AssetIcon logoUrl={chainTokenImage} symbol={chainTokenLabel} />
-          {chainTokenLabel}
-        </$Title>
-        {complianceState === ComplianceStates.FULL_ACCESS && (
-          <Toolbar tw="inlineRow gap-0.5 p-0 [--stickyArea-topHeight:max-content]">
-            {!canAccountTrade ? (
-              <OnboardingTriggerButton size={ButtonSize.Small} />
-            ) : (
-              <IconButton
-                iconName={IconName.Send}
-                shape={ButtonShape.Square}
-                size={ButtonSize.Small}
-                action={ButtonAction.Base}
-                onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
-              />
-            )}
-          </Toolbar>
-        )}
-      </$Header>
       <$BalanceRow>
         <div>
           <$Label>
@@ -168,17 +142,6 @@ export const StakingPanel = () => {
   );
 };
 
-const $Header = styled.div`
-  ${layoutMixins.spacedRow}
-  gap: 1rem;
-`;
-
-const $Title = styled.h3`
-  ${layoutMixins.inlineRow}
-  font: var(--font-medium-book);
-  color: var(--color-text-2);
-  --asset-icon-size: 1.5rem;
-`;
 const $TotalBalance = styled(Details)`
   div {
     --scrollArea-height: auto;

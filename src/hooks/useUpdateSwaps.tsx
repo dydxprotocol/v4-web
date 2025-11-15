@@ -5,7 +5,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
-import { USDC_DECIMALS } from '@/constants/tokens';
+import { DYDX_CHAIN_DYDX_DENOM, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -36,24 +36,24 @@ export const useUpdateSwaps = () => {
   const swapToCallback = useRef<{ [key: string]: boolean }>({});
   const withdrawToCallback = useRef<{ [key: string]: boolean }>({});
 
-  const reservedForGas = parseUnits(`${AMOUNT_RESERVED_FOR_GAS_USDC}`, USDC_DECIMALS);
+  const reservedForGasBigInt = parseUnits(`${AMOUNT_RESERVED_FOR_GAS_USDC}`, USDC_DECIMALS);
 
-  const availableAccountBalance = useMemo(() => {
+  const availableBalanceBigInt = useMemo(() => {
     if (!accountUsdcBalance) return BigInt(0);
     return parseUnits(accountUsdcBalance, USDC_DECIMALS);
   }, [accountUsdcBalance]);
 
-  const availableSubaccountBalance = useMemo(() => {
+  const subaccountBalanceBigInt = useMemo(() => {
     if (!parentSubaccountBalance) return BigInt(0);
-    return parseUnits(`${parentSubaccountBalance}`, USDC_DECIMALS) - reservedForGas;
-  }, [parentSubaccountBalance, reservedForGas]);
+    return parseUnits(`${parentSubaccountBalance}`, USDC_DECIMALS) - reservedForGasBigInt;
+  }, [parentSubaccountBalance, reservedForGasBigInt]);
 
   const withdrawUsdcFromSubaccount = useCallback(
     async (amountRequired: bigint) => {
       if (!parentSubaccountSummary) {
         throw new Error('Parent subaccount not found');
       }
-      if (availableSubaccountBalance < amountRequired) {
+      if (subaccountBalanceBigInt < amountRequired) {
         throw new Error('Insufficeient USDC balance in subaccount');
       }
       const tx = await withdraw(Number(formatUnits(amountRequired, USDC_DECIMALS)), 0);
@@ -62,7 +62,7 @@ export const useUpdateSwaps = () => {
         tx,
       });
     },
-    [availableSubaccountBalance, parentSubaccountSummary, withdraw]
+    [subaccountBalanceBigInt, parentSubaccountSummary, withdraw]
   );
 
   const executeSwap = useCallback(
@@ -100,8 +100,6 @@ export const useUpdateSwaps = () => {
             dispatch(updateSwap({ swap: { id: swap.id, txHash, status: 'success' } }));
           }
         },
-        onTransactionBroadcast: async () => {},
-        onTransactionSigned: async () => {},
       });
     },
     [dispatch, dydxAddress, neutronAddress, nobleAddress, osmosisAddress, skipClient]
@@ -113,14 +111,14 @@ export const useUpdateSwaps = () => {
     for (let i = 0; i < pendingSwaps.length; i += 1) {
       const swap = pendingSwaps[i]!;
       const { route, status } = swap;
-      const inputAmount = BigInt(route.amountIn);
-      const inputIsDydx = route.sourceAssetDenom === 'adydx';
+      const inputAmountBigInt = BigInt(route.amountIn);
+      const inputIsDydx = route.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM;
       if (status === 'pending') {
         // If swapping USDC to DyDx, USDC has to be moved from the subaccount to the account before the swap
-        if (!inputIsDydx && availableAccountBalance < inputAmount) {
+        if (!inputIsDydx && availableBalanceBigInt < inputAmountBigInt) {
           if (withdrawToCallback.current[swap.id]) continue;
           withdrawToCallback.current[swap.id] = true;
-          withdrawUsdcFromSubaccount(inputAmount)
+          withdrawUsdcFromSubaccount(inputAmountBigInt)
             .catch((error) => {
               logBonsaiError('useUpdateSwaps', 'Error withdrawing from subaccount', {
                 error,
@@ -148,14 +146,14 @@ export const useUpdateSwaps = () => {
               });
             });
         }
-      } else if (status === 'pending-transfer' && availableAccountBalance > inputAmount) {
+      } else if (status === 'pending-transfer' && availableBalanceBigInt > inputAmountBigInt) {
         logBonsaiInfo('useUpdateSwaps', 'Balance transfer from subaccount completed');
         dispatch(updateSwap({ swap: { ...swap, status: 'pending' } }));
       }
     }
   }, [
-    availableAccountBalance,
-    availableSubaccountBalance,
+    availableBalanceBigInt,
+    subaccountBalanceBigInt,
     dispatch,
     executeSwap,
     pendingSwaps,
