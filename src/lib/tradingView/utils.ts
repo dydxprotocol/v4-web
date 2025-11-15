@@ -171,7 +171,7 @@ export const getWidgetOverrides = ({
   return {
     theme: THEME_NAMES[appTheme],
     overrides: {
-      'paneProperties.background': theme.layer2,
+      'paneProperties.background': theme.layer1,
       'paneProperties.horzGridProperties.color': theme.layer3,
       'paneProperties.vertGridProperties.color': theme.layer3,
       'paneProperties.crossHairProperties.style': 1,

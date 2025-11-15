@@ -32,8 +32,6 @@ body {
   font-weight: 500;
   outline: none;
 
-  background-color: var(--color-layer-1) !important;
-
   --ui-lib-button-color-bg: var(--color-accent);
   --ui-lib-button-color-border: var(--color-accent);
   --ui-lib-nav-button-default-color-bg: transparent !important;

@@ -5,7 +5,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
-import { ButtonAction } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -30,7 +30,6 @@ import { WithSidebar } from '@/components/WithSidebar';
 import { TradeHistoryList } from '@/views/Lists/Trade/TradeHistoryList';
 import { AccountHistoryList } from '@/views/Lists/Transfers/AccountHistoryList';
 import { FundingHistoryList } from '@/views/Lists/Transfers/FundingHistoryList';
-// import { VaultTransferList } from '@/views/Lists/Transfers/VaultTransferList';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
@@ -91,7 +90,6 @@ const PortfolioPage = () => {
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route path={HistoryRoute.Trades} element={<TradeHistoryList />} />
           <Route path={HistoryRoute.Transfers} element={<AccountHistoryList />} />
-          {/* <Route path={HistoryRoute.VaultTransfers} element={<VaultTransferList />} /> */}
           <Route path={HistoryRoute.Payments} element={<FundingHistoryList />} />
         </Route>
         <Route
@@ -184,8 +182,8 @@ const PortfolioPage = () => {
   ) : (
     <WithSidebar
       sidebar={
-        <div tw="flexColumn h-full justify-between bg-color-layer-1">
-          <NavigationMenu
+        <div tw="flexColumn h-full justify-between bg-color-layer-0">
+          <$NavigationMenu
             items={[
               {
                 group: 'views',
@@ -274,33 +272,43 @@ const PortfolioPage = () => {
                 ],
               },
             ]}
-            tw="bg-color-layer-1 p-0.5 pt-0"
+            tw="bg-color-layer-0 p-0.5 pt-0"
           />
           {onboardingState === OnboardingState.AccountConnected && (
             <$Footer>
               {complianceState === ComplianceStates.FULL_ACCESS && (
                 <Button
-                  action={ButtonAction.Primary}
+                  action={ButtonAction.SimplePrimary}
+                  size={ButtonSize.Small}
+                  shape={ButtonShape.Rectangle}
+                  tw="flex-1"
                   onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                 >
+                  <Icon iconName={IconName.Plus} size="0.75rem" />
                   {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                 </Button>
               )}
               {usdcBalance > 0 && (
                 <Button
-                  action={ButtonAction.Base}
+                  action={ButtonAction.Secondary}
+                  size={ButtonSize.Small}
+                  shape={ButtonShape.Square}
                   onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
                 >
-                  {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+                  <span className="sr-only">{stringGetter({ key: STRING_KEYS.WITHDRAW })}</span>
+                  <Icon iconName={IconName.Withdraw} />
                 </Button>
               )}
               {complianceState === ComplianceStates.FULL_ACCESS &&
                 (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
                   <Button
-                    action={ButtonAction.Base}
+                    action={ButtonAction.Secondary}
+                    size={ButtonSize.Small}
                     onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
+                    shape={ButtonShape.Square}
                   >
-                    {stringGetter({ key: STRING_KEYS.TRANSFER })}
+                    <span className="sr-only">{stringGetter({ key: STRING_KEYS.TRANSFER })}</span>
+                    <Icon iconName={IconName.Transfer} />
                   </Button>
                 )}
             </$Footer>
@@ -319,6 +327,13 @@ const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
 `;
+
+const $NavigationMenu = styled(NavigationMenu)`
+  li a.active > div {
+    background-color: var(--color-accent-faded);
+  }
+`;
+
 const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
@@ -326,11 +341,8 @@ const $Footer = styled.div`
   padding: 1rem;
 
   gap: 0.5rem;
-
-  > button {
-    flex-grow: 1;
-  }
 `;
+
 const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;

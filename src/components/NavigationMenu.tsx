@@ -219,16 +219,16 @@ const $Root = styled(Root)`
 
   --navigationMenu-item-height: 2rem;
 
-  --navigationMenu-tab-item-checked-backgroundColor: var(--color-layer-1);
+  --navigationMenu-tab-item-checked-backgroundColor: var(--color-accent-faded);
   --navigationMenu-underline-item-checked-backgroundColor: var(transparent);
-  --navigationMenu-tab-item-highlighted-backgroundColor: var(--color-layer-4);
+  --navigationMenu-tab-item-highlighted-backgroundColor: var(--color-layer-3);
   --navigationMenu-underline-item-highlighted-backgroundColor: transparent;
   --navigationMenu-tab-item-radius: 0.5rem;
   --navigationMenu-underline-item-radius: 0px;
   --navigationMenu-tab-item-padding: 0.5rem 1rem;
   --navigationMenu-underline-item-padding: 0.5rem;
 
-  --navigationMenu-item-checked-textColor: var(--color-text-2);
+  --navigationMenu-item-checked-textColor: var(--color-accent);
   --navigationMenu-item-highlighted-textColor: var(--color-text-2);
 
   /* Rules */

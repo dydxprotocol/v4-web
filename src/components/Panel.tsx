@@ -73,7 +73,7 @@ const $Panel = styled.section<{ onClick?: () => void }>`
 
   ${layoutMixins.row}
 
-  background-color: var(--color-layer-3);
+  background-color: var(--color-layer-1);
   border-radius: var(--panel-border-radius);
 
   ${({ onClick }) =>

@@ -419,8 +419,8 @@ const $Main = styled.main`
 
   position: relative;
 
-  gap: 0.5rem;
-  padding: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 `;
 
 const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import LogoDark from '@/icons/logos/logo-mark-dark.svg';
 import LogoLight from '@/icons/logos/logo-mark-light.svg';
 
@@ -8,8 +7,8 @@ import { getAppThemeSetting } from '@/state/appUiConfigsSelectors';
 
 export const LogoShortIcon: React.FC<{ id?: string; width?: number; height?: number }> = ({
   id,
-  width = 135,
-  height = 145,
+  width,
+  height,
 }: {
   id?: string;
   width?: number;
@@ -17,9 +16,12 @@ export const LogoShortIcon: React.FC<{ id?: string; width?: number; height?: num
 }) => {
   const themeSetting: AppThemeSetting = useAppSelector(getAppThemeSetting);
   const isDark = themeSetting === AppTheme.Dark;
-  // return !isDark ? <LogoDark /> : <LogoLight />;
   return (
-    <div id={id} className="overflow-hidden object-center">
+    <div
+      id={id}
+      className="ml-1 flex h-auto w-full flex-row items-start justify-center overflow-hidden object-center"
+      style={{ width, height }}
+    >
       {!isDark ? <LogoDark /> : <LogoLight />}
     </div>
   );

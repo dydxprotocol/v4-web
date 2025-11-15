@@ -235,6 +235,7 @@ const MarketsDropdownContent = ({
           filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
+          compactLayout
         />
       </$Toolbar>
       {slotTop}
@@ -398,7 +399,8 @@ const $Popover = styled(Popover)`
   ${popoverMixins.popover}
   --popover-item-height: 2.75rem;
 
-  --popover-backgroundColor: var(--color-layer-2);
+  --popover-backgroundColor: var(--color-layer-0);
+
   display: flex;
   flex-direction: column;
 
@@ -412,7 +414,7 @@ const $Popover = styled(Popover)`
 
   max-width: 100vw;
 
-  box-shadow: 0 0 0 1px var(--color-border);
+  box-shadow: 0 5px 15px 3px rgba(0, 0, 0, 0.2);
   border-radius: 0;
 
   &:focus-visible {
@@ -477,11 +479,12 @@ const $ScrollArea = styled.div`
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
   --table-header-height: 2.25rem;
+  --tableRow-backgroundColor: var(--color-layer-0);
 
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
-    background-color: var(--color-layer-2);
+    background-color: var(--color-layer-0);
 
     tr {
       height: var(--stickyArea-topHeight);
@@ -491,7 +494,7 @@ const $Table = styled(Table)`
   tfoot {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 3px;
-    background-color: var(--color-layer-2);
+    background-color: var(--color-layer-0);
 
     tr {
       height: var(--stickyArea-bottomHeight);

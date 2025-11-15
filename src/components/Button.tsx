@@ -109,6 +109,7 @@ const buttonActionVariants = {
       --button-border: 0px solid var(var(--default-border-width)) var(--color-accent);
       --button-hover-filter: brightness(var(--hover-filter-variant));
       background-image: var(--color-gradient-orange);
+      font-weight: 600;
     `,
     [ButtonStyle.WithoutBackground]: css`
       --button-textColor: var(--color-accent);
@@ -120,10 +121,11 @@ const buttonActionVariants = {
 
   [ButtonAction.SimplePrimary]: {
     [ButtonStyle.Default]: css`
-      --button-textColor: var(--color-text-2);
+      --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-accent);
       --button-border: none;
       --button-hover-filter: none;
+      font-weight: 600;
     `,
     [ButtonStyle.WithoutBackground]: css`
       --button-textColor: var(--color-text-2);

@@ -269,7 +269,7 @@ export const MarketsCompactTable = ({
 const $Table = styled(Table)`
   ${defaultTableMixins}
   --tableCell-padding: 0.625rem 1.25rem;
-  --tableRow-backgroundColor: var(--color-layer-3);
+  --tableRow-backgroundColor: var(--color-layer-2);
 
   border-bottom-right-radius: 0.625rem;
   border-bottom-left-radius: 0.625rem;

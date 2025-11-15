@@ -80,14 +80,9 @@ export const HeaderDesktop = () => {
         //   label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
         //   href: AppRoute.Vault,
         // },
-        // affiliatesEnabled && {
-        //   value: 'REFERRALS',
-        //   label: stringGetter({ key: STRING_KEYS.REFERRALS }),
-        //   href: AppRoute.Referrals,
-        // },
         {
           value: 'REWARDS',
-          label: 'Rewards', // TODO: Localize
+          label: stringGetter({ key: STRING_KEYS.REWARDS }),
           href: AppRoute.Rewards,
           slotAfter: !hasSeenLaunchIncentives && (
             <div tw="h-[0.4375rem] w-[0.4375rem] rounded-[50%] bg-color-accent" />
@@ -111,24 +106,6 @@ export const HeaderDesktop = () => {
                 );
               },
             },
-            // {
-            //   value: 'ApiTradingKeys',
-            //   slotBefore: <Icon iconName={IconName.Passkey} />,
-            //   label: stringGetter({ key: STRING_KEYS.API_TRADING_KEYS }),
-            //   onClick: () => dispatch(openDialog(DialogTypes.TradingKeys())),
-            // },
-            // {
-            //   value: 'MINTSCAN',
-            //   slotBefore: <Icon iconName={IconName.Mintscan} />,
-            //   label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
-            //   href: mintscanBase,
-            // },
-            // {
-            //   value: 'COMMUNITY',
-            //   slotBefore: <Icon iconName={IconName.Discord} />,
-            //   label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-            //   href: community,
-            // },
             {
               value: 'TERMS_OF_USE',
               slotBefore: <Icon iconName={IconName.File} />,
@@ -141,20 +118,6 @@ export const HeaderDesktop = () => {
               label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
               href: AppRoute.Privacy,
             },
-            // {
-            //   value: 'HELP',
-            //   slotBefore: <Icon iconName={IconName.HelpCircle} />,
-            //   label: stringGetter({ key: STRING_KEYS.HELP }),
-            //   onClick: () => {
-            //     dispatch(openDialog(DialogTypes.Help()));
-            //   },
-            // },
-            // {
-            //   value: 'STATS',
-            //   slotBefore: <Icon iconName={IconName.FundingChart} />,
-            //   label: stringGetter({ key: STRING_KEYS.STATISTICS }),
-            //   href: exchangeStats,
-            // },
           ],
         },
       ].filter(isTruthy),
@@ -234,7 +197,7 @@ export const HeaderDesktop = () => {
 const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
-  --logo-width: 4rem;
+  --logo-width: 3.5rem;
 
   ${layoutMixins.container}
   ${layoutMixins.stickyHeader}
@@ -277,6 +240,7 @@ const $NavigationMenu = styled(NavigationMenu)`
   }
 
   ${layoutMixins.scrollArea}
+  background-color: transparent;
   padding: 0 1rem;
   scroll-padding: 0 0.5rem;
 ` as typeof NavigationMenu;

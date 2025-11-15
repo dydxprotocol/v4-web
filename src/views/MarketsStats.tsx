@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+// import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
@@ -12,7 +12,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
+// import { Button } from '@/components/Button';
 import { NewTag } from '@/components/Tag';
 
 import { ExchangeBillboards } from './ExchangeBillboards';
@@ -50,7 +50,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
           <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
         </$Section>
       )}
-      <$TradingLeaguesBanner>
+      {/* <$TradingLeaguesBanner>
         <img
           src="/trading-league.svg"
           alt="Trading League trophy"
@@ -75,12 +75,12 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_CTA })}
           </Button>
         </div>
-      </$TradingLeaguesBanner>
+      </$TradingLeaguesBanner> */}
     </section>
   );
 };
 
-const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-color-layer-3`;
+const $Section = tw.div`grid grid-rows-[auto_1fr] rounded-0.625 bg-color-layer-2`;
 
 const $SectionHeader = styled.div`
   ${layoutMixins.row}
@@ -99,28 +99,28 @@ const $SectionHeader = styled.div`
   }
 `;
 
-const $TradingLeaguesBanner = styled.div`
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/trading-league-banner-bg.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  position: relative;
-  overflow: hidden;
-  padding: 1.5rem;
-  display: grid;
-  border-radius: 0.625rem;
-`;
+// const $TradingLeaguesBanner = styled.div`
+//   background-image:
+//     linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/trading-league-banner-bg.png');
+//   background-position: center;
+//   background-size: cover;
+//   background-repeat: no-repeat;
+//   position: relative;
+//   overflow: hidden;
+//   padding: 1.5rem;
+//   display: grid;
+//   border-radius: 0.625rem;
+// `;
 
-const $ActiveTag = styled.span`
-  border-radius: 0.5rem;
-  border: 1px solid;
-  border-color: var(--color-positive);
-  background-color: color-mix(in srgb, var(--color-positive) 12%, transparent);
-  padding: 0.1875rem 0.375rem;
-  color: var(--color-positive);
-  font: var(--font-mini-bold);
-  vertical-align: middle;
-  display: inline-block;
-  transform: translateY(-2px);
-`;
+// const $ActiveTag = styled.span`
+//   border-radius: 0.5rem;
+//   border: 1px solid;
+//   border-color: var(--color-positive);
+//   background-color: color-mix(in srgb, var(--color-positive) 12%, transparent);
+//   padding: 0.1875rem 0.375rem;
+//   color: var(--color-positive);
+//   font: var(--font-mini-bold);
+//   vertical-align: middle;
+//   display: inline-block;
+//   transform: translateY(-2px);
+// `;

@@ -814,12 +814,12 @@ const $TableWrapper = styled.div<{
 }>`
   // Params
   --tableStickyRow-textColor: var(--color-text-0, inherit);
-  --tableStickyRow-backgroundColor: inherit;
+  --tableStickyRow-backgroundColor: var(--color-layer-0);
   --table-header-height: 2rem;
   --table-footer-height: 0rem;
 
-  --tableRow-hover-backgroundColor: var(--color-layer-3);
-  --tableRow-backgroundColor: ;
+  --tableRow-hover-backgroundColor: var(--color-layer-1);
+  --tableRow-backgroundColor: var(--color-layer-0);
 
   --table-cell-align: start; // start | center | end
   --table-firstColumn-cell-align: start; // start | center | end | var(--table-cell-align)
@@ -868,7 +868,7 @@ const $Table = styled.table<StyledTableStyleProps>`
   align-self: start;
 
   ${layoutMixins.stickyArea1}
-  --stickyArea1-background: var(--color-layer-2);
+  --stickyArea1-background: var(--color-layer-0);
   --stickyArea1-topHeight: var(--table-header-height);
   --stickyArea1-bottomHeight: var(--table-footer-height);
 

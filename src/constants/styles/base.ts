@@ -1,5 +1,3 @@
-// TODO: remove unused colors, should only have 7 light/dark grays, no grayblue or purple, only one or two reds/greens/yellows
-// TODO: (continued) will require replacing usage of those colors throughout the app
 export enum ColorToken {
   Black = '#000000',
   White = '#FFFFFF',
