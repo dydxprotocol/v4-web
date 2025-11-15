@@ -18,8 +18,6 @@ export const GlobalStyle = createGlobalStyle`
     --color-layer-6: ${({ theme }) => theme.layer6};
     --color-layer-7: ${({ theme }) => theme.layer7};
 
-    --color-layer-3-faded: ${({ theme }) => theme.layer3Faded};
-
     --color-border: ${({ theme }) => theme.borderDefault};
     --color-border-faded: ${({ theme }) => theme.borderFaded};
     --color-border-white: ${({ theme }) => theme.borderButton};

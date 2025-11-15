@@ -30,8 +30,6 @@ export default {
       'color-layer-6': 'var(--color-layer-6)',
       'color-layer-7': 'var(--color-layer-7)',
 
-      'color-layer-3-faded': 'var(--color-layer-3-faded)',
-
       'color-border': 'var(--color-border)',
       'color-border-faded': 'var(--color-border-faded)',
       'color-border-white': 'var(--color-border-white)',
