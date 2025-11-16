@@ -123,6 +123,33 @@ const useTurnkeyWalletContext = () => {
   }, [authIframeClient]);
 
   /* ----------------------------- Onboarding Functions ----------------------------- */
+
+  // used to fetch the credential id for the passkey sign in
+  const fetchCredentialId = useCallback(
+    async (tkClient?: TurnkeyIndexedDbClient): Promise<string | undefined> => {
+      if (turnkey == null || tkClient == null) {
+        return undefined;
+      }
+      // Try and get the current user
+      const token = await turnkey.getSession();
+
+      // If the user is not found, we assume the user is not logged in
+      if (!token?.expiry || token.expiry > Date.now()) {
+        return undefined;
+      }
+
+      const { user: indexedDbUser } = await tkClient.getUser({
+        organizationId: token.organizationId,
+        userId: token.userId,
+      });
+      if (indexedDbUser.authenticators.length === 0) {
+        return undefined;
+      }
+      return indexedDbUser.authenticators[0]?.credentialId;
+    },
+    [turnkey]
+  );
+
   const fetchUser = useCallback(
     async (tkClient?: TurnkeyIndexedDbClient): Promise<UserSession | undefined> => {
       const isIndexedDbFlow = tkClient instanceof TurnkeyIndexedDbClient;
@@ -202,7 +229,6 @@ const useTurnkeyWalletContext = () => {
       tkClient?: TurnkeyIndexedDbClient;
     }) => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
-
       const ethAccount = selectedTurnkeyWallet?.accounts.find(
         (account) => account.addressFormat === AddressFormat.Ethereum
       );
@@ -341,6 +367,7 @@ const useTurnkeyWalletContext = () => {
     isNewTurnkeyUser,
 
     endTurnkeySession,
+    fetchCredentialId,
     onboardDydx,
     getUploadAddressPayload,
     setIsNewTurnkeyUser,
