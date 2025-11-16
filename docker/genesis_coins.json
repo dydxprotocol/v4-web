@@ -1,0 +1,59 @@
+[
+  {
+    "owner": "0x94ffcc53b892684acefaebc8a3d4a595e528a8cf664eeb3ef36f1020b0809d0d",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000032",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  },
+  {
+    "owner": "0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000033",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  },
+  {
+    "owner": "0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000034",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  },
+
+  {
+    "owner": "0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000035",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  },
+
+  {
+    "owner": "0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000036",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  },
+
+  {
+    "owner": "0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b",
+    "amount": 9007199254740991,
+    "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+    "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000037",
+    "output_index": 0,
+    "tx_pointer_block_height": 0,
+    "tx_pointer_tx_idx": 0
+  }
+]

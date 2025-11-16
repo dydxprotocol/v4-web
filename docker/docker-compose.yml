@@ -1,0 +1,65 @@
+services:
+  fuel-core:
+    image: starboard/fuel-core
+    container_name: 'starboard_fuel_core'
+    environment:
+      MIN_GAS_PRICE: ${MIN_GAS_PRICE}
+      # This is the private key of the consensus.PoA.signing_key in the chainConfig.json
+      # this key is responsible for validating the transactions
+      CONSENSUS_KEY_SECRET: ${WALLET_SECRET}
+    ports:
+      - '${FUEL_CORE_PORT}:4000'
+    volumes:
+      - fuel-core-db:/mnt/db
+    healthcheck:
+      test: curl --fail http://localhost:4000/v1/health || exit 1
+      interval: 1s
+      timeout: 5s
+      retries: 20
+
+  db:
+    image: postgres:15
+    container_name: "starboard_indexer_db"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT}:5432"
+      # command: ["postgres", "-c", "log_statement=all"]
+
+  indexer:
+    image: starboard
+    container_name: 'starboard_indexer_processor'
+    environment:
+      FUEL_CORE_PORT: ${FUEL_CORE_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: starboard_indexer_db
+      GATEWAY_URL: ${GATEWAY_URL}
+      GRAPHQL_URL: http://starboard_fuel_core:4000/v1/graphql
+      VAULT_PRICEFEED_ADDRESS: ${VAULT_PRICEFEED_ADDRESS}
+      VAULT_ADDRESS: ${VAULT_ADDRESS}
+      FROM_BLOCK: ${FROM_BLOCK}
+      NVM_DIR: /root/.nvm
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && /root/wait_for_db.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+
+  api:
+    image: starboard
+    container_name: 'starboard_indexer_api'
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: starboard_indexer_db
+      NVM_DIR: /root/.nvm
+    ports:
+      - "${GQL_PORT}:4000"
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && /root/wait_for_db.sh && cd /starboard/indexer && ../node_modules/.bin/squid-graphql-server"]
+
+volumes:
+  fuel-core-db:
+    name: 'starboard_fuel-core-db'

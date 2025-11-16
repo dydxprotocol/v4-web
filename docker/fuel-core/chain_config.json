@@ -1,0 +1,314 @@
+{
+  "chain_name": "Local network",
+  "consensus_parameters": {
+    "V2": {
+      "tx_params": {
+        "V1": {
+          "max_inputs": 255,
+          "max_outputs": 255,
+          "max_witnesses": 255,
+          "max_gas_per_tx": 30000000,
+          "max_size": 129024,
+          "max_bytecode_subsections": 256
+        }
+      },
+      "predicate_params": {
+        "V1": {
+          "max_predicate_length": 102400,
+          "max_predicate_data_length": 102400,
+          "max_message_data_length": 102400,
+          "max_gas_per_predicate": 30000000
+        }
+      },
+      "script_params": {
+        "V1": {
+          "max_script_length": 102400,
+          "max_script_data_length": 102400
+        }
+      },
+      "contract_params": {
+        "V1": {
+          "contract_max_size": 129024,
+          "max_storage_slots": 1760
+        }
+      },
+      "fee_params": {
+        "V1": {
+          "gas_price_factor": 92000,
+          "gas_per_byte": 1
+        }
+      },
+      "chain_id": 0,
+      "gas_costs": {
+        "V6": {
+          "add": 2,
+          "addi": 2,
+          "and": 2,
+          "andi": 2,
+          "bal": 598,
+          "bhei": 2,
+          "bhsh": 132,
+          "burn": 1228,
+          "cb": 2,
+          "cfsi": 2,
+          "div": 2,
+          "divi": 2,
+          "eck1": 3424,
+          "ecr1": 45146,
+          "eq": 2,
+          "exp": 2,
+          "expi": 2,
+          "flag": 2,
+          "gm": 2,
+          "gt": 2,
+          "gtf": 3,
+          "ji": 2,
+          "jmp": 2,
+          "jne": 2,
+          "jnei": 2,
+          "jnzi": 2,
+          "jmpf": 2,
+          "jmpb": 2,
+          "jnzf": 2,
+          "jnzb": 2,
+          "jnef": 2,
+          "jneb": 2,
+          "lb": 2,
+          "log": 182,
+          "lt": 2,
+          "lw": 2,
+          "mint": 1886,
+          "mlog": 2,
+          "mod": 2,
+          "modi": 2,
+          "move": 2,
+          "movi": 2,
+          "mroo": 5,
+          "mul": 2,
+          "muli": 2,
+          "mldv": 4,
+          "niop": 2,
+          "noop": 1,
+          "not": 2,
+          "or": 2,
+          "ori": 2,
+          "poph": 5,
+          "popl": 5,
+          "pshh": 5,
+          "pshl": 5,
+          "ret_contract": 105,
+          "rvrt_contract": 98,
+          "sb": 2,
+          "sll": 2,
+          "slli": 2,
+          "srl": 2,
+          "srli": 2,
+          "srw": 503,
+          "sub": 2,
+          "subi": 2,
+          "sw": 2,
+          "sww": 510,
+          "time": 62,
+          "tr": 1642,
+          "tro": 1339,
+          "wdcm": 3,
+          "wqcm": 3,
+          "wdop": 3,
+          "wqop": 4,
+          "wdml": 4,
+          "wqml": 4,
+          "wddv": 5,
+          "wqdv": 7,
+          "wdmd": 11,
+          "wqmd": 18,
+          "wdam": 10,
+          "wqam": 12,
+          "wdmm": 11,
+          "wqmm": 11,
+          "xor": 2,
+          "xori": 2,
+          "ecop": 12911,
+          "aloc": {
+            "LightOperation": {
+              "base": 2,
+              "units_per_gas": 300
+            }
+          },
+          "bsiz": {
+            "LightOperation": {
+              "base": 41,
+              "units_per_gas": 279
+            }
+          },
+          "bldd": {
+            "LightOperation": {
+              "base": 60,
+              "units_per_gas": 96
+            }
+          },
+          "cfe": {
+            "LightOperation": {
+              "base": 2,
+              "units_per_gas": 287
+            }
+          },
+          "cfei": {
+            "LightOperation": {
+              "base": 2,
+              "units_per_gas": 459
+            }
+          },
+          "call": {
+            "LightOperation": {
+              "base": 1244,
+              "units_per_gas": 43
+            }
+          },
+          "ccp": {
+            "LightOperation": {
+              "base": 108,
+              "units_per_gas": 102
+            }
+          },
+          "croo": {
+            "LightOperation": {
+              "base": 136,
+              "units_per_gas": 2
+            }
+          },
+          "csiz": {
+            "LightOperation": {
+              "base": 46,
+              "units_per_gas": 274
+            }
+          },
+          "ed19": {
+            "LightOperation": {
+              "base": 7430,
+              "units_per_gas": 3
+            }
+          },
+          "k256": {
+            "LightOperation": {
+              "base": 319,
+              "units_per_gas": 3
+            }
+          },
+          "ldc": {
+            "LightOperation": {
+              "base": 125,
+              "units_per_gas": 92
+            }
+          },
+          "logd": {
+            "LightOperation": {
+              "base": 642,
+              "units_per_gas": 2
+            }
+          },
+          "mcl": {
+            "LightOperation": {
+              "base": 3,
+              "units_per_gas": 625
+            }
+          },
+          "mcli": {
+            "LightOperation": {
+              "base": 3,
+              "units_per_gas": 625
+            }
+          },
+          "mcp": {
+            "LightOperation": {
+              "base": 4,
+              "units_per_gas": 493
+            }
+          },
+          "mcpi": {
+            "LightOperation": {
+              "base": 5,
+              "units_per_gas": 819
+            }
+          },
+          "meq": {
+            "LightOperation": {
+              "base": 3,
+              "units_per_gas": 608
+            }
+          },
+          "retd_contract": {
+            "LightOperation": {
+              "base": 514,
+              "units_per_gas": 2
+            }
+          },
+          "s256": {
+            "LightOperation": {
+              "base": 52,
+              "units_per_gas": 2
+            }
+          },
+          "scwq": {
+            "HeavyOperation": {
+              "base": 507,
+              "gas_per_unit": 515
+            }
+          },
+          "smo": {
+            "LightOperation": {
+              "base": 4955,
+              "units_per_gas": 2
+            }
+          },
+          "srwq": {
+            "HeavyOperation": {
+              "base": 520,
+              "gas_per_unit": 522
+            }
+          },
+          "swwq": {
+            "HeavyOperation": {
+              "base": 507,
+              "gas_per_unit": 525
+            }
+          },
+          "epar": {
+            "HeavyOperation": {
+              "base": 188912,
+              "gas_per_unit": 138413
+            }
+          },
+          "contract_root": {
+            "LightOperation": {
+              "base": 53,
+              "units_per_gas": 1
+            }
+          },
+          "state_root": {
+            "HeavyOperation": {
+              "base": 414,
+              "gas_per_unit": 209
+            }
+          },
+          "new_storage_per_byte": 63,
+          "vm_initialization": {
+            "LightOperation": {
+              "base": 6928,
+              "units_per_gas": 27
+            }
+          }
+        }
+      },
+      "base_asset_id": "f8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+      "block_gas_limit": 42000000,
+      "block_transaction_size_limit": 2600960,
+      "privileged_address": "b0c319eb0751b33b57e3b3fcc1a960ca5a1e239cccc1b45ce40fdae8fcb989d7"
+    }
+  },
+  "genesis_state_transition_version": 11,
+  "consensus": {
+    "PoA": {
+      "signing_key": "e0a9fcde1b73f545252e01b30b50819eb9547d07531fa3df0385c5695736634d"
+    }
+  }
+}
