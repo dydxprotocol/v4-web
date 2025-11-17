@@ -78,6 +78,7 @@ const SpotPage = () => {
       liquidityUsd: tokenMetadata.liquidityUSD,
       logoUrl: tokenMetadata.image,
       marketCapUsd: +tokenMetadata.totalSupply * tokenPrice,
+      fdvUsd: tokenMetadata.tokenFDV,
       priceUsd: tokenPrice,
       totalSupply: +tokenMetadata.totalSupply,
       volume24hUsd: tokenMetadata.volumeUSD,
