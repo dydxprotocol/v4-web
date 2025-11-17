@@ -31,10 +31,6 @@ import {
 import { hdKeyManager } from '@/lib/hdKeyManager';
 import { sleep } from '@/lib/timeUtils';
 
-// ============================================================================
-// Types & Interfaces
-// ============================================================================
-
 export interface SourceAccount {
   address?: string;
   chain?: WalletNetworkType;
@@ -59,11 +55,7 @@ export interface WalletDerivationResult {
   shouldClearSignature?: boolean;
 }
 
-export type CosmosChain = 'noble' | 'osmosis' | 'neutron';
-
-// ============================================================================
-// OnboardingOrchestrator Class
-// ============================================================================
+export type SupportedCosmosChain = 'noble' | 'osmosis' | 'neutron';
 
 export class OnboardingOrchestrator {
   /**
@@ -443,10 +435,6 @@ export class OnboardingOrchestrator {
     };
   }
 
-  // ============================================================================
-  // On-Demand Cosmos Wallet Derivation
-  // ============================================================================
-
   /**
    * Derive a Cosmos wallet on-demand from mnemonic
    * Used for Noble, Osmosis, Neutron wallets when needed
@@ -455,7 +443,10 @@ export class OnboardingOrchestrator {
    * @param chain - Which Cosmos chain wallet to derive
    * @returns LocalWallet for the specified chain
    */
-  async deriveCosmosWallet(mnemonic: string, chain: CosmosChain): Promise<LocalWallet | null> {
+  async deriveCosmosWallet(
+    mnemonic: string,
+    chain: SupportedCosmosChain
+  ): Promise<LocalWallet | null> {
     try {
       const prefix = this.getCosmosPrefix(chain);
       const LazyLocalWallet = await getLazyLocalWallet();
@@ -472,7 +463,7 @@ export class OnboardingOrchestrator {
    */
   async deriveCosmosWalletFromSigner(
     offlineSigner: any,
-    chain: CosmosChain
+    chain: string
   ): Promise<LocalWallet | null> {
     try {
       const LazyLocalWallet = await getLazyLocalWallet();
@@ -488,7 +479,7 @@ export class OnboardingOrchestrator {
   /**
    * Get the Bech32 prefix for a Cosmos chain
    */
-  private getCosmosPrefix(chain: CosmosChain): string {
+  private getCosmosPrefix(chain: SupportedCosmosChain): string {
     switch (chain) {
       case 'noble':
         return NOBLE_BECH32_PREFIX;
