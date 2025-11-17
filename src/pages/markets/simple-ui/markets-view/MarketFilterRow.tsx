@@ -86,10 +86,10 @@ const MarketFilterRow = ({
             }) satisfies MenuItem<MarketFilters>[]
           }
           css={{
-            '--button-toggle-on-border': 'none',
+            '--button-toggle-on-border': 'var(--color-accent)',
             '--button-toggle-off-border': 'solid var(--default-border-width) var(--color-border)',
-            '--button-toggle-off-backgroundColor': 'transparent',
-            '--button-toggle-on-backgroundColor': 'var(--color-layer-4)',
+            '--button-toggle-off-backgroundColor': 'var(--color-layer-0',
+            '--button-toggle-on-backgroundColor': 'var(--color-accent-faded)',
           }}
           value={filter}
           onValueChange={setFilter}

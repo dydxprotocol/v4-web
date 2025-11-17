@@ -1,24 +1,24 @@
 /* Constants */
 
 :root {
-  --fontFamily-base: 'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif;
-  --fontFamily-monospace: Courier, monospace, var(--fontFamily-base);
+  --fontFamily-base: 'Instrument Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fontFamily-monospace: 'Roboto Mono', Courier, monospace, var(--fontFamily-base);
 
-  --fontWeight-base-0: 450;
+  --fontWeight-base-0: 400;
   --fontWeight-base-1: 500;
   --fontWeight-base-2: 700;
 
-  --letter-spacing-base: -0.02em;
+  --letter-spacing-base: -6%;
 
   /* New Typography system */
-  --fontSize-tiny: 0.625rem; /* 10px/11px */
-  --fontSize-mini: 0.75rem; /* 12px/13px */
-  --fontSize-small: 0.8438rem; /* 13.5px/14.5px */
-  --fontSize-base: 0.9375rem; /* 15px/16px */
-  --fontSize-medium: 1.125rem; /* 18px/18px */
-  --fontSize-large: 1.375rem; /* 22px/22px */
-  --fontSize-extra: 1.75rem; /* 28px/25px */
-  --fontSize-extra-large: 2rem; /* 32px/32px */
+  --fontSize-tiny: 0.625rem; /* 10px */
+  --fontSize-mini: 0.75rem; /* 12px */
+  --fontSize-small: 0.875rem; /* 14px */
+  --fontSize-regular: 1rem; /* 16px */
+  --fontSize-base: 1rem; /* 16px */
+  --fontSize-medium: 1.125rem; /* 18px */
+  --fontSize-large: 1.375rem; /* 22px */
+  --fontSize-extra: 1.75rem; /* 28px */
 
   --fontWeight-regular: 400;
   --fontWeight-book: 450;
@@ -73,13 +73,14 @@
 
 @media screen and (max-width: 64rem) {
   :root {
-    --fontSize-tiny: 0.6875rem;
-    --fontSize-mini: 0.8125rem;
-    --fontSize-small: 0.9063rem;
+    --fontSize-tiny: 0.6rem;
+    --fontSize-mini: 0.625rem;
+    --fontSize-small: 0.75rem;
+    --fontSize-regular: 0.875rem;
     --fontSize-base: 1rem;
     --fontSize-medium: 1.125rem;
     --fontSize-large: 1.375rem;
-    --fontSize-extra: 1.5625rem;
+    --fontSize-extra: 1.75rem;
   }
 }
 

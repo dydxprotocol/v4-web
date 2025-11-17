@@ -437,9 +437,13 @@ const $DragHandle = styled.div`
 `;
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
+  background-color: var(--color-layer-0);
+  * {
+    background-color: var(--color-layer-0);
+  }
   header {
-    background-color: var(--color-layer-2);
+    background-color: var(--color-layer-0);
   }
 
-  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+  --trigger-active-underline-backgroundColor: var(--color-layer-0);
 ` as typeof CollapsibleTabs;

@@ -16,7 +16,7 @@ export const popoverMixins = {
 
     --trigger-height: ;
 
-    --trigger-backgroundColor: var(--color-layer-2);
+    --trigger-backgroundColor: var(transparent, --color-layer-2);
     --trigger-textColor: var(--color-text-0);
 
     --trigger-open-backgroundColor: var(--color-layer-1);

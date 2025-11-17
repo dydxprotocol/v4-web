@@ -213,7 +213,7 @@ const ButtonStyle = css<StyleProps & { $isSimpleUi?: boolean }>`
 
   background-color: var(--button-backgroundColor);
   border: var(--button-border);
-  border-radius: var(--button-radius, 0.5em);
+  border-radius: var(--button-radius, 0.75rem);
 
   color: var(--button-textColor);
   text-align: center;

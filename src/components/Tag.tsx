@@ -83,7 +83,8 @@ export const Tag = styled.span<StyleProps>`
 
 export const NewTag = styled(Tag)`
   background-color: var(--color-accent-faded);
-  color: var(--color-accent);
+  background-image: var(--color-gradient-orange);
+  color: var(--color-text-button);
   text-transform: uppercase;
 `;
 

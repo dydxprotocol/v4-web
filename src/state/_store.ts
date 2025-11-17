@@ -63,7 +63,7 @@ const rootReducer = combineReducers(reducers);
 
 const persistConfig = {
   key: 'root',
-  version: 6,
+  version: -1,
   storage,
   whitelist: [
     'affiliates',

@@ -31,9 +31,9 @@ export enum ColorToken {
   DarkGray10 = '#23232F',
   DarkGray11 = '#212124',
   DarkGray12 = '#18181B',
-  DarkGray13 = '#181818',
+  DarkGray13 = '#18181B',
   DarkGray14 = '#1B1B1D',
-  DarkGray15 = '#0C0C0D',
+  DarkGray15 = '#18181A',
 
   GrayBlue0 = '#464659',
   GrayBlue1 = '#38384D',
@@ -51,6 +51,8 @@ export enum ColorToken {
   Purple0 = '#7774FF',
   Purple1 = '#6966FF',
 
+  Orange0 = '#FF5A02',
+
   Green0 = '#CEEDE3',
   Green1 = '#1AFFB9',
   Green2 = '#3ED9A4',
@@ -60,7 +62,7 @@ export enum ColorToken {
   Green6 = '#2C5254',
 
   Yellow0 = '#FFCC48',
-  Yellow1 = '#FFB647',
+  Yellow1 = '#FDC103',
 
   Red0 = '#FF5C5C',
   Red1 = '#E76565',
@@ -84,5 +86,6 @@ export enum BrightnessFilterToken {
   Darken10 = '0.9',
   Darken5 = '0.95',
   Darken30 = '0.7',
+  Darken50 = '0.5',
   Lighten10 = '1.1',
 }

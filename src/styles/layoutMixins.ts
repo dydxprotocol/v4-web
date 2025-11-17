@@ -53,7 +53,7 @@ const scrollAreaFadeStart = css`
     left: 0;
     height: 100%;
     width: var(--scrollArea-fadeWidth);
-    background: linear-gradient(to left, transparent 10%, var(--color-layer-2));
+    background: linear-gradient(to left, transparent 10%, var(--color-layer-1));
     z-index: var(--scrollArea-fade-zIndex);
   }
 `;
@@ -74,7 +74,7 @@ const scrollAreaFadeEnd = css`
     right: 0;
     height: 100%;
     width: var(--scrollArea-fadeWidth);
-    background: linear-gradient(to right, transparent 10%, var(--color-layer-2));
+    background: linear-gradient(to right, transparent 10%, var(--color-layer-1));
     z-index: var(--scrollArea-fade-zIndex);
   }
 `;
@@ -211,7 +211,7 @@ const stickyArea = css`
       )
   );
 
-  background: var(--stickyArea-background, var(--color-layer-2));
+  background: var(--stickyArea-background, var(--color-layer-0));
 `;
 
 // Use as a descendant of layoutMixins.stickyArea
@@ -375,6 +375,8 @@ export const layoutMixins = {
     isolation: isolate;
     z-index: 1;
     position: relative;
+
+    border-radius: 0.75rem;
 
     /*
       Inner layers:
@@ -846,7 +848,7 @@ export const layoutMixins = {
     --border-width: var(--default-border-width);
     --border-color: var(--color-border);
 
-    gap: var(--border-width);
+    gap: 0.5rem;
 
     > * {
       ${() => withOuterBorder}
@@ -857,13 +859,13 @@ export const layoutMixins = {
     --border-width: var(--default-border-width);
     --border-color: var(--color-border);
 
-    gap: var(--border-width);
+    gap: 0.5rem;
 
-    > * {
+    /* > * {
       box-shadow:
         0 var(--border-width) var(--border-color),
         0 calc(-1 * var(--border-width)) var(--border-color);
-    }
+    } */
   `,
 
   // An outer border with a dynamic radius + clip effect based on a "max" width and the current container width.

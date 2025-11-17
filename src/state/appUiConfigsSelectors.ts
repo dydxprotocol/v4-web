@@ -18,13 +18,11 @@ export const getAppTheme = (state: RootState): AppTheme => {
 
 const ChartDotBackgrounds = {
   [AppTheme.Dark]: '/chart-dots-background-dark.svg',
-  [AppTheme.Classic]: '/chart-dots-background-dark.svg',
   [AppTheme.Light]: '/chart-dots-background-light.svg',
 };
 
 const GridBackgrounds = {
   [AppTheme.Dark]: '/grid-background-dark.svg',
-  [AppTheme.Classic]: '/grid-background-dark.svg',
   [AppTheme.Light]: '/grid-background-light.svg',
 };
 

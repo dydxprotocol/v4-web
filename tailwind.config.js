@@ -54,6 +54,7 @@ export default {
       'color-gradient-success': 'var(--color-gradient-success)',
       'color-gradient-warning': 'var(--color-gradient-warning)',
       'color-gradient-error': 'var(--color-gradient-error)',
+      'color-gradient-orange': 'var(--color-gradient-orange)',
 
       'color-positive': 'var(--color-positive)',
       'color-negative': 'var(--color-negative)',

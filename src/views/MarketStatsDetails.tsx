@@ -162,16 +162,18 @@ const $Details = styled(Details)`
 const $MidMarketPrice = styled.div`
   ${layoutMixins.sticky}
   ${layoutMixins.row}
-  font: var(--font-medium-medium);
+  font-family: var(--fontFamily-monospace);
+  font-weight: var(--fontWeight-medium);
 
-  background-color: var(--color-layer-2);
-  box-shadow: 0.25rem 0 0.75rem var(--color-layer-2);
+  background-color: var(--color-layer-1);
+  box-shadow: 0.25rem 0 0.75rem var(--color-layer-1);
   padding-left: 1rem;
   gap: 1rem;
 `;
 
 const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
+  font-family: var(--fontFamily-monospace);
 
   ${({ color }) =>
     color &&

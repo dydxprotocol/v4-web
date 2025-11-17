@@ -63,4 +63,7 @@ const $Container = styled.div`
   grid-auto-flow: column;
   justify-content: start;
   align-items: stretch;
+  background-color: var(--color-layer-1) !important; // TODO: figure out why this is needed
+  border-radius: 0.75rem;
+  overflow: hidden; // quick/easy way to maintain the border radius
 `;

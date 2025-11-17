@@ -3,7 +3,7 @@
   --default-border-width: 1px;
 
   /* Header + footer constants */
-  --page-header-height: 2.75rem;
+  --page-header-height: 3rem;
   --page-header-height-mobile: 4rem;
   --page-footer-height: 2rem;
   --page-footer-height-mobile: 4.5rem;
@@ -55,4 +55,6 @@
   --form-input-height-mobile: 3.5rem;
   --form-input-paddingY: 0.25rem;
   --form-input-paddingX: 0.625rem;
+
+  --color-gradient-orange: linear-gradient(135deg, #ffb647 0%, #ff5a02 100%);
 }

@@ -225,7 +225,7 @@ const $Container = styled(Content)<{
   --dialog-inset: 1rem;
 
   --dialog-width: 30rem;
-  --dialog-backgroundColor: var(--color-layer-3);
+  --dialog-backgroundColor: var(--color-layer-1);
   --dialog-radius: 1rem;
 
   --dialog-paddingX: 1.5rem;

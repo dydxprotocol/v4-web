@@ -50,12 +50,12 @@ export const ToggleButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, To
 );
 
 const $BaseButton = styled(BaseButton)`
-  --button-toggle-off-backgroundColor: var(--color-layer-3);
-  --button-toggle-off-textColor: var(--color-text-0);
+  --button-toggle-off-backgroundColor: var(--color-layer-0);
+  --button-toggle-off-textColor: var(--color-text-1);
   --button-toggle-off-border: solid var(--border-width) var(--border-color);
-  --button-toggle-on-backgroundColor: var(--color-layer-1);
-  --button-toggle-on-textColor: var(--color-text-2);
-  --button-toggle-on-border: solid var(--border-width) var(--border-color);
+  --button-toggle-on-backgroundColor: var(--color-accent-faded);
+  --button-toggle-on-textColor: var(--color-accent);
+  --button-toggle-on-border: none; // solid var(--border-width) var(--border-color);
 
   --button-backgroundColor: var(--button-toggle-off-backgroundColor);
   --button-textColor: var(--button-toggle-off-textColor);

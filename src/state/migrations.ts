@@ -1,12 +1,7 @@
 import { createMigrate, MigrationManifest, PersistedState, PersistMigrate } from 'redux-persist';
 import { MigrationConfig } from 'redux-persist/lib/createMigrate';
 
-import { migration0 } from './migrations/0';
-import { migration1 } from './migrations/1';
-import { migration2 } from './migrations/2';
-import { migration3 } from './migrations/3';
-import { migration4 } from './migrations/4';
-import { migration5 } from './migrations/5';
+// import all migrations here
 
 /**
  * @description Migrate function should be used when the expected param for your migration is a previous state with reducer data
@@ -14,6 +9,7 @@ import { migration5 } from './migrations/5';
  * @param migration function to alter state and return new state
  * @returns updated with the type of PersistedState & {...}
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function migrate<V, V2>(state: PersistedState, migration: (persistedState: V) => V2): V2 {
   const persistedState = state as V;
   const migratedState = migration(persistedState);
@@ -21,12 +17,7 @@ function migrate<V, V2>(state: PersistedState, migration: (persistedState: V) =>
 }
 
 export const migrations: MigrationManifest = {
-  0: migration0,
-  1: migration1,
-  2: migration2,
-  3: migration3,
-  4: (state: PersistedState) => migrate(state, migration4),
-  6: migration5,
+  //
 } as const;
 
 /*

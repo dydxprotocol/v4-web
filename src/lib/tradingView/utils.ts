@@ -171,7 +171,7 @@ export const getWidgetOverrides = ({
   return {
     theme: THEME_NAMES[appTheme],
     overrides: {
-      'paneProperties.background': theme.layer2,
+      'paneProperties.background': theme.layer1,
       'paneProperties.horzGridProperties.color': theme.layer3,
       'paneProperties.vertGridProperties.color': theme.layer3,
       'paneProperties.crossHairProperties.style': 1,
@@ -251,7 +251,7 @@ export const getWidgetOptions = (
     container: 'tv-price-chart',
     library_path: '/tradingview/', // relative to public folder
     custom_css_url: '/tradingview/custom-styles.css',
-    custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
+    custom_font_family: "'Instrument Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     disabled_features: disabledFeatures,
     timezone,

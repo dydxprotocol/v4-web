@@ -12,6 +12,7 @@ export enum AppRoute {
   Terms = '/terms',
   Privacy = '/privacy',
   Referrals = '/referrals',
+  Rewards = '/rewards',
 }
 
 export enum MarketsRoute {

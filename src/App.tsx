@@ -58,7 +58,6 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
-import { useTokenConfigs } from './hooks/useTokenConfigs';
 import { useUpdateTransfers } from './hooks/useUpdateTransfers';
 import { WalletConnectionProvider } from './hooks/useWalletConnection';
 import { isTruthy } from './lib/isTruthy';
@@ -69,7 +68,6 @@ import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
-import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
 import { getAppThemeSetting } from './state/appUiConfigsSelectors';
 import { openDialog } from './state/dialogs';
 import { getIsUserMenuOpen } from './state/dialogsSelectors';
@@ -101,7 +99,6 @@ const Content = () => {
   useOpenDepositIfRelevant();
 
   const { isTablet, isNotTablet } = useBreakpoints();
-  const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
   const isShowingHeader = isNotTablet;
@@ -123,7 +120,7 @@ const Content = () => {
   if (isSimpleUi) {
     const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
     const backgroundColor =
-      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-1)' : 'transparent';
+      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-0)' : 'transparent';
 
     return (
       <>
@@ -205,7 +202,7 @@ const Content = () => {
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
-              <Route path={`/${chainTokenLabel}/*`} element={<RewardsPage />} />
+              <Route path={`${AppRoute.Rewards}/*`} element={<RewardsPage />} />
 
               {isTablet && (
                 <>
@@ -261,9 +258,6 @@ function useUiRefreshMigrations() {
   useEffect(() => {
     if (!seenUiRefresh) {
       setSeenUiRefresh(true);
-      if (themeSetting === AppTheme.Classic) {
-        dispatch(setAppThemeSetting(AppTheme.Dark));
-      }
     }
   }, [themeSetting, seenUiRefresh, dispatch, setSeenUiRefresh]);
 }
@@ -424,6 +418,9 @@ const $Main = styled.main`
   isolation: isolate;
 
   position: relative;
+
+  padding-left: 1rem;
+  padding-right: 1rem;
 `;
 
 const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`

@@ -116,7 +116,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
 };
 const $TabsRoot = styled(TabsRoot)`
   /* Overrides */
-  --trigger-backgroundColor: var(--color-layer-2);
+  --trigger-backgroundColor: var(--color-layer-1);
   --trigger-textColor: var(--color-text-0);
 
   --trigger-active-backgroundColor: var(--color-layer-1);
@@ -130,7 +130,7 @@ const $TabsRoot = styled(TabsRoot)`
   overscroll-behavior: contain;
 
   ${layoutMixins.stickyArea0}
-  --stickyArea0-background: var(--color-layer-2);
+  --stickyArea0-background: var(--color-layer-1);
   --stickyArea0-topHeight: var(--tabs-height);
   --stickyArea0-topGap: var(--border-width);
 

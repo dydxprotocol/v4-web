@@ -60,6 +60,7 @@ export const TradeBoxOrderView = () => {
 
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
+  background-color: var(--color-layer-1);
 `;
 
 const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
@@ -69,7 +70,7 @@ const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
 
 const $OrderTypeTabs = styled(Tabs)`
   --tabs-height: 2.125rem;
-  --trigger-active-backgroundColor: var(--trigger-backgroundColor);
+  --trigger-active-backgroundColor: var(--color-layer-1) !important;
 
   > * > header > div {
     width: 100%;
