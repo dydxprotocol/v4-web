@@ -120,16 +120,13 @@ export class OnboardingOrchestrator {
   }
 
   /**
-   * MAIN ORCHESTRATION METHOD
-   * Replaces Side Effect #4 (lines 182-283 in useAccounts)
-   *
    * Handles all wallet type flows and determines next onboarding state
    */
   async handleWalletConnection(params: {
     context: OnboardingContext;
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
-      mnemonic: Uint8Array;
+      mnemonic: string;
       privateKey: Uint8Array;
       publicKey: Uint8Array;
     }>;
@@ -148,9 +145,7 @@ export class OnboardingOrchestrator {
       context;
 
     try {
-      // ============================================================
-      // TURNKEY FLOW
-      // ============================================================
+      // ------ Turnkey Flow ------ //
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
         return await this.handleTurnkeyFlow({
           sourceAccount,
@@ -160,16 +155,12 @@ export class OnboardingOrchestrator {
         });
       }
 
-      // ============================================================
-      // TEST WALLET FLOW
-      // ============================================================
+      // ------ Impersonate Wallet Flow ------ //
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
         return await this.handleTestWalletFlow(sourceAccount);
       }
 
-      // ============================================================
-      // COSMOS FLOW
-      // ============================================================
+      // ------ Cosmos Flow ------ //
       if (sourceAccount.chain === WalletNetworkType.Cosmos && isConnectedGraz) {
         return await this.handleCosmosFlow({
           getCosmosOfflineSigner,
@@ -177,9 +168,7 @@ export class OnboardingOrchestrator {
         });
       }
 
-      // ============================================================
-      // EVM FLOW
-      // ============================================================
+      // ------ Evm Flow ------ //
       if (sourceAccount.chain === WalletNetworkType.Evm) {
         return await this.handleEvmFlow({
           sourceAccount,
@@ -192,9 +181,7 @@ export class OnboardingOrchestrator {
         });
       }
 
-      // ============================================================
-      // SOLANA FLOW
-      // ============================================================
+      // ------ Solana Flow ------ //
       if (sourceAccount.chain === WalletNetworkType.Solana) {
         return await this.handleSolanaFlow({
           sourceAccount,
@@ -204,9 +191,6 @@ export class OnboardingOrchestrator {
         });
       }
 
-      // ============================================================
-      // NO VALID WALLET - DISCONNECT
-      // ============================================================
       return {
         onboardingState: OnboardingState.Disconnected,
       };
@@ -219,10 +203,6 @@ export class OnboardingOrchestrator {
     }
   }
 
-  // ============================================================================
-  // Wallet Type Handlers
-  // ============================================================================
-
   /**
    * Handle Turnkey wallet flow
    * Turnkey is an embedded wallet - no WalletConnected state, only AccountConnected or Disconnected
@@ -231,7 +211,12 @@ export class OnboardingOrchestrator {
     sourceAccount: SourceAccount;
     hasLocalDydxWallet: boolean;
     blockedGeo: boolean;
-    getWalletFromSignature: any;
+    getWalletFromSignature: (params: { signature: string }) => Promise<{
+      wallet: LocalWallet;
+      mnemonic: string;
+      privateKey: Uint8Array;
+      publicKey: Uint8Array;
+    }>;
   }): Promise<WalletDerivationResult> {
     const { sourceAccount, hasLocalDydxWallet, blockedGeo, getWalletFromSignature } = params;
 
