@@ -25,7 +25,7 @@ const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const useUpdateSwaps = () => {
   const { withdraw } = useSubaccount();
   const dispatch = useAppDispatch();
-  const { nobleAddress, dydxAddress, osmosisAddress, neutronAddress } = useAccounts();
+  const { dydxAddress, getNobleAddress, getOsmosisAddress, getNeutronAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   const pendingSwaps = useAppSelector(getPendingSwaps);
@@ -68,6 +68,18 @@ export const useUpdateSwaps = () => {
   const executeSwap = useCallback(
     async (swap: Swap) => {
       const { route } = swap;
+
+      // Derive Cosmos addresses on-demand
+      const [nobleAddress, osmosisAddress, neutronAddress] = await Promise.all([
+        getNobleAddress(),
+        getOsmosisAddress(),
+        getNeutronAddress(),
+      ]);
+
+      if (!nobleAddress || !osmosisAddress || !neutronAddress) {
+        throw new Error('Failed to derive Cosmos addresses');
+      }
+
       const userAddresses = getUserAddressesForRoute(
         route,
         // Don't need source account for swaps
@@ -102,7 +114,7 @@ export const useUpdateSwaps = () => {
         },
       });
     },
-    [dispatch, dydxAddress, neutronAddress, nobleAddress, osmosisAddress, skipClient]
+    [dispatch, dydxAddress, getNeutronAddress, getNobleAddress, getOsmosisAddress, skipClient]
   );
 
   useEffect(() => {

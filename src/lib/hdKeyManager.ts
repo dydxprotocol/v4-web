@@ -57,16 +57,22 @@ class LocalWalletManager {
 
   private localWallet: LocalWallet | undefined;
 
-  private localNobleWallet: LocalWallet | undefined;
+  private hdKey: Hdkey | undefined;
+
+  // Cache for derived Noble wallet
+  private localNobleWalletCache: LocalWallet | undefined;
 
   setStore(store: RootStore) {
     this.store = store;
   }
 
-  setLocalWallet(localWallet: LocalWallet, localNobleWallet: LocalWallet) {
+  setLocalWallet(localWallet: LocalWallet, hdKey: Hdkey) {
     this.localWalletNonce = this.localWalletNonce != null ? this.localWalletNonce + 1 : 0;
     this.localWallet = localWallet;
-    this.localNobleWallet = localNobleWallet;
+    this.hdKey = hdKey;
+
+    // Clear Noble wallet cache when wallet changes
+    this.localNobleWalletCache = undefined;
 
     if (!this.store) {
       log('LocalWalletManager: store has not been set');
@@ -84,18 +90,57 @@ class LocalWalletManager {
     return this.localWallet;
   }
 
-  getLocalNobleWallet(localWalletNonce: number): LocalWallet | undefined {
+  /**
+   * Get Noble wallet - derives on-demand from hdKey
+   * Returns cached version if already derived for this nonce
+   */
+  async getLocalNobleWallet(localWalletNonce: number): Promise<LocalWallet | undefined> {
     if (localWalletNonce !== this.localWalletNonce) {
       return undefined;
     }
 
-    return this.localNobleWallet;
+    // Return cached if available
+    if (this.localNobleWalletCache) {
+      return this.localNobleWalletCache;
+    }
+
+    // Derive from hdKey if available
+    if (this.hdKey?.mnemonic) {
+      try {
+        const { onboardingOrchestrator } = await import('@/lib/onboarding/OnboardingOrchestrator');
+
+        this.localNobleWalletCache =
+          (await onboardingOrchestrator.deriveCosmosWallet(this.hdKey.mnemonic, 'noble')) ??
+          undefined;
+
+        return this.localNobleWalletCache;
+      } catch (error) {
+        log('LocalWalletManager: Failed to derive Noble wallet', error);
+        return undefined;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Get cached Noble wallet synchronously (for selectors)
+   * Returns cached version if available, otherwise undefined
+   * Does NOT trigger derivation - use getLocalNobleWallet() for that
+   */
+  getCachedLocalNobleWallet(localWalletNonce: number): LocalWallet | undefined {
+    if (localWalletNonce !== this.localWalletNonce) {
+      return undefined;
+    }
+
+    return this.localNobleWalletCache;
   }
 
   clearLocalWallet() {
     this.localWalletNonce = undefined;
     this.localWallet = undefined;
-    this.localNobleWallet = undefined;
+    this.hdKey = undefined;
+    this.localNobleWalletCache = undefined;
     this.store?.dispatch(setLocalWalletNonce(undefined));
   }
 }
