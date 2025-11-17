@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
+import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { CHAIN_INFO } from '@/constants/chains';
@@ -55,7 +56,6 @@ import {
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getActiveDialog } from '@/state/dialogsSelectors';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -82,8 +82,7 @@ import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
-import { useDepositAddress } from './useDepositAddress';
-import { DepositStatusResponse, useDepositStatus } from './useDepositStatus';
+import { useAutomatedDepositNotifications } from './useAutomatedDepositNotifications';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -1034,66 +1033,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.DepositAddressEvents,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const { dydxAddress } = useAccounts();
-      const activeDialog = useAppSelector(getActiveDialog);
       const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
-      const { depositAddresses } = useDepositAddress();
+      const { newDeposits, setNewDeposits, prevDepositIdsRef, setEnabled } =
+        useAutomatedDepositNotifications();
 
-      const [enabled, setEnabled] = useState(false);
-      const [newDeposits, setNewDeposits] = useState<DepositStatusResponse['deposits']['results']>(
-        []
-      );
-
-      const { data: depositStatus } = useDepositStatus({ enabled });
-
-      // refs to track previous values across renders
-      const prevDepositIdsRef = useRef<Set<string>>(new Set());
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
-      const sessionStartTimestampRef = useRef<number>(new Date(Date.now()).getTime());
-
       const NOTIFICATION_DEBOUNCE = 1 * timeUnits.second; // 1 second
-
-      useEffect(() => {
-        const isDepositDialogOpen = activeDialog && DialogTypes.is.Deposit2(activeDialog);
-        if (dydxAddress && depositAddresses && isDepositDialogOpen) {
-          setEnabled(true);
-          return;
-        }
-        setEnabled(false);
-      }, [dydxAddress, depositAddresses, activeDialog]);
-
-      // Stage 1: Watch for deposits from backend and update refs
-      useEffect(() => {
-        if (!dydxAddress || !depositStatus?.deposits.results || !depositAddresses) return;
-
-        const incomingDeposits = depositStatus.deposits.results;
-        const now = Date.now();
-        const sessionDuration = now - sessionStartTimestampRef.current;
-
-        const recentDeposits = incomingDeposits.filter((deposit) => {
-          const depositAge = now - new Date(deposit.created_at).getTime();
-
-          return depositAge >= 0 && depositAge <= sessionDuration;
-        });
-
-        if (recentDeposits.length === 0) return;
-
-        const prevDepositIds = prevDepositIdsRef.current;
-
-        const updatedDeposits = recentDeposits.filter((deposit) => !prevDepositIds.has(deposit.id));
-
-        if (updatedDeposits.length === 0) {
-          setNewDeposits([]);
-          return;
-        }
-
-        setNewDeposits(
-          updatedDeposits.toSorted(
-            (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          )
-        );
-      }, [dydxAddress, depositStatus, depositAddresses, enabled]);
 
       useEffect(() => {
         if (newDeposits.length === 0) {
@@ -1159,10 +1105,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
           const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
-          const matchingDeposit = newDeposits.find(
-            (deposit) =>
-              Math.abs(parseFloat(deposit?.amount) - parseFloat(diff.toFixed(USD_DECIMALS))) < 0.01
-          );
+          const matchingDeposit = newDeposits.find((deposit) => {
+            const depositAmount = Number(formatUnits(BigInt(deposit?.amount ?? 0), 6)).toFixed(
+              USD_DECIMALS
+            );
+            return (
+              depositAmount &&
+              Math.abs(parseFloat(depositAmount) - parseFloat(diff.toFixed(USD_DECIMALS))) < 0.01
+            );
+          });
 
           if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
@@ -1196,27 +1147,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
         prevWalletBalanceRef.current = usdcAmount;
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [usdcAmount, trigger, stringGetter]);
-
-      // Clean up old deposit IDs every 2 minutes to prevent memory bloat, if no new deposits in queue, disable the query
-      useEffect(() => {
-        const cleanupInterval = setInterval(() => {
-          const now = Date.now();
-          const isDepositDialogOpen = activeDialog && DialogTypes.is.Deposit2(activeDialog);
-          if (newDeposits.length === 0 && !isDepositDialogOpen) {
-            setEnabled(false);
-          }
-          const recentDeposits = depositStatus?.deposits.results.filter((deposit) => {
-            // Keep IDs for deposits from the last half hour jic
-            return (
-              now - new Date(deposit.created_at).getTime() <= 30 * timeUnits.minute // 30 minutes
-            );
-          });
-          prevDepositIdsRef.current = new Set(recentDeposits?.map((d) => d.id) ?? []);
-        }, 5 * timeUnits.minute); // Clean up every 5 minutes
-
-        return () => clearInterval(cleanupInterval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [depositStatus, newDeposits]);
     },
     useNotificationAction: () => {
       return () => {};
