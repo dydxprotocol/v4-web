@@ -17,6 +17,9 @@ export interface WalletState {
   localWallet?: {
     address?: string;
     subaccountNumber?: number;
+    // Indicates if wallet was directly imported (mnemonic) vs derived from source wallet
+    // When 'imported', sourceAccount is not required for AccountConnected state
+    walletSource?: 'imported' | 'derived';
   };
   turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
   turnkeyPrimaryWallet?: TurnkeyWallet;
@@ -32,6 +35,7 @@ const initialState: WalletState = {
   localWallet: {
     address: undefined,
     subaccountNumber: 0,
+    walletSource: undefined,
   },
   turnkeyEmailOnboardingData: undefined,
   turnkeyPrimaryWallet: undefined,
@@ -73,7 +77,13 @@ export const walletSlice = createSlice({
     },
     setLocalWallet: (
       state,
-      { payload }: PayloadAction<{ address?: string; subaccountNumber?: number }>
+      {
+        payload,
+      }: PayloadAction<{
+        address?: string;
+        subaccountNumber?: number;
+        walletSource?: 'imported' | 'derived';
+      }>
     ) => {
       state.localWallet = payload;
     },
