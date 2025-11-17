@@ -1108,21 +1108,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
             !prevDepositIdsRef.current.has(deposit.id)
           ) {
             trigger({
-              id: `deposit-${deposit.id}`,
+              id: `automated-deposit-${deposit.id}`,
               displayData: {
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
-                groupKey: 'DepositAddressEvents',
+                groupKey: NotificationType.DepositAddressEvents,
                 slotTitleLeft: (
                   <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
                 ),
                 title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
-                body: stringGetter({
-                  key: STRING_KEYS.DEPOSIT_DETECTED_BODY,
-                  params: {
-                    AMOUNT: Number(deposit.amount).toFixed(2),
-                    ASSET: 'USDC',
-                  },
-                }),
+                body: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_BODY }),
                 toastSensitivity: 'foreground',
                 actionDescription: stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION }),
                 renderActionSlot: () => {
@@ -1166,21 +1160,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
           const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
           const matchingDeposit = newDeposits.find(
-            (deposit) => Number(deposit.amount).toFixed(2) === diff.toFixed(2)
+            (deposit) =>
+              Math.abs(parseFloat(deposit?.amount) - parseFloat(diff.toFixed(USD_DECIMALS))) < 0.01
           );
 
-          if (now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
-              id: `deposit-confirmed-${matchingDeposit?.id}`,
+              id: `deposit-confirmed-${matchingDeposit?.id ?? crypto.randomUUID()}`,
               displayData: {
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
-                groupKey: 'DepositAddressEvents',
+                groupKey: NotificationType.DepositAddressEvents,
                 icon: <Icon iconName={IconName.CheckCircle} size="1.25rem" />,
                 title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
                 body: stringGetter({
                   key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
                   params: {
-                    AMOUNT: diff.toFixed(2),
+                    AMOUNT: diff.toFixed(USD_DECIMALS),
                     ASSET: 'USDC',
                   },
                 }),
@@ -1220,7 +1215,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }, 5 * timeUnits.minute); // Clean up every 5 minutes
 
         return () => clearInterval(cleanupInterval);
-      }, [depositStatus, newDeposits, activeDialog]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [depositStatus, newDeposits]);
     },
     useNotificationAction: () => {
       return () => {};

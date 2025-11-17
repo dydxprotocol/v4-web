@@ -7,6 +7,7 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { useAccounts } from './useAccounts';
 import { useDepositAddress } from './useDepositAddress';
+import { logBonsaiError } from '@/bonsai/logs';
 
 export type DepositStatusResponse = {
   address: string;
@@ -50,7 +51,7 @@ export const useDepositStatus = ({ enabled }: { enabled: boolean } = { enabled: 
 
         return await response.json();
       } catch (error) {
-        // Gracefully handle errors - return empty deposits
+        logBonsaiError('useDepositStatus', 'Failed to fetch automated deposits', { error });
         return { address: dydxAddress, deposits: { results: [], total: 0 } };
       }
     },

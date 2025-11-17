@@ -19,7 +19,7 @@ export const useDepositAddress = () => {
     error: fetchDepositAddressesError,
   } = useQuery({
     enabled: canQueryForDepositAddresses,
-    queryKey: ['turnkeyWallets'],
+    queryKey: ['turnkeyWallets', dydxAddress],
     queryFn: async (): Promise<{
       avalancheAddress: string;
       evmAddress: string;
