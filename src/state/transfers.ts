@@ -37,6 +37,7 @@ export type Withdraw = {
   transferAssetRelease: TransferAssetRelease | null | undefined; // Where the asset was transferred to
   status: 'pending' | 'success' | 'error';
   updatedAt?: number;
+  txHash: string;
 };
 
 export type Transfer = Deposit | Withdraw;
