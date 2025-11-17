@@ -44,6 +44,7 @@ import { CancelAllNotification } from '@/views/notifications/CancelAllNotificati
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { SwapNotification } from '@/views/notifications/SwapNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
@@ -62,6 +63,7 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
+import { getSwaps } from '@/state/swapSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
@@ -969,6 +971,34 @@ export const notificationTypes: NotificationTypeConfig[] = [
           dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
       };
+    },
+  },
+  {
+    type: NotificationType.Swap,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const swaps = useAppSelector(getSwaps, shallowEqual);
+
+      useEffect(() => {
+        swaps.forEach((swap) => {
+          const isPending = swap.status === 'pending' || swap.status === 'pending-transfer';
+          trigger({
+            id: swap.id,
+            displayData: {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.SWAP }),
+              groupKey: NotificationType.Swap,
+              toastSensitivity: 'background',
+              toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <SwapNotification swap={swap} notification={notification} isToast={isToast} />
+              ),
+            },
+            updateKey: [swap.status],
+          });
+        });
+      }, [swaps, trigger, stringGetter]);
     },
   },
   {
