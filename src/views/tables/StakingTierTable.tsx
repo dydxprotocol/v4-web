@@ -29,7 +29,7 @@ export const StakingTierTable = () => {
   const stringGetter = useStringGetter();
   const userFeeTier = useAppSelector(BonsaiCore.account.stats.data).stakingTierId;
   const stakingTiers = useAppSelector(BonsaiCore.configs.stakingTiers);
-  const { chainTokenDecimals, chainTokenDenom } = useTokenConfigs();
+  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const currentStakingDiscountLevel: number | undefined = useStakingTierLevel();
 
   const calculateMinStakedTokens = useCallback(
@@ -90,7 +90,7 @@ export const StakingTierTable = () => {
                   type={OutputType.Asset}
                   isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 1}
                   value={calculateMinStakedTokens(level1?.minStakedBaseTokens)}
-                  slotRight={<span>{chainTokenDenom}</span>}
+                  slotRight={<span>{chainTokenLabel}</span>}
                   fractionDigits={0}
                 />
               </div>
@@ -134,7 +134,7 @@ export const StakingTierTable = () => {
                   type={OutputType.Asset}
                   isHighlighted={feeTierName === userFeeTier && currentStakingDiscountLevel === 2}
                   value={calculateMinStakedTokens(level2?.minStakedBaseTokens)}
-                  slotRight={<span>{chainTokenDenom}</span>}
+                  slotRight={<span>{chainTokenLabel}</span>}
                   fractionDigits={0}
                 />
               </div>
@@ -158,7 +158,7 @@ export const StakingTierTable = () => {
     ] satisfies ColumnDef<StakingTier>[];
   }, [
     stringGetter,
-    chainTokenDenom,
+    chainTokenLabel,
     calculateMinStakedTokens,
     userFeeTier,
     currentStakingDiscountLevel,
@@ -171,7 +171,7 @@ export const StakingTierTable = () => {
       tableId="staking-tiers"
       getRowKey={(row: StakingTier) => row.feeTierName}
       getRowAttributes={(row: StakingTier) => ({
-        'data-yours': row.feeTierName === userFeeTier,
+        'data-yours': row.feeTierName === userFeeTier && Boolean(currentStakingDiscountLevel),
       })}
       columns={columns}
       selectionBehavior="replace"
