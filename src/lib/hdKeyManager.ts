@@ -6,6 +6,7 @@ import { Hdkey } from '@/constants/account';
 import type { RootStore } from '@/state/_store';
 import { setHdKeyNonce, setLocalWalletNonce } from '@/state/wallet';
 
+import { deriveCosmosWallet } from './onboarding/deriveCosmosWallets';
 import { log } from './telemetry';
 
 class HDKeyManager {
@@ -107,11 +108,8 @@ class LocalWalletManager {
     // Derive from hdKey if available
     if (this.hdKey?.mnemonic) {
       try {
-        const { onboardingOrchestrator } = await import('@/lib/onboarding/OnboardingOrchestrator');
-
         this.localNobleWalletCache =
-          (await onboardingOrchestrator.deriveCosmosWallet(this.hdKey.mnemonic, 'noble')) ??
-          undefined;
+          (await deriveCosmosWallet(this.hdKey.mnemonic, 'noble')) ?? undefined;
 
         return this.localNobleWalletCache;
       } catch (error) {

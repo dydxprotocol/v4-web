@@ -1,27 +1,8 @@
-/**
- * OnboardingOrchestrator
- *
- * Vanilla JS class that handles all onboarding business logic.
- * Replaces the complex useEffect logic in useAccounts.
- *
- * Design principles:
- * - No React hooks or dependencies
- * - Pure business logic, fully testable
- * - Returns wallet data rather than managing state directly
- * - Explicit inputs and outputs for each method
- *
- * Wallet storage strategy:
- * - All mnemonics stored in SecureStorage (Web Crypto API)
- * - No more encrypted signatures with static keys
- * - STORED: localDydxWallet mnemonic
- * - ON-DEMAND: Noble, Osmosis, Neutron wallets derived from mnemonic when needed
- */
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
-import { NOBLE_BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import { type LocalWallet } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingState } from '@/constants/account';
-import { NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
 import {
   ConnectorType,
   PrivateInformation,
@@ -56,9 +37,7 @@ export interface WalletDerivationResult {
   error?: string;
 }
 
-export type SupportedCosmosChain = 'noble' | 'osmosis' | 'neutron';
-
-export class OnboardingOrchestrator {
+class OnboardingSupervisor {
   /**
    * Derive dYdX wallet from signature using DydxWalletService
    * Used for EVM, Solana, and Turnkey wallets
@@ -170,7 +149,7 @@ export class OnboardingOrchestrator {
         onboardingState: OnboardingState.Disconnected,
       };
     } catch (error) {
-      logBonsaiError('OnboardingOrchestrator', 'handleWalletConnection failed', { error });
+      logBonsaiError('OnboardingSupervisor', 'handleWalletConnection failed', { error });
       return {
         onboardingState: OnboardingState.Disconnected,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -218,7 +197,7 @@ export class OnboardingOrchestrator {
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'Turnkey signing failed', { error });
+        logBonsaiError('OnboardingSupervisor', 'Turnkey signing failed', { error });
         return {
           onboardingState: OnboardingState.Disconnected,
           error: 'Failed to sign with Turnkey',
@@ -276,7 +255,7 @@ export class OnboardingOrchestrator {
         };
       }
     } catch (error) {
-      logBonsaiError('OnboardingOrchestrator', 'Cosmos wallet creation failed', { error });
+      logBonsaiError('OnboardingSupervisor', 'Cosmos wallet creation failed', { error });
     }
 
     return {
@@ -338,7 +317,7 @@ export class OnboardingOrchestrator {
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'Privy signing failed', { error });
+        logBonsaiError('OnboardingSupervisor', 'Privy signing failed', { error });
         return {
           onboardingState: OnboardingState.WalletConnected,
           error: 'Failed to sign with Privy',
@@ -394,7 +373,7 @@ export class OnboardingOrchestrator {
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'Solana signing failed', { error });
+        logBonsaiError('OnboardingSupervisor', 'Solana signing failed', { error });
         return {
           onboardingState: OnboardingState.WalletConnected,
           error: 'Failed to sign with Solana wallet',
@@ -407,64 +386,7 @@ export class OnboardingOrchestrator {
       onboardingState: OnboardingState.WalletConnected,
     };
   }
-
-  /**
-   * Derive a Cosmos wallet on-demand from mnemonic
-   * Used for Noble, Osmosis, Neutron wallets when needed
-   *
-   * @param mnemonic - The mnemonic to derive from
-   * @param chain - Which Cosmos chain wallet to derive
-   * @returns LocalWallet for the specified chain
-   */
-  async deriveCosmosWallet(
-    mnemonic: string,
-    chain: SupportedCosmosChain
-  ): Promise<LocalWallet | null> {
-    try {
-      const prefix = this.getCosmosPrefix(chain);
-      const LazyLocalWallet = await getLazyLocalWallet();
-      return await LazyLocalWallet.fromMnemonic(mnemonic, prefix);
-    } catch (error) {
-      logBonsaiError('OnboardingOrchestrator', `Failed to derive ${chain} wallet`, { error });
-      return null;
-    }
-  }
-
-  /**
-   * Derive a Cosmos wallet from offline signer
-   * Used when user has a native Cosmos wallet connected
-   */
-  async deriveCosmosWalletFromSigner(
-    offlineSigner: any,
-    chain: string
-  ): Promise<LocalWallet | null> {
-    try {
-      const LazyLocalWallet = await getLazyLocalWallet();
-      return await LazyLocalWallet.fromOfflineSigner(offlineSigner);
-    } catch (error) {
-      logBonsaiError('OnboardingOrchestrator', `Failed to derive ${chain} wallet from signer`, {
-        error,
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Get the Bech32 prefix for a Cosmos chain
-   */
-  private getCosmosPrefix(chain: SupportedCosmosChain): string {
-    switch (chain) {
-      case 'noble':
-        return NOBLE_BECH32_PREFIX;
-      case 'osmosis':
-        return OSMO_BECH32_PREFIX;
-      case 'neutron':
-        return NEUTRON_BECH32_PREFIX;
-      default:
-        throw new Error(`Unknown Cosmos chain: ${chain}`);
-    }
-  }
 }
 
 // Export singleton instance
-export const onboardingOrchestrator = new OnboardingOrchestrator();
+export const onboardingManager = new OnboardingSupervisor();

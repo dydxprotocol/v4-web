@@ -124,6 +124,7 @@ const useAccountsContext = () => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature,
       });
+
       const key = { mnemonic, privateKey, publicKey };
       hdKeyManager.setHdkey(wallet.address, key);
       setLocalDydxWallet(wallet);
@@ -147,9 +148,9 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
-      const { onboardingOrchestrator } = await import('@/lib/onboarding/OnboardingOrchestrator');
+      const { onboardingManager } = await import('@/lib/onboarding/OnboardingSupervisor');
 
-      const result = await onboardingOrchestrator.handleWalletConnection({
+      const result = await onboardingManager.handleWalletConnection({
         context: {
           sourceAccount,
           hasLocalDydxWallet,
