@@ -18,6 +18,7 @@ import { setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
+import { dydxWalletService } from '@/lib/wallet/dydxWalletService';
 
 import { useCosmosWallets } from './useCosmosWallets';
 import { useDydxClient } from './useDydxClient';
@@ -227,9 +228,8 @@ const useAccountsContext = () => {
   }, [blockedGeo]);
 
   // Disconnect wallet / accounts
-  const disconnectLocalDydxWallet = async () => {
+  const disconnectLocalDydxWallet = () => {
     // Clear persisted mnemonic from SecureStorage
-    const { dydxWalletService } = await import('@/lib/wallet/dydxWalletService');
     dydxWalletService.clearStoredWallet();
 
     setLocalDydxWallet(undefined);
