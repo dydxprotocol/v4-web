@@ -61,7 +61,7 @@ class SpotCandleSocketManager extends BaseSocketIOManager {
     this.socket!.on('token-bars-update', (update: SpotTokenBarsUpdate) => {
       const { aggregates } = update.data;
 
-      Object.keys(this.subscriptions).forEach((channel) => {
+      this.subscriptions.forEach((_, channel) => {
         const [tokenMint, resolution] = channel.split(':');
 
         if (tokenMint === update.tokenMint) {
