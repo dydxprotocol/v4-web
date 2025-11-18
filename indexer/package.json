@@ -8,9 +8,7 @@
     "apply:migration": "squid-typeorm-migration apply",
     "start": "ts-node -r dotenv/config src/main.ts",
     "populate:events": "ts-node e2e/populate-events.ts",
-    "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
-    "aaa": "ts-node e2e/verify-indexer-price.ts",
-    "test:e2e": "vitest --mode indexer-e2e run"
+    "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e"
   },
   "dependencies": {
     "@subsquid/batch-processor": "^0.0.0",

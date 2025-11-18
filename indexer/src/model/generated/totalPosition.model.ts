@@ -17,7 +17,7 @@ export class TotalPosition {
     isLong!: boolean
 
     @BigIntColumn_({nullable: false})
-    collateralAmout!: bigint
+    collateralAmount!: bigint
 
     @BigIntColumn_({nullable: false})
     size!: bigint

@@ -34,11 +34,6 @@ if [ $FUEL_NODE_PID -lt $$ ]; then
     exit 1
 fi
 
-ps
-echo $FUEL_NODE_PID
-echo $$
-ps aux
-
 echo "Deploying Mocked Stork contract"
 # priv key is hardcoded, taken form the fuel node starting script
 OUTPUT=`pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a"`
@@ -47,7 +42,8 @@ MOCK_STORK_CONTRACT=`echo "$OUTPUT" | grep "Mocked Stork deployed to" |  awk '{p
 if [ -z "$MOCK_STORK_CONTRACT" ]; then
     echo "stork mock deployemnt failed"
     echo "$OUTPUT"
-    kill $FUEL_NODE_PID
+    # kill is not enough, node spawns a subprocess
+    pkill -P $FUEL_NODE_PID
     exit 1
 fi
 
@@ -57,10 +53,12 @@ echo "$OUTPUT"
 USDC_CONTRACT=`echo "$OUTPUT" | grep -A 2 "Deploying token named mckUSDC sUSDC" | grep "Token deployed to" |  awk '{print $(NF-2)}'`
 USDC_ASSET_ID=`echo "$OUTPUT" | grep -A 2 "Deploying token named mckUSDC sUSDC" | grep "Token deployed to" |  awk '{print $NF}'`
 VAULT_CONTRACT=`echo "$OUTPUT" | grep "Vault deployed to" |  awk '{print $NF}'`
-if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" ]; then
+PRICEFEED_WRAPPER_CONTRACT=`echo "$OUTPUT" | grep "PricefeedWrapper deployed to" |  awk '{print $NF}'`
+if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" ] || [ -z "$PRICEFEED_WRAPPER_CONTRACT" ]; then
     echo "vault deployemnt failed"
     echo "$OUTPUT"
-    kill $FUEL_NODE_PID
+    # kill is not enough, node spawns a subprocess
+    pkill -P $FUEL_NODE_PID
     exit 1
 fi
 
@@ -68,11 +66,12 @@ if [ $1 == "none" ]; then
     echo "Skipping population of events"
 else
     echo "Populating events"
-    ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
+    ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --pricefeedWrapperAddress="${PRICEFEED_WRAPPER_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
     if [ $? -ne 0 ]; then
         echo "Failed to execute the script"
-        kill $FUEL_NODE_PID
-        EXIT_CODE=1
+        # kill is not enough, node spawns a subprocess
+        pkill -P $FUEL_NODE_PID
+        exit 1
     fi
     echo "Events populated"
 fi
@@ -81,7 +80,8 @@ echo "Launch Postgres database to store the data"
 docker compose up -d
 if [ $? -ne 0 ]; then
     echo "Failed to launch Postgres database"
-    kill $FUEL_NODE_PID
+    # kill is not enough, node spawns a subprocess
+     pkill -P $FUEL_NODE_PID
     exit 1
 fi
 
@@ -131,6 +131,18 @@ else
             while [ $ii -lt 10 ]; do
                 SQD_INDEXER_HEIGHT=`docker exec "indexer-db-1" psql --csv -t -U postgres -c "select height from squid_processor.status where id=0"`
                 if [ "$SQD_INDEXER_HEIGHT" -ge "$FUEL_NODE_HEIGHT" ]; then
+                    break
+                fi
+                # check if the indexer is running
+                SQD_INDEXER_OUT=`grep "theindexerstoppedunexpectedly" indexer.log |  wc -l`
+                if [ "$SQD_INDEXER_OUT" -eq "1" ]; then
+                    echo "squid indexer stopped unexpectedly"
+                    echo "------------- indexer.log ------------- "
+                    cat indexer.log
+                    echo "------------- indexer.log ------------- "
+                    ii=10
+                    SQD_INDEXER_PID=""
+                    EXIT_CODE=1
                     break
                 fi
                 sleep 1

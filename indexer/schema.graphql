@@ -38,7 +38,7 @@ enum PositionChange {
 type Position @entity {
   id: ID!
   positionKey: PositionKey!
-  collateralAmout: BigInt!
+  collateralAmount: BigInt!
   size: BigInt!
   timestamp: Int!
   latest: Boolean!
@@ -55,7 +55,7 @@ type TotalPosition @entity {
   id: ID!
   indexAssetId: String! @index
   isLong: Boolean!
-  collateralAmout: BigInt!
+  collateralAmount: BigInt!
   size: BigInt!
   lastTimestamp: Int!
 }
