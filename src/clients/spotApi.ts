@@ -144,6 +144,12 @@ export interface SpotApiTokenInfoObject {
   tokenFDV: string;
   isGraduating: boolean;
   tokenDexUrl: string;
+  top10HoldersPercent?: number;
+  holders?: number;
+  devHoldingPercent?: number;
+  snipersPercent?: number;
+  bundlersPercent?: number;
+  insidersPercent?: number;
 }
 
 export type SpotApiTokenMetadataResponse = {
