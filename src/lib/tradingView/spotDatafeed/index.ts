@@ -51,6 +51,10 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
     const { from, to } = periodParams;
 
+    // Clamp to parameter to current time to prevent API from returning future placeholder candles
+    const currentTimeSeconds = Math.floor(Date.now() / 1000) + 1;
+    const clampedTo = Math.min(to, currentTimeSeconds);
+
     if (!symbolInfo.ticker) {
       const error = new Error('Symbol ticker is required');
       onErrorCallback(error.message);
@@ -65,7 +69,7 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
         tokenMint,
         resolution: interval,
         from,
-        to,
+        to: clampedTo,
       };
 
       const bars = await wrapAndLogBonsaiError(
