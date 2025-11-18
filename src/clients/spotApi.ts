@@ -122,6 +122,7 @@ export interface SpotApiTokenInfoObject {
   socialLinks: SpotApiTokenSocialLinksObject;
   otherLinks: string;
   decimals: number;
+  circulatingSupply: string;
   totalSupply: string;
   priceUSD: number;
   priceSOL: number;
