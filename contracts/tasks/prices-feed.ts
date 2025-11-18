@@ -11,7 +11,7 @@ if (require.main === module) {
 // BTC 0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43
 // BNB 0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f
 // ETH 0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace
-const assetMapping = {
+const assetMapping: Record<string, string> = {
     "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a":
         "0x7416a56f222e196d0487dce8a1a8003936862e7a15092a91898d69fa8bce290c",
     "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43":
@@ -33,8 +33,8 @@ async function pricesFeed(taskArgs: any) {
     const query =
         "https://hermes.pyth.network/v2/updates/price/latest?&ids[]=0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a&ids[]=0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43&ids[]=0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f&ids[]=0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
     const pricesResponse = await fetch(query)
-        .then((response) => response.json())
-        .then((jsonResponse) => jsonResponse)
+        .then((response: Response) => response.json())
+        .then((jsonResponse: any) => jsonResponse)
 
     // eslint-disable-next-line no-restricted-syntax
     for (const priceData of pricesResponse.parsed) {

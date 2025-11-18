@@ -22,6 +22,7 @@
         "deploy:stork-mock": "ts-node tasks/deploy-stork-mock.ts",
         "setup:testnet": "ts-node tasks/setup-testnet.ts",
         "prices:feed": "ts-node tasks/prices-feed.ts",
+        "prices:verify": "ts-node tasks/verify-prices.ts",
         "faucet": "ts-node tasks/faucet.ts"
     },
     "devDependencies": {

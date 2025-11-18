@@ -1,0 +1,42 @@
+# Node modules (will be installed fresh)
+node_modules/
+npm-debug.log
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts (we generate types in container)
+types/
+out/
+target/
+dist/
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+test/
+tests/
+
+# Documentation
+*.md
+!README.md
+
+# Environment files (use AWS Secrets Manager instead)
+.env*
+!.env.example
+
+# Sway contract source (not needed for runtime)
+# But keep contracts/tasks/ which has the TypeScript scripts
+contracts/contracts/
+!contracts/contracts/mocks/stork-mock/out/release/
+contracts/core/
+contracts/helpers/
+contracts/testnet/
+contracts/vault-expose/
