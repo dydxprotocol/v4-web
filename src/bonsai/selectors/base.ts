@@ -89,9 +89,6 @@ export const selectRawSpotTokenPriceLoading = (state: RootState) =>
 export const selectRawSpotTokenMetadata = (state: RootState) => state.raw.spot.tokenMetadata.data;
 export const selectRawSpotTokenMetadataLoading = (state: RootState) =>
   state.raw.spot.tokenMetadata.status;
-export const selectRawSpotCandles = (state: RootState) => state.raw.spot.currentTokenCandles.data;
-export const selectRawSpotCandlesLoading = (state: RootState) =>
-  state.raw.spot.currentTokenCandles.status;
 
 export const selectRawSpotWalletPositions = (state: RootState) =>
   state.raw.spot.walletPositions.data;

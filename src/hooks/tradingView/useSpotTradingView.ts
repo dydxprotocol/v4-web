@@ -39,7 +39,7 @@ export const useSpotTradingView = ({
   const appColorMode = useAppSelector(getAppColorMode);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const isSimpleUi = useSimpleUiEnabled();
-  const { spotCandleService } = useEndpointsConfig();
+  const { spotApi } = useEndpointsConfig();
 
   const savedTvChartConfig = useAppSelector((state) => getTvChartConfig(state, false, true));
 
@@ -49,7 +49,7 @@ export const useSpotTradingView = ({
   );
 
   useEffect(() => {
-    if (!symbol || !spotCandleService) {
+    if (!symbol || !spotApi) {
       return () => {};
     }
 
@@ -60,7 +60,7 @@ export const useSpotTradingView = ({
     const options: TradingTerminalWidgetOptions = {
       ...widgetOptions,
       ...widgetOverrides,
-      datafeed: getSpotDatafeed(spotCandleService),
+      datafeed: getSpotDatafeed(spotApi),
       interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
       locale: languageCode as LanguageCode,
       symbol,
@@ -86,7 +86,7 @@ export const useSpotTradingView = ({
   }, [
     selectedLocale,
     symbol,
-    spotCandleService,
+    spotApi,
     setTvWidget,
     isSimpleUi,
     isTablet,

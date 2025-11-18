@@ -1,10 +1,6 @@
-import { last } from 'lodash';
-
 import { createAppSelector } from '@/state/appTypes';
 
 import {
-  selectRawSpotCandles,
-  selectRawSpotCandlesLoading,
   selectRawSpotSolPrice,
   selectRawSpotSolPriceLoading,
   selectRawSpotTokenMetadata,
@@ -44,24 +40,6 @@ export const selectSpotTokenMetadataLoading = createAppSelector(
   [selectRawSpotTokenMetadataLoading],
   (loading) => loading
 );
-
-export const selectSpotCandles = createAppSelector(
-  [selectRawSpotCandles],
-  (candles) => candles ?? []
-);
-
-export const selectSpotCandlesLoading = createAppSelector(
-  [selectRawSpotCandlesLoading],
-  (loading) => loading
-);
-
-export const selectLatestSpotCandle = createAppSelector([selectSpotCandles], (candles) => {
-  return last(candles);
-});
-
-export const selectSpotCandlePrice = createAppSelector([selectLatestSpotCandle], (candle) => {
-  return candle?.c;
-});
 
 export const selectSpotWalletPositions = createAppSelector(
   [selectRawSpotWalletPositions],

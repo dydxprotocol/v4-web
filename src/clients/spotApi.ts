@@ -167,6 +167,62 @@ export type SpotApiTokenSearchResponse = {
   tokens: SpotApiSearchTokenInfoObject[];
 };
 
+export type SpotApiBarsResolution =
+  | '1S'
+  | '5S'
+  | '15S'
+  | '30S'
+  | '1'
+  | '5'
+  | '15'
+  | '30'
+  | '60'
+  | '240'
+  | '720'
+  | '1D'
+  | '7D';
+
+export type SpotApiGetBarsQuery = {
+  from: number; // unix timestamp
+  tokenMint: string;
+  to?: number; // unix timestamp, defaults to current time
+  resolution?: SpotApiBarsResolution;
+};
+
+export interface SpotApiGetBarsResponseData {
+  buyVolume: string[];
+  buyers: number[];
+  buys: number[];
+  c: number[];
+  h: number[];
+  l: number[];
+  liquidity: string[];
+  o: number[];
+  sellVolume: string[];
+  sellers: number[];
+  sells: number[];
+  t: number[];
+  traders: number[];
+  transactions: number[];
+  volume: string[];
+  volumeNativeToken: string[];
+  s: string;
+  pair: Record<string, any>;
+}
+
+export type SpotApiGetBarsResponse = {
+  data: SpotApiGetBarsResponseData;
+};
+
+export interface SpotApiBarObject {
+  t: number; // timestamp (unix seconds)
+  o: number; // open
+  h: number; // high
+  l: number; // low
+  c: number; // close
+  volume: string; // volume in USD
+}
+
 export class SpotApiClient {
   private host: string;
 
@@ -204,6 +260,23 @@ export class SpotApiClient {
     return this._get<SpotApiTokenSearchResponse>(
       `tokens/search?phrase=${encodeURIComponent(query ?? '')}&limit=${limit}`
     );
+  }
+
+  async getBars(query: SpotApiGetBarsQuery) {
+    const params = new URLSearchParams({
+      from: query.from.toString(),
+      tokenMint: query.tokenMint,
+    });
+
+    if (query.to) {
+      params.append('to', query.to.toString());
+    }
+
+    if (query.resolution) {
+      params.append('resolution', query.resolution);
+    }
+
+    return this._get<SpotApiGetBarsResponse>(`tokens/bars?${params.toString()}`);
   }
 
   async createTransaction(request: SpotApiCreateTransactionRequest) {
@@ -264,4 +337,24 @@ export const landSpotTransaction = async (
 ) => {
   const client = getOrCreateSpotApiClient(apiUrl);
   return client.landTransaction(request);
+};
+
+export const transformBarsResponseToBars = (
+  response: SpotApiGetBarsResponse
+): SpotApiBarObject[] => {
+  const { data } = response;
+  return data.t.map((t, i) => ({
+    t,
+    o: data.o[i] ?? 0,
+    h: data.h[i] ?? 0,
+    l: data.l[i] ?? 0,
+    c: data.c[i] ?? 0,
+    volume: data.volume[i] ?? '0',
+  }));
+};
+
+export const getSpotBars = async (apiUrl: string, query: SpotApiGetBarsQuery) => {
+  const client = getOrCreateSpotApiClient(apiUrl);
+  const response = await client.getBars(query);
+  return transformBarsResponseToBars(response);
 };
