@@ -74,7 +74,7 @@ const SpotPage = () => {
       buys24hUsd: tokenMetadata.token24hBuys,
       sells24hUsd: -tokenMetadata.token24hSells,
       change24hPercent: tokenMetadata.pricePercentChange24h,
-      circulatingSupply: +tokenMetadata.totalSupply,
+      circulatingSupply: +tokenMetadata.circulatingSupply,
       liquidityUsd: tokenMetadata.liquidityUSD,
       logoUrl: tokenMetadata.image,
       marketCapUsd: +tokenMetadata.totalSupply * tokenPrice,
