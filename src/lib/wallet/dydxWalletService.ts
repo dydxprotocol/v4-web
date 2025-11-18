@@ -157,7 +157,6 @@ export class DydxWalletService {
       // Persist derived mnemonic to secure storage
       // This replaces the old encrypted signature approach with more secure Web Crypto API
       if (persist) {
-        console.log('storing mnemonic', mnemonic);
         await secureStorage.store(MNEMONIC_STORAGE_KEY, mnemonic);
       }
 
