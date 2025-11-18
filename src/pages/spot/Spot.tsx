@@ -55,7 +55,7 @@ const SpotPage = () => {
       tokenSymbol: position.tokenData.symbol,
       tokenImage: position.tokenData.image,
       holdingsAmount: position.currentBalance,
-      holdingsUsd: 0,
+      holdingsUsd: position.unrealizedValueUsd,
       boughtAmount: position.totalBought,
       boughtUsd: position.totalBoughtUsd,
       soldAmount: position.totalSold,

@@ -13,7 +13,6 @@ import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { SpotApiTokenInfoObject } from '@/clients/spotApi';
-import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
 import {
   SpotApiWsWalletPositionObject,
   SpotApiWsWalletPositionsUpdate,
@@ -96,10 +95,6 @@ import {
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
-  selectLatestSpotCandle,
-  selectSpotCandlePrice,
-  selectSpotCandles,
-  selectSpotCandlesLoading,
   selectSpotPositions,
   selectSpotSolPrice,
   selectSpotSolPriceLoading,
@@ -248,12 +243,6 @@ interface BonsaiCoreShape {
       data: BasicSelector<SpotApiTokenInfoObject | undefined>;
       loading: BasicSelector<LoadableStatus>;
     };
-    candles: {
-      data: BasicSelector<SpotCandleServiceCandleObject[]>;
-      loading: BasicSelector<LoadableStatus>;
-      latestCandle: BasicSelector<SpotCandleServiceCandleObject | undefined>;
-      currentPrice: BasicSelector<number | undefined>;
-    };
     walletPositions: {
       data: BasicSelector<SpotApiWsWalletPositionsUpdate | undefined>;
       loading: BasicSelector<LoadableStatus>;
@@ -355,12 +344,6 @@ export const BonsaiCore: BonsaiCoreShape = {
     tokenMetadata: {
       data: selectSpotTokenMetadata,
       loading: selectSpotTokenMetadataLoading,
-    },
-    candles: {
-      data: selectSpotCandles,
-      loading: selectSpotCandlesLoading,
-      latestCandle: selectLatestSpotCandle,
-      currentPrice: selectSpotCandlePrice,
     },
     walletPositions: {
       data: selectSpotWalletPositions,

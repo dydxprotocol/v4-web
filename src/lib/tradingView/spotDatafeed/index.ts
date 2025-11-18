@@ -1,7 +1,7 @@
 import { wrapAndLogBonsaiError } from '@/bonsai/logs';
 import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/charting_library';
 
-import { getSpotCandleData, SpotCandleServiceQuery } from '@/clients/spotCandleService';
+import { getSpotBars, SpotApiGetBarsQuery } from '@/clients/spotApi';
 import {
   subscribeToSpotCandles,
   unsubscribeFromSpotStream,
@@ -58,28 +58,26 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
     }
 
     try {
-      const token = symbolInfo.ticker;
+      const tokenMint = symbolInfo.ticker;
       const interval = resolutionToSpotInterval(resolution);
-      const fromMs = from * 1000;
-      const toMs = to * 1000;
 
-      const query: SpotCandleServiceQuery = {
-        token,
-        interval,
-        from: fromMs,
-        to: toMs,
+      const query: SpotApiGetBarsQuery = {
+        tokenMint,
+        resolution: interval,
+        from,
+        to,
       };
 
-      const candles = await wrapAndLogBonsaiError(
-        () => getSpotCandleData(spotApiUrl, query),
-        'getSpotCandleData'
+      const bars = await wrapAndLogBonsaiError(
+        () => getSpotBars(spotApiUrl, query),
+        'getSpotBars'
       )();
 
-      if (candles.length === 0) {
+      if (bars.length === 0) {
         onHistoryCallback([], { noData: true });
       } else {
-        const bars = transformSpotCandlesForChart(candles);
-        onHistoryCallback(bars, { noData: false });
+        const chartBars = transformSpotCandlesForChart(bars);
+        onHistoryCallback(chartBars, { noData: false });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -90,16 +88,16 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
   subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID) => {
     if (!symbolInfo.ticker) return;
 
-    const token = symbolInfo.ticker;
+    const tokenMint = symbolInfo.ticker;
     const interval = resolutionToSpotInterval(resolution);
 
     subscribeToSpotCandles(
       spotApiUrl,
-      token,
+      tokenMint,
       interval,
-      (candle) => {
-        const bar = transformSpotCandleForChart(candle);
-        onRealtimeCallback(bar);
+      (bar) => {
+        const chartBar = transformSpotCandleForChart(bar);
+        onRealtimeCallback(chartBar);
       },
       subscriberUID
     );

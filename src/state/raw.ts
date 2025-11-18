@@ -34,7 +34,6 @@ import {
 } from '@/types/indexer/indexerManual';
 
 import { SpotApiTokenMetadataResponse, SpotApiTokenPriceResponse } from '@/clients/spotApi';
-import { SpotCandleServiceCandleObject } from '@/clients/spotCandleService';
 import { calc } from '@/lib/do';
 import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
@@ -110,7 +109,6 @@ export interface RawDataState {
     solPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
     tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
     tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
-    currentTokenCandles: Loadable<SpotCandleServiceCandleObject[]>;
     walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
   };
 }
@@ -153,7 +151,6 @@ const initialState: RawDataState = {
   spot: {
     solPrice: loadableIdle(),
     tokenMetadata: loadableIdle(),
-    currentTokenCandles: loadableIdle(),
     tokenPrice: loadableIdle(),
     walletPositions: loadableIdle(),
   },
@@ -270,9 +267,6 @@ export const rawSlice = createSlice({
       ) => {
         state.spot.tokenMetadata = action.payload;
       },
-      setSpotCandles: (state, action: PayloadAction<Loadable<SpotCandleServiceCandleObject[]>>) => {
-        state.spot.currentTokenCandles = action.payload;
-      },
       setSpotWalletPositions: (
         state,
         action: PayloadAction<Loadable<SpotApiWsWalletPositionsUpdate | undefined>>
@@ -367,6 +361,5 @@ export const {
   setSpotSolPrice,
   setSpotTokenPrice,
   setSpotTokenMetadata,
-  setSpotCandles,
   setSpotWalletPositions,
 } = rawSlice.actions;

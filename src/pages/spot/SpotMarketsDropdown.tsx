@@ -150,8 +150,7 @@ export const SpotMarketsDropdown = ({
               defaultSortDescriptor={{ column: 'volume24h', direction: 'descending' }}
               label="Spot"
               columns={columns}
-              initialPageSize={50}
-              paginationBehavior="paginate"
+              paginationBehavior="showAll"
               shouldResetOnTotalRowsChange
               getIsRowPinned={(row) => favoritedSet.has(row.tokenAddress)}
               slotEmpty={

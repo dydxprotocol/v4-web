@@ -7,43 +7,34 @@ import type {
 
 import { RESOLUTION_TO_SPOT_INTERVAL_MAP, TradingViewBar } from '@/constants/candles';
 
-import {
-  SpotCandleServiceCandleObject,
-  SpotCandleServiceInterval,
-} from '@/clients/spotCandleService';
+import { SpotApiBarObject, SpotApiBarsResolution } from '@/clients/spotApi';
 import { objectKeys } from '@/lib/objectHelpers';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
-// Convert TradingView resolution to spot candle service interval
-export const resolutionToSpotInterval = (
-  resolution: ResolutionString
-): SpotCandleServiceInterval => {
+// Convert TradingView resolution to spot bars resolution
+export const resolutionToSpotInterval = (resolution: ResolutionString): SpotApiBarsResolution => {
   return RESOLUTION_TO_SPOT_INTERVAL_MAP[resolution] ?? '1D';
 };
 
 // Supported resolutions for spot charts
 export const SPOT_SUPPORTED_RESOLUTIONS = objectKeys(RESOLUTION_TO_SPOT_INTERVAL_MAP);
 
-// Transform single candle item for chart consumption
-export const transformSpotCandleForChart = (
-  candle: SpotCandleServiceCandleObject
-): TradingViewBar => {
+// Transform single bar item for chart consumption
+export const transformSpotCandleForChart = (bar: SpotApiBarObject): TradingViewBar => {
   return {
-    time: candle.t * 1000, // Convert to milliseconds
-    open: candle.o,
-    high: candle.h,
-    low: candle.l,
-    close: candle.c,
-    volume: candle.v_usd,
+    time: bar.t * 1000, // Convert to milliseconds
+    open: bar.o,
+    high: bar.h,
+    low: bar.l,
+    close: bar.c,
+    volume: parseFloat(bar.volume),
   };
 };
 
-// Transform array of candle data for chart consumption
-export const transformSpotCandlesForChart = (
-  candles: SpotCandleServiceCandleObject[]
-): TradingViewBar[] => {
-  return candles.map(transformSpotCandleForChart);
+// Transform array of bar data for chart consumption
+export const transformSpotCandlesForChart = (bars: SpotApiBarObject[]): TradingViewBar[] => {
+  return bars.map(transformSpotCandleForChart);
 };
 
 // Create symbol info for spot tokens
