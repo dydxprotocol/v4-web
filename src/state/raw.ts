@@ -12,9 +12,11 @@ import {
   ComplianceResponse,
   ConfigTiers,
   GeoState,
+  PerpetualMarketFeeDiscount,
   RewardsParams,
   TokenPriceResponse,
   UserFeeTier,
+  UserStakingTier,
 } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
@@ -69,6 +71,7 @@ export type ComplianceState = {
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
+    feeDiscounts: Loadable<PerpetualMarketFeeDiscount | undefined>;
     assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
     sparklines: Loadable<{
@@ -81,6 +84,7 @@ export interface RawDataState {
     nobleUsdcBalance: Loadable<Coin>;
     stats: Loadable<AccountStats | undefined>;
     feeTier: Loadable<UserFeeTier | undefined>;
+    stakingTier: Loadable<UserStakingTier | undefined>;
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<OrdersData>;
@@ -105,6 +109,7 @@ export interface RawDataState {
 const initialState: RawDataState = {
   markets: {
     allMarkets: loadableIdle(),
+    feeDiscounts: loadableIdle(),
     assets: loadableIdle(),
     orderbooks: {},
     sparklines: loadableIdle(),
@@ -117,6 +122,7 @@ const initialState: RawDataState = {
     nobleUsdcBalance: loadableIdle(),
     stats: loadableIdle(),
     feeTier: loadableIdle(),
+    stakingTier: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
     transfers: loadableIdle(),
@@ -171,6 +177,12 @@ export const rawSlice = createSlice({
       },
       setAccountFeeTierRaw: (state, action: PayloadAction<Loadable<UserFeeTier | undefined>>) => {
         state.account.feeTier = action.payload;
+      },
+      setAccountStakingTierRaw: (
+        state,
+        action: PayloadAction<Loadable<UserStakingTier | undefined>>
+      ) => {
+        state.account.stakingTier = action.payload;
       },
       setConfigTiers: (state, action: PayloadAction<Loadable<ConfigTiers>>) => {
         state.configs = action.payload;
@@ -268,6 +280,12 @@ export const rawSlice = createSlice({
         ...stateToMerge,
       };
     },
+    setMarketsFeeDiscountsRaw: (
+      state,
+      action: PayloadAction<Loadable<PerpetualMarketFeeDiscount | undefined>>
+    ) => {
+      state.markets.feeDiscounts = action.payload;
+    },
   },
 });
 
@@ -312,6 +330,8 @@ export const {
   setIndexerHeightRaw,
   setValidatorHeightRaw,
   setAccountFeeTierRaw,
+  setAccountStakingTierRaw,
+  setMarketsFeeDiscountsRaw,
   setConfigTiers,
   setComplianceGeoRaw,
   setLocalAddressScreenV2Raw,

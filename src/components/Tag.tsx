@@ -108,3 +108,9 @@ export const PrivateTag = styled(Tag)`
   background-color: var(--color-gradient-error);
   color: var(--color-error);
 `;
+
+export const OutlinedAccentTag = styled(Tag)`
+  background-color: transparent;
+  color: var(--color-accent);
+  border: solid var(--default-border-width) var(--color-accent);
+`;

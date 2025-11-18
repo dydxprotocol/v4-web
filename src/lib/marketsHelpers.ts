@@ -54,6 +54,7 @@ export function getMarketDataFromPerpetualMarketSummary(
     marketCap,
     sectorTags,
     isFavorite,
+    marketFeeDiscountMultiplier,
   } = market;
 
   return {
@@ -82,6 +83,7 @@ export function getMarketDataFromPerpetualMarketSummary(
     marketCap,
     sectorTags,
     isFavorite,
+    marketFeeDiscountMultiplier,
   };
 }
 
@@ -132,5 +134,6 @@ export function getMarketDataFromAsset(asset: AssetData, favoritedMarkets: strin
     marketCap: marketCap ?? reportedMarketCap,
     sectorTags: sectorTags ?? [],
     isFavorite: favoritedMarkets.includes(ticker),
+    marketFeeDiscountMultiplier: undefined,
   } satisfies MarketData;
 }

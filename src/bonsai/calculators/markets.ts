@@ -3,7 +3,7 @@ import { mapValues, orderBy, pickBy } from 'lodash';
 import { weakMapMemoize } from 'reselect';
 
 import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/constants/markets';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { QUANTUM_MULTIPLIER, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { EMPTY_ARR } from '@/constants/objects';
 import { IndexerSparklineTimePeriod } from '@/types/indexer/indexerApiGen';
 import {
@@ -18,12 +18,15 @@ import {
 } from '@/lib/assetUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { BIG_NUMBERS, MaybeBigNumber, MustBigNumber, MustNumber } from '@/lib/numbers';
+import { objectFromEntries } from '@/lib/objectHelpers';
 
 import { MarketsData } from '../types/rawTypes';
 import {
   AllAssetData,
+  AllPerpetualMarketsFeeDiscounts,
   MarketInfo,
   MarketsInfo,
+  PerpetualMarketFeeDiscount,
   PerpetualMarketSparklines,
   PerpetualMarketSummaries,
 } from '../types/summaryTypes';
@@ -129,6 +132,7 @@ export function createMarketSummary(
   markets: MarketsInfo | undefined,
   sparklines: PerpetualMarketSparklines | undefined,
   assetInfo: AllAssetData | undefined,
+  marketFeeDiscounts: AllPerpetualMarketsFeeDiscounts | undefined,
   listOfFavorites: string[]
 ): PerpetualMarketSummaries | undefined {
   if (markets == null) {
@@ -154,6 +158,10 @@ export function createMarketSummary(
 
       const formattedAssetData = formatAssetDataForPerpetualMarketSummary(assetData, market);
 
+      const feeData = marketFeeDiscounts?.[market.clobPairId];
+      const marketFeeDiscountMultiplier =
+        feeData && feeData.isApplicable ? feeData.feeDiscountMultiplier : undefined;
+
       return {
         ...market,
         ...formattedAssetData,
@@ -161,6 +169,7 @@ export function createMarketSummary(
         isNew,
         isFavorite: listOfFavorites.includes(market.ticker),
         isUnlaunched: false,
+        marketFeeDiscountMultiplier,
       };
     }),
     isTruthy
@@ -208,4 +217,34 @@ export function calculateEffectiveSelectedLeverageBigNumber({
 
   // Fallback
   return BIG_NUMBERS.ONE;
+}
+
+export function calculateMarketsFeeDiscounts(
+  feeDiscounts: PerpetualMarketFeeDiscount | undefined
+): AllPerpetualMarketsFeeDiscounts | undefined {
+  if (feeDiscounts == null) return undefined;
+
+  const now = Date.now();
+
+  const discountEntries = objectFromEntries(
+    feeDiscounts.map((discount) => {
+      const startTimeMs =
+        discount.startTime != null ? new Date(discount.startTime).getTime() : null;
+      const endTimeMs = discount.endTime != null ? new Date(discount.endTime).getTime() : null;
+
+      return [
+        discount.clobPairId,
+        {
+          ...discount,
+          isApplicable:
+            startTimeMs != null && endTimeMs != null && now >= startTimeMs && now < endTimeMs,
+          feeDiscountMultiplier: MustBigNumber(discount.chargePpm)
+            .div(QUANTUM_MULTIPLIER)
+            .toNumber(),
+        },
+      ];
+    })
+  );
+
+  return discountEntries;
 }

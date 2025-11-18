@@ -11,6 +11,7 @@ export interface DismissableState {
   hasDismissedSurgeBanner: boolean;
   hasDismissedRebateBanner: boolean;
   hasDismissedTradingLeagueBanner: boolean;
+  hasDismissedNoFeeBanner: boolean;
 }
 
 const initialState: DismissableState = {
@@ -22,6 +23,7 @@ const initialState: DismissableState = {
   hasDismissedSurgeBanner: false,
   hasDismissedRebateBanner: false,
   hasDismissedTradingLeagueBanner: false,
+  hasDismissedNoFeeBanner: false,
 };
 
 export const dismissableSlice = createSlice({
@@ -49,6 +51,9 @@ export const dismissableSlice = createSlice({
     setHasDismissedTradingLeagueBanner: (state, action: PayloadAction<boolean>) => {
       state.hasDismissedTradingLeagueBanner = action.payload;
     },
+    setHasDismissedNoFeeBanner: (state, action: PayloadAction<boolean>) => {
+      state.hasDismissedNoFeeBanner = action.payload;
+    },
   },
 });
 
@@ -60,4 +65,5 @@ export const {
   setHasDismissedSurgeBanner,
   setHasDismissedRebateBanner,
   setHasDismissedTradingLeagueBanner,
+  setHasDismissedNoFeeBanner,
 } = dismissableSlice.actions;

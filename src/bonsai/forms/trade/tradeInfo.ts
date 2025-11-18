@@ -215,7 +215,10 @@ export function calculateTradeInfo(
           const size = calculated.marketOrder?.size;
           const usdcSize = mapIfPresent(price, size, (p, s) => p * s);
           const feeRate = accountData.userFeeStats.takerFeeRate ?? 0;
-          const totalFees = mapIfPresent(usdcSize, (u) => u * feeRate);
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(usdcSize, (u) => u * feeRate)
+          );
 
           const isPositionClosed =
             mapIfPresent(
@@ -293,10 +296,9 @@ export function calculateTradeInfo(
             subaccountToUse
           );
 
-          const totalFees = mapIfPresent(
-            feeRate,
-            inputSummary.size?.usdcSize,
-            (fee, usdc) => fee * usdc
+          const totalFees = calculateTradeFeeAfterDiscounts(
+            accountData,
+            mapIfPresent(feeRate, inputSummary.size?.usdcSize, (fee, usdc) => fee * usdc)
           );
 
           return {
@@ -515,6 +517,7 @@ function createMarketOrder(
         effectiveSizeTarget,
         orderbook,
         accountData.userFeeStats.takerFeeRate ?? 0,
+        accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier,
         oraclePrice,
         equity,
         freeCollateral,
@@ -531,6 +534,7 @@ function simulateMarketOrder(
   effectiveSizeTargetBase: SizeTarget,
   orderbook: CanvasOrderbookLine[],
   feeRate: number,
+  marketDiscountMultiplier: number | undefined,
   oraclePrice: number,
   subaccountEquity: number,
   subaccountFreeCollateral: number,
@@ -555,6 +559,9 @@ function simulateMarketOrder(
   const orderbookRows: OrderbookUsage[] = [];
   let filled = false;
 
+  const feeRateAfterMarketDiscount =
+    marketDiscountMultiplier == null ? feeRate : feeRate * marketDiscountMultiplier;
+
   if (orderbook.length === 0) {
     return {
       orderbook: [],
@@ -578,13 +585,15 @@ function simulateMarketOrder(
 
     let sizeToTake = 0;
     const sizeEquityImpact =
-      oraclePrice * operationMultipler - rowPrice * feeRate - rowPrice * operationMultipler;
+      oraclePrice * operationMultipler -
+      rowPrice * feeRateAfterMarketDiscount -
+      rowPrice * operationMultipler;
 
     if (effectiveSizeTarget.type === 'size') {
       sizeToTake = effectiveSizeTarget.target - totalSize;
     } else if (effectiveSizeTarget.type === 'usdc') {
       const maxSizeForRemainingUsdc =
-        (effectiveSizeTarget.target - totalCost) / (rowPrice * (1 + feeRate));
+        (effectiveSizeTarget.target - totalCost) / (rowPrice * (1 + feeRateAfterMarketDiscount));
       sizeToTake = maxSizeForRemainingUsdc;
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (effectiveSizeTarget.type === 'maximum') {
@@ -645,7 +654,7 @@ function simulateMarketOrder(
     } else {
       totalSize += sizeToTake;
       totalCostWithoutFees += sizeToTake * rowPrice;
-      totalCost += sizeToTake * rowPrice + sizeToTake * rowPrice * feeRate;
+      totalCost += sizeToTake * rowPrice + sizeToTake * rowPrice * feeRateAfterMarketDiscount;
       thisPositionValue += sizeToTake * operationMultipler * oraclePrice;
       equity +=
         // update to notional
@@ -653,7 +662,7 @@ function simulateMarketOrder(
         // update to quote for cost
         sizeToTake * operationMultipler * -1 * rowPrice +
         // update to quote for fees
-        sizeToTake * rowPrice * feeRate * -1;
+        sizeToTake * rowPrice * feeRateAfterMarketDiscount * -1;
       orderbookRows.push({ price: rowPrice, size: sizeToTake });
     }
   }
@@ -1170,4 +1179,18 @@ function getTransferAmountFromTargetLeverage(
     (margin + feesAtFillPriceWithBuffer + slippageLoss) *
     (ignoreSlippageAndOracleDrift ? 1 + FLAT_TRANSFER_BUFFER : 1)
   );
+}
+
+function calculateTradeFeeAfterDiscounts(
+  accountData: TradeFormInputData,
+  feeUsdc: number | undefined
+) {
+  const marketDiscountMultiplier =
+    accountData.currentTradeMarketSummary?.marketFeeDiscountMultiplier;
+
+  if (feeUsdc == null) return undefined;
+
+  const feeAfterMarketDiscount =
+    marketDiscountMultiplier != null ? feeUsdc * marketDiscountMultiplier : feeUsdc;
+  return feeAfterMarketDiscount;
 }
