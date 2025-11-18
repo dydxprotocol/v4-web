@@ -1,19 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { AES, enc } from 'crypto-js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
-import {
-  ConnectorType,
-  DydxAddress,
-  PrivateInformation,
-  WalletNetworkType,
-} from '@/constants/wallets';
+import { ConnectorType, DydxAddress, PrivateInformation } from '@/constants/wallets';
 
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
@@ -21,12 +14,10 @@ import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
+import { setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
-import { log } from '@/lib/telemetry';
-import { sleep } from '@/lib/timeUtils';
 
 import { useCosmosWallets } from './useCosmosWallets';
 import { useDydxClient } from './useDydxClient';
@@ -92,17 +83,6 @@ const useAccountsContext = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 
-  const decryptSignature = (encryptedSignature: string | undefined) => {
-    const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
-
-    if (!staticEncryptionKey) throw new Error('No decryption key found');
-    if (!encryptedSignature) throw new Error('No signature found');
-
-    const decrypted = AES.decrypt(encryptedSignature, staticEncryptionKey);
-    const signature = decrypted.toString(enc.Utf8);
-    return signature;
-  };
-
   // dYdXClient Onboarding & Account Helpers
   const { indexerClient, getWalletFromSignature } = useDydxClient();
   // dYdX subaccounts
@@ -167,103 +147,38 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
-      /**
-       * Handle Turnkey separately since it is an embedded wallet.
-       * There will not be an OnboardingState.WalletConnected state, only AccountConnected or Disconnected.
-       */
-      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-        if (!hasLocalDydxWallet && sourceAccount.encryptedSignature && !blockedGeo) {
-          try {
-            const signature = decryptSignature(sourceAccount.encryptedSignature);
-            await setWalletFromSignature(signature);
-            dispatch(setOnboardingState(OnboardingState.AccountConnected));
-          } catch (error) {
-            log('useAccounts/decryptSignature', error);
-            dispatch(clearSavedEncryptedSignature());
-          }
-        } else if (hasLocalDydxWallet) {
-          dispatch(setOnboardingState(OnboardingState.AccountConnected));
-        } else {
-          dispatch(setOnboardingState(OnboardingState.Disconnected));
-        }
-        return;
+      const { onboardingOrchestrator } = await import('@/lib/onboarding/OnboardingOrchestrator');
+
+      const result = await onboardingOrchestrator.handleWalletConnection({
+        context: {
+          sourceAccount,
+          hasLocalDydxWallet,
+          blockedGeo,
+          isConnectedGraz,
+          authenticated,
+          ready,
+        },
+        getWalletFromSignature,
+        signMessageAsync,
+        getCosmosOfflineSigner,
+        selectedDydxChainId,
+      });
+
+      // Handle the result
+      if (result.wallet) {
+        setLocalDydxWallet(result.wallet);
       }
 
-      /**
-       * Handle Test (dYdX), Cosmos (dYdX), Evm, and Solana wallets
-       */
-      if (sourceAccount.walletInfo?.connectorType === ConnectorType.Test) {
-        dispatch(setOnboardingState(OnboardingState.WalletConnected));
-        const wallet = new (await getLazyLocalWallet())();
-        wallet.address = sourceAccount.address;
-        setLocalDydxWallet(wallet);
-        dispatch(setOnboardingState(OnboardingState.AccountConnected));
-      } else if (sourceAccount.chain === WalletNetworkType.Cosmos && isConnectedGraz) {
-        try {
-          const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
-          if (dydxOfflineSigner) {
-            setLocalDydxWallet(
-              await (await getLazyLocalWallet()).fromOfflineSigner(dydxOfflineSigner)
-            );
-            dispatch(setOnboardingState(OnboardingState.AccountConnected));
-          }
-        } catch (error) {
-          log('useAccounts/setLocalDydxWallet', error);
-        }
-      } else if (sourceAccount.chain === WalletNetworkType.Evm) {
-        if (!hasLocalDydxWallet) {
-          dispatch(setOnboardingState(OnboardingState.WalletConnected));
+      if (result.hdKey) {
+        setHdKey(result.hdKey);
+      }
 
-          if (
-            sourceAccount.walletInfo?.connectorType === ConnectorType.Privy &&
-            authenticated &&
-            ready
-          ) {
-            try {
-              // Give Privy a second to finish the auth flow before getting the signature
-              await sleep();
-              const signature = await signMessageAsync();
+      // Dispatch onboarding state
+      dispatch(setOnboardingState(result.onboardingState));
 
-              await setWalletFromSignature(signature);
-              dispatch(setOnboardingState(OnboardingState.AccountConnected));
-            } catch (error) {
-              log('useAccounts/decryptSignature', error);
-              dispatch(clearSavedEncryptedSignature());
-            }
-          } else if (sourceAccount.encryptedSignature && !blockedGeo) {
-            try {
-              const signature = decryptSignature(sourceAccount.encryptedSignature);
-
-              await setWalletFromSignature(signature);
-              dispatch(setOnboardingState(OnboardingState.AccountConnected));
-            } catch (error) {
-              log('useAccounts/decryptSignature', error);
-              dispatch(clearSavedEncryptedSignature());
-            }
-          }
-        } else {
-          dispatch(setOnboardingState(OnboardingState.AccountConnected));
-        }
-      } else if (sourceAccount.chain === WalletNetworkType.Solana) {
-        if (!hasLocalDydxWallet) {
-          dispatch(setOnboardingState(OnboardingState.WalletConnected));
-
-          if (sourceAccount.encryptedSignature && !blockedGeo) {
-            try {
-              const signature = decryptSignature(sourceAccount.encryptedSignature);
-              await setWalletFromSignature(signature);
-              dispatch(setOnboardingState(OnboardingState.AccountConnected));
-            } catch (error) {
-              log('useAccounts/decryptSignature', error);
-              dispatch(clearSavedEncryptedSignature());
-            }
-          }
-        } else {
-          dispatch(setOnboardingState(OnboardingState.AccountConnected));
-        }
-      } else {
+      // Handle disconnected state
+      if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
         disconnectLocalDydxWallet();
-        dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
   }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);

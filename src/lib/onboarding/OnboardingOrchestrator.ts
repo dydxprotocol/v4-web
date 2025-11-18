@@ -11,13 +11,14 @@
  * - Explicit inputs and outputs for each method
  *
  * Wallet storage strategy:
- * - STORED: localDydxWallet only
+ * - All mnemonics stored in SecureStorage (Web Crypto API)
+ * - No more encrypted signatures with static keys
+ * - STORED: localDydxWallet mnemonic
  * - ON-DEMAND: Noble, Osmosis, Neutron wallets derived from mnemonic when needed
  */
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
 import { NOBLE_BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
-import { AES, enc } from 'crypto-js';
 
 import { OnboardingState } from '@/constants/account';
 import { NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
@@ -31,10 +32,11 @@ import {
 import { hdKeyManager } from '@/lib/hdKeyManager';
 import { sleep } from '@/lib/timeUtils';
 
+import { dydxWalletService } from '../wallet/dydxWalletService';
+
 export interface SourceAccount {
   address?: string;
   chain?: WalletNetworkType;
-  encryptedSignature?: string;
   walletInfo?: WalletInfo;
 }
 
@@ -52,38 +54,13 @@ export interface WalletDerivationResult {
   hdKey?: PrivateInformation;
   onboardingState: OnboardingState;
   error?: string;
-  shouldClearSignature?: boolean;
 }
 
 export type SupportedCosmosChain = 'noble' | 'osmosis' | 'neutron';
 
 export class OnboardingOrchestrator {
   /**
-   * Decrypt encrypted signature using static key
-   * TODO: Replace with secure per-user encryption
-   */
-  private decryptSignature(encryptedSignature: string): string {
-    const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
-
-    if (!staticEncryptionKey) {
-      throw new Error('No decryption key found');
-    }
-    if (!encryptedSignature) {
-      throw new Error('No signature found');
-    }
-
-    const decrypted = AES.decrypt(encryptedSignature, staticEncryptionKey);
-    const signature = decrypted.toString(enc.Utf8);
-
-    if (!signature) {
-      throw new Error('Failed to decrypt signature');
-    }
-
-    return signature;
-  }
-
-  /**
-   * Derive dYdX wallet from signature
+   * Derive dYdX wallet from signature using DydxWalletService
    * Used for EVM, Solana, and Turnkey wallets
    */
   private async deriveWalletFromSignature(
@@ -91,13 +68,17 @@ export class OnboardingOrchestrator {
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;
-      privateKey: Uint8Array;
-      publicKey: Uint8Array;
+      privateKey: Uint8Array | null;
+      publicKey: Uint8Array | null;
     }>
   ): Promise<{ wallet: LocalWallet; hdKey: PrivateInformation }> {
     const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
       signature,
     });
+
+    if (!privateKey || !publicKey) {
+      throw new Error('Failed to derive wallet from signature');
+    }
 
     const hdKey: PrivateInformation = {
       mnemonic,
@@ -105,8 +86,8 @@ export class OnboardingOrchestrator {
       publicKey,
     };
 
-    // Update HD key manager
     hdKeyManager.setHdkey(wallet.address, hdKey);
+    await dydxWalletService.deriveFromSignature(signature);
 
     return { wallet, hdKey };
   }
@@ -119,8 +100,8 @@ export class OnboardingOrchestrator {
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;
-      privateKey: Uint8Array;
-      publicKey: Uint8Array;
+      privateKey: Uint8Array | null;
+      publicKey: Uint8Array | null;
     }>;
     signMessageAsync?: () => Promise<string>;
     getCosmosOfflineSigner?: (chainId: string) => Promise<any>;
@@ -144,6 +125,7 @@ export class OnboardingOrchestrator {
           hasLocalDydxWallet,
           blockedGeo,
           getWalletFromSignature,
+          signMessageAsync,
         });
       }
 
@@ -180,6 +162,7 @@ export class OnboardingOrchestrator {
           hasLocalDydxWallet,
           blockedGeo,
           getWalletFromSignature,
+          signMessageAsync,
         });
       }
 
@@ -206,23 +189,24 @@ export class OnboardingOrchestrator {
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;
-      privateKey: Uint8Array;
-      publicKey: Uint8Array;
+      privateKey: Uint8Array | null;
+      publicKey: Uint8Array | null;
     }>;
+    signMessageAsync?: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
-    const { sourceAccount, hasLocalDydxWallet, blockedGeo, getWalletFromSignature } = params;
+    const { hasLocalDydxWallet, blockedGeo, getWalletFromSignature, signMessageAsync } = params;
 
-    // If wallet already exists, just set state
+    // If wallet already exists (restored from SecureStorage), just set state
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
       };
     }
 
-    // If we have encrypted signature and not geo-blocked, derive wallet
-    if (sourceAccount.encryptedSignature && !blockedGeo) {
+    // If not geo-blocked, derive wallet from signature
+    if (!blockedGeo && signMessageAsync) {
       try {
-        const signature = this.decryptSignature(sourceAccount.encryptedSignature);
+        const signature = await signMessageAsync();
         const { wallet, hdKey } = await this.deriveWalletFromSignature(
           signature,
           getWalletFromSignature
@@ -234,16 +218,15 @@ export class OnboardingOrchestrator {
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'Turnkey signature decryption failed', { error });
+        logBonsaiError('OnboardingOrchestrator', 'Turnkey signing failed', { error });
         return {
           onboardingState: OnboardingState.Disconnected,
-          error: 'Failed to decrypt Turnkey signature',
-          shouldClearSignature: true,
+          error: 'Failed to sign with Turnkey',
         };
       }
     }
 
-    // No wallet and no signature - disconnected
+    // No wallet and geo-blocked or can't sign - disconnected
     return {
       onboardingState: OnboardingState.Disconnected,
     };
@@ -324,10 +307,17 @@ export class OnboardingOrchestrator {
       getWalletFromSignature,
     } = params;
 
-    // If wallet already exists, just set state
+    // If wallet already exists (restored from SecureStorage), just set state
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
+      };
+    }
+
+    // If geo-blocked, stay in WalletConnected state
+    if (blockedGeo) {
+      return {
+        onboardingState: OnboardingState.WalletConnected,
       };
     }
 
@@ -352,35 +342,11 @@ export class OnboardingOrchestrator {
         return {
           onboardingState: OnboardingState.WalletConnected,
           error: 'Failed to sign with Privy',
-          shouldClearSignature: true,
         };
       }
     }
 
-    // Other EVM wallets - use encrypted signature
-    if (sourceAccount.encryptedSignature && !blockedGeo) {
-      try {
-        const signature = this.decryptSignature(sourceAccount.encryptedSignature);
-        const { wallet, hdKey } = await this.deriveWalletFromSignature(
-          signature,
-          getWalletFromSignature
-        );
-
-        return {
-          wallet,
-          hdKey,
-          onboardingState: OnboardingState.AccountConnected,
-        };
-      } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'EVM signature decryption failed', { error });
-        return {
-          onboardingState: OnboardingState.WalletConnected,
-          error: 'Failed to decrypt signature',
-          shouldClearSignature: true,
-        };
-      }
-    }
-
+    // Other EVM wallets - need to trigger signing flow in UI
     // Wallet connected but waiting for signature
     return {
       onboardingState: OnboardingState.WalletConnected,
@@ -395,20 +361,28 @@ export class OnboardingOrchestrator {
     hasLocalDydxWallet: boolean;
     blockedGeo: boolean;
     getWalletFromSignature: any;
+    signMessageAsync?: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
-    const { sourceAccount, hasLocalDydxWallet, blockedGeo, getWalletFromSignature } = params;
+    const { hasLocalDydxWallet, blockedGeo, getWalletFromSignature, signMessageAsync } = params;
 
-    // If wallet already exists, just set state
+    // If wallet already exists (restored from SecureStorage), just set state
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
       };
     }
 
-    // Derive from encrypted signature
-    if (sourceAccount.encryptedSignature && !blockedGeo) {
+    // If geo-blocked, stay in WalletConnected state
+    if (blockedGeo) {
+      return {
+        onboardingState: OnboardingState.WalletConnected,
+      };
+    }
+
+    // Derive from signature if available
+    if (signMessageAsync) {
       try {
-        const signature = this.decryptSignature(sourceAccount.encryptedSignature);
+        const signature = await signMessageAsync();
         const { wallet, hdKey } = await this.deriveWalletFromSignature(
           signature,
           getWalletFromSignature
@@ -420,11 +394,10 @@ export class OnboardingOrchestrator {
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
-        logBonsaiError('OnboardingOrchestrator', 'Solana signature decryption failed', { error });
+        logBonsaiError('OnboardingOrchestrator', 'Solana signing failed', { error });
         return {
           onboardingState: OnboardingState.WalletConnected,
-          error: 'Failed to decrypt signature',
-          shouldClearSignature: true,
+          error: 'Failed to sign with Solana wallet',
         };
       }
     }

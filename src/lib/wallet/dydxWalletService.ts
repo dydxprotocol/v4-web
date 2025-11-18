@@ -131,10 +131,13 @@ export class DydxWalletService {
    * This is the existing flow for connected wallets
    *
    * @param signature - Signature from source wallet
-   * @param persist - Whether to store encrypted signature
+   * @param persist - Whether to persist the derived mnemonic for future sessions
    * @returns Wallet creation result with dYdX address
    */
-  async deriveFromSignature(signature: string): Promise<WalletCreationResult> {
+  async deriveFromSignature(
+    signature: string,
+    persist: boolean = true
+  ): Promise<WalletCreationResult> {
     try {
       // Derive HD key from signature
       const { mnemonic, privateKey, publicKey } =
@@ -151,14 +154,18 @@ export class DydxWalletService {
         };
       }
 
-      // Note: We don't persist signature-derived wallets to secure storage
-      // They remain in memory only, tied to the source wallet session
+      // Persist derived mnemonic to secure storage
+      // This replaces the old encrypted signature approach with more secure Web Crypto API
+      if (persist) {
+        await secureStorage.store(MNEMONIC_STORAGE_KEY, mnemonic);
+      }
 
       // Update app state
       await this.setWalletInState(wallet, mnemonic, privateKey, publicKey);
 
       logBonsaiInfo('DydxWalletService', 'deriveFromSignature', {
         address: wallet.address,
+        persisted: persist,
       });
 
       return {
