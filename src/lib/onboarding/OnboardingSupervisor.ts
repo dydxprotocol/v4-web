@@ -72,6 +72,48 @@ class OnboardingSupervisor {
   }
 
   /**
+   * Restore wallet from SecureStorage if available
+   * Called at the start of handleWalletConnection to check for persisted session
+   */
+  private async restoreFromSecureStorage(): Promise<WalletDerivationResult | null> {
+    try {
+      const storedMnemonic = await dydxWalletService.exportMnemonic();
+
+      if (!storedMnemonic) {
+        return null;
+      }
+
+      // Derive wallet from stored mnemonic
+      const { onboarding, BECH32_PREFIX } = await import('@dydxprotocol/v4-client-js');
+      const { privateKey, publicKey } = onboarding.deriveHDKeyFromMnemonic(storedMnemonic);
+
+      if (!privateKey || !publicKey) {
+        return null;
+      }
+
+      const LocalWallet = await getLazyLocalWallet();
+      const wallet = await LocalWallet.fromMnemonic(storedMnemonic, BECH32_PREFIX);
+
+      const hdKey: PrivateInformation = {
+        mnemonic: storedMnemonic,
+        privateKey,
+        publicKey,
+      };
+
+      hdKeyManager.setHdkey(wallet.address, hdKey);
+
+      return {
+        wallet,
+        hdKey,
+        onboardingState: OnboardingState.AccountConnected,
+      };
+    } catch (error) {
+      logBonsaiError('OnboardingSupervisor', 'Failed to restore from SecureStorage', { error });
+      return null;
+    }
+  }
+
+  /**
    * Handles all wallet type flows and determines next onboarding state
    */
   async handleWalletConnection(params: {
@@ -97,6 +139,15 @@ class OnboardingSupervisor {
       context;
 
     try {
+      // ------ Restore from SecureStorage ------ //
+      // Check for persisted session before processing wallet connections
+      if (!hasLocalDydxWallet && !blockedGeo) {
+        const restored = await this.restoreFromSecureStorage();
+        if (restored) {
+          return restored;
+        }
+      }
+
       // ------ Turnkey Flow ------ //
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
         return await this.handleTurnkeyFlow({

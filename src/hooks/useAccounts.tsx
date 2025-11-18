@@ -67,6 +67,7 @@ const useAccountsContext = () => {
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
 
   useEffect(() => {
+    return;
     const { address } = sourceAccount;
     // wallet accounts switched
     if (previousAddress && address !== previousAddress) {
@@ -226,7 +227,11 @@ const useAccountsContext = () => {
   }, [blockedGeo]);
 
   // Disconnect wallet / accounts
-  const disconnectLocalDydxWallet = () => {
+  const disconnectLocalDydxWallet = async () => {
+    // Clear persisted mnemonic from SecureStorage
+    const { dydxWalletService } = await import('@/lib/wallet/dydxWalletService');
+    dydxWalletService.clearStoredWallet();
+
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
