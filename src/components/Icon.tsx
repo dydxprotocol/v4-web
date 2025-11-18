@@ -142,6 +142,7 @@ import {
 } from '@/icons';
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { LogoShortIcon } from '@/icons/logo-short';
+import SignalIcon from '@/icons/signal.svg';
 import UsdcIcon from '@/icons/usdc.svg';
 
 import { calc } from '@/lib/do';
@@ -257,6 +258,7 @@ export enum IconName {
   Shield = 'Shield',
   ShieldStroke = 'ShieldStroke',
   Show = 'Show',
+  Signal = 'Signal',
   Sparkles = 'Sparkles',
   SpeechBubble = 'SpeechBubble',
   SocialLogin = 'SocialLogin',
@@ -398,6 +400,7 @@ const icons = {
   [IconName.Settings]: SettingsIcon,
   [IconName.Share]: ShareIcon,
   [IconName.Shield]: ShieldIcon,
+  [IconName.Signal]: SignalIcon,
   [IconName.ShieldStroke]: ShieldStrokeIcon,
   [IconName.Show]: ShowIcon,
   [IconName.Sparkles]: SparklesIcon,
