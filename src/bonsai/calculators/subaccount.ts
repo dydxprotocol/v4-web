@@ -35,10 +35,7 @@ import {
   SubaccountSummaryDerived,
 } from '../types/summaryTypes';
 import { getPositionUniqueId } from './helpers';
-import {
-  calculateEffectiveSelectedLeverageBigNumber,
-  getMarketEffectiveInitialMarginForMarket,
-} from './markets';
+import { getMarketEffectiveInitialMarginForMarket } from './markets';
 
 export function calculateParentSubaccountPositions(
   parent: ParentSubaccountDataBase,
@@ -235,10 +232,7 @@ export function calculateEffectiveMarketImfFromSelectedLeverage({
   initialMarginFraction: BigNumber | undefined;
   effectiveInitialMarginFraction: BigNumber | undefined;
 }) {
-  const effectiveSelectedLeverage = calculateEffectiveSelectedLeverageBigNumber({
-    userSelectedLeverage: rawSelectedLeverage,
-    initialMarginFraction,
-  });
+  const effectiveSelectedLeverage = BigNumber(25);
   const imfFromSelectedLeverage = BIG_NUMBERS.ONE.div(effectiveSelectedLeverage);
   const adjustedImfFromSelectedLeverage = BigNumber.max(
     imfFromSelectedLeverage,
@@ -318,7 +312,7 @@ function calculatePositionDerivedExtra(
     initialRiskFromSelectedLeverage,
   } = position;
 
-  const leverage = equity.gt(0) ? notional.div(equity) : null;
+  const leverage = BigNumber(25);
 
   const marginValueMaintenance = marginMode === 'ISOLATED' ? equity : maintenanceRisk;
   const marginValueInitial = marginMode === 'ISOLATED' ? equity : initialRisk;

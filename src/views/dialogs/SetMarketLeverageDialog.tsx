@@ -48,8 +48,13 @@ export const SetMarketLeverageDialog = ({
     BonsaiHelpers.markets.selectMarketSummaryById,
     marketId
   );
-  const { assetId, initialMarginFraction, effectiveInitialMarginFraction, displayableTicker } =
-    orEmptyObj(marketData);
+  const {
+    clobPairId,
+    assetId,
+    initialMarginFraction,
+    effectiveInitialMarginFraction,
+    displayableTicker,
+  } = orEmptyObj(marketData);
 
   const logoUrl = useAppSelectorWithArgs(BonsaiHelpers.assets.selectAssetLogo, assetId);
 
@@ -163,6 +168,10 @@ export const SetMarketLeverageDialog = ({
         throw new Error(stringGetter({ key: STRING_KEYS.INVALID_LEVERAGE_VALUE }));
       }
 
+      if (clobPairId === undefined) {
+        throw new Error("clobPairId doesn't exist");
+      }
+
       // TODO: This is currently a dummy transaction that just saves to local state.
       // When this becomes a real chain transaction, it should return an OperationResult
       // and the error handling pattern below will work correctly.
@@ -170,6 +179,7 @@ export const SetMarketLeverageDialog = ({
       const result = await saveMarketLeverage({
         dispatch,
         marketId,
+        clobPairId,
         leverage: leverageBN.toNumber(),
         subaccountInfo,
       });

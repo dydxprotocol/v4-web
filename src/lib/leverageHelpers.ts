@@ -11,11 +11,13 @@ import { parseToPrimitives } from './parseToPrimitives';
 export async function saveMarketLeverage({
   dispatch,
   marketId,
+  clobPairId,
   leverage,
   subaccountInfo,
 }: {
   dispatch: Dispatch;
   marketId: string;
+  clobPairId: string;
   leverage: number;
   subaccountInfo: SubaccountInfo;
 }): Promise<OperationResult<void>> {
@@ -38,7 +40,7 @@ export async function saveMarketLeverage({
     subaccountInfo.address,
     [
       {
-        clorPairId: marketId,
+        clobPairId: Number(clobPairId),
         customImfPpm: 1000000 / leverage,
       },
     ]
