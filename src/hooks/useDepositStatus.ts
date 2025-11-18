@@ -1,3 +1,4 @@
+import { logBonsaiError } from '@/bonsai/logs';
 import { selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 
@@ -7,7 +8,6 @@ import { useAppSelector } from '@/state/appTypes';
 
 import { useAccounts } from './useAccounts';
 import { useDepositAddress } from './useDepositAddress';
-import { logBonsaiError } from '@/bonsai/logs';
 
 export type DepositStatusResponse = {
   address: string;
