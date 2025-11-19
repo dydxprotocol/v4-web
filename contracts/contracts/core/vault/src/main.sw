@@ -65,8 +65,8 @@ const MAX_LEVERAGE: u256 = 1_000_000_000; // 100_000x
 const MAX_FEE_BASIS_POINTS: u64 = 500; // 5%
 const DEFAULT_LIQUIDATION_FEE: u256 = 5; // 5 USDC (without decimals)
 const MAX_LIQUIDATION_FEE: u256 = 5; // 100 USDC (without decimals)
-const LP_ASSET_NAME: str[18] = __to_str_array("StarBoard LP Token");
-const LP_ASSET_SYMBOL: str[4] = __to_str_array("SBLP");
+const LP_ASSET_NAME: str[11] = __to_str_array("StarBoardLP");
+const LP_ASSET_SYMBOL: str[3] = __to_str_array("SLP");
 
 configurable {
     /// The stable asset used for collateral in short positions
