@@ -51,19 +51,21 @@ const SpotPage = () => {
   useCurrentSpotToken();
 
   const holdings: SpotPositionItem[] = useMemo(() => {
-    return walletPositions.map((position) => ({
-      tokenAddress: position.tokenMint,
-      tokenName: position.tokenData.tokenNameFull,
-      tokenSymbol: position.tokenData.symbol,
-      tokenImage: position.tokenData.image,
-      holdingsAmount: position.currentBalance,
-      holdingsUsd: position.unrealizedValueUsd,
-      boughtAmount: position.totalBought,
-      boughtUsd: position.totalBoughtUsd,
-      soldAmount: position.totalSold,
-      soldUsd: position.totalSoldUsd,
-      pnlUsd: position.totalPnL,
-    }));
+    return walletPositions
+      .filter((position) => position.unrealizedValueUsd > 0.5)
+      .map((position) => ({
+        tokenAddress: position.tokenMint,
+        tokenName: position.tokenData.tokenNameFull,
+        tokenSymbol: position.tokenData.symbol,
+        tokenImage: position.tokenData.image,
+        holdingsAmount: position.currentBalance,
+        holdingsUsd: position.unrealizedValueUsd,
+        boughtAmount: position.totalBought,
+        boughtUsd: position.totalBoughtUsd,
+        soldAmount: position.totalSold,
+        soldUsd: position.totalSoldUsd,
+        pnlUsd: position.totalPnL,
+      }));
   }, [walletPositions]);
 
   const currentTokenData = useMemo<SpotHeaderToken | null>(() => {
