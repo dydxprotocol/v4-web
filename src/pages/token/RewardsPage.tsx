@@ -146,10 +146,15 @@ export default RewardsPage;
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
+  background-color: var(--color-layer-0);
 `;
 
-const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;
+const $DetachedSection = tw(
+  DetachedSection
+)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen bg-color-layer-0`;
 
 const $Tabs = styled(Tabs)`
-  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+  --trigger-backgroundColor: transparent;
+  --trigger-active-underline-backgroundColor: var(--color-layer-0);
+  background-color: var(--color-layer-0);
 ` as typeof Tabs;

@@ -1,7 +1,5 @@
 import { useCallback, useEffect } from 'react';
 
-import { useWallets } from '@privy-io/react-auth';
-
 import { LocalStorageKey } from '@/constants/localStorage';
 import { AVAILABLE_ENVIRONMENTS, DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
 
@@ -24,9 +22,6 @@ export const useSelectedNetwork = (): {
   const selectedNetwork = useAppSelector(getSelectedNetwork);
   const chainId = useEnvConfig('ethereumChainId');
 
-  const { wallets } = useWallets();
-  const privyWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-
   const [, setLocalStorageNetwork] = useLocalStorage<DydxNetwork>({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
@@ -39,8 +34,8 @@ export const useSelectedNetwork = (): {
 
       setLocalStorageNetwork(network);
       dispatch(setSelectedNetwork(network));
-      privyWallet?.switchChain(Number(chainId));
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, disconnect, setLocalStorageNetwork, chainId]
   );
 

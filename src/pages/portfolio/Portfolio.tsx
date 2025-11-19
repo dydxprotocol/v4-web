@@ -284,7 +284,7 @@ const PortfolioPage = () => {
                   tw="flex-1"
                   onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                 >
-                  <Icon iconName={IconName.Plus} size="0.75rem" />
+                  <Icon iconName={IconName.Deposit2} size="0.9rem" />
                   {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                 </Button>
               )}
@@ -308,7 +308,7 @@ const PortfolioPage = () => {
                     shape={ButtonShape.Square}
                   >
                     <span className="sr-only">{stringGetter({ key: STRING_KEYS.TRANSFER })}</span>
-                    <Icon iconName={IconName.Transfer} />
+                    <Icon iconName={IconName.Send} />
                   </Button>
                 )}
             </$Footer>

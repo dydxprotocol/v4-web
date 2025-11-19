@@ -93,10 +93,10 @@ export const popoverMixins = {
     --popover-margin: 0;
     --popover-width: auto;
     --popover-radius: 0.5em;
-    /* --popover-backgroundColor: ; */
+    --popover-backgroundColor: var(--color-layer-2);
     /* --popover-textColor: ; */
-    /* --popover-shadow-color: ; */
-    --popover-shadow-size: 0;
+    --popover-shadow-color: #00000011;
+    --popover-shadow-size: 3px;
     --popover-backdrop-filter: saturate(120%) blur(6px);
     --popover-origin: var(--radix-popper-transform-origin);
     --popover-border: none;

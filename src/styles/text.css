@@ -1,7 +1,7 @@
 /* Constants */
 
 :root {
-  --fontFamily-base: 'Instrument Sans', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fontFamily-base: 'Poppins', system-ui, -apple-system, Helvetica, Arial, sans-serif;
   --fontFamily-monospace: 'Roboto Mono', Courier, monospace, var(--fontFamily-base);
 
   --fontWeight-base-0: 400;

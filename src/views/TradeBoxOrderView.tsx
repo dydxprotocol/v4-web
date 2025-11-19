@@ -70,7 +70,9 @@ const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
 
 const $OrderTypeTabs = styled(Tabs)`
   --tabs-height: 2.125rem;
-  --trigger-active-backgroundColor: var(--color-layer-1) !important;
+  --trigger-active-backgroundColor: var(--transparent);
+  --trigger-backgroundColor: var(--color-layer-1);
+  background-color: var(--color-layer-1);
 
   > * > header > div {
     width: 100%;

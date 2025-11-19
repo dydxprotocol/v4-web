@@ -131,6 +131,7 @@ export const RewardsLeaderboardPanel = () => {
 const $Panel = styled(Panel)`
   --panel-content-paddingY: 1.5rem;
   --panel-content-paddingX: 1.5rem;
+  background-color: var(--color-layer-1);
 `;
 
 const $Table = styled(Table)`

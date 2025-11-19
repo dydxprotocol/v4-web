@@ -1,28 +1,26 @@
-import LogoDark from '@/icons/logos/logo-mark-dark.svg';
-import LogoLight from '@/icons/logos/logo-mark-light.svg';
-
-import { useAppSelector } from '@/state/appTypes';
-import { AppTheme, AppThemeSetting } from '@/state/appUiConfigs';
-import { getAppThemeSetting } from '@/state/appUiConfigsSelectors';
+import Logo from '@/icons/logos/logo.png';
 
 export const LogoShortIcon: React.FC<{ id?: string; width?: number; height?: number }> = ({
   id,
-  width,
-  height,
+  width = 179,
+  height = 204,
 }: {
   id?: string;
   width?: number;
   height?: number;
 }) => {
-  const themeSetting: AppThemeSetting = useAppSelector(getAppThemeSetting);
-  const isDark = themeSetting === AppTheme.Dark;
   return (
     <div
       id={id}
-      className="ml-1 flex h-auto w-full flex-row items-start justify-center overflow-hidden object-center"
-      style={{ width, height }}
+      className="ml-1 flex aspect-square h-auto w-full flex-row items-start justify-center overflow-hidden object-center"
     >
-      {!isDark ? <LogoDark /> : <LogoLight />}
+      <img
+        src={Logo}
+        alt="Bonk"
+        width={width}
+        height={height}
+        className="h-full w-auto object-contain"
+      />
     </div>
   );
 };

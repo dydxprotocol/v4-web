@@ -373,8 +373,16 @@ const $Toolbar = styled(Toolbar)`
 
 const $Table = styled(Table)`
   ${defaultTableMixins}
+  border-radius: 0.75rem;
+
   tbody {
     --tableCell-padding: 1rem 0;
+  }
+
+  tr {
+    border-top: 1px solid var(--color-layer-2);
+    border-bottom: 1px solid var(--color-layer-2);
+    border-radius: 0.625rem;
   }
 
   @media ${breakpoints.tablet} {

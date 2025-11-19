@@ -8,10 +8,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-// import { StatsigFlags } from '@/constants/statsig';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
-// import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -47,7 +45,6 @@ export const HeaderDesktop = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
 
-  // const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
@@ -75,11 +72,11 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
         },
-        // {
-        //   value: 'VAULT',
-        //   label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
-        //   href: AppRoute.Vault,
-        // },
+        {
+          value: 'VAULT',
+          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
+          href: AppRoute.Vault,
+        },
         {
           value: 'REWARDS',
           label: stringGetter({ key: STRING_KEYS.REWARDS }),

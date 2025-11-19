@@ -219,6 +219,7 @@ const $TradeLayoutMobile = styled.article`
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+  gap: 0.5rem;
 `;
 
 const $CoverUpTradingView = styled.div`

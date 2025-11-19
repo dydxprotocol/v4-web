@@ -95,7 +95,7 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-1);
       --button-backgroundColor: var(--color-layer-5);
-      --button-border: solid var(--border-width) var(--color-border);
+      --button-border: none;
     `,
     [ButtonStyle.WithoutBackground]: css`
       --button-textColor: var(--color-text-1);
@@ -124,7 +124,7 @@ const buttonActionVariants = {
       --button-textColor: var(--color-text-button);
       --button-backgroundColor: var(--color-accent);
       --button-border: none;
-      --button-hover-filter: none;
+      --button-hover-filter: brightness(var(--hover-filter-variant));
       font-weight: 600;
     `,
     [ButtonStyle.WithoutBackground]: css`
@@ -153,7 +153,7 @@ const buttonActionVariants = {
     [ButtonStyle.Default]: css`
       --button-textColor: var(--color-text-1);
       --button-backgroundColor: var(--color-layer-3);
-      --button-border: solid var(--border-width) var(--color-border);
+      --button-border: none;
     `,
     [ButtonStyle.WithoutBackground]: css`
       --button-textColor: var(--color-text-0);

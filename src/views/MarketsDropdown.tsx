@@ -479,22 +479,34 @@ const $ScrollArea = styled.div`
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
   --table-header-height: 2.25rem;
-  --tableRow-backgroundColor: var(--color-layer-0);
+  --tableRow-backgroundColor: var(--color-layer-1);
+  --tableRow-border-top: solid 2px var(--color-layer-2);
+  --tableRow-border-bottom: solid 2px var(--color-layer-2);
+  --tableRow-border-radius: 0.625rem;
+  border-radius: 0.625rem;
 
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
+    --stickyArea-border-top: solid 1px var(--color-layer-0);
+    --stickyArea-border-top-radius: 0.625rem;
     background-color: var(--color-layer-0);
 
     tr {
       height: var(--stickyArea-topHeight);
+      border-top-left-radius: 0.625rem;
+      border-top-right-radius: 0.625rem;
+      border-top: 1px solid var(--color-layer-2);
+      border-bottom: 1px solid var(--color-layer-2);
+      --stickyArea-border-top: var(--tableRow-border-top);
+      --stickyArea-border-bottom: var(--tableRow-border-bottom);
     }
   }
 
   tfoot {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 3px;
-    background-color: var(--color-layer-0);
+    background-color: var(--color-layer-1);
 
     tr {
       height: var(--stickyArea-bottomHeight);

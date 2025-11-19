@@ -14,8 +14,6 @@ import { Switch } from '@/components/Switch';
 import { MarketsStats } from '@/views/MarketsStats';
 import { MarketsTable } from '@/views/tables/MarketsTable';
 
-// import { MarketsBanners } from './MarketsBanners';
-
 const Markets = () => {
   const stringGetter = useStringGetter();
   const [showHighlights, setShowHighlights] = useState(true);
@@ -26,7 +24,6 @@ const Markets = () => {
   return (
     <$Page>
       <$HeaderSection>
-        {/* <MarketsBanners marketsTableRef={marketsTableRef} /> */}
         <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
 

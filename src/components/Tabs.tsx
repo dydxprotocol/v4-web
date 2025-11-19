@@ -178,7 +178,7 @@ const $Root = styled(Root)<{
   --trigger-backgroundColor: var(--color-layer-1);
   --trigger-textColor: var(--color-text-0);
 
-  --trigger-active-backgroundColor: var(--color-layer-1) !important;
+  --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
   --trigger-hover-textColor: var(--trigger-active-textColor);
   --trigger-active-underlineColor: var(--color-accent);

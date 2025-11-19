@@ -74,13 +74,13 @@ export const AccountInfoSection = () => {
 
   const depositButton = (
     <Button
-      tw="flex-1"
       onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
-      shape={ButtonShape.Rectangle}
-      size={ButtonSize.Small}
-      action={ButtonAction.Primary}
+      shape={ButtonShape.Square}
+      size={ButtonSize.XSmall}
+      action={ButtonAction.SimplePrimary}
     >
-      <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
+      <span tw="sr-only">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
+      <Icon size="1rem" iconName={IconName.Deposit2} />
     </Button>
   );
 
@@ -88,9 +88,10 @@ export const AccountInfoSection = () => {
     <Button
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Square}
-      size={ButtonSize.Small}
+      size={ButtonSize.XSmall}
       action={ButtonAction.Base}
     >
+      <span tw="sr-only">{stringGetter({ key: STRING_KEYS.WITHDRAW })}</span>
       <Icon size="1rem" iconName={IconName.Withdraw} />
     </Button>
   );
@@ -100,7 +101,7 @@ export const AccountInfoSection = () => {
       tw="flex-1"
       onClick={() => dispatch(openDialog(DialogTypes.Withdraw2({})))}
       shape={ButtonShape.Rectangle}
-      size={ButtonSize.Small}
+      size={ButtonSize.XXSmall}
       action={ButtonAction.Base}
     >
       <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.WITHDRAW })}</span>
@@ -109,7 +110,8 @@ export const AccountInfoSection = () => {
   );
 
   const depositWithdrawRow = dydxAccounts && (
-    <div tw="inlineRow gap-0.75 pt-0.25">
+    <div tw="inlineRow gap-0.5 pb-0.5">
+      <h2 tw="flex-1 font-small-bold">{stringGetter({ key: STRING_KEYS.YOUR_ACCOUNT })}</h2>
       {complianceState === ComplianceStates.FULL_ACCESS ? (
         <>
           {depositButton}
@@ -188,10 +190,10 @@ export const AccountInfoSection = () => {
 
   return (
     <$Container>
+      {depositWithdrawRow}
       <$StackContainer $isTablet={isTablet}>
         <$Details items={detailItems} layout="column" withOverflow={false} isLoading={isLoading} />
       </$StackContainer>
-      {depositWithdrawRow}
     </$Container>
   );
 };
@@ -215,6 +217,8 @@ const $Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 1rem 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-layer-1);
 `;
 
 const $StackContainer = styled.div<{ $isTablet: boolean }>`

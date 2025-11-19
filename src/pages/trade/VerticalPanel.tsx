@@ -96,5 +96,8 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
 };
 
 const $Tabs = styled(Tabs)`
-  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+  --trigger-active-underline-backgroundColor: var(--color-layer-1);
+  --tabs-content-backgroundColor: var(--color-layer-1);
+  background-color: var(--color-layer-1);
+  --stickyArea0-background: var(--color-layer-1);
 ` as typeof Tabs;

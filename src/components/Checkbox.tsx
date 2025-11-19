@@ -45,7 +45,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 );
 const $Root = styled(Root)`
   --checkbox-backgroundColor: var(--color-layer-0);
-  --checkbox-borderColor: var(--color-border);
+  --checkbox-borderColor: var(--color-layer-3);
 
   min-width: 1.25rem;
   height: 1.25rem;

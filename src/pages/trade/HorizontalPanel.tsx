@@ -16,7 +16,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { MobileTabs } from '@/components/Tabs';
-import { Tag, TagType } from '@/components/Tag';
+import { Tag, TagSize, TagType } from '@/components/Tag';
 import {
   FundingPaymentsTable,
   FundingPaymentsTableColumnKey,
@@ -191,7 +191,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
           <LoadingSpinner tw="[--spinner-width:1rem]" />
         ) : (
           ordersTagNumber && (
-            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+            <Tag type={TagType.Number} size={TagSize.Small} isHighlighted={hasUnseenOrderUpdates}>
               {ordersTagNumber}
             </Tag>
           )
@@ -248,7 +248,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
       ) : (
         orderHistoryTagNumber &&
         numUnseenOrderHistory > 0 && (
-          <Tag type={TagType.Number} isHighlighted={numUnseenOrderHistory > 0}>
+          <Tag type={TagType.Number} size={TagSize.Small} isHighlighted={numUnseenOrderHistory > 0}>
             {orderHistoryTagNumber}
           </Tag>
         )
@@ -301,7 +301,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
         <LoadingSpinner tw="[--spinner-width:1rem]" />
       ) : (
         fillsTagNumber && (
-          <Tag type={TagType.Number} isHighlighted={hasUnseenFillUpdates}>
+          <Tag type={TagType.Number} size={TagSize.Small} isHighlighted={hasUnseenFillUpdates}>
             {fillsTagNumber}
           </Tag>
         )
@@ -438,10 +438,12 @@ const $DragHandle = styled.div`
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
   background-color: var(--color-layer-0);
-  * {
+  header,
+  header button {
     background-color: var(--color-layer-0);
   }
-  header {
+
+  > div * {
     background-color: var(--color-layer-0);
   }
 

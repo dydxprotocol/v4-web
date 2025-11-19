@@ -519,12 +519,11 @@ const $Balances = styled.div`
   ${layoutMixins.flexColumn}
   > div {
     ${layoutMixins.spacedRow}
-    box-shadow: 0 0 0 1px var(--color-border);
 
     gap: 0.5rem;
     padding: 0.625rem 1rem;
 
-    background-color: var(--color-layer-4);
+    background-color: var(--color-layer-3);
 
     &:first-child {
       border-radius: 0.5rem 0.5rem 0 0;

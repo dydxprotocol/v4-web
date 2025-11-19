@@ -54,7 +54,7 @@ const $Search = styled.div`
   width: auto;
   overflow: hidden;
   height: 2.5rem;
-  background-color: var(--color-layer-5);
+  background-color: var(--color-layer-3);
   color: ${({ theme }) => theme.textTertiary};
   border-radius: 2.5rem;
   border: solid var(--border-width) var(--color-layer-6);

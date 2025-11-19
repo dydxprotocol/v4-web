@@ -89,7 +89,11 @@ export const MarketFilter = forwardRef(
                   fallback: value,
                 })
               ),
-              slotAfter: isNew && <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>,
+              slotAfter: isNew && (
+                <NewTag tw="ml-px px-0.25 py-0 font-tiny-book">
+                  {stringGetter({ key: STRING_KEYS.NEW })}
+                </NewTag>
+              ),
               value,
             };
           }) satisfies MenuItem<MarketFilters>[]
@@ -125,7 +129,7 @@ const $MarketFilter = styled.div<{ $compactLayout: boolean }>`
   overflow: hidden;
 
   button {
-    --button-toggle-off-border: none;
+    --button-toggle-off-border: 1px solid var(--color-layer-6);
     --button-toggle-off-backgroundColor: transparent;
   }
 
@@ -145,4 +149,5 @@ const $ToggleGroup = styled(ToggleGroup)`
 const $SearchInput = styled(SearchInput)`
   min-width: 12rem;
   flex-grow: 1;
+  background-color: var(--color-layer-2);
 `;

@@ -28,13 +28,14 @@ export const Tag = styled.span<StyleProps>`
   font-family: var(--fontFamily-base);
   font-weight: var(--fontWeight-book);
   display: inline-flex;
+  min-width: 1.05rem;
+  justify-content: center;
 
   background-color: var(--color-layer-6);
   border-radius: 0.25rem;
 
   color: var(--color-text-2);
-  letter-spacing: 0.04em;
-  line-height: 1.3;
+  line-height: 1;
 
   ${({ type, size }) =>
     ({
@@ -77,7 +78,7 @@ export const Tag = styled.span<StyleProps>`
     isHighlighted &&
     css`
       background-color: var(--color-accent);
-      color: var(--color-text-button);
+      color: var(--color-text-2);
     `}
 `;
 
