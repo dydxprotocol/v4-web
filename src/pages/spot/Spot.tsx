@@ -20,6 +20,8 @@ import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
+import { mapIfPresent } from '@/lib/do';
+
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
 import { SpotHorizontalPanel } from './SpotHorizontalPanel';
@@ -83,11 +85,11 @@ const SpotPage = () => {
       totalSupply: +tokenMetadata.totalSupply,
       volume24hUsd: tokenMetadata.volumeUSD,
       holders: tokenMetadata.holders,
-      top10HoldersPercent: tokenMetadata.top10HoldersPercent,
-      devHoldingPercent: tokenMetadata.devHoldingPercent,
-      snipersPercent: tokenMetadata.snipersPercent,
-      bundlersPercent: tokenMetadata.bundlersPercent,
-      insidersPercent: tokenMetadata.insidersPercent,
+      top10HoldersPercent: mapIfPresent(tokenMetadata.top10HoldersPercent, (v) => v / 100),
+      devHoldingPercent: mapIfPresent(tokenMetadata.devHoldingPercent, (v) => v / 100),
+      snipersPercent: mapIfPresent(tokenMetadata.snipersPercent, (v) => v / 100),
+      bundlersPercent: mapIfPresent(tokenMetadata.bundlersPercent, (v) => v / 100),
+      insidersPercent: mapIfPresent(tokenMetadata.insidersPercent, (v) => v / 100),
     };
   }, [tokenMetadata, tokenPrice]);
 
@@ -145,37 +147,41 @@ const SpotPage = () => {
               key: 'holders',
               iconName: IconName.UserGroup,
               label: 'Holders',
-              value: <Output type={OutputType.CompactNumber} value={null} />,
+              value: <Output type={OutputType.CompactNumber} value={currentTokenData.holders} />,
             },
             {
               key: 'top10',
               iconName: IconName.User2,
               label: 'Top 10',
-              value: <Output type={OutputType.Percent} value={null} />,
+              value: (
+                <Output type={OutputType.Percent} value={currentTokenData.top10HoldersPercent} />
+              ),
             },
             {
               key: 'devHolding',
               iconName: IconName.ChefHat,
               label: 'Dev Holding',
-              value: <Output type={OutputType.Percent} value={null} />,
+              value: (
+                <Output type={OutputType.Percent} value={currentTokenData.devHoldingPercent} />
+              ),
             },
             {
               key: 'snipers',
               iconName: IconName.Scope,
               label: 'Snipers',
-              value: <Output type={OutputType.Percent} value={null} />,
+              value: <Output type={OutputType.Percent} value={currentTokenData.snipersPercent} />,
             },
             {
               key: 'bundlers',
               iconName: IconName.Ghost,
               label: 'Bundlers',
-              value: <Output type={OutputType.Percent} value={null} />,
+              value: <Output type={OutputType.Percent} value={currentTokenData.bundlersPercent} />,
             },
             {
               key: 'insiders',
               iconName: IconName.Warning,
               label: 'Insiders',
-              value: <Output type={OutputType.Percent} value={null} />,
+              value: <Output type={OutputType.Percent} value={currentTokenData.insidersPercent} />,
             },
           ]}
         />

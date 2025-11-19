@@ -3,9 +3,9 @@ import { type ReactNode } from 'react';
 import { ButtonSize, ButtonStyle } from '@/constants/buttons';
 
 import { CopyButton } from '@/components/CopyButton';
-import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { InfoGrid } from '@/components/InfoGrid';
 import { Output, OutputType } from '@/components/Output';
 
 import { truncateAddress } from '@/lib/wallet';
@@ -58,19 +58,17 @@ export const SpotTokenInfo = ({
         </div>
       </div>
 
-      <Details
+      <InfoGrid
         items={items.map((item) => ({
           key: item.key,
           label: (
-            <span tw="row items-center gap-0.25 text-color-text-0 font-mini-book">
+            <span tw="row gap-0.25">
               {item.iconName && <Icon iconName={item.iconName} size="1rem" />}
               {item.label}
             </span>
           ),
-          value: <span tw="font-base-bold">{item.value}</span>,
+          value: item.value,
         }))}
-        layout="grid"
-        tw="gap-[0.5rem] [--details-grid-numColumns:3]"
       />
 
       <div tw="spacedRow">
