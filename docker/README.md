@@ -117,6 +117,17 @@ WARNING. Using valuable private keys in this way is not safe.
 docker exec -t -e PRIV_K=USER_PRIVATE_KEY --env-file .env starboard_indexer_processor bash -i -c "pnpm --filter starboard/contracts faucet --url=http://starboard_fuel_core:4000/v1/graphql --privK=\${PRIV_K} --token=\${USDC_ADDRESS}"
 ```
 
+In order to get real prices from the pyth oracle and put them in the contract run the following command.
+Fill `USER_PRIVATE_KEY`, the user related to this private key receives tokens.
+It is required to send a transaction.
+This is one time update, not in a loop.
+There is preset list of supported assets.
+WARNING. Using valuable private keys in this way is not safe.
+
+```shell
+docker exec -t -e PRIV_K=0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a --env-file .env starboard_indexer_processor bash -i -c "pnpm --filter starboard/contracts prices:feed --url=http://starboard_fuel_core:4000/v1/graphql --priceSignerPrivK=\${PRIV_K} --mockPricefeedAddress=\${VAULT_PRICEFEED_ADDRESS}"
+```
+
 ## Fuel node image
 
 The snapshot is prepared based on [this](https://github.com/FuelLabs/fuels-wallet/blob/master/docker/fuel-core/Dockerfile).
