@@ -82,6 +82,12 @@ const SpotPage = () => {
       priceUsd: tokenPrice,
       totalSupply: +tokenMetadata.totalSupply,
       volume24hUsd: tokenMetadata.volumeUSD,
+      holders: tokenMetadata.holders,
+      top10HoldersPercent: tokenMetadata.top10HoldersPercent,
+      devHoldingPercent: tokenMetadata.devHoldingPercent,
+      snipersPercent: tokenMetadata.snipersPercent,
+      bundlersPercent: tokenMetadata.bundlersPercent,
+      insidersPercent: tokenMetadata.insidersPercent,
     };
   }, [tokenMetadata, tokenPrice]);
 

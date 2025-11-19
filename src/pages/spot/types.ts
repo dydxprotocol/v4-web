@@ -13,4 +13,10 @@ export interface SpotHeaderToken {
   totalSupply?: number;
   buys24hUsd?: number;
   sells24hUsd?: number;
+  holders?: number;
+  top10HoldersPercent?: number;
+  devHoldingPercent?: number;
+  snipersPercent?: number;
+  bundlersPercent?: number;
+  insidersPercent?: number;
 }
