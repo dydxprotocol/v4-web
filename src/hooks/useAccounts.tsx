@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { BonsaiCore } from '@/bonsai/ontology';
 import { type LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 
@@ -56,7 +55,6 @@ const useAccountsContext = () => {
     dydxAccountGraz,
   } = useWalletConnection();
 
-  const hasSubAccount = useAppSelector(BonsaiCore.account.parentSubaccountSummary.data) != null;
   const sourceAccount = useAppSelector(getSourceAccount);
 
   const { ready, authenticated } = usePrivy();
@@ -64,26 +62,6 @@ const useAccountsContext = () => {
   const blockedGeo = useMemo(() => {
     return geo.currentlyGeoBlocked && checkForGeo;
   }, [geo, checkForGeo]);
-
-  const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
-
-  useEffect(() => {
-    return;
-    const { address } = sourceAccount;
-    // wallet accounts switched
-    if (previousAddress && address !== previousAddress) {
-      // Disconnect local wallet
-      disconnectLocalDydxWallet();
-    }
-
-    setPreviousAddress(address);
-    // We only want to set the source wallet address if the address changes
-    // OR when our connection state changes.
-    // The address can be cached via local storage, so it won't change when we reconnect
-    // But the hasSubAccount value will become true once you reconnect
-    // This allows us to trigger a state update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceAccount.address, sourceAccount.chain, hasSubAccount]);
 
   // dYdXClient Onboarding & Account Helpers
   const { indexerClient, getWalletFromSignature } = useDydxClient();
@@ -268,6 +246,8 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+    setLocalDydxWallet,
+    setHdKey,
 
     // Cosmos wallets (on-demand)
     ...cosmosWallets,

@@ -5,6 +5,7 @@ import { type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { OnboardingState } from '@/constants/account';
 import {
   ConnectorType,
+  DydxAddress,
   PrivateInformation,
   WalletNetworkType,
   type WalletInfo,
@@ -69,6 +70,90 @@ class OnboardingSupervisor {
     await dydxWalletService.deriveFromSignature(signature);
 
     return { wallet, hdKey };
+  }
+
+  /**
+   * Derive keys with determinism check for first-time users
+   * Ensures wallets support deterministic signing by requesting two signatures
+   *
+   * @param signMessageAsync - Function to sign a message
+   * @param getWalletFromSignature - Function to derive wallet from signature
+   * @param checkPreviousTransactions - Function to check if user has transaction history
+   * @returns Wallet derivation result with determinism validation
+   */
+  async deriveKeysWithDeterminismCheck(params: {
+    signMessageAsync: () => Promise<string>;
+    getWalletFromSignature: (params: { signature: string }) => Promise<{
+      wallet: LocalWallet;
+      mnemonic: string;
+      privateKey: Uint8Array | null;
+      publicKey: Uint8Array | null;
+    }>;
+    checkPreviousTransactions: (dydxAddress: DydxAddress) => Promise<boolean>;
+  }): Promise<
+    | { success: true; wallet: LocalWallet; hdKey: PrivateInformation; isNewUser: boolean }
+    | { success: false; error: string; isDeterminismError?: boolean }
+  > {
+    const { signMessageAsync, getWalletFromSignature, checkPreviousTransactions } = params;
+
+    try {
+      // Step 1: Get first signature and derive wallet
+      const firstSignature = await signMessageAsync();
+      const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
+        signature: firstSignature,
+      });
+
+      if (!privateKey || !publicKey || !wallet.address) {
+        return {
+          success: false,
+          error: 'Failed to derive wallet from signature',
+        };
+      }
+
+      // Step 2: Check for previous transactions
+      const hasPreviousTransactions = await checkPreviousTransactions(
+        wallet.address as DydxAddress
+      );
+
+      // Step 3: For new users, ensure determinism with second signature
+      if (!hasPreviousTransactions) {
+        const secondSignature = await signMessageAsync();
+
+        if (firstSignature !== secondSignature) {
+          return {
+            success: false,
+            error:
+              'Your wallet does not support deterministic signing. Please switch to a different wallet provider.',
+            isDeterminismError: true,
+          };
+        }
+      }
+
+      // Step 4: Persist to SecureStorage (replaces old encrypted signature approach)
+      await dydxWalletService.deriveFromSignature(firstSignature);
+
+      // Step 5: Set up hdKey
+      const hdKey: PrivateInformation = {
+        mnemonic,
+        privateKey,
+        publicKey,
+      };
+
+      hdKeyManager.setHdkey(wallet.address, hdKey);
+
+      return {
+        success: true,
+        wallet,
+        hdKey,
+        isNewUser: !hasPreviousTransactions,
+      };
+    } catch (error) {
+      logBonsaiError('OnboardingSupervisor', 'deriveKeysWithDeterminismCheck failed', { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
   /**

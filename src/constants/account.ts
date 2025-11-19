@@ -1,4 +1,4 @@
-import type { DydxAddress, EvmAddress } from './wallets';
+import type { DydxAddress } from './wallets';
 import { SolAddress } from './wallets';
 
 export enum OnboardingSteps {
@@ -35,14 +35,6 @@ export enum EvmDerivedAccountStatus {
   EnsuringDeterminism,
   Derived,
 }
-
-export type EvmDerivedAddresses = {
-  version?: string;
-  [EvmAddress: EvmAddress]: {
-    encryptedSignature?: string;
-    dydxAddress?: DydxAddress;
-  };
-};
 
 export type SolDerivedAddresses = {
   version?: string;

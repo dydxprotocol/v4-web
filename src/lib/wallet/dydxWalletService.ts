@@ -22,19 +22,58 @@ export interface WalletCreationResult {
   error?: string;
 }
 
-/**
- * DydxWalletService
- *
- * Manages dYdX wallet creation, import, and derivation.
- * Supports multiple wallet sources:
- * - Direct mnemonic import (bypass source wallet)
- * - Derivation from source wallet signature (existing flow)
- * - Private key import
- *
- * This service enables AccountConnected state without requiring
- * a connected source wallet (WalletConnected state).
- */
 export class DydxWalletService {
+  /**
+   * Import wallet from private key
+   * Direct private key import without mnemonic
+   *
+   * @param privateKey - Private key as hex string (with or without 0x prefix)
+   * @param persist - Whether to store for future sessions
+   * @returns Wallet creation result with dYdX address
+   */
+  async importFromPrivateKey(
+    privateKey: string,
+    persist: boolean = true
+  ): Promise<WalletCreationResult> {
+    try {
+      // Create wallet from private key
+      const LocalWallet = await getLazyLocalWallet();
+      const wallet = await LocalWallet.fromPrivateKey(privateKey);
+
+      if (!wallet.address) {
+        return {
+          success: false,
+          error: 'Failed to create wallet from private key.',
+        };
+      }
+
+      // Note: Private key imports don't have mnemonic, so we can't derive Cosmos wallets
+      // Store the private key directly
+      if (persist) {
+        await secureStorage.store('imported_private_key', privateKey);
+      }
+
+      // Update app state (no hdKey material for private key imports)
+      await this.setWalletInState(wallet, ''); // Empty string for mnemonic
+
+      logBonsaiInfo('DydxWalletService', 'importFromPrivateKey', {
+        address: wallet.address,
+        persisted: persist,
+      });
+
+      return {
+        success: true,
+        dydxAddress: wallet.address as DydxAddress,
+      };
+    } catch (error) {
+      logBonsaiError('DydxWalletService', 'Failed to importFromPrivateKey', { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
   /**
    * Import wallet from mnemonic phrase
    * This bypasses the need for a source wallet connection
