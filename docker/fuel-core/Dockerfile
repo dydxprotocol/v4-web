@@ -6,6 +6,8 @@
 
 FROM ghcr.io/fuellabs/fuel-core:v0.45.1
 
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /fuel
 
 COPY ./chain_config.json .

@@ -36,6 +36,5 @@ RUN export PNPM_HOME="${HOME}/.local/share/pnpm" && \
     pnpm --filter starboard/indexer build && \
     tar -xzC public -f tradingview/tradingview.tgz
 
-COPY --chmod=0744 ./wait_for_db.sh /root/
 COPY --chmod=0744 ./setup_starboard_contracts.sh /root/
 

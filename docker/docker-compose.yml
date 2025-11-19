@@ -12,10 +12,11 @@ services:
     volumes:
       - fuel-core-db:/mnt/db
     healthcheck:
-      test: curl --fail http://localhost:4000/v1/health || exit 1
-      interval: 1s
-      timeout: 5s
-      retries: 20
+      test: ["CMD-SHELL", "curl --fail http://localhost:4000/v1/health || exit 1"]
+      interval: 10s
+      start_period: 3s
+      timeout: 10s
+      retries: 10
 
   db:
     image: postgres:15
@@ -27,6 +28,12 @@ services:
     ports:
       - "${DB_PORT}:5432"
       # command: ["postgres", "-c", "log_statement=all"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      start_period: 3s
+      timeout: 10s
+      retries: 10
 
   indexer:
     image: starboard
@@ -44,7 +51,12 @@ services:
       VAULT_ADDRESS: ${VAULT_ADDRESS}
       FROM_BLOCK: ${FROM_BLOCK}
       NVM_DIR: /root/.nvm
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && /root/wait_for_db.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+    depends_on:
+      fuel-core:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   api:
     image: starboard
@@ -58,7 +70,10 @@ services:
       NVM_DIR: /root/.nvm
     ports:
       - "${GQL_PORT}:4000"
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && /root/wait_for_db.sh && cd /starboard/indexer && ../node_modules/.bin/squid-graphql-server"]
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-graphql-server"]
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   fuel-core-db:
