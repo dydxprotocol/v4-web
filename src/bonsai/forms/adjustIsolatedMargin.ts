@@ -110,6 +110,13 @@ export interface SubaccountTransferPayload {
   destinationSubaccountNumber: number;
 }
 
+export interface SubaccountUpdateLeveragePayload {
+  senderAddress: string;
+  subaccountNumber: number;
+  clobPairId: number;
+  leverage: number;
+}
+
 interface SummaryData {
   accountBefore: AccountDetails;
   accountAfter: AccountDetails;

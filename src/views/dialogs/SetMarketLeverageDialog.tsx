@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
-import { SubaccountClient } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -14,6 +13,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { formMixins } from '@/styles/formMixins';
 
@@ -27,10 +27,10 @@ import { Slider } from '@/components/Slider';
 import { AccentTag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setSelectedMarketLeverage } from '@/state/raw';
 
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
-import { saveMarketLeverage } from '@/lib/leverageHelpers';
 import { calculateMarketMaxLeverage } from '@/lib/marketsHelpers';
 import { MaybeBigNumber, MustBigNumber } from '@/lib/numbers';
 import { orEmptyObj } from '@/lib/typeUtils';
@@ -42,7 +42,8 @@ export const SetMarketLeverageDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const { dydxAddress, localDydxWallet } = useAccounts();
+  const { updateLeverage } = useSubaccount();
+  const { dydxAddress } = useAccounts();
 
   const marketData = useAppSelectorWithArgs(
     BonsaiHelpers.markets.selectMarketSummaryById,
@@ -172,19 +173,25 @@ export const SetMarketLeverageDialog = ({
         throw new Error("clobPairId doesn't exist");
       }
 
-      // TODO: This is currently a dummy transaction that just saves to local state.
-      // When this becomes a real chain transaction, it should return an OperationResult
-      // and the error handling pattern below will work correctly.
-      const subaccountInfo = SubaccountClient.forLocalWallet(localDydxWallet!);
-      const result = await saveMarketLeverage({
-        dispatch,
-        marketId,
-        clobPairId,
-        leverage: leverageBN.toNumber(),
-        subaccountInfo,
+      if (currentPosition === undefined) {
+        throw new Error('current position does not exist');
+      }
+
+      if (dydxAddress === undefined) {
+        throw new Error('dydx address does not exist');
+      }
+
+      const leverage = leverageBN.toNumber();
+
+      const result = await updateLeverage({
+        senderAddress: dydxAddress,
+        subaccountNumber: currentPosition.subaccountNumber,
+        clobPairId: Number(clobPairId),
+        leverage,
       });
 
       if (isOperationSuccess(result)) {
+        dispatch(setSelectedMarketLeverage({ marketId, leverage }));
         setIsOpen(false);
       } else if (isOperationFailure(result)) {
         setErrorMessageRaw(result.errorString);

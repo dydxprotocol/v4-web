@@ -1,7 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
-import { SubaccountTransferPayload } from '@/bonsai/forms/adjustIsolatedMargin';
+import {
+  SubaccountTransferPayload,
+  SubaccountUpdateLeveragePayload,
+} from '@/bonsai/forms/adjustIsolatedMargin';
 import { TransferPayload, TransferToken } from '@/bonsai/forms/transfers';
 import { TriggerOrdersPayload } from '@/bonsai/forms/triggers/types';
 import { getLazyTradingKeyUtils } from '@/bonsai/lib/lazyDynamicLibs';
@@ -654,6 +657,52 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [compositeClient, localDydxWallet]
   );
 
+  const updateLeverage = useCallback(
+    async (params: SubaccountUpdateLeveragePayload) => {
+      try {
+        const subaccount = localDydxWallet
+          ? SubaccountClient.forLocalWallet(localDydxWallet, params.subaccountNumber)
+          : undefined;
+
+        if (subaccount == null) {
+          throw new Error('local wallet client not initialized');
+        }
+
+        if (!compositeClient) {
+          throw new Error('Missing compositeClient or localWallet');
+        }
+
+        if (params.senderAddress !== subaccount.address) {
+          throw new Error('Sender address does not match local wallet');
+        }
+
+        const tx = await compositeClient.validatorClient.post.updateLeverage(
+          subaccount,
+          subaccount.address,
+          [
+            {
+              clobPairId: params.clobPairId,
+              customImfPpm: 1000000 / params.leverage,
+            },
+          ]
+        );
+
+        const parsedTx = parseToPrimitives(tx);
+        logBonsaiInfo('useSubaccount/updateLeverage', 'Successful update leverage', {
+          parsedTx,
+        });
+        return wrapOperationSuccess(parsedTx);
+      } catch (error) {
+        const parsed = stringifyTransactionError(error);
+        logBonsaiError('useSubaccount/updateLeverage', 'Failed update leverage', {
+          parsed,
+        });
+        return wrapOperationFailure(parsed);
+      }
+    },
+    [compositeClient, localDydxWallet]
+  );
+
   const createTransferMessage = useCallback(
     (payload: TransferPayload) => {
       if (subaccountClient == null || !localDydxWallet) {
@@ -912,5 +961,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     createRandomTradingKeyWallet,
     authorizeTradingKeyWallet,
     removeAuthorizedKey,
+
+    updateLeverage,
   };
 };
