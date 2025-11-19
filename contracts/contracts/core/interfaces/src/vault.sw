@@ -57,8 +57,6 @@ abi Vault {
     fn clear_asset_config(asset: b256);
     #[storage(write)]
     fn set_approved_router(router: Identity, is_active: bool);
-    #[storage(write)]
-    fn set_router(router: ContractId);
     /*
           ____ __     ___
          / / / \ \   / (_) _____      __
@@ -93,10 +91,6 @@ abi Vault {
     fn get_pool_amounts(asset: b256) -> u256;
     #[storage(read)]
     fn get_fee_reserve() -> u256;
-    #[storage(read)]
-    fn get_all_whitelisted_assets_length() -> u64;
-    #[storage(read)]
-    fn get_whitelisted_asset_by_index(index: u64) -> b256;
     #[storage(read)]
     fn is_asset_whitelisted(asset: b256) -> bool;
     #[storage(read)]

@@ -85,14 +85,11 @@ storage {
         gov: Identity = ZERO_IDENTITY,
         is_initialized: bool = false,
         lock: bool = false,
-        // Externals
-        router: ContractId = ZERO_CONTRACT,
         /// ---------------------  Fees  ---------------------
         /// charged when liquidating a position
         /// denominated in collateral asset
         liquidation_fee: u256 = 0u256,
         /// charged when minting/burning LP assets
-        /// helps maintain the stability of the RLP pool and discourage rapid entering and exiting.
         /// 0.3% by default
         mint_burn_fee_basis_points: u64 = 30,
         /// applied to size of leveraged positions
@@ -102,8 +99,6 @@ storage {
         approved_routers: StorageMap<Identity, StorageMap<Identity, bool>> = StorageMap {},
         is_liquidator: StorageMap<Identity, bool> = StorageMap {},
         max_leverage: StorageMap<b256, u256> = StorageMap {},
-        whitelisted_asset_count: u64 = 0,
-        all_whitelisted_assets: StorageVec<b256> = StorageVec {},
         whitelisted_assets: StorageMap<b256, bool> = StorageMap {},
         asset_decimals: StorageMap<b256, u32> = StorageMap {},
         // tracks all open Positions
@@ -119,7 +114,9 @@ storage {
         funding_info: StorageMap<b256, FundingInfo> = StorageMap {},
     },
     // SRC20 support - track total supply of the LP asset
-    total_supply: u64 = 0,
+    lp_asset {
+        total_supply: u64 = 0,
+    },
 }
 
 impl SRC20 for Contract {
@@ -131,7 +128,7 @@ impl SRC20 for Contract {
     #[storage(read)]
     fn total_supply(asset: AssetId) -> Option<u64> {
         if asset == AssetId::default() {
-            Some(storage.total_supply.read())
+            Some(storage::lp_asset.total_supply.try_read().unwrap_or(0))
         } else {
             None
         }
@@ -203,20 +200,25 @@ impl Vault for Contract {
         require(
             !storage::vault
                 .is_initialized
-                .read(),
+                .try_read()
+                .unwrap_or(false),
             Error::VaultAlreadyInitialized,
         );
         storage::vault.is_initialized.write(true);
+        storage::vault.lock.write(false);
         storage::vault.gov.write(gov);
 
-        if storage::vault.liquidation_fee.read() == 0 {
-            // cannot initialize in the storage section because of the configurable
-            storage::vault
-                .liquidation_fee
-                .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
-        }
+        // set the default fees
+        // the liquidation fee cannot initialize in the storage section because of the configurable
+        storage::vault
+            .liquidation_fee
+            .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
+        storage::vault.mint_burn_fee_basis_points.write(30);
+        storage::vault.margin_fee_basis_points.write(10);
 
-        storage.total_supply.write(0);
+        storage::vault.fee_reserve.write(0);
+
+        storage::lp_asset.total_supply.write(0);
         let lp_asset = AssetId::default();
         let sender = msg_sender().unwrap();
         // Emit SRC20 events for LP asset
@@ -260,13 +262,6 @@ impl Vault for Contract {
             liquidator,
             is_active,
         });
-    }
-
-    #[storage(write)]
-    fn set_router(router: ContractId) {
-        _only_gov();
-        storage::vault.router.write(router);
-        log(SetRouter { router });
     }
 
     #[storage(read, write)]
@@ -320,15 +315,6 @@ impl Vault for Contract {
     fn set_asset_config(asset: b256, asset_decimals: u32) {
         _only_gov();
 
-        // increment token count for the first time
-        if !storage::vault.whitelisted_assets.get(asset).try_read().unwrap_or(false)
-        {
-            storage::vault
-                .whitelisted_asset_count
-                .write(storage::vault.whitelisted_asset_count.read() + 1);
-            storage::vault.all_whitelisted_assets.push(asset);
-        }
-
         storage::vault.whitelisted_assets.insert(asset, true);
         storage::vault.asset_decimals.insert(asset, asset_decimals);
 
@@ -353,10 +339,6 @@ impl Vault for Contract {
 
         storage::vault.whitelisted_assets.remove(asset);
         storage::vault.asset_decimals.remove(asset);
-
-        storage::vault
-            .whitelisted_asset_count
-            .write(storage::vault.whitelisted_asset_count.read() - 1);
 
         log(ClearAssetConfig { asset });
     }
@@ -435,20 +417,6 @@ impl Vault for Contract {
     #[storage(read)]
     fn get_fee_reserve() -> u256 {
         storage::vault.fee_reserve.try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
-    fn get_all_whitelisted_assets_length() -> u64 {
-        storage::vault.all_whitelisted_assets.len()
-    }
-
-    #[storage(read)]
-    fn get_whitelisted_asset_by_index(index: u64) -> b256 {
-        if index >= storage::vault.all_whitelisted_assets.len() {
-            return b256::zero();
-        }
-
-        storage::vault.all_whitelisted_assets.get(index).unwrap().read()
     }
 
     #[storage(read)]
@@ -554,6 +522,7 @@ impl Vault for Contract {
     #[payable]
     #[storage(read, write)]
     fn add_liquidity(receiver: Identity) -> u64 {
+        _only_initialized();
         sl_require_not_paused();
 
         _begin_non_reentrant(storage::vault.lock);
@@ -567,6 +536,7 @@ impl Vault for Contract {
     #[payable]
     #[storage(read, write)]
     fn remove_liquidity(receiver: Identity) -> u64 {
+        _only_initialized();
         sl_require_not_paused();
 
         _begin_non_reentrant(storage::vault.lock);
@@ -586,6 +556,7 @@ impl Vault for Contract {
         size_delta: u256,
         is_long: bool,
     ) -> (u256, u256) {
+        _only_initialized();
         sl_require_not_paused();
 
         _begin_non_reentrant(storage::vault.lock);
@@ -607,6 +578,7 @@ impl Vault for Contract {
         is_long: bool,
         receiver: Identity,
     ) -> (u256, u256, u256) {
+        _only_initialized();
         sl_require_not_paused();
 
         _begin_non_reentrant(storage::vault.lock);
@@ -632,6 +604,7 @@ impl Vault for Contract {
         is_long: bool,
         fee_receiver: Identity,
     ) {
+        _only_initialized();
         sl_require_not_paused();
 
         _begin_non_reentrant(storage::vault.lock);
@@ -644,13 +617,36 @@ impl Vault for Contract {
 
 // ---------------------  Internal  ---------------------
 
+/// Checks is the caller is the governor, reverts if not.
+/// # Additional Information
+///
+/// The contract must be initialized
+/// # Reverts
+///
+/// - `VaultForbiddenNotGov` if the caller is not the governor, or the contract is not initialized
 #[storage(read)]
 fn _only_gov() {
     require(
         get_sender() == storage::vault
             .gov
-            .read(),
+            .try_read()
+            .unwrap_or(ZERO_IDENTITY),
         Error::VaultForbiddenNotGov,
+    );
+}
+
+/// Checks if the contract is initialized, reverts if not.
+/// # Reverts
+///
+/// - `VaultNotInitialized` if the contract is not initialized
+#[storage(read)]
+fn _only_initialized() {
+    require(
+        storage::vault
+            .is_initialized
+            .try_read()
+            .unwrap_or(false),
+        Error::VaultNotInitialized,
     );
 }
 
@@ -899,9 +895,7 @@ fn _decrease_pool_amount(amount: u256) {
 fn _validate_router(account: Identity) {
     let sender = get_sender();
 
-    if sender == account
-        || sender == Identity::ContractId(storage::vault.router.read())
-    {
+    if sender == account {
         return;
     }
 
@@ -1030,8 +1024,8 @@ fn _add_liquidity(receiver: Identity) -> u64 {
     );
     require(mint_amount > 0, "mint_amount is 0");
 
-    let new_supply = mint_amount + storage.total_supply.read();
-    storage.total_supply.write(new_supply);
+    let new_supply = mint_amount + storage::lp_asset.total_supply.read();
+    storage::lp_asset.total_supply.write(new_supply);
 
     mint_to(receiver, DEFAULT_SUB_ID, mint_amount);
 
@@ -1087,8 +1081,8 @@ fn _remove_liquidity(receiver: Identity) -> u64 {
     _decrease_pool_amount(redemption_amount.as_u256());
 
     let burn_amount_u64 = u64::try_from(lp_asset_amount).unwrap();
-    let new_supply = storage.total_supply.read() - burn_amount_u64;
-    storage.total_supply.write(new_supply);
+    let new_supply = storage::lp_asset.total_supply.read() - burn_amount_u64;
+    storage::lp_asset.total_supply.write(new_supply);
     burn(DEFAULT_SUB_ID, burn_amount_u64);
     log(TotalSupplyEvent {
         asset: AssetId::default(),

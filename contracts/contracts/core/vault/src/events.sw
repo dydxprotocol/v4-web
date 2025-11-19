@@ -9,9 +9,6 @@ pub struct SetGov {
 pub struct SetPaused {
     pub is_paused: bool,
 }
-pub struct SetRouter {
-    pub router: ContractId,
-}
 pub struct SetApprovedRouter {
     pub account: Identity,
     pub router: Identity,
