@@ -106,6 +106,17 @@ PricefeedWrapper (must be included in a transaction to modify a position):
 0x212EB3F8Ff08392B2aa030768A3814fc5A0a67F94412CfE07e37DD1cbC24F9D6
 ```
 
+In order to mint USDC tokens run the following command.
+This executes the token's faucet.
+Fill `USER_PRIVATE_KEY`, the user related to this private key receives tokens.
+It is required to send a transaction.
+The user gets 1M USDC.
+WARNING. Using valuable private keys in this way is not safe.
+
+```shell
+docker exec -t -e PRIV_K=USER_PRIVATE_KEY --env-file .env starboard_indexer_processor bash -i -c "pnpm --filter starboard/contracts faucet --url=http://starboard_fuel_core:4000/v1/graphql --privK=\${PRIV_K} --token=\${USDC_ADDRESS}"
+```
+
 ## Fuel node image
 
 The snapshot is prepared based on [this](https://github.com/FuelLabs/fuels-wallet/blob/master/docker/fuel-core/Dockerfile).
