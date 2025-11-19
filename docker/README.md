@@ -2,7 +2,7 @@
 
 ## Build
 
-Build the fuel node image
+Build the fuel node images
 
 ```shell
 cd fuel-core
@@ -24,18 +24,27 @@ The services include:
 - The indexer processor
 - The indexer API
 
+Do it one time on installation. There is no need to modify `.env` file afterwards.
+
+```shell
+cp .env.example .env.
+```
+
 Start the services
 
 ```shell
 docker-compose up -d
 ```
 
-Deploy the contracts (the container must be any starboard):
+Deploy the contracts The container must be any starboard.
+Do it once per instantiation, only on a clean state - next execution yields other contract addresses.
+
 ```shell
 docker exec -t starboard_indexer_processor bash -i -c /root/setup_starboard_contracts.sh
 ```
 
 Shutdown the services:
+
 ```shell
 docker-compose down -v
 ```
@@ -53,6 +62,49 @@ Prefunded accounts (priv key, address):
 - PriceSigner: `0xb19556cb693d7850d0e75d05a6e2e4c9ed5691d9e5bc54a7d43ee6eed3ad5fe3` `0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b`
 
 Of course, the roles above are conventional.
+
+## Fuel Wallet integration
+
+Open a web browser and open the fuel browser extention (README does not cover Fuel Wallet installation).
+Find `add network` option. The params of the new local network:
+
+```
+URL:
+http://localhost:4000/v1/graphql
+
+ChainId:
+0
+```
+
+## Front End
+
+Configuration useful for FE:
+
+```
+The indexer address:
+http://localhost:4350/v1/graphql
+
+The local fuel node endpoint:
+http://localhost:4000/v1/graphql
+
+ChainId of local fuel network:
+0
+
+Vault contract address:
+0x4A1Aa5E2e2f1A6233a189f2F882a6065134fBD3133f1a1f4b8c61D275ba32615
+
+USDC contract address (needed for minting test tokens):
+0x9534954321965C4B2dC45712AC3e7B575AFD43C38d2c9834bb5232f5F2BF2c6E
+
+USDC assetId (needed to transfer coins):
+0xda81350458510a2b4adfb85032ad319a61f271e9ccabe702c96696efc72bc6de
+
+Stork Mock address (must be included in a transaction to modify a position):
+0x422729Dc06fD5811ec48eDf38915a52aa6383B3a2e91a7f45F1eECaAba2aEf81
+
+PricefeedWrapper (must be included in a transaction to modify a position):
+0x212EB3F8Ff08392B2aa030768A3814fc5A0a67F94412CfE07e37DD1cbC24F9D6
+```
 
 ## Fuel node image
 
