@@ -170,6 +170,7 @@ export function useWithdrawStep({
               estimatedAmountUsd: withdrawRoute.usdAmountOut ?? '',
               isInstantWithdraw: isInstantTransfer(withdrawRoute),
               transferAssetRelease: null,
+              txHash,
             };
             logBonsaiInfo('withdrawHooks', 'withdraw tx submitted', {
               withdrawId,
