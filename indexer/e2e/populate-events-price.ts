@@ -15,11 +15,11 @@ const graphQLUrl = "http://127.0.0.1:4000/v1/graphql"
 
 
 if (require.main === module) {
-    pupulateEvents(getArgs(["mockPricefeedAddress", "vaultAddress", "usdcAddress"]))
+    populateEvents(getArgs(["mockPricefeedAddress", "vaultAddress", "usdcAddress"]))
 }
 
 
-async function pupulateEvents(taskArgs: any) {
+async function populateEvents(taskArgs: any) {
     const provider = new Provider(graphQLUrl)
 
     // preparation, usually the same for all the populate scripts

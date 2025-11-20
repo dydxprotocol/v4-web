@@ -2,7 +2,7 @@ import {run} from '@subsquid/batch-processor'
 import {augmentBlock, Block, Receipt} from '@subsquid/fuel-objects'
 import {DataSourceBuilder, FieldSelection} from '@subsquid/fuel-stream'
 import {TypeormDatabase} from '@subsquid/typeorm-store'
-import { Interface, BN } from 'fuels';
+import { Interface, BN, DateTime } from 'fuels';
 import {Price, PositionKey, Position, TotalPosition, Liquidity, TotalLiquidity, PositionChange} from './model/generated'
 import priceOracleAbi from './abis/stork-mock-abi.json'
 import vaultAbi from './abis/vault-abi.json'
@@ -17,6 +17,15 @@ export const VAULT_PRICEFEED_ADDRESS = process.env.VAULT_PRICEFEED_ADDRESS ?? ""
 export const VAULT_ADDRESS = process.env.VAULT_ADDRESS ?? "";
 export const FROM_BLOCK = process.env.FROM_BLOCK ?? "";
 export const E2E_TEST_LOG = (process.env.E2E_TEST_LOG ?? "0") == "1"; // 0 - no log, 1 - log
+
+// Event log IDs from contract ABI
+const EVENT_SET_PRICE = 6508751692018611352n
+const EVENT_ADD_LIQUIDITY = 3102420689146076761n
+const EVENT_REMOVE_LIQUIDITY = 683494322165434932n
+const EVENT_INCREASE_POSITION = 16595060151443604364n
+const EVENT_DECREASE_POSITION = 17276184846747919138n
+const EVENT_CLOSE_POSITION = 1607443183907089103n
+const EVENT_LIQUIDATE_POSITION = 7908178656321864902n
 
 if (!GRAPHQL_URL || !VAULT_PRICEFEED_ADDRESS || !VAULT_ADDRESS) {
   throw new Error('Environment variables not set');
@@ -62,9 +71,7 @@ const dataSource = dataSourceBuilder.build()
 const database = new TypeormDatabase()
 
 function getUTCBlockTime(block: Block): number {
-    // magic constant: TAI64 to UTC
-    // the constant may slightly change in years
-    return Number(block.header.time - 4611686018427387941n)
+    return DateTime.fromTai64(block.header.time.toString()).toUnixSeconds()
 }
 
 async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: true}}>, _block: Block, ctx: any) {
@@ -88,6 +95,7 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
 async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: true}}>, block: Block, ctx: any) {
     const logs = vaultInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
+    console.log("log", log)
     const provider = log.account.Address.bits
     const stablelDetla = log.stable_asset_amount
     const lpAmountDelta = log.lp_asset_amount
@@ -134,6 +142,7 @@ async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: tr
 async function handleRemoveLiquidity(receipt: Receipt<{receipt: {rb: true, data: true}}>, block: Block, ctx: any) {
     const logs = vaultInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
+    console.log("log", log)
     const provider = log.account.Address.bits
     const stablelDetla = BigInt(log.stable_asset_amount.toString())
     const lpAmountDelta = BigInt(log.lp_asset_amount.toString())
@@ -437,7 +446,7 @@ run(dataSource, database, async ctx => {
             // vault pricefeed
             if (receipt.contract.toLowerCase() === VAULT_PRICEFEED_ADDRESS.toLowerCase()) {
                 // events::SetPrice
-                if (receipt.rb === 6508751692018611352n) {
+                if (receipt.rb === EVENT_SET_PRICE) {
                     await handlePriceUpdate(receipt, block, ctx)
                 } else {
                     // drop unsupported event
@@ -447,22 +456,22 @@ run(dataSource, database, async ctx => {
             // vault
             if (receipt.contract.toLowerCase() === VAULT_ADDRESS.toLowerCase()) {
                 // events::AddLiquidity
-                if (receipt.rb === 3102420689146076761n) {
+                if (receipt.rb === EVENT_ADD_LIQUIDITY) {
                     await handleAddLiquidity(receipt, block, ctx)
                 // events::RemoveLiquidity
-                } else if (receipt.rb === 683494322165434932n) {
+                } else if (receipt.rb === EVENT_REMOVE_LIQUIDITY) {
                     await handleRemoveLiquidity(receipt, block, ctx)
                 // events::IncreasePosition
-                } else if (receipt.rb === 16595060151443604364n) {
+                } else if (receipt.rb === EVENT_INCREASE_POSITION) {
                     await handleIncreasePosition(receipt, block, ctx)
                 // events::DecreasePosition
-                } else if (receipt.rb === 17276184846747919138n) {
+                } else if (receipt.rb === EVENT_DECREASE_POSITION) {
                     await handleDecreasePosition(receipt, block, ctx)
                 // events::ClosePosition
-                } else if (receipt.rb === 1607443183907089103n) {
+                } else if (receipt.rb === EVENT_CLOSE_POSITION) {
                     await handleClosePosition(receipt, block, ctx)
                 // events::LiquidatePosition
-                } else if (receipt.rb === 7908178656321864902n) {
+                } else if (receipt.rb === EVENT_LIQUIDATE_POSITION) {
                     await handleLiquidatePosition(receipt, block, ctx)
                 } else {
                     // drop unsupported event

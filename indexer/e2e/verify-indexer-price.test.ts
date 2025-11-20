@@ -27,7 +27,7 @@ describe("Verify Prices", () => {
         await client.connect()    
     })
 
-    it("should store corrent number of events", async () => {
+    it("should store correct number of events", async () => {
         const btcResult = await client.query('SELECT COUNT(*) as c FROM price WHERE asset = $1', [BTC_ASSET])
         const btcRecords = btcResult.rows[0].c
         expect(btcRecords).toBe("20")
