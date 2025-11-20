@@ -68,7 +68,7 @@ const MIN_LEVERAGE: u64 = 10_000; // 1x
 const MAX_LEVERAGE: u256 = 1_000_000_000; // 100_000x
 const MAX_FEE_BASIS_POINTS: u64 = 500; // 5%
 const DEFAULT_LIQUIDATION_FEE: u256 = 5; // 5 USDC (without decimals)
-const MAX_LIQUIDATION_FEE: u256 = 5; // 100 USDC (without decimals)
+const MAX_LIQUIDATION_FEE: u256 = 100; // 100 USDC (without decimals)
 const LP_ASSET_NAME: str[11] = __to_str_array("StarBoardLP");
 const LP_ASSET_SYMBOL: str[3] = __to_str_array("SLP");
 
