@@ -28,6 +28,7 @@ type AddressInputProps = {
   destinationChain: string;
   onDestinationClicked: () => void;
   placeholder?: string;
+  isChainSelectable?: boolean;
 };
 
 export const AddressInput = ({
@@ -36,6 +37,7 @@ export const AddressInput = ({
   destinationChain,
   onDestinationClicked,
   placeholder,
+  isChainSelectable = true,
 }: AddressInputProps) => {
   const stringGetter = useStringGetter();
   const { sourceAccount } = useAccounts();
@@ -81,14 +83,14 @@ export const AddressInput = ({
         )}
       </div>
       <$ChainButton
-        disabled={sourceAccount.chain === WalletNetworkType.Solana}
+        disabled={!isChainSelectable || sourceAccount.chain === WalletNetworkType.Solana}
         onClick={onDestinationClicked}
       >
         <div tw="flex items-center gap-0.5">
           <AssetIcon tw="[--asset-icon-size:2rem]" logoUrl={CHAIN_INFO[destinationChain]?.icon} />
           <div>{CHAIN_INFO[destinationChain]?.name}</div>
         </div>
-        {sourceAccount.chain !== WalletNetworkType.Solana && (
+        {isChainSelectable && sourceAccount.chain !== WalletNetworkType.Solana && (
           <$CaretIcon size="10px" iconName={IconName.Caret} />
         )}
       </$ChainButton>

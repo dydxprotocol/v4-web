@@ -6,7 +6,15 @@ import { DydxAddress } from '@/constants/wallets';
 
 import type { RootState } from './_store';
 import { createAppSelector } from './appTypes';
-import { Deposit, isDeposit, isWithdraw, Transfer, Withdraw } from './transfers';
+import {
+  Deposit,
+  isDeposit,
+  isSpotWithdraw,
+  isWithdraw,
+  SpotWithdraw,
+  Transfer,
+  Withdraw,
+} from './transfers';
 
 export const getTransfersByAddress = (state: RootState) => state.transfers.transfersByDydxAddress;
 
@@ -78,6 +86,15 @@ export const selectWithdraw = createAppSelector(
   (allTransfers, id) => {
     return allTransfers.find(
       (transfer): transfer is Withdraw => isWithdraw(transfer) && transfer.id === id
+    );
+  }
+);
+
+export const selectSpotWithdraw = createAppSelector(
+  [selectAllTransfers, (s, id: string) => id],
+  (allTransfers, id) => {
+    return allTransfers.find(
+      (transfer): transfer is SpotWithdraw => isSpotWithdraw(transfer) && transfer.id === id
     );
   }
 );

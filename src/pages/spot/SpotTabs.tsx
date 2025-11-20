@@ -8,6 +8,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 export enum SpotTabVariant {
   Buy = 'Buy',
   Sell = 'Sell',
+  Default = 'Default',
 }
 
 export type SpotTabItem = {
@@ -26,6 +27,7 @@ export type SpotTabsProps = {
   className?: string;
   sharedContent?: React.ReactNode;
   disabled?: boolean;
+  hideTabs?: boolean;
 };
 
 export const SpotTabs = ({
@@ -36,6 +38,7 @@ export const SpotTabs = ({
   className,
   sharedContent,
   disabled,
+  hideTabs = false,
 }: SpotTabsProps) => {
   const fallbackValue = items.find((i) => !i.disabled)?.value;
 
@@ -46,18 +49,20 @@ export const SpotTabs = ({
       onValueChange={onValueChange}
       className={className}
     >
-      <$List>
-        {items.map((item) => (
-          <$Trigger
-            key={item.value}
-            value={item.value}
-            disabled={item.disabled ?? disabled}
-            $variant={item.variant ?? SpotTabVariant.Buy}
-          >
-            {item.label}
-          </$Trigger>
-        ))}
-      </$List>
+      {!hideTabs && (
+        <$List>
+          {items.map((item) => (
+            <$Trigger
+              key={item.value}
+              value={item.value}
+              disabled={item.disabled ?? disabled}
+              $variant={item.variant ?? SpotTabVariant.Default}
+            >
+              {item.label}
+            </$Trigger>
+          ))}
+        </$List>
+      )}
       {sharedContent ??
         items.map((item) => (
           <$Content key={item.value} value={item.value}>
@@ -95,6 +100,11 @@ const spotTabVariants: Record<SpotTabVariant, ReturnType<typeof css>> = {
     --tab-textColor: var(--color-red);
     --tab-backgroundColor: var(--color-red-faded);
   `,
+
+  [SpotTabVariant.Default]: css`
+    --tab-textColor: var(--color-text-2);
+    --tab-backgroundColor: var(--color-layer-4);
+  `,
 };
 
 const $Trigger = styled(Trigger)<{
@@ -125,7 +135,7 @@ const $Trigger = styled(Trigger)<{
   font-size: var(--fontSize-base);
   font-weight: 500;
   flex: 1;
-  height: 2.25rem;
+  height: 2.5rem;
   border-radius: calc(var(--tab-border-radius) - 0.125rem);
   padding: 0 1rem;
   text-align: center;
