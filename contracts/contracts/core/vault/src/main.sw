@@ -128,6 +128,7 @@ impl SRC20 for Contract {
     #[storage(read)]
     fn total_supply(asset: AssetId) -> Option<u64> {
         if asset == AssetId::default() {
+            // try_read is used instead of read for the sake of upgradability
             Some(storage::lp_asset.total_supply.try_read().unwrap_or(0))
         } else {
             None
@@ -197,6 +198,7 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn initialize(gov: Identity) {
+        // try_read is used instead of read for the sake of upgradability
         require(
             !storage::vault
                 .is_initialized
@@ -627,6 +629,7 @@ impl Vault for Contract {
 #[storage(read)]
 fn _only_gov() {
     require(
+        // try_read is used instead of read for the sake of upgradability
         get_sender() == storage::vault
             .gov
             .try_read()
@@ -642,6 +645,7 @@ fn _only_gov() {
 #[storage(read)]
 fn _only_initialized() {
     require(
+        // try_read is used instead of read for the sake of upgradability
         storage::vault
             .is_initialized
             .try_read()
