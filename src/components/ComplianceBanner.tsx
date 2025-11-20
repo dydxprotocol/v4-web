@@ -14,7 +14,6 @@ import { useComplianceState } from '@/hooks/useComplianceState';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 
@@ -34,7 +33,6 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
     useComplianceState();
-  const { help } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = useSimpleUiEnabled();
 
@@ -57,19 +55,13 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
       {stringGetter({
         key: STRING_KEYS.BLOCKED_BANNER_MESSAGE_SHORT,
         params: {
-          CONTACT_SUPPORT_LINK: (
-            <Link href={help} isInline>
+          TERMS_OF_USE_LINK: (
+            <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
               {stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })}
             </Link>
           ),
         },
-      })}{' '}
-      <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
-        {stringGetter({
-          key: STRING_KEYS.LEARN_MORE,
-        })}{' '}
-        →
-      </Link>
+      })}
     </span>
   ) : (
     <span>{complianceMessage}</span>
