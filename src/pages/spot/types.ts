@@ -7,7 +7,7 @@ export interface SpotHeaderToken {
   priceUsd?: number;
   marketCapUsd?: number;
   change24hPercent?: number;
-  fdvUsd?: string;
+  fdvUsd?: number;
   liquidityUsd?: number;
   circulatingSupply?: number;
   totalSupply?: number;

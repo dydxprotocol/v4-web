@@ -94,3 +94,8 @@ export const selectRawSpotWalletPositions = (state: RootState) =>
   state.raw.spot.walletPositions.data;
 export const selectRawSpotWalletPositionsLoading = (state: RootState) =>
   state.raw.spot.walletPositions.status;
+
+export const selectRawSpotPortfolioTrades = (state: RootState) =>
+  state.raw.spot.portfolioTrades.data;
+export const selectRawSpotPortfolioTradesLoading = (state: RootState) =>
+  state.raw.spot.portfolioTrades.status;

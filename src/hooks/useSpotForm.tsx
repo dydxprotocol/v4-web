@@ -12,6 +12,7 @@ import { useSpotTransactionSubmit } from '@/hooks/useSpotTransactionSubmit';
 import { Icon, IconName } from '@/components/Icon';
 import { formatNumberOutput, OutputType } from '@/components/Output';
 
+import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { spotFormActions } from '@/state/spotForm';
@@ -90,6 +91,11 @@ export function useSpotForm() {
     try {
       const result = await submitTransactionMutation(payload);
       dispatch(spotFormActions.reset());
+
+      appQueryClient.invalidateQueries({
+        queryKey: ['spot', 'portfolioTrades'],
+        exact: false,
+      });
 
       const { landResponse } = result;
       const isBuy = landResponse.side === SpotApiSide.BUY;

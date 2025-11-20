@@ -229,6 +229,25 @@ export interface SpotApiBarObject {
   volume: string; // volume in USD
 }
 
+export interface SpotApiTradeObject {
+  id: string;
+  walletAddress: string;
+  tokenMint: string;
+  decimals: number;
+  side: SpotApiSide;
+  tokenAmount: number;
+  solAmount: number;
+  usdValue: number;
+  tokenPriceUsd: number;
+  txHash: string;
+  createdAt: string;
+}
+
+export type SpotApiPortfolioTradesResponse = {
+  trades: SpotApiTradeObject[];
+  tokenData: Record<string, SpotApiTokenInfoObject>;
+};
+
 export class SpotApiClient {
   private host: string;
 
@@ -291,6 +310,10 @@ export class SpotApiClient {
 
   async landTransaction(request: SpotApiLandTransactionRequest) {
     return this._post<SpotApiLandTransactionResponse>('transactions/land', request);
+  }
+
+  async getPortfolioTrades(address: string) {
+    return this._get<SpotApiPortfolioTradesResponse>(`portfolio/${address}/trades`);
   }
 
   get url() {
@@ -363,4 +386,9 @@ export const getSpotBars = async (apiUrl: string, query: SpotApiGetBarsQuery) =>
   const client = getOrCreateSpotApiClient(apiUrl);
   const response = await client.getBars(query);
   return transformBarsResponseToBars(response);
+};
+
+export const getSpotPortfolioTrades = async (apiUrl: string, address: string) => {
+  const client = getOrCreateSpotApiClient(apiUrl);
+  return client.getPortfolioTrades(address);
 };
