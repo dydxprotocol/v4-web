@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import { OrderStatus, SubaccountFillType } from '@/bonsai/types/summaryTypes';
@@ -6,8 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
+import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
+import { CHAIN_INFO } from '@/constants/chains';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import {
@@ -44,6 +46,7 @@ import { CancelAllNotification } from '@/views/notifications/CancelAllNotificati
 import { CloseAllPositionsNotification } from '@/views/notifications/CloseAllPositionsNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
+import { SwapNotification } from '@/views/notifications/SwapNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
@@ -62,6 +65,7 @@ import {
 } from '@/state/localOrdersSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
+import { getSwaps } from '@/state/swapSelectors';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
@@ -72,7 +76,7 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
@@ -80,6 +84,7 @@ import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
+import { useAutomatedDepositNotifications } from './useAutomatedDepositNotifications';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useAppSelectorWithArgs } from './useParameterizedSelector';
 import { useAllStatsigDynamicConfigValues } from './useStatsig';
@@ -972,6 +977,34 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.Swap,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const swaps = useAppSelector(getSwaps, shallowEqual);
+
+      useEffect(() => {
+        swaps.forEach((swap) => {
+          const isPending = swap.status === 'pending' || swap.status === 'pending-transfer';
+          trigger({
+            id: swap.id,
+            displayData: {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.SWAP }),
+              groupKey: NotificationType.Swap,
+              toastSensitivity: 'background',
+              toastDuration: isPending ? Infinity : DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <SwapNotification swap={swap} notification={notification} isToast={isToast} />
+              ),
+            },
+            updateKey: [swap.status],
+          });
+        });
+      }, [swaps, trigger, stringGetter]);
+    },
+  },
+  {
     type: NotificationType.FeedbackRequest,
     useTrigger: ({ trigger }) => {
       const { dydxAddress } = useAccounts();
@@ -1024,6 +1057,129 @@ export const notificationTypes: NotificationTypeConfig[] = [
           trigger({ id: notification.id, displayData: notification.displayData });
         });
       }, [customNotifications, trigger]);
+    },
+  },
+  {
+    type: NotificationType.DepositAddressEvents,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
+      const { newDeposits, setNewDeposits, prevDepositIdsRef, setEnabled } =
+        useAutomatedDepositNotifications();
+
+      const prevWalletBalanceRef = useRef<string | undefined>(undefined);
+      const lastNotificationTimeRef = useRef<number>(0);
+      const NOTIFICATION_DEBOUNCE = 1 * timeUnits.second; // 1 second
+
+      useEffect(() => {
+        if (newDeposits.length === 0) {
+          setEnabled(false);
+          return;
+        }
+
+        const now = Date.now();
+        newDeposits.forEach((deposit) => {
+          if (
+            now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE &&
+            !prevDepositIdsRef.current.has(deposit.id)
+          ) {
+            trigger({
+              id: `automated-deposit-${deposit.id}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2,
+                groupKey: NotificationType.DepositAddressEvents,
+                slotTitleLeft: (
+                  <Icon iconName={IconName.Signal} size="1.25rem" tw="text-color-success" />
+                ),
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_TITLE }),
+                body: stringGetter({ key: STRING_KEYS.DEPOSIT_DETECTED_BODY }),
+                toastSensitivity: 'foreground',
+                actionDescription: stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION }),
+                renderActionSlot: () => {
+                  const chainInfo = CHAIN_INFO[deposit.chain_id];
+                  return (
+                    chainInfo?.explorerBaseUrl && (
+                      <Link
+                        href={`${chainInfo.explorerBaseUrl}/tx/${deposit.transaction_hash}`}
+                        isAccent
+                      >
+                        {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
+                      </Link>
+                    )
+                  );
+                },
+              },
+              updateKey: [deposit.id],
+            });
+            prevDepositIdsRef.current.add(deposit.id);
+          }
+          lastNotificationTimeRef.current = now;
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [newDeposits, trigger, stringGetter]);
+
+      // Stage 2: Watch for wallet balance increases (after sweep/rebalance to subaccount)
+      useEffect(() => {
+        if (!usdcAmount) return;
+
+        const now = Date.now();
+        const prevWallet = prevWalletBalanceRef.current;
+
+        if (!prevWallet) {
+          prevWalletBalanceRef.current = usdcAmount;
+          return;
+        }
+
+        const prevWalletBalanceBN = MaybeBigNumber(prevWallet);
+        const usdcBalanceBN = MaybeBigNumber(usdcAmount);
+
+        if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
+          const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
+          const matchingDeposit = newDeposits.find((deposit) => {
+            const depositAmount = Number(formatUnits(BigInt(deposit?.amount ?? 0), 6)).toFixed(
+              USD_DECIMALS
+            );
+            return (
+              depositAmount &&
+              Math.abs(parseFloat(depositAmount) - parseFloat(diff.toFixed(USD_DECIMALS))) < 0.01
+            );
+          });
+
+          if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
+            trigger({
+              id: `deposit-confirmed-${matchingDeposit?.id ?? crypto.randomUUID()}`,
+              displayData: {
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
+                groupKey: NotificationType.DepositAddressEvents,
+                icon: <Icon iconName={IconName.CheckCircle} size="1.25rem" />,
+                title: stringGetter({ key: STRING_KEYS.DEPOSIT_CONFIRMED_TITLE }),
+                body: stringGetter({
+                  key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
+                  params: {
+                    AMOUNT: diff.toFixed(USD_DECIMALS),
+                    ASSET: 'USDC',
+                  },
+                }),
+                toastSensitivity: 'foreground',
+              },
+            });
+            lastNotificationTimeRef.current = now;
+          }
+
+          if (matchingDeposit) {
+            const updatedDeposits = newDeposits.filter(
+              (deposit) => deposit.id !== matchingDeposit.id
+            );
+            setNewDeposits(updatedDeposits);
+          }
+        }
+
+        prevWalletBalanceRef.current = usdcAmount;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [usdcAmount, trigger, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
   {
