@@ -1,71 +1,64 @@
 import styled from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
-
 import { useQuickUpdatingState } from '@/hooks/useQuickUpdatingState';
-import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { Slider } from '@/components/Slider';
-import { WithLabel } from '@/components/WithLabel';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const AmountCloseInput = ({
-  amountClosePercentInput,
-  setAmountCloseInput,
+export const AllocationSlider = ({
+  allocationPercentInput,
+  setAllocationInput,
 }: {
-  amountClosePercentInput: string | undefined;
-  setAmountCloseInput: (val: string | undefined) => void;
+  allocationPercentInput: string | undefined;
+  setAllocationInput: (val: string | undefined) => void;
 }) => {
   const {
-    value: amountClose,
-    setValue: setAmountClose,
-    commitValue: commitAmountClose,
+    value: allocation,
+    setValue: setAllocation,
+    commitValue: commitAllocation,
   } = useQuickUpdatingState<string | undefined>({
-    setValueSlow: setAmountCloseInput,
-    slowValue: amountClosePercentInput,
+    setValueSlow: setAllocationInput,
+    slowValue: allocationPercentInput,
     debounceMs: 100,
   });
 
   const onSliderDrag = ([newValue]: number[]) => {
     const newValueString = mapIfPresent(newValue, (lev) => MustBigNumber(lev).toFixed(0));
-    setAmountClose(newValueString ?? '');
+    setAllocation(newValueString ?? '');
   };
 
   const commitValue = (newValue: string | undefined) => {
-    commitAmountClose(newValue);
+    commitAllocation(newValue);
   };
 
   const onValueCommit = ([newValue]: number[]) => {
     commitValue(MustBigNumber(newValue).toFixed(0));
   };
 
-  const stringGetter = useStringGetter();
   return (
     <$InputContainer>
-      <$WithLabel
-        label={<div tw="mb-0.25 flex">{stringGetter({ key: STRING_KEYS.AMOUNT_CLOSE })}</div>}
-      >
-        <$AmountCloseSlider
-          label={stringGetter({ key: STRING_KEYS.AMOUNT_CLOSE })}
+      <div tw="w-full">
+        <$AllocationSlider
+          label="Allocation"
           min={0}
           max={100}
           step={0.1}
-          value={MustBigNumber(amountClose).toNumber()}
+          value={MustBigNumber(allocation).toNumber()}
           onSliderDrag={onSliderDrag}
           onValueCommit={onValueCommit}
         />
-      </$WithLabel>
+      </div>
       <$InnerInputContainer>
         <Input
-          placeholder={`${MustBigNumber(amountClose).toFixed(0)}%`}
+          placeholder={`${MustBigNumber(allocation).toFixed(0)}%`}
           type={InputType.Percent}
-          value={amountClose}
+          value={allocation}
           max={100}
           onInput={({ formattedValue }: { formattedValue: string }) => {
             commitValue(formattedValue);
@@ -81,15 +74,9 @@ const $InputContainer = styled.div`
   --input-height: 3.5rem;
   --input-backgroundColor: none;
 
-  padding: var(--form-input-paddingY) var(--form-input-paddingX);
-
   @media ${breakpoints.tablet} {
     --input-height: 4rem;
   }
-`;
-
-const $WithLabel = styled(WithLabel)`
-  ${formMixins.inputLabel}
 `;
 
 const $InnerInputContainer = styled.div`
@@ -97,7 +84,7 @@ const $InnerInputContainer = styled.div`
   --input-backgroundColor: var(--color-layer-4);
   --input-borderColor: none;
   --input-height: 2.25rem;
-  --input-width: 5rem;
+  --input-width: 4rem;
 
   margin-left: 0.25rem;
 
@@ -111,7 +98,7 @@ const $InnerInputContainer = styled.div`
   }
 `;
 
-const $AmountCloseSlider = styled(Slider)`
+const $AllocationSlider = styled(Slider)`
   height: 1.375rem;
   --slider-track-background: linear-gradient(
     90deg,

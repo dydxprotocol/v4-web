@@ -77,7 +77,7 @@ export const useTradeForm = ({
   const subaccountNumber = useAppSelector(getSubaccountId);
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  const { errors: tradeErrors, summary } = fullFormSummary;
+  const { errors: tradeErrors, summary, inputData } = fullFormSummary;
   const tradeFormInputValues = summary.effectiveTrade;
   const { marketId } = tradeFormInputValues;
   const isClosePosition = source === TradeFormSource.ClosePositionForm;
@@ -115,6 +115,7 @@ export const useTradeForm = ({
     if (payload == null || tradePayload == null || hasValidationErrors) {
       return;
     }
+
     onPlaceOrder?.(tradePayload);
     track(
       AnalyticsEvents.TradePlaceOrderClick({

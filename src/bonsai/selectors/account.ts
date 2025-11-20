@@ -48,6 +48,7 @@ import {
   selectRawOrdersRestData,
   selectRawParentSubaccount,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeveragesData,
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
@@ -86,23 +87,31 @@ export const selectCurrentMarketInfoRaw = createAppSelector(
 );
 
 export const selectParentSubaccountSummary = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, markets) => {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, markets, selectedMarketLeverages) => {
     if (parentSubaccount == null || markets == null) {
       return undefined;
     }
-    const result = calculateParentSubaccountSummary(parentSubaccount, markets);
+    const result = calculateParentSubaccountSummary(
+      parentSubaccount,
+      markets,
+      selectedMarketLeverages ?? {}
+    );
     return result;
   }
 );
 
 export const selectParentSubaccountPositions = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, markets) => {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, markets, selectedMarketLeverages) => {
     if (parentSubaccount == null || markets == null) {
       return undefined;
     }
-    return calculateParentSubaccountPositions(parentSubaccount, markets);
+    return calculateParentSubaccountPositions(
+      parentSubaccount,
+      markets,
+      selectedMarketLeverages ?? {}
+    );
   }
 );
 
@@ -163,13 +172,17 @@ export const selectAccountOrdersLoading = createAppSelector(
 );
 
 export const selectChildSubaccountSummaries = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, marketsData) => {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, marketsData, selectedMarketLeverages) => {
     if (parentSubaccount == null || marketsData == null) {
       return undefined;
     }
 
-    return calculateChildSubaccountSummaries(parentSubaccount, marketsData);
+    return calculateChildSubaccountSummaries(
+      parentSubaccount,
+      marketsData,
+      selectedMarketLeverages ?? {}
+    );
   }
 );
 

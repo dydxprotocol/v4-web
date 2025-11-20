@@ -19,6 +19,7 @@ import { useTokenConfigs } from './useTokenConfigs';
 export function useTransferForm(initialToUsdc: boolean) {
   const rawParentSubaccountData = useAppSelector(BonsaiRaw.parentSubaccountBase);
   const rawRelevantMarkets = useAppSelector(BonsaiRaw.parentSubaccountRelevantMarkets);
+  const selectedMarketLeverages = useAppSelector(BonsaiRaw.selectedMarketLeverages);
   const walletBalances = useAppSelector(BonsaiCore.account.balances.data);
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const {
@@ -36,6 +37,7 @@ export function useTransferForm(initialToUsdc: boolean) {
     (): TransferFormInputData => ({
       rawParentSubaccountData,
       rawRelevantMarkets,
+      selectedMarketLeverages: selectedMarketLeverages ?? {},
       canViewAccount,
       walletBalances,
       display: {
@@ -57,6 +59,7 @@ export function useTransferForm(initialToUsdc: boolean) {
       feeResult,
       rawParentSubaccountData,
       rawRelevantMarkets,
+      selectedMarketLeverages,
       usdcDecimals,
       usdcDenom,
       usdcLabel,
