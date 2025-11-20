@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -9,9 +9,11 @@ import {
   SpotHoldingsTableProps,
   type SpotPositionItem,
 } from './SpotHoldingsTable';
+import { SpotTradesTable, type SpotTradeItem } from './SpotTradesTable';
 
 type SpotHorizontalPanelProps = {
   data: SpotPositionItem[];
+  trades?: SpotTradeItem[];
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
   onRowAction?: SpotHoldingsTableProps['onRowAction'];
@@ -20,30 +22,44 @@ type SpotHorizontalPanelProps = {
 
 // TODO: spot localization
 
+enum PanelTabs {
+  Holdings = 'Holdings',
+  Trades = 'Trades',
+}
+
 export const SpotHorizontalPanel = ({
   data,
+  trades = [],
   isOpen = true,
   setIsOpen,
   onRowAction,
   onSellAction,
 }: SpotHorizontalPanelProps) => {
+  const [tab, setTab] = useState<PanelTabs>(PanelTabs.Holdings);
+
   const tabItems = useMemo(
     () => [
       {
-        value: 'Holdings',
+        value: PanelTabs.Holdings,
         label: 'Holdings',
         content: (
           <SpotHoldingsTable data={data} onRowAction={onRowAction} onSellAction={onSellAction} />
         ),
       },
+      {
+        value: PanelTabs.Trades,
+        label: 'Trades',
+        content: <SpotTradesTable data={trades} />,
+      },
     ],
-    [data, onRowAction, onSellAction]
+    [data, trades, onRowAction, onSellAction]
   );
 
   return (
     <$CollapsibleTabs
-      defaultTab="Holdings"
-      tab="Holdings"
+      defaultTab={PanelTabs.Holdings}
+      tab={tab}
+      setTab={setTab}
       defaultOpen={isOpen}
       onOpenChange={setIsOpen}
       dividerStyle="underline"

@@ -1,6 +1,8 @@
 import { createAppSelector } from '@/state/appTypes';
 
 import {
+  selectRawSpotPortfolioTrades,
+  selectRawSpotPortfolioTradesLoading,
   selectRawSpotSolPrice,
   selectRawSpotSolPriceLoading,
   selectRawSpotTokenMetadata,
@@ -54,4 +56,14 @@ export const selectSpotWalletPositionsLoading = createAppSelector(
 export const selectSpotPositions = createAppSelector(
   [selectSpotWalletPositions],
   (walletPositions) => walletPositions?.positions ?? []
+);
+
+export const selectSpotPortfolioTrades = createAppSelector(
+  [selectRawSpotPortfolioTrades],
+  (portfolioTrades) => portfolioTrades ?? { trades: [], tokenData: {} }
+);
+
+export const selectSpotPortfolioTradesLoading = createAppSelector(
+  [selectRawSpotPortfolioTradesLoading],
+  (loading) => loading
 );

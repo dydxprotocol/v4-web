@@ -33,7 +33,11 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
-import { SpotApiTokenMetadataResponse, SpotApiTokenPriceResponse } from '@/clients/spotApi';
+import {
+  SpotApiPortfolioTradesResponse,
+  SpotApiTokenMetadataResponse,
+  SpotApiTokenPriceResponse,
+} from '@/clients/spotApi';
 import { calc } from '@/lib/do';
 import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
@@ -110,6 +114,7 @@ export interface RawDataState {
     tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
     tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
     walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
+    portfolioTrades: Loadable<SpotApiPortfolioTradesResponse | undefined>;
   };
 }
 
@@ -153,6 +158,7 @@ const initialState: RawDataState = {
     tokenMetadata: loadableIdle(),
     tokenPrice: loadableIdle(),
     walletPositions: loadableIdle(),
+    portfolioTrades: loadableIdle(),
   },
 };
 
@@ -273,6 +279,12 @@ export const rawSlice = createSlice({
       ) => {
         state.spot.walletPositions = action.payload;
       },
+      setSpotPortfolioTrades: (
+        state,
+        action: PayloadAction<Loadable<SpotApiPortfolioTradesResponse | undefined>>
+      ) => {
+        state.spot.portfolioTrades = action.payload;
+      },
     }),
     // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
@@ -362,4 +374,5 @@ export const {
   setSpotTokenPrice,
   setSpotTokenMetadata,
   setSpotWalletPositions,
+  setSpotPortfolioTrades,
 } = rawSlice.actions;

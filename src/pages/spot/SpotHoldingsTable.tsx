@@ -191,8 +191,7 @@ export const SpotHoldingsTable = ({
         onRowAction?.(row);
       }}
       columns={columns}
-      initialPageSize={20}
-      paginationBehavior="paginate"
+      paginationBehavior="showAll"
       withInnerBorders
       withScrollSnapColumns
       withScrollSnapRows

@@ -28,7 +28,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     {
       key: 'fdv',
       label: 'FDV',
-      value: <Output type={OutputType.Text} value={stats.fdvUsd} />,
+      value: <Output type={OutputType.CompactFiat} value={stats.fdvUsd} />,
     },
     {
       key: 'liquidity',

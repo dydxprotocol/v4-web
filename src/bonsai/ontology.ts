@@ -12,7 +12,7 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
-import { SpotApiTokenInfoObject } from '@/clients/spotApi';
+import { SpotApiPortfolioTradesResponse, SpotApiTokenInfoObject } from '@/clients/spotApi';
 import {
   SpotApiWsWalletPositionObject,
   SpotApiWsWalletPositionsUpdate,
@@ -95,6 +95,8 @@ import {
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
+  selectSpotPortfolioTrades,
+  selectSpotPortfolioTradesLoading,
   selectSpotPositions,
   selectSpotSolPrice,
   selectSpotSolPriceLoading,
@@ -248,6 +250,10 @@ interface BonsaiCoreShape {
       loading: BasicSelector<LoadableStatus>;
       positions: BasicSelector<SpotApiWsWalletPositionObject[]>;
     };
+    portfolioTrades: {
+      data: BasicSelector<SpotApiPortfolioTradesResponse>;
+      loading: BasicSelector<LoadableStatus>;
+    };
   };
 }
 
@@ -349,6 +355,10 @@ export const BonsaiCore: BonsaiCoreShape = {
       data: selectSpotWalletPositions,
       loading: selectSpotWalletPositionsLoading,
       positions: selectSpotPositions,
+    },
+    portfolioTrades: {
+      data: selectSpotPortfolioTrades,
+      loading: selectSpotPortfolioTradesLoading,
     },
   },
 };

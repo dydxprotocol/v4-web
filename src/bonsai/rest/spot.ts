@@ -4,13 +4,23 @@ import { timeUnits } from '@/constants/time';
 import { SOL_MINT_ADDRESS } from '@/constants/tokens';
 
 import { type RootStore } from '@/state/_store';
+import { getUserSolanaWalletAddress } from '@/state/accountInfoSelectors';
 import { appQueryClient } from '@/state/appQueryClient';
 import { getCurrentPath, getSpotApiEndpoint } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
-import { setSpotSolPrice, setSpotTokenMetadata, setSpotTokenPrice } from '@/state/raw';
+import {
+  setSpotPortfolioTrades,
+  setSpotSolPrice,
+  setSpotTokenMetadata,
+  setSpotTokenPrice,
+} from '@/state/raw';
 import { getCurrentSpotToken } from '@/state/spot';
 
-import { getSpotTokenMetadata, getSpotTokenUsdPrice } from '@/clients/spotApi';
+import {
+  getSpotPortfolioTrades,
+  getSpotTokenMetadata,
+  getSpotTokenUsdPrice,
+} from '@/clients/spotApi';
 
 import { createStoreEffect } from '../lib/createStoreEffect';
 import { loadableIdle } from '../lib/loadable';
@@ -134,6 +144,56 @@ export function setUpSpotTokenPriceQuery(store: RootStore) {
 
     return () => {
       store.dispatch(setSpotTokenPrice(loadableIdle()));
+      unsubscribe();
+    };
+  });
+}
+
+const getPortfolioTradesParams = createAppSelector(
+  [getCurrentPath, getSpotApiEndpoint, getUserSolanaWalletAddress],
+  (currentPath, spotApiEndpoint, walletAddress) => {
+    if (!currentPath.startsWith('/spot') || !walletAddress) {
+      return null;
+    }
+    return { endpoint: spotApiEndpoint, walletAddress };
+  }
+);
+
+export function setUpPortfolioTradesQuery(store: RootStore) {
+  return createStoreEffect(store, getPortfolioTradesParams, (params) => {
+    if (!params) {
+      store.dispatch(setSpotPortfolioTrades(loadableIdle()));
+      return () => {};
+    }
+
+    const { endpoint, walletAddress } = params;
+
+    const observer = new QueryObserver(appQueryClient, {
+      queryKey: ['spot', 'portfolioTrades', walletAddress],
+      queryFn: wrapAndLogBonsaiError(
+        () => getSpotPortfolioTrades(endpoint, walletAddress),
+        'portfolioTrades'
+      ),
+      refetchInterval: timeUnits.minute * 2,
+      staleTime: timeUnits.minute * 2,
+      retryDelay: (attempt) => timeUnits.second * 3 * 2 ** attempt,
+    });
+
+    const unsubscribe = safeSubscribeObserver(observer, (result) => {
+      try {
+        store.dispatch(setSpotPortfolioTrades(queryResultToLoadable(result)));
+      } catch (e) {
+        logBonsaiError(
+          'setUpPortfolioTradesQuery',
+          'Error handling result from react query',
+          e,
+          result
+        );
+      }
+    });
+
+    return () => {
+      store.dispatch(setSpotPortfolioTrades(loadableIdle()));
       unsubscribe();
     };
   });

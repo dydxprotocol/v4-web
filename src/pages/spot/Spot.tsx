@@ -21,12 +21,14 @@ import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { mapIfPresent } from '@/lib/do';
+import { MustNumber } from '@/lib/numbers';
 
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
 import { SpotHorizontalPanel } from './SpotHorizontalPanel';
 import { SpotTokenInfo } from './SpotTokenInfo';
 import { SpotTradeForm } from './SpotTradeForm';
+import { type SpotTradeItem } from './SpotTradesTable';
 import { SpotHeaderToken } from './types';
 
 // TODO: spot localization
@@ -42,6 +44,7 @@ const SpotPage = () => {
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const tokenPrice = useAppSelector(BonsaiCore.spot.tokenPrice.data);
   const walletPositions = useAppSelector(BonsaiCore.spot.walletPositions.positions);
+  const portfolioTrades = useAppSelector(BonsaiCore.spot.portfolioTrades.data);
 
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,6 +71,27 @@ const SpotPage = () => {
       }));
   }, [walletPositions]);
 
+  const trades: SpotTradeItem[] = useMemo(() => {
+    return portfolioTrades.trades.map((trade) => {
+      const tokenData = portfolioTrades.tokenData[trade.tokenMint];
+
+      return {
+        id: trade.id,
+        side: trade.side,
+        tokenAmount: trade.tokenAmount,
+        usdValue: trade.usdValue,
+        txHash: trade.txHash,
+        createdAt: trade.createdAt,
+        tokenSymbol: tokenData?.symbol,
+        tokenImage: tokenData?.image,
+        marketCapUsd: mapIfPresent(
+          tokenData?.circulatingSupply,
+          (circulatingSupply) => MustNumber(circulatingSupply) * trade.tokenPriceUsd
+        ),
+      };
+    });
+  }, [portfolioTrades]);
+
   const currentTokenData = useMemo<SpotHeaderToken | null>(() => {
     if (!tokenMetadata || tokenPrice == null) return null;
 
@@ -81,8 +105,8 @@ const SpotPage = () => {
       circulatingSupply: +tokenMetadata.circulatingSupply,
       liquidityUsd: tokenMetadata.liquidityUSD,
       logoUrl: tokenMetadata.image,
-      marketCapUsd: +tokenMetadata.totalSupply * tokenPrice,
-      fdvUsd: tokenMetadata.tokenFDV,
+      marketCapUsd: +tokenMetadata.circulatingSupply * tokenPrice,
+      fdvUsd: +tokenMetadata.totalSupply * tokenPrice,
       priceUsd: tokenPrice,
       totalSupply: +tokenMetadata.totalSupply,
       volume24hUsd: tokenMetadata.volumeUSD,
@@ -196,6 +220,7 @@ const SpotPage = () => {
       <$GridSection gridArea="Horizontal">
         <SpotHorizontalPanel
           data={holdings}
+          trades={trades}
           isOpen={isHorizontalOpen}
           setIsOpen={setIsHorizontalOpen}
           onRowAction={handlePositionSelect}
