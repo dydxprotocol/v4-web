@@ -139,8 +139,6 @@ describe("Vault SRC20", () => {
             const lpAssetId: AssetId = { bits: LP_ASSET_ID }
             const decimalsResult = (await vault.functions.decimals(lpAssetId).get()).value
 
-            expect(decimalsResult).toBeDefined()
-            expect(decimalsResult).not.toBeUndefined()
             expect(decimalsResult).eq(9)
         })
 
@@ -157,8 +155,6 @@ describe("Vault SRC20", () => {
             const lpAssetId: AssetId = { bits: LP_ASSET_ID }
             const totalSupplyResult = (await vault.functions.total_supply(lpAssetId).get()).value
 
-            expect(totalSupplyResult).toBeDefined()
-            expect(totalSupplyResult).not.toBeUndefined()
             expect(totalSupplyResult?.toNumber()).eq(0)
         })
 
@@ -167,7 +163,6 @@ describe("Vault SRC20", () => {
 
             // Get initial supply
             const initialSupplyResult = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(initialSupplyResult).not.toBeUndefined()
             const initialSupply = initialSupplyResult!
             expect(initialSupply.toNumber()).eq(0)
 
@@ -186,9 +181,7 @@ describe("Vault SRC20", () => {
 
             // Check supply increased
             const newSupplyResult = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(newSupplyResult).not.toBeUndefined()
             const newSupply = newSupplyResult!
-            expect(newSupply.toNumber()).gt(0)
             expect(newSupply.toNumber()).gt(initialSupply.toNumber())
         })
 
@@ -209,7 +202,6 @@ describe("Vault SRC20", () => {
             )
 
             const supplyAfterAddResult = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(supplyAfterAddResult).not.toBeUndefined()
             const supplyAfterAdd = supplyAfterAddResult!
             const lpBalance = await user0.getBalance(LP_ASSET_ID)
 
@@ -225,7 +217,6 @@ describe("Vault SRC20", () => {
 
             // Check supply decreased
             const supplyAfterRemoveResult = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(supplyAfterRemoveResult).not.toBeUndefined()
             const supplyAfterRemove = supplyAfterRemoveResult!
             expect(supplyAfterRemove.toNumber()).lt(supplyAfterAdd.toNumber())
         })
@@ -254,7 +245,6 @@ describe("Vault SRC20", () => {
             )
 
             const supply1Result = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(supply1Result).not.toBeUndefined()
             const supply1 = supply1Result!.toNumber()
 
             // Second add liquidity
@@ -268,7 +258,6 @@ describe("Vault SRC20", () => {
             )
 
             const supply2Result = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(supply2Result).not.toBeUndefined()
             const supply2 = supply2Result!.toNumber()
             expect(supply2).gt(supply1)
 
@@ -286,7 +275,6 @@ describe("Vault SRC20", () => {
             )
 
             const supply3Result = (await vault.functions.total_supply(lpAssetId).get()).value
-            expect(supply3Result).not.toBeUndefined()
             const supply3 = supply3Result!.toNumber()
             expect(supply3).lt(supply2)
             expect(supply3).gt(0)
