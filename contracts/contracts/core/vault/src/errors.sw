@@ -3,7 +3,6 @@ library;
 
 pub enum Error {
     VaultAlreadyInitialized: (),
-    VaultForbiddenNotGov: (),
     VaultNotInitialized: (),
     VaultInvalidMsgCaller: (),
     VaultSizeExceeded: (),

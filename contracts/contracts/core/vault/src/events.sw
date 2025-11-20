@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 library;
 
-use helpers::signed_256::Signed256;
+use signed_int::i256::I256;
 use core_interfaces::vault::Position;
 pub struct SetGov {
     pub gov: Identity,
@@ -92,7 +92,7 @@ pub struct DecreasePosition {
 }
 pub struct ClosePosition {
     pub key: b256,
-    pub realized_pnl: Signed256,
+    pub realized_pnl: I256,
 }
 pub struct LiquidatePosition {
     pub key: b256,

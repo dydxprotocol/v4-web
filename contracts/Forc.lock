@@ -3,6 +3,7 @@ name = "core_interfaces"
 source = "path+from-root-B13D3383E17FE97A"
 dependencies = [
     "helpers",
+    "signed_int",
     "std",
 ]
 
@@ -31,6 +32,15 @@ source = "path+from-root-A53CDECCD463BB5B"
 dependencies = ["std"]
 
 [[package]]
+name = "ownership"
+version = "0.26.1"
+source = "registry+ownership?0.26.1#QmcmRuXsD2ZaE74nZ5vGxc1QhYJhjQKMwho6ZfkYt1cs6Q!"
+dependencies = [
+    "src5",
+    "std",
+]
+
+[[package]]
 name = "pausable"
 version = "0.26.1"
 source = "registry+pausable?0.26.1#QmapdwdUETu3aWXa5xnjdsgqDWhh9WnGkYQcBi7UqfWsrL!"
@@ -45,6 +55,12 @@ dependencies = [
     "std",
     "stork_sway_sdk",
 ]
+
+[[package]]
+name = "reentrancy"
+version = "0.26.1"
+source = "registry+reentrancy?0.26.1#QmSgL8w74XSe54aQH7ySQUA2Bc3abTNnN15jVrynRJrFRE!"
+dependencies = ["std"]
 
 [[package]]
 name = "signed_int"
@@ -62,6 +78,12 @@ dependencies = ["std"]
 name = "src3"
 version = "0.8.0"
 source = "registry+src3?0.8.0#QmWZt1NRQHid4p5cmFMG11n1tnRfNSgWGXUWDgojt9hjzs!"
+dependencies = ["std"]
+
+[[package]]
+name = "src5"
+version = "0.8.0"
+source = "registry+src5?0.8.0#QmNRPZrPHFBiEAyWPU8gesdPsD2zb3cMKwEgxJwV1ZEjyD!"
 dependencies = ["std"]
 
 [[package]]
@@ -101,9 +123,13 @@ source = "member"
 dependencies = [
     "core_interfaces",
     "helpers",
+    "ownership",
     "pausable",
+    "reentrancy",
+    "signed_int",
     "src20",
     "src3",
+    "src5",
     "std",
 ]
 
@@ -113,8 +139,12 @@ source = "member"
 dependencies = [
     "core_interfaces",
     "helpers",
+    "ownership",
     "pausable",
+    "reentrancy",
+    "signed_int",
     "src20",
     "src3",
+    "src5",
     "std",
 ]

@@ -1366,9 +1366,7 @@ describe("Vault.funding_rate", () => {
         })
 
         it("non owner cannot set the liquidator", async () => {
-            await expect(call2(vaultUser0.functions.set_liquidator(user0Identity, true))).rejects.toThrowError(
-                "VaultForbiddenNotGov",
-            )
+            await expect(call2(vaultUser0.functions.set_liquidator(user0Identity, true))).rejects.toThrowError("NotOwner")
         })
 
         it("non liquidator cannot liquidate a position", async () => {

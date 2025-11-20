@@ -28,9 +28,12 @@ use std::{
     string::String,
 };
 use std::hash::*;
-use helpers::{reentrancy::*, signed_256::*, utils::*, zero::*};
+use helpers::{utils::*, zero::*};
 use src3::SRC3;
 use src20::{SetDecimalsEvent, SetNameEvent, SetSymbolEvent, SRC20, TotalSupplyEvent};
+use src5::{SRC5, State};
+use ownership::{_owner, initialize_ownership, only_owner, renounce_ownership, transfer_ownership};
+use signed_int::i256::I256;
 use core_interfaces::{
     pricefeed_wrapper::PricefeedWrapper,
     vault::{
@@ -47,6 +50,7 @@ use pausable::{
     Pausable,
     require_not_paused as sl_require_not_paused,
 };
+use reentrancy::reentrancy_guard;
 use events::*;
 use errors::*;
 
@@ -80,11 +84,7 @@ configurable {
 
 storage {
     vault {
-        // gov is not restricted to an `Address` (EOA) or a `Contract` (external)
-        // because this can be either a regular EOA (Address) or a Multisig (Contract)
-        gov: Identity = ZERO_IDENTITY,
         is_initialized: bool = false,
-        lock: bool = false,
         /// ---------------------  Fees  ---------------------
         /// charged when liquidating a position
         /// denominated in collateral asset
@@ -171,7 +171,7 @@ impl Pausable for Contract {
 
     #[storage(write)]
     fn pause() {
-        _only_gov();
+        only_owner();
 
         sl_pause();
         log(SetPaused {
@@ -181,12 +181,19 @@ impl Pausable for Contract {
 
     #[storage(write)]
     fn unpause() {
-        _only_gov();
+        only_owner();
 
         sl_unpause();
         log(SetPaused {
             is_paused: false,
         });
+    }
+}
+
+impl SRC5 for Contract {
+    #[storage(read)]
+    fn owner() -> State {
+        _owner()
     }
 }
 
@@ -207,8 +214,7 @@ impl Vault for Contract {
             Error::VaultAlreadyInitialized,
         );
         storage::vault.is_initialized.write(true);
-        storage::vault.lock.write(false);
-        storage::vault.gov.write(gov);
+        initialize_ownership(gov);
 
         // set the default fees
         // the liquidation fee cannot initialize in the storage section because of the configurable
@@ -250,15 +256,8 @@ impl Vault for Contract {
 
     // ---------------------  Admin  ---------------------
     #[storage(write)]
-    fn set_gov(gov: Identity) {
-        _only_gov();
-        storage::vault.gov.write(gov);
-        log(SetGov { gov })
-    }
-
-    #[storage(write)]
     fn set_liquidator(liquidator: Identity, is_active: bool) {
-        _only_gov();
+        only_owner();
         storage::vault.is_liquidator.insert(liquidator, is_active);
         log(SetLiquidator {
             liquidator,
@@ -272,7 +271,7 @@ impl Vault for Contract {
         margin_fee_basis_points: u64,
         liquidation_fee: u256,
     ) {
-        _only_gov();
+        only_owner();
 
         require(
             mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS && margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
@@ -303,7 +302,7 @@ impl Vault for Contract {
     /// e.g: 50 * 10_000 = 50%
     #[storage(write)]
     fn set_max_leverage(asset: b256, max_leverage: u256) {
-        _only_gov();
+        only_owner();
         require(max_leverage <= MAX_LEVERAGE, Error::VaultInvalidMaxLeverage);
         storage::vault.max_leverage.insert(asset, max_leverage);
         log(SetMaxLeverage {
@@ -315,7 +314,7 @@ impl Vault for Contract {
     // TODO exclude the collateral asset
     #[storage(read, write)]
     fn set_asset_config(asset: b256, asset_decimals: u32) {
-        _only_gov();
+        only_owner();
 
         storage::vault.whitelisted_assets.insert(asset, true);
         storage::vault.asset_decimals.insert(asset, asset_decimals);
@@ -328,7 +327,7 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn clear_asset_config(asset: b256) {
-        _only_gov();
+        only_owner();
 
         require(
             storage::vault
@@ -361,7 +360,7 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn withdraw_fees(receiver: Identity) -> u64 {
-        _only_gov();
+        only_owner();
 
         _withdraw_fees(receiver)
     }
@@ -526,12 +525,9 @@ impl Vault for Contract {
     fn add_liquidity(receiver: Identity) -> u64 {
         _only_initialized();
         sl_require_not_paused();
-
-        _begin_non_reentrant(storage::vault.lock);
+        reentrancy_guard();
 
         let amount_out = _add_liquidity(receiver);
-        _end_non_reentrant(storage::vault.lock);
-
         amount_out
     }
 
@@ -540,11 +536,9 @@ impl Vault for Contract {
     fn remove_liquidity(receiver: Identity) -> u64 {
         _only_initialized();
         sl_require_not_paused();
-
-        _begin_non_reentrant(storage::vault.lock);
+        reentrancy_guard();
 
         let amount_out = _remove_liquidity(receiver);
-        _end_non_reentrant(storage::vault.lock);
 
         amount_out
     }
@@ -560,12 +554,9 @@ impl Vault for Contract {
     ) -> (u256, u256) {
         _only_initialized();
         sl_require_not_paused();
-
-        _begin_non_reentrant(storage::vault.lock);
+        reentrancy_guard();
 
         let (new_collateral, price) = _increase_position(account, index_asset, size_delta, is_long);
-
-        _end_non_reentrant(storage::vault.lock);
         (new_collateral, price)
     }
 
@@ -582,8 +573,7 @@ impl Vault for Contract {
     ) -> (u256, u256, u256) {
         _only_initialized();
         sl_require_not_paused();
-
-        _begin_non_reentrant(storage::vault.lock);
+        reentrancy_guard();
 
         _validate_router(account);
         let (new_collateral, price, paid_out_collateral) = _decrease_position(
@@ -594,8 +584,6 @@ impl Vault for Contract {
             is_long,
             receiver,
         );
-
-        _end_non_reentrant(storage::vault.lock);
         (new_collateral, price, paid_out_collateral)
     }
 
@@ -608,35 +596,13 @@ impl Vault for Contract {
     ) {
         _only_initialized();
         sl_require_not_paused();
-
-        _begin_non_reentrant(storage::vault.lock);
+        reentrancy_guard();
 
         _liquidate_position(account, index_asset, is_long, fee_receiver);
-
-        _end_non_reentrant(storage::vault.lock);
     }
 }
 
 // ---------------------  Internal  ---------------------
-
-/// Checks is the caller is the governor, reverts if not.
-/// # Additional Information
-///
-/// The contract must be initialized
-/// # Reverts
-///
-/// - `VaultForbiddenNotGov` if the caller is not the governor, or the contract is not initialized
-#[storage(read)]
-fn _only_gov() {
-    require(
-        // try_read is used instead of read for the sake of upgradability
-        get_sender() == storage::vault
-            .gov
-            .try_read()
-            .unwrap_or(ZERO_IDENTITY),
-        Error::VaultForbiddenNotGov,
-    );
-}
 
 /// Checks if the contract is initialized, reverts if not.
 /// # Reverts
@@ -1281,9 +1247,9 @@ fn _decrease_position(
 
     if pnl_delta > 0 {
         if has_profit {
-            position.realized_pnl = position.realized_pnl + Signed256::from(pnl_delta);
+            position.realized_pnl = position.realized_pnl + I256::from_uint(pnl_delta);
         } else {
-            position.realized_pnl = position.realized_pnl - Signed256::from(pnl_delta);
+            position.realized_pnl = position.realized_pnl - I256::from_uint(pnl_delta);
         }
     }
     log(UpdatePnl {

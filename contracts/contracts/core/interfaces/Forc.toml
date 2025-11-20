@@ -6,4 +6,4 @@ name = "core_interfaces"
 
 [dependencies]
 helpers = { path = "../../helpers" }
-
+signed_int = "0.26.1"

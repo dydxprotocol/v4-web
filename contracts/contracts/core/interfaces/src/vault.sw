@@ -2,15 +2,15 @@
 library;
 
 use std::hash::*;
+use signed_int::i256::I256;
 
-use helpers::signed_256::*;
 pub struct Position {
     pub size: u256,
     pub collateral: u256,
     pub average_price: u256,
     pub cumulative_funding_rate: u256,
     pub reserve_amount: u256,
-    pub realized_pnl: Signed256,
+    pub realized_pnl: I256,
     pub last_increased_time: u64,
 }
 pub struct PositionKey {
@@ -37,8 +37,6 @@ abi Vault {
        / / /    / ___ \ (_| | | | | | | | | | |
       /_/_/    /_/   \_\__,_|_| |_| |_|_|_| |_|                         
     */
-    #[storage(write)]
-    fn set_gov(gov: Identity);
     #[storage(write)]
     fn set_liquidator(liquidator: Identity, is_active: bool);
     #[storage(write)]
@@ -184,7 +182,7 @@ impl Position {
             average_price: 0,
             cumulative_funding_rate: 0,
             reserve_amount: 0,
-            realized_pnl: Signed256::from(0),
+            realized_pnl: I256::zero(),
             last_increased_time: 0,
         }
     }
