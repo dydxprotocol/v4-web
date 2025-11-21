@@ -1,6 +1,7 @@
 import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { BigNumber } from 'bignumber.js';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -41,7 +42,7 @@ import { addSwap } from '@/state/swaps';
 
 import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
@@ -71,11 +72,12 @@ export const Swap = () => {
   const tokenBalances = useMemo(() => {
     const dydx = {
       rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
-      formatted: Math.max(0, Number(nativeTokenBalance ?? 0)).toFixed(2),
+      formatted: MustBigNumber(nativeTokenBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
+
     const usdc = {
       rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
-      formatted: Math.max(0, parentSubaccountUsdcBalance ?? 0).toFixed(2),
+      formatted: MustBigNumber(parentSubaccountUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
 
     if (inputToken === 'usdc') {
@@ -109,19 +111,9 @@ export const Swap = () => {
 
   const setMaxAmount = (m: SwapMode) => {
     if (m === 'exact-in') {
-      const formattedInput = formatUnits(
-        tokenBalances.inputBalance.rawBalanceBigInt,
-        inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
-      );
-
-      setAmount(formattedInput);
+      setAmount(tokenBalances.inputBalance.formatted);
     } else {
-      const formattedOutput = formatUnits(
-        tokenBalances.outputBalance.rawBalanceBigInt,
-        inputToken === 'usdc' ? DYDX_DECIMALS : USDC_DECIMALS
-      );
-
-      setAmount(formattedOutput);
+      setAmount(tokenBalances.outputBalance.formatted);
     }
     setMode(m);
   };
