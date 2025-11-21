@@ -61,6 +61,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
 
+import { SpotActions } from './SpotActions';
 import { SubaccountActions } from './SubaccountActions';
 import { WalletActions } from './WalletActions';
 
@@ -332,6 +333,7 @@ export const AccountMenu = () => {
                       }
                     />
                   </div>
+                  <SpotActions />
                 </div>
               )}
             </$Balances>
