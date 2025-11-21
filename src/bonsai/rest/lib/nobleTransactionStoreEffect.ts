@@ -64,14 +64,16 @@ const selectNobleTxAuthorizedAccount = createAppSelector(
       return undefined;
     }
 
-    const localNobleWallet = localWalletManager.getLocalNobleWallet(localWalletNonce);
+    const localNobleWallet = localWalletManager.getCachedLocalNobleWallet(localWalletNonce);
+
     const nobleAddress = convertBech32Address({
       address: parentSubaccountInfo.wallet,
       bech32Prefix: NOBLE_BECH32_PREFIX,
     });
+
     const isCorrectWallet = localNobleWallet?.address === nobleAddress;
 
-    if (!isCorrectWallet || localNobleWallet == null) return undefined;
+    if (!isCorrectWallet) return undefined;
 
     return {
       localNobleWallet,
