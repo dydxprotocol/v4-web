@@ -139,6 +139,7 @@ export const SpotMarketsDropdown = ({
             <LoadingSpace id="spot-token-search-loading" />
           ) : (
             <$Table
+              withOuterBorder
               withInnerBorders
               data={searchResults}
               tableId="spot-markets-dropdown"
