@@ -1,12 +1,14 @@
 import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
+import { BigNumber } from 'bignumber.js';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
 import { OnboardingState } from '@/constants/account';
+import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -25,6 +27,7 @@ import UsdcLogo from '@/icons/usdc-inverted.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
 
 import { Accordion } from '@/components/Accordion';
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
@@ -39,7 +42,7 @@ import { addSwap } from '@/state/swaps';
 
 import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
@@ -69,11 +72,12 @@ export const Swap = () => {
   const tokenBalances = useMemo(() => {
     const dydx = {
       rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
-      formatted: Math.max(0, Number(nativeTokenBalance ?? 0)).toFixed(2),
+      formatted: MustBigNumber(nativeTokenBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
+
     const usdc = {
       rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
-      formatted: Math.max(0, parentSubaccountUsdcBalance ?? 0).toFixed(2),
+      formatted: MustBigNumber(parentSubaccountUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
 
     if (inputToken === 'usdc') {
@@ -184,7 +188,9 @@ export const Swap = () => {
           tw="flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1"
         >
           <div tw="flex justify-between">
-            <div tw="text-color-text-0 font-small-medium">From</div>
+            <div tw="text-color-text-0 font-small-medium">
+              {stringGetter({ key: STRING_KEYS.SWAP_FROM })}
+            </div>
             <Button
               disabled={hasPendingSwap}
               buttonStyle={ButtonStyle.WithoutBackground}
@@ -235,7 +241,9 @@ export const Swap = () => {
           tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1"
         >
           <div tw="flex justify-between">
-            <div tw="text-color-text-0 font-small-medium">To</div>
+            <div tw="text-color-text-0 font-small-medium">
+              {stringGetter({ key: STRING_KEYS.SWAP_TO })}
+            </div>
             <Button
               onClick={() => setMaxAmount('exact-out')}
               disabled={hasPendingSwap}
@@ -270,6 +278,11 @@ export const Swap = () => {
           </div>
         </$InputContainer>
       </div>
+      {hasPendingSwap && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({ key: STRING_KEYS.SWAP_IN_PROGRESS_WARNING })}
+        </AlertMessage>
+      )}
       {onboardingState !== OnboardingState.AccountConnected ? (
         <OnboardingTriggerButton size={ButtonSize.BasePlus} />
       ) : error ? (
