@@ -66,7 +66,7 @@ export const SpotWithdrawForm = ({
       return 'Amount must be greater than zero';
     }
 
-    if (maxWithdrawable && amountBN.gt(maxWithdrawable)) {
+    if (amountBN.gt(maxWithdrawable)) {
       return stringGetter({
         key: STRING_KEYS.INSUFFICIENT_BALANCE,
       });
