@@ -109,9 +109,19 @@ export const Swap = () => {
 
   const setMaxAmount = (m: SwapMode) => {
     if (m === 'exact-in') {
-      setAmount(tokenBalances.inputBalance.formatted);
+      const formattedInput = formatUnits(
+        tokenBalances.inputBalance.rawBalanceBigInt,
+        inputToken === 'usdc' ? USDC_DECIMALS : DYDX_DECIMALS
+      );
+
+      setAmount(formattedInput);
     } else {
-      setAmount(tokenBalances.outputBalance.formatted);
+      const formattedOutput = formatUnits(
+        tokenBalances.outputBalance.rawBalanceBigInt,
+        inputToken === 'usdc' ? DYDX_DECIMALS : USDC_DECIMALS
+      );
+
+      setAmount(formattedOutput);
     }
     setMode(m);
   };
