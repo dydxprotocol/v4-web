@@ -9,10 +9,16 @@ cd fuel-core
 docker build -t starboard/fuel-core .
 ```
 
-Build the starboard project image
+Build the starboard project image.
+To build from the `main` branch simply run
 ```shell
 cd starboard
 docker build -t starboard .
+```
+To build from other branch use a docker build arg `STARBOARD_BRANCH`, for instance
+```shell
+cd starboard
+docker build --build-arg STARBOARD_BRANCH=lglen/feat/STAR-306-indexer-update -t starboard .
 ```
 
 ## Run
@@ -24,10 +30,10 @@ The services include:
 - The indexer processor
 - The indexer API
 
-Do it one time on installation. There is no need to modify `.env` file afterwards.
+Do this once on installation. There is no need to modify `.env` file afterwards.
 
 ```shell
-cp .env.example .env.
+cp .env.example .env
 ```
 
 Start the services
@@ -36,8 +42,9 @@ Start the services
 docker-compose up -d
 ```
 
-Deploy the contracts The container must be any starboard.
-Do it once per instantiation, only on a clean state - next execution yields other contract addresses.
+Deploy the contracts. The container must be any starboard.
+Do this once per instantiation and only on a clean state.
+Subsequent executions will yield different contract addresses.
 
 ```shell
 docker exec -t starboard_indexer_processor bash -i -c /root/setup_starboard_contracts.sh
@@ -65,10 +72,10 @@ Of course, the roles above are conventional.
 
 ## Fuel Wallet integration
 
-Open a web browser and open the fuel browser extention (README does not cover Fuel Wallet installation).
+Open a web browser and open the fuel browser extension (README does not cover Fuel Wallet installation).
 Find `add network` option. The params of the new local network:
 
-```
+```yaml
 URL:
 http://localhost:4000/v1/graphql
 
@@ -80,7 +87,7 @@ ChainId:
 
 Configuration useful for FE:
 
-```
+```yaml
 The indexer address:
 http://localhost:4350/v1/graphql
 

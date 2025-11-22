@@ -1,5 +1,6 @@
 FROM ubuntu:24.04
 
+
 RUN apt update && apt install -y git curl postgresql-client && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://install.fuel.network | sh && \
@@ -16,11 +17,13 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | b
 
 RUN curl -fsSL https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
 
+ARG STARBOARD_BRANCH=main
+
 RUN git clone \
     https://github.com/wt-xyz/starboard.git \
     /starboard && \
     cd /starboard && \
-    git checkout lglen/feat/STAR-306-indexer-update
+    git checkout ${STARBOARD_BRANCH}
 
 WORKDIR /starboard
 
