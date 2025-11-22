@@ -5,6 +5,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { formatUnits, parseUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DYDX_CHAIN_DYDX_DENOM, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSkipClient } from '@/hooks/transfers/skipClient';
@@ -17,6 +18,8 @@ import { appQueryClient } from '@/state/appQueryClient';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getPendingSwaps } from '@/state/swapSelectors';
 import { Swap, updateSwap } from '@/state/swaps';
+
+import { track } from '@/lib/analytics/analytics';
 
 import { useSubaccount } from './useSubaccount';
 
@@ -94,7 +97,10 @@ export const useUpdateSwaps = () => {
         route,
         userAddresses,
         slippageTolerancePercent: SWAP_SLIPPAGE_PERCENT,
-        onTransactionCompleted: async ({ txHash, status }) => {
+        onTransactionBroadcast: async ({ txHash, chainId }) => {
+          track(AnalyticsEvents.SwapSubmitted({ id: swap.id, txHash, ...route, chainId }));
+        },
+        onTransactionCompleted: async ({ chainId, txHash, status }) => {
           const errorStates = ['STATE_COMPLETED_ERROR', 'STATE_ABANDONED', 'STATE_PENDING_ERROR'];
           if (status?.state && errorStates.includes(status.state)) {
             logBonsaiError('useUpdateSwaps', 'Error executing swap', {
@@ -109,6 +115,8 @@ export const useUpdateSwaps = () => {
               txHash,
               swapId: swap.id,
             });
+
+            track(AnalyticsEvents.SwapFinalized({ id: swap.id, txHash, chainId, ...route }));
             dispatch(updateSwap({ swap: { id: swap.id, txHash, status: 'success' } }));
           }
         },
@@ -135,6 +143,16 @@ export const useUpdateSwaps = () => {
               logBonsaiError('useUpdateSwaps', 'Error withdrawing from subaccount', {
                 error,
               });
+
+              track(
+                AnalyticsEvents.SwapError({
+                  id: swap.id,
+                  step: 'withdraw-subaccount',
+                  error: error.message,
+                  ...route,
+                })
+              );
+
               dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
             })
             .then(() => {
@@ -149,6 +167,16 @@ export const useUpdateSwaps = () => {
                 error,
                 swapId: swap.id,
               });
+
+              track(
+                AnalyticsEvents.SwapError({
+                  id: swap.id,
+                  step: 'execute-swap',
+                  error: error.message,
+                  ...route,
+                })
+              );
+
               dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
             })
             .then(() => {

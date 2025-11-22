@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { selectIndexerReady, selectIndexerUrl } from '@/bonsai/socketSelectors';
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { avalanche, mainnet, polygon } from 'viem/chains';
 
@@ -15,6 +13,7 @@ import { SOLANA_MAINNET_ID } from '@/constants/solana';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useCopyValue } from '@/hooks/useCopyValue';
+import { useDepositAddress } from '@/hooks/useDepositAddress';
 import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -55,32 +54,13 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const stringGetter = useStringGetter();
 
   const { dydxAddress } = useAccounts();
-  const indexerUrl = useAppSelector(selectIndexerUrl);
-  const indexerReady = useAppSelector(selectIndexerReady);
-
-  const canQueryForDepositAddresses = dydxAddress != null && indexerReady;
   const { isUploadingAddress } = useTurnkeyAuth();
-
   const {
-    data: depositAddresses,
-    isLoading: isLoadingDepositAddresses,
-    isError: failedToFetchDepositAddresses,
-    error: fetchDepositAddressesError,
-  } = useQuery({
-    enabled: canQueryForDepositAddresses,
-    queryKey: ['turnkeyWallets'],
-    queryFn: async (): Promise<{
-      avalancheAddress: string;
-      evmAddress: string;
-      svmAddress: string;
-    }> => {
-      const response = await fetch(`${indexerUrl}/v4/bridging/getDepositAddress/${dydxAddress}`, {
-        method: 'GET',
-      }).then((res) => res.json());
-
-      return response;
-    },
-  });
+    depositAddresses,
+    isLoadingDepositAddresses,
+    failedToFetchDepositAddresses,
+    fetchDepositAddressesError,
+  } = useDepositAddress();
 
   useEffect(() => {
     // Optimistic Deposit Initiated for tracking purposes
@@ -92,7 +72,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
       track(
         AnalyticsEvents.TurnkeyFetchDepositAddressError({
           dydxAddress,
-          error: fetchDepositAddressesError.message,
+          error: fetchDepositAddressesError?.message ?? 'Unknown error',
         })
       );
     }
