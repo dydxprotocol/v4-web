@@ -10,6 +10,7 @@ type Liquidity @entity {
   provider: String! @index
   stable: BigInt!
   lpAmount: BigInt!
+  fee: BigInt!
   timestamp: Int!
   latest: Boolean!
 }

@@ -97,26 +97,25 @@ async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: tr
     const log = logs[0]
     console.log("log", log)
     const provider = log.account.Address.bits
-    const stablelDetla = log.stable_asset_amount
-    const lpAmountDelta = log.lp_asset_amount
+    // the user transfers in
+    const stableDetla = BigInt(log.stable_asset_amount.toString())
+    const lpAmountDelta = BigInt(log.lp_asset_amount.toString())
+    const fee = BigInt(log.fee.toString())
 
     const currentLiquidity: Liquidity = await ctx.store.findOne(Liquidity, { where: { provider: provider, latest: true }})
-    let stable;
-    let lpAmount;
     if (currentLiquidity) {
         currentLiquidity.latest = false
         await ctx.store.upsert(currentLiquidity)
-        stable = currentLiquidity.stable + stablelDetla
-        lpAmount = currentLiquidity.lpAmount + lpAmountDelta
-    } else {
-        stable = stablelDetla
-        lpAmount = lpAmountDelta
     }
+    // the liquidity pool gets the amount
+    const stable = stableDetla - fee
+    const lpAmount = lpAmountDelta
     const liquidity: Liquidity = new Liquidity({
         id: receipt.id,
         provider: provider,
         stable: stable,
         lpAmount: lpAmount,
+        fee: fee,
         timestamp: getUTCBlockTime(block),
         latest: true,
     })
@@ -124,14 +123,14 @@ async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: tr
 
     let totalLiquidity: TotalLiquidity = await ctx.store.findOne(TotalLiquidity, { where: { id: "1" }})
     if (totalLiquidity) {
-        totalLiquidity.stable = totalLiquidity.stable + stablelDetla
+        totalLiquidity.stable = totalLiquidity.stable + stableDetla - fee
         totalLiquidity.lpAmount = totalLiquidity.lpAmount + lpAmountDelta
         totalLiquidity.lastTimestamp = getUTCBlockTime(block)
         await ctx.store.upsert(totalLiquidity)
     } else {
         totalLiquidity = new TotalLiquidity({
             id: "1",
-            stable: stablelDetla,
+            stable: stableDetla - fee,
             lpAmount: lpAmountDelta,
             lastTimestamp: getUTCBlockTime(block),
         })
@@ -144,25 +143,27 @@ async function handleRemoveLiquidity(receipt: Receipt<{receipt: {rb: true, data:
     const log = logs[0]
     console.log("log", log)
     const provider = log.account.Address.bits
-    const stablelDetla = BigInt(log.stable_asset_amount.toString())
+    // the amount transferred out to the user
+    const stableDetla = BigInt(log.stable_asset_amount.toString())
     const lpAmountDelta = BigInt(log.lp_asset_amount.toString())
+    const fee = BigInt(log.fee.toString())
 
     const currentLiquidity: Liquidity = await ctx.store.findOne(Liquidity, { where: { provider: provider, latest: true }})
-    let stable;
-    let lpAmount;
-    if (currentLiquidity) {
-        currentLiquidity.latest = false
-        await ctx.store.upsert(currentLiquidity)
-        stable = currentLiquidity.stable - stablelDetla
-        lpAmount = currentLiquidity.lpAmount - lpAmountDelta
-    } else {
+    if (!currentLiquidity) {
         throw new Error('Liquidity not found')
     }
+    currentLiquidity.latest = false
+    await ctx.store.upsert(currentLiquidity)
+    // the amount substracted from the liquidity pool
+    // For remove, store the amount removed (stable_asset_amount + fee) and lp_asset_amount
+    const stable = stableDetla + fee
+    const lpAmount = lpAmountDelta
     const liquidity: Liquidity = new Liquidity({
         id: receipt.id,
         provider: provider,
-        stable: stable,
-        lpAmount: lpAmount,
+        stable: -stable,
+        lpAmount: -lpAmount,
+        fee: fee,
         timestamp: getUTCBlockTime(block),
         latest: true,
     })
@@ -170,18 +171,12 @@ async function handleRemoveLiquidity(receipt: Receipt<{receipt: {rb: true, data:
 
     let totalLiquidity: TotalLiquidity = await ctx.store.findOne(TotalLiquidity, { where: { id: "1" }})
     if (totalLiquidity) {
-        totalLiquidity.stable = totalLiquidity.stable - stablelDetla
+        totalLiquidity.stable = totalLiquidity.stable - stableDetla - fee
         totalLiquidity.lpAmount = totalLiquidity.lpAmount - lpAmountDelta
         totalLiquidity.lastTimestamp = getUTCBlockTime(block)
         await ctx.store.upsert(totalLiquidity)
     } else {
-        totalLiquidity = new TotalLiquidity({
-            id: "1",
-            stable: stablelDetla,
-            lpAmount: lpAmountDelta,
-            lastTimestamp: getUTCBlockTime(block),
-        })
-        await ctx.store.insert(totalLiquidity)
+        throw new Error('Total liquidity not found')
     }
 }
 

@@ -5,14 +5,6 @@ import pg from "pg"
 
 const { Pool, Client } = pg
 
-// adsresses are hardcoded, taken form the fuel node starting script
-const deployerAddress = "0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6" //0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6
-const user0Address = "0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770" //0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770"
-const user1Address = "0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c" //0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c"
-const user2Address = "0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b" //0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b"
-const liquidatorAddress = "0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088" //0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088"
-
-
 describe("Verify Prices", () => {
     let client: pg.Client
     beforeAll(async () => {

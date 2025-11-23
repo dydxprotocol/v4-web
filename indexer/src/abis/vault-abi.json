@@ -46,29 +46,39 @@
       "metadataTypeId": 5
     },
     {
-      "type": "enum helpers::reentrancy::ReentrancyError",
-      "concreteTypeId": "2612db1dbf857e3bd45053dd8464f0c4d0906ec49e6fb9d510402423176610d2",
+      "type": "enum ownership::errors::InitializationError",
+      "concreteTypeId": "b1fddf488ccb9e63d11888b2750bbd1280a1ae1c49f2d6637fd4cf1e930d1468",
       "metadataTypeId": 6
-    },
-    {
-      "type": "enum helpers::signed_256::Error",
-      "concreteTypeId": "c57297d6a7b36878bd091ce2bb802ea898ec7e0a53f2d38cb34b8e82c97bf983",
-      "metadataTypeId": 7
     },
     {
       "type": "enum pausable::errors::PauseError",
       "concreteTypeId": "455b46a49016f5c03c18ce54b969ea3d0d33c9b00263b3dcc36aa8da27558b8a",
+      "metadataTypeId": 7
+    },
+    {
+      "type": "enum reentrancy::errors::ReentrancyError",
+      "concreteTypeId": "e52e660ff9a330c417b6493bb8d3d0049bafaa6c4a771b32b205d71bc2bc5ace",
       "metadataTypeId": 8
+    },
+    {
+      "type": "enum src5::AccessError",
+      "concreteTypeId": "f1247475d0d1466599267010f088190f8664dd31663a40c5d5e525d8e64b995d",
+      "metadataTypeId": 9
+    },
+    {
+      "type": "enum src5::State",
+      "concreteTypeId": "287a382c1e0b1f11d12a422e77a248d27761327cd17515cc6e6369d528cf31ca",
+      "metadataTypeId": 10
     },
     {
       "type": "enum std::identity::Identity",
       "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
-      "metadataTypeId": 9
+      "metadataTypeId": 11
     },
     {
       "type": "enum std::option::Option<struct std::string::String>",
       "concreteTypeId": "7c06d929390a9aeeb8ffccf8173ac0d101a9976d99dda01cce74541a81e75ac0",
-      "metadataTypeId": 10,
+      "metadataTypeId": 12,
       "typeArguments": [
         "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c"
       ]
@@ -76,7 +86,7 @@
     {
       "type": "enum std::option::Option<u64>",
       "concreteTypeId": "d852149004cc9ec0bbe7dc4e37bffea1d41469b759512b6136f2e865a4c06e7d",
-      "metadataTypeId": 10,
+      "metadataTypeId": 12,
       "typeArguments": [
         "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
       ]
@@ -84,7 +94,7 @@
     {
       "type": "enum std::option::Option<u8>",
       "concreteTypeId": "2da102c46c7263beeed95818cd7bee801716ba8303dddafdcd0f6c9efda4a0f1",
-      "metadataTypeId": 10,
+      "metadataTypeId": 12,
       "typeArguments": [
         "c89951a24c6ca28c13fd1cfdc646b2b656d69e61a92b91023be7eb58eb914b6b"
       ]
@@ -96,157 +106,157 @@
     {
       "type": "struct core_interfaces::vault::FundingInfo",
       "concreteTypeId": "2b14fdd13855ff2a88ae5b14c5b878eff0fc6419870b1bde0b69563eb16a9c0c",
-      "metadataTypeId": 13
+      "metadataTypeId": 15
     },
     {
       "type": "struct core_interfaces::vault::Position",
       "concreteTypeId": "3c946bc1dc37ba30bafc7846f183ddb6bb4dbc93b26e91fa87aaf4d29613b0cb",
-      "metadataTypeId": 14
+      "metadataTypeId": 16
     },
     {
       "type": "struct events::AddLiquidity",
       "concreteTypeId": "2b0e032df05fde5983b2b9679381b7d50b86d5b2906433071a974b5a60f108e9",
-      "metadataTypeId": 15
+      "metadataTypeId": 17
     },
     {
       "type": "struct events::ClearAssetConfig",
       "concreteTypeId": "3d0474c702badab0e663699820f0c39e07964c76ec933823c8ebaa2d368868d0",
-      "metadataTypeId": 16
+      "metadataTypeId": 18
     },
     {
       "type": "struct events::ClosePosition",
       "concreteTypeId": "164ec90f2567aacf79e7c3b16da30979eca25bb28a9d54bde3f76c2e60991bb6",
-      "metadataTypeId": 17
+      "metadataTypeId": 19
     },
     {
       "type": "struct events::CollectSwapFees",
       "concreteTypeId": "eeb48779a1f1a01fb5450db9b5304af98685f04b0137df91962d97369d3cff2c",
-      "metadataTypeId": 18
+      "metadataTypeId": 20
     },
     {
       "type": "struct events::DecreasePosition",
       "concreteTypeId": "efc15695c0656322f439c297568242d3f65af9fde2a5f9c6b7052027dd244f9a",
-      "metadataTypeId": 19
+      "metadataTypeId": 21
     },
     {
       "type": "struct events::IncreasePosition",
       "concreteTypeId": "e64d7f488909438c3f2993022fe1ca4d21a75e333dda6474c844ce615bcaa819",
-      "metadataTypeId": 20
+      "metadataTypeId": 22
     },
     {
       "type": "struct events::LiquidatePosition",
       "concreteTypeId": "6dbf7e96ae6404c6e5c840a50205524c00399749c888ec57884820c238d166c0",
-      "metadataTypeId": 21
+      "metadataTypeId": 23
     },
     {
       "type": "struct events::RegisterPositionByKey",
       "concreteTypeId": "d70bb134945990b64959a75b9357d3cb7a579d59ced16542d117fc9f32474d3e",
-      "metadataTypeId": 22
+      "metadataTypeId": 24
     },
     {
       "type": "struct events::RemoveLiquidity",
       "concreteTypeId": "097c4276f6aaca3406916024f56092501e2c9ea73e31bcbb671f896f4f95a93e",
-      "metadataTypeId": 23
+      "metadataTypeId": 25
     },
     {
       "type": "struct events::SetApprovedRouter",
       "concreteTypeId": "229bc151d1fb57761117b661230e22ebdab179095446fb6bda4bd2f62a9bebf9",
-      "metadataTypeId": 24
+      "metadataTypeId": 26
     },
     {
       "type": "struct events::SetAssetConfig",
       "concreteTypeId": "1e94628396920ef89acb953041b493c50f2f325ff771ee58af8f7c8b4d5e3890",
-      "metadataTypeId": 25
+      "metadataTypeId": 27
     },
     {
       "type": "struct events::SetFees",
       "concreteTypeId": "65b4b5a4f6cb0fb32d93ee4909a33603f2474d5778876f5bfb8a366a46a6fba5",
-      "metadataTypeId": 26
+      "metadataTypeId": 28
     },
     {
       "type": "struct events::SetGov",
       "concreteTypeId": "ed61073796af24b33de31ddc59c970aefa2613605f42d0dc94a2b1360de862c8",
-      "metadataTypeId": 27
+      "metadataTypeId": 29
     },
     {
       "type": "struct events::SetLiquidator",
       "concreteTypeId": "2b6f09f432a827e63ee46ce9812752485a7cf3cbedc4f81ea41118895f01b447",
-      "metadataTypeId": 28
+      "metadataTypeId": 30
     },
     {
       "type": "struct events::SetMaxLeverage",
       "concreteTypeId": "cb1f983cd10d47d63a5cce7bcc2182049edff6d981f040eeccfe2c2d6b57665d",
-      "metadataTypeId": 29
+      "metadataTypeId": 31
     },
     {
       "type": "struct events::SetPaused",
       "concreteTypeId": "b8192ed971046a41de05339b780d017906957fba8d7709f65c72df13b7f1b6aa",
-      "metadataTypeId": 30
-    },
-    {
-      "type": "struct events::SetRouter",
-      "concreteTypeId": "6de86139f21108d3c0ec2ee2c44a8ef669c325a45237bc86ae1fd12232ab4744",
-      "metadataTypeId": 31
+      "metadataTypeId": 32
     },
     {
       "type": "struct events::UpdateFundingInfo",
       "concreteTypeId": "533a11b199b437c6858157a89214892fb11c6a37a787f46e2268aa4fe6bfa71c",
-      "metadataTypeId": 32
+      "metadataTypeId": 33
     },
     {
       "type": "struct events::WithdrawFees",
       "concreteTypeId": "aed31b17d9586e07201770792a5bec23432449aaf33e230df13c56b1cd70136b",
-      "metadataTypeId": 33
+      "metadataTypeId": 34
     },
     {
       "type": "struct events::WriteFeeReserve",
       "concreteTypeId": "6f1254771865ae1159b4b3823bac0a3a304ad5425210a89e0dec5017cab985ca",
-      "metadataTypeId": 34
+      "metadataTypeId": 35
     },
     {
       "type": "struct events::WritePoolAmount",
       "concreteTypeId": "a79e7431ee681dc41a8182097fb9d2d8f280d9e6a6034d0ac27c3ff79a6ecab2",
-      "metadataTypeId": 35
+      "metadataTypeId": 36
     },
     {
       "type": "struct events::WritePosition",
       "concreteTypeId": "f9d1d0fb63cf5f45168c897aabad8f67bcd0374494acb3b8acaa0ba07a87fec7",
-      "metadataTypeId": 36
+      "metadataTypeId": 37
+    },
+    {
+      "type": "struct ownership::events::OwnershipSet",
+      "concreteTypeId": "8c0d2488561c35a28ef795bb8bcc4c43999cdd1e3ecbd10c226e0a68660c54d4",
+      "metadataTypeId": 38
     },
     {
       "type": "struct src20::SetDecimalsEvent",
       "concreteTypeId": "b6a606756ed20ecf9e047dfc134b0a9ba42ccc642956ce4205e784e82ee1daa1",
-      "metadataTypeId": 38
+      "metadataTypeId": 40
     },
     {
       "type": "struct src20::SetNameEvent",
       "concreteTypeId": "2c4e26d9fde4e3c732683d47b93ece2ba27aa77cc27495ea42fe5491ef144f0d",
-      "metadataTypeId": 39
+      "metadataTypeId": 41
     },
     {
       "type": "struct src20::SetSymbolEvent",
       "concreteTypeId": "3dc850985943a7e8e5becd967e8b8eaa26a7dec1f75a1a80ace5b3bf622b1e1a",
-      "metadataTypeId": 40
+      "metadataTypeId": 42
     },
     {
       "type": "struct src20::TotalSupplyEvent",
       "concreteTypeId": "7a3907033239b7e20b602aaf2a1a55863934467688426a359aae8b410786d2ba",
-      "metadataTypeId": 41
+      "metadataTypeId": 43
     },
     {
       "type": "struct std::asset_id::AssetId",
       "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      "metadataTypeId": 43
+      "metadataTypeId": 45
     },
     {
       "type": "struct std::contract_id::ContractId",
       "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
-      "metadataTypeId": 46
+      "metadataTypeId": 48
     },
     {
       "type": "struct std::string::String",
       "concreteTypeId": "9a7f1d3e963c10e0a4ea70a8e20a4813d1dc5682e28f74cb102ae50d32f7f98c",
-      "metadataTypeId": 47
+      "metadataTypeId": 49
     },
     {
       "type": "u256",
@@ -353,7 +363,7 @@
           "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
         },
         {
-          "name": "VaultForbiddenNotGov",
+          "name": "VaultNotInitialized",
           "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
         },
         {
@@ -479,40 +489,18 @@
       ]
     },
     {
-      "type": "enum helpers::reentrancy::ReentrancyError",
+      "type": "enum ownership::errors::InitializationError",
       "metadataTypeId": 6,
       "components": [
         {
-          "name": "ReentrantCall",
-          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
-        }
-      ]
-    },
-    {
-      "type": "enum helpers::signed_256::Error",
-      "metadataTypeId": 7,
-      "components": [
-        {
-          "name": "Signed256AdditionOverflow",
-          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
-        },
-        {
-          "name": "Signed256SubtractionOverflow",
-          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
-        },
-        {
-          "name": "Signed256MultiplicationOverflow",
-          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
-        },
-        {
-          "name": "Signed256DivisionOverflow",
+          "name": "CannotReinitialized",
           "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
         }
       ]
     },
     {
       "type": "enum pausable::errors::PauseError",
-      "metadataTypeId": 8,
+      "metadataTypeId": 7,
       "components": [
         {
           "name": "Paused",
@@ -525,22 +513,60 @@
       ]
     },
     {
-      "type": "enum std::identity::Identity",
+      "type": "enum reentrancy::errors::ReentrancyError",
+      "metadataTypeId": 8,
+      "components": [
+        {
+          "name": "NonReentrant",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        }
+      ]
+    },
+    {
+      "type": "enum src5::AccessError",
       "metadataTypeId": 9,
       "components": [
         {
+          "name": "NotOwner",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        }
+      ]
+    },
+    {
+      "type": "enum src5::State",
+      "metadataTypeId": 10,
+      "components": [
+        {
+          "name": "Uninitialized",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "Initialized",
+          "typeId": 11
+        },
+        {
+          "name": "Revoked",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        }
+      ]
+    },
+    {
+      "type": "enum std::identity::Identity",
+      "metadataTypeId": 11,
+      "components": [
+        {
           "name": "Address",
-          "typeId": 42
+          "typeId": 44
         },
         {
           "name": "ContractId",
-          "typeId": 46
+          "typeId": 48
         }
       ]
     },
     {
       "type": "enum std::option::Option",
-      "metadataTypeId": 10,
+      "metadataTypeId": 12,
       "components": [
         {
           "name": "None",
@@ -548,24 +574,24 @@
         },
         {
           "name": "Some",
-          "typeId": 11
+          "typeId": 13
         }
       ],
       "typeParameters": [
-        11
+        13
       ]
     },
     {
       "type": "generic T",
-      "metadataTypeId": 11
+      "metadataTypeId": 13
     },
     {
       "type": "raw untyped ptr",
-      "metadataTypeId": 12
+      "metadataTypeId": 14
     },
     {
       "type": "struct core_interfaces::vault::FundingInfo",
-      "metadataTypeId": 13,
+      "metadataTypeId": 15,
       "components": [
         {
           "name": "total_short_sizes",
@@ -591,7 +617,7 @@
     },
     {
       "type": "struct core_interfaces::vault::Position",
-      "metadataTypeId": 14,
+      "metadataTypeId": 16,
       "components": [
         {
           "name": "size",
@@ -615,7 +641,7 @@
         },
         {
           "name": "realized_pnl",
-          "typeId": 37
+          "typeId": 39
         },
         {
           "name": "last_increased_time",
@@ -625,11 +651,11 @@
     },
     {
       "type": "struct events::AddLiquidity",
-      "metadataTypeId": 15,
+      "metadataTypeId": 17,
       "components": [
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "stable_asset_amount",
@@ -640,14 +666,14 @@
           "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
-          "name": "fee_basis_points",
+          "name": "fee",
           "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
       ]
     },
     {
       "type": "struct events::ClearAssetConfig",
-      "metadataTypeId": 16,
+      "metadataTypeId": 18,
       "components": [
         {
           "name": "asset",
@@ -657,7 +683,7 @@
     },
     {
       "type": "struct events::ClosePosition",
-      "metadataTypeId": 17,
+      "metadataTypeId": 19,
       "components": [
         {
           "name": "key",
@@ -665,13 +691,13 @@
         },
         {
           "name": "realized_pnl",
-          "typeId": 37
+          "typeId": 39
         }
       ]
     },
     {
       "type": "struct events::CollectSwapFees",
-      "metadataTypeId": 18,
+      "metadataTypeId": 20,
       "components": [
         {
           "name": "fee_amount",
@@ -681,7 +707,7 @@
     },
     {
       "type": "struct events::DecreasePosition",
-      "metadataTypeId": 19,
+      "metadataTypeId": 21,
       "components": [
         {
           "name": "key",
@@ -689,7 +715,7 @@
         },
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "index_asset",
@@ -743,7 +769,7 @@
     },
     {
       "type": "struct events::IncreasePosition",
-      "metadataTypeId": 20,
+      "metadataTypeId": 22,
       "components": [
         {
           "name": "key",
@@ -751,7 +777,7 @@
         },
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "index_asset",
@@ -797,7 +823,7 @@
     },
     {
       "type": "struct events::LiquidatePosition",
-      "metadataTypeId": 21,
+      "metadataTypeId": 23,
       "components": [
         {
           "name": "key",
@@ -805,7 +831,7 @@
         },
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "index_asset",
@@ -859,7 +885,7 @@
     },
     {
       "type": "struct events::RegisterPositionByKey",
-      "metadataTypeId": 22,
+      "metadataTypeId": 24,
       "components": [
         {
           "name": "position_key",
@@ -867,7 +893,7 @@
         },
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "index_asset",
@@ -881,11 +907,11 @@
     },
     {
       "type": "struct events::RemoveLiquidity",
-      "metadataTypeId": 23,
+      "metadataTypeId": 25,
       "components": [
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "stable_asset_amount",
@@ -896,22 +922,22 @@
           "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         },
         {
-          "name": "fee_basis_points",
+          "name": "fee",
           "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
       ]
     },
     {
       "type": "struct events::SetApprovedRouter",
-      "metadataTypeId": 24,
+      "metadataTypeId": 26,
       "components": [
         {
           "name": "account",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "router",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "is_active",
@@ -921,7 +947,7 @@
     },
     {
       "type": "struct events::SetAssetConfig",
-      "metadataTypeId": 25,
+      "metadataTypeId": 27,
       "components": [
         {
           "name": "asset",
@@ -935,7 +961,7 @@
     },
     {
       "type": "struct events::SetFees",
-      "metadataTypeId": 26,
+      "metadataTypeId": 28,
       "components": [
         {
           "name": "mint_burn_fee_basis_points",
@@ -953,21 +979,21 @@
     },
     {
       "type": "struct events::SetGov",
-      "metadataTypeId": 27,
+      "metadataTypeId": 29,
       "components": [
         {
           "name": "gov",
-          "typeId": 9
+          "typeId": 11
         }
       ]
     },
     {
       "type": "struct events::SetLiquidator",
-      "metadataTypeId": 28,
+      "metadataTypeId": 30,
       "components": [
         {
           "name": "liquidator",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "is_active",
@@ -977,7 +1003,7 @@
     },
     {
       "type": "struct events::SetMaxLeverage",
-      "metadataTypeId": 29,
+      "metadataTypeId": 31,
       "components": [
         {
           "name": "asset",
@@ -991,7 +1017,7 @@
     },
     {
       "type": "struct events::SetPaused",
-      "metadataTypeId": 30,
+      "metadataTypeId": 32,
       "components": [
         {
           "name": "is_paused",
@@ -1000,18 +1026,8 @@
       ]
     },
     {
-      "type": "struct events::SetRouter",
-      "metadataTypeId": 31,
-      "components": [
-        {
-          "name": "router",
-          "typeId": 46
-        }
-      ]
-    },
-    {
       "type": "struct events::UpdateFundingInfo",
-      "metadataTypeId": 32,
+      "metadataTypeId": 33,
       "components": [
         {
           "name": "asset",
@@ -1037,11 +1053,11 @@
     },
     {
       "type": "struct events::WithdrawFees",
-      "metadataTypeId": 33,
+      "metadataTypeId": 34,
       "components": [
         {
           "name": "receiver",
-          "typeId": 9
+          "typeId": 11
         },
         {
           "name": "amount",
@@ -1051,7 +1067,7 @@
     },
     {
       "type": "struct events::WriteFeeReserve",
-      "metadataTypeId": 34,
+      "metadataTypeId": 35,
       "components": [
         {
           "name": "fee_reserve",
@@ -1061,7 +1077,7 @@
     },
     {
       "type": "struct events::WritePoolAmount",
-      "metadataTypeId": 35,
+      "metadataTypeId": 36,
       "components": [
         {
           "name": "asset",
@@ -1075,7 +1091,7 @@
     },
     {
       "type": "struct events::WritePosition",
-      "metadataTypeId": 36,
+      "metadataTypeId": 37,
       "components": [
         {
           "name": "position_key",
@@ -1083,31 +1099,37 @@
         },
         {
           "name": "position",
-          "typeId": 14
+          "typeId": 16
         }
       ]
     },
     {
-      "type": "struct helpers::signed_256::Signed256",
-      "metadataTypeId": 37,
+      "type": "struct ownership::events::OwnershipSet",
+      "metadataTypeId": 38,
       "components": [
         {
-          "name": "value",
-          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
-        },
+          "name": "new_owner",
+          "typeId": 11
+        }
+      ]
+    },
+    {
+      "type": "struct signed_int::i256::I256",
+      "metadataTypeId": 39,
+      "components": [
         {
-          "name": "is_neg",
-          "typeId": "b760f44fa5965c2474a3b471467a22c43185152129295af588b022ae50b50903"
+          "name": "underlying",
+          "typeId": "1b5759d94094368cfd443019e7ca5ec4074300e544e5ea993a979f5da627261e"
         }
       ]
     },
     {
       "type": "struct src20::SetDecimalsEvent",
-      "metadataTypeId": 38,
+      "metadataTypeId": 40,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 45
         },
         {
           "name": "decimals",
@@ -1115,65 +1137,65 @@
         },
         {
           "name": "sender",
-          "typeId": 9
+          "typeId": 11
         }
       ]
     },
     {
       "type": "struct src20::SetNameEvent",
-      "metadataTypeId": 39,
+      "metadataTypeId": 41,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 45
         },
         {
           "name": "name",
-          "typeId": 10,
+          "typeId": 12,
           "typeArguments": [
             {
               "name": "",
-              "typeId": 47
+              "typeId": 49
             }
           ]
         },
         {
           "name": "sender",
-          "typeId": 9
+          "typeId": 11
         }
       ]
     },
     {
       "type": "struct src20::SetSymbolEvent",
-      "metadataTypeId": 40,
+      "metadataTypeId": 42,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 45
         },
         {
           "name": "symbol",
-          "typeId": 10,
+          "typeId": 12,
           "typeArguments": [
             {
               "name": "",
-              "typeId": 47
+              "typeId": 49
             }
           ]
         },
         {
           "name": "sender",
-          "typeId": 9
+          "typeId": 11
         }
       ]
     },
     {
       "type": "struct src20::TotalSupplyEvent",
-      "metadataTypeId": 41,
+      "metadataTypeId": 43,
       "components": [
         {
           "name": "asset",
-          "typeId": 43
+          "typeId": 45
         },
         {
           "name": "supply",
@@ -1181,13 +1203,13 @@
         },
         {
           "name": "sender",
-          "typeId": 9
+          "typeId": 11
         }
       ]
     },
     {
       "type": "struct std::address::Address",
-      "metadataTypeId": 42,
+      "metadataTypeId": 44,
       "components": [
         {
           "name": "bits",
@@ -1197,7 +1219,7 @@
     },
     {
       "type": "struct std::asset_id::AssetId",
-      "metadataTypeId": 43,
+      "metadataTypeId": 45,
       "components": [
         {
           "name": "bits",
@@ -1207,11 +1229,11 @@
     },
     {
       "type": "struct std::bytes::Bytes",
-      "metadataTypeId": 44,
+      "metadataTypeId": 46,
       "components": [
         {
           "name": "buf",
-          "typeId": 45
+          "typeId": 47
         },
         {
           "name": "len",
@@ -1221,11 +1243,11 @@
     },
     {
       "type": "struct std::bytes::RawBytes",
-      "metadataTypeId": 45,
+      "metadataTypeId": 47,
       "components": [
         {
           "name": "ptr",
-          "typeId": 12
+          "typeId": 14
         },
         {
           "name": "cap",
@@ -1235,7 +1257,7 @@
     },
     {
       "type": "struct std::contract_id::ContractId",
-      "metadataTypeId": 46,
+      "metadataTypeId": 48,
       "components": [
         {
           "name": "bits",
@@ -1245,11 +1267,11 @@
     },
     {
       "type": "struct std::string::String",
-      "metadataTypeId": 47,
+      "metadataTypeId": 49,
       "components": [
         {
           "name": "bytes",
-          "typeId": 44
+          "typeId": 46
         }
       ]
     }
@@ -1380,6 +1402,19 @@
       ]
     },
     {
+      "name": "owner",
+      "inputs": [],
+      "output": "287a382c1e0b1f11d12a422e77a248d27761327cd17515cc6e6369d528cf31ca",
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
       "name": "add_liquidity",
       "inputs": [
         {
@@ -1469,19 +1504,6 @@
         }
       ],
       "output": "9d715771850ece467c8bde9a83e15ee2d05965af9773c9d8a9cbd4572e85565b",
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": [
-            "read"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "get_all_whitelisted_assets_length",
-      "inputs": [],
-      "output": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
       "attributes": [
         {
           "name": "storage",
@@ -1889,24 +1911,6 @@
       ]
     },
     {
-      "name": "get_whitelisted_asset_by_index",
-      "inputs": [
-        {
-          "name": "index",
-          "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
-        }
-      ],
-      "output": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b",
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": [
-            "read"
-          ]
-        }
-      ]
-    },
-    {
       "name": "increase_position",
       "inputs": [
         {
@@ -2123,24 +2127,6 @@
       ]
     },
     {
-      "name": "set_gov",
-      "inputs": [
-        {
-          "name": "gov",
-          "concreteTypeId": "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335"
-        }
-      ],
-      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": [
-            "write"
-          ]
-        }
-      ]
-    },
-    {
       "name": "set_liquidator",
       "inputs": [
         {
@@ -2188,24 +2174,6 @@
             " e.g: 50 * 10_000 = 50%"
           ]
         },
-        {
-          "name": "storage",
-          "arguments": [
-            "write"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "set_router",
-      "inputs": [
-        {
-          "name": "router",
-          "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54"
-        }
-      ],
-      "output": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
-      "attributes": [
         {
           "name": "storage",
           "arguments": [
@@ -2266,20 +2234,24 @@
   ],
   "loggedTypes": [
     {
-      "logId": "5432468599230875534",
-      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3"
+      "logId": "17376141311665587813",
+      "concreteTypeId": "f1247475d0d1466599267010f088190f8664dd31663a40c5d5e525d8e64b995d"
     },
     {
       "logId": "13265685688835402305",
       "concreteTypeId": "b8192ed971046a41de05339b780d017906957fba8d7709f65c72df13b7f1b6aa"
     },
     {
+      "logId": "5432468599230875534",
+      "concreteTypeId": "4b640168969ec78e1ff09a1a9ccc8234ffaf1b016e862a4251e06348e490b3d3"
+    },
+    {
       "logId": "4997665884103701952",
       "concreteTypeId": "455b46a49016f5c03c18ce54b969ea3d0d33c9b00263b3dcc36aa8da27558b8a"
     },
     {
-      "logId": "2743496043835784763",
-      "concreteTypeId": "2612db1dbf857e3bd45053dd8464f0c4d0906ec49e6fb9d510402423176610d2"
+      "logId": "16514249102412951748",
+      "concreteTypeId": "e52e660ff9a330c417b6493bb8d3d0049bafaa6c4a771b32b205d71bc2bc5ace"
     },
     {
       "logId": "8003552358277950993",
@@ -2310,10 +2282,6 @@
       "concreteTypeId": "3d0474c702badab0e663699820f0c39e07964c76ec933823c8ebaa2d368868d0"
     },
     {
-      "logId": "14227601121009166456",
-      "concreteTypeId": "c57297d6a7b36878bd091ce2bb802ea898ec7e0a53f2d38cb34b8e82c97bf983"
-    },
-    {
       "logId": "5997125308282845126",
       "concreteTypeId": "533a11b199b437c6858157a89214892fb11c6a37a787f46e2268aa4fe6bfa71c"
     },
@@ -2336,6 +2304,14 @@
     {
       "logId": "16595060151443604364",
       "concreteTypeId": "e64d7f488909438c3f2993022fe1ca4d21a75e333dda6474c844ce615bcaa819"
+    },
+    {
+      "logId": "12825652816513834595",
+      "concreteTypeId": "b1fddf488ccb9e63d11888b2750bbd1280a1ae1c49f2d6637fd4cf1e930d1468"
+    },
+    {
+      "logId": "10091762507985991074",
+      "concreteTypeId": "8c0d2488561c35a28ef795bb8bcc4c43999cdd1e3ecbd10c226e0a68660c54d4"
     },
     {
       "logId": "3192531903561655239",
@@ -2382,10 +2358,6 @@
       "concreteTypeId": "cb1f983cd10d47d63a5cce7bcc2182049edff6d981f040eeccfe2c2d6b57665d"
     },
     {
-      "logId": "7919686846233250003",
-      "concreteTypeId": "6de86139f21108d3c0ec2ee2c44a8ef669c325a45237bc86ae1fd12232ab4744"
-    },
-    {
       "logId": "12597442371930058247",
       "concreteTypeId": "aed31b17d9586e07201770792a5bec23432449aaf33e230df13c56b1cd70136b"
     }
@@ -2395,25 +2367,25 @@
     {
       "name": "COLLATERAL_ASSET_ID",
       "concreteTypeId": "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      "offset": 95800,
+      "offset": 91112,
       "indirect": false
     },
     {
       "name": "COLLATERAL_ASSET",
       "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b",
-      "offset": 95760,
+      "offset": 91072,
       "indirect": false
     },
     {
       "name": "COLLATERAL_ASSET_DECIMALS",
       "concreteTypeId": "d7649d428b9ff33d188ecbf38a7e4d8fd167fa01b2e10fe9a8f9308e52f1d7cc",
-      "offset": 95792,
+      "offset": 91104,
       "indirect": false
     },
     {
       "name": "PRICEFEED_WRAPPER",
       "concreteTypeId": "29c10735d33b5159f0c71ee1dbd17b36a3e69e41f00fab0d42e1bd9f428d8a54",
-      "offset": 95832,
+      "offset": 91144,
       "indirect": false
     }
   ],

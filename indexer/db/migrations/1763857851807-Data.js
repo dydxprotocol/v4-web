@@ -1,11 +1,11 @@
-module.exports = class Data1763469346899 {
-    name = 'Data1763469346899'
+module.exports = class Data1763857851807 {
+    name = 'Data1763857851807'
 
     async up(db) {
         await db.query(`CREATE TABLE "price" ("id" character varying NOT NULL, "asset" text NOT NULL, "timestamp" integer NOT NULL, "price" numeric NOT NULL, CONSTRAINT "PK_d163e55e8cce6908b2e0f27cea4" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f0e41cd724226edf5d9b89aa0d" ON "price" ("asset") `)
         await db.query(`CREATE INDEX "IDX_5970068a939d81a9882e19de91" ON "price" ("timestamp") `)
-        await db.query(`CREATE TABLE "liquidity" ("id" character varying NOT NULL, "provider" text NOT NULL, "stable" numeric NOT NULL, "lp_amount" numeric NOT NULL, "timestamp" integer NOT NULL, "latest" boolean NOT NULL, CONSTRAINT "PK_cc7af331aa0cf8bbf8c8ec4f1e5" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "liquidity" ("id" character varying NOT NULL, "provider" text NOT NULL, "stable" numeric NOT NULL, "lp_amount" numeric NOT NULL, "fee" numeric NOT NULL, "timestamp" integer NOT NULL, "latest" boolean NOT NULL, CONSTRAINT "PK_cc7af331aa0cf8bbf8c8ec4f1e5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9f3599bd7e6813aa76c6d96a2a" ON "liquidity" ("provider") `)
         await db.query(`CREATE TABLE "total_liquidity" ("id" character varying NOT NULL, "stable" numeric NOT NULL, "lp_amount" numeric NOT NULL, "last_timestamp" integer NOT NULL, CONSTRAINT "PK_370b756e55d566ebbe5c3dbf682" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "position_key" ("id" character varying NOT NULL, "account" text NOT NULL, "index_asset_id" text NOT NULL, "is_long" boolean NOT NULL, CONSTRAINT "PK_5d2983a07609414f65f76cff6de" PRIMARY KEY ("id"))`)

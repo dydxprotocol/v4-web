@@ -1,17 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { BNB_ASSET, expandDecimals, getArgs, moveBlockchainTime, toPrice } from "./utils"
 import { BTC_ASSET, USDC_ASSET, ETH_ASSET } from "./utils"
+import { USER_0_ADDRESS } from "./utils"
 import pg from "pg"
 
 const { Pool, Client } = pg
-
-// adsresses are hardcoded, taken form the fuel node starting script
-const deployerAddress = "0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6" //0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6
-const user0Address = "0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770" //0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770"
-const user1Address = "0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c" //0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c"
-const user2Address = "0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b" //0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b"
-const liquidatorAddress = "0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088" //0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088"
-
 
 describe("Verify Positions", () => {
     let client: pg.Client
@@ -55,7 +48,7 @@ describe("Verify Positions", () => {
     })
 
     it("should be the the correct count of BNB closed positions", async () => {
-        const positionKeyResult = await client.query('SELECT id FROM position_key WHERE account = $1 AND index_asset_id = $2 AND is_long = $3', [user0Address, BNB_ASSET, true])
+        const positionKeyResult = await client.query('SELECT id FROM position_key WHERE account = $1 AND index_asset_id = $2 AND is_long = $3', [USER_0_ADDRESS, BNB_ASSET, true])
         const positionKeyId = positionKeyResult.rows[0].id
         const closedPositionBNBResult = await client.query('SELECT * FROM position WHERE position_key_id = $1 AND change = $2', [positionKeyId, "CLOSE"])
         expect(closedPositionBNBResult.rows.length).toBe(2)

@@ -19,6 +19,9 @@ export class Liquidity {
     @BigIntColumn_({nullable: false})
     lpAmount!: bigint
 
+    @BigIntColumn_({nullable: false})
+    fee!: bigint
+
     @IntColumn_({nullable: false})
     timestamp!: number
 
