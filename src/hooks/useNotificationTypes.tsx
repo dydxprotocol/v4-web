@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { groupBy, isNumber, max, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import tw from 'twin.macro';
-import { formatUnits } from 'viem';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { CHAIN_INFO } from '@/constants/chains';
@@ -1138,33 +1137,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         const prevWalletBalanceBN = MaybeBigNumber(prevWallet);
         const usdcBalanceBN = MaybeBigNumber(usdcAmount);
-        const prevSubaccountFreeCollateralBN = MaybeBigNumber(prevSubaccountFreeCollateral);
-        const subaccountFreeCollateralBN = MaybeBigNumber(subaccountFreeCollateral);
 
         if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
           const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
-          const accountDiff = subaccountFreeCollateralBN?.minus(
-            prevSubaccountFreeCollateralBN ?? 0n
+
+          const matchingDeposit = newDeposits.find((deposit) =>
+            prevDepositIdsRef.current.has(deposit.id)
           );
 
-          // if the account diff is not positive, its a withdrawal/swap - don't show the notification
-          if (!accountDiff?.gt(0)) {
-            return;
-          }
-
-          const matchingDeposit = newDeposits.find((deposit) => {
-            const depositAmount = Number(formatUnits(BigInt(deposit.amount), 6)).toFixed(
-              USD_DECIMALS
-            );
-            return (
-              depositAmount &&
-              Math.abs(parseFloat(depositAmount) - parseFloat(diff.toFixed(USD_DECIMALS))) < 0.01
-            );
-          });
+          if (!matchingDeposit) return;
 
           if (diff.gt(0.01) && now - lastNotificationTimeRef.current > NOTIFICATION_DEBOUNCE) {
             trigger({
-              id: `deposit-confirmed-${matchingDeposit?.id ?? crypto.randomUUID()}`,
+              id: `deposit-confirmed-${matchingDeposit.id}`,
               displayData: {
                 toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS * 2, // 20 seconds
                 groupKey: NotificationType.DepositAddressEvents,
@@ -1173,7 +1158,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 body: stringGetter({
                   key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
                   params: {
-                    AMOUNT: accountDiff.toFixed(USD_DECIMALS),
+                    AMOUNT: diff.toFixed(USD_DECIMALS),
                     ASSET: 'USDC',
                   },
                 }),
@@ -1183,14 +1168,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
             lastNotificationTimeRef.current = now;
           }
 
-          if (matchingDeposit) {
-            const updatedDeposits = newDeposits.filter(
-              (deposit) => deposit.id !== matchingDeposit.id
-            );
-            setNewDeposits(updatedDeposits);
-            if (updatedDeposits.length === 0) {
-              setEnabled(false);
-            }
+          const updatedDeposits = newDeposits.filter(
+            (deposit) => deposit.id !== matchingDeposit.id
+          );
+          setNewDeposits(updatedDeposits);
+          if (updatedDeposits.length === 0) {
+            setEnabled(false);
           }
         }
 
