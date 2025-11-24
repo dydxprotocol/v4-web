@@ -5,6 +5,7 @@ import bs58 from 'bs58';
 
 import {
   SpotApiCreateTransactionRequest,
+  SpotApiLandingMethod,
   createSpotTransaction,
   landSpotTransaction,
 } from '@/clients/spotApi';
@@ -47,6 +48,10 @@ export const useSpotTransactionSubmit = () => {
       const landResponse = await landSpotTransaction(spotApiEndpoint, {
         signedTransaction: signedTransactionBase58,
         expectedTokenMint: request.tokenMint,
+        landingMethod: createResponse.metadata.jupiterRequestId
+          ? SpotApiLandingMethod.JUPITER
+          : undefined,
+        jupiterRequestId: createResponse.metadata.jupiterRequestId,
       });
 
       return {

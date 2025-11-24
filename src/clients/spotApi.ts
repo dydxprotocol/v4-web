@@ -9,6 +9,7 @@ export enum SpotApiLandingMethod {
   NORMAL = 'normal',
   HELIUS = 'helius',
   ZERO_SLOT = '0slot',
+  JUPITER = 'jupiter',
 }
 
 export enum SpotApiSide {
@@ -50,6 +51,7 @@ export type SpotApiTransactionMetadataObject = {
   subRoute?: string;
   fallbackUsed?: boolean;
   latency?: number;
+  jupiterRequestId?: string;
 };
 
 export type SpotApiCreateTransactionResponse = {
@@ -62,6 +64,7 @@ export type SpotApiLandTransactionRequest = {
   expectedTokenMint: string;
   walletAddress?: string;
   landingMethod?: SpotApiLandingMethod;
+  jupiterRequestId?: string;
 };
 
 export type SpotApiLandTransactionResponse = {
