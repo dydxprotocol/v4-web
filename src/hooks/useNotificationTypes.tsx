@@ -51,6 +51,7 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
+  getSubaccountFreeCollateral,
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
   selectShouldAccountRebalanceUsdc,
@@ -1064,18 +1065,18 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { usdcAmount } = useAppSelector(BonsaiCore.account.balances.data);
+      const subaccountFreeCollateral = useAppSelector(getSubaccountFreeCollateral);
+
       const { newDeposits, setNewDeposits, prevDepositIdsRef, setEnabled } =
         useAutomatedDepositNotifications();
 
       const prevWalletBalanceRef = useRef<string | undefined>(undefined);
+      const prevSubaccountFreeCollateralRef = useRef<number | undefined>(undefined);
       const lastNotificationTimeRef = useRef<number>(0);
       const NOTIFICATION_DEBOUNCE = 1 * timeUnits.second; // 1 second
 
       useEffect(() => {
-        if (newDeposits.length === 0) {
-          setEnabled(false);
-          return;
-        }
+        if (newDeposits.length === 0) return;
 
         const now = Date.now();
         newDeposits.forEach((deposit) => {
@@ -1124,6 +1125,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         const now = Date.now();
         const prevWallet = prevWalletBalanceRef.current;
+        const prevSubaccountFreeCollateral = prevSubaccountFreeCollateralRef.current;
+
+        if (!prevSubaccountFreeCollateral) {
+          prevSubaccountFreeCollateralRef.current = subaccountFreeCollateral;
+        }
 
         if (!prevWallet) {
           prevWalletBalanceRef.current = usdcAmount;
@@ -1132,11 +1138,22 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
         const prevWalletBalanceBN = MaybeBigNumber(prevWallet);
         const usdcBalanceBN = MaybeBigNumber(usdcAmount);
+        const prevSubaccountFreeCollateralBN = MaybeBigNumber(prevSubaccountFreeCollateral);
+        const subaccountFreeCollateralBN = MaybeBigNumber(subaccountFreeCollateral);
 
         if (prevWalletBalanceBN && usdcBalanceBN && usdcBalanceBN.gt(prevWalletBalanceBN)) {
           const diff = usdcBalanceBN.minus(prevWalletBalanceBN);
+          const accountDiff = subaccountFreeCollateralBN?.minus(
+            prevSubaccountFreeCollateralBN ?? 0n
+          );
+
+          // if the account diff is not positive, its a withdrawal/swap - don't show the notification
+          if (!accountDiff?.gt(0)) {
+            return;
+          }
+
           const matchingDeposit = newDeposits.find((deposit) => {
-            const depositAmount = Number(formatUnits(BigInt(deposit?.amount ?? 0), 6)).toFixed(
+            const depositAmount = Number(formatUnits(BigInt(deposit.amount), 6)).toFixed(
               USD_DECIMALS
             );
             return (
@@ -1156,7 +1173,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 body: stringGetter({
                   key: STRING_KEYS.DEPOSIT_CONFIRMED_BODY,
                   params: {
-                    AMOUNT: diff.toFixed(USD_DECIMALS),
+                    AMOUNT: accountDiff.toFixed(USD_DECIMALS),
                     ASSET: 'USDC',
                   },
                 }),
@@ -1171,12 +1188,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
               (deposit) => deposit.id !== matchingDeposit.id
             );
             setNewDeposits(updatedDeposits);
+            if (updatedDeposits.length === 0) {
+              setEnabled(false);
+            }
           }
         }
 
         prevWalletBalanceRef.current = usdcAmount;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [usdcAmount, trigger, stringGetter]);
+      }, [usdcAmount, subaccountFreeCollateral, trigger, stringGetter]);
     },
     useNotificationAction: () => {
       return () => {};
