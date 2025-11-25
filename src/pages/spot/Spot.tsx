@@ -67,7 +67,7 @@ const SpotPage = () => {
         boughtUsd: position.totalBoughtUsd,
         soldAmount: position.totalSold,
         soldUsd: position.totalSoldUsd,
-        pnlUsd: position.totalPnL,
+        pnlUsd: position.unrealizedPnL,
       }));
   }, [walletPositions]);
 
