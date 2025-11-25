@@ -196,10 +196,14 @@ export const TradeSizeInputs = () => {
         <AllocationSlider
           allocationPercentInput={
             tradeValues.size != null && OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
-              ? (AttemptBigNumber(tradeValues.size.value.value)?.times(100).toFixed(0) ?? '')
+              ? (AttemptBigNumber(tradeValues.size.value.value)
+                  ?.times(100)
+                  .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
               : tradeValues.size == null || tradeValues.size.value.value === ''
                 ? ''
-                : (AttemptBigNumber(effectiveSizes.allocationPercent)?.times(100).toFixed(0) ?? '')
+                : (AttemptBigNumber(effectiveSizes.allocationPercent)
+                    ?.times(100)
+                    .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
           }
           setAllocationInput={(value: string | undefined) => {
             dispatch(
