@@ -40,7 +40,7 @@ const TIME_RANGES = [
   { value: '90d', labelNumDays: '90', time: 90 * timeUnits.day },
 ] as const;
 
-const finalBackupZoomDomain = 90 * timeUnits.day;
+const finalBackupZoomDomain = 30 * timeUnits.day;
 
 export const VaultPnlChart = ({ className }: VaultPnlChartProps) => {
   const stringGetter = useStringGetter();
