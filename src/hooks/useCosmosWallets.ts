@@ -59,7 +59,7 @@ export function useCosmosWallets(
           return await deriveCosmosWalletFromSigner(nobleOfflineSigner, 'noble');
         }
       } catch (error) {
-        // Fall through to mnemonic derivation
+        return null;
       }
     }
 
@@ -70,7 +70,6 @@ export function useCosmosWallets(
    * Get Osmosis wallet on-demand
    */
   const getOsmosisWallet = useCallback(async (): Promise<LocalWallet | null> => {
-    // Derive from mnemonic if available
     if (hdKey?.mnemonic) {
       try {
         return await deriveCosmosWallet(hdKey.mnemonic, 'osmosis');
@@ -83,7 +82,6 @@ export function useCosmosWallets(
       }
     }
 
-    // Derive from private key if available
     if (hdKey?.privateKey) {
       try {
         return await deriveCosmosWalletFromPrivateKey(
@@ -98,7 +96,6 @@ export function useCosmosWallets(
       }
     }
 
-    // Fall through to offline signer derivation
     if (getCosmosOfflineSigner) {
       try {
         const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
@@ -106,7 +103,7 @@ export function useCosmosWallets(
           return await deriveCosmosWalletFromSigner(osmosisOfflineSigner, 'osmosis');
         }
       } catch (error) {
-        // Fall through to mnemonic derivation
+        return null;
       }
     }
 
@@ -117,7 +114,6 @@ export function useCosmosWallets(
    * Get Neutron wallet on-demand
    */
   const getNeutronWallet = useCallback(async (): Promise<LocalWallet | null> => {
-    // Derive from mnemonic if available
     if (hdKey?.mnemonic) {
       try {
         return await deriveCosmosWallet(hdKey.mnemonic, 'neutron');
@@ -129,7 +125,6 @@ export function useCosmosWallets(
       }
     }
 
-    // Derive from private key if available
     if (hdKey?.privateKey) {
       try {
         return await deriveCosmosWalletFromPrivateKey(
@@ -144,7 +139,6 @@ export function useCosmosWallets(
       }
     }
 
-    // Fall through to offline signer derivation
     if (getCosmosOfflineSigner) {
       try {
         const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
@@ -152,7 +146,7 @@ export function useCosmosWallets(
           return await deriveCosmosWalletFromSigner(neutronOfflineSigner, 'neutron');
         }
       } catch (error) {
-        // Fall through to mnemonic derivation
+        return null;
       }
     }
 

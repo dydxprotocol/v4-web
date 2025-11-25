@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
+
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { CoinbaseDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -14,6 +16,8 @@ import { Dialog } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
 
+import { convertBech32Address } from '@/lib/addressUtils';
+
 const THREE_SECOND_DELAY = 3000;
 export const CoinbaseDepositDialog = ({
   onBack,
@@ -21,7 +25,14 @@ export const CoinbaseDepositDialog = ({
 }: DialogProps<CoinbaseDepositDialogProps>) => {
   const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
-  const { nobleAddress } = useAccounts();
+  const { dydxAddress } = useAccounts();
+
+  const nobleAddress =
+    dydxAddress &&
+    convertBech32Address({
+      address: dydxAddress as string,
+      bech32Prefix: NOBLE_BECH32_PREFIX,
+    });
 
   const onCopy = () => {
     if (!nobleAddress) return;
