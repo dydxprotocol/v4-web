@@ -6,7 +6,11 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
 import type { PrivateInformation } from '@/constants/wallets';
 
-import { onboardingManager } from '@/lib/onboarding/OnboardingSupervisor';
+import {
+  deriveCosmosWallet,
+  deriveCosmosWalletFromPrivateKey,
+  deriveCosmosWalletFromSigner,
+} from '@/lib/onboarding/deriveCosmosWallets';
 
 /**
  *
@@ -22,54 +26,54 @@ export function useCosmosWallets(
    * Get Noble wallet on-demand
    */
   const getNobleWallet = useCallback(async (): Promise<LocalWallet | null> => {
-    // Try to get from offline signer first (for native Cosmos wallets)
-    if (getCosmosOfflineSigner) {
-      try {
-        const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
-        if (nobleOfflineSigner) {
-          return await onboardingManager.deriveCosmosWalletFromSigner(nobleOfflineSigner, 'noble');
-        }
-      } catch (error) {
-        // Fall through to mnemonic derivation
-      }
-    }
-
     // Derive from mnemonic if available
     if (hdKey?.mnemonic) {
       try {
-        return await onboardingManager.deriveCosmosWallet(hdKey.mnemonic, 'noble');
+        return await deriveCosmosWallet(hdKey.mnemonic, 'noble');
       } catch (error) {
         logBonsaiError('useCosmosWallets', 'Failed to derive Noble wallet w/ mnemonic', { error });
         return null;
       }
     }
 
-    return null;
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
+    // Derive from private key if available
+    if (hdKey?.privateKey) {
+      try {
+        return await deriveCosmosWalletFromPrivateKey(
+          Buffer.from(hdKey.privateKey).toString('hex'),
+          'noble'
+        );
+      } catch (error) {
+        logBonsaiError('useCosmosWallets', 'Failed to derive Noble wallet w/ private key', {
+          error,
+        });
+        return null;
+      }
+    }
 
-  /**
-   * Get Osmosis wallet on-demand
-   */
-  const getOsmosisWallet = useCallback(async (): Promise<LocalWallet | null> => {
-    // Try to get from offline signer first (for native Cosmos wallets)
+    // Fall through to offline signer derivation
     if (getCosmosOfflineSigner) {
       try {
-        const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
-        if (osmosisOfflineSigner) {
-          return await onboardingManager.deriveCosmosWalletFromSigner(
-            osmosisOfflineSigner,
-            'osmosis'
-          );
+        const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
+        if (nobleOfflineSigner) {
+          return await deriveCosmosWalletFromSigner(nobleOfflineSigner, 'noble');
         }
       } catch (error) {
         // Fall through to mnemonic derivation
       }
     }
 
+    return null;
+  }, [hdKey?.mnemonic, hdKey?.privateKey, getCosmosOfflineSigner]);
+
+  /**
+   * Get Osmosis wallet on-demand
+   */
+  const getOsmosisWallet = useCallback(async (): Promise<LocalWallet | null> => {
     // Derive from mnemonic if available
     if (hdKey?.mnemonic) {
       try {
-        return await onboardingManager.deriveCosmosWallet(hdKey.mnemonic, 'osmosis');
+        return await deriveCosmosWallet(hdKey.mnemonic, 'osmosis');
       } catch (error) {
         logBonsaiError('useCosmosWallets', 'Failed to derive Osmosis wallet w/ mnemonic', {
           error,
@@ -79,32 +83,44 @@ export function useCosmosWallets(
       }
     }
 
-    return null;
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
+    // Derive from private key if available
+    if (hdKey?.privateKey) {
+      try {
+        return await deriveCosmosWalletFromPrivateKey(
+          Buffer.from(hdKey.privateKey).toString('hex'),
+          'osmosis'
+        );
+      } catch (error) {
+        logBonsaiError('useCosmosWallets', 'Failed to derive Osmosis wallet w/ private key', {
+          error,
+        });
+        return null;
+      }
+    }
 
-  /**
-   * Get Neutron wallet on-demand
-   */
-  const getNeutronWallet = useCallback(async (): Promise<LocalWallet | null> => {
-    // Try to get from offline signer first (for native Cosmos wallets)
+    // Fall through to offline signer derivation
     if (getCosmosOfflineSigner) {
       try {
-        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
-        if (neutronOfflineSigner) {
-          return await onboardingManager.deriveCosmosWalletFromSigner(
-            neutronOfflineSigner,
-            'neutron'
-          );
+        const osmosisOfflineSigner = await getCosmosOfflineSigner(getOsmosisChainId());
+        if (osmosisOfflineSigner) {
+          return await deriveCosmosWalletFromSigner(osmosisOfflineSigner, 'osmosis');
         }
       } catch (error) {
         // Fall through to mnemonic derivation
       }
     }
 
+    return null;
+  }, [hdKey?.mnemonic, hdKey?.privateKey, getCosmosOfflineSigner]);
+
+  /**
+   * Get Neutron wallet on-demand
+   */
+  const getNeutronWallet = useCallback(async (): Promise<LocalWallet | null> => {
     // Derive from mnemonic if available
     if (hdKey?.mnemonic) {
       try {
-        return await onboardingManager.deriveCosmosWallet(hdKey.mnemonic, 'neutron');
+        return await deriveCosmosWallet(hdKey.mnemonic, 'neutron');
       } catch (error) {
         logBonsaiError('useCosmosWallets', 'Failed to derive Neutron wallet w/ mnemonic', {
           error,
@@ -113,8 +129,35 @@ export function useCosmosWallets(
       }
     }
 
+    // Derive from private key if available
+    if (hdKey?.privateKey) {
+      try {
+        return await deriveCosmosWalletFromPrivateKey(
+          Buffer.from(hdKey.privateKey).toString('hex'),
+          'neutron'
+        );
+      } catch (error) {
+        logBonsaiError('useCosmosWallets', 'Failed to derive Neutron wallet w/ private key', {
+          error,
+        });
+        return null;
+      }
+    }
+
+    // Fall through to offline signer derivation
+    if (getCosmosOfflineSigner) {
+      try {
+        const neutronOfflineSigner = await getCosmosOfflineSigner(getNeutronChainId());
+        if (neutronOfflineSigner) {
+          return await deriveCosmosWalletFromSigner(neutronOfflineSigner, 'neutron');
+        }
+      } catch (error) {
+        // Fall through to mnemonic derivation
+      }
+    }
+
     return null;
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
+  }, [hdKey?.mnemonic, hdKey?.privateKey, getCosmosOfflineSigner]);
 
   /**
    * Get Noble wallet address without creating full wallet
