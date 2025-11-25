@@ -172,13 +172,7 @@ export const useWalletConnectionContext = () => {
   const { logout } = useLogout();
 
   const connectWallet = useCallback(
-    async ({
-      wallet,
-      forceConnect,
-    }: {
-      wallet: WalletInfo | undefined;
-      forceConnect?: boolean;
-    }) => {
+    async ({ wallet }: { wallet: WalletInfo | undefined }) => {
       if (!wallet) return;
 
       try {
@@ -201,12 +195,11 @@ export const useWalletConnectionContext = () => {
         } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
           await connectPhantom();
         } else if (isWagmiConnectorType(wallet)) {
-          if (!isConnectedWagmi && !!forceConnect) {
+          if (!isConnectedWagmi) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
             // This could happen in the mipd case if the user has uninstalled or disabled the injected wallet they've previously selected
             // TODO: add analytics to see how often this happens?
             if (!connector) return;
-
             await connectWagmi({ connector });
           }
         }

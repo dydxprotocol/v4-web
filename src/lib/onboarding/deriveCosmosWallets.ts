@@ -23,7 +23,27 @@ export async function deriveCosmosWallet(
     const LazyLocalWallet = await getLazyLocalWallet();
     return await LazyLocalWallet.fromMnemonic(mnemonic, prefix);
   } catch (error) {
-    logBonsaiError('OnboardingSupervisor', `Failed to derive ${chain} wallet`, { error });
+    logBonsaiError('OnboardingSupervisor', `Failed to derive ${chain} wallet from mnemonic`, {
+      error,
+    });
+
+    return null;
+  }
+}
+
+export async function deriveCosmosWalletFromPrivateKey(
+  privateKey: string,
+  chain: SupportedCosmosChain
+): Promise<LocalWallet | null> {
+  try {
+    const prefix = getCosmosPrefix(chain);
+    const LazyLocalWallet = await getLazyLocalWallet();
+    return await LazyLocalWallet.fromPrivateKey(privateKey, prefix);
+  } catch (error) {
+    logBonsaiError('OnboardingSupervisor', `Failed to derive ${chain} wallet from private key`, {
+      error,
+    });
+
     return null;
   }
 }

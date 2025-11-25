@@ -93,9 +93,17 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
       setDerivationStatus(EvmDerivedAccountStatus.Deriving);
 
       // Track first signature request
-      const wrappedSignMessage = async () => {
+      const wrappedSignMessage = async (requestNumber: number) => {
+        if (requestNumber === 2) {
+          setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
+        }
+
         const sig = await signMessageAsync();
-        track(AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({ signatureNumber: 1 }));
+
+        track(
+          AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({ signatureNumber: requestNumber })
+        );
+
         return sig;
       };
 
@@ -126,12 +134,6 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
 
         setError(result.error);
         return;
-      }
-
-      // Track second signature for new users
-      if (result.isNewUser) {
-        setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
-        track(AnalyticsEvents.OnboardingDeriveKeysSignatureReceived({ signatureNumber: 2 }));
       }
 
       // Set wallet in useAccounts state

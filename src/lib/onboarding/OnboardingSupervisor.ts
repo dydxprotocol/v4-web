@@ -1,6 +1,6 @@
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
-import { type LocalWallet } from '@dydxprotocol/v4-client-js';
+import { BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingState } from '@/constants/account';
 import {
@@ -82,7 +82,7 @@ class OnboardingSupervisor {
    * @returns Wallet derivation result with determinism validation
    */
   async deriveKeysWithDeterminismCheck(params: {
-    signMessageAsync: () => Promise<string>;
+    signMessageAsync: (requestNumber: number) => Promise<string>;
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;
@@ -98,7 +98,7 @@ class OnboardingSupervisor {
 
     try {
       // Step 1: Get first signature and derive wallet
-      const firstSignature = await signMessageAsync();
+      const firstSignature = await signMessageAsync(1);
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature: firstSignature,
       });
@@ -117,7 +117,7 @@ class OnboardingSupervisor {
 
       // Step 3: For new users, ensure determinism with second signature
       if (!hasPreviousTransactions) {
-        const secondSignature = await signMessageAsync();
+        const secondSignature = await signMessageAsync(2);
 
         if (firstSignature !== secondSignature) {
           return {
@@ -162,30 +162,19 @@ class OnboardingSupervisor {
    */
   private async restoreFromSecureStorage(): Promise<WalletDerivationResult | null> {
     try {
-      const storedMnemonic = await dydxWalletService.exportMnemonic();
-
-      if (!storedMnemonic) {
-        return null;
-      }
-
-      // Derive wallet from stored mnemonic
-      const { onboarding, BECH32_PREFIX } = await import('@dydxprotocol/v4-client-js');
-      const { privateKey, publicKey } = onboarding.deriveHDKeyFromMnemonic(storedMnemonic);
-
-      if (!privateKey || !publicKey) {
+      const storedPrivateKey = await dydxWalletService.exportPrivateKey();
+      if (!storedPrivateKey) {
         return null;
       }
 
       const LocalWallet = await getLazyLocalWallet();
-      const wallet = await LocalWallet.fromMnemonic(storedMnemonic, BECH32_PREFIX);
+      const wallet = await LocalWallet.fromPrivateKey(storedPrivateKey, BECH32_PREFIX);
 
       const hdKey: PrivateInformation = {
-        mnemonic: storedMnemonic,
-        privateKey,
-        publicKey,
+        mnemonic: '',
+        privateKey: Buffer.from(storedPrivateKey, 'hex'),
+        publicKey: null,
       };
-
-      hdKeyManager.setHdkey(wallet.address, hdKey);
 
       return {
         wallet,
@@ -226,8 +215,9 @@ class OnboardingSupervisor {
     try {
       // ------ Restore from SecureStorage ------ //
       // Check for persisted session before processing wallet connections
-      if (!hasLocalDydxWallet && !blockedGeo) {
+      if (dydxWalletService.hasStoredWallet() && !blockedGeo) {
         const restored = await this.restoreFromSecureStorage();
+
         if (restored) {
           return restored;
         }
@@ -478,7 +468,7 @@ class OnboardingSupervisor {
     getWalletFromSignature: any;
     signMessageAsync?: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
-    const { hasLocalDydxWallet, blockedGeo, getWalletFromSignature, signMessageAsync } = params;
+    const { hasLocalDydxWallet, blockedGeo } = params;
 
     // If wallet already exists (restored from SecureStorage), just set state
     if (hasLocalDydxWallet) {
@@ -492,29 +482,6 @@ class OnboardingSupervisor {
       return {
         onboardingState: OnboardingState.WalletConnected,
       };
-    }
-
-    // Derive from signature if available
-    if (signMessageAsync) {
-      try {
-        const signature = await signMessageAsync();
-        const { wallet, hdKey } = await this.deriveWalletFromSignature(
-          signature,
-          getWalletFromSignature
-        );
-
-        return {
-          wallet,
-          hdKey,
-          onboardingState: OnboardingState.AccountConnected,
-        };
-      } catch (error) {
-        logBonsaiError('OnboardingSupervisor', 'Solana signing failed', { error });
-        return {
-          onboardingState: OnboardingState.WalletConnected,
-          error: 'Failed to sign with Solana wallet',
-        };
-      }
     }
 
     // Wallet connected but waiting for signature

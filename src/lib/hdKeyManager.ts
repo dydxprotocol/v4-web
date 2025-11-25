@@ -6,7 +6,10 @@ import { Hdkey } from '@/constants/account';
 import type { RootStore } from '@/state/_store';
 import { setHdKeyNonce, setLocalWalletNonce } from '@/state/wallet';
 
-import { deriveCosmosWallet } from './onboarding/deriveCosmosWallets';
+import {
+  deriveCosmosWallet,
+  deriveCosmosWalletFromPrivateKey,
+} from './onboarding/deriveCosmosWallets';
 import { log } from './telemetry';
 
 class HDKeyManager {
@@ -110,6 +113,17 @@ class LocalWalletManager {
       try {
         this.localNobleWalletCache =
           (await deriveCosmosWallet(this.hdKey.mnemonic, 'noble')) ?? undefined;
+
+        return this.localNobleWalletCache;
+      } catch (error) {
+        log('LocalWalletManager: Failed to derive Noble wallet', error);
+        return undefined;
+      }
+    } else if (this.hdKey?.privateKey) {
+      try {
+        const privateKey = Buffer.from(this.hdKey.privateKey).toString('hex');
+        this.localNobleWalletCache =
+          (await deriveCosmosWalletFromPrivateKey(privateKey, 'noble')) ?? undefined;
 
         return this.localNobleWalletCache;
       } catch (error) {

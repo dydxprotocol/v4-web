@@ -14,7 +14,7 @@ import { log } from '@/lib/telemetry';
 
 import { secureStorage } from './secureStorage';
 
-const MNEMONIC_STORAGE_KEY = 'imported_mnemonic';
+const STORAGE_KEY = 'trading_wallet_key';
 
 export interface WalletCreationResult {
   success: boolean;
@@ -50,7 +50,7 @@ export class DydxWalletService {
       // Note: Private key imports don't have mnemonic, so we can't derive Cosmos wallets
       // Store the private key directly
       if (persist) {
-        await secureStorage.store('imported_private_key', privateKey);
+        await secureStorage.store(STORAGE_KEY, privateKey);
       }
 
       // Update app state (no hdKey material for private key imports)
@@ -75,65 +75,6 @@ export class DydxWalletService {
   }
 
   /**
-   * Import wallet from mnemonic phrase
-   * This bypasses the need for a source wallet connection
-   *
-   * @param mnemonic - 12 or 24 word mnemonic phrase
-   * @param persist - Whether to encrypt and store mnemonic for future sessions
-   * @returns Wallet creation result with dYdX address
-   */
-  async importFromMnemonic(
-    mnemonic: string,
-    persist: boolean = true
-  ): Promise<WalletCreationResult> {
-    try {
-      // Validate mnemonic format
-      const words = mnemonic.trim().split(/\s+/);
-      if (words.length !== 12 && words.length !== 24) {
-        return {
-          success: false,
-          error: 'Invalid mnemonic. Must be 12 or 24 words.',
-        };
-      }
-
-      // Create wallet from mnemonic
-      const LocalWallet = await getLazyLocalWallet();
-      const wallet = await LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
-
-      if (!wallet.address) {
-        return {
-          success: false,
-          error: 'Failed to create wallet from mnemonic.',
-        };
-      }
-
-      // Store encrypted mnemonic if persistence requested
-      if (persist) {
-        await secureStorage.store(MNEMONIC_STORAGE_KEY, mnemonic);
-      }
-
-      // Update app state
-      await this.setWalletInState(wallet, mnemonic);
-
-      logBonsaiInfo('DydxWalletService', 'importFromMnemonic', {
-        address: wallet.address,
-        persisted: persist,
-      });
-
-      return {
-        success: true,
-        dydxAddress: wallet.address as DydxAddress,
-      };
-    } catch (error) {
-      logBonsaiError('DydxWalletService', 'Failed to importFromMnemonic', { error });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
-      };
-    }
-  }
-
-  /**
    * Restore wallet from previously stored mnemonic
    * Called on app initialization to restore session
    *
@@ -141,14 +82,14 @@ export class DydxWalletService {
    */
   async restoreFromStorage(): Promise<WalletCreationResult | null> {
     try {
-      const storedMnemonic = await secureStorage.retrieve(MNEMONIC_STORAGE_KEY);
+      const storedPrivateKey = await secureStorage.retrieve(STORAGE_KEY);
 
-      if (!storedMnemonic) {
+      if (!storedPrivateKey) {
         return null;
       }
 
       // Re-import without re-storing (it's already stored)
-      const result = await this.importFromMnemonic(storedMnemonic, false);
+      const result = await this.importFromPrivateKey(storedPrivateKey, false);
 
       if (result.success) {
         logBonsaiInfo('DydxWalletService', 'restoreFromStorage', {
@@ -196,7 +137,7 @@ export class DydxWalletService {
       // Persist derived mnemonic to secure storage
       // This replaces the old encrypted signature approach with more secure Web Crypto API
       if (persist) {
-        await secureStorage.store(MNEMONIC_STORAGE_KEY, mnemonic);
+        await secureStorage.store(STORAGE_KEY, Buffer.from(privateKey).toString('hex'));
       }
 
       // Update app state
@@ -260,7 +201,7 @@ export class DydxWalletService {
    * Check if a wallet is stored in secure storage
    */
   hasStoredWallet(): boolean {
-    return secureStorage.has(MNEMONIC_STORAGE_KEY);
+    return secureStorage.has(STORAGE_KEY);
   }
 
   /**
@@ -268,7 +209,7 @@ export class DydxWalletService {
    * Called on user sign out
    */
   clearStoredWallet(): void {
-    secureStorage.remove(MNEMONIC_STORAGE_KEY);
+    secureStorage.remove(STORAGE_KEY);
     logBonsaiInfo('DydxWalletService', 'clearStoredWallet');
   }
 
@@ -278,37 +219,13 @@ export class DydxWalletService {
    *
    * @returns Decrypted mnemonic or null if not found
    */
-  async exportMnemonic(): Promise<string | null> {
+  async exportPrivateKey(): Promise<string | null> {
     try {
-      return await secureStorage.retrieve(MNEMONIC_STORAGE_KEY);
+      return await secureStorage.retrieve(STORAGE_KEY);
     } catch (error) {
       logBonsaiError('DydxWalletService', 'Failed to exportMnemonic', { error });
       return null;
     }
-  }
-
-  /**
-   * Validate mnemonic format
-   */
-  validateMnemonic(mnemonic: string): { valid: boolean; error?: string } {
-    const words = mnemonic.trim().split(/\s+/);
-
-    if (words.length !== 12 && words.length !== 24) {
-      return {
-        valid: false,
-        error: 'Mnemonic must be 12 or 24 words',
-      };
-    }
-
-    // Check for empty words
-    if (words.some((word) => !word)) {
-      return {
-        valid: false,
-        error: 'Mnemonic contains empty words',
-      };
-    }
-
-    return { valid: true };
   }
 }
 
