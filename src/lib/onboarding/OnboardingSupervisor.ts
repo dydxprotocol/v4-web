@@ -82,7 +82,7 @@ class OnboardingSupervisor {
    * @returns Wallet derivation result with determinism validation
    */
   async deriveKeysWithDeterminismCheck(params: {
-    signMessageAsync: (requestNumber: number) => Promise<string>;
+    signMessageAsync: (requestNumber: 1 | 2) => Promise<string>;
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;

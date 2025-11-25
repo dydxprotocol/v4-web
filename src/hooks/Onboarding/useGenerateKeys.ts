@@ -93,7 +93,7 @@ export function useGenerateKeys(generateKeysProps?: GenerateKeysProps) {
       setDerivationStatus(EvmDerivedAccountStatus.Deriving);
 
       // Track first signature request
-      const wrappedSignMessage = async (requestNumber: number) => {
+      const wrappedSignMessage = async (requestNumber: 1 | 2) => {
         if (requestNumber === 2) {
           setDerivationStatus(EvmDerivedAccountStatus.EnsuringDeterminism);
         }
