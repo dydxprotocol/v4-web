@@ -676,7 +676,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           throw new Error('Sender address does not match local wallet');
         }
 
-        const tx = await compositeClient.validatorClient.post.updateLeverage(
+        const tx = await compositeClient.validatorClient.post.updatePerpetualMarketsLeverage(
           subaccount,
           subaccount.address,
           [

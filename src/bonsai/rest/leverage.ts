@@ -66,7 +66,7 @@ export function setUpUserLeverageParamsQuery(store: RootStore) {
 
         const subaccountLeverages = await Promise.all(
           childSubaccounts.map(async (sa) => {
-            return compositeClient.validatorClient.get.getUserLeverage(
+            return compositeClient.validatorClient.get.getPerpetualMarketsLeverage(
               parent.address,
               sa.subaccountNumber
             );
