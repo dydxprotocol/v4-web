@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react';
 
+import {
+  getPositionIdToUseForTrade,
+  getRelevantAccountDetails,
+  memoizedMergeMarkets,
+} from '@/bonsai/forms/trade/summary';
+import { calculateSubaccountToUseForTrade } from '@/bonsai/forms/trade/tradeInfo';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
@@ -28,6 +34,7 @@ import { AccentTag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedMarketLeverage } from '@/state/raw';
+import { getTradeFormInputData, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
@@ -49,6 +56,8 @@ export const SetMarketLeverageDialog = ({
     BonsaiHelpers.markets.selectMarketSummaryById,
     marketId
   );
+  const accountData = useAppSelectorWithArgs(getTradeFormInputData);
+  const { marginMode } = useAppSelector(getTradeFormValues);
   const {
     clobPairId,
     assetId,
@@ -129,7 +138,6 @@ export const SetMarketLeverageDialog = ({
     leverageNumber > (MaybeBigNumber(effectiveSelectedLeverage)?.toNumber() ?? 0);
 
   const errorMessage = useMemo(() => {
-    console.log(errorMessageRaw);
     if (errorMessageRaw != null) {
       const parsingResult = parseTransactionError('SetMarketLeverage', errorMessageRaw);
       return stringGetter({ key: parsingResult?.stringKey ?? STRING_KEYS.UNKNOWN_ERROR });
@@ -173,8 +181,8 @@ export const SetMarketLeverageDialog = ({
         throw new Error("clobPairId doesn't exist");
       }
 
-      if (currentPosition === undefined) {
-        throw new Error('current position does not exist');
+      if (marketData === undefined) {
+        throw new Error('market data does not exist');
       }
 
       if (dydxAddress === undefined) {
@@ -183,9 +191,41 @@ export const SetMarketLeverageDialog = ({
 
       const leverage = leverageBN.toNumber();
 
+      let subaccountNumber = currentPosition?.subaccountNumber;
+      if (!subaccountNumber) {
+        const positionIdToUse = getPositionIdToUseForTrade(
+          marketId,
+          accountData.rawParentSubaccountData
+        );
+        const rawMarkets = memoizedMergeMarkets(
+          accountData.rawRelevantMarkets,
+          accountData.currentTradeMarket
+        );
+
+        const baseAccount = mapIfPresent(
+          accountData.rawParentSubaccountData,
+          rawMarkets,
+          (rawParentSubaccountData, markets) =>
+            getRelevantAccountDetails(
+              rawParentSubaccountData,
+              markets,
+              accountData.rawSelectedMarketLeverages,
+              positionIdToUse
+            )
+        );
+
+        subaccountNumber = calculateSubaccountToUseForTrade(
+          marginMode,
+          baseAccount?.position?.subaccountNumber,
+          accountData.currentTradeMarketOpenOrders[0]?.subaccountNumber,
+          accountData.allOpenOrders,
+          accountData.rawParentSubaccountData
+        );
+      }
+
       const result = await updateLeverage({
         senderAddress: dydxAddress,
-        subaccountNumber: currentPosition.subaccountNumber,
+        subaccountNumber,
         clobPairId: Number(clobPairId),
         leverage,
       });

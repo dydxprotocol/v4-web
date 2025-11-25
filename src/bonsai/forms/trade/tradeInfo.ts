@@ -683,7 +683,7 @@ function simulateMarketOrder(
   };
 }
 
-function calculateSubaccountToUseForTrade(
+export function calculateSubaccountToUseForTrade(
   marginMode: MarginMode | undefined,
   existingPositionSubaccount: number | undefined,
   openOrderSubaccount: number | undefined,

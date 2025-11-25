@@ -404,7 +404,7 @@ const iocOnlyExecutionOptions: SelectionOption<ExecutionType>[] = [
 
 const emptyExecutionOptions: SelectionOption<ExecutionType>[] = [];
 
-const memoizedMergeMarkets = weakMapMemoize(
+export const memoizedMergeMarkets = weakMapMemoize(
   (
     rawRelevantMarkets: TradeFormInputData['rawRelevantMarkets'],
     currentTradeMarket: TradeFormInputData['currentTradeMarket']
@@ -474,7 +474,7 @@ function calculateTradeFormOptions(
   return options;
 }
 
-function getRelevantAccountDetails(
+export function getRelevantAccountDetails(
   rawParentSubaccountData: ParentSubaccountDataBase,
   rawRelevantMarkets: MarketsData,
   rawSelectedMarketLeverages: { [marketId: string]: number },
@@ -501,7 +501,7 @@ function getRelevantAccountDetails(
   return { position, account, subaccountSummaries };
 }
 
-function getPositionIdToUseForTrade(
+export function getPositionIdToUseForTrade(
   marketId: string | undefined,
   rawParentSubaccountData: ParentSubaccountDataBase | undefined
 ): PositionUniqueId | undefined {
