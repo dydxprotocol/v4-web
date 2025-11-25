@@ -150,6 +150,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
             PositionsTableColumnKey.Size,
             PositionsTableColumnKey.Value,
             PositionsTableColumnKey.PnL,
+            PositionsTableColumnKey.RealizedPnL,
             PositionsTableColumnKey.Margin,
             PositionsTableColumnKey.AverageOpen,
             PositionsTableColumnKey.Oracle,
@@ -326,6 +327,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
                   FillsTableColumnKey.Price,
                   FillsTableColumnKey.Total,
                   FillsTableColumnKey.Fee,
+                  FillsTableColumnKey.ClosedPnl,
                   FillsTableColumnKey.Liquidity,
                 ].filter(isTruthy)
           }
