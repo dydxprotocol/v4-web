@@ -183,7 +183,7 @@ export const SetMarketLeverageDialog = ({
       const leverage = leverageBN.toNumber();
 
       const subaccountNumber = currentPosition?.subaccountNumber;
-      if (subaccountNumber) {
+      if (subaccountNumber !== undefined) {
         const result = await updateLeverage({
           senderAddress: dydxAddress,
           subaccountNumber,

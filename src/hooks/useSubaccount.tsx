@@ -22,6 +22,7 @@ import { formatUnits, parseUnits } from 'viem';
 import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { AnalyticsEvents, DEFAULT_TRANSACTION_MEMO, TransactionMemo } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
+import { DEFAULT_LEVERAGE_PPM } from '@/constants/leverage';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { USDC_DECIMALS } from '@/constants/tokens';
 import { DydxAddress, WalletType } from '@/constants/wallets';
@@ -682,7 +683,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           [
             {
               clobPairId: params.clobPairId,
-              customImfPpm: 1000000 / params.leverage,
+              customImfPpm: DEFAULT_LEVERAGE_PPM / params.leverage,
             },
           ]
         );

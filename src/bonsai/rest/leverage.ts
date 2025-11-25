@@ -1,3 +1,4 @@
+import { DEFAULT_LEVERAGE_PPM } from '@/constants/leverage';
 import { timeUnits } from '@/constants/time';
 
 import { type RootStore } from '@/state/_store';
@@ -93,7 +94,7 @@ export function setUpUserLeverageParamsQuery(store: RootStore) {
                   }
                   return {
                     ...leverageAcc,
-                    [market]: 1000000 / l.customImfPpm,
+                    [market]: DEFAULT_LEVERAGE_PPM / l.customImfPpm,
                   };
                 },
                 {} as typeof acc
