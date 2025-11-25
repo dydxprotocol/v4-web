@@ -1,11 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import {
-  getPositionIdToUseForTrade,
-  getRelevantAccountDetails,
-  memoizedMergeMarkets,
-} from '@/bonsai/forms/trade/summary';
-import { calculateSubaccountToUseForTrade } from '@/bonsai/forms/trade/tradeInfo';
 import { parseTransactionError } from '@/bonsai/lib/extractErrors';
 import { isOperationFailure, isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
@@ -34,7 +28,6 @@ import { AccentTag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedMarketLeverage } from '@/state/raw';
-import { getTradeFormInputData, getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { useDisappearingValue } from '@/lib/disappearingValue';
 import { mapIfPresent } from '@/lib/do';
@@ -56,8 +49,6 @@ export const SetMarketLeverageDialog = ({
     BonsaiHelpers.markets.selectMarketSummaryById,
     marketId
   );
-  const accountData = useAppSelectorWithArgs(getTradeFormInputData);
-  const { marginMode } = useAppSelector(getTradeFormValues);
   const {
     clobPairId,
     assetId,
@@ -191,50 +182,26 @@ export const SetMarketLeverageDialog = ({
 
       const leverage = leverageBN.toNumber();
 
-      let subaccountNumber = currentPosition?.subaccountNumber;
-      if (!subaccountNumber) {
-        const positionIdToUse = getPositionIdToUseForTrade(
-          marketId,
-          accountData.rawParentSubaccountData
-        );
-        const rawMarkets = memoizedMergeMarkets(
-          accountData.rawRelevantMarkets,
-          accountData.currentTradeMarket
-        );
+      const subaccountNumber = currentPosition?.subaccountNumber;
+      if (subaccountNumber) {
+        const result = await updateLeverage({
+          senderAddress: dydxAddress,
+          subaccountNumber,
+          clobPairId: Number(clobPairId),
+          leverage,
+        });
 
-        const baseAccount = mapIfPresent(
-          accountData.rawParentSubaccountData,
-          rawMarkets,
-          (rawParentSubaccountData, markets) =>
-            getRelevantAccountDetails(
-              rawParentSubaccountData,
-              markets,
-              accountData.rawSelectedMarketLeverages,
-              positionIdToUse
-            )
-        );
-
-        subaccountNumber = calculateSubaccountToUseForTrade(
-          marginMode,
-          baseAccount?.position?.subaccountNumber,
-          accountData.currentTradeMarketOpenOrders[0]?.subaccountNumber,
-          accountData.allOpenOrders,
-          accountData.rawParentSubaccountData
-        );
-      }
-
-      const result = await updateLeverage({
-        senderAddress: dydxAddress,
-        subaccountNumber,
-        clobPairId: Number(clobPairId),
-        leverage,
-      });
-
-      if (isOperationSuccess(result)) {
+        if (isOperationSuccess(result)) {
+          dispatch(setSelectedMarketLeverage({ marketId, leverage }));
+          setIsOpen(false);
+        } else if (isOperationFailure(result)) {
+          setErrorMessageRaw(result.errorString);
+        }
+      } else {
+        // Set temporary market leverage. The updateLeverage call will happen once
+        // trade form determines what subacccount to use for new position
         dispatch(setSelectedMarketLeverage({ marketId, leverage }));
         setIsOpen(false);
-      } else if (isOperationFailure(result)) {
-        setErrorMessageRaw(result.errorString);
       }
     } catch (error) {
       if (error?.message != null && typeof error.message === 'string') {

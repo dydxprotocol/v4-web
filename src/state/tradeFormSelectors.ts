@@ -27,7 +27,7 @@ const selectRawOrderbook = BonsaiHelpers.currentMarket.orderbook.selectGroupedDa
   state: RootState
 ) => ReturnType<typeof BonsaiHelpers.currentMarket.orderbook.selectGroupedData>;
 
-export const getTradeFormInputData = createAppSelector(
+const getTradeFormInputData = createAppSelector(
   [
     BonsaiCore.account.stats.data,
     BonsaiCore.rewardParams.data,
