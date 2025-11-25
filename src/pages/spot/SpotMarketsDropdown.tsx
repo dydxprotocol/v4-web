@@ -148,7 +148,6 @@ export const SpotMarketsDropdown = ({
                 onSelect(row);
                 setIsOpen(false);
               }}
-              defaultSortDescriptor={{ column: 'volume24h', direction: 'descending' }}
               label="Spot"
               columns={columns}
               paginationBehavior="showAll"
