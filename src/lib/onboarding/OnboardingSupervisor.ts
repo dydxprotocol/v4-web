@@ -491,5 +491,4 @@ class OnboardingSupervisor {
   }
 }
 
-// Export singleton instance
 export const onboardingManager = new OnboardingSupervisor();

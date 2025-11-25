@@ -8,8 +8,7 @@
  * - Uses AES-GCM encryption with 256-bit keys
  * - Unique salt per browser/device stored in localStorage
  * - Protects against casual file system inspection
- * - Does NOT protect against XSS attacks or code execution
- * - Similar security model to MetaMask's encrypted vault
+ * - Warning: Does NOT protect against XSS attacks or code execution
  */
 import { logBonsaiError } from '@/bonsai/logs';
 
@@ -178,5 +177,4 @@ export class SecureStorageService {
   }
 }
 
-// Export singleton instance
 export const secureStorage = new SecureStorageService();

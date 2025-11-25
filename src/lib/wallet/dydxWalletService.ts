@@ -36,7 +36,6 @@ export class DydxWalletService {
     persist: boolean = true
   ): Promise<WalletCreationResult> {
     try {
-      // Create wallet from private key
       const LocalWallet = await getLazyLocalWallet();
       const wallet = await LocalWallet.fromPrivateKey(privateKey);
 
@@ -47,7 +46,6 @@ export class DydxWalletService {
         };
       }
 
-      // Note: Private key imports don't have mnemonic, so we can't derive Cosmos wallets
       // Store the private key directly
       if (persist) {
         await secureStorage.store(STORAGE_KEY, privateKey);
@@ -75,10 +73,7 @@ export class DydxWalletService {
   }
 
   /**
-   * Restore wallet from previously stored mnemonic
-   * Called on app initialization to restore session
-   *
-   * @returns Wallet creation result or null if no stored mnemonic
+   * @returns Wallet creation result or null if no stored private key
    */
   async restoreFromStorage(): Promise<WalletCreationResult | null> {
     try {
@@ -134,8 +129,7 @@ export class DydxWalletService {
         };
       }
 
-      // Persist derived mnemonic to secure storage
-      // This replaces the old encrypted signature approach with more secure Web Crypto API
+      // Persist derived private key to secure storage using Web Crypto API
       if (persist) {
         await secureStorage.store(STORAGE_KEY, Buffer.from(privateKey).toString('hex'));
       }
@@ -190,22 +184,14 @@ export class DydxWalletService {
       })
     );
 
-    // Set onboarding state to AccountConnected
     store.dispatch(setOnboardingState(OnboardingState.AccountConnected));
-
-    // Note: Noble wallet derivation happens separately in useAccounts
-    // We could potentially add that here in the future for a more complete service
   }
 
-  /**
-   * Check if a wallet is stored in secure storage
-   */
   hasStoredWallet(): boolean {
     return secureStorage.has(STORAGE_KEY);
   }
 
   /**
-   * Clear stored wallet data
    * Called on user sign out
    */
   clearStoredWallet(): void {
@@ -214,20 +200,16 @@ export class DydxWalletService {
   }
 
   /**
-   * Export current wallet mnemonic (for backup)
-   * WARNING: Only call this when user explicitly requests backup
-   *
-   * @returns Decrypted mnemonic or null if not found
+   * @returns Decrypted trading key or null if not found
    */
   async exportPrivateKey(): Promise<string | null> {
     try {
       return await secureStorage.retrieve(STORAGE_KEY);
     } catch (error) {
-      logBonsaiError('DydxWalletService', 'Failed to exportMnemonic', { error });
+      logBonsaiError('DydxWalletService', `Failed to export ${STORAGE_KEY}`, { error });
       return null;
     }
   }
 }
 
-// Export singleton instance
 export const dydxWalletService = new DydxWalletService();
