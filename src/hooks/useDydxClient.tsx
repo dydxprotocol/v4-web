@@ -6,6 +6,7 @@ import { useCompositeClient, useIndexerClient } from '@/bonsai/rest/lib/useIndex
 import {
   BECH32_PREFIX,
   FaucetClient,
+  NOBLE_BECH32_PREFIX,
   PnlTickInterval,
   SelectedGasDenom,
   onboarding,
@@ -15,7 +16,6 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { RESOLUTION_MAP, RESOLUTION_TO_INTERVAL_MS, type Candle } from '@/constants/candles';
-import { getNobleChainId } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { isDev } from '@/constants/networks';
 
@@ -87,7 +87,7 @@ const useDydxClientContext = () => {
 
     return {
       wallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, BECH32_PREFIX),
-      nobleWallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, getNobleChainId()),
+      nobleWallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, NOBLE_BECH32_PREFIX),
       mnemonic,
       privateKey,
       publicKey,

@@ -1,8 +1,8 @@
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
-import { LocalWallet } from '@dydxprotocol/v4-client-js';
+import { LocalWallet, NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 
-import { getNeutronChainId, getNobleChainId, getOsmosisChainId } from '@/constants/graz';
+import { NEUTRON_BECH32_PREFIX, OSMO_BECH32_PREFIX } from '@/constants/graz';
 
 export type SupportedCosmosChain = 'noble' | 'osmosis' | 'neutron';
 
@@ -73,11 +73,11 @@ export async function deriveCosmosWalletFromSigner(
 function getCosmosPrefix(chain: SupportedCosmosChain): string {
   switch (chain) {
     case 'noble':
-      return getNobleChainId();
+      return NOBLE_BECH32_PREFIX;
     case 'osmosis':
-      return getOsmosisChainId();
+      return OSMO_BECH32_PREFIX;
     case 'neutron':
-      return getNeutronChainId();
+      return NEUTRON_BECH32_PREFIX;
     default:
       throw new Error(`Unknown Cosmos chain: ${chain}`);
   }

@@ -1,6 +1,6 @@
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
-import { BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import { BECH32_PREFIX, NOBLE_BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
 import { OfflineAminoSigner, OfflineDirectSigner } from '@keplr-wallet/types';
 
 import { OnboardingState } from '@/constants/account';
@@ -192,7 +192,7 @@ class OnboardingSupervisor {
 
       const LocalWallet = await getLazyLocalWallet();
       const wallet = await LocalWallet.fromPrivateKey(storedPrivateKey, BECH32_PREFIX);
-      const nobleWallet = await LocalWallet.fromPrivateKey(storedPrivateKey, getNobleChainId());
+      const nobleWallet = await LocalWallet.fromPrivateKey(storedPrivateKey, NOBLE_BECH32_PREFIX);
 
       const hdKey: PrivateInformation = {
         mnemonic: '',
@@ -357,7 +357,7 @@ class OnboardingSupervisor {
     const nobleWallet = new LocalWallet();
     nobleWallet.address = convertBech32Address({
       address: sourceAccount.address!,
-      bech32Prefix: getNobleChainId(),
+      bech32Prefix: NOBLE_BECH32_PREFIX,
     });
 
     return {
