@@ -20,6 +20,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getTradeFormValues } from '@/state/tradeFormSelectors';
 
 import { identify, track } from '@/lib/analytics/analytics';
+import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
@@ -153,10 +154,10 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(
       AnalyticsUserProperties.IsRememberMe(
-        dydxAddress ? Boolean(sourceAccount.encryptedSignature) : null
+        dydxAddress ? dydxPersistedWalletService.hasStoredWallet() : null
       )
     );
-  }, [dydxAddress, sourceAccount.encryptedSignature]);
+  }, [dydxAddress]);
 
   // AnalyticsUserProperty.SubaccountNumber
   const subaccountNumber = useAppSelector(getSubaccountId);

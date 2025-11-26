@@ -211,7 +211,7 @@ export const DepositForm = ({
   const connectWagmi = async () => {
     try {
       setAwaitingWalletAction(true);
-      await connectWallet({ wallet: selectedWallet, forceConnect: true });
+      await connectWallet({ wallet: selectedWallet });
       setAwaitingWalletAction(false);
     } catch (e) {
       setAwaitingWalletAction(false);

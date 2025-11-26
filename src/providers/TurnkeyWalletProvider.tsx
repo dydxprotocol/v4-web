@@ -4,7 +4,6 @@ import { logBonsaiError } from '@/bonsai/logs';
 import { uncompressRawPublicKey } from '@turnkey/crypto';
 import { TurnkeyIndexedDbClient } from '@turnkey/sdk-browser';
 import { useTurnkey } from '@turnkey/sdk-react';
-import { AES } from 'crypto-js';
 import { hashMessage, hashTypedData, toHex } from 'viem';
 
 import { ConnectorType, getSignTypedDataForTurnkey } from '@/constants/wallets';
@@ -18,11 +17,7 @@ import {
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import {
-  clearTurnkeyPrimaryWallet,
-  setSavedEncryptedSignature,
-  setTurnkeyPrimaryWallet,
-} from '@/state/wallet';
+import { clearTurnkeyPrimaryWallet, setTurnkeyPrimaryWallet } from '@/state/wallet';
 import {
   getSourceAccount,
   getTurnkeyEmailOnboardingData,
@@ -194,11 +189,11 @@ const useTurnkeyWalletContext = () => {
   const onboardDydx = useCallback(
     async ({
       salt,
-      setWalletFromSignature,
+      setWalletFromTurnkeySignature,
       tkClient,
     }: {
       salt?: string;
-      setWalletFromSignature: (signature: string) => Promise<string | undefined>;
+      setWalletFromTurnkeySignature: (signature: string) => Promise<string | undefined>;
       tkClient?: TurnkeyIndexedDbClient;
     }) => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
@@ -234,18 +229,10 @@ const useTurnkeyWalletContext = () => {
       });
 
       const signature = `${response.r}${response.s}${response.v}`;
-      const staticEncryptionKey = import.meta.env.VITE_PK_ENCRYPTION_KEY;
-
-      if (staticEncryptionKey) {
-        const encryptedSignature = AES.encrypt(signature, staticEncryptionKey).toString();
-        dispatch(setSavedEncryptedSignature(encryptedSignature));
-      }
-
-      const dydxAddress = await setWalletFromSignature(signature);
+      const dydxAddress = await setWalletFromTurnkeySignature(signature);
       return dydxAddress;
     },
     [
-      dispatch,
       turnkeyEmailOnboardingData,
       primaryTurnkeyWallet,
       getPrimaryUserWallets,
