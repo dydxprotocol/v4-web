@@ -16,26 +16,20 @@ export function setUpUserLeverageParamsQuery(store: RootStore) {
   const cleanupEffect = createValidatorQueryStoreEffect(store, {
     name: 'leverageParams',
     selector: selectParentSubaccountAndMarkets,
-    getQueryKey: (data) => ['leverageParams', data.parentSubaccount?.address],
+    getQueryKey: (data) => ['leverageParams', data.parentSubaccount.wallet],
     getQueryFn: (compositeClient, data) => {
       return async () => {
-        if (!data.parentSubaccount || !data.markets) {
+        if (!data.parentSubaccount.wallet || !data.markets) {
           return {};
         }
 
-        const clobPairToMarket = Object.values(data.markets!).reduce(
-          (acc, market) => {
-            return {
-              ...acc,
-              [market.clobPairId]: market.ticker,
-            };
-          },
-          {} as { [clobPairId: number]: string }
+        const clobPairToMarket = Object.fromEntries(
+          Object.values(data.markets).map((m) => [m.clobPairId, m.ticker])
         );
 
         const leverages = await compositeClient.validatorClient.get.getPerpetualMarketsLeverage(
-          data.parentSubaccount!.address,
-          0
+          data.parentSubaccount.wallet,
+          data.parentSubaccount.subaccount
         );
         return leverages.clobPairLeverage.reduce(
           (acc, leverage) => {

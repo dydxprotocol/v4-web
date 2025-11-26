@@ -116,7 +116,7 @@ export const selectParentSubaccountPositions = createAppSelector(
 );
 
 export const selectParentSubaccountAndMarkets = createAppSelector(
-  [selectRawParentSubaccountData, selectRawMarketsData],
+  [selectParentSubaccountInfo, selectRawMarketsData],
   (parentSubaccount, markets) => {
     return {
       parentSubaccount,

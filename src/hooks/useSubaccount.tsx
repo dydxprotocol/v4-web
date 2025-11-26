@@ -687,10 +687,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             },
           ]
         );
-        if (subaccount.subaccountNumber !== 0) {
+        if (subaccount.subaccountNumber !== subaccountNumber) {
           // Always update the leverage on the cross subaccount so it's easier to consolidate all
           // the user's set leverages. No need to await this
-          const crossSubaccount = SubaccountClient.forLocalWallet(localDydxWallet, 0);
+          const crossSubaccount = SubaccountClient.forLocalWallet(
+            localDydxWallet,
+            subaccountNumber
+          );
           compositeClient.validatorClient.post
             .updatePerpetualMarketsLeverage(crossSubaccount, crossSubaccount.address, [
               {
