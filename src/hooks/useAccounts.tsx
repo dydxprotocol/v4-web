@@ -17,6 +17,7 @@ import { setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
+import { onboardingManager } from '@/lib/onboarding/OnboardingSupervisor';
 import { dydxWalletService } from '@/lib/wallet/dydxWalletService';
 
 import { useCosmosWallets } from './useCosmosWallets';
@@ -99,7 +100,7 @@ const useAccountsContext = () => {
     dispatch(setLocalWallet({ address: dydxAddress, subaccountNumber: 0 }));
   }, [dispatch, dydxAddress]);
 
-  const setWalletFromSignature = useCallback(
+  const setWalletFromTurnkeySignature = useCallback(
     async (signature: string) => {
       const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
         signature,
@@ -107,6 +108,10 @@ const useAccountsContext = () => {
 
       const key = { mnemonic, privateKey, publicKey };
       hdKeyManager.setHdkey(wallet.address, key);
+
+      // Persist to SecureStorage for session restoration
+      await dydxWalletService.deriveFromSignature(signature);
+
       setLocalDydxWallet(wallet);
       setHdKey(key);
       return wallet.address;
@@ -128,8 +133,6 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
-      const { onboardingManager } = await import('@/lib/onboarding/OnboardingSupervisor');
-
       const result = await onboardingManager.handleWalletConnection({
         context: {
           sourceAccount,
@@ -239,7 +242,7 @@ const useAccountsContext = () => {
     signerWagmi,
     publicClientWagmi,
 
-    setWalletFromSignature,
+    setWalletFromTurnkeySignature,
 
     // dYdX accounts
     hdKey,

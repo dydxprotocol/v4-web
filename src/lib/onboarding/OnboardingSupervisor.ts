@@ -212,6 +212,11 @@ class OnboardingSupervisor {
     const { sourceAccount, hasLocalDydxWallet, blockedGeo, isConnectedGraz, authenticated, ready } =
       context;
 
+    console.log('handleWalletConnection', {
+      stored: dydxWalletService.hasStoredWallet(),
+      blockedGeo,
+    });
+
     try {
       // ------ Restore from SecureStorage ------ //
       // Check for persisted session before processing wallet connections
@@ -226,11 +231,8 @@ class OnboardingSupervisor {
       // ------ Turnkey Flow ------ //
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
         return await this.handleTurnkeyFlow({
-          sourceAccount,
           hasLocalDydxWallet,
           blockedGeo,
-          getWalletFromSignature,
-          signMessageAsync,
         });
       }
 
@@ -285,53 +287,32 @@ class OnboardingSupervisor {
 
   /**
    * Handle Turnkey wallet flow
-   * Turnkey is an embedded wallet - no WalletConnected state, only AccountConnected or Disconnected
+   * Turnkey is an embedded wallet managed entirely by TurnkeyAuthProvider
+   * Signing is done via Turnkey SDK, persistence via setWalletFromSignature()
+   * OnboardingSupervisor only validates state
    */
   private async handleTurnkeyFlow(params: {
-    sourceAccount: SourceAccount;
     hasLocalDydxWallet: boolean;
     blockedGeo: boolean;
-    getWalletFromSignature: (params: { signature: string }) => Promise<{
-      wallet: LocalWallet;
-      mnemonic: string;
-      privateKey: Uint8Array | null;
-      publicKey: Uint8Array | null;
-    }>;
-    signMessageAsync?: () => Promise<string>;
   }): Promise<WalletDerivationResult> {
-    const { hasLocalDydxWallet, blockedGeo, getWalletFromSignature, signMessageAsync } = params;
+    const { hasLocalDydxWallet, blockedGeo } = params;
 
-    // If wallet already exists (restored from SecureStorage), just set state
+    // If wallet already exists (restored from SecureStorage or set by TurnkeyAuthProvider)
     if (hasLocalDydxWallet) {
       return {
         onboardingState: OnboardingState.AccountConnected,
       };
     }
 
-    // If not geo-blocked, derive wallet from signature
-    if (!blockedGeo && signMessageAsync) {
-      try {
-        const signature = await signMessageAsync();
-        const { wallet, hdKey } = await this.deriveWalletFromSignature(
-          signature,
-          getWalletFromSignature
-        );
-
-        return {
-          wallet,
-          hdKey,
-          onboardingState: OnboardingState.AccountConnected,
-        };
-      } catch (error) {
-        logBonsaiError('OnboardingSupervisor', 'Turnkey signing failed', { error });
-        return {
-          onboardingState: OnboardingState.Disconnected,
-          error: 'Failed to sign with Turnkey',
-        };
-      }
+    // If geo-blocked, user cannot proceed
+    if (blockedGeo) {
+      return {
+        onboardingState: OnboardingState.Disconnected,
+      };
     }
 
-    // No wallet and geo-blocked or can't sign - disconnected
+    // Wallet is being set up by TurnkeyAuthProvider
+    // Return Disconnected until TurnkeyAuthProvider completes the flow
     return {
       onboardingState: OnboardingState.Disconnected,
     };

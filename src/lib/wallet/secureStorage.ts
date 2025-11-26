@@ -1,15 +1,3 @@
-/**
- * SecureStorageService
- *
- * Provides encrypted storage for sensitive data using the Web Crypto API.
- * Uses a browser-specific encryption key derived from a random salt.
- *
- * Security Model:
- * - Uses AES-GCM encryption with 256-bit keys
- * - Unique salt per browser/device stored in localStorage
- * - Protects against casual file system inspection
- * - Warning: Does NOT protect against XSS attacks or code execution
- */
 import { logBonsaiError } from '@/bonsai/logs';
 
 import { arrayBufferToBase64 } from '@/lib/arrayBufferToBase64';
@@ -19,11 +7,16 @@ const STORAGE_PREFIX = 'dydx.secure.';
 const SALT_KEY = `${STORAGE_PREFIX}salt`;
 
 interface EncryptedData {
-  data: string; // Base64 encoded encrypted data
-  iv: string; // Base64 encoded initialization vector
+  data: string;
+  iv: string;
   version: number; // Version for future migrations
 }
 
+/**
+ * @class SecureStorageService
+ * @description Provides encrypted storage for sensitive data using the Web Crypto API.
+ * Uses a browser-specific encryption key derived from a random salt.
+ */
 export class SecureStorageService {
   private encryptionKey: CryptoKey | null = null;
 

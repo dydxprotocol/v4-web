@@ -71,7 +71,12 @@ const useTurnkeyAuthContext = () => {
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const sourceAccount = useAppSelector(getSourceAccount);
   const { indexedDbClient, authIframeClient } = useTurnkey();
-  const { dydxAddress: connectedDydxAddress, setWalletFromSignature, selectWallet } = useAccounts();
+  const {
+    dydxAddress: connectedDydxAddress,
+    setWalletFromTurnkeySignature,
+    selectWallet,
+  } = useAccounts();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [emailToken, setEmailToken] = useState<string>();
   const [emailSignInError, setEmailSignInError] = useState<string>();
@@ -310,7 +315,7 @@ const useTurnkeyAuthContext = () => {
       await indexedDbClient?.loginWithSession(session);
       const derivedDydxAddress = await onboardDydx({
         salt,
-        setWalletFromSignature,
+        setWalletFromTurnkeySignature,
         tkClient: indexedDbClient,
       });
 
@@ -330,7 +335,7 @@ const useTurnkeyAuthContext = () => {
       setEmailSignInStatus('success');
       setEmailSignInError(undefined);
     },
-    [onboardDydx, indexedDbClient, setWalletFromSignature, uploadAddress]
+    [onboardDydx, indexedDbClient, setWalletFromTurnkeySignature, uploadAddress]
   );
 
   /* ----------------------------- Email Sign In ----------------------------- */
@@ -403,7 +408,7 @@ const useTurnkeyAuthContext = () => {
 
         await indexedDbClient.loginWithSession(session);
         const derivedDydxAddress = await onboardDydx({
-          setWalletFromSignature,
+          setWalletFromTurnkeySignature,
           tkClient: indexedDbClient,
         });
 
@@ -477,7 +482,7 @@ const useTurnkeyAuthContext = () => {
       targetPublicKeys,
       turnkeyEmailOnboardingData,
       onboardDydx,
-      setWalletFromSignature,
+      setWalletFromTurnkeySignature,
       searchParams,
       setSearchParams,
       stringGetter,

@@ -189,11 +189,11 @@ const useTurnkeyWalletContext = () => {
   const onboardDydx = useCallback(
     async ({
       salt,
-      setWalletFromSignature,
+      setWalletFromTurnkeySignature,
       tkClient,
     }: {
       salt?: string;
-      setWalletFromSignature: (signature: string) => Promise<string | undefined>;
+      setWalletFromTurnkeySignature: (signature: string) => Promise<string | undefined>;
       tkClient?: TurnkeyIndexedDbClient;
     }) => {
       const selectedTurnkeyWallet = primaryTurnkeyWallet ?? (await getPrimaryUserWallets(tkClient));
@@ -229,7 +229,7 @@ const useTurnkeyWalletContext = () => {
       });
 
       const signature = `${response.r}${response.s}${response.v}`;
-      const dydxAddress = await setWalletFromSignature(signature);
+      const dydxAddress = await setWalletFromTurnkeySignature(signature);
       return dydxAddress;
     },
     [
