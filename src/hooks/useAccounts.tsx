@@ -18,7 +18,7 @@ import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
 import { onboardingManager } from '@/lib/onboarding/OnboardingSupervisor';
-import { dydxWalletService } from '@/lib/wallet/dydxWalletService';
+import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useCosmosWallets } from './useCosmosWallets';
 import { useDydxClient } from './useDydxClient';
@@ -87,6 +87,7 @@ const useAccountsContext = () => {
 
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
+  const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
@@ -102,17 +103,20 @@ const useAccountsContext = () => {
 
   const setWalletFromTurnkeySignature = useCallback(
     async (signature: string) => {
-      const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
-        signature,
-      });
+      const { wallet, nobleWallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature(
+        {
+          signature,
+        }
+      );
 
       const key = { mnemonic, privateKey, publicKey };
       hdKeyManager.setHdkey(wallet.address, key);
 
       // Persist to SecureStorage for session restoration
-      await dydxWalletService.deriveFromSignature(signature);
+      await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
       setLocalDydxWallet(wallet);
+      setLocalNobleWallet(nobleWallet);
       setHdKey(key);
       return wallet.address;
     },
@@ -124,12 +128,12 @@ const useAccountsContext = () => {
   const cosmosWallets = useCosmosWallets(hdKey, getCosmosOfflineSigner);
 
   useEffect(() => {
-    if (localDydxWallet && hdKey) {
-      localWalletManager.setLocalWallet(localDydxWallet, hdKey);
+    if (localDydxWallet && localNobleWallet) {
+      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet, hdKey]);
+  }, [localDydxWallet, localNobleWallet]);
 
   useEffect(() => {
     (async () => {
@@ -151,6 +155,10 @@ const useAccountsContext = () => {
       // Handle the result
       if (result.wallet) {
         setLocalDydxWallet(result.wallet);
+      }
+
+      if (result.nobleWallet) {
+        setLocalNobleWallet(result.nobleWallet);
       }
 
       if (result.hdKey) {
@@ -211,7 +219,7 @@ const useAccountsContext = () => {
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
     // Clear persisted mnemonic from SecureStorage
-    dydxWalletService.clearStoredWallet();
+    dydxPersistedWalletService.clearStoredWallet();
 
     setLocalDydxWallet(undefined);
     setHdKey(undefined);
@@ -247,9 +255,11 @@ const useAccountsContext = () => {
     // dYdX accounts
     hdKey,
     localDydxWallet,
+    localNobleWallet,
     dydxAccounts,
     dydxAddress,
     setLocalDydxWallet,
+    setLocalNobleWallet,
     setHdKey,
 
     // Cosmos wallets (on-demand)

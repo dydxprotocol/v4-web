@@ -15,6 +15,7 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { RESOLUTION_MAP, RESOLUTION_TO_INTERVAL_MS, type Candle } from '@/constants/candles';
+import { getNobleChainId } from '@/constants/graz';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { isDev } from '@/constants/networks';
 
@@ -86,6 +87,7 @@ const useDydxClientContext = () => {
 
     return {
       wallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, BECH32_PREFIX),
+      nobleWallet: await (await getLazyLocalWallet()).fromMnemonic(mnemonic, getNobleChainId()),
       mnemonic,
       privateKey,
       publicKey,

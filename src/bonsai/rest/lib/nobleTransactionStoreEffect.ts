@@ -64,7 +64,7 @@ const selectNobleTxAuthorizedAccount = createAppSelector(
       return undefined;
     }
 
-    const localNobleWallet = localWalletManager.getCachedLocalNobleWallet(localWalletNonce);
+    const localNobleWallet = localWalletManager.getLocalNobleWallet(localWalletNonce);
 
     const nobleAddress = convertBech32Address({
       address: parentSubaccountInfo.wallet,

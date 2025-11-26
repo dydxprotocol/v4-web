@@ -31,7 +31,7 @@ import { getSourceAccount, getTurnkeyEmailOnboardingData } from '@/state/walletS
 
 import { identify, track } from '@/lib/analytics/analytics';
 import { parseTurnkeyError } from '@/lib/turnkey/turnkeyUtils';
-import { dydxWalletService } from '@/lib/wallet/dydxWalletService';
+import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useTurnkeyWallet } from './TurnkeyWalletProvider';
 
@@ -538,7 +538,7 @@ const useTurnkeyAuthContext = () => {
    */
   useEffect(() => {
     const turnkeyOnboardingToken = searchParams.get('token');
-    const hasStoredWallet = dydxWalletService.hasStoredWallet();
+    const hasStoredWallet = dydxPersistedWalletService.hasStoredWallet();
 
     if (turnkeyOnboardingToken && connectedDydxAddress != null) {
       searchParams.delete('token');

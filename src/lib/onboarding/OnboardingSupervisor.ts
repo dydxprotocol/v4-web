@@ -1,8 +1,10 @@
 import { getLazyLocalWallet } from '@/bonsai/lib/lazyDynamicLibs';
 import { logBonsaiError } from '@/bonsai/logs';
 import { BECH32_PREFIX, type LocalWallet } from '@dydxprotocol/v4-client-js';
+import { OfflineAminoSigner, OfflineDirectSigner } from '@keplr-wallet/types';
 
 import { OnboardingState } from '@/constants/account';
+import { getNobleChainId } from '@/constants/graz';
 import {
   ConnectorType,
   DydxAddress,
@@ -11,10 +13,11 @@ import {
   type WalletInfo,
 } from '@/constants/wallets';
 
+import { convertBech32Address } from '@/lib/addressUtils';
 import { hdKeyManager } from '@/lib/hdKeyManager';
 import { sleep } from '@/lib/timeUtils';
 
-import { dydxWalletService } from '../wallet/dydxWalletService';
+import { dydxPersistedWalletService } from '../wallet/dydxPersistedWalletService';
 
 export interface SourceAccount {
   address?: string;
@@ -31,12 +34,21 @@ export interface OnboardingContext {
   ready?: boolean;
 }
 
-export interface WalletDerivationResult {
-  wallet?: LocalWallet;
-  hdKey?: PrivateInformation;
-  onboardingState: OnboardingState;
-  error?: string;
-}
+export type WalletDerivationResult =
+  | {
+      wallet?: undefined;
+      nobleWallet?: undefined;
+      hdKey?: PrivateInformation;
+      onboardingState: OnboardingState;
+      error?: string;
+    }
+  | {
+      wallet: LocalWallet;
+      nobleWallet: LocalWallet;
+      hdKey?: PrivateInformation;
+      onboardingState: OnboardingState;
+      error?: string;
+    };
 
 class OnboardingSupervisor {
   /**
@@ -47,12 +59,13 @@ class OnboardingSupervisor {
     signature: string,
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
+      nobleWallet: LocalWallet;
       mnemonic: string;
       privateKey: Uint8Array | null;
       publicKey: Uint8Array | null;
     }>
-  ): Promise<{ wallet: LocalWallet; hdKey: PrivateInformation }> {
-    const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
+  ): Promise<{ wallet: LocalWallet; nobleWallet: LocalWallet; hdKey: PrivateInformation }> {
+    const { wallet, nobleWallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
       signature,
     });
 
@@ -67,9 +80,9 @@ class OnboardingSupervisor {
     };
 
     hdKeyManager.setHdkey(wallet.address, hdKey);
-    await dydxWalletService.deriveFromSignature(signature);
+    await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
-    return { wallet, hdKey };
+    return { wallet, nobleWallet, hdKey };
   }
 
   /**
@@ -86,12 +99,19 @@ class OnboardingSupervisor {
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
       mnemonic: string;
+      nobleWallet: LocalWallet;
       privateKey: Uint8Array | null;
       publicKey: Uint8Array | null;
     }>;
     checkPreviousTransactions: (dydxAddress: DydxAddress) => Promise<boolean>;
   }): Promise<
-    | { success: true; wallet: LocalWallet; hdKey: PrivateInformation; isNewUser: boolean }
+    | {
+        success: true;
+        wallet: LocalWallet;
+        nobleWallet: LocalWallet;
+        hdKey: PrivateInformation;
+        isNewUser: boolean;
+      }
     | { success: false; error: string; isDeterminismError?: boolean }
   > {
     const { signMessageAsync, getWalletFromSignature, checkPreviousTransactions } = params;
@@ -99,9 +119,11 @@ class OnboardingSupervisor {
     try {
       // Step 1: Get first signature and derive wallet
       const firstSignature = await signMessageAsync(1);
-      const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature({
-        signature: firstSignature,
-      });
+      const { wallet, nobleWallet, mnemonic, privateKey, publicKey } = await getWalletFromSignature(
+        {
+          signature: firstSignature,
+        }
+      );
 
       if (!privateKey || !publicKey || !wallet.address) {
         return {
@@ -129,8 +151,8 @@ class OnboardingSupervisor {
         }
       }
 
-      // Step 4: Persist to SecureStorage (replaces old encrypted signature approach)
-      await dydxWalletService.deriveFromSignature(firstSignature);
+      // Step 4: Persist to SecureStorage
+      await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
       // Step 5: Set up hdKey
       const hdKey: PrivateInformation = {
@@ -144,6 +166,7 @@ class OnboardingSupervisor {
       return {
         success: true,
         wallet,
+        nobleWallet,
         hdKey,
         isNewUser: !hasPreviousTransactions,
       };
@@ -162,13 +185,14 @@ class OnboardingSupervisor {
    */
   private async restoreFromSecureStorage(): Promise<WalletDerivationResult | null> {
     try {
-      const storedPrivateKey = await dydxWalletService.exportPrivateKey();
+      const storedPrivateKey = await dydxPersistedWalletService.exportPrivateKey();
       if (!storedPrivateKey) {
         return null;
       }
 
       const LocalWallet = await getLazyLocalWallet();
       const wallet = await LocalWallet.fromPrivateKey(storedPrivateKey, BECH32_PREFIX);
+      const nobleWallet = await LocalWallet.fromPrivateKey(storedPrivateKey, getNobleChainId());
 
       const hdKey: PrivateInformation = {
         mnemonic: '',
@@ -178,6 +202,7 @@ class OnboardingSupervisor {
 
       return {
         wallet,
+        nobleWallet,
         hdKey,
         onboardingState: OnboardingState.AccountConnected,
       };
@@ -194,12 +219,15 @@ class OnboardingSupervisor {
     context: OnboardingContext;
     getWalletFromSignature: (params: { signature: string }) => Promise<{
       wallet: LocalWallet;
+      nobleWallet: LocalWallet;
       mnemonic: string;
       privateKey: Uint8Array | null;
       publicKey: Uint8Array | null;
     }>;
     signMessageAsync?: () => Promise<string>;
-    getCosmosOfflineSigner?: (chainId: string) => Promise<any>;
+    getCosmosOfflineSigner?: (
+      chainId: string
+    ) => Promise<(OfflineAminoSigner & OfflineDirectSigner) | undefined>;
     selectedDydxChainId?: string;
   }): Promise<WalletDerivationResult> {
     const {
@@ -212,15 +240,10 @@ class OnboardingSupervisor {
     const { sourceAccount, hasLocalDydxWallet, blockedGeo, isConnectedGraz, authenticated, ready } =
       context;
 
-    console.log('handleWalletConnection', {
-      stored: dydxWalletService.hasStoredWallet(),
-      blockedGeo,
-    });
-
     try {
       // ------ Restore from SecureStorage ------ //
       // Check for persisted session before processing wallet connections
-      if (dydxWalletService.hasStoredWallet() && !blockedGeo) {
+      if (dydxPersistedWalletService.hasStoredWallet() && !blockedGeo) {
         const restored = await this.restoreFromSecureStorage();
 
         if (restored) {
@@ -288,7 +311,7 @@ class OnboardingSupervisor {
   /**
    * Handle Turnkey wallet flow
    * Turnkey is an embedded wallet managed entirely by TurnkeyAuthProvider
-   * Signing is done via Turnkey SDK, persistence via setWalletFromSignature()
+   * Signing is done via Turnkey SDK, persistence via setWalletFromTurnkeySignature()
    * OnboardingSupervisor only validates state
    */
   private async handleTurnkeyFlow(params: {
@@ -324,11 +347,22 @@ class OnboardingSupervisor {
   private async handleTestWalletFlow(
     sourceAccount: SourceAccount
   ): Promise<WalletDerivationResult> {
-    const wallet = new (await getLazyLocalWallet())();
+    const LocalWallet = await getLazyLocalWallet();
+
+    // Create dYdX test wallet
+    const wallet = new LocalWallet();
     wallet.address = sourceAccount.address!;
+
+    // Create Noble test wallet with bech32 conversion
+    const nobleWallet = new LocalWallet();
+    nobleWallet.address = convertBech32Address({
+      address: sourceAccount.address!,
+      bech32Prefix: getNobleChainId(),
+    });
 
     return {
       wallet,
+      nobleWallet,
       // Test wallets don't have hdKey material
       onboardingState: OnboardingState.AccountConnected,
     };
@@ -338,7 +372,9 @@ class OnboardingSupervisor {
    * Handle Cosmos wallet flow
    */
   private async handleCosmosFlow(params: {
-    getCosmosOfflineSigner?: (chainId: string) => Promise<any>;
+    getCosmosOfflineSigner?: (
+      chainId: string
+    ) => Promise<(OfflineAminoSigner & OfflineDirectSigner) | undefined>;
     selectedDydxChainId?: string;
   }): Promise<WalletDerivationResult> {
     const { getCosmosOfflineSigner, selectedDydxChainId } = params;
@@ -352,11 +388,17 @@ class OnboardingSupervisor {
 
     try {
       const dydxOfflineSigner = await getCosmosOfflineSigner(selectedDydxChainId);
-      if (dydxOfflineSigner) {
+      const nobleOfflineSigner = await getCosmosOfflineSigner(getNobleChainId());
+
+      if (dydxOfflineSigner && nobleOfflineSigner) {
         const wallet = await (await getLazyLocalWallet()).fromOfflineSigner(dydxOfflineSigner);
+        const nobleWallet = await (
+          await getLazyLocalWallet()
+        ).fromOfflineSigner(nobleOfflineSigner);
 
         return {
           wallet,
+          nobleWallet,
           // Cosmos wallets from offline signer don't expose hdKey material
           onboardingState: OnboardingState.AccountConnected,
         };
@@ -413,18 +455,20 @@ class OnboardingSupervisor {
         // Give Privy time to finish auth flow
         await sleep();
         const signature = await signMessageAsync!();
-        const { wallet, hdKey } = await this.deriveWalletFromSignature(
+        const { wallet, nobleWallet, hdKey } = await this.deriveWalletFromSignature(
           signature,
           getWalletFromSignature
         );
 
         return {
           wallet,
+          nobleWallet,
           hdKey,
           onboardingState: OnboardingState.AccountConnected,
         };
       } catch (error) {
         logBonsaiError('OnboardingSupervisor', 'Privy signing failed', { error });
+
         return {
           onboardingState: OnboardingState.WalletConnected,
           error: 'Failed to sign with Privy',
