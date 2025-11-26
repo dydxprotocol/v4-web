@@ -4,7 +4,7 @@
 # https://github.com/FuelLabs/chain-configuration/blob/master/upgradelog/ignition-devnet/consensus_parameters/18.json
 # https://github.com/FuelLabs/chain-configuration/blob/master/upgradelog/ignition-devnet/state_transition_function/32.wasm
 
-FROM ghcr.io/fuellabs/fuel-core:v0.45.1
+FROM ghcr.io/fuellabs/fuel-core:v0.47.1
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 

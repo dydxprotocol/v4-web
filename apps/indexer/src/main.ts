@@ -4,11 +4,13 @@ import { DataSourceBuilder } from '@subsquid/fuel-stream'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { Contract, Position, Market, Asset, Account, Payment, Trade } from './model'
 
+// Default URLs (fallbacks if environment variables are not set)
 const SUBSQUID_NETWORK_GATEWAY_URL_MAINNET = 'https://v2.archive.subsquid.io/network/fuel-mainnet'
 const SUBSQUID_NETWORK_GATEWAY_URL_TESTNET = 'https://v2.archive.subsquid.io/network/fuel-testnet'
 const MAINNET_URL = 'https://mainnet.fuel.network/v1/graphql'
 const TESTNET_URL = 'https://testnet.fuel.network/v1/graphql'
 const LOCAL_NODE_URL = 'http://localhost:4000/v1/graphql'
+
 const CONTRACTS = {
     VAULT: {
         ADDRESS: {
@@ -18,13 +20,41 @@ const CONTRACTS = {
     }
 }
 
-const dataSource = new DataSourceBuilder()
-    .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_TESTNET)
-    // .setGateway(SUBSQUID_NETWORK_GATEWAY_URL_MAINNET)
+// Read configuration from environment variables
+// GRAPHQL_URL: The Fuel GraphQL endpoint (required)
+// GATEWAY_URL: The Subsquid archive gateway (optional - if empty, runs in local-only mode)
+const graphqlUrl = process.env.GRAPHQL_URL || LOCAL_NODE_URL
+const gatewayUrl = process.env.GATEWAY_URL || ''
+
+// Determine the mode based on configuration
+const isLocalMode = !gatewayUrl || gatewayUrl.trim() === ''
+const mode = isLocalMode ? 'LOCAL' : 
+             graphqlUrl.includes('mainnet') ? 'MAINNET' : 
+             graphqlUrl.includes('testnet') ? 'TESTNET' : 'CUSTOM'
+
+console.log('='.repeat(60))
+console.log('Starboard Indexer Configuration')
+console.log('='.repeat(60))
+console.log(`Mode:        ${mode}`)
+console.log(`GraphQL URL: ${graphqlUrl}`)
+console.log(`Gateway URL: ${isLocalMode ? '(none - local mode)' : gatewayUrl}`)
+console.log('='.repeat(60))
+
+// Build data source with dynamic configuration
+const dataSourceBuilder = new DataSourceBuilder()
+
+// Only use Subsquid archive gateway if specified (for testnet/mainnet)
+// For local development, omit the gateway to fetch directly from the node
+if (!isLocalMode) {
+    dataSourceBuilder.setGateway(gatewayUrl)
+    console.log('📡 Using Subsquid archive gateway for historical data')
+} else {
+    console.log('🏠 Running in local mode - fetching directly from Fuel node')
+}
+
+const dataSource = dataSourceBuilder
     .setGraphql({
-        // url: MAINNET_URL,
-        url: TESTNET_URL,
-        // url: LOCAL_NODE_URL,
+        url: graphqlUrl,
         strideConcurrency: 3,
         strideSize: 30
     })

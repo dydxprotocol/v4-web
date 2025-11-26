@@ -1,0 +1,66 @@
+# Don't copy these into Docker context (faster builds)
+
+# Node modules (we install them in the image)
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Build outputs (we build in the image)
+dist/
+build/
+lib/
+*.log
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+__tests__/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Docker files
+docker/
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Python
+python/
+*.pyc
+__pycache__/
+venv/
+
+# Coverage
+coverage/
+.nyc_output/
+

@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# TODO change to --poa-interval-period 1sec \
-
-# Start the Fuel Core node
+# Start the Fuel Core node with increased GraphQL limits for indexer compatibility
 /root/fuel-core run \
     --ip 0.0.0.0 \
     --port 4000 \
@@ -13,5 +11,8 @@
     --debug \
     --min-gas-price ${MIN_GAS_PRICE} \
     --snapshot ./ \
-    --consensus-key ${CONSENSUS_KEY_SECRET}
+    --consensus-key ${CONSENSUS_KEY_SECRET} \
+    --graphql-max-complexity 200000000 \
+    --graphql-max-depth 20 \
+    --graphql-max-recursive-depth 20
 

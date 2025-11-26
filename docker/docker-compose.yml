@@ -1,5 +1,8 @@
 services:
   fuel-core:
+    build:
+      context: ./fuel-core
+      dockerfile: Dockerfile
     image: starboard/fuel-core
     container_name: 'starboard_fuel_core'
     environment:
@@ -36,6 +39,9 @@ services:
       retries: 10
 
   indexer:
+    build:
+      context: ..
+      dockerfile: docker/starboard/Dockerfile
     image: starboard
     container_name: 'starboard_indexer_processor'
     environment:
@@ -51,12 +57,18 @@ services:
       VAULT_ADDRESS: ${VAULT_ADDRESS}
       FROM_BLOCK: ${FROM_BLOCK}
       NVM_DIR: /root/.nvm
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/apps/indexer && ../../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
     depends_on:
       fuel-core:
         condition: service_healthy
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'node.*main.js' || exit 1"]
+      interval: 30s
+      start_period: 60s
+      timeout: 10s
+      retries: 3
 
   api:
     image: starboard
@@ -69,11 +81,17 @@ services:
       DB_HOST: starboard_indexer_db
       NVM_DIR: /root/.nvm
     ports:
-      - "${GQL_PORT}:4000"
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-graphql-server"]
+      - "${GQL_PORT}:${GQL_PORT}"
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/apps/indexer && ../../node_modules/.bin/squid-graphql-server"]
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'squid-graphql-server' || exit 1"]
+      interval: 30s
+      start_period: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   fuel-core-db:
