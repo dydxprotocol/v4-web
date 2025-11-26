@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { OrderSizeInputs } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
+import { BigNumber } from 'bignumber.js';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 import tw from 'twin.macro';

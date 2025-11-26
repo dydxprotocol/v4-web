@@ -665,7 +665,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
           ? SubaccountClient.forLocalWallet(localDydxWallet, params.subaccountNumber)
           : undefined;
 
-        if (subaccount == null) {
+        if (localDydxWallet === undefined || subaccount == null) {
           throw new Error('local wallet client not initialized');
         }
 
@@ -687,6 +687,28 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             },
           ]
         );
+        if (subaccount.subaccountNumber !== 0) {
+          // Always update the leverage on the cross subaccount so it's easier to consolidate all
+          // the user's set leverages. No need to await this
+          const crossSubaccount = SubaccountClient.forLocalWallet(localDydxWallet, 0);
+          compositeClient.validatorClient.post
+            .updatePerpetualMarketsLeverage(crossSubaccount, crossSubaccount.address, [
+              {
+                clobPairId: params.clobPairId,
+                customImfPpm: DEFAULT_LEVERAGE_PPM / params.leverage,
+              },
+            ])
+            .then((crossTx) => {
+              const parsedTx = parseToPrimitives(crossTx);
+              logBonsaiInfo(
+                'useSubaccount/updateLeverage',
+                'Successful update leverage for cross',
+                {
+                  parsedTx,
+                }
+              );
+            });
+        }
 
         const parsedTx = parseToPrimitives(tx);
         logBonsaiInfo('useSubaccount/updateLeverage', 'Successful update leverage', {

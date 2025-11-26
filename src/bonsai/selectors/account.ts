@@ -115,6 +115,22 @@ export const selectParentSubaccountPositions = createAppSelector(
   }
 );
 
+export const selectParentSubaccountAndMarkets = createAppSelector(
+  [selectRawParentSubaccountData, selectRawMarketsData],
+  (parentSubaccount, markets) => {
+    return {
+      parentSubaccount,
+      markets,
+    };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: (prev, next) =>
+        prev.parentSubaccount?.address === next.parentSubaccount?.address,
+    },
+  }
+);
+
 export const selectParentSubaccountSummaryLoading = createAppSelector(
   [selectRawParentSubaccount, selectRawMarkets],
   mergeLoadableStatus
