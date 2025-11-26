@@ -40,7 +40,7 @@ Dockerfile*
 # Environment files
 .env
 .env.*
-!.env.example
+!.env.docker
 
 # OS files
 .DS_Store
