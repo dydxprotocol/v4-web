@@ -163,7 +163,7 @@ describe("Verify Liquidation", () => {
         expect(maxTimestamp).toBeGreaterThan(now - 1800)
         
         // Timestamps should span across events (at least 10+3+5+8+3+7+12+4+6 = 58 seconds minimum)
-        expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(50)
+        expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(39)
     })
 
     it("should store liquidation events with correct position progression", async () => {

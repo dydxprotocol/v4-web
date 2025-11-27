@@ -40,7 +40,7 @@ OUTPUT=`pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.
 echo "$OUTPUT"
 MOCK_STORK_CONTRACT=`echo "$OUTPUT" | grep "Mocked Stork deployed to" |  awk '{print $NF}'`
 if [ -z "$MOCK_STORK_CONTRACT" ]; then
-    echo "stork mock deployemnt failed"
+    echo "stork mock deployment failed"
     echo "$OUTPUT"
     # kill is not enough, node spawns a subprocess
     pkill -P $FUEL_NODE_PID
@@ -55,7 +55,7 @@ USDC_ASSET_ID=`echo "$OUTPUT" | grep -A 2 "Deploying token named mckUSDC sUSDC" 
 VAULT_CONTRACT=`echo "$OUTPUT" | grep "Vault deployed to" |  awk '{print $NF}'`
 PRICEFEED_WRAPPER_CONTRACT=`echo "$OUTPUT" | grep "PricefeedWrapper deployed to" |  awk '{print $NF}'`
 if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" ] || [ -z "$PRICEFEED_WRAPPER_CONTRACT" ]; then
-    echo "vault deployemnt failed"
+    echo "vault deployment failed"
     echo "$OUTPUT"
     # kill is not enough, node spawns a subprocess
     pkill -P $FUEL_NODE_PID
@@ -166,10 +166,12 @@ fi
 ##################### closing #########################################################
 
 echo "clean up the squid indexer"
-kill $SQD_INDEXER_PID
-if [ $? -ne 0 ]; then
-    echo "Failed to down the squid indexer"
-    EXIT_CODE=1
+if [ -n "$SQD_INDEXER_PID" ]; then
+    kill "$SQD_INDEXER_PID"
+    if [ $? -ne 0 ]; then
+        echo "Failed to down the squid indexer"
+        EXIT_CODE=1
+    fi
 fi
 
 echo "Shut down Postgres and erase the indexer data"

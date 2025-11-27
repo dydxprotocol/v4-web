@@ -41,7 +41,7 @@ docker exec "$(basename "$(pwd)")-db-1" psql -U postgres \
 
 ## E2E Tests
 
-End to end tests are executed with the bash script `e2e/run.sh`.
+End-to-end tests are executed with the bash script `e2e/run.sh`.
 It depends on the `contracts` package: to run the fuel test node and deploy contracts.
 The script runs the fuel node, deploys contracts and mocks, executes a test script,
 starts up the database, starts up the indexer, waits for the indexer to process the events
@@ -59,12 +59,12 @@ Run an example test
 ```
 
 The interactive mode simply waits for Ctrl-C to initialize the shutdown 
-in order to enable the infrastructure for other test purposes
+to enable the infrastructure for other test purposes
 ```shell
 ./e2e/run.sh e2e/populate-events-price.ts e2e/verify-indexer-price.test.ts i
 ```
 
-The script `e2e/populate-events-price.ts` is the referencial one.
+The script `e2e/populate-events-price.ts` is the referential one.
 It sends transactions to blockchain to populate events.
 To provide more tests, copy the script and replace the section with testing code.
 Each test scripts requires a separate execution of `run.sh`.
@@ -72,7 +72,7 @@ This is a standalone script executed with `ts-node`.
 
 The script `e2e/verify-indexer-price.test.ts` is the referential one.
 It connects to db or the indexer API and tests the processing results.
-It is also posibble to send additional transactions that emit events,
+It is also possible to send additional transactions that emit events,
 but an additional code to watch the indexer sync would be required.
 The script is vitest compatible. It is excluded in a normal run.
 Here a dedicated mode `indexer-e2e` is used to execute the script with vitest.

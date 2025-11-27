@@ -92,4 +92,8 @@ describe("Verify Positions", () => {
         const closedPositionResult = await client.query('SELECT id FROM position WHERE collateral_amount = 0 AND size <> 0')
         expect(closedPositionResult.rows.length).toBe(0)
     })
+    
+    afterAll(async () => {
+        await client.end()
+    })
 })

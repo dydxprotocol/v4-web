@@ -82,12 +82,14 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
     const priceValue = underlying.upper.mul(new BN("18446744073709551616"))
         .add(underlying.lower)
         .sub(new BN("170141183460469231731687303715884105728"))
-        .abs();
+        .abs()
+    const timestampNs = BigInt(value.timestamp_ns.toString())
+    const timestampSec = Number(timestampNs / 1_000_000_000n)
     const price: Price = new Price({
         id: receipt.id,
         asset: asset,
-        price: priceValue,
-        timestamp: value.timestamp_ns / 1000000000,
+        price: BigInt(priceValue.toString()),
+        timestamp: timestampSec,
     })
     await ctx.store.insert(price)
 }
@@ -95,7 +97,6 @@ async function handlePriceUpdate(receipt: Receipt<{receipt: {rb: true, data: tru
 async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: true}}>, block: Block, ctx: any) {
     const logs = vaultInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
-    console.log("log", log)
     const provider = log.account.Address.bits
     // the user transfers in
     const stableDetla = BigInt(log.stable_asset_amount.toString())
@@ -141,7 +142,6 @@ async function handleAddLiquidity(receipt: Receipt<{receipt: {rb: true, data: tr
 async function handleRemoveLiquidity(receipt: Receipt<{receipt: {rb: true, data: true}}>, block: Block, ctx: any) {
     const logs = vaultInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
-    console.log("log", log)
     const provider = log.account.Address.bits
     // the amount transferred out to the user
     const stableDetla = BigInt(log.stable_asset_amount.toString())
@@ -252,7 +252,7 @@ async function handleIncreasePosition(receipt: Receipt<{receipt: {rb: true, data
         await ctx.store.upsert(totalPosition)
     } else {
         totalPosition = new TotalPosition({
-            id: receipt.id, // another value?
+            id: `${log.index_asset}-${log.is_long}`,
             indexAssetId: log.index_asset,
             isLong: log.is_long,
             collateralAmount: collateral,
@@ -418,7 +418,7 @@ async function handleLiquidatePosition(receipt: Receipt<{receipt: {rb: true, dat
     if (!totalPosition) {
         throw new Error('Total position not found')
     }
-    totalPosition.collateralAmount = totalPosition.collateralAmount - collateralDelta //TODO
+    totalPosition.collateralAmount = totalPosition.collateralAmount - collateralDelta
     totalPosition.size = totalPosition.size - sizeDelta
     totalPosition.lastTimestamp = getUTCBlockTime(block)
     await ctx.store.upsert(totalPosition)
