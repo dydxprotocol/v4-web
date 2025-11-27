@@ -13,6 +13,7 @@ import { setUpConfigTiersQuery } from './rest/configTiers';
 import { setUpFillsQuery } from './rest/fills';
 import { setUpGeoQuery } from './rest/geo';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
+import { setUpUserLeverageParamsQuery } from './rest/leverage';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
@@ -37,6 +38,7 @@ export const storeLifecycles = [
   setUpAssetsQuery,
   setUpParentSubaccount,
   setUpFillsQuery,
+  setUpUserLeverageParamsQuery,
   setUpOrdersQuery,
   setUpTransfersQuery,
   setUpBlockTradingRewardsQuery,
