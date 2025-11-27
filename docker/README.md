@@ -11,7 +11,7 @@ That's it! All services will start with proper Docker practices.
 
 ## File Structure
 
-```
+```text
 starboard/
 ├── .dockerignore                    # Optimizes Docker build context
 └── docker/
@@ -116,9 +116,11 @@ make test-fuel   # Test fuel-core only
 
 ## Environment Variables
 
-Configuration is in `docker/.env.docker` - **no setup needed!** The file includes sensible defaults for local development.
+Configuration is in `docker/.env.docker` - **committed to the repo with test-only values for local development.**
 
 All services reference this file via `env_file: - .env.docker` in `docker-compose.yml`.
+
+You can edit `.env.docker` directly if you need custom values.
 
 Key variables in `.env.docker`:
 
@@ -344,6 +346,11 @@ This gives us:
 - ✅ Organized Dockerfile location
 - ✅ Clean repository structure
 
+```yaml
+context: ..              # Build from repo root ✅
+dockerfile: docker/starboard/Dockerfile  # But Dockerfile is organized in subdir
+```
+
 ## Troubleshooting
 
 ### Build fails
@@ -366,7 +373,7 @@ docker-compose ps
 
 ### Port conflicts
 
-Edit `docker/.env` to change ports:
+Edit `docker/.env.docker` to change ports:
 ```bash
 FUEL_CORE_PORT=4001
 GQL_PORT=4351

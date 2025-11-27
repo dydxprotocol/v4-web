@@ -89,11 +89,13 @@ services:
       DB_HOST: starboard_indexer_db
       NVM_DIR: /root/.nvm
     ports:
-      - "${GQL_PORT:-4350}:${GQL_PORT:-4350}"
+      - "${GQL_PORT:-4350}:4350"
     command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/apps/indexer && ../../node_modules/.bin/squid-graphql-server"]
     depends_on:
       db:
         condition: service_healthy
+      indexer:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'squid-graphql-server' || exit 1"]
       interval: 30s

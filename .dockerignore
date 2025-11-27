@@ -28,8 +28,7 @@ __tests__/
 *.spec.ts
 *.spec.js
 
-# Docker files
-docker/
+# Docker files (keep docker/ for setup scripts)
 Dockerfile*
 .dockerignore
 

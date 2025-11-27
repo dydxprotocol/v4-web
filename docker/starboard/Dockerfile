@@ -42,7 +42,7 @@ RUN export PNPM_HOME="/root/.local/share/pnpm" && \
     export PATH="${HOME}/.fuelup/bin:${PATH}" && \
     export NVM_DIR="$HOME/.nvm" && \
     . ${HOME}/.nvm/nvm.sh && \
-    pnpm install --ignore-scripts --frozen-lockfile
+    pnpm install --frozen-lockfile
 
 # Copy application code
 COPY . .

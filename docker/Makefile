@@ -2,7 +2,8 @@
 # Simplified commands for managing the local development environment
 
 .PHONY: help setup up start down restart logs logs-indexer logs-api logs-fuel logs-db status clean build rebuild \
-	deploy-contracts mint-usdc mint-usdc-user1 mint-usdc-custom feed-prices dev-rebuild-indexer
+	deploy-contracts mint-usdc mint-usdc-user1 mint-usdc-custom feed-prices dev-rebuild-indexer \
+	ps health test test-api test-fuel shell-indexer shell-api shell-fuel shell-db restart-indexer restart-api
 
 # Default target
 .DEFAULT_GOAL := help
@@ -120,14 +121,18 @@ health: ## Check health of all services
 		echo "✗ Unhealthy or starting"; \
 	fi
 	@printf "Indexer:     "
-	@if docker ps --filter name=starboard_indexer_processor --format '{{.Status}}' | grep -q 'Up'; then \
-		echo "✓ Running"; \
+	@if docker ps --filter name=starboard_indexer_processor --format '{{.Status}}' | grep -q '(healthy)'; then \
+		echo "✓ Healthy"; \
+	elif docker ps --filter name=starboard_indexer_processor --format '{{.Status}}' | grep -q 'Up'; then \
+		echo "⏳ Starting"; \
 	else \
 		echo "✗ Not running"; \
 	fi
 	@printf "API:         "
-	@if docker ps --filter name=starboard_indexer_api --format '{{.Status}}' | grep -q 'Up'; then \
-		echo "✓ Running"; \
+	@if docker ps --filter name=starboard_indexer_api --format '{{.Status}}' | grep -q '(healthy)'; then \
+		echo "✓ Healthy"; \
+	elif docker ps --filter name=starboard_indexer_api --format '{{.Status}}' | grep -q 'Up'; then \
+		echo "⏳ Starting"; \
 	else \
 		echo "✗ Not running"; \
 	fi
@@ -156,21 +161,19 @@ deploy-contracts: ## Deploy contracts to local node
 # Asset management
 mint-usdc: ## Mint USDC to User0 account (default test account)
 	@echo "Minting 1M USDC to User0..."
-	@docker exec -t -e PRIV_K=0x366079294383ed426ef94b9e86a8e448876a92c1ead9bbf75e6e205a6f4f570d \
-		--env-file .env.docker starboard_indexer_processor \
+	@docker exec -t --env-file .env.docker starboard_indexer_processor \
 		bash -i -c "pnpm --filter starboard/contracts faucet \
 		--url=http://starboard_fuel_core:4000/v1/graphql \
-		--privK=\$${PRIV_K} \
+		--privK=\$${USER0_PRIV_K} \
 		--token=\$${USDC_ADDRESS}"
 	@echo "✓ USDC minted successfully"
 
 mint-usdc-user1: ## Mint USDC to User1 account
 	@echo "Minting 1M USDC to User1..."
-	@docker exec -t -e PRIV_K=0xb978aa71a1487dc9c1f996493af73f0427cf78f560b606224e7f0089bae04c41 \
-		--env-file .env.docker starboard_indexer_processor \
+	@docker exec -t --env-file .env.docker starboard_indexer_processor \
 		bash -i -c "pnpm --filter starboard/contracts faucet \
 		--url=http://starboard_fuel_core:4000/v1/graphql \
-		--privK=\$${PRIV_K} \
+		--privK=\$${USER1_PRIV_K} \
 		--token=\$${USDC_ADDRESS}"
 	@echo "✓ USDC minted to User1 successfully"
 
@@ -194,14 +197,15 @@ feed-prices: ## Update oracle prices from Pyth
 	@docker exec -t --env-file .env.docker starboard_indexer_processor \
 		bash -i -c "pnpm --filter starboard/contracts prices:feed \
 		--url=http://starboard_fuel_core:4000/v1/graphql \
-		--priceSignerPrivK=0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a \
+		--priceSignerPrivK=\$${PRICE_SIGNER_PRIV_K} \
 		--mockPricefeedAddress=\$${VAULT_PRICEFEED_ADDRESS}"
 	@echo "✓ Prices updated successfully"
 
 # Development workflow
+# Note: This Makefile must be run from the docker/ directory
 dev-rebuild-indexer: ## Rebuild local indexer code and restart
 	@echo "Building indexer..."
-	@cd ../apps/indexer && pnpm build
+	@$(MAKE) -C ../apps/indexer build || (cd ../apps/indexer && pnpm build)
 	@echo "Restarting indexer..."
 	@$(MAKE) --no-print-directory restart-indexer
 	@echo "✓ Indexer updated with local code"

@@ -82,13 +82,7 @@ print_status "Starting services (docker-compose will build images if needed)..."
 echo ""
 
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
-
-if [ $? -eq 0 ]; then
-    print_success "Services started successfully"
-else
-    print_error "Failed to start services"
-    exit 1
-fi
+print_success "Services started successfully"
 
 echo ""
 print_status "Waiting for services to become healthy..."
@@ -111,8 +105,10 @@ echo "  PostgreSQL:         localhost:23751"
 echo ""
 echo "Prefunded Test Account (Deployer):"
 echo "──────────────────────────────────────────────────────────"
+# gitleaks:allow - This is a test-only private key for local development
 echo "  Private Key: 0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a"
 echo "  Address:     0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6"
+echo "  ⚠️  TEST KEY ONLY - Never use with real funds!"
 echo ""
 echo "Useful Commands:"
 echo "──────────────────────────────────────────────────────────"
