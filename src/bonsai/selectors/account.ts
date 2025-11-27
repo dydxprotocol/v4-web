@@ -89,13 +89,13 @@ export const selectCurrentMarketInfoRaw = createAppSelector(
 export const selectParentSubaccountSummary = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
   (parentSubaccount, markets, selectedMarketLeverages) => {
-    if (parentSubaccount == null || markets == null) {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
     const result = calculateParentSubaccountSummary(
       parentSubaccount,
       markets,
-      selectedMarketLeverages ?? {}
+      selectedMarketLeverages
     );
     return result;
   }
@@ -104,14 +104,10 @@ export const selectParentSubaccountSummary = createAppSelector(
 export const selectParentSubaccountPositions = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
   (parentSubaccount, markets, selectedMarketLeverages) => {
-    if (parentSubaccount == null || markets == null) {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
-    return calculateParentSubaccountPositions(
-      parentSubaccount,
-      markets,
-      selectedMarketLeverages ?? {}
-    );
+    return calculateParentSubaccountPositions(parentSubaccount, markets, selectedMarketLeverages);
   }
 );
 
@@ -190,14 +186,14 @@ export const selectAccountOrdersLoading = createAppSelector(
 export const selectChildSubaccountSummaries = createAppSelector(
   [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
   (parentSubaccount, marketsData, selectedMarketLeverages) => {
-    if (parentSubaccount == null || marketsData == null) {
+    if (parentSubaccount == null || marketsData == null || selectedMarketLeverages == null) {
       return undefined;
     }
 
     return calculateChildSubaccountSummaries(
       parentSubaccount,
       marketsData,
-      selectedMarketLeverages ?? {}
+      selectedMarketLeverages
     );
   }
 );

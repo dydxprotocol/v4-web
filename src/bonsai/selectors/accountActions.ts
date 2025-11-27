@@ -17,7 +17,7 @@ export const selectParentSubaccountSummaryDeposit = createAppSelector(
     (_s, input: DepositUsdcProps) => input,
   ],
   (parentSubaccount, markets, selectedMarketLeverages, depositInputs) => {
-    if (parentSubaccount == null || markets == null) {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
 
@@ -26,7 +26,7 @@ export const selectParentSubaccountSummaryDeposit = createAppSelector(
     const result = calculateParentSubaccountSummary(
       modifiedParentSubaccount,
       markets,
-      selectedMarketLeverages ?? {}
+      selectedMarketLeverages
     );
     return result;
   }
@@ -40,7 +40,7 @@ export const selectParentSubaccountSummaryWithdrawal = createAppSelector(
     (_s, input: WithdrawUsdcProps) => input,
   ],
   (parentSubaccount, markets, selectedMarketLeverages, withdrawalInputs) => {
-    if (parentSubaccount == null || markets == null) {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
 
@@ -49,7 +49,7 @@ export const selectParentSubaccountSummaryWithdrawal = createAppSelector(
     const result = calculateParentSubaccountSummary(
       modifiedParentSubaccount,
       markets,
-      selectedMarketLeverages ?? {}
+      selectedMarketLeverages
     );
     return result;
   }
