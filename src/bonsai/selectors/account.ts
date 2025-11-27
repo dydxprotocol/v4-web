@@ -122,7 +122,7 @@ export const selectParentSubaccountAndMarkets = createAppSelector(
   {
     memoizeOptions: {
       resultEqualityCheck: (prev, next) =>
-        prev.parentSubaccount?.address === next.parentSubaccount?.address,
+        prev.parentSubaccount?.wallet === next.parentSubaccount?.wallet,
     },
   }
 );
