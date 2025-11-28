@@ -32,7 +32,7 @@
     "strictNullChecks": true
   },
   "exclude": ["node_modules", "build", "dist", "./ts-sdk/__native__/**"],
-  "include": ["src", "scripts", "styled.d.ts", "__tests__", "wdio.conf.ts", "types"],
+  "include": ["src", "scripts", "styled.d.ts", "__tests__", "wdio.conf.ts", "types", "vitest.setup.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"

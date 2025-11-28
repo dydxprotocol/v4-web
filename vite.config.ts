@@ -97,8 +97,10 @@ export default defineConfig(({ mode }) => ({
       '**/apps/indexer/**', // Exclude indexer tests (Unstable)
       '**/ts-sdk/__tests__/modules/client/**', // Exclude API tests (endpoints)
       '**/ts-sdk/__tests__/modules/onboarding.test.ts', // Exclude onboarding tests (non-fuel related, we removed dydx deps)
+      '**/contracts/test/**', // Exclude contract tests (require fuel-core in PATH, run separately in contracts/)
     ],
     environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
   },
   build: {
     rollupOptions: {
