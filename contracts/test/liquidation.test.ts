@@ -524,7 +524,7 @@ describe("Vault.funding_rate", () => {
             const liquidationState1 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()
             ).value
-            expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
+            expect(liquidationState1[0].toString()).eq("2") // 2 means max leverage exceeded (position at edge)
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
