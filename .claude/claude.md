@@ -19,7 +19,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Format: `ty
 - E2E tests: add `-e2e` suffix (e.g., `web-e2e`)
 
 **Examples:**
-```
+```text
 fix(ui/web): dashboard login button misaligned on mobile
 feat(api/web,docs): create user data retrieval endpoints
 chore(config/web): add default coverage directory to jest config
@@ -98,6 +98,6 @@ Use [Conventional Comments](https://conventionalcomments.org/) format:
 - Suggest HOW to change without providing pastable solutions
 
 **Example:**
-```
+```text
 **suggestion (non-blocking):** Consider extracting this logic into a separate function for better testability.
 ```

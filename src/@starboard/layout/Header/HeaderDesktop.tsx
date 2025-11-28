@@ -36,6 +36,8 @@ import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { EXTERNAL_LINKS } from '@starboard/constants/externalLinks';
+
 export const HeaderDesktop = () => {
   const { isUrlDataEmpty } = useMobileAppUrl();
   const stringGetter = useStringGetter();
@@ -87,7 +89,7 @@ export const HeaderDesktop = () => {
           value: 'MINTSCAN',
           label: stringGetter({ key: STRING_KEYS.BLOCK_EXPLORER }),
           slotBefore: <Icon iconName={IconName.Terminal} />,
-          href: 'https://app.fuel.network/contract/0x8002f2e86302ef9421558d0ae25a68cdfdbec5d27915cc2db49eded220799ecc/transactions',
+          href: EXTERNAL_LINKS.FUEL_CONTRACT_EXPLORER,
         },
         /* {
 * value: 'MORE',
@@ -183,11 +185,7 @@ export const HeaderDesktop = () => {
                 tw="mr-[0.5em]"
                 shape={ButtonShape.Pill}
                 size={ButtonSize.XSmall}
-                action={
-                  !availableBalance || availableBalance > 0
-                    ? ButtonAction.Secondary
-                    : ButtonAction.Primary
-                }
+                action={availableBalance === 0 ? ButtonAction.Primary : ButtonAction.Secondary}
                 onClick={() => {
                   dispatch(openDialog(DialogTypes.Deposit2({})));
                 }}
