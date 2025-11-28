@@ -21,7 +21,7 @@ runFn(async () => {
 
 // lazy import the app so we can start up bonsai before the app chugs into being
 const App = lazy(async () => {
-  return import('./App');
+  return import('./@starboard/App');
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
