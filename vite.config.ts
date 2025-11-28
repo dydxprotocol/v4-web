@@ -29,6 +29,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: [
       { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@starboard', replacement: path.resolve(__dirname, 'src/@starboard') },
       { find: 'public', replacement: path.resolve(__dirname, 'public') },
       {
         find: 'stream',
