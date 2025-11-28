@@ -86,7 +86,7 @@ export const HeaderDesktop = () => {
          *   ),
          * }, */
         {
-          value: 'MINTSCAN',
+          value: 'BLOCK_EXPLORER',
           label: stringGetter({ key: STRING_KEYS.BLOCK_EXPLORER }),
           slotBefore: <Icon iconName={IconName.Terminal} />,
           href: EXTERNAL_LINKS.FUEL_CONTRACT_EXPLORER,
@@ -199,10 +199,7 @@ export const HeaderDesktop = () => {
 
         <MobileDownloadLinks />
 
-        {
-          // Do not show separator if there are no mobile download links
-          isUrlDataEmpty || <VerticalSeparator />
-        }
+        {!isUrlDataEmpty && <VerticalSeparator />}
 
         <NotificationsMenu
           slotTrigger={

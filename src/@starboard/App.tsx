@@ -277,10 +277,11 @@ function useOpenDepositIfRelevant() {
 }
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
-  // eslint-disable-next-line react/display-name
-  return ({ children }: { children: React.ReactNode }) => (
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <Component {...props}>{children}</Component>
   );
+  Wrapper.displayName = `Wrapped(${Component.displayName || Component.name || 'Component'})`;
+  return Wrapper;
 };
 
 const providers = [
