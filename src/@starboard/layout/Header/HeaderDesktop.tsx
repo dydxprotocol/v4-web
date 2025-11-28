@@ -1,3 +1,4 @@
+import { EXTERNAL_LINKS } from '@starboard/constants/externalLinks';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -35,8 +36,6 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-
-import { EXTERNAL_LINKS } from '@starboard/constants/externalLinks';
 
 export const HeaderDesktop = () => {
   const { isUrlDataEmpty } = useMobileAppUrl();

@@ -280,7 +280,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <Component {...props}>{children}</Component>
   );
-  Wrapper.displayName = `Wrapped(${Component.displayName || Component.name || 'Component'})`;
+  Wrapper.displayName = `Wrapped(${Component.displayName ?? Component.name})`;
   return Wrapper;
 };
 
