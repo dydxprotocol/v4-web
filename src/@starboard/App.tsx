@@ -308,15 +308,11 @@ const providers = [
 const App = () => {
   return [...providers].reverse().reduce(
     (children, Provider) => {
-      return (
-        <Provider>
-          <PersistGate loading={<LoadingSpace id="main" />} persistor={persistor}>
-            {children}
-          </PersistGate>
-        </Provider>
-      );
+      return <Provider>{children}</Provider>;
     },
-    <Content />
+    <PersistGate loading={<LoadingSpace id="main" />} persistor={persistor}>
+      <Content />
+    </PersistGate>
   );
 };
 
