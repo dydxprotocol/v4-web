@@ -520,7 +520,7 @@ describe("Vault.funding_rate", () => {
                     }),
             )
             // still ok (no fees, so position is safe at this price)
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(42000, 18)))
             const liquidationState1 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()
             ).value
