@@ -20,7 +20,8 @@
     "useUnknownInCatchVariables": false,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@starboard/*": ["src/@starboard/*"]
     },
     "types": ["node", "@wdio/globals", "mocha"],
     "plugins": [
