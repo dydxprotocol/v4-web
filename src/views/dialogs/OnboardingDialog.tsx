@@ -45,6 +45,7 @@ import { testFlags } from '@/lib/testFlags';
 import { LanguageSelector } from '../menus/LanguageSelector';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
+import { ImportPrivateKey } from './OnboardingDialog/ImportPrivateKey';
 import { SignIn } from './OnboardingDialog/SignIn';
 
 export const OnboardingDialog = ({
@@ -52,6 +53,7 @@ export const OnboardingDialog = ({
 }: DialogProps<OnboardingDialogProps>) => {
   const dispatch = useAppDispatch();
   const [derivationStatus, setDerivationStatus] = useState(EvmDerivedAccountStatus.NotDerived);
+  const [showImportPrivateKey, setShowImportPrivateKey] = useState(false);
 
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
@@ -60,7 +62,11 @@ export const OnboardingDialog = ({
   const showNewDepositFlow =
     useStatsigGateValue(StatsigFlags.ffDepositRewrite) || testFlags.showNewDepositFlow;
   const isTurnkeyEnabled = useEnableTurnkey();
-  const currentOnboardingStep = useAppSelectorWithArgs(calculateOnboardingStep, isTurnkeyEnabled);
+  const currentOnboardingStep = useAppSelectorWithArgs(
+    calculateOnboardingStep,
+    isTurnkeyEnabled,
+    showImportPrivateKey
+  );
   const isSimpleUi = useSimpleUiEnabled();
   const { dydxAddress } = useAccounts();
   const privyWallet = useDisplayedWallets().find((wallet) => wallet.name === WalletType.Privy);
@@ -111,6 +117,10 @@ export const OnboardingDialog = ({
         DialogTypes.SetupPasskey({ onClose: () => dispatch(openDialog(DialogTypes.Onboarding())) })
       )
     );
+  };
+
+  const onImportPrivateKey = () => {
+    setShowImportPrivateKey(true);
   };
 
   const onSubmitEmail = ({ userEmail }: { userEmail: string }) => {
@@ -212,6 +222,7 @@ export const OnboardingDialog = ({
                   onChooseWallet={onChooseWallet}
                   onSignInWithSocials={onSignInWithSocials}
                   onSignInWithPasskey={onSignInWithPasskey}
+                  onImportPrivateKey={onImportPrivateKey}
                 />
               </$Content>
             ),
@@ -264,6 +275,17 @@ export const OnboardingDialog = ({
               </$Content>
             ),
             width: '23rem',
+          },
+          [OnboardingSteps.ImportPrivateKey]: {
+            // TODO: Localize
+            title: 'Import Permissioned Key',
+            description: 'Connect a wallet by importing its private keys',
+            children: (
+              <$Content>
+                <ImportPrivateKey />
+              </$Content>
+            ),
+            onBack: () => setShowImportPrivateKey(false),
           },
         }[currentOnboardingStep])}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
