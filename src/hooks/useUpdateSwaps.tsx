@@ -56,7 +56,7 @@ export const useUpdateSwaps = () => {
       if (!parentSubaccountSummary) {
         throw new Error('Parent subaccount not found');
       }
-      if (subaccountBalanceBigInt < amountRequired) {
+      if (subaccountBalanceBigInt <= amountRequired) {
         throw new Error('Insufficeient USDC balance in subaccount');
       }
       const tx = await withdraw(Number(formatUnits(amountRequired, USDC_DECIMALS)), 0);
