@@ -137,6 +137,13 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
+      if (
+        sourceAccount.walletInfo?.connectorType === ConnectorType.Import &&
+        !dydxPersistedWalletService.hasStoredWallet()
+      ) {
+        return;
+      }
+
       const result = await onboardingManager.handleWalletConnection({
         context: {
           sourceAccount,
@@ -216,12 +223,39 @@ const useAccountsContext = () => {
     }
   }, [blockedGeo]);
 
+  // Import wallet from private key
+  const importWallet = useCallback(
+    async (privateKey: string): Promise<{ success: boolean; error?: string }> => {
+      selectWallet({
+        connectorType: ConnectorType.Import,
+        name: 'Import',
+      });
+
+      const result = await onboardingManager.handleWalletImport(privateKey);
+
+      if (!result.success) {
+        return { success: false, error: result.error };
+      }
+
+      // Set wallets in state
+      setLocalDydxWallet(result.wallet);
+      setLocalNobleWallet(result.nobleWallet);
+
+      // Dispatch connected state
+      dispatch(setOnboardingState(OnboardingState.AccountConnected));
+
+      return { success: true };
+    },
+    [dispatch, selectWallet]
+  );
+
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
     // Clear persisted mnemonic from SecureStorage
     dydxPersistedWalletService.clearStoredWallet();
 
     setLocalDydxWallet(undefined);
+    setLocalNobleWallet(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
   };
@@ -251,6 +285,7 @@ const useAccountsContext = () => {
     publicClientWagmi,
 
     setWalletFromTurnkeySignature,
+    importWallet,
 
     // dYdX accounts
     hdKey,

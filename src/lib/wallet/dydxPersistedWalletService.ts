@@ -28,14 +28,19 @@ export class DydxPersistedWalletService {
    * Store private key in secure storage
    * @param privateKey - Private key to store
    */
-  async secureStorePrivateKey(privateKey?: Uint8Array<ArrayBufferLike> | null): Promise<void> {
+  async secureStorePrivateKey(
+    privateKey?: Uint8Array<ArrayBufferLike> | string | null
+  ): Promise<void> {
     try {
       if (!privateKey) {
         this.clearStoredWallet();
         throw new Error('PrivateKey was not derived from Signature');
       }
 
-      await secureStorage.store(STORAGE_KEY, Buffer.from(privateKey).toString('hex'));
+      await secureStorage.store(
+        STORAGE_KEY,
+        typeof privateKey === 'string' ? privateKey : Buffer.from(privateKey).toString('hex')
+      );
     } catch (error) {
       logBonsaiError('DydxWalletService', `Failed to secure store ${STORAGE_KEY}`, { error });
     }
