@@ -12,7 +12,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
@@ -84,10 +84,9 @@ const September2025RewardsPanel = () => {
                 </span>{' '}
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.SURGE_HEADLINE_NOV_2025,
+                    key: STRING_KEYS.SURGE_HEADLINE_DEC_2025,
                     params: {
-                      REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
-                      REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
+                      REBATE_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercent,
                     },
                   })}
                 </span>
@@ -99,10 +98,9 @@ const September2025RewardsPanel = () => {
             <span>
               <span tw="text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.SURGE_BODY_NOV_2025,
+                  key: STRING_KEYS.SURGE_BODY_DEC_2025,
                   params: {
-                    REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
-                    REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
+                    REBATE_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercent,
                   },
                 })}{' '}
                 <Link href="https://www.dydx.xyz/surge" isInline>
@@ -117,11 +115,11 @@ const September2025RewardsPanel = () => {
               <div tw="text-color-accent">
                 {stringGetter({
                   key: STRING_KEYS.SURGE_COUNTDOWN,
-                  params: { SURGE_SEASON: OCT_2025_REWARDS_DETAILS.season },
+                  params: { SURGE_SEASON: CURRENT_SURGE_REWARDS_DETAILS.season },
                 })}
                 :
               </div>
-              <MinutesCountdown endTime={OCT_2025_REWARDS_DETAILS.endTime} />
+              <MinutesCountdown endTime={CURRENT_SURGE_REWARDS_DETAILS.endTime} />
             </div>
           </div>
         </div>
@@ -137,7 +135,7 @@ const Sept2025RewardsPanel = () => {
 
   const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
     dydxAddress,
-    totalUsdRewards: OCT_2025_REWARDS_DETAILS.rewardAmountUsd,
+    totalUsdRewards: CURRENT_SURGE_REWARDS_DETAILS.rewardAmountUsd,
   });
 
   return (
