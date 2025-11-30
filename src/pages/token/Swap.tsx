@@ -91,18 +91,9 @@ export const Swap = () => {
       formatted: MustBigNumber(usableUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
 
-    if (inputToken === 'usdc') {
-      return {
-        inputBalance: usdc,
-        outputBalance: dydx,
-      };
-    }
-
     return {
-      inputBalance: dydx,
-      outputBalance: usdc,
-      dydx,
-      usdc,
+      inputBalance: inputToken === 'usdc' ? usdc : dydx,
+      outputBalance: inputToken === 'usdc' ? dydx : usdc,
     };
   }, [nativeTokenBalance, parentSubaccountUsdcBalance, inputToken]);
 
@@ -144,11 +135,13 @@ export const Swap = () => {
 
   const hasSufficientBalance = useMemo(() => {
     if (!quote || !amount) return true;
+    const inputBalance =
+      mode === 'exact-in' ? tokenBalances.inputBalance : tokenBalances.outputBalance;
     const inputAmountBigInt = BigInt(quote.amountIn);
-    const inputBalanceBigInt = tokenBalances.inputBalance.rawBalanceBigInt;
+    const inputBalanceBigInt = inputBalance.rawBalanceBigInt;
     if (!inputBalanceBigInt) return true;
     return inputBalanceBigInt >= inputAmountBigInt;
-  }, [quote, amount, tokenBalances.inputBalance.rawBalanceBigInt]);
+  }, [quote, amount, mode, tokenBalances]);
 
   const usdcPerDydx = useMemo(() => {
     if (!priceQuote) return undefined;
