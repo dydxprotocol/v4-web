@@ -1,5 +1,7 @@
-import { omit } from 'lodash';
+import { isEqual, omit } from 'lodash';
 import { shallowEqual } from 'react-redux';
+
+import { IndexerWsBaseMarketObject } from '@/types/indexer/indexerManual';
 
 import { createAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets } from '@/state/appUiConfigsSelectors';
@@ -9,7 +11,12 @@ import { calculateEffectiveSelectedLeverage, createMarketSummary } from '../calc
 import { mergeLoadableStatus } from '../lib/mapLoadable';
 import { PerpetualMarketSummary } from '../types/summaryTypes';
 import { selectAllAssetsInfo } from './assets';
-import { selectRawAssets, selectRawMarkets, selectRawSelectedMarketLeveragesData } from './base';
+import {
+  selectRawAssets,
+  selectRawMarkets,
+  selectRawMarketsData,
+  selectRawSelectedMarketLeveragesData,
+} from './base';
 import { selectAllMarketsInfo, selectMarketsFeeDiscounts, selectSparkLinesData } from './markets';
 
 export const selectAllMarketSummariesLoading = createAppSelector(
@@ -54,6 +61,28 @@ export const selectCurrentMarketInfoStable = createAppSelector(
   {
     memoizeOptions: {
       resultEqualityCheck: shallowEqual,
+    },
+  }
+);
+
+export type StableIndexerWsBaseMarketObject = Omit<IndexerWsBaseMarketObject, unstablePaths>;
+
+export const selectAllMarketsInfoStable = createAppSelector(
+  [selectRawMarketsData],
+  (markets) => {
+    if (!markets) return markets;
+
+    return Object.entries(markets).reduce<Record<string, StableIndexerWsBaseMarketObject>>(
+      (acc, [marketId, market]) => {
+        acc[marketId] = omit(market, ...unstablePaths);
+        return acc;
+      },
+      {}
+    );
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
     },
   }
 );

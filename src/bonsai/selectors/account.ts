@@ -1,5 +1,5 @@
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { orderBy, pick } from 'lodash';
+import { isEqual, orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
@@ -54,6 +54,7 @@ import {
   selectRawTransfersRestData,
   selectRawValidatorHeightDataLoadable,
 } from './base';
+import { selectAllMarketsInfoStable } from './summary';
 
 const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };
 
@@ -112,7 +113,7 @@ export const selectParentSubaccountPositions = createAppSelector(
 );
 
 export const selectParentSubaccountAndMarkets = createAppSelector(
-  [selectParentSubaccountInfo, selectRawMarketsData],
+  [selectParentSubaccountInfo, selectAllMarketsInfoStable],
   (parentSubaccount, markets) => {
     return {
       parentSubaccount,
@@ -122,7 +123,8 @@ export const selectParentSubaccountAndMarkets = createAppSelector(
   {
     memoizeOptions: {
       resultEqualityCheck: (prev, next) =>
-        prev.parentSubaccount?.wallet === next.parentSubaccount?.wallet,
+        prev.parentSubaccount?.wallet === next.parentSubaccount?.wallet &&
+        isEqual(prev.markets, next.markets),
     },
   }
 );
