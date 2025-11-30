@@ -7,7 +7,11 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
-import { OnboardingState } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_DYDX,
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  OnboardingState,
+} from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
@@ -70,14 +74,21 @@ export const Swap = () => {
   const [isFromInputFocused, setIsFromInputFocused] = useState(false);
 
   const tokenBalances = useMemo(() => {
+    const usableDydxBalance = Math.max(
+      Number(nativeTokenBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_DYDX,
+      0
+    );
     const dydx = {
-      rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
-      formatted: MustBigNumber(nativeTokenBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalanceBigInt: parseUnits(`${usableDydxBalance}`, DYDX_DECIMALS),
+      formatted: MustBigNumber(usableDydxBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
-
+    const usableUsdcBalance = Math.max(
+      (parentSubaccountUsdcBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_USDC,
+      0
+    );
     const usdc = {
-      rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
-      formatted: MustBigNumber(parentSubaccountUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalanceBigInt: parseUnits(`${usableUsdcBalance}`, USDC_DECIMALS),
+      formatted: MustBigNumber(usableUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
 
     if (inputToken === 'usdc') {
