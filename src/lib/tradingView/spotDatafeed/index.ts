@@ -1,7 +1,11 @@
 import { wrapAndLogBonsaiError } from '@/bonsai/logs';
+import { BonsaiCore } from '@/bonsai/ontology';
 import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/charting_library';
 
+import { type RootStore } from '@/state/_store';
+
 import { getSpotBars, SpotApiGetBarsQuery } from '@/clients/spotApi';
+import { waitForSelector } from '@/lib/asyncUtils';
 import {
   subscribeToSpotCandles,
   unsubscribeFromSpotStream,
@@ -33,7 +37,7 @@ const configurationData: DatafeedConfiguration = {
   ],
 };
 
-export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
+export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDataFeed => ({
   onReady: (cb) => {
     setTimeout(() => cb(configurationData), 0);
   },
@@ -44,7 +48,8 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
   },
 
   resolveSymbol: async (tokenSymbol, onSymbolResolvedCallback) => {
-    const symbolInfo = createSpotSymbolInfo(tokenSymbol);
+    const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
+    const symbolInfo = createSpotSymbolInfo(tokenSymbol, tokenPrice);
     setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
   },
 
