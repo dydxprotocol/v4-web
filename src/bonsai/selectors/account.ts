@@ -1,5 +1,5 @@
 import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
-import { orderBy, pick } from 'lodash';
+import { isEqual, orderBy, pick } from 'lodash';
 import { shallowEqual } from 'react-redux';
 
 import { EMPTY_ARR } from '@/constants/objects';
@@ -48,11 +48,13 @@ import {
   selectRawOrdersRestData,
   selectRawParentSubaccount,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeveragesData,
   selectRawTransfersLiveData,
   selectRawTransfersRest,
   selectRawTransfersRestData,
   selectRawValidatorHeightDataLoadable,
 } from './base';
+import { selectAllMarketsInfoStable } from './summary';
 
 const BACKUP_BLOCK_HEIGHT = { height: 0, time: '1971-01-01T00:00:00Z' };
 
@@ -86,23 +88,44 @@ export const selectCurrentMarketInfoRaw = createAppSelector(
 );
 
 export const selectParentSubaccountSummary = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, markets) => {
-    if (parentSubaccount == null || markets == null) {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, markets, selectedMarketLeverages) => {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
-    const result = calculateParentSubaccountSummary(parentSubaccount, markets);
+    const result = calculateParentSubaccountSummary(
+      parentSubaccount,
+      markets,
+      selectedMarketLeverages
+    );
     return result;
   }
 );
 
 export const selectParentSubaccountPositions = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, markets) => {
-    if (parentSubaccount == null || markets == null) {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, markets, selectedMarketLeverages) => {
+    if (parentSubaccount == null || markets == null || selectedMarketLeverages == null) {
       return undefined;
     }
-    return calculateParentSubaccountPositions(parentSubaccount, markets);
+    return calculateParentSubaccountPositions(parentSubaccount, markets, selectedMarketLeverages);
+  }
+);
+
+export const selectParentSubaccountAndMarkets = createAppSelector(
+  [selectParentSubaccountInfo, selectAllMarketsInfoStable],
+  (parentSubaccount, markets) => {
+    return {
+      parentSubaccount,
+      markets,
+    };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: (prev, next) =>
+        prev.parentSubaccount?.wallet === next.parentSubaccount?.wallet &&
+        isEqual(prev.markets, next.markets),
+    },
   }
 );
 
@@ -163,13 +186,17 @@ export const selectAccountOrdersLoading = createAppSelector(
 );
 
 export const selectChildSubaccountSummaries = createAppSelector(
-  [selectRawParentSubaccountData, selectRelevantMarketsData],
-  (parentSubaccount, marketsData) => {
-    if (parentSubaccount == null || marketsData == null) {
+  [selectRawParentSubaccountData, selectRelevantMarketsData, selectRawSelectedMarketLeveragesData],
+  (parentSubaccount, marketsData, selectedMarketLeverages) => {
+    if (parentSubaccount == null || marketsData == null || selectedMarketLeverages == null) {
       return undefined;
     }
 
-    return calculateChildSubaccountSummaries(parentSubaccount, marketsData);
+    return calculateChildSubaccountSummaries(
+      parentSubaccount,
+      marketsData,
+      selectedMarketLeverages
+    );
   }
 );
 

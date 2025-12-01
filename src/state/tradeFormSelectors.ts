@@ -34,6 +34,7 @@ const getTradeFormInputData = createAppSelector(
     BonsaiCore.configs.feeTiers,
     BonsaiRaw.parentSubaccountBase,
     BonsaiRaw.parentSubaccountRelevantMarkets,
+    BonsaiRaw.selectedMarketLeverages,
     BonsaiCore.account.openOrders.data,
     BonsaiHelpers.currentMarket.account.openOrders,
     BonsaiHelpers.currentMarket.marketInfo,
@@ -47,6 +48,7 @@ const getTradeFormInputData = createAppSelector(
     feeTiers,
     rawParentSubaccountData,
     rawRelevantMarkets,
+    selectedMarketLeverages,
     allOpenOrders,
     currentTradeMarketOpenOrders,
     currentTradeMarketSummary,
@@ -56,6 +58,7 @@ const getTradeFormInputData = createAppSelector(
   ): TradeFormInputData => ({
     rawParentSubaccountData,
     rawRelevantMarkets,
+    rawSelectedMarketLeverages: selectedMarketLeverages ?? {},
 
     currentTradeMarketOpenOrders,
     allOpenOrders,
@@ -132,7 +135,6 @@ export const getClosePositionFormSummary = createAppSelector(
 
         // let these default
         marginMode: undefined,
-        targetLeverage: undefined,
         postOnly: undefined,
         triggerPrice: undefined,
         execution: undefined,

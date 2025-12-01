@@ -18,5 +18,4 @@ export const closePositionFormActions = {
   setSizeUsd: closePositionFormSlice.actions.setSizeUsd,
   setLimitPrice: closePositionFormSlice.actions.setLimitPrice,
   setOrderType: closePositionFormSlice.actions.setOrderType,
-  setSizeLeverageSigned: closePositionFormSlice.actions.setSizeLeverageSigned,
 };

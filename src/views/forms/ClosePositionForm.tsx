@@ -47,7 +47,7 @@ import { orEmptyObj } from '@/lib/typeUtils';
 
 import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { TradeFormMessages } from '../TradeFormMessages/TradeFormMessages';
-import { AmountCloseInput } from './TradeForm/AmountCloseInput';
+import { AllocationSlider } from './TradeForm/AllocationSlider';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
 type ElementProps = {
@@ -203,21 +203,19 @@ export const ClosePositionForm = ({
         tw="w-full"
       />
 
-      <AmountCloseInput
-        amountClosePercentInput={(tradeValues.size != null &&
-        OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
-          ? AttemptBigNumber(tradeValues.size.value.value)
-          : AttemptBigNumber(
-              mapIfPresent(
-                effectiveSizes?.size,
-                summary.accountDetailsBefore?.position?.unsignedSize.toNumber(),
-                (tSize, positionSize) => (positionSize > 0 ? tSize / positionSize : 0)
-              )
-            )
-        )
-          ?.times(100)
-          .toFixed(0, BigNumber.ROUND_FLOOR)}
-        setAmountCloseInput={(value: string | undefined) => {
+      <AllocationSlider
+        allocationPercentInput={
+          tradeValues.size != null && OrderSizeInputs.is.AVAILABLE_PERCENT(tradeValues.size)
+            ? (AttemptBigNumber(tradeValues.size.value.value)
+                ?.times(100)
+                .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
+            : tradeValues.size == null || tradeValues.size.value.value === ''
+              ? ''
+              : (AttemptBigNumber(effectiveSizes?.allocationPercent)
+                  ?.times(100)
+                  .toFixed(0, BigNumber.ROUND_FLOOR) ?? '')
+        }
+        setAllocationInput={(value: string | undefined) => {
           dispatch(
             closePositionFormActions.setSizeAvailablePercent(
               mapIfPresent(value, (v) => MaybeBigNumber(v)?.div(100).toFixed(2)) ?? ''
