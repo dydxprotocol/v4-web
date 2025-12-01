@@ -56,7 +56,7 @@ export const useUpdateSwaps = () => {
       if (!parentSubaccountSummary) {
         throw new Error('Parent subaccount not found');
       }
-      if (subaccountBalanceBigInt < amountRequired) {
+      if (subaccountBalanceBigInt <= amountRequired) {
         throw new Error('Insufficeient USDC balance in subaccount');
       }
       const tx = await withdraw(Number(formatUnits(amountRequired, USDC_DECIMALS)), 0);
@@ -127,6 +127,9 @@ export const useUpdateSwaps = () => {
           if (withdrawToCallback.current[swap.id]) continue;
           withdrawToCallback.current[swap.id] = true;
           withdrawUsdcFromSubaccount(inputAmountBigInt)
+            .then(() => {
+              dispatch(updateSwap({ swap: { ...swap, status: 'pending-transfer' } }));
+            })
             .catch((error) => {
               logBonsaiError('useUpdateSwaps', 'Error withdrawing from subaccount', {
                 error,
@@ -142,14 +145,17 @@ export const useUpdateSwaps = () => {
               );
 
               dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
-            })
-            .then(() => {
-              dispatch(updateSwap({ swap: { ...swap, status: 'pending-transfer' } }));
             });
         } else {
           if (swapToCallback.current[swap.id]) continue;
           swapToCallback.current[swap.id] = true;
           executeSwap(swap)
+            .then(() => {
+              appQueryClient.invalidateQueries({
+                queryKey: ['validator', 'accountBalances'],
+                exact: false,
+              });
+            })
             .catch((error) => {
               logBonsaiError('useUpdateSwaps', 'Error executing swap', {
                 error,
@@ -166,12 +172,6 @@ export const useUpdateSwaps = () => {
               );
 
               dispatch(updateSwap({ swap: { ...swap, status: 'error' } }));
-            })
-            .then(() => {
-              appQueryClient.invalidateQueries({
-                queryKey: ['validator', 'accountBalances'],
-                exact: false,
-              });
             });
         }
       } else if (status === 'pending-transfer' && availableBalanceBigInt > inputAmountBigInt) {

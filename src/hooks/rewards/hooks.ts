@@ -10,7 +10,7 @@ import { mapIfPresent } from '@/lib/do';
 
 import { useQueryChaosLabsIncentives } from '../useQueryChaosLabsIncentives';
 import {
-  OCT_2025_REWARDS_DETAILS,
+  CURRENT_SURGE_REWARDS_DETAILS,
   pointsToEstimatedDollarRewards,
   pointsToEstimatedDydxRewards,
 } from './util';
@@ -76,7 +76,7 @@ export function useChaosLabsPointsDistribution() {
         item.incentivePoints,
         pointsInfo?.totalPoints,
         dydxPrice,
-        OCT_2025_REWARDS_DETAILS.rewardAmountUsd
+        CURRENT_SURGE_REWARDS_DETAILS.rewardAmountUsd
       ),
     })),
   };
