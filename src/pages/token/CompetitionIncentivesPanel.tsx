@@ -23,7 +23,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 
 
-import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 

@@ -270,7 +270,7 @@ const getRewardsLeaderboardTableColumnDef = ({
             value={pnl}
           />
         ),
-      }
+      },
     } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsCompetitionItem>>
   )[key],
 });
