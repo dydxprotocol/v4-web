@@ -3,7 +3,10 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
+import { StatsigFlags } from '@/constants/statsig';
 
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Panel } from '@/components/Panel';
@@ -13,6 +16,8 @@ import { Swap } from './Swap';
 
 export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
+  const isSwapEnabledBase = useStatsigGateValue(StatsigFlags.ffSwapEnabled);
+  const isSwapEnabled = isDev || isSwapEnabledBase;
 
   const [selectedTab, setSelectedTab] = useState<'swap' | 'stake'>('swap');
   return (
@@ -20,13 +25,15 @@ export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
       className={className}
       slotHeader={
         <$Header>
-          <$HeaderButton
-            onClick={() => setSelectedTab('swap')}
-            $isSelected={selectedTab === 'swap'}
-            type="button"
-          >
-            {stringGetter({ key: STRING_KEYS.SWAP })}
-          </$HeaderButton>
+          {isSwapEnabled && (
+            <$HeaderButton
+              onClick={() => setSelectedTab('swap')}
+              $isSelected={selectedTab === 'swap'}
+              type="button"
+            >
+              {stringGetter({ key: STRING_KEYS.SWAP })}
+            </$HeaderButton>
+          )}
           <$HeaderButton
             onClick={() => setSelectedTab('stake')}
             $isSelected={selectedTab === 'stake'}
@@ -37,7 +44,7 @@ export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
         </$Header>
       }
     >
-      {selectedTab === 'swap' && <Swap />}
+      {isSwapEnabled && selectedTab === 'swap' && <Swap />}
       {selectedTab === 'stake' && <Stake />}
     </Panel>
   );
