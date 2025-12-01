@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details, type DetailsItem } from '@/components/Details';
@@ -23,7 +25,13 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     {
       key: 'price',
       label: 'Price',
-      value: <Output type={OutputType.SmallFiat} value={stats.priceUsd} />,
+      value: (
+        <Output
+          type={OutputType.SmallFiat}
+          value={stats.priceUsd}
+          minimumFractionDigits={SMALL_USD_DECIMALS}
+        />
+      ),
     },
     {
       key: 'fdv',
