@@ -19,7 +19,9 @@ export const SwapAndStakingPanel = ({ className }: { className?: string }) => {
   const isSwapEnabledBase = useStatsigGateValue(StatsigFlags.ffSwapEnabled);
   const isSwapEnabled = isDev || isSwapEnabledBase;
 
-  const [selectedTab, setSelectedTab] = useState<'swap' | 'stake'>('swap');
+  const [selectedTab, setSelectedTab] = useState<'swap' | 'stake'>(
+    isSwapEnabled ? 'swap' : 'stake'
+  );
   return (
     <Panel
       className={className}
