@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 
 import styled from 'styled-components';
 
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -79,7 +81,13 @@ export const SpotMarketsDropdown = ({
           columnKey: 'price',
           getCellValue: (row: SpotHeaderToken) => row.priceUsd ?? 0,
           label: 'Price',
-          renderCell: ({ priceUsd }) => <Output type={OutputType.Fiat} value={priceUsd} />,
+          renderCell: ({ priceUsd }) => (
+            <Output
+              type={OutputType.Fiat}
+              value={priceUsd}
+              minimumFractionDigits={SMALL_USD_DECIMALS}
+            />
+          ),
         },
         {
           columnKey: 'marketCap',
