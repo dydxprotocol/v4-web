@@ -7,19 +7,13 @@ import styled, { css } from 'styled-components';
 import tw from 'twin.macro';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC, OnboardingState } from '@/constants/account';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
-import {
-  ConnectorType,
-  DydxChainAsset,
-  WalletNetworkType,
-  wallets,
-  WalletType,
-} from '@/constants/wallets';
+import { ConnectorType, DydxChainAsset, wallets, WalletType } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -32,7 +26,6 @@ import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
-import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { AppleIcon, AppleLightIcon, DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
@@ -46,7 +39,6 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
-import { WithTooltip } from '@/components/WithTooltip';
 import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -65,9 +57,10 @@ import { SpotActions } from './SpotActions';
 import { SubaccountActions } from './SubaccountActions';
 import { WalletActions } from './WalletActions';
 
+// TODO: spot localization
+
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
-  const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
@@ -86,20 +79,13 @@ export const AccountMenu = () => {
 
   const { debugCompliance } = useEnvFeatures();
   const {
-    sourceAccount: { walletInfo, address },
+    sourceAccount: { walletInfo },
     dydxAddress,
     hdKey,
     solanaAddress,
     canDeriveSolanaWallet,
   } = useAccounts();
   const { registerAffiliate } = useSubaccount();
-
-  let displayAddress: string | undefined;
-  if (walletInfo?.name === WalletType.Phantom) {
-    displayAddress = truncateAddress(address, '');
-  } else {
-    displayAddress = truncateAddress(address, '0x');
-  }
 
   const privy = usePrivy();
   const { google, discord, twitter } = privy.user ?? {};
@@ -186,70 +172,35 @@ export const AccountMenu = () => {
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
           <div tw="flexColumn gap-1 px-1 pb-0.5 pt-1">
-            <$AddressRow>
-              <AssetIcon
-                logoUrl={chainTokenImage}
-                symbol={chainTokenLabel}
-                tw="z-[1] [--asset-icon-size:1.75rem]"
-              />
-              <$Column>
-                {walletInfo && walletInfo.name !== WalletType.Keplr ? (
-                  <DydxDerivedAddress address={address} />
-                ) : (
-                  <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                )}
-                <$Address>{truncateAddress(dydxAddress)}</$Address>
-              </$Column>
-              <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
-              <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                <$IconButton
+            <div tw="row flex-wrap gap-[0.25rem]">
+              {!!walletInfo && canDeriveSolanaWallet && spotEnabled && solanaAddress && (
+                <$AddressCopyButton
+                  value={solanaAddress}
+                  size={ButtonSize.XSmall}
+                  shape={ButtonShape.Pill}
+                  copyIconPosition="end"
                   action={ButtonAction.Base}
-                  href={`${mintscanBase}/account/${dydxAddress}`}
-                  iconName={IconName.LinkOut}
-                  shape={ButtonShape.Square}
-                  type={ButtonType.Link}
-                />
-              </WithTooltip>
-            </$AddressRow>
-            {walletInfo && canDeriveSolanaWallet && spotEnabled && (
-              <$AddressRow>
-                <div tw="relative flex justify-center rounded-[50%] bg-[#303045] text-[1rem] leading-[0]">
-                  <Icon iconName={IconName.AddressConnector} tw="absolute top-[-1.625rem] h-1.75" />
-                  <Icon iconName={IconName.Sol} size="1.75rem" tw="z-[1]" />
-                </div>
-                <$Column>
-                  <$label>Spot Address</$label>
-                  <$Address>{truncateAddress(solanaAddress, '')}</$Address>
-                </$Column>
-                <$CopyButton buttonType="icon" value={solanaAddress} shape={ButtonShape.Square} />
-                <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                  <$IconButton
-                    action={ButtonAction.Base}
-                    href={`https://solscan.io/account/${solanaAddress}`}
-                    iconName={IconName.LinkOut}
-                    shape={ButtonShape.Square}
-                    type={ButtonType.Link}
-                  />
-                </WithTooltip>
-              </$AddressRow>
-            )}
-            {walletInfo &&
-              walletInfo.name !== WalletType.Privy &&
-              walletInfo.name !== WalletType.Keplr && (
-                <$AddressRow>
-                  <div tw="relative rounded-[50%] bg-[#303045] p-0.375 text-[1rem] leading-[0]">
-                    <Icon
-                      iconName={IconName.AddressConnector}
-                      tw="absolute top-[-1.625rem] h-1.75"
-                    />
-                    {walletIcon}
-                  </div>
-                  <$Column>
-                    <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
-                    <$Address>{displayAddress}</$Address>
-                  </$Column>
-                </$AddressRow>
+                >
+                  <Icon iconName={IconName.Sol} size="1.25rem" />
+                  Spot
+                </$AddressCopyButton>
               )}
+              <$AddressCopyButton
+                value={dydxAddress}
+                size={ButtonSize.XSmall}
+                shape={ButtonShape.Pill}
+                copyIconPosition="end"
+                action={ButtonAction.Base}
+              >
+                <AssetIcon
+                  logoUrl={chainTokenImage}
+                  symbol={chainTokenLabel}
+                  tw="[--asset-icon-size:1.25rem]"
+                />
+                Perpetuals
+              </$AddressCopyButton>
+            </div>
+
             <$Balances>
               <div>
                 <div>
@@ -501,58 +452,8 @@ export const AccountMenu = () => {
   );
 };
 
-const DydxDerivedAddress = ({
-  address,
-  chain,
-  dydxAddress,
-}: {
-  address?: string;
-  chain?: WalletNetworkType.Solana | WalletNetworkType.Evm;
-  dydxAddress?: string;
-}) => {
-  const stringGetter = useStringGetter();
-
-  const tooltipText =
-    chain === WalletNetworkType.Solana
-      ? stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_SOLANA_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            SOLANA_ADDRESS: truncateAddress(address, ''),
-          },
-        })
-      : stringGetter({
-          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_FROM_ETHEREUM_BODY,
-          params: {
-            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-            EVM_ADDRESS: truncateAddress(address, '0x'),
-          },
-        });
-
-  return (
-    <WithTooltip
-      slotTooltip={
-        <dl>
-          <dt>{tooltipText}</dt>
-        </dl>
-      }
-    >
-      <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-    </WithTooltip>
-  );
-};
-
 const $Column = styled.div`
   ${layoutMixins.column}
-`;
-const $AddressRow = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.5rem;
-
-  ${$Column} {
-    margin-right: 0.5rem;
-  }
 `;
 const $label = styled.div`
   ${layoutMixins.row}
@@ -630,7 +531,6 @@ const $IconButton = styled(IconButton)`
     `}
 `;
 
-const $CopyButton = styled(CopyButton)`
-  --button-padding: 0 0.25rem;
-  --button-border: solid var(--border-width) var(--color-layer-6);
+const $AddressCopyButton = styled(CopyButton)`
+  --button-padding: 0 0.375rem;
 `;
