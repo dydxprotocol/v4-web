@@ -13,7 +13,7 @@ import { MAX_SUBACCOUNT_NUMBER, NUM_PARENT_SUBACCOUNTS } from '@/constants/accou
 import { MAJOR_MARKETS } from '@/constants/markets';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 
 import { assertNever } from '@/lib/assertNever';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -900,7 +900,7 @@ const RATE_LOST_TO_REV_SHARES = 0.4; // megavault and ops
 const MAX_POSSIBLE_TAKER_REV_SHARE = 0.5; // affiliates
 
 const IS_FEE_REBATE_TIME: boolean = true;
-const FEE_REBATE_PERCENT = OCT_2025_REWARDS_DETAILS.rebateFraction;
+const FEE_REBATE_PERCENT = CURRENT_SURGE_REWARDS_DETAILS.rebateFraction;
 
 function calculateTakerReward(
   usdcSize: number | undefined,

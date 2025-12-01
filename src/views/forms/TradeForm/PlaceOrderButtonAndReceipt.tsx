@@ -285,7 +285,7 @@ export const PlaceOrderButtonAndReceipt = ({
                 tag={reward ? chainTokenLabel : ''}
               />
             ),
-            tooltip: 'max-reward-sept-2025',
+            tooltip: 'max-reward-dec-2025',
           }
         : {
             key: 'max-reward',
