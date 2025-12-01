@@ -70,6 +70,7 @@ export const Swap = () => {
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
   const [mode, setMode] = useState<SwapMode>('exact-in');
   const [amount, setAmount] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isToInputFocused, setIsToInputFocused] = useState(false);
   const [isFromInputFocused, setIsFromInputFocused] = useState(false);
 
