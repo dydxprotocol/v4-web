@@ -65,7 +65,7 @@ export const selectCurrentMarketInfoStable = createAppSelector(
   }
 );
 
-export type StableIndexerWsBaseMarketObject = Omit<IndexerWsBaseMarketObject, unstablePaths>;
+export type StableIndexerWsBaseMarketObject = Omit<IndexerWsBaseMarketObject, UnstablePaths>;
 
 export const selectAllMarketsInfoStable = createAppSelector(
   [selectRawMarketsData],
