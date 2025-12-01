@@ -255,7 +255,7 @@ const getRewardsLeaderboardTableColumnDef = ({
             css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
             tw="text-small font-medium"
             type={OutputType.Number}
-            value={estimatedDydxRewards}
+            value={Number.isNaN(Number(estimatedDydxRewards)) ? 0 : estimatedDydxRewards}
           />
         ),
       },
