@@ -14,6 +14,14 @@ const graphQLUrl = "http://127.0.0.1:4000/v1/graphql"
 
 if (require.main === module) {
     populateEvents(getArgs(["mockPricefeedAddress", "vaultAddress", "pricefeedWrapperAddress", "usdcAddress"]))
+        .then(() => {
+            process.exit(0)
+        })
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error)
+            process.exit(1)
+        })
 }
 
 

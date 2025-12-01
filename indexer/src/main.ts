@@ -27,6 +27,14 @@ const EVENT_DECREASE_POSITION = 17276184846747919138n
 const EVENT_CLOSE_POSITION = 1607443183907089103n
 const EVENT_LIQUIDATE_POSITION = 7908178656321864902n
 
+const LOG_TYPE_SET_PRICE = "enum stork_sway_sdk::events::StorkEvent"
+const LOG_TYPE_ADD_LIQUIDITY = "struct events::AddLiquidity"
+const LOG_TYPE_REMOVE_LIQUIDITY = "struct events::RemoveLiquidity"
+const LOG_TYPE_INCREASE_POSITION = "struct events::IncreasePosition"
+const LOG_TYPE_DECREASE_POSITION = "struct events::DecreasePosition"
+const LOG_TYPE_CLOSE_POSITION = "struct events::ClosePosition"
+const LOG_TYPE_LIQUIDATE_POSITION = "struct events::LiquidatePosition"
+
 if (!GRAPHQL_URL || !VAULT_PRICEFEED_ADDRESS || !VAULT_ADDRESS) {
   throw new Error('Environment variables not set');
 }
@@ -69,6 +77,30 @@ if (FROM_BLOCK) {
 const dataSource = dataSourceBuilder.build()
 
 const database = new TypeormDatabase()
+
+const typeNameByLogId: Record<number, string> = {};
+priceOracleAbi.loggedTypes.forEach(loggedType => {
+    const logId = loggedType.logId
+    const concreteTypeId = loggedType.concreteTypeId
+    const typeName = priceOracleAbi.concreteTypes.find(concreteType => concreteType.concreteTypeId === concreteTypeId)?.type
+    if (typeName) {
+        typeNameByLogId[Number(logId)] = typeName
+    }
+});
+vaultAbi.loggedTypes.forEach(loggedType => {
+    const logId = loggedType.logId
+    const concreteTypeId = loggedType.concreteTypeId
+    const typeName = vaultAbi.concreteTypes.find(concreteType => concreteType.concreteTypeId === concreteTypeId)?.type
+    if (typeName) {
+        typeNameByLogId[Number(logId)] = typeName
+    }
+});
+// Check if all expected log types are present in the type name by log id map
+[LOG_TYPE_SET_PRICE, LOG_TYPE_ADD_LIQUIDITY, LOG_TYPE_REMOVE_LIQUIDITY, LOG_TYPE_INCREASE_POSITION, LOG_TYPE_DECREASE_POSITION, LOG_TYPE_CLOSE_POSITION, LOG_TYPE_LIQUIDATE_POSITION].forEach(logType => {
+    if (!Object.values(typeNameByLogId).includes(logType)) {
+        throw new Error(`Log type ${logType} not found`)
+    }
+});
 
 function getUTCBlockTime(block: Block): number {
     return DateTime.fromTai64(block.header.time.toString()).toUnixSeconds()
@@ -344,7 +376,7 @@ async function handleDecreasePosition(receipt: Receipt<{receipt: {rb: true, data
 
 // The ClosePosition event goes right after the DecreasePosition event
 // so just update the status
-async function handleClosePosition(receipt: Receipt<{receipt: {rb: true, data: true}}>, block: Block, ctx: any) {
+async function handleClosePosition(receipt: Receipt<{receipt: {rb: true, data: true}}>, _block: Block, ctx: any) {
     const logs = vaultInterface.decodeLog(receipt.data!, receipt.rb!.toString())
     const log = logs[0]
     const positionKey = log.key
@@ -440,8 +472,13 @@ run(dataSource, database, async ctx => {
             }
             // vault pricefeed
             if (receipt.contract.toLowerCase() === VAULT_PRICEFEED_ADDRESS.toLowerCase()) {
+                const logType = typeNameByLogId[Number(receipt.rb)]
+                if (!logType) {
+                    // drop unsupported event
+                    continue
+                }
                 // events::SetPrice
-                if (receipt.rb === EVENT_SET_PRICE) {
+                if (logType === LOG_TYPE_SET_PRICE) {
                     await handlePriceUpdate(receipt, block, ctx)
                 } else {
                     // drop unsupported event
@@ -450,23 +487,28 @@ run(dataSource, database, async ctx => {
             }
             // vault
             if (receipt.contract.toLowerCase() === VAULT_ADDRESS.toLowerCase()) {
+                const logType = typeNameByLogId[Number(receipt.rb)]
+                if (!logType) {
+                    // drop unsupported event
+                    continue
+                }
                 // events::AddLiquidity
-                if (receipt.rb === EVENT_ADD_LIQUIDITY) {
+                if (logType === LOG_TYPE_ADD_LIQUIDITY) {
                     await handleAddLiquidity(receipt, block, ctx)
                 // events::RemoveLiquidity
-                } else if (receipt.rb === EVENT_REMOVE_LIQUIDITY) {
+                } else if (logType === LOG_TYPE_REMOVE_LIQUIDITY) {
                     await handleRemoveLiquidity(receipt, block, ctx)
                 // events::IncreasePosition
-                } else if (receipt.rb === EVENT_INCREASE_POSITION) {
+                } else if (logType === LOG_TYPE_INCREASE_POSITION) {
                     await handleIncreasePosition(receipt, block, ctx)
                 // events::DecreasePosition
-                } else if (receipt.rb === EVENT_DECREASE_POSITION) {
+                } else if (logType === LOG_TYPE_DECREASE_POSITION) {
                     await handleDecreasePosition(receipt, block, ctx)
                 // events::ClosePosition
-                } else if (receipt.rb === EVENT_CLOSE_POSITION) {
+                } else if (logType === LOG_TYPE_CLOSE_POSITION) {
                     await handleClosePosition(receipt, block, ctx)
                 // events::LiquidatePosition
-                } else if (receipt.rb === EVENT_LIQUIDATE_POSITION) {
+                } else if (logType === LOG_TYPE_LIQUIDATE_POSITION) {
                     await handleLiquidatePosition(receipt, block, ctx)
                 } else {
                     // drop unsupported event

@@ -1,0 +1,17 @@
+manifestVersion: subsquid.io/v0.1
+name: starboard-indexer-squid
+version: 1
+description: Starboard Indexer Squid
+build: {}
+deploy:
+  addons:
+    postgres: {}
+  processor:
+    - name: processor
+      cmd:
+        - sqd
+        - process:e2e
+  api:
+    cmd:
+      - sqd
+      - serve:e2e

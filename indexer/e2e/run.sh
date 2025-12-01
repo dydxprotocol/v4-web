@@ -19,20 +19,14 @@ do
     ii=$(($ii+1))
 done
 
-echo "Starting the fuel node"
-FUEL_NODE_OUT=`(pnpm --filter starboard/contracts run:node 2>&1 &) | grep -m 1 "Node is up" | wc -l`
-if [ "$FUEL_NODE_OUT" -ne "1" ]; then
-    echo "fuel node failed to start"
-    exit 1
-fi
-
-# cannot use FUEL_NODE_PID=$!, use walkaround to get the process id
-# it is assumed that the fuel node is started with 'node' and it is the only such subprocess
-FUEL_NODE_PID=`pgrep -n node`
-if [ $FUEL_NODE_PID -lt $$ ]; then
-    echo "fuel node process is down"
-    exit 1
-fi
+# echo "Launch Postgres database and Fuel Node"
+# pnpm sqd up:local
+# if [ $? -ne 0 ]; then
+#     echo "Failed to launch Postgres database and Fuel Node"
+#     # just in case, clean up running containers
+#     docker compose down -v
+#     exit 1
+# fi
 
 echo "Deploying Mocked Stork contract"
 # priv key is hardcoded, taken form the fuel node starting script
@@ -42,8 +36,7 @@ MOCK_STORK_CONTRACT=`echo "$OUTPUT" | grep "Mocked Stork deployed to" |  awk '{p
 if [ -z "$MOCK_STORK_CONTRACT" ]; then
     echo "stork mock deployment failed"
     echo "$OUTPUT"
-    # kill is not enough, node spawns a subprocess
-    pkill -P $FUEL_NODE_PID
+    docker compose down -v
     exit 1
 fi
 
@@ -57,8 +50,7 @@ PRICEFEED_WRAPPER_CONTRACT=`echo "$OUTPUT" | grep "PricefeedWrapper deployed to"
 if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" ] || [ -z "$PRICEFEED_WRAPPER_CONTRACT" ]; then
     echo "vault deployment failed"
     echo "$OUTPUT"
-    # kill is not enough, node spawns a subprocess
-    pkill -P $FUEL_NODE_PID
+    docker compose down -v
     exit 1
 fi
 
@@ -69,124 +61,83 @@ else
     ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --pricefeedWrapperAddress="${PRICEFEED_WRAPPER_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
     if [ $? -ne 0 ]; then
         echo "Failed to execute the script"
-        # kill is not enough, node spawns a subprocess
-        pkill -P $FUEL_NODE_PID
+        docker compose down -v
         exit 1
     fi
     echo "Events populated"
 fi
 
-echo "Launch Postgres database to store the data"
-docker compose up -d
-if [ $? -ne 0 ]; then
-    echo "Failed to launch Postgres database"
-    # kill is not enough, node spawns a subprocess
-     pkill -P $FUEL_NODE_PID
-    exit 1
-fi
-
-EXIT_CODE=0
-
 echo "Apply database migrations to create the target schema"
 # there is some delay on OS to expose a port
 sleep 1
-pnpm apply:migration
+pnpm sqd migration:apply
 if [ $? -ne 0 ]; then
     echo "Failed to apply database migrations"
-    EXIT_CODE=1
+    docker compose down -v
+    exit 1
+fi
+
+echo "Starting the squid indexer"
+VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd run  2>&1 > indexer.log &
+SQD_INDEXER_PID=$!
+
+EXIT_CODE=0
+
+if [ $INTERACTIVE -eq 1 ]; then
+    echo "Waiting for CTRL-C"
+    (trap exit SIGINT; sleep 9999999)
 else
-    echo "Starting the squid indexer"
-    # weird but it works this way, there were problems with redirecting logs
-    # theindexerstoppedunexpectedly is the guardian to indicate that the indexer stopped unexpectedly
-    # we want the indexer log for the post processing
-    { VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm start:e2e 2>&1 | tee indexer.log > /dev/null; echo "theindexerstoppedunexpectedly" >> indexer.log; } &
-    sleep 1
-
-    # there is doouble grep, first greps also the guardian in order to stop the tailing if the indexer stopped unexpectedly,
-    # second grep is to check if the indexer actually started
-    SQD_INDEXER_OUT=`tail -f -n +1 indexer.log | grep -m 1 "Indexer run started\|theindexerstoppedunexpectedly" | grep "Indexer run started" | wc -l`
-    if [ "$SQD_INDEXER_OUT" -ne "1" ]; then
-        echo "squid indexer failed to start"
-        cat indexer.log
-        EXIT_CODE=1
-    fi
-
-    # cannot use SQD_INDEXER_PID=$!, use walkaround to get the process id
-    # it is assumed that the indexer is started with 'node' and it is the only such subprocess alive after the fuel node
-    SQD_INDEXER_PID=`pgrep -n node`
-    if [ $SQD_INDEXER_PID -le $FUEL_NODE_PID ]; then
-        echo "indexer process is down"
-        EXIT_CODE=1
-    fi
-
-    if [ $EXIT_CODE -eq 0 ]; then
-        if [ $INTERACTIVE -eq 1 ]; then
-            echo "Waiting for CTRL-C"
-            (trap exit SIGINT; sleep 9999999)
-        else
-            echo "Waiting until the indexer reaches the fuel node height"
-            # the target height
-            FUEL_NODE_HEIGHT=`curl -s http://127.0.0.1:4000/v1/graphql -X POST -H "Content-Type: application/json" -d '{"query":"query { chain { latestBlock { height } } }"}' | jq -r '.data.chain.latestBlock.height'`
-            ii=0
-            while [ $ii -lt 10 ]; do
-                SQD_INDEXER_HEIGHT=`docker exec "indexer-db-1" psql --csv -t -U postgres -c "select height from squid_processor.status where id=0"`
-                if [ "$SQD_INDEXER_HEIGHT" -ge "$FUEL_NODE_HEIGHT" ]; then
-                    break
-                fi
-                # check if the indexer is running
-                SQD_INDEXER_OUT=`grep "theindexerstoppedunexpectedly" indexer.log |  wc -l`
-                if [ "$SQD_INDEXER_OUT" -eq "1" ]; then
-                    echo "squid indexer stopped unexpectedly"
-                    echo "------------- indexer.log ------------- "
-                    cat indexer.log
-                    echo "------------- indexer.log ------------- "
-                    ii=10
-                    SQD_INDEXER_PID=""
-                    EXIT_CODE=1
-                    break
-                fi
-                sleep 1
-                ii=$(($ii+1))
-            done
-            if [ $ii -eq 10 ]; then
-                echo "Indexer did not reach the fuel node height within timeout"
-                EXIT_CODE=1
-            elif [ $2 == "none" ]; then
-                echo "Indexer reached the fuel node height"
-                echo "Skipping verification of indexer"
-            else
-                echo "Execute the verification script"
-                pnpm test:e2e $2
-                EXIT_CODE=$?
+    echo "Waiting until the indexer reaches the fuel node height"
+    # the target height
+    FUEL_NODE_HEIGHT=`curl -s http://127.0.0.1:4000/v1/graphql -X POST -H "Content-Type: application/json" -d '{"query":"query { chain { latestBlock { height } } }"}' | jq -r '.data.chain.latestBlock.height'`
+    ii=0
+    while [ $ii -lt 20 ]; do
+        SQD_INDEXER_TABLE_MARKER=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT COUNT(1) FROM information_schema.tables WHERE table_schema='squid_processor' AND table_name='status'"`
+        if [ "$SQD_INDEXER_TABLE_MARKER" -eq "1" ]; then
+            SQD_INDEXER_HEIGHT=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT height FROM squid_processor.status WHERE id=0"`
+            if [ "$SQD_INDEXER_HEIGHT" -ge "$FUEL_NODE_HEIGHT" ]; then
+                break
             fi
         fi
+        sleep 1
+        ii=$(($ii+1))
+    done
+    if [ $ii -eq 20 ]; then
+        echo "Indexer did not reach the fuel node height within timeout"
+        EXIT_CODE=1
+    elif [ $2 == "none" ]; then
+        echo "Indexer reached the fuel node height"
+        echo "Skipping verification of indexer"
+    else
+        echo "Execute the verification script"
+        pnpm test:e2e $2
+        EXIT_CODE=$?
     fi
 fi
 
+
 ##################### closing #########################################################
+
+echo "------------------------------------------------"
+ps aux
+echo "------------------------------------------------"
+echo SQD_INDEXER_PID: $SQD_INDEXER_PID
+echo "------------------------------------------------"
 
 echo "clean up the squid indexer"
 if [ -n "$SQD_INDEXER_PID" ]; then
-    kill "$SQD_INDEXER_PID"
+    kill -15 "$SQD_INDEXER_PID"
     if [ $? -ne 0 ]; then
         echo "Failed to down the squid indexer"
         EXIT_CODE=1
     fi
 fi
 
-echo "Shut down Postgres and erase the indexer data"
-docker compose down -v
-if [ $? -ne 0 ]; then
-    echo "Failed to erase the indexer data"
-    EXIT_CODE=1
-fi
-
-echo "clean up the fuel node"
-# kill is not enough, node spawns a subprocess
-pkill -P $FUEL_NODE_PID
-if [ $? -ne 0 ]; then
-    echo "Failed to down the fuel node"
-    EXIT_CODE=1
-fi
+# echo "Shut down Postgres and Fuel Node and erase the indexer data"
+# pnpm sqd down:local
+# if [ $? -ne 0 ]; then
+#     echo "Failed to erase the indexer data"
+#     EXIT_CODE=1
+# fi
 
 exit $EXIT_CODE
