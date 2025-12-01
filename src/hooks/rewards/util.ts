@@ -29,7 +29,7 @@ export const CURRENT_SURGE_REWARDS_DETAILS = {
   endTime: '2025-12-31T23:59:59.000Z', // end of month
 };
 
-export const NOV_2025_COMPETITION_DETAILS = {
+export const DEC_2025_COMPETITION_DETAILS = {
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
   endTime: '2025-12-31T23:59:59.000Z', // end of month
