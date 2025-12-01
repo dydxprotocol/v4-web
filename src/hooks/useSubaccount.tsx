@@ -687,36 +687,55 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
             },
           ]
         );
+
+        let parsedTx = parseToPrimitives(tx);
+        logBonsaiInfo(
+          'useSubaccount/updateLeverage',
+          'Successful update leverage for target subaccount',
+          {
+            parsedTx,
+          }
+        );
         if (subaccount.subaccountNumber !== subaccountNumber) {
-          // Always update the leverage on the cross subaccount so it's easier to consolidate all
-          // the user's set leverages. No need to await this
-          const crossSubaccount = SubaccountClient.forLocalWallet(
-            localDydxWallet,
-            subaccountNumber
-          );
-          compositeClient.validatorClient.post
-            .updatePerpetualMarketsLeverage(crossSubaccount, crossSubaccount.address, [
-              {
-                clobPairId: params.clobPairId,
-                customImfPpm: DEFAULT_LEVERAGE_PPM / params.leverage,
-              },
-            ])
-            .then((crossTx) => {
-              const parsedTx = parseToPrimitives(crossTx);
-              logBonsaiInfo(
-                'useSubaccount/updateLeverage',
-                'Successful update leverage for cross',
-                {
-                  parsedTx,
-                }
+          let attempts = 0;
+          const maxAttempts = 3;
+
+          let crossTx;
+          let txError;
+          while (attempts < maxAttempts && crossTx === undefined) {
+            try {
+              // Always update the leverage on the cross subaccount so it's easier to consolidate all
+              // the user's set leverages. No need to await this
+              const crossSubaccount = SubaccountClient.forLocalWallet(
+                localDydxWallet,
+                subaccountNumber
               );
-            });
+              // eslint-disable-next-line no-await-in-loop
+              crossTx = await compositeClient.validatorClient.post.updatePerpetualMarketsLeverage(
+                crossSubaccount,
+                crossSubaccount.address,
+                [
+                  {
+                    clobPairId: params.clobPairId,
+                    customImfPpm: DEFAULT_LEVERAGE_PPM / params.leverage,
+                  },
+                ]
+              );
+              parsedTx = parseToPrimitives(crossTx);
+            } catch (error) {
+              txError = stringifyTransactionError(error);
+              logBonsaiError('useSubaccount/updateLeverage', 'Failed update cross leverage', {
+                parsed: txError,
+              });
+            }
+            attempts += 1;
+          }
+
+          if (crossTx === undefined && txError !== undefined) {
+            return wrapOperationFailure(txError);
+          }
         }
 
-        const parsedTx = parseToPrimitives(tx);
-        logBonsaiInfo('useSubaccount/updateLeverage', 'Successful update leverage', {
-          parsedTx,
-        });
         return wrapOperationSuccess(parsedTx);
       } catch (error) {
         const parsed = stringifyTransactionError(error);
@@ -726,7 +745,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         return wrapOperationFailure(parsed);
       }
     },
-    [compositeClient, localDydxWallet]
+    [compositeClient, localDydxWallet, subaccountNumber]
   );
 
   const createTransferMessage = useCallback(
@@ -989,5 +1008,6 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     removeAuthorizedKey,
 
     updateLeverage,
+    subaccountNumber,
   };
 };

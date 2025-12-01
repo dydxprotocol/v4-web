@@ -42,7 +42,7 @@ export const SetMarketLeverageDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const { updateLeverage } = useSubaccount();
+  const { updateLeverage, subaccountNumber: crossSubaccountNumber } = useSubaccount();
   const { dydxAddress } = useAccounts();
 
   const marketData = useAppSelectorWithArgs(
@@ -183,25 +183,22 @@ export const SetMarketLeverageDialog = ({
       const leverage = leverageBN.toNumber();
 
       const subaccountNumber = currentPosition?.subaccountNumber;
-      if (subaccountNumber !== undefined) {
-        const result = await updateLeverage({
-          senderAddress: dydxAddress,
-          subaccountNumber,
-          clobPairId: Number(clobPairId),
-          leverage,
-        });
+      // If the user doesn't have a position, we update the leverage in the cross subaccount so
+      // it's "remembered". If the user does have a position, we update the leverage in the
+      // proper subaccount - updateLeverage will also update it the cross subaccount since
+      // that is the source of truth for the leverage we show on the frontend.
+      const result = await updateLeverage({
+        senderAddress: dydxAddress,
+        subaccountNumber: subaccountNumber ?? crossSubaccountNumber,
+        clobPairId: Number(clobPairId),
+        leverage,
+      });
 
-        if (isOperationSuccess(result)) {
-          dispatch(setSelectedMarketLeverage({ marketId, leverage }));
-          setIsOpen(false);
-        } else if (isOperationFailure(result)) {
-          setErrorMessageRaw(result.errorString);
-        }
-      } else {
-        // Set temporary market leverage. The updateLeverage call will happen once
-        // trade form determines what subacccount to use for new position
+      if (isOperationSuccess(result)) {
         dispatch(setSelectedMarketLeverage({ marketId, leverage }));
         setIsOpen(false);
+      } else if (isOperationFailure(result)) {
+        setErrorMessageRaw(result.errorString);
       }
     } catch (error) {
       if (error?.message != null && typeof error.message === 'string') {
