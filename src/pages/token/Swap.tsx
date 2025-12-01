@@ -145,10 +145,21 @@ export const Swap = () => {
   }, [quote, amount, mode, tokenBalances]);
 
   const usdcPerDydx = useMemo(() => {
+    if (quote) {
+      const usdcAmount = formatUnits(
+        BigInt(inputToken === 'usdc' ? quote.amountIn : quote.amountOut),
+        USDC_DECIMALS
+      );
+      const dydxAmount = formatUnits(
+        BigInt(inputToken === 'dydx' ? quote.amountIn : quote.amountOut),
+        DYDX_DECIMALS
+      );
+      return Number(usdcAmount) / Number(dydxAmount);
+    }
     if (!priceQuote) return undefined;
 
     return Number(formatUnits(BigInt(priceQuote.amountOut), USDC_DECIMALS));
-  }, [priceQuote]);
+  }, [priceQuote, quote, inputToken]);
 
   const quotedAmount = useMemo(() => {
     if (!quote || !amount) return '';
