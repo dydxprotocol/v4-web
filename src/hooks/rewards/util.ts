@@ -19,14 +19,14 @@ export function pointsToEstimatedDollarRewards(
 }
 
 // Move to Chaos Labs query once its available
-export const OCT_2025_REWARDS_DETAILS = {
-  season: 8,
-  rewardAmount: '$1M',
-  rewardAmountUsd: 1_000_000,
+export const CURRENT_SURGE_REWARDS_DETAILS = {
+  season: 9,
+  rewardAmount: '',
+  rewardAmountUsd: 0,
   rebatePercent: '50%',
   rebatePercentNumeric: '50',
   rebateFraction: 0.5,
-  endTime: '2025-11-30T23:59:59.000Z', // end of month
+  endTime: '2025-12-31T23:59:59.000Z', // end of month
 };
 
 export const NOV_2025_COMPETITION_DETAILS = {
