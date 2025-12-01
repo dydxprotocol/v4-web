@@ -30,7 +30,7 @@ export const CURRENT_SURGE_REWARDS_DETAILS = {
 };
 
 export const NOV_2025_COMPETITION_DETAILS = {
-  rewardAmount: '$250k',
-  rewardAmountUsd: 250_000,
-  endTime: '2025-11-30T23:59:59.000Z', // end of month
+  rewardAmount: '$1M',
+  rewardAmountUsd: 1_000_000,
+  endTime: '2025-12-31T23:59:59.000Z', // end of month
 };
