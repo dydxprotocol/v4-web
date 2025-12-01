@@ -1,18 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
-
-
 import { Duration } from 'luxon';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-
-
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
-
-
 
 import { useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
 import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
@@ -21,11 +15,7 @@ import { useNow } from '@/hooks/useNow';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-
-
 import { layoutMixins } from '@/styles/layoutMixins';
-
-
 
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
@@ -33,7 +23,6 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
-
 
 export const CompetitionIncentivesPanel = () => {
   const isSept2025RewardsBase = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
