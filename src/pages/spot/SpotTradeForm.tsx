@@ -28,7 +28,7 @@ export const SpotTradeForm = () => {
   const [quickOptionsState, setQuickOptionsState] = useState({
     [SpotSide.SELL]: {
       [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
-      [SpotSellInputType.SOL]: ['0.1', '0.25', '0.5', '1'],
+      [SpotSellInputType.USD]: ['50', '100', '250', '500'],
     },
     [SpotSide.BUY]: {
       [SpotBuyInputType.USD]: ['50', '100', '250', '500'],

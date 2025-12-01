@@ -74,7 +74,7 @@ export function useSpotForm() {
       }
 
       const nextType = type as SpotSellInputType;
-      const nextSizeNum = nextType === SpotSellInputType.SOL ? amounts?.sol : amounts?.percent;
+      const nextSizeNum = nextType === SpotSellInputType.USD ? amounts?.usd : amounts?.percent;
 
       dispatch(spotFormActions.setSellInputType(nextType));
       dispatch(spotFormActions.setSize(nextSizeNum?.toString() ?? ''));

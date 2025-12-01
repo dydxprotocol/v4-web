@@ -19,7 +19,7 @@ export enum SpotBuyInputType {
 
 export enum SpotSellInputType {
   PERCENT = 'PERCENT',
-  SOL = 'SOL',
+  USD = 'USD',
 }
 
 export interface SpotFormState {
@@ -107,9 +107,9 @@ function calculateSummary(state: SpotFormState, inputData: SpotFormInputData): S
           return { sol, usd, token, percent: undefined };
         }
 
-        if (state.sellInputType === SpotSellInputType.SOL) {
-          const sol = size;
-          const usd = sol * solUsdPrice;
+        if (state.sellInputType === SpotSellInputType.USD) {
+          const usd = size;
+          const sol = usd / solUsdPrice;
           const token = usd / tokenUsdPrice;
           const percent =
             inputData.userTokenBalance != null && inputData.userTokenBalance > 0

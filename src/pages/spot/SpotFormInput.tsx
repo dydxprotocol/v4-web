@@ -28,9 +28,9 @@ const INPUT_CONFIG_MAP = {
       decimals: PERCENT_DECIMALS,
       type: InputType.Percent,
     },
-    [SpotSellInputType.SOL]: {
-      decimals: TOKEN_DECIMALS,
-      type: InputType.Number,
+    [SpotSellInputType.USD]: {
+      decimals: USD_DECIMALS,
+      type: InputType.Currency,
     },
   },
 } as const;
@@ -42,8 +42,8 @@ const TAB_OPTIONS_MAP: Record<SpotSide, TabOption<SpotSellInputType | SpotBuyInp
       value: SpotSellInputType.PERCENT,
     },
     {
-      label: <Icon iconName={IconName.SolanaSimple} />,
-      value: SpotSellInputType.SOL,
+      label: <Icon iconName={IconName.DollarSign} />,
+      value: SpotSellInputType.USD,
     },
   ],
   [SpotSide.BUY]: [
