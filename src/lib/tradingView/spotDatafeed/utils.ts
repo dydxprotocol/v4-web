@@ -6,6 +6,7 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { RESOLUTION_TO_SPOT_INTERVAL_MAP, TradingViewBar } from '@/constants/candles';
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { SpotApiBarObject, SpotApiBarsResolution } from '@/clients/spotApi';
 import { objectKeys } from '@/lib/objectHelpers';
@@ -37,8 +38,23 @@ export const transformSpotCandlesForChart = (bars: SpotApiBarObject[]): TradingV
   return bars.map(transformSpotCandleForChart);
 };
 
+const getSpotPriceDecimals = (price?: number | null): number => {
+  if (!price || price <= 0) return 6;
+
+  const magnitude = Math.floor(Math.log10(Math.abs(price)));
+  const decimals = Math.max(0, SMALL_USD_DECIMALS - magnitude - 1);
+
+  return Math.min(decimals, 10);
+};
+
 // Create symbol info for spot tokens
-export const createSpotSymbolInfo = (tokenSymbol: string): LibrarySymbolInfo => {
+export const createSpotSymbolInfo = (
+  tokenSymbol: string,
+  tokenPrice?: number | null
+): LibrarySymbolInfo => {
+  const decimals = getSpotPriceDecimals(tokenPrice);
+  const pricescale = 10 ** decimals;
+
   return {
     ticker: tokenSymbol,
     name: tokenSymbol,
@@ -49,7 +65,7 @@ export const createSpotSymbolInfo = (tokenSymbol: string): LibrarySymbolInfo => 
     exchange: 'Spot',
     listed_exchange: 'Spot',
     minmov: 1,
-    pricescale: 1000000,
+    pricescale,
     has_intraday: true,
     has_daily: true,
     has_weekly_and_monthly: true,

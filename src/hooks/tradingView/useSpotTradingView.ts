@@ -14,7 +14,7 @@ import type { TvWidget } from '@/constants/tvchart';
 
 import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateSpotChartConfig } from '@/state/tradingView';
@@ -34,6 +34,7 @@ export const useSpotTradingView = ({
   symbol: string;
 }) => {
   const dispatch = useAppDispatch();
+  const store = useAppStore();
   const { isTablet } = useBreakpoints();
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
@@ -60,7 +61,7 @@ export const useSpotTradingView = ({
     const options: TradingTerminalWidgetOptions = {
       ...widgetOptions,
       ...widgetOverrides,
-      datafeed: getSpotDatafeed(spotApi),
+      datafeed: getSpotDatafeed(store, spotApi),
       interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
       locale: languageCode as LanguageCode,
       symbol,
