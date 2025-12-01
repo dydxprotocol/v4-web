@@ -249,8 +249,7 @@ export const Swap = () => {
               {stringGetter({ key: STRING_KEYS.SWAP_TO })}
             </div>
             <Button
-              onClick={() => setMaxAmount('exact-out')}
-              disabled={hasPendingSwap}
+              disabled
               buttonStyle={ButtonStyle.WithoutBackground}
               tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
             >
@@ -269,14 +268,11 @@ export const Swap = () => {
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
               tw="bg-[unset] font-large-bold"
-              disabled={hasPendingSwap}
+              disabled
               $isLoading={mode === 'exact-in' && (isLoading || isPlaceholderData)}
               type="text"
               placeholder="0"
               value={to}
-              onChange={onValueChange('exact-out')}
-              onFocus={() => setIsToInputFocused(true)}
-              onBlur={() => setIsToInputFocused(false)}
             />
             <TokenLogo token={otherToken(inputToken)} />
           </div>
