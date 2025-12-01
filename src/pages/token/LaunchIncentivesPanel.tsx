@@ -84,7 +84,7 @@ const September2025RewardsPanel = () => {
                 </span>{' '}
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.SURGE_HEADLINE_DEC_2025,
+                    key: STRING_KEYS.SURGE_HEADLING_DEC_2025,
                     params: {
                       REBATE_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercent,
                     },
