@@ -135,6 +135,7 @@ const SpotPage = () => {
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
     navigate(`/spot/${token.tokenAddress}`);
+    setSearchQuery('');
   };
 
   const handlePositionSelect = (token: SpotPositionItem) => {
