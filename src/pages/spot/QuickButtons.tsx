@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import { NumericFormat } from 'react-number-format';
 import styled, { css } from 'styled-components';
@@ -11,13 +11,16 @@ type ValidationConfig = {
   decimalScale?: number;
 };
 
-type QuickButtonProps = {
+export type QuickButtonProps = {
   options: string[];
   onSelect?: (value: string) => void;
   onOptionsEdit?: (options: string[]) => void;
   currentValue?: string;
   disabled?: boolean;
   validation?: ValidationConfig;
+  prefix?: string;
+  suffix?: string;
+  slotRight?: ReactNode;
 };
 
 export const QuickButtons = ({
@@ -27,6 +30,9 @@ export const QuickButtons = ({
   currentValue,
   disabled,
   validation,
+  prefix,
+  suffix,
+  slotRight,
 }: QuickButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState<string[]>(options);
@@ -81,7 +87,9 @@ export const QuickButtons = ({
               decimalScale={validation?.decimalScale ?? 2}
               disabled={disabled}
               value={editValues[i]}
-              onChange={(e) => handleInputChange(i, e.target.value)}
+              onValueChange={(values: { value: string }) => handleInputChange(i, values.value)}
+              prefix={prefix}
+              suffix={suffix}
             />
           </$InputQuickButtonContainer>
         ) : (
@@ -92,7 +100,12 @@ export const QuickButtons = ({
             isSelected={currentValue === option}
             disabled={disabled}
           >
-            <span tw="truncate">{option}</span>
+            <span tw="truncate">
+              {prefix}
+              {option}
+              {suffix}
+            </span>
+            {slotRight}
           </$QuickButtonContainer>
         )
       )}
@@ -139,6 +152,7 @@ const QuickButtonContainerStyles = css`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 0.25rem;
   height: 100%;
   justify-content: center;
   border-radius: 0.5rem;
