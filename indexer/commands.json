@@ -7,7 +7,7 @@
     },
     "build": {
       "description": "Build the squid project",
-      "deps": ["clean"],
+      "deps": ["clean", "codegen"],
       "cmd": ["tsc"]
     },
     "up:local": {
@@ -50,9 +50,9 @@
       "cmd": ["node", "--require=dotenv/config", "lib/main.js"]
     },
     "process:e2e": {
-      "description": "Load .env.e2e and start the squid processor",
+      "description": "Load .env.indexer-e2e and start the squid processor",
       "deps": ["build", "migration:apply"],
-      "cmd": ["node", "--require=dotenv/config", "lib/main.js", "dotenv_config_path=.env.e2e"]
+      "cmd": ["node", "--require=dotenv/config", "lib/main.js", "dotenv_config_path=.env.indexer-e2e"]
     },
     "process:prod": {
       "description": "Start the squid processor",

@@ -8,7 +8,7 @@
     "apply:migration": "squid-typeorm-migration apply",
     "start": "ts-node -r dotenv/config src/main.ts",
     "populate:events": "ts-node e2e/populate-events.ts",
-    "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.e2e",
+    "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
     "test:e2e": "vitest --mode indexer-e2e run"
   },
   "dependencies": {

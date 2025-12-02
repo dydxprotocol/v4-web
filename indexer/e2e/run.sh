@@ -1,5 +1,13 @@
 #!/bin/bash
 
+kill_with_children () {
+    local pid=$1
+    for spid in $(ps -o pid= --ppid $pid); do
+        kill_with_children $spid
+    done
+    kill -15 $pid
+}
+
 if [ $# -lt 2 ]; then
     echo "Usage: ./e2e/run.sh <populate-events-script> <verify-indexer-script> <optional i>"
     echo "i - interactive mode, waits for CTRL-C before shutting down"
@@ -67,19 +75,21 @@ else
     echo "Events populated"
 fi
 
-echo "Apply database migrations to create the target schema"
-# there is some delay on OS to expose a port
-sleep 1
-pnpm sqd migration:apply
-if [ $? -ne 0 ]; then
-    echo "Failed to apply database migrations"
-    docker compose down -v
-    exit 1
-fi
+# echo "Apply database migrations to create the target schema"
+# # there is some delay on OS to expose a port
+# sleep 1
+# pnpm sqd migration:apply
+# if [ $? -ne 0 ]; then
+#     echo "Failed to apply database migrations"
+#     docker compose down -v
+#     exit 1
+# fi
 
 echo "Starting the squid indexer"
-VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd run  2>&1 > indexer.log &
+VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd process:e2e  2>&1 > indexer.log &
 SQD_INDEXER_PID=$!
+pnpm sqd serve:e2e  2>&1 > api.log &
+API_SERVER_PID=$!
 
 EXIT_CODE=0
 
@@ -115,18 +125,20 @@ else
     fi
 fi
 
-
 ##################### closing #########################################################
 
-echo "------------------------------------------------"
-ps aux
-echo "------------------------------------------------"
-echo SQD_INDEXER_PID: $SQD_INDEXER_PID
-echo "------------------------------------------------"
+echo "clean up the API server"
+if [ -n "$API_SERVER_PID" ]; then
+    kill_with_children $API_SERVER_PID
+    if [ $? -ne 0 ]; then
+        echo "Failed to down the API server"
+        EXIT_CODE=1
+    fi
+fi
 
 echo "clean up the squid indexer"
 if [ -n "$SQD_INDEXER_PID" ]; then
-    kill -15 "$SQD_INDEXER_PID"
+    kill_with_children $SQD_INDEXER_PID
     if [ $? -ne 0 ]; then
         echo "Failed to down the squid indexer"
         EXIT_CODE=1

@@ -42,10 +42,10 @@ docker exec "$(basename "$(pwd)")-db-1" psql -U postgres \
 ## E2E Tests
 
 End-to-end tests are executed with the bash script `e2e/run.sh`.
-It depends on the `contracts` package: to run the fuel test node and deploy contracts.
-The script runs the fuel node, deploys contracts and mocks, executes a test script,
-starts up the database, starts up the indexer, waits for the indexer to process the events
-and shuts everything down.
+It depends on the `docker` and `contracts` packages: to run the fuel test node and deploy contracts.
+The script deploys contracts and mocks, executes a test script,
+starts up the indexer, waits for the indexer to process the events
+and shuts everything down. The database and the fuel node have to run separately.
 
 Build contracts
 ```shell
@@ -53,9 +53,23 @@ pnpm --filter starboard/contracts build
 pnpm --filter starboard/contracts gen:types
 ```
 
+To build the Docker image `starboard/fuel-core` refer to the `docker/README.md` instruction.
+
+Run the database and the fuel node.
+
+```shell
+pnpm sqd up:local
+```
+
 Run an example test
 ```shell
 ./e2e/run.sh e2e/populate-events-price.ts e2e/verify-indexer-price.test.ts
+```
+
+Shut down the database and the fuel node.
+
+```shell
+pnpm sqd down:local
 ```
 
 The interactive mode simply waits for Ctrl-C to initialize the shutdown 
