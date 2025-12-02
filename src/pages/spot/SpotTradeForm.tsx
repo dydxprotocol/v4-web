@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -27,6 +27,18 @@ export const SpotTradeForm = () => {
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, [form.state.side]);
 
   const [quickOptionsState, setQuickOptionsState] = useState({
     [SpotSide.SELL]: {

@@ -141,7 +141,7 @@ const getColumnDef = ({
         renderCell: (row) => (
           <TableCell>
             <Button
-              action={ButtonAction.Destroy}
+              action={ButtonAction.Reset}
               buttonStyle={ButtonStyle.Default}
               size={ButtonSize.XSmall}
               onClick={() => onSellAction?.(row)}
