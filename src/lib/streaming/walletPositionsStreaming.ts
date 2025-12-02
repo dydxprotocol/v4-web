@@ -25,9 +25,19 @@ export interface SpotApiWsWalletPositionObject {
   unrealizedValueUsd: number;
 }
 
+export interface SpotApiWsWalletBalanceObject {
+  mint: string;
+  amount: number;
+  decimals: number;
+  rawAmount: string;
+  priceUsd: number;
+  usdValue: number;
+}
+
 export interface SpotApiWsWalletPositionsUpdate {
   walletAddress: string;
   positions: SpotApiWsWalletPositionObject[];
+  tokenBalances: SpotApiWsWalletBalanceObject[];
   totalPnL: number;
   totalRealizedPnL: number;
   totalUnrealizedPnL: number;

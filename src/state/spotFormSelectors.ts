@@ -33,9 +33,8 @@ export const getSpotFormInputData = createAppSelector(
     userSolBalance: walletPositions?.solBalance
       ? walletPositions.solBalance / LAMPORTS_PER_SOL
       : undefined,
-    userTokenBalance: walletPositions?.positions.find(
-      (position) => position.tokenMint === tokenMint
-    )?.currentBalance,
+    userTokenBalance: walletPositions?.tokenBalances.find((position) => position.mint === tokenMint)
+      ?.amount,
     tokenMint: tokenMetadata?.tokenMint,
     decimals: tokenMetadata?.decimals,
     pairAddress: tokenMetadata?.pairAddress,

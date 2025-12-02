@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
+import { keyBy } from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
@@ -24,6 +25,7 @@ import { spotFormActions } from '@/state/spotForm';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
+import { isPresent } from '@/lib/typeUtils';
 
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
@@ -47,6 +49,7 @@ const SpotPage = () => {
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const tokenPrice = useAppSelector(BonsaiCore.spot.tokenPrice.data);
   const walletPositions = useAppSelector(BonsaiCore.spot.walletPositions.positions);
+  const tokenBalances = useAppSelector(BonsaiCore.spot.walletPositions.tokenBalances);
   const portfolioTrades = useAppSelector(BonsaiCore.spot.portfolioTrades.data);
 
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
@@ -57,22 +60,30 @@ const SpotPage = () => {
   useCurrentSpotToken();
 
   const holdings: SpotPositionItem[] = useMemo(() => {
-    return walletPositions
-      .filter((position) => position.unrealizedValueUsd > 0.5)
-      .map((position) => ({
-        tokenAddress: position.tokenMint,
-        tokenName: position.tokenData.tokenNameFull,
-        tokenSymbol: position.tokenData.symbol,
-        tokenImage: position.tokenData.image,
-        holdingsAmount: position.currentBalance,
-        holdingsUsd: position.unrealizedValueUsd,
-        boughtAmount: position.totalBought,
-        boughtUsd: position.totalBoughtUsd,
-        soldAmount: position.totalSold,
-        soldUsd: position.totalSoldUsd,
-        pnlUsd: position.unrealizedPnL,
-      }));
-  }, [walletPositions]);
+    const positionsByMint = keyBy(walletPositions, 'tokenMint');
+
+    const res: SpotPositionItem[] = tokenBalances
+      .map((tokenBalance) => {
+        const position = positionsByMint[tokenBalance.mint];
+        if (!position) return null;
+        return {
+          tokenAddress: position.tokenMint,
+          tokenName: position.tokenData.tokenNameFull,
+          tokenSymbol: position.tokenData.symbol,
+          tokenImage: position.tokenData.image,
+          holdingsAmount: tokenBalance.amount,
+          holdingsUsd: tokenBalance.usdValue,
+          boughtAmount: position.totalBought,
+          boughtUsd: position.totalBoughtUsd,
+          soldAmount: position.totalSold,
+          soldUsd: position.totalSoldUsd,
+          pnlUsd: position.unrealizedPnL,
+        };
+      })
+      .filter(isPresent);
+
+    return res;
+  }, [tokenBalances, walletPositions]);
 
   const trades: SpotTradeItem[] = useMemo(() => {
     return portfolioTrades.trades.map((trade) => {

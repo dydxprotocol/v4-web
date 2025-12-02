@@ -58,6 +58,11 @@ export const selectSpotPositions = createAppSelector(
   (walletPositions) => walletPositions?.positions ?? []
 );
 
+export const selectSpotBalances = createAppSelector(
+  [selectSpotWalletPositions],
+  (walletPositions) => walletPositions?.tokenBalances ?? []
+);
+
 export const selectSpotPortfolioTrades = createAppSelector(
   [selectRawSpotPortfolioTrades],
   (portfolioTrades) => portfolioTrades ?? { trades: [], tokenData: {} }
