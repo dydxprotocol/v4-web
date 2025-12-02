@@ -1,0 +1,40 @@
+services:
+  fuel-core:
+    image: starboard/fuel-core
+    container_name: 'starboard_fuel_core'
+    environment:
+      MIN_GAS_PRICE: ${MIN_GAS_PRICE}
+      # This is the private key of the consensus.PoA.signing_key in the chainConfig.json
+      # this key is responsible for validating the transactions
+      CONSENSUS_KEY_SECRET: ${WALLET_SECRET}
+    ports:
+      - '${FUEL_CORE_PORT}:4000'
+    volumes:
+      - fuel-core-db:/mnt/db
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:4000/v1/health || exit 1"]
+      interval: 1s
+      start_period: 1s
+      timeout: 1s
+      retries: 10
+
+  db:
+    image: postgres:15
+    container_name: "starboard_indexer_db"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT}:5432"
+      # command: ["postgres", "-c", "log_statement=all"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 1s
+      start_period: 1s
+      timeout: 1s
+      retries: 10
+
+volumes:
+  fuel-core-db:
+    name: 'starboard_fuel-core-db'

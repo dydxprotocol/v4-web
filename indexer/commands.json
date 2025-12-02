@@ -12,11 +12,11 @@
     },
     "up:local": {
       "description": "Start a PG database and Fuel Node",
-      "cmd": ["docker", "compose", "up", "-d"]
+      "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "up", "-d"]
     },
     "down:local": {
       "description": "Drop a PG database and Fuel Node",
-      "cmd": ["docker", "compose", "down", "-v"]
+      "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "down", "-v"]
     },
     "migration:apply": {
       "description": "Apply the DB migrations",

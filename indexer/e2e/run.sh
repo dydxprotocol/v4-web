@@ -75,16 +75,7 @@ else
     echo "Events populated"
 fi
 
-# echo "Apply database migrations to create the target schema"
-# # there is some delay on OS to expose a port
-# sleep 1
-# pnpm sqd migration:apply
-# if [ $? -ne 0 ]; then
-#     echo "Failed to apply database migrations"
-#     docker compose down -v
-#     exit 1
-# fi
-
+# this command builds the project and applies the database migrations along
 echo "Starting the squid indexer"
 VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd process:e2e  2>&1 > indexer.log &
 SQD_INDEXER_PID=$!
