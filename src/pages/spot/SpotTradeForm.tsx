@@ -15,6 +15,8 @@ import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { useAppSelector } from '@/state/appTypes';
 
+import { mapIfPresent } from '@/lib/do';
+
 import { QuickButtonProps, QuickButtons } from './QuickButtons';
 import { SpotFormInput } from './SpotFormInput';
 import { SpotTabs, SpotTabVariant } from './SpotTabs';
@@ -118,6 +120,12 @@ export const SpotTradeForm = () => {
             balances={{
               sol: form.inputData.userSolBalance ?? 0,
               token: form.inputData.userTokenBalance ?? 0,
+              usd:
+                mapIfPresent(
+                  form.inputData.userSolBalance,
+                  form.inputData.solPriceUsd,
+                  (solBalance, solPrice) => solBalance * solPrice
+                ) ?? 0,
             }}
             inputType={
               form.state.side === SpotSide.BUY ? form.state.buyInputType : form.state.sellInputType
