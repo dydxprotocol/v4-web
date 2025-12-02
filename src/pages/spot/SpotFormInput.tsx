@@ -1,15 +1,17 @@
-import { forwardRef, useCallback, useId, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useId, useImperativeHandle, useMemo, useRef } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { PERCENT_DECIMALS, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Input, InputProps, InputType } from '@/components/Input';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputProps, OutputType } from '@/components/Output';
 import { TabGroup, TabOption } from '@/components/TabGroup';
 
 const INPUT_CONFIG_MAP = {
@@ -65,6 +67,7 @@ export type SpotFormInputProps = {
   balances: {
     sol: number;
     token: number;
+    usd: number;
   };
   side: SpotSide;
   inputType: SpotBuyInputType | SpotSellInputType;
@@ -96,6 +99,30 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
     const internalRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => internalRef.current!, []);
+
+    const balanceOutputProps: OutputProps = useMemo(() => {
+      if (side === SpotSide.BUY) {
+        if (inputType === SpotBuyInputType.SOL) {
+          return {
+            value: balances.sol,
+            type: OutputType.Asset,
+            slotRight: ' SOL',
+          };
+        }
+
+        return {
+          value: balances.usd,
+          type: OutputType.CompactNumber,
+          slotRight: ' USD',
+        };
+      }
+
+      return {
+        value: balances.token,
+        type: OutputType.Asset,
+        slotRight: ` ${tokenSymbol}`,
+      };
+    }, [balances.sol, balances.token, balances.usd, inputType, side, tokenSymbol]);
 
     const handleContainerClick = useCallback(() => {
       if (!internalRef.current) return;
@@ -133,18 +160,15 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
             <label htmlFor={id}>Amount</label>
             <div tw="row gap-[0.25rem]">
               <Icon iconName={IconName.Wallet3} />
-              <Output
-                tw="text-color-text-1"
-                value={side === SpotSide.BUY ? balances.sol : balances.token}
-                type={OutputType.Asset}
-                slotRight={side === SpotSide.BUY ? ' SOL' : ` ${tokenSymbol}`}
-              />
-              {/* <IconButton
-                iconName={IconName.PlusCircle}
-                buttonStyle={ButtonStyle.WithoutBackground}
-                size={ButtonSize.XXSmall}
-                action={ButtonAction.Primary}
-              /> */}
+              <Output tw="text-color-text-1" {...balanceOutputProps} />
+              {side === SpotSide.BUY && (
+                <IconButton
+                  iconName={IconName.PlusCircle}
+                  buttonStyle={ButtonStyle.WithoutBackground}
+                  size={ButtonSize.XXSmall}
+                  action={ButtonAction.Primary}
+                />
+              )}
             </div>
           </div>
           <div tw="row gap-[0.5rem]">
