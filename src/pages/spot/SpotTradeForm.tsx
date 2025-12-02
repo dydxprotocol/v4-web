@@ -10,11 +10,12 @@ import { useSpotForm } from '@/hooks/useSpotForm';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { useAppSelector } from '@/state/appTypes';
 
-import { QuickButtons } from './QuickButtons';
+import { QuickButtonProps, QuickButtons } from './QuickButtons';
 import { SpotFormInput } from './SpotFormInput';
 import { SpotTabs, SpotTabVariant } from './SpotTabs';
 
@@ -51,6 +52,28 @@ export const SpotTradeForm = () => {
       ? { min: 0, max: 100, decimalScale: 2 }
       : { min: 0, decimalScale: 2 };
   }, [form.state.side, form.state.sellInputType]);
+
+  const currencyIndicator = useMemo((): Pick<
+    QuickButtonProps,
+    'prefix' | 'suffix' | 'slotRight'
+  > => {
+    if (form.state.side === SpotSide.BUY) {
+      if (form.state.buyInputType === SpotBuyInputType.USD) {
+        return { prefix: '$' };
+      }
+      if (form.state.buyInputType === SpotBuyInputType.SOL) {
+        return { slotRight: <Icon iconName={IconName.SolanaSimple} size="0.875rem" /> };
+      }
+    } else {
+      if (form.state.sellInputType === SpotSellInputType.USD) {
+        return { prefix: '$' };
+      }
+      if (form.state.sellInputType === SpotSellInputType.PERCENT) {
+        return { suffix: '%' };
+      }
+    }
+    return {};
+  }, [form.state.side, form.state.buyInputType, form.state.sellInputType]);
 
   const handleQuickOptionsChange = useCallback(
     (newOptions: string[]) => {
@@ -111,6 +134,7 @@ export const SpotTradeForm = () => {
             currentValue={form.state.size}
             disabled={form.isPending}
             validation={validationConfig}
+            {...currencyIndicator}
           />
           {form.primaryAlert != null &&
             (form.primaryAlert.resources.text?.stringKey != null ||
