@@ -1,6 +1,6 @@
 // NON GENERATED MIGRATION
-module.exports = class Data1762648930785 {
-    name = 'Data1762648930785'
+module.exports = class Data1763857851808 {
+    name = 'Data1763857851808'
 
     async up(db) {
         await db.query(`CREATE INDEX "IDX_price_asset_timestamp" ON "price" ("asset", "timestamp") `)

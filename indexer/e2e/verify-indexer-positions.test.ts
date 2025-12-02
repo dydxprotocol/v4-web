@@ -145,87 +145,69 @@ describe('Verify Positions', () => {
   });
 
   describe('API tests', () => {
-    function getGraphQLURL(query: string) {
-      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
+    function getGraphQLURL() {
+      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql`;
+    }
+
+    async function graphQLPost(query: string) {
+      const response = await fetch(getGraphQLURL(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `query{${query}}`,
+        }),
+      });
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`GraphQL request failed: ${response.status}: ${responseText}`);
+      }
+      return response.json();
     }
 
     it('should find correct total positions', async () => {
-      const btcLongURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id,size}`
+      const btcLongData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      const btcLongResponse = await fetch(btcLongURL);
-      if (!btcLongResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcLongResponse.status}`);
-      }
-      const btcLongData = await btcLongResponse.json();
-      expect(btcLongData.data.totalPositions.length).toBe(1);
-      expect(btcLongData.data.totalPositions[0].size).toBe(expandDecimals(1000));
+      expect(btcLongData.data.allTotalPositions.nodes.length).toBe(1);
+      expect(btcLongData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(1000));
 
-      const btcShortURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){id,size}`
+      const btcShortData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id,size}}`
       );
-      const btcShortResponse = await fetch(btcShortURL);
-      if (!btcShortResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcShortResponse.status}`);
-      }
-      const btcShortData = await btcShortResponse.json();
-      expect(btcShortData.data.totalPositions.length).toBe(1);
-      expect(btcShortData.data.totalPositions[0].size).toBe(expandDecimals(1000));
+      expect(btcShortData.data.allTotalPositions.nodes.length).toBe(1);
+      expect(btcShortData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(1000));
 
-      const ethLongURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${ETH_ASSET}",isLong_eq:true}){id,size}`
+      const ethLongData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      const ethLongResponse = await fetch(ethLongURL);
-      if (!ethLongResponse.ok) {
-        throw new Error(`GraphQL request failed: ${ethLongResponse.status}`);
-      }
-      const ethLongData = await ethLongResponse.json();
-      expect(ethLongData.data.totalPositions.length).toBe(1);
-      expect(ethLongData.data.totalPositions[0].size).toBe(expandDecimals(3000));
+      expect(ethLongData.data.allTotalPositions.nodes.length).toBe(1);
+      expect(ethLongData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(3000));
 
-      const ethShortURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${ETH_ASSET}",isLong_eq:false}){id}`
+      const ethShortData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:false}){nodes{id}}`
       );
-      const ethShortResponse = await fetch(ethShortURL);
-      if (!ethShortResponse.ok) {
-        throw new Error(`GraphQL request failed: ${ethShortResponse.status}`);
-      }
-      const ethShortData = await ethShortResponse.json();
-      expect(ethShortData.data.totalPositions.length).toBe(0);
+      expect(ethShortData.data.allTotalPositions.nodes.length).toBe(0);
 
-      const bnbLongURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${BNB_ASSET}",isLong_eq:true}){id,size}`
+      const bnbLongData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      const bnbLongResponse = await fetch(bnbLongURL);
-      if (!bnbLongResponse.ok) {
-        throw new Error(`GraphQL request failed: ${bnbLongResponse.status}`);
-      }
-      const bnbLongData = await bnbLongResponse.json();
-      expect(bnbLongData.data.totalPositions.length).toBe(1);
-      expect(bnbLongData.data.totalPositions[0].size).toBe('0');
+      expect(bnbLongData.data.allTotalPositions.nodes.length).toBe(1);
+      expect(bnbLongData.data.allTotalPositions.nodes[0].size).toBe('0');
 
-      const bnbShortURL = getGraphQLURL(
-        `totalPositions(where:{indexAssetId_eq:"${BNB_ASSET}",isLong_eq:false}){id}`
+      const bnbShortData = await graphQLPost(
+        `allTotalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:false}){nodes{id}}`
       );
-      const bnbShortResponse = await fetch(bnbShortURL);
-      if (!bnbShortResponse.ok) {
-        throw new Error(`GraphQL request failed: ${bnbShortResponse.status}`);
-      }
-      const bnbShortData = await bnbShortResponse.json();
-      expect(bnbShortData.data.totalPositions.length).toBe(0);
+      expect(bnbShortData.data.allTotalPositions.nodes.length).toBe(0);
     });
 
     it('should position key be unique', async () => {
-      const positionKeysURL = getGraphQLURL(`positionKeys{id,account,indexAssetId,isLong}`);
-      const positionKeysResponse = await fetch(positionKeysURL);
-      if (!positionKeysResponse.ok) {
-        throw new Error(`GraphQL request failed: ${positionKeysResponse.status}`);
-      }
-      const positionKeysData = await positionKeysResponse.json();
+      const positionKeysData = await graphQLPost(`allPositionKeys{nodes{id,account,indexAssetId,isLong}}`);
 
       // Check that there are no duplicate combinations of account, indexAssetId, and isLong
       const seen = new Set<string>();
-      positionKeysData.data.positionKeys.forEach(
+      positionKeysData.data.allPositionKeys.nodes.forEach(
         (key: { account: string; indexAssetId: string; isLong: boolean }) => {
           const uniqueKey = `${key.account}-${key.indexAssetId}-${key.isLong}`;
           expect(seen.has(uniqueKey)).toBe(false);
@@ -236,40 +218,25 @@ describe('Verify Positions', () => {
 
     it('should be the the correct count of BNB closed positions', async () => {
       // First get the position key for USER_0_ADDRESS and BNB_ASSET
-      const positionKeyURL = getGraphQLURL(
-        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BNB_ASSET}",isLong_eq:true}){id}`
+      const positionKeyData = await graphQLPost(
+        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id}}`
       );
-      const positionKeyResponse = await fetch(positionKeyURL);
-      if (!positionKeyResponse.ok) {
-        throw new Error(`GraphQL request failed: ${positionKeyResponse.status}`);
-      }
-      const positionKeyData = await positionKeyResponse.json();
-      expect(positionKeyData.data.positionKeys.length).toBe(1);
-      const positionKeyId = positionKeyData.data.positionKeys[0].id;
+      expect(positionKeyData.data.allPositionKeys.nodes.length).toBe(1);
+      const positionKeyId = positionKeyData.data.allPositionKeys.nodes[0].id;
 
       // Then get closed positions for this key
-      const closedPositionsURL = getGraphQLURL(
-        `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:CLOSE}){id}`
+      const closedPositionsData = await graphQLPost(
+        `allPositions(condition:{positionKeyId:"${positionKeyId}",change:"CLOSE"}){nodes{id}}`
       );
-      const closedPositionsResponse = await fetch(closedPositionsURL);
-      if (!closedPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${closedPositionsResponse.status}`);
-      }
-      const closedPositionsData = await closedPositionsResponse.json();
-      expect(closedPositionsData.data.positions.length).toBe(2);
+      expect(closedPositionsData.data.allPositions.nodes.length).toBe(2);
     });
 
     it('should BNB positions have the same position key', async () => {
       // Get all positions for these keys
-      const allPositionsURL = getGraphQLURL(`positions{id,positionKey{id,indexAssetId}}`);
-      const allPositionsResponse = await fetch(allPositionsURL);
-      if (!allPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${allPositionsResponse.status}`);
-      }
-      const allPositionsData = await allPositionsResponse.json();
+      const allPositionsData = await graphQLPost(`allPositions{nodes{id,positionKey{id,indexAssetId}}}`);
 
       // Filter positions for BNB
-      const bnbPositions = allPositionsData.data.positions.filter(
+      const bnbPositions = allPositionsData.data.allPositions.nodes.filter(
         (p: { positionKey: { indexAssetId: string } }) => p.positionKey.indexAssetId === BNB_ASSET
       );
 
@@ -283,53 +250,38 @@ describe('Verify Positions', () => {
 
     it('should be exactly 1 latest position for each position key', async () => {
       // Get all position keys
-      const positionKeysURL = getGraphQLURL(`positionKeys{id}`);
-      const positionKeysResponse = await fetch(positionKeysURL);
-      const positionKeysData = await positionKeysResponse.json();
+      const positionKeysData = await graphQLPost(`allPositionKeys{nodes{id}}`);
 
       // For each position key, check that there's exactly one latest position
       // eslint-disable-next-line no-restricted-syntax
-      for (const key of positionKeysData.data.positionKeys) {
-        const latestPositionsURL = getGraphQLURL(
-          `positions(where:{positionKey:{id_eq:"${key.id}"},latest_eq:true}){id}`
+      for (const key of positionKeysData.data.allPositionKeys.nodes) {
+        // eslint-disable-next-line no-await-in-loop
+        const latestPositionsData = await graphQLPost(
+          `allPositions(condition:{positionKeyId:"${key.id}",latest:true}){nodes{id}}`
         );
-        // eslint-disable-next-line no-await-in-loop
-        const latestPositionsResponse = await fetch(latestPositionsURL);
-        // eslint-disable-next-line no-await-in-loop
-        const latestPositionsData = await latestPositionsResponse.json();
-        expect(latestPositionsData.data.positions.length).toBe(1);
+        expect(latestPositionsData.data.allPositions.nodes.length).toBe(1);
       }
     });
 
     it('should be two BTC positions', async () => {
-      const positionKeysURL = getGraphQLURL(
-        `positionKeys(where:{indexAssetId_eq:"${BTC_ASSET}"}){id,account,isLong}`
+      const positionKeysData = await graphQLPost(
+        `allPositionKeys(condition:{indexAssetId:"${BTC_ASSET}"}){nodes{id,account,isLong}}`
       );
-      const positionKeysResponse = await fetch(positionKeysURL);
-      if (!positionKeysResponse.ok) {
-        throw new Error(`GraphQL request failed: ${positionKeysResponse.status}`);
-      }
-      const positionKeysData = await positionKeysResponse.json();
 
-      expect(positionKeysData.data.positionKeys.length).toBe(2);
-      expect(positionKeysData.data.positionKeys[0].account).not.toBe(
-        positionKeysData.data.positionKeys[1].account
+      expect(positionKeysData.data.allPositionKeys.nodes.length).toBe(2);
+      expect(positionKeysData.data.allPositionKeys.nodes[0].account).not.toBe(
+        positionKeysData.data.allPositionKeys.nodes[1].account
       );
-      expect(positionKeysData.data.positionKeys[0].isLong).not.toBe(
-        positionKeysData.data.positionKeys[1].isLong
+      expect(positionKeysData.data.allPositionKeys.nodes[0].isLong).not.toBe(
+        positionKeysData.data.allPositionKeys.nodes[1].isLong
       );
     });
 
     it('should closed positions have no size', async () => {
-      const closedPositionsURL = getGraphQLURL(`positions(where:{change_eq:CLOSE}){id,size}`);
-      const closedPositionsResponse = await fetch(closedPositionsURL);
-      if (!closedPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${closedPositionsResponse.status}`);
-      }
-      const closedPositionsData = await closedPositionsResponse.json();
+      const closedPositionsData = await graphQLPost(`allPositions(condition:{change:"CLOSE"}){nodes{id,size}}`);
 
       // All closed positions should have size 0
-      closedPositionsData.data.positions.forEach((position: { size: string }) => {
+      closedPositionsData.data.allPositions.nodes.forEach((position: { size: string }) => {
         expect(position.size).toBe('0');
       });
     });
@@ -337,15 +289,10 @@ describe('Verify Positions', () => {
     it('should positions with no size be closed', async () => {
       // Note: GraphQL doesn't directly support filtering by size = 0,
       // so we'll fetch all positions and filter client-side
-      const allPositionsURL = getGraphQLURL(`positions{id,size,change}`);
-      const allPositionsResponse = await fetch(allPositionsURL);
-      if (!allPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${allPositionsResponse.status}`);
-      }
-      const allPositionsData = await allPositionsResponse.json();
+      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,change}}`);
 
       // Filter positions with size 0
-      const positionsWithNoSize = allPositionsData.data.positions.filter(
+      const positionsWithNoSize = allPositionsData.data.allPositions.nodes.filter(
         (p: { size: string }) => p.size === '0'
       );
 
@@ -356,15 +303,10 @@ describe('Verify Positions', () => {
     });
 
     it('should positions with no size have no collateral', async () => {
-      const allPositionsURL = getGraphQLURL(`positions{id,size,collateralAmount}`);
-      const allPositionsResponse = await fetch(allPositionsURL);
-      if (!allPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${allPositionsResponse.status}`);
-      }
-      const allPositionsData = await allPositionsResponse.json();
+      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,collateralAmount}}`);
 
       // Filter positions with size 0
-      const positionsWithNoSize = allPositionsData.data.positions.filter(
+      const positionsWithNoSize = allPositionsData.data.allPositions.nodes.filter(
         (p: { size: string }) => p.size === '0'
       );
 
@@ -375,15 +317,10 @@ describe('Verify Positions', () => {
     });
 
     it('should positions with no collateral have no size', async () => {
-      const allPositionsURL = getGraphQLURL(`positions{id,size,collateralAmount}`);
-      const allPositionsResponse = await fetch(allPositionsURL);
-      if (!allPositionsResponse.ok) {
-        throw new Error(`GraphQL request failed: ${allPositionsResponse.status}`);
-      }
-      const allPositionsData = await allPositionsResponse.json();
+      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,collateralAmount}}`);
 
       // Filter positions with collateralAmount 0
-      const positionsWithNoCollateral = allPositionsData.data.positions.filter(
+      const positionsWithNoCollateral = allPositionsData.data.allPositions.nodes.filter(
         (p: { collateralAmount: string }) => p.collateralAmount === '0'
       );
 

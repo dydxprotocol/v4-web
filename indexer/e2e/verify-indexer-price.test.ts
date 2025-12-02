@@ -104,71 +104,61 @@ describe('Verify Prices', () => {
     });
   });
   describe('API tests', () => {
-    function getGraphQLURL(query: string) {
-      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
+    function getGraphQLURL() {
+      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql`;
+    }
+
+    async function graphQLPost(query: string) {
+      const response = await fetch(getGraphQLURL(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `query{${query}}`,
+        }),
+      });
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`GraphQL request failed: ${response.status}: ${responseText}`);
+      }
+      return response.json();
     }
 
     it('should return correct number of price events', async () => {
-      const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){id}`);
-      const btcResponse = await fetch(btcURL);
-      if (!btcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
-      }
-      const btcData = await btcResponse.json();
-      expect(btcData.data.prices.length).toBe(20);
+      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{id}}`);
+      expect(btcData.data.allPrices.nodes.length).toBe(20);
 
-      const usdcURL = getGraphQLURL(`prices(where:{asset_eq:"${USDC_ASSET}"}){id}`);
-      const usdcResponse = await fetch(usdcURL);
-      if (!usdcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${usdcResponse.status}`);
-      }
-      const usdcData = await usdcResponse.json();
-      expect(usdcData.data.prices.length).toBe(2);
+      const usdcData = await graphQLPost(`allPrices(condition:{asset:"${USDC_ASSET}"}){nodes{id}}`);
+      expect(usdcData.data.allPrices.nodes.length).toBe(2);
 
-      const ethURL = getGraphQLURL(`prices(where:{asset_eq:"${ETH_ASSET}"}){id}`);
-      const ethResponse = await fetch(ethURL);
-      if (!ethResponse.ok) {
-        throw new Error(`GraphQL request failed: ${ethResponse.status}`);
-      }
-      const ethData = await ethResponse.json();
-      expect(ethData.data.prices.length).toBe(2);
+      const ethData = await graphQLPost(`allPrices(condition:{asset:"${ETH_ASSET}"}){nodes{id}}`);
+      expect(ethData.data.allPrices.nodes.length).toBe(2);
     });
 
     it('should return correct usdc price', async () => {
-      const usdcURL = getGraphQLURL(`prices(where:{asset_eq:"${USDC_ASSET}"}){price}`);
-      const usdcResponse = await fetch(usdcURL);
-      if (!usdcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${usdcResponse.status}`);
-      }
-      const usdcData = await usdcResponse.json();
-      expect(usdcData.data.prices.length).toBe(2);
+      const usdcData = await graphQLPost(`allPrices(condition:{asset:"${USDC_ASSET}"}){nodes{price}}`);
+      expect(usdcData.data.allPrices.nodes.length).toBe(2);
       // All USDC prices should be 1 (toPrice(1))
-      usdcData.data.prices.forEach((price: { price: string }) => {
+      usdcData.data.allPrices.nodes.forEach((price: { price: string }) => {
         expect(price.price).toBe(toPrice(1));
       });
     });
 
     it('should return correct eth price', async () => {
-      const ethURL = getGraphQLURL(`prices(where:{asset_eq:"${ETH_ASSET}"}){price}`);
-      const ethResponse = await fetch(ethURL);
-      const ethData = await ethResponse.json();
-      expect(ethData.data.prices.length).toBe(2);
+      const ethData = await graphQLPost(`allPrices(condition:{asset:"${ETH_ASSET}"}){nodes{price}}`);
+      expect(ethData.data.allPrices.nodes.length).toBe(2);
       // All ETH prices should be 3000 (toPrice(3000))
-      ethData.data.prices.forEach((price: { price: string }) => {
+      ethData.data.allPrices.nodes.forEach((price: { price: string }) => {
         expect(price.price).toBe(toPrice(3000));
       });
     });
 
     it('should store correct btc price', async () => {
-      const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){price}`);
-      const btcResponse = await fetch(btcURL);
-      if (!btcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
-      }
-      const btcData = await btcResponse.json();
-      expect(btcData.data.prices.length).toBe(20);
+      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{price}}`);
+      expect(btcData.data.allPrices.nodes.length).toBe(20);
 
-      const prices = btcData.data.prices.map((p: { price: string }) => BigInt(p.price));
+      const prices = btcData.data.allPrices.nodes.map((p: { price: string }) => BigInt(p.price));
       const minPrice = prices.reduce((min: bigint, p: bigint) => (p < min ? p : min), prices[0]);
       const maxPrice = prices.reduce((max: bigint, p: bigint) => (p > max ? p : max), prices[0]);
 
@@ -177,15 +167,10 @@ describe('Verify Prices', () => {
     });
 
     it('should return correct btc timestamps', async () => {
-      const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){timestamp}`);
-      const btcResponse = await fetch(btcURL);
-      if (!btcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
-      }
-      const btcData = await btcResponse.json();
-      expect(btcData.data.prices.length).toBe(20);
+      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`);
+      expect(btcData.data.allPrices.nodes.length).toBe(20);
 
-      const timestamps = btcData.data.prices.map((p: { timestamp: number }) => p.timestamp);
+      const timestamps = btcData.data.allPrices.nodes.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
       const now = Math.floor(Date.now() / 1000);
@@ -198,15 +183,10 @@ describe('Verify Prices', () => {
     });
 
     it('should return correct btc timestamp spread across events', async () => {
-      const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){timestamp}`);
-      const btcResponse = await fetch(btcURL);
-      if (!btcResponse.ok) {
-        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
-      }
-      const btcData = await btcResponse.json();
-      expect(btcData.data.prices.length).toBe(20);
+      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`);
+      expect(btcData.data.allPrices.nodes.length).toBe(20);
 
-      const timestamps = btcData.data.prices.map((p: { timestamp: number }) => p.timestamp);
+      const timestamps = btcData.data.allPrices.nodes.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
 

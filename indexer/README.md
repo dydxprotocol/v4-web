@@ -30,8 +30,9 @@ node -r dotenv/config lib/main.js
 # or (this does not require the project to be build)
 pnpm start
 
-# Run API, update db connection params
-pnpm exec postgraphile -c "postgres://postgres:postgres@localhost:23751/postgres" --enhance-graphiql
+# Run API, update db connection params, 
+# for the production consult postgres docs for safer configuration
+pnpm postgraphile -c "postgres://postgres:postgres@localhost:23751/postgres" --enhance-graphiql
 
 # Erase the indexer data
 docker compose down -v
