@@ -14,6 +14,7 @@ import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
 import { SpotApiPortfolioTradesResponse, SpotApiTokenInfoObject } from '@/clients/spotApi';
 import {
+  SpotApiWsWalletBalanceObject,
   SpotApiWsWalletPositionObject,
   SpotApiWsWalletPositionsUpdate,
 } from '@/lib/streaming/walletPositionsStreaming';
@@ -96,6 +97,7 @@ import {
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
+  selectSpotBalances,
   selectSpotPortfolioTrades,
   selectSpotPortfolioTradesLoading,
   selectSpotPositions,
@@ -252,6 +254,7 @@ interface BonsaiCoreShape {
       data: BasicSelector<SpotApiWsWalletPositionsUpdate | undefined>;
       loading: BasicSelector<LoadableStatus>;
       positions: BasicSelector<SpotApiWsWalletPositionObject[]>;
+      tokenBalances: BasicSelector<SpotApiWsWalletBalanceObject[]>;
     };
     portfolioTrades: {
       data: BasicSelector<SpotApiPortfolioTradesResponse>;
@@ -358,6 +361,7 @@ export const BonsaiCore: BonsaiCoreShape = {
       data: selectSpotWalletPositions,
       loading: selectSpotWalletPositionsLoading,
       positions: selectSpotPositions,
+      tokenBalances: selectSpotBalances,
     },
     portfolioTrades: {
       data: selectSpotPortfolioTrades,
