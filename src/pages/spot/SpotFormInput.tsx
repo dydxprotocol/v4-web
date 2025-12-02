@@ -98,7 +98,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
     const id = useId();
     const internalRef = useRef<HTMLInputElement>(null);
 
-    useImperativeHandle(ref, () => internalRef.current!, []);
+    useImperativeHandle(ref, () => internalRef.current!);
 
     const balanceOutputProps: OutputProps = useMemo(() => {
       if (side === SpotSide.BUY) {

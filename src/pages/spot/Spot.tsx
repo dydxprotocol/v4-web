@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
@@ -17,8 +18,9 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
+import { spotFormActions } from '@/state/spotForm';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
@@ -36,6 +38,7 @@ import { SpotHeaderToken } from './types';
 const SpotPage = () => {
   const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
   const solPriceStatus = useAppSelector(BonsaiCore.spot.solPrice.loading);
@@ -132,6 +135,7 @@ const SpotPage = () => {
   };
 
   const handlePositionSell = (token: SpotPositionItem) => {
+    dispatch(spotFormActions.setSide(SpotSide.SELL));
     navigate(`/spot/${token.tokenAddress}`);
   };
 
