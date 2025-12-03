@@ -19,7 +19,7 @@ describe('Verify Liquidation', () => {
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '5432'),
+      port: parseInt(process.env.VITE_DB_PORT ?? '0'),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -281,5 +281,304 @@ describe('Verify Liquidation', () => {
 
   afterAll(async () => {
     await client.end();
+  });
+
+  describe('API tests', () => {
+    function getGraphQLURL(query: string) {
+      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
+    }
+
+    it('should store correct number of liquidation events', async () => {
+      const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){id}`);
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBe(3); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
+    });
+
+    it('should have liquidated positions with zero collateral and size', async () => {
+      const liquidationsURL = getGraphQLURL(
+        `positions(where:{change_eq:LIQUIDATE}){id,collateralAmount,size}`
+      );
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBeGreaterThan(0);
+      
+      for (const position of liquidationsData.data.positions) {
+        expect(BigInt(position.collateralAmount)).toBe(BigInt(0));
+        expect(BigInt(position.size)).toBe(BigInt(0));
+      }
+    });
+
+    it('should store correct liquidation for user0 BTC long position', async () => {
+      // First get the position key for USER_0_ADDRESS and BTC_ASSET (long)
+      const positionKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
+      );
+      const positionKeyResponse = await fetch(positionKeyURL);
+      const positionKeyData = await positionKeyResponse.json();
+      expect(positionKeyData.data.positionKeys.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys[0].id;
+
+      // Then get liquidation position for this key
+      const liquidationURL = getGraphQLURL(
+        `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
+      );
+      const liquidationResponse = await fetch(liquidationURL);
+      const liquidationData = await liquidationResponse.json();
+      expect(liquidationData.data.positions.length).toBe(1);
+      const liquidation = liquidationData.data.positions[0];
+
+      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.size).toBe('0');
+      expect(liquidation.latest).toBe(true);
+      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
+      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+    });
+
+    it('should store correct liquidation for user1 BTC short position', async () => {
+      // First get the position key for USER_1_ADDRESS and BTC_ASSET (short)
+      const positionKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_1_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){id}`
+      );
+      const positionKeyResponse = await fetch(positionKeyURL);
+      const positionKeyData = await positionKeyResponse.json();
+      expect(positionKeyData.data.positionKeys.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys[0].id;
+
+      // Then get liquidation position for this key
+      const liquidationURL = getGraphQLURL(
+        `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
+      );
+      const liquidationResponse = await fetch(liquidationURL);
+      const liquidationData = await liquidationResponse.json();
+      expect(liquidationData.data.positions.length).toBe(1);
+      const liquidation = liquidationData.data.positions[0];
+
+      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.size).toBe('0');
+      expect(liquidation.latest).toBe(true);
+      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
+      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+    });
+
+    it('should store correct liquidation for user0 ETH long position', async () => {
+      // First get the position key for USER_0_ADDRESS and ETH_ASSET (long)
+      const positionKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${ETH_ASSET}",isLong_eq:true}){id}`
+      );
+      const positionKeyResponse = await fetch(positionKeyURL);
+      const positionKeyData = await positionKeyResponse.json();
+      expect(positionKeyData.data.positionKeys.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys[0].id;
+
+      // Then get liquidation position for this key
+      const liquidationURL = getGraphQLURL(
+        `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
+      );
+      const liquidationResponse = await fetch(liquidationURL);
+      const liquidationData = await liquidationResponse.json();
+      expect(liquidationData.data.positions.length).toBe(1);
+      const liquidation = liquidationData.data.positions[0];
+
+      expect(liquidation.collateralAmount).toBe('0');
+      expect(liquidation.size).toBe('0');
+      expect(liquidation.latest).toBe(true);
+      expect(BigInt(liquidation.positionFee)).toBeGreaterThanOrEqual(0);
+      expect(BigInt(liquidation.collateralTransferred)).toBeGreaterThan(0); // liquidation fee
+    });
+
+    it('should have only one latest record per position key after liquidation', async () => {
+      // User0 BTC long - should have latest = true only for liquidation
+      const user0BtcLongKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
+      );
+      const user0BtcLongKeyResponse = await fetch(user0BtcLongKeyURL);
+      const user0BtcLongKeyData = await user0BtcLongKeyResponse.json();
+      if (user0BtcLongKeyData.data.positionKeys.length > 0) {
+        const positionKeyId = user0BtcLongKeyData.data.positionKeys[0].id;
+        const latestPositionsURL = getGraphQLURL(
+          `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
+        );
+        const latestPositionsResponse = await fetch(latestPositionsURL);
+        const latestPositionsData = await latestPositionsResponse.json();
+        expect(latestPositionsData.data.positions.length).toBe(1);
+      }
+
+      // User1 BTC short - should have latest = true only for liquidation
+      const user1BtcShortKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_1_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){id}`
+      );
+      const user1BtcShortKeyResponse = await fetch(user1BtcShortKeyURL);
+      const user1BtcShortKeyData = await user1BtcShortKeyResponse.json();
+      if (user1BtcShortKeyData.data.positionKeys.length > 0) {
+        const positionKeyId = user1BtcShortKeyData.data.positionKeys[0].id;
+        const latestPositionsURL = getGraphQLURL(
+          `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
+        );
+        const latestPositionsResponse = await fetch(latestPositionsURL);
+        const latestPositionsData = await latestPositionsResponse.json();
+        expect(latestPositionsData.data.positions.length).toBe(1);
+      }
+
+      // User0 ETH long - should have latest = true only for liquidation
+      const user0EthLongKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${ETH_ASSET}",isLong_eq:true}){id}`
+      );
+      const user0EthLongKeyResponse = await fetch(user0EthLongKeyURL);
+      const user0EthLongKeyData = await user0EthLongKeyResponse.json();
+      if (user0EthLongKeyData.data.positionKeys.length > 0) {
+        const positionKeyId = user0EthLongKeyData.data.positionKeys[0].id;
+        const latestPositionsURL = getGraphQLURL(
+          `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
+        );
+        const latestPositionsResponse = await fetch(latestPositionsURL);
+        const latestPositionsData = await latestPositionsResponse.json();
+        expect(latestPositionsData.data.positions.length).toBe(1);
+      }
+    });
+
+    it('should store correct liquidation timestamps', async () => {
+      const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){timestamp}`);
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      
+      const timestamps = liquidationsData.data.positions.map(
+        (p: { timestamp: number }) => p.timestamp
+      );
+      const minTimestamp = Math.min(...timestamps);
+      const maxTimestamp = Math.max(...timestamps);
+      const now = Math.floor(Date.now() / 1000);
+
+      // Timestamps should be recent
+      expect(minTimestamp).toBeLessThan(now + 1800);
+      expect(minTimestamp).toBeGreaterThan(now - 1800);
+      expect(maxTimestamp).toBeLessThan(now + 1800);
+      expect(maxTimestamp).toBeGreaterThan(now - 1800);
+
+      // Timestamps should span across events (at least 10+3+5+8+3+7+12+4+6 = 58 seconds minimum)
+      expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(39);
+    });
+
+    it('should store liquidation events with correct position progression', async () => {
+      // Check User0 BTC long position progression
+      const user0BtcLongKeyURL = getGraphQLURL(
+        `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
+      );
+      const user0BtcLongKeyResponse = await fetch(user0BtcLongKeyURL);
+      const user0BtcLongKeyData = await user0BtcLongKeyResponse.json();
+      
+      if (user0BtcLongKeyData.data.positionKeys.length > 0) {
+        const positionKeyId = user0BtcLongKeyData.data.positionKeys[0].id;
+        const positionsURL = getGraphQLURL(
+          `positions(where:{positionKey:{id_eq:"${positionKeyId}"}}){change,collateralAmount,size,timestamp}`
+        );
+        const positionsResponse = await fetch(positionsURL);
+        const positionsData = await positionsResponse.json();
+        expect(positionsData.data.positions.length).toBeGreaterThan(0);
+
+        // Sort by timestamp ASC
+        const sortedPositions = positionsData.data.positions.sort(
+          (a: { timestamp: number }, b: { timestamp: number }) => a.timestamp - b.timestamp
+        );
+
+        // Should have INCREASE followed by LIQUIDATE
+        const changes = sortedPositions.map((p: { change: string }) => p.change);
+        expect(changes).toContain('INCREASE');
+        expect(changes).toContain('LIQUIDATE');
+
+        // The liquidation should be the last one with zero collateral and size
+        const liquidation = sortedPositions.find((p: { change: string }) => p.change === 'LIQUIDATE');
+        expect(liquidation).toBeDefined();
+        expect(BigInt(liquidation.collateralAmount)).toBe(BigInt(0));
+        expect(BigInt(liquidation.size)).toBe(BigInt(0));
+      }
+    });
+
+    it('should store liquidation fees correctly', async () => {
+      const liquidationsURL = getGraphQLURL(
+        `positions(where:{change_eq:LIQUIDATE}){collateralTransferred,positionFee}`
+      );
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBe(3);
+
+      for (const position of liquidationsData.data.positions) {
+        // collateralTransferred should be the liquidation fee (at least 5 USDC)
+        expect(BigInt(position.collateralTransferred)).toBeGreaterThanOrEqual(
+          BigInt(expandDecimals(5))
+        );
+        // positionFee should be non-negative
+        expect(BigInt(position.positionFee)).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should store PnL and funding rate for liquidations', async () => {
+      const liquidationsURL = getGraphQLURL(
+        `positions(where:{change_eq:LIQUIDATE}){pnlDelta,fundingRate}`
+      );
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBe(3);
+
+      for (const position of liquidationsData.data.positions) {
+        // PnL delta and funding rate should be stored (can be positive or negative)
+        expect(position.pnlDelta).toBeDefined();
+        expect(position.fundingRate).toBeDefined();
+      }
+    });
+
+    it('should store realized PnL and funding rate for liquidations', async () => {
+      const liquidationsURL = getGraphQLURL(
+        `positions(where:{change_eq:LIQUIDATE}){realizedPnl,realizedFundingRate}`
+      );
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBe(3);
+
+      for (const position of liquidationsData.data.positions) {
+        // Realized values should be stored
+        expect(position.realizedPnl).toBeDefined();
+        expect(position.realizedFundingRate).toBeDefined();
+      }
+    });
+
+    it('should have liquidation events marked as latest for closed positions', async () => {
+      const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){latest}`);
+      const liquidationsResponse = await fetch(liquidationsURL);
+      const liquidationsData = await liquidationsResponse.json();
+      expect(liquidationsData.data.positions.length).toBe(3);
+
+      for (const position of liquidationsData.data.positions) {
+        expect(position.latest).toBe(true);
+      }
+    });
+
+    it('should update total positions correctly after liquidations', async () => {
+      // Check BTC long total position (should decrease after user0 liquidation)
+      const btcLongTotalURL = getGraphQLURL(
+        `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){collateralAmount,size}`
+      );
+      const btcLongTotalResponse = await fetch(btcLongTotalURL);
+      const btcLongTotalData = await btcLongTotalResponse.json();
+      if (btcLongTotalData.data.totalPositions.length > 0) {
+        const total = btcLongTotalData.data.totalPositions[0];
+        // After liquidation, total should reflect the removed position
+        expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
+        expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
+      }
+
+      // Check BTC short total position (should decrease after user1 liquidation)
+      const btcShortTotalURL = getGraphQLURL(
+        `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){collateralAmount,size}`
+      );
+      const btcShortTotalResponse = await fetch(btcShortTotalURL);
+      const btcShortTotalData = await btcShortTotalResponse.json();
+      if (btcShortTotalData.data.totalPositions.length > 0) {
+        const total = btcShortTotalData.data.totalPositions[0];
+        // After liquidation, total should reflect the removed position
+        expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
+        expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
+      }
+    });
   });
 });

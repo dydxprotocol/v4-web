@@ -93,7 +93,6 @@ else
     FUEL_NODE_HEIGHT=`curl -s http://127.0.0.1:4000/v1/graphql -X POST -H "Content-Type: application/json" -d '{"query":"query { chain { latestBlock { height } } }"}' | jq -r '.data.chain.latestBlock.height'`
     ii=0
     while [ $ii -lt 20 ]; do
-        date
         SQD_INDEXER_TABLE_MARKER=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT COUNT(1) FROM information_schema.tables WHERE table_schema='squid_processor' AND table_name='status'"`
         if [ "$SQD_INDEXER_TABLE_MARKER" -eq "1" ]; then
             SQD_INDEXER_HEIGHT=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT height FROM squid_processor.status WHERE id=0"`

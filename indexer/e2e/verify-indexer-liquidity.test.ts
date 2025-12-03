@@ -12,7 +12,7 @@ describe('Verify Liquidity', () => {
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '5432'),
+      port: parseInt(process.env.VITE_DB_PORT ?? '0'),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -240,5 +240,254 @@ describe('Verify Liquidity', () => {
 
   afterAll(async () => {
     await client.end();
+  });
+
+  describe('API tests', () => {
+    function getGraphQLURL(query: string) {
+      return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
+    }
+
+    it('should store correct number of liquidity events', async () => {
+      const user0URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){id}`);
+      const user0Response = await fetch(user0URL);
+      const user0Data = await user0Response.json();
+      expect(user0Data.data.liquidities.length).toBe(4); // 2 adds + 2 removes
+
+      const user1URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_1_ADDRESS}"}){id}`);
+      const user1Response = await fetch(user1URL);
+      const user1Data = await user1Response.json();
+      expect(user1Data.data.liquidities.length).toBe(2); // 1 add + 1 remove
+
+      const user2URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){id}`);
+      const user2Response = await fetch(user2URL);
+      const user2Data = await user2Response.json();
+      expect(user2Data.data.liquidities.length).toBe(2); // 2 adds
+    });
+
+    it('should store correct latest liquidity for user0', async () => {
+      // Also check sum of all liquidity records for user0
+      const user0AllURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){stable,lpAmount}`
+      );
+      const user0AllResponse = await fetch(user0AllURL);
+      const user0AllData = await user0AllResponse.json();
+      const sumStable = user0AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
+        BigInt(0)
+      );
+      const sumLpAmount = user0AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
+        BigInt(0)
+      );
+      expect(sumStable.toString()).toBe('0');
+      expect(sumLpAmount.toString()).toBe('0');
+    });
+
+    it('should store correct latest liquidity for user1', async () => {
+      // Also check sum of all liquidity records for user1
+      const user1AllURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_1_ADDRESS}"}){stable,lpAmount}`
+      );
+      const user1AllResponse = await fetch(user1AllURL);
+      const user1AllData = await user1AllResponse.json();
+      const sumStable = user1AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
+        BigInt(0)
+      );
+      const sumLpAmount = user1AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
+        BigInt(0)
+      );
+      expect(sumStable.toString()).toBe('0');
+      expect(sumLpAmount.toString()).toBe('0');
+    });
+
+    it('should store correct latest liquidity for user2', async () => {
+      // Also check sum of all liquidity records for user2
+      const user2AllURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){stable,lpAmount}`
+      );
+      const user2AllResponse = await fetch(user2AllURL);
+      const user2AllData = await user2AllResponse.json();
+      const sumStable = user2AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
+        BigInt(0)
+      );
+      const sumLpAmount = user2AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
+        BigInt(0)
+      );
+      
+      // User2 added 7000 + 2000 = 9000, so latest should be around 9000 (minus fees)
+      // Note: Due to fees, the exact amount might be slightly less
+      expect(sumStable).toBeGreaterThan(BigInt(expandDecimals(8500))); // At least 8500 after fees
+      expect(sumStable).toBeLessThanOrEqual(BigInt(expandDecimals(9000)));
+      expect(sumLpAmount).toBeGreaterThan(0);
+    });
+
+    it('should store correct total liquidity', async () => {
+      const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
+      const totalResponse = await fetch(totalURL);
+      const totalData = await totalResponse.json();
+      console.log('totalData', totalData);
+      expect(totalData.data.totalLiquidities.length).toBe(1);
+      
+      const totalLiquidity = totalData.data.totalLiquidities[0];
+      // Total should be user2's liquidity (9000 minus fees)
+      const stableAmount = BigInt(totalLiquidity.stable);
+      expect(stableAmount).toBeGreaterThan(BigInt(expandDecimals(8500)));
+      expect(stableAmount).toBeLessThanOrEqual(BigInt(expandDecimals(9000)));
+      expect(BigInt(totalLiquidity.lpAmount)).toBeGreaterThan(0);
+    });
+
+    it('should have total liquidity match final provider state', async () => {
+      // Get user2's sum
+      const user2AllURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){stable,lpAmount}`
+      );
+      const user2AllResponse = await fetch(user2AllURL);
+      const user2AllData = await user2AllResponse.json();
+      const user2Stable = user2AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
+        BigInt(0)
+      );
+      const user2Lp = user2AllData.data.liquidities.reduce(
+        (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
+        BigInt(0)
+      );
+
+      // Get total liquidity
+      const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
+      const totalResponse = await fetch(totalURL);
+      const totalData = await totalResponse.json();
+      const totalStable = BigInt(totalData.data.totalLiquidities[0].stable);
+      const totalLp = BigInt(totalData.data.totalLiquidities[0].lpAmount);
+
+      // Since user0 and user1 removed all liquidity, total should match user2's positive values
+      // User2's latest is an add event (positive), so total should match
+      expect(totalStable).toBe(user2Stable);
+      expect(totalLp).toBe(user2Lp);
+    });
+
+    it('should store correct total liquidity timestamp', async () => {
+      const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){lastTimestamp}`);
+      const totalResponse = await fetch(totalURL);
+      const totalData = await totalResponse.json();
+      expect(totalData.data.totalLiquidities.length).toBe(1);
+      
+      const totalTimestamp = totalData.data.totalLiquidities[0].lastTimestamp;
+      const now = Math.floor(Date.now() / 1000);
+
+      // Timestamp should be recent
+      expect(totalTimestamp).toBeLessThan(now + 1800);
+      expect(totalTimestamp).toBeGreaterThan(now - 1800);
+
+      // Total liquidity timestamp should match the latest provider liquidity timestamp
+      const allLiquidityURL = getGraphQLURL(`liquidities{timestamp}`);
+      const allLiquidityResponse = await fetch(allLiquidityURL);
+      const allLiquidityData = await allLiquidityResponse.json();
+      const maxLiquidityTimestamp = Math.max(
+        ...allLiquidityData.data.liquidities.map((liq: { timestamp: number }) => liq.timestamp)
+      );
+      expect(totalTimestamp).toBe(maxLiquidityTimestamp);
+    });
+
+    it('should have only one total liquidity record', async () => {
+      const totalURL = getGraphQLURL(`totalLiquidities{id}`);
+      const totalResponse = await fetch(totalURL);
+      const totalData = await totalResponse.json();
+      expect(totalData.data.totalLiquidities.length).toBe(1);
+    });
+
+    it('should have total liquidity with non-negative values', async () => {
+      const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
+      const totalResponse = await fetch(totalURL);
+      const totalData = await totalResponse.json();
+      const totalLiquidity = totalData.data.totalLiquidities[0];
+
+      expect(BigInt(totalLiquidity.stable)).toBeGreaterThanOrEqual(0);
+      expect(BigInt(totalLiquidity.lpAmount)).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should store correct liquidity timestamps', async () => {
+      const user0URL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){timestamp}`
+      );
+      const user0Response = await fetch(user0URL);
+      const user0Data = await user0Response.json();
+      
+      const timestamps = user0Data.data.liquidities.map((liq: { timestamp: number }) => liq.timestamp);
+      const minTimestamp = Math.min(...timestamps);
+      const maxTimestamp = Math.max(...timestamps);
+      const now = Math.floor(Date.now() / 1000);
+
+      // Timestamps should be recent
+      expect(minTimestamp).toBeLessThan(now + 1800);
+      expect(minTimestamp).toBeGreaterThan(now - 1800);
+      expect(maxTimestamp).toBeLessThan(now + 1800);
+      expect(maxTimestamp).toBeGreaterThan(now - 1800);
+
+      // Timestamps should span across events (at least 5+10+8+12+7+15 = 57 seconds)
+      expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(57);
+    });
+
+    it('should have only one latest record per provider', async () => {
+      const user0LatestURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_0_ADDRESS}",latest_eq:true}){id}`
+      );
+      const user0LatestResponse = await fetch(user0LatestURL);
+      const user0LatestData = await user0LatestResponse.json();
+      expect(user0LatestData.data.liquidities.length).toBe(1);
+
+      const user1LatestURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_1_ADDRESS}",latest_eq:true}){id}`
+      );
+      const user1LatestResponse = await fetch(user1LatestURL);
+      const user1LatestData = await user1LatestResponse.json();
+      expect(user1LatestData.data.liquidities.length).toBe(1);
+
+      const user2LatestURL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_2_ADDRESS}",latest_eq:true}){id}`
+      );
+      const user2LatestResponse = await fetch(user2LatestURL);
+      const user2LatestData = await user2LatestResponse.json();
+      expect(user2LatestData.data.liquidities.length).toBe(1);
+    });
+
+    it('should store correct liquidity progression for user0', async () => {
+      const user0URL = getGraphQLURL(
+        `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){stable,lpAmount,timestamp}`
+      );
+      const user0Response = await fetch(user0URL);
+      const user0Data = await user0Response.json();
+      expect(user0Data.data.liquidities.length).toBe(4);
+
+      // Sort by timestamp ASC
+      const sortedLiquidity = user0Data.data.liquidities.sort(
+        (a: { timestamp: number }, b: { timestamp: number }) => a.timestamp - b.timestamp
+      );
+
+      // First add: 10000 USDC (after fees, positive value)
+      const firstAdd = sortedLiquidity[0];
+      expect(BigInt(firstAdd.stable)).toBeGreaterThanOrEqual(BigInt(expandDecimals(9500))); // After fees
+      expect(BigInt(firstAdd.stable)).toBeGreaterThan(0); // Positive
+      expect(BigInt(firstAdd.lpAmount)).toBeGreaterThan(0); // Positive
+
+      // Second add: 3000 USDC (after fees, positive value, not accumulated)
+      const secondAdd = sortedLiquidity[1];
+      expect(BigInt(secondAdd.stable)).toBeGreaterThanOrEqual(BigInt(expandDecimals(2800))); // After fees
+      expect(BigInt(secondAdd.stable)).toBeGreaterThan(0); // Positive
+      expect(BigInt(secondAdd.lpAmount)).toBeGreaterThan(0); // Positive
+
+      // First remove: negative value (amount removed)
+      const firstRemove = sortedLiquidity[2];
+      expect(BigInt(firstRemove.stable)).toBeLessThan(0); // Negative
+      expect(BigInt(firstRemove.lpAmount)).toBeLessThan(0); // Negative
+
+      // Second remove: negative value (amount removed)
+      const secondRemove = sortedLiquidity[3];
+      expect(BigInt(secondRemove.stable)).toBeLessThan(0); // Negative
+      expect(BigInt(secondRemove.lpAmount)).toBeLessThan(0); // Negative
+    });
   });
 });
