@@ -61,6 +61,7 @@ const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: Ord
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
   border-top-right-radius: 0.75rem;
   border-top-left-radius: 0.75rem;
+  --tabs-height: 2.625rem;
   overflow: hidden;
 
   ${({ activeTab }) =>

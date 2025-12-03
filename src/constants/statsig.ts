@@ -15,6 +15,7 @@ export enum StatsigFlags {
   ffWithdrawRewrite = 'ff_withdraw_rewrite',
   ffSeptember2025Rewards = 'ff_rewards_sep_2025',
   ffTurnkeyWeb = 'ff_turnkey_web',
+  ffSwapEnabled = 'ff_swap_ui_web',
 
   abPopupDeposit = 'ab_popup_deposit',
 }

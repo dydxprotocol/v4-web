@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { ChaosLabsCompetitionItem, useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -25,7 +25,6 @@ export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
   PNL = 'PNL',
-  Rewards = 'Rewards',
 }
 
 export const CompetitionLeaderboardPanel = () => {
@@ -67,7 +66,7 @@ export const CompetitionLeaderboardPanel = () => {
     }));
 
     exportCSV(csvRows, {
-      filename: `rewards-leaderboard-season-${OCT_2025_REWARDS_DETAILS.season}`,
+      filename: `rewards-leaderboard-season-${CURRENT_SURGE_REWARDS_DETAILS.season}`,
       columnHeaders: [
         {
           key: 'rank',
@@ -80,10 +79,6 @@ export const CompetitionLeaderboardPanel = () => {
         {
           key: 'pnl',
           displayLabel: stringGetter({ key: STRING_KEYS.PNL }),
-        },
-        {
-          key: 'dollarReward',
-          displayLabel: stringGetter({ key: STRING_KEYS.REWARDS }),
         },
       ],
     });
@@ -273,23 +268,6 @@ const getRewardsLeaderboardTableColumnDef = ({
             tw="text-small font-medium"
             type={OutputType.Fiat}
             value={pnl}
-          />
-        ),
-      },
-      [RewardsLeaderboardTableColumns.Rewards]: {
-        columnKey: RewardsLeaderboardTableColumns.Rewards,
-        getCellValue: (row) => row.dollarReward,
-        label: (
-          <div tw="py-0.375 text-base font-medium text-color-text-0">
-            {stringGetter({ key: STRING_KEYS.PRIZE })}
-          </div>
-        ),
-        renderCell: ({ dollarReward, account }) => (
-          <Output
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
-            tw="text-small font-medium"
-            type={OutputType.Fiat}
-            value={dollarReward}
           />
         ),
       },

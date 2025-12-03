@@ -35,7 +35,6 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
               shape={ButtonShape.Square}
               size={ButtonSize.XSmall}
               onClick={() =>
-                // todo this handoff should be using uniqueid
                 dispatch(
                   openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.uniqueId }))
                 )
@@ -45,7 +44,27 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
         )
       }
     >
-      <Output type={OutputType.Fiat} value={position.marginValueInitial} showSign={ShowSign.None} />
+      <Output
+        type={OutputType.Fiat}
+        value={position.marginValueInitialFromSelectedLeverage}
+        showSign={ShowSign.None}
+      />
+      {position.marginMode === 'ISOLATED' &&
+        position.effectiveSelectedLeverage
+          .minus(position.leverage ?? 0)
+          .abs()
+          .gt(1) && (
+          <div tw="row">
+            (
+            <Output
+              type={OutputType.Multiple}
+              fractionDigits={0}
+              value={position.leverage}
+              showSign={ShowSign.None}
+            />
+            )
+          </div>
+        )}
     </TableCell>
   );
 };

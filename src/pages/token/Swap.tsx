@@ -1,17 +1,22 @@
 import { EventHandler, useMemo, useState } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
-import { ArrowDownIcon } from '@radix-ui/react-icons';
-import { capitalize } from 'lodash';
+import { BigNumber } from 'bignumber.js';
 import { SyntheticInputEvent } from 'react-number-format/types/types';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 import { formatUnits, parseUnits } from 'viem';
 
-import { OnboardingState } from '@/constants/account';
+import {
+  AMOUNT_RESERVED_FOR_GAS_DYDX,
+  AMOUNT_RESERVED_FOR_GAS_USDC,
+  OnboardingState,
+} from '@/constants/account';
+import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { DYDX_CHAIN_DYDX_DENOM, DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
+import { DYDX_DECIMALS, USDC_DECIMALS } from '@/constants/tokens';
 
 import { useSwapQuote } from '@/hooks/swap/useSwapQuote';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -26,6 +31,7 @@ import UsdcLogo from '@/icons/usdc-inverted.svg';
 import WarningFilled from '@/icons/warning-filled.svg';
 
 import { Accordion } from '@/components/Accordion';
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
@@ -38,8 +44,9 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { selectHasPendingSwaps } from '@/state/swapSelectors';
 import { addSwap } from '@/state/swaps';
 
+import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
-import { BIG_NUMBERS } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
@@ -47,7 +54,7 @@ function otherToken(currToken: 'usdc' | 'dydx') {
 }
 
 function getTokenLabel(token: 'usdc' | 'dydx') {
-  return token === 'usdc' ? 'USDC' : 'dYdX';
+  return token === 'usdc' ? 'USDC' : 'DYDX';
 }
 
 const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
@@ -63,31 +70,31 @@ export const Swap = () => {
   const [inputToken, setInputToken] = useState<'dydx' | 'usdc'>('usdc');
   const [mode, setMode] = useState<SwapMode>('exact-in');
   const [amount, setAmount] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isToInputFocused, setIsToInputFocused] = useState(false);
   const [isFromInputFocused, setIsFromInputFocused] = useState(false);
 
   const tokenBalances = useMemo(() => {
+    const usableDydxBalance = Math.max(
+      Number(nativeTokenBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_DYDX,
+      0
+    );
     const dydx = {
-      rawBalanceBigInt: parseUnits(nativeTokenBalance ?? '0', DYDX_DECIMALS),
-      formatted: Math.max(0, Number(nativeTokenBalance ?? 0)).toFixed(2),
+      rawBalanceBigInt: parseUnits(`${usableDydxBalance}`, DYDX_DECIMALS),
+      formatted: MustBigNumber(usableDydxBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
+    const usableUsdcBalance = Math.max(
+      (parentSubaccountUsdcBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_USDC,
+      0
+    );
     const usdc = {
-      rawBalanceBigInt: parseUnits(`${parentSubaccountUsdcBalance ?? 0}`, USDC_DECIMALS),
-      formatted: Math.max(0, parentSubaccountUsdcBalance ?? 0).toFixed(2),
+      rawBalanceBigInt: parseUnits(`${usableUsdcBalance}`, USDC_DECIMALS),
+      formatted: MustBigNumber(usableUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
     };
-
-    if (inputToken === 'usdc') {
-      return {
-        inputBalance: usdc,
-        outputBalance: dydx,
-      };
-    }
 
     return {
-      inputBalance: dydx,
-      outputBalance: usdc,
-      dydx,
-      usdc,
+      inputBalance: inputToken === 'usdc' ? usdc : dydx,
+      outputBalance: inputToken === 'usdc' ? dydx : usdc,
     };
   }, [nativeTokenBalance, parentSubaccountUsdcBalance, inputToken]);
 
@@ -116,6 +123,7 @@ export const Swap = () => {
 
   const debouncedAmount = useDebounce(amount);
 
+  // Swap Quote
   const {
     data: quote,
     isLoading,
@@ -123,39 +131,42 @@ export const Swap = () => {
     error,
   } = useSwapQuote(inputToken, debouncedAmount, mode);
 
-  const hasSufficientBalance = useMemo(() => {
-    if (!quote || !amount) return true;
-
-    const inputAmountBigInt = parseUnits(
-      quote.amountIn,
-      quote.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM ? DYDX_DECIMALS : USDC_DECIMALS
-    );
-    const inputBalanceBigInt =
-      quote.sourceAssetDenom === DYDX_CHAIN_DYDX_DENOM
-        ? tokenBalances.dydx?.rawBalanceBigInt
-        : tokenBalances.usdc?.rawBalanceBigInt;
-
-    if (!inputBalanceBigInt) return true;
-
-    return inputBalanceBigInt <= inputAmountBigInt;
-  }, [quote, amount, tokenBalances.dydx?.rawBalanceBigInt, tokenBalances.usdc?.rawBalanceBigInt]);
-
+  // Exchange Rate Quote
   const { data: priceQuote } = useSwapQuote('dydx', '1', 'exact-in');
 
+  const hasSufficientBalance = useMemo(() => {
+    if (!quote || !amount) return true;
+    const inputBalance =
+      mode === 'exact-in' ? tokenBalances.inputBalance : tokenBalances.outputBalance;
+    const inputAmountBigInt = BigInt(quote.amountIn);
+    const inputBalanceBigInt = inputBalance.rawBalanceBigInt;
+    if (!inputBalanceBigInt) return true;
+    return inputBalanceBigInt >= inputAmountBigInt;
+  }, [quote, amount, mode, tokenBalances]);
+
   const usdcPerDydx = useMemo(() => {
+    if (quote) {
+      const usdcAmount = formatUnits(
+        BigInt(inputToken === 'usdc' ? quote.amountIn : quote.amountOut),
+        USDC_DECIMALS
+      );
+      const dydxAmount = formatUnits(
+        BigInt(inputToken === 'dydx' ? quote.amountIn : quote.amountOut),
+        DYDX_DECIMALS
+      );
+      return Number(usdcAmount) / Number(dydxAmount);
+    }
     if (!priceQuote) return undefined;
 
     return Number(formatUnits(BigInt(priceQuote.amountOut), USDC_DECIMALS));
-  }, [priceQuote]);
+  }, [priceQuote, quote, inputToken]);
 
   const quotedAmount = useMemo(() => {
     if (!quote || !amount) return '';
-
     const quotedToken = mode === 'exact-in' ? otherToken(inputToken) : inputToken;
     const quotedTokenDecimals = quotedToken === 'dydx' ? DYDX_DECIMALS : USDC_DECIMALS;
     const quotedTokenAmount = mode === 'exact-in' ? quote.amountOut : quote.amountIn;
     const formattedQuotedTokenAmount = formatUnits(BigInt(quotedTokenAmount), quotedTokenDecimals);
-
     return Number(formattedQuotedTokenAmount).toFixed(2);
   }, [quote, inputToken, mode, amount]);
 
@@ -181,6 +192,7 @@ export const Swap = () => {
       return;
     }
     const swapId = `swap-${crypto.randomUUID()}`;
+    track(AnalyticsEvents.SwapInitiated({ id: swapId, ...quote }));
     dispatch(addSwap({ swap: { id: swapId, route: quote, status: 'pending' } }));
   };
 
@@ -192,11 +204,13 @@ export const Swap = () => {
           tw="flex flex-col gap-0.25 rounded-0.5 bg-color-layer-4 p-1"
         >
           <div tw="flex justify-between">
-            <div tw="text-color-text-0 font-small-medium">From</div>
+            <div tw="text-color-text-0 font-small-medium">
+              {stringGetter({ key: STRING_KEYS.SWAP_FROM })}
+            </div>
             <Button
               disabled={hasPendingSwap}
               buttonStyle={ButtonStyle.WithoutBackground}
-              tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
+              tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
               onClick={() => setMaxAmount('exact-in')}
             >
               <CardHolderIcon />
@@ -235,7 +249,7 @@ export const Swap = () => {
           onClick={onSwitchTokens}
           disabled={hasPendingSwap}
         >
-          <ArrowDownIcon tw="h-1.25 w-1.25" />
+          <Icon iconName={IconName.TransferArrows} tw="h-1.25 w-1.25" />
         </$SwapButton>
 
         <$InputContainer
@@ -243,12 +257,13 @@ export const Swap = () => {
           tw="flex flex-col gap-0.25 rounded-0.5 border border-solid border-color-layer-4 p-1"
         >
           <div tw="flex justify-between">
-            <div tw="text-color-text-0 font-small-medium">To</div>
+            <div tw="text-color-text-0 font-small-medium">
+              {stringGetter({ key: STRING_KEYS.SWAP_TO })}
+            </div>
             <Button
-              onClick={() => setMaxAmount('exact-out')}
-              disabled={hasPendingSwap}
+              disabled
               buttonStyle={ButtonStyle.WithoutBackground}
-              tw="flex h-fit items-center gap-0.375 p-0 text-color-layer-7 font-small-medium"
+              tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
             >
               <CardHolderIcon />
               {tokenBalances.outputBalance.formatted ? (
@@ -265,29 +280,40 @@ export const Swap = () => {
           <div tw="flex items-center justify-between gap-0.5">
             <$Input
               tw="bg-[unset] font-large-bold"
-              disabled={hasPendingSwap}
+              disabled
               $isLoading={mode === 'exact-in' && (isLoading || isPlaceholderData)}
               type="text"
               placeholder="0"
               value={to}
-              onChange={onValueChange('exact-out')}
-              onFocus={() => setIsToInputFocused(true)}
-              onBlur={() => setIsToInputFocused(false)}
             />
             <TokenLogo token={otherToken(inputToken)} />
           </div>
         </$InputContainer>
       </div>
-
+      {hasPendingSwap && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({ key: STRING_KEYS.SWAP_IN_PROGRESS_WARNING })}
+        </AlertMessage>
+      )}
       {onboardingState !== OnboardingState.AccountConnected ? (
         <OnboardingTriggerButton size={ButtonSize.BasePlus} />
       ) : error ? (
-        <div tw="flex h-3 justify-center rounded-0.75 border border-solid border-color-layer-4 p-0.75">
-          <div tw="flex items-center gap-0.5 leading-5">
-            <WarningFilled tw="h-[15.6px] w-[17.3px] text-red" />
-            <div tw="text-base text-color-text-0">{capitalize(error.message)}</div>
-          </div>
-        </div>
+        <WithTooltip
+          tooltipString={stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: error.message },
+          })}
+          slotTrigger={
+            <div tw="flex h-3 w-full justify-center rounded-0.75 border border-solid border-color-layer-4 p-0.75 hover:cursor-help">
+              <div tw="flex items-center gap-0.5 leading-5">
+                <WarningFilled tw="h-[15.6px] w-[17.3px] text-red" />
+                <div tw="text-base text-color-text-0 underline decoration-dashed">
+                  {stringGetter({ key: STRING_KEYS.SWAP })}
+                </div>
+              </div>
+            </div>
+          }
+        />
       ) : (
         <Button
           tw="h-3 p-0.75"
@@ -427,7 +453,7 @@ const ExchangeRate = ({
       </div>
       <div tw="flex items-center gap-0.25">
         <GasIcon />
-        <Output value={gas} type={OutputType.CompactNumber} slotLeft="$" />
+        <Output value={gas} type={OutputType.Fiat} />
       </div>
     </div>
   );
@@ -471,7 +497,6 @@ const TokenLogo = ({ token }: { token: 'usdc' | 'dydx' }) => {
   return (
     <div tw="relative h-1.5 w-1.5">
       <DydxLogo tw="h-1.5 w-1.5" />
-      <DydxLogo tw="absolute -bottom-0.125 -right-0.125 h-0.75 w-0.75 rounded-[99%] border-2 border-solid border-color-layer-4" />
     </div>
   );
 };

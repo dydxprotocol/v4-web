@@ -9,13 +9,12 @@ import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
-import { NOV_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
+import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useNow } from '@/hooks/useNow';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -57,9 +56,9 @@ const September2025RewardsPanel = () => {
               <div tw="font-medium-bold">
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.COMPETITION_HEADLINE_NOV_2025,
+                    key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025,
                     params: {
-                      REWARD_AMOUNT: NOV_2025_COMPETITION_DETAILS.rewardAmount,
+                      REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount,
                     },
                   })}
                 </span>
@@ -71,12 +70,12 @@ const September2025RewardsPanel = () => {
             <span>
               <span tw="text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.COMPETITION_BODY_NOV_2025,
+                  key: STRING_KEYS.COMPETITION_BODY_DEC_2025,
                   params: {
-                    REWARD_AMOUNT: NOV_2025_COMPETITION_DETAILS.rewardAmount,
+                    REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount,
                   },
                 })}{' '}
-                <Link href="https://www.dydx.xyz/surge" isInline>
+                <Link href="https://www.mintscan.io/dydx/proposals/321" isInline>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
                 </Link>
               </span>
@@ -140,10 +139,6 @@ const Sept2025RewardsPanel = () => {
           </$Points>
         </div>
         <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />
-      </div>
-
-      <div tw="flex items-center gap-[0.5em] self-end font-tiny-medium">
-        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
       </div>
     </div>
   );

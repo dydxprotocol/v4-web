@@ -82,6 +82,7 @@ const reducer = createVanillaReducer({
 export interface TransferFormInputData {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+  selectedMarketLeverages: { [marketId: string]: number };
   walletBalances: AccountBalances | undefined;
   feeResult: TransferFeeData | undefined; // Fee data provided by consumer
   canViewAccount: boolean | undefined;
@@ -146,6 +147,7 @@ function calculateSummary(
   const accountBefore = getAccountDetails(
     inputData.rawParentSubaccountData,
     inputData.rawRelevantMarkets,
+    inputData.selectedMarketLeverages,
     inputData.walletBalances
   );
 
@@ -268,6 +270,7 @@ function calculateSummary(
       ...getAccountDetails(
         modifiedSubaccountData,
         inputData.rawRelevantMarkets,
+        inputData.selectedMarketLeverages,
         inputData.walletBalances
       ),
       availableNativeBalance: calc(() => {
@@ -292,13 +295,18 @@ function calculateSummary(
 }
 
 function getAccountDetails(
-  rawParentSubaccountData?: ParentSubaccountDataBase,
-  rawRelevantMarkets?: MarketsData,
+  rawParentSubaccountData: ParentSubaccountDataBase | undefined,
+  rawRelevantMarkets: MarketsData | undefined,
+  selectedMarketLeverages: { [marketId: string]: number },
   rawWalletBalances?: AccountBalances
 ): AccountDetails {
   return {
     ...(mapIfPresent(rawParentSubaccountData, rawRelevantMarkets, (subaccountData, marketsData) => {
-      const calculatedAccount = calculateParentSubaccountSummary(subaccountData, marketsData);
+      const calculatedAccount = calculateParentSubaccountSummary(
+        subaccountData,
+        marketsData,
+        selectedMarketLeverages
+      );
       return {
         equity: calculatedAccount.equity.toNumber(),
         freeCollateral: calculatedAccount.freeCollateral.toNumber(),

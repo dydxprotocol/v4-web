@@ -61,12 +61,14 @@ export function useSwapQuote(
   const { skipClient } = useSkipClient();
   const tokenConfig = useTokenConfigs();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
+  const rawAmount = amount && parseFloat(amount);
+  const isAmountValid = rawAmount && rawAmount > 0;
 
   return useQuery({
     queryKey: ['swap-quote', input, amount, mode, selectedDydxChainId],
     queryFn: () =>
       getSkipSwapRoute(skipClient, input, tokenConfig, selectedDydxChainId, amount, mode),
-    enabled: Boolean(amount),
+    enabled: Boolean(isAmountValid),
     staleTime: 15 * timeUnits.second,
     // Don't auto-retry because some errors are legitimate
     retry: 0,

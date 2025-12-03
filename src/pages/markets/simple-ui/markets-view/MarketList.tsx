@@ -76,9 +76,11 @@ const sortPositions = (
           ? marginValueInitial.div(subaccountEquity).toNumber()
           : undefined;
 
-      return orderBy(positions, (position) => getMarginUsage(position.marginValueInitial) ?? 0, [
-        'desc',
-      ]);
+      return orderBy(
+        positions,
+        (position) => getMarginUsage(position.marginValueInitialFromSelectedLeverage) ?? 0,
+        ['desc']
+      );
     }
     case PositionSortType.Price:
       return orderBy(
