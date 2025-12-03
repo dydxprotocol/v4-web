@@ -36,15 +36,10 @@ export const CompetitionIncentivesPanel = () => {
 
 const September2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
-
   const now = new Date();
   // December 2025 is the first month (Month 1)
   // Calculate months difference from Dec 2025, and add 1 to make it "Month 1"
-  const monthNumber =
-    (now.getUTCFullYear() - 2025) * 12 +
-    (now.getUTCMonth() - 11) +
-    1;
-
+  const monthNumber = (now.getUTCFullYear() - 2025) * 12 + (now.getUTCMonth() - 11) + 1;
   // For endTime, set to last ms of current UTC month
   const endTime = (() => {
     const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0)); // first of next month UTC
