@@ -28,13 +28,8 @@ export const useAutomatedDepositNotifications = () => {
     const isDepositDialogOpen = activeDialog && DialogTypes.is.Deposit2(activeDialog);
     if (!enabled && dydxAddress && depositAddresses && isDepositDialogOpen) {
       setEnabled(true);
-      return;
     }
-    if (!dydxAddress || !depositAddresses || newDeposits.length === 0) {
-      setEnabled(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dydxAddress, depositAddresses, activeDialog]);
+  }, [dydxAddress, depositAddresses, activeDialog, enabled]);
 
   // Stage 1: Watch for deposits from backend and update refs
   useEffect(() => {

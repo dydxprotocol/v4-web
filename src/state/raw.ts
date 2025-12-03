@@ -77,6 +77,7 @@ export interface RawDataState {
     sparklines: Loadable<{
       [period: string]: IndexerSparklineResponseObject | undefined;
     }>;
+    selectedMarketLeverages: Loadable<{ [marketId: string]: number }>;
   };
   account: {
     balances: Loadable<Coin[]>;
@@ -112,6 +113,8 @@ const initialState: RawDataState = {
     assets: loadableIdle(),
     orderbooks: {},
     sparklines: loadableIdle(),
+    // TODO: this should actually be idle eventually, not success with empty data
+    selectedMarketLeverages: { status: 'success', data: {} },
   },
   account: {
     parentSubaccount: loadableIdle(),
@@ -235,6 +238,21 @@ export const rawSlice = createSlice({
       ) => {
         state.rewards.price = action.payload;
       },
+      setSelectedMarketLeverage: (
+        state,
+        action: PayloadAction<{ marketId: string; leverage: number }>
+      ) => {
+        const { marketId, leverage } = action.payload;
+        if (state.markets.selectedMarketLeverages.status === 'success') {
+          state.markets.selectedMarketLeverages.data[marketId] = leverage;
+        }
+      },
+      setSelectedMarketLeverages: (
+        state,
+        action: PayloadAction<Loadable<{ [marketId: string]: number }>>
+      ) => {
+        state.markets.selectedMarketLeverages = action.payload;
+      },
     }),
     // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
@@ -320,4 +338,6 @@ export const {
   setSourceAddressScreenV2Raw,
   setRewardsParams,
   setRewardsTokenPrice,
+  setSelectedMarketLeverage,
+  setSelectedMarketLeverages,
 } = rawSlice.actions;

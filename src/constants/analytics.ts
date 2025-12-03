@@ -2,7 +2,7 @@ import { OrderSide, TradeFormType } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { ApiStatus, SubaccountFill } from '@/bonsai/types/summaryTypes';
 import { type SupportedLocale } from '@dydxprotocol/v4-localization';
-import { RouteResponse, UserAddress } from '@skip-go/client';
+import { Route, RouteResponse, UserAddress } from '@skip-go/client';
 import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { type CustomFlags, type StatsigFlags } from '@/constants/statsig';
@@ -391,6 +391,18 @@ export const AnalyticsEvents = unionize(
       amount?: number;
       validatorAddress?: string;
     }>(),
+
+    // Swapping
+    SwapInitiated: ofType<{ id: string } & Route>(),
+    SwapError: ofType<
+      {
+        id: string;
+        step: 'withdraw-subaccount' | 'execute-swap';
+        error: string;
+      } & Route
+    >(),
+    SwapSubmitted: ofType<{ id: string; txHash: string; chainId: string } & Route>(),
+    SwapFinalized: ofType<{ id: string; txHash: string; chainId: string } & Route>(),
 
     // Sharing
     SharePnlShared: ofType<{

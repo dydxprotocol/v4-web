@@ -17,12 +17,13 @@ export const MarginAndLeverageButtons = ({ className }: StyleProps) => {
 };
 
 const $MarginAndLeverageButtons = styled.div`
+  height: 2.625rem;
   display: flex;
   gap: 0.5rem;
 
-  abbr,
-  button,
-  span {
+  > abbr,
+  > button,
+  > span {
     ${layoutMixins.flexExpandToSpace}
     height: 2.25rem;
     flex-basis: 100%;

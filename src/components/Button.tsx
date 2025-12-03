@@ -255,6 +255,16 @@ const getDisabledStateForButtonAction = (action?: ButtonAction, buttonStyle?: Bu
       --button-cursor: not-allowed;
     `;
   }
+  if (action === ButtonAction.Primary) {
+    return css`
+      background-image: none;
+      --button-backgroundColor: var(--color-accent-faded);
+      --button-textColor: var(--color-text-0);
+      --button-cursor: not-allowed;
+      --button-hover-filter: none;
+      --button-border: solid var(--border-width) var(--color-accent-faded);
+    `;
+  }
   return css`
     --button-textColor: var(--color-text-0);
     --button-backgroundColor: var(--button-disabled-backgroundColor, var(--color-layer-2));
