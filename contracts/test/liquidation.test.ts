@@ -519,12 +519,12 @@ describe("Vault.funding_rate", () => {
                         forward: [expandDecimals(100), USDC_ASSET_ID],
                     }),
             )
-            // still ok (no fees, so position is safe at this price)
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(42000, 18)))
+            // still ok
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
             const liquidationState1 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()
             ).value
-            expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed (fees are 0)
+            expect(liquidationState1[0].toString()).eq("0") // 0 means no liquidation needed
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
