@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     image: starboard/fuel-core
     container_name: 'starboard_fuel_core'
+    restart: unless-stopped
     env_file:
       - .env.docker
     environment:
@@ -26,6 +27,7 @@ services:
   db:
     image: postgres:15
     container_name: "starboard_indexer_db"
+    restart: unless-stopped
     env_file:
       - .env.docker
     environment:
@@ -48,6 +50,7 @@ services:
       dockerfile: docker/starboard/Dockerfile
     image: starboard
     container_name: 'starboard_indexer_processor'
+    restart: unless-stopped
     env_file:
       - .env.docker
     environment:
@@ -77,8 +80,12 @@ services:
       retries: 3
 
   api:
+    build:
+      context: ..
+      dockerfile: docker/starboard/Dockerfile
     image: starboard
     container_name: 'starboard_indexer_api'
+    restart: unless-stopped
     env_file:
       - .env.docker
     environment:

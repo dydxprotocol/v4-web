@@ -36,6 +36,12 @@ COPY apps/indexer/package.json ./apps/indexer/
 COPY contracts/package.json ./contracts/
 COPY ts-sdk/package.json ./ts-sdk/
 
+# Copy files needed by preinstall and postinstall scripts
+COPY scripts ./scripts
+COPY tradingview ./tradingview
+COPY apps/indexer/.env.example ./apps/indexer/c
+RUN mkdir -p public
+
 # Install dependencies (cached if package files haven't changed)
 RUN export PNPM_HOME="/root/.local/share/pnpm" && \
     export PATH="$PNPM_HOME:${PATH}" && \
