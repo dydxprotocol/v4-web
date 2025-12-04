@@ -5,7 +5,8 @@ use stork_sway_sdk::interface::Stork;
 use std::u128::U128;
 use std::block::timestamp;
 use core_interfaces::pricefeed_wrapper::{Error, PricefeedWrapper};
-pub const MAX_PRICE_STALENESS: u64 = 120;
+pub const MAX_PRICE_STALENESS: u64 = 120_000_000_000; // 120 seconds in nanoseconds
+pub const TAI64_TO_UNIX_OFFSET: u64 = 4611686018427387941; // TAI64 epoch offset to Unix epoch
 configurable {
     STORK_CONTRACT: ContractId = ContractId::zero(),
 }
@@ -14,7 +15,9 @@ impl PricefeedWrapper for Contract {
         let stork = abi(Stork, STORK_CONTRACT.bits());
         let price = stork.get_temporal_numeric_value_unchecked_v1(feedId);
         require(
-            price.timestamp_ns + MAX_PRICE_STALENESS >= timestamp(),
+            // magic constant: TAI64 to UTC, 10^9 for nanoseconds
+            // the constant may slightly change in years
+            price.timestamp_ns + MAX_PRICE_STALENESS >= (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64,
             Error::PricefeedWrapperStaledPrice,
         );
         // the code below calculates

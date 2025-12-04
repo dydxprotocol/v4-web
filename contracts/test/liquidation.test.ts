@@ -263,7 +263,7 @@ describe("Vault.funding_rate", () => {
                     }),
             )
             // still ok
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800000001, 12)))
             const liquidationState1 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, true, false).get()
             ).value
@@ -271,7 +271,7 @@ describe("Vault.funding_rate", () => {
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800000001, 12)))
             // TODO something wrong here
             const liquidationState2 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, true, false).get()
@@ -520,7 +520,7 @@ describe("Vault.funding_rate", () => {
                     }),
             )
             // still ok
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43199999999, 12)))
             const liquidationState1 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()
             ).value
@@ -528,7 +528,7 @@ describe("Vault.funding_rate", () => {
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43199999999, 12)))
             // TODO something wrong here
             const liquidationState2 = (
                 await vaultLiquidator.functions.validate_liquidation(user1Identity, BTC_ASSET, false, false).get()
@@ -802,9 +802,9 @@ describe("Vault.funding_rate", () => {
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity),
             )
-            const updatePNLLog = tx.logs[tx.logs.length - 4]
-            expect(updatePNLLog.has_profit).eq(false)
-            expect(updatePNLLog.delta.toString()).eq(expandDecimals(80))
+            const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+            expect(liquidatePositionLog.pnl_delta_has_profit).eq(false)
+            expect(liquidatePositionLog.pnl_delta.toString()).eq(expandDecimals(80))
         })
 
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
@@ -887,11 +887,11 @@ describe("Vault.funding_rate", () => {
                     }),
             )
             // still ok
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800000001, 12)))
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(36800000001, 12)))
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, true, liquidatorIdentity))
             const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, true).get()).value
             const position = (await vault.functions.get_position_by_key(positionKey).get()).value
@@ -1156,9 +1156,9 @@ describe("Vault.funding_rate", () => {
             const tx = await call(
                 vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity),
             )
-            const updatePNLLog = tx.logs[tx.logs.length - 4]
-            expect(updatePNLLog.has_profit).eq(false)
-            expect(updatePNLLog.delta.toString()).eq(expandDecimals(80))
+            const liquidatePositionLog = tx.logs[tx.logs.length - 1]
+            expect(liquidatePositionLog.pnl_delta_has_profit).eq(false)
+            expect(liquidatePositionLog.pnl_delta.toString()).eq(expandDecimals(80))
         })
 
         it("can liquidate a position exceeding max leverage, check the funding rate", async () => {
@@ -1241,11 +1241,11 @@ describe("Vault.funding_rate", () => {
                     }),
             )
             // still ok
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200000001, 12)))
             // generate some funding rate debt
             await moveBlockchainTime(launchedNode, 110)
             // refresh the timestamp in stork mock
-            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200, 18)))
+            await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(43200000001, 12)))
             await call(vaultLiquidator.functions.liquidate_position(user1Identity, BTC_ASSET, false, liquidatorIdentity))
             const positionKey = (await vault.functions.get_position_key(user1Identity, BTC_ASSET, false).get()).value
             const position = (await vault.functions.get_position_by_key(positionKey).get()).value

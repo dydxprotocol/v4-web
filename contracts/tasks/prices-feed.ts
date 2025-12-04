@@ -4,6 +4,14 @@ import { call, getArgs } from "./utils"
 
 if (require.main === module) {
     pricesFeed(getArgs(["url", "priceSignerPrivK", "mockPricefeedAddress"]))
+        .then(() => {
+            process.exit(0)
+        })
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error)
+            process.exit(1)
+        })
 }
 
 // pyth pricefeed id -> stork asset

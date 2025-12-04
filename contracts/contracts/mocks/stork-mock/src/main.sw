@@ -8,6 +8,7 @@ use std::vm::evm::evm_address::EvmAddress;
 use std::block::timestamp;
 use std::u128::U128;
 use signed_int::i128::I128;
+pub const TAI64_TO_UNIX_OFFSET: u64 = 4611686018427387941; // TAI64 epoch offset to Unix epoch
 storage {
     prices: StorageMap<b256, TemporalNumericValue> = StorageMap {},
 }
@@ -35,8 +36,11 @@ impl StorkMock for Contract {
             Some(value) => value,
             None => panic "price_value_i128 overflow",
         };
+        // magic constant: TAI64 to UTC, 10^9 for nanoseconds
+        // the constant may slightly change in years
+        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64;
         let price = TemporalNumericValue {
-            timestamp_ns: timestamp(),
+            timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
@@ -60,8 +64,11 @@ impl StorkMock for Contract {
             Some(value) => value,
             None => panic "price_value_i128 underflow",
         };
+        // magic constant: TAI64 to UTC, 10^9 for nanoseconds
+        // the constant may slightly change in years
+        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64;
         let price = TemporalNumericValue {
-            timestamp_ns: timestamp(),
+            timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
         };
         storage.prices.insert(id, price);
