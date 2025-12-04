@@ -11,6 +11,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -71,23 +72,26 @@ export const SpotTradeForm = () => {
     QuickButtonProps,
     'prefix' | 'suffix' | 'slotRight'
   > => {
-    if (form.state.side === SpotSide.BUY) {
-      if (form.state.buyInputType === SpotBuyInputType.USD) {
-        return { prefix: '$' };
-      }
-      if (form.state.buyInputType === SpotBuyInputType.SOL) {
-        return { slotRight: <Icon iconName={IconName.SolanaSimple} size="0.875rem" /> };
-      }
-    } else {
-      if (form.state.sellInputType === SpotSellInputType.USD) {
-        return { prefix: '$' };
-      }
-      if (form.state.sellInputType === SpotSellInputType.PERCENT) {
-        return { suffix: '%' };
-      }
+    const { side, buyInputType, sellInputType } = form.state;
+
+    if (side === SpotSide.BUY && buyInputType === SpotBuyInputType.USD) {
+      return { prefix: '$' };
     }
+
+    if (side === SpotSide.BUY && buyInputType === SpotBuyInputType.SOL) {
+      return { slotRight: <Icon iconName={IconName.SolanaSimple} size="0.875rem" /> };
+    }
+
+    if (side === SpotSide.SELL && sellInputType === SpotSellInputType.USD) {
+      return { prefix: '$' };
+    }
+
+    if (side === SpotSide.SELL && sellInputType === SpotSellInputType.PERCENT) {
+      return { suffix: '%' };
+    }
+
     return {};
-  }, [form.state.side, form.state.buyInputType, form.state.sellInputType]);
+  }, [form.state]);
 
   const handleQuickOptionsChange = useCallback(
     (newOptions: string[]) => {
@@ -122,62 +126,72 @@ export const SpotTradeForm = () => {
       }}
       sharedContent={
         <div tw="flex flex-1 flex-col gap-0.75">
-          <SpotFormInput
-            ref={inputRef}
-            value={form.state.size}
-            disabled={form.isPending}
-            onInput={({ formattedValue }: { formattedValue: string }) =>
-              form.actions.setSize(formattedValue)
-            }
-            balances={{
-              sol: form.inputData.userSolBalance ?? 0,
-              token: form.inputData.userTokenBalance ?? 0,
-              usd:
-                mapIfPresent(
-                  form.inputData.userSolBalance,
-                  form.inputData.solPriceUsd,
-                  (solBalance, solPrice) => solBalance * solPrice
-                ) ?? 0,
-            }}
-            inputType={
-              form.state.side === SpotSide.BUY ? form.state.buyInputType : form.state.sellInputType
-            }
-            onInputTypeChange={form.handleInputTypeChange}
-            side={form.state.side}
-            tokenAmount={form.summary.amounts?.token ?? 0}
-            tokenSymbol={tokenMetadata?.symbol ?? ''}
-          />
-          <QuickButtons
-            options={quickOptions}
-            onSelect={(val) => form.actions.setSize(val)}
-            onOptionsEdit={handleQuickOptionsChange}
-            currentValue={form.state.size}
-            disabled={form.isPending}
-            validation={validationConfig}
-            {...currencyIndicator}
-          />
-          {form.primaryAlert != null &&
-            (form.primaryAlert.resources.text?.stringKey != null ||
-              form.primaryAlert.resources.text?.fallback != null) && (
-              <ValidationAlertMessage error={form.primaryAlert} />
-            )}
-          <Button
-            tw="mt-auto"
-            action={form.state.side === SpotSide.BUY ? ButtonAction.Create : ButtonAction.Destroy}
-            onClick={form.submitTransaction}
-            disabled={!form.canSubmit}
-            state={
-              form.isPending
-                ? ButtonState.Loading
-                : !form.canSubmit
-                  ? ButtonState.Disabled
-                  : ButtonState.Default
-            }
-          >
-            {form.state.side === SpotSide.BUY
-              ? stringGetter({ key: STRING_KEYS.BUY })
-              : stringGetter({ key: STRING_KEYS.SELL })}
-          </Button>
+          {!form.inputData.isReady ? (
+            <LoadingSpace />
+          ) : (
+            <>
+              <SpotFormInput
+                ref={inputRef}
+                value={form.state.size}
+                disabled={form.isPending}
+                onInput={({ formattedValue }: { formattedValue: string }) =>
+                  form.actions.setSize(formattedValue)
+                }
+                balances={{
+                  sol: form.inputData.userSolBalance ?? 0,
+                  token: form.inputData.userTokenBalance ?? 0,
+                  usd:
+                    mapIfPresent(
+                      form.inputData.userSolBalance,
+                      form.inputData.solPriceUsd,
+                      (solBalance, solPrice) => solBalance * solPrice
+                    ) ?? 0,
+                }}
+                inputType={
+                  form.state.side === SpotSide.BUY
+                    ? form.state.buyInputType
+                    : form.state.sellInputType
+                }
+                onInputTypeChange={form.handleInputTypeChange}
+                side={form.state.side}
+                tokenAmount={form.summary.amounts?.token ?? 0}
+                tokenSymbol={tokenMetadata?.symbol ?? ''}
+              />
+              <QuickButtons
+                options={quickOptions}
+                onSelect={(val) => form.actions.setSize(val)}
+                onOptionsEdit={handleQuickOptionsChange}
+                currentValue={form.state.size}
+                disabled={form.isPending}
+                validation={validationConfig}
+                {...currencyIndicator}
+              />
+              {form.primaryAlert != null &&
+                (form.primaryAlert.resources.text?.stringKey != null ||
+                  form.primaryAlert.resources.text?.fallback != null) && (
+                  <ValidationAlertMessage error={form.primaryAlert} />
+                )}
+              <Button
+                tw="mt-auto"
+                action={
+                  form.state.side === SpotSide.BUY ? ButtonAction.Create : ButtonAction.Destroy
+                }
+                onClick={form.submitTransaction}
+                disabled={!form.canSubmit}
+                state={
+                  form.isPending
+                    ? ButtonState.Loading
+                    : !form.canSubmit
+                      ? ButtonState.Disabled
+                      : ButtonState.Default
+                }
+              >
+                {form.state.side === SpotSide.BUY
+                  ? stringGetter({ key: STRING_KEYS.BUY })
+                  : stringGetter({ key: STRING_KEYS.SELL })}
+              </Button>
+            </>
+          )}
         </div>
       }
       items={[

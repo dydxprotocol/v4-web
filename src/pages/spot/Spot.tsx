@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
+import { SPOT_DUST_USD_THRESHOLD } from '@/constants/spot';
 
 import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
 import { useSpotTokenSearch } from '@/hooks/useSpotTokenSearch';
@@ -24,7 +25,6 @@ import { spotFormActions } from '@/state/spotForm';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
-import { isPresent } from '@/lib/typeUtils';
 
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
@@ -50,11 +50,11 @@ const SpotPage = () => {
   const portfolioTrades = useAppSelector(BonsaiCore.spot.portfolioTrades.data);
 
   const isTokenMetadataLoading =
-    useAppSelector(BonsaiCore.spot.tokenMetadata.loading) === 'pending';
+    useAppSelector(BonsaiCore.spot.tokenMetadata.loading) !== 'success';
   const isWalletPositionsLoading =
-    useAppSelector(BonsaiCore.spot.walletPositions.loading) === 'pending';
+    useAppSelector(BonsaiCore.spot.walletPositions.loading) !== 'success';
   const isPortfolioTradesLoading =
-    useAppSelector(BonsaiCore.spot.portfolioTrades.loading) === 'pending';
+    useAppSelector(BonsaiCore.spot.portfolioTrades.loading) !== 'success';
 
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,22 +69,22 @@ const SpotPage = () => {
     const res: SpotPositionItem[] = tokenBalances
       .map((tokenBalance) => {
         const position = positionsByMint[tokenBalance.mint];
-        if (!position) return null;
+
         return {
-          tokenAddress: position.tokenMint,
-          tokenName: position.tokenData.tokenNameFull,
-          tokenSymbol: position.tokenData.symbol,
-          tokenImage: position.tokenData.image,
           holdingsAmount: tokenBalance.amount,
           holdingsUsd: tokenBalance.usdValue,
-          boughtAmount: position.totalBought,
-          boughtUsd: position.totalBoughtUsd,
-          soldAmount: position.totalSold,
-          soldUsd: position.totalSoldUsd,
-          pnlUsd: position.unrealizedPnL,
+          tokenAddress: tokenBalance.mint,
+          tokenName: position?.tokenData.tokenNameFull ?? 'Unknown',
+          tokenSymbol: position?.tokenData.symbol ?? 'Unknown',
+          tokenImage: position?.tokenData.image,
+          boughtAmount: position?.totalBought,
+          boughtUsd: position?.totalBoughtUsd,
+          soldAmount: position?.totalSold,
+          soldUsd: position?.totalSoldUsd,
+          pnlUsd: position?.unrealizedPnL,
         };
       })
-      .filter(isPresent);
+      .filter((holding) => holding.holdingsUsd >= SPOT_DUST_USD_THRESHOLD);
 
     return res;
   }, [tokenBalances, walletPositions]);

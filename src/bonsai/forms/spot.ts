@@ -70,6 +70,9 @@ export interface SpotFormInputData {
   pairAddress: string | undefined;
   tradeRoute: SpotApiTradeRoute | undefined;
   solanaAddress: string | undefined;
+  isReady: boolean;
+  isAsyncDataReady: boolean;
+  isRestReady: boolean;
 }
 
 export interface SpotAmounts {
@@ -195,13 +198,15 @@ export function getErrors(
   }
 
   if (
+    inputData.userSolBalance == null ||
     inputData.tokenPriceUsd == null ||
     inputData.solPriceUsd == null ||
     inputData.tokenMint == null ||
     inputData.pairAddress == null ||
     inputData.tradeRoute == null ||
     inputData.solanaAddress == null ||
-    inputData.decimals == null
+    inputData.decimals == null ||
+    !inputData.isAsyncDataReady
   ) {
     validationErrors.push(
       simpleValidationError({
@@ -218,7 +223,7 @@ export function getErrors(
     const requiredSol = summary.amounts?.sol;
     const availableSol = inputData.userSolBalance;
 
-    if (requiredSol != null && availableSol != null && requiredSol > availableSol) {
+    if (requiredSol != null && requiredSol > availableSol) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_INSUFFICIENT_SOL',
@@ -230,7 +235,7 @@ export function getErrors(
       );
     }
 
-    if (availableSol != null && availableSol < 0.01) {
+    if (availableSol < 0.01) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_LOW_SOL_FOR_FEES',
