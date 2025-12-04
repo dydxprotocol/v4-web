@@ -61,6 +61,7 @@ export const CopyButton = ({
     </Button>
   );
 };
+
 const $InlineRow = styled.div<{ copied: boolean }>`
   ${layoutMixins.inlineRow}
   cursor: pointer;

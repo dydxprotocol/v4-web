@@ -10,17 +10,18 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { SpotHeaderToken } from './types';
 
 type SpotMarketStatsRowProps = {
-  stats: SpotHeaderToken;
+  stats?: SpotHeaderToken | null;
+  isLoading?: boolean;
 };
 
 // TODO: spot localization
 
-export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
+export const SpotMarketStatsRow = ({ stats, isLoading = false }: SpotMarketStatsRowProps) => {
   const items: DetailsItem[] = [
     {
       key: 'market-cap',
       label: 'Market Cap',
-      value: <Output type={OutputType.CompactFiat} value={stats.marketCapUsd} />,
+      value: <Output type={OutputType.CompactFiat} value={stats?.marketCapUsd} />,
     },
     {
       key: 'price',
@@ -28,7 +29,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
       value: (
         <Output
           type={OutputType.SmallFiat}
-          value={stats.priceUsd}
+          value={stats?.priceUsd}
           minimumFractionDigits={SMALL_USD_DECIMALS}
         />
       ),
@@ -36,20 +37,20 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     {
       key: 'fdv',
       label: 'FDV',
-      value: <Output type={OutputType.CompactFiat} value={stats.fdvUsd} />,
+      value: <Output type={OutputType.CompactFiat} value={stats?.fdvUsd} />,
     },
     {
       key: 'liquidity',
       label: 'Liquidity',
-      value: <Output type={OutputType.CompactFiat} value={stats.liquidityUsd} />,
+      value: <Output type={OutputType.CompactFiat} value={stats?.liquidityUsd} />,
     },
     {
       key: 'supply',
       label: 'Circulating/Total Supply',
       value: (
         <span tw="row">
-          <Output type={OutputType.CompactNumber} value={stats.circulatingSupply} />/
-          <Output type={OutputType.CompactNumber} value={stats.totalSupply} />
+          <Output type={OutputType.CompactNumber} value={stats?.circulatingSupply} />/
+          <Output type={OutputType.CompactNumber} value={stats?.totalSupply} />
         </span>
       ),
     },
@@ -59,7 +60,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
       value: (
         <Output
           type={OutputType.Percent}
-          value={stats.change24hPercent}
+          value={stats?.change24hPercent}
           showSign={ShowSign.Both}
           withPolarityColor
         />
@@ -68,7 +69,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     {
       key: 'volume',
       label: 'Volume 24h',
-      value: <Output type={OutputType.CompactFiat} value={stats.volume24hUsd} />,
+      value: <Output type={OutputType.CompactFiat} value={stats?.volume24hUsd} />,
     },
     {
       key: 'buys',
@@ -76,7 +77,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
       value: (
         <Output
           type={OutputType.CompactFiat}
-          value={stats.buys24hUsd}
+          value={stats?.buys24hUsd}
           withSubscript
           withPolarityColor
         />
@@ -88,7 +89,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
       value: (
         <Output
           type={OutputType.CompactFiat}
-          value={stats.sells24hUsd}
+          value={stats?.sells24hUsd}
           withSubscript
           withPolarityColor
           showSign={ShowSign.None}
@@ -97,7 +98,7 @@ export const SpotMarketStatsRow = ({ stats }: SpotMarketStatsRowProps) => {
     },
   ];
 
-  return <$Details items={items} layout="rowColumns" withSeparators />;
+  return <$Details items={items} layout="rowColumns" withSeparators isLoading={isLoading} />;
 };
 
 const $Details = styled(Details)`

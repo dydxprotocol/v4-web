@@ -15,7 +15,6 @@ import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 
@@ -43,14 +42,19 @@ const SpotPage = () => {
   const dispatch = useAppDispatch();
 
   const tradeLayout = useAppSelector(getSelectedTradeLayout);
-  const solPriceStatus = useAppSelector(BonsaiCore.spot.solPrice.loading);
-  const tokenMetadataStatus = useAppSelector(BonsaiCore.spot.tokenMetadata.loading);
-  const tokenPriceStatus = useAppSelector(BonsaiCore.spot.tokenPrice.loading);
+
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
   const tokenPrice = useAppSelector(BonsaiCore.spot.tokenPrice.data);
-  const walletPositions = useAppSelector(BonsaiCore.spot.walletPositions.positions);
   const tokenBalances = useAppSelector(BonsaiCore.spot.walletPositions.tokenBalances);
+  const walletPositions = useAppSelector(BonsaiCore.spot.walletPositions.positions);
   const portfolioTrades = useAppSelector(BonsaiCore.spot.portfolioTrades.data);
+
+  const isTokenMetadataLoading =
+    useAppSelector(BonsaiCore.spot.tokenMetadata.loading) === 'pending';
+  const isWalletPositionsLoading =
+    useAppSelector(BonsaiCore.spot.walletPositions.loading) === 'pending';
+  const isPortfolioTradesLoading =
+    useAppSelector(BonsaiCore.spot.portfolioTrades.loading) === 'pending';
 
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,23 +155,14 @@ const SpotPage = () => {
     navigate(`/spot/${token.tokenAddress}`);
   };
 
-  const isDataLoading =
-    solPriceStatus !== 'success' ||
-    tokenMetadataStatus !== 'success' ||
-    tokenPriceStatus !== 'success' ||
-    !currentTokenData;
-
-  if (isDataLoading) {
-    return <LoadingSpace id="spot-page-loading" />;
-  }
-
   return (
     <$SpotLayout tradeLayout={tradeLayout} isHorizontalOpen={isHorizontalOpen}>
       <header tw="[grid-area:Top]">
         <SpotHeader
           currentToken={currentTokenData}
-          searchResults={searchResults ?? []}
+          searchResults={searchResults}
           isSearchLoading={isSearchLoading}
+          isTokenLoading={isTokenMetadataLoading}
           onTokenSelect={handleTokenSelect}
           onSearchTextChange={handleTokenSearchChange}
         />
@@ -176,6 +171,7 @@ const SpotPage = () => {
       <$GridSection gridArea="Side">
         <SpotTradeForm />
         <SpotTokenInfo
+          isLoading={isTokenMetadataLoading}
           links={[
             { icon: IconName.Earth, url: '1' },
             { icon: IconName.File, url: '2' },
@@ -189,14 +185,14 @@ const SpotPage = () => {
               key: 'holders',
               iconName: IconName.UserGroup,
               label: 'Holders',
-              value: <Output type={OutputType.CompactNumber} value={currentTokenData.holders} />,
+              value: <$Output type={OutputType.CompactNumber} value={currentTokenData?.holders} />,
             },
             {
               key: 'top10',
               iconName: IconName.User2,
               label: 'Top 10',
               value: (
-                <Output type={OutputType.Percent} value={currentTokenData.top10HoldersPercent} />
+                <$Output type={OutputType.Percent} value={currentTokenData?.top10HoldersPercent} />
               ),
             },
             {
@@ -204,26 +200,30 @@ const SpotPage = () => {
               iconName: IconName.ChefHat,
               label: 'Dev Holding',
               value: (
-                <Output type={OutputType.Percent} value={currentTokenData.devHoldingPercent} />
+                <$Output type={OutputType.Percent} value={currentTokenData?.devHoldingPercent} />
               ),
             },
             {
               key: 'snipers',
               iconName: IconName.Scope,
               label: 'Snipers',
-              value: <Output type={OutputType.Percent} value={currentTokenData.snipersPercent} />,
+              value: <$Output type={OutputType.Percent} value={currentTokenData?.snipersPercent} />,
             },
             {
               key: 'bundlers',
               iconName: IconName.Ghost,
               label: 'Bundlers',
-              value: <Output type={OutputType.Percent} value={currentTokenData.bundlersPercent} />,
+              value: (
+                <$Output type={OutputType.Percent} value={currentTokenData?.bundlersPercent} />
+              ),
             },
             {
               key: 'insiders',
               iconName: IconName.Warning,
               label: 'Insiders',
-              value: <Output type={OutputType.Percent} value={currentTokenData.insidersPercent} />,
+              value: (
+                <$Output type={OutputType.Percent} value={currentTokenData?.insidersPercent} />
+              ),
             },
           ]}
         />
@@ -235,7 +235,9 @@ const SpotPage = () => {
 
       <$GridSection gridArea="Horizontal">
         <SpotHorizontalPanel
-          data={holdings}
+          isTradesLoading={isPortfolioTradesLoading}
+          isHoldingsLoading={isWalletPositionsLoading}
+          holdings={holdings}
           trades={trades}
           isOpen={isHorizontalOpen}
           setIsOpen={setIsHorizontalOpen}
@@ -321,4 +323,8 @@ const $SpotLayout = styled.article<{
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
   ${layoutMixins.withOuterAndInnerBorders}
+`;
+
+const $Output = styled(Output)`
+  line-height: 1;
 `;
