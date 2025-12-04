@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 
-import { ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
 
 import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
@@ -29,6 +29,7 @@ type SpotTokenInfoProps = {
   contractAddress: string;
   createdAt: number | string | Date;
   className?: string;
+  isLoading?: boolean;
 };
 
 // TODO: spot localization
@@ -39,6 +40,7 @@ export const SpotTokenInfo = ({
   contractAddress,
   createdAt,
   className,
+  isLoading = false,
 }: SpotTokenInfoProps) => {
   return (
     <div className={className} tw="flexColumn gap-1 p-1">
@@ -53,12 +55,14 @@ export const SpotTokenInfo = ({
               buttonStyle={ButtonStyle.WithoutBackground}
               iconName={l.icon}
               iconSize="1.125rem"
+              disabled={isLoading}
             />
           ))}
         </div>
       </div>
 
       <InfoGrid
+        isLoading={isLoading}
         items={items.map((item) => ({
           key: item.key,
           label: (
@@ -74,15 +78,22 @@ export const SpotTokenInfo = ({
       <div tw="spacedRow">
         <CopyButton
           value={contractAddress}
-          buttonStyle={ButtonStyle.WithoutBackground}
+          buttonStyle={ButtonStyle.Default}
+          shape={ButtonShape.Pill}
+          action={ButtonAction.Secondary}
+          copyIconPosition="end"
           size={ButtonSize.XXSmall}
-          buttonType="text"
+          buttonType="default"
         >
-          <span tw="font-base-medium">{truncateAddress(contractAddress, '')}</span>
+          <span tw="font-mini-medium">{truncateAddress(contractAddress, '')}</span>
         </CopyButton>
         <div tw="row items-center gap-0.25 font-mini-book">
           <Icon iconName={IconName.Clock} />
-          <Output type={OutputType.RelativeTime} value={new Date(createdAt).getTime()} />
+          <Output
+            type={OutputType.RelativeTime}
+            value={new Date(createdAt).getTime()}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </div>

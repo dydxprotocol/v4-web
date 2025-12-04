@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import {
   SpotHoldingsTable,
@@ -12,8 +13,10 @@ import {
 import { SpotTradesTable, type SpotTradeItem } from './SpotTradesTable';
 
 type SpotHorizontalPanelProps = {
-  data: SpotPositionItem[];
+  holdings?: SpotPositionItem[];
   trades?: SpotTradeItem[];
+  isHoldingsLoading?: boolean;
+  isTradesLoading?: boolean;
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
   onRowAction?: SpotHoldingsTableProps['onRowAction'];
@@ -28,8 +31,10 @@ enum PanelTabs {
 }
 
 export const SpotHorizontalPanel = ({
-  data,
+  holdings = [],
   trades = [],
+  isHoldingsLoading = false,
+  isTradesLoading = false,
   isOpen = true,
   setIsOpen,
   onRowAction,
@@ -42,17 +47,23 @@ export const SpotHorizontalPanel = ({
       {
         value: PanelTabs.Holdings,
         label: 'Holdings',
-        content: (
-          <SpotHoldingsTable data={data} onRowAction={onRowAction} onSellAction={onSellAction} />
+        content: isHoldingsLoading ? (
+          <LoadingSpace />
+        ) : (
+          <SpotHoldingsTable
+            data={holdings}
+            onRowAction={onRowAction}
+            onSellAction={onSellAction}
+          />
         ),
       },
       {
         value: PanelTabs.Trades,
         label: 'Trades',
-        content: <SpotTradesTable data={trades} />,
+        content: isTradesLoading ? <LoadingSpace /> : <SpotTradesTable data={trades} />,
       },
     ],
-    [data, trades, onRowAction, onSellAction]
+    [isHoldingsLoading, holdings, onRowAction, onSellAction, isTradesLoading, trades]
   );
 
   return (

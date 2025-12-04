@@ -4,6 +4,7 @@ import { LoadingDots, LoadingDotsProps } from '@/components/Loading/LoadingDots'
 import { LoadingOutput } from '@/components/Loading/LoadingOutput';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
+import { LoadingAssetIcon } from './LoadingAssetIcon';
 import { StoryWrapper } from '.ladle/components';
 
 export const Dots: Story<LoadingDotsProps> = (args) => {
@@ -37,3 +38,13 @@ export const Output: Story = (args) => {
 };
 
 Output.args = {};
+
+export const AssetIcon: Story = (args) => {
+  return (
+    <StoryWrapper>
+      <LoadingAssetIcon {...args} />
+    </StoryWrapper>
+  );
+};
+
+AssetIcon.args = {};

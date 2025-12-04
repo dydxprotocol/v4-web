@@ -10,6 +10,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { DropdownIcon } from '@/components/DropdownIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
@@ -27,9 +28,10 @@ import { truncateAddress } from '@/lib/wallet';
 import { SpotHeaderToken } from './types';
 
 type SpotMarketsDropdownProps = {
-  current: SpotHeaderToken;
-  searchResults: SpotHeaderToken[];
+  current?: SpotHeaderToken | null;
+  searchResults?: SpotHeaderToken[];
   isSearchLoading?: boolean;
+  isTokenLoading?: boolean;
   onSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
   className?: string;
@@ -39,8 +41,9 @@ type SpotMarketsDropdownProps = {
 
 export const SpotMarketsDropdown = ({
   current,
-  searchResults,
+  searchResults = [],
   isSearchLoading,
+  isTokenLoading,
   onSelect,
   onSearchTextChange,
   className,
@@ -120,16 +123,20 @@ export const SpotMarketsDropdown = ({
         <$TriggerContainer $isOpen={isOpen}>
           <div tw="flex items-center gap-0.25">
             <$AssetIconWithStar>
-              {favoritedSet.has(current.tokenAddress) && (
+              {current?.tokenAddress && favoritedSet.has(current.tokenAddress) && (
                 <$FavoriteStatus iconName={IconName.Star} />
               )}
               <$AssetIcon
-                logoUrl={current.logoUrl ?? undefined}
-                symbol={current.symbol}
-                tw="mr-0.25"
+                logoUrl={current?.logoUrl}
+                symbol={current?.symbol}
+                isLoading={isTokenLoading}
               />
             </$AssetIconWithStar>
-            <h2 tw="text-color-text-2 font-medium-medium">{current.symbol}</h2>
+            {isTokenLoading ? (
+              <LoadingDots size={5} />
+            ) : (
+              <h2 tw="text-color-text-2 font-medium-medium">{current?.symbol}</h2>
+            )}
           </div>
           <p tw="row gap-0.5 text-color-text-0 font-small-book">
             <DropdownIcon isOpen={isOpen} />

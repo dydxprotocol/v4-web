@@ -9,9 +9,10 @@ import { SpotMarketsDropdown } from './SpotMarketsDropdown';
 import { SpotHeaderToken } from './types';
 
 export type SpotHeaderProps = {
-  currentToken: SpotHeaderToken;
-  searchResults: SpotHeaderToken[];
+  currentToken?: SpotHeaderToken | null;
+  searchResults?: SpotHeaderToken[];
   isSearchLoading?: boolean;
+  isTokenLoading?: boolean;
   onTokenSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
   className?: string;
@@ -19,8 +20,9 @@ export type SpotHeaderProps = {
 
 export const SpotHeader = ({
   currentToken,
-  searchResults,
+  searchResults = [],
   isSearchLoading,
+  isTokenLoading,
   onTokenSelect,
   onSearchTextChange,
   className,
@@ -33,9 +35,10 @@ export const SpotHeader = ({
         isSearchLoading={isSearchLoading}
         onSelect={onTokenSelect}
         onSearchTextChange={onSearchTextChange}
+        isTokenLoading={isTokenLoading}
       />
       <VerticalSeparator fullHeight />
-      <SpotMarketStatsRow stats={currentToken} />
+      <SpotMarketStatsRow stats={currentToken} isLoading={isTokenLoading} />
     </$Container>
   );
 };
