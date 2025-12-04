@@ -3,6 +3,7 @@ import { BonsaiCore, BonsaiForms } from '@/bonsai/ontology';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import { SpotApiTradeRoute } from '@/clients/spotApi';
+import { isPresent } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
 import { getUserSolanaWalletAddress } from './accountInfoSelectors';
@@ -17,6 +18,10 @@ export const getSpotFormInputData = createAppSelector(
     BonsaiCore.spot.tokenMetadata.data,
     BonsaiCore.spot.tokenPrice.data,
     BonsaiCore.spot.walletPositions.data,
+    BonsaiCore.spot.solPrice.loading,
+    BonsaiCore.spot.tokenMetadata.loading,
+    BonsaiCore.spot.tokenPrice.loading,
+    BonsaiCore.spot.walletPositions.loading,
     getCurrentSpotToken,
     getUserSolanaWalletAddress,
   ],
@@ -25,22 +30,45 @@ export const getSpotFormInputData = createAppSelector(
     tokenMetadata,
     tokenPriceUsd,
     walletPositions,
+    solPriceStatus,
+    tokenMetadataStatus,
+    tokenPriceStatus,
+    walletPositionsStatus,
     tokenMint,
     solanaAddress
-  ): SpotFormInputData => ({
-    tokenPriceUsd,
-    solPriceUsd,
-    userSolBalance: walletPositions?.solBalance
+  ): SpotFormInputData => {
+    const userSolBalance = isPresent(walletPositions?.solBalance)
       ? walletPositions.solBalance / LAMPORTS_PER_SOL
-      : undefined,
-    userTokenBalance: walletPositions?.tokenBalances.find((position) => position.mint === tokenMint)
-      ?.amount,
-    tokenMint: tokenMetadata?.tokenMint,
-    decimals: tokenMetadata?.decimals,
-    pairAddress: tokenMetadata?.pairAddress,
-    tradeRoute: tokenMetadata?.tradeRoute as SpotApiTradeRoute | undefined,
-    solanaAddress,
-  })
+      : undefined;
+
+    const userTokenBalance = walletPositions?.tokenBalances.find(
+      (position) => position.mint === tokenMint
+    )?.amount;
+
+    const isAsyncDataReady = [
+      solPriceStatus,
+      tokenMetadataStatus,
+      tokenPriceStatus,
+      walletPositionsStatus,
+    ].every((status) => status === 'success');
+
+    const isRestReady = isPresent(tokenMint) && isPresent(solanaAddress);
+
+    return {
+      tokenPriceUsd,
+      solPriceUsd,
+      userSolBalance,
+      userTokenBalance,
+      tokenMint: tokenMetadata?.tokenMint,
+      decimals: tokenMetadata?.decimals,
+      pairAddress: tokenMetadata?.pairAddress,
+      tradeRoute: tokenMetadata?.tradeRoute as SpotApiTradeRoute | undefined,
+      solanaAddress,
+      isReady: isRestReady && isAsyncDataReady,
+      isAsyncDataReady,
+      isRestReady,
+    };
+  }
 );
 
 export const getSpotFormSummary = createAppSelector(

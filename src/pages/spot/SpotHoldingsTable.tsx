@@ -77,10 +77,12 @@ const getColumnDef = ({
         renderCell: ({ holdingsUsd, holdingsAmount, tokenName }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={holdingsUsd} />
-            <span tw="inlineRow">
-              <Output type={OutputType.CompactNumber} value={holdingsAmount} />
-              {tokenName}
-            </span>
+            {holdingsAmount != null && (
+              <span tw="inlineRow">
+                <Output type={OutputType.CompactNumber} value={holdingsAmount} />
+                {tokenName}
+              </span>
+            )}
           </TableCell>
         ),
       },
@@ -91,10 +93,12 @@ const getColumnDef = ({
         renderCell: ({ boughtUsd, boughtAmount, tokenName }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={boughtUsd} />
-            <span tw="inlineRow">
-              <Output type={OutputType.CompactNumber} value={boughtAmount} />
-              {tokenName}
-            </span>
+            {boughtAmount != null && (
+              <span tw="inlineRow">
+                <Output type={OutputType.CompactNumber} value={boughtAmount} />
+                {tokenName}
+              </span>
+            )}
           </TableCell>
         ),
       },
@@ -105,10 +109,12 @@ const getColumnDef = ({
         renderCell: ({ soldUsd, soldAmount, tokenName }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={soldUsd} />
-            <span tw="inlineRow">
-              <Output type={OutputType.CompactNumber} value={soldAmount} />
-              {tokenName}
-            </span>
+            {soldAmount != null && (
+              <span tw="inlineRow">
+                <Output type={OutputType.CompactNumber} value={soldAmount} />
+                {tokenName}
+              </span>
+            )}
           </TableCell>
         ),
       },
