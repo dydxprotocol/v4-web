@@ -29,12 +29,16 @@ jobs:
         node-version: 18
         cache: pnpm
 
-    - run: |
+    - name: Run contracts tests
+      run: |
         pnpm install --ignore-scripts --frozen-lockfile
         pnpm run build:ts-sdk
         pnpm --filter starboard/contracts build
         pnpm --filter starboard/contracts gen:types
         pnpm --filter starboard/contracts test
+
+    - name: Postinstall script
+      run: |
         tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
 
     - run: pnpm exec vitest run
