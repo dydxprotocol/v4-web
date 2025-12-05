@@ -117,9 +117,13 @@ function getUTCBlockTime(block: Block): number {
   return DateTime.fromTai64(block.header.time.toString()).toUnixSeconds();
 }
 
+function generateId(receipt: Receipt<{ receipt: { rb: true; data: true } }>, block: Block): string {
+  return `${block.header.height}-${receipt.transactionIndex}-${receipt.index}`;
+}
+
 async function handlePriceUpdate(
   receipt: Receipt<{ receipt: { rb: true; data: true } }>,
-  _block: Block,
+  block: Block,
   ctx: any
 ) {
   const logs = priceOracleInterface.decodeLog(receipt.data!, receipt.rb!.toString());
@@ -134,7 +138,7 @@ async function handlePriceUpdate(
   const timestampNs = BigInt(value.timestamp_ns.toString());
   const timestampSec = Number(timestampNs / 1_000_000_000n);
   const price: Price = new Price({
-    id: receipt.id,
+    id: generateId(receipt, block),
     asset,
     price: BigInt(priceValue.toString()),
     timestamp: timestampSec,
@@ -166,7 +170,7 @@ async function handleAddLiquidity(
   const stable = stableDetla - fee;
   const lpAmount = lpAmountDelta;
   const liquidity: Liquidity = new Liquidity({
-    id: receipt.id,
+    id: generateId(receipt, block),
     provider,
     stable,
     lpAmount,
@@ -221,7 +225,7 @@ async function handleRemoveLiquidity(
   const stable = stableDetla + fee;
   const lpAmount = lpAmountDelta;
   const liquidity: Liquidity = new Liquidity({
-    id: receipt.id,
+    id: generateId(receipt, block),
     provider,
     stable: -stable,
     lpAmount: -lpAmount,
@@ -300,7 +304,7 @@ async function handleIncreasePosition(
   size += sizeDelta;
   realizedFundingRate += fundingRate;
   const position: Position = new Position({
-    id: receipt.id,
+    id: generateId(receipt, block),
     positionKey,
     collateralAmount: collateral,
     size,
@@ -398,7 +402,7 @@ async function handleDecreasePosition(
   }
 
   const position: Position = new Position({
-    id: receipt.id,
+    id: generateId(receipt, block),
     positionKey,
     collateralAmount: collateral,
     size,
@@ -498,7 +502,7 @@ async function handleLiquidatePosition(
   // must be: currentPosition.collateralAmount == collateralDelta
   // must be: currentPosition.size == sizeDelta
   const position: Position = new Position({
-    id: receipt.id,
+    id: generateId(receipt, block),
     positionKey,
     collateralAmount: BigInt(0),
     size: BigInt(0),
