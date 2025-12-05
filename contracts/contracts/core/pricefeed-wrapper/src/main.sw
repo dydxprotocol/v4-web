@@ -6,7 +6,11 @@ use std::u128::U128;
 use std::block::timestamp;
 use core_interfaces::pricefeed_wrapper::{Error, PricefeedWrapper};
 pub const MAX_PRICE_STALENESS: u64 = 120_000_000_000; // 120 seconds in nanoseconds
-pub const TAI64_TO_UNIX_OFFSET: u64 = 4611686018427387941; // TAI64 epoch offset to Unix epoch
+// TAI64 epoch offset to Unix epoch
+// This is 4611686018427387941 = 2^62 + 37 leap seconds
+// This is valid for the year 2025, may change in 2026 and beyond
+// The change is not an issue because MAX_PRICE_STALENESS is 120 seconds
+pub const TAI64_TO_UNIX_OFFSET: u64 = 4611686018427387941;
 configurable {
     STORK_CONTRACT: ContractId = ContractId::zero(),
 }
@@ -17,7 +21,7 @@ impl PricefeedWrapper for Contract {
         require(
             // magic constant: TAI64 to UTC, 10^9 for nanoseconds
             // the constant may slightly change in years
-            price.timestamp_ns + MAX_PRICE_STALENESS >= (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64,
+            price.timestamp_ns + MAX_PRICE_STALENESS >= (timestamp() - TAI64_TO_UNIX_OFFSET) * 1_000_000_000u64,
             Error::PricefeedWrapperStaledPrice,
         );
         // the code below calculates

@@ -1468,7 +1468,6 @@ fn _liquidate_position(
         available_collateral = available_collateral - position_fee;
     }
 
-    // TODO should we handle somehow the funding rate and pnl?
     if position_fee > 0 {
         let new_fee_reserve = _get_fee_reserve() + position_fee;
         _write_fee_reserve(new_fee_reserve);

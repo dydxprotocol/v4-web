@@ -25,7 +25,7 @@ export function getArgs(requiredArgs: string[]): Record<string, string | boolean
         {} as Record<string, string | boolean>,
     )
     requiredArgs.forEach((arg) => {
-        if (!argsObject[arg]) {
+        if (!(arg in argsObject)) {
             throw new Error(`Required argument ${arg} not provided`)
         }
     })

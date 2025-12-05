@@ -38,7 +38,7 @@ impl StorkMock for Contract {
         };
         // magic constant: TAI64 to UTC, 10^9 for nanoseconds
         // the constant may slightly change in years
-        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64;
+        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1_000_000_000u64;
         let price = TemporalNumericValue {
             timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
@@ -66,7 +66,7 @@ impl StorkMock for Contract {
         };
         // magic constant: TAI64 to UTC, 10^9 for nanoseconds
         // the constant may slightly change in years
-        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1000000000u64;
+        let timestamp_ns = (timestamp() - TAI64_TO_UNIX_OFFSET) * 1_000_000_000u64;
         let price = TemporalNumericValue {
             timestamp_ns: timestamp_ns,
             quantized_value: price_value_i128,
