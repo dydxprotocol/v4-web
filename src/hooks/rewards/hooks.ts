@@ -11,6 +11,7 @@ import { mapIfPresent } from '@/lib/do';
 import { useQueryChaosLabsIncentives } from '../useQueryChaosLabsIncentives';
 import {
   CURRENT_SURGE_REWARDS_DETAILS,
+  feesToEstimatedDollarRewards,
   pointsToEstimatedDollarRewards,
   pointsToEstimatedDydxRewards,
 } from './util';
@@ -182,3 +183,73 @@ export type ChaosLabsCompetitionItem = {
   dollarReward: number;
   pnl: number;
 };
+
+export function useChaosLabsFeeLeaderboard({
+  address,
+  dydxPrice,
+}: {
+  address?: string;
+  dydxPrice: number | undefined;
+}) {
+  return useQuery({
+    queryKey: ['chaoslabs/fee-leaderboard', address],
+    queryFn: wrapAndLogError(
+      () => getChaosLabsFeeLeaderboard({ address, dydxPrice }),
+      'LaunchIncentives/fetchFeeLeaderboard',
+      true
+    ),
+  });
+}
+
+export type ChaosLabsFeeLeaderboardItem = {
+  address: string;
+  total_fees: number;
+  rank: number;
+  estimatedDollarRewards: number;
+  estimatedDydxRewards: number;
+};
+
+type ChaosLabsFeeLeaderboardResponse = {
+  success: boolean;
+  addressEntry?: ChaosLabsFeeLeaderboardItem;
+  data: ChaosLabsFeeLeaderboardItem[];
+  pagination?: {
+    total: number;
+    totalPages: number;
+    page: number;
+    perPage: number;
+  };
+};
+
+const addRewardsToLeaderboardEntry = (
+  entry: ChaosLabsFeeLeaderboardItem,
+  dydxPrice: number | undefined
+) => {
+  const dollarRewards = feesToEstimatedDollarRewards(entry.total_fees);
+  const dydxRewards = dydxPrice ? dollarRewards / dydxPrice : 0;
+  return {
+    ...entry,
+    estimatedDollarRewards: dollarRewards,
+    estimatedDydxRewards: dydxRewards,
+  };
+};
+
+async function getChaosLabsFeeLeaderboard({
+  address,
+  dydxPrice,
+}: {
+  address?: string;
+  dydxPrice: number | undefined;
+}) {
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-fee-leaderboard?perPage=1000${address ? `&address=${address}` : ''}`
+  );
+
+  const data = (await res.json()) as ChaosLabsFeeLeaderboardResponse;
+  return {
+    leaderboard: data.data.map((entry) => addRewardsToLeaderboardEntry(entry, dydxPrice)),
+    addressEntry: data.addressEntry
+      ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
+      : undefined,
+  };
+}
