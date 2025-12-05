@@ -10,11 +10,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { SkipClient, useSkipClient } from '../transfers/skipClient';
 import { TokenConfigsResult, useTokenConfigs } from '../useTokenConfigs';
 
-const SWAP_VENUES = [
-  { chainId: 'osmosis-1', name: 'osmosis-poolmanager' },
-  { chainId: 'neutron-1', name: 'neutron-duality' },
-  { chainId: 'neutron-1', name: 'neutron-astroport' },
-];
+const SWAP_VENUES = [{ chainId: 'osmosis-1', name: 'osmosis-poolmanager' }];
 
 // Swaps are from dydxchain DYDX <-> dydxchain USDC
 async function getSkipSwapRoute(
@@ -38,8 +34,13 @@ async function getSkipSwapRoute(
     sourceAssetChainId: chainId,
     destAssetDenom: outputTokenDenom,
     destAssetChainId: chainId,
-    smartRelay: true,
     swapVenues: SWAP_VENUES,
+    smartSwapOptions: {
+      splitRoutes: true,
+    },
+    smartRelay: true,
+    allowUnsafe: false,
+    goFast: true,
     ...(mode === 'exact-in'
       ? { amountIn: parseUnits(amount, inputTokenDecimals).toString() }
       : { amountOut: parseUnits(amount, outputTokenDecimals).toString() }),
