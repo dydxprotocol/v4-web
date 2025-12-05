@@ -43,7 +43,8 @@ import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
+  const { documentation, community, mintscanBase, exchangeStats, fundingComparison } =
+    useURLConfigs();
   const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { dydxAccounts } = useAccounts();
@@ -125,6 +126,12 @@ export const HeaderDesktop = () => {
               slotBefore: <Icon iconName={IconName.Mintscan} />,
               label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
               href: mintscanBase,
+            },
+            {
+              value: 'FUNDING_COMPARISON',
+              slotBefore: <Icon iconName={IconName.FundingChart} />,
+              label: stringGetter({ key: STRING_KEYS.FUNDING_COMPARISON }),
+              href: fundingComparison,
             },
             {
               value: 'COMMUNITY',
