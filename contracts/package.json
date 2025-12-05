@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "main": "node.js",
     "license": "Apache-2.0",
+    "engines": {
+        "node": ">=22.0.0"
+    },
     "scripts": {
         "clean": "forc clean",
         "build:vault-expose-1": "ts-node -e 'require(\"fs\").cpSync(\"contracts/core/vault/src/\", \"contracts/vault-expose/src/\", {recursive: true});'",

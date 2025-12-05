@@ -3,6 +3,9 @@
   "version": "1.3.17",
   "description": "General client library for the new dYdX system (v4 decentralized)",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "module": "./build/src/index.js",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",

@@ -5,11 +5,10 @@
   "type": "module",
   "license": "AGPL-3.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22.0.0"
   },
   "packageManager": "pnpm@8.6.6",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "dev": "cp ./template.html ./index.html && vite",
     "dev:mainnet": "VITE_NETWORK_MODE=MAINNET pnpm run dev",
     "dev:all": "make -C docker start && pnpm run dev",
@@ -54,7 +53,6 @@
     "wdio": "wdio run ./wdio.conf.ts",
     "validate-mermaid": "node scripts/validate-mermaid-remark.js"
   },
-  "packageManager": "pnpm@8.6.6",
   "dependencies": {
     "@cosmjs/amino": "^0.32.1",
     "@cosmjs/crypto": "^0.32.1",
