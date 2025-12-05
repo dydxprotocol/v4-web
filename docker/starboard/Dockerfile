@@ -39,7 +39,7 @@ COPY ts-sdk/package.json ./ts-sdk/
 # Copy files needed by preinstall and postinstall scripts
 COPY scripts ./scripts
 COPY tradingview ./tradingview
-COPY apps/indexer/.env.example ./apps/indexer/c
+COPY apps/indexer/.env.example ./apps/indexer/.env.example
 RUN mkdir -p public
 
 # Install dependencies (cached if package files haven't changed)
