@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { Duration } from 'luxon';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -11,7 +12,7 @@ import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
+import { useChaosLabsFeeLeaderboard, useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -32,7 +33,7 @@ import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
 
@@ -132,10 +133,11 @@ const September2025RewardsPanel = () => {
 const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
 
-  const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
-    dydxAddress,
-    totalUsdRewards: CURRENT_SURGE_REWARDS_DETAILS.rewardAmountUsd,
+  const { data, isLoading } = useChaosLabsFeeLeaderboard({
+    address: dydxAddress,
+    dydxPrice,
   });
 
   return (
@@ -163,7 +165,7 @@ const Sept2025RewardsPanel = () => {
             <Output
               tw="text-extra font-extra-bold"
               type={OutputType.Fiat}
-              value={incentiveRewards}
+              value={data?.addressEntry?.estimatedDollarRewards ?? 0}
               isLoading={isLoading}
             />
           </$Points>
