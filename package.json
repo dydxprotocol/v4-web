@@ -248,6 +248,8 @@
     "overrides": {
       "@injectivelabs/ts-types": "1.15.3",
       "@injectivelabs/networks": "1.15.3",
+      "@injectivelabs/utils": "1.15.3",
+      "@injectivelabs/sdk-ts": "1.15.3",
       "@react-types/shared": "3.32.0",
       "@react-types/grid": "3.3.5",
       "@react-types/table": "3.6.1",
