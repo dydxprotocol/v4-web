@@ -241,23 +241,15 @@ async function getChaosLabsFeeLeaderboard({
   address?: string;
   dydxPrice: number | undefined;
 }) {
-  try {
-    const res = await fetch(
-      `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-fee-leaderboard?perPage=1000${address ? `&address=${address}` : ''}`
-    );
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-fee-leaderboard?perPage=1000${address ? `&address=${address}` : ''}`
+  );
 
-    const data = (await res.json()) as ChaosLabsFeeLeaderboardResponse;
-    return {
-      leaderboard: data.data.map((entry) => addRewardsToLeaderboardEntry(entry, dydxPrice)),
-      addressEntry: data.addressEntry
-        ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
-        : undefined,
-    };
-  } catch (error) {
-    console.error('Failed to fetch ChaosLabs Fee Leaderboard:', error);
-    return {
-      leaderboard: [],
-      addressEntry: undefined,
-    };
-  }
+  const data = (await res.json()) as ChaosLabsFeeLeaderboardResponse;
+  return {
+    leaderboard: data.data.map((entry) => addRewardsToLeaderboardEntry(entry, dydxPrice)),
+    addressEntry: data.addressEntry
+      ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
+      : undefined,
+  };
 }

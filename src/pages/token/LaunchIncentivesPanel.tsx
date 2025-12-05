@@ -12,7 +12,7 @@ import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsFeeLeaderboard, useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
+import { useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
