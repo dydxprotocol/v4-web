@@ -1,16 +1,9 @@
 import pg from 'pg';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-import {
-  expandDecimals,
-  USER_0_ADDRESS,
-  USER_1_ADDRESS,
-  LIQUIDATOR_ADDRESS,
-  BTC_ASSET,
-  ETH_ASSET,
-} from './utils';
+import { expandDecimals, USER_0_ADDRESS, USER_1_ADDRESS, BTC_ASSET, ETH_ASSET } from './utils';
 
-const { Pool, Client } = pg;
+const { Client } = pg;
 
 describe('Verify Liquidation', () => {
   let client: pg.Client;
@@ -19,7 +12,7 @@ describe('Verify Liquidation', () => {
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '0'),
+      port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -41,10 +34,10 @@ describe('Verify Liquidation', () => {
       ['LIQUIDATE']
     );
     expect(liquidations.rows.length).toBeGreaterThan(0);
-    for (const row of liquidations.rows) {
+    liquidations.rows.forEach((row: any) => {
       expect(BigInt(row.collateral_amount)).toBe(BigInt(0));
       expect(BigInt(row.size)).toBe(BigInt(0));
-    }
+    });
   });
 
   it('should store correct liquidation for user0 BTC long position', async () => {
@@ -206,12 +199,12 @@ describe('Verify Liquidation', () => {
     );
     expect(liquidations.rows.length).toBe(3);
 
-    for (const row of liquidations.rows) {
+    liquidations.rows.forEach((row: any) => {
       // collateral_transferred should be the liquidation fee (at least 5 USDC)
       expect(BigInt(row.collateral_transferred)).toBeGreaterThanOrEqual(BigInt(expandDecimals(5)));
       // position_fee should be non-negative
       expect(BigInt(row.position_fee)).toBeGreaterThanOrEqual(0);
-    }
+    });
   });
 
   it('should store PnL and funding rate for liquidations', async () => {
@@ -221,11 +214,11 @@ describe('Verify Liquidation', () => {
     );
     expect(liquidations.rows.length).toBe(3);
 
-    for (const row of liquidations.rows) {
+    liquidations.rows.forEach((row: any) => {
       // PnL delta and funding rate should be stored (can be positive or negative)
       expect(row.pnl_delta).toBeDefined();
       expect(row.funding_rate).toBeDefined();
-    }
+    });
   });
 
   it('should store realized PnL and funding rate for liquidations', async () => {
@@ -235,11 +228,11 @@ describe('Verify Liquidation', () => {
     );
     expect(liquidations.rows.length).toBe(3);
 
-    for (const row of liquidations.rows) {
+    liquidations.rows.forEach((row: any) => {
       // Realized values should be stored
       expect(row.realized_pnl).toBeDefined();
       expect(row.realized_funding_rate).toBeDefined();
-    }
+    });
   });
 
   it('should have liquidation events marked as latest for closed positions', async () => {
@@ -248,9 +241,9 @@ describe('Verify Liquidation', () => {
     ]);
     expect(liquidations.rows.length).toBe(3);
 
-    for (const row of liquidations.rows) {
+    liquidations.rows.forEach((row: any) => {
       expect(row.latest).toBe(true);
-    }
+    });
   });
 
   it('should update total positions correctly after liquidations', async () => {
@@ -302,11 +295,11 @@ describe('Verify Liquidation', () => {
       const liquidationsResponse = await fetch(liquidationsURL);
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBeGreaterThan(0);
-      
-      for (const position of liquidationsData.data.positions) {
+
+      liquidationsData.data.positions.forEach((position: any) => {
         expect(BigInt(position.collateralAmount)).toBe(BigInt(0));
         expect(BigInt(position.size)).toBe(BigInt(0));
-      }
+      });
     });
 
     it('should store correct liquidation for user0 BTC long position', async () => {
@@ -441,7 +434,7 @@ describe('Verify Liquidation', () => {
       const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){timestamp}`);
       const liquidationsResponse = await fetch(liquidationsURL);
       const liquidationsData = await liquidationsResponse.json();
-      
+
       const timestamps = liquidationsData.data.positions.map(
         (p: { timestamp: number }) => p.timestamp
       );
@@ -466,7 +459,7 @@ describe('Verify Liquidation', () => {
       );
       const user0BtcLongKeyResponse = await fetch(user0BtcLongKeyURL);
       const user0BtcLongKeyData = await user0BtcLongKeyResponse.json();
-      
+
       if (user0BtcLongKeyData.data.positionKeys.length > 0) {
         const positionKeyId = user0BtcLongKeyData.data.positionKeys[0].id;
         const positionsURL = getGraphQLURL(
@@ -487,7 +480,9 @@ describe('Verify Liquidation', () => {
         expect(changes).toContain('LIQUIDATE');
 
         // The liquidation should be the last one with zero collateral and size
-        const liquidation = sortedPositions.find((p: { change: string }) => p.change === 'LIQUIDATE');
+        const liquidation = sortedPositions.find(
+          (p: { change: string }) => p.change === 'LIQUIDATE'
+        );
         expect(liquidation).toBeDefined();
         expect(BigInt(liquidation.collateralAmount)).toBe(BigInt(0));
         expect(BigInt(liquidation.size)).toBe(BigInt(0));
@@ -502,14 +497,14 @@ describe('Verify Liquidation', () => {
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
-      for (const position of liquidationsData.data.positions) {
+      liquidationsData.data.positions.forEach((position: any) => {
         // collateralTransferred should be the liquidation fee (at least 5 USDC)
         expect(BigInt(position.collateralTransferred)).toBeGreaterThanOrEqual(
           BigInt(expandDecimals(5))
         );
         // positionFee should be non-negative
         expect(BigInt(position.positionFee)).toBeGreaterThanOrEqual(0);
-      }
+      });
     });
 
     it('should store PnL and funding rate for liquidations', async () => {
@@ -520,11 +515,11 @@ describe('Verify Liquidation', () => {
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
-      for (const position of liquidationsData.data.positions) {
+      liquidationsData.data.positions.forEach((position: any) => {
         // PnL delta and funding rate should be stored (can be positive or negative)
         expect(position.pnlDelta).toBeDefined();
         expect(position.fundingRate).toBeDefined();
-      }
+      });
     });
 
     it('should store realized PnL and funding rate for liquidations', async () => {
@@ -535,11 +530,11 @@ describe('Verify Liquidation', () => {
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
-      for (const position of liquidationsData.data.positions) {
+      liquidationsData.data.positions.forEach((position: any) => {
         // Realized values should be stored
         expect(position.realizedPnl).toBeDefined();
         expect(position.realizedFundingRate).toBeDefined();
-      }
+      });
     });
 
     it('should have liquidation events marked as latest for closed positions', async () => {
@@ -548,9 +543,9 @@ describe('Verify Liquidation', () => {
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
-      for (const position of liquidationsData.data.positions) {
+      liquidationsData.data.positions.forEach((position: any) => {
         expect(position.latest).toBe(true);
-      }
+      });
     });
 
     it('should update total positions correctly after liquidations', async () => {

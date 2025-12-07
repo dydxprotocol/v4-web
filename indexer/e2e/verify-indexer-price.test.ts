@@ -1,9 +1,9 @@
 import pg from 'pg';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-import { getArgs, moveBlockchainTime, toPrice, BTC_ASSET, USDC_ASSET, ETH_ASSET } from './utils';
+import { toPrice, BTC_ASSET, USDC_ASSET, ETH_ASSET } from './utils';
 
-const { Pool, Client } = pg;
+const { Client } = pg;
 
 describe('Verify Prices', () => {
   describe('DB tests', () => {
@@ -13,10 +13,10 @@ describe('Verify Prices', () => {
         user: process.env.VITE_DB_USER,
         password: process.env.VITE_DB_PASS,
         host: 'localhost',
-        port: parseInt(process.env.VITE_DB_PORT ?? '0'),
+        port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
         database: process.env.VITE_DB_NAME,
       });
-  
+
       await client.connect();
     });
 
@@ -148,11 +148,11 @@ describe('Verify Prices', () => {
       const btcResponse = await fetch(btcURL);
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
-      
+
       const prices = btcData.data.prices.map((p: { price: string }) => BigInt(p.price));
-      const minPrice = prices.reduce((min: bigint, p: bigint) => p < min ? p : min, prices[0]);
-      const maxPrice = prices.reduce((max: bigint, p: bigint) => p > max ? p : max, prices[0]);
-      
+      const minPrice = prices.reduce((min: bigint, p: bigint) => (p < min ? p : min), prices[0]);
+      const maxPrice = prices.reduce((max: bigint, p: bigint) => (p > max ? p : max), prices[0]);
+
       expect(minPrice.toString()).toBe(toPrice(44700));
       expect(maxPrice.toString()).toBe(toPrice(45550));
     });
@@ -162,12 +162,12 @@ describe('Verify Prices', () => {
       const btcResponse = await fetch(btcURL);
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
-      
+
       const timestamps = btcData.data.prices.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
       const now = Math.floor(Date.now() / 1000);
-      
+
       // Timestamps should be within reasonable range from current time
       expect(minTimestamp).toBeLessThan(now + 1800);
       expect(minTimestamp).toBeGreaterThan(now - 1800);
@@ -180,11 +180,11 @@ describe('Verify Prices', () => {
       const btcResponse = await fetch(btcURL);
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
-      
+
       const timestamps = btcData.data.prices.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
-      
+
       // 205 is the sum of seconds when moving the blockchain time in the populate-events-price.ts script
       expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(205);
     });

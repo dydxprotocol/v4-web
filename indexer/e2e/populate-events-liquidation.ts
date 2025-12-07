@@ -1,6 +1,7 @@
 import { Provider, Wallet, createAssetId } from 'fuels';
-import { StorkMock, Vault, TestnetToken } from '../../contracts/types';
 
+// eslint-disable-next-line import/no-relative-packages
+import { StorkMock, Vault, TestnetToken } from '../../contracts/types';
 import {
   call,
   getArgs,

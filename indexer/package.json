@@ -7,11 +7,10 @@
     "gen:migration": "squid-typeorm-migration generate",
     "apply:migration": "squid-typeorm-migration apply",
     "start": "ts-node -r dotenv/config src/main.ts",
-    "populate:events": "ts-node e2e/populate-events.ts",
     "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
     "test:e2e": "vitest --mode indexer-e2e run",
-    "lint": "eslint --ext .ts,.tsx --ignore-pattern 'src/model/generated/**' src/",
-    "fix-lint": "eslint --fix --ext .ts,.tsx --ignore-pattern 'src/model/generated/**' src/"
+    "lint": "eslint --ext .ts,.tsx src/ e2e/",
+    "fix-lint": "eslint --fix --ext .ts,.tsx src/ e2e/"
   },
   "dependencies": {
     "@subsquid/batch-processor": "^0.0.0",

@@ -1,6 +1,7 @@
 import { Provider, Wallet, createAssetId } from 'fuels';
-import { StorkMock, Vault, TestnetToken } from '../../contracts/types';
 
+// eslint-disable-next-line import/no-relative-packages
+import { StorkMock, Vault, TestnetToken } from '../../contracts/types';
 import {
   call,
   getArgs,
@@ -123,7 +124,6 @@ async function populateEvents(taskArgs: any) {
   // Get LP token balances for removal
   const user0LpBalance = await user0Wallet.getBalance(LP_ASSET_ID);
   const user1LpBalance = await user1Wallet.getBalance(LP_ASSET_ID);
-  const user2LpBalance = await user2Wallet.getBalance(LP_ASSET_ID);
 
   // User0 removes half of their liquidity
   const user0RemoveAmount = user0LpBalance.div(2);

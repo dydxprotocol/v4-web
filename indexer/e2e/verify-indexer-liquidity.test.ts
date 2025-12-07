@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 import { expandDecimals, USER_0_ADDRESS, USER_1_ADDRESS, USER_2_ADDRESS } from './utils';
 
-const { Pool, Client } = pg;
+const { Client } = pg;
 
 describe('Verify Liquidity', () => {
   let client: pg.Client;
@@ -12,7 +12,7 @@ describe('Verify Liquidity', () => {
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '0'),
+      port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -317,7 +317,7 @@ describe('Verify Liquidity', () => {
         (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
         BigInt(0)
       );
-      
+
       // User2 added 7000 + 2000 = 9000, so latest should be around 9000 (minus fees)
       // Note: Due to fees, the exact amount might be slightly less
       expect(sumStable).toBeGreaterThan(BigInt(expandDecimals(8500))); // At least 8500 after fees
@@ -329,9 +329,8 @@ describe('Verify Liquidity', () => {
       const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
       const totalResponse = await fetch(totalURL);
       const totalData = await totalResponse.json();
-      console.log('totalData', totalData);
       expect(totalData.data.totalLiquidities.length).toBe(1);
-      
+
       const totalLiquidity = totalData.data.totalLiquidities[0];
       // Total should be user2's liquidity (9000 minus fees)
       const stableAmount = BigInt(totalLiquidity.stable);
@@ -374,7 +373,7 @@ describe('Verify Liquidity', () => {
       const totalResponse = await fetch(totalURL);
       const totalData = await totalResponse.json();
       expect(totalData.data.totalLiquidities.length).toBe(1);
-      
+
       const totalTimestamp = totalData.data.totalLiquidities[0].lastTimestamp;
       const now = Math.floor(Date.now() / 1000);
 
@@ -415,8 +414,10 @@ describe('Verify Liquidity', () => {
       );
       const user0Response = await fetch(user0URL);
       const user0Data = await user0Response.json();
-      
-      const timestamps = user0Data.data.liquidities.map((liq: { timestamp: number }) => liq.timestamp);
+
+      const timestamps = user0Data.data.liquidities.map(
+        (liq: { timestamp: number }) => liq.timestamp
+      );
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
       const now = Math.floor(Date.now() / 1000);

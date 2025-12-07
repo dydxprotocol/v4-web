@@ -1,19 +1,9 @@
 import pg from 'pg';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-import {
-  BNB_ASSET,
-  expandDecimals,
-  getArgs,
-  moveBlockchainTime,
-  toPrice,
-  BTC_ASSET,
-  USDC_ASSET,
-  ETH_ASSET,
-  USER_0_ADDRESS,
-} from './utils';
+import { BNB_ASSET, expandDecimals, BTC_ASSET, ETH_ASSET, USER_0_ADDRESS } from './utils';
 
-const { Pool, Client } = pg;
+const { Client } = pg;
 
 describe('Verify Positions', () => {
   let client: pg.Client;
@@ -22,7 +12,7 @@ describe('Verify Positions', () => {
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '0'),
+      port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -207,14 +197,16 @@ describe('Verify Positions', () => {
       const positionKeysURL = getGraphQLURL(`positionKeys{id,account,indexAssetId,isLong}`);
       const positionKeysResponse = await fetch(positionKeysURL);
       const positionKeysData = await positionKeysResponse.json();
-      
+
       // Check that there are no duplicate combinations of account, indexAssetId, and isLong
       const seen = new Set<string>();
-      for (const key of positionKeysData.data.positionKeys) {
-        const uniqueKey = `${key.account}-${key.indexAssetId}-${key.isLong}`;
-        expect(seen.has(uniqueKey)).toBe(false);
-        seen.add(uniqueKey);
-      }
+      positionKeysData.data.positionKeys.forEach(
+        (key: { account: string; indexAssetId: string; isLong: boolean }) => {
+          const uniqueKey = `${key.account}-${key.indexAssetId}-${key.isLong}`;
+          expect(seen.has(uniqueKey)).toBe(false);
+          seen.add(uniqueKey);
+        }
+      );
     });
 
     it('should be the the correct count of BNB closed positions', async () => {
@@ -237,28 +229,21 @@ describe('Verify Positions', () => {
     });
 
     it('should BNB positions have the same position key', async () => {
-      // Get all position keys for BNB
-      const bnbPositionKeysURL = getGraphQLURL(
-        `positionKeys(where:{indexAssetId_eq:"${BNB_ASSET}"}){id}`
-      );
-      const bnbPositionKeysResponse = await fetch(bnbPositionKeysURL);
-      const bnbPositionKeysData = await bnbPositionKeysResponse.json();
-      
       // Get all positions for these keys
       const allPositionsURL = getGraphQLURL(`positions{id,positionKey{id,indexAssetId}}`);
       const allPositionsResponse = await fetch(allPositionsURL);
       const allPositionsData = await allPositionsResponse.json();
-      
+
       // Filter positions for BNB
       const bnbPositions = allPositionsData.data.positions.filter(
         (p: { positionKey: { indexAssetId: string } }) => p.positionKey.indexAssetId === BNB_ASSET
       );
-      
+
       // Get unique position key IDs
       const uniquePositionKeyIds = new Set(
         bnbPositions.map((p: { positionKey: { id: string } }) => p.positionKey.id)
       );
-      
+
       expect(uniquePositionKeyIds.size).toBe(1);
     });
 
@@ -267,13 +252,16 @@ describe('Verify Positions', () => {
       const positionKeysURL = getGraphQLURL(`positionKeys{id}`);
       const positionKeysResponse = await fetch(positionKeysURL);
       const positionKeysData = await positionKeysResponse.json();
-      
+
       // For each position key, check that there's exactly one latest position
+      // eslint-disable-next-line no-restricted-syntax
       for (const key of positionKeysData.data.positionKeys) {
         const latestPositionsURL = getGraphQLURL(
           `positions(where:{positionKey:{id_eq:"${key.id}"},latest_eq:true}){id}`
         );
+        // eslint-disable-next-line no-await-in-loop
         const latestPositionsResponse = await fetch(latestPositionsURL);
+        // eslint-disable-next-line no-await-in-loop
         const latestPositionsData = await latestPositionsResponse.json();
         expect(latestPositionsData.data.positions.length).toBe(1);
       }
@@ -285,7 +273,7 @@ describe('Verify Positions', () => {
       );
       const positionKeysResponse = await fetch(positionKeysURL);
       const positionKeysData = await positionKeysResponse.json();
-      
+
       expect(positionKeysData.data.positionKeys.length).toBe(2);
       expect(positionKeysData.data.positionKeys[0].account).not.toBe(
         positionKeysData.data.positionKeys[1].account
@@ -299,7 +287,7 @@ describe('Verify Positions', () => {
       const closedPositionsURL = getGraphQLURL(`positions(where:{change_eq:CLOSE}){id,size}`);
       const closedPositionsResponse = await fetch(closedPositionsURL);
       const closedPositionsData = await closedPositionsResponse.json();
-      
+
       // All closed positions should have size 0
       closedPositionsData.data.positions.forEach((position: { size: string }) => {
         expect(position.size).toBe('0');
@@ -312,12 +300,12 @@ describe('Verify Positions', () => {
       const allPositionsURL = getGraphQLURL(`positions{id,size,change}`);
       const allPositionsResponse = await fetch(allPositionsURL);
       const allPositionsData = await allPositionsResponse.json();
-      
+
       // Filter positions with size 0
       const positionsWithNoSize = allPositionsData.data.positions.filter(
         (p: { size: string }) => p.size === '0'
       );
-      
+
       // All should have change = CLOSE
       positionsWithNoSize.forEach((position: { change: string }) => {
         expect(position.change).toBe('CLOSE');
@@ -328,12 +316,12 @@ describe('Verify Positions', () => {
       const allPositionsURL = getGraphQLURL(`positions{id,size,collateralAmount}`);
       const allPositionsResponse = await fetch(allPositionsURL);
       const allPositionsData = await allPositionsResponse.json();
-      
+
       // Filter positions with size 0
       const positionsWithNoSize = allPositionsData.data.positions.filter(
         (p: { size: string }) => p.size === '0'
       );
-      
+
       // All should have collateralAmount 0
       positionsWithNoSize.forEach((position: { collateralAmount: string }) => {
         expect(position.collateralAmount).toBe('0');
@@ -344,12 +332,12 @@ describe('Verify Positions', () => {
       const allPositionsURL = getGraphQLURL(`positions{id,size,collateralAmount}`);
       const allPositionsResponse = await fetch(allPositionsURL);
       const allPositionsData = await allPositionsResponse.json();
-      
+
       // Filter positions with collateralAmount 0
       const positionsWithNoCollateral = allPositionsData.data.positions.filter(
         (p: { collateralAmount: string }) => p.collateralAmount === '0'
       );
-      
+
       // All should have size 0
       positionsWithNoCollateral.forEach((position: { size: string }) => {
         expect(position.size).toBe('0');

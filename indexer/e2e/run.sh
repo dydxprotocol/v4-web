@@ -62,7 +62,7 @@ if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" 
     exit 1
 fi
 
-if [ $1 == "none" ]; then
+if [ "$1" = "none" ]; then
     echo "Skipping population of events"
 else
     echo "Populating events"
@@ -94,8 +94,10 @@ else
     ii=0
     while [ $ii -lt 20 ]; do
         SQD_INDEXER_TABLE_MARKER=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT COUNT(1) FROM information_schema.tables WHERE table_schema='squid_processor' AND table_name='status'"`
+        SQD_INDEXER_TABLE_MARKER=$(echo "$SQD_INDEXER_TABLE_MARKER" | tr -d '[:space:]')
         if [ "$SQD_INDEXER_TABLE_MARKER" -eq "1" ]; then
             SQD_INDEXER_HEIGHT=`docker exec "starboard_indexer_db" psql --csv -t -U postgres -c "SELECT height FROM squid_processor.status WHERE id=0"`
+            SQD_INDEXER_HEIGHT=$(echo "$SQD_INDEXER_HEIGHT" | tr -d '[:space:]')
             if [ "$SQD_INDEXER_HEIGHT" -ge "$FUEL_NODE_HEIGHT" ]; then
                 break
             fi
