@@ -8,11 +8,19 @@ const { Client } = pg;
 describe('Verify Liquidation', () => {
   let client: pg.Client;
   beforeAll(async () => {
+    if (
+      !process.env.VITE_DB_USER ||
+      !process.env.VITE_DB_PASS ||
+      !process.env.VITE_DB_PORT ||
+      !process.env.VITE_DB_NAME
+    ) {
+      throw new Error('Environment variables not set');
+    }
     client = new Client({
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
+      port: parseInt(process.env.VITE_DB_PORT, 10),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -162,7 +170,7 @@ describe('Verify Liquidation', () => {
     expect(maxTimestamp).toBeLessThan(now + 1800);
     expect(maxTimestamp).toBeGreaterThan(now - 1800);
 
-    // Timestamps should span across events (at least 10+3+5+8+3+7+12+4+6 = 58 seconds minimum)
+    // Timestamps should span across events (minimum ~39 seconds between first and last liquidation)
     expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(39);
   });
 
@@ -272,10 +280,6 @@ describe('Verify Liquidation', () => {
     }
   });
 
-  afterAll(async () => {
-    await client.end();
-  });
-
   describe('API tests', () => {
     function getGraphQLURL(query: string) {
       return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
@@ -284,6 +288,9 @@ describe('Verify Liquidation', () => {
     it('should store correct number of liquidation events', async () => {
       const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){id}`);
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
     });
@@ -293,6 +300,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{change_eq:LIQUIDATE}){id,collateralAmount,size}`
       );
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBeGreaterThan(0);
 
@@ -308,6 +318,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
       );
       const positionKeyResponse = await fetch(positionKeyURL);
+      if (!positionKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${positionKeyResponse.status}`);
+      }
       const positionKeyData = await positionKeyResponse.json();
       expect(positionKeyData.data.positionKeys.length).toBe(1);
       const positionKeyId = positionKeyData.data.positionKeys[0].id;
@@ -317,6 +330,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
       );
       const liquidationResponse = await fetch(liquidationURL);
+      if (!liquidationResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationResponse.status}`);
+      }
       const liquidationData = await liquidationResponse.json();
       expect(liquidationData.data.positions.length).toBe(1);
       const liquidation = liquidationData.data.positions[0];
@@ -334,6 +350,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_1_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){id}`
       );
       const positionKeyResponse = await fetch(positionKeyURL);
+      if (!positionKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${positionKeyResponse.status}`);
+      }
       const positionKeyData = await positionKeyResponse.json();
       expect(positionKeyData.data.positionKeys.length).toBe(1);
       const positionKeyId = positionKeyData.data.positionKeys[0].id;
@@ -343,6 +362,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
       );
       const liquidationResponse = await fetch(liquidationURL);
+      if (!liquidationResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationResponse.status}`);
+      }
       const liquidationData = await liquidationResponse.json();
       expect(liquidationData.data.positions.length).toBe(1);
       const liquidation = liquidationData.data.positions[0];
@@ -360,6 +382,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${ETH_ASSET}",isLong_eq:true}){id}`
       );
       const positionKeyResponse = await fetch(positionKeyURL);
+      if (!positionKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${positionKeyResponse.status}`);
+      }
       const positionKeyData = await positionKeyResponse.json();
       expect(positionKeyData.data.positionKeys.length).toBe(1);
       const positionKeyId = positionKeyData.data.positionKeys[0].id;
@@ -369,6 +394,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{positionKey:{id_eq:"${positionKeyId}"},change_eq:LIQUIDATE}){id,collateralAmount,size,latest,positionFee,collateralTransferred}`
       );
       const liquidationResponse = await fetch(liquidationURL);
+      if (!liquidationResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationResponse.status}`);
+      }
       const liquidationData = await liquidationResponse.json();
       expect(liquidationData.data.positions.length).toBe(1);
       const liquidation = liquidationData.data.positions[0];
@@ -386,6 +414,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
       );
       const user0BtcLongKeyResponse = await fetch(user0BtcLongKeyURL);
+      if (!user0BtcLongKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user0BtcLongKeyResponse.status}`);
+      }
       const user0BtcLongKeyData = await user0BtcLongKeyResponse.json();
       if (user0BtcLongKeyData.data.positionKeys.length > 0) {
         const positionKeyId = user0BtcLongKeyData.data.positionKeys[0].id;
@@ -393,6 +424,9 @@ describe('Verify Liquidation', () => {
           `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
         );
         const latestPositionsResponse = await fetch(latestPositionsURL);
+        if (!latestPositionsResponse.ok) {
+          throw new Error(`GraphQL request failed: ${latestPositionsResponse.status}`);
+        }
         const latestPositionsData = await latestPositionsResponse.json();
         expect(latestPositionsData.data.positions.length).toBe(1);
       }
@@ -402,6 +436,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_1_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){id}`
       );
       const user1BtcShortKeyResponse = await fetch(user1BtcShortKeyURL);
+      if (!user1BtcShortKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user1BtcShortKeyResponse.status}`);
+      }
       const user1BtcShortKeyData = await user1BtcShortKeyResponse.json();
       if (user1BtcShortKeyData.data.positionKeys.length > 0) {
         const positionKeyId = user1BtcShortKeyData.data.positionKeys[0].id;
@@ -409,6 +446,9 @@ describe('Verify Liquidation', () => {
           `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
         );
         const latestPositionsResponse = await fetch(latestPositionsURL);
+        if (!latestPositionsResponse.ok) {
+          throw new Error(`GraphQL request failed: ${latestPositionsResponse.status}`);
+        }
         const latestPositionsData = await latestPositionsResponse.json();
         expect(latestPositionsData.data.positions.length).toBe(1);
       }
@@ -418,6 +458,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${ETH_ASSET}",isLong_eq:true}){id}`
       );
       const user0EthLongKeyResponse = await fetch(user0EthLongKeyURL);
+      if (!user0EthLongKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user0EthLongKeyResponse.status}`);
+      }
       const user0EthLongKeyData = await user0EthLongKeyResponse.json();
       if (user0EthLongKeyData.data.positionKeys.length > 0) {
         const positionKeyId = user0EthLongKeyData.data.positionKeys[0].id;
@@ -425,6 +468,9 @@ describe('Verify Liquidation', () => {
           `positions(where:{positionKey:{id_eq:"${positionKeyId}"},latest_eq:true}){id}`
         );
         const latestPositionsResponse = await fetch(latestPositionsURL);
+        if (!latestPositionsResponse.ok) {
+          throw new Error(`GraphQL request failed: ${latestPositionsResponse.status}`);
+        }
         const latestPositionsData = await latestPositionsResponse.json();
         expect(latestPositionsData.data.positions.length).toBe(1);
       }
@@ -433,6 +479,9 @@ describe('Verify Liquidation', () => {
     it('should store correct liquidation timestamps', async () => {
       const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){timestamp}`);
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
 
       const timestamps = liquidationsData.data.positions.map(
@@ -448,7 +497,7 @@ describe('Verify Liquidation', () => {
       expect(maxTimestamp).toBeLessThan(now + 1800);
       expect(maxTimestamp).toBeGreaterThan(now - 1800);
 
-      // Timestamps should span across events (at least 10+3+5+8+3+7+12+4+6 = 58 seconds minimum)
+      // Timestamps should span across events (minimum ~39 seconds between first and last liquidation)
       expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(39);
     });
 
@@ -458,6 +507,9 @@ describe('Verify Liquidation', () => {
         `positionKeys(where:{account_eq:"${USER_0_ADDRESS}",indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){id}`
       );
       const user0BtcLongKeyResponse = await fetch(user0BtcLongKeyURL);
+      if (!user0BtcLongKeyResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user0BtcLongKeyResponse.status}`);
+      }
       const user0BtcLongKeyData = await user0BtcLongKeyResponse.json();
 
       if (user0BtcLongKeyData.data.positionKeys.length > 0) {
@@ -466,6 +518,9 @@ describe('Verify Liquidation', () => {
           `positions(where:{positionKey:{id_eq:"${positionKeyId}"}}){change,collateralAmount,size,timestamp}`
         );
         const positionsResponse = await fetch(positionsURL);
+        if (!positionsResponse.ok) {
+          throw new Error(`GraphQL request failed: ${positionsResponse.status}`);
+        }
         const positionsData = await positionsResponse.json();
         expect(positionsData.data.positions.length).toBeGreaterThan(0);
 
@@ -494,6 +549,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{change_eq:LIQUIDATE}){collateralTransferred,positionFee}`
       );
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
@@ -512,6 +570,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{change_eq:LIQUIDATE}){pnlDelta,fundingRate}`
       );
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
@@ -527,6 +588,9 @@ describe('Verify Liquidation', () => {
         `positions(where:{change_eq:LIQUIDATE}){realizedPnl,realizedFundingRate}`
       );
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
@@ -540,6 +604,9 @@ describe('Verify Liquidation', () => {
     it('should have liquidation events marked as latest for closed positions', async () => {
       const liquidationsURL = getGraphQLURL(`positions(where:{change_eq:LIQUIDATE}){latest}`);
       const liquidationsResponse = await fetch(liquidationsURL);
+      if (!liquidationsResponse.ok) {
+        throw new Error(`GraphQL request failed: ${liquidationsResponse.status}`);
+      }
       const liquidationsData = await liquidationsResponse.json();
       expect(liquidationsData.data.positions.length).toBe(3);
 
@@ -554,6 +621,9 @@ describe('Verify Liquidation', () => {
         `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:true}){collateralAmount,size}`
       );
       const btcLongTotalResponse = await fetch(btcLongTotalURL);
+      if (!btcLongTotalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcLongTotalResponse.status}`);
+      }
       const btcLongTotalData = await btcLongTotalResponse.json();
       if (btcLongTotalData.data.totalPositions.length > 0) {
         const total = btcLongTotalData.data.totalPositions[0];
@@ -567,6 +637,9 @@ describe('Verify Liquidation', () => {
         `totalPositions(where:{indexAssetId_eq:"${BTC_ASSET}",isLong_eq:false}){collateralAmount,size}`
       );
       const btcShortTotalResponse = await fetch(btcShortTotalURL);
+      if (!btcShortTotalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcShortTotalResponse.status}`);
+      }
       const btcShortTotalData = await btcShortTotalResponse.json();
       if (btcShortTotalData.data.totalPositions.length > 0) {
         const total = btcShortTotalData.data.totalPositions[0];
@@ -575,5 +648,9 @@ describe('Verify Liquidation', () => {
         expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
       }
     });
+  });
+
+  afterAll(async () => {
+    await client.end();
   });
 });

@@ -8,11 +8,19 @@ const { Client } = pg;
 describe('Verify Liquidity', () => {
   let client: pg.Client;
   beforeAll(async () => {
+    if (
+      !process.env.VITE_DB_USER ||
+      !process.env.VITE_DB_PASS ||
+      !process.env.VITE_DB_PORT ||
+      !process.env.VITE_DB_NAME
+    ) {
+      throw new Error('Environment variables not set');
+    }
     client = new Client({
       user: process.env.VITE_DB_USER,
       password: process.env.VITE_DB_PASS,
       host: 'localhost',
-      port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
+      port: parseInt(process.env.VITE_DB_PORT, 10),
       database: process.env.VITE_DB_NAME,
     });
 
@@ -111,7 +119,7 @@ describe('Verify Liquidity', () => {
     // Total liquidity should match user2's final state (only provider with remaining liquidity)
     // Note: Total liquidity calculation differs from summing liquidity records because
     // remove events in liquidity records include fees, but total liquidity subtracts
-    // stableDetla without fee on remove
+    // stableDelta without fee on remove
     const user2Result = await client.query(
       'SELECT SUM(stable) AS stable, SUM(lp_amount) AS lp_amount FROM liquidity WHERE provider = $1',
       [USER_2_ADDRESS]
@@ -238,10 +246,6 @@ describe('Verify Liquidity', () => {
     expect(BigInt(secondRemove.lp_amount)).toBeLessThan(0); // Negative
   });
 
-  afterAll(async () => {
-    await client.end();
-  });
-
   describe('API tests', () => {
     function getGraphQLURL(query: string) {
       return `http://localhost:${process.env.VITE_GRAPHQL_SERVER_PORT}/graphql?query=query{${query}}`;
@@ -250,16 +254,25 @@ describe('Verify Liquidity', () => {
     it('should store correct number of liquidity events', async () => {
       const user0URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){id}`);
       const user0Response = await fetch(user0URL);
+      if (!user0Response.ok) {
+        throw new Error(`GraphQL request failed: ${user0Response.status}`);
+      }
       const user0Data = await user0Response.json();
       expect(user0Data.data.liquidities.length).toBe(4); // 2 adds + 2 removes
 
       const user1URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_1_ADDRESS}"}){id}`);
       const user1Response = await fetch(user1URL);
+      if (!user1Response.ok) {
+        throw new Error(`GraphQL request failed: ${user1Response.status}`);
+      }
       const user1Data = await user1Response.json();
       expect(user1Data.data.liquidities.length).toBe(2); // 1 add + 1 remove
 
       const user2URL = getGraphQLURL(`liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){id}`);
       const user2Response = await fetch(user2URL);
+      if (!user2Response.ok) {
+        throw new Error(`GraphQL request failed: ${user2Response.status}`);
+      }
       const user2Data = await user2Response.json();
       expect(user2Data.data.liquidities.length).toBe(2); // 2 adds
     });
@@ -270,6 +283,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){stable,lpAmount}`
       );
       const user0AllResponse = await fetch(user0AllURL);
+      if (!user0AllResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user0AllResponse.status}`);
+      }
       const user0AllData = await user0AllResponse.json();
       const sumStable = user0AllData.data.liquidities.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
@@ -289,6 +305,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_1_ADDRESS}"}){stable,lpAmount}`
       );
       const user1AllResponse = await fetch(user1AllURL);
+      if (!user1AllResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user1AllResponse.status}`);
+      }
       const user1AllData = await user1AllResponse.json();
       const sumStable = user1AllData.data.liquidities.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
@@ -308,6 +327,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){stable,lpAmount}`
       );
       const user2AllResponse = await fetch(user2AllURL);
+      if (!user2AllResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user2AllResponse.status}`);
+      }
       const user2AllData = await user2AllResponse.json();
       const sumStable = user2AllData.data.liquidities.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
@@ -328,6 +350,9 @@ describe('Verify Liquidity', () => {
     it('should store correct total liquidity', async () => {
       const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
       const totalResponse = await fetch(totalURL);
+      if (!totalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${totalResponse.status}`);
+      }
       const totalData = await totalResponse.json();
       expect(totalData.data.totalLiquidities.length).toBe(1);
 
@@ -345,6 +370,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_2_ADDRESS}"}){stable,lpAmount}`
       );
       const user2AllResponse = await fetch(user2AllURL);
+      if (!user2AllResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user2AllResponse.status}`);
+      }
       const user2AllData = await user2AllResponse.json();
       const user2Stable = user2AllData.data.liquidities.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
@@ -358,6 +386,9 @@ describe('Verify Liquidity', () => {
       // Get total liquidity
       const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
       const totalResponse = await fetch(totalURL);
+      if (!totalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${totalResponse.status}`);
+      }
       const totalData = await totalResponse.json();
       const totalStable = BigInt(totalData.data.totalLiquidities[0].stable);
       const totalLp = BigInt(totalData.data.totalLiquidities[0].lpAmount);
@@ -371,6 +402,9 @@ describe('Verify Liquidity', () => {
     it('should store correct total liquidity timestamp', async () => {
       const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){lastTimestamp}`);
       const totalResponse = await fetch(totalURL);
+      if (!totalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${totalResponse.status}`);
+      }
       const totalData = await totalResponse.json();
       expect(totalData.data.totalLiquidities.length).toBe(1);
 
@@ -394,6 +428,9 @@ describe('Verify Liquidity', () => {
     it('should have only one total liquidity record', async () => {
       const totalURL = getGraphQLURL(`totalLiquidities{id}`);
       const totalResponse = await fetch(totalURL);
+      if (!totalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${totalResponse.status}`);
+      }
       const totalData = await totalResponse.json();
       expect(totalData.data.totalLiquidities.length).toBe(1);
     });
@@ -401,6 +438,9 @@ describe('Verify Liquidity', () => {
     it('should have total liquidity with non-negative values', async () => {
       const totalURL = getGraphQLURL(`totalLiquidities(where:{id_eq:"1"}){stable,lpAmount}`);
       const totalResponse = await fetch(totalURL);
+      if (!totalResponse.ok) {
+        throw new Error(`GraphQL request failed: ${totalResponse.status}`);
+      }
       const totalData = await totalResponse.json();
       const totalLiquidity = totalData.data.totalLiquidities[0];
 
@@ -413,6 +453,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){timestamp}`
       );
       const user0Response = await fetch(user0URL);
+      if (!user0Response.ok) {
+        throw new Error(`GraphQL request failed: ${user0Response.status}`);
+      }
       const user0Data = await user0Response.json();
 
       const timestamps = user0Data.data.liquidities.map(
@@ -437,6 +480,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_0_ADDRESS}",latest_eq:true}){id}`
       );
       const user0LatestResponse = await fetch(user0LatestURL);
+      if (!user0LatestResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user0LatestResponse.status}`);
+      }
       const user0LatestData = await user0LatestResponse.json();
       expect(user0LatestData.data.liquidities.length).toBe(1);
 
@@ -444,6 +490,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_1_ADDRESS}",latest_eq:true}){id}`
       );
       const user1LatestResponse = await fetch(user1LatestURL);
+      if (!user1LatestResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user1LatestResponse.status}`);
+      }
       const user1LatestData = await user1LatestResponse.json();
       expect(user1LatestData.data.liquidities.length).toBe(1);
 
@@ -451,6 +500,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_2_ADDRESS}",latest_eq:true}){id}`
       );
       const user2LatestResponse = await fetch(user2LatestURL);
+      if (!user2LatestResponse.ok) {
+        throw new Error(`GraphQL request failed: ${user2LatestResponse.status}`);
+      }
       const user2LatestData = await user2LatestResponse.json();
       expect(user2LatestData.data.liquidities.length).toBe(1);
     });
@@ -460,6 +512,9 @@ describe('Verify Liquidity', () => {
         `liquidities(where:{provider_eq:"${USER_0_ADDRESS}"}){stable,lpAmount,timestamp}`
       );
       const user0Response = await fetch(user0URL);
+      if (!user0Response.ok) {
+        throw new Error(`GraphQL request failed: ${user0Response.status}`);
+      }
       const user0Data = await user0Response.json();
       expect(user0Data.data.liquidities.length).toBe(4);
 
@@ -490,5 +545,9 @@ describe('Verify Liquidity', () => {
       expect(BigInt(secondRemove.stable)).toBeLessThan(0); // Negative
       expect(BigInt(secondRemove.lpAmount)).toBeLessThan(0); // Negative
     });
+  });
+
+  afterAll(async () => {
+    await client.end();
   });
 });

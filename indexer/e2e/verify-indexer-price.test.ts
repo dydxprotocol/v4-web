@@ -6,20 +6,28 @@ import { toPrice, BTC_ASSET, USDC_ASSET, ETH_ASSET } from './utils';
 const { Client } = pg;
 
 describe('Verify Prices', () => {
-  describe('DB tests', () => {
-    let client: pg.Client;
-    beforeAll(async () => {
-      client = new Client({
-        user: process.env.VITE_DB_USER,
-        password: process.env.VITE_DB_PASS,
-        host: 'localhost',
-        port: parseInt(process.env.VITE_DB_PORT ?? '0', 10),
-        database: process.env.VITE_DB_NAME,
-      });
-
-      await client.connect();
+  let client: pg.Client;
+  beforeAll(async () => {
+    if (
+      !process.env.VITE_DB_USER ||
+      !process.env.VITE_DB_PASS ||
+      !process.env.VITE_DB_PORT ||
+      !process.env.VITE_DB_NAME
+    ) {
+      throw new Error('Environment variables not set');
+    }
+    client = new Client({
+      user: process.env.VITE_DB_USER,
+      password: process.env.VITE_DB_PASS,
+      host: 'localhost',
+      port: parseInt(process.env.VITE_DB_PORT, 10),
+      database: process.env.VITE_DB_NAME,
     });
 
+    await client.connect();
+  });
+
+  describe('DB tests', () => {
     it('should store correct number of events', async () => {
       const btcResult = await client.query('SELECT COUNT(*) as c FROM price WHERE asset = $1', [
         BTC_ASSET,
@@ -94,10 +102,6 @@ describe('Verify Prices', () => {
       // 205 is the sum of seconds when moving the blockchain time in the populate-events-price.ts script
       expect(btcMaxTimestamp - btcMinTimestamp).toBeGreaterThanOrEqual(205);
     });
-
-    afterAll(async () => {
-      await client.end();
-    });
   });
   describe('API tests', () => {
     function getGraphQLURL(query: string) {
@@ -107,16 +111,25 @@ describe('Verify Prices', () => {
     it('should return correct number of price events', async () => {
       const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){id}`);
       const btcResponse = await fetch(btcURL);
+      if (!btcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
+      }
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
 
       const usdcURL = getGraphQLURL(`prices(where:{asset_eq:"${USDC_ASSET}"}){id}`);
       const usdcResponse = await fetch(usdcURL);
+      if (!usdcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${usdcResponse.status}`);
+      }
       const usdcData = await usdcResponse.json();
       expect(usdcData.data.prices.length).toBe(2);
 
       const ethURL = getGraphQLURL(`prices(where:{asset_eq:"${ETH_ASSET}"}){id}`);
       const ethResponse = await fetch(ethURL);
+      if (!ethResponse.ok) {
+        throw new Error(`GraphQL request failed: ${ethResponse.status}`);
+      }
       const ethData = await ethResponse.json();
       expect(ethData.data.prices.length).toBe(2);
     });
@@ -124,6 +137,9 @@ describe('Verify Prices', () => {
     it('should return correct usdc price', async () => {
       const usdcURL = getGraphQLURL(`prices(where:{asset_eq:"${USDC_ASSET}"}){price}`);
       const usdcResponse = await fetch(usdcURL);
+      if (!usdcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${usdcResponse.status}`);
+      }
       const usdcData = await usdcResponse.json();
       expect(usdcData.data.prices.length).toBe(2);
       // All USDC prices should be 1 (toPrice(1))
@@ -146,6 +162,9 @@ describe('Verify Prices', () => {
     it('should store correct btc price', async () => {
       const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){price}`);
       const btcResponse = await fetch(btcURL);
+      if (!btcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
+      }
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
 
@@ -160,6 +179,9 @@ describe('Verify Prices', () => {
     it('should return correct btc timestamps', async () => {
       const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){timestamp}`);
       const btcResponse = await fetch(btcURL);
+      if (!btcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
+      }
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
 
@@ -178,6 +200,9 @@ describe('Verify Prices', () => {
     it('should return correct btc timestamp spread across events', async () => {
       const btcURL = getGraphQLURL(`prices(where:{asset_eq:"${BTC_ASSET}"}){timestamp}`);
       const btcResponse = await fetch(btcURL);
+      if (!btcResponse.ok) {
+        throw new Error(`GraphQL request failed: ${btcResponse.status}`);
+      }
       const btcData = await btcResponse.json();
       expect(btcData.data.prices.length).toBe(20);
 
@@ -188,5 +213,9 @@ describe('Verify Prices', () => {
       // 205 is the sum of seconds when moving the blockchain time in the populate-events-price.ts script
       expect(maxTimestamp - minTimestamp).toBeGreaterThanOrEqual(205);
     });
+  });
+
+  afterAll(async () => {
+    await client.end();
   });
 });

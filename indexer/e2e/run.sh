@@ -16,7 +16,7 @@ if [ $# -lt 2 ]; then
 fi
 
 INTERACTIVE=0
-ii=2
+ii=0
 for arg in "$@"
 do
     if [ $ii -gt 1 ]; then
@@ -26,15 +26,6 @@ do
     fi
     ii=$(($ii+1))
 done
-
-# echo "Launch Postgres database and Fuel Node"
-# pnpm sqd up:local
-# if [ $? -ne 0 ]; then
-#     echo "Failed to launch Postgres database and Fuel Node"
-#     # just in case, clean up running containers
-#     docker compose down -v
-#     exit 1
-# fi
 
 echo "Deploying Mocked Stork contract"
 # priv key is hardcoded, taken form the fuel node starting script
@@ -77,9 +68,9 @@ fi
 
 # this command builds the project and applies the database migrations along
 echo "Starting the squid indexer"
-VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd process:e2e  2>&1 > indexer.log &
+VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd process:e2e > indexer.log 2>&1 &
 SQD_INDEXER_PID=$!
-pnpm sqd serve:e2e  2>&1 > api.log &
+pnpm sqd serve:e2e > api.log 2>&1 &
 API_SERVER_PID=$!
 
 EXIT_CODE=0
@@ -137,12 +128,5 @@ if [ -n "$SQD_INDEXER_PID" ]; then
         EXIT_CODE=1
     fi
 fi
-
-# echo "Shut down Postgres and Fuel Node and erase the indexer data"
-# pnpm sqd down:local
-# if [ $? -ne 0 ]; then
-#     echo "Failed to erase the indexer data"
-#     EXIT_CODE=1
-# fi
 
 exit $EXIT_CODE
