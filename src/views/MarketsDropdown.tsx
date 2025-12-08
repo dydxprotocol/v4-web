@@ -29,6 +29,7 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
+import { TradeFeeDiscountTag } from '@/components/TradeFeeDiscountTag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getIsMarketFavorited } from '@/state/appUiConfigsSelectors';
@@ -84,6 +85,7 @@ const MarketsDropdownContent = ({
             isUnlaunched,
             effectiveInitialMarginFraction,
             initialMarginFraction,
+            marketFeeDiscountMultiplier,
           }: MarketData) => (
             <div tw="flex items-center gap-0.25">
               <FavoriteButton marketId={id} />
@@ -103,6 +105,10 @@ const MarketsDropdownContent = ({
                   />
                 )}
               </Tag>
+              <TradeFeeDiscountTag
+                marketFeeDiscountMultiplier={marketFeeDiscountMultiplier}
+                symbol={displayId}
+              />
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </div>
           ),

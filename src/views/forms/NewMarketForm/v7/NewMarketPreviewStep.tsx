@@ -165,7 +165,7 @@ export const NewMarketPreviewStep = ({
           params: {
             NUM_DAYS: <span tw="text-color-text-1">{MARKET_LAUNCH_TOKEN_LOCKUP_DURATION}</span>,
             PAST_DAYS: MARKET_LAUNCH_TOKEN_LOCKUP_DURATION,
-            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" />,
+            APR_PERCENTAGE: <MegaVaultYieldOutput tw="inline-block" yieldType="thirtyDay" />,
           },
         })}
       </span>

@@ -20,3 +20,6 @@ export const getHasDismissedRebateBanner = (state: RootState) =>
 
 export const getHasDismissedTradingLeagueBanner = (state: RootState) =>
   state.dismissable.hasDismissedTradingLeagueBanner;
+
+export const getHasDismissedNoFeeBanner = (state: RootState) =>
+  state.dismissable.hasDismissedNoFeeBanner;

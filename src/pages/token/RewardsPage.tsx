@@ -32,8 +32,8 @@ import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
-import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
+import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 enum Tab {
@@ -85,7 +85,7 @@ const RewardsPage = () => {
           <$DetachedSection>
             {showGeoblockedPanel && <GeoblockedPanel />}
             {showStakingRewardPanel && stakingRewardPanel}
-            <StakingPanel />
+            <SwapAndStakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
             <RewardsHelpPanel />
@@ -130,7 +130,7 @@ const RewardsPage = () => {
             <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
-              <StakingPanel />
+              <SwapAndStakingPanel />
               <UnbondingPanels />
               <RewardsHelpPanel />
               {legalDisclaimer}

@@ -1,10 +1,12 @@
 import { RefObject, useMemo } from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -17,19 +19,20 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import {
+  setHasDismissedNoFeeBanner,
   setHasDismissedPmlBanner,
   setHasDismissedRebateBanner,
-  setHasDismissedTradingLeagueBanner,
 } from '@/state/dismissable';
 import {
+  getHasDismissedNoFeeBanner,
   getHasDismissedPmlBanner,
   getHasDismissedRebateBanner,
-  getHasDismissedTradingLeagueBanner,
 } from '@/state/dismissableSelectors';
 import { setMarketFilter } from '@/state/perpetuals';
 
@@ -48,8 +51,9 @@ export const MarketsBanners = ({
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
   const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
-  const hasDismissedTradingLeagueBanner = useAppSelector(getHasDismissedTradingLeagueBanner);
+  const hasDismissedNoFeeBanner = useAppSelector(getHasDismissedNoFeeBanner);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
@@ -59,8 +63,8 @@ export const MarketsBanners = ({
     dispatch(setHasDismissedRebateBanner(true));
   };
 
-  const onDismissTradingLeagueBanner = () => {
-    dispatch(setHasDismissedTradingLeagueBanner(true));
+  const onDismissNoFeeBanner = () => {
+    dispatch(setHasDismissedNoFeeBanner(true));
   };
 
   const onClickPmlBanner = () => {
@@ -69,9 +73,13 @@ export const MarketsBanners = ({
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const onClickNoFeeBanner = () => {
+    navigate(`${AppRoute.Trade}/BTC-USD`);
+  };
+
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
   const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
-  const shouldDisplayTradingLeagueBanner = !hasDismissedTradingLeagueBanner;
+  const shouldDisplayNoFeeBanner = !hasDismissedNoFeeBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -158,46 +166,35 @@ export const MarketsBanners = ({
     </$RebateBanner>
   ) : null;
 
-  const tradingLeagueBanner = shouldDisplayTradingLeagueBanner ? (
-    <$TradingLeagueBanner>
-      <div tw="mr-auto flex h-full flex-col justify-center">
-        <div tw="mb-0.75 flex items-center gap-1">
-          <span tw="text-large text-white font-extra-large-bold">
-            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_TITLE })}
-          </span>
-          <$ActiveTag>{stringGetter({ key: STRING_KEYS.ACTIVE })}</$ActiveTag>
-        </div>
-        <div tw="flex items-center gap-1.5">
-          <Button
-            action={ButtonAction.Primary}
-            type={ButtonType.Link}
-            href="https://dydx.trade/dydx?utm_source=markets&utm_medium=ui&utm_campaign=01112025-markets-leagues-dydx&utm_term=&utm_content=markets-banner"
-            tw="relative z-10 w-12"
-          >
-            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_CTA })}
-          </Button>
-          <span tw="text-white font-base-book">
-            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_SUBTITLE })}
-          </span>
-        </div>
-      </div>
-
+  const noFeeBanner = shouldDisplayNoFeeBanner ? (
+    <$NoFeeBanner>
+      <img src="/no-fee-banner-hedgie.png" alt="Hedgie" tw="block h-[150%]" />
       <img
-        src="/trading-league.png"
-        alt="Trading League trophy"
-        tw="relative right-8 top-0 my-2 h-[90%] object-contain mobile:hidden"
+        src="/no-fee-banner-coins.png"
+        alt="Coins"
+        tw="pointer-events-none absolute right-7 h-[200%] object-contain"
       />
-
+      <div tw="z-[1] ml-1 mr-auto flex flex-col items-start">
+        <span tw="text-large text-white font-extra-bold">
+          <span tw="mr-0.25 rounded-[0.25rem] bg-color-accent px-0.25">
+            {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE_ACCENT })}
+          </span>{' '}
+          {stringGetter({ key: STRING_KEYS.NO_FEE_DECEMBER_BANNER_TITLE })}
+        </span>
+        <Link isAccent onClick={onClickNoFeeBanner} tw="font-base-medium">
+          {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_CTA })} →
+        </Link>
+      </div>
       <IconButton
         tw="absolute right-0.5 top-0.5 border-none"
         iconName={IconName.Close}
         size={ButtonSize.XSmall}
-        onClick={onDismissTradingLeagueBanner}
+        onClick={onDismissNoFeeBanner}
       />
-    </$TradingLeagueBanner>
+    </$NoFeeBanner>
   ) : null;
 
-  return tradingLeagueBanner ?? rebateBanner ?? pmlBanner ?? null;
+  return noFeeBanner ?? rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -298,34 +295,13 @@ const $RebateBanner = styled($MarketsPageBanner)`
   }
 `;
 
-const $TradingLeagueBanner = styled($MarketsPageBanner)`
-  height: 8rem;
-  background: url('/TradingLeagueBanner.png') center center / cover no-repeat;
+const $NoFeeBanner = styled($MarketsPageBanner)`
   position: relative;
-  margin-bottom: 1rem;
-
-  img,
-  span,
-  button,
-  a {
-    z-index: 1;
-  }
-
-  @media ${breakpoints.mobile} {
-    height: 8rem;
-
-    span {
-      font: var(--font-small-book);
-    }
-  }
-`;
-
-const $ActiveTag = styled.span`
-  border-radius: 99rem;
-  border: 1px solid;
-  border-color: color-mix(in srgb, var(--color-positive) 40%, transparent);
-  background-color: color-mix(in srgb, var(--color-positive) 5%, transparent);
-  padding: 0.25rem 0.75rem;
-  color: var(--color-positive);
-  font: var(--font-small-book);
+  height: 8rem;
+  overflow: hidden;
+  background-image:
+    url('/no-fee-banner-dots.png'), linear-gradient(90.59deg, #141528 17.91%, #18181f 82.09%);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;

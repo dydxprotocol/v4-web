@@ -10,11 +10,10 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { IndexerOrderSide } from '@/types/indexer/indexerApiGen';
 
-import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useViewPanel } from '@/hooks/useSeen';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -40,8 +39,6 @@ import {
   getIndexerLiquidityStringKey,
   getIndexerOrderSideStringKey,
 } from '../../lib/enumToStringKeyHelpers';
-
-const MOBILE_FILLS_PER_PAGE = 50;
 
 export enum FillsTableColumnKey {
   Time = 'Time',
@@ -295,7 +292,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
 };
@@ -307,7 +303,6 @@ export const FillsTable = forwardRef(
       columnWidths,
       currentMarket,
       initialPageSize,
-      withGradientCardRows,
       withOuterBorder,
       withInnerBorders = true,
     }: ElementProps & StyleProps,
@@ -315,7 +310,6 @@ export const FillsTable = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-    const { isMobile } = useBreakpoints();
 
     const marketFills = useAppSelector(BonsaiHelpers.currentMarket.account.fills);
     const allFills = useAppSelector(BonsaiCore.account.fills.data);
@@ -347,9 +341,7 @@ export const FillsTable = forwardRef(
         key={currentMarket ?? 'all-fills'}
         label="Fills"
         tableId="fills"
-        data={
-          isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
-        }
+        data={fillsData}
         getRowKey={(row: FillTableRow) => row.id ?? ''}
         onRowAction={(key: Key) =>
           dispatch(openDialog(DialogTypes.FillDetails({ fillId: `${key}` })))
@@ -379,7 +371,7 @@ export const FillsTable = forwardRef(
   }
 );
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 ` as typeof Table;
 const $InlineRow = tw.div`inlineRow`;
 const $Side = styled.span<{ side: Nullable<IndexerOrderSide> }>`

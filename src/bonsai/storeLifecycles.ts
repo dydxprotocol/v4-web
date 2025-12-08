@@ -13,6 +13,7 @@ import { setUpConfigTiersQuery } from './rest/configTiers';
 import { setUpFillsQuery } from './rest/fills';
 import { setUpGeoQuery } from './rest/geo';
 import { setUpIndexerHeightQuery, setUpValidatorHeightQuery } from './rest/height';
+import { setUpUserLeverageParamsQuery } from './rest/leverage';
 import { alwaysUseCurrentNetworkClient } from './rest/lib/compositeClientManager';
 import { setUpNobleBalanceQuery } from './rest/nobleBalance';
 import { setUpOrdersQuery } from './rest/orders';
@@ -22,9 +23,11 @@ import { setUpTransfersQuery } from './rest/transfers';
 import {
   setUpAccountBalancesQuery,
   setUpAccountFeeTierQuery,
+  setUpAccountStakingTierQuery,
   setUpAccountStatsQuery,
   setUpCompositeClientAccountCacheQuery,
 } from './rest/validatorAccountMetadata';
+import { setUpMarketsFeeDiscountQuery } from './rest/validatorMarketsMetadata';
 import { setUpMarkets } from './websocket/markets';
 import { setUpOrderbook } from './websocket/orderbook';
 import { setUpParentSubaccount } from './websocket/parentSubaccount';
@@ -35,6 +38,7 @@ export const storeLifecycles = [
   setUpAssetsQuery,
   setUpParentSubaccount,
   setUpFillsQuery,
+  setUpUserLeverageParamsQuery,
   setUpOrdersQuery,
   setUpTransfersQuery,
   setUpBlockTradingRewardsQuery,
@@ -58,4 +62,6 @@ export const storeLifecycles = [
   setUpRewardsTokenPriceQuery,
   setUpCancelOrphanedTriggerOrdersLifecycle,
   setUpReclaimChildSubaccountBalancesLifecycle,
+  setUpMarketsFeeDiscountQuery,
+  setUpAccountStakingTierQuery,
 ] as const;

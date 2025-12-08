@@ -1,0 +1,1 @@
+export const DEFAULT_LEVERAGE_PPM = 1000000;

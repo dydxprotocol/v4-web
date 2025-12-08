@@ -22,7 +22,7 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -48,6 +48,7 @@ import {
 } from '../../lib/enumToStringKeyHelpers';
 import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsLeverageCell } from './PositionsTable/PositionsLeverageCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
 
@@ -107,7 +108,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ marketSummary, leverage, signedSize, side }) => (
+        renderCell: ({ marketSummary, effectiveSelectedLeverage, signedSize, side }) => (
           <TableCell
             stacked
             slotLeft={
@@ -132,7 +133,7 @@ const getPositionsTableColumnDef = ({
               <span tw="text-color-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
-                value={leverage}
+                value={effectiveSelectedLeverage}
                 showSign={ShowSign.None}
               />
             </div>
@@ -226,13 +227,15 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Leverage]: {
         columnKey: 'leverage',
-        getCellValue: (row) => row.leverage?.toNumber(),
+        getCellValue: (row) => row.effectiveSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ leverage }) => (
-          <TableCell>
-            <Output type={OutputType.Multiple} value={leverage} showSign={ShowSign.None} />
-          </TableCell>
+        isActionable: true,
+        renderCell: ({ effectiveSelectedLeverage, market }) => (
+          <PositionsLeverageCell
+            marketId={market}
+            effectiveSelectedLeverage={effectiveSelectedLeverage}
+          />
         ),
       },
       [PositionsTableColumnKey.Type]: {
@@ -282,7 +285,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.marginValueInitial.toNumber(),
+        getCellValue: (row) => row.marginValueInitialFromSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
@@ -403,7 +406,7 @@ const getPositionsTableColumnDef = ({
           market,
           marketSummary,
           assetId,
-          leverage,
+          effectiveSelectedLeverage,
           side,
           entryPrice,
           updatedUnrealizedPnl: unrealizedPnl,
@@ -412,7 +415,7 @@ const getPositionsTableColumnDef = ({
             marketId={market}
             assetId={assetId}
             side={side}
-            leverage={leverage}
+            leverage={effectiveSelectedLeverage}
             oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)}
             entryPrice={entryPrice}
             unrealizedPnl={unrealizedPnl}
@@ -439,7 +442,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
 };
 
@@ -455,7 +457,6 @@ export const PositionsTable = forwardRef(
       initialPageSize,
       onNavigate,
       navigateToOrders,
-      withGradientCardRows,
       withOuterBorder,
     }: ElementProps & StyleProps,
     _ref
@@ -547,7 +548,6 @@ export const PositionsTable = forwardRef(
           </>
         }
         initialPageSize={initialPageSize}
-        withGradientCardRows={withGradientCardRows}
         withOuterBorder={withOuterBorder}
         withInnerBorders
         withScrollSnapColumns
@@ -559,7 +559,7 @@ export const PositionsTable = forwardRef(
 );
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 
   tr {
     &:after {

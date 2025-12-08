@@ -26,7 +26,7 @@ import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 
 import { SourceAccount } from '@/state/wallet';
 
-import { AttemptBigNumber } from '@/lib/numbers';
+import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
@@ -77,7 +77,7 @@ export function useDepositTokenBalances() {
     );
 
     return [
-      orderBy(unsortedWithBalances, ({ valueUSD }) => valueUSD, ['desc']),
+      orderBy(unsortedWithBalances, ({ valueUSD }) => MustBigNumber(valueUSD).toNumber(), ['desc']),
       unsortedWithoutBalances,
     ];
   }, [data]);

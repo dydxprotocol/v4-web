@@ -22,6 +22,8 @@ export enum NotificationType {
   FillWithNoOrder = 'FillWithNoOrder',
   Order = 'Order',
   CosmosWalletLifecycle = 'CosmosWalletLifecycle', // lifecycle events for cosmos wallets
+  DepositAddressEvents = 'DepositAddressEvents', // lifecycle events for deposit notifications
+  Swap = 'Swap',
 }
 
 export enum NotificationCategoryPreferences {
@@ -41,6 +43,7 @@ export const NotificationTypeCategory: {
   [NotificationType.SkipTransfer]: NotificationCategoryPreferences.Transfers,
   [NotificationType.SkipTransfer2]: NotificationCategoryPreferences.Transfers,
   [NotificationType.FunkitDeposit]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.Swap]: NotificationCategoryPreferences.Transfers,
   [NotificationType.BlockTradingReward]: NotificationCategoryPreferences.Trading, // deprecated
   [NotificationType.FillWithNoOrder]: NotificationCategoryPreferences.Trading,
   [NotificationType.Order]: NotificationCategoryPreferences.Trading,
@@ -55,6 +58,7 @@ export const NotificationTypeCategory: {
   [NotificationType.PredictionMarketConcluded]: NotificationCategoryPreferences.MustSee,
   [NotificationType.Custom]: NotificationCategoryPreferences.MustSee,
   [NotificationType.CosmosWalletLifecycle]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.DepositAddressEvents]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [

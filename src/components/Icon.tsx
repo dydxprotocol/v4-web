@@ -129,6 +129,7 @@ import {
   TrophyIcon,
   TryAgainIcon,
   UserIcon,
+  UsersIcon,
   ViewfinderIcon,
   VolumeIcon,
   Wallet2Icon,
@@ -141,6 +142,7 @@ import {
 } from '@/icons';
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { LogoShortIcon } from '@/icons/logo-short';
+import SignalIcon from '@/icons/signal.svg';
 import UsdcIcon from '@/icons/usdc.svg';
 
 import { calc } from '@/lib/do';
@@ -256,6 +258,7 @@ export enum IconName {
   Shield = 'Shield',
   ShieldStroke = 'ShieldStroke',
   Show = 'Show',
+  Signal = 'Signal',
   Sparkles = 'Sparkles',
   SpeechBubble = 'SpeechBubble',
   SocialLogin = 'SocialLogin',
@@ -278,6 +281,7 @@ export enum IconName {
   TryAgain = 'TryAgain',
   Usdc = 'Usdc',
   User = 'User',
+  Users = 'Users',
   Viewfinder = 'Viewfinder',
   Volume = 'Volume',
   Wallet = 'Wallet',
@@ -396,6 +400,7 @@ const icons = {
   [IconName.Settings]: SettingsIcon,
   [IconName.Share]: ShareIcon,
   [IconName.Shield]: ShieldIcon,
+  [IconName.Signal]: SignalIcon,
   [IconName.ShieldStroke]: ShieldStrokeIcon,
   [IconName.Show]: ShowIcon,
   [IconName.Sparkles]: SparklesIcon,
@@ -420,6 +425,7 @@ const icons = {
   [IconName.TryAgain]: TryAgainIcon,
   [IconName.Usdc]: UsdcIcon,
   [IconName.User]: UserIcon,
+  [IconName.Users]: UsersIcon,
   [IconName.Viewfinder]: ViewfinderIcon,
   [IconName.Volume]: VolumeIcon,
   [IconName.Wallet]: WalletIcon,

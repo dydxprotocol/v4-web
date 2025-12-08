@@ -40,6 +40,7 @@ import {
   selectAccountFillsLoading,
   selectAccountOrders,
   selectAccountOrdersLoading,
+  selectAccountStakingTier,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
@@ -76,10 +77,11 @@ import {
   selectRawIndexerHeightDataLoading,
   selectRawMarketsData,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeveragesData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
-import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
+import { selectEquityTiers, selectFeeTiers, selectStakingTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
   selectCurrentMarketDepthChart,
@@ -93,8 +95,10 @@ import {
   selectCurrentMarketAssetId,
   selectCurrentMarketAssetLogoUrl,
   selectCurrentMarketAssetName,
+  selectCurrentMarketEffectiveSelectedLeverage,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
+  selectEffectiveSelectedMarketLeverage,
   selectMarketSummaryById,
   StablePerpetualMarketSummary,
 } from './selectors/summary';
@@ -117,10 +121,12 @@ import {
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
   RewardParamsSummary,
+  StakingTiers,
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
   SubaccountTransfer,
+  UserStakingTierSummary,
   UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -176,6 +182,9 @@ interface BonsaiCoreShape {
     nobleUsdcBalance: {
       data: BasicSelector<string | undefined>;
     };
+    stakingTier: {
+      data: BasicSelector<UserStakingTierSummary | undefined>;
+    };
   };
   markets: {
     currentMarketId: BasicSelector<string | undefined>;
@@ -203,6 +212,7 @@ interface BonsaiCoreShape {
   configs: {
     feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
+    stakingTiers: BasicSelector<StakingTiers | undefined>;
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
   rewardParams: { data: BasicSelector<RewardParamsSummary> };
@@ -255,6 +265,9 @@ export const BonsaiCore: BonsaiCoreShape = {
     nobleUsdcBalance: {
       data: selectAccountNobleUsdcBalance,
     },
+    stakingTier: {
+      data: selectAccountStakingTier,
+    },
   },
   markets: {
     currentMarketId: getCurrentMarketId,
@@ -282,6 +295,7 @@ export const BonsaiCore: BonsaiCoreShape = {
   configs: {
     equityTiers: selectEquityTiers,
     feeTiers: selectFeeTiers,
+    stakingTiers: selectStakingTiers,
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
   rewardParams: { data: selectRewardsSummary },
@@ -292,6 +306,7 @@ interface BonsaiRawShape {
   // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
   // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  selectedMarketLeverages: BasicSelector<{ [marketId: string]: number } | undefined>;
   currentMarket: BasicSelector<RecordValueType<MarketsData> | undefined>;
   // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
@@ -300,6 +315,7 @@ interface BonsaiRawShape {
 export const BonsaiRaw: BonsaiRawShape = {
   parentSubaccountBase: selectRawParentSubaccountData,
   parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  selectedMarketLeverages: selectRawSelectedMarketLeveragesData,
   currentMarket: selectCurrentMarketInfoRaw,
   allMarkets: selectRawMarketsData,
 };
@@ -314,6 +330,7 @@ interface BonsaiHelpersShape {
     assetId: BasicSelector<string | undefined>;
     assetLogo: BasicSelector<string | undefined>;
     assetName: BasicSelector<string | undefined>;
+    effectiveSelectedLeverage: BasicSelector<number>;
 
     account: {
       buyingPower: BasicSelector<BigNumber | undefined>;
@@ -346,6 +363,7 @@ interface BonsaiHelpersShape {
       PerpetualMarketSummary | undefined,
       [string | undefined]
     >;
+    selectEffectiveSelectedMarketLeverage: BasicSelector<number, [string | undefined]>;
   };
   forms: {
     deposit: {
@@ -371,6 +389,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     assetId: selectCurrentMarketAssetId,
     assetLogo: selectCurrentMarketAssetLogoUrl,
     assetName: selectCurrentMarketAssetName,
+    effectiveSelectedLeverage: selectCurrentMarketEffectiveSelectedLeverage,
     orderbook: {
       selectGroupedData: selectCurrentMarketOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
@@ -397,6 +416,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   },
   markets: {
     selectMarketSummaryById,
+    selectEffectiveSelectedMarketLeverage,
   },
   forms: {
     deposit: {

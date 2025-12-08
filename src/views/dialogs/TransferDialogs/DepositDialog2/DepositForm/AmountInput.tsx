@@ -19,6 +19,8 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
+import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
+
 import { getTokenSymbol, isNativeTokenDenom } from '../../utils';
 
 export type AmountInputProps = {
@@ -29,11 +31,6 @@ export type AmountInputProps = {
   tokenBalance: { raw?: string; formatted?: string };
   error?: Error | null;
 };
-
-const numericValueRegex = /^\d*(?:\\[.])?\d*$/;
-function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
 
 const GAS_RESERVE_AMOUNT = parseUnits(EVM_GAS_RESERVE_AMOUNT.toString(), ETH_DECIMALS);
 
