@@ -21,7 +21,7 @@ export interface SpotApiWsWalletPositionObject {
   firstTradeAt: string;
   lastTradeAt: string;
   tradeCount: number;
-  tokenData: SpotApiTokenInfoObject;
+  tokenData?: SpotApiTokenInfoObject;
   unrealizedValueUsd: number;
 }
 
