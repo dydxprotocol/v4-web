@@ -284,7 +284,7 @@ export class SpotApiClient {
     return this._get<SpotApiTokenMetadataResponse>(`tokens/info?mint=${mint}`);
   }
 
-  async searchTokens(query?: string, limit = 20) {
+  async searchTokens(query?: string, limit = 100) {
     return this._get<SpotApiTokenSearchResponse>(
       `tokens/search?phrase=${encodeURIComponent(query ?? '')}&limit=${limit}`
     );
