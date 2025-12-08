@@ -49,16 +49,16 @@ const getSpotPriceDecimals = (price?: number | null): number => {
 
 // Create symbol info for spot tokens
 export const createSpotSymbolInfo = (
-  tokenSymbol: string,
+  tokenMint: string,
   tokenPrice?: number | null
 ): LibrarySymbolInfo => {
   const decimals = getSpotPriceDecimals(tokenPrice);
   const pricescale = 10 ** decimals;
 
   return {
-    ticker: tokenSymbol,
-    name: tokenSymbol,
-    description: tokenSymbol,
+    ticker: tokenMint,
+    name: tokenMint,
+    description: tokenMint,
     type: 'crypto',
     session: '24x7',
     timezone,

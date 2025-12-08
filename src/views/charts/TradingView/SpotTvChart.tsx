@@ -9,16 +9,16 @@ import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { BaseTvChart } from './BaseTvChart';
 
 export interface SpotTvChartProps {
-  symbol: string;
+  tokenMint: string;
 }
 
-export const SpotTvChart = ({ symbol }: SpotTvChartProps) => {
+export const SpotTvChart = ({ tokenMint }: SpotTvChartProps) => {
   const [tvWidget, setTvWidget] = useState<TvWidget>();
   const isSimpleUi = useSimpleUiEnabled();
 
   useSpotTradingView({
     setTvWidget,
-    symbol,
+    tokenMint,
   });
 
   useTradingViewTheme({ tvWidget });

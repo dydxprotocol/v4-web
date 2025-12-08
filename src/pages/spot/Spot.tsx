@@ -37,7 +37,7 @@ import { SpotHeaderToken } from './types';
 // TODO: spot localization
 
 const SpotPage = () => {
-  const { symbol } = useParams<{ symbol: string }>();
+  const { tokenMint } = useParams<{ tokenMint: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -116,7 +116,7 @@ const SpotPage = () => {
     return {
       name: tokenMetadata.tokenNameFull ?? tokenMetadata.symbol ?? 'Unknown',
       symbol: tokenMetadata.symbol ?? 'Unknown',
-      tokenAddress: symbol!,
+      tokenAddress: tokenMint!,
       buys24hUsd: tokenMetadata.token24hBuys,
       sells24hUsd: -MustNumber(tokenMetadata.token24hSells),
       change24hPercent: tokenMetadata.pricePercentChange24h,
@@ -135,7 +135,7 @@ const SpotPage = () => {
       bundlersPercent: mapIfPresent(tokenMetadata.bundlersPercent, (v) => v / 100),
       insidersPercent: mapIfPresent(tokenMetadata.insidersPercent, (v) => v / 100),
     };
-  }, [symbol, tokenMetadata, tokenPrice]);
+  }, [tokenMint, tokenMetadata, tokenPrice]);
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
     navigate(`/spot/${token.tokenAddress}`);
@@ -178,7 +178,7 @@ const SpotPage = () => {
             { icon: IconName.CoinMarketCap, url: '3' },
             { icon: IconName.SocialX, url: '4' },
           ]}
-          contractAddress={symbol!}
+          contractAddress={tokenMint!}
           createdAt={Date.now() - 21 * 24 * 60 * 60 * 1000}
           items={[
             {
@@ -230,7 +230,7 @@ const SpotPage = () => {
       </$GridSection>
 
       <$GridSection gridArea="Inner">
-        <SpotTvChart symbol={symbol!} />
+        <SpotTvChart tokenMint={tokenMint!} />
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">

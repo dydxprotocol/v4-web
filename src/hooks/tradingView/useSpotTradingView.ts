@@ -28,10 +28,10 @@ import { useSimpleUiEnabled } from '../useSimpleUiEnabled';
 
 export const useSpotTradingView = ({
   setTvWidget,
-  symbol,
+  tokenMint,
 }: {
   setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
-  symbol: string;
+  tokenMint: string;
 }) => {
   const dispatch = useAppDispatch();
   const store = useAppStore();
@@ -50,7 +50,7 @@ export const useSpotTradingView = ({
   );
 
   useEffect(() => {
-    if (!symbol || !spotApi) {
+    if (!tokenMint || !spotApi) {
       return () => {};
     }
 
@@ -64,7 +64,7 @@ export const useSpotTradingView = ({
       datafeed: getSpotDatafeed(store, spotApi),
       interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
       locale: languageCode as LanguageCode,
-      symbol,
+      symbol: tokenMint,
       saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       auto_save_delay: 1,
     };
@@ -86,7 +86,7 @@ export const useSpotTradingView = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedLocale,
-    symbol,
+    tokenMint,
     spotApi,
     setTvWidget,
     isSimpleUi,

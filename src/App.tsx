@@ -209,7 +209,9 @@ const Content = () => {
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
 
-              {isSpotEnabled && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
+              {isSpotEnabled && (
+                <Route path={`${AppRoute.Spot}/:tokenMint`} element={<SpotPage />} />
+              )}
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
