@@ -1,5 +1,5 @@
 {
-  "name": "starboard/indexer",
+  "name": "@starboard/indexer",
   "version": "1.0.0",
   "scripts": {
     "build": "rm -rf lib && tsc",

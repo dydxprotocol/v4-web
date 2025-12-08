@@ -1,7 +1,7 @@
 packages:
-  - apps/*
   - contracts
   - indexer
+  - fuel-ts-sdk
 linkWorkspacePackages: true
 overrides:
   follow-redirects: 1.15.3
