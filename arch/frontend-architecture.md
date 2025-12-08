@@ -602,7 +602,7 @@ class AccountTransactionSupervisor {
 
 The application has complete Fuel smart contract infrastructure:
 
-#### **Contract Type Definitions** (`apps/indexer/src/types/`)
+#### **Contract Type Definitions** (`contracts/types/`)
 
 ```typescript
 // Auto-generated from Fuel contracts
@@ -667,7 +667,7 @@ const FuelContractManager = {
 
 ## 5. Indexer Integration Architecture
 
-### Subsquid-Based Indexer (`apps/indexer/`)
+### Subsquid-Based Indexer (`indexer/`)
 
 The application uses a **Subsquid** indexer for blockchain data processing:
 
