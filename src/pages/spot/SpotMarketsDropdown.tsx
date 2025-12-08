@@ -103,7 +103,7 @@ export const SpotMarketsDropdown = ({
                 type={OutputType.Percent}
                 value={change24hPercent}
                 showSign={ShowSign.Both}
-                withPolarityColor
+                withSignedValueColor
               />
             </TableCell>
           ),

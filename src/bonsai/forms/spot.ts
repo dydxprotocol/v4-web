@@ -1,8 +1,10 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+import { MIN_SOL_RESERVE } from '@/constants/spot';
+
 import { SpotApiCreateTransactionRequest, SpotApiSide, SpotApiTradeRoute } from '@/clients/spotApi';
 import { calc, mapIfPresent } from '@/lib/do';
-import { AttemptNumber } from '@/lib/numbers';
+import { AttemptNumber, MustNumber } from '@/lib/numbers';
 
 import { createForm, createVanillaReducer } from '../lib/forms';
 import { ErrorType, simpleValidationError, ValidationError } from '../lib/validationErrors';
@@ -220,10 +222,10 @@ export function getErrors(
   }
 
   if (state.side === SpotSide.BUY) {
-    const requiredSol = summary.amounts?.sol;
+    const requiredSol = MustNumber(summary.amounts?.sol);
     const availableSol = inputData.userSolBalance;
 
-    if (requiredSol != null && requiredSol > availableSol) {
+    if (requiredSol > availableSol) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_INSUFFICIENT_SOL',
@@ -235,35 +237,35 @@ export function getErrors(
       );
     }
 
-    if (availableSol < 0.01) {
+    if (availableSol - requiredSol < MIN_SOL_RESERVE) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_LOW_SOL_FOR_FEES',
           type: ErrorType.warning,
           titleFallback: 'Low SOL Balance',
-          textFallback: 'Your SOL balance is low. You may not have enough for transaction fees.',
+          textFallback:
+            'After this trade, your remaining SOL may be insufficient for future transaction fees',
         })
       );
     }
   } else {
-    const requiredToken = summary.amounts?.token;
-    const availableToken = inputData.userTokenBalance;
+    const requiredToken = MustNumber(summary.amounts?.token);
+    const availableToken = MustNumber(inputData.userTokenBalance);
+    const sellPercentage = MustNumber(summary.amounts?.percent);
 
-    if (requiredToken != null && availableToken != null && requiredToken > availableToken) {
+    if (requiredToken > availableToken) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_INSUFFICIENT_TOKEN',
           type: ErrorType.error,
           fields: ['size'],
           titleFallback: 'Insufficient Balance',
-          textFallback: 'Insufficient token balance for this sale',
+          textFallback: 'Insufficient token balance for this trade',
         })
       );
     }
-  }
 
-  if (state.side === SpotSide.SELL && state.sellInputType === SpotSellInputType.PERCENT) {
-    if (parsedSize > 100) {
+    if (state.sellInputType === SpotSellInputType.PERCENT && sellPercentage > 100) {
       validationErrors.push(
         simpleValidationError({
           code: 'SPOT_PERCENT_TOO_HIGH',
@@ -274,18 +276,17 @@ export function getErrors(
         })
       );
     }
-  }
 
-  const minUsdAmount = 0.1; // Minimum $0.10 USD
-  if (summary.amounts?.usd != null && summary.amounts.usd < minUsdAmount) {
-    validationErrors.push(
-      simpleValidationError({
-        code: 'SPOT_AMOUNT_TOO_SMALL',
-        type: ErrorType.warning,
-        titleFallback: 'Amount Too Small',
-        textFallback: 'Trade amount is very small. Consider increasing the amount.',
-      })
-    );
+    if (inputData.userSolBalance < MIN_SOL_RESERVE) {
+      validationErrors.push(
+        simpleValidationError({
+          code: 'SPOT_LOW_SOL_FOR_FEES',
+          type: ErrorType.warning,
+          titleFallback: 'Low SOL Balance',
+          textFallback: 'Your SOL balance may be insufficient for transaction fees',
+        })
+      );
+    }
   }
 
   return validationErrors;

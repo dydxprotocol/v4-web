@@ -341,7 +341,7 @@ const useAccountsContext = () => {
       }
     };
     setCosmosWallets();
-  }, [hdKey?.mnemonic, getCosmosOfflineSigner, canDeriveSolanaWallet]);
+  }, [hdKey?.mnemonic, getCosmosOfflineSigner]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {

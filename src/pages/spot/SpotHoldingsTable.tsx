@@ -128,7 +128,7 @@ const getColumnDef = ({
               type={OutputType.Fiat}
               value={pnlUsd}
               showSign={ShowSign.Both}
-              withPolarityColor
+              withSignedValueColor
             />
           </TableCell>
         ),

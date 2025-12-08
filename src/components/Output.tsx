@@ -327,7 +327,7 @@ type StyleProps = {
   className?: string;
   withBaseFont?: boolean;
   withSignColor?: boolean;
-  withPolarityColor?: boolean;
+  withSignedValueColor?: boolean;
 };
 
 export type OutputProps = ElementProps & StyleProps;
@@ -351,7 +351,7 @@ export const Output = ({
   withParentheses,
   showSign = ShowSign.Negative,
   withSignColor = false,
-  withPolarityColor,
+  withSignedValueColor,
 
   dateOptions,
   relativeTimeOptions = {
@@ -502,8 +502,8 @@ export const Output = ({
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
-          polarity={
-            withPolarityColor
+          valueColor={
+            withSignedValueColor
               ? isNegative
                 ? NumberSign.Negative
                 : isPositive
@@ -565,19 +565,19 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
       --output-afterString: ')';
     `}
 `;
-const $Number = styled($Text)<{ withBaseFont?: boolean; polarity?: NumberSign }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean; valueColor?: NumberSign }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`
       font-feature-settings: var(--fontFeature-monoNumbers);
     `}
 
-  ${({ polarity }) =>
-    polarity === NumberSign.Positive
+  ${({ valueColor }) =>
+    valueColor === NumberSign.Positive
       ? css`
           color: var(--color-positive) !important;
         `
-      : polarity === NumberSign.Negative
+      : valueColor === NumberSign.Negative
         ? css`
             color: var(--color-negative) !important;
           `

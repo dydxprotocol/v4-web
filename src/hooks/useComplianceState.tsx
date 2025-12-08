@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
-import { useLocation } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
@@ -34,9 +34,7 @@ export const useComplianceState = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
-  const location = useLocation();
-
-  const isSpotPage = location.pathname.startsWith(AppRoute.Spot);
+  const isSpotPage = useMatch(`${AppRoute.Spot}/*`) != null;
 
   const complianceState = useMemo(() => {
     if (

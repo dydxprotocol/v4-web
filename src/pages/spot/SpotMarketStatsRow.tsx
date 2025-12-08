@@ -62,7 +62,7 @@ export const SpotMarketStatsRow = ({ stats, isLoading = false }: SpotMarketStats
           type={OutputType.Percent}
           value={stats?.change24hPercent}
           showSign={ShowSign.Both}
-          withPolarityColor
+          withSignedValueColor
         />
       ),
     },
@@ -79,7 +79,7 @@ export const SpotMarketStatsRow = ({ stats, isLoading = false }: SpotMarketStats
           type={OutputType.CompactFiat}
           value={stats?.buys24hUsd}
           withSubscript
-          withPolarityColor
+          withSignedValueColor
         />
       ),
     },
@@ -91,7 +91,7 @@ export const SpotMarketStatsRow = ({ stats, isLoading = false }: SpotMarketStats
           type={OutputType.CompactFiat}
           value={stats?.sells24hUsd}
           withSubscript
-          withPolarityColor
+          withSignedValueColor
           showSign={ShowSign.None}
         />
       ),

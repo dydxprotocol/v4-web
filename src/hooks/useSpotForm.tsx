@@ -133,7 +133,7 @@ export function useSpotForm() {
           body: 'Transaction failed. Please try again.',
         },
         {
-          toastDuration: 8000,
+          toastDuration: 5000,
         }
       );
       throw error;
