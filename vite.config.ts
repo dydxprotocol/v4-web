@@ -87,18 +87,20 @@ export default defineConfig(({ mode }) => ({
   publicDir: 'public',
   test: {
     globals: true,
-    exclude: mode === 'indexer-e2e' ? [] : [ // the indexer e2e always specifies a single file from e2e, no need to exclude
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/cypress/**',
-      '**/.{idea,git,cache,output,temp}/**',
-      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-      '**/e2e/**',
-      '**/apps/indexer/**', // Exclude indexer tests (Unstable)
-      '**/ts-sdk/__tests__/modules/client/**', // Exclude API tests (endpoints)
-      '**/ts-sdk/__tests__/modules/onboarding.test.ts', // Exclude onboarding tests (non-fuel related, we removed dydx deps)
-      '**/contracts/test/**', // Exclude contract tests (require fuel-core in PATH, run separately in contracts/)
-    ],
+    exclude:
+      mode === 'indexer-e2e'
+        ? []
+        : [
+            // the indexer e2e always specifies a single file from e2e, no need to exclude
+            '**/node_modules/**',
+            '**/dist/**',
+            '**/cypress/**',
+            '**/.{idea,git,cache,output,temp}/**',
+            '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+            '**/e2e/**',
+            '**/apps/indexer/**', // Exclude indexer tests (Unstable)
+            '**/contracts/test/**', // Exclude contract tests (require fuel-core in PATH, run separately in contracts/)
+          ],
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
   },
