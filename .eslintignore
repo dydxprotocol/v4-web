@@ -3,3 +3,4 @@ vite-env.d.ts
 polyfills.ts
 vite.config.ts
 commitlint.config.ts
+fuel-ts-sdk/
