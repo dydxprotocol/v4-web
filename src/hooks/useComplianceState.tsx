@@ -21,6 +21,7 @@ import {
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { useEnableSpot } from './useEnableSpot';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
@@ -35,6 +36,7 @@ export const useComplianceState = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
   const isSpotPage = useMatch(`${AppRoute.Spot}/*`) != null;
+  const isSpotEnabled = useEnableSpot();
 
   const complianceState = useMemo(() => {
     if (
@@ -101,7 +103,8 @@ export const useComplianceState = () => {
 
   const disableConnectButton =
     complianceState === ComplianceStates.READ_ONLY &&
-    onboardingState === OnboardingState.Disconnected;
+    onboardingState === OnboardingState.Disconnected &&
+    !isSpotEnabled;
 
   return {
     complianceStatus,
