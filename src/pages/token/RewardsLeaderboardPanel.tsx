@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import styled from 'styled-components';
@@ -42,8 +42,12 @@ export const RewardsLeaderboardPanel = () => {
   const { data: feeLeaderboardWithoutRewards, isLoading } = useChaosLabsFeeLeaderboard({
     address: dydxAddress,
   });
-  const feeLeaderboard = feeLeaderboardWithoutRewards?.leaderboard.map((entry) =>
-    addRewardsToLeaderboardEntry(entry, dydxPrice)
+  const feeLeaderboard = useMemo(
+    () =>
+      feeLeaderboardWithoutRewards?.leaderboard.map((entry) =>
+        addRewardsToLeaderboardEntry(entry, dydxPrice)
+      ),
+    [feeLeaderboardWithoutRewards?.leaderboard, dydxPrice]
   );
 
   const getRowKey = useCallback((row: ChaosLabsFeeLeaderboardItem) => row.rank, []);

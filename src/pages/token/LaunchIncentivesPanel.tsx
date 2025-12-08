@@ -138,9 +138,11 @@ const Sept2025RewardsPanel = () => {
   const { data, isLoading } = useChaosLabsFeeLeaderboard({
     address: dydxAddress,
   });
-  const addressEntry = data?.addressEntry
-    ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
-    : undefined;
+  const addressEntry = useMemo(
+    () =>
+      data?.addressEntry ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice) : undefined,
+    [data?.addressEntry, dydxPrice]
+  );
 
   return (
     <div tw="flex flex-col justify-between gap-0.75 self-stretch">
