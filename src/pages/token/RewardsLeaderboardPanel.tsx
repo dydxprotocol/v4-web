@@ -1,11 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsFeeLeaderboardItem, useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
+import {
+  addRewardsToLeaderboardEntry,
+  ChaosLabsFeeLeaderboardItem,
+  ChaosLabsFeeLeaderboardItemWithRewards,
+  useChaosLabsFeeLeaderboard,
+} from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -34,10 +39,16 @@ export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
   const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
-  const { data: feeLeaderboard, isLoading } = useChaosLabsFeeLeaderboard({
+  const { data: feeLeaderboardWithoutRewards, isLoading } = useChaosLabsFeeLeaderboard({
     address: dydxAddress,
-    dydxPrice,
   });
+  const feeLeaderboard = useMemo(
+    () =>
+      feeLeaderboardWithoutRewards?.leaderboard.map((entry) =>
+        addRewardsToLeaderboardEntry(entry, dydxPrice)
+      ),
+    [feeLeaderboardWithoutRewards?.leaderboard, dydxPrice]
+  );
 
   const getRowKey = useCallback((row: ChaosLabsFeeLeaderboardItem) => row.rank, []);
 
@@ -53,7 +64,7 @@ export const RewardsLeaderboardPanel = () => {
   const onDownload = () => {
     if (!feeLeaderboard) return;
 
-    const csvRows = feeLeaderboard?.leaderboard.map((item) => ({
+    const csvRows = feeLeaderboard?.map((item) => ({
       rank: item.rank,
       address: item.address,
       estimatedRewards: item.estimatedDydxRewards,
@@ -97,7 +108,7 @@ export const RewardsLeaderboardPanel = () => {
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
             label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-            data={feeLeaderboard?.leaderboard ?? []}
+            data={feeLeaderboard ?? []}
             tableId="trading-rewards"
             getRowKey={getRowKey}
             columns={columns}
@@ -191,7 +202,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsFeeLeaderboardItem> => ({
+}): ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -268,6 +279,9 @@ const getRewardsLeaderboardTableColumnDef = ({
           />
         ),
       },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsFeeLeaderboardItem>>
+    } satisfies Record<
+      RewardsLeaderboardTableColumns,
+      ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards>
+    >
   )[key],
 });

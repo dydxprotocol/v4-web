@@ -184,29 +184,29 @@ export type ChaosLabsCompetitionItem = {
   pnl: number;
 };
 
-export function useChaosLabsFeeLeaderboard({
-  address,
-  dydxPrice,
-}: {
-  address?: string;
-  dydxPrice: number | undefined;
-}) {
+export function useChaosLabsFeeLeaderboard({ address }: { address?: string }) {
   return useQuery({
     queryKey: ['chaoslabs/fee-leaderboard', address],
     queryFn: wrapAndLogError(
-      () => getChaosLabsFeeLeaderboard({ address, dydxPrice }),
+      () => getChaosLabsFeeLeaderboard({ address }),
       'LaunchIncentives/fetchFeeLeaderboard',
       true
     ),
   });
 }
 
-export type ChaosLabsFeeLeaderboardItem = {
+export type ChaosLabsFeeLeaderboardItemWithRewards = {
   address: string;
   total_fees: number;
   rank: number;
   estimatedDollarRewards: number;
   estimatedDydxRewards: number;
+};
+
+export type ChaosLabsFeeLeaderboardItem = {
+  address: string;
+  total_fees: number;
+  rank: number;
 };
 
 type ChaosLabsFeeLeaderboardResponse = {
@@ -221,10 +221,10 @@ type ChaosLabsFeeLeaderboardResponse = {
   };
 };
 
-const addRewardsToLeaderboardEntry = (
+export const addRewardsToLeaderboardEntry = (
   entry: ChaosLabsFeeLeaderboardItem,
   dydxPrice: number | undefined
-) => {
+): ChaosLabsFeeLeaderboardItemWithRewards => {
   const dollarRewards = feesToEstimatedDollarRewards(entry.total_fees);
   const dydxRewards = dydxPrice ? dollarRewards / dydxPrice : 0;
   return {
@@ -234,22 +234,14 @@ const addRewardsToLeaderboardEntry = (
   };
 };
 
-async function getChaosLabsFeeLeaderboard({
-  address,
-  dydxPrice,
-}: {
-  address?: string;
-  dydxPrice: number | undefined;
-}) {
+async function getChaosLabsFeeLeaderboard({ address }: { address?: string }) {
   const res = await fetch(
     `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-fee-leaderboard?perPage=1000${address ? `&address=${address}` : ''}`
   );
 
   const data = (await res.json()) as ChaosLabsFeeLeaderboardResponse;
   return {
-    leaderboard: data.data.map((entry) => addRewardsToLeaderboardEntry(entry, dydxPrice)),
-    addressEntry: data.addressEntry
-      ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
-      : undefined,
+    leaderboard: data.data,
+    addressEntry: data.addressEntry,
   };
 }
