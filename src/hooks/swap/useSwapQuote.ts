@@ -38,8 +38,13 @@ async function getSkipSwapRoute(
     sourceAssetChainId: chainId,
     destAssetDenom: outputTokenDenom,
     destAssetChainId: chainId,
-    smartRelay: true,
     swapVenues: SWAP_VENUES,
+    smartSwapOptions: {
+      splitRoutes: true,
+    },
+    smartRelay: true,
+    allowUnsafe: false,
+    goFast: true,
     ...(mode === 'exact-in'
       ? { amountIn: parseUnits(amount, inputTokenDecimals).toString() }
       : { amountOut: parseUnits(amount, outputTokenDecimals).toString() }),
