@@ -20,14 +20,14 @@ services:
         echo "🏗️  Using local code from /starboard-local"
         
         # Copy local built code to the expected location
-        if [ -d "/starboard-local/apps/indexer/lib" ]; then
+        if [ -d "/starboard-local/indexer/lib" ]; then
           echo "📦 Copying built indexer code..."
-          cp -r /starboard-local/apps/indexer/lib/* /starboard/apps/indexer/lib/ 2>/dev/null || true
+          cp -r /starboard-local/indexer/lib/* /starboard/indexer/lib/ 2>/dev/null || true
         fi
-        
+
         # Run migrations
         source /root/.nvm/nvm.sh
-        cd /starboard/apps/indexer
+        cd /starboard/indexer
         /starboard/node_modules/.bin/squid-typeorm-migration apply
         
         # Start the indexer

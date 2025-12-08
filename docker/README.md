@@ -288,7 +288,7 @@ docker logs starboard_indexer_processor | grep "Starboard Indexer Configuration"
 
 ```bash
 # 1. Edit code
-vim ../apps/indexer/src/main.ts
+vim ../indexer/src/main.ts
 
 # 2. Rebuild (uses local changes via COPY)
 docker-compose build indexer

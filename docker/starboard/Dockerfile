@@ -32,14 +32,17 @@ WORKDIR /starboard
 
 # Copy package files first (better layer caching)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/indexer/package.json ./apps/indexer/
+COPY indexer/package.json ./indexer/
+COPY fuel-ts-sdk/package.json fuel-ts-sdk/codegen.yml fuel-ts-sdk/scalar-definitions.graphql ./fuel-ts-sdk/
 COPY contracts/package.json ./contracts/
-COPY ts-sdk/package.json ./ts-sdk/
+
+# Copy frozen legacy ts-sdk tarball
+COPY packages/starboard-client-js-1.3.17.tgz ./packages/
 
 # Copy files needed by preinstall and postinstall scripts
 COPY scripts ./scripts
 COPY tradingview ./tradingview
-COPY apps/indexer/.env.example ./apps/indexer/.env.example
+COPY indexer/.env.example indexer/schema.graphql ./indexer/
 RUN mkdir -p public
 
 # Install dependencies (cached if package files haven't changed)
@@ -59,10 +62,9 @@ RUN export PNPM_HOME="/root/.local/share/pnpm" && \
     export PATH="${HOME}/.fuelup/bin:${PATH}" && \
     export NVM_DIR="$HOME/.nvm" && \
     . ${HOME}/.nvm/nvm.sh && \
-    pnpm run build:ts-sdk && \
     pnpm --filter starboard/contracts build && \
     pnpm --filter starboard/contracts gen:types && \
-    pnpm --filter starboard-indexer build && \
+    pnpm --filter @starboard/indexer build && \
     if [ -f tradingview/tradingview.tgz ]; then tar -xzC public -f tradingview/tradingview.tgz; fi
 
 # Copy contract setup script

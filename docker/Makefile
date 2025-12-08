@@ -205,7 +205,7 @@ feed-prices: ## Update oracle prices from Pyth
 # Note: This Makefile must be run from the docker/ directory
 dev-rebuild-indexer: ## Rebuild local indexer code and restart
 	@echo "Building indexer..."
-	@$(MAKE) -C ../apps/indexer build || (cd ../apps/indexer && pnpm build)
+	@$(MAKE) -C ../indexer build || (cd ../indexer && pnpm build)
 	@echo "Restarting indexer..."
 	@$(MAKE) --no-print-directory restart-indexer
 	@echo "✓ Indexer updated with local code"

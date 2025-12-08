@@ -66,7 +66,7 @@ services:
       VAULT_ADDRESS: ${VAULT_ADDRESS:-0x926db3Ae7909265BcAb347F45F59826FCF259Be9F915881e9Ef7D07cE29df51c}
       FROM_BLOCK: ${FROM_BLOCK:-0}
       NVM_DIR: /root/.nvm
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/apps/indexer && ../../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
     depends_on:
       fuel-core:
         condition: service_healthy
@@ -97,7 +97,7 @@ services:
       NVM_DIR: /root/.nvm
     ports:
       - "${GQL_PORT:-4350}:4350"
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/apps/indexer && ../../node_modules/.bin/squid-graphql-server"]
+    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-graphql-server"]
     depends_on:
       db:
         condition: service_healthy
