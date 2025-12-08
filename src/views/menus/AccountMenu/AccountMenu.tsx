@@ -197,7 +197,7 @@ export const AccountMenu = () => {
                   symbol={chainTokenLabel}
                   tw="[--asset-icon-size:1.25rem]"
                 />
-                Perpetuals
+                {stringGetter({ key: STRING_KEYS.PERPETUALS })}
               </$AddressCopyButton>
             </div>
 
