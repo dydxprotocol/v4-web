@@ -1,6 +1,5 @@
 node_modules
 build
-apps/web/src/config/abi/types
 .next
 cli/aptos-codegen
 dist
@@ -17,7 +16,6 @@ cache
 apis/farms
 oldcontracts
 malicious
-apps/web/public/images
 uniswapV3
 apis
 types
