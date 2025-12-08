@@ -1,0 +1,6 @@
+# Scalar definitions needed by GraphQL Code Generator
+# Subsquid provides these automatically in the indexer, but codegen needs them explicitly
+scalar BigInt
+scalar BigDecimal
+scalar DateTime
+scalar JSON

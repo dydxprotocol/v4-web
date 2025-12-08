@@ -1,0 +1,27 @@
+{
+  "name": "@starboard/fuel-ts-sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "codegen": "graphql-codegen --config ./codegen.yml",
+    "postinstall": "pnpm codegen"
+  },
+  "dependencies": {
+    "graphql": "^16.8.1",
+    "graphql-request": "^7.3.5"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^6.1.0",
+    "@graphql-codegen/typescript": "^5.0.5",
+    "@graphql-codegen/typescript-operations": "^5.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^6.3.0",
+    "vitest": "^1.4.0"
+  }
+}

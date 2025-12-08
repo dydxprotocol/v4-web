@@ -1,0 +1,24 @@
+# GraphQL Code Generator config for Fuel TS SDK
+# Generates types from indexer GraphQL schema
+# Schema source: /indexer/schema.graphql
+#
+# Note: scalar-definitions.graphql provides scalar types that Subsquid automatically
+# includes but GraphQL Code Generator needs explicitly defined
+
+schema:
+  - ../indexer/schema.graphql
+  - ./scalar-definitions.graphql
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - typescript
+    config:
+      strictScalars: true
+      avoidOptionals: false
+      maybeValue: T | null
+      # Scalars from Subsquid indexer
+      scalars:
+        BigInt: string
+        BigDecimal: string
+        DateTime: string
+        JSON: any
