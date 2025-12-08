@@ -12,7 +12,7 @@ import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
+import { addRewardsToLeaderboardEntry, useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -137,8 +137,10 @@ const Sept2025RewardsPanel = () => {
 
   const { data, isLoading } = useChaosLabsFeeLeaderboard({
     address: dydxAddress,
-    dydxPrice,
   });
+  const addressEntry = data?.addressEntry
+    ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice)
+    : undefined;
 
   return (
     <div tw="flex flex-col justify-between gap-0.75 self-stretch">
@@ -165,7 +167,7 @@ const Sept2025RewardsPanel = () => {
             <Output
               tw="text-extra font-extra-bold"
               type={OutputType.Fiat}
-              value={data?.addressEntry?.estimatedDollarRewards ?? 0}
+              value={addressEntry?.estimatedDollarRewards ?? 0}
               isLoading={isLoading}
             />
           </$Points>
