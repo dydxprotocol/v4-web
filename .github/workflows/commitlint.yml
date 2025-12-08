@@ -1,7 +1,7 @@
 name: Lint
 on:
   pull_request:
-    types: ["opened", "edited", "reopened", "synchronize"]
+    types: ['opened', 'edited', 'reopened', 'synchronize']
 
 jobs:
   lint:
@@ -39,7 +39,7 @@ jobs:
           | sed -E 's/^\[[A-Za-z0-9_-]+-[0-9]+\][[:space:]]*//' \
           | pnpx commitlint --config commitlint.config.ts
         env:
-          PR_TITLE: "${{ github.event.pull_request.title }}"
+          PR_TITLE: '${{ github.event.pull_request.title }}'
 
       - name: SwayLint
         run: |
@@ -49,6 +49,5 @@ jobs:
       - name: ESLint
         run: |
           pnpm --filter starboard/contracts lint:ts
-          pnpm --filter starboard/indexer lint
+          pnpm --filter @starboard/indexer lint
           pnpm lint
-
