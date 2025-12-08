@@ -74,7 +74,7 @@ const SpotPage = () => {
           holdingsAmount: tokenBalance.amount,
           holdingsUsd: tokenBalance.usdValue,
           tokenAddress: tokenBalance.mint,
-          tokenName: position?.tokenData.tokenNameFull ?? 'Unknown',
+          tokenName: position?.tokenData.tokenNameFull ?? position?.tokenData.symbol ?? 'Unknown',
           tokenSymbol: position?.tokenData.symbol ?? 'Unknown',
           tokenImage: position?.tokenData.image,
           boughtAmount: position?.totalBought,
@@ -114,19 +114,19 @@ const SpotPage = () => {
     if (!tokenMetadata || tokenPrice == null) return null;
 
     return {
-      name: tokenMetadata.tokenNameFull,
-      symbol: tokenMetadata.symbol,
-      tokenAddress: tokenMetadata.tokenMint,
+      name: tokenMetadata.tokenNameFull ?? tokenMetadata.symbol ?? 'Unknown',
+      symbol: tokenMetadata.symbol ?? 'Unknown',
+      tokenAddress: symbol!,
       buys24hUsd: tokenMetadata.token24hBuys,
-      sells24hUsd: -tokenMetadata.token24hSells,
+      sells24hUsd: -MustNumber(tokenMetadata.token24hSells),
       change24hPercent: tokenMetadata.pricePercentChange24h,
-      circulatingSupply: +tokenMetadata.circulatingSupply,
+      circulatingSupply: MustNumber(tokenMetadata.circulatingSupply),
       liquidityUsd: tokenMetadata.liquidityUSD,
       logoUrl: tokenMetadata.image,
-      marketCapUsd: +tokenMetadata.circulatingSupply * tokenPrice,
-      fdvUsd: +tokenMetadata.totalSupply * tokenPrice,
+      marketCapUsd: MustNumber(tokenMetadata.circulatingSupply) * tokenPrice,
+      fdvUsd: MustNumber(tokenMetadata.totalSupply) * tokenPrice,
       priceUsd: tokenPrice,
-      totalSupply: +tokenMetadata.totalSupply,
+      totalSupply: MustNumber(tokenMetadata.totalSupply),
       volume24hUsd: tokenMetadata.volumeUSD,
       holders: tokenMetadata.holders,
       top10HoldersPercent: mapIfPresent(tokenMetadata.top10HoldersPercent, (v) => v / 100),
@@ -135,7 +135,7 @@ const SpotPage = () => {
       bundlersPercent: mapIfPresent(tokenMetadata.bundlersPercent, (v) => v / 100),
       insidersPercent: mapIfPresent(tokenMetadata.insidersPercent, (v) => v / 100),
     };
-  }, [tokenMetadata, tokenPrice]);
+  }, [symbol, tokenMetadata, tokenPrice]);
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
     navigate(`/spot/${token.tokenAddress}`);
