@@ -26,7 +26,6 @@ import {
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { clearSavedEncryptedSignature, setLocalWallet } from '@/state/wallet';
@@ -38,7 +37,6 @@ import { log } from '@/lib/telemetry';
 import { sleep } from '@/lib/timeUtils';
 
 import { useDydxClient } from './useDydxClient';
-import { useEnvFeatures } from './useEnvFeatures';
 import { useLocalStorage } from './useLocalStorage';
 import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
@@ -55,8 +53,6 @@ export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();
-  const geo = useAppSelector(getGeo);
-  const { checkForGeo } = useEnvFeatures();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { endTurnkeySession } = useTurnkeyWallet();
 
@@ -76,10 +72,6 @@ const useAccountsContext = () => {
   const sourceAccount = useAppSelector(getSourceAccount);
 
   const { ready, authenticated } = usePrivy();
-
-  const blockedGeo = useMemo(() => {
-    return geo.currentlyGeoBlocked && checkForGeo;
-  }, [geo, checkForGeo]);
 
   const [previousAddress, setPreviousAddress] = useState(sourceAccount.address);
 
@@ -198,7 +190,7 @@ const useAccountsContext = () => {
        * There will not be an OnboardingState.WalletConnected state, only AccountConnected or Disconnected.
        */
       if (sourceAccount.walletInfo?.connectorType === ConnectorType.Turnkey) {
-        if (!hasLocalDydxWallet && sourceAccount.encryptedSignature && !blockedGeo) {
+        if (!hasLocalDydxWallet && sourceAccount.encryptedSignature) {
           try {
             const signature = decryptSignature(sourceAccount.encryptedSignature);
             await setWalletFromSignature(signature);
@@ -256,7 +248,7 @@ const useAccountsContext = () => {
               log('useAccounts/decryptSignature', error);
               dispatch(clearSavedEncryptedSignature());
             }
-          } else if (sourceAccount.encryptedSignature && !blockedGeo) {
+          } else if (sourceAccount.encryptedSignature) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
 
@@ -274,7 +266,7 @@ const useAccountsContext = () => {
         if (!hasLocalDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
-          if (sourceAccount.encryptedSignature && !blockedGeo) {
+          if (sourceAccount.encryptedSignature) {
             try {
               const signature = decryptSignature(sourceAccount.encryptedSignature);
               await setWalletFromSignature(signature);
@@ -292,7 +284,7 @@ const useAccountsContext = () => {
         dispatch(setOnboardingState(OnboardingState.Disconnected));
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
+  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet]);
 
   useEffect(() => {
     const setCosmosWallets = async () => {
@@ -385,12 +377,6 @@ const useAccountsContext = () => {
       })
     );
   }, [dispatch, dydxSubaccounts]);
-
-  useEffect(() => {
-    if (blockedGeo) {
-      disconnect();
-    }
-  }, [blockedGeo]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

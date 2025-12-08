@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
+import { useLocation } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { Link } from '@/components/Link';
 import { OutputType, formatDateOutput } from '@/components/Output';
@@ -32,6 +34,9 @@ export const useComplianceState = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
+  const location = useLocation();
+
+  const isSpotPage = location.pathname.startsWith(AppRoute.Spot);
 
   const complianceState = useMemo(() => {
     if (
@@ -105,8 +110,8 @@ export const useComplianceState = () => {
     complianceState,
     complianceMessage,
     disableConnectButton,
-    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY,
+    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY && !isSpotPage,
     showComplianceBanner:
-      complianceMessage != null || complianceState === ComplianceStates.READ_ONLY,
+      (complianceMessage != null || complianceState === ComplianceStates.READ_ONLY) && !isSpotPage,
   };
 };

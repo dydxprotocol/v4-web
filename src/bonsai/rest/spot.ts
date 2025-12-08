@@ -1,5 +1,6 @@
 import { QueryObserver } from '@tanstack/react-query';
 
+import { AppRoute } from '@/constants/routes';
 import { timeUnits } from '@/constants/time';
 import { SOL_MINT_ADDRESS } from '@/constants/tokens';
 
@@ -31,7 +32,7 @@ import { safeSubscribeObserver } from './lib/safeSubscribe';
 const getSpotApiEndpointWhenOnSpotPage = createAppSelector(
   [getCurrentPath, getSpotApiEndpoint, getCurrentSpotToken],
   (currentPath, spotApiEndpoint, currentSpotToken) => {
-    if (!currentPath.startsWith('/spot') || !currentSpotToken) {
+    if (!currentPath.startsWith(AppRoute.Spot) || !currentSpotToken) {
       return null;
     }
     return { endpoint: spotApiEndpoint, currentSpotToken };
@@ -152,7 +153,7 @@ export function setUpSpotTokenPriceQuery(store: RootStore) {
 const getPortfolioTradesParams = createAppSelector(
   [getCurrentPath, getSpotApiEndpoint, getUserSolanaWalletAddress],
   (currentPath, spotApiEndpoint, walletAddress) => {
-    if (!currentPath.startsWith('/spot') || !walletAddress) {
+    if (!currentPath.startsWith(AppRoute.Spot) || !walletAddress) {
       return null;
     }
     return { endpoint: spotApiEndpoint, walletAddress };
