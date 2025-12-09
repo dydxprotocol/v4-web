@@ -48,9 +48,11 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
   },
 
   resolveSymbol: async (tokenMint, onSymbolResolvedCallback) => {
-    const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
-    const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice);
-    setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
+    setTimeout(async () => {
+      const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
+      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice);
+      onSymbolResolvedCallback(symbolInfo);
+    }, 0);
   },
 
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
