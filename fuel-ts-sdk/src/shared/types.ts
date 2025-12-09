@@ -1,0 +1,34 @@
+import { z } from 'zod';
+
+/**
+ * Address - Fuel blockchain address
+ */
+export const AddressSchema = z.string().min(1, 'Address cannot be empty').brand<'Address'>();
+export type Address = z.infer<typeof AddressSchema>;
+export const address = (str: string): Address => AddressSchema.parse(str);
+export const safeAddress = (str: string): Address | undefined => {
+  const result = AddressSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
+ * AssetId - Fuel asset identifier
+ */
+export const AssetIdSchema = z.string().min(1, 'Asset ID cannot be empty').brand<'AssetId'>();
+export type AssetId = z.infer<typeof AssetIdSchema>;
+export const assetId = (str: string): AssetId => AssetIdSchema.parse(str);
+export const safeAssetId = (str: string): AssetId | undefined => {
+  const result = AssetIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
+ * PositionId - Unique position identifier
+ */
+export const PositionIdSchema = z.string().min(1, 'Position ID cannot be empty').brand<'PositionId'>();
+export type PositionId = z.infer<typeof PositionIdSchema>;
+export const positionId = (str: string): PositionId => PositionIdSchema.parse(str);
+export const safePositionId = (str: string): PositionId | undefined => {
+  const result = PositionIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
