@@ -101,6 +101,7 @@ export default defineConfig(({ mode }) => ({
             '**/indexer/**', // Exclude indexer tests (Unstable)
             '**/contracts/test/**', // Exclude contract tests (require fuel-core in PATH, run separately in contracts/)
             '**/fuel-ts-sdk/**', // Exclude fuel-ts-sdk tests (run separately with own config)
+            '**/tradingView/dydxfeed/__test__/**', // Exclude due to legacy starboard-client-js ESM import bug
           ],
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
