@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -6,7 +6,11 @@ import { keyBy } from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-import { TradeLayouts } from '@/constants/layout';
+import {
+  HORIZONTAL_PANEL_MAX_HEIGHT,
+  HORIZONTAL_PANEL_MIN_HEIGHT,
+  TradeLayouts,
+} from '@/constants/layout';
 import { SPOT_DUST_USD_THRESHOLD } from '@/constants/spot';
 
 import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
@@ -20,6 +24,8 @@ import { Output, OutputType } from '@/components/Output';
 import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setHorizontalPanelHeightPx } from '@/state/appUiConfigs';
+import { getHorizontalPanelHeightPx } from '@/state/appUiConfigsSelectors';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 import { spotFormActions } from '@/state/spotForm';
 
@@ -27,6 +33,7 @@ import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
 import { isPresent } from '@/lib/typeUtils';
 
+import { useResizablePanel } from '../trade/useResizablePanel';
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
 import { SpotHorizontalPanel } from './SpotHorizontalPanel';
@@ -57,7 +64,23 @@ const SpotPage = () => {
   const isPortfolioTradesLoading =
     useAppSelector(BonsaiCore.spot.portfolioTrades.loading) !== 'success';
 
+  const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
+  const setPanelHeight = useCallback(
+    (h: number) => {
+      dispatch(setHorizontalPanelHeightPx(h));
+    },
+    [dispatch]
+  );
   const [isHorizontalOpen, setIsHorizontalOpen] = useState(true);
+  const {
+    handleMouseDown,
+    panelHeight: horizontalPanelHeight,
+    isDragging,
+  } = useResizablePanel(horizontalPanelHeightPxBase, setPanelHeight, {
+    min: HORIZONTAL_PANEL_MIN_HEIGHT,
+    max: HORIZONTAL_PANEL_MAX_HEIGHT,
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: searchResults, isPending: isSearchLoading } = useSpotTokenSearch(searchQuery);
@@ -219,7 +242,11 @@ const SpotPage = () => {
   };
 
   return (
-    <$SpotLayout tradeLayout={tradeLayout} isHorizontalOpen={isHorizontalOpen}>
+    <$SpotLayout
+      tradeLayout={tradeLayout}
+      isHorizontalOpen={isHorizontalOpen}
+      horizontalPanelHeightPx={horizontalPanelHeight}
+    >
       <header tw="[grid-area:Top]">
         <SpotHeader
           currentToken={currentTokenData}
@@ -231,7 +258,7 @@ const SpotPage = () => {
         />
       </header>
 
-      <$GridSection gridArea="Side">
+      <$SideGridSection gridArea="Side">
         <SpotTradeForm />
         <SpotTokenInfo
           isLoading={isTokenMetadataLoading}
@@ -240,10 +267,11 @@ const SpotPage = () => {
           createdAt={currentTokenData?.createdAt}
           items={tokenInfoItems}
         />
-      </$GridSection>
+      </$SideGridSection>
 
       <$GridSection gridArea="Inner">
         <SpotTvChart tokenMint={tokenMint!} />
+        {isDragging && <$CoverUpTradingView />}
       </$GridSection>
 
       <$GridSection gridArea="Horizontal">
@@ -256,6 +284,7 @@ const SpotPage = () => {
           setIsOpen={setIsHorizontalOpen}
           onRowAction={handlePositionSelect}
           onSellAction={handlePositionSell}
+          handleStartResize={handleMouseDown}
         />
       </$GridSection>
     </$SpotLayout>
@@ -267,20 +296,23 @@ export default SpotPage;
 const $SpotLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalOpen: boolean;
+  horizontalPanelHeightPx: number;
 }>`
+  --horizontalPanel-height: ${({ horizontalPanelHeightPx }) => `${horizontalPanelHeightPx}px`};
+
   /* prettier-ignore */
   --layout-default: 
     'Top Top' auto 
     'Inner Side' minmax(0, 1fr)
-    'Horizontal Side' 300px
-    / 1fr 400px;
+    'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr var(--spot-sidebar-width);
 
   /* prettier-ignore */
   --layout-default-desktopMedium:
     'Top Side' auto
     'Inner Side' minmax(0, 1fr)
-    'Horizontal Side' 300px
-    / 1fr 400px;
+    'Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    / 1fr var(--spot-sidebar-width);
 
   --layout: var(--layout-default);
 
@@ -302,11 +334,7 @@ const $SpotLayout = styled.article<{
   ${({ isHorizontalOpen }) =>
     !isHorizontalOpen &&
     css`
-      --layout-default: 'Top Top' auto 'Inner Side' minmax(0, 1fr) 'Horizontal Side'
-        var(--tabs-height) / 1fr 400px;
-
-      --layout-default-desktopMedium: 'Top Side' auto 'Inner Side' minmax(0, 1fr) 'Horizontal Side'
-        var(--tabs-height) / 1fr 400px;
+      --horizontalPanel-height: auto !important;
     `}
 
   width: 0;
@@ -335,9 +363,20 @@ const $SpotLayout = styled.article<{
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
-  ${layoutMixins.withOuterAndInnerBorders}
+`;
+
+const $SideGridSection = styled($GridSection)`
+  ${layoutMixins.withInnerHorizontalBorders}
 `;
 
 const $Output = styled(Output)`
   line-height: 1;
+`;
+
+const $CoverUpTradingView = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.2);
 `;

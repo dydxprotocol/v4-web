@@ -21,6 +21,7 @@ type SpotHorizontalPanelProps = {
   setIsOpen?: (isOpen: boolean) => void;
   onRowAction?: SpotHoldingsTableProps['onRowAction'];
   onSellAction?: SpotHoldingsTableProps['onSellAction'];
+  handleStartResize?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 // TODO: spot localization
@@ -39,6 +40,7 @@ export const SpotHorizontalPanel = ({
   setIsOpen,
   onRowAction,
   onSellAction,
+  handleStartResize,
 }: SpotHorizontalPanelProps) => {
   const [tab, setTab] = useState<PanelTabs>(PanelTabs.Holdings);
 
@@ -67,15 +69,18 @@ export const SpotHorizontalPanel = ({
   );
 
   return (
-    <$CollapsibleTabs
-      defaultTab={PanelTabs.Holdings}
-      tab={tab}
-      setTab={setTab}
-      defaultOpen={isOpen}
-      onOpenChange={setIsOpen}
-      dividerStyle="underline"
-      tabItems={tabItems}
-    />
+    <>
+      <$DragHandle onMouseDown={handleStartResize} />
+      <$CollapsibleTabs
+        defaultTab={PanelTabs.Holdings}
+        tab={tab}
+        setTab={setTab}
+        defaultOpen={isOpen}
+        onOpenChange={setIsOpen}
+        dividerStyle="underline"
+        tabItems={tabItems}
+      />
+    </>
   );
 };
 
@@ -86,3 +91,13 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
 
   --trigger-active-underline-backgroundColor: var(--color-layer-2);
 ` as typeof CollapsibleTabs;
+
+const $DragHandle = styled.div`
+  width: 100%;
+  height: 0.5rem;
+  cursor: ns-resize;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+`;
