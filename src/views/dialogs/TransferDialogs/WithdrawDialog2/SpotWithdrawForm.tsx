@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useMemo } from 'react';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { SOLANA_MAINNET_ID } from '@/constants/solana';
-import { SOLANA_BASE_TRANSACTION_FEE } from '@/constants/spot';
+import { MIN_SOL_RESERVE, SOLANA_BASE_TRANSACTION_FEE } from '@/constants/spot';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -62,22 +62,36 @@ export const SpotWithdrawForm = ({
       return 'Solana wallet not connected';
     }
 
-    if (amountBN == null || amountBN.lte(0)) {
-      return 'Amount must be greater than zero';
-    }
-
-    if (amountBN.gt(maxWithdrawable)) {
-      return stringGetter({
-        key: STRING_KEYS.INSUFFICIENT_BALANCE,
-      });
-    }
-
     if (!isValidWithdrawalAddress(destinationAddress, SOLANA_MAINNET_ID)) {
       return 'Invalid Solana address';
     }
 
+    if (amountBN == null || amountBN.lte(0)) {
+      return 'Amount must be greater than zero';
+    }
+
+    if (solBalanceBN == null) {
+      return 'Loading balance...';
+    }
+
+    if (amountBN.gt(solBalanceBN)) {
+      return stringGetter({ key: STRING_KEYS.INSUFFICIENT_BALANCE });
+    }
+
+    if (amountBN.gt(maxWithdrawable)) {
+      return `Must keep ${MIN_SOL_RESERVE} SOL reserved for fees`;
+    }
+
     return undefined;
-  }, [amount, amountBN, solanaAddress, maxWithdrawable, destinationAddress, stringGetter]);
+  }, [
+    destinationAddress,
+    amount,
+    solanaAddress,
+    amountBN,
+    solBalanceBN,
+    maxWithdrawable,
+    stringGetter,
+  ]);
 
   const withdrawDisabled = !destinationAddress || !amount || !!validationError;
 
