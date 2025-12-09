@@ -106,6 +106,7 @@ const SpotPage = () => {
           soldAmount: position?.totalSold,
           soldUsd: position?.totalSoldUsd,
           pnlUsd: position?.unrealizedPnL,
+          avgEntryUsd: position?.averageCostBasis,
         };
       })
       .filter((holding) => holding.holdingsUsd >= SPOT_DUST_USD_THRESHOLD);

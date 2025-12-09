@@ -4,6 +4,7 @@ import { ColumnSize } from '@react-types/table';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { defaultTableMixins } from '@/styles/tableMixins';
 
@@ -26,6 +27,7 @@ export interface SpotPositionItem {
   soldAmount?: number;
   soldUsd?: number;
   pnlUsd?: number;
+  avgEntryUsd?: number;
 }
 
 export enum SpotHoldingsTableColumnKey {
@@ -36,6 +38,7 @@ export enum SpotHoldingsTableColumnKey {
   PnL = 'PnL',
   TpSl = 'TpSl',
   Actions = 'Actions',
+  AvgEntry = 'AvgEntry',
 }
 
 // TODO: spot localization
@@ -118,6 +121,20 @@ const getColumnDef = ({
           </TableCell>
         ),
       },
+      [SpotHoldingsTableColumnKey.AvgEntry]: {
+        columnKey: 'avgEntry',
+        label: 'Avg Entry',
+        getCellValue: (row) => row.avgEntryUsd ?? 0,
+        renderCell: ({ avgEntryUsd }) => (
+          <TableCell>
+            <Output
+              type={OutputType.Fiat}
+              value={avgEntryUsd}
+              minimumFractionDigits={SMALL_USD_DECIMALS}
+            />
+          </TableCell>
+        ),
+      },
       [SpotHoldingsTableColumnKey.PnL]: {
         columnKey: 'pnlUsd',
         label: 'PNL',
@@ -176,6 +193,7 @@ export const SpotHoldingsTable = ({
     SpotHoldingsTableColumnKey.Holdings,
     SpotHoldingsTableColumnKey.Bought,
     SpotHoldingsTableColumnKey.Sold,
+    SpotHoldingsTableColumnKey.AvgEntry,
     SpotHoldingsTableColumnKey.PnL,
     SpotHoldingsTableColumnKey.Actions,
   ],
