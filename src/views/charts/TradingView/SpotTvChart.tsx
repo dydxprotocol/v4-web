@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import type { TvWidget } from '@/constants/tvchart';
 
+import { useSpotChartMarketAndResolution } from '@/hooks/tradingView/useSpotChartMarketAndResolution';
 import { useSpotTradingView } from '@/hooks/tradingView/useSpotTradingView';
 import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
@@ -19,6 +20,11 @@ export const SpotTvChart = ({ tokenMint }: SpotTvChartProps) => {
   useSpotTradingView({
     setTvWidget,
     tokenMint,
+  });
+
+  useSpotChartMarketAndResolution({
+    tokenMint,
+    tvWidget,
   });
 
   useTradingViewTheme({ tvWidget });

@@ -84,14 +84,5 @@ export const useSpotTradingView = ({
       tvChartWidget.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedLocale,
-    tokenMint,
-    spotApi,
-    setTvWidget,
-    isSimpleUi,
-    isTablet,
-    savedResolution,
-    dispatch,
-  ]);
+  }, [selectedLocale, !!tokenMint, spotApi, setTvWidget, isSimpleUi, isTablet, dispatch]);
 };

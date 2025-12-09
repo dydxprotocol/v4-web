@@ -55,7 +55,7 @@ export const SpotTokenInfo = ({
         <div tw="row gap-0.25">
           {(isLoading ? [null] : links).map((l) => (
             <IconButton
-              key={l?.url}
+              key={isLoading ? 'loading-icon' : l?.url}
               href={l?.url}
               aria-label={l?.title ?? l?.url}
               action={ButtonAction.Navigation}
