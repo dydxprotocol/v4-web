@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Starboard frontend architecture consists of **two distinct layers**: a **standalone TypeScript SDK** (`ts-sdk/`) that handles blockchain interactions, and a **React frontend application** (`src/`) that provides the trading interface. The frontend uses Redux state management with a custom abstraction layer called "Bonsai" and integrates with the Fuel network through the SDK and direct Fuel wallet connections.
+The Starboard frontend architecture consists of **two distinct layers**: a **standalone TypeScript SDK** (`fuel-ts-sdk/`) that handles blockchain interactions, and a **React frontend application** (`src/`) that provides the trading interface. The frontend uses Redux state management with a custom abstraction layer called "Bonsai" and integrates with the Fuel network through the SDK and direct Fuel wallet connections.
 
 ## Architecture Diagram
 
@@ -14,33 +14,33 @@ graph TB
             COMPS[UI Components<br/>Forms, Charts, Dialogs]
             HOOKS[Custom Hooks<br/>Wallet, Trading, Data]
         end
-        
+
         subgraph "Bonsai Abstraction Layer"
             BONSAI[Bonsai Ontology<br/>Data Selectors & Access]
             EFFECTS[Store Effects<br/>Query Management]
             CALC[Calculators<br/>Business Logic]
         end
-        
+
         subgraph "State Management (Redux)"
             STORE[Redux Store<br/>with Persistence]
             SLICES[Redux Slices<br/>Account, Trading, Wallet]
             MIDDLEWARE[Custom Middleware<br/>Localization, App Logic]
         end
-        
+
         subgraph "Frontend API Layer"
             QUERY[React Query<br/>Caching & Sync]
             META[Metadata Service<br/>Asset Info & Charts]
         end
     end
 
-    subgraph "SDK Layer (ts-sdk/)"
+    subgraph "SDK Layer (fuel-ts-sdk/)"
         subgraph "Starboard Client SDK"
             COMPOSITE[CompositeClient<br/>Main Trading Client]
             INDEXER_CLIENT[IndexerClient<br/>REST API Client]
             FUEL_CLIENT[FuelClient<br/>Fuel Network Transactions]
             SOCKET[SocketClient<br/>WebSocket Connections]
         end
-        
+
         subgraph "SDK Modules"
             ACCOUNT[Account Module<br/>Subaccount Management]
             COMPOSER[Transaction Composer<br/>Message Building]
@@ -48,11 +48,11 @@ graph TB
             WALLET[Local Wallet<br/>HD Key Management]
         end
     end
-    
+
     subgraph "Fuel Wallet Layer"
         FUEL_WALLET[Fuel Connectors<br/>Fuel Network Wallets]
     end
-    
+
     subgraph "External Systems"
         FUEL_NET[Fuel Network<br/>Starboard Contracts]
         INDEXER[Subsquid Indexer<br/>GraphQL & REST API]
@@ -69,13 +69,13 @@ graph TB
     CALC --> BONSAI
     STORE --> SLICES
     SLICES --> MIDDLEWARE
-    
+
     %% Frontend to SDK connections
     HOOKS --> COMPOSITE
     EFFECTS --> INDEXER_CLIENT
     EFFECTS --> SOCKET
     BONSAI --> COMPOSITE
-    
+
     %% SDK internal connections
     COMPOSITE --> ACCOUNT
     COMPOSITE --> COMPOSER
@@ -84,10 +84,10 @@ graph TB
     INDEXER_CLIENT --> SOCKET
     FUEL_CLIENT --> COMPOSER
     FUEL_CLIENT --> SIGNER
-    
+
     %% Wallet connections
     HOOKS --> FUEL_WALLET
-    
+
     %% External system connections
     FUEL_WALLET --> FUEL_NET
     INDEXER_CLIENT --> INDEXER
@@ -112,13 +112,14 @@ graph TB
 
 ## SDK vs Frontend Application Boundaries
 
-### What's in the SDK Layer (`ts-sdk/`)
+### What's in the SDK Layer (`fuel-ts-sdk/`)
 
 **Package**: `@starboard/client-js` - Standalone TypeScript library
 
 **Contents**:
+
 - **Blockchain Clients**: CompositeClient, IndexerClient, FuelClient, SocketClient
-- **Transaction Modules**: Account management, transaction composition, signing, broadcasting  
+- **Transaction Modules**: Account management, transaction composition, signing, broadcasting
 - **Fuel Integration**: Direct Fuel network communication, contract interactions
 - **Network Communication**: REST API clients, WebSocket connections
 - **Dependencies**: Pure blockchain/crypto libraries (Fuel SDK, Ethers)
@@ -137,6 +138,7 @@ const indexer = new IndexerClient(indexerEndpoint);
 **Package**: `starboard-frontend` - React-based trading interface
 
 **Contents**:
+
 - **React Components**: Trading forms, charts, market displays, wallet interfaces
 - **State Management**: Redux store with application-specific slices and persistence
 - **Bonsai Layer**: Business logic abstraction over SDK and state management
@@ -145,9 +147,9 @@ const indexer = new IndexerClient(indexerEndpoint);
 - **Dependencies**: React ecosystem (React, Redux, UI libraries)
 
 ```typescript
-// Example Frontend usage  
-import { useAppSelector } from 'state/store';
+// Example Frontend usage
 import { useStarboardClient } from 'hooks/useStarboardClient';
+import { useAppSelector } from 'state/store';
 
 const { fuelClient, compositeClient } = useStarboardClient();
 const accountData = useAppSelector(selectAccountData);
@@ -156,7 +158,7 @@ const accountData = useAppSelector(selectAccountData);
 ### Key Separation Principles
 
 1. **SDK is Fuel-focused** - Specialized for Fuel network and Starboard contracts
-2. **Frontend is application-specific** - Tailored for Starboard trading interface  
+2. **Frontend is application-specific** - Tailored for Starboard trading interface
 3. **SDK has no UI dependencies** - Pure business logic and network communication
 4. **Frontend consumes SDK** - Uses SDK clients through React hooks and Bonsai layer
 5. **Clear import boundaries** - Frontend imports SDK, never the reverse
@@ -174,10 +176,7 @@ const store = configureStore({
     serializableCheck: {
       ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
     },
-  }).concat([
-    appMiddleware,
-    localizationMiddleware,
-  ]),
+  }).concat([appMiddleware, localizationMiddleware]),
   devTools: process.env.NODE_ENV !== 'production',
 });
 
@@ -192,23 +191,27 @@ const persistConfig = {
 ### Key Redux Slices
 
 #### **Account Slice** (`src/state/account.ts`)
+
 - **User authentication state**
 - **Subaccount management**
 - **Balance and position tracking**
 - **Deposit/withdrawal status**
 
 #### **Wallet Slice** (`src/state/wallet.ts`)
+
 - **Multi-chain wallet connections**
 - **Address management**
 - **Connection status tracking**
 - **Network switching state**
 
 #### **Trading Slices**
+
 - **`perpetuals.ts`**: Market data, positions, orders
 - **`tradeForm.ts`**: Trading interface state
 - **`transfers.ts`**: Cross-chain transfer management
 
 #### **UI/UX Slices**
+
 - **`appUiConfigs.ts`**: User interface preferences
 - **`layout.ts`**: Layout and responsive design state
 - **`notifications.ts`**: Toast and alert management
@@ -218,16 +221,16 @@ const persistConfig = {
 ```typescript
 // Selective persistence to avoid performance issues
 const persistWhitelist = [
-  'account',           // User authentication and subaccounts
-  'appUiConfigs',      // UI preferences and settings
-  'layout',            // Layout state and customizations
+  'account', // User authentication and subaccounts
+  'appUiConfigs', // UI preferences and settings
+  'layout', // Layout state and customizations
 ];
 
 // Sensitive data excluded from persistence
 const persistBlacklist = [
-  'wallet',            // Wallet connection state (security)
-  'perpetuals',        // Market data (stale quickly)
-  'notifications',     // Temporary UI notifications
+  'wallet', // Wallet connection state (security)
+  'perpetuals', // Market data (stale quickly)
+  'notifications', // Temporary UI notifications
 ];
 ```
 
@@ -266,18 +269,19 @@ export const useCurrentMarket = () => {
 // Reactive query management based on state changes with dependency injection
 const createIndexerQueryStoreEffect = (store, queryClient, indexerClient, config) => {
   let requestId = 0;
-  
+
   return () => {
     const state = store.getState();
     const selectorData = config.selector(state);
-    
+
     if (selectorData) {
       const currentRequestId = ++requestId;
       const queryKey = config.getQueryKey(selectorData);
       const queryFn = config.getQueryFn(indexerClient, selectorData);
-      
+
       // Trigger React Query with dynamic key and function, guard against stale responses
-      queryClient.fetchQuery(queryKey, queryFn)
+      queryClient
+        .fetchQuery(queryKey, queryFn)
         .then((result) => {
           // Only process if this is still the latest request
           if (currentRequestId === requestId) {
@@ -303,6 +307,7 @@ const createIndexerQueryStoreEffect = (store, queryClient, indexerClient, config
 The REST API system provides structured data fetching with automatic state synchronization:
 
 #### **Market Data APIs**
+
 ```typescript
 // src/bonsai/rest/markets.ts
 const marketsEffect = createIndexerQueryStoreEffect(store, {
@@ -315,6 +320,7 @@ const marketsEffect = createIndexerQueryStoreEffect(store, {
 ```
 
 #### **Account Data APIs**
+
 ```typescript
 // src/bonsai/rest/fills.ts - Trade history
 const fillsEffect = createIndexerQueryStoreEffect(store, {
@@ -322,7 +328,8 @@ const fillsEffect = createIndexerQueryStoreEffect(store, {
   selector: selectParentSubaccountInfo,
   getQueryKey: (data) => ['account', 'fills', data.wallet, data.subaccount],
   getQueryFn: (indexerClient, data) => {
-    return () => indexerClient.account.getParentSubaccountNumberFills(data.wallet!, data.subaccount!);
+    return () =>
+      indexerClient.account.getParentSubaccountNumberFills(data.wallet!, data.subaccount!);
   },
   onResult: (fills) => store.dispatch(setAccountFillsRaw(loadableWithData(fills))),
 });
@@ -361,15 +368,9 @@ class IndexerWebsocketManager {
     this.heartbeat = null;
     this.isConnected = false;
   }
-  
+
   // Channel subscription management
-  addChannelSubscription({
-    channel,
-    id,
-    handleBaseData,
-    handleUpdates,
-    handleError
-  }) {
+  addChannelSubscription({ channel, id, handleBaseData, handleUpdates, handleError }) {
     const subscription = {
       channel: `${channel}/${id}`,
       onMessage: (data) => {
@@ -378,9 +379,9 @@ class IndexerWebsocketManager {
         } else if (data.type === 'channel_data') {
           handleUpdates(data.contents);
         }
-      }
+      },
     };
-    
+
     this.websocket.subscribe(subscription);
     return () => this.websocket.unsubscribe(subscription);
   }
@@ -393,23 +394,23 @@ class IndexerWebsocketManager {
       }
     }, 30000);
   }
-  
+
   stopMonitoring() {
     if (this.heartbeat) {
       clearInterval(this.heartbeat);
       this.heartbeat = null;
     }
   }
-  
+
   reconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
       return;
     }
-    
+
     const backoffDelay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
     this.reconnectAttempts++;
-    
+
     setTimeout(() => {
       this.connect();
     }, backoffDelay);
@@ -429,7 +430,7 @@ const orderbookSubscription = websocket.addChannelSubscription({
   },
   handleUpdates: (updates) => {
     dispatch(updateOrderbookIncrementally({ marketId, updates }));
-  }
+  },
 });
 
 // Live trade feed
@@ -441,7 +442,7 @@ const tradesSubscription = websocket.addChannelSubscription({
   },
   handleUpdates: (newTrades) => {
     dispatch(addMarketTrades({ marketId, trades: newTrades }));
-  }
+  },
 });
 
 // Account position updates
@@ -450,7 +451,7 @@ const accountSubscription = websocket.addChannelSubscription({
   id: `${address}/${subaccountNumber}`,
   handleUpdates: (accountData) => {
     dispatch(updateSubaccountData(accountData));
-  }
+  },
 });
 ```
 
@@ -488,26 +489,30 @@ The application connects to the Fuel network through Fuel wallet connectors:
 const FuelWalletProvider = () => {
   const fuel = useFuel();
   const { wallet, isConnected } = useWallet();
-  
+
   const connectFuelWallet = async () => {
     await fuel.selectConnector('Fuel Wallet');
     const connection = await fuel.connect();
     const accounts = await fuel.accounts();
-    
-    dispatch(setFuelWalletState({
-      isConnected: true,
-      address: accounts[0]?.address,
-      accounts: accounts
-    }));
+
+    dispatch(
+      setFuelWalletState({
+        isConnected: true,
+        address: accounts[0]?.address,
+        accounts: accounts,
+      })
+    );
   };
-  
+
   const disconnectFuelWallet = async () => {
     await fuel.disconnect();
-    dispatch(setFuelWalletState({
-      isConnected: false,
-      address: null,
-      accounts: []
-    }));
+    dispatch(
+      setFuelWalletState({
+        isConnected: false,
+        address: null,
+        accounts: [],
+      })
+    );
   };
 };
 ```
@@ -521,16 +526,16 @@ class FuelClientManager {
   // Fuel-specific client resource management
   private clients = new Map<string, ClientInstance>();
   private resourceManager = new ResourceCacheManager();
-  
+
   async getFuelClient(network: FuelNetworkConfig) {
     const cacheKey = `fuel-${network.chainId}`;
-    
+
     return this.resourceManager.getOrCreate(cacheKey, async () => {
       const provider = new Provider(network.fuelNodeUrl);
       const client = new FuelClient(provider);
       return {
         instance: client,
-        cleanup: () => client.disconnect()
+        cleanup: () => client.disconnect(),
       };
     });
   }
@@ -556,13 +561,12 @@ class AccountTransactionSupervisor {
   ) {
     try {
       dispatch(operationStarted({ operationName, payload }));
-      
+
       const clients = await this.getFuelClients();
       const result = await operation(clients, payload);
-      
+
       dispatch(operationSucceeded({ operationName, result }));
       return { type: 'success', payload: result };
-      
     } catch (error) {
       dispatch(operationFailed({ operationName, error: error.message }));
       return { type: 'failure', errorString: error.message, parsedError: error };
@@ -571,28 +575,31 @@ class AccountTransactionSupervisor {
 
   // Fuel trading operations
   async increasePosition(payload: IncreasePositionPayload) {
-    return this.wrapOperation('increasePosition', payload, async ({ fuelClient, wallet }, payload) => {
-      const vault = new Vault(payload.vaultContractId, wallet);
-      
-      return vault.functions.increase_position(
-        payload.account,
-        payload.collateralAsset,
-        payload.indexAsset,
-        payload.sizeDelta,
-        payload.isLong
-      ).call();
-    });
+    return this.wrapOperation(
+      'increasePosition',
+      payload,
+      async ({ fuelClient, wallet }, payload) => {
+        const vault = new Vault(payload.vaultContractId, wallet);
+
+        return vault.functions
+          .increase_position(
+            payload.account,
+            payload.collateralAsset,
+            payload.indexAsset,
+            payload.sizeDelta,
+            payload.isLong
+          )
+          .call();
+      }
+    );
   }
 
   // Liquidity operations
   async depositToVault(payload: DepositPayload) {
     return this.wrapOperation('deposit', payload, async ({ fuelClient, wallet }, payload) => {
       const vault = new Vault(payload.vaultContractId, wallet);
-      
-      return vault.functions.buy_rusd(
-        payload.asset,
-        payload.receiver
-      ).call();
+
+      return vault.functions.buy_rusd(payload.asset, payload.receiver).call();
     });
   }
 }
@@ -608,29 +615,34 @@ The application has complete Fuel smart contract infrastructure:
 // Auto-generated from Fuel contracts
 export class Vault extends Contract {
   functions: {
-    increase_position: InvokeFunction<[
-      account: IdentityInput,
-      collateral_asset: AssetIdInput,
-      index_asset: AssetIdInput,
-      size_delta: BigNumberish,
-      is_long: boolean
-    ], void>;
-    
-    decrease_position: InvokeFunction<[
-      account: IdentityInput,
-      collateral_asset: AssetIdInput,
-      index_asset: AssetIdInput,
-      collateral_delta: BigNumberish,
-      size_delta: BigNumberish,
-      is_long: boolean,
-      receiver: IdentityInput
-    ], BN>;
-    
-    swap: InvokeFunction<[
-      asset_in: AssetIdInput,
-      asset_out: AssetIdInput,
-      receiver: IdentityInput
-    ], BN>;
+    increase_position: InvokeFunction<
+      [
+        account: IdentityInput,
+        collateral_asset: AssetIdInput,
+        index_asset: AssetIdInput,
+        size_delta: BigNumberish,
+        is_long: boolean,
+      ],
+      void
+    >;
+
+    decrease_position: InvokeFunction<
+      [
+        account: IdentityInput,
+        collateral_asset: AssetIdInput,
+        index_asset: AssetIdInput,
+        collateral_delta: BigNumberish,
+        size_delta: BigNumberish,
+        is_long: boolean,
+        receiver: IdentityInput,
+      ],
+      BN
+    >;
+
+    swap: InvokeFunction<
+      [asset_in: AssetIdInput, asset_out: AssetIdInput, receiver: IdentityInput],
+      BN
+    >;
   };
 }
 ```
@@ -643,25 +655,25 @@ const FuelContractManager = {
   async executeVaultOperation(operation: VaultOperation, connectedWallet: Account) {
     const provider = await connectedWallet.provider();
     const vault = new Vault(CONTRACT_ID, connectedWallet);
-    
+
     switch (operation.type) {
       case 'increasePosition':
-        return vault.functions.increase_position(
-          operation.account,
-          operation.collateralAsset,
-          operation.indexAsset,
-          operation.sizeDelta,
-          operation.isLong
-        ).call();
-        
+        return vault.functions
+          .increase_position(
+            operation.account,
+            operation.collateralAsset,
+            operation.indexAsset,
+            operation.sizeDelta,
+            operation.isLong
+          )
+          .call();
+
       case 'swap':
-        return vault.functions.swap(
-          operation.assetIn,
-          operation.assetOut,
-          operation.receiver
-        ).call();
+        return vault.functions
+          .swap(operation.assetIn, operation.assetOut, operation.receiver)
+          .call();
     }
-  }
+  },
 };
 ```
 
@@ -750,7 +762,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             break;
         }
       }
-      
+
       // Process RLP contract events
       if (log.address === RLP_CONTRACT_ADDRESS) {
         switch (log.topic0) {
@@ -785,7 +797,10 @@ const createAccountDataQuery = (address: string, subaccountNumber: number) => {
           freeCollateral
           positions {
             id
-            market { ticker, oraclePrice }
+            market {
+              ticker
+              oraclePrice
+            }
             side
             size
             entryPrice
@@ -809,7 +824,7 @@ const accountDataEffect = createIndexerQueryStoreEffect(store, {
   onResult: (accountData) => {
     store.dispatch(setSubaccountPositions(accountData.account.subaccounts[0].positions));
     store.dispatch(setSubaccountSummary(accountData.account.subaccounts[0]));
-  }
+  },
 });
 ```
 
@@ -830,13 +845,13 @@ const subscribeToAccountUpdates = (address: string, subaccountNumber: number) =>
       }
     }
   `;
-  
+
   indexerWebSocket.subscribe({
     query: subscription,
     variables: { address, subaccount: subaccountNumber },
     next: (data) => {
       store.dispatch(updateSubaccountData(data.accountUpdated));
-    }
+    },
   });
 };
 ```
@@ -896,14 +911,14 @@ sequenceDiagram
     ReactComponent->>BonsaiHook: useUserPositions()
     BonsaiHook->>ReduxStore: selectCurrentAccount()
     ReduxStore-->>BonsaiHook: {address, subaccount}
-    
+
     BonsaiHook->>StoreEffect: accountDataEffect triggered
     StoreEffect->>ReactQuery: fetchQuery(['positions', address, subaccount])
     ReactQuery->>IndexerClient: getPositions(address, subaccount)
     IndexerClient->>SubsquidIndexer: GraphQL Query
-    
+
     Note over SubsquidIndexer: Query cached/computed data<br/>from processed blockchain events
-    
+
     SubsquidIndexer-->>IndexerClient: Positions Data
     IndexerClient-->>ReactQuery: Formatted Positions
     ReactQuery-->>StoreEffect: Query Result
@@ -911,7 +926,7 @@ sequenceDiagram
     ReduxStore-->>BonsaiHook: Updated State
     BonsaiHook-->>ReactComponent: Positions Data
     ReactComponent-->>User: Display Positions UI
-    
+
     Note over ReactComponent,SubsquidIndexer: WebSocket Updates
     SubsquidIndexer->>ReactQuery: Real-time Position Updates
     ReactQuery->>ReduxStore: dispatch(updatePositions(delta))
@@ -940,31 +955,31 @@ sequenceDiagram
     User->>TradingForm: Enter size, leverage, asset
     TradingForm->>BonsaiHook: validatePositionParams()
     BonsaiHook-->>TradingForm: Validation Result
-    
+
     User->>TradingForm: Submit Form
     TradingForm->>TransactionSupervisor: increasePosition(payload)
     TransactionSupervisor->>ReduxStore: dispatch(operationStarted)
-    
+
     TransactionSupervisor->>FuelClientManager: getFuelClient()
     FuelClientManager-->>TransactionSupervisor: FuelClient Instance
     TransactionSupervisor->>FuelWallet: Request Transaction Signature
-    
+
     FuelWallet-->>User: Show Transaction Details
     User->>FuelWallet: Approve Transaction
     FuelWallet-->>TransactionSupervisor: Signed Transaction
-    
+
     TransactionSupervisor->>FuelClient: executeTransaction()
     FuelClient->>StarboardVault: increase_position(account, asset, size, isLong)
     StarboardVault->>FuelNetwork: Submit Transaction
-    
+
     FuelNetwork-->>StarboardVault: Transaction Hash
     StarboardVault-->>FuelClient: Transaction Result
     FuelClient-->>TransactionSupervisor: Success Response
-    
+
     TransactionSupervisor->>ReduxStore: dispatch(operationSucceeded)
     ReduxStore->>ReactComponent: Update UI State
     ReactComponent-->>User: Show "Transaction Pending"
-    
+
     Note over FuelNetwork,SubsquidIndexer: Transaction Processing
     FuelNetwork->>FuelNetwork: Mine Transaction Block
     FuelNetwork->>SubsquidIndexer: Emit IncreasePosition Event
@@ -992,13 +1007,13 @@ sequenceDiagram
     User->>ReactComponent: Open Trading Page for ETH-USD
     ReactComponent->>BonsaiHook: useMarketData('ETH-USD')
     BonsaiHook->>WebSocketManager: subscribeToMarket('ETH-USD')
-    
+
     WebSocketManager->>IndexerWebSocket: connect()
     IndexerWebSocket->>SubsquidIndexer: WebSocket Connection
     WebSocketManager->>IndexerWebSocket: subscribe('v4_orderbook/ETH-USD')
     WebSocketManager->>IndexerWebSocket: subscribe('v4_trades/ETH-USD')
     WebSocketManager->>IndexerWebSocket: subscribe('v4_candles/ETH-USD')
-    
+
     IndexerWebSocket-->>WebSocketManager: subscription_ack
     SubsquidIndexer-->>IndexerWebSocket: initial_data (baseline snapshot)
     IndexerWebSocket-->>WebSocketManager: handleBaseData()
@@ -1007,39 +1022,39 @@ sequenceDiagram
     ReduxStore-->>BonsaiHook: Initial Market Data
     BonsaiHook-->>ReactComponent: Market Data
     ReactComponent-->>User: Display Charts & Orderbook
-    
+
     Note over User,FuelNetwork: Real-Time Updates Flow
-    
+
     loop Continuous Real-Time Updates
         FuelNetwork->>FuelNetwork: New Trade Executed
         FuelNetwork->>SubsquidIndexer: Emit TradeExecuted Event
         SubsquidIndexer->>SubsquidIndexer: Process Event & Update Aggregated Data
-        
+
         SubsquidIndexer->>IndexerWebSocket: websocket_update('v4_trades/ETH-USD')
         IndexerWebSocket->>WebSocketManager: handleUpdates(newTrade)
         WebSocketManager->>ReduxStore: dispatch(addMarketTrade(newTrade))
-        
+
         SubsquidIndexer->>IndexerWebSocket: websocket_update('v4_orderbook/ETH-USD')
         IndexerWebSocket->>WebSocketManager: handleUpdates(orderbookDelta)
         WebSocketManager->>ReduxStore: dispatch(updateOrderbookIncrementally(delta))
-        
+
         SubsquidIndexer->>IndexerWebSocket: websocket_update('v4_candles/ETH-USD')
         IndexerWebSocket->>WebSocketManager: handleUpdates(newCandle)
         WebSocketManager->>ReduxStore: dispatch(updateCandleData(candle))
-        
+
         ReduxStore->>ReactComponent: State Changes Trigger Re-render
         ReactComponent->>ReactComponent: Update Charts & Trade Feed
         ReactComponent-->>User: Live UI Updates (No Page Refresh)
     end
-    
+
     Note over User,FuelNetwork: Connection Management
-    
+
     alt Connection Lost
         IndexerWebSocket->>WebSocketManager: onDisconnect()
         WebSocketManager->>WebSocketManager: scheduleReconnect()
         WebSocketManager->>ReduxStore: dispatch(setConnectionStatus('reconnecting'))
         ReactComponent-->>User: Show "Reconnecting..." indicator
-        
+
         WebSocketManager->>IndexerWebSocket: reconnect()
         IndexerWebSocket->>SubsquidIndexer: Re-establish connection
         WebSocketManager->>IndexerWebSocket: re-subscribe to all channels
@@ -1048,7 +1063,7 @@ sequenceDiagram
         ReduxStore->>ReactComponent: Update with latest data
         ReactComponent-->>User: Remove reconnection indicator
     end
-    
+
     Note over User,ReactComponent: Cleanup
     User->>ReactComponent: Navigate Away from Trading Page
     ReactComponent->>BonsaiHook: useEffect cleanup
@@ -1061,19 +1076,22 @@ sequenceDiagram
 ## 7. Technology Stack Summary
 
 ### **Core Technologies**
+
 - **Frontend Framework**: React 18 with TypeScript
-- **Build Tool**: Vite with optimized development experience  
+- **Build Tool**: Vite with optimized development experience
 - **State Management**: Redux Toolkit with Redux Persist
 - **Styling**: Styled Components + TailwindCSS + Twin.macro
 - **UI Components**: Radix UI primitives with custom design system
 
 ### **Blockchain Integration**
+
 - **Fuel Network**: `fuels` SDK for smart contract interactions
 - **Fuel Wallets**: Fuel connectors for wallet management
 - **Starboard Contracts**: Custom TypeScript SDK for perpetuals trading
 - **Indexer Integration**: Subsquid-based blockchain data processing
 
 ### **Data & API Layer**
+
 - **Indexer**: Subsquid framework for blockchain data indexing
 - **GraphQL**: Generated schema with TypeORM database models
 - **REST API**: Custom endpoints with React Query caching
@@ -1081,6 +1099,7 @@ sequenceDiagram
 - **Type Safety**: Comprehensive TypeScript with runtime validation
 
 ### **Development & Testing**
+
 - **Testing**: Vitest with React Testing Library
 - **Code Quality**: ESLint, Prettier, TypeScript strict mode
 - **Development**: Hot reload, mock servers, fake data injection
@@ -1091,21 +1110,25 @@ sequenceDiagram
 This Fuel-focused architecture provides:
 
 ### **Clean Separation of Concerns**
+
 - **SDK Layer**: Pure Fuel network communication and contract interactions
 - **Frontend Layer**: React-based trading interface with comprehensive state management
 - **Clear Boundaries**: No cross-dependencies, SDK can be used independently
 
 ### **Fuel Network Integration**
+
 - **Native Fuel Support**: Direct integration with Fuel network and Starboard contracts
 - **Wallet Integration**: Fuel wallet connectors for seamless user experience
 - **Contract Interactions**: Type-safe contract calls with auto-generated interfaces
 
-### **Real-Time Capabilities** 
+### **Real-Time Capabilities**
+
 - **Live Data**: WebSocket connections for real-time market data and account updates
 - **Responsive UI**: Optimistic updates with automatic conflict resolution
 - **Performance**: Efficient state management with selective persistence
 
 ### **Scalable Foundation**
+
 - **Modular Design**: Clear separation between data layer, business logic, and UI
 - **Type Safety**: Comprehensive TypeScript usage throughout the stack
 - **Testing Support**: Mock servers and fake data injection for development
