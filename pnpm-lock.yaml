@@ -145,9 +145,6 @@ importers:
       '@solana/web3.js':
         specifier: ^1.93.0
         version: 1.93.0
-      '@starboard/fuel-ts-sdk':
-        specifier: workspace:*
-        version: link:fuel-ts-sdk
       '@statsig/js-client':
         specifier: 1.4.0
         version: 1.4.0
@@ -30732,6 +30729,7 @@ packages:
   /sucrase@3.35.0:
     resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==}
     engines: {node: '>=16 || 14 >=14.17'}
+    hasBin: true
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
       commander: 4.1.1
@@ -31235,6 +31233,7 @@ packages:
 
   /tree-kill@1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
 
   /trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}

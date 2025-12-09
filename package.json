@@ -137,7 +137,6 @@
     "redux-persist": "^6.0.0",
     "reselect": "^5.1.0",
     "starboard-client-js": "file:./packages/starboard-client-js-1.3.17.tgz",
-    "@starboard/fuel-ts-sdk": "workspace:*",
     "styled-components": "^6.1.12",
     "twin.macro": "^3.4.1",
     "typia": "^7.1.0",
