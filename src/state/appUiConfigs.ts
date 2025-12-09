@@ -1,3 +1,4 @@
+import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -5,6 +6,28 @@ import { MarketsSortType, PositionSortType } from '@/constants/marketList';
 import { DisplayUnit } from '@/constants/trade';
 
 import { track } from '@/lib/analytics/analytics';
+
+export type SpotQuickOptions = {
+  [SpotSide.SELL]: {
+    [SpotSellInputType.PERCENT]: string[];
+    [SpotSellInputType.USD]: string[];
+  };
+  [SpotSide.BUY]: {
+    [SpotBuyInputType.USD]: string[];
+    [SpotBuyInputType.SOL]: string[];
+  };
+};
+
+export const DEFAULT_SPOT_QUICK_OPTIONS: SpotQuickOptions = {
+  [SpotSide.SELL]: {
+    [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
+    [SpotSellInputType.USD]: ['50', '100', '250', '500'],
+  },
+  [SpotSide.BUY]: {
+    [SpotBuyInputType.USD]: ['50', '100', '250', '500'],
+    [SpotBuyInputType.SOL]: ['0.1', '0.25', '0.5', '1'],
+  },
+};
 
 export enum AppTheme {
   Classic = 'Classic',
@@ -39,6 +62,7 @@ export interface AppUIConfigsState {
   shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
   spotFavorites: string[];
+  spotQuickOptions: SpotQuickOptions;
   horizontalPanelHeightPx: number;
   tablePageSizes: { [tableKey: string]: number };
   simpleUI: {
@@ -56,6 +80,7 @@ export const initialState: AppUIConfigsState = {
   shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
   spotFavorites: [],
+  spotQuickOptions: DEFAULT_SPOT_QUICK_OPTIONS,
   horizontalPanelHeightPx: 288,
   tablePageSizes: {},
   simpleUI: {
@@ -154,6 +179,23 @@ export const appUiConfigsSlice = createSlice({
     ) => {
       state.simpleUI.sortPositionsBy = payload;
     },
+    setSpotQuickOptions: (
+      state: AppUIConfigsState,
+      {
+        payload,
+      }: PayloadAction<{
+        side: SpotSide;
+        inputType: SpotBuyInputType | SpotSellInputType;
+        options: string[];
+      }>
+    ) => {
+      const { side, inputType, options } = payload;
+      if (side === SpotSide.BUY) {
+        state.spotQuickOptions[SpotSide.BUY][inputType as SpotBuyInputType] = options;
+      } else {
+        state.spotQuickOptions[SpotSide.SELL][inputType as SpotSellInputType] = options;
+      }
+    },
   },
 });
 
@@ -172,4 +214,5 @@ export const {
   setSimpleUISortPositionsBy,
   favoriteSpotToken,
   unfavoriteSpotToken,
+  setSpotQuickOptions,
 } = appUiConfigsSlice.actions;

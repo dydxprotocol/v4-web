@@ -78,3 +78,6 @@ export const getSimpleUISortMarketsBy = (state: RootState) =>
 
 export const getSimpleUISortPositionsBy = (state: RootState) =>
   state.appUiConfigs.simpleUI.sortPositionsBy;
+
+// Spot
+export const getSpotQuickOptions = (state: RootState) => state.appUiConfigs.spotQuickOptions;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -14,7 +14,9 @@ import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
 
-import { useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { setSpotQuickOptions } from '@/state/appUiConfigs';
+import { getSpotQuickOptions } from '@/state/appUiConfigsSelectors';
 
 import { mapIfPresent } from '@/lib/do';
 
@@ -24,8 +26,10 @@ import { SpotTabs, SpotTabVariant } from './SpotTabs';
 
 export const SpotTradeForm = () => {
   const stringGetter = useStringGetter();
+  const dispatch = useAppDispatch();
   const form = useSpotForm();
   const tokenMetadata = useAppSelector(BonsaiCore.spot.tokenMetadata.data);
+  const quickOptionsState = useAppSelector(getSpotQuickOptions);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const isFirstRender = useRef(true);
@@ -40,17 +44,6 @@ export const SpotTradeForm = () => {
       inputRef.current?.focus();
     });
   }, [form.state.side]);
-
-  const [quickOptionsState, setQuickOptionsState] = useState({
-    [SpotSide.SELL]: {
-      [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
-      [SpotSellInputType.USD]: ['50', '100', '250', '500'],
-    },
-    [SpotSide.BUY]: {
-      [SpotBuyInputType.USD]: ['50', '100', '250', '500'],
-      [SpotBuyInputType.SOL]: ['0.1', '0.25', '0.5', '1'],
-    },
-  });
 
   const quickOptions = useMemo(() => {
     if (form.state.side === SpotSide.BUY) {
@@ -95,25 +88,16 @@ export const SpotTradeForm = () => {
 
   const handleQuickOptionsChange = useCallback(
     (newOptions: string[]) => {
-      if (form.state.side === SpotSide.BUY) {
-        setQuickOptionsState((prev) => ({
-          ...prev,
-          [SpotSide.BUY]: {
-            ...prev[SpotSide.BUY],
-            [form.state.buyInputType]: newOptions,
-          },
-        }));
-      } else {
-        setQuickOptionsState((prev) => ({
-          ...prev,
-          [SpotSide.SELL]: {
-            ...prev[SpotSide.SELL],
-            [form.state.sellInputType]: newOptions,
-          },
-        }));
-      }
+      dispatch(
+        setSpotQuickOptions({
+          side: form.state.side,
+          inputType:
+            form.state.side === SpotSide.BUY ? form.state.buyInputType : form.state.sellInputType,
+          options: newOptions,
+        })
+      );
     },
-    [form.state.buyInputType, form.state.sellInputType, form.state.side]
+    [dispatch, form.state.buyInputType, form.state.sellInputType, form.state.side]
   );
 
   return (
