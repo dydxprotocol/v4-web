@@ -1,5 +1,5 @@
 export const DEFAULT_PRIORITY_FEE_LAMPORTS = 100000;
-export const DEFAULT_SLIPPAGE_BPS = 100;
+export const DEFAULT_SLIPPAGE_BPS = 2000;
 
 export const SPOT_DUST_USD_THRESHOLD = 0.01;
 export const MIN_SOL_RESERVE = 0.002;
