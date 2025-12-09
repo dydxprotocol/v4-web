@@ -1,6 +1,6 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
-import { SpotCandleServiceInterval } from '@/lib/tradingView/spotDatafeed/types';
+import { SpotApiBarsResolution } from '@/clients/spotApi';
 
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { STRING_KEYS } from './localization';
@@ -122,6 +122,22 @@ export const RESOLUTION_CHART_CONFIGS = {
   '1D': { defaultRange: 2 * timeUnits.month },
 } as Record<ResolutionString, { defaultRange: number }>;
 
+export const SPOT_RESOLUTION_CHART_CONFIGS = {
+  '1S': { defaultRange: 5 * timeUnits.minute },
+  '5S': { defaultRange: 10 * timeUnits.minute },
+  '15S': { defaultRange: 30 * timeUnits.minute },
+  '30S': { defaultRange: timeUnits.hour },
+  '1': { defaultRange: 2 * timeUnits.hour },
+  '5': { defaultRange: 10 * timeUnits.hour },
+  '15': { defaultRange: 30 * timeUnits.hour },
+  '30': { defaultRange: timeUnits.day },
+  '60': { defaultRange: 6 * timeUnits.day },
+  '240': { defaultRange: 24 * timeUnits.day },
+  '720': { defaultRange: 48 * timeUnits.day },
+  '1D': { defaultRange: 4 * timeUnits.month },
+  '1W': { defaultRange: timeUnits.year },
+} as Record<ResolutionString, { defaultRange: number }>;
+
 export const RESOLUTION_STRING_TO_LABEL = {
   '1': { value: '1', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
   '5': { value: '5', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
@@ -133,7 +149,7 @@ export const RESOLUTION_STRING_TO_LABEL = {
 } as Record<ResolutionString, { value: string; unitStringKey?: string }>;
 
 /**
- * @description ResolutionStrings used with TradingView's charting library mapped to SpotCandleServiceInterval
+ * @description ResolutionStrings used with TradingView's charting library mapped to SpotApiBarsResolution
  */
 export const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
   '1S': '1S',
@@ -149,4 +165,4 @@ export const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
   '720': '720',
   '1D': '1D',
   '1W': '7D',
-} as Record<ResolutionString, SpotCandleServiceInterval>;
+} as Record<ResolutionString, SpotApiBarsResolution>;

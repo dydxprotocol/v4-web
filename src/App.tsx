@@ -37,7 +37,6 @@ import { FooterMobile } from '@/layout/Footer/FooterMobile';
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 
-import { testFlags } from '@/lib/testFlags';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
@@ -53,6 +52,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useEnableSpot } from './hooks/useEnableSpot';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
@@ -68,6 +68,7 @@ import { TurnkeyAuthProvider } from './providers/TurnkeyAuthProvider';
 import { TurnkeyWalletProvider } from './providers/TurnkeyWalletProvider';
 import { persistor } from './state/_store';
 import { setOnboardedThisSession } from './state/account';
+import { setCurrentPath } from './state/app';
 import { appQueryClient } from './state/appQueryClient';
 import { useAppDispatch, useAppSelector } from './state/appTypes';
 import { AppTheme, setAppThemeSetting } from './state/appUiConfigs';
@@ -106,12 +107,19 @@ const Content = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
+  const isSpotEnabled = useEnableSpot();
+
+  // Track current path in Redux for conditional polling
+  useEffect(() => {
+    dispatch(setCurrentPath(location.pathname));
+  }, [location.pathname, dispatch]);
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -201,7 +209,9 @@ const Content = () => {
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
 
-              {testFlags.spot && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
+              {isSpotEnabled && (
+                <Route path={`${AppRoute.Spot}/:tokenMint`} element={<SpotPage />} />
+              )}
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />

@@ -80,3 +80,22 @@ export const selectRawSelectedMarketLeverages = (state: RootState) =>
   state.raw.markets.selectedMarketLeverages;
 export const selectRawSelectedMarketLeveragesData = (state: RootState) =>
   state.raw.markets.selectedMarketLeverages.data;
+export const selectRawSpotSolPrice = (state: RootState) => state.raw.spot.solPrice.data;
+export const selectRawSpotSolPriceLoading = (state: RootState) => state.raw.spot.solPrice.status;
+export const selectRawSpotTokenPrice = (state: RootState) => state.raw.spot.tokenPrice.data;
+export const selectRawSpotTokenPriceLoading = (state: RootState) =>
+  state.raw.spot.tokenPrice.status;
+
+export const selectRawSpotTokenMetadata = (state: RootState) => state.raw.spot.tokenMetadata.data;
+export const selectRawSpotTokenMetadataLoading = (state: RootState) =>
+  state.raw.spot.tokenMetadata.status;
+
+export const selectRawSpotWalletPositions = (state: RootState) =>
+  state.raw.spot.walletPositions.data;
+export const selectRawSpotWalletPositionsLoading = (state: RootState) =>
+  state.raw.spot.walletPositions.status;
+
+export const selectRawSpotPortfolioTrades = (state: RootState) =>
+  state.raw.spot.portfolioTrades.data;
+export const selectRawSpotPortfolioTradesLoading = (state: RootState) =>
+  state.raw.spot.portfolioTrades.status;

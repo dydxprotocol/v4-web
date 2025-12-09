@@ -10,6 +10,7 @@ export interface AppState {
   pageLoaded: boolean;
   initializationError?: string;
   selectedNetwork: DydxNetwork;
+  currentPath: string;
 }
 
 const initialState: AppState = {
@@ -20,6 +21,7 @@ const initialState: AppState = {
     defaultValue: DEFAULT_APP_ENVIRONMENT,
     validateFn: validateAgainstAvailableEnvironments,
   }),
+  currentPath: '/',
 };
 
 export const appSlice = createSlice({
@@ -37,8 +39,15 @@ export const appSlice = createSlice({
     setInitializationError: (state: AppState, action: PayloadAction<string | undefined>) => {
       state.initializationError = action.payload;
     },
+    setCurrentPath: (state: AppState, action: PayloadAction<string>) => {
+      state.currentPath = action.payload;
+    },
   },
 });
 
-export const { initializeLocalization, setSelectedNetwork, setInitializationError } =
-  appSlice.actions;
+export const {
+  initializeLocalization,
+  setSelectedNetwork,
+  setInitializationError,
+  setCurrentPath,
+} = appSlice.actions;
