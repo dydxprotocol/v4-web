@@ -25,11 +25,12 @@ import { spotFormActions } from '@/state/spotForm';
 
 import { mapIfPresent } from '@/lib/do';
 import { MustNumber } from '@/lib/numbers';
+import { isPresent } from '@/lib/typeUtils';
 
 import { SpotHeader } from './SpotHeader';
 import { type SpotPositionItem } from './SpotHoldingsTable';
 import { SpotHorizontalPanel } from './SpotHorizontalPanel';
-import { SpotTokenInfo } from './SpotTokenInfo';
+import { SpotTokenInfo, TokenInfoItem, TokenInfoLink } from './SpotTokenInfo';
 import { SpotTradeForm } from './SpotTradeForm';
 import { type SpotTradeItem } from './SpotTradesTable';
 import { SpotHeaderToken } from './types';
@@ -134,8 +135,70 @@ const SpotPage = () => {
       snipersPercent: mapIfPresent(tokenMetadata.snipersPercent, (v) => v / 100),
       bundlersPercent: mapIfPresent(tokenMetadata.bundlersPercent, (v) => v / 100),
       insidersPercent: mapIfPresent(tokenMetadata.insidersPercent, (v) => v / 100),
+      createdAt: mapIfPresent(tokenMetadata.createdAt, (v) => new Date(v * 1000)),
     };
   }, [tokenMint, tokenMetadata, tokenPrice]);
+
+  const tokenLinks = useMemo(() => {
+    const { socialLinks } = tokenMetadata ?? {};
+
+    const links: TokenInfoLink[] = [
+      { icon: IconName.Earth, url: socialLinks?.website },
+      { icon: IconName.CoinMarketCap, url: socialLinks?.coinmarketcap },
+      { icon: IconName.SocialX, url: socialLinks?.twitter },
+    ].filter((v): v is TokenInfoLink => isPresent(v.url));
+
+    return links;
+  }, [tokenMetadata]);
+
+  const tokenInfoItems: TokenInfoItem[] = useMemo(
+    () => [
+      {
+        key: 'holders',
+        iconName: IconName.UserGroup,
+        label: 'Holders',
+        value: <$Output type={OutputType.CompactNumber} value={currentTokenData?.holders} />,
+      },
+      {
+        key: 'top10',
+        iconName: IconName.User2,
+        label: 'Top 10',
+        value: <$Output type={OutputType.Percent} value={currentTokenData?.top10HoldersPercent} />,
+      },
+      {
+        key: 'devHolding',
+        iconName: IconName.ChefHat,
+        label: 'Dev Holding',
+        value: <$Output type={OutputType.Percent} value={currentTokenData?.devHoldingPercent} />,
+      },
+      {
+        key: 'snipers',
+        iconName: IconName.Scope,
+        label: 'Snipers',
+        value: <$Output type={OutputType.Percent} value={currentTokenData?.snipersPercent} />,
+      },
+      {
+        key: 'bundlers',
+        iconName: IconName.Ghost,
+        label: 'Bundlers',
+        value: <$Output type={OutputType.Percent} value={currentTokenData?.bundlersPercent} />,
+      },
+      {
+        key: 'insiders',
+        iconName: IconName.Warning,
+        label: 'Insiders',
+        value: <$Output type={OutputType.Percent} value={currentTokenData?.insidersPercent} />,
+      },
+    ],
+    [
+      currentTokenData?.bundlersPercent,
+      currentTokenData?.devHoldingPercent,
+      currentTokenData?.holders,
+      currentTokenData?.insidersPercent,
+      currentTokenData?.snipersPercent,
+      currentTokenData?.top10HoldersPercent,
+    ]
+  );
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
     navigate(`/spot/${token.tokenAddress}`);
@@ -172,60 +235,10 @@ const SpotPage = () => {
         <SpotTradeForm />
         <SpotTokenInfo
           isLoading={isTokenMetadataLoading}
-          links={[
-            { icon: IconName.Earth, url: '1' },
-            { icon: IconName.File, url: '2' },
-            { icon: IconName.CoinMarketCap, url: '3' },
-            { icon: IconName.SocialX, url: '4' },
-          ]}
+          links={tokenLinks}
           contractAddress={tokenMint!}
-          createdAt={Date.now() - 21 * 24 * 60 * 60 * 1000}
-          items={[
-            {
-              key: 'holders',
-              iconName: IconName.UserGroup,
-              label: 'Holders',
-              value: <$Output type={OutputType.CompactNumber} value={currentTokenData?.holders} />,
-            },
-            {
-              key: 'top10',
-              iconName: IconName.User2,
-              label: 'Top 10',
-              value: (
-                <$Output type={OutputType.Percent} value={currentTokenData?.top10HoldersPercent} />
-              ),
-            },
-            {
-              key: 'devHolding',
-              iconName: IconName.ChefHat,
-              label: 'Dev Holding',
-              value: (
-                <$Output type={OutputType.Percent} value={currentTokenData?.devHoldingPercent} />
-              ),
-            },
-            {
-              key: 'snipers',
-              iconName: IconName.Scope,
-              label: 'Snipers',
-              value: <$Output type={OutputType.Percent} value={currentTokenData?.snipersPercent} />,
-            },
-            {
-              key: 'bundlers',
-              iconName: IconName.Ghost,
-              label: 'Bundlers',
-              value: (
-                <$Output type={OutputType.Percent} value={currentTokenData?.bundlersPercent} />
-              ),
-            },
-            {
-              key: 'insiders',
-              iconName: IconName.Warning,
-              label: 'Insiders',
-              value: (
-                <$Output type={OutputType.Percent} value={currentTokenData?.insidersPercent} />
-              ),
-            },
-          ]}
+          createdAt={currentTokenData?.createdAt}
+          items={tokenInfoItems}
         />
       </$GridSection>
 

@@ -1,6 +1,12 @@
 import { type ReactNode } from 'react';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonStyle,
+  ButtonType,
+} from '@/constants/buttons';
 
 import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
@@ -10,13 +16,13 @@ import { Output, OutputType } from '@/components/Output';
 
 import { truncateAddress } from '@/lib/wallet';
 
-type TokenInfoLink = {
+export type TokenInfoLink = {
   icon: IconName;
   url: string;
   title?: string;
 };
 
-type TokenInfoItem = {
+export type TokenInfoItem = {
   key: string;
   label: string;
   value: ReactNode;
@@ -27,7 +33,7 @@ type SpotTokenInfoProps = {
   links: TokenInfoLink[];
   items: TokenInfoItem[];
   contractAddress: string;
-  createdAt: number | string | Date;
+  createdAt?: number | string | Date;
   className?: string;
   isLoading?: boolean;
 };
@@ -47,15 +53,16 @@ export const SpotTokenInfo = ({
       <div tw="spacedRow">
         <div tw="text-color-text-2 font-base-bold">Token Info</div>
         <div tw="row gap-0.25">
-          {links.map((l) => (
+          {(isLoading ? [null] : links).map((l) => (
             <IconButton
-              key={l.url}
-              href={l.url}
-              aria-label={l.title ?? l.url}
-              buttonStyle={ButtonStyle.WithoutBackground}
-              iconName={l.icon}
+              key={l?.url}
+              href={l?.url}
+              aria-label={l?.title ?? l?.url}
+              action={ButtonAction.Navigation}
+              iconName={l?.icon}
               iconSize="1.125rem"
-              disabled={isLoading}
+              state={{ isLoading }}
+              type={ButtonType.Link}
             />
           ))}
         </div>
@@ -87,14 +94,16 @@ export const SpotTokenInfo = ({
         >
           <span tw="font-mini-medium">{truncateAddress(contractAddress, '')}</span>
         </CopyButton>
-        <div tw="row items-center gap-0.25 font-mini-book">
-          <Icon iconName={IconName.Clock} />
-          <Output
-            type={OutputType.RelativeTime}
-            value={new Date(createdAt).getTime()}
-            isLoading={isLoading}
-          />
-        </div>
+        {(isLoading || !!createdAt) && (
+          <div tw="row items-center gap-0.25 font-mini-book">
+            <Icon iconName={IconName.Clock} />
+            <Output
+              type={OutputType.RelativeTime}
+              value={createdAt ? new Date(createdAt).getTime() : null}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

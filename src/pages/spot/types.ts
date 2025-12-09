@@ -19,4 +19,5 @@ export interface SpotHeaderToken {
   snipersPercent?: number;
   bundlersPercent?: number;
   insidersPercent?: number;
+  createdAt?: Date;
 }
