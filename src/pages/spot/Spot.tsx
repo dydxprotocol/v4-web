@@ -135,12 +135,12 @@ const SpotPage = () => {
   }, [portfolioTrades]);
 
   const currentTokenData = useMemo<SpotHeaderToken | null>(() => {
-    if (!tokenMetadata || tokenPrice == null) return null;
+    if (!tokenMetadata || tokenPrice == null || !tokenMint) return null;
 
     return {
       name: tokenMetadata.tokenNameFull ?? tokenMetadata.symbol ?? 'Unknown',
       symbol: tokenMetadata.symbol ?? 'Unknown',
-      tokenAddress: tokenMint!,
+      tokenAddress: tokenMint,
       buys24hUsd: tokenMetadata.token24hBuys,
       sells24hUsd: -MustNumber(tokenMetadata.token24hSells),
       change24hPercent: tokenMetadata.pricePercentChange24h,
@@ -241,6 +241,8 @@ const SpotPage = () => {
     navigate(`/spot/${token.tokenAddress}`);
   };
 
+  if (!tokenMint) return null;
+
   return (
     <$SpotLayout
       tradeLayout={tradeLayout}
@@ -263,14 +265,14 @@ const SpotPage = () => {
         <SpotTokenInfo
           isLoading={isTokenMetadataLoading}
           links={tokenLinks}
-          contractAddress={tokenMint!}
+          contractAddress={tokenMint}
           createdAt={currentTokenData?.createdAt}
           items={tokenInfoItems}
         />
       </$SideGridSection>
 
       <$GridSection gridArea="Inner">
-        <SpotTvChart tokenMint={tokenMint!} />
+        <SpotTvChart tokenMint={tokenMint} />
         {isDragging && <$CoverUpTradingView />}
       </$GridSection>
 

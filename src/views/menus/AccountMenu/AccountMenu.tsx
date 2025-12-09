@@ -182,7 +182,7 @@ export const AccountMenu = () => {
                   action={ButtonAction.Base}
                 >
                   <Icon iconName={IconName.Sol} size="1.25rem" />
-                  Spot
+                  {stringGetter({ key: STRING_KEYS.SPOT })}
                 </$AddressCopyButton>
               )}
               <$AddressCopyButton
