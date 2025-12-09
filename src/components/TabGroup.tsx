@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 
 import styled from 'styled-components';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 export interface TabOption<T> {
   label: React.ReactNode;
   value: T;
@@ -54,17 +56,21 @@ export const TabGroup = <T,>({ value, onTabChange, options, className }: TabGrou
   return (
     <$Container ref={containerRef} className={className}>
       <$ActiveTabIndicator ref={activeTabRef} />
-      {options.map((option) => (
-        <$Tab
-          disabled={option.disabled}
-          key={String(option.value)}
-          data-value={option.value}
-          onClick={() => onTabChange(option.value)}
-          $isActive={option.value === value}
-        >
-          {option.label}
-        </$Tab>
-      ))}
+      {options.map((option) => {
+        const isText = typeof option.label === 'string' || typeof option.label === 'number';
+
+        return (
+          <$Tab
+            disabled={option.disabled}
+            key={String(option.value)}
+            data-value={option.value}
+            onClick={() => onTabChange(option.value)}
+            $isActive={option.value === value}
+          >
+            {isText ? <$TextItem>{option.label}</$TextItem> : option.label}
+          </$Tab>
+        );
+      })}
     </$Container>
   );
 };
@@ -98,7 +104,7 @@ const $Tab = styled.button<{ $isActive: boolean }>`
   background: transparent;
   border: none;
   border-radius: 0.5rem;
-  height: 3rem;
+  height: var(--tab-group-height, 3rem);
   color: ${({ $isActive }) => ($isActive ? 'var(--color-text-2)' : 'var(--color-text-0)')};
   cursor: pointer;
   transition: color 0.2s ease-in-out;
@@ -106,6 +112,9 @@ const $Tab = styled.button<{ $isActive: boolean }>`
   min-width: 0;
   font-size: 1rem;
   font-weight: var(--fontWeight-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     color: var(--color-text-1);
@@ -118,4 +127,8 @@ const $Tab = styled.button<{ $isActive: boolean }>`
   &:focus-visible {
     outline: 2px solid var(--color-accent);
   }
+`;
+
+const $TextItem = styled.span`
+  ${layoutMixins.textTruncate}
 `;
