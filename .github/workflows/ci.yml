@@ -37,6 +37,10 @@ jobs:
         pnpm --filter starboard/contracts gen:types
         pnpm --filter starboard/contracts test
 
+    - name: Test fuel-ts-sdk
+      run: |
+        pnpm --filter fuel-ts-sdk test
+
     - name: Postinstall script
       run: |
         tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script

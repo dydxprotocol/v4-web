@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm codegen && tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
