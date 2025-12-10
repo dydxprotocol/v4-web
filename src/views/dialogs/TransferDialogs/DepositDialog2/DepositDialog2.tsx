@@ -68,7 +68,7 @@ function getDefaultToken(
 
 export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
   const dispatch = useAppDispatch();
-  const { sourceAccount } = useAccounts();
+  const { sourceAccount, solanaAddress } = useAccounts();
   const { isLoading: isLoadingBalances, withBalances } = useDepositTokenBalances();
   const highestBalance = withBalances.at(0);
 
@@ -153,7 +153,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
         <SpotTabs
           value={currentDepositType}
           onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
-          hideTabs={formState !== 'form' || !isSpotEnabled}
+          hideTabs={formState !== 'form' || !isSpotEnabled || !solanaAddress}
           items={tabs}
         />
       </div>

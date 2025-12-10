@@ -55,7 +55,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const stringGetter = useStringGetter();
   const isSpotEnabled = useEnableSpot();
 
-  const { dydxAddress } = useAccounts();
+  const { dydxAddress, solanaAddress } = useAccounts();
   const { isUploadingAddress } = useTurnkeyAuth();
   const {
     depositAddresses,
@@ -280,7 +280,7 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
         <SpotTabs
           value={selectedTab === 'perpetuals' ? 'perps' : 'spot'}
           onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
-          hideTabs={!isSpotEnabled}
+          hideTabs={!isSpotEnabled || !solanaAddress}
           items={tabs}
         />
       </div>
