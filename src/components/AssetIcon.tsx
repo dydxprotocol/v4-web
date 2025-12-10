@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -38,16 +38,26 @@ export const AssetIcon = ({
   const [isError, setIsError] = useState(false);
   const isAssetIconLoading = useContext(LoadingContext);
 
+  const placeHolderElement = useMemo(
+    () => (
+      <$Container className={className} $hasChainIcon={!!chainId}>
+        <Placeholder className={className} symbol={symbol ?? ''} />
+        {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
+      </$Container>
+    ),
+    [chainId, className, symbol]
+  );
+
   if (isLoading || isAssetIconLoading) {
     return <$LoadingAssetIcon className={className} />;
   }
 
   if (isError || (!logoUrl && !isAssetSymbol(symbol))) {
-    return <Placeholder className={className} symbol={symbol ?? ''} />;
+    return placeHolderElement;
   }
 
   return logoUrl ? (
-    <$Container className={className}>
+    <$Container className={className} $hasChainIcon={!!chainId}>
       <$ContainerBackground />
       <$AssetIcon
         src={logoUrl}
@@ -62,6 +72,7 @@ export const AssetIcon = ({
           }
         }}
       />
+      {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
   ) : isAssetSymbol(symbol) ? (
     <$Container className={className} $hasChainIcon={!!chainId}>
@@ -70,7 +81,7 @@ export const AssetIcon = ({
       {chainId && <$ChainIcon src={CHAIN_INFO[chainId]?.icon} alt={CHAIN_INFO[chainId]?.name} />}
     </$Container>
   ) : (
-    <Placeholder className={className} symbol={symbol ?? ''} />
+    placeHolderElement
   );
 };
 
