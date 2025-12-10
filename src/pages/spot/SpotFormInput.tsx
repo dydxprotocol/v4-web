@@ -1,10 +1,12 @@
 import { forwardRef, useCallback, useId, useImperativeHandle, useMemo, useRef } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { PERCENT_DECIMALS, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -13,6 +15,8 @@ import { IconButton } from '@/components/IconButton';
 import { Input, InputProps, InputType } from '@/components/Input';
 import { Output, OutputProps, OutputType } from '@/components/Output';
 import { TabGroup, TabOption } from '@/components/TabGroup';
+
+import { openDialog } from '@/state/dialogs';
 
 const INPUT_CONFIG_MAP = {
   [SpotSide.BUY]: {
@@ -97,6 +101,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
   ) => {
     const id = useId();
     const internalRef = useRef<HTMLInputElement>(null);
+    const dispatch = useDispatch();
 
     useImperativeHandle(ref, () => internalRef.current!);
 
@@ -167,6 +172,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
                   buttonStyle={ButtonStyle.WithoutBackground}
                   size={ButtonSize.XXSmall}
                   action={ButtonAction.Primary}
+                  onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                 />
               )}
             </div>
