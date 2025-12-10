@@ -275,8 +275,9 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
         </div>
       }
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
+      hasHeaderBorder
     >
-      <div tw="h-full w-full overflow-hidden">
+      <div tw="h-full w-full overflow-hidden p-1.25">
         <SpotTabs
           value={selectedTab === 'perpetuals' ? 'perps' : 'spot'}
           onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
@@ -289,14 +290,13 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 };
 
 const $Dialog = styled(Dialog)`
+  --dialog-content-paddingTop: 0;
+  --dialog-content-paddingRight: 0;
+  --dialog-content-paddingBottom: 0;
+  --dialog-content-paddingLeft: 0;
+
   @media ${breakpoints.notMobile} {
     max-width: 26.25rem;
-    --dialog-content-paddingLeft: 1.25rem;
-    --dialog-content-paddingRight: 1.25rem;
-    --dialog-content-paddingBottom: 1.25rem;
-    --dialog-paddingX: 1.25rem;
-    --dialog-header-paddingTop: 1.25rem;
-    --dialog-header-paddingBottom: 1.25rem;
   }
 `;
 

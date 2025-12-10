@@ -384,7 +384,6 @@ export const DepositForm = ({
         />
       </div>
       <DepositSteps
-        tw="ml-[-0.5rem]"
         steps={depositSteps}
         currentStep={currentStep}
         currentStepError={currentStepError}
