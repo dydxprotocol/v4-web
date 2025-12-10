@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { SpotSide } from '@/bonsai/forms/spot';
+import { SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { keyBy } from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -243,6 +243,8 @@ const SpotPage = () => {
 
   const handlePositionSell = (token: SpotPositionItem) => {
     dispatch(spotFormActions.setSide(SpotSide.SELL));
+    dispatch(spotFormActions.setSellInputType(SpotSellInputType.PERCENT));
+    dispatch(spotFormActions.setSize('100'));
     navigate(`/spot/${token.tokenAddress}`);
   };
 
