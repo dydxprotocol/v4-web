@@ -15,8 +15,6 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import breakpoints from '@/styles/breakpoints';
-
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
@@ -26,6 +24,7 @@ import { openDialog } from '@/state/dialogs';
 import { SourceAccount } from '@/state/wallet';
 
 import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
+import { DepositStatus } from './DepositForm/DepositStatus';
 import { SpotDepositForm } from './SpotDepositForm';
 import { useDepositTokenBalances } from './queries';
 
@@ -78,6 +77,10 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const [currentDepositType, setCurrentDepositType] = useState<'perps' | 'spot'>('perps');
   const [formState, setFormState] = useState<DepositFormState>('form');
+  const [currentPerpsDeposit, setCurrentPerpsDeposit] = useState<{
+    txHash: string;
+    chainId: string;
+  }>();
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
 
   const handleTabChange = (newTab: 'perps' | 'spot') => {
@@ -126,7 +129,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           defaultToken={getDefaultToken(sourceAccount, highestBalance)}
           formState={formState}
           setFormState={setFormState}
-          setIsOpen={setIsOpen}
+          onDeposit={setCurrentPerpsDeposit}
           tokenSelectRef={tokenSelectRef}
           onShowForm={onShowForm}
         />
@@ -148,29 +151,32 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
       onBack={formState === 'form' || currentDepositType === 'spot' ? undefined : onBack}
       title={dialogTitle}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
+      hasHeaderBorder
     >
-      <div tw="h-full w-full overflow-hidden">
-        <SpotTabs
-          value={currentDepositType}
-          onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
-          hideTabs={formState !== 'form' || !isSpotEnabled || !solanaAddress}
-          items={tabs}
+      {currentPerpsDeposit ? (
+        <DepositStatus
+          onClose={() => setIsOpen(false)}
+          txHash={currentPerpsDeposit.txHash}
+          chainId={currentPerpsDeposit.chainId}
         />
-      </div>
+      ) : (
+        <div tw="h-full w-full p-1.25">
+          <SpotTabs
+            value={currentDepositType}
+            onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
+            hideTabs={formState !== 'form' || !isSpotEnabled || !solanaAddress}
+            items={tabs}
+          />
+        </div>
+      )}
     </$Dialog>
   );
 };
 
 const $Dialog = styled(Dialog)`
   --asset-icon-chain-icon-borderColor: var(--dialog-backgroundColor);
-
-  @media ${breakpoints.notMobile} {
-    max-width: 26.25rem;
-    --dialog-content-paddingLeft: 1.25rem;
-    --dialog-content-paddingRight: 1.25rem;
-    --dialog-content-paddingBottom: 1.25rem;
-    --dialog-paddingX: 1.25rem;
-    --dialog-header-paddingTop: 1.25rem;
-    --dialog-header-paddingBottom: 1.25rem;
-  }
+  --dialog-content-paddingTop: 0;
+  --dialog-content-paddingRight: 0;
+  --dialog-content-paddingBottom: 0;
+  --dialog-content-paddingLeft: 0;
 `;
