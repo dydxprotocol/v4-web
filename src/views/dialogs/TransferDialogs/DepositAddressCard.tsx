@@ -78,17 +78,25 @@ export const DepositAddressCard = ({
       <div tw="flexColumn min-w-0 justify-between">
         <img tw="size-2.25 rounded-[50%]" src={chainIcon} alt={chainName} />
         {addressRepresentation && address ? (
-          <div tw="row ml-[-0.5rem] cursor-pointer items-end gap-0.125 rounded-[6px] p-0.5 hover:bg-color-layer-1">
+          <div tw="ml-[-0.5rem] cursor-pointer rounded-[6px] p-0.5 hover:bg-color-layer-1">
             <div tw="min-w-0 whitespace-normal break-words text-justify">
               <span tw="text-color-text-2">{addressRepresentation.firstPart}</span>
               <span tw="text-color-text-0">{addressRepresentation.middlePart}</span>
-              <span tw="text-color-text-2">{addressRepresentation.lastPart}</span>
+              <span tw="text-color-text-2">
+                {addressRepresentation.lastPart}
+                {copied ? (
+                  <Icon
+                    iconName={IconName.CheckCircle}
+                    tw="ml-0.25 inline align-middle text-color-success"
+                  />
+                ) : (
+                  <Icon
+                    iconName={IconName.Copy}
+                    tw="ml-0.25 inline align-middle text-color-accent"
+                  />
+                )}
+              </span>
             </div>
-            {copied ? (
-              <Icon iconName={IconName.CheckCircle} tw="text-color-success" />
-            ) : (
-              <Icon iconName={IconName.Copy} tw="text-color-accent" />
-            )}
           </div>
         ) : null}
       </div>
