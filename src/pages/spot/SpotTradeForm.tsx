@@ -127,6 +127,7 @@ export const SpotTradeForm = () => {
                     : form.state.sellInputType
                 }
                 onInputTypeChange={form.handleInputTypeChange}
+                onBalanceClick={(value) => form.actions.setSize(value)}
                 side={form.state.side}
                 tokenAmount={form.summary.amounts?.token ?? 0}
                 tokenSymbol={tokenMetadata?.symbol ?? ''}

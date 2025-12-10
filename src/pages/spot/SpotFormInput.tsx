@@ -76,6 +76,7 @@ export type SpotFormInputProps = {
   side: SpotSide;
   inputType: SpotBuyInputType | SpotSellInputType;
   onInputTypeChange: (side: SpotSide, inputType: SpotBuyInputType | SpotSellInputType) => void;
+  onBalanceClick?: (value: string) => void;
   validationConfig?: {
     type: AlertType;
     message: string;
@@ -95,6 +96,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
       tokenSymbol,
       tokenAmount,
       onInputTypeChange,
+      onBalanceClick,
       ...inputProps
     },
     ref
@@ -165,7 +167,18 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
             <label htmlFor={id}>Amount</label>
             <div tw="row gap-[0.25rem]">
               <Icon iconName={IconName.Wallet3} />
-              <Output tw="text-color-text-1" {...balanceOutputProps} />
+              <button
+                type="button"
+                disabled={side !== SpotSide.BUY || !onBalanceClick}
+                tw="flex"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const value = inputType === SpotBuyInputType.SOL ? balances.sol : balances.usd;
+                  onBalanceClick?.(value.toString());
+                }}
+              >
+                <Output tw="text-color-text-1" {...balanceOutputProps} />
+              </button>
               {side === SpotSide.BUY && (
                 <IconButton
                   iconName={IconName.PlusCircle}
