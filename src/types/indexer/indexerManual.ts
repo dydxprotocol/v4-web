@@ -158,8 +158,8 @@ export interface IndexerCompositeFillObject {
   subaccountNumber?: number;
   market?: string;
   positionSideBefore?: IndexerPositionSide;
-  positionSizeBefore?: number;
-  entryPriceBefore?: number;
+  positionSizeBefore?: string;
+  entryPriceBefore?: string;
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {

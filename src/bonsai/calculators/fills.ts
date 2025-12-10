@@ -71,8 +71,11 @@ const calculateClosedPnl = (fill: IndexerCompositeFillObject) => {
     return undefined;
   }
 
+  const positionSizeBefore = parseFloat(fill.positionSizeBefore);
+  const entryPriceBefore = parseFloat(fill.entryPriceBefore);
+
   // No position before = opening trade, only fees realize
-  if (fill.positionSizeBefore === 0) {
+  if (positionSizeBefore === 0) {
     return -fee;
   }
 
@@ -90,13 +93,13 @@ const calculateClosedPnl = (fill: IndexerCompositeFillObject) => {
   const price = MustNumber(fill.price ?? '0');
 
   // Position reducing - cap closing amount to actual position size
-  const closingAmount = Math.min(size, fill.positionSizeBefore);
+  const closingAmount = Math.min(size, positionSizeBefore);
 
   // Calculate P&L only on the closing portion
   const closingPnl =
     fill.positionSideBefore === IndexerPositionSide.LONG
-      ? (price - fill.entryPriceBefore) * closingAmount
-      : (fill.entryPriceBefore - price) * closingAmount;
+      ? (price - entryPriceBefore) * closingAmount
+      : (entryPriceBefore - price) * closingAmount;
 
   return closingPnl - fee;
 };
