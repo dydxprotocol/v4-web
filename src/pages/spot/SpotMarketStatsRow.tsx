@@ -104,6 +104,7 @@ export const SpotMarketStatsRow = ({ stats, isLoading = false }: SpotMarketStats
 const $Details = styled(Details)`
   ${layoutMixins.scrollArea}
   ${layoutMixins.row}
-    isolation: isolate;
+  
+  isolation: isolate;
   font: var(--font-mini-book);
 ` as typeof Details;
