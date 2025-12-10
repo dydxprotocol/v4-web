@@ -2,10 +2,13 @@ import { SpotFormInputData } from '@/bonsai/forms/spot';
 import { BonsaiCore, BonsaiForms } from '@/bonsai/ontology';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+import { SpotWalletStatus } from '@/constants/account';
+
 import { SpotApiTradeRoute } from '@/clients/spotApi';
 import { isPresent } from '@/lib/typeUtils';
 
 import { type RootState } from './_store';
+import { calculateSpotWalletStatus } from './accountCalculators';
 import { getUserSolanaWalletAddress } from './accountInfoSelectors';
 import { createAppSelector } from './appTypes';
 import { getCurrentSpotToken } from './spot';
@@ -24,6 +27,7 @@ export const getSpotFormInputData = createAppSelector(
     BonsaiCore.spot.walletPositions.loading,
     getCurrentSpotToken,
     getUserSolanaWalletAddress,
+    calculateSpotWalletStatus,
   ],
   (
     solPriceUsd,
@@ -35,7 +39,8 @@ export const getSpotFormInputData = createAppSelector(
     tokenPriceStatus,
     walletPositionsStatus,
     tokenMint,
-    solanaAddress
+    solanaAddress,
+    walletStatus
   ): SpotFormInputData => {
     const userSolBalance = isPresent(walletPositions?.solBalance)
       ? walletPositions.solBalance / LAMPORTS_PER_SOL
@@ -45,12 +50,15 @@ export const getSpotFormInputData = createAppSelector(
       (position) => position.mint === tokenMint
     )?.amount;
 
-    const isAsyncDataReady = [
-      solPriceStatus,
-      tokenMetadataStatus,
-      tokenPriceStatus,
-      walletPositionsStatus,
-    ].every((status) => status === 'success');
+    const isMarketDataReady = [solPriceStatus, tokenMetadataStatus, tokenPriceStatus].every(
+      (status) => status === 'success'
+    );
+
+    // For connected users, also wait for wallet positions (for balances)
+    const isAsyncDataReady =
+      walletStatus === SpotWalletStatus.Connected
+        ? isMarketDataReady && walletPositionsStatus === 'success'
+        : isMarketDataReady;
 
     const isRestReady = isPresent(tokenMint) && isPresent(solanaAddress);
 
@@ -67,6 +75,7 @@ export const getSpotFormInputData = createAppSelector(
       isReady: isRestReady && isAsyncDataReady,
       isAsyncDataReady,
       isRestReady,
+      walletStatus,
     };
   }
 );

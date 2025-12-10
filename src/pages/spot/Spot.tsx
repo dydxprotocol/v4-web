@@ -6,6 +6,7 @@ import { keyBy } from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
+import { SpotWalletStatus } from '@/constants/account';
 import {
   HORIZONTAL_PANEL_MAX_HEIGHT,
   HORIZONTAL_PANEL_MIN_HEIGHT,
@@ -23,6 +24,7 @@ import { IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { SpotTvChart } from '@/views/charts/TradingView/SpotTvChart';
 
+import { calculateSpotWalletStatus } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setHorizontalPanelHeightPx } from '@/state/appUiConfigs';
 import { getHorizontalPanelHeightPx } from '@/state/appUiConfigsSelectors';
@@ -56,13 +58,15 @@ const SpotPage = () => {
   const tokenBalances = useAppSelector(BonsaiCore.spot.walletPositions.tokenBalances);
   const walletPositions = useAppSelector(BonsaiCore.spot.walletPositions.positions);
   const portfolioTrades = useAppSelector(BonsaiCore.spot.portfolioTrades.data);
+  const walletStatus = useAppSelector(calculateSpotWalletStatus);
 
+  const canLoadSpotData = walletStatus === SpotWalletStatus.Connected;
   const isTokenMetadataLoading =
     useAppSelector(BonsaiCore.spot.tokenMetadata.loading) !== 'success';
   const isWalletPositionsLoading =
-    useAppSelector(BonsaiCore.spot.walletPositions.loading) !== 'success';
+    useAppSelector(BonsaiCore.spot.walletPositions.loading) !== 'success' && canLoadSpotData;
   const isPortfolioTradesLoading =
-    useAppSelector(BonsaiCore.spot.portfolioTrades.loading) !== 'success';
+    useAppSelector(BonsaiCore.spot.portfolioTrades.loading) !== 'success' && canLoadSpotData;
 
   const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
   const setPanelHeight = useCallback(

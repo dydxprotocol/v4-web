@@ -1,5 +1,6 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+import { SpotWalletStatus } from '@/constants/account';
 import { MIN_SOL_RESERVE } from '@/constants/spot';
 
 import { SpotApiCreateTransactionRequest, SpotApiSide, SpotApiTradeRoute } from '@/clients/spotApi';
@@ -75,6 +76,7 @@ export interface SpotFormInputData {
   isReady: boolean;
   isAsyncDataReady: boolean;
   isRestReady: boolean;
+  walletStatus: SpotWalletStatus;
 }
 
 export interface SpotAmounts {
@@ -184,6 +186,29 @@ export function getErrors(
   summary: SpotSummaryData
 ): ValidationError[] {
   const validationErrors: ValidationError[] = [];
+
+  if (inputData.walletStatus === SpotWalletStatus.Disconnected) {
+    validationErrors.push(
+      simpleValidationError({
+        code: 'SPOT_WALLET_DISCONNECTED',
+        type: ErrorType.error,
+        titleFallback: 'Connect Wallet',
+      })
+    );
+    return validationErrors;
+  }
+
+  if (inputData.walletStatus === SpotWalletStatus.Unsupported) {
+    validationErrors.push(
+      simpleValidationError({
+        code: 'SPOT_WALLET_UNSUPPORTED',
+        type: ErrorType.error,
+        titleFallback: 'Unsupported Wallet',
+        textFallback: 'Spot trading requires an EVM or Solana wallet',
+      })
+    );
+    return validationErrors;
+  }
 
   const parsedSize = AttemptNumber(state.size);
 
