@@ -9,6 +9,9 @@ RUN apt update && apt install -y \
     git \
     curl \
     postgresql-client \
+    build-essential \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Fuel toolchain
@@ -27,6 +30,11 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | b
 
 # Install pnpm
 RUN curl -fsSL https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+
+# Install node-gyp globally for native module builds
+RUN export NVM_DIR="$HOME/.nvm" && \
+    . ${HOME}/.nvm/nvm.sh && \
+    npm install -g node-gyp
 
 WORKDIR /starboard
 
