@@ -10,7 +10,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 
-import { Transfer } from '@/state/transfers';
+import { isSpotWithdraw, Transfer } from '@/state/transfers';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
@@ -29,7 +29,14 @@ export const SkipTransferNotificationRow = ({
 }) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { type, status, estimatedAmountUsd, finalAmountUsd, updatedAt } = transfer;
+  const { type, status } = transfer;
+
+  // Skip spot withdrawals for now
+  if (isSpotWithdraw(transfer)) {
+    return null;
+  }
+
+  const { estimatedAmountUsd, finalAmountUsd, updatedAt } = transfer;
   const transferAmountBN = MustBigNumber(finalAmountUsd ?? estimatedAmountUsd);
   const isReceiving = type === 'deposit';
   const multiplier = isReceiving ? 1 : -1;

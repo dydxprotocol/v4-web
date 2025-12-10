@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 
 import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
+import { useMatch } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { Link } from '@/components/Link';
 import { OutputType, formatDateOutput } from '@/components/Output';
@@ -19,6 +21,7 @@ import {
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { useEnableSpot } from './useEnableSpot';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useStringGetter } from './useStringGetter';
 import { useURLConfigs } from './useURLConfigs';
@@ -32,6 +35,8 @@ export const useComplianceState = () => {
   const selectedLocale = useAppSelector(getSelectedLocale);
   const onboardingState = useAppSelector(getOnboardingState);
   const { checkForGeo } = useEnvFeatures();
+  const isSpotPage = useMatch(`${AppRoute.Spot}/*`) != null;
+  const isSpotEnabled = useEnableSpot();
 
   const complianceState = useMemo(() => {
     if (
@@ -98,15 +103,16 @@ export const useComplianceState = () => {
 
   const disableConnectButton =
     complianceState === ComplianceStates.READ_ONLY &&
-    onboardingState === OnboardingState.Disconnected;
+    onboardingState === OnboardingState.Disconnected &&
+    !isSpotEnabled;
 
   return {
     complianceStatus,
     complianceState,
     complianceMessage,
     disableConnectButton,
-    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY,
+    showRestrictionWarning: complianceState === ComplianceStates.READ_ONLY && !isSpotPage,
     showComplianceBanner:
-      complianceMessage != null || complianceState === ComplianceStates.READ_ONLY,
+      (complianceMessage != null || complianceState === ComplianceStates.READ_ONLY) && !isSpotPage,
   };
 };

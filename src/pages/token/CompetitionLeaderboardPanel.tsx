@@ -25,6 +25,7 @@ export enum RewardsLeaderboardTableColumns {
   Rank = 'Rank',
   Trader = 'Trader',
   PNL = 'PNL',
+  EstimatedPrize = 'EstimatedPrize',
 }
 
 export const CompetitionLeaderboardPanel = () => {
@@ -269,6 +270,18 @@ const getRewardsLeaderboardTableColumnDef = ({
             type={OutputType.Fiat}
             value={pnl}
           />
+        ),
+      },
+      [RewardsLeaderboardTableColumns.EstimatedPrize]: {
+        columnKey: RewardsLeaderboardTableColumns.EstimatedPrize,
+        getCellValue: (row) => row.dollarReward,
+        label: (
+          <div tw="py-0.375 text-base font-medium text-color-text-0">
+            {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
+          </div>
+        ),
+        renderCell: ({ dollarReward }) => (
+          <Output tw="text-small font-medium" type={OutputType.Fiat} value={dollarReward} />
         ),
       },
     } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsCompetitionItem>>

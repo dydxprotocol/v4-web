@@ -36,14 +36,14 @@ export const CompetitionIncentivesPanel = () => {
 
 const September2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
-
-  const week = Math.floor((new Date().getUTCDate() - 1) / 7) + 1;
-
+  const now = new Date();
+  // December 2025 is the first month (Month 1)
+  // Calculate months difference from Dec 2025, and add 1 to make it "Month 1"
+  const monthNumber = (now.getUTCFullYear() - 2025) * 12 + (now.getUTCMonth() - 11) + 1;
+  // For endTime, set to last ms of current UTC month
   const endTime = (() => {
-    const date = new Date();
-    date.setUTCDate((week - 1) * 7);
-    date.setUTCHours(23, 59, 59, 999);
-    date.setUTCDate(date.getUTCDate() + 7);
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0)); // first of next month UTC
+    date.setTime(date.getTime() - 1);
     return date.toISOString();
   })();
 
@@ -86,8 +86,8 @@ const September2025RewardsPanel = () => {
             <div tw="flex gap-0.375">
               <div tw="text-color-accent">
                 {stringGetter({
-                  key: STRING_KEYS.WEEK_COUNTDOWN,
-                  params: { WEEK: week },
+                  key: STRING_KEYS.MONTH_COUNTDOWN,
+                  params: { MONTH: monthNumber },
                 })}
                 :
               </div>
@@ -124,7 +124,7 @@ const Sept2025RewardsPanel = () => {
             })}
             slotTrigger={
               <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
-                {stringGetter({ key: STRING_KEYS.WEEKLY_PRIZE })}
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
                 <Icon iconName={IconName.InfoStroke} />
               </div>
             }

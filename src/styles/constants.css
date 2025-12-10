@@ -14,6 +14,7 @@
 
   /* Sidebar constants */
   --sidebar-width: 20.25rem;
+  --spot-sidebar-width: 25rem;
   --collapsed-sidebar-width: 3.5rem;
 
   /* Content constants */
@@ -48,6 +49,7 @@
 
   /* Market Selector constants */
   --marketsDropdown-openWidth: 55rem;
+  --spot-marketsDropdown-openWidth: 40rem;
 
   /* Form constants */
   --form-input-gap: 0.625rem;

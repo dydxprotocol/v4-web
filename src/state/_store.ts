@@ -27,6 +27,8 @@ import { customCreateMigrate } from './migrations';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 import { rawSlice } from './raw';
+import { spotSlice } from './spot';
+import { spotFormSlice } from './spotForm';
 import { swapsSlice } from './swaps';
 import { tradeFormSlice } from './tradeForm';
 import { getClosePositionFormSummary, getTradeFormSummary } from './tradeFormSelectors';
@@ -47,6 +49,8 @@ const reducers = {
   triggersForm: triggersFormSlice.reducer,
   tradeForm: tradeFormSlice.reducer,
   closePositionForm: closePositionFormSlice.reducer,
+  spot: spotSlice.reducer,
+  spotForm: spotFormSlice.reducer,
   layout: layoutSlice.reducer,
   localization: localizationSlice.reducer,
   localOrders: localOrdersSlice.reducer,

@@ -11,6 +11,8 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
   green: ColorToken.Green1,
   red: ColorToken.Red0,
 
+  redFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
+  greenFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   baseLayer: ColorToken.BONKPurple,
@@ -85,6 +87,8 @@ const LightThemeBase: () => ThemeColorBase = () => ({
   green: ColorToken.Green5,
   red: ColorToken.Red1,
 
+  redFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
+  greenFaded: generateFadedColorVariant(ColorToken.Green5, OpacityToken.Opacity16),
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   baseLayer: '#FF5A0220',

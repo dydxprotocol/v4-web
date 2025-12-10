@@ -273,7 +273,7 @@ export const WithdrawForm = ({
   };
 
   return (
-    <div tw="flex h-full min-h-10 flex-col gap-1 p-1.25">
+    <div tw="flex h-full min-h-10 flex-col gap-1">
       <AddressInput
         value={destinationAddress}
         onChange={setDestinationAddress}

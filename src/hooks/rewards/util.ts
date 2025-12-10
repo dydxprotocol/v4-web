@@ -18,6 +18,11 @@ export function pointsToEstimatedDollarRewards(
   return (points / totalPoints) * totalUsdRewards;
 }
 
+export function feesToEstimatedDollarRewards(totalFees?: number): number {
+  if (!totalFees) return 0;
+  return totalFees * 0.5;
+}
+
 // Move to Chaos Labs query once its available
 export const CURRENT_SURGE_REWARDS_DETAILS = {
   season: 9,

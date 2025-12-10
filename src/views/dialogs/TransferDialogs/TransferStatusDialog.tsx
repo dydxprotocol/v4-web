@@ -8,7 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 
-import { isDeposit, isWithdraw } from '@/state/transfers';
+import { isDeposit, isSpotWithdraw, isWithdraw } from '@/state/transfers';
 import { selectTransfer } from '@/state/transfersSelectors';
 
 import { DepositStatus } from './DepositDialog2/DepositForm/DepositStatus';
@@ -36,7 +36,9 @@ export const TransferStatusDialog = ({
         chainId={transfer.chainId}
       />
     ) : transfer && isWithdraw(transfer) ? (
-      <WithdrawStatus onClose={() => setIsOpen(false)} id={transferId} />
+      <WithdrawStatus onClose={() => setIsOpen(false)} id={transferId} type="perps" />
+    ) : transfer && isSpotWithdraw(transfer) ? (
+      <WithdrawStatus onClose={() => setIsOpen(false)} id={transferId} type="spot" />
     ) : null;
 
   return (

@@ -90,4 +90,13 @@ export function isEvmDepositChainId(chainId: string) {
   return EVM_DEPOSIT_CHAINS.map((chain) => String(chain.id)).includes(chainId);
 }
 
+export const NEAR_INSTANT_DEPOSIT_CHAINS = [
+  SOLANA_MAINNET_ID,
+  CosmosChainId.Noble,
+  CosmosChainId.Osmosis,
+  CosmosChainId.Neutron,
+  polygon.id.toString(),
+  avalanche.id.toString(),
+];
+
 export const DYDX_DEPOSIT_CHAIN = 'dydx-mainnet-1';

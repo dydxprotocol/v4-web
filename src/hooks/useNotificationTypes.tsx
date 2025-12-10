@@ -66,6 +66,7 @@ import {
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCustomNotifications } from '@/state/notificationsSelectors';
 import { getSwaps } from '@/state/swapSelectors';
+import { isSpotWithdraw } from '@/state/transfers';
 import { selectTransfersByAddress } from '@/state/transfersSelectors';
 import { selectIsKeplrConnected } from '@/state/walletSelectors';
 
@@ -330,17 +331,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const { type, status } = transfer;
           const id = transfer.id;
 
-          const finalAmount = formatNumberOutput(
-            transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
-            OutputType.Fiat,
-            { decimalSeparator, groupSeparator, selectedLocale }
-          );
+          const finalAmount = isSpotWithdraw(transfer)
+            ? `${formatNumberOutput(transfer.amount, OutputType.Number, { decimalSeparator, groupSeparator, selectedLocale, fractionDigits: 4 })} SOL`
+            : formatNumberOutput(
+                transfer.finalAmountUsd ?? transfer.estimatedAmountUsd,
+                OutputType.Fiat,
+                { decimalSeparator, groupSeparator, selectedLocale }
+              );
 
           const isSuccess = status === 'success';
           let body: string = '';
           let title: string = '';
 
-          if (type === 'withdraw') {
+          if (type === 'withdraw' || type === 'spot-withdraw') {
             title = stringGetter({
               key: isSuccess ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
             });

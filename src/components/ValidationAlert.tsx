@@ -37,14 +37,15 @@ export const ValidationAlertMessage = ({
     >
       <span>
         {stringGetter({
-          key:
-            error.resources.text?.stringKey ??
-            error.resources.title?.stringKey ??
-            STRING_KEYS.UNKNOWN_ERROR,
+          key: error.resources.text?.stringKey ?? error.resources.title?.stringKey,
           params:
             renderParams({ params: error.resources.text?.params }) ??
             renderParams({ params: error.resources.title?.params }) ??
             {},
+          fallback:
+            error.resources.text?.fallback ??
+            error.resources.title?.fallback ??
+            STRING_KEYS.UNKNOWN_ERROR,
         })}
         {ourLink != null ? (
           <>
