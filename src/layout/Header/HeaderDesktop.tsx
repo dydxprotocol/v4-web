@@ -7,10 +7,12 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+import { SPOT_DEFAULT_TOKEN_MINT } from '@/constants/spot';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -39,7 +41,6 @@ import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -50,6 +51,7 @@ export const HeaderDesktop = () => {
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
+  const isSpotEnabled = useEnableSpot();
 
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
@@ -64,10 +66,10 @@ export const HeaderDesktop = () => {
           href: AppRoute.Trade,
         },
         // TODO(spot): Localize
-        testFlags.spot && {
+        isSpotEnabled && {
           value: 'SPOT',
           label: stringGetter({ key: STRING_KEYS.SPOT }),
-          href: `${AppRoute.Spot}/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn`,
+          href: `${AppRoute.Spot}/${SPOT_DEFAULT_TOKEN_MINT}`,
         },
         {
           value: 'MARKETS',
