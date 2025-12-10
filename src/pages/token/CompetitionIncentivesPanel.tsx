@@ -124,7 +124,7 @@ const Sept2025RewardsPanel = () => {
             })}
             slotTrigger={
               <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
-                {stringGetter({ key: STRING_KEYS.MONTHLY_PRIZE })}
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
                 <Icon iconName={IconName.InfoStroke} />
               </div>
             }
