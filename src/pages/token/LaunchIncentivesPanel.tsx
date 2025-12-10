@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import { Duration } from 'luxon';
 import styled from 'styled-components';
 import tw from 'twin.macro';
@@ -11,8 +12,8 @@ import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsUsdRewards } from '@/hooks/rewards/hooks';
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { addRewardsToLeaderboardEntry, useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
@@ -32,7 +33,7 @@ import { Panel } from '@/components/Panel';
 import { SuccessTag, TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/appUiConfigs';
 import { openDialog } from '@/state/dialogs';
 
@@ -84,10 +85,9 @@ const September2025RewardsPanel = () => {
                 </span>{' '}
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.SURGE_HEADLINE_SEP_2025,
+                    key: STRING_KEYS.SURGE_HEADLING_DEC_2025,
                     params: {
-                      REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
-                      REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
+                      REBATE_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercent,
                     },
                   })}
                 </span>
@@ -99,10 +99,9 @@ const September2025RewardsPanel = () => {
             <span>
               <span tw="text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.SURGE_BODY_SEP_2025,
+                  key: STRING_KEYS.SURGE_BODY_DEC_2025,
                   params: {
-                    REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
-                    REBATE_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercent,
+                    REBATE_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercent,
                   },
                 })}{' '}
                 <Link href="https://www.dydx.xyz/surge" isInline>
@@ -117,11 +116,11 @@ const September2025RewardsPanel = () => {
               <div tw="text-color-accent">
                 {stringGetter({
                   key: STRING_KEYS.SURGE_COUNTDOWN,
-                  params: { SURGE_SEASON: OCT_2025_REWARDS_DETAILS.season },
+                  params: { SURGE_SEASON: CURRENT_SURGE_REWARDS_DETAILS.season },
                 })}
                 :
               </div>
-              <MinutesCountdown endTime={OCT_2025_REWARDS_DETAILS.endTime} />
+              <MinutesCountdown endTime={CURRENT_SURGE_REWARDS_DETAILS.endTime} />
             </div>
           </div>
         </div>
@@ -134,11 +133,16 @@ const September2025RewardsPanel = () => {
 const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
 
-  const { data: incentiveRewards, isLoading } = useChaosLabsUsdRewards({
-    dydxAddress,
-    totalUsdRewards: OCT_2025_REWARDS_DETAILS.rewardAmountUsd,
+  const { data, isLoading } = useChaosLabsFeeLeaderboard({
+    address: dydxAddress,
   });
+  const addressEntry = useMemo(
+    () =>
+      data?.addressEntry ? addRewardsToLeaderboardEntry(data.addressEntry, dydxPrice) : undefined,
+    [data?.addressEntry, dydxPrice]
+  );
 
   return (
     <div tw="flex flex-col justify-between gap-0.75 self-stretch">
@@ -156,7 +160,7 @@ const Sept2025RewardsPanel = () => {
             })}
             slotTrigger={
               <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
-                {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_MONTHLY_REWARD })}
                 <Icon iconName={IconName.InfoStroke} />
               </div>
             }
@@ -165,7 +169,7 @@ const Sept2025RewardsPanel = () => {
             <Output
               tw="text-extra font-extra-bold"
               type={OutputType.Fiat}
-              value={incentiveRewards}
+              value={addressEntry?.estimatedDollarRewards ?? 0}
               isLoading={isLoading}
             />
           </$Points>
@@ -319,8 +323,8 @@ const MinutesCountdown = ({ endTime }: { endTime: string }) => {
 
   const formattedMsLeft = useMemo(() => {
     return Duration.fromMillis(msLeft)
-      .shiftTo('days', 'hours', 'minutes')
-      .toFormat('d:hh:mm', { floor: true });
+      .shiftTo('days', 'hours', 'minutes', 'seconds')
+      .toFormat("d'd' h'h' m'm' s's'", { floor: true });
   }, [msLeft]);
 
   return <div>{formattedMsLeft}</div>;

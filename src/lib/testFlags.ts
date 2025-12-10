@@ -68,10 +68,6 @@ class TestFlags {
     return this.booleanFlag(this.queryParams.enable_turnkey);
   }
 
-  get enableAppleAuth() {
-    return this.booleanFlag(this.queryParams.apple_auth);
-  }
-
   get spot() {
     return this.booleanFlag(this.queryParams.spot);
   }

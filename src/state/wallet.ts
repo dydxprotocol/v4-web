@@ -16,6 +16,7 @@ export interface WalletState {
   sourceAccount: SourceAccount;
   localWallet?: {
     address?: string;
+    solanaAddress?: string;
     subaccountNumber?: number;
   };
   turnkeyEmailOnboardingData?: TurnkeyEmailOnboardingData;
@@ -73,7 +74,9 @@ export const walletSlice = createSlice({
     },
     setLocalWallet: (
       state,
-      { payload }: PayloadAction<{ address?: string; subaccountNumber?: number }>
+      {
+        payload,
+      }: PayloadAction<{ address?: string; solanaAddress?: string; subaccountNumber?: number }>
     ) => {
       state.localWallet = payload;
     },

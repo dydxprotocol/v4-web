@@ -52,7 +52,7 @@ export type ExternalNavKeplrDialogProps = {};
 export type ManageAccountDialogProps = {};
 export type MnemonicExportDialogProps = {};
 export type MobileDownloadDialogProps = { mobileAppUrl: string };
-export type MobileSignInDialogProps = {};
+export type MobileSignInDialogProps = { skipWaiting?: boolean };
 export type OnboardingDialogProps = {};
 export type OrderDetailsDialogProps = { orderId: string };
 export type PredictionMarketIntroDialogProps = {};
@@ -63,6 +63,7 @@ export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
@@ -111,7 +112,7 @@ export type WithdrawFromSubaccountDialogProps = {};
 export type CriteriaDialogProps = {
   accountStats?: IAffiliateStats;
   stakedAmount?: bigint;
-  userTier?: number | 'vip';
+  userTier?: number;
 };
 export type CoinbaseDepositDialogProps = {
   onBack?: () => void;
@@ -157,6 +158,7 @@ export const DialogTypes = unionize(
     Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
+    SetMarketLeverage: ofType<SetMarketLeverageDialogProps>(),
     SetupPasskey: ofType<SetupPasskeyDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),

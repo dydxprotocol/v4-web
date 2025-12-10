@@ -89,7 +89,7 @@ export const NewMarketSelectionStep = ({
           {stringGetter({
             key: STRING_KEYS.MARKET_LAUNCH_DETAILS_4,
             params: {
-              APR_PERCENTAGE: <MegaVaultYieldOutput yieldType="ninetyDay" tw="inline-block" />,
+              APR_PERCENTAGE: <MegaVaultYieldOutput yieldType="thirtyDay" tw="inline-block" />,
               DEPOSIT_AMOUNT: (
                 <Output
                   useGrouping

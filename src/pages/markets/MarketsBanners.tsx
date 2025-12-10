@@ -1,10 +1,12 @@
 import { RefObject, useMemo } from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters } from '@/constants/markets';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -17,12 +19,18 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { setHasDismissedPmlBanner, setHasDismissedRebateBanner } from '@/state/dismissable';
 import {
+  setHasDismissedNoFeeBanner,
+  setHasDismissedPmlBanner,
+  setHasDismissedRebateBanner,
+} from '@/state/dismissable';
+import {
+  getHasDismissedNoFeeBanner,
   getHasDismissedPmlBanner,
   getHasDismissedRebateBanner,
 } from '@/state/dismissableSelectors';
@@ -43,7 +51,9 @@ export const MarketsBanners = ({
   const { isMobile } = useBreakpoints();
   const hasDismissedPmlBanner = useAppSelector(getHasDismissedPmlBanner);
   const hasDismissedRebateBanner = useAppSelector(getHasDismissedRebateBanner);
+  const hasDismissedNoFeeBanner = useAppSelector(getHasDismissedNoFeeBanner);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onDismissPmlBanner = () => {
     dispatch(setHasDismissedPmlBanner(true));
@@ -53,14 +63,23 @@ export const MarketsBanners = ({
     dispatch(setHasDismissedRebateBanner(true));
   };
 
+  const onDismissNoFeeBanner = () => {
+    dispatch(setHasDismissedNoFeeBanner(true));
+  };
+
   const onClickPmlBanner = () => {
     dispatch(setShouldHideLaunchableMarkets(false));
     dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const onClickNoFeeBanner = () => {
+    navigate(`${AppRoute.Trade}/BTC-USD`);
+  };
+
   const shouldDisplayPmlBanner = !hasDismissedPmlBanner;
   const shouldDisplayRebateBanner = !hasDismissedRebateBanner;
+  const shouldDisplayNoFeeBanner = !hasDismissedNoFeeBanner;
 
   const pmlBanner = shouldDisplayPmlBanner ? (
     <$PmlBanner onClick={onClickPmlBanner} role="button" tabIndex={0}>
@@ -147,7 +166,35 @@ export const MarketsBanners = ({
     </$RebateBanner>
   ) : null;
 
-  return rebateBanner ?? pmlBanner ?? null;
+  const noFeeBanner = shouldDisplayNoFeeBanner ? (
+    <$NoFeeBanner>
+      <img src="/no-fee-banner-hedgie.png" alt="Hedgie" tw="block h-[150%]" />
+      <img
+        src="/no-fee-banner-coins.png"
+        alt="Coins"
+        tw="pointer-events-none absolute right-7 h-[200%] object-contain"
+      />
+      <div tw="z-[1] ml-1 mr-auto flex flex-col items-start">
+        <span tw="text-large text-white font-extra-bold">
+          <span tw="mr-0.25 rounded-[0.25rem] bg-color-accent px-0.25">
+            {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE_ACCENT })}
+          </span>{' '}
+          {stringGetter({ key: STRING_KEYS.NO_FEE_DECEMBER_BANNER_TITLE })}
+        </span>
+        <Link isAccent onClick={onClickNoFeeBanner} tw="font-base-medium">
+          {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_CTA })} →
+        </Link>
+      </div>
+      <IconButton
+        tw="absolute right-0.5 top-0.5 border-none"
+        iconName={IconName.Close}
+        size={ButtonSize.XSmall}
+        onClick={onDismissNoFeeBanner}
+      />
+    </$NoFeeBanner>
+  ) : null;
+
+  return noFeeBanner ?? rebateBanner ?? pmlBanner ?? null;
 };
 
 const $MarketsPageBanner = styled.div`
@@ -246,4 +293,15 @@ const $RebateBanner = styled($MarketsPageBanner)`
       font: var(--font-small-book);
     }
   }
+`;
+
+const $NoFeeBanner = styled($MarketsPageBanner)`
+  position: relative;
+  height: 8rem;
+  overflow: hidden;
+  background-image:
+    url('/no-fee-banner-dots.png'), linear-gradient(90.59deg, #141528 17.91%, #18181f 82.09%);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;

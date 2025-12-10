@@ -12,9 +12,11 @@ import {
   ComplianceResponse,
   ConfigTiers,
   GeoState,
+  PerpetualMarketFeeDiscount,
   RewardsParams,
   TokenPriceResponse,
   UserFeeTier,
+  UserStakingTier,
 } from '@/bonsai/types/summaryTypes';
 import { Coin } from '@cosmjs/proto-signing';
 import { HeightResponse } from '@dydxprotocol/v4-client-js';
@@ -31,7 +33,13 @@ import {
   IndexerSparklineResponseObject,
 } from '@/types/indexer/indexerManual';
 
+import {
+  SpotApiPortfolioTradesResponse,
+  SpotApiTokenMetadataResponse,
+  SpotApiTokenPriceResponse,
+} from '@/clients/spotApi';
 import { calc } from '@/lib/do';
+import { SpotApiWsWalletPositionsUpdate } from '@/lib/streaming/walletPositionsStreaming';
 
 import { autoBatchAllReducers } from './autoBatchHelpers';
 
@@ -69,17 +77,20 @@ export type ComplianceState = {
 export interface RawDataState {
   markets: {
     allMarkets: Loadable<MarketsData>;
+    feeDiscounts: Loadable<PerpetualMarketFeeDiscount | undefined>;
     assets: Loadable<AssetInfos>;
     orderbooks: { [marketId: string]: Loadable<OrderbookData> };
     sparklines: Loadable<{
       [period: string]: IndexerSparklineResponseObject | undefined;
     }>;
+    selectedMarketLeverages: Loadable<{ [marketId: string]: number }>;
   };
   account: {
     balances: Loadable<Coin[]>;
     nobleUsdcBalance: Loadable<Coin>;
     stats: Loadable<AccountStats | undefined>;
     feeTier: Loadable<UserFeeTier | undefined>;
+    stakingTier: Loadable<UserStakingTier | undefined>;
     parentSubaccount: Loadable<ParentSubaccountData>;
     fills: Loadable<IndexerCompositeFillResponse>;
     orders: Loadable<OrdersData>;
@@ -99,14 +110,24 @@ export interface RawDataState {
     data: Loadable<RewardsParams | undefined>;
     price: Loadable<TokenPriceResponse | undefined>;
   };
+  spot: {
+    solPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenPrice: Loadable<SpotApiTokenPriceResponse | undefined>;
+    tokenMetadata: Loadable<SpotApiTokenMetadataResponse | undefined>;
+    walletPositions: Loadable<SpotApiWsWalletPositionsUpdate | undefined>;
+    portfolioTrades: Loadable<SpotApiPortfolioTradesResponse | undefined>;
+  };
 }
 
 const initialState: RawDataState = {
   markets: {
     allMarkets: loadableIdle(),
+    feeDiscounts: loadableIdle(),
     assets: loadableIdle(),
     orderbooks: {},
     sparklines: loadableIdle(),
+    // TODO: this should actually be idle eventually, not success with empty data
+    selectedMarketLeverages: { status: 'success', data: {} },
   },
   account: {
     parentSubaccount: loadableIdle(),
@@ -114,6 +135,7 @@ const initialState: RawDataState = {
     nobleUsdcBalance: loadableIdle(),
     stats: loadableIdle(),
     feeTier: loadableIdle(),
+    stakingTier: loadableIdle(),
     fills: loadableIdle(),
     orders: loadableIdle(),
     transfers: loadableIdle(),
@@ -133,6 +155,13 @@ const initialState: RawDataState = {
   rewards: {
     data: loadableIdle(),
     price: loadableIdle(),
+  },
+  spot: {
+    solPrice: loadableIdle(),
+    tokenMetadata: loadableIdle(),
+    tokenPrice: loadableIdle(),
+    walletPositions: loadableIdle(),
+    portfolioTrades: loadableIdle(),
   },
 };
 
@@ -168,6 +197,12 @@ export const rawSlice = createSlice({
       },
       setAccountFeeTierRaw: (state, action: PayloadAction<Loadable<UserFeeTier | undefined>>) => {
         state.account.feeTier = action.payload;
+      },
+      setAccountStakingTierRaw: (
+        state,
+        action: PayloadAction<Loadable<UserStakingTier | undefined>>
+      ) => {
+        state.account.stakingTier = action.payload;
       },
       setConfigTiers: (state, action: PayloadAction<Loadable<ConfigTiers>>) => {
         state.configs = action.payload;
@@ -223,6 +258,51 @@ export const rawSlice = createSlice({
       ) => {
         state.rewards.price = action.payload;
       },
+      setSelectedMarketLeverage: (
+        state,
+        action: PayloadAction<{ marketId: string; leverage: number }>
+      ) => {
+        const { marketId, leverage } = action.payload;
+        if (state.markets.selectedMarketLeverages.status === 'success') {
+          state.markets.selectedMarketLeverages.data[marketId] = leverage;
+        }
+      },
+      setSelectedMarketLeverages: (
+        state,
+        action: PayloadAction<Loadable<{ [marketId: string]: number }>>
+      ) => {
+        state.markets.selectedMarketLeverages = action.payload;
+      },
+      setSpotSolPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.solPrice = action.payload;
+      },
+      setSpotTokenPrice: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenPriceResponse | undefined>>
+      ) => {
+        state.spot.tokenPrice = action.payload;
+      },
+      setSpotTokenMetadata: (
+        state,
+        action: PayloadAction<Loadable<SpotApiTokenMetadataResponse | undefined>>
+      ) => {
+        state.spot.tokenMetadata = action.payload;
+      },
+      setSpotWalletPositions: (
+        state,
+        action: PayloadAction<Loadable<SpotApiWsWalletPositionsUpdate | undefined>>
+      ) => {
+        state.spot.walletPositions = action.payload;
+      },
+      setSpotPortfolioTrades: (
+        state,
+        action: PayloadAction<Loadable<SpotApiPortfolioTradesResponse | undefined>>
+      ) => {
+        state.spot.portfolioTrades = action.payload;
+      },
     }),
     // orderbook is throttled separately for fine-grained control
     setOrderbookRaw: (
@@ -249,6 +329,12 @@ export const rawSlice = createSlice({
         }),
         ...stateToMerge,
       };
+    },
+    setMarketsFeeDiscountsRaw: (
+      state,
+      action: PayloadAction<Loadable<PerpetualMarketFeeDiscount | undefined>>
+    ) => {
+      state.markets.feeDiscounts = action.payload;
     },
   },
 });
@@ -294,10 +380,19 @@ export const {
   setIndexerHeightRaw,
   setValidatorHeightRaw,
   setAccountFeeTierRaw,
+  setAccountStakingTierRaw,
+  setMarketsFeeDiscountsRaw,
   setConfigTiers,
   setComplianceGeoRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
   setRewardsParams,
   setRewardsTokenPrice,
+  setSelectedMarketLeverage,
+  setSelectedMarketLeverages,
+  setSpotSolPrice,
+  setSpotTokenPrice,
+  setSpotTokenMetadata,
+  setSpotWalletPositions,
+  setSpotPortfolioTrades,
 } = rawSlice.actions;

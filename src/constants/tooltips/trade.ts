@@ -1,6 +1,6 @@
 import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 
 export const tradeTooltips = {
   'account-leverage': ({ stringGetter }) => ({
@@ -137,6 +137,10 @@ export const tradeTooltips = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_BODY }),
   }),
+  'market-fee-discount': ({ stringGetter, stringParams }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MARKET_FEE_DISCOUNT_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MARKET_FEE_DISCOUNT_BODY, params: stringParams }),
+  }),
   'max-reward': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_BODY }),
@@ -146,14 +150,27 @@ export const tradeTooltips = {
     body: stringGetter({
       key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_SEPT_2025_BODY,
       params: {
-        REWARD_PERCENT: OCT_2025_REWARDS_DETAILS.rebatePercentNumeric,
-        REWARD_AMOUNT: OCT_2025_REWARDS_DETAILS.rewardAmount,
+        REWARD_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercentNumeric,
+        REWARD_AMOUNT: CURRENT_SURGE_REWARDS_DETAILS.rewardAmount,
+      },
+    }),
+  }),
+  'max-reward-dec-2025': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_DEC_2025_TITLE }),
+    body: stringGetter({
+      key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_DEC_2025_BODY,
+      params: {
+        REWARD_PERCENT: CURRENT_SURGE_REWARDS_DETAILS.rebatePercentNumeric,
       },
     }),
   }),
   'max-withdraw': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_BODY }),
+  }),
+  'max-slippage': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_SLIPPAGE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_SLIPPAGE_BODY }),
   }),
   'maker-fee': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAKER_FEE_TITLE }),
@@ -222,6 +239,10 @@ export const tradeTooltips = {
   'price-impact': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.PRICE_IMPACT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.PRICE_IMPACT_BODY }),
+  }),
+  'price-impact-warning': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.PRICE_IMPACT_WARNING_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.PRICE_IMPACT_WARNING_BODY }),
   }),
   'realized-pnl': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REALIZED_PNL_TITLE }),

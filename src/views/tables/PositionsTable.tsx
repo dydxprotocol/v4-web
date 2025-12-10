@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 
 import { BonsaiCore } from '@/bonsai/ontology';
 import {
@@ -22,7 +22,7 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { tradeViewMixins } from '@/styles/tradeViewMixins';
+import { defaultTableMixins } from '@/styles/tableMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -48,6 +48,7 @@ import {
 } from '../../lib/enumToStringKeyHelpers';
 import { CloseAllPositionsButton } from './PositionsTable/CloseAllPositionsButton';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsLeverageCell } from './PositionsTable/PositionsLeverageCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
 
@@ -86,6 +87,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly,
   showClosePositionAction,
   navigateToOrders,
+  navigateToMarket,
   isSinglePosition,
   isTablet,
 }: {
@@ -95,6 +97,7 @@ const getPositionsTableColumnDef = ({
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
+  navigateToMarket: (market: string) => void;
   isSinglePosition: boolean;
   isTablet: boolean;
 }) => ({
@@ -105,7 +108,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.uniqueId,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ marketSummary, leverage, signedSize, side }) => (
+        renderCell: ({ marketSummary, effectiveSelectedLeverage, signedSize, side }) => (
           <TableCell
             stacked
             slotLeft={
@@ -130,7 +133,7 @@ const getPositionsTableColumnDef = ({
               <span tw="text-color-text-0">@</span>
               <$HighlightOutput
                 type={OutputType.Multiple}
-                value={leverage}
+                value={effectiveSelectedLeverage}
                 showSign={ShowSign.None}
               />
             </div>
@@ -213,19 +216,26 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.marketSummary?.displayableTicker,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ marketSummary }) => {
-          return <MarketSummaryTableCell marketSummary={marketSummary} />;
+        renderCell: ({ market, marketSummary }) => {
+          return (
+            <MarketSummaryTableCell
+              marketSummary={marketSummary}
+              onClick={() => navigateToMarket(market)}
+            />
+          );
         },
       },
       [PositionsTableColumnKey.Leverage]: {
         columnKey: 'leverage',
-        getCellValue: (row) => row.leverage?.toNumber(),
+        getCellValue: (row) => row.effectiveSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ leverage }) => (
-          <TableCell>
-            <Output type={OutputType.Multiple} value={leverage} showSign={ShowSign.None} />
-          </TableCell>
+        isActionable: true,
+        renderCell: ({ effectiveSelectedLeverage, market }) => (
+          <PositionsLeverageCell
+            marketId={market}
+            effectiveSelectedLeverage={effectiveSelectedLeverage}
+          />
         ),
       },
       [PositionsTableColumnKey.Type]: {
@@ -275,7 +285,7 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.marginValueInitial.toNumber(),
+        getCellValue: (row) => row.marginValueInitialFromSelectedLeverage.toNumber(),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
@@ -396,7 +406,7 @@ const getPositionsTableColumnDef = ({
           market,
           marketSummary,
           assetId,
-          leverage,
+          effectiveSelectedLeverage,
           side,
           entryPrice,
           updatedUnrealizedPnl: unrealizedPnl,
@@ -405,7 +415,7 @@ const getPositionsTableColumnDef = ({
             marketId={market}
             assetId={assetId}
             side={side}
-            leverage={leverage}
+            leverage={effectiveSelectedLeverage}
             oraclePrice={MaybeBigNumber(marketSummary?.oraclePrice)}
             entryPrice={entryPrice}
             unrealizedPnl={unrealizedPnl}
@@ -432,7 +442,6 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withGradientCardRows?: boolean;
   withOuterBorder?: boolean;
 };
 
@@ -448,7 +457,6 @@ export const PositionsTable = forwardRef(
       initialPageSize,
       onNavigate,
       navigateToOrders,
-      withGradientCardRows,
       withOuterBorder,
     }: ElementProps & StyleProps,
     _ref
@@ -498,6 +506,18 @@ export const PositionsTable = forwardRef(
       [positions, tpslOrdersByPositionUniqueId, marketSummaries]
     );
 
+    const navigateToMarket = useCallback(
+      (market: string) => {
+        if (!currentMarket) {
+          navigate(`${AppRoute.Trade}/${market}`, {
+            state: { from: currentRoute },
+          });
+          onNavigate?.();
+        }
+      },
+      [currentMarket]
+    );
+
     return (
       <$Table
         key={currentMarket ?? 'positions'}
@@ -512,21 +532,12 @@ export const PositionsTable = forwardRef(
             isAccountViewOnly,
             showClosePositionAction,
             navigateToOrders,
+            navigateToMarket,
             isSinglePosition: positionsData.length === 1,
             isTablet,
           })
         )}
         getRowKey={(row: PositionTableRow) => row.uniqueId}
-        onRowAction={
-          currentMarket
-            ? undefined
-            : (id, row) => {
-                navigate(`${AppRoute.Trade}/${row.market}`, {
-                  state: { from: currentRoute },
-                });
-                onNavigate?.();
-              }
-        }
         getRowAttributes={(row: PositionTableRow) => ({
           'data-side': row.side,
         })}
@@ -537,7 +548,6 @@ export const PositionsTable = forwardRef(
           </>
         }
         initialPageSize={initialPageSize}
-        withGradientCardRows={withGradientCardRows}
         withOuterBorder={withOuterBorder}
         withInnerBorders
         withScrollSnapColumns
@@ -549,7 +559,7 @@ export const PositionsTable = forwardRef(
 );
 
 const $Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
+  ${defaultTableMixins}
 
   tr {
     &:after {

@@ -39,6 +39,7 @@ import { ReclaimChildSubaccountFundsDialog } from '@/views/dialogs/ReclaimChildS
 import { ReferralDialog } from '@/views/dialogs/ReferralDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
+import { SetMarketLeverageDialog } from '@/views/dialogs/SetMarketLeverageDialog';
 import { SetupPasskeyDialog } from '@/views/dialogs/SetupPasskeyDialog';
 import { ShareAffiliateDialog } from '@/views/dialogs/ShareAffiliateDialog';
 import { SharePNLAnalyticsDialog } from '@/views/dialogs/SharePNLAnalyticsDialog';
@@ -131,6 +132,7 @@ export const DialogManager = React.memo(() => {
     Referral: (args) => <ReferralDialog {...args} {...modalProps} />,
     RestrictedGeo: (args) => <RestrictedGeoDialog {...args} {...modalProps} />,
     RestrictedWallet: (args) => <RestrictedWalletDialog {...args} {...modalProps} />,
+    SetMarketLeverage: (args) => <SetMarketLeverageDialog {...args} {...modalProps} />,
     SetupPasskey: (args) => <SetupPasskeyDialog {...args} {...modalProps} />,
     ShareAffiliate: (args) => <ShareAffiliateDialog {...args} {...modalProps} />,
     SharePNLAnalytics: (args) => <SharePNLAnalyticsDialog {...args} {...modalProps} />,

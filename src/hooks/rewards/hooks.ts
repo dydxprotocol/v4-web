@@ -10,12 +10,13 @@ import { mapIfPresent } from '@/lib/do';
 
 import { useQueryChaosLabsIncentives } from '../useQueryChaosLabsIncentives';
 import {
-  OCT_2025_REWARDS_DETAILS,
+  CURRENT_SURGE_REWARDS_DETAILS,
+  feesToEstimatedDollarRewards,
   pointsToEstimatedDollarRewards,
   pointsToEstimatedDydxRewards,
 } from './util';
 
-export type ChaosLabsLeaderboardItem = {
+export type ChaosLabsPointsItem = {
   rank: number;
   account: DydxAddress;
   accountLabel: string;
@@ -49,7 +50,7 @@ async function getChaosLabsPointsDistribution() {
     }),
   });
   const parsedRes = (await res.json()) as {
-    data: { incentivesLeaderboard: ChaosLabsLeaderboardItem[] };
+    data: { incentivesLeaderboard: ChaosLabsPointsItem[] };
   };
 
   return parsedRes.data.incentivesLeaderboard;
@@ -76,7 +77,7 @@ export function useChaosLabsPointsDistribution() {
         item.incentivePoints,
         pointsInfo?.totalPoints,
         dydxPrice,
-        OCT_2025_REWARDS_DETAILS.rewardAmountUsd
+        CURRENT_SURGE_REWARDS_DETAILS.rewardAmountUsd
       ),
     })),
   };
@@ -125,3 +126,122 @@ export const useChaosLabsUsdRewards = ({
     isLoading: totalPointsLoading || pointsLoading,
   };
 };
+
+export type ChaosLabsPnlItem = {
+  address: string;
+  pnl: number;
+  startOfThisWeekPnlSnapshot: {
+    equity: string;
+    totalPnl: string;
+  };
+  volume: number;
+  position: number;
+  dollarReward: number;
+};
+
+async function getChaosLabsPnlDistribution() {
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-clc?perPage=1000`,
+    {
+      method: 'GET',
+    }
+  );
+  const parsedRes = (await res.json()) as {
+    data: ChaosLabsPnlItem[];
+  };
+
+  return parsedRes.data;
+}
+
+export function useChaosLabsPnlDistribution() {
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
+
+  const { data: pnlItems, isLoading: pnlItemsLoading } = useQuery({
+    queryKey: ['chaoslabs/pnls'],
+    queryFn: wrapAndLogError(
+      () => getChaosLabsPnlDistribution(),
+      'LaunchIncentives/fetchPnls',
+      true
+    ),
+  });
+
+  return {
+    isLoading: pnlItemsLoading || !dydxPrice,
+    data: pnlItems,
+  };
+}
+
+export type ChaosLabsLeaderboardItem = {
+  rank: number;
+  account: string;
+  estimatedDydxRewards: string | number;
+};
+
+export type ChaosLabsCompetitionItem = {
+  rank: number;
+  account: string;
+  dollarReward: number;
+  pnl: number;
+};
+
+export function useChaosLabsFeeLeaderboard({ address }: { address?: string }) {
+  return useQuery({
+    queryKey: ['chaoslabs/fee-leaderboard', address],
+    queryFn: wrapAndLogError(
+      () => getChaosLabsFeeLeaderboard({ address }),
+      'LaunchIncentives/fetchFeeLeaderboard',
+      true
+    ),
+  });
+}
+
+export type ChaosLabsFeeLeaderboardItemWithRewards = {
+  address: string;
+  total_fees: number;
+  rank: number;
+  estimatedDollarRewards: number;
+  estimatedDydxRewards: number;
+};
+
+export type ChaosLabsFeeLeaderboardItem = {
+  address: string;
+  total_fees: number;
+  rank: number;
+};
+
+type ChaosLabsFeeLeaderboardResponse = {
+  success: boolean;
+  addressEntry?: ChaosLabsFeeLeaderboardItem;
+  data: ChaosLabsFeeLeaderboardItem[];
+  pagination?: {
+    total: number;
+    totalPages: number;
+    page: number;
+    perPage: number;
+  };
+};
+
+export const addRewardsToLeaderboardEntry = (
+  entry: ChaosLabsFeeLeaderboardItem,
+  dydxPrice: number | undefined
+): ChaosLabsFeeLeaderboardItemWithRewards => {
+  const dollarRewards = feesToEstimatedDollarRewards(entry.total_fees);
+  const dydxRewards = dydxPrice ? dollarRewards / dydxPrice : 0;
+  return {
+    ...entry,
+    estimatedDollarRewards: dollarRewards,
+    estimatedDydxRewards: dydxRewards,
+  };
+};
+
+async function getChaosLabsFeeLeaderboard({ address }: { address?: string }) {
+  const res = await fetch(
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-fee-leaderboard?perPage=1000${address ? `&address=${address}` : ''}`
+  );
+
+  const data = (await res.json()) as ChaosLabsFeeLeaderboardResponse;
+  return {
+    leaderboard: data.data,
+    addressEntry: data.addressEntry,
+  };
+}

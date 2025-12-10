@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { BonsaiHooks } from '@/bonsai/ontology';
 import { sumBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
@@ -19,17 +21,25 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Tabs } from '@/components/Tabs';
 import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
+import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { RewardsLeaderboardPanel } from './RewardsLeaderboardPanel';
-import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
+import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
+
+enum Tab {
+  Rewards = 'Rewards',
+  Competition = 'Competition',
+}
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -39,6 +49,8 @@ const RewardsPage = () => {
   const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();
+
+  const [value, setValue] = useState(Tab.Rewards);
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -73,7 +85,7 @@ const RewardsPage = () => {
           <$DetachedSection>
             {showGeoblockedPanel && <GeoblockedPanel />}
             {showStakingRewardPanel && stakingRewardPanel}
-            <StakingPanel />
+            <SwapAndStakingPanel />
             <UnbondingPanels />
             <LaunchIncentivesPanel />
             <RewardsHelpPanel />
@@ -83,14 +95,42 @@ const RewardsPage = () => {
       ) : (
         <$DetachedSection>
           <div tw="flex gap-1.5">
-            <div tw="flexColumn flex-[2] gap-1.5">
-              <LaunchIncentivesPanel />
-              <RewardsLeaderboardPanel />
-            </div>
+            <$Tabs
+              fullWidthTabs
+              dividerStyle="underline"
+              value={value}
+              onValueChange={(v: Tab) => {
+                setValue(v);
+              }}
+              tw="flex-[2]"
+              items={[
+                {
+                  content: (
+                    <div tw="flexColumn gap-1.5">
+                      <LaunchIncentivesPanel />
+                      <RewardsLeaderboardPanel />
+                    </div>
+                  ),
+                  label: stringGetter({ key: STRING_KEYS.REWARDS }),
+                  value: Tab.Rewards,
+                },
+                {
+                  content: (
+                    <div tw="flexColumn gap-1.5">
+                      <CompetitionIncentivesPanel />
+                      <CompetitionLeaderboardPanel />
+                    </div>
+                  ),
+                  label: stringGetter({ key: STRING_KEYS.REBATES }),
+                  value: Tab.Competition,
+                },
+              ]}
+              withTransitions={false}
+            />
             <div tw="flexColumn flex-1 gap-1.5">
               {showGeoblockedPanel && <GeoblockedPanel />}
               {showStakingRewardPanel && stakingRewardPanel}
-              <StakingPanel />
+              <SwapAndStakingPanel />
               <UnbondingPanels />
               <RewardsHelpPanel />
               {legalDisclaimer}
@@ -109,3 +149,7 @@ const $Page = styled.div`
 `;
 
 const $DetachedSection = tw(DetachedSection)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen`;
+
+const $Tabs = styled(Tabs)`
+  --trigger-active-underline-backgroundColor: var(--color-layer-2);
+` as typeof Tabs;

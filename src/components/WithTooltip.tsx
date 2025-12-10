@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS, TooltipStrings } from '@/constants/localization';
 import { TooltipStringKeys, tooltipStrings } from '@/constants/tooltips';
@@ -33,6 +33,7 @@ type StyleProps = {
   side?: 'top' | 'right' | 'bottom' | 'left';
   sideOffset?: number;
   className?: string;
+  withUnderline?: boolean;
 };
 
 export const WithTooltip = ({
@@ -49,6 +50,7 @@ export const WithTooltip = ({
   sideOffset,
   className,
   slotTooltip,
+  withUnderline = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const urlConfigs = useURLConfigs();
@@ -82,7 +84,7 @@ export const WithTooltip = ({
         <Trigger asChild>
           {slotTrigger ?? (
             <$Abbr>
-              <$Underlined>{children}</$Underlined>
+              <$Underlined withUnderline={withUnderline}>{children}</$Underlined>
               {withIcon && <Icon iconName={IconName.HelpCircle} tw="text-color-text-0" />}
               {slotRight}
             </$Abbr>
@@ -118,13 +120,16 @@ export const WithTooltip = ({
   );
 };
 
-const $Underlined = styled.span`
+const $Underlined = styled.span<{ withUnderline: boolean }>`
   ${layoutMixins.inlineRow}
-
-  text-decoration: underline dashed 0px;
-  text-underline-position: under;
-  text-decoration-color: var(--color-text-0);
-  text-decoration-skip-ink: all;
+  ${({ withUnderline }) =>
+    withUnderline &&
+    css`
+      text-decoration: underline dashed 0px;
+      text-underline-position: under;
+      text-decoration-color: var(--color-text-0);
+      text-decoration-skip-ink: all;
+    `}
 `;
 
 const $Abbr = styled.abbr`

@@ -1,13 +1,22 @@
 import { wrapAndLogBonsaiError } from '@/bonsai/logs';
+import { BonsaiCore } from '@/bonsai/ontology';
 import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/charting_library';
 
-import { getSpotCandleData } from './candleService';
-import { subscribeToSpotStream, unsubscribeFromSpotStream } from './streaming';
-import { SpotCandleServiceQuery } from './types';
+import { type RootStore } from '@/state/_store';
+
+import { getSpotBars, SpotApiGetBarsQuery } from '@/clients/spotApi';
+import { waitForSelector } from '@/lib/asyncUtils';
+import {
+  subscribeToSpotCandles,
+  unsubscribeFromSpotStream,
+} from '@/lib/streaming/spotCandleStreaming';
+
 import {
   createSpotSymbolInfo,
   resolutionToSpotInterval,
   SPOT_SUPPORTED_RESOLUTIONS,
+  transformSpotCandleForChart,
+  transformSpotCandlesForChart,
 } from './utils';
 
 const configurationData: DatafeedConfiguration = {
@@ -28,7 +37,7 @@ const configurationData: DatafeedConfiguration = {
   ],
 };
 
-export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
+export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDataFeed => ({
   onReady: (cb) => {
     setTimeout(() => cb(configurationData), 0);
   },
@@ -38,13 +47,20 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
     onResultReadyCallback([]);
   },
 
-  resolveSymbol: async (tokenSymbol, onSymbolResolvedCallback) => {
-    const symbolInfo = createSpotSymbolInfo(tokenSymbol);
-    setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
+  resolveSymbol: async (tokenMint, onSymbolResolvedCallback) => {
+    setTimeout(async () => {
+      const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
+      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice);
+      onSymbolResolvedCallback(symbolInfo);
+    }, 0);
   },
 
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
     const { from, to } = periodParams;
+
+    // Clamp to parameter to current time to prevent API from returning future placeholder candles
+    const currentTimeSeconds = Math.floor(Date.now() / 1000) + 1;
+    const clampedTo = Math.min(to, currentTimeSeconds);
 
     if (!symbolInfo.ticker) {
       const error = new Error('Symbol ticker is required');
@@ -53,27 +69,26 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
     }
 
     try {
-      const token = symbolInfo.ticker;
+      const tokenMint = symbolInfo.ticker;
       const interval = resolutionToSpotInterval(resolution);
-      const fromMs = from * 1000;
-      const toMs = to * 1000;
 
-      const query: SpotCandleServiceQuery = {
-        token,
-        interval,
-        from: fromMs,
-        to: toMs,
+      const query: SpotApiGetBarsQuery = {
+        tokenMint,
+        resolution: interval,
+        from,
+        to: clampedTo,
       };
 
       const bars = await wrapAndLogBonsaiError(
-        () => getSpotCandleData(spotApiUrl, query),
-        'getSpotCandleData'
+        () => getSpotBars(spotApiUrl, query),
+        'getSpotBars'
       )();
 
       if (bars.length === 0) {
         onHistoryCallback([], { noData: true });
       } else {
-        onHistoryCallback(bars, { noData: false });
+        const chartBars = transformSpotCandlesForChart(bars);
+        onHistoryCallback(chartBars, { noData: false });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -83,8 +98,20 @@ export const getSpotDatafeed = (spotApiUrl: string): IBasicDataFeed => ({
 
   subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID) => {
     if (!symbolInfo.ticker) return;
-    const token = symbolInfo.ticker;
-    subscribeToSpotStream(spotApiUrl, token, resolution, onRealtimeCallback, subscriberUID);
+
+    const tokenMint = symbolInfo.ticker;
+    const interval = resolutionToSpotInterval(resolution);
+
+    subscribeToSpotCandles(
+      spotApiUrl,
+      tokenMint,
+      interval,
+      (bar) => {
+        const chartBar = transformSpotCandleForChart(bar);
+        onRealtimeCallback(chartBar);
+      },
+      subscriberUID
+    );
   },
 
   unsubscribeBars: (subscriberUID) => {

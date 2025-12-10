@@ -37,7 +37,10 @@ export const usePortfolioValues = ({
     [activeDatum, selectedLocale, stringGetter]
   );
 
-  const accountEquity = activeDatum ? activeDatum.equity : equity;
+  const accountEquity = useMemo(
+    () => (activeDatum ? activeDatum.equity : equity),
+    [activeDatum, equity]
+  );
 
   const earliestVisibleDatum = visibleData?.[0];
   const latestVisibleDatum = visibleData?.[visibleData.length - 1];
@@ -51,10 +54,11 @@ export const usePortfolioValues = ({
       );
 
       pnlDiff = activeDatum
-        ? MustBigNumber(activeDatum.totalPnl).minus(earliestVisibleDatum.totalPnl)
-        : fullTimeframeDiff;
+        ? MustBigNumber(activeDatum.totalPnl)
+        : MustBigNumber(latestVisibleDatum.totalPnl);
 
-      pnlDiffPercent = pnlDiff.div(earliestVisibleDatum.equity);
+      const netTransfers = MustBigNumber(latestVisibleDatum.netTransfers);
+      pnlDiffPercent = netTransfers.isZero() ? 0 : pnlDiff.div(netTransfers);
 
       return {
         pnlDiff: pnlDiff.toFixed(4),

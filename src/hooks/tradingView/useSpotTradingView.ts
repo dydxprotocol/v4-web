@@ -14,7 +14,7 @@ import type { TvWidget } from '@/constants/tvchart';
 
 import { useEndpointsConfig } from '@/hooks/useEndpointsConfig';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/appUiConfigsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { updateSpotChartConfig } from '@/state/tradingView';
@@ -28,18 +28,19 @@ import { useSimpleUiEnabled } from '../useSimpleUiEnabled';
 
 export const useSpotTradingView = ({
   setTvWidget,
-  symbol,
+  tokenMint,
 }: {
   setTvWidget: Dispatch<SetStateAction<TvWidget | undefined>>;
-  symbol: string;
+  tokenMint: string;
 }) => {
   const dispatch = useAppDispatch();
+  const store = useAppStore();
   const { isTablet } = useBreakpoints();
   const appTheme = useAppSelector(getAppTheme);
   const appColorMode = useAppSelector(getAppColorMode);
   const selectedLocale = useAppSelector(getSelectedLocale);
   const isSimpleUi = useSimpleUiEnabled();
-  const { spotCandleService } = useEndpointsConfig();
+  const { spotApi } = useEndpointsConfig();
 
   const savedTvChartConfig = useAppSelector((state) => getTvChartConfig(state, false, true));
 
@@ -49,7 +50,7 @@ export const useSpotTradingView = ({
   );
 
   useEffect(() => {
-    if (!symbol || !spotCandleService) {
+    if (!tokenMint || !spotApi) {
       return () => {};
     }
 
@@ -60,10 +61,10 @@ export const useSpotTradingView = ({
     const options: TradingTerminalWidgetOptions = {
       ...widgetOptions,
       ...widgetOverrides,
-      datafeed: getSpotDatafeed(spotCandleService),
+      datafeed: getSpotDatafeed(store, spotApi),
       interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
       locale: languageCode as LanguageCode,
-      symbol,
+      symbol: tokenMint,
       saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       auto_save_delay: 1,
     };
@@ -83,14 +84,5 @@ export const useSpotTradingView = ({
       tvChartWidget.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedLocale,
-    symbol,
-    spotCandleService,
-    setTvWidget,
-    isSimpleUi,
-    isTablet,
-    savedResolution,
-    dispatch,
-  ]);
+  }, [selectedLocale, !!tokenMint, spotApi, setTvWidget, isSimpleUi, isTablet, dispatch]);
 };

@@ -14,7 +14,6 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Popover, TriggerType } from '@/components/Popover';
-import { VerticalSeparator } from '@/components/Separator';
 
 export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) => {
   const stringGetter = useStringGetter();
@@ -41,31 +40,28 @@ export const MobileDownloadLinks = ({ withBadges }: { withBadges?: boolean }) =>
   }
 
   return (
-    <>
-      <Popover
-        triggerType={TriggerType.MobileDownloadTrigger}
-        align="center"
-        slotTrigger={<$IconButton iconName={IconName.Mobile} shape={ButtonShape.Square} />}
-        sideOffset={8}
-      >
-        <$DownloadLinksInPopover>
-          <div>{stringGetter({ key: STRING_KEYS.GET_DYDX_ON_PHONE })}</div>
-          <div tw="row gap-0.5">
-            {googlePlayStoreUrl && (
-              <Link href={googlePlayStoreUrl}>
-                <img tw="w-10" src="/play-store.png" alt="google-play" />
-              </Link>
-            )}
-            {appleAppStoreUrl && (
-              <Link href={appleAppStoreUrl}>
-                <img tw="w-10" src="/app-store.png" alt="app-store" />
-              </Link>
-            )}
-          </div>
-        </$DownloadLinksInPopover>
-      </Popover>
-      <VerticalSeparator />
-    </>
+    <Popover
+      triggerType={TriggerType.MobileDownloadTrigger}
+      align="center"
+      slotTrigger={<$IconButton iconName={IconName.Mobile} shape={ButtonShape.Square} />}
+      sideOffset={8}
+    >
+      <$DownloadLinksInPopover>
+        <div>{stringGetter({ key: STRING_KEYS.GET_DYDX_ON_PHONE })}</div>
+        <div tw="row gap-0.5">
+          {googlePlayStoreUrl && (
+            <Link href={googlePlayStoreUrl}>
+              <img tw="w-10" src="/play-store.png" alt="google-play" />
+            </Link>
+          )}
+          {appleAppStoreUrl && (
+            <Link href={appleAppStoreUrl}>
+              <img tw="w-10" src="/app-store.png" alt="app-store" />
+            </Link>
+          )}
+        </div>
+      </$DownloadLinksInPopover>
+    </Popover>
   );
 };
 

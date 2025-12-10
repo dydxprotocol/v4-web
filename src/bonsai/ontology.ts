@@ -12,10 +12,17 @@ import { IndexerWsTradesUpdateObject } from '@/types/indexer/indexerManual';
 import { type RootState } from '@/state/_store';
 import { getCurrentMarketId } from '@/state/currentMarketSelectors';
 
+import { SpotApiPortfolioTradesResponse, SpotApiTokenInfoObject } from '@/clients/spotApi';
+import {
+  SpotApiWsWalletBalanceObject,
+  SpotApiWsWalletPositionObject,
+  SpotApiWsWalletPositionsUpdate,
+} from '@/lib/streaming/walletPositionsStreaming';
 import { RecordValueType } from '@/lib/typeUtils';
 
 import { HistoricalFundingObject } from './calculators/funding';
 import { AdjustIsolatedMarginFormFns } from './forms/adjustIsolatedMargin';
+import { SpotFormFns } from './forms/spot';
 import { TradeFormFns } from './forms/trade/trade';
 import { TransferFormFns } from './forms/transfers';
 import { TriggerOrdersFormFns } from './forms/triggers/triggers';
@@ -40,6 +47,7 @@ import {
   selectAccountFillsLoading,
   selectAccountOrders,
   selectAccountOrdersLoading,
+  selectAccountStakingTier,
   selectAccountTransfers,
   selectAccountTransfersLoading,
   selectChildSubaccountSummaries,
@@ -76,10 +84,11 @@ import {
   selectRawIndexerHeightDataLoading,
   selectRawMarketsData,
   selectRawParentSubaccountData,
+  selectRawSelectedMarketLeveragesData,
   selectRawValidatorHeightDataLoading,
 } from './selectors/base';
 import { selectCompliance, selectComplianceLoading } from './selectors/compliance';
-import { selectEquityTiers, selectFeeTiers } from './selectors/configs';
+import { selectEquityTiers, selectFeeTiers, selectStakingTiers } from './selectors/configs';
 import { selectCurrentMarketOrderbookLoading } from './selectors/markets';
 import {
   selectCurrentMarketDepthChart,
@@ -88,13 +97,29 @@ import {
 } from './selectors/orderbook';
 import { selectRewardsSummary } from './selectors/rewards';
 import {
+  selectSpotBalances,
+  selectSpotPortfolioTrades,
+  selectSpotPortfolioTradesLoading,
+  selectSpotPositions,
+  selectSpotSolPrice,
+  selectSpotSolPriceLoading,
+  selectSpotTokenMetadata,
+  selectSpotTokenMetadataLoading,
+  selectSpotTokenPrice,
+  selectSpotTokenPriceLoading,
+  selectSpotWalletPositions,
+  selectSpotWalletPositionsLoading,
+} from './selectors/spot';
+import {
   selectAllMarketSummaries,
   selectAllMarketSummariesLoading,
   selectCurrentMarketAssetId,
   selectCurrentMarketAssetLogoUrl,
   selectCurrentMarketAssetName,
+  selectCurrentMarketEffectiveSelectedLeverage,
   selectCurrentMarketInfo,
   selectCurrentMarketInfoStable,
+  selectEffectiveSelectedMarketLeverage,
   selectMarketSummaryById,
   StablePerpetualMarketSummary,
 } from './selectors/summary';
@@ -117,10 +142,12 @@ import {
   PerpetualMarketSummaries,
   PerpetualMarketSummary,
   RewardParamsSummary,
+  StakingTiers,
   SubaccountFill,
   SubaccountOrder,
   SubaccountPosition,
   SubaccountTransfer,
+  UserStakingTierSummary,
   UserStats,
 } from './types/summaryTypes';
 import { useCurrentMarketTradesValue } from './websocket/trades';
@@ -176,6 +203,9 @@ interface BonsaiCoreShape {
     nobleUsdcBalance: {
       data: BasicSelector<string | undefined>;
     };
+    stakingTier: {
+      data: BasicSelector<UserStakingTierSummary | undefined>;
+    };
   };
   markets: {
     currentMarketId: BasicSelector<string | undefined>;
@@ -203,9 +233,34 @@ interface BonsaiCoreShape {
   configs: {
     feeTiers: BasicSelector<FeeTierSummary[] | undefined>;
     equityTiers: BasicSelector<EquityTiersSummary | undefined>;
+    stakingTiers: BasicSelector<StakingTiers | undefined>;
   };
   compliance: { data: BasicSelector<Compliance>; loading: BasicSelector<LoadableStatus> };
   rewardParams: { data: BasicSelector<RewardParamsSummary> };
+  spot: {
+    solPrice: {
+      data: BasicSelector<number | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tokenPrice: {
+      data: BasicSelector<number | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    tokenMetadata: {
+      data: BasicSelector<SpotApiTokenInfoObject | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+    walletPositions: {
+      data: BasicSelector<SpotApiWsWalletPositionsUpdate | undefined>;
+      loading: BasicSelector<LoadableStatus>;
+      positions: BasicSelector<SpotApiWsWalletPositionObject[]>;
+      tokenBalances: BasicSelector<SpotApiWsWalletBalanceObject[]>;
+    };
+    portfolioTrades: {
+      data: BasicSelector<SpotApiPortfolioTradesResponse>;
+      loading: BasicSelector<LoadableStatus>;
+    };
+  };
 }
 
 export const BonsaiCore: BonsaiCoreShape = {
@@ -255,6 +310,9 @@ export const BonsaiCore: BonsaiCoreShape = {
     nobleUsdcBalance: {
       data: selectAccountNobleUsdcBalance,
     },
+    stakingTier: {
+      data: selectAccountStakingTier,
+    },
   },
   markets: {
     currentMarketId: getCurrentMarketId,
@@ -282,9 +340,34 @@ export const BonsaiCore: BonsaiCoreShape = {
   configs: {
     equityTiers: selectEquityTiers,
     feeTiers: selectFeeTiers,
+    stakingTiers: selectStakingTiers,
   },
   compliance: { data: selectCompliance, loading: selectComplianceLoading },
   rewardParams: { data: selectRewardsSummary },
+  spot: {
+    solPrice: {
+      data: selectSpotSolPrice,
+      loading: selectSpotSolPriceLoading,
+    },
+    tokenPrice: {
+      data: selectSpotTokenPrice,
+      loading: selectSpotTokenPriceLoading,
+    },
+    tokenMetadata: {
+      data: selectSpotTokenMetadata,
+      loading: selectSpotTokenMetadataLoading,
+    },
+    walletPositions: {
+      data: selectSpotWalletPositions,
+      loading: selectSpotWalletPositionsLoading,
+      positions: selectSpotPositions,
+      tokenBalances: selectSpotBalances,
+    },
+    portfolioTrades: {
+      data: selectSpotPortfolioTrades,
+      loading: selectSpotPortfolioTradesLoading,
+    },
+  },
 };
 
 interface BonsaiRawShape {
@@ -292,6 +375,7 @@ interface BonsaiRawShape {
   // DANGER: only the CURRENT relevant markets, so you cannot use if your operation might make MORE markets relevant
   // e.g. any place order
   parentSubaccountRelevantMarkets: BasicSelector<MarketsData | undefined>;
+  selectedMarketLeverages: BasicSelector<{ [marketId: string]: number } | undefined>;
   currentMarket: BasicSelector<RecordValueType<MarketsData> | undefined>;
   // DANGER: updates a lot
   allMarkets: BasicSelector<MarketsData | undefined>;
@@ -300,6 +384,7 @@ interface BonsaiRawShape {
 export const BonsaiRaw: BonsaiRawShape = {
   parentSubaccountBase: selectRawParentSubaccountData,
   parentSubaccountRelevantMarkets: selectRelevantMarketsData,
+  selectedMarketLeverages: selectRawSelectedMarketLeveragesData,
   currentMarket: selectCurrentMarketInfoRaw,
   allMarkets: selectRawMarketsData,
 };
@@ -314,6 +399,7 @@ interface BonsaiHelpersShape {
     assetId: BasicSelector<string | undefined>;
     assetLogo: BasicSelector<string | undefined>;
     assetName: BasicSelector<string | undefined>;
+    effectiveSelectedLeverage: BasicSelector<number>;
 
     account: {
       buyingPower: BasicSelector<BigNumber | undefined>;
@@ -346,6 +432,7 @@ interface BonsaiHelpersShape {
       PerpetualMarketSummary | undefined,
       [string | undefined]
     >;
+    selectEffectiveSelectedMarketLeverage: BasicSelector<number, [string | undefined]>;
   };
   forms: {
     deposit: {
@@ -371,6 +458,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
     assetId: selectCurrentMarketAssetId,
     assetLogo: selectCurrentMarketAssetLogoUrl,
     assetName: selectCurrentMarketAssetName,
+    effectiveSelectedLeverage: selectCurrentMarketEffectiveSelectedLeverage,
     orderbook: {
       selectGroupedData: selectCurrentMarketOrderbook,
       loading: selectCurrentMarketOrderbookLoading,
@@ -397,6 +485,7 @@ export const BonsaiHelpers: BonsaiHelpersShape = {
   },
   markets: {
     selectMarketSummaryById,
+    selectEffectiveSelectedMarketLeverage,
   },
   forms: {
     deposit: {
@@ -436,4 +525,5 @@ export const BonsaiForms = {
   TriggerOrdersFormFns,
   AdjustIsolatedMarginFormFns,
   TransferFormFns,
+  SpotFormFns,
 };

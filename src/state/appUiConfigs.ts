@@ -1,3 +1,4 @@
+import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -5,6 +6,28 @@ import { MarketsSortType, PositionSortType } from '@/constants/marketList';
 import { DisplayUnit } from '@/constants/trade';
 
 import { track } from '@/lib/analytics/analytics';
+
+export type SpotQuickOptions = {
+  [SpotSide.SELL]: {
+    [SpotSellInputType.PERCENT]: string[];
+    [SpotSellInputType.USD]: string[];
+  };
+  [SpotSide.BUY]: {
+    [SpotBuyInputType.USD]: string[];
+    [SpotBuyInputType.SOL]: string[];
+  };
+};
+
+export const DEFAULT_SPOT_QUICK_OPTIONS: SpotQuickOptions = {
+  [SpotSide.SELL]: {
+    [SpotSellInputType.PERCENT]: ['10', '25', '50', '100'],
+    [SpotSellInputType.USD]: ['50', '100', '250', '500'],
+  },
+  [SpotSide.BUY]: {
+    [SpotBuyInputType.USD]: ['50', '100', '250', '500'],
+    [SpotBuyInputType.SOL]: ['0.1', '0.25', '0.5', '1'],
+  },
+};
 
 export enum AppTheme {
   Classic = 'Classic',
@@ -38,6 +61,8 @@ export interface AppUIConfigsState {
   displayUnit: DisplayUnit;
   shouldHideLaunchableMarkets: boolean;
   favoritedMarkets: string[];
+  spotFavorites: string[];
+  spotQuickOptions: SpotQuickOptions;
   horizontalPanelHeightPx: number;
   tablePageSizes: { [tableKey: string]: number };
   simpleUI: {
@@ -54,6 +79,8 @@ export const initialState: AppUIConfigsState = {
   displayUnit: DisplayUnit.Asset,
   shouldHideLaunchableMarkets: false,
   favoritedMarkets: [],
+  spotFavorites: [],
+  spotQuickOptions: DEFAULT_SPOT_QUICK_OPTIONS,
   horizontalPanelHeightPx: 288,
   tablePageSizes: {},
   simpleUI: {
@@ -120,6 +147,20 @@ export const appUiConfigsSlice = createSlice({
       const newFavoritedMarkets = currentFavoritedMarkets.filter((id) => id !== marketId);
       state.favoritedMarkets = newFavoritedMarkets;
     },
+    favoriteSpotToken: (
+      state: AppUIConfigsState,
+      { payload: tokenAddress }: PayloadAction<string>
+    ) => {
+      const currentFavoritedTokens = state.spotFavorites;
+      const newFavoritedTokens = [...currentFavoritedTokens, tokenAddress];
+      state.spotFavorites = newFavoritedTokens;
+    },
+    unfavoriteSpotToken: (
+      state: AppUIConfigsState,
+      { payload: tokenAddress }: PayloadAction<string>
+    ) => {
+      state.spotFavorites = state.spotFavorites.filter((id) => id !== tokenAddress);
+    },
     setTablePageSize: (
       state: AppUIConfigsState,
       { payload: { pageSize, tableId } }: PayloadAction<{ tableId: string; pageSize: number }>
@@ -138,6 +179,23 @@ export const appUiConfigsSlice = createSlice({
     ) => {
       state.simpleUI.sortPositionsBy = payload;
     },
+    setSpotQuickOptions: (
+      state: AppUIConfigsState,
+      {
+        payload,
+      }: PayloadAction<{
+        side: SpotSide;
+        inputType: SpotBuyInputType | SpotSellInputType;
+        options: string[];
+      }>
+    ) => {
+      const { side, inputType, options } = payload;
+      if (side === SpotSide.BUY) {
+        state.spotQuickOptions[SpotSide.BUY][inputType as SpotBuyInputType] = options;
+      } else {
+        state.spotQuickOptions[SpotSide.SELL][inputType as SpotSellInputType] = options;
+      }
+    },
   },
 });
 
@@ -154,4 +212,7 @@ export const {
   setTablePageSize,
   setSimpleUISortMarketsBy,
   setSimpleUISortPositionsBy,
+  favoriteSpotToken,
+  unfavoriteSpotToken,
+  setSpotQuickOptions,
 } = appUiConfigsSlice.actions;

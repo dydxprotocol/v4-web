@@ -1,26 +1,30 @@
-import { ReactNode, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { BonsaiCore } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
-import { ButtonStyle } from '@/constants/buttons';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { ChaosLabsLeaderboardItem, useChaosLabsPointsDistribution } from '@/hooks/rewards/hooks';
-import { OCT_2025_REWARDS_DETAILS } from '@/hooks/rewards/util';
+import {
+  addRewardsToLeaderboardEntry,
+  ChaosLabsFeeLeaderboardItem,
+  ChaosLabsFeeLeaderboardItemWithRewards,
+  useChaosLabsFeeLeaderboard,
+} from '@/hooks/rewards/hooks';
+import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import BadgeRank1 from '@/icons/badge-rank-1.svg';
-import BadgeRank2 from '@/icons/badge-rank-2.svg';
-import BadgeRank3 from '@/icons/badge-rank-3.svg';
+import { TrophyIcon } from '@/icons';
 
-import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ColumnDef, Table } from '@/components/Table';
+
+import { useAppSelector } from '@/state/appTypes';
 
 import { exportCSV } from '@/lib/csv';
 import { truncateAddress } from '@/lib/wallet';
@@ -31,39 +35,22 @@ export enum RewardsLeaderboardTableColumns {
   Rewards = 'Rewards',
 }
 
-const Top3Item = ({ item, icon }: { item: ChaosLabsLeaderboardItem; icon: ReactNode }) => {
-  return (
-    <div tw="flex gap-0.5">
-      {icon}
-      <div tw="flex flex-col gap-0.125">
-        <div tw="flex items-center text-small font-medium text-color-text-1">
-          <div> {truncateAddress(item.account)}</div>
-          <CopyButton
-            buttonType="icon"
-            value={item.account}
-            buttonStyle={ButtonStyle.WithoutBackground}
-          />
-        </div>
-
-        <Output
-          tw="text-large font-bold text-color-text-2"
-          value={item.estimatedDydxRewards}
-          type={OutputType.CompactNumber}
-          slotRight={
-            <div tw="mb-0.125 ml-0.5 self-end text-small font-medium text-color-text-0">dYdX</div>
-          }
-        />
-      </div>
-    </div>
-  );
-};
-
 export const RewardsLeaderboardPanel = () => {
   const stringGetter = useStringGetter();
-  const { data, isLoading } = useChaosLabsPointsDistribution();
   const { dydxAddress } = useAccounts();
+  const dydxPrice = useAppSelector(BonsaiCore.rewardParams.data).tokenPrice;
+  const { data: feeLeaderboardWithoutRewards, isLoading } = useChaosLabsFeeLeaderboard({
+    address: dydxAddress,
+  });
+  const feeLeaderboard = useMemo(
+    () =>
+      feeLeaderboardWithoutRewards?.leaderboard.map((entry) =>
+        addRewardsToLeaderboardEntry(entry, dydxPrice)
+      ),
+    [feeLeaderboardWithoutRewards?.leaderboard, dydxPrice]
+  );
 
-  const getRowKey = useCallback((row: ChaosLabsLeaderboardItem) => row.rank, []);
+  const getRowKey = useCallback((row: ChaosLabsFeeLeaderboardItem) => row.rank, []);
 
   const columns = Object.values(RewardsLeaderboardTableColumns).map(
     (key: RewardsLeaderboardTableColumns) =>
@@ -75,16 +62,16 @@ export const RewardsLeaderboardPanel = () => {
   );
 
   const onDownload = () => {
-    if (!data) return;
+    if (!feeLeaderboard) return;
 
-    const csvRows = data.map((item) => ({
+    const csvRows = feeLeaderboard?.map((item) => ({
       rank: item.rank,
-      address: item.account,
+      address: item.address,
       estimatedRewards: item.estimatedDydxRewards,
     }));
 
     exportCSV(csvRows, {
-      filename: `rewards-leaderboard-season-${OCT_2025_REWARDS_DETAILS.season}`,
+      filename: `rewards-leaderboard-season-${CURRENT_SURGE_REWARDS_DETAILS.season}`,
       columnHeaders: [
         {
           key: 'rank',
@@ -102,13 +89,13 @@ export const RewardsLeaderboardPanel = () => {
     });
   };
 
-  const [first, second, third] = (data ?? []).slice(0, 3);
-
   return (
     <$Panel>
       <div tw="flex flex-col gap-1">
         <div tw="flex items-center justify-between">
-          <div tw="font-medium-bold">{stringGetter({ key: STRING_KEYS.LEADERBOARD })}</div>
+          <div tw="font-medium-bold">
+            {stringGetter({ key: STRING_KEYS.SURGE_LEADERBOARD_TITLE })}
+          </div>
           <button
             onClick={onDownload}
             type="button"
@@ -118,15 +105,10 @@ export const RewardsLeaderboardPanel = () => {
           </button>
         </div>
 
-        <div tw="flex items-center justify-between gap-2 px-1.5 py-0.5 pr-2">
-          {first && <Top3Item icon={<BadgeRank1 />} item={first} />}
-          {second && <Top3Item icon={<BadgeRank2 />} item={second} />}
-          {third && <Top3Item icon={<BadgeRank3 />} item={third} />}
-        </div>
         <div tw="overflow-hidden rounded-0.5 border border-solid border-color-border">
           <$Table
             label={stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-            data={data ?? []}
+            data={feeLeaderboard ?? []}
             tableId="trading-rewards"
             getRowKey={getRowKey}
             columns={columns}
@@ -135,7 +117,7 @@ export const RewardsLeaderboardPanel = () => {
               direction: 'ascending',
             }}
             getIsRowPinned={(row) => {
-              return row.account === dydxAddress;
+              return row.address === dydxAddress;
             }}
             slotEmpty={
               isLoading ? (
@@ -147,9 +129,9 @@ export const RewardsLeaderboardPanel = () => {
                 </div>
               )
             }
-            getRowAttributes={({ account }) => ({
+            getRowAttributes={({ address }) => ({
               style: {
-                backgroundColor: account === dydxAddress ? 'var(--color-accent-faded)' : undefined,
+                backgroundColor: address === dydxAddress ? 'var(--color-accent-faded)' : undefined,
               },
             })}
             selectionBehavior="replace"
@@ -220,7 +202,7 @@ const getRewardsLeaderboardTableColumnDef = ({
   key: RewardsLeaderboardTableColumns;
   stringGetter: StringGetterFunction;
   dydxAddress?: string;
-}): ColumnDef<ChaosLabsLeaderboardItem> => ({
+}): ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards> => ({
   ...(
     {
       [RewardsLeaderboardTableColumns.Rank]: {
@@ -231,14 +213,17 @@ const getRewardsLeaderboardTableColumnDef = ({
             {stringGetter({ key: STRING_KEYS.RANK })}
           </div>
         ),
-        renderCell: ({ rank, account }) => (
+        renderCell: ({ rank, address }) => (
           <div tw="flex gap-0.5">
             <div tw="flex items-center justify-center rounded-20 border border-solid border-color-border p-0.5">
               <div tw="flex h-0.5 min-w-0.5 items-center justify-center text-small font-medium">
                 {rank}
               </div>
             </div>
-            {account === dydxAddress && (
+            {rank === 1 && <TrophyIcon tw="size-1.5 text-[#e5c346]" />}
+            {rank === 2 && <TrophyIcon tw="size-1.5 text-[#c9c9cb]" />}
+            {rank === 3 && <TrophyIcon tw="size-1.5 text-[#c37b3f]" />}
+            {address === dydxAddress && (
               <div tw="flex items-center justify-center rounded-20 border border-solid border-color-accent px-0.5">
                 <span tw="text-small font-medium text-color-accent">
                   {stringGetter({ key: STRING_KEYS.YOU })}
@@ -250,23 +235,23 @@ const getRewardsLeaderboardTableColumnDef = ({
       },
       [RewardsLeaderboardTableColumns.Trader]: {
         columnKey: RewardsLeaderboardTableColumns.Trader,
-        getCellValue: (row) => row.account,
+        getCellValue: (row) => row.address,
         label: (
           <div tw="py-0.375 text-base font-medium text-color-text-0">
             {stringGetter({ key: STRING_KEYS.TRADER })}
           </div>
         ),
-        renderCell: ({ account }) => (
+        renderCell: ({ address }) => (
           <div
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            css={{ color: address === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
             tw="flex items-center gap-0.5 text-small font-medium"
           >
-            {truncateAddress(account)}
+            {truncateAddress(address)}
             <Link
               css={{
-                color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-0)',
+                color: address === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-0)',
               }}
-              href={getTraderLink(account)}
+              href={getTraderLink(address)}
               iconSize="1rem"
               isNewPage
               withIcon
@@ -282,16 +267,21 @@ const getRewardsLeaderboardTableColumnDef = ({
             {stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}
           </div>
         ),
-        renderCell: ({ estimatedDydxRewards, account }) => (
+        renderCell: ({ estimatedDydxRewards, address }) => (
           <Output
             slotRight=" DYDX"
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            css={{
+              color: address === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)',
+            }}
             tw="text-small font-medium"
             type={OutputType.Number}
-            value={estimatedDydxRewards}
+            value={Number.isNaN(Number(estimatedDydxRewards)) ? 0 : estimatedDydxRewards}
           />
         ),
       },
-    } satisfies Record<RewardsLeaderboardTableColumns, ColumnDef<ChaosLabsLeaderboardItem>>
+    } satisfies Record<
+      RewardsLeaderboardTableColumns,
+      ColumnDef<ChaosLabsFeeLeaderboardItemWithRewards>
+    >
   )[key],
 });
