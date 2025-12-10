@@ -53,9 +53,11 @@ const VaultPage = () => {
               <VaultTransactionsCard />
             </$VaultTransactionsCardContainer>
             <$HorizontalSeparatorFiller />
-            <$PnlRow>
-              <$PnlChart />
-            </$PnlRow>
+            <$VaultHeaderChartSection>
+              <$PnlRow>
+                <$PnlChart />
+              </$PnlRow>
+            </$VaultHeaderChartSection>
             <$VaultDescription />
             <$VaultPositionsSection />
           </$VaultDetailsColumn>
@@ -91,11 +93,13 @@ const VaultPage = () => {
     <$Page>
       <$TwoColumnContainer>
         <$VaultDetailsColumn>
-          <$VaultHeader />
-          <$HorizontalSeparatorFiller />
-          <$PnlRow>
-            <$PnlChart />
-          </$PnlRow>
+          <$VaultHeaderChartSection>
+            <$VaultHeader />
+            <$HorizontalSeparatorFiller />
+            <$PnlRow>
+              <$PnlChart />
+            </$PnlRow>
+          </$VaultHeaderChartSection>
           <$HorizontalSeparatorFiller />
           <$VaultDescription />
           <$VaultPositionsSection />
@@ -119,7 +123,6 @@ const VaultPage = () => {
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
-  padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 `;
 
@@ -177,6 +180,13 @@ const $VaultDescription = styled(VaultDescription)`
   ${xPaddingWhenSmall}
 `;
 const $HorizontalSeparatorFiller = tw(HorizontalSeparatorFiller)`flex min-h-px max-h-px`;
+
+const $VaultHeaderChartSection = styled.div`
+  background-color: var(--color-layer-0);
+  border-radius: 0.7rem;
+  padding: 1.25rem;
+  ${xPaddingWhenSmall}
+`;
 
 const $PnlRow = styled.div``;
 const $PnlChart = styled(VaultPnlChart)``;

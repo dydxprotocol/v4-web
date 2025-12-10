@@ -81,7 +81,7 @@ export const useTradingViewTheme = ({
         const volumeStudyId = tvWidget
           .activeChart()
           .getAllStudies()
-          .find((x) => x.name === 'Volume')?.id;
+          .find((x: { name: string }) => x.name === 'Volume')?.id;
 
         if (volumeStudyId) {
           const volume = tvWidget.activeChart().getStudyById(volumeStudyId);

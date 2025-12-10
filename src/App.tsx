@@ -43,6 +43,7 @@ import { config, privyConfig } from '@/lib/wagmi';
 
 import { BonsaiCore } from './bonsai/ontology';
 import { ComplianceBanner } from './components/ComplianceBanner';
+import GlobalBackground from './components/GlobalBackground';
 import { RestrictionWarning } from './components/RestrictionWarning';
 import { DialogTypes } from './constants/dialogs';
 import { LocalStorageKey } from './constants/localStorage';
@@ -122,7 +123,7 @@ const Content = () => {
   if (isSimpleUi) {
     const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
     const backgroundColor =
-      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-layer-0)' : 'transparent';
+      matchMarkets && isSimpleUiUserMenuOpen ? 'var(--color-base-layer)' : 'transparent';
 
     return (
       <>
@@ -133,6 +134,7 @@ const Content = () => {
             backgroundColor,
           }}
         >
+          <GlobalBackground />
           <ComplianceBanner tw="h-fit min-h-0" />
 
           <$SimpleUiMain>
@@ -181,71 +183,77 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$Content
-        isShowingHeader={isShowingHeader}
-        isShowingFooter={isShowingFooter}
-        showRestrictionWarning={showComplianceBanner}
-      >
-        {isShowingHeader && <HeaderDesktop />}
-        <RestrictionWarning />
-        <$Main>
-          <Suspense fallback={<LoadingSpace id="main" />}>
-            <Routes>
-              <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
+      <$AppContainer>
+        <$Content
+          isShowingHeader={isShowingHeader}
+          isShowingFooter={isShowingFooter}
+          showRestrictionWarning={showComplianceBanner}
+        >
+          <GlobalBackground />
+          {isShowingHeader && <HeaderDesktop />}
+          <RestrictionWarning />
+          <$Main>
+            <Suspense fallback={<LoadingSpace id="main" />}>
+              <Routes>
+                <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
 
-              <Route path={AppRoute.Trade}>
-                <Route path=":market" element={<TradePage />} />
-                <Route path={AppRoute.Trade} element={<TradePage />} />
-              </Route>
+                <Route path={AppRoute.Trade}>
+                  <Route path=":market" element={<TradePage />} />
+                  <Route path={AppRoute.Trade} element={<TradePage />} />
+                </Route>
 
-              {testFlags.spot && <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />}
+                {testFlags.spot && (
+                  <Route path={`${AppRoute.Spot}/:symbol`} element={<SpotPage />} />
+                )}
 
-              <Route path={AppRoute.Markets}>
-                <Route path={AppRoute.Markets} element={<MarketsPage />} />
-              </Route>
+                <Route path={AppRoute.Markets}>
+                  <Route path={AppRoute.Markets} element={<MarketsPage />} />
+                </Route>
 
-              <Route path={`${AppRoute.Rewards}/*`} element={<RewardsPage />} />
+                <Route path={`${AppRoute.Rewards}/*`} element={<RewardsPage />} />
 
-              {isTablet && (
-                <>
-                  <Route path={AppRoute.Alerts} element={<AlertsPage />} />
-                  <Route path={AppRoute.Profile} element={<ProfilePage />} />
-                  <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
-                </>
-              )}
+                {isTablet && (
+                  <>
+                    <Route path={AppRoute.Alerts} element={<AlertsPage />} />
+                    <Route path={AppRoute.Profile} element={<ProfilePage />} />
+                    <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
+                  </>
+                )}
 
-              <Route element={<GuardedMobileRoute />}>
-                <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
-              </Route>
+                <Route element={<GuardedMobileRoute />}>
+                  <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
+                </Route>
 
-              <Route path={AppRoute.Vault}>
-                <Route path={AppRoute.Vault} element={<VaultPage />} />
-              </Route>
-              <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
-              <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
-              <Route
-                path="*"
-                element={
-                  <Navigate
-                    to={
-                      pathFromHash || (abDefaultToMarkets ? AppRoute.Markets : DEFAULT_TRADE_ROUTE)
-                    }
-                    replace
-                  />
-                }
-              />
-            </Routes>
-          </Suspense>
-        </$Main>
+                <Route path={AppRoute.Vault}>
+                  <Route path={AppRoute.Vault} element={<VaultPage />} />
+                </Route>
+                <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
+                <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
+                <Route
+                  path="*"
+                  element={
+                    <Navigate
+                      to={
+                        pathFromHash ||
+                        (abDefaultToMarkets ? AppRoute.Markets : DEFAULT_TRADE_ROUTE)
+                      }
+                      replace
+                    />
+                  }
+                />
+              </Routes>
+            </Suspense>
+          </$Main>
 
-        {isTablet ? <FooterMobile /> : <FooterDesktop />}
+          {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
+          <NotificationsToastArea tw="z-[2] [grid-area:Main]" />
 
-        <$DialogArea ref={dialogAreaRef}>
-          <DialogManager />
-        </$DialogArea>
-      </$Content>
+          <$DialogArea ref={dialogAreaRef}>
+            <DialogManager />
+          </$DialogArea>
+        </$Content>
+      </$AppContainer>
     </>
   );
 };
@@ -338,6 +346,13 @@ function shouldForwardProp(propName: string, target: WebTarget): boolean {
   return true;
 }
 
+const $AppContainer = styled.div`
+  width: 100%;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
 const $Content = styled.div<{
   isShowingHeader: boolean;
   isShowingFooter: boolean;
@@ -384,22 +399,28 @@ const $Content = styled.div<{
     ${layoutMixins.scrollArea}
     --scrollArea-height: 100vh;
 
+  position: relative;
+
   @supports (-webkit-touch-callout: none) {
     height: -webkit-fill-available;
   }
 
   ${layoutMixins.stickyArea0}
+  --stickyArea0-background: transparent;
+  --stickyArea-background: transparent;
   --stickyArea0-topHeight: var(--page-currentHeaderHeight);
   --stickyArea0-topGap: var(--border-width);
   --stickyArea0-bottomGap: var(--border-width);
   --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
+
+  background: transparent;
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
 
   ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:
-      ${isShowingHeader ? css`'Header' var(--page-currentHeaderHeight)` : ''}
+      ${isShowingHeader ? css`'Header' calc(var(--page-currentHeaderHeight) + 4rem)` : ''}
       ${showRestrictionWarning
         ? css`'RestrictionWarning' var(--restriction-warning-currentHeight)`
         : ''}
@@ -420,9 +441,15 @@ const $Main = styled.main`
   isolation: isolate;
 
   position: relative;
+  z-index: 1;
 
   padding-left: 1rem;
   padding-right: 1rem;
+
+  /* Override min-width from contentSectionAttached to allow proper grid constraints */
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 `;
 
 const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
@@ -430,6 +457,7 @@ const $SimpleUiContainer = styled.div<{ showRestrictionBanner?: boolean }>`
   flex-direction: column;
   overflow: hidden;
   height: 100%;
+  position: relative;
 `;
 
 const $SimpleUiMain = styled.main`
@@ -437,6 +465,7 @@ const $SimpleUiMain = styled.main`
   position: relative;
   min-height: 0;
   flex: 1;
+  z-index: 1;
 `;
 
 const $DialogArea = styled.aside`

@@ -36,6 +36,7 @@ import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
@@ -98,10 +99,6 @@ export const AccountMenu = () => {
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
 
-  const onRecoverKeys = () => {
-    dispatch(openDialog(DialogTypes.Onboarding()));
-  };
-
   const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
   const usedBalanceBN = MustBigNumber(usdcBalance);
@@ -113,7 +110,16 @@ export const AccountMenu = () => {
 
   const walletIcon = useMemo(() => {
     if (onboardingState === OnboardingState.WalletConnected) {
-      return <Icon iconName={IconName.Warning} tw="text-[1.25rem] text-color-warning" />;
+      return (
+        <$VerifyWalletButton
+          action={ButtonAction.Base}
+          shape={ButtonShape.Pill}
+          size={ButtonSize.XSmall}
+          type={ButtonType.Button}
+        >
+          <span tw="font-small-bold">Re-verify wallet</span>
+        </$VerifyWalletButton>
+      );
     }
 
     if (walletInfo == null) {
@@ -321,7 +327,9 @@ export const AccountMenu = () => {
               <OnboardingTriggerButton />
             </$ConnectToChain>
           ),
-          onSelect: onRecoverKeys,
+          onSelect: () => {
+            dispatch(openDialog(DialogTypes.Onboarding()));
+          },
           separator: true,
         },
         onboardingState === OnboardingState.AccountConnected &&
@@ -583,4 +591,15 @@ const $IconButton = styled(IconButton)`
 const $CopyButton = styled(CopyButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
+`;
+
+const $VerifyWalletButton = styled(Button)`
+  --button-backgroundColor: transparent;
+  --button-border: solid var(--border-width) var(--color-accent);
+  --button-textColor: var(--color-accent);
+  --button-padding: 0.5rem 1.5rem;
+
+  span {
+    color: var(--color-accent) !important;
+  }
 `;

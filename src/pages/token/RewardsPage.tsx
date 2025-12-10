@@ -146,12 +146,14 @@ export default RewardsPage;
 
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
-  background-color: var(--color-layer-0);
+  background-color: transparent;
+  border-radius: 1rem;
+  overflow: hidden;
 `;
 
 const $DetachedSection = tw(
   DetachedSection
-)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen bg-color-layer-0`;
+)`flex flex-col gap-1.5 p-1 max-w-7xl tablet:w-screen bg-color-layer-0 rounded-1`;
 
 const $Tabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;

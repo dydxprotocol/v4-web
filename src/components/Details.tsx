@@ -224,7 +224,8 @@ const $Details = styled.dl<{
   --details-item-backgroundColor: transparent;
   --details-subitem-borderWidth: 2px;
   --details-grid-numColumns: 2;
-  --details-item-vertical-padding: ;
+  --details-item-vertical-padding: 2px;
+  line-height: 1;
 
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
 `;
@@ -292,6 +293,10 @@ const $Item = styled.div<{
       color: var(--color-text-0);
       opacity: 0.5;
     }
+  }
+
+  dd * {
+    line-height: 1;
   }
 `;
 

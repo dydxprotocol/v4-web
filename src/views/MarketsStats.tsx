@@ -40,7 +40,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       {hasNewMarkets && (
         <$Section>
           <$SectionHeader>
-            <h4 tw="flex items-center gap-0.375">
+            <h4 tw="flex items-center gap-0.25">
               {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
               <NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</NewTag>
             </h4>

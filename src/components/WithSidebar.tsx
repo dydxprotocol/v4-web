@@ -55,6 +55,9 @@ export const WithSidebar: React.FC<WithSidebarProps> = ({ children, sidebar }) =
   );
 };
 const $Container = styled.div`
+  border-radius: 1rem;
+  overflow: hidden;
+
   /* Params */
   --withSidebar-containerWidth: 100vw;
   --withSidebar-open-sidebarWidth: var(--sidebar-width);

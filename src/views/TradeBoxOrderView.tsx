@@ -4,6 +4,7 @@ import { TradeFormType } from '@/bonsai/forms/trade/types';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
+import { ColorToken } from '@/constants/styles/base';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -15,7 +16,6 @@ import { tradeFormActions } from '@/state/tradeForm';
 
 import { TradeSideTabs } from './TradeSideTabs';
 import { TradeForm } from './forms/TradeForm';
-import { MarginAndLeverageButtons } from './forms/TradeForm/MarginAndLeverageButtons';
 import { useTradeTypeOptions } from './forms/TradeForm/useTradeTypeOptions';
 
 export const TradeBoxOrderView = () => {
@@ -36,11 +36,10 @@ export const TradeBoxOrderView = () => {
   const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
 
   return (
-    <div tw="flex flex-col gap-0">
-      <$MarginAndLeverageButtons />
+    <div tw="flex h-full flex-col gap-0">
       <TradeSideTabs
         sharedContent={
-          <div tw="flex min-h-full flex-col">
+          <div tw="flex min-h-0 flex-1 flex-col">
             <$OrderTypeTabs
               value={selectedTradeType}
               items={tradeTypeItems}
@@ -65,22 +64,36 @@ const $Container = styled.div`
   background-color: var(--color-layer-1);
 `;
 
-const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
-  padding: 0.25rem 1rem;
-  box-shadow: inset 0 calc(-1 * var(--border-width)) var(--border-color);
-`;
-
 const $OrderTypeTabs = styled(Tabs)`
   --trigger-backgroundColor: var(--color-layer-1);
   --tabs-height: 2.625rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
+  --trigger-active-underlineColor: ${ColorToken.Orange0};
+  --trigger-active-textColor: ${ColorToken.Orange0};
+  --trigger-active-underline-size: 2px;
+  --trigger-underline-size: 0px;
+  --trigger-active-underline-backgroundColor: transparent;
   background-color: var(--color-layer-1);
+  flex: 1;
+  min-height: 0;
 
-  > * > header > div {
+  /* Target the list container - use high specificity to override parent styles */
+  > div > header > ul[role='tablist'] {
     width: 100%;
-    > button {
+
+    > button[role='tab'] {
       width: 33%;
       padding: 0;
+
+      &[data-state='active'] {
+        box-shadow: inset 0 -2px 0 ${ColorToken.Orange0} !important;
+        color: ${ColorToken.Orange0} !important;
+      }
     }
+  }
+
+  /* Ensure underline shows - override any inherited box-shadow: none */
+  button[role='tab'][data-state='active'] {
+    box-shadow: inset 0 -2px 0 ${ColorToken.Orange0} !important;
   }
 ` as typeof Tabs;

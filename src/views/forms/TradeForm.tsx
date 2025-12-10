@@ -32,7 +32,6 @@ import { TradeFormAlertContent } from '../TradeFormMessages/TradeFormAlertConten
 import { TradeFormMessages } from '../TradeFormMessages/TradeFormMessages';
 import { TradeSideTabs } from '../TradeSideTabs';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
-import { MarginAndLeverageButtons } from './TradeForm/MarginAndLeverageButtons';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
 import { TradeFormInputs } from './TradeForm/TradeFormInputs';
@@ -234,7 +233,6 @@ export const TradeForm = ({
           tw="overflow-visible"
           sharedContent={
             <$Content tw="gap-0.75 shadow-none">
-              <$MarginAndLeverageButtons />
               {tabletActionsRow}
               {orderbookAndInputs}
             </$Content>
@@ -306,10 +304,6 @@ const $TopActionsRow = styled.div`
     grid-auto-columns: var(--orderbox-column-width) 1fr;
     gap: var(--orderbox-gap);
   }
-`;
-
-const $MarginAndLeverageButtons = styled(MarginAndLeverageButtons)`
-  margin-top: 0.75rem;
 `;
 
 const $OrderbookButton = styled(ToggleButton)`

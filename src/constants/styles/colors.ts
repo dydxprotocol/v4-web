@@ -35,6 +35,7 @@ type BaseColors = {
 };
 
 type LayerColors = {
+  baseLayer: string;
   layer0: string;
   layer1: string;
   layer2: string;

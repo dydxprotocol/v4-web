@@ -128,8 +128,11 @@ const contentSectionDetached = css`
   ${() => contentSection}
   ${() => stickyLeft}
 
-  max-width: min(var(--content-container-width), var(--content-max-width));
+  /* Use full container width - max-width constraint removed to allow content to fill constrained containers */
+  width: 100%;
+  max-width: var(--content-container-width);
   transition: max-width 0.3s var(--ease-out-expo);
+  align-self: center;
 `;
 
 // An item within a horizontally scrollable container that is unaffected by the horizontal scroll position.
@@ -437,16 +440,15 @@ export const layoutMixins = {
   contentContainerPage: css`
     /* Overrides */
     ${() => contentContainer}
-    --content-container-width: 100vw;
-    --content-max-width: var(--default-page-content-max-width);
+    /* Use 100% to respect parent container constraints (like max-width) instead of 100vw */
+    /* This allows parent containers with max-width to properly constrain the content */
+    --content-container-width: 100%;
+    --content-max-width: 100%;
 
     /* Computed */
-    --contentContainerPage-paddingLeft: calc(
-      (var(--content-container-width) - var(--content-max-width)) / 2
-    );
-    --contentContainerPage-paddingRight: calc(
-      (var(--content-container-width) - var(--content-max-width)) / 2
-    );
+    /* No padding needed since we're using full container width */
+    --contentContainerPage-paddingLeft: 0px;
+    --contentContainerPage-paddingRight: 0px;
 
     /* Rules */
     ${() => scrollSnapItem}
@@ -454,7 +456,7 @@ export const layoutMixins = {
     min-height: 100%;
     /* height: max-content; */
 
-    --padding-y: clamp(0rem, (var(--content-container-width) - var(--content-max-width)) / 2, 2rem);
+    --padding-y: 0rem;
     padding-top: var(--padding-y);
     padding-bottom: var(--padding-y);
     scroll-padding-top: var(--padding-y);

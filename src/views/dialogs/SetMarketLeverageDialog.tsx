@@ -6,7 +6,7 @@ import { BonsaiCore, BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonState, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonState, ButtonType } from '@/constants/buttons';
 import { DialogProps, SetMarketLeverageDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -275,10 +275,11 @@ export const SetMarketLeverageDialog = ({
 
         {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
 
-        <Button
+        <$SaveButton
           type={ButtonType.Submit}
           tw="w-full"
-          action={ButtonAction.Primary}
+          shape={ButtonShape.Pill}
+          action={ButtonAction.SimplePrimary}
           state={
             isBelowMinimum || !hasLeverageChanged
               ? ButtonState.Disabled
@@ -288,7 +289,7 @@ export const SetMarketLeverageDialog = ({
           }
         >
           {stringGetter({ key: STRING_KEYS.SAVE })}
-        </Button>
+        </$SaveButton>
       </form>
     </Dialog>
   );
@@ -322,4 +323,13 @@ const $LeverageSlider = styled(Slider)`
     var(--color-layer-7) 0%,
     var(--color-text-2) 100%
   );
+`;
+
+const $SaveButton = styled(Button)`
+  --button-textColor: var(--color-white) !important;
+  --button-padding: 0.5rem 1.5rem;
+
+  span {
+    color: var(--color-white) !important;
+  }
 `;

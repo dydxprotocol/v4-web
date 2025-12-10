@@ -1,9 +1,10 @@
+import styled from 'styled-components';
+
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import useOnboardingFlow from '@/hooks/Onboarding/useOnboardingFlow';
-import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -25,15 +26,14 @@ export const OnboardingTriggerButton = ({
   size = ButtonSize.Small,
 }: OnboardingTriggerButtonProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const isSimpleUi = useSimpleUiEnabled();
   const { openOnboardingDialog, onboardingState, isAccountViewOnly, isOnboardingDisabled } =
     useOnboardingFlow({ onClick });
 
   return (
-    <Button
+    <$SignInButton
       className={className}
-      action={isSimpleUi ? ButtonAction.SimplePrimary : ButtonAction.Primary}
-      shape={shape}
+      action={ButtonAction.SimplePrimary}
+      shape={shape ?? ButtonShape.Pill}
       size={size}
       type={ButtonType.Button}
       state={{
@@ -49,6 +49,15 @@ export const OnboardingTriggerButton = ({
             [OnboardingState.Disconnected]: stringGetter({ key: STRING_KEYS.SIGN_IN_TITLE }),
             [OnboardingState.WalletConnected]: stringGetter({ key: STRING_KEYS.RECOVER_KEYS }),
           }[onboardingState as string]}
-    </Button>
+    </$SignInButton>
   );
 };
+
+const $SignInButton = styled(Button)`
+  --button-textColor: var(--color-white) !important;
+  --button-padding: 0.5rem 1.5rem;
+
+  span {
+    color: var(--color-white) !important;
+  }
+`;

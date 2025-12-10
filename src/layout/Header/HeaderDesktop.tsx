@@ -147,18 +147,18 @@ export const HeaderDesktop = () => {
       <$NavAfter>
         {onboardingState === OnboardingState.AccountConnected &&
           complianceState === ComplianceStates.FULL_ACCESS && (
-            <Button
+            <$DepositButton
               tw="mr-[0.5em]"
-              shape={ButtonShape.Rectangle}
+              shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
-              action={ButtonAction.AccentFaded}
+              action={ButtonAction.SimplePrimary}
               onClick={() => {
                 dispatch(openDialog(DialogTypes.Deposit2({})));
               }}
               state={{ isDisabled: !dydxAccounts }}
             >
               <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
-            </Button>
+            </$DepositButton>
           )}
 
         {onboardingState === OnboardingState.AccountConnected ? (
@@ -194,14 +194,18 @@ export const HeaderDesktop = () => {
 const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
-  --logo-width: 3.5rem;
+  --logo-width: 12rem;
 
   ${layoutMixins.container}
-  ${layoutMixins.stickyHeader}
-  ${layoutMixins.scrollSnapItem}
   backdrop-filter: none;
-  background-color: var(--color-layer-0);
+  background-color: 'transparent';
+  border-radius: 0.75rem;
+  overflow: visible;
   height: var(--page-currentHeaderHeight);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
 
   grid-area: Header;
 
@@ -214,6 +218,10 @@ const $Header = styled.header`
     var(--border-width) 1fr var(--border-width) auto;
 
   z-index: 2;
+
+  &:before {
+    border-radius: 0.75rem;
+  }
 
   @media ${breakpoints.tablet} {
     --trigger-height: 3rem;
@@ -232,8 +240,8 @@ const $NavigationScrollBar = styled.div`
 
 const $NavigationMenu = styled(NavigationMenu)`
   & {
-    --navigationMenu-height: var(--stickyArea-topHeight);
-    --navigationMenu-item-height: var(--stickyArea-topHeight);
+    --navigationMenu-height: var(--page-header-height);
+    --navigationMenu-item-height: var(--page-header-height);
   }
 
   ${layoutMixins.scrollArea}
@@ -285,4 +293,13 @@ const $IconButton = styled(IconButton)<{ size?: string }>`
 const $LanguageSelector = styled(LanguageSelector)`
   ${headerMixins.dropdownTrigger}
   --trigger-padding: 0.33rem 0.5rem;
+`;
+
+const $DepositButton = styled(Button)`
+  --button-textColor: var(--color-white) !important;
+  --button-padding: 0.5rem 1.5rem;
+
+  span {
+    color: var(--color-white) !important;
+  }
 `;

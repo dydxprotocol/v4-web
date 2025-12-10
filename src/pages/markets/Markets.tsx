@@ -45,13 +45,13 @@ const $Page = styled.div`
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
-  margin: 1.5rem 0;
+  margin-bottom: 1.5rem;
 
   @media ${breakpoints.tablet} {
     ${layoutMixins.flexColumn}
     gap: 1rem;
 
-    margin: 1rem 0;
+    margin-bottom: 1rem;
   }
 `;
 

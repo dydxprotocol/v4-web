@@ -2,18 +2,18 @@
 
 /* Theme: Dark (default) */
 :root {
-  --color-layer-0: #18181A;
-  --color-layer-1: #1B1B1D;
-  --color-layer-2: #212124;
-  --color-layer-3: #28282B;
-  --color-layer-4: #303033;
-  --color-layer-5: #3B3B3F;
-  --color-layer-6: #494950;
-  --color-layer-7: #56565C;
+  --color-layer-0: #1D0623;
+  --color-layer-1: #17001C;
+  --color-layer-2: #1D0623;
+  --color-layer-3: #1D0623;
+  --color-layer-4: #1D0623;
+  --color-layer-5: #1D0623;
+  --color-layer-6: #1D0623;
+  --color-layer-7: #1D0623;
 
-  --color-border: #28282B;
+  --color-border: #28282B00;
 
-  --color-text-0: #888891;
+  --color-text-0: #898899;
   --color-text-1: #CACACE;
   --color-text-2: #FFFFFF;
   --color-text-button: #FFFFFF;
@@ -26,7 +26,7 @@
 /* Theme: Light */
 :root.theme-light {
 	--color-layer-0: #FFFFFF;
-  --color-layer-1: #F5F7F8;
+  --color-layer-1: #FFFFFF;
   --color-layer-2: #E9ECEE;
   --color-layer-3: #FCFDFF;
   --color-layer-4: #F7F8FA;
@@ -48,18 +48,18 @@
   
 /* Theme: Dark */
 :root.theme-dark {
-  --color-layer-0: #18181A;
-  --color-layer-1: #1B1B1D;
-  --color-layer-2: #212124;
-  --color-layer-3: #28282B;
-  --color-layer-4: #303033;
-  --color-layer-5: #3B3B3F;
-  --color-layer-6: #494950;
-  --color-layer-7: #56565C;
+  --color-layer-0: #1D0623;
+  --color-layer-1: #17001C;
+  --color-layer-2: #1D0623;
+  --color-layer-3: #1D0623;
+  --color-layer-4: #1D0623;
+  --color-layer-5: #1D0623;
+  --color-layer-6: #1D0623;
+  --color-layer-7: #1D0623;
 
-  --color-border: #28282B;
+  --color-border: #28282B00;
 
-  --color-text-0: #888891;
+  --color-text-0: #898899;
   --color-text-1: #CACACE;
   --color-text-2: #FFFFFF;
   --color-text-button: #FFFFFF;
@@ -68,4 +68,3 @@
 
   --color-gradient-orange: linear-gradient(135deg, #ffb647 0%, #ff5a02 100%);
 }
-  
