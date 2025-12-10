@@ -93,6 +93,10 @@ const VaultPage = lazy(() => import('@/pages/vaults/VaultPage'));
 const SimpleMarketsPage = lazy(() => import('@/pages/markets/simple-ui/MarketsMobile'));
 const SimpleAssetPage = lazy(() => import('@/pages/trade/simple-ui/AssetPage'));
 
+// Mobile Web
+const MobileWebTradePage = lazy(() => import('@/pages/trade/mobile-web/Trade'));
+const MobileWebTradeFormPage = lazy(() => import('@/pages/trade/mobile-web/TradeForm'));
+
 const Content = () => {
   useInitializePage();
   useAnalytics();
@@ -205,27 +209,27 @@ const Content = () => {
               <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
 
               <Route path={AppRoute.Trade}>
-                <Route path=":market" element={<TradePage />} />
-                <Route path={AppRoute.Trade} element={<TradePage />} />
+                <Route path=":market" element={isTablet ? <MobileWebTradePage /> : <TradePage />} />
+                <Route
+                  path={AppRoute.Trade}
+                  element={isTablet ? <MobileWebTradePage /> : <TradePage />}
+                />
               </Route>
 
               {isSpotEnabled && (
                 <Route path={`${AppRoute.Spot}/:tokenMint`} element={<SpotPage />} />
               )}
 
+              <Route path={AppRoute.TradeForm}>
+                <Route path=":market" element={<MobileWebTradeFormPage />} />
+                <Route path={AppRoute.TradeForm} element={<MobileWebTradeFormPage />} />
+              </Route>
+
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
 
               <Route path={`/${chainTokenLabel}/*`} element={<RewardsPage />} />
-
-              {isTablet && (
-                <>
-                  <Route path={AppRoute.Alerts} element={<AlertsPage />} />
-                  <Route path={AppRoute.Profile} element={<ProfilePage />} />
-                  <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
-                </>
-              )}
 
               <Route element={<GuardedMobileRoute />}>
                 <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />

@@ -32,7 +32,7 @@ import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
 import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
-import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { TradeHeaderMobile } from './mobile-web/TradeHeader';
 import { useResizablePanel } from './useResizablePanel';
 
 const LaunchableMarket = () => {

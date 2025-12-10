@@ -452,7 +452,7 @@ const $MobileDetails = styled(Details)`
   }
 `;
 
-const $Actions = styled.footer`
+const $Actions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
