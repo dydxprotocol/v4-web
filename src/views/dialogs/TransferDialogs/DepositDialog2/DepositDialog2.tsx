@@ -12,16 +12,21 @@ import { ConnectorType, WalletNetworkType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStringGetter } from '@/hooks/useStringGetter';
+
+import breakpoints from '@/styles/breakpoints';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { SourceAccount } from '@/state/wallet';
 
 import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
+import { SpotDepositForm } from './SpotDepositForm';
 import { useDepositTokenBalances } from './queries';
 
 function getDefaultToken(
@@ -69,9 +74,16 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
 
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
+  const isSpotEnabled = useEnableSpot();
 
+  const [currentDepositType, setCurrentDepositType] = useState<'perps' | 'spot'>('perps');
   const [formState, setFormState] = useState<DepositFormState>('form');
   const tokenSelectRef = useRef<HTMLDivElement | null>(null);
+
+  const handleTabChange = (newTab: 'perps' | 'spot') => {
+    setCurrentDepositType(newTab);
+    setFormState('form');
+  };
 
   const dialogTitle = (
     {
@@ -101,18 +113,11 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     }
   }, [sourceAccount, dispatch, setIsOpen]);
 
-  return (
-    <$Dialog
-      isOpen
-      preventCloseOnOverlayClick
-      withAnimation
-      hasHeaderBorder
-      setIsOpen={setIsOpen}
-      onBack={formState === 'form' ? undefined : onBack}
-      title={dialogTitle}
-      placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
-    >
-      {isLoadingBalances ? (
+  const tabs: SpotTabItem[] = [
+    {
+      value: 'perps',
+      label: 'Perpetuals',
+      content: isLoadingBalances ? (
         <div tw="flex h-full w-full items-center justify-center overflow-hidden">
           <LoadingSpace tw="my-4" />
         </div>
@@ -125,16 +130,47 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
           tokenSelectRef={tokenSelectRef}
           onShowForm={onShowForm}
         />
-      )}
+      ),
+    },
+    {
+      value: 'spot',
+      label: 'Spot',
+      content: <SpotDepositForm />,
+    },
+  ];
+
+  return (
+    <$Dialog
+      isOpen
+      preventCloseOnOverlayClick
+      withAnimation
+      setIsOpen={setIsOpen}
+      onBack={formState === 'form' || currentDepositType === 'spot' ? undefined : onBack}
+      title={dialogTitle}
+      placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
+    >
+      <div tw="h-full w-full overflow-hidden">
+        <SpotTabs
+          value={currentDepositType}
+          onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
+          hideTabs={formState !== 'form' || !isSpotEnabled}
+          items={tabs}
+        />
+      </div>
     </$Dialog>
   );
 };
 
 const $Dialog = styled(Dialog)`
-  --dialog-content-paddingTop: 0;
-  --dialog-content-paddingRight: 0;
-  --dialog-content-paddingBottom: 0;
-  --dialog-content-paddingLeft: 0;
-
   --asset-icon-chain-icon-borderColor: var(--dialog-backgroundColor);
+
+  @media ${breakpoints.notMobile} {
+    max-width: 26.25rem;
+    --dialog-content-paddingLeft: 1.25rem;
+    --dialog-content-paddingRight: 1.25rem;
+    --dialog-content-paddingBottom: 1.25rem;
+    --dialog-paddingX: 1.25rem;
+    --dialog-header-paddingTop: 1.25rem;
+    --dialog-header-paddingBottom: 1.25rem;
+  }
 `;

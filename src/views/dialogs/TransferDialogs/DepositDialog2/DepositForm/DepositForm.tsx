@@ -446,7 +446,7 @@ export const DepositForm = ({
   );
 
   return (
-    <div tw="flex h-full min-h-10 flex-col p-1.25">
+    <div tw="flex h-full min-h-10 flex-col">
       <div tw="flex flex-col gap-0.5">{depositContent}</div>
       <div tw="mt-auto flex flex-col gap-0.75">{depositContentBottom}</div>
     </div>
