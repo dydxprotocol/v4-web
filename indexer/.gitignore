@@ -2,3 +2,4 @@
 /node_modules
 /lib
 .fuel_node.log
+/builds

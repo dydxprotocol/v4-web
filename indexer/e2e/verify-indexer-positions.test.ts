@@ -168,46 +168,48 @@ describe('Verify Positions', () => {
 
     it('should find correct total positions', async () => {
       const btcLongData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id,size}}`
+        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      expect(btcLongData.data.allTotalPositions.nodes.length).toBe(1);
-      expect(btcLongData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(1000));
+      expect(btcLongData.data.totalPositions.nodes.length).toBe(1);
+      expect(btcLongData.data.totalPositions.nodes[0].size).toBe(expandDecimals(1000));
 
       const btcShortData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id,size}}`
+        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id,size}}`
       );
-      expect(btcShortData.data.allTotalPositions.nodes.length).toBe(1);
-      expect(btcShortData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(1000));
+      expect(btcShortData.data.totalPositions.nodes.length).toBe(1);
+      expect(btcShortData.data.totalPositions.nodes[0].size).toBe(expandDecimals(1000));
 
       const ethLongData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id,size}}`
+        `totalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      expect(ethLongData.data.allTotalPositions.nodes.length).toBe(1);
-      expect(ethLongData.data.allTotalPositions.nodes[0].size).toBe(expandDecimals(3000));
+      expect(ethLongData.data.totalPositions.nodes.length).toBe(1);
+      expect(ethLongData.data.totalPositions.nodes[0].size).toBe(expandDecimals(3000));
 
       const ethShortData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:false}){nodes{id}}`
+        `totalPositions(condition:{indexAssetId:"${ETH_ASSET}",isLong:false}){nodes{id}}`
       );
-      expect(ethShortData.data.allTotalPositions.nodes.length).toBe(0);
+      expect(ethShortData.data.totalPositions.nodes.length).toBe(0);
 
       const bnbLongData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id,size}}`
+        `totalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id,size}}`
       );
-      expect(bnbLongData.data.allTotalPositions.nodes.length).toBe(1);
-      expect(bnbLongData.data.allTotalPositions.nodes[0].size).toBe('0');
+      expect(bnbLongData.data.totalPositions.nodes.length).toBe(1);
+      expect(bnbLongData.data.totalPositions.nodes[0].size).toBe('0');
 
       const bnbShortData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:false}){nodes{id}}`
+        `totalPositions(condition:{indexAssetId:"${BNB_ASSET}",isLong:false}){nodes{id}}`
       );
-      expect(bnbShortData.data.allTotalPositions.nodes.length).toBe(0);
+      expect(bnbShortData.data.totalPositions.nodes.length).toBe(0);
     });
 
     it('should position key be unique', async () => {
-      const positionKeysData = await graphQLPost(`allPositionKeys{nodes{id,account,indexAssetId,isLong}}`);
+      const positionKeysData = await graphQLPost(
+        `positionKeys{nodes{id,account,indexAssetId,isLong}}`
+      );
 
       // Check that there are no duplicate combinations of account, indexAssetId, and isLong
       const seen = new Set<string>();
-      positionKeysData.data.allPositionKeys.nodes.forEach(
+      positionKeysData.data.positionKeys.nodes.forEach(
         (key: { account: string; indexAssetId: string; isLong: boolean }) => {
           const uniqueKey = `${key.account}-${key.indexAssetId}-${key.isLong}`;
           expect(seen.has(uniqueKey)).toBe(false);
@@ -219,24 +221,26 @@ describe('Verify Positions', () => {
     it('should be the the correct count of BNB closed positions', async () => {
       // First get the position key for USER_0_ADDRESS and BNB_ASSET
       const positionKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BNB_ASSET}",isLong:true}){nodes{id}}`
       );
-      expect(positionKeyData.data.allPositionKeys.nodes.length).toBe(1);
-      const positionKeyId = positionKeyData.data.allPositionKeys.nodes[0].id;
+      expect(positionKeyData.data.positionKeys.nodes.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys.nodes[0].id;
 
       // Then get closed positions for this key
       const closedPositionsData = await graphQLPost(
-        `allPositions(condition:{positionKeyId:"${positionKeyId}",change:"CLOSE"}){nodes{id}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"CLOSE"}){nodes{id}}`
       );
-      expect(closedPositionsData.data.allPositions.nodes.length).toBe(2);
+      expect(closedPositionsData.data.positions.nodes.length).toBe(2);
     });
 
     it('should BNB positions have the same position key', async () => {
       // Get all positions for these keys
-      const allPositionsData = await graphQLPost(`allPositions{nodes{id,positionKey{id,indexAssetId}}}`);
+      const allPositionsData = await graphQLPost(
+        `positions{nodes{id,positionKey{id,indexAssetId}}}`
+      );
 
       // Filter positions for BNB
-      const bnbPositions = allPositionsData.data.allPositions.nodes.filter(
+      const bnbPositions = allPositionsData.data.positions.nodes.filter(
         (p: { positionKey: { indexAssetId: string } }) => p.positionKey.indexAssetId === BNB_ASSET
       );
 
@@ -250,38 +254,40 @@ describe('Verify Positions', () => {
 
     it('should be exactly 1 latest position for each position key', async () => {
       // Get all position keys
-      const positionKeysData = await graphQLPost(`allPositionKeys{nodes{id}}`);
+      const positionKeysData = await graphQLPost(`positionKeys{nodes{id}}`);
 
       // For each position key, check that there's exactly one latest position
       // eslint-disable-next-line no-restricted-syntax
-      for (const key of positionKeysData.data.allPositionKeys.nodes) {
+      for (const key of positionKeysData.data.positionKeys.nodes) {
         // eslint-disable-next-line no-await-in-loop
         const latestPositionsData = await graphQLPost(
-          `allPositions(condition:{positionKeyId:"${key.id}",latest:true}){nodes{id}}`
+          `positions(condition:{positionKeyId:"${key.id}",latest:true}){nodes{id}}`
         );
-        expect(latestPositionsData.data.allPositions.nodes.length).toBe(1);
+        expect(latestPositionsData.data.positions.nodes.length).toBe(1);
       }
     });
 
     it('should be two BTC positions', async () => {
       const positionKeysData = await graphQLPost(
-        `allPositionKeys(condition:{indexAssetId:"${BTC_ASSET}"}){nodes{id,account,isLong}}`
+        `positionKeys(condition:{indexAssetId:"${BTC_ASSET}"}){nodes{id,account,isLong}}`
       );
 
-      expect(positionKeysData.data.allPositionKeys.nodes.length).toBe(2);
-      expect(positionKeysData.data.allPositionKeys.nodes[0].account).not.toBe(
-        positionKeysData.data.allPositionKeys.nodes[1].account
+      expect(positionKeysData.data.positionKeys.nodes.length).toBe(2);
+      expect(positionKeysData.data.positionKeys.nodes[0].account).not.toBe(
+        positionKeysData.data.positionKeys.nodes[1].account
       );
-      expect(positionKeysData.data.allPositionKeys.nodes[0].isLong).not.toBe(
-        positionKeysData.data.allPositionKeys.nodes[1].isLong
+      expect(positionKeysData.data.positionKeys.nodes[0].isLong).not.toBe(
+        positionKeysData.data.positionKeys.nodes[1].isLong
       );
     });
 
     it('should closed positions have no size', async () => {
-      const closedPositionsData = await graphQLPost(`allPositions(condition:{change:"CLOSE"}){nodes{id,size}}`);
+      const closedPositionsData = await graphQLPost(
+        `positions(condition:{change:"CLOSE"}){nodes{id,size}}`
+      );
 
       // All closed positions should have size 0
-      closedPositionsData.data.allPositions.nodes.forEach((position: { size: string }) => {
+      closedPositionsData.data.positions.nodes.forEach((position: { size: string }) => {
         expect(position.size).toBe('0');
       });
     });
@@ -289,10 +295,10 @@ describe('Verify Positions', () => {
     it('should positions with no size be closed', async () => {
       // Note: GraphQL doesn't directly support filtering by size = 0,
       // so we'll fetch all positions and filter client-side
-      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,change}}`);
+      const allPositionsData = await graphQLPost(`positions{nodes{id,size,change}}`);
 
       // Filter positions with size 0
-      const positionsWithNoSize = allPositionsData.data.allPositions.nodes.filter(
+      const positionsWithNoSize = allPositionsData.data.positions.nodes.filter(
         (p: { size: string }) => p.size === '0'
       );
 
@@ -303,10 +309,10 @@ describe('Verify Positions', () => {
     });
 
     it('should positions with no size have no collateral', async () => {
-      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,collateralAmount}}`);
+      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateralAmount}}`);
 
       // Filter positions with size 0
-      const positionsWithNoSize = allPositionsData.data.allPositions.nodes.filter(
+      const positionsWithNoSize = allPositionsData.data.positions.nodes.filter(
         (p: { size: string }) => p.size === '0'
       );
 
@@ -317,10 +323,10 @@ describe('Verify Positions', () => {
     });
 
     it('should positions with no collateral have no size', async () => {
-      const allPositionsData = await graphQLPost(`allPositions{nodes{id,size,collateralAmount}}`);
+      const allPositionsData = await graphQLPost(`positions{nodes{id,size,collateralAmount}}`);
 
       // Filter positions with collateralAmount 0
-      const positionsWithNoCollateral = allPositionsData.data.allPositions.nodes.filter(
+      const positionsWithNoCollateral = allPositionsData.data.positions.nodes.filter(
         (p: { collateralAmount: string }) => p.collateralAmount === '0'
       );
 

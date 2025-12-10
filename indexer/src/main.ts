@@ -25,7 +25,6 @@ export const GRAPHQL_URL = process.env.GRAPHQL_URL ?? '';
 export const VAULT_PRICEFEED_ADDRESS = process.env.VAULT_PRICEFEED_ADDRESS ?? '';
 export const VAULT_ADDRESS = process.env.VAULT_ADDRESS ?? '';
 export const FROM_BLOCK = process.env.FROM_BLOCK ?? '';
-export const E2E_TEST_LOG = (process.env.E2E_TEST_LOG ?? '0') === '1'; // 0 - no log, 1 - log
 
 const LOG_TYPE_SET_PRICE = 'enum stork_sway_sdk::events::StorkEvent';
 const LOG_TYPE_ADD_LIQUIDITY = 'struct events::AddLiquidity';
@@ -532,11 +531,6 @@ async function handleLiquidatePosition(
 }
 
 run(dataSource, database, async (ctx) => {
-  if (E2E_TEST_LOG) {
-    // E2E test log indicating that the indexer started successfully
-    // eslint-disable-next-line no-console
-    console.log('Indexer run started');
-  }
   const blocks = ctx.blocks.map(augmentBlock);
 
   // eslint-disable-next-line no-restricted-syntax

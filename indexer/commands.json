@@ -10,11 +10,19 @@
       "deps": ["clean", "codegen"],
       "cmd": ["tsc"]
     },
-    "up:local": {
+    "up": {
+      "description": "Start a PG database",
+      "cmd": ["docker", "compose", "up", "-d"]
+    },
+    "down": {
+      "description": "Drop a PG database",
+      "cmd": ["docker", "compose", "down"]
+    },
+    "up:e2e": {
       "description": "Start a PG database and Fuel Node",
       "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "up", "-d"]
     },
-    "down:local": {
+    "down:e2e": {
       "description": "Drop a PG database and Fuel Node",
       "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "down", "-v"]
     },
@@ -46,13 +54,7 @@
     },
     "process": {
       "description": "Load .env and start the squid processor",
-      "deps": ["build", "migration:apply"],
       "cmd": ["node", "--require=dotenv/config", "lib/main.js"]
-    },
-    "process:e2e": {
-      "description": "Load .env.indexer-e2e and start the squid processor",
-      "deps": ["build", "migration:apply"],
-      "cmd": ["node", "--require=dotenv/config", "lib/main.js", "dotenv_config_path=.env.indexer-e2e"]
     },
     "process:prod": {
       "description": "Start the squid processor",
@@ -61,20 +63,12 @@
       "hidden": true
     },
     "serve": {
-      "description": "Start the GraphQL API server",
-      "cmd": ["squid-graphql-server"]
-    },
-    "serve:e2e": {
-      "description": "Start the GraphQL API server",
-      "cmd": ["pnpm", "postgraphile", "-p", "4350", "-c", "postgres://postgres:postgres@localhost:23751/postgres", "--enhance-graphiql", "--watch"]
+      "description": "Start the PostGraphile GraphQL server",
+      "cmd": ["node", "--require=dotenv/config", "lib/api.js"]
     },
     "serve:prod": {
-      "description": "Start the GraphQL API server with caching and limits",
-      "cmd": ["squid-graphql-server",
-        "--dumb-cache", "in-memory",
-        "--dumb-cache-ttl", "1000",
-        "--dumb-cache-size", "100",
-        "--dumb-cache-max-age", "1000" ]
+      "description": "Start the PostGraphile GraphQL server in Subsquid Cloud setting",
+      "cmd": ["node", "lib/api.js"]
     },
     "check-updates": {
       "cmd": ["npx", "--yes", "npm-check-updates", "--filter=/subsquid/", "--upgrade"],

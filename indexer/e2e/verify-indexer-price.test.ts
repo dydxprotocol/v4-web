@@ -33,7 +33,7 @@ describe('Verify Prices', () => {
         BTC_ASSET,
       ]);
       const btcRecords = btcResult.rows[0].c;
-      expect(btcRecords).toBe('20');
+      expect(btcRecords).toBe('70');
 
       const usdcResult = await client.query('SELECT COUNT(*) as c FROM price WHERE asset = $1', [
         USDC_ASSET,
@@ -74,7 +74,7 @@ describe('Verify Prices', () => {
       const btcMinPrice = btcResult.rows[0].min_price;
       const btcMaxPrice = btcResult.rows[0].max_price;
       expect(btcMinPrice).toBe(toPrice(44700));
-      expect(btcMaxPrice).toBe(toPrice(45550));
+      expect(btcMaxPrice).toBe(toPrice(47360));
     });
 
     it('should store correct btc timestamp', async () => {
@@ -126,51 +126,53 @@ describe('Verify Prices', () => {
     }
 
     it('should return correct number of price events', async () => {
-      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{id}}`);
-      expect(btcData.data.allPrices.nodes.length).toBe(20);
+      const btcData = await graphQLPost(`prices(condition:{asset:"${BTC_ASSET}"}){nodes{id}}`);
+      expect(btcData.data.prices.nodes.length).toBe(70);
 
-      const usdcData = await graphQLPost(`allPrices(condition:{asset:"${USDC_ASSET}"}){nodes{id}}`);
-      expect(usdcData.data.allPrices.nodes.length).toBe(2);
+      const usdcData = await graphQLPost(`prices(condition:{asset:"${USDC_ASSET}"}){nodes{id}}`);
+      expect(usdcData.data.prices.nodes.length).toBe(2);
 
-      const ethData = await graphQLPost(`allPrices(condition:{asset:"${ETH_ASSET}"}){nodes{id}}`);
-      expect(ethData.data.allPrices.nodes.length).toBe(2);
+      const ethData = await graphQLPost(`prices(condition:{asset:"${ETH_ASSET}"}){nodes{id}}`);
+      expect(ethData.data.prices.nodes.length).toBe(2);
     });
 
     it('should return correct usdc price', async () => {
-      const usdcData = await graphQLPost(`allPrices(condition:{asset:"${USDC_ASSET}"}){nodes{price}}`);
-      expect(usdcData.data.allPrices.nodes.length).toBe(2);
+      const usdcData = await graphQLPost(`prices(condition:{asset:"${USDC_ASSET}"}){nodes{price}}`);
+      expect(usdcData.data.prices.nodes.length).toBe(2);
       // All USDC prices should be 1 (toPrice(1))
-      usdcData.data.allPrices.nodes.forEach((price: { price: string }) => {
+      usdcData.data.prices.nodes.forEach((price: { price: string }) => {
         expect(price.price).toBe(toPrice(1));
       });
     });
 
     it('should return correct eth price', async () => {
-      const ethData = await graphQLPost(`allPrices(condition:{asset:"${ETH_ASSET}"}){nodes{price}}`);
-      expect(ethData.data.allPrices.nodes.length).toBe(2);
+      const ethData = await graphQLPost(`prices(condition:{asset:"${ETH_ASSET}"}){nodes{price}}`);
+      expect(ethData.data.prices.nodes.length).toBe(2);
       // All ETH prices should be 3000 (toPrice(3000))
-      ethData.data.allPrices.nodes.forEach((price: { price: string }) => {
+      ethData.data.prices.nodes.forEach((price: { price: string }) => {
         expect(price.price).toBe(toPrice(3000));
       });
     });
 
     it('should store correct btc price', async () => {
-      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{price}}`);
-      expect(btcData.data.allPrices.nodes.length).toBe(20);
+      const btcData = await graphQLPost(`prices(condition:{asset:"${BTC_ASSET}"}){nodes{price}}`);
+      expect(btcData.data.prices.nodes.length).toBe(70);
 
-      const prices = btcData.data.allPrices.nodes.map((p: { price: string }) => BigInt(p.price));
+      const prices = btcData.data.prices.nodes.map((p: { price: string }) => BigInt(p.price));
       const minPrice = prices.reduce((min: bigint, p: bigint) => (p < min ? p : min), prices[0]);
       const maxPrice = prices.reduce((max: bigint, p: bigint) => (p > max ? p : max), prices[0]);
 
       expect(minPrice.toString()).toBe(toPrice(44700));
-      expect(maxPrice.toString()).toBe(toPrice(45550));
+      expect(maxPrice.toString()).toBe(toPrice(47360));
     });
 
     it('should return correct btc timestamps', async () => {
-      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`);
-      expect(btcData.data.allPrices.nodes.length).toBe(20);
+      const btcData = await graphQLPost(
+        `prices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`
+      );
+      expect(btcData.data.prices.nodes.length).toBe(70);
 
-      const timestamps = btcData.data.allPrices.nodes.map((p: { timestamp: number }) => p.timestamp);
+      const timestamps = btcData.data.prices.nodes.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
       const now = Math.floor(Date.now() / 1000);
@@ -183,10 +185,12 @@ describe('Verify Prices', () => {
     });
 
     it('should return correct btc timestamp spread across events', async () => {
-      const btcData = await graphQLPost(`allPrices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`);
-      expect(btcData.data.allPrices.nodes.length).toBe(20);
+      const btcData = await graphQLPost(
+        `prices(condition:{asset:"${BTC_ASSET}"}){nodes{timestamp}}`
+      );
+      expect(btcData.data.prices.nodes.length).toBe(70);
 
-      const timestamps = btcData.data.allPrices.nodes.map((p: { timestamp: number }) => p.timestamp);
+      const timestamps = btcData.data.prices.nodes.map((p: { timestamp: number }) => p.timestamp);
       const minTimestamp = Math.min(...timestamps);
       const maxTimestamp = Math.max(...timestamps);
 

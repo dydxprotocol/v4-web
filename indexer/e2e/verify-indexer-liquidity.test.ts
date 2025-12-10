@@ -269,26 +269,32 @@ describe('Verify Liquidity', () => {
     }
 
     it('should store correct number of liquidity events', async () => {
-      const user0Data = await graphQLPost(`allLiquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{id}}`);
-      expect(user0Data.data.allLiquidities.nodes.length).toBe(4); // 2 adds + 2 removes
+      const user0Data = await graphQLPost(
+        `liquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{id}}`
+      );
+      expect(user0Data.data.liquidities.nodes.length).toBe(4); // 2 adds + 2 removes
 
-      const user1Data = await graphQLPost(`allLiquidities(condition:{provider:"${USER_1_ADDRESS}"}){nodes{id}}`);
-      expect(user1Data.data.allLiquidities.nodes.length).toBe(2); // 1 add + 1 remove
+      const user1Data = await graphQLPost(
+        `liquidities(condition:{provider:"${USER_1_ADDRESS}"}){nodes{id}}`
+      );
+      expect(user1Data.data.liquidities.nodes.length).toBe(2); // 1 add + 1 remove
 
-      const user2Data = await graphQLPost(`allLiquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{id}}`);
-      expect(user2Data.data.allLiquidities.nodes.length).toBe(2); // 2 adds
+      const user2Data = await graphQLPost(
+        `liquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{id}}`
+      );
+      expect(user2Data.data.liquidities.nodes.length).toBe(2); // 2 adds
     });
 
     it('should store correct latest liquidity for user0', async () => {
       // Also check sum of all liquidity records for user0
       const user0AllData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{stable,lpAmount}}`
+        `liquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{stable,lpAmount}}`
       );
-      const sumStable = user0AllData.data.allLiquidities.nodes.reduce(
+      const sumStable = user0AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
         BigInt(0)
       );
-      const sumLpAmount = user0AllData.data.allLiquidities.nodes.reduce(
+      const sumLpAmount = user0AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
         BigInt(0)
       );
@@ -299,13 +305,13 @@ describe('Verify Liquidity', () => {
     it('should store correct latest liquidity for user1', async () => {
       // Also check sum of all liquidity records for user1
       const user1AllData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_1_ADDRESS}"}){nodes{stable,lpAmount}}`
+        `liquidities(condition:{provider:"${USER_1_ADDRESS}"}){nodes{stable,lpAmount}}`
       );
-      const sumStable = user1AllData.data.allLiquidities.nodes.reduce(
+      const sumStable = user1AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
         BigInt(0)
       );
-      const sumLpAmount = user1AllData.data.allLiquidities.nodes.reduce(
+      const sumLpAmount = user1AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
         BigInt(0)
       );
@@ -316,13 +322,13 @@ describe('Verify Liquidity', () => {
     it('should store correct latest liquidity for user2', async () => {
       // Also check sum of all liquidity records for user2
       const user2AllData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{stable,lpAmount}}`
+        `liquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{stable,lpAmount}}`
       );
-      const sumStable = user2AllData.data.allLiquidities.nodes.reduce(
+      const sumStable = user2AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
         BigInt(0)
       );
-      const sumLpAmount = user2AllData.data.allLiquidities.nodes.reduce(
+      const sumLpAmount = user2AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
         BigInt(0)
       );
@@ -335,10 +341,12 @@ describe('Verify Liquidity', () => {
     });
 
     it('should store correct total liquidity', async () => {
-      const totalData = await graphQLPost(`allTotalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`);
-      expect(totalData.data.allTotalLiquidities.nodes.length).toBe(1);
+      const totalData = await graphQLPost(
+        `totalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`
+      );
+      expect(totalData.data.totalLiquidities.nodes.length).toBe(1);
 
-      const totalLiquidity = totalData.data.allTotalLiquidities.nodes[0];
+      const totalLiquidity = totalData.data.totalLiquidities.nodes[0];
       // Total should be user2's liquidity (9000 minus fees)
       const stableAmount = BigInt(totalLiquidity.stable);
       expect(stableAmount).toBeGreaterThan(BigInt(expandDecimals(8500)));
@@ -349,21 +357,23 @@ describe('Verify Liquidity', () => {
     it('should have total liquidity match final provider state', async () => {
       // Get user2's sum
       const user2AllData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{stable,lpAmount}}`
+        `liquidities(condition:{provider:"${USER_2_ADDRESS}"}){nodes{stable,lpAmount}}`
       );
-      const user2Stable = user2AllData.data.allLiquidities.nodes.reduce(
+      const user2Stable = user2AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { stable: string }) => sum + BigInt(liq.stable),
         BigInt(0)
       );
-      const user2Lp = user2AllData.data.allLiquidities.nodes.reduce(
+      const user2Lp = user2AllData.data.liquidities.nodes.reduce(
         (sum: bigint, liq: { lpAmount: string }) => sum + BigInt(liq.lpAmount),
         BigInt(0)
       );
 
       // Get total liquidity
-      const totalData = await graphQLPost(`allTotalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`);
-      const totalStable = BigInt(totalData.data.allTotalLiquidities.nodes[0].stable);
-      const totalLp = BigInt(totalData.data.allTotalLiquidities.nodes[0].lpAmount);
+      const totalData = await graphQLPost(
+        `totalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`
+      );
+      const totalStable = BigInt(totalData.data.totalLiquidities.nodes[0].stable);
+      const totalLp = BigInt(totalData.data.totalLiquidities.nodes[0].lpAmount);
 
       // Since user0 and user1 removed all liquidity, total should match user2's positive values
       // User2's latest is an add event (positive), so total should match
@@ -372,10 +382,12 @@ describe('Verify Liquidity', () => {
     });
 
     it('should store correct total liquidity timestamp', async () => {
-      const totalData = await graphQLPost(`allTotalLiquidities(condition:{id:"1"}){nodes{lastTimestamp}}`);
-      expect(totalData.data.allTotalLiquidities.nodes.length).toBe(1);
+      const totalData = await graphQLPost(
+        `totalLiquidities(condition:{id:"1"}){nodes{lastTimestamp}}`
+      );
+      expect(totalData.data.totalLiquidities.nodes.length).toBe(1);
 
-      const totalTimestamp = totalData.data.allTotalLiquidities.nodes[0].lastTimestamp;
+      const totalTimestamp = totalData.data.totalLiquidities.nodes[0].lastTimestamp;
       const now = Math.floor(Date.now() / 1000);
 
       // Timestamp should be recent
@@ -383,21 +395,25 @@ describe('Verify Liquidity', () => {
       expect(totalTimestamp).toBeGreaterThan(now - 1800);
 
       // Total liquidity timestamp should match the latest provider liquidity timestamp
-      const allLiquidityData = await graphQLPost(`allLiquidities{nodes{timestamp}}`);
+      const allLiquidityData = await graphQLPost(`liquidities{nodes{timestamp}}`);
       const maxLiquidityTimestamp = Math.max(
-        ...allLiquidityData.data.allLiquidities.nodes.map((liq: { timestamp: number }) => liq.timestamp)
+        ...allLiquidityData.data.liquidities.nodes.map(
+          (liq: { timestamp: number }) => liq.timestamp
+        )
       );
       expect(totalTimestamp).toBe(maxLiquidityTimestamp);
     });
 
     it('should have only one total liquidity record', async () => {
-      const totalData = await graphQLPost(`allTotalLiquidities{nodes{id}}`);
-      expect(totalData.data.allTotalLiquidities.nodes.length).toBe(1);
+      const totalData = await graphQLPost(`totalLiquidities{nodes{id}}`);
+      expect(totalData.data.totalLiquidities.nodes.length).toBe(1);
     });
 
     it('should have total liquidity with non-negative values', async () => {
-      const totalData = await graphQLPost(`allTotalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`);
-      const totalLiquidity = totalData.data.allTotalLiquidities.nodes[0];
+      const totalData = await graphQLPost(
+        `totalLiquidities(condition:{id:"1"}){nodes{stable,lpAmount}}`
+      );
+      const totalLiquidity = totalData.data.totalLiquidities.nodes[0];
 
       expect(BigInt(totalLiquidity.stable)).toBeGreaterThanOrEqual(0);
       expect(BigInt(totalLiquidity.lpAmount)).toBeGreaterThanOrEqual(0);
@@ -405,10 +421,10 @@ describe('Verify Liquidity', () => {
 
     it('should store correct liquidity timestamps', async () => {
       const user0Data = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{timestamp}}`
+        `liquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{timestamp}}`
       );
 
-      const timestamps = user0Data.data.allLiquidities.nodes.map(
+      const timestamps = user0Data.data.liquidities.nodes.map(
         (liq: { timestamp: number }) => liq.timestamp
       );
       const minTimestamp = Math.min(...timestamps);
@@ -427,29 +443,29 @@ describe('Verify Liquidity', () => {
 
     it('should have only one latest record per provider', async () => {
       const user0LatestData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_0_ADDRESS}",latest:true}){nodes{id}}`
+        `liquidities(condition:{provider:"${USER_0_ADDRESS}",latest:true}){nodes{id}}`
       );
-      expect(user0LatestData.data.allLiquidities.nodes.length).toBe(1);
+      expect(user0LatestData.data.liquidities.nodes.length).toBe(1);
 
       const user1LatestData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_1_ADDRESS}",latest:true}){nodes{id}}`
+        `liquidities(condition:{provider:"${USER_1_ADDRESS}",latest:true}){nodes{id}}`
       );
-      expect(user1LatestData.data.allLiquidities.nodes.length).toBe(1);
+      expect(user1LatestData.data.liquidities.nodes.length).toBe(1);
 
       const user2LatestData = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_2_ADDRESS}",latest:true}){nodes{id}}`
+        `liquidities(condition:{provider:"${USER_2_ADDRESS}",latest:true}){nodes{id}}`
       );
-      expect(user2LatestData.data.allLiquidities.nodes.length).toBe(1);
+      expect(user2LatestData.data.liquidities.nodes.length).toBe(1);
     });
 
     it('should store correct liquidity progression for user0', async () => {
       const user0Data = await graphQLPost(
-        `allLiquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{stable,lpAmount,timestamp}}`
+        `liquidities(condition:{provider:"${USER_0_ADDRESS}"}){nodes{stable,lpAmount,timestamp}}`
       );
-      expect(user0Data.data.allLiquidities.nodes.length).toBe(4);
+      expect(user0Data.data.liquidities.nodes.length).toBe(4);
 
       // Sort by timestamp ASC
-      const sortedLiquidity = user0Data.data.allLiquidities.nodes.sort(
+      const sortedLiquidity = user0Data.data.liquidities.nodes.sort(
         (a: { timestamp: number }, b: { timestamp: number }) => a.timestamp - b.timestamp
       );
 

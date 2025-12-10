@@ -1,11 +1,35 @@
 #!/bin/bash
 
+# export $(grep -v '^#' .env.indexer-e2e | xargs)
+
+export DOTENV_CONFIG_PATH=.env.indexer-e2e
+
+export MOCK_STORK_CONTRACT=0x422729Dc06fD5811ec48eDf38915a52aa6383B3a2e91a7f45F1eECaAba2aEf81
+export VAULT_CONTRACT=0x2067c1DF217DD8e8dDf0cb5E0f26bF8d9b4584b3512Aeee270a19e8A27576aE4
+export PRICEFEED_WRAPPER_CONTRACT=0x212EB3F8Ff08392B2aa030768A3814fc5A0a67F94412CfE07e37DD1cbC24F9D6
+export USDC_CONTRACT=0x9534954321965C4B2dC45712AC3e7B575AFD43C38d2c9834bb5232f5F2BF2c6E
+export USDC_ASSET_ID=0xda81350458510a2b4adfb85032ad319a61f271e9ccabe702c96696efc72bc6de
+
 kill_with_children () {
     local pid=$1
     for spid in $(ps -o pid= --ppid $pid); do
         kill_with_children $spid
     done
     kill -15 $pid
+}
+
+populate_events() {
+  if [ "$1" = "none" ]; then
+      echo "Skipping population of events"
+  else
+      echo "Populating events"
+      ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --pricefeedWrapperAddress="${PRICEFEED_WRAPPER_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
+      if [ $? -ne 0 ]; then
+          echo "Failed to execute the script"
+          exit 1
+      fi
+      echo "Events populated"
+  fi
 }
 
 if [ $# -lt 2 ]; then
@@ -27,50 +51,24 @@ do
     ii=$(($ii+1))
 done
 
-echo "Deploying Mocked Stork contract"
-# priv key is hardcoded, taken form the fuel node starting script
-OUTPUT=`pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a"`
-echo "$OUTPUT"
-MOCK_STORK_CONTRACT=`echo "$OUTPUT" | grep "Mocked Stork deployed to" |  awk '{print $NF}'`
-if [ -z "$MOCK_STORK_CONTRACT" ]; then
-    echo "stork mock deployment failed"
-    echo "$OUTPUT"
-    docker compose down -v
-    exit 1
+echo "Deploying Mocked Stork contract" && \
+pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" && \
+echo "Deploying the Vault contract" && \
+pnpm --filter starboard/contracts setup:testnet --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" --storkContractAddress="${MOCK_STORK_CONTRACT}" && \
+echo "Building the squid indexer and applying the database migrations" && \
+pnpm sqd build && \
+pnpm sqd migration:apply && \
+populate_events $1
+
+if [ $? -ne 0 ]; then
+  echo "Failed, exiting"
+  exit 1
 fi
 
-echo "Deploying the Vault contract"
-OUTPUT=`pnpm --filter starboard/contracts setup:testnet --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" --storkContractAddress="${MOCK_STORK_CONTRACT}"`
-echo "$OUTPUT"
-USDC_CONTRACT=`echo "$OUTPUT" | grep -A 2 "Deploying token named mckUSDC sUSDC" | grep "Token deployed to" |  awk '{print $(NF-2)}'`
-USDC_ASSET_ID=`echo "$OUTPUT" | grep -A 2 "Deploying token named mckUSDC sUSDC" | grep "Token deployed to" |  awk '{print $NF}'`
-VAULT_CONTRACT=`echo "$OUTPUT" | grep "Vault deployed to" |  awk '{print $NF}'`
-PRICEFEED_WRAPPER_CONTRACT=`echo "$OUTPUT" | grep "PricefeedWrapper deployed to" |  awk '{print $NF}'`
-if [ -z "$USDC_CONTRACT" ] || [ -z "$USDC_ASSET_ID" ] || [ -z "$VAULT_CONTRACT" ] || [ -z "$PRICEFEED_WRAPPER_CONTRACT" ]; then
-    echo "vault deployment failed"
-    echo "$OUTPUT"
-    docker compose down -v
-    exit 1
-fi
-
-if [ "$1" = "none" ]; then
-    echo "Skipping population of events"
-else
-    echo "Populating events"
-    ts-node $1 --mockPricefeedAddress="${MOCK_STORK_CONTRACT}" --vaultAddress="${VAULT_CONTRACT}" --pricefeedWrapperAddress="${PRICEFEED_WRAPPER_CONTRACT}" --usdcAddress="${USDC_CONTRACT}"
-    if [ $? -ne 0 ]; then
-        echo "Failed to execute the script"
-        docker compose down -v
-        exit 1
-    fi
-    echo "Events populated"
-fi
-
-# this command builds the project and applies the database migrations along
 echo "Starting the squid indexer"
-VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} E2E_TEST_LOG=1 pnpm sqd process:e2e > indexer.log 2>&1 &
+VAULT_PRICEFEED_ADDRESS=${MOCK_STORK_CONTRACT} VAULT_ADDRESS=${VAULT_CONTRACT} pnpm sqd process > indexer.log 2>&1 &
 SQD_INDEXER_PID=$!
-pnpm sqd serve:e2e > api.log 2>&1 &
+pnpm sqd serve > api.log 2>&1 &
 API_SERVER_PID=$!
 
 EXIT_CODE=0

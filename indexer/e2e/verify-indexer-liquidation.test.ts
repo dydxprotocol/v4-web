@@ -303,17 +303,19 @@ describe('Verify Liquidation', () => {
     }
 
     it('should store correct number of liquidation events', async () => {
-      const liquidationsData = await graphQLPost(`allPositions(condition:{change:"LIQUIDATE"}){nodes{id}}`);
-      expect(liquidationsData.data.allPositions.nodes.length).toBe(3); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
+      const liquidationsData = await graphQLPost(
+        `positions(condition:{change:"LIQUIDATE"}){nodes{id}}`
+      );
+      expect(liquidationsData.data.positions.nodes.length).toBe(3); // 3 liquidations: user0 BTC long, user1 BTC short, user0 ETH long
     });
 
     it('should have liquidated positions with zero collateral and size', async () => {
       const liquidationsData = await graphQLPost(
-        `allPositions(condition:{change:"LIQUIDATE"}){nodes{id,collateralAmount,size}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{id,collateralAmount,size}}`
       );
-      expect(liquidationsData.data.allPositions.nodes.length).toBeGreaterThan(0);
+      expect(liquidationsData.data.positions.nodes.length).toBeGreaterThan(0);
 
-      liquidationsData.data.allPositions.nodes.forEach((position: any) => {
+      liquidationsData.data.positions.nodes.forEach((position: any) => {
         expect(BigInt(position.collateralAmount)).toBe(BigInt(0));
         expect(BigInt(position.size)).toBe(BigInt(0));
       });
@@ -322,17 +324,17 @@ describe('Verify Liquidation', () => {
     it('should store correct liquidation for user0 BTC long position', async () => {
       // First get the position key for USER_0_ADDRESS and BTC_ASSET (long)
       const positionKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
       );
-      expect(positionKeyData.data.allPositionKeys.nodes.length).toBe(1);
-      const positionKeyId = positionKeyData.data.allPositionKeys.nodes[0].id;
+      expect(positionKeyData.data.positionKeys.nodes.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys.nodes[0].id;
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `allPositions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
       );
-      expect(liquidationData.data.allPositions.nodes.length).toBe(1);
-      const liquidation = liquidationData.data.allPositions.nodes[0];
+      expect(liquidationData.data.positions.nodes.length).toBe(1);
+      const liquidation = liquidationData.data.positions.nodes[0];
 
       expect(liquidation.collateralAmount).toBe('0');
       expect(liquidation.size).toBe('0');
@@ -344,17 +346,17 @@ describe('Verify Liquidation', () => {
     it('should store correct liquidation for user1 BTC short position', async () => {
       // First get the position key for USER_1_ADDRESS and BTC_ASSET (short)
       const positionKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_1_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_1_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id}}`
       );
-      expect(positionKeyData.data.allPositionKeys.nodes.length).toBe(1);
-      const positionKeyId = positionKeyData.data.allPositionKeys.nodes[0].id;
+      expect(positionKeyData.data.positionKeys.nodes.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys.nodes[0].id;
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `allPositions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
       );
-      expect(liquidationData.data.allPositions.nodes.length).toBe(1);
-      const liquidation = liquidationData.data.allPositions.nodes[0];
+      expect(liquidationData.data.positions.nodes.length).toBe(1);
+      const liquidation = liquidationData.data.positions.nodes[0];
 
       expect(liquidation.collateralAmount).toBe('0');
       expect(liquidation.size).toBe('0');
@@ -366,17 +368,17 @@ describe('Verify Liquidation', () => {
     it('should store correct liquidation for user0 ETH long position', async () => {
       // First get the position key for USER_0_ADDRESS and ETH_ASSET (long)
       const positionKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id}}`
       );
-      expect(positionKeyData.data.allPositionKeys.nodes.length).toBe(1);
-      const positionKeyId = positionKeyData.data.allPositionKeys.nodes[0].id;
+      expect(positionKeyData.data.positionKeys.nodes.length).toBe(1);
+      const positionKeyId = positionKeyData.data.positionKeys.nodes[0].id;
 
       // Then get liquidation position for this key
       const liquidationData = await graphQLPost(
-        `allPositions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
+        `positions(condition:{positionKeyId:"${positionKeyId}",change:"LIQUIDATE"}){nodes{id,collateralAmount,size,latest,positionFee,collateralTransferred}}`
       );
-      expect(liquidationData.data.allPositions.nodes.length).toBe(1);
-      const liquidation = liquidationData.data.allPositions.nodes[0];
+      expect(liquidationData.data.positions.nodes.length).toBe(1);
+      const liquidation = liquidationData.data.positions.nodes[0];
 
       expect(liquidation.collateralAmount).toBe('0');
       expect(liquidation.size).toBe('0');
@@ -388,45 +390,47 @@ describe('Verify Liquidation', () => {
     it('should have only one latest record per position key after liquidation', async () => {
       // User0 BTC long - should have latest = true only for liquidation
       const user0BtcLongKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
       );
-      if (user0BtcLongKeyData.data.allPositionKeys.nodes.length > 0) {
-        const positionKeyId = user0BtcLongKeyData.data.allPositionKeys.nodes[0].id;
+      if (user0BtcLongKeyData.data.positionKeys.nodes.length > 0) {
+        const positionKeyId = user0BtcLongKeyData.data.positionKeys.nodes[0].id;
         const latestPositionsData = await graphQLPost(
-          `allPositions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
+          `positions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
         );
-        expect(latestPositionsData.data.allPositions.nodes.length).toBe(1);
+        expect(latestPositionsData.data.positions.nodes.length).toBe(1);
       }
 
       // User1 BTC short - should have latest = true only for liquidation
       const user1BtcShortKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_1_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_1_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{id}}`
       );
-      if (user1BtcShortKeyData.data.allPositionKeys.nodes.length > 0) {
-        const positionKeyId = user1BtcShortKeyData.data.allPositionKeys.nodes[0].id;
+      if (user1BtcShortKeyData.data.positionKeys.nodes.length > 0) {
+        const positionKeyId = user1BtcShortKeyData.data.positionKeys.nodes[0].id;
         const latestPositionsData = await graphQLPost(
-          `allPositions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
+          `positions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
         );
-        expect(latestPositionsData.data.allPositions.nodes.length).toBe(1);
+        expect(latestPositionsData.data.positions.nodes.length).toBe(1);
       }
 
       // User0 ETH long - should have latest = true only for liquidation
       const user0EthLongKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${ETH_ASSET}",isLong:true}){nodes{id}}`
       );
-      if (user0EthLongKeyData.data.allPositionKeys.nodes.length > 0) {
-        const positionKeyId = user0EthLongKeyData.data.allPositionKeys.nodes[0].id;
+      if (user0EthLongKeyData.data.positionKeys.nodes.length > 0) {
+        const positionKeyId = user0EthLongKeyData.data.positionKeys.nodes[0].id;
         const latestPositionsData = await graphQLPost(
-          `allPositions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
+          `positions(condition:{positionKeyId:"${positionKeyId}",latest:true}){nodes{id}}`
         );
-        expect(latestPositionsData.data.allPositions.nodes.length).toBe(1);
+        expect(latestPositionsData.data.positions.nodes.length).toBe(1);
       }
     });
 
     it('should store correct liquidation timestamps', async () => {
-      const liquidationsData = await graphQLPost(`allPositions(condition:{change:"LIQUIDATE"}){nodes{timestamp}}`);
+      const liquidationsData = await graphQLPost(
+        `positions(condition:{change:"LIQUIDATE"}){nodes{timestamp}}`
+      );
 
-      const timestamps = liquidationsData.data.allPositions.nodes.map(
+      const timestamps = liquidationsData.data.positions.nodes.map(
         (p: { timestamp: number }) => p.timestamp
       );
       const minTimestamp = Math.min(...timestamps);
@@ -446,18 +450,18 @@ describe('Verify Liquidation', () => {
     it('should store liquidation events with correct position progression', async () => {
       // Check User0 BTC long position progression
       const user0BtcLongKeyData = await graphQLPost(
-        `allPositionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
+        `positionKeys(condition:{account:"${USER_0_ADDRESS}",indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{id}}`
       );
 
-      if (user0BtcLongKeyData.data.allPositionKeys.nodes.length > 0) {
-        const positionKeyId = user0BtcLongKeyData.data.allPositionKeys.nodes[0].id;
+      if (user0BtcLongKeyData.data.positionKeys.nodes.length > 0) {
+        const positionKeyId = user0BtcLongKeyData.data.positionKeys.nodes[0].id;
         const positionsData = await graphQLPost(
-          `allPositions(condition:{positionKeyId:"${positionKeyId}"}){nodes{change,collateralAmount,size,timestamp}}`
+          `positions(condition:{positionKeyId:"${positionKeyId}"}){nodes{change,collateralAmount,size,timestamp}}`
         );
-        expect(positionsData.data.allPositions.nodes.length).toBeGreaterThan(0);
+        expect(positionsData.data.positions.nodes.length).toBeGreaterThan(0);
 
         // Sort by timestamp ASC
-        const sortedPositions = positionsData.data.allPositions.nodes.sort(
+        const sortedPositions = positionsData.data.positions.nodes.sort(
           (a: { timestamp: number }, b: { timestamp: number }) => a.timestamp - b.timestamp
         );
 
@@ -478,11 +482,11 @@ describe('Verify Liquidation', () => {
 
     it('should store liquidation fees correctly', async () => {
       const liquidationsData = await graphQLPost(
-        `allPositions(condition:{change:"LIQUIDATE"}){nodes{collateralTransferred,positionFee}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{collateralTransferred,positionFee}}`
       );
-      expect(liquidationsData.data.allPositions.nodes.length).toBe(3);
+      expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
-      liquidationsData.data.allPositions.nodes.forEach((position: any) => {
+      liquidationsData.data.positions.nodes.forEach((position: any) => {
         // collateralTransferred should be the liquidation fee (at least 5 USDC)
         expect(BigInt(position.collateralTransferred)).toBeGreaterThanOrEqual(
           BigInt(expandDecimals(5))
@@ -494,11 +498,11 @@ describe('Verify Liquidation', () => {
 
     it('should store PnL and funding rate for liquidations', async () => {
       const liquidationsData = await graphQLPost(
-        `allPositions(condition:{change:"LIQUIDATE"}){nodes{pnlDelta,fundingRate}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{pnlDelta,fundingRate}}`
       );
-      expect(liquidationsData.data.allPositions.nodes.length).toBe(3);
+      expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
-      liquidationsData.data.allPositions.nodes.forEach((position: any) => {
+      liquidationsData.data.positions.nodes.forEach((position: any) => {
         // PnL delta and funding rate should be stored (can be positive or negative)
         expect(position.pnlDelta).toBeDefined();
         expect(position.fundingRate).toBeDefined();
@@ -507,11 +511,11 @@ describe('Verify Liquidation', () => {
 
     it('should store realized PnL and funding rate for liquidations', async () => {
       const liquidationsData = await graphQLPost(
-        `allPositions(condition:{change:"LIQUIDATE"}){nodes{realizedPnl,realizedFundingRate}}`
+        `positions(condition:{change:"LIQUIDATE"}){nodes{realizedPnl,realizedFundingRate}}`
       );
-      expect(liquidationsData.data.allPositions.nodes.length).toBe(3);
+      expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
-      liquidationsData.data.allPositions.nodes.forEach((position: any) => {
+      liquidationsData.data.positions.nodes.forEach((position: any) => {
         // Realized values should be stored
         expect(position.realizedPnl).toBeDefined();
         expect(position.realizedFundingRate).toBeDefined();
@@ -519,10 +523,12 @@ describe('Verify Liquidation', () => {
     });
 
     it('should have liquidation events marked as latest for closed positions', async () => {
-      const liquidationsData = await graphQLPost(`allPositions(condition:{change:"LIQUIDATE"}){nodes{latest}}`);
-      expect(liquidationsData.data.allPositions.nodes.length).toBe(3);
+      const liquidationsData = await graphQLPost(
+        `positions(condition:{change:"LIQUIDATE"}){nodes{latest}}`
+      );
+      expect(liquidationsData.data.positions.nodes.length).toBe(3);
 
-      liquidationsData.data.allPositions.nodes.forEach((position: any) => {
+      liquidationsData.data.positions.nodes.forEach((position: any) => {
         expect(position.latest).toBe(true);
       });
     });
@@ -530,10 +536,10 @@ describe('Verify Liquidation', () => {
     it('should update total positions correctly after liquidations', async () => {
       // Check BTC long total position (should decrease after user0 liquidation)
       const btcLongTotalData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{collateralAmount,size}}`
+        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:true}){nodes{collateralAmount,size}}`
       );
-      if (btcLongTotalData.data.allTotalPositions.nodes.length > 0) {
-        const total = btcLongTotalData.data.allTotalPositions.nodes[0];
+      if (btcLongTotalData.data.totalPositions.nodes.length > 0) {
+        const total = btcLongTotalData.data.totalPositions.nodes[0];
         // After liquidation, total should reflect the removed position
         expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
         expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);
@@ -541,10 +547,10 @@ describe('Verify Liquidation', () => {
 
       // Check BTC short total position (should decrease after user1 liquidation)
       const btcShortTotalData = await graphQLPost(
-        `allTotalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{collateralAmount,size}}`
+        `totalPositions(condition:{indexAssetId:"${BTC_ASSET}",isLong:false}){nodes{collateralAmount,size}}`
       );
-      if (btcShortTotalData.data.allTotalPositions.nodes.length > 0) {
-        const total = btcShortTotalData.data.allTotalPositions.nodes[0];
+      if (btcShortTotalData.data.totalPositions.nodes.length > 0) {
+        const total = btcShortTotalData.data.totalPositions.nodes[0];
         // After liquidation, total should reflect the removed position
         expect(BigInt(total.collateralAmount)).toBeGreaterThanOrEqual(0);
         expect(BigInt(total.size)).toBeGreaterThanOrEqual(0);

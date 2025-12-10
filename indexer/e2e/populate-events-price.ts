@@ -81,107 +81,107 @@ async function populateEvents(taskArgs: any) {
   await moveBlockchainTime(provider, 23, 1);
   await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45350)));
 
-  await moveBlockchainTime(provider, 14, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45420)))
-  await moveBlockchainTime(provider, 5, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45510)))
-  await moveBlockchainTime(provider, 9, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45480)))
-  await moveBlockchainTime(provider, 13, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45600)))
-  await moveBlockchainTime(provider, 4, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45570)))
-  await moveBlockchainTime(provider, 11, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45720)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45650)))
-  await moveBlockchainTime(provider, 10, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45810)))
-  await moveBlockchainTime(provider, 6, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45790)))
-  await moveBlockchainTime(provider, 12, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45950)))
-  await moveBlockchainTime(provider, 8, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46020)))
-  await moveBlockchainTime(provider, 15, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45980)))
-  await moveBlockchainTime(provider, 9, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46100)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46040)))
-  await moveBlockchainTime(provider, 14, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46150)))
-  await moveBlockchainTime(provider, 6, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46210)))
-  await moveBlockchainTime(provider, 10, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46130)))
-  await moveBlockchainTime(provider, 16, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46280)))
-  await moveBlockchainTime(provider, 5, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46350)))
-  await moveBlockchainTime(provider, 11, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46270)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46390)))
-  await moveBlockchainTime(provider, 13, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46420)))
-  await moveBlockchainTime(provider, 9, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46310)))
-  await moveBlockchainTime(provider, 12, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46480)))
-  await moveBlockchainTime(provider, 8, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46520)))
-  await moveBlockchainTime(provider, 15, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46460)))
-  await moveBlockchainTime(provider, 6, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46590)))
-  await moveBlockchainTime(provider, 10, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46630)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46570)))
-  await moveBlockchainTime(provider, 14, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46680)))
-  await moveBlockchainTime(provider, 5, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46750)))
-  await moveBlockchainTime(provider, 11, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46690)))
-  await moveBlockchainTime(provider, 9, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46810)))
-  await moveBlockchainTime(provider, 12, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46760)))
-  await moveBlockchainTime(provider, 8, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46890)))
-  await moveBlockchainTime(provider, 13, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46940)))
-  await moveBlockchainTime(provider, 6, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46870)))
-  await moveBlockchainTime(provider, 15, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47010)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46980)))
-  await moveBlockchainTime(provider, 14, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47090)))
-  await moveBlockchainTime(provider, 5, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47130)))
-  await moveBlockchainTime(provider, 11, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47070)))
-  await moveBlockchainTime(provider, 9, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47180)))
-  await moveBlockchainTime(provider, 12, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47220)))
-  await moveBlockchainTime(provider, 8, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47160)))
-  await moveBlockchainTime(provider, 13, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47290)))
-  await moveBlockchainTime(provider, 6, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47240)))
-  await moveBlockchainTime(provider, 15, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47310)))
-  await moveBlockchainTime(provider, 7, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47360)))
-  await moveBlockchainTime(provider, 10, 1)
-  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47300)))
+  await moveBlockchainTime(provider, 14, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45420)));
+  await moveBlockchainTime(provider, 5, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45510)));
+  await moveBlockchainTime(provider, 9, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45480)));
+  await moveBlockchainTime(provider, 13, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45600)));
+  await moveBlockchainTime(provider, 4, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45570)));
+  await moveBlockchainTime(provider, 11, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45720)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45650)));
+  await moveBlockchainTime(provider, 10, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45810)));
+  await moveBlockchainTime(provider, 6, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45790)));
+  await moveBlockchainTime(provider, 12, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45950)));
+  await moveBlockchainTime(provider, 8, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46020)));
+  await moveBlockchainTime(provider, 15, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(45980)));
+  await moveBlockchainTime(provider, 9, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46100)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46040)));
+  await moveBlockchainTime(provider, 14, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46150)));
+  await moveBlockchainTime(provider, 6, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46210)));
+  await moveBlockchainTime(provider, 10, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46130)));
+  await moveBlockchainTime(provider, 16, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46280)));
+  await moveBlockchainTime(provider, 5, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46350)));
+  await moveBlockchainTime(provider, 11, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46270)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46390)));
+  await moveBlockchainTime(provider, 13, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46420)));
+  await moveBlockchainTime(provider, 9, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46310)));
+  await moveBlockchainTime(provider, 12, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46480)));
+  await moveBlockchainTime(provider, 8, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46520)));
+  await moveBlockchainTime(provider, 15, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46460)));
+  await moveBlockchainTime(provider, 6, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46590)));
+  await moveBlockchainTime(provider, 10, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46630)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46570)));
+  await moveBlockchainTime(provider, 14, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46680)));
+  await moveBlockchainTime(provider, 5, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46750)));
+  await moveBlockchainTime(provider, 11, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46690)));
+  await moveBlockchainTime(provider, 9, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46810)));
+  await moveBlockchainTime(provider, 12, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46760)));
+  await moveBlockchainTime(provider, 8, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46890)));
+  await moveBlockchainTime(provider, 13, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46940)));
+  await moveBlockchainTime(provider, 6, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46870)));
+  await moveBlockchainTime(provider, 15, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47010)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(46980)));
+  await moveBlockchainTime(provider, 14, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47090)));
+  await moveBlockchainTime(provider, 5, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47130)));
+  await moveBlockchainTime(provider, 11, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47070)));
+  await moveBlockchainTime(provider, 9, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47180)));
+  await moveBlockchainTime(provider, 12, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47220)));
+  await moveBlockchainTime(provider, 8, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47160)));
+  await moveBlockchainTime(provider, 13, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47290)));
+  await moveBlockchainTime(provider, 6, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47240)));
+  await moveBlockchainTime(provider, 15, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47310)));
+  await moveBlockchainTime(provider, 7, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47360)));
+  await moveBlockchainTime(provider, 10, 1);
+  await call(storkMockDeployer.functions.update_price(BTC_ASSET, toPrice(47300)));
 
-  await call(storkMockDeployer.functions.update_price(USDC_ASSET, toPrice(1)))
-  await call(storkMockDeployer.functions.update_price(ETH_ASSET, toPrice(3000)))
+  await call(storkMockDeployer.functions.update_price(USDC_ASSET, toPrice(1)));
+  await call(storkMockDeployer.functions.update_price(ETH_ASSET, toPrice(3000)));
 }
