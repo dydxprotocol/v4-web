@@ -121,7 +121,7 @@ const RewardsPage = () => {
                       <CompetitionLeaderboardPanel />
                     </div>
                   ),
-                  label: stringGetter({ key: STRING_KEYS.COMPETITIONS }),
+                  label: stringGetter({ key: STRING_KEYS.REBATES }),
                   value: Tab.Competition,
                 },
               ]}

@@ -141,7 +141,7 @@ export type ChaosLabsPnlItem = {
 
 async function getChaosLabsPnlDistribution() {
   const res = await fetch(
-    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-clc?perPage=100`,
+    `https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-clc?perPage=1000`,
     {
       method: 'GET',
     }

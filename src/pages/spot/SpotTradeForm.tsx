@@ -3,7 +3,8 @@ import { useCallback, useMemo, useRef } from 'react';
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
 
-import { ButtonAction, ButtonState } from '@/constants/buttons';
+import { SpotWalletStatus } from '@/constants/account';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useSpotForm } from '@/hooks/useSpotForm';
@@ -13,6 +14,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ValidationAlertMessage } from '@/components/ValidationAlert';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSpotQuickOptions } from '@/state/appUiConfigs';
@@ -91,14 +93,14 @@ export const SpotTradeForm = () => {
   return (
     <SpotTabs
       tw="p-1"
-      disabled={form.isPending}
+      disabled={form.isPending || form.inputData.walletStatus !== SpotWalletStatus.Connected}
       value={form.state.side}
       onValueChange={(v) => {
         form.actions.setSide(v as SpotSide);
       }}
       sharedContent={
         <div tw="flex flex-1 flex-col gap-0.75">
-          {!form.inputData.isReady ? (
+          {!form.inputData.isAsyncDataReady ? (
             <LoadingSpace />
           ) : (
             <>
@@ -125,6 +127,7 @@ export const SpotTradeForm = () => {
                     : form.state.sellInputType
                 }
                 onInputTypeChange={form.handleInputTypeChange}
+                onBalanceClick={(value) => form.actions.setSize(value)}
                 side={form.state.side}
                 tokenAmount={form.summary.amounts?.token ?? 0}
                 tokenSymbol={tokenMetadata?.symbol ?? ''}
@@ -143,25 +146,26 @@ export const SpotTradeForm = () => {
                   form.primaryAlert.resources.text?.fallback != null) && (
                   <ValidationAlertMessage error={form.primaryAlert} />
                 )}
-              <Button
-                tw="mt-auto"
-                action={
-                  form.state.side === SpotSide.BUY ? ButtonAction.Create : ButtonAction.Destroy
-                }
-                onClick={form.submitTransaction}
-                disabled={!form.canSubmit}
-                state={
-                  form.isPending
-                    ? ButtonState.Loading
-                    : !form.canSubmit
-                      ? ButtonState.Disabled
-                      : ButtonState.Default
-                }
-              >
-                {form.state.side === SpotSide.BUY
-                  ? stringGetter({ key: STRING_KEYS.BUY })
-                  : stringGetter({ key: STRING_KEYS.SELL })}
-              </Button>
+              {form.inputData.walletStatus === SpotWalletStatus.Disconnected ? (
+                <OnboardingTriggerButton tw="mt-auto" size={ButtonSize.Base} />
+              ) : (
+                <Button
+                  tw="mt-auto"
+                  action={
+                    form.state.side === SpotSide.BUY ? ButtonAction.Create : ButtonAction.Destroy
+                  }
+                  onClick={form.submitTransaction}
+                  disabled={!form.canSubmit}
+                  state={{
+                    isLoading: form.isPending,
+                    isDisabled: !form.canSubmit,
+                  }}
+                >
+                  {form.state.side === SpotSide.BUY
+                    ? stringGetter({ key: STRING_KEYS.BUY })
+                    : stringGetter({ key: STRING_KEYS.SELL })}
+                </Button>
+              )}
             </>
           )}
         </div>

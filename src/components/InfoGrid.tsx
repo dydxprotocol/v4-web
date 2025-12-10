@@ -53,7 +53,7 @@ const $Card = styled.div`
   justify-content: center;
   gap: 0.25rem;
   padding: 0.85rem;
-  border: solid var(--border-width) var(--color-border);
+  border: solid var(--border-width) var(--color-layer-4);
   border-radius: 0.5rem;
 `;
 

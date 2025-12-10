@@ -31,7 +31,7 @@ import { WithdrawForm } from './WithdrawForm';
 import { WithdrawStatus } from './WithdrawStatus';
 
 export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) => {
-  const { dydxAddress, sourceAccount } = useAccounts();
+  const { dydxAddress, sourceAccount, solanaAddress } = useAccounts();
   const isPrivy = sourceAccount.walletInfo?.name === WalletType.Privy;
   const isTurnkey = sourceAccount.walletInfo?.name === WalletType.Turnkey;
   const [destinationAddress, setDestinationAddress] = useState(
@@ -176,7 +176,7 @@ export const WithdrawDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>)
           <SpotTabs
             value={currentWithdrawType}
             onValueChange={(v) => handleTabChange(v as 'perps' | 'spot')}
-            hideTabs={formState === 'chain-select' || !isSpotEnabled}
+            hideTabs={formState === 'chain-select' || !isSpotEnabled || !solanaAddress}
             items={tabs}
           />
         </div>

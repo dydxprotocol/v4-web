@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { SMALL_USD_DECIMALS } from '@/constants/numbers';
+import { SOLANA_MAINNET_ID } from '@/constants/solana';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -60,9 +61,9 @@ export const SpotMarketsDropdown = ({
           getCellValue: (row) => row.name,
           label: 'Name',
           renderCell: ({ symbol, logoUrl, tokenAddress }) => (
-            <div tw="flex items-center gap-0.25">
+            <div tw="flex items-center gap-[0.75rem]">
               <FavoriteButton marketId={tokenAddress} variant="spot" />
-              <$AssetIcon logoUrl={logoUrl} symbol={symbol} />
+              <$AssetIcon logoUrl={logoUrl} symbol={symbol} chainId={SOLANA_MAINNET_ID} />
               <div tw="flex flex-col">
                 <h2>{symbol}</h2>
                 <span tw="text-color-text-0 font-mini-book">
@@ -222,7 +223,7 @@ const $Popover = styled(Popover)`
       ) - var(--restriction-warning-currentHeight)
   );
 
-  width: var(--marketsDropdown-openWidth);
+  width: var(--spot-marketsDropdown-openWidth);
 
   max-width: 100vw;
 
@@ -270,7 +271,8 @@ const $Table = styled(Table)`
 ` as typeof Table;
 
 const $AssetIcon = styled(AssetIcon)`
-  --asset-icon-size: 1.5em;
+  --asset-icon-size: 2rem;
+  --asset-icon-chain-icon-borderColor: var(--color-layer-2);
 `;
 
 const $FavoriteStatus = styled(Icon)`

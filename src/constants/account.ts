@@ -36,6 +36,18 @@ export enum EvmDerivedAccountStatus {
   Derived,
 }
 
+/**
+ * @description Wallet status for spot trading
+ * - Disconnected: wallet not connected
+ * - Unsupported: Cosmos wallets can't derive Solana address
+ * - Connected: EVM/Solana/Turnkey wallets that can trade spot
+ */
+export enum SpotWalletStatus {
+  Disconnected = 'Disconnected',
+  Unsupported = 'Unsupported',
+  Connected = 'Connected',
+}
+
 export type EvmDerivedAddresses = {
   version?: string;
   [EvmAddress: EvmAddress]: {
