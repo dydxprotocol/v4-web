@@ -1,1 +1,1 @@
-export { createGraphQLPositionRepository } from './repository';
+export { createGraphQLPositionRepository } from './positions.repository';
