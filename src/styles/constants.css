@@ -49,6 +49,7 @@
 
   /* Market Selector constants */
   --marketsDropdown-openWidth: 55rem;
+  --spot-marketsDropdown-openWidth: 40rem;
 
   /* Form constants */
   --form-input-gap: 0.625rem;

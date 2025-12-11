@@ -1,10 +1,12 @@
 import { forwardRef, useCallback, useId, useImperativeHandle, useMemo, useRef } from 'react';
 
 import { SpotBuyInputType, SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { PERCENT_DECIMALS, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -13,6 +15,8 @@ import { IconButton } from '@/components/IconButton';
 import { Input, InputProps, InputType } from '@/components/Input';
 import { Output, OutputProps, OutputType } from '@/components/Output';
 import { TabGroup, TabOption } from '@/components/TabGroup';
+
+import { openDialog } from '@/state/dialogs';
 
 const INPUT_CONFIG_MAP = {
   [SpotSide.BUY]: {
@@ -72,6 +76,7 @@ export type SpotFormInputProps = {
   side: SpotSide;
   inputType: SpotBuyInputType | SpotSellInputType;
   onInputTypeChange: (side: SpotSide, inputType: SpotBuyInputType | SpotSellInputType) => void;
+  onBalanceClick?: (value: string) => void;
   validationConfig?: {
     type: AlertType;
     message: string;
@@ -91,12 +96,14 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
       tokenSymbol,
       tokenAmount,
       onInputTypeChange,
+      onBalanceClick,
       ...inputProps
     },
     ref
   ) => {
     const id = useId();
     const internalRef = useRef<HTMLInputElement>(null);
+    const dispatch = useDispatch();
 
     useImperativeHandle(ref, () => internalRef.current!);
 
@@ -160,13 +167,25 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
             <label htmlFor={id}>Amount</label>
             <div tw="row gap-[0.25rem]">
               <Icon iconName={IconName.Wallet3} />
-              <Output tw="text-color-text-1" {...balanceOutputProps} />
+              <button
+                type="button"
+                disabled={side !== SpotSide.BUY || !onBalanceClick}
+                tw="flex"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const value = inputType === SpotBuyInputType.SOL ? balances.sol : balances.usd;
+                  onBalanceClick?.(value.toString());
+                }}
+              >
+                <Output tw="text-color-text-1" {...balanceOutputProps} />
+              </button>
               {side === SpotSide.BUY && (
                 <IconButton
                   iconName={IconName.PlusCircle}
                   buttonStyle={ButtonStyle.WithoutBackground}
                   size={ButtonSize.XXSmall}
                   action={ButtonAction.Primary}
+                  onClick={() => dispatch(openDialog(DialogTypes.Deposit2({})))}
                 />
               )}
             </div>

@@ -52,6 +52,7 @@ export const useSpotTransactionSubmit = () => {
           ? SpotApiLandingMethod.JUPITER
           : undefined,
         jupiterRequestId: createResponse.metadata.jupiterRequestId,
+        walletAddress: solanaAddress,
       });
 
       return {
