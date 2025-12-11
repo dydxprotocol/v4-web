@@ -14,7 +14,7 @@ import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { LogoIcon } from '@/icons/logo';
+import { LogoShortIcon } from '@/icons/logo-short';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -75,8 +75,8 @@ export const SharePNLAnalyticsDialog = ({
           params: {
             MARKET: symbol,
           },
-        })}\n\n#dYdX #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
-        related: 'dYdX',
+        })}\n\n#bonk_trade #${symbol}\n[${stringGetter({ key: STRING_KEYS.TWEET_PASTE_IMAGE_AND_DELETE_THIS })}]`,
+        related: 'bonk_inu',
       });
 
       dispatch(closeDialog());
@@ -125,8 +125,9 @@ export const SharePNLAnalyticsDialog = ({
             value={unrealizedPnl}
             showSign={ShowSign.Both}
           />
-
-          <LogoIcon tw="mt-auto h-auto w-[5.125rem]" />
+          <div className="mt-auto flex h-auto max-h-[3rem] w-full justify-center">
+            <LogoShortIcon tw="h-auto w-full" />
+          </div>
         </div>
 
         <div tw="grid">
