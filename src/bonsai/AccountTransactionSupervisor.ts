@@ -137,8 +137,6 @@ export class AccountTransactionSupervisor {
     return async () => {
       const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
 
-      console.log('wrapOperation', maybeDydxLocalWallet);
-
       const result = await taskBuilder({ payload: basePayload })
         .with<AddSharedContextMiddlewareProps>(
           addSharedContextMiddleware(nameForLogging, { ...this.shared, maybeDydxLocalWallet })
