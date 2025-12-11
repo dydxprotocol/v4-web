@@ -23,3 +23,6 @@ export const getHasDismissedTradingLeagueBanner = (state: RootState) =>
 
 export const getHasDismissedNoFeeBanner = (state: RootState) =>
   state.dismissable.hasDismissedNoFeeBanner;
+
+export const getHasDismissedTradingLeagueRewardsNotification = (state: RootState) =>
+  state.dismissable.hasDismissedTradingLeagueRewardsNotification;

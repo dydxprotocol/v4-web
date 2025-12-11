@@ -57,6 +57,8 @@ import {
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { setHasDismissedTradingLeagueRewardsNotification } from '@/state/dismissable';
+import { getHasDismissedTradingLeagueRewardsNotification } from '@/state/dismissableSelectors';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -574,6 +576,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.RewardsProgramUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const dispatch = useAppDispatch();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
 
@@ -729,6 +732,59 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`pump-trading-competition-base`],
           });
       }, [stringGetter, trigger]);
+
+      const hasDismissedTradingLeagueRewardsNotification = useAppSelector(
+        getHasDismissedTradingLeagueRewardsNotification
+      );
+      const hasShownRewardNotificationThisSession = useRef(false);
+
+      useEffect(() => {
+        const now = new Date().getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
+
+        if (
+          now < seasonEnd &&
+          dydxAddress != null &&
+          !hasDismissedTradingLeagueRewardsNotification &&
+          !hasShownRewardNotificationThisSession.current
+        ) {
+          hasShownRewardNotificationThisSession.current = true;
+
+          // TODO: localize notification strings
+          trigger({
+            id: `trading-league-rewards-notification`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: 'Rewards Reminder',
+              body: 'Have you claimed your Trading League rewards yet?',
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: 'Go to Rewards',
+              renderActionSlot: () => (
+                // TODO: replace with official trading league rewards page
+                <Link
+                  href="https://dydx-unlimited-lp.webflow.io/trading-league-rewards"
+                  isAccent
+                  onClick={() => {
+                    dispatch(setHasDismissedTradingLeagueRewardsNotification(true));
+                  }}
+                >
+                  Go to Rewards
+                </Link>
+              ),
+            },
+            updateKey: [`trading-league-rewards-notification`],
+          });
+        }
+      }, [
+        currentSeason,
+        dispatch,
+        dydxAddress,
+        hasDismissedTradingLeagueRewardsNotification,
+        hasShownRewardNotificationThisSession,
+        stringGetter,
+        trigger,
+      ]);
     },
   },
   {
