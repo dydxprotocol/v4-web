@@ -21,4 +21,5 @@ export interface PositionRepository {
   getPositions(options?: GetPositionsOptions): Promise<Position[]>;
   getPositionsByAccount(account: Address, latestOnly?: boolean): Promise<Position[]>;
   getPositionsByAsset(indexAssetId: AssetId, isLong?: boolean, latestOnly?: boolean): Promise<Position[]>;
+  getCurrentPositions(account: Address): Promise<Position[]>;
 }
