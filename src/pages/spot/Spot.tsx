@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { keyBy } from 'lodash';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { SpotWalletStatus } from '@/constants/account';
@@ -47,7 +47,7 @@ import { SpotHeaderToken } from './types';
 // TODO: spot localization
 
 const SpotPage = () => {
-  const { tokenMint } = useParams<{ tokenMint: string }>();
+  const { currentSpotToken: tokenMint } = useCurrentSpotToken();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -88,8 +88,6 @@ const SpotPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: searchResults, isPending: isSearchLoading } = useSpotTokenSearch(searchQuery);
-
-  useCurrentSpotToken();
 
   const holdings: SpotPositionItem[] = useMemo(() => {
     const positionsByMint = keyBy(walletPositions, 'tokenMint');
@@ -247,8 +245,6 @@ const SpotPage = () => {
     dispatch(spotFormActions.setSize('100'));
     navigate(`/spot/${token.tokenAddress}`);
   };
-
-  if (!tokenMint) return null;
 
   return (
     <$SpotLayout
