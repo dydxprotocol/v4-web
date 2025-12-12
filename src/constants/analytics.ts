@@ -626,6 +626,21 @@ export const AnalyticsEvents = unionize(
       errorName: string;
       errorMessage: string;
     }>(),
+
+    // Spot Withdrawal
+    SpotSolWithdrawalStarted: ofType<{
+      solAmount: number;
+    }>(),
+    SpotSolWithdrawalSuccess: ofType<{
+      solAmount: number;
+      timingMs: Record<string, number>;
+    }>(),
+    SpotSolWithdrawalError: ofType<{
+      solAmount: number;
+      step: string;
+      errorName: string;
+      errorMessage: string;
+    }>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
