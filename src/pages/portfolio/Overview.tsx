@@ -90,7 +90,6 @@ export const Overview = () => {
                   PositionsTableColumnKey.Size,
                   PositionsTableColumnKey.Value,
                   PositionsTableColumnKey.PnL,
-                  PositionsTableColumnKey.RealizedPnL,
                   PositionsTableColumnKey.Margin,
                   PositionsTableColumnKey.AverageOpen,
                   PositionsTableColumnKey.Oracle,
