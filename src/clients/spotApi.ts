@@ -1,8 +1,7 @@
 import { logBonsaiError } from '@/bonsai/logs';
 
-import { DEFAULT_PRIORITY_FEE_LAMPORTS, DEFAULT_SLIPPAGE_BPS } from '@/constants/spot';
-
 import { simpleFetch } from '@/lib/simpleFetch';
+import { isPresent } from '@/lib/typeUtils';
 
 export enum SpotApiLandingMethod {
   JITO = 'jito',
@@ -34,10 +33,10 @@ export type SpotApiCreateTransactionRequest = {
   tokenMint: string;
   side: SpotApiSide;
   inAmount: string;
-  maxSlippageBps?: number;
+  maxSlippageBps: number;
   pool: string;
   tradeRoute: SpotApiTradeRoute;
-  priorityFeeLamports?: number;
+  priorityFeeLamports: number;
 };
 
 export type SpotApiTransactionMetadataObject = {
@@ -191,11 +190,20 @@ export type SpotApiBarsResolution =
   | '1D'
   | '7D';
 
+export enum SpotApiTokenPairStatisticsType {
+  Filtered = 'FILTERED',
+  Unfiltered = 'UNFILTERED',
+}
+
 export type SpotApiGetBarsQuery = {
   from: number; // unix timestamp
   tokenMint: string;
   to?: number; // unix timestamp, defaults to current time
   resolution?: SpotApiBarsResolution;
+  statsType?: SpotApiTokenPairStatisticsType;
+  removeEmptyBars?: boolean;
+  removeLeadingNullValues?: boolean;
+  countback?: number;
 };
 
 export interface SpotApiGetBarsResponseData {
@@ -291,20 +299,12 @@ export class SpotApiClient {
   }
 
   async getBars(query: SpotApiGetBarsQuery) {
-    const params = new URLSearchParams({
-      from: query.from.toString(),
-      tokenMint: query.tokenMint,
-    });
-
-    if (query.to) {
-      params.append('to', query.to.toString());
-    }
-
-    if (query.resolution) {
-      params.append('resolution', query.resolution);
-    }
-
-    return this._get<SpotApiGetBarsResponse>(`tokens/bars?${params.toString()}`);
+    const params = new URLSearchParams(
+      Object.entries(query)
+        .filter(([_, v]) => isPresent(v))
+        .map(([k, v]) => [k, String(v)])
+    );
+    return this._get<SpotApiGetBarsResponse>(`tokens/bars?${params}`);
   }
 
   async createTransaction(request: SpotApiCreateTransactionRequest) {
@@ -353,14 +353,7 @@ export const createSpotTransaction = async (
   request: SpotApiCreateTransactionRequest
 ) => {
   const client = getOrCreateSpotApiClient(apiUrl);
-
-  const requestWithDefaults: Required<SpotApiCreateTransactionRequest> = {
-    ...request,
-    maxSlippageBps: request.maxSlippageBps ?? DEFAULT_SLIPPAGE_BPS,
-    priorityFeeLamports: request.priorityFeeLamports ?? DEFAULT_PRIORITY_FEE_LAMPORTS,
-  };
-
-  return client.createTransaction(requestWithDefaults);
+  return client.createTransaction(request);
 };
 
 export const landSpotTransaction = async (

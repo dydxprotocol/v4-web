@@ -34,7 +34,7 @@ import { useAllStatsigGateValues } from './useStatsig';
 
 export const useAnalytics = () => {
   const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
-  const { sourceAccount, selectedWallet, dydxAddress } = useAccounts();
+  const { sourceAccount, selectedWallet, dydxAddress, solanaAddress } = useAccounts();
   const { indexerClient } = useDydxClient();
   const statsigConfig = useAllStatsigGateValues();
   /** User properties */
@@ -149,6 +149,11 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
   }, [dydxAddress]);
+
+  // AnalyticsUserProperty.SolanaAddress
+  useEffect(() => {
+    identify(AnalyticsUserProperties.SolanaAddress(solanaAddress ?? null));
+  }, [solanaAddress]);
 
   useEffect(() => {
     identify(

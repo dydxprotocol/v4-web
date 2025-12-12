@@ -29,7 +29,7 @@ export const useSpotTokenSearch = (query: string, debounceMs = 300) => {
         priceUsd: token.priceUsd,
         volume24hUsd: token.volumeUsd,
       }));
-    }, 'spotTokenSearch'),
+    }, 'spot/spotTokenSearch'),
     staleTime: timeUnits.minute,
   });
 };
