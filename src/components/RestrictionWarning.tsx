@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { ComplianceBanner } from './ComplianceBanner';
 
 export const RestrictionWarning = () => {
@@ -9,7 +7,7 @@ export const RestrictionWarning = () => {
 };
 
 const $RestrictedWarning = styled(ComplianceBanner)`
-  ${layoutMixins.sticky}
-  --stickyArea-totalInsetTop: var(--page-currentHeaderHeight);
+  /* TEMPORARY: Removed sticky behavior */
+  position: static !important; /* Force non-sticky */
   height: var(--restriction-warning-currentHeight);
 `;

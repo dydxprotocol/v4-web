@@ -33,7 +33,8 @@ import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
 import { getOnboardingState } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
+import { AppTheme, setAppThemeSetting } from '@/state/appUiConfigs';
+import { getAppTheme, getHasSeenLaunchIncentives } from '@/state/appUiConfigsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -46,8 +47,14 @@ export const HeaderDesktop = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { complianceState } = useComplianceState();
   const isSpotEnabled = useEnableSpot();
+  const currentTheme = useAppSelector(getAppTheme);
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
+
+  const handleThemeToggle = () => {
+    const newTheme = currentTheme === AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+    dispatch(setAppThemeSetting(newTheme));
+  };
 
   const navItems = [
     {
@@ -68,15 +75,10 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
         },
-        {
+        onboardingState === OnboardingState.AccountConnected && {
           value: 'PORTFOLIO',
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
-        },
-        {
-          value: 'VAULT',
-          label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
-          href: AppRoute.Vault,
         },
         {
           value: 'REWARDS',
@@ -90,6 +92,12 @@ export const HeaderDesktop = () => {
           value: 'MORE',
           label: stringGetter({ key: STRING_KEYS.MORE }),
           subitems: [
+            {
+              value: 'VAULT',
+              slotBefore: <Icon iconName={IconName.Bank} />,
+              label: stringGetter({ key: STRING_KEYS.MEGAVAULT }),
+              href: AppRoute.Vault,
+            },
             {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
@@ -172,22 +180,26 @@ export const HeaderDesktop = () => {
           <MobileDownloadLinks />
         )}
 
-        <$IconButton
+        {onboardingState === OnboardingState.AccountConnected && (
+          <NotificationsMenu
+            slotTrigger={
+              <$IconButton
+                shape={ButtonShape.Rectangle}
+                iconComponent={BellStrokeIcon as React.ElementType}
+              />
+            }
+          />
+        )}
+
+        <$ThemeToggleButton
           shape={ButtonShape.Rectangle}
-          iconName={IconName.HelpCircle}
-          onClick={() => dispatch(openDialog(DialogTypes.Help()))}
+          iconName={currentTheme === AppTheme.Dark ? IconName.Sun : IconName.Moon}
+          onClick={handleThemeToggle}
         />
 
-        <NotificationsMenu
-          slotTrigger={
-            <$IconButton
-              shape={ButtonShape.Rectangle}
-              iconComponent={BellStrokeIcon as React.ElementType}
-            />
-          }
-        />
-
-        <AccountMenu />
+        <$AccountMenuWrapper>
+          <AccountMenu />
+        </$AccountMenuWrapper>
       </$NavAfter>
     </$Header>
   );
@@ -267,7 +279,7 @@ const $LogoLink = styled(Link)`
   > div {
     margin: auto;
     width: auto;
-    height: 69%;
+    height: 85%;
   }
 `;
 
@@ -287,8 +299,15 @@ const $NavAfter = styled.div`
 const $IconButton = styled(IconButton)<{ size?: string }>`
   ${headerMixins.button}
   --button-border: none;
-  --button-icon-size: 1rem;
+  --button-icon-size: 1.15rem;
   --button-padding: 0 0.5em;
+`;
+
+const $ThemeToggleButton = styled(IconButton)`
+  ${headerMixins.button}
+  --button-border: none;
+  --button-icon-size: 1.25em;
+  --button-padding: 0.33rem 0.5rem;
 `;
 
 const $LanguageSelector = styled(LanguageSelector)`
@@ -302,5 +321,15 @@ const $DepositButton = styled(Button)`
 
   span {
     color: var(--color-white) !important;
+  }
+`;
+
+const $AccountMenuWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  > * {
+    transform: scale(1.15);
+    transform-origin: center;
   }
 `;

@@ -114,7 +114,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
 
   return (
     <$ComplianceBanner className={className}>
-      <div tw="absolute inset-0 z-[-1] bg-color-gradient-error" />
+      {/* <div tw="absolute inset-0 z-[-1] bg-color-gradient-error" /> */}
       {isTablet && (
         <IconButton
           tw="absolute right-0.25 top-0.25 text-color-text-2"
@@ -159,7 +159,7 @@ const $ComplianceBanner = styled.div`
 
   font: var(--font-small-book);
   border-left: 4px solid var(--color-error);
-  background-color: var(--color-layer-2);
+  background-color: var(--color-gradient-error);
   color: var(--color-error);
 
   @media ${breakpoints.tablet} {
