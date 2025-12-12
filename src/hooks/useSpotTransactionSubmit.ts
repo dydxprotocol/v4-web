@@ -37,7 +37,7 @@ export const useSpotTransactionSubmit = () => {
     const createPayload = formSummary.payload;
     // Should never happen - submit button should always be disabled when payload is not truthy
     if (!createPayload) {
-      logBonsaiError('useSpotTransactionSubmit', 'No payload available', {
+      logBonsaiError('spot/useSpotTransactionSubmit', 'No payload available', {
         formInputData,
         formState,
       });
@@ -50,7 +50,7 @@ export const useSpotTransactionSubmit = () => {
     let step: 'validateWallet' | 'createTransaction' | 'signTransaction' | 'landTransaction' =
       'validateWallet';
 
-    logBonsaiInfo('useSpotTransactionSubmit', 'Crafting a transaction', {
+    logBonsaiInfo('spot/useSpotTransactionSubmit', 'Crafting a transaction', {
       createPayload,
       formInputData,
       formState,
@@ -108,7 +108,7 @@ export const useSpotTransactionSubmit = () => {
       timingMs.landTransactionMs = landTransactionTimer.elapsed();
 
       timingMs.totalMs = totalTimer.elapsed();
-      logBonsaiInfo('useSpotTransactionSubmit', 'Successfuly landed a transaction', {
+      logBonsaiInfo('spot/useSpotTransactionSubmit', 'Successfuly landed a transaction', {
         createPayload,
         formInputData,
         formState,
@@ -141,7 +141,7 @@ export const useSpotTransactionSubmit = () => {
         ? await error.response.text().catch(() => undefined)
         : undefined;
 
-      logBonsaiError('useSpotTransactionSubmit', 'Transaction failure', {
+      logBonsaiError('spot/useSpotTransactionSubmit', 'Transaction failure', {
         error,
         createPayload,
         formInputData,
