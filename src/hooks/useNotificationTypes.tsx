@@ -736,55 +736,39 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const hasDismissedTradingLeagueRewardsNotification = useAppSelector(
         getHasDismissedTradingLeagueRewardsNotification
       );
-      const hasShownRewardNotificationThisSession = useRef(false);
-
       useEffect(() => {
         const now = new Date().getTime();
         const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
 
-        if (
-          now < seasonEnd &&
-          dydxAddress != null &&
-          !hasDismissedTradingLeagueRewardsNotification &&
-          !hasShownRewardNotificationThisSession.current
-        ) {
-          hasShownRewardNotificationThisSession.current = true;
-
-          // TODO: localize notification strings
+        if (now < seasonEnd && rewards != null && !hasDismissedTradingLeagueRewardsNotification) {
           trigger({
             id: `trading-league-rewards-notification`,
             displayData: {
-              icon: <Icon iconName={IconName.Sparkles} />,
-              title: 'Rewards Reminder',
-              body: 'Have you claimed your Trading League rewards yet?',
+              icon: <Icon iconName={IconName.Trophy} />,
+              title: stringGetter({ key: STRING_KEYS.TRADING_LEAGUES }),
+              body: stringGetter({ key: STRING_KEYS.CLAIM_TRADING_LEAGUE_REWARD_BODY }),
               toastSensitivity: 'foreground',
               groupKey: NotificationType.RewardsProgramUpdates,
-              actionAltText: 'Go to Rewards',
+              actionAltText: stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY }),
               renderActionSlot: () => (
-                // TODO: replace with official trading league rewards page
                 <Link
-                  href="https://dydx-unlimited-lp.webflow.io/trading-league-rewards"
+                  href="https://www.dydx.xyz/trading-league-rewards"
                   isAccent
                   onClick={() => {
                     dispatch(setHasDismissedTradingLeagueRewardsNotification(true));
                   }}
                 >
-                  Go to Rewards
+                  {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })}
                 </Link>
               ),
             },
             updateKey: [`trading-league-rewards-notification`],
           });
         }
-      }, [
-        currentSeason,
-        dispatch,
-        dydxAddress,
-        hasDismissedTradingLeagueRewardsNotification,
-        hasShownRewardNotificationThisSession,
-        stringGetter,
-        trigger,
-      ]);
+      }, [currentSeason, rewards, stringGetter, trigger]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
   {
