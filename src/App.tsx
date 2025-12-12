@@ -52,7 +52,6 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
 import { useComplianceState } from './hooks/useComplianceState';
-import { useEnableSpot } from './hooks/useEnableSpot';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useReferralCode } from './hooks/useReferralCode';
@@ -114,7 +113,6 @@ const Content = () => {
   const isSimpleUi = useSimpleUiEnabled();
   const { showComplianceBanner } = useComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
-  const isSpotEnabled = useEnableSpot();
 
   // Track current path in Redux for conditional polling
   useEffect(() => {
@@ -209,9 +207,10 @@ const Content = () => {
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
 
-              {isSpotEnabled && (
-                <Route path={`${AppRoute.Spot}/:tokenMint`} element={<SpotPage />} />
-              )}
+              <Route path={AppRoute.Spot}>
+                <Route path=":tokenMint" element={<SpotPage />} />
+                <Route index element={<SpotPage />} />
+              </Route>
 
               <Route path={AppRoute.Markets}>
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />

@@ -2,7 +2,7 @@ import { MarginMode } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import styled from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonStyle } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -125,8 +125,9 @@ export const MarginModeSelector = ({ className }: { className?: string }) => {
   const leverageButton = (
     <Button
       size={ButtonSize.XSmall}
-      tw="[--button-backgroundColor:--color-layer-4] [--button-border:none]"
-      slotRight={<Icon iconName={IconName.Pencil} tw="text-color-accent" />}
+      action={ButtonAction.SimpleSecondary}
+      buttonStyle={ButtonStyle.WithoutBackground}
+      slotRight={<Icon iconName={IconName.Caret} size="0.75em" tw="text-color-text-0" />}
       onClick={() =>
         currentMarket != null
           ? dispatch(openDialog(DialogTypes.SetMarketLeverage({ marketId: currentMarket })))
