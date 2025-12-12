@@ -219,6 +219,10 @@ export const SpotHoldingsTable = ({
       withInnerBorders
       withScrollSnapColumns
       withScrollSnapRows
+      defaultSortDescriptor={{
+        column: 'holdingsUsd',
+        direction: 'descending',
+      }}
       slotEmpty={
         <>
           <Icon iconName={IconName.Positions} tw="text-[3em]" />
