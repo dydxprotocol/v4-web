@@ -641,6 +641,9 @@ export const AnalyticsEvents = unionize(
       errorName: string;
       errorMessage: string;
     }>(),
+
+    // Spot Deposit
+    SpotDepositInitiated: ofType<{}>(),
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
