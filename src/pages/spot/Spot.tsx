@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
@@ -12,6 +12,7 @@ import {
   HORIZONTAL_PANEL_MIN_HEIGHT,
   TradeLayouts,
 } from '@/constants/layout';
+import { AppRoute } from '@/constants/routes';
 import { SPOT_DUST_USD_THRESHOLD } from '@/constants/spot';
 
 import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
@@ -86,6 +87,7 @@ const SpotPage = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const { data: searchResults, isPending: isSearchLoading } = useSpotTokenSearch(searchQuery);
 
@@ -227,12 +229,13 @@ const SpotPage = () => {
   );
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
+    setIsSearchOpen(false);
     setSearchQuery('');
   };
 
   const handlePositionSelect = (token: SpotPositionItem) => {
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
   };
 
   const handleTokenSearchChange = (value: string) => {
@@ -243,8 +246,14 @@ const SpotPage = () => {
     dispatch(spotFormActions.setSide(SpotSide.SELL));
     dispatch(spotFormActions.setSellInputType(SpotSellInputType.PERCENT));
     dispatch(spotFormActions.setSize('100'));
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
   };
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      setSearchQuery('');
+    }
+  }, [isSearchOpen]);
 
   return (
     <$SpotLayout
@@ -260,6 +269,9 @@ const SpotPage = () => {
           isTokenLoading={isTokenMetadataLoading}
           onTokenSelect={handleTokenSelect}
           onSearchTextChange={handleTokenSearchChange}
+          isDropDownOpen={isSearchOpen}
+          onDropDownChange={setIsSearchOpen}
+          searchValue={searchQuery}
         />
       </header>
 
