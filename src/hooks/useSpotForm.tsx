@@ -83,13 +83,8 @@ export function useSpotForm() {
   );
 
   const submitTransaction = useCallback(async () => {
-    const payload = formSummary.summary.payload;
-    if (!payload) {
-      throw new Error('No payload available');
-    }
-
     try {
-      const result = await submitTransactionMutation(payload);
+      const result = await submitTransactionMutation();
       dispatch(spotFormActions.reset());
 
       appQueryClient.invalidateQueries({
@@ -140,7 +135,6 @@ export function useSpotForm() {
     }
   }, [
     dispatch,
-    formSummary.summary.payload,
     submitTransactionMutation,
     tokenMetadata?.symbol,
     decimalSeparator,
