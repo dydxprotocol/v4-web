@@ -57,6 +57,8 @@ import {
 } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { setHasDismissedTradingLeagueRewardsNotification } from '@/state/dismissable';
+import { getHasDismissedTradingLeagueRewardsNotification } from '@/state/dismissableSelectors';
 import {
   getLocalCancelAlls,
   getLocalCancelOrders,
@@ -574,6 +576,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.RewardsProgramUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const dispatch = useAppDispatch();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
 
@@ -729,6 +732,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`pump-trading-competition-base`],
           });
       }, [stringGetter, trigger]);
+
+      const hasDismissedTradingLeagueRewardsNotification = useAppSelector(
+        getHasDismissedTradingLeagueRewardsNotification
+      );
+      useEffect(() => {
+        const now = new Date().getTime();
+        const seasonEnd = new Date(CURRENT_REWARDS_SEASON_EXPIRATION).getTime();
+
+        if (now < seasonEnd && rewards != null && !hasDismissedTradingLeagueRewardsNotification) {
+          trigger({
+            id: `trading-league-rewards-notification`,
+            displayData: {
+              icon: <Icon iconName={IconName.Trophy} />,
+              title: stringGetter({ key: STRING_KEYS.TRADING_LEAGUES }),
+              body: stringGetter({ key: STRING_KEYS.CLAIM_TRADING_LEAGUE_REWARD_BODY }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY }),
+              renderActionSlot: () => (
+                <Link
+                  href="https://www.dydx.xyz/trading-league-rewards"
+                  isAccent
+                  onClick={() => {
+                    dispatch(setHasDismissedTradingLeagueRewardsNotification(true));
+                  }}
+                >
+                  {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })}
+                </Link>
+              ),
+            },
+            updateKey: [`trading-league-rewards-notification`],
+          });
+        }
+      }, [currentSeason, rewards, stringGetter, trigger]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
   {
