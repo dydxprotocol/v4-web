@@ -7,7 +7,9 @@ import { type RootStore } from '@/state/_store';
 import {
   getSpotBars,
   SpotApiGetBarsQuery,
+  SpotApiHistoricalBarsStatus,
   SpotApiTokenPairStatisticsType,
+  transformBarsResponseToBars,
 } from '@/clients/spotApi';
 import { waitForSelector } from '@/lib/asyncUtils';
 import {
@@ -54,7 +56,10 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
   resolveSymbol: async (tokenMint, onSymbolResolvedCallback) => {
     setTimeout(async () => {
       const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
-      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice);
+      const { symbol, tokenNameFull } = await waitForSelector(store, (s) =>
+        BonsaiCore.spot.tokenMetadata.data(s)
+      );
+      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice, tokenNameFull, symbol);
       onSymbolResolvedCallback(symbolInfo);
     }, 0);
   },
@@ -82,12 +87,14 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
         statsType: SpotApiTokenPairStatisticsType.Filtered,
       };
 
-      const bars = await wrapAndLogBonsaiError(
+      const barsResponse = await wrapAndLogBonsaiError(
         () => getSpotBars(spotApiUrl, query),
-        'getSpotBars'
+        'spot/getSpotBars'
       )();
 
-      if (bars.length === 0) {
+      const bars = transformBarsResponseToBars(barsResponse);
+
+      if (barsResponse.data.s === SpotApiHistoricalBarsStatus.NO_DATA) {
         onHistoryCallback([], { noData: true });
       } else {
         const chartBars = transformSpotCandlesForChart(bars);

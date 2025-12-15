@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import { DEFAULT_RESOLUTION, SPOT_RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
+import { DEFAULT_RESOLUTION } from '@/constants/candles';
+import { SPOT_TV_DEFAULT_VISIBLE_BAR_COUNT } from '@/constants/spot';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useAppSelector } from '@/state/appTypes';
@@ -42,29 +43,43 @@ export const useSpotChartMarketAndResolution = ({
       tvWidget
         .activeChart()
         .onIntervalChanged()
-        .subscribe(null, (newResolution) => {
-          setVisibleRangeForResolution(tvWidget, newResolution);
+        .subscribe(null, () => {
+          setVisibleRange(tvWidget);
         });
 
-      // Set visible range on initial render
-      setVisibleRangeForResolution(tvWidget, resolution);
+      setVisibleRange(tvWidget);
     });
   }, [tokenMint, tvWidget]);
 };
 
-const setVisibleRangeForResolution = (tvWidget: TvWidget, resolution: ResolutionString) => {
-  const defaultRange: number | undefined = SPOT_RESOLUTION_CHART_CONFIGS[resolution]?.defaultRange;
+const setVisibleRange = (tvWidget: TvWidget) => {
+  const defaultBarCount = SPOT_TV_DEFAULT_VISIBLE_BAR_COUNT;
+  const chart = tvWidget.activeChart();
 
-  if (defaultRange) {
-    const to = Date.now() / 1000;
-    const from = (Date.now() - defaultRange) / 1000;
+  const handleDataLoaded = () => {
+    chart
+      .exportData({ includeTime: true, includeSeries: true, includedStudies: [] })
+      .then((exportedData) => {
+        const bars = exportedData.data;
+        if (bars.length === 0) return;
 
-    tvWidget.activeChart().setVisibleRange(
-      {
-        from,
-        to,
-      },
-      { percentRightMargin: 10 }
-    );
-  }
+        const startIndex = Math.max(0, bars.length - defaultBarCount);
+        const fromBar = bars[startIndex];
+        const toBar = bars[bars.length - 1];
+        const from = fromBar?.[0];
+        const to = toBar?.[0];
+
+        if (from && to) {
+          chart.setVisibleRange({ from, to }, { percentRightMargin: 10 });
+        }
+      })
+      .catch(() => {
+        // Fallback: do nothing, let TradingView use default zoom
+      });
+
+    // Unsubscribe after handling
+    chart.onDataLoaded().unsubscribe(null, handleDataLoaded);
+  };
+
+  chart.onDataLoaded().subscribe(null, handleDataLoaded);
 };
