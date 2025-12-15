@@ -51,9 +51,9 @@ import { SkipProvider } from './hooks/transfers/skipClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useCommandMenu } from './hooks/useCommandMenu';
-import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { usePerpetualsComplianceState } from './hooks/usePerpetualsComplianceState';
 import { useReferralCode } from './hooks/useReferralCode';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useSimpleUiEnabled } from './hooks/useSimpleUiEnabled';
@@ -111,7 +111,7 @@ const Content = () => {
   const isShowingFooter = useShouldShowFooter();
   const abDefaultToMarkets = useCustomFlagValue(CustomFlags.abDefaultToMarkets);
   const isSimpleUi = useSimpleUiEnabled();
-  const { showComplianceBanner } = useComplianceState();
+  const { showComplianceBanner } = usePerpetualsComplianceState();
   const isSimpleUiUserMenuOpen = useAppSelector(getIsUserMenuOpen);
 
   // Track current path in Redux for conditional polling

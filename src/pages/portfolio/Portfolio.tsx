@@ -14,8 +14,8 @@ import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -63,7 +63,7 @@ const PortfolioPage = () => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   const initialPageSize = 20;
   const isSimpleUi = useSimpleUiEnabled();

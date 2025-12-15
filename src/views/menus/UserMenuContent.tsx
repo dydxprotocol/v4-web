@@ -13,7 +13,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -37,7 +37,7 @@ export const UserMenuContent = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const onboardingState = useAppSelector(getOnboardingState);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const isTurnkeyConnected = useAppSelector(selectIsTurnkeyConnected);
   const { equity, freeCollateral } = orEmptyObj(

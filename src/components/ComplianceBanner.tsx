@@ -6,10 +6,9 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize, ButtonStyle, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -20,14 +19,14 @@ import { AlertMessage } from './AlertMessage';
 import { Button } from './Button';
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
-import { Link } from './Link';
+import { TermsOfUseLink } from './TermsOfUseLink';
 
 export const ComplianceBanner = ({ className }: { className?: string }) => {
   const [showLess, setShowLess] = useState(false);
   const complianceBannerRef = useRef<HTMLDivElement>(null);
   const stringGetter = useStringGetter();
   const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
-    useComplianceState();
+    usePerpetualsComplianceState();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = useSimpleUiEnabled();
 
@@ -48,13 +47,9 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   const complianceContent = showRestrictionWarning ? (
     <span>
       {stringGetter({
-        key: STRING_KEYS.BLOCKED_BANNER_MESSAGE_SHORT,
+        key: STRING_KEYS.PERPETUALS_UNAVAILABLE_MESSAGE,
         params: {
-          TERMS_OF_USE_LINK: (
-            <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
-              {stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })}
-            </Link>
-          ),
+          TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
         },
       })}
     </span>

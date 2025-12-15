@@ -13,7 +13,7 @@ import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -38,7 +38,7 @@ export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
   const currentTradeFormConfig = currentTradeFormSummary.options;

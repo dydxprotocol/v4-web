@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { IconName } from '@/components/Icon';
@@ -29,7 +29,7 @@ export const TradeFormMessages = ({
   shouldPromptUserToPlaceLimitOrder: boolean;
 }) => {
   const dispatch = useAppDispatch();
-  const { complianceMessage, complianceStatus } = useComplianceState();
+  const { complianceMessage, complianceStatus } = usePerpetualsComplianceState();
 
   return (
     <>

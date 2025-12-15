@@ -7,7 +7,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -33,7 +33,7 @@ export const Stake = () => {
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const stakingApr = useStakingAPR();
 
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
   const { chainTokenLabel } = useTokenConfigs();
   const { protocolStaking } = useURLConfigs();

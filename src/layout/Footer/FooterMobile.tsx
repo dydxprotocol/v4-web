@@ -6,8 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useShouldShowFooter } from '@/hooks/useShouldShowFooter';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -31,7 +31,7 @@ export const FooterMobile = () => {
 
   const marketId = useAppSelector(getCurrentMarketId);
 
-  const { disableConnectButton } = useComplianceState();
+  const { disableConnectButton } = usePerpetualsComplianceState();
   const { hasUnreadNotifications } = useNotifications();
 
   if (!useShouldShowFooter()) return null;

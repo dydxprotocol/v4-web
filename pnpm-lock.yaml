@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.2.0
-    version: 3.2.0
+    specifier: 3.3.0
+    version: 3.3.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.365
-    version: 1.1.365
+    specifier: 1.1.367
+    version: 1.1.367
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -1671,8 +1671,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.2.0:
-    resolution: {integrity: sha512-dHziRFVcyAzAP5xvi+IZaG9bhoYP7pK91DbfAe8DFuBf/DmUdhSKIOG+92MRe9LFISnl01b6hzP6Y/f3oqFV9A==}
+  /@dydxprotocol/v4-client-js@3.3.0:
+    resolution: {integrity: sha512-5chJrVsRJBL4Ba+/1r5R9IEd+ytNsTvq/YWKcnI9Je2WdUB/qBnMs89ifPauB7wAI++myqUZ1OeBVqQUW3pStQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1702,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.365:
-    resolution: {integrity: sha512-ea+HKdKlInDCgIVtaWhZrviDvAqSsbEBKo3aqrXWM2cpS0RV9VK0/SPO/NSru+tQJuBCeTji1yByR0gCHACFbg==}
+  /@dydxprotocol/v4-localization@1.1.367:
+    resolution: {integrity: sha512-lUGI2cSZy6BHm/jCIw0MN85WCGepy0CpAjXHrBAnR9QXmZGcTFN8LLfTC7XfbKWy/0tFNMcRc3HF26qNPIu2bg==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
@@ -16865,7 +16865,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -21370,7 +21370,7 @@ packages:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -22035,7 +22035,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -23554,7 +23554,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color
