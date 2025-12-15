@@ -8,17 +8,16 @@ import tw from 'twin.macro';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isDev } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { StatsigFlags } from '@/constants/statsig';
 
+// import { StatsigFlags } from '@/constants/statsig';
 import { addRewardsToLeaderboardEntry, useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNow } from '@/hooks/useNow';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
-import { useStatsigGateValue } from '@/hooks/useStatsig';
+// import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ChaosLabsIcon } from '@/icons/chaos-labs';
@@ -45,20 +44,22 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
     dispatch(markLaunchIncentivesSeen());
   }, [dispatch]);
 
-  const isSept2025RewardsBase = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
-  const isSept2025Rewards = isDev ? true : isSept2025RewardsBase;
-  if (isSept2025Rewards) {
-    return <September2025RewardsPanel />;
-  }
+  // NOTE: may need to remove this ff check
+  // const isSept2025RewardsBase = useStatsigGateValue(StatsigFlags.ffSeptember2025Rewards);
+  // const isSept2025Rewards = isSept2025RewardsBase;
+  // if (isSept2025Rewards) {
+  //   return <September2025RewardsPanel />;
+  // }
 
   return isNotTablet ? (
-    <$Panel
-      className={className}
-      slotHeader={<LaunchIncentivesTitle />}
-      slotRight={<EstimatedRewards />}
-    >
-      <LaunchIncentivesContent />
-    </$Panel>
+    // <$Panel
+    //   className={className}
+    //   slotHeader={<LaunchIncentivesTitle />}
+    //   slotRight={<EstimatedRewards />}
+    // >
+    //   <LaunchIncentivesContent />
+    // </$Panel>
+    <September2025RewardsPanel />
   ) : (
     <$Panel className={className}>
       <$Column>
