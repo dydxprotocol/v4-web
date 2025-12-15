@@ -4,7 +4,11 @@ import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/c
 
 import { type RootStore } from '@/state/_store';
 
-import { getSpotBars, SpotApiGetBarsQuery } from '@/clients/spotApi';
+import {
+  getSpotBars,
+  SpotApiGetBarsQuery,
+  SpotApiTokenPairStatisticsType,
+} from '@/clients/spotApi';
 import { waitForSelector } from '@/lib/asyncUtils';
 import {
   subscribeToSpotCandles,
@@ -56,11 +60,7 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
   },
 
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-    const { from, to } = periodParams;
-
-    // Clamp to parameter to current time to prevent API from returning future placeholder candles
-    const currentTimeSeconds = Math.floor(Date.now() / 1000) + 1;
-    const clampedTo = Math.min(to, currentTimeSeconds);
+    const { from, to, countBack } = periodParams;
 
     if (!symbolInfo.ticker) {
       const error = new Error('Symbol ticker is required');
@@ -76,7 +76,10 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
         tokenMint,
         resolution: interval,
         from,
-        to: clampedTo,
+        to,
+        countback: Math.min(countBack, 1500),
+        removeEmptyBars: true,
+        statsType: SpotApiTokenPairStatisticsType.Filtered,
       };
 
       const bars = await wrapAndLogBonsaiError(
