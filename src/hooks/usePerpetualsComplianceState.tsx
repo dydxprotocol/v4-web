@@ -55,12 +55,12 @@ export const usePerpetualsComplianceState = () => {
     const isGeoBlocked = geo.currentlyGeoBlocked && checkForGeo;
 
     if (firstStrikeStatuses.includes(complianceStatus) || isGeoBlocked) {
-      message = `${stringGetter({
+      message = stringGetter({
         key: STRING_KEYS.PERPETUALS_UNAVAILABLE_MESSAGE,
         params: {
           TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
         },
-      })}`;
+      });
     } else if (complianceStatus === ComplianceStatus.BLOCKED) {
       message = stringGetter({
         key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE_WITH_HELP,
