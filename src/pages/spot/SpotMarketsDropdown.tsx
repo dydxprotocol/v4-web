@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import styled from 'styled-components';
 
@@ -33,9 +33,12 @@ type SpotMarketsDropdownProps = {
   searchResults?: SpotHeaderToken[];
   isSearchLoading?: boolean;
   isTokenLoading?: boolean;
+  searchValue?: string;
+  className?: string;
+  isOpen?: boolean;
   onSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
-  className?: string;
+  onOpenChange?: (value: boolean) => void;
 };
 
 // TODO: spot localization
@@ -45,11 +48,13 @@ export const SpotMarketsDropdown = ({
   searchResults = [],
   isSearchLoading,
   isTokenLoading,
+  searchValue,
+  className,
+  isOpen = false,
   onSelect,
   onSearchTextChange,
-  className,
+  onOpenChange,
 }: SpotMarketsDropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const favoritedTokenAddresses = useAppSelector(getSpotFavorites);
   const favoritedSet = useMemo(() => new Set(favoritedTokenAddresses), [favoritedTokenAddresses]);
 
@@ -116,7 +121,7 @@ export const SpotMarketsDropdown = ({
   return (
     <$Popover
       open={isOpen}
-      onOpenChange={setIsOpen}
+      onOpenChange={onOpenChange}
       noBlur
       sideOffset={1}
       className={className}
@@ -148,7 +153,11 @@ export const SpotMarketsDropdown = ({
     >
       <div tw="flex h-full flex-col">
         <$Toolbar>
-          <$SearchInput placeholder="Search markets" onTextChange={onSearchTextChange} />
+          <$SearchInput
+            placeholder="Search markets"
+            onTextChange={onSearchTextChange}
+            value={searchValue}
+          />
         </$Toolbar>
         <$ScrollArea>
           {isSearchLoading ? (
@@ -162,7 +171,6 @@ export const SpotMarketsDropdown = ({
               getRowKey={(row) => row.tokenAddress}
               onRowAction={(_, row) => {
                 onSelect(row);
-                setIsOpen(false);
               }}
               label="Spot"
               columns={columns}

@@ -13,9 +13,12 @@ export type SpotHeaderProps = {
   searchResults?: SpotHeaderToken[];
   isSearchLoading?: boolean;
   isTokenLoading?: boolean;
+  className?: string;
+  isDropDownOpen?: boolean;
+  searchValue?: string;
   onTokenSelect: (token: SpotHeaderToken) => void;
   onSearchTextChange?: (value: string) => void;
-  className?: string;
+  onDropDownChange?: (value: boolean) => void;
 };
 
 export const SpotHeader = ({
@@ -23,9 +26,12 @@ export const SpotHeader = ({
   searchResults = [],
   isSearchLoading,
   isTokenLoading,
+  searchValue,
+  className,
+  isDropDownOpen,
   onTokenSelect,
   onSearchTextChange,
-  className,
+  onDropDownChange,
 }: SpotHeaderProps) => {
   return (
     <$Container className={className}>
@@ -36,6 +42,9 @@ export const SpotHeader = ({
         onSelect={onTokenSelect}
         onSearchTextChange={onSearchTextChange}
         isTokenLoading={isTokenLoading}
+        isOpen={isDropDownOpen}
+        onOpenChange={onDropDownChange}
+        searchValue={searchValue}
       />
       <VerticalSeparator fullHeight />
       <SpotMarketStatsRow stats={currentToken} isLoading={isTokenLoading} />
