@@ -81,6 +81,7 @@ export type SpotFormInputProps = {
     type: AlertType;
     message: string;
   };
+  showDeposit?: boolean;
 } & InputProps;
 
 // TODO: spot localization
@@ -97,6 +98,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
       tokenAmount,
       onInputTypeChange,
       onBalanceClick,
+      showDeposit = false,
       ...inputProps
     },
     ref
@@ -179,7 +181,7 @@ export const SpotFormInput = forwardRef<HTMLInputElement, SpotFormInputProps>(
               >
                 <Output tw="text-color-text-1" {...balanceOutputProps} />
               </button>
-              {side === SpotSide.BUY && (
+              {side === SpotSide.BUY && showDeposit && (
                 <IconButton
                   iconName={IconName.PlusCircle}
                   buttonStyle={ButtonStyle.WithoutBackground}

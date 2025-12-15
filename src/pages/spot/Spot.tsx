@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SpotSellInputType, SpotSide } from '@/bonsai/forms/spot';
 import { BonsaiCore } from '@/bonsai/ontology';
 import { keyBy } from 'lodash';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import { SpotWalletStatus } from '@/constants/account';
@@ -12,6 +12,7 @@ import {
   HORIZONTAL_PANEL_MIN_HEIGHT,
   TradeLayouts,
 } from '@/constants/layout';
+import { AppRoute } from '@/constants/routes';
 import { SPOT_DUST_USD_THRESHOLD } from '@/constants/spot';
 
 import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
@@ -47,7 +48,7 @@ import { SpotHeaderToken } from './types';
 // TODO: spot localization
 
 const SpotPage = () => {
-  const { tokenMint } = useParams<{ tokenMint: string }>();
+  const { currentSpotToken: tokenMint } = useCurrentSpotToken();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -86,10 +87,9 @@ const SpotPage = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const { data: searchResults, isPending: isSearchLoading } = useSpotTokenSearch(searchQuery);
-
-  useCurrentSpotToken();
 
   const holdings: SpotPositionItem[] = useMemo(() => {
     const positionsByMint = keyBy(walletPositions, 'tokenMint');
@@ -229,12 +229,13 @@ const SpotPage = () => {
   );
 
   const handleTokenSelect = (token: SpotHeaderToken) => {
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
+    setIsSearchOpen(false);
     setSearchQuery('');
   };
 
   const handlePositionSelect = (token: SpotPositionItem) => {
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
   };
 
   const handleTokenSearchChange = (value: string) => {
@@ -245,10 +246,14 @@ const SpotPage = () => {
     dispatch(spotFormActions.setSide(SpotSide.SELL));
     dispatch(spotFormActions.setSellInputType(SpotSellInputType.PERCENT));
     dispatch(spotFormActions.setSize('100'));
-    navigate(`/spot/${token.tokenAddress}`);
+    navigate(`${AppRoute.Spot}/${token.tokenAddress}`);
   };
 
-  if (!tokenMint) return null;
+  useEffect(() => {
+    if (!isSearchOpen) {
+      setSearchQuery('');
+    }
+  }, [isSearchOpen]);
 
   return (
     <$SpotLayout
@@ -264,6 +269,9 @@ const SpotPage = () => {
           isTokenLoading={isTokenMetadataLoading}
           onTokenSelect={handleTokenSelect}
           onSearchTextChange={handleTokenSearchChange}
+          isDropDownOpen={isSearchOpen}
+          onDropDownChange={setIsSearchOpen}
+          searchValue={searchQuery}
         />
       </header>
 

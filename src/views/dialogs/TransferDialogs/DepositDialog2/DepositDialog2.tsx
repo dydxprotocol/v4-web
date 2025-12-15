@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 import { mainnet } from 'viem/chains';
 
+import { AnalyticsEvents } from '@/constants/analytics';
 import { DepositDialog2Props, DialogProps, DialogTypes } from '@/constants/dialogs';
 import { CosmosChainId } from '@/constants/graz';
 import { STRING_KEYS } from '@/constants/localization';
@@ -22,6 +23,8 @@ import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { SourceAccount } from '@/state/wallet';
+
+import { track } from '@/lib/analytics/analytics';
 
 import { DepositFormContent, DepositFormState } from './DepositForm/DepositFormContainer';
 import { DepositStatus } from './DepositForm/DepositStatus';
@@ -109,6 +112,13 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     }
   };
 
+  useEffect(() => {
+    // Optimistic Deposit Initiated for tracking purposes
+    if (currentDepositType === 'spot') {
+      track(AnalyticsEvents.SpotDepositInitiated({}));
+    }
+  }, [currentDepositType]);
+
   useLayoutEffect(() => {
     if (sourceAccount.walletInfo?.connectorType === ConnectorType.Privy) {
       setIsOpen(false);
@@ -119,7 +129,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
   const tabs: SpotTabItem[] = [
     {
       value: 'perps',
-      label: 'Perpetuals',
+      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
       content: isLoadingBalances ? (
         <div tw="flex h-full w-full items-center justify-center overflow-hidden">
           <LoadingSpace tw="my-4" />
@@ -137,7 +147,7 @@ export const DepositDialog2 = ({ setIsOpen }: DialogProps<DepositDialog2Props>) 
     },
     {
       value: 'spot',
-      label: 'Spot',
+      label: stringGetter({ key: STRING_KEYS.SPOT }),
       content: <SpotDepositForm />,
     },
   ];
