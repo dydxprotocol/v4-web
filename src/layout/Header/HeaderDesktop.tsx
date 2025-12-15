@@ -7,7 +7,6 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { SPOT_DEFAULT_TOKEN_MINT } from '@/constants/spot';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -68,7 +67,7 @@ export const HeaderDesktop = () => {
         isSpotEnabled && {
           value: 'SPOT',
           label: stringGetter({ key: STRING_KEYS.SPOT }),
-          href: `${AppRoute.Spot}/${SPOT_DEFAULT_TOKEN_MINT}`,
+          href: AppRoute.Spot,
         },
         {
           value: 'MARKETS',

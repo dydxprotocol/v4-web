@@ -58,6 +58,8 @@ import { SpotActions } from './SpotActions';
 import { SubaccountActions } from './SubaccountActions';
 import { WalletActions } from './WalletActions';
 
+// TODO: spot localization
+
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();

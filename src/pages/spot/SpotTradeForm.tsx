@@ -131,6 +131,7 @@ export const SpotTradeForm = () => {
                 side={form.state.side}
                 tokenAmount={form.summary.amounts?.token ?? 0}
                 tokenSymbol={tokenMetadata?.symbol ?? ''}
+                showDeposit={form.inputData.walletStatus === SpotWalletStatus.Connected}
               />
               <QuickButtons
                 options={quickOptions}

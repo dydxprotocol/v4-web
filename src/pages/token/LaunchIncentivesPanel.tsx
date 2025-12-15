@@ -10,7 +10,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
-// import { StatsigFlags } from '@/constants/statsig';
 import { addRewardsToLeaderboardEntry, useChaosLabsFeeLeaderboard } from '@/hooks/rewards/hooks';
 import { CURRENT_SURGE_REWARDS_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
