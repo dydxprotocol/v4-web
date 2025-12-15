@@ -380,10 +380,13 @@ const $SpotLayout = styled.article<{
 
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
+  border: var(--default-border-width, 1px) solid var(--color-border) !important;
+  border-radius: 0.75rem !important;
 `;
 
 const $SideGridSection = styled($GridSection)`
   ${layoutMixins.withInnerHorizontalBorders}
+  background-color: var(--color-layer-1);
 `;
 
 const $Output = styled(Output)`

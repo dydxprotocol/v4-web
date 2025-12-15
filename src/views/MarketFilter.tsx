@@ -101,7 +101,7 @@ export const MarketFilter = forwardRef(
         }
         value={selectedFilter}
         onValueChange={onChangeFilter}
-        overflow="wrap"
+        overflow="scroll"
         slotBefore={unlaunchedMarketSwitch}
       />
     );
@@ -114,7 +114,7 @@ export const MarketFilter = forwardRef(
             onTextChange={onSearchTextChange}
           />
         </div>
-        <div tw="flex w-full items-center justify-start gap-0.5 overflow-hidden">
+        <div tw="relative flex w-full items-center justify-start gap-0.5 overflow-hidden overflow-x-auto">
           {filterToggles}
         </div>
       </$MarketFilter>

@@ -125,6 +125,7 @@ export const SpotMarketsDropdown = ({
       noBlur
       sideOffset={1}
       className={className}
+      align="start"
       slotTrigger={
         <$TriggerContainer $isOpen={isOpen}>
           <div tw="flex items-center gap-0.25">
@@ -236,7 +237,9 @@ const $Popover = styled(Popover)`
   max-width: 100vw;
 
   box-shadow: 0 0 0 1px var(--color-border);
-  border-radius: 0;
+
+  border: var(--default-border-width, 1px) solid var(--color-border);
+  border-radius: 0.75rem;
 
   &:focus-visible {
     outline: none;

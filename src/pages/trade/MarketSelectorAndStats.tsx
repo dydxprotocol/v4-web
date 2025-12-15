@@ -63,7 +63,7 @@ const $Container = styled.div`
   grid-auto-flow: column;
   justify-content: start;
   align-items: stretch;
-  background-color: var(--color-layer-1) !important; // TODO: figure out why this is needed
+  background-color: var(--color-layer-1);
 
   /* Completely override box-shadow border from withOuterAndInnerBorders */
   --border-color: transparent !important;

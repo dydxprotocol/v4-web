@@ -133,6 +133,7 @@ const Content = () => {
 
   // Check if we're on the trade page
   const isTradePage = matchPath(`${AppRoute.Trade}/*`, location.pathname) !== null;
+  const isSpotPage = matchPath(`${AppRoute.Spot}/*`, location.pathname) !== null;
 
   if (isSimpleUi) {
     const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
@@ -197,7 +198,7 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$AppContainer isTradePage={isTradePage}>
+      <$AppContainer isTradePage={isTradePage || isSpotPage}>
         <$Content
           isShowingHeader={isShowingHeader}
           isShowingFooter={isShowingFooter}
