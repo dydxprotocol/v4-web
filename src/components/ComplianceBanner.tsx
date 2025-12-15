@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react';
 
-import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonSize, ButtonStyle, ButtonType } from '@/constants/buttons';
+import { ButtonStyle, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -16,7 +15,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import breakpoints from '@/styles/breakpoints';
 
 import { AlertMessage } from './AlertMessage';
-import { Button } from './Button';
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
 import { TermsOfUseLink } from './TermsOfUseLink';
@@ -25,7 +23,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   const [showLess, setShowLess] = useState(false);
   const complianceBannerRef = useRef<HTMLDivElement>(null);
   const stringGetter = useStringGetter();
-  const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
+  const { complianceMessage, showComplianceBanner, showRestrictionWarning } =
     usePerpetualsComplianceState();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = useSimpleUiEnabled();
@@ -57,13 +55,6 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
     <span>{complianceMessage}</span>
   );
 
-  const action =
-    complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY ? (
-      <Button tw="w-fit" size={isTablet ? ButtonSize.XSmall : ButtonSize.Small} onClick={() => {}}>
-        {stringGetter({ key: STRING_KEYS.ACTION_REQUIRED })} →
-      </Button>
-    ) : null;
-
   const toggleShowLess = () => {
     setShowLess((prev) => !prev);
   };
@@ -79,10 +70,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         {showLess ? (
           stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
         ) : (
-          <div tw="flex flex-col gap-0.5">
-            {complianceContent}
-            {action}
-          </div>
+          <div tw="flex flex-col gap-0.5">{complianceContent}</div>
         )}
 
         <IconButton
@@ -109,14 +97,9 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         />
       )}
 
-      {showLess && isTablet ? (
-        stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
-      ) : (
-        <>
-          {complianceContent}
-          {action}
-        </>
-      )}
+      {showLess && isTablet
+        ? stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
+        : complianceContent}
     </$ComplianceBanner>
   );
 };
