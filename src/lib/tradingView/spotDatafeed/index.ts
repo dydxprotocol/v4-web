@@ -77,7 +77,7 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
         resolution: interval,
         from,
         to,
-        countback: countBack,
+        countback: Math.min(countBack, 1500),
         removeEmptyBars: true,
         statsType: SpotApiTokenPairStatisticsType.Filtered,
       };
