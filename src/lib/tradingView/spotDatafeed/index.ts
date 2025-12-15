@@ -89,7 +89,7 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
 
       const barsResponse = await wrapAndLogBonsaiError(
         () => getSpotBars(spotApiUrl, query),
-        'getSpotBars'
+        'spot/getSpotBars'
       )();
 
       const bars = transformBarsResponseToBars(barsResponse);
