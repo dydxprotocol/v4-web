@@ -128,6 +128,9 @@ const Content = () => {
 
   const { dialogAreaRef } = useDialogArea() ?? {};
 
+  // Check if we're on the trade page
+  const isTradePage = matchPath(`${AppRoute.Trade}/*`, location.pathname) !== null;
+
   if (isSimpleUi) {
     const matchMarkets = matchPath(AppRoute.Markets, location.pathname);
     const backgroundColor =
@@ -191,7 +194,7 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$AppContainer>
+      <$AppContainer isTradePage={isTradePage}>
         <$Content
           isShowingHeader={isShowingHeader}
           isShowingFooter={isShowingFooter}
@@ -354,9 +357,16 @@ function shouldForwardProp(propName: string, target: WebTarget): boolean {
   return true;
 }
 
-const $AppContainer = styled.div`
+const $AppContainer = styled.div<{ isTradePage?: boolean }>`
   width: 100%;
-  max-width: 1600px;
+  ${({ isTradePage }) =>
+    isTradePage
+      ? css`
+          max-width: 1800px;
+        `
+      : css`
+          max-width: 1600px;
+        `}
   margin-left: auto;
   margin-right: auto;
 `;
@@ -417,14 +427,20 @@ const $Content = styled.div<{
   --stickyArea0-background: transparent;
   --stickyArea-background: transparent;
   --stickyArea0-topHeight: var(--page-currentHeaderHeight);
-  --stickyArea0-topGap: var(--border-width);
-  --stickyArea0-bottomGap: var(--border-width);
+  --stickyArea0-topGap: 0;
+  --stickyArea0-bottomGap: 0;
   --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
 
   background: transparent;
 
   ${layoutMixins.withOuterAndInnerBorders}
   display: grid;
+
+  /* Remove borders from all grid children to prevent sticky borders */
+  > * {
+    --border-color: transparent;
+    box-shadow: none;
+  }
 
   ${({ showRestrictionWarning, isShowingHeader }) => css`
     grid-template:

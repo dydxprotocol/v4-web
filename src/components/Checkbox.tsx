@@ -44,8 +44,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   </div>
 );
 const $Root = styled(Root)`
-  --checkbox-backgroundColor: var(--color-layer-0);
-  --checkbox-borderColor: var(--color-accent-faded);
+  --checkbox-backgroundColor: var(--color-layer-2);
+  --checkbox-borderColor: var(--color-layer-7);
 
   min-width: 1.25rem;
   height: 1.25rem;
@@ -56,11 +56,13 @@ const $Root = styled(Root)`
 
   &[data-state='checked'] {
     --checkbox-backgroundColor: var(--color-accent);
+    --checkbox-borderColor: var(--color-accent);
   }
 
   &[data-disabled] {
     cursor: not-allowed;
     --checkbox-backgroundColor: var(--color-layer-1);
+    --checkbox-borderColor: var(--color-border-faded);
   }
 `;
 const $Label = styled.label<{ disabled?: boolean }>`

@@ -217,10 +217,18 @@ const $Header = styled.header`
   height: var(--page-currentHeaderHeight);
   margin-top: 2rem;
   margin-bottom: 2rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
+  width: 100%;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 
   grid-area: Header;
+
+  /* Override border from withOuterAndInnerBorders */
+  --border-color: transparent;
+  box-shadow: none;
 
   display: grid;
   align-items: stretch;

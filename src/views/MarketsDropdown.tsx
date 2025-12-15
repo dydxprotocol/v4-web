@@ -333,6 +333,7 @@ export const MarketsDropdown = memo(
         noBlur
         onOpenChange={setIsOpen}
         sideOffset={1}
+        align="start"
         slotTrigger={
           <>
             {triggerBackground}
@@ -412,10 +413,12 @@ const $Popover = styled(Popover)`
 
   width: var(--marketsDropdown-openWidth);
 
-  max-width: 100vw;
+  /* Constrain to app container max-width instead of viewport width */
+  /* Ensure popover respects the app container's max-width (1800px for trade pages) */
+  max-width: min(100vw, 1800px);
 
   box-shadow: 0 5px 15px 3px rgba(0, 0, 0, 0.2);
-  border-radius: 0;
+  border-radius: 0.75rem;
 
   &:focus-visible {
     outline: none;

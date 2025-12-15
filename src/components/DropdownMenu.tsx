@@ -132,6 +132,7 @@ const $DropdownIcon = styled.span`
   font-size: 0.375em;
   transition: transform 0.3s var(--ease-out-expo);
   align-items: center;
+  color: var(--trigger-textColor, var(--color-text-2));
 
   ${$Trigger}[data-state='open'] & {
     transform: scaleY(-1);

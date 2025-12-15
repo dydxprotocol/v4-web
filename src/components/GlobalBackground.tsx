@@ -18,13 +18,13 @@ const GlobalBackground: React.FC = () => {
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
 
-  const gradient = `linear-gradient(to bottom, rgba(${r}, ${g}, ${b}, 0), rgba(${r}, ${g}, ${b}, 0.5), rgba(${r}, ${g}, ${b}, 0))`;
+  const gradient = `linear-gradient(to bottom, rgba(${r}, ${g}, ${b}, 0.5), rgba(${r}, ${g}, ${b}, 0))`;
 
   return (
     <div
       className="pointer-events-none fixed left-0 right-0 z-0 h-[42rem] max-h-[60vh] w-full"
       style={{
-        top: '5rem',
+        top: '0',
         background: gradient,
       }}
     />

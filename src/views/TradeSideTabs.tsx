@@ -124,7 +124,7 @@ const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
   > div:first-child > header button[role='tab'],
   header:first-of-type button[role='tab'] {
     border-radius: 9999px !important; /* Fully rounded for pill shape */
-    background-color: var(--trigger-backgroundColor) !important;
+    background-color: transparent !important;
     color: var(--trigger-textColor) !important;
     opacity: 0.5 !important; /* 50% opacity for unselected tabs */
     transition:
@@ -140,7 +140,7 @@ const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
     }
 
     &:hover:not([data-state='active']) {
-      background-color: var(--trigger-hover-backgroundColor) !important;
+      background-color: transparent !important;
       color: var(--trigger-hover-textColor) !important;
       opacity: 0.5 !important; /* Keep 50% opacity on hover for unselected */
     }

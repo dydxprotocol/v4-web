@@ -396,7 +396,7 @@ const $Group = styled.section`
 
   ${layoutMixins.column}
 
-  color: var(--color-text-0);
+  color: var(--color-text-2);
 `;
 
 const $GroupHeader = styled.header`
@@ -489,6 +489,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
 
   --item-checked-textColor: var(--navigationMenu-item-checked-textColor);
   --item-highlighted-textColor: var(--navigationMenu-item-highlighted-textColor);
+  color: var(--color-text-2);
   ${layoutMixins.scrollSnapItem}
 
   min-height: var(--navigationMenu-item-height);
@@ -544,6 +545,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
 const $Icon = styled(Icon)`
   font-size: 0.375em;
   transition: rotate 0.3s var(--ease-out-expo);
+  color: var(--color-text-2);
 
   ${$List}[data-orientation="menu"] & {
     rotate: -0.25turn;

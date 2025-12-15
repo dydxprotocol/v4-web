@@ -95,9 +95,9 @@ const TradePage = () => {
       isHorizontalPanelOpen={isHorizontalPanelOpen}
       horizontalPanelHeightPx={horizontalPanelHeight}
     >
-      <header tw="[grid-area:Top]">
+      <$TopHeader>
         <MarketSelectorAndStats />
-      </header>
+      </$TopHeader>
 
       <$GridSection gridArea="Side" tw="grid-rows-[auto_minmax(0,1fr)]">
         <AccountInfo />
@@ -220,6 +220,18 @@ const $TradeLayoutMobile = styled.article`
 const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
   gap: 0.5rem;
+`;
+
+const $TopHeader = styled.header`
+  grid-area: Top;
+
+  /* Remove box-shadow border from withOuterAndInnerBorders */
+  --border-color: transparent !important;
+  box-shadow: none !important;
+
+  /* Ensure rounded corners */
+  border-radius: 0.75rem;
+  overflow: hidden;
 `;
 
 const $CoverUpTradingView = styled.div`

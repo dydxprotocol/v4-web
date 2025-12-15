@@ -234,7 +234,6 @@ export const popoverMixins = {
       &[data-highlighted] // @radix-ui
       {
         filter: brightness(var(--hover-filter-base));
-        background-color: var(--item-highlighted-backgroundColor, var(--color-layer-2));
         color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
         outline: none;
       }
@@ -243,10 +242,6 @@ export const popoverMixins = {
     &[data-state='checked'], // @radix-ui
     &[aria-current='page'] // <a>
     {
-      background-color: var(
-        --item-checked-backgroundColor,
-        var(--trigger-selected-color, var(--popover-backgroundColor, inherit))
-      );
       color: var(--item-checked-textColor, var(--trigger-textColor, inherit));
     }
   `,

@@ -363,7 +363,7 @@ export const PlaceOrderButtonAndReceipt = ({
           ].filter(isTruthy)}
         </$WithSeparators>
       </div>
-      <WithDetailsReceipt detailItems={items} hideReceipt={!isReceiptOpen}>
+      <$WithDetailsReceiptStyled detailItems={items} hideReceipt={!isReceiptOpen}>
         {!canAccountTrade ? (
           <OnboardingTriggerButton size={ButtonSize.Base} />
         ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
@@ -371,7 +371,7 @@ export const PlaceOrderButtonAndReceipt = ({
         ) : (
           submitButton
         )}
-      </WithDetailsReceipt>
+      </$WithDetailsReceiptStyled>
     </$Footer>
   );
 };
@@ -385,6 +385,10 @@ const $Footer = styled.footer`
 
 const $WithSeparators = styled(WithSeparators)`
   --separatorHeight-padding: 0.5rem;
+`;
+
+const $WithDetailsReceiptStyled = styled(WithDetailsReceipt)`
+  --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
 const $HideButton = styled(ToggleButton)`
