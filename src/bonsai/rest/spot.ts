@@ -52,7 +52,7 @@ export function setUpTokenMetadataQuery(store: RootStore) {
       queryKey: ['spot', 'tokenMetadata', currentSpotToken],
       queryFn: wrapAndLogBonsaiError(
         () => getSpotTokenMetadata(endpoint, currentSpotToken),
-        'tokenMetadata'
+        'spot/tokenMetadata'
       ),
       refetchInterval: timeUnits.minute * 5,
       staleTime: timeUnits.minute * 5,
@@ -64,8 +64,8 @@ export function setUpTokenMetadataQuery(store: RootStore) {
         store.dispatch(setSpotTokenMetadata(queryResultToLoadable(result)));
       } catch (e) {
         logBonsaiError(
-          'setUpTokenMetadataQuery',
-          'Error handling result from react query',
+          'spot/setUpTokenMetadataQuery',
+          'Error handling result from react query store effect',
           e,
           result
         );
@@ -90,7 +90,7 @@ export function setUpSolPriceQuery(store: RootStore) {
       queryKey: ['spotTokenPrice', SOL_MINT_ADDRESS],
       queryFn: wrapAndLogBonsaiError(
         () => getSpotTokenUsdPrice(params.endpoint, SOL_MINT_ADDRESS),
-        'solPrice'
+        'spot/solPrice'
       ),
       refetchInterval: timeUnits.second * 10,
       staleTime: timeUnits.second * 10,
@@ -101,7 +101,12 @@ export function setUpSolPriceQuery(store: RootStore) {
       try {
         store.dispatch(setSpotSolPrice(queryResultToLoadable(result)));
       } catch (e) {
-        logBonsaiError('setUpSolPriceQuery', 'Error handling result from react query', e, result);
+        logBonsaiError(
+          'spot/setUpSolPriceQuery',
+          'Error handling result from react query store effect',
+          e,
+          result
+        );
       }
     });
 
@@ -123,7 +128,7 @@ export function setUpSpotTokenPriceQuery(store: RootStore) {
       queryKey: ['spotTokenPrice', params.currentSpotToken],
       queryFn: wrapAndLogBonsaiError(
         () => getSpotTokenUsdPrice(params.endpoint, params.currentSpotToken),
-        'tokenPrice'
+        'spot/tokenPrice'
       ),
       refetchInterval: timeUnits.second * 10,
       staleTime: timeUnits.second * 10,
@@ -135,8 +140,8 @@ export function setUpSpotTokenPriceQuery(store: RootStore) {
         store.dispatch(setSpotTokenPrice(queryResultToLoadable(result)));
       } catch (e) {
         logBonsaiError(
-          'setUpSpotTokenPriceQuery',
-          'Error handling result from react query',
+          'spot/setUpSpotTokenPriceQuery',
+          'Error handling result from react query store effect',
           e,
           result
         );
@@ -173,7 +178,7 @@ export function setUpPortfolioTradesQuery(store: RootStore) {
       queryKey: ['spot', 'portfolioTrades', walletAddress],
       queryFn: wrapAndLogBonsaiError(
         () => getSpotPortfolioTrades(endpoint, walletAddress),
-        'portfolioTrades'
+        'spot/portfolioTrades'
       ),
       refetchInterval: timeUnits.minute * 2,
       staleTime: timeUnits.minute * 2,
@@ -185,8 +190,8 @@ export function setUpPortfolioTradesQuery(store: RootStore) {
         store.dispatch(setSpotPortfolioTrades(queryResultToLoadable(result)));
       } catch (e) {
         logBonsaiError(
-          'setUpPortfolioTradesQuery',
-          'Error handling result from react query',
+          'spot/setUpPortfolioTradesQuery',
+          'Error handling result from react query store effect',
           e,
           result
         );
