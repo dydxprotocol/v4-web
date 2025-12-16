@@ -9,8 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
@@ -44,7 +44,7 @@ export const HeaderDesktop = () => {
   const dispatch = useAppDispatch();
   const { dydxAccounts } = useAccounts();
   const onboardingState = useAppSelector(getOnboardingState);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const isSpotEnabled = useEnableSpot();
   const currentTheme = useAppSelector(getAppTheme);
 
