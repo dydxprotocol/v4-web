@@ -9,8 +9,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { IndexerPositionSide } from '@/types/indexer/indexerApiGen';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -60,7 +60,7 @@ export const PositionsTriggersCell = ({
   const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   const onViewOrders = () => onViewOrdersClick(marketId);
 

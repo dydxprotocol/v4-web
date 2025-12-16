@@ -3,11 +3,11 @@ import { ComplianceStates } from '@/constants/compliance';
 import { calculateShouldRenderTriggersInPositionsTable } from '@/state/accountCalculators';
 import { useAppSelector } from '@/state/appTypes';
 
-import { useComplianceState } from './useComplianceState';
+import { usePerpetualsComplianceState } from './usePerpetualsComplianceState';
 
 export const useShouldShowTriggers = () => {
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   return shouldRenderTriggers && complianceState === ComplianceStates.FULL_ACCESS;
 };

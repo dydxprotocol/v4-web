@@ -3,15 +3,18 @@ import { ComplianceState } from '@/state/raw';
 import { Compliance, ComplianceStatus } from '../types/summaryTypes';
 
 export function calculateCompliance({
+  geoHeaders,
   geo: geoBase,
   localAddressScreenV2,
   sourceAddressScreenV2,
 }: ComplianceState): Compliance {
-  const rawGeo = geoBase.data;
   const geo = {
-    currentlyGeoBlocked: rawGeo == null ? false : rawGeo.blocked && !rawGeo.whitelisted,
-    currentCountry: rawGeo?.country,
+    currentlyGeoBlocked: geoBase.data?.whitelisted
+      ? false
+      : geoHeaders.data?.status === 'restricted',
+    currentCountry: geoHeaders.data?.country,
   };
+
   if (sourceAddressScreenV2.data?.status === ComplianceStatus.BLOCKED) {
     return {
       geo,
@@ -19,12 +22,14 @@ export function calculateCompliance({
       updatedAt: sourceAddressScreenV2.data.updatedAt,
     };
   }
+
   if (localAddressScreenV2.data?.errors != null) {
     return {
       geo,
       status: ComplianceStatus.UNKNOWN,
     };
   }
+
   return {
     geo,
     ...(localAddressScreenV2.data ?? {

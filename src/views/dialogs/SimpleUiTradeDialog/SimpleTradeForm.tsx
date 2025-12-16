@@ -22,7 +22,7 @@ import {
 
 import { useTradeErrors } from '@/hooks/TradingForm/useTradeErrors';
 import { TradeFormSource, useTradeForm } from '@/hooks/TradingForm/useTradeForm';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -68,7 +68,7 @@ export const SimpleTradeForm = ({
   const displayUnit = useAppSelector(getSelectedDisplayUnit);
   const tradeValues = useAppSelector(getTradeFormValues);
   const fullFormSummary = useAppSelector(getTradeFormSummary);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const { summary } = fullFormSummary;
   const midPrice = useAppSelector(BonsaiHelpers.currentMarket.midPrice.data);
   const buyingPower = useAppSelector(BonsaiHelpers.currentMarket.account.buyingPower);
