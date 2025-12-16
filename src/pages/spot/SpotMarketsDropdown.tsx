@@ -179,10 +179,6 @@ export const SpotMarketsDropdown = ({
               initialPageSize={20}
               shouldResetOnTotalRowsChange
               getIsRowPinned={(row) => favoritedSet.has(row.tokenAddress)}
-              defaultSortDescriptor={{
-                column: 'volume24h',
-                direction: 'descending',
-              }}
               slotEmpty={
                 <>
                   <Icon iconName={IconName.Coins} tw="text-[3em]" />
@@ -254,6 +250,7 @@ const $ScrollArea = styled.div`
   position: relative;
   flex: 1;
   min-height: 0; /* Allow flex item to shrink below content size */
+  height: 100%;
 `;
 
 const $Table = styled(Table)`

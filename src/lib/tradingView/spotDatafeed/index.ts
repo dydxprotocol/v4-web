@@ -4,7 +4,13 @@ import type { DatafeedConfiguration, IBasicDataFeed } from 'public/tradingview/c
 
 import { type RootStore } from '@/state/_store';
 
-import { getSpotBars, SpotApiGetBarsQuery } from '@/clients/spotApi';
+import {
+  getSpotBars,
+  SpotApiGetBarsQuery,
+  SpotApiHistoricalBarsStatus,
+  SpotApiTokenPairStatisticsType,
+  transformBarsResponseToBars,
+} from '@/clients/spotApi';
 import { waitForSelector } from '@/lib/asyncUtils';
 import {
   subscribeToSpotCandles,
@@ -50,17 +56,20 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
   resolveSymbol: async (tokenMint, onSymbolResolvedCallback) => {
     setTimeout(async () => {
       const tokenPrice = await waitForSelector(store, (s) => BonsaiCore.spot.tokenPrice.data(s));
-      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice);
+      const { symbol, tokenNameFull } = await waitForSelector(store, (s) =>
+        BonsaiCore.spot.tokenMetadata.data(s)
+      );
+      const symbolInfo = createSpotSymbolInfo(tokenMint, tokenPrice, tokenNameFull, symbol);
       onSymbolResolvedCallback(symbolInfo);
     }, 0);
   },
 
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-    const { from, to } = periodParams;
+    const { from, to, countBack } = periodParams;
 
     // Clamp to parameter to current time to prevent API from returning future placeholder candles
-    const currentTimeSeconds = Math.floor(Date.now() / 1000) + 1;
-    const clampedTo = Math.min(to, currentTimeSeconds);
+    // const currentTimeSeconds = Math.floor(Date.now() / 1000) + 1;
+    // const clampedTo = Math.min(to, currentTimeSeconds);
 
     if (!symbolInfo.ticker) {
       const error = new Error('Symbol ticker is required');
@@ -76,15 +85,20 @@ export const getSpotDatafeed = (store: RootStore, spotApiUrl: string): IBasicDat
         tokenMint,
         resolution: interval,
         from,
-        to: clampedTo,
+        to,
+        countback: Math.min(countBack, 1500),
+        removeEmptyBars: true,
+        statsType: SpotApiTokenPairStatisticsType.Filtered,
       };
 
-      const bars = await wrapAndLogBonsaiError(
+      const barsResponse = await wrapAndLogBonsaiError(
         () => getSpotBars(spotApiUrl, query),
-        'getSpotBars'
+        'spot/getSpotBars'
       )();
 
-      if (bars.length === 0) {
+      const bars = transformBarsResponseToBars(barsResponse);
+
+      if (barsResponse.data.s === SpotApiHistoricalBarsStatus.NO_DATA) {
         onHistoryCallback([], { noData: true });
       } else {
         const chartBars = transformSpotCandlesForChart(bars);

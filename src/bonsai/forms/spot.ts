@@ -1,7 +1,11 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import { SpotWalletStatus } from '@/constants/account';
-import { MIN_SOL_RESERVE } from '@/constants/spot';
+import {
+  DEFAULT_PRIORITY_FEE_LAMPORTS,
+  DEFAULT_SLIPPAGE_BPS,
+  MIN_SOL_RESERVE,
+} from '@/constants/spot';
 
 import { SpotApiCreateTransactionRequest, SpotApiSide, SpotApiTradeRoute } from '@/clients/spotApi';
 import { calc, mapIfPresent } from '@/lib/do';
@@ -151,6 +155,8 @@ function calculateSummary(state: SpotFormState, inputData: SpotFormInputData): S
             inAmount,
             pool: pairAddress,
             tradeRoute,
+            maxSlippageBps: DEFAULT_SLIPPAGE_BPS,
+            priorityFeeLamports: DEFAULT_PRIORITY_FEE_LAMPORTS,
           };
         }
       );
@@ -172,6 +178,8 @@ function calculateSummary(state: SpotFormState, inputData: SpotFormInputData): S
           inAmount,
           pool: pairAddress,
           tradeRoute,
+          maxSlippageBps: DEFAULT_SLIPPAGE_BPS,
+          priorityFeeLamports: DEFAULT_PRIORITY_FEE_LAMPORTS,
         };
       }
     );
