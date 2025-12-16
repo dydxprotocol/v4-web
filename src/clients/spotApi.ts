@@ -206,6 +206,11 @@ export type SpotApiGetBarsQuery = {
   countback?: number;
 };
 
+export enum SpotApiHistoricalBarsStatus {
+  OK = 'ok',
+  NO_DATA = 'no_data',
+}
+
 export interface SpotApiGetBarsResponseData {
   buyVolume: string[];
   buyers: number[];
@@ -223,7 +228,7 @@ export interface SpotApiGetBarsResponseData {
   transactions: number[];
   volume: string[];
   volumeNativeToken: string[];
-  s: string;
+  s: SpotApiHistoricalBarsStatus;
   pair: Record<string, any>;
 }
 
@@ -380,8 +385,7 @@ export const transformBarsResponseToBars = (
 
 export const getSpotBars = async (apiUrl: string, query: SpotApiGetBarsQuery) => {
   const client = getOrCreateSpotApiClient(apiUrl);
-  const response = await client.getBars(query);
-  return transformBarsResponseToBars(response);
+  return client.getBars(query);
 };
 
 export const getSpotPortfolioTrades = async (apiUrl: string, address: string) => {
