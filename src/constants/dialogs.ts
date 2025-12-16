@@ -46,7 +46,6 @@ export type ExternalLinkDialogProps = {
 };
 export type ExternalNavStrideDialogProps = {};
 export type FillDetailsDialogProps = { fillId: string };
-export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
@@ -144,7 +143,6 @@ export const DialogTypes = unionize(
     ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
     ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
     FillDetails: ofType<FillDetailsDialogProps>(),
-    GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
     ManageAccount: ofType<ManageAccountDialogProps>(),
