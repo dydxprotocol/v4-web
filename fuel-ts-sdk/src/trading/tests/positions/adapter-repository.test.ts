@@ -73,7 +73,7 @@ describe('Position Repository Adapter', () => {
       expect(mockRequest).toHaveBeenCalledTimes(1);
       expect(positions).toHaveLength(2);
       expect(positions[0]?.id).toBe('pos-001');
-      expect(positions[0]?.collateralAmount).toBe(BigInt(1000000));
+      expect(positions[0]?.collateralAmount.value).toBe(BigInt(1000000));
     });
 
     it('should apply limit and offset options', async () => {
