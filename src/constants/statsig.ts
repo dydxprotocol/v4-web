@@ -18,6 +18,7 @@ export enum StatsigFlags {
   ffSwapEnabled = 'ff_swap_ui_web',
   ffSpot = 'ff_spot',
   abPopupDeposit = 'ab_popup_deposit',
+  ffSpotBonk = 'ff_spot_bonk',
 }
 
 export enum CustomFlags {

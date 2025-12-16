@@ -198,7 +198,7 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <$AppContainer isTradePage={isTradePage || isSpotPage}>
+      <$AppContainer>
         <$Content
           isShowingHeader={isShowingHeader}
           isShowingFooter={isShowingFooter}
@@ -207,7 +207,7 @@ const Content = () => {
           <GlobalBackground />
           {isShowingHeader && <HeaderDesktop />}
           <RestrictionWarning />
-          <$Main>
+          <$Main isTradePage={isTradePage || isSpotPage}>
             <Suspense fallback={<LoadingSpace id="main" />}>
               <Routes>
                 <Route path={`${AppRoute.Referrals}/*`} element={<AffiliatesPage />} />
@@ -362,16 +362,9 @@ function shouldForwardProp(propName: string, target: WebTarget): boolean {
   return true;
 }
 
-const $AppContainer = styled.div<{ isTradePage?: boolean }>`
+const $AppContainer = styled.div`
   width: 100%;
-  ${({ isTradePage }) =>
-    isTradePage
-      ? css`
-          max-width: 1800px;
-        `
-      : css`
-          max-width: 1600px;
-        `}
+  max-width: 1800px;
   margin-left: auto;
   margin-right: auto;
 `;
@@ -461,8 +454,23 @@ const $Content = styled.div<{
   transition: 0.3s var(--ease-out-expo);
 `;
 
-const $Main = styled.main`
+const $Main = styled.main<{ isTradePage?: boolean }>`
   ${layoutMixins.contentSectionAttached}
+
+  ${({ isTradePage }) =>
+    isTradePage
+      ? css`
+          width: 100%;
+          max-width: 1800px;
+        `
+      : css`
+          width: 100%;
+          max-width: 1600px;
+        `}
+
+  margin-left: auto;
+  margin-right: auto;
+
   box-shadow: none;
 
   grid-area: Main;
@@ -476,8 +484,8 @@ const $Main = styled.main`
   padding-right: 1rem;
 
   /* Override min-width from contentSectionAttached to allow proper grid constraints */
-  min-width: 0;
-  max-width: 100%;
+  /* min-width: 0;
+  max-width: 100%; */
   overflow-x: hidden;
 `;
 

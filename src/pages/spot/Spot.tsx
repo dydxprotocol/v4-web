@@ -16,6 +16,7 @@ import { AppRoute } from '@/constants/routes';
 import { SPOT_DUST_USD_THRESHOLD } from '@/constants/spot';
 
 import { useCurrentSpotToken } from '@/hooks/useCurrentSpotToken';
+import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useSpotTokenSearch } from '@/hooks/useSpotTokenSearch';
 
 import breakpoints from '@/styles/breakpoints';
@@ -70,6 +71,7 @@ const SpotPage = () => {
     useAppSelector(BonsaiCore.spot.portfolioTrades.loading) !== 'success' && canLoadSpotData;
 
   const horizontalPanelHeightPxBase = useAppSelector(getHorizontalPanelHeightPx);
+
   const setPanelHeight = useCallback(
     (h: number) => {
       dispatch(setHorizontalPanelHeightPx(h));
@@ -254,6 +256,12 @@ const SpotPage = () => {
       setSearchQuery('');
     }
   }, [isSearchOpen]);
+
+  const isSpotEnabled = useEnableSpot();
+  if (!isSpotEnabled) {
+    navigate(AppRoute.Trade);
+    return null;
+  }
 
   return (
     <$SpotLayout
