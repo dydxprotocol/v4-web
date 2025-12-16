@@ -405,10 +405,13 @@ const $Popover = styled(Popover)`
   display: flex;
   flex-direction: column;
 
-  height: calc(
+  /* Use max-height instead of height to allow the popover to be smaller if needed */
+  /* Add buffer space (4rem) to ensure pagination controls and bottom rows are visible */
+  max-height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(
         --page-footer-height
-      ) - var(--restriction-warning-currentHeight)
+      ) - var(--restriction-warning-currentHeight) -
+      4rem
   );
 
   width: var(--marketsDropdown-openWidth);
@@ -476,7 +479,8 @@ const $TriggerFlag = styled.div`
 const $ScrollArea = styled.div`
   overflow: scroll;
   position: relative;
-  height: 100%;
+  flex: 1;
+  min-height: 0; /* Allow flex item to shrink below content size */
 `;
 
 const $Table = styled(Table)`

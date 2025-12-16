@@ -43,21 +43,21 @@ export const TradeSideTabs = ({ sharedContent, className }: ElementProps & Style
 
   return (
     <$Container className={className}>
-      <$HeaderSection>
+      <$MarginModeSection>
         <MarginModeSelector />
-        <$TradeSideTabs
-          fullWidthTabs
-          dividerStyle="none"
-          activeTab={side}
-          value={side}
-          items={items}
-          onValueChange={(newSide: OrderSide) => {
-            dispatch(tradeFormActions.setSide(newSide));
-          }}
-          disabled={!allowChangingOrderType}
-          sharedContent={sharedContent}
-        />
-      </$HeaderSection>
+      </$MarginModeSection>
+      <$TradeSideTabs
+        fullWidthTabs
+        dividerStyle="none"
+        activeTab={side}
+        value={side}
+        items={items}
+        onValueChange={(newSide: OrderSide) => {
+          dispatch(tradeFormActions.setSide(newSide));
+        }}
+        disabled={!allowChangingOrderType}
+        sharedContent={sharedContent}
+      />
     </$Container>
   );
 };
@@ -73,23 +73,21 @@ const $Container = styled.div`
   flex-direction: column;
 `;
 
-const $HeaderSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
+const $MarginModeSection = styled.div`
+  flex-shrink: 0;
+  padding: 0.5rem 0.5rem 0 0.5rem;
   background-color: var(--color-layer-1);
   border-top-right-radius: 0.75rem;
   border-top-left-radius: 0.75rem;
-  flex: 1;
-  min-height: 0;
 `;
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
   --tabs-height: 2.625rem;
   overflow: visible;
-  padding: 0;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
 
   /* Base styles for all tabs */
   --trigger-backgroundColor: #12121280; /* #121212 at 50% opacity */

@@ -81,6 +81,12 @@ const $PriceChart = styled.div<{ isChartReady?: boolean }>`
 
   height: 100%;
 
+  ${({ isChartReady }) =>
+    !isChartReady &&
+    css`
+      background-color: var(--color-layer-1);
+    `}
+
   #tv-price-chart {
     ${({ isChartReady }) =>
       !isChartReady &&

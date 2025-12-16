@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { Separator } from '@radix-ui/react-separator';
 import styled, { css } from 'styled-components';
 
-const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
+const StyledSeparator = styled(Separator)<{ $fullHeight: boolean; $transparent?: boolean }>`
   flex: 0 !important;
   z-index: -1;
 
@@ -18,7 +18,8 @@ const StyledSeparator = styled(Separator)<{ $fullHeight: boolean }>`
     align-self: center;
     width: 0;
     margin: 0 !important;
-    border-right: solid var(--border-width, var(--default-border-width)) var(--color-border);
+    border-right: solid var(--border-width, var(--default-border-width))
+      ${({ $transparent }) => ($transparent ? 'transparent' : 'var(--color-border)')};
 
     ${({ $fullHeight }) =>
       $fullHeight
@@ -35,16 +36,19 @@ export const VerticalSeparator = ({
   className,
   decorative = false,
   fullHeight = false,
+  transparent = false,
 }: {
   className?: string;
   decorative?: boolean;
   fullHeight?: boolean;
+  transparent?: boolean;
 }) => (
   <StyledSeparator
     className={className}
     orientation="vertical"
     decorative={decorative}
     $fullHeight={fullHeight}
+    $transparent={transparent}
   />
 );
 

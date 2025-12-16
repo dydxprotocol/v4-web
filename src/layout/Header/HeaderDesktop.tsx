@@ -135,16 +135,16 @@ export const HeaderDesktop = () => {
         <LogoShortIcon />
       </$LogoLink>
 
-      <VerticalSeparator />
+      <VerticalSeparator transparent />
 
       <$NavBefore>
         <$LanguageSelector sideOffset={16}>
           <Icon iconName={IconName.Translate} size="1.25em" />
         </$LanguageSelector>
-        <VerticalSeparator />
+        <VerticalSeparator transparent />
       </$NavBefore>
 
-      <VerticalSeparator />
+      <VerticalSeparator transparent />
 
       <$NavigationScrollBar>
         <$NavigationMenu items={navItems} orientation="horizontal" dividerStyle="underline" />

@@ -64,7 +64,7 @@ export const RewardsLeaderboardPanel = () => {
   const onDownload = () => {
     if (!feeLeaderboard) return;
 
-    const csvRows = feeLeaderboard?.map((item) => ({
+    const csvRows = feeLeaderboard.map((item) => ({
       rank: item.rank,
       address: item.address,
       estimatedRewards: item.estimatedDydxRewards,

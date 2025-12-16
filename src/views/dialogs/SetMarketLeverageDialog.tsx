@@ -326,10 +326,21 @@ const $LeverageSlider = styled(Slider)`
 `;
 
 const $SaveButton = styled(Button)`
-  --button-textColor: var(--color-white) !important;
   --button-padding: 0.5rem 1.5rem;
 
+  /* White text when enabled */
+  --button-textColor: var(--color-white);
+
   span {
-    color: var(--color-white) !important;
+    color: var(--color-white);
+  }
+
+  /* Darker, visible text when disabled */
+  &:disabled {
+    --button-textColor: var(--color-text-1) !important;
+
+    span {
+      color: var(--color-text-1) !important;
+    }
   }
 `;
