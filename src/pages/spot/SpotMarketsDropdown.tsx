@@ -178,10 +178,6 @@ export const SpotMarketsDropdown = ({
               initialPageSize={20}
               shouldResetOnTotalRowsChange
               getIsRowPinned={(row) => favoritedSet.has(row.tokenAddress)}
-              defaultSortDescriptor={{
-                column: 'volume24h',
-                direction: 'descending',
-              }}
               slotEmpty={
                 <>
                   <Icon iconName={IconName.Coins} tw="text-[3em]" />
