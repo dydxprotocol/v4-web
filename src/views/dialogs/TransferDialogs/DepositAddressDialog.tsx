@@ -66,8 +66,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
 
   useEffect(() => {
     // Optimistic Deposit Initiated for tracking purposes
-    track(AnalyticsEvents.TurnkeyDepositInitiated({}));
-  }, []);
+    if (selectedTab === 'perpetuals') {
+      track(AnalyticsEvents.TurnkeyDepositInitiated({}));
+    } else {
+      track(AnalyticsEvents.SpotDepositInitiated({}));
+    }
+  }, [selectedTab]);
 
   useEffect(() => {
     if (failedToFetchDepositAddresses && dydxAddress) {
@@ -249,12 +253,12 @@ export const DepositAddressDialog = ({ setIsOpen }: DialogProps<DepositDialog2Pr
   const tabs: SpotTabItem[] = [
     {
       value: 'perps',
-      label: 'Perpetuals',
+      label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
       content: perpetualsContent,
     },
     {
       value: 'spot',
-      label: 'Spot',
+      label: stringGetter({ key: STRING_KEYS.SPOT }),
       content: <SpotDepositForm />,
     },
   ];
