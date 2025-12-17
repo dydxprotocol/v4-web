@@ -1,15 +1,12 @@
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
 import { useStringGetter } from '@/hooks/useStringGetter';
-import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 
@@ -19,7 +16,6 @@ type ExchangeBillboardsProps = {
 
 export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
 
   const {
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
@@ -49,10 +45,8 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
           type: OutputType.Fiat,
-          linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
-          link: `${chainTokenLabel}`,
         },
-      ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
+      ].map(({ key, labelKey, tagKey, value, fractionDigits, type }) => (
         <div
           key={key}
           tw="row flex-1 justify-between rounded-0.625 bg-color-layer-2 px-1 pb-0.5 pt-0.75 tablet:pb-0.75 tablet:pt-1"
@@ -62,17 +56,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label>{stringGetter({ key: labelKey })}</label>
               <Tag>{stringGetter({ key: tagKey })}</Tag>
-
-              {link && linkLabelKey ? (
-                <$BillboardLink
-                  href={link}
-                  size={ButtonSize.Small}
-                  type={ButtonType.Link}
-                  action={ButtonAction.Navigation}
-                >
-                  {stringGetter({ key: linkLabelKey })}
-                </$BillboardLink>
-              ) : null}
             </div>
             <Output
               useGrouping
@@ -88,13 +71,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
     </div>
   );
 };
-const $BillboardLink = styled(Button)`
-  --button-textColor: var(--color-accent);
-  --button-height: unset;
-  --button-padding: 0;
-  justify-content: flex-start;
-  margin-left: auto;
-`;
 const $BillboardStat = styled.div`
   ${layoutMixins.column}
 
