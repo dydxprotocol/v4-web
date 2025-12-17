@@ -25,7 +25,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { AccountMenu } from '@/views/menus/AccountMenu/AccountMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
@@ -168,16 +167,6 @@ export const HeaderDesktop = () => {
               <span tw="font-small-bold">{stringGetter({ key: STRING_KEYS.DEPOSIT })}</span>
             </$DepositButton>
           )}
-
-        {onboardingState === OnboardingState.AccountConnected ? (
-          <$IconButton
-            shape={ButtonShape.Rectangle}
-            iconName={IconName.Mobile}
-            onClick={() => dispatch(openDialog(DialogTypes.MobileSignIn({ skipWaiting: true })))}
-          />
-        ) : (
-          <MobileDownloadLinks />
-        )}
 
         {onboardingState === OnboardingState.AccountConnected && (
           <NotificationsMenu
