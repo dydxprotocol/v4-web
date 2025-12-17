@@ -77,11 +77,12 @@ import {
   getIndexerOrderSideStringKey,
   getIndexerOrderTypeStringKey,
 } from '@/lib/enumToStringKeyHelpers';
-import { BIG_NUMBERS, MaybeBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MaybeBigNumber, MustNumber } from '@/lib/numbers';
 import { getAverageFillPrice } from '@/lib/orders';
 import { sleep } from '@/lib/timeUtils';
 import { isPresent, orEmptyRecord } from '@/lib/typeUtils';
 
+import { DEC_2025_COMPETITION_DETAILS } from './rewards/util';
 import { useAccounts } from './useAccounts';
 import { useAffiliateMetadata } from './useAffiliatesInfo';
 import { useApiState } from './useApiState';
@@ -576,6 +577,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const dydxAddress = useAppSelector(getUserWalletAddress);
       const currentSeason = CURRENT_REWARDS_SEASON;
+      const { decimal: decimalSeparator, group: groupSeparator } = useLocaleSeparators();
+      const selectedLocale = useAppSelector(getSelectedLocale);
 
       const { data: rewards } = useQuery({
         queryKey: ['dydx-surge-rewards', currentSeason, dydxAddress],
@@ -729,6 +732,62 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`pump-trading-competition-base`],
           });
       }, [stringGetter, trigger]);
+
+      const REBATE_CLAIM_DEC_2025_1_END_TIME = DEC_2025_COMPETITION_DETAILS.endTime;
+      useEffect(() => {
+        if (
+          new Date().getTime() < new Date(REBATE_CLAIM_DEC_2025_1_END_TIME).getTime() &&
+          dydxAddress != null &&
+          DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress] != null
+        ) {
+          const amount = MustNumber(
+            DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress]
+          );
+          trigger({
+            id: `dec-2025-rebate-1-claim`,
+            displayData: {
+              icon: <Icon iconName={IconName.Sparkles} />,
+              title: stringGetter({
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_TITLE,
+                fallback: 'Claim your loss rebate today!',
+              }),
+              body: stringGetter({
+                key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_BODY,
+                fallback: `You may be eligible for a ${formatNumberOutput(amount, OutputType.Fiat, {
+                  fractionDigits: 0,
+                  decimalSeparator,
+                  groupSeparator,
+                  selectedLocale,
+                })} rebate.`,
+                params: {
+                  AMOUNT: formatNumberOutput(amount, OutputType.Fiat, {
+                    decimalSeparator,
+                    groupSeparator,
+                    selectedLocale,
+                  }),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.RewardsProgramUpdates,
+              actionAltText: stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY }),
+              renderActionSlot: () => (
+                <Link href="https://www.dydx.xyz/liquidation-rebates" isAccent>
+                  {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })} →
+                </Link>
+              ),
+            },
+            updateKey: [`pump-trading-competition-base`],
+          });
+        }
+      }, [
+        REBATE_CLAIM_DEC_2025_1_END_TIME,
+        decimalSeparator,
+        dydxAddress,
+        groupSeparator,
+        selectedLocale,
+        stringGetter,
+        trigger,
+      ]);
     },
   },
   {
