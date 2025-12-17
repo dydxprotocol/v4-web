@@ -259,7 +259,7 @@ export const OnboardingDialog = ({
     />
   );
 };
-const $Content = tw.div`flexColumn gap-1`;
+const $Content = tw.div`flexColumn mt-2 gap-1`;
 
 const $Dialog = styled(Dialog)<{ width?: string }>`
   @media ${breakpoints.notMobile} {
