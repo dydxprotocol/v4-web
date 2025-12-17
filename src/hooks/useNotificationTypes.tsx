@@ -749,16 +749,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <Icon iconName={IconName.Sparkles} />,
               title: stringGetter({
                 key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_TITLE,
-                fallback: 'Claim your loss rebate today!',
               }),
               body: stringGetter({
                 key: STRING_KEYS.DEC_2025_REBATE_NOTIFICATION_BODY,
-                fallback: `You may be eligible for a ${formatNumberOutput(amount, OutputType.Fiat, {
-                  fractionDigits: 0,
-                  decimalSeparator,
-                  groupSeparator,
-                  selectedLocale,
-                })} rebate.`,
                 params: {
                   AMOUNT: formatNumberOutput(amount, OutputType.Fiat, {
                     decimalSeparator,
@@ -776,7 +769,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 </Link>
               ),
             },
-            updateKey: [`pump-trading-competition-base`],
+            updateKey: [`dec-2025-rebate-1-claim`, dydxAddress],
           });
         }
       }, [

@@ -39,10 +39,6 @@ export const DEC_2025_COMPETITION_DETAILS = {
   rewardAmountUsd: 1_000_000,
   endTime: '2025-12-31T23:59:59.000Z', // end of month
   estimatedWalletRewards: {
-    // TESTING ONLY
-    dydx1s2klpv8ykcvf57dsvggkn8ul63eawde9amkvtx: '100',
-    // END TESTING ONLY
-
     dydx18scsz5rdh242lnlnsgwxu5f5pmtf8cqw0pl58c: '5,775.42',
     dydx17vt04dtfau0hvm0v6ahx708lflpgg4gedfqsyh: '5,132.79',
     dydx10hpl83hamwz0pxvjlanh5rcas3mdgf8xk7g7ra: '4,963.81',
