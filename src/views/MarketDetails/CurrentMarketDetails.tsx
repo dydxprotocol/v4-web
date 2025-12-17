@@ -41,7 +41,7 @@ export const CurrentMarketDetails = () => {
 
   const preferEIMF = Boolean(
     effectiveInitialMarginFraction &&
-      initialMarginFraction !== effectiveInitialMarginFraction.toString()
+    initialMarginFraction !== effectiveInitialMarginFraction.toString()
   );
 
   const items = [

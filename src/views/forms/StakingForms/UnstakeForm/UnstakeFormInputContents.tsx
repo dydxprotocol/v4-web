@@ -120,7 +120,7 @@ export const UnstakeFormInputContents = ({
                   }
                   withDiff={Boolean(
                     (amounts[currentDelegations[0]!.validator] ?? 0) &&
-                      currentDelegations[0]!.amount
+                    currentDelegations[0]!.amount
                   )}
                 />
               ),

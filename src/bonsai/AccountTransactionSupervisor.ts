@@ -509,7 +509,11 @@ export class AccountTransactionSupervisor {
           currentHeight ?? undefined,
           goodTilBlock ?? undefined,
           memo,
-          Method.BroadcastTxSync
+          Method.BroadcastTxSync,
+          undefined,
+          undefined,
+          // TODO: This is a hotfix. Make this a config variable.
+          'dydx14qzh5r34masec5hxs93er7uc0hpfzynktav4dt'
         );
 
         if ((tx as IndexedTx | undefined)?.code !== 0) {

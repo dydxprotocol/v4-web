@@ -61,8 +61,8 @@ export function useWithdrawalRoutes({
 
   const hasValidAddress = Boolean(
     destinationAddress &&
-      token?.chainId &&
-      isValidWithdrawalAddress(destinationAddress, token.chainId)
+    token?.chainId &&
+    isValidWithdrawalAddress(destinationAddress, token.chainId)
   );
 
   return useQuery({

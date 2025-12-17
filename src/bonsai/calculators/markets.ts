@@ -151,7 +151,7 @@ export function createMarketSummary(
         recentMarketIdsByClobPairId.has(market.ticker) ||
         Boolean(
           (sparklines?.[IndexerSparklineTimePeriod.SEVENDAYS]?.[market.ticker]?.length ?? 0) <
-            SEVEN_DAY_SPARKLINE_ENTRIES
+          SEVEN_DAY_SPARKLINE_ENTRIES
         );
 
       const assetData = assetInfo?.[market.assetId];
