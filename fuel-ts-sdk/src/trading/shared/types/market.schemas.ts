@@ -1,5 +1,5 @@
+import { PercentageValue } from '@/shared/models/decimals';
 import { decimalValueSchema } from '@/shared/utils/decimalCalculator';
-import { PercentageValue } from '@/trading/src/positions/domain/positions.decimals';
 import { z } from 'zod';
 
 export const MarketConfigSchema = z.object({
