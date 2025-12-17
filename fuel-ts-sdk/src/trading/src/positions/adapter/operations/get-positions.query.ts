@@ -1,17 +1,18 @@
 import { gql } from 'graphql-request';
 
 export const GET_POSITIONS_QUERY = gql`
-  query GetPositions(
-    $limit: Int
-    $offset: Int
-    $where: PositionWhereInput
-    $orderBy: [PositionOrderByInput!]
+query GetPositions($limit: Int, $offset: Int, $where: PositionFilter, $orderBy: [PositionsOrderBy!]) {
+  positions(
+    offset: $offset
+    filter: $where
+    orderBy: $orderBy
+    first: $limit
   ) {
-    positions(limit: $limit, offset: $offset, where: $where, orderBy: $orderBy) {
+    nodes {
       id
       positionKey {
-        id
         account
+        id
         indexAssetId
         isLong
       }
@@ -28,4 +29,5 @@ export const GET_POSITIONS_QUERY = gql`
       realizedPnl
     }
   }
+}
 `;
