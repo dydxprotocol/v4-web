@@ -1,5 +1,7 @@
+import * as Account from './src/account';
 import * as Positions from './src/positions';
-export { Positions };
+
+export { Account, Positions };
 
 // Re-export prices as a namespace
 import * as Prices from './src/prices';
