@@ -1,14 +1,9 @@
 import { TradeFormType } from '@/bonsai/forms/trade/types';
 import { ValidationError } from '@/bonsai/lib/validationErrors';
-import { ComplianceStatus } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
-import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
-
-import { AlertMessage } from '@/components/AlertMessage';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
@@ -29,16 +24,9 @@ export const TradeFormMessages = ({
   shouldPromptUserToPlaceLimitOrder: boolean;
 }) => {
   const dispatch = useAppDispatch();
-  const { complianceMessage, complianceStatus } = usePerpetualsComplianceState();
 
   return (
     <>
-      {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
-        <AlertMessage type={AlertType.Error}>
-          <span>{complianceMessage}</span>
-        </AlertMessage>
-      )}
-
       <TradeFormAlertContent
         placeOrderError={placeOrderError}
         isErrorShownInOrderStatusToast={isErrorShownInOrderStatusToast}

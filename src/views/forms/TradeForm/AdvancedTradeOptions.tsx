@@ -1,19 +1,15 @@
-import { useEffect } from 'react';
-
 import { ExecutionType, TimeInForce, TimeUnit, TradeFormType } from '@/bonsai/forms/trade/types';
 import { BonsaiHelpers } from '@/bonsai/ontology';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import tw from 'twin.macro';
 
-import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
@@ -38,7 +34,6 @@ export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
-  const { complianceState } = usePerpetualsComplianceState();
 
   const currentTradeFormSummary = useAppSelector(getTradeFormSummary).summary;
   const currentTradeFormConfig = currentTradeFormSummary.options;
@@ -88,11 +83,6 @@ export const AdvancedTradeOptions = () => {
   const hasTimeInForce = timeInForceOptions.length > 0;
   const needsTimeRow = showGoodTil || (hasTimeInForce && timeInForce != null);
   const needsTriggers = showTriggerOrders;
-  useEffect(() => {
-    if (complianceState === ComplianceStates.CLOSE_ONLY) {
-      dispatch(tradeFormActions.setReduceOnly(true));
-    }
-  }, [complianceState, dispatch]);
 
   const necessary = needsTimeRow || needsExecution || needsTriggers;
   if (!necessary) {
@@ -194,7 +184,7 @@ export const AdvancedTradeOptions = () => {
           {shouldShowReduceOnly && (
             <Checkbox
               checked={!!reduceOnly}
-              disabled={showReduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
+              disabled={showReduceOnlyTooltip}
               onCheckedChange={(checked) => dispatch(tradeFormActions.setReduceOnly(checked))}
               id="reduce-only"
               label={

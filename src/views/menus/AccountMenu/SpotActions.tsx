@@ -4,9 +4,11 @@ import { Item } from '@radix-ui/react-dropdown-menu';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { IconName } from '@/components/Icon';
@@ -24,11 +26,12 @@ export const SpotActions = memo(() => {
   const stringGetter = useStringGetter();
   const maxWithdrawable = useMaxWithdrawableSol();
   const hasBalance = maxWithdrawable > 0;
+  const { complianceState } = useComplianceState();
 
   return (
     <div tw="inlineRow">
       {[
-        {
+        complianceState !== ComplianceStates.READ_ONLY && {
           dialog: DialogTypes.Deposit2({}),
           iconName: IconName.Deposit,
           tooltipStringKey: STRING_KEYS.DEPOSIT,

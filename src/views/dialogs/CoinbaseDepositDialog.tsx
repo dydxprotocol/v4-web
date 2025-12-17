@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { CoinbaseDepositDialogProps, DialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -33,12 +35,21 @@ export const CoinbaseDepositDialog = ({
   const [selectedTab, setSelectedTab] = useState<'perps' | 'spot'>('perps');
   const { nobleAddress, solanaAddress } = useAccounts();
   const isSpotEnabled = useEnableSpot();
+  const { complianceState } = useComplianceState();
 
   useEffect(() => {
     if (selectedTab === 'spot') {
       track(AnalyticsEvents.SpotDepositInitiated({}));
     }
   }, [selectedTab]);
+
+  useLayoutEffect(() => {
+    if (complianceState === ComplianceStates.READ_ONLY) {
+      setIsOpen(false);
+    } else if (complianceState !== ComplianceStates.FULL_ACCESS) {
+      setSelectedTab('spot');
+    }
+  }, [complianceState, setIsOpen]);
 
   const onCopy = () => {
     if (!nobleAddress) return;
@@ -88,6 +99,7 @@ export const CoinbaseDepositDialog = ({
       value: 'perps',
       label: stringGetter({ key: STRING_KEYS.PERPETUALS }),
       content: perpetualsContent,
+      disabled: complianceState !== ComplianceStates.FULL_ACCESS,
     },
     {
       value: 'spot',
