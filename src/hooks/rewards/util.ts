@@ -38,6 +38,7 @@ export const DEC_2025_COMPETITION_DETAILS = {
   rewardAmount: '$1M',
   rewardAmountUsd: 1_000_000,
   endTime: '2025-12-31T23:59:59.000Z', // end of month
+  claimStartTime: '2025-12-19T23:59:00.000Z', // proposal passes + a few hours for any changes to claim page
   claimEndtime: '2026-01-31T23:59:59.000Z', // end of jan
   estimatedWalletRewards: {
     dydx18scsz5rdh242lnlnsgwxu5f5pmtf8cqw0pl58c: '5775.42',

@@ -733,10 +733,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
       }, [stringGetter, trigger]);
 
-      const REBATE_CLAIM_DEC_2025_1_END_TIME = DEC_2025_COMPETITION_DETAILS.claimEndtime;
       useEffect(() => {
         if (
-          new Date().getTime() < new Date(REBATE_CLAIM_DEC_2025_1_END_TIME).getTime() &&
+          new Date().getTime() < new Date(DEC_2025_COMPETITION_DETAILS.claimEndtime).getTime() &&
+          new Date().getTime() > new Date(DEC_2025_COMPETITION_DETAILS.claimStartTime).getTime() &&
           dydxAddress != null &&
           DEC_2025_COMPETITION_DETAILS.estimatedWalletRewards[dydxAddress] != null
         ) {
@@ -772,15 +772,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             updateKey: [`dec-2025-rebate-1-claim`, dydxAddress],
           });
         }
-      }, [
-        REBATE_CLAIM_DEC_2025_1_END_TIME,
-        decimalSeparator,
-        dydxAddress,
-        groupSeparator,
-        selectedLocale,
-        stringGetter,
-        trigger,
-      ]);
+      }, [decimalSeparator, dydxAddress, groupSeparator, selectedLocale, stringGetter, trigger]);
     },
   },
   {
