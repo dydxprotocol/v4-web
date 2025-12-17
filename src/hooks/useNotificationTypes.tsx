@@ -733,7 +733,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           });
       }, [stringGetter, trigger]);
 
-      const REBATE_CLAIM_DEC_2025_1_END_TIME = DEC_2025_COMPETITION_DETAILS.endTime;
+      const REBATE_CLAIM_DEC_2025_1_END_TIME = DEC_2025_COMPETITION_DETAILS.claimEndtime;
       useEffect(() => {
         if (
           new Date().getTime() < new Date(REBATE_CLAIM_DEC_2025_1_END_TIME).getTime() &&
