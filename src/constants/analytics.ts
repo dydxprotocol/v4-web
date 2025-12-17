@@ -51,9 +51,6 @@ export const customTrackEvent = <T extends AnalyticsEventTypes>(
 // User properties
 export const AnalyticsUserProperties = unionize(
   {
-    // Bonk
-    isBonk: ofType<boolean | null>(),
-
     // Referrer
     CustomDomainReferrer: ofType<string | null>(),
 
@@ -64,6 +61,7 @@ export const AnalyticsUserProperties = unionize(
       'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
     >(),
     Version: ofType<string | null>(),
+    Frontend: ofType<'bonk' | 'dydx'>(),
 
     // Location
     Geo: ofType<string | null>(),
@@ -120,7 +118,7 @@ export const AnalyticsUserPropertyLoggableTypes = {
   CustomFlags: 'customFlags',
   UserId: 'userId',
   IsNewUser: 'isNewUser',
-  isBonk: 'isBonk',
+  Frontend: 'frontend',
 } as const satisfies Record<AnalyticsUserPropertyTypes, string>;
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
