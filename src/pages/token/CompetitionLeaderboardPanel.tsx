@@ -11,8 +11,8 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { TrophyIcon } from '@/icons';
 
+import { CopyButton } from '@/components/CopyButton';
 import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
@@ -186,10 +186,6 @@ const $Table = styled(Table)`
   }
 ` as typeof Table;
 
-const getTraderLink = (address: string) => {
-  return `https://community.chaoslabs.xyz/dydx-v4/risk/accounts/${address}/subAccount/0/overview`;
-};
-
 const getRewardsLeaderboardTableColumnDef = ({
   key,
   stringGetter,
@@ -238,21 +234,14 @@ const getRewardsLeaderboardTableColumnDef = ({
           </div>
         ),
         renderCell: ({ account }) => (
-          <div
-            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+          <CopyButton
+            value={account}
             tw="flex items-center gap-0.5 text-small font-medium"
+            css={{ color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-1)' }}
+            buttonType="text"
           >
             {truncateAddress(account)}
-            <Link
-              css={{
-                color: account === dydxAddress ? 'var(--color-accent)' : 'var(--color-text-0)',
-              }}
-              href={getTraderLink(account)}
-              iconSize="1rem"
-              isNewPage
-              withIcon
-            />
-          </div>
+          </CopyButton>
         ),
       },
       [RewardsLeaderboardTableColumns.PNL]: {
