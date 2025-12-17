@@ -184,6 +184,13 @@ export type ChaosLabsCompetitionItem = {
   pnl: number;
 };
 
+export type BonkPnlItem = {
+  address: string;
+  pnl: number;
+  volume: number;
+  position: number;
+};
+
 export function useChaosLabsFeeLeaderboard({ address }: { address?: string }) {
   return useQuery({
     queryKey: ['chaoslabs/fee-leaderboard', address],
@@ -243,5 +250,28 @@ async function getChaosLabsFeeLeaderboard({ address }: { address?: string }) {
   return {
     leaderboard: data.data,
     addressEntry: data.addressEntry,
+  };
+}
+
+async function getBonkPnlDistribution() {
+  const res = await fetch(
+    'https://pp-external-api-ffb2ad95ef03.herokuapp.com/api/dydx-weekly-bonk-pnl',
+    {
+      method: 'GET',
+    }
+  );
+  const parsedRes = await res.json();
+  return parsedRes.data as BonkPnlItem[];
+}
+
+export function useBonkPnlDistribution() {
+  const { data: bonkPnlItems, isLoading: bonkPnlItemsLoading } = useQuery({
+    queryKey: ['bonk/pnls'],
+    queryFn: wrapAndLogError(() => getBonkPnlDistribution(), 'BonkPnl/fetchPnls', true),
+  });
+
+  return {
+    isLoading: bonkPnlItemsLoading,
+    data: bonkPnlItems,
   };
 }

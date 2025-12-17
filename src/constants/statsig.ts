@@ -19,6 +19,7 @@ export enum StatsigFlags {
   ffSpot = 'ff_spot',
   abPopupDeposit = 'ab_popup_deposit',
   ffSpotBonk = 'ff_spot_bonk',
+  ffBonkPnlLeaderboard = 'ff_bonk_pnl_leaderboard',
 }
 
 export enum CustomFlags {
