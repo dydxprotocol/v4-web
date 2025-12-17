@@ -72,6 +72,7 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     identify(AnalyticsUserProperties.CustomDomainReferrer(document.referrer));
+    identify(AnalyticsUserProperties.Frontend('dydx'));
   }, []);
 
   useEffect(() => {
