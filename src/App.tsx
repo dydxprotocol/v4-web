@@ -364,7 +364,7 @@ function shouldForwardProp(propName: string, target: WebTarget): boolean {
 
 const $AppContainer = styled.div`
   width: 100%;
-  max-width: 1800px;
+  /* max-width: 1800px; */
   margin-left: auto;
   margin-right: auto;
 `;
@@ -461,7 +461,7 @@ const $Main = styled.main<{ isTradePage?: boolean }>`
     isTradePage
       ? css`
           width: 100%;
-          max-width: 1800px;
+          max-width: 100%;
         `
       : css`
           width: 100%;

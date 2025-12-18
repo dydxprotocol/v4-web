@@ -23,7 +23,7 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
+// import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
 import {
   setHasDismissedNoFeeBanner,
   setHasDismissedPmlBanner,
@@ -34,7 +34,8 @@ import {
   getHasDismissedPmlBanner,
   getHasDismissedRebateBanner,
 } from '@/state/dismissableSelectors';
-import { setMarketFilter } from '@/state/perpetuals';
+
+// import { setMarketFilter } from '@/state/perpetuals';
 
 export const MarketsBanners = ({
   marketsTableRef,
@@ -44,7 +45,8 @@ export const MarketsBanners = ({
   const stringGetter = useStringGetter();
   const allMarkets = useMarketsData({
     filter: MarketFilters.ALL,
-    forceShowUnlaunchedMarkets: true,
+    forceShowUnlaunchedMarkets: false,
+    forceHideUnlaunchedMarkets: true,
   }).markets;
   const launchable = useMemo(() => allMarkets.filter((f) => f.isUnlaunched), [allMarkets]);
   const launched = useMemo(() => allMarkets.filter((f) => !f.isUnlaunched), [allMarkets]);
@@ -68,8 +70,8 @@ export const MarketsBanners = ({
   };
 
   const onClickPmlBanner = () => {
-    dispatch(setShouldHideLaunchableMarkets(false));
-    dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
+    // dispatch(setShouldHideLaunchableMarkets(false));
+    // dispatch(setMarketFilter(MarketFilters.LAUNCHABLE));
     marketsTableRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 

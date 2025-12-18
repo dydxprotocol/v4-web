@@ -1,9 +1,9 @@
-// import { isDev } from '@/constants/networks';
+import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 
 import { useStatsigGateValue } from './useStatsig';
 
 export const useEnableSpot = () => {
   const spotFF = useStatsigGateValue(StatsigFlags.ffSpotBonk);
-  return spotFF; // could also do only spotFF;
+  return isDev || spotFF;
 };

@@ -18,10 +18,8 @@ import { NewTag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithLabel } from '@/components/WithLabel';
 
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { useAppDispatch } from '@/state/appTypes';
 import { setShouldHideLaunchableMarkets } from '@/state/appUiConfigs';
-import { getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
-import { setMarketFilter } from '@/state/perpetuals';
 
 type MarketFilterProps = {
   selectedFilter: MarketFilters;
@@ -46,16 +44,17 @@ export const MarketFilter = forwardRef(
   ) => {
     const stringGetter = useStringGetter();
     const dispatch = useAppDispatch();
-    const shouldHideLaunchableMarkets = useAppSelector(getShouldHideLaunchableMarkets);
+    const shouldHideLaunchableMarkets = true;
 
     const onShouldHideLaunchableMarkets = useCallback(
       (shouldHide: boolean) => {
         dispatch(setShouldHideLaunchableMarkets(!shouldHide));
 
-        if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
-          dispatch(setMarketFilter(MarketFilters.ALL));
-        }
+        // if (!shouldHide && selectedFilter === MarketFilters.LAUNCHABLE) {
+        //   dispatch(setMarketFilter(MarketFilters.ALL));
+        // }
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [dispatch, selectedFilter]
     );
 
@@ -63,7 +62,7 @@ export const MarketFilter = forwardRef(
       () => (
         <WithLabel
           label={stringGetter({ key: STRING_KEYS.SHOW_LAUNCHABLE_MARKETS })}
-          tw="mr-1 flex flex-row flex-nowrap items-center"
+          tw="mr-1 hidden flex-row flex-nowrap items-center"
         >
           <Switch
             name="show-launchable"

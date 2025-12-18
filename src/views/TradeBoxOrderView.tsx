@@ -67,6 +67,8 @@ const $Container = styled.div`
 const $OrderTypeTabs = styled(Tabs)`
   --trigger-backgroundColor: var(--color-layer-1);
   --tabs-height: 2.625rem;
+  --tabs-padding: 0.1rem;
+  --trigger-paddingX: 1rem;
   --trigger-active-backgroundColor: var(--trigger-backgroundColor);
   --trigger-active-underlineColor: ${ColorToken.Orange0};
   --trigger-active-textColor: ${ColorToken.Orange0};
@@ -76,19 +78,20 @@ const $OrderTypeTabs = styled(Tabs)`
   background-color: var(--color-layer-1);
   flex: 1;
   min-height: 0;
+  align-self: center;
+  width: 100%;
 
   /* Target the list container - use high specificity to override parent styles */
-  > div > header > ul[role='tablist'] {
-    width: 100%;
+  > div > header > div[role='tablist'] {
+    width: auto;
 
     > button[role='tab'] {
-      width: 33%;
-      padding: 0;
+      width: fit-content;
 
-      &[data-state='active'] {
+      /* &[data-state='active'] {
         box-shadow: inset 0 -2px 0 ${ColorToken.Orange0} !important;
         color: ${ColorToken.Orange0} !important;
-      }
+      } */
     }
   }
 

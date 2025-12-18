@@ -194,7 +194,7 @@ export const HeaderDesktop = () => {
 };
 const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
-  --trigger-height: 2.25rem;
+  --trigger-height: 2rem;
   --logo-width: 12rem;
 
   ${layoutMixins.container}
@@ -203,10 +203,10 @@ const $Header = styled.header`
   border-radius: 0.75rem;
   overflow: visible;
   height: var(--page-currentHeaderHeight);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 1.75rem;
+  margin-bottom: 1rem;
   width: 100%;
-  max-width: 1800px;
+  /* max-width: 100%; */
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;

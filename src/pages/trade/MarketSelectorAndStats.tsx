@@ -65,6 +65,9 @@ const $Container = styled.div`
   align-items: stretch;
   background-color: var(--color-layer-1);
 
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+
   /* Completely override box-shadow border from withOuterAndInnerBorders */
   --border-color: transparent !important;
   box-shadow: none !important;

@@ -252,9 +252,9 @@ export const TradeForm = ({
 const $TradeForm = styled.form`
   /* Params */
   --tradeBox-content-paddingTop: ;
-  --tradeBox-content-paddingRight: ;
+  --tradeBox-content-paddingRight: 0.25rem;
   --tradeBox-content-paddingBottom: ;
-  --tradeBox-content-paddingLeft: ;
+  --tradeBox-content-paddingLeft: 0.25rem;
 
   /* Rules */
   --orderbox-column-width: 180px;

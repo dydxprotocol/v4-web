@@ -65,9 +65,9 @@ const filterFunctions: Record<MarketFilters, (market: MarketData) => boolean | u
   [MarketFilters.RWA]: (market) => {
     return market.sectorTags?.includes(MarketFilters.RWA);
   },
-  [MarketFilters.LAUNCHABLE]: (market) => {
-    return market.isUnlaunched;
-  },
+  // [MarketFilters.LAUNCHABLE]: (market) => {
+  //   return market.isUnlaunched;
+  // },
 };
 
 const sortByMarketCap = (a: AssetData, b: AssetData) => {

@@ -47,7 +47,7 @@ const AssetPage = () => {
         <Icon iconName={IconName.Info} />
         {stringGetter({ key: STRING_KEYS.LAUNCHABLE_DETAILS })}
       </div>
-      <div tw="h-[20rem] font-small-book">
+      <div tw="h-[20rem] font-small-book tablet:h-[30svh]">
         <TvChartLaunchable marketId={currentMarketId} />
       </div>
       <div tw="flexColumn gap-2 px-1.25">
@@ -94,7 +94,7 @@ const AssetPage = () => {
     </>
   ) : (
     <>
-      <div tw="mb-1.5 h-[20rem] font-small-book">
+      <div tw="mb-1.5 h-[20rem] font-small-book tablet:h-[30svh]">
         <TvChart />
       </div>
       <div tw="flexColumn gap-2 px-1.25 pb-[5.25rem]">

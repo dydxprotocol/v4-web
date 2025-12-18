@@ -20,7 +20,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
-import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
+// import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
 import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -40,7 +40,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagSign } from '@/components/Tag';
 import { WalletIcon } from '@/components/WalletIcon';
-import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
+// import { MobileDownloadLinks } from '@/views/MobileDownloadLinks';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccountFreeCollateral } from '@/state/accountSelectors';
@@ -93,7 +93,7 @@ export const AccountMenu = () => {
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
 
-  const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
+  // const { appleAppStoreUrl, googlePlayStoreUrl } = useMobileAppUrl();
 
   const usedBalanceBN = MustBigNumber(usdcBalance);
 
@@ -103,7 +103,10 @@ export const AccountMenu = () => {
     usedBalanceBN.minus(AMOUNT_RESERVED_FOR_GAS_USDC).toFixed(2) !== '0.00';
 
   const walletIcon = useMemo(() => {
-    if (onboardingState === OnboardingState.WalletConnected) {
+    if (
+      onboardingState === OnboardingState.WalletConnected &&
+      walletInfo?.connectorType !== ConnectorType.PhantomSolana
+    ) {
       return (
         <$VerifyWalletButton
           action={ButtonAction.Base}
@@ -374,7 +377,7 @@ export const AccountMenu = () => {
           ? [
               {
                 value: 'registerAffiliate',
-                icon: <Icon iconName={IconName.Gear} />,
+                icon: <Icon iconName={IconName.Pencil} />,
                 label: 'Register Affiliate',
                 onSelect: () => {
                   // eslint-disable-next-line no-alert
@@ -390,7 +393,7 @@ export const AccountMenu = () => {
           ? [
               {
                 value: 'ComplianceConfig',
-                icon: <Icon iconName={IconName.Gear} />,
+                icon: <Icon iconName={IconName.GearStroke} />,
                 label: 'Compliance Config',
                 onSelect: () => {
                   dispatch(openDialog(DialogTypes.ComplianceConfig()));
@@ -398,24 +401,24 @@ export const AccountMenu = () => {
               },
             ]
           : []),
-        ...((appleAppStoreUrl ?? googlePlayStoreUrl)
-          ? [
-              {
-                value: 'MobileDownload',
-                icon: <Icon iconName={IconName.Qr} />,
-                label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
-                onSelect: () => {
-                  dispatch(
-                    openDialog(
-                      DialogTypes.MobileDownload({
-                        mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
-                      })
-                    )
-                  );
-                },
-              },
-            ]
-          : []),
+        // ...((appleAppStoreUrl ?? googlePlayStoreUrl)
+        //   ? [
+        //       {
+        //         value: 'MobileDownload',
+        //         icon: <Icon iconName={IconName.Qr} />,
+        //         label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
+        //         onSelect: () => {
+        //           dispatch(
+        //             openDialog(
+        //               DialogTypes.MobileDownload({
+        //                 mobileAppUrl: (appleAppStoreUrl ?? googlePlayStoreUrl)!,
+        //               })
+        //             )
+        //           );
+        //         },
+        //       },
+        //     ]
+        //   : []),
         onboardingState === OnboardingState.AccountConnected &&
           hdKey && {
             value: 'MobileQrSignIn',
@@ -450,7 +453,7 @@ export const AccountMenu = () => {
           onSelect: () => dispatch(openDialog(DialogTypes.DisconnectWallet())),
         },
       ].filter(isTruthy)}
-      slotBottomContent={<MobileDownloadLinks withBadges />}
+      // slotBottomContent={<MobileDownloadLinks withBadges />}
       align="end"
       sideOffset={16}
     >
