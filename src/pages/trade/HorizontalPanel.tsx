@@ -326,6 +326,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen, handleStartResize }:
                   FillsTableColumnKey.Price,
                   FillsTableColumnKey.Total,
                   FillsTableColumnKey.Fee,
+                  FillsTableColumnKey.ClosedPnl,
                   FillsTableColumnKey.Liquidity,
                 ].filter(isTruthy)
           }
