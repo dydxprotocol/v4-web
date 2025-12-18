@@ -122,22 +122,6 @@ export const RESOLUTION_CHART_CONFIGS = {
   '1D': { defaultRange: 2 * timeUnits.month },
 } as Record<ResolutionString, { defaultRange: number }>;
 
-export const SPOT_RESOLUTION_CHART_CONFIGS = {
-  '1S': { defaultRange: 5 * timeUnits.minute },
-  '5S': { defaultRange: 10 * timeUnits.minute },
-  '15S': { defaultRange: 30 * timeUnits.minute },
-  '30S': { defaultRange: timeUnits.hour },
-  '1': { defaultRange: 2 * timeUnits.hour },
-  '5': { defaultRange: 10 * timeUnits.hour },
-  '15': { defaultRange: 30 * timeUnits.hour },
-  '30': { defaultRange: timeUnits.day },
-  '60': { defaultRange: 6 * timeUnits.day },
-  '240': { defaultRange: 24 * timeUnits.day },
-  '720': { defaultRange: 48 * timeUnits.day },
-  '1D': { defaultRange: 4 * timeUnits.month },
-  '1W': { defaultRange: timeUnits.year },
-} as Record<ResolutionString, { defaultRange: number }>;
-
 export const RESOLUTION_STRING_TO_LABEL = {
   '1': { value: '1', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },
   '5': { value: '5', unitStringKey: STRING_KEYS.MINUTES_ABBREVIATED },

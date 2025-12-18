@@ -30,8 +30,8 @@ import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 
 import { useAccounts } from '../useAccounts';
 import { ConnectionErrorType, useApiState } from '../useApiState';
-import { useComplianceState } from '../useComplianceState';
 import { useOnOrderIndexed } from '../useOnOrderIndexed';
+import { usePerpetualsComplianceState } from '../usePerpetualsComplianceState';
 import { useStringGetter } from '../useStringGetter';
 import { useSubaccount } from '../useSubaccount';
 
@@ -67,7 +67,7 @@ export const useTradeForm = ({
   const stringGetter = useStringGetter();
 
   const { connectionError } = useApiState();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const { updateLeverage } = useSubaccount();
   const { dydxAddress } = useAccounts();
 
