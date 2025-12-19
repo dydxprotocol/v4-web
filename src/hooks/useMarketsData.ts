@@ -118,6 +118,7 @@ export const useMarketsData = ({
       .filter((m) => m.status !== 'FINAL_SETTLEMENT')
       // temporarily filter out markets with empty/0 oracle price
       .filter((m) => MustBigNumber(m.oraclePrice).gt(0))
+      .filter((a) => !ASSETS_TO_REMOVE.has(a.assetId))
       .map(getMarketDataFromPerpetualMarketSummary);
 
     const unlaunchedMarketsData =
