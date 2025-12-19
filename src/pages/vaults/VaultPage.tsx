@@ -124,6 +124,7 @@ const VaultPage = () => {
 const $Page = styled.div`
   ${layoutMixins.contentContainerPage}
   padding-bottom: 1.5rem;
+  max-width: calc(100vw - 2rem);
 `;
 
 const $MobilePage = styled.div`

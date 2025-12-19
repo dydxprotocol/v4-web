@@ -36,10 +36,7 @@ export const track = (event: AnalyticsEvent) => {
     console.log(`[Analytics] ${event.type}`, eventPayload);
   }
   const customEvent = customTrackEvent({
-    detail: {
-      eventType: event.type,
-      eventData: eventPayload,
-    },
+    detail: { eventType: event.type, eventData: eventPayload },
   });
 
   globalThis.dispatchEvent(customEvent);

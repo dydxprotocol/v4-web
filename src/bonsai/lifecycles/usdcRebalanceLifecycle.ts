@@ -16,7 +16,7 @@ import { createSemaphore, SupersededError } from '../lib/semaphore';
 import { logBonsaiError, logBonsaiInfo } from '../logs';
 import { createValidatorStoreEffect } from '../rest/lib/indexerQueryStoreEffect';
 import {
-  selectTxAuthorizedAccount,
+  selectTxAuthorizedCloseOnlyAccount,
   selectUserHasUsdcGasForTransaction,
 } from '../selectors/accountTransaction';
 
@@ -30,7 +30,7 @@ const INVALIDATION_SLEEP_TIME = timeUnits.second * 10;
 export function setUpUsdcRebalanceLifecycle(store: RootStore) {
   const balanceAndTransfersSelector = createAppSelector(
     [
-      selectTxAuthorizedAccount,
+      selectTxAuthorizedCloseOnlyAccount,
       selectUserHasUsdcGasForTransaction,
       selectShouldAccountRebalanceUsdc,
     ],

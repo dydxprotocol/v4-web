@@ -197,6 +197,7 @@ export enum SubaccountFillType {
 export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   marginMode: MarginMode;
   type: SubaccountFillType | undefined;
+  closedPnl?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;
