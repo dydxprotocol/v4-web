@@ -29,6 +29,7 @@ datadogLogs.createLogger(LOGGER_NAME);
 const datadogLogger = datadogLogs.getLogger(LOGGER_NAME)!;
 datadogLogger.setContextProperty('dd-client-token', CLIENT_TOKEN);
 datadogLogger.setContextProperty('instance-id', instanceId);
+datadogLogger.setContextProperty('frontend', 'bonk');
 
 /**
  * TODO: make a logger wrapper that enables us also log to the console
