@@ -115,59 +115,58 @@ const PortfolioPage = () => {
               <Route
                 path={HistoryRoute.Trades}
                 element={
-                  <>
-                    <FillsTable
-                      initialPageSize={initialPageSize}
-                      columnKeys={
-                        isTablet
-                          ? [
-                              FillsTableColumnKey.Time,
-                              FillsTableColumnKey.TypeAmount,
-                              FillsTableColumnKey.PriceFee,
-                            ]
-                          : [
-                              FillsTableColumnKey.Market,
-                              FillsTableColumnKey.Time,
-                              FillsTableColumnKey.Type,
-                              FillsTableColumnKey.Side,
-                              FillsTableColumnKey.AmountTag,
-                              FillsTableColumnKey.Price,
-                              FillsTableColumnKey.Total,
-                              FillsTableColumnKey.Fee,
-                              FillsTableColumnKey.ClosedPnl,
-                              FillsTableColumnKey.Liquidity,
-                            ]
-                      }
-                    />
-                    <Route
-                      path={HistoryRoute.Transfers}
-                      element={
-                        <TransferHistoryTable
-                          initialPageSize={initialPageSize}
-                          withOuterBorder={isNotTablet}
-                        />
-                      }
-                    />
-                    <Route
-                      path={HistoryRoute.VaultTransfers}
-                      element={
-                        <VaultTransactionsTable
-                          withOuterBorders
-                          withTxHashLink
-                          emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}
-                        />
-                      }
-                    />
-                    <Route
-                      path={HistoryRoute.Payments}
-                      element={
-                        <FundingPaymentsTable
-                          initialPageSize={initialPageSize}
-                          withOuterBorder={isNotTablet}
-                        />
-                      }
-                    />
-                  </>
+                  <FillsTable
+                    initialPageSize={initialPageSize}
+                    columnKeys={
+                      isTablet
+                        ? [
+                            FillsTableColumnKey.Time,
+                            FillsTableColumnKey.TypeAmount,
+                            FillsTableColumnKey.PriceFee,
+                          ]
+                        : [
+                            FillsTableColumnKey.Market,
+                            FillsTableColumnKey.Time,
+                            FillsTableColumnKey.Type,
+                            FillsTableColumnKey.Side,
+                            FillsTableColumnKey.AmountTag,
+                            FillsTableColumnKey.Price,
+                            FillsTableColumnKey.Total,
+                            FillsTableColumnKey.Fee,
+                            FillsTableColumnKey.ClosedPnl,
+                            FillsTableColumnKey.Liquidity,
+                          ]
+                    }
+                    withOuterBorder={isNotTablet}
+                  />
+                }
+              />
+              <Route
+                path={HistoryRoute.Transfers}
+                element={
+                  <TransferHistoryTable
+                    initialPageSize={initialPageSize}
+                    withOuterBorder={isNotTablet}
+                  />
+                }
+              />
+              <Route
+                path={HistoryRoute.VaultTransfers}
+                element={
+                  <VaultTransactionsTable
+                    withOuterBorders
+                    withTxHashLink
+                    emptyString={stringGetter({ key: STRING_KEYS.YOU_HAVE_NO_VAULT_BALANCE })}
+                  />
+                }
+              />
+              <Route
+                path={HistoryRoute.Payments}
+                element={
+                  <FundingPaymentsTable
+                    initialPageSize={initialPageSize}
+                    withOuterBorder={isNotTablet}
+                  />
                 }
               />
             </Route>
