@@ -52,6 +52,7 @@ export enum FillsTableColumnKey {
   AmountTag = 'Amount-Tag',
   Total = 'Total',
   Fee = 'Fee',
+  ClosedPnl = 'ClosedPnl',
 
   // Tablet Only
   TypeAmount = 'Type-Amount',
@@ -209,6 +210,16 @@ const getFillsTableColumnDef = ({
         renderCell: ({ fee }) => (
           <TableCell>
             <Output type={OutputType.Fiat} value={fee} />
+          </TableCell>
+        ),
+      },
+      [FillsTableColumnKey.ClosedPnl]: {
+        columnKey: 'closedPnl',
+        getCellValue: (row) => row.closedPnl,
+        label: stringGetter({ key: STRING_KEYS.CLOSED_PNL }),
+        renderCell: ({ closedPnl }) => (
+          <TableCell>
+            <Output type={OutputType.Fiat} value={closedPnl} />
           </TableCell>
         ),
       },

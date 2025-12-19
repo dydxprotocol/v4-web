@@ -4,6 +4,7 @@ import { BonsaiCore } from '@/bonsai/ontology';
 import { AssetData } from '@/bonsai/types/summaryTypes';
 import { shallowEqual } from 'react-redux';
 
+import { HIDDEN_MARKETS } from '@/constants/hiddenMarkets';
 import {
   HiddenMarketFilterTags,
   MARKET_FILTER_OPTIONS,
@@ -74,7 +75,7 @@ const sortByMarketCap = (a: AssetData, b: AssetData) => {
   return (b.marketCap ?? 0) - (a.marketCap ?? 0);
 };
 
-const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT', 'PIPPIN']);
+const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT', ...HIDDEN_MARKETS]);
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
@@ -116,9 +117,10 @@ export const useMarketsData = ({
       .filter(isTruthy)
       // filter out markets that cannot be traded
       .filter((m) => m.status !== 'FINAL_SETTLEMENT')
-      // temporarily filter out markets with empty/0 oracle price
+      // temporarily filter out markets with empty/0 oracle price and $0 open interest
       .filter((m) => MustBigNumber(m.oraclePrice).gt(0))
-      .filter((a) => !ASSETS_TO_REMOVE.has(a.assetId))
+      .filter((m) => MustBigNumber(m.openInterestUSDC).gt(0))
+      .filter((m) => !HIDDEN_MARKETS.has(m.assetId))
       .map(getMarketDataFromPerpetualMarketSummary);
 
     const unlaunchedMarketsData =
