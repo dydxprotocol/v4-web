@@ -1,5 +1,4 @@
 export const HIDDEN_MARKETS = new Set([
-  'PIPPIN',
   'BABYDOGE',
   'ID',
   'AERGO',
