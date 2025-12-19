@@ -64,9 +64,9 @@ const calculateClosedPnl = (fill: IndexerCompositeFillObject) => {
 
   // Old fills are not supported so we show -- instead of 0
   if (
-    fill.positionSideBefore === undefined ||
-    fill.positionSizeBefore === undefined ||
-    fill.entryPriceBefore === undefined
+    fill.positionSideBefore == null ||
+    fill.positionSizeBefore == null ||
+    fill.entryPriceBefore == null
   ) {
     return undefined;
   }

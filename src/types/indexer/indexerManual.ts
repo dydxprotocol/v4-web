@@ -157,9 +157,9 @@ export interface IndexerCompositeFillObject {
   clientMetadata?: string | null;
   subaccountNumber?: number;
   market?: string;
-  positionSideBefore?: IndexerPositionSide;
-  positionSizeBefore?: string;
-  entryPriceBefore?: string;
+  positionSideBefore?: IndexerPositionSide | null;
+  positionSizeBefore?: string | null;
+  entryPriceBefore?: string | null;
 }
 
 export interface IndexerWsParentSubaccountSubscribedResponse {
