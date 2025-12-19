@@ -74,7 +74,7 @@ const sortByMarketCap = (a: AssetData, b: AssetData) => {
   return (b.marketCap ?? 0) - (a.marketCap ?? 0);
 };
 
-const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT']);
+const ASSETS_TO_REMOVE = new Set(['USDC', 'USDT', 'PIPPIN']);
 export const useMarketsData = ({
   filter = MarketFilters.ALL,
   searchFilter,
