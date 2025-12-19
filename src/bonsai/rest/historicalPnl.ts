@@ -55,16 +55,18 @@ export function useParentSubaccountHistoricalPnls() {
           for (let request = 0; request < MAX_REQUESTS; request += 1) {
             const thisResult =
               // eslint-disable-next-line no-await-in-loop
-              await indexerClient.account.getParentSubaccountNumberHistoricalPNLsV2(
-                address,
-                subaccount,
-                true,
-                undefined,
-                // one second before oldest current result
-                mapIfPresent(allResults.at(-1), (r) =>
-                  new Date(new Date(r.createdAt).getTime() - timeUnits.second).toISOString()
-                ) ?? undefined
-              );
+              await indexerClient.account
+                .getParentSubaccountNumberHistoricalPNLsV2(
+                  address,
+                  subaccount,
+                  true,
+                  undefined,
+                  // one second before oldest current result
+                  mapIfPresent(allResults.at(-1), (r) =>
+                    new Date(new Date(r.createdAt).getTime() - timeUnits.second).toISOString()
+                  ) ?? undefined
+                )
+                .catch(() => ({ pnl: [] }));
             const typedResult = isIndexerHistoricalPnlResponse(thisResult);
 
             // we discard the final item because the indexer incorrectly computes this datapoint on nearly every request
@@ -93,12 +95,9 @@ export function useParentSubaccountHistoricalPnls() {
         const hourlyResults = runFn(async () => {
           const result =
             // eslint-disable-next-line no-await-in-loop
-            await indexerClient.account.getParentSubaccountNumberHistoricalPNLsV2(
-              address,
-              subaccount,
-              false,
-              undefined
-            );
+            await indexerClient.account
+              .getParentSubaccountNumberHistoricalPNLsV2(address, subaccount, false, undefined)
+              .catch(() => ({ pnl: [] }));
           const typedResult = isIndexerHistoricalPnlResponse(result);
 
           // we discard the final item because the indexer incorrectly computes this datapoint on nearly every request
