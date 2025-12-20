@@ -210,10 +210,183 @@ const notional = Trading.Positions.calculateNotional(positionHistory, oraclePric
 
 ---
 
-## Future Work (Next Sprints)
+## Next Steps: Complete Trading Domain
 
-### GraphQL Subscriptions Integration
-**Deferred:** Backend implementation pending
+### Task 3: Implement Orders Subdomain
+**Priority:** HIGH
+**Story Points:** 8-10 (estimated 5-7 hours)
+**User Stories:** STAR-107, STAR-108, STAR-110, STAR-113
+**Location:** `fuel-ts-sdk/src/trading/src/orders/`
+
+**Prerequisites:**
+- Indexer must expose order events and fill tracking
+- GraphQL schema must include Order, OrderStatus, OrderType queries
+
+**Implementation Checklist:**
+
+**Domain Layer:**
+- [ ] Create `Order` domain model (ID, account, market, size, price, timestamp, status, type, side)
+- [ ] Create `Fill` domain model for order execution history
+- [ ] Define Zod schemas for validation
+- [ ] Create domain enums: `OrderStatus`, `OrderType`, `OrderSide`
+- [ ] Type guards and accessors
+
+**Adapter Layer:**
+- [ ] GraphQL operations: `getOrdersByAccount`, `getOrderHistory`, `getOrderFills`
+- [ ] Create `OrderRepository` port interface
+- [ ] Implement `GraphQLOrderRepository`
+
+**State Layer:**
+- [ ] Create `orders` Redux slice: `LoadableState<Record<Address, Order[]>>`
+- [ ] Thunks: `fetchOrdersByAccount`, `fetchOrderHistory`
+- [ ] Selectors: `selectOrdersByAccount`, `selectActiveOrders`, `selectOrderHistory`
+- [ ] Optional: `fills` slice for granular fill tracking
+
+**Services Layer:**
+- [ ] Create `OrderDataService` using StoreService
+- [ ] Methods: `getOrdersByAccount`, `getActiveOrders`, `getOrderHistory`, `getOrderFills`
+- [ ] All methods return `DataResult<T>`
+
+**Integration:**
+- [ ] Update `trading/di.ts` to include orders
+- [ ] Export from `trading/src/orders/index.ts`
+- [ ] Update `TradingThunkExtras` type
+- [ ] Wire up services in client
+
+**Testing:**
+- [ ] Domain model tests
+- [ ] Repository adapter tests
+- [ ] Redux state tests (thunks, reducers, selectors)
+- [ ] Service tests with mock store
+
+**Acceptance Criteria:**
+- ✅ All tests passing
+- ✅ Services return DataResult<T>
+- ✅ Follows same pattern as Markets/Positions
+- ✅ Integrated into `client.trading.orders`
+
+**Related User Stories:**
+- **STAR-107**: Open Long Position - needs order placement
+- **STAR-108**: Open Short Position - needs order placement
+- **STAR-110**: Close Positions - needs order management
+- **STAR-113**: View Trading History - needs order/fill history
+
+---
+
+### Task 4: Implement Funding Subdomain
+**Priority:** MEDIUM
+**Story Points:** 5-7 (estimated 3-4 hours)
+**User Stories:** STAR-109 (position details), STAR-127 (analytics)
+**Location:** `fuel-ts-sdk/src/trading/src/funding/`
+
+**Prerequisites:**
+- Indexer tracks funding rate updates
+- GraphQL schema includes funding rate queries
+
+**Implementation Checklist:**
+
+**Domain Layer:**
+- [ ] Create `FundingRate` model (market, rate, timestamp, next funding time)
+- [ ] Create `FundingPayment` model (position key, payment amount, timestamp)
+- [ ] Define Zod schemas
+
+**Adapter Layer:**
+- [ ] GraphQL operations: `getFundingRates`, `getFundingHistory`
+- [ ] Create `FundingRepository` port
+- [ ] Implement `GraphQLFundingRepository`
+
+**State Layer:**
+- [ ] Create `funding-rates` slice: `LoadableState<Record<AssetId, FundingRate>>`
+- [ ] Thunks: `fetchFundingRates`
+- [ ] Selectors: `selectFundingRate`, `selectAllFundingRates`
+- [ ] Optional: `funding-payments` slice
+
+**Services Layer:**
+- [ ] Create `FundingDataService`
+- [ ] Methods: `getFundingRate`, `getFundingPayments`
+- [ ] Pure calculation helpers:
+  - `calculateNextFundingPayment(position, fundingRate)`
+  - `calculateAccruedFunding(position, currentRate)`
+
+**Integration:**
+- [ ] Update `trading/di.ts`
+- [ ] Export from `trading/src/funding/index.ts`
+- [ ] Update `TradingThunkExtras`
+- [ ] Wire up in client
+
+**Testing:**
+- [ ] Domain tests
+- [ ] Repository tests
+- [ ] State management tests
+- [ ] Calculation function tests
+
+**Acceptance Criteria:**
+- ✅ Funding rates accessible via services
+- ✅ Calculations integrate with position metrics
+- ✅ Tests passing
+- ✅ Follows established patterns
+
+---
+
+### Task 5: Frontend Integration (SDK Consumer)
+**Priority:** HIGH
+**Story Points:** 13-21 (not SDK work, listed for context)
+**User Stories:** STAR-123, STAR-126, STAR-127
+**Location:** `src/@starboard/trading/`
+
+**SDK Consumption Pattern:**
+```typescript
+// Frontend setup
+import { createStarboardClient } from 'fuel-ts-sdk';
+import type { Position, Order, DataResult } from 'fuel-ts-sdk';
+import { PositionSide, OrderStatus } from 'fuel-ts-sdk';
+
+const client = createStarboardClient({ indexerUrl: process.env.INDEXER_URL });
+
+// Redux Provider setup
+<Provider store={client.store}>
+  <App />
+</Provider>
+
+// Fetch data via thunks
+const dispatch = useAppDispatch();
+useEffect(() => {
+  dispatch(fetchPositionsByAccount(account));
+  dispatch(fetchOrdersByAccount(account));
+  dispatch(fetchOraclePrices(marketAssets));
+}, [account, dispatch]);
+
+// Access via services with status handling
+const positionsResult = client.trading.positions.positionDataService
+  .getPositionsByAccount(account);
+
+if (positionsResult.status === 'pending') return <Spinner />;
+if (positionsResult.status === 'rejected') return <Error error={positionsResult.error} />;
+if (positionsResult.status === 'fulfilled') {
+  const positions = positionsResult.data;
+  // Render positions
+}
+
+// Use pure calculation functions
+const metrics = client.trading.portfolio.calculatePortfolioMetrics(
+  positions, collateralBalance, oraclePrices, usedMargin
+);
+```
+
+**Frontend Deliverables (not SDK scope):**
+- Trading forms (PositionForm.tsx)
+- Positions table (PositionsTable.tsx)
+- Order management UI
+- Market selector and stats
+- P&L charts
+- Trading history view
+
+---
+
+### Task 6: GraphQL Subscriptions (Future)
+**Priority:** LOW (deferred until backend ready)
+**Story Points:** 3-5
+**Location:** All subdomains (add subscriptions to existing repositories)
 
 **Planned Approach:**
 - Add subscription methods to repositories
@@ -237,41 +410,28 @@ export const subscribeToOraclePrices = createAsyncThunk(
 
 ---
 
-### Additional Subdomains (Per domain-ownership.md)
+## Other Domains (Outside Trading)
 
-#### Orders Subdomain
-**Location:** `fuel-ts-sdk/src/trading/src/orders/` (not started)
-
-**Scope:**
-- Order domain models (`Order`, `OrderStatus`, `OrderType`)
-- Order repository (GraphQL)
-- Order state management (Redux)
-- Order services with StoreService
-
-#### Funding Subdomain
-**Location:** `fuel-ts-sdk/src/trading/src/funding/` (not started)
-
-**Scope:**
-- Funding rate calculations
-- Funding payment history
-- State management for funding rates
-
-#### Liquidity Domain (Top-Level)
-**Location:** `fuel-ts-sdk/src/liquidity/` (not started)
+### Liquidity Domain (Top-Level)
+**Location:** `fuel-ts-sdk/src/liquidity/`
+**Story Points:** ~30-40
+**User Stories:** STAR-115, STAR-116, STAR-117
 
 **Scope:**
 - LP position management
 - Pool state queries
 - Fee distribution calculations
-- Similar full-stack structure as trading
+- Similar full-stack structure as Trading
 
-#### Account Domain (Top-Level)
-**Location:** `fuel-ts-sdk/src/account/` (not started)
+### Account/Collateral Domain (Top-Level)
+**Location:** `fuel-ts-sdk/src/account/`
+**Story Points:** ~20-25
+**User Stories:** STAR-112, STAR-114
 
 **Scope:**
 - Wallet integration helpers
-- Balance queries
-- Collateral management
+- Balance queries (native + ERC20)
+- Collateral deposit/withdrawal
 - Account dashboard aggregations
 
 ---
