@@ -1,8 +1,8 @@
-import { decimalValueSchema } from '@/shared/utils/decimalCalculator';
 import { PercentageValue, RatioOutput, UsdValue } from '@/shared/models/decimals';
+import { decimalValueSchema } from '@/shared/utils/decimalCalculator';
 import { z } from 'zod';
 
-export const AccountMetricsSchema = z.object({
+export const PortfolioMetricsSchema = z.object({
   equity: decimalValueSchema(UsdValue),
   totalNotional: decimalValueSchema(UsdValue),
   accountLeverage: decimalValueSchema(RatioOutput),
