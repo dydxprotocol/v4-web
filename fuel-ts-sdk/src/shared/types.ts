@@ -43,3 +43,14 @@ export const safePriceId = (str: string): PriceId | undefined => {
   const result = PriceIdSchema.safeParse(str);
   return result.success ? result.data : undefined;
 };
+
+/**
+ * CandleId - Unique candle identifier
+ */
+export const CandleIdSchema = z.string().min(1, 'Candle ID cannot be empty').brand<'CandleId'>();
+export type CandleId = z.infer<typeof CandleIdSchema>;
+export const candleId = (str: string): CandleId => CandleIdSchema.parse(str);
+export const safeCandleId = (str: string): CandleId | undefined => {
+  const result = CandleIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};

@@ -1,0 +1,63 @@
+type CandleM1 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleM5 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleM15 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleM30 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleH1 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleH4 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+
+type CandleD1 @entity {
+  id: ID!
+  asset: String! @index
+  startedAt: Int!
+  lowPrice: BigInt!
+  highPrice: BigInt!
+  closePrice: BigInt!
+}
+

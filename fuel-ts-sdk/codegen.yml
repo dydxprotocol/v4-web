@@ -7,6 +7,7 @@
 
 schema:
   - ../indexer/schema.graphql
+  - ../indexer/schema.views.graphql
   - ./scalar-definitions.graphql
 generates:
   src/generated/graphql.ts:
