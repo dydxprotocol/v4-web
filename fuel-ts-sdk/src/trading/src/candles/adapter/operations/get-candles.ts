@@ -7,7 +7,7 @@ import type {
   CandleM30,
   CandleM5,
 } from '@/generated/graphql';
-import { AssetId, assetId, candleId } from '@/shared/types';
+import { AssetId, assetId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 
 import { CandleSchema, type Candle } from '../../domain';

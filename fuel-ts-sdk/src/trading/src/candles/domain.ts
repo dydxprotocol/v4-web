@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AssetIdSchema, CandleIdSchema } from '@/shared/types';
+import { AssetIdSchema } from '@/shared/types';
 
 export type Candle = z.infer<typeof CandleSchema>;
 
