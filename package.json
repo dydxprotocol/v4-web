@@ -93,7 +93,7 @@
     "@react-spring/web": "^9.7.2",
     "@react-stately/table": "^3.9.1",
     "@react-types/table": "^3.6.1",
-    "@reduxjs/toolkit": "^2.2.5",
+    "@reduxjs/toolkit": "^2.2.7",
     "@skip-go/client": "1.1.7",
     "@solana/web3.js": "^1.93.0",
     "@statsig/js-client": "1.4.0",
