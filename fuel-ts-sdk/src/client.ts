@@ -1,8 +1,9 @@
-import { Positions } from '@/trading';
+import { Positions, Prices } from '@/trading';
 import { GraphQLClient } from 'graphql-request';
 
 export interface StarboardClient {
   positions: Positions.PositionRepository;
+  prices: Prices.PriceRepository;
 }
 
 export interface StarboardClientConfig {
@@ -14,5 +15,6 @@ export const createStarboardClient = (config: StarboardClientConfig): StarboardC
 
   return {
     positions: Positions.createGraphQLPositionRepository(graphqlClient),
+    prices: Prices.createGraphQLPriceRepository(graphqlClient),
   };
 };

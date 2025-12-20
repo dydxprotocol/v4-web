@@ -32,3 +32,14 @@ export const safePositionId = (str: string): PositionId | undefined => {
   const result = PositionIdSchema.safeParse(str);
   return result.success ? result.data : undefined;
 };
+
+/**
+ * PriceId - Unique price identifier
+ */
+export const PriceIdSchema = z.string().min(1, 'Price ID cannot be empty').brand<'PriceId'>();
+export type PriceId = z.infer<typeof PriceIdSchema>;
+export const priceId = (str: string): PriceId => PriceIdSchema.parse(str);
+export const safePriceId = (str: string): PriceId | undefined => {
+  const result = PriceIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};

@@ -3,7 +3,6 @@ import { AddressSchema, AssetIdSchema, PositionIdSchema } from '@/shared/types';
 import { PositionChange } from '@/generated/graphql';
 
 export type PositionKey = z.infer<typeof PositionKeySchema>;
-
 export type Position = z.infer<typeof PositionSchema>;
 
 // Re-export PositionChange from generated types (single source of truth)
