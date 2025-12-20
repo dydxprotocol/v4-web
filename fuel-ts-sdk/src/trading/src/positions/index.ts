@@ -1,3 +1,9 @@
+import type { StoreService } from '@/shared/lib/store-service';
+import type { GraphQLClient } from 'graphql-request';
+
+import { createGraphQLPositionRepository } from './adapter';
+import { createPositionDataService } from './services/position-data.service';
+
 export {
   calculateEntryPrice,
   filterClosedPositions,
@@ -34,3 +40,19 @@ export {
   calculatePositionHealth,
   calculateRiskMetrics,
 } from './services/risk.service';
+
+export type { PositionDataService } from './services/position-data.service';
+
+export { positionsReducer, type PositionsThunkExtra } from './state/positions/index';
+
+export function createRepositories(graphqlClient: GraphQLClient) {
+  return {
+    graphQLPositionRepository: createGraphQLPositionRepository(graphqlClient),
+  };
+}
+
+export function createServices(storeService: StoreService) {
+  return {
+    positionDataService: createPositionDataService(storeService),
+  };
+}

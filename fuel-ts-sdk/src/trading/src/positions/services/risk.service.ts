@@ -1,7 +1,7 @@
 import { PercentageValue, RatioOutput, UsdValue } from '@/shared/models/decimals';
 import { DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 
-import type { MarketConfig } from '../../../shared/types';
+import type { MarketConfig } from '@/trading/src/markets';
 import type { RiskMetrics } from '../domain/risk.models';
 
 export function calculateInitialMargin(notional: UsdValue, marketConfig: MarketConfig): UsdValue {

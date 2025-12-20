@@ -1,7 +1,7 @@
 import { PercentageValue, UsdValue } from '@/shared/models/decimals';
 import { describe, expect, it } from 'vitest';
 
-import type { MarketConfig } from '../../shared/types';
+import type { MarketConfig } from '@/trading/src/markets';
 import {
   calculateInitialMargin,
   calculateMaintenanceMargin,

@@ -7,7 +7,7 @@ import {
 } from '@/shared/models/decimals';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 
-import type { MarketConfig } from '../../../shared/types';
+import type { MarketConfig } from '@/trading/src/markets';
 import { getPositionSide } from '../domain/positions.accessors';
 import type { Position } from '../domain/positions.models';
 import { PositionSide } from '../domain/positions.models';

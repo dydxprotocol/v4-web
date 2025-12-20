@@ -2,7 +2,7 @@ import { CollateralAmount, OraclePrice, PercentageValue, UsdValue } from '@/shar
 import { address, assetId, positionId } from '@/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import type { MarketConfig } from '../../shared/types';
+import type { MarketConfig } from '@/trading/src/markets';
 import { PositionSize } from '../../src/positions/domain/positions.decimals';
 import { PositionChange } from '../../src/positions/domain/positions.models';
 import {
