@@ -2,15 +2,15 @@ import { CollateralAmount, OraclePrice, UsdValue } from '@/shared/models/decimal
 import { address, assetId } from '@/shared/types';
 import { describe, expect, it } from 'vitest';
 
+import { portfolioMetrics } from '@/cross-domain/portfolio/services/portfolio-metrics.service';
 import { PositionSize } from '../../src/positions/domain/positions.decimals';
-import {
-  calculateAccountEquity,
-  calculateAccountLeverage,
-  calculateAccountMetrics,
-  calculateMarginUsage,
-  calculateTotalNotional,
-} from '../../src/account/services/account-metrics.service';
 import { createMockPosition } from '../positions/helpers';
+
+const calculateAccountEquity = portfolioMetrics.calculateAccountEquity.bind(portfolioMetrics);
+const calculateAccountLeverage = portfolioMetrics.calculateAccountLeverage.bind(portfolioMetrics);
+const calculateAccountMetrics = portfolioMetrics.calculatePortfolioMetrics.bind(portfolioMetrics);
+const calculateMarginUsage = portfolioMetrics.calculateMarginUsage.bind(portfolioMetrics);
+const calculateTotalNotional = portfolioMetrics.calculateTotalNotional.bind(portfolioMetrics);
 
 describe('Account Metrics Service', () => {
   describe('calculateAccountEquity', () => {
