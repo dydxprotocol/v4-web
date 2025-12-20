@@ -1,3 +1,4 @@
+import type { AssetId } from '@/shared/types';
 import type { Price } from './domain';
 
 /**
@@ -9,7 +10,7 @@ export interface GetPricesOptions {
   /**
    * Filter by asset identifier (raw string as returned by the subgraph).
    */
-  asset?: string;
+  asset?: AssetId;
   /**
    * Default ordering is by timestamp descending.
    */

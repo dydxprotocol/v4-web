@@ -1,5 +1,5 @@
 import type { Position as GraphQLPosition } from '@/generated/graphql';
-import { address, assetId, positionId } from '@/shared/types';
+import { Address, address, AssetId, assetId, positionId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 
 import { PositionKeySchema, PositionSchema, type Position } from '../../domain';
@@ -23,10 +23,19 @@ export const getPositions =
     return data.positions.nodes.map(toDomainPosition);
   };
 
+interface PositionWhereClause {
+  positionKey?: {
+    account_eq?: Address;
+    indexAssetId_eq?: AssetId;
+    isLong_eq?: boolean;
+  };
+  latest_eq?: boolean;
+}
+
 function buildWhereClause(options: GetPositionsOptions) {
   const { account, indexAssetId, isLong, latestOnly } = options;
 
-  const where: any = {};
+  const where: PositionWhereClause = {};
 
   if (account || indexAssetId || isLong !== undefined) {
     where.positionKey = {};

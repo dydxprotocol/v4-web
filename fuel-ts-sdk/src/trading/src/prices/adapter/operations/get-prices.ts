@@ -1,5 +1,5 @@
 import type { Price as GraphQLPrice } from '@/generated/graphql';
-import { assetId, priceId } from '@/shared/types';
+import { AssetId, assetId, priceId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 
 import { PriceSchema, type Price } from '../../domain';
@@ -23,10 +23,14 @@ export const getPrices =
     return data.prices.nodes.map(toDomainPrice);
   };
 
+interface PriceWhereClause {
+  asset_eq?: AssetId;
+}
+
 function buildWhereClause(options: GetPricesOptions) {
   const { asset } = options;
 
-  const where: any = {};
+  const where: PriceWhereClause = {};
 
   if (asset) {
     where.asset_eq = asset;
