@@ -12,5 +12,14 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
   ],
+  "rules": {
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ]
+  },
   "ignorePatterns": ["src/generated/", "dist/", "node_modules/"]
 }
