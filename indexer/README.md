@@ -69,7 +69,7 @@ To build the Docker image `starboard/fuel-core` refer to the `docker/README.md` 
 Run the database and the fuel node.
 
 ```shell
-pnpm sqd up:local
+pnpm sqd up:e2e
 ```
 
 Run an example test
@@ -80,7 +80,7 @@ Run an example test
 Shut down the database and the fuel node.
 
 ```shell
-pnpm sqd down:local
+pnpm sqd down:e2e
 ```
 
 The interactive mode simply waits for Ctrl-C to initialize the shutdown 

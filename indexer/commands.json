@@ -20,11 +20,11 @@
     },
     "up:e2e": {
       "description": "Start a PG database and Fuel Node",
-      "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "up", "-d"]
+      "cmd": ["docker", "compose", "-f", "docker-compose-indexer-e2e.yml", "up", "-d"]
     },
     "down:e2e": {
       "description": "Drop a PG database and Fuel Node",
-      "cmd": ["docker-compose", "-f", "docker-compose-indexer-e2e.yml", "down", "-v"]
+      "cmd": ["docker", "compose", "-f", "docker-compose-indexer-e2e.yml", "down", "-v"]
     },
     "migration:apply": {
       "description": "Apply the DB migrations",

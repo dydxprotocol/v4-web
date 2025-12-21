@@ -20,7 +20,7 @@ export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((build, opti
       }
 
       extend type Query {
-        squidStatus: _ProcessorStatus!
+        squidStatus: [_ProcessorStatus!]!
       }
     `,
     resolvers: {
@@ -34,7 +34,9 @@ export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((build, opti
               .join(' UNION ALL ')
           );
 
-          return rows;
+          console.log('rows', rows);
+
+          return rows || [];
         },
       },
     },
@@ -76,7 +78,7 @@ app.use(
       externalGraphqlRoute:
         process.env.BASE_PATH == null ? undefined : `${process.env.BASE_PATH}/api/graphql`,
       graphileBuildOptions: {
-        stateSchemas: ['evm'],
+        stateSchemas: ['squid_processor'],
       },
     }
   )

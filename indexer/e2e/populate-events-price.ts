@@ -4,22 +4,19 @@ import { Provider, Wallet } from 'fuels';
 import { StorkMock } from '../../contracts/types';
 import {
   call,
-  getArgs,
   moveBlockchainTime,
   toPrice,
   BTC_ASSET,
   USDC_ASSET,
   ETH_ASSET,
+  deployerPK,
 } from './utils';
-
-// priv keys are hardcoded, taken form the fuel node starting script
-const deployerPK = '0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a'; // 0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6
 
 // graphql url is hardcoded, taken form the fuel node starting script
 const graphQLUrl = 'http://127.0.0.1:4000/v1/graphql';
 
 if (require.main === module) {
-  populateEvents(getArgs(['mockPricefeedAddress', 'vaultAddress', 'usdcAddress']))
+  populateEvents()
     .then(() => {
       process.exit(0);
     })
@@ -30,13 +27,19 @@ if (require.main === module) {
     });
 }
 
-async function populateEvents(taskArgs: any) {
+async function populateEvents() {
+  const mockPricefeedAddress = process.env.MOCK_STORK_CONTRACT;
+
+  if (!mockPricefeedAddress) {
+    throw new Error('Missing required environment variable: MOCK_STORK_CONTRACT');
+  }
+
   const provider = new Provider(graphQLUrl);
 
   // preparation, usually the same for all the populate scripts
   const deployerWallet = Wallet.fromPrivateKey(deployerPK, provider);
 
-  const storkMockDeployer = new StorkMock(taskArgs.mockPricefeedAddress, deployerWallet);
+  const storkMockDeployer = new StorkMock(mockPricefeedAddress, deployerWallet);
 
   // custom code, populate the events
   await call(storkMockDeployer.functions.update_price(USDC_ASSET, toPrice(1)));
