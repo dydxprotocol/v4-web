@@ -9,7 +9,7 @@ import {
   BTC_ASSET,
   USDC_ASSET,
   ETH_ASSET,
-  deployerPK,
+  DEPLOYER_PK,
 } from './utils';
 
 // graphql url is hardcoded, taken form the fuel node starting script
@@ -37,7 +37,7 @@ async function populateEvents() {
   const provider = new Provider(graphQLUrl);
 
   // preparation, usually the same for all the populate scripts
-  const deployerWallet = Wallet.fromPrivateKey(deployerPK, provider);
+  const deployerWallet = Wallet.fromPrivateKey(DEPLOYER_PK, provider);
 
   const storkMockDeployer = new StorkMock(mockPricefeedAddress, deployerWallet);
 

@@ -34,9 +34,7 @@ export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((build, opti
               .join(' UNION ALL ')
           );
 
-          console.log('rows', rows);
-
-          return rows || [];
+          return rows;
         },
       },
     },

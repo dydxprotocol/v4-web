@@ -16,17 +16,17 @@ import {
   BTC_ASSET,
   USDC_ASSET,
   ETH_ASSET,
-  deployerPK,
-  user0PK,
-  user1PK,
-  user2PK,
+  DEPLOYER_PK,
+  USER_0_PK,
+  USER_1_PK,
+  USER_2_PK,
 } from './utils';
 
 // graphql url is hardcoded, taken form the fuel node starting script
 const graphQLUrl = 'http://127.0.0.1:4000/v1/graphql';
 
 if (require.main === module) {
-  pupulateEvents()
+  populateEvents()
     .then(() => {
       process.exit(0);
     })
@@ -37,7 +37,7 @@ if (require.main === module) {
     });
 }
 
-async function pupulateEvents() {
+async function populateEvents() {
   const mockPricefeedAddress = process.env.MOCK_STORK_CONTRACT;
   const vaultAddress = process.env.VAULT_CONTRACT;
   const pricefeedWrapperAddress = process.env.PRICEFEED_WRAPPER_CONTRACT;
@@ -52,10 +52,10 @@ async function pupulateEvents() {
   const provider = new Provider(graphQLUrl);
 
   // preparation, usually the same for all the populate scripts
-  const deployerWallet = Wallet.fromPrivateKey(deployerPK, provider);
-  const user0Wallet = Wallet.fromPrivateKey(user0PK, provider);
-  const user1Wallet = Wallet.fromPrivateKey(user1PK, provider);
-  const user2Wallet = Wallet.fromPrivateKey(user2PK, provider);
+  const deployerWallet = Wallet.fromPrivateKey(DEPLOYER_PK, provider);
+  const user0Wallet = Wallet.fromPrivateKey(USER_0_PK, provider);
+  const user1Wallet = Wallet.fromPrivateKey(USER_1_PK, provider);
+  const user2Wallet = Wallet.fromPrivateKey(USER_2_PK, provider);
 
   const user0Identity = walletToAddressIdentity(user0Wallet);
   const user1Identity = walletToAddressIdentity(user1Wallet);

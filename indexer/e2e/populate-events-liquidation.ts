@@ -17,10 +17,10 @@ import {
   getBtcConfig,
   getEthConfig,
   ETH_MAX_LEVERAGE,
-  deployerPK,
-  user0PK,
-  user1PK,
-  liquidatorPK,
+  DEPLOYER_PK,
+  USER_0_PK,
+  USER_1_PK,
+  LIQUIDATOR_PK,
 } from './utils';
 
 // graphql url is hardcoded, taken form the fuel node starting script
@@ -53,10 +53,10 @@ async function populateEvents() {
   const provider = new Provider(graphQLUrl);
 
   // preparation, usually the same for all the populate scripts
-  const deployerWallet = Wallet.fromPrivateKey(deployerPK, provider);
-  const user0Wallet = Wallet.fromPrivateKey(user0PK, provider);
-  const user1Wallet = Wallet.fromPrivateKey(user1PK, provider);
-  const liquidatorWallet = Wallet.fromPrivateKey(liquidatorPK, provider);
+  const deployerWallet = Wallet.fromPrivateKey(DEPLOYER_PK, provider);
+  const user0Wallet = Wallet.fromPrivateKey(USER_0_PK, provider);
+  const user1Wallet = Wallet.fromPrivateKey(USER_1_PK, provider);
+  const liquidatorWallet = Wallet.fromPrivateKey(LIQUIDATOR_PK, provider);
 
   const user0Identity = walletToAddressIdentity(user0Wallet);
   const user1Identity = walletToAddressIdentity(user1Wallet);

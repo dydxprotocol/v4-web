@@ -27,13 +27,6 @@ export const USER_1_PK = '0xb978aa71a1487dc9c1f996493af73f0427cf78f560b606224e7f
 export const USER_2_PK = '0xb19556cb693d7850d0e75d05a6e2e4c9ed5691d9e5bc54a7d43ee6eed3ad5fe3'; // 0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b"
 export const LIQUIDATOR_PK = '0xa5675fc7eb0657940fc73f6ec6c5265c045065ddac62e12e1174da030f3868b3'; // 0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088"
 
-// camelCase exports for convenience
-export const deployerPK = DEPLOYER_PK;
-export const user0PK = USER_0_PK;
-export const user1PK = USER_1_PK;
-export const user2PK = USER_2_PK;
-export const liquidatorPK = LIQUIDATOR_PK;
-
 export function getArgs(requiredArgs: string[]) {
   const argsObject = process.argv.reduce(
     (args, arg) => {
