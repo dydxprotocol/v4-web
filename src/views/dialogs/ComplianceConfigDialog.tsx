@@ -8,9 +8,6 @@ import { ButtonAction } from '@/constants/buttons';
 import { ComplianceConfigDialogProps, DialogProps } from '@/constants/dialogs';
 import { MenuGroup } from '@/constants/menus';
 
-import { useAccounts } from '@/hooks/useAccounts';
-import { useDydxClient } from '@/hooks/useDydxClient';
-
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
@@ -36,7 +33,7 @@ const usePreferenceMenu = () => {
 
   const complianceStatus = useAppSelector(getComplianceStatus);
   const geo = useAppSelector(getGeo);
-  const geoRestricted = geo.currentlyGeoBlocked;
+  const geoRestricted = geo.isPerpetualsGeoBlocked;
   const notificationSection = useMemo(
     (): MenuGroup<string, string> => ({
       group: 'status',
@@ -63,7 +60,7 @@ const usePreferenceMenu = () => {
       items: [
         {
           value: 'RestrictGeo',
-          label: 'Simulate Restricted Geo',
+          label: 'Simulate Restricted Perps Geo',
           slotAfter: (
             <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
           ),
@@ -103,23 +100,6 @@ const usePreferenceMenu = () => {
 
 export const ComplianceConfigDialog = ({ setIsOpen }: DialogProps<ComplianceConfigDialogProps>) => {
   const preferenceItems = usePreferenceMenu();
-  const complianceStatus = useAppSelector(getComplianceStatus);
-
-  const { dydxAddress } = useAccounts();
-  const { compositeClient } = useDydxClient();
-
-  const submit = async () => {
-    const endpoint = `${compositeClient?.indexerClient.config.restEndpoint}/v4/compliance/setStatus`;
-    if (dydxAddress) {
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address: dydxAddress, status: complianceStatus }),
-      });
-    }
-  };
 
   return (
     <$ComboboxDialogMenu
@@ -128,8 +108,8 @@ export const ComplianceConfigDialog = ({ setIsOpen }: DialogProps<ComplianceConf
       items={preferenceItems}
       setIsOpen={setIsOpen}
     >
-      <Button action={ButtonAction.Primary} onClick={() => submit()}>
-        Submit
+      <Button action={ButtonAction.Primary} onClick={() => setIsOpen(false)}>
+        Close
       </Button>
     </$ComboboxDialogMenu>
   );

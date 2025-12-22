@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { accountTransactionManager } from '@/bonsai/AccountTransactionSupervisor';
-import { TradeFormInputData, TradeFormSummary, TradeFormType } from '@/bonsai/forms/trade/types';
+import { TradeFormInputData, TradeFormSummary } from '@/bonsai/forms/trade/types';
 import { PlaceOrderPayload } from '@/bonsai/forms/triggers/types';
 import { isOperationSuccess } from '@/bonsai/lib/operationResult';
 import { ErrorType, ValidationError } from '@/bonsai/lib/validationErrors';
@@ -10,8 +10,6 @@ import { BonsaiCore } from '@/bonsai/ontology';
 
 import { AnalyticsEvents } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';
-
-import { useTradeTypeOptions } from '@/views/forms/TradeForm/useTradeTypeOptions';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountInfoSelectors';
@@ -30,8 +28,8 @@ import { purgeBigNumbers } from '@/lib/purgeBigNumber';
 
 import { useAccounts } from '../useAccounts';
 import { ConnectionErrorType, useApiState } from '../useApiState';
+import { useComplianceState } from '../useComplianceState';
 import { useOnOrderIndexed } from '../useOnOrderIndexed';
-import { usePerpetualsComplianceState } from '../usePerpetualsComplianceState';
 import { useStringGetter } from '../useStringGetter';
 import { useSubaccount } from '../useSubaccount';
 
@@ -67,17 +65,12 @@ export const useTradeForm = ({
   const stringGetter = useStringGetter();
 
   const { connectionError } = useApiState();
-  const { complianceState } = usePerpetualsComplianceState();
+  const { complianceState } = useComplianceState();
   const { updateLeverage } = useSubaccount();
   const { dydxAddress } = useAccounts();
 
   const { setUnIndexedClientId, clientId: unIndexedClientId } =
     useOnOrderIndexed(onLastOrderIndexed);
-
-  const { selectedTradeType } = useTradeTypeOptions({
-    showAll: true,
-    showAssetIcon: true,
-  });
 
   const currentInput = useAppSelector(getCurrentTradePageForm);
   const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
@@ -96,14 +89,8 @@ export const useTradeForm = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
-  const closeOnlyTradingUnavailable =
-    complianceState === ComplianceStates.CLOSE_ONLY &&
-    selectedTradeType !== TradeFormType.MARKET &&
-    currentInput !== 'CLOSE_POSITION';
-
   const tradingUnavailable =
-    closeOnlyTradingUnavailable ||
-    complianceState === ComplianceStates.READ_ONLY ||
+    complianceState !== ComplianceStates.FULL_ACCESS ||
     connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
 
   const shouldEnableTrade =
