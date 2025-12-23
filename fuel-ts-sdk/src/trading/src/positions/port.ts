@@ -11,7 +11,7 @@ export interface GetPositionsOptions {
   indexAssetId?: AssetId;
   isLong?: boolean;
   latestOnly?: boolean;
-  orderBy?: 'TIMESTAMP_ASC' | 'TIMESTAMP_DESC';
+  orderBy?: 'timestamp_ASC' | 'timestamp_DESC';
 }
 
 /**

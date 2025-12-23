@@ -1,5 +1,10 @@
 node_modules/
-public/*
-!public/configs/
-!public/configs/*.json
-!public/configs/**/*.json
+dist/
+build/
+lib/
+.next/
+coverage/
+pnpm-lock.yaml
+*.min.js
+*.min.css
+frontend/src/vite-env.d.ts

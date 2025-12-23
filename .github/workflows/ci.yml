@@ -11,7 +11,13 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up pnpm
-      uses: dydxprotocol/setup-pnpm@v2.0.0
+      uses: pnpm/action-setup@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
 
     - name: Install forc
       shell: bash
@@ -22,12 +28,6 @@ jobs:
         fuelup update
         fuelup toolchain install mainnet
         fuelup default mainnet
-
-    - name: Set up Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        cache: pnpm
 
     - name: Run contracts tests
       run: |
@@ -41,8 +41,5 @@ jobs:
       run: |
         pnpm --filter fuel-ts-sdk test
 
-    - name: Postinstall script
-      run: |
-        tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
-
-    - run: pnpm exec vitest run
+    - name: Run frontend tests
+      run: pnpm exec vitest run

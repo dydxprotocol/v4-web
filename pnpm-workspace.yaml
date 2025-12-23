@@ -1,6 +1,7 @@
 packages:
   - contracts
   - indexer
+  - frontend
   - fuel-ts-sdk
 linkWorkspacePackages: true
 overrides:

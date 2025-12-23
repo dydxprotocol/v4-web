@@ -2,7 +2,6 @@
   "recommendations": [
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "styled-components.vscode-styled-components",
     "bradlc.vscode-tailwindcss"
   ]
 }

@@ -63,3 +63,7 @@ venv/
 coverage/
 .nyc_output/
 
+# TradingView (extracted via postinstall)
+frontend/public/tradingview/
+frontend/public/._tradingview
+

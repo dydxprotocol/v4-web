@@ -1,33 +1,31 @@
 import { gql } from 'graphql-request';
 
 export const GET_POSITIONS_QUERY = gql`
-query GetPositions($limit: Int, $offset: Int, $where: PositionFilter, $orderBy: [PositionsOrderBy!]) {
+query GetPositions($limit: Int, $offset: Int, $where: PositionWhereInput, $orderBy: [PositionOrderByInput!]) {
   positions(
     offset: $offset
-    filter: $where
+    where: $where
     orderBy: $orderBy
-    first: $limit
+    limit: $limit
   ) {
-    nodes {
+    id
+    positionKey {
+      account
       id
-      positionKey {
-        account
-        id
-        indexAssetId
-        isLong
-      }
-      collateralAmount
-      size
-      timestamp
-      latest
-      change
-      collateralTransferred
-      positionFee
-      fundingRate
-      pnlDelta
-      realizedFundingRate
-      realizedPnl
+      indexAssetId
+      isLong
     }
+    collateralAmount
+    size
+    timestamp
+    latest
+    change
+    collateralTransferred
+    positionFee
+    fundingRate
+    pnlDelta
+    realizedFundingRate
+    realizedPnl
   }
 }
 `;

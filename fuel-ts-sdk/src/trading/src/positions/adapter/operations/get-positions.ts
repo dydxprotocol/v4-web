@@ -9,18 +9,18 @@ import { GET_POSITIONS_QUERY } from './get-positions.query';
 export const getPositions =
   (client: GraphQLClient) =>
   async (options: GetPositionsOptions = {}): Promise<Position[]> => {
-    const { limit = 100, offset = 0, orderBy = 'TIMESTAMP_DESC' } = options;
+    const { limit = 100, offset = 0, orderBy = 'timestamp_DESC' } = options;
 
     const where = buildWhereClause(options);
 
-    const data = await client.request<{ positions: { nodes: GraphQLPosition[] } }>(GET_POSITIONS_QUERY, {
+    const data = await client.request<{ positions: GraphQLPosition[] }>(GET_POSITIONS_QUERY, {
       limit,
       offset,
       where,
       orderBy: [orderBy],
     });
 
-    return data.positions.nodes.map(toDomainPosition);
+    return data.positions.map(toDomainPosition);
   };
 
 interface PositionWhereClause {
