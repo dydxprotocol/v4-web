@@ -1,15 +1,29 @@
 {
   "explorer.sortOrder": "foldersNestsFiles",
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.context.ts": "$(capture).provider.tsx",
+    "*.context.tsx": "$(capture).provider.tsx",
+    "*.tsx": "$(capture).css.ts, $(capture).styles.ts, $(capture).test.tsx, $(capture).spec.tsx",
+    "*.ts": "$(capture).test.ts, $(capture).spec.ts"
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "files.watcherExclude": {
     "**/.git": true,
-    "**/node_modules/*": true,
-    "**/node_modules/@dydxprotocol/v4-abacus": false
+    "**/node_modules/*": true
   },
   "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "tailwindCSS.classAttributes": ["tw"],
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)", // tw`...`
@@ -30,5 +44,6 @@
       },
       "self_closing_tag": true
     }
-  }
+  },
+  "css.customData": [".vscode/css-custom-data.json"]
 }

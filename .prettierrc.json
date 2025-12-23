@@ -2,21 +2,21 @@
   "printWidth": 100,
   "singleQuote": true,
   "trailingComma": "es5",
-  "jsxBracketSameLine": false,
+  "semi": true,
+  "tabWidth": 2,
+  "arrowParens": "always",
+  "endOfLine": "lf",
   "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
-  "tailwindAttributes": ["tw"],
+  "tailwindAttributes": ["tw", "className"],
   "tailwindFunctions": ["tw"],
   "importOrder": [
-    "^./polyfills$",
     "^react$",
+    "^react-dom",
+    "^react-router",
     "<THIRD_PARTY_MODULES>",
-    "^@/(constants|abi|types)(.*)$",
-    "^@/(hooks|contexts)(.*)$",
-    "^@/(styles|icons)(.*)$",
-    "^@/(components|views|pages|layout)(.*)$",
-    "^@/state(.*)$",
-    "^@/(clients|lib)(.*)$",
+    "^@/(.*)$",
     "^[./]"
   ],
-  "importOrderSeparation": true
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true
 }

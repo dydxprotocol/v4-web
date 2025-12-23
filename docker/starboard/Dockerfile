@@ -26,7 +26,7 @@ RUN curl https://install.fuel.network | sh && \
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && \
     export NVM_DIR="$HOME/.nvm" && \
     . ${HOME}/.nvm/nvm.sh && \
-    nvm install 18
+    nvm install 22
 
 # Install pnpm
 RUN curl -fsSL https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
@@ -40,18 +40,15 @@ WORKDIR /starboard
 
 # Copy package files first (better layer caching)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY frontend/package.json ./frontend/
 COPY indexer/package.json ./indexer/
 COPY fuel-ts-sdk/package.json fuel-ts-sdk/codegen.yml fuel-ts-sdk/scalar-definitions.graphql ./fuel-ts-sdk/
 COPY contracts/package.json ./contracts/
 
-# Copy frozen legacy ts-sdk tarball
-COPY packages/starboard-client-js-1.3.17.tgz ./packages/
-
 # Copy files needed by preinstall and postinstall scripts
 COPY scripts ./scripts
-COPY tradingview ./tradingview
-COPY indexer/.env.example indexer/schema.graphql ./indexer/
-RUN mkdir -p public
+COPY packages/tradingview.tgz ./packages/
+COPY indexer/schema.graphql ./indexer/
 
 # Install dependencies (cached if package files haven't changed)
 RUN export PNPM_HOME="/root/.local/share/pnpm" && \
@@ -70,10 +67,11 @@ RUN export PNPM_HOME="/root/.local/share/pnpm" && \
     export PATH="${HOME}/.fuelup/bin:${PATH}" && \
     export NVM_DIR="$HOME/.nvm" && \
     . ${HOME}/.nvm/nvm.sh && \
+    pnpm run build:ts-sdk && \
     pnpm --filter starboard/contracts build && \
     pnpm --filter starboard/contracts gen:types && \
     pnpm --filter @starboard/indexer build && \
-    if [ -f tradingview/tradingview.tgz ]; then tar -xzC public -f tradingview/tradingview.tgz; fi
+    pnpm --filter frontend build
 
 # Copy contract setup script
 RUN if [ -f docker/starboard/setup_starboard_contracts.sh ]; then \

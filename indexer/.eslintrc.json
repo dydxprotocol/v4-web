@@ -1,5 +1,0 @@
-{
-  "parserOptions": {
-    "project": ["./tsconfig.json", "./tsconfig.e2e.json"]
-  }
-}
