@@ -15,6 +15,7 @@
   "dependencies": {
     "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
     "@graphile/pg-aggregates": "^0.1.1",
+    "@graphile/pg-pubsub": "^4.14.1",
     "@subsquid/batch-processor": "^0.0.0",
     "@subsquid/cli": "^3.2.3",
     "@subsquid/fuel-objects": "^0.0.4",
@@ -26,11 +27,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.1",
     "fuels": "0.101.3",
+    "graphile-build": "^4.14.1",
     "pg": "^8.13.0",
     "postgraphile": "^4.14.1",
-    "graphile-build": "^4.14.1",
-    "typeorm": "^0.3.20",
     "postgraphile-plugin-connection-filter": "^2.3.0",
+    "typeorm": "^0.3.20",
     "vitest": "1.4.0"
   },
   "devDependencies": {

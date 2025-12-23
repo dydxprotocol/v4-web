@@ -14,7 +14,7 @@ export interface GetCandlesOptions {
   limit?: number;
   offset?: number;
   /**
-   * Filter by asset identifier (raw string as returned by the subgraph).
+   * Filter by asset identifier.
    */
   asset?: AssetId;
   /**

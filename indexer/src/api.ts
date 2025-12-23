@@ -1,14 +1,15 @@
 import SimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
 import AggregatesPluggin from '@graphile/pg-aggregates';
+import PgPubsub from '@graphile/pg-pubsub';
 import express from 'express';
 import { NodePlugin } from 'graphile-build';
 import type * as pg from 'pg';
-import { gql, makeExtendSchemaPlugin, postgraphile, Plugin } from 'postgraphile';
+import { gql, makeExtendSchemaPlugin, postgraphile, Plugin, makePluginHook } from 'postgraphile';
 import FilterPlugin from 'postgraphile-plugin-connection-filter';
 
 const app = express();
 
-export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((build, options) => {
+export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((_build, options) => {
   const schemas: string[] = options.stateSchemas || ['squid_processor'];
 
   return {
@@ -41,6 +42,23 @@ export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((build, opti
   };
 });
 
+export const CurrentPricePlugin: Plugin = makeExtendSchemaPlugin((_build, _options) => {
+  return {
+    typeDefs: gql`
+      type _CurrentPricePayload {
+        asset: String!
+        timestamp: Int!
+        price: BigInt!
+      }
+
+      extend type Subscription {
+        currentPriceUpdated: _CurrentPricePayload
+          @pgSubscription(topic: "postgraphile:current_price_update")
+      }
+    `,
+  };
+});
+
 app.get('/graphql', (_req, res, _next) => {
   const graphiqlPath: string =
     process.env.BASE_PATH == null ? '/graphiql' : `${process.env.BASE_PATH}/api/graphiql`;
@@ -48,6 +66,8 @@ app.get('/graphql', (_req, res, _next) => {
     `<div>Welcome to the GraphQL API of SQD&#39;s <a href=https://github.com/subsquid-labs/squid-postgraphile-example>Postgraphile example squid</a>!</div><div><a href=${graphiqlPath}>The GraphiQL playground is here.</a></div>`
   );
 });
+
+const pluginHook = makePluginHook([PgPubsub]);
 
 app.use(
   postgraphile(
@@ -60,10 +80,12 @@ app.use(
     },
     'public',
     {
+      pluginHook,
       graphiql: true,
       enhanceGraphiql: true,
       watchPg: true,
       dynamicJson: true,
+      subscriptions: true,
       disableDefaultMutations: true,
       disableQueryLog: true, // set to false to see the processed queries
       skipPlugins: [NodePlugin],
@@ -72,6 +94,7 @@ app.use(
         FilterPlugin,
         SimplifyInflectorPlugin,
         ProcessorStatusPlugin,
+        CurrentPricePlugin,
       ],
       externalGraphqlRoute:
         process.env.BASE_PATH == null ? undefined : `${process.env.BASE_PATH}/api/graphql`,
