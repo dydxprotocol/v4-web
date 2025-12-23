@@ -56,7 +56,7 @@ const September2025RewardsPanel = () => {
               <div tw="font-medium-bold">
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025,
+                    key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025_UPDATE_1,
                     params: {
                       REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount,
                     },
@@ -67,19 +67,32 @@ const September2025RewardsPanel = () => {
                 {stringGetter({ key: STRING_KEYS.ACTIVE })}
               </SuccessTag>
             </div>
-            <span>
-              <span tw="text-color-text-0">
+            <div>
+              <p tw="mb-0.5 text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.COMPETITION_BODY_DEC_2025,
+                  key: STRING_KEYS.COMPETITION_BODY_1_DEC_2025,
                   params: {
-                    REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount,
+                    PROGRAM_LINK: (
+                      <Link href="https://www.mintscan.io/dydx/proposals/321" isInline>
+                        {stringGetter({ key: STRING_KEYS.COMPETITION_BODY_1_DEC_2025_LINK_TEXT })}
+                      </Link>
+                    ),
                   },
-                })}{' '}
-                <Link href="https://www.mintscan.io/dydx/proposals/321" isInline>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-                </Link>
-              </span>
-            </span>
+                })}
+              </p>
+              <p tw="text-color-text-0">
+                {stringGetter({
+                  key: STRING_KEYS.COMPETITION_BODY_2_DEC_2025,
+                  params: {
+                    HERE_LINK: (
+                      <Link href="https://www.dydx.xyz/liquidation-rebates" isInline>
+                        {stringGetter({ key: STRING_KEYS.HERE })}
+                      </Link>
+                    ),
+                  },
+                })}
+              </p>
+            </div>
           </div>
           <div tw="flex items-center gap-0.25 self-start rounded-3 bg-color-layer-1 px-0.875 py-0.5">
             <Icon iconName={IconName.Clock} size="1.25rem" tw="text-color-accent" />

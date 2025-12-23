@@ -21,7 +21,7 @@ export function setUpTransfersQuery(store: RootStore) {
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'transfers', data],
     getQueryFn: (indexerClient, data) => {
-      if (!isTruthy(data.wallet) || data.subaccount == null) {
+      if (!isTruthy(data.wallet) || data.subaccount == null || data.isGeoRestricted) {
         return null;
       }
       return async () => {

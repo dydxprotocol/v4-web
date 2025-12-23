@@ -72,7 +72,7 @@ export const selectRawLocalAddressScreenV2 = (state: RootState) =>
 export const selectRawSourceAddressScreenV2 = (state: RootState) =>
   state.raw.compliance.sourceAddressScreenV2;
 export const selectRawGeo = (state: RootState) => state.raw.compliance.geo;
-
+export const selectRawGeoHeaders = (state: RootState) => state.raw.compliance.geoHeaders;
 export const selectRawRewardParams = (state: RootState) => state.raw.rewards.data.data;
 export const selectRawRewardPrice = (state: RootState) => state.raw.rewards.price.data;
 

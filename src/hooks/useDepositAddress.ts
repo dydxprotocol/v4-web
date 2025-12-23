@@ -2,6 +2,7 @@ import { selectIndexerReady, selectIndexerUrl } from '@/bonsai/socketSelectors';
 import { useQuery } from '@tanstack/react-query';
 
 import { useAppSelector } from '@/state/appTypes';
+import { selectIsTurnkeyConnected } from '@/state/walletSelectors';
 
 import { useAccounts } from './useAccounts';
 
@@ -9,8 +10,9 @@ export const useDepositAddress = () => {
   const { dydxAddress } = useAccounts();
   const indexerUrl = useAppSelector(selectIndexerUrl);
   const indexerReady = useAppSelector(selectIndexerReady);
+  const isTurnkeyConnected = useAppSelector(selectIsTurnkeyConnected);
 
-  const canQueryForDepositAddresses = dydxAddress != null && indexerReady;
+  const canQueryForDepositAddresses = dydxAddress != null && indexerReady && isTurnkeyConnected;
 
   const {
     data: depositAddresses,

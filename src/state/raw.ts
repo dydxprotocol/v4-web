@@ -24,6 +24,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer';
 
 import { DydxNetwork } from '@/constants/networks';
+import { timeUnits } from '@/constants/time';
 import {
   IndexerHistoricalBlockTradingRewardsResponse,
   IndexerParentSubaccountTransferResponse,
@@ -51,6 +52,13 @@ interface NetworkState {
   errorInitializing: boolean;
 }
 
+export type GeoHeaders = {
+  status: string | 'restricted' | undefined;
+  region: string | undefined;
+  country: string | undefined;
+  lastUpdated: string; // ISO timestamp of when this was stored
+};
+
 export type HeightEntry = {
   requestTime: string;
   receivedTime: string;
@@ -69,6 +77,7 @@ export type ComplianceErrors = {
 };
 
 export type ComplianceState = {
+  geoHeaders: Loadable<GeoHeaders | undefined>;
   geo: Loadable<GeoState | undefined>;
   sourceAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
   localAddressScreenV2: Loadable<ComplianceResponse & ComplianceErrors>;
@@ -148,6 +157,7 @@ const initialState: RawDataState = {
   },
   configs: loadableIdle(),
   compliance: {
+    geoHeaders: loadableIdle(),
     geo: loadableIdle(),
     localAddressScreenV2: loadableIdle(),
     sourceAddressScreenV2: loadableIdle(),
@@ -236,6 +246,31 @@ export const rawSlice = createSlice({
       },
       setComplianceGeoRaw: (state, action: PayloadAction<Loadable<GeoState | undefined>>) => {
         state.compliance.geo = action.payload;
+      },
+      setComplianceGeoHeadersRaw: (
+        state,
+        action: PayloadAction<Loadable<Omit<GeoHeaders, 'lastUpdated'> | undefined>>
+      ) => {
+        const now = Date.now();
+        const lastUpdated = state.compliance.geoHeaders.data?.lastUpdated;
+
+        // Update if no data exists or if it's been more than an hour since last update
+        const shouldUpdate =
+          !state.compliance.geoHeaders.data ||
+          !lastUpdated ||
+          now - new Date(lastUpdated).getTime() > timeUnits.hour;
+
+        if (shouldUpdate && action.payload.status === 'success') {
+          state.compliance.geoHeaders = {
+            ...action.payload,
+            data: action.payload.data
+              ? {
+                  ...action.payload.data,
+                  lastUpdated: new Date().toISOString(),
+                }
+              : undefined,
+          };
+        }
       },
       setLocalAddressScreenV2Raw: (
         state,
@@ -384,6 +419,7 @@ export const {
   setMarketsFeeDiscountsRaw,
   setConfigTiers,
   setComplianceGeoRaw,
+  setComplianceGeoHeadersRaw,
   setLocalAddressScreenV2Raw,
   setSourceAddressScreenV2Raw,
   setRewardsParams,

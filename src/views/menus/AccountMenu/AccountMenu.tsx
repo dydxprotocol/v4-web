@@ -18,10 +18,10 @@ import { ConnectorType, DydxChainAsset, wallets, WalletType } from '@/constants/
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnableSpot } from '@/hooks/useEnableSpot';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useMobileAppUrl } from '@/hooks/useMobileAppUrl';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -62,7 +62,7 @@ import { WalletActions } from './WalletActions';
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
   const affiliatesEnabled = useStatsigGateValue(StatsigFlags.ffEnableAffiliates);
   const spotEnabled = useEnableSpot();
   const dispatch = useAppDispatch();

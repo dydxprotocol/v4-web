@@ -1,38 +1,30 @@
 import { useRef, useState } from 'react';
 
-import { ComplianceStatus } from '@/bonsai/types/summaryTypes';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonSize, ButtonStyle, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
+import { ButtonStyle, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useSimpleUiEnabled } from '@/hooks/useSimpleUiEnabled';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
-
 import { AlertMessage } from './AlertMessage';
-import { Button } from './Button';
 import { IconName } from './Icon';
 import { IconButton } from './IconButton';
-import { Link } from './Link';
+import { TermsOfUseLink } from './TermsOfUseLink';
 
 export const ComplianceBanner = ({ className }: { className?: string }) => {
   const [showLess, setShowLess] = useState(false);
   const complianceBannerRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const { complianceMessage, complianceStatus, showComplianceBanner, showRestrictionWarning } =
-    useComplianceState();
+  const { complianceMessage, showComplianceBanner, showRestrictionWarning } =
+    usePerpetualsComplianceState();
   const { isTablet } = useBreakpoints();
   const isSimpleUi = useSimpleUiEnabled();
 
@@ -53,32 +45,15 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
   const complianceContent = showRestrictionWarning ? (
     <span>
       {stringGetter({
-        key: STRING_KEYS.BLOCKED_BANNER_MESSAGE_SHORT,
+        key: STRING_KEYS.PERPETUALS_UNAVAILABLE_MESSAGE,
         params: {
-          TERMS_OF_USE_LINK: (
-            <Link href={`${BASE_ROUTE}${AppRoute.Terms}`} isInline>
-              {stringGetter({ key: STRING_KEYS.CONTACT_SUPPORT })}
-            </Link>
-          ),
+          TERMS_OF_USE_LINK: <TermsOfUseLink isInline tw="underline" />,
         },
       })}
     </span>
   ) : (
     <span>{complianceMessage}</span>
   );
-
-  const action =
-    complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY ? (
-      <Button
-        tw="w-fit"
-        size={isTablet ? ButtonSize.XSmall : ButtonSize.Small}
-        onClick={() => {
-          dispatch(openDialog(DialogTypes.GeoCompliance()));
-        }}
-      >
-        {stringGetter({ key: STRING_KEYS.ACTION_REQUIRED })} →
-      </Button>
-    ) : null;
 
   const toggleShowLess = () => {
     setShowLess((prev) => !prev);
@@ -95,10 +70,7 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         {showLess ? (
           stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
         ) : (
-          <div tw="flex flex-col gap-0.5">
-            {complianceContent}
-            {action}
-          </div>
+          <div tw="flex flex-col gap-0.5">{complianceContent}</div>
         )}
 
         <IconButton
@@ -125,14 +97,9 @@ export const ComplianceBanner = ({ className }: { className?: string }) => {
         />
       )}
 
-      {showLess && isTablet ? (
-        stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
-      ) : (
-        <>
-          {complianceContent}
-          {action}
-        </>
-      )}
+      {showLess && isTablet
+        ? stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING })
+        : complianceContent}
     </$ComplianceBanner>
   );
 };

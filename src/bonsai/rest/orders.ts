@@ -21,7 +21,7 @@ export function setUpOrdersQuery(store: RootStore) {
     selector: selectParentSubaccountInfo,
     getQueryKey: (data) => ['account', 'orders', data.wallet, data.subaccount],
     getQueryFn: (indexerClient, data) => {
-      if (!isTruthy(data.wallet) || data.subaccount == null) {
+      if (!isTruthy(data.wallet) || data.subaccount == null || data.isGeoRestricted) {
         return null;
       }
       return () =>

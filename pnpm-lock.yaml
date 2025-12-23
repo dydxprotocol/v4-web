@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.2.0
-    version: 3.2.0
+    specifier: 3.4.0
+    version: 3.4.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.365
-    version: 1.1.365
+    specifier: 1.1.371
+    version: 1.1.371
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -1671,8 +1671,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.2.0:
-    resolution: {integrity: sha512-dHziRFVcyAzAP5xvi+IZaG9bhoYP7pK91DbfAe8DFuBf/DmUdhSKIOG+92MRe9LFISnl01b6hzP6Y/f3oqFV9A==}
+  /@dydxprotocol/v4-client-js@3.4.0:
+    resolution: {integrity: sha512-dMEcqfJAreiDQjrgJyUNGqxUH3sh5J5LG5fKItCRIM7MsygAvf5/kpedQByh6nO6ov+tUw4zgT4OFc9vKN+cMQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1681,7 +1681,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.4.0-rc.0
+      '@dydxprotocol/v4-proto': 9.5.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -1702,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.365:
-    resolution: {integrity: sha512-ea+HKdKlInDCgIVtaWhZrviDvAqSsbEBKo3aqrXWM2cpS0RV9VK0/SPO/NSru+tQJuBCeTji1yByR0gCHACFbg==}
+  /@dydxprotocol/v4-localization@1.1.371:
+    resolution: {integrity: sha512-MoZWv3DSH9dQgy5jnUtdk4wUPBbe3p6kOWQz2/9gLc0y+sIwLr5LNqpSS6+dn43/Ni/mr8jcj0QwM9nrAvGhWQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
@@ -1712,8 +1712,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@9.4.0-rc.0:
-    resolution: {integrity: sha512-1vtvGAdX2U6PWiDEYbNA253fB4m53eAQsmC/4hquy7rRGTam/33YdrKKDPtGCIByFbXSt/P9pegg+F4HZ7MrBQ==}
+  /@dydxprotocol/v4-proto@9.5.0:
+    resolution: {integrity: sha512-J8Hqw3PyVmx4FViwo2w1KHvTt70r/OG6gpaogbeDifY6lB6UU/j/PUjdAZVkjLREkzJY4XzhJkrsnqpBtF/1mg==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -16865,7 +16865,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -21370,7 +21370,7 @@ packages:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -22035,7 +22035,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -23554,7 +23554,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.4
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@8.1.1)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color

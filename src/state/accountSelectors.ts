@@ -288,14 +288,6 @@ export const getComplianceStatus = createAppSelector(
 );
 
 /**
- * @returns compliance status of the current session
- */
-export const getComplianceUpdatedAt = createAppSelector(
-  [BonsaiCore.compliance.data],
-  (compliance) => compliance.updatedAt
-);
-
-/**
  * @returns compliance geo of the current session
  */
 export const getGeo = createAppSelector(
