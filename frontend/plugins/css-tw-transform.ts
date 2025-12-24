@@ -22,7 +22,12 @@ export function cssTwTransformPlugin(): Plugin {
       }
 
       // Check if file uses css or tw props
-      if (!code.includes(' css=') && !code.includes(' tw=') && !code.includes('css=') && !code.includes('tw=')) {
+      if (
+        !code.includes(' css=') &&
+        !code.includes(' tw=') &&
+        !code.includes('css=') &&
+        !code.includes('tw=')
+      ) {
         return null;
       }
 
@@ -52,7 +57,10 @@ export function cssTwTransformPlugin(): Plugin {
       }
 
       // Helper to extract quoted string (double or single quotes)
-      function extractQuotedString(str: string, startIdx: number): { value: string; endIdx: number } | null {
+      function extractQuotedString(
+        str: string,
+        startIdx: number
+      ): { value: string; endIdx: number } | null {
         const quote = str[startIdx];
         if (quote !== '"' && quote !== "'") return null;
 
@@ -107,7 +115,8 @@ export function cssTwTransformPlugin(): Plugin {
               const extracted = extractQuotedString(propsString, valueStart - 1);
               if (extracted) {
                 existingClassName = `"${extracted.value}"`;
-                cleanedProps = propsString.slice(0, classNameIdx) + propsString.slice(extracted.endIdx + 1);
+                cleanedProps =
+                  propsString.slice(0, classNameIdx) + propsString.slice(extracted.endIdx + 1);
               }
             }
           }

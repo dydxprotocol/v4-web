@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { CurrentPrice as GraphQLCurrentPrice } from '@/generated/graphql';
 
 describe('CurrentPrice Adapter - Mapper', () => {
@@ -55,4 +55,3 @@ describe('CurrentPrice Adapter - Mapper', () => {
     expect(price).toBe(BigInt(0));
   });
 });
-

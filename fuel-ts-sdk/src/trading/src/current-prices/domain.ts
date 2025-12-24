@@ -8,4 +8,3 @@ export const CurrentPriceSchema = z.object({
   price: z.bigint(),
   timestamp: z.number().int(),
 });
-

@@ -1,4 +1,4 @@
-import { useMemo, type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
 import { createStarboardClient } from 'fuel-ts-sdk';
 import { getEnv } from '@/lib/env';
 import { StarboardClientContext } from './StarboardClient.context';

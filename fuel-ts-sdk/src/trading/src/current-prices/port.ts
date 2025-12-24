@@ -23,4 +23,3 @@ export interface GetCurrentPricesOptions {
 export interface CurrentPriceRepository {
   getCurrentPrices(options?: GetCurrentPricesOptions): Promise<CurrentPrice[]>;
 }
-

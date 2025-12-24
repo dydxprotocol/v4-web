@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { CurrentPrice, CurrentPriceSchema } from '../../src/current-prices';
+import { describe, expect, it } from 'vitest';
 import { assetId } from '@/shared/types';
+import { CurrentPrice, CurrentPriceSchema } from '../../src/current-prices';
 
 describe('CurrentPrice Domain', () => {
   describe('CurrentPriceSchema', () => {
@@ -94,4 +94,3 @@ describe('CurrentPrice Domain', () => {
     });
   });
 });
-

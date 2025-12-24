@@ -7,12 +7,7 @@ export const GET_CURRENT_PRICES_QUERY = gql`
     $where: CurrentPriceFilter
     $orderBy: [CurrentPricesOrderBy!]
   ) {
-    currentPrices(
-      offset: $offset
-      filter: $where
-      orderBy: $orderBy
-      first: $limit
-    ) {
+    currentPrices(offset: $offset, filter: $where, orderBy: $orderBy, first: $limit) {
       nodes {
         asset
         price
@@ -21,4 +16,3 @@ export const GET_CURRENT_PRICES_QUERY = gql`
     }
   }
 `;
-

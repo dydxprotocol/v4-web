@@ -1,10 +1,12 @@
 // NON GENERATED MIGRATION
 module.exports = class Data1763857851809 {
-   name = 'Data1763857851809'
+  name = 'Data1763857851809';
 
-   async up(db) {
-      await db.query(`CREATE TABLE "current_price" ("asset" text NOT NULL, "timestamp" integer NOT NULL, "price" numeric NOT NULL, PRIMARY KEY ("asset"))`)
-      await db.query(`
+  async up(db) {
+    await db.query(
+      `CREATE TABLE "current_price" ("asset" text NOT NULL, "timestamp" integer NOT NULL, "price" numeric NOT NULL, PRIMARY KEY ("asset"))`
+    );
+    await db.query(`
 CREATE OR REPLACE FUNCTION current_price_update() RETURNS TRIGGER AS $$
 DECLARE
     v_cnt integer;
@@ -19,17 +21,17 @@ BEGIN
    END IF;
    RETURN NEW;
 END;
-$$ LANGUAGE plpgsql`)
-      await db.query(`
+$$ LANGUAGE plpgsql`);
+    await db.query(`
 CREATE OR REPLACE TRIGGER current_price_update_trigger
 AFTER INSERT ON price
 FOR EACH ROW
-EXECUTE FUNCTION current_price_update()`)
-   }
+EXECUTE FUNCTION current_price_update()`);
+  }
 
-   async down(db) {
-      await db.query(`DROP TRIGGER current_price_update_trigger ON price`)
-      await db.query(`DROP FUNCTION current_price_update()`)
-      await db.query(`DROP TABLE "current_price"`)
-   }
-}
+  async down(db) {
+    await db.query(`DROP TRIGGER current_price_update_trigger ON price`);
+    await db.query(`DROP FUNCTION current_price_update()`);
+    await db.query(`DROP TABLE "current_price"`);
+  }
+};

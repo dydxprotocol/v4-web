@@ -1,7 +1,6 @@
-import type { CurrentPrice as GraphQLCurrentPrice } from '@/generated/graphql';
 import type { GraphQLClient } from 'graphql-request';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
+import type { CurrentPrice as GraphQLCurrentPrice } from '@/generated/graphql';
 import { createGraphQLCurrentPriceRepository } from '../../src/current-prices';
 
 describe('CurrentPrice Repository Adapter', () => {
@@ -196,4 +195,3 @@ describe('CurrentPrice Repository Adapter', () => {
     });
   });
 });
-

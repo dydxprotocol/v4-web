@@ -1,8 +1,7 @@
+import type { GraphQLClient } from 'graphql-request';
 import type { CurrentPrice as GraphQLCurrentPrice } from '@/generated/graphql';
 import { AssetId, assetId } from '@/shared/types';
-import type { GraphQLClient } from 'graphql-request';
-
-import { CurrentPriceSchema, type CurrentPrice } from '../../domain';
+import { type CurrentPrice, CurrentPriceSchema } from '../../domain';
 import type { GetCurrentPricesOptions } from '../../port';
 import { GET_CURRENT_PRICES_QUERY } from './get-current-prices.query';
 
@@ -48,4 +47,3 @@ function toDomainCurrentPrice(gql: GraphQLCurrentPrice): CurrentPrice {
     timestamp: gql.timestamp,
   });
 }
-

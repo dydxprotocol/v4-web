@@ -1,5 +1,4 @@
 import type { GraphQLClient } from 'graphql-request';
-
 import type { CurrentPriceRepository } from '../port';
 import { getCurrentPrices } from './operations/get-current-prices';
 
@@ -8,4 +7,3 @@ export const createGraphQLCurrentPriceRepository = (
 ): CurrentPriceRepository => ({
   getCurrentPrices: getCurrentPrices(client),
 });
-

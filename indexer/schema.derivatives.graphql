@@ -67,4 +67,3 @@ type CurrentPrice @entity {
   timestamp: Int! @index
   price: BigInt!
 }
-

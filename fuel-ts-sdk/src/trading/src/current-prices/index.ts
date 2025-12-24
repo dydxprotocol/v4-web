@@ -7,4 +7,3 @@ export type { GetCurrentPricesOptions, CurrentPriceRepository } from './port';
 
 // Adapter exports
 export { createGraphQLCurrentPriceRepository } from './adapter';
-
