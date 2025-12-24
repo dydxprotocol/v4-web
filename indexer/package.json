@@ -39,6 +39,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^22.7.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^3.0.9"
   }
 }
