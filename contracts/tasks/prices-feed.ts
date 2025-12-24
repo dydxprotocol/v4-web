@@ -8,7 +8,6 @@ if (require.main === module) {
             process.exit(0)
         })
         .catch((error) => {
-             
             console.error(error)
             process.exit(1)
         })
@@ -31,7 +30,6 @@ const assetMapping = {
 }
 
 async function pricesFeed(taskArgs: any) {
-     
     console.log("Fetch prices and feed to vault pricefeed")
 
     const provider = new Provider(taskArgs.url)
@@ -44,7 +42,6 @@ async function pricesFeed(taskArgs: any) {
         .then((response) => response.json())
         .then((jsonResponse) => jsonResponse)
 
-     
     for (const priceData of pricesResponse.parsed) {
         const pricefeedId = priceData.id
         const asset = assetMapping[`0x${pricefeedId}`]
@@ -55,12 +52,11 @@ async function pricesFeed(taskArgs: any) {
         const exponent = priceData.price.expo
         const timestamp = priceData.price.publish_time
         const priceInput = BigInt(price) * BigInt(10) ** BigInt(18 + exponent)
-         
+
         await call(storkMock.functions.update_price(asset, priceInput.toString()))
-         
+
         console.log(`Updated price for ${pricefeedId} at timestamp ${timestamp}`)
     }
 
-     
     console.log(`Prices fetched`)
 }

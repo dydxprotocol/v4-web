@@ -8,7 +8,6 @@ if (require.main === module) {
             process.exit(0)
         })
         .catch((error) => {
-             
             console.error(error)
             process.exit(1)
         })
@@ -29,7 +28,7 @@ export async function deployStarboard(taskArgs: any) {
         salt,
     })
     const { contract: pricefeedWrapper } = await waitForResultPricefeedWrapper()
-     
+
     console.log(`PricefeedWrapper deployed to: ${pricefeedWrapper.id.toString()} ${pricefeedWrapper.id.toB256().toString()}`)
 
     const { waitForResult: waitForResultVaultImpl } = await VaultFactory.deploy(deployer, {

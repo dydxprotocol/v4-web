@@ -17,7 +17,6 @@ if (require.main === module) {
 }
 
 async function runNode() {
-     
     console.log(`Running node`)
 
     const launchedNode = await launchNode()
@@ -56,7 +55,7 @@ async function runNode() {
         baseAssetId,
     )
     await response.waitForResult()
-     
+
     console.log("Node is up")
 
     const rl = readline.createInterface({
