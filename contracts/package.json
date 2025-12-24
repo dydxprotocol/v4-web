@@ -12,7 +12,7 @@
         "build:vault-expose-1": "ts-node -e 'require(\"fs\").cpSync(\"contracts/core/vault/src/\", \"contracts/vault-expose/src/\", {recursive: true});'",
         "build:vault-expose-2": "ts-node -e 'const concat = require(\"concat\"); concat([\"contracts/vault-expose/src/main.sw\", \"contracts/vault-expose/vault-expose.txt\"], \"contracts/vault-expose/src/main.sw\")'",
         "build:contracts": "forc build --release --log-level 4",
-        "build:pre": "pnpm build:vault-expose-1 && pnpm pnpm build:vault-expose-2",
+        "build:pre": "pnpm build:vault-expose-1 && pnpm build:vault-expose-2",
         "build": "pnpm build:pre && pnpm build:contracts",
         "gen:types": "fuels typegen -i ./contracts/**/*-abi.json -o ./types",
         "test": "vitest run",
