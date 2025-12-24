@@ -171,12 +171,12 @@ describe('Position Repository Adapter', () => {
 
       const repository = createGraphQLPositionRepository(mockClient);
 
-      await repository.getPositions({ orderBy: 'timestamp_ASC' });
+      await repository.getPositions({ orderBy: 'TIMESTAMP_ASC' });
 
       expect(mockRequest).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          orderBy: ['timestamp_ASC'],
+          orderBy: ['TIMESTAMP_ASC'],
         })
       );
     });

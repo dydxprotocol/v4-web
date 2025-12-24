@@ -39,6 +39,5 @@
       },
       "self_closing_tag": true
     }
-  },
-  "css.customData": [".vscode/css-custom-data.json"]
+  }
 }
