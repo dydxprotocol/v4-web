@@ -8,7 +8,7 @@ if (require.main === module) {
             process.exit(0)
         })
         .catch((error) => {
-            // eslint-disable-next-line no-console
+             
             console.error(error)
             process.exit(1)
         })
@@ -22,7 +22,7 @@ export async function deployTestnetToken(taskArgs: any) {
     const provider = new Provider(taskArgs.url)
     const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
-    // eslint-disable-next-line no-console
+     
     console.log(`Deploying token named ${taskArgs.name} ${taskArgs.symbol} decimals: ${taskArgs.decimals}`)
 
     const { waitForResult: waitForResultTestnetToken } = await TestnetTokenFactory.deploy(deployer, {
@@ -36,10 +36,10 @@ export async function deployTestnetToken(taskArgs: any) {
     const { contract: tt } = await waitForResultTestnetToken()
 
     const ttAssetId = (await tt.functions.get_asset_id().get()).value
-    // eslint-disable-next-line no-console
+     
     console.log(`Token deployed to: contractId: ${tt.id.toString()} assetId: ${ttAssetId.bits}`)
     await call(tt.functions.initialize())
-    // eslint-disable-next-line no-console
+     
     console.log("Token initialized")
 
     return [tt.id.toString(), ttAssetId.bits]

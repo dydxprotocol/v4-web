@@ -1,6 +1,7 @@
 {
     "name": "starboard/contracts",
     "version": "1.0.0",
+    "type": "module",
     "main": "node.js",
     "license": "Apache-2.0",
     "engines": {
@@ -17,9 +18,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "lint:contracts": "forc fmt --check",
-        "lint:ts": "eslint --ext .ts,.tsx test/ tasks/",
-        "lint": "forc fmt --check && eslint --ext .ts,.tsx test/ tasks/",
-        "fix-lint": "eslint --fix --ext .ts,.tsx test/ tasks/",
+        "lint": "forc fmt --check && eslint test/ tasks/",
+        "lint:fix": "eslint --fix test/ tasks/",
         "run:node": "ts-node tasks/run-node.ts",
         "deploy:testnet:token": "ts-node tasks/deploy-testnet-token.ts",
         "deploy:starboard": "ts-node tasks/deploy-starboard.ts",

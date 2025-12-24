@@ -17,7 +17,7 @@ if (require.main === module) {
 }
 
 async function runNode() {
-    // eslint-disable-next-line no-console
+     
     console.log(`Running node`)
 
     const launchedNode = await launchNode()
@@ -56,7 +56,7 @@ async function runNode() {
         baseAssetId,
     )
     await response.waitForResult()
-    // eslint-disable-next-line no-console
+     
     console.log("Node is up")
 
     const rl = readline.createInterface({
