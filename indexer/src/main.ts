@@ -532,9 +532,7 @@ async function handleLiquidatePosition(
 run(dataSource, database, async (ctx) => {
   const blocks = ctx.blocks.map(augmentBlock);
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const block of blocks) {
-    // eslint-disable-next-line no-restricted-syntax
     for (const receipt of block.receipts) {
       if (receipt.contract === undefined) {
         // something went wrong
@@ -549,7 +547,6 @@ run(dataSource, database, async (ctx) => {
         }
         // events::SetPrice
         if (logType === LOG_TYPE_SET_PRICE) {
-          // eslint-disable-next-line no-await-in-loop
           await handlePriceUpdate(receipt, block, ctx);
         } else {
           // drop unsupported event
@@ -565,27 +562,21 @@ run(dataSource, database, async (ctx) => {
         }
         // events::AddLiquidity
         if (logType === LOG_TYPE_ADD_LIQUIDITY) {
-          // eslint-disable-next-line no-await-in-loop
           await handleAddLiquidity(receipt, block, ctx);
           // events::RemoveLiquidity
         } else if (logType === LOG_TYPE_REMOVE_LIQUIDITY) {
-          // eslint-disable-next-line no-await-in-loop
           await handleRemoveLiquidity(receipt, block, ctx);
           // events::IncreasePosition
         } else if (logType === LOG_TYPE_INCREASE_POSITION) {
-          // eslint-disable-next-line no-await-in-loop
           await handleIncreasePosition(receipt, block, ctx);
           // events::DecreasePosition
         } else if (logType === LOG_TYPE_DECREASE_POSITION) {
-          // eslint-disable-next-line no-await-in-loop
           await handleDecreasePosition(receipt, block, ctx);
           // events::ClosePosition
         } else if (logType === LOG_TYPE_CLOSE_POSITION) {
-          // eslint-disable-next-line no-await-in-loop
           await handleClosePosition(receipt, block, ctx);
           // events::LiquidatePosition
         } else if (logType === LOG_TYPE_LIQUIDATE_POSITION) {
-          // eslint-disable-next-line no-await-in-loop
           await handleLiquidatePosition(receipt, block, ctx);
         } else {
           // drop unsupported event

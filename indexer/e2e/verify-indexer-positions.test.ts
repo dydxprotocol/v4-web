@@ -256,9 +256,8 @@ describe('Verify Positions', () => {
       const positionKeysData = await graphQLPost(`positionKeys{nodes{id}}`);
 
       // For each position key, check that there's exactly one latest position
-      // eslint-disable-next-line no-restricted-syntax
+
       for (const key of positionKeysData.data.positionKeys.nodes) {
-        // eslint-disable-next-line no-await-in-loop
         const latestPositionsData = await graphQLPost(
           `positions(condition:{positionKeyId:"${key.id}",latest:true}){nodes{id}}`
         );

@@ -151,6 +151,7 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import-x": "^4.16.1",
     "globals": "^16.5.0",
     "pnpm": "^8.6.6",
     "prettier": "^3.2.5",

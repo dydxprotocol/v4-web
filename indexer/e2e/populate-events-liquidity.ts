@@ -1,5 +1,4 @@
 import { Provider, Wallet, createAssetId } from 'fuels';
-// eslint-disable-next-line import/no-relative-packages
 import { StorkMock, TestnetToken, Vault } from '../../contracts/types';
 import {
   BTC_ASSET,
@@ -26,7 +25,6 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.error(error);
       process.exit(1);
     });
