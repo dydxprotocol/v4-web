@@ -4,7 +4,7 @@ description: 'Starboard Indexer - Testnet'
 slot: test2
 
 build:
-  node_version: '20'
+  node_version: '22'
   package_manager: 'pnpm'
   install:
     cmd:

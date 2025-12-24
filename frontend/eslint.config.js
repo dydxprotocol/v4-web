@@ -16,6 +16,8 @@ export default tseslint.config(
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,
+      react.configs.flat.recommended,
+      react.configs.flat['jsx-runtime'],
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       prettier,
@@ -42,6 +44,8 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/exhaustive-deps': 'warn',
       'react/jsx-no-constructed-context-values': 'warn',
+      'react/no-unknown-property': ['error', { ignore: ['css', 'tw'] }],
+      'react/no-unescaped-entities': 'off',
       // TypeScript-specific
       '@typescript-eslint/no-empty-object-type': 'off',
     },

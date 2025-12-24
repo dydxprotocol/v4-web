@@ -8,6 +8,7 @@ import type { Plugin } from 'vite';
  * - <div tw="p-4" /> -> <div className="p-4" />
  * - <div css={styles.button} tw="p-4" /> -> <div className={clsx(styles.button, "p-4")} />
  * - <div css={[styles.a, styles.b]} tw="p-4" /> -> <div className={clsx(styles.a, styles.b, "p-4")} />
+ * - <div className="existing" css={styles.button} /> -> <div className={clsx("existing", styles.button)} />
  */
 export function cssTwTransformPlugin(): Plugin {
   return {
@@ -21,7 +22,7 @@ export function cssTwTransformPlugin(): Plugin {
       }
 
       // Check if file uses css or tw props
-      if (!code.includes(' css=') && !code.includes(' tw=')) {
+      if (!code.includes(' css=') && !code.includes(' tw=') && !code.includes('css=') && !code.includes('tw=')) {
         return null;
       }
 
@@ -50,14 +51,31 @@ export function cssTwTransformPlugin(): Plugin {
         return null;
       }
 
-      // Process each JSX tag
-      // Match opening tags like <div ... > or <Component ... >
-      const tagPattern = /<(\w+)((?:\s+[^>]*?)?)>/g;
+      // Helper to extract quoted string (double or single quotes)
+      function extractQuotedString(str: string, startIdx: number): { value: string; endIdx: number } | null {
+        const quote = str[startIdx];
+        if (quote !== '"' && quote !== "'") return null;
 
-      transformed = code.replace(tagPattern, (fullMatch, tagName, propsString) => {
-        // Check if this tag has css or tw props
-        const hasCssProp = propsString.includes(' css=');
-        const hasTwProp = propsString.includes(' tw=');
+        let content = '';
+        for (let i = startIdx + 1; i < str.length; i++) {
+          const char = str[i];
+          if (char === quote && str[i - 1] !== '\\') {
+            return { value: content, endIdx: i };
+          }
+          content += char;
+        }
+        return null;
+      }
+
+      // Process each JSX tag (including self-closing)
+      // Match opening tags like <div ... > or <Component ... /> or multiline
+      const tagPattern = /<(\w+)((?:\s+[^>]*?)?)(\/?)\s*>/gs;
+
+      transformed = code.replace(tagPattern, (fullMatch, tagName, propsString, selfClosing) => {
+        // Check if this tag has css, tw, or className props
+        const hasCssProp = /\s+css=/.test(propsString);
+        const hasTwProp = /\s+tw=/.test(propsString);
+        const hasClassNameProp = /\s+className=/.test(propsString);
 
         if (!hasCssProp && !hasTwProp) {
           return fullMatch;
@@ -65,27 +83,55 @@ export function cssTwTransformPlugin(): Plugin {
 
         let cssValue: string | null = null;
         let twValue: string | null = null;
+        let existingClassName: string | null = null;
         let cleanedProps = propsString;
 
-        // Extract css prop value
-        if (hasCssProp) {
-          const cssIdx = propsString.indexOf(' css={');
-          if (cssIdx !== -1) {
-            const cssStartIdx = cssIdx + 6; // after " css={"
-            cssValue = extractBracedContent(propsString, cssStartIdx - 1); // -1 to include the opening {
-            if (cssValue !== null) {
-              // Remove css prop from props string - need to find the full extent
-              const cssEndIdx = cssStartIdx + cssValue.length + 1; // +1 for closing }
-              cleanedProps = propsString.slice(0, cssIdx) + propsString.slice(cssEndIdx);
+        // Extract existing className prop value
+        if (hasClassNameProp) {
+          const classNameMatch = propsString.match(/\s+className=(['"{])/);
+          if (classNameMatch) {
+            const classNameIdx = propsString.indexOf(classNameMatch[0]);
+            const valueStart = classNameIdx + classNameMatch[0].length;
+            const firstChar = classNameMatch[1];
+
+            if (firstChar === '{') {
+              // className={expression}
+              const extracted = extractBracedContent(propsString, valueStart - 1);
+              if (extracted !== null) {
+                existingClassName = extracted.trim();
+                const endIdx = valueStart + extracted.length + 1;
+                cleanedProps = propsString.slice(0, classNameIdx) + propsString.slice(endIdx);
+              }
+            } else {
+              // className="string" or className='string'
+              const extracted = extractQuotedString(propsString, valueStart - 1);
+              if (extracted) {
+                existingClassName = `"${extracted.value}"`;
+                cleanedProps = propsString.slice(0, classNameIdx) + propsString.slice(extracted.endIdx + 1);
+              }
             }
           }
         }
 
-        // Extract tw prop value
+        // Extract css prop value
+        if (hasCssProp) {
+          const cssMatch = cleanedProps.match(/\s+css=/);
+          if (cssMatch) {
+            const cssIdx = cleanedProps.indexOf(cssMatch[0]);
+            const cssStartIdx = cssIdx + cssMatch[0].length + 1; // after " css={"
+            cssValue = extractBracedContent(cleanedProps, cssStartIdx - 1);
+            if (cssValue !== null) {
+              const cssEndIdx = cssStartIdx + cssValue.length + 1;
+              cleanedProps = cleanedProps.slice(0, cssIdx) + cleanedProps.slice(cssEndIdx);
+            }
+          }
+        }
+
+        // Extract tw prop value (handle both double and single quotes)
         if (hasTwProp) {
-          const twMatch = propsString.match(/\s+tw="([^"]*)"/);
+          const twMatch = cleanedProps.match(/\s+tw=(['"])(.+?)\1/);
           if (twMatch) {
-            const extractedTwValue = twMatch[1];
+            const extractedTwValue = twMatch[2];
 
             // Validate: enforce maximum number of utility classes
             const classCount = extractedTwValue.trim().split(/\s+/).filter(Boolean).length;
@@ -106,35 +152,46 @@ export function cssTwTransformPlugin(): Plugin {
 
             twValue = extractedTwValue;
             // Remove tw prop from props string
-            cleanedProps = cleanedProps.replace(/\s+tw="[^"]*"/, '');
+            cleanedProps = cleanedProps.replace(/\s+tw=['"][^'"]*['"]/, '');
           }
         }
 
         // Build className expression
         let classNameExpr: string;
+        const parts: string[] = [];
 
-        if (cssValue !== null && twValue !== null) {
-          // Both css and tw: css={x} tw="y" → className={clsx(x, "y")}
-          needsClsx = true;
-          classNameExpr = `{clsx(${cssValue.trim()}, "${twValue}")}`;
-        } else if (cssValue !== null) {
-          // Only css: css={x} → className={clsx(x)}
-          needsClsx = true;
-          classNameExpr = `{clsx(${cssValue.trim()})}`;
-        } else if (twValue !== null) {
-          // Only tw: tw="..." → className="..."
-          classNameExpr = `"${twValue}"`;
-        } else {
+        if (existingClassName) {
+          parts.push(existingClassName);
+        }
+        if (cssValue !== null) {
+          parts.push(cssValue.trim());
+        }
+        if (twValue !== null) {
+          parts.push(`"${twValue}"`);
+        }
+
+        if (parts.length === 0) {
           return fullMatch;
         }
 
+        if (parts.length === 1 && twValue !== null && !existingClassName && !cssValue) {
+          // Only tw, no existing className, no css: tw="..." → className="..."
+          classNameExpr = `"${twValue}"`;
+        } else {
+          // Multiple values or has css: use clsx
+          needsClsx = true;
+          classNameExpr = `{clsx(${parts.join(', ')})}`;
+        }
+
         // Reconstruct tag
-        return `<${tagName}${cleanedProps} className=${classNameExpr}>`;
+        return `<${tagName}${cleanedProps} className=${classNameExpr}${selfClosing}>`;
       });
 
       // If we used clsx, ensure it's imported
       if (needsClsx && transformed !== code) {
-        if (!transformed.includes("from 'clsx'") && !transformed.includes('from "clsx"')) {
+        // Check for any existing clsx import (named, default, or aliased)
+        const hasClsxImport = /import\s+.*\bclsx\b.*from\s+['"]clsx['"]/.test(transformed);
+        if (!hasClsxImport) {
           transformed = `import { clsx } from 'clsx';\n${transformed}`;
         }
       }
