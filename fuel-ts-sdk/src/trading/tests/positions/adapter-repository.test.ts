@@ -65,7 +65,7 @@ describe('Position Repository Adapter', () => {
 
   describe('getPositions', () => {
     it('should fetch positions with default options', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const positions = await repository.getPositions();
@@ -77,7 +77,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should apply limit and offset options', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
       await repository.getPositions({ limit: 10, offset: 5 });
@@ -92,7 +92,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should filter by account', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAccount = address('0x1234567890abcdef');
@@ -112,7 +112,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should filter by asset ID', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAssetId = assetId('0xasset123');
@@ -132,7 +132,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should filter by isLong', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
 
@@ -151,7 +151,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should filter by latestOnly', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
 
@@ -168,22 +168,22 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should apply custom orderBy', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
 
-      await repository.getPositions({ orderBy: 'TIMESTAMP_ASC' });
+      await repository.getPositions({ orderBy: 'timestamp_ASC' });
 
       expect(mockRequest).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          orderBy: ['TIMESTAMP_ASC'],
+          orderBy: ['timestamp_ASC'],
         })
       );
     });
 
     it('should combine multiple filters', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAccount = address('0x1234567890abcdef');
@@ -212,7 +212,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should not include where clause when no filters provided', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
 
@@ -229,7 +229,7 @@ describe('Position Repository Adapter', () => {
 
   describe('getPositionsByAccount', () => {
     it('should fetch positions for specific account with latestOnly=true by default', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAccount = address('0x1234567890abcdef');
@@ -250,7 +250,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should allow fetching all positions for account when latestOnly=false', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: mockGraphQLPositions } });
+      mockRequest.mockResolvedValue({ positions: mockGraphQLPositions });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAccount = address('0x1234567890abcdef');
@@ -275,7 +275,7 @@ describe('Position Repository Adapter', () => {
 
   describe('getPositionsByAsset', () => {
     it('should fetch positions for specific asset with latestOnly=true by default', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAssetId = assetId('0xasset123');
@@ -296,7 +296,7 @@ describe('Position Repository Adapter', () => {
     });
 
     it('should filter by isLong when provided', async () => {
-      mockRequest.mockResolvedValue({ positions: { nodes: [mockGraphQLPositions[0]] } });
+      mockRequest.mockResolvedValue({ positions: [mockGraphQLPositions[0]] });
 
       const repository = createGraphQLPositionRepository(mockClient);
       const testAssetId = assetId('0xasset123');
