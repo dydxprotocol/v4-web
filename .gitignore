@@ -24,6 +24,7 @@ entry_points/
 !.vscode/settings.json
 .idea
 .DS_Store
+.specify/
 *.suo
 *.ntvs*
 *.njsproj
