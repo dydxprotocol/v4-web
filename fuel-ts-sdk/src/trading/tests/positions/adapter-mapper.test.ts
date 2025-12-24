@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Position as GraphQLPosition } from '@/generated/graphql';
 import { PositionChange } from '../../src/positions';
 

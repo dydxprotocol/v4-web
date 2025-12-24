@@ -1,9 +1,8 @@
-import type { Position as GraphQLPosition } from '@/generated/graphql';
-import { address, assetId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { createGraphQLPositionRepository, PositionChange } from '../../src/positions';
+import type { Position as GraphQLPosition } from '@/generated/graphql';
+import { address, assetId } from '@/shared/types';
+import { PositionChange, createGraphQLPositionRepository } from '../../src/positions';
 
 describe('Position Repository Adapter', () => {
   let mockClient: GraphQLClient;

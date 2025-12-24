@@ -1,5 +1,6 @@
 import { Candles, CurrentPrices, Positions, Prices } from '@/trading';
 import { GraphQLClient } from 'graphql-request';
+import { Candles, Positions, Prices } from '@/trading';
 
 export interface StarboardClient {
   positions: Positions.PositionRepository;

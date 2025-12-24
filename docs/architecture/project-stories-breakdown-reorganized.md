@@ -3,6 +3,7 @@
 ## Table of Contents
 
 ### [1. Architecture EPIC](#1-architecture-epic)
+
 - [STAR-140: System Architecture Documentation](#star-140-system-architecture-documentation)
 - [STAR-141: Sequence Diagrams for User Flows](#star-141-sequence-diagrams-for-user-flows)
 - [STAR-142: Architecture Decision Records](#star-142-architecture-decision-records)
@@ -11,12 +12,14 @@
 - [STAR-146: Data Flow Diagrams](#star-146-data-flow-diagrams)
 
 ### [2. Technical Implementation EPIC](#2-technical-implementation-epic)
+
 - [STAR-148: Subsquid Indexer Infrastructure](#star-148-subsquid-indexer-infrastructure)
 - [STAR-151: Monitoring and Observability with Sentry](#star-151-monitoring-and-observability-with-sentry)
 - [STAR-152: Vercel Hosting and Deployment](#star-152-vercel-hosting-and-deployment)
 - [STAR-157: Pulumi Environment Variable Management](#star-157-pulumi-environment-variable-management)
 
 ### [3. Implementation EPIC](#3-implementation-epic)
+
 - [STAR-113: View Account Balance and Collateral](#star-113-view-account-balance-and-collateral)
 - [STAR-107: Open Long Position](#star-107-open-long-position)
 - [STAR-108: Open Short Position](#star-108-open-short-position)
@@ -44,6 +47,7 @@
 **Story**: As a developer, I want comprehensive system architecture documentation so that I can understand the overall system design and make informed technical decisions.
 
 **Task Flow**:
+
 1. Analyze existing Ruscet architecture and DYDX frontend structure
 2. Define Starboard's architectural patterns and principles
 3. Document component interactions and data flow through Client SDK
@@ -55,6 +59,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **Architecture Review**
   - Required competencies: Solution Architecture, Systems Design
   - Area of project modified: Documentation
@@ -72,6 +77,7 @@
 **Story**: As a developer, I want sequence diagrams for key user flows so that I can understand the interaction patterns between components during critical operations through the Client SDK.
 
 **Task Flow**:
+
 1. Identify critical user flows (trading, LP operations, wallet connection)
 2. Map component interactions for each flow through Client SDK
 3. Create sequence diagrams using standard notation
@@ -83,6 +89,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **Flow Identification**
   - Required competencies: Business Analysis, User Experience
   - Area of project modified: Documentation
@@ -100,6 +107,7 @@
 **Story**: As a developer, I want Architecture Decision Records documenting key technical decisions so that I can understand the rationale behind architectural choices.
 
 **Task Flow**:
+
 1. Identify key architectural decisions made
 2. Document context and problem statement for each decision
 3. List considered alternatives with pros/cons
@@ -111,6 +119,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **ADR Template Creation**
   - Required competencies: Technical Documentation
   - Area of project modified: Documentation
@@ -128,6 +137,7 @@
 **Story**: As a developer, I want an Entity Relationship Diagram and comprehensive API documentation so that I can understand the data model and integrate with all system endpoints and GraphQL queries via Subsquid indexer.
 
 **Task Flow**:
+
 1. Analyze smart contract storage structures
 2. Map indexer database schema defined by Subsquid configuration
 3. Document entity relationships and cardinality
@@ -141,6 +151,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **Data Model Analysis**
   - Required competencies: Database Design, Smart Contract Development
   - Area of project modified: Documentation
@@ -158,6 +169,7 @@
 **Story**: As a developer, I want detailed smart contract ABI documentation so that I can interact with the contracts correctly and understand their interfaces.
 
 **Task Flow**:
+
 1. Extract ABIs from compiled contracts
 2. Document each function's purpose and parameters
 3. Specify events and their meanings
@@ -169,6 +181,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **ABI Extraction and Documentation**
   - Required competencies: Smart Contract Development, Sway/Solidity
   - Area of project modified: Documentation
@@ -186,6 +199,7 @@
 **Story**: As a developer, I want data flow diagrams showing how data moves through the system so that I can understand data transformations and processing pipelines through the Client SDK.
 
 **Task Flow**:
+
 1. Map data sources (blockchain, oracles, user input)
 2. Document data transformations at each layer through Client SDK
 3. Identify data storage points (no caching)
@@ -197,6 +211,7 @@
 **Prerequisite Technical Stories**: None
 
 **Subtasks**:
+
 - **Data Pipeline Mapping**
   - Required competencies: Data Architecture, Systems Design
   - Area of project modified: Documentation
@@ -218,6 +233,7 @@
 **Story**: As a dev, I want Subsquid indexer infrastructure deployed for both testnet and mainnet so that blockchain events can be processed and made available via GraphQL API, handling database configuration and API gateway functionality.
 
 **Task Flow**:
+
 1. Deploy Subsquid processor nodes for testnet and mainnet
 2. Configure event processing pipelines
 3. Set up GraphQL gateway and API routing
@@ -230,6 +246,7 @@
 **Prerequisite Technical Stories**: None
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Subsquid processor running and syncing with Fuel testnet and mainnet networks
   - GraphQL endpoint publicly accessible (no authentication required)
@@ -244,6 +261,7 @@
   - Automated deployment via CI/CD
 
 **Subtasks**:
+
 - **Subsquid Deployment for Both Networks**
   - Required competencies: DevOps, Blockchain Infrastructure, Subsquid
   - Area of project modified: Infrastructure
@@ -261,6 +279,7 @@
 **Story**: As a dev, I want Sentry configured for monitoring and observability so that I can track system health, debug issues, and ensure optimal performance.
 
 **Task Flow**:
+
 1. Configure Sentry for error tracking and performance monitoring
 2. Set up log aggregation through Sentry
 3. Create dashboards and visualizations
@@ -272,6 +291,7 @@
 **Prerequisite Technical Stories**: None
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Sentry configured for all services (frontend, indexer)
   - Error tracking with full context and stack traces
@@ -284,6 +304,7 @@
   - Dashboard load time < 3 seconds
 
 **Subtasks**:
+
 - **Sentry Configuration**
   - Required competencies: DevOps, Monitoring Tools, Sentry
   - Area of project modified: Infrastructure
@@ -301,6 +322,7 @@
 **Story**: As a dev, I want Vercel hosting configured so that the frontend is deployed with CDN, static asset optimization, and automated deployment pipeline.
 
 **Task Flow**:
+
 1. Configure Vercel project for frontend hosting
 2. Set up automated deployments from Git
 3. Configure custom domains and SSL
@@ -312,6 +334,7 @@
 **Prerequisite Technical Stories**: None
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Vercel project configured with auto-deployments
   - CDN optimization for static assets handled by Vercel
@@ -324,6 +347,7 @@
   - Build time optimization
 
 **Subtasks**:
+
 - **Vercel Project Setup**
   - Required competencies: Frontend Deployment, Vercel
   - Area of project modified: Infrastructure
@@ -341,6 +365,7 @@
 **Story**: As a dev, I want Pulumi configured for environment variable management so that secrets and configuration can be managed securely across different environments.
 
 **Task Flow**:
+
 1. Set up Pulumi project structure
 2. Configure environment-specific stacks (dev, staging, production)
 3. Implement secrets management
@@ -352,6 +377,7 @@
 **Prerequisite Technical Stories**: None
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Pulumi stacks for each environment
   - Secure secrets management using Pulumi ESC (Environment, Secrets, and Configuration)
@@ -364,6 +390,7 @@
   - Integration with existing CI/CD pipeline
 
 **Subtasks**:
+
 - **Pulumi Project Setup**
   - Required competencies: Pulumi, Infrastructure as Code
   - Area of project modified: Infrastructure
@@ -385,6 +412,7 @@
 **Story**: As a trader, I want to view the current balance of my account so that I can understand my available collateral and make informed trading decisions.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -393,7 +421,7 @@ sequenceDiagram
     participant FuelSDK
     participant FuelRPC
     participant Indexer
-    
+
     User->>Frontend: Navigate to Dashboard
     Frontend->>Client: Get account balance
     Client->>FuelSDK: wallet.getBalance(USDC_ASSET_ID)
@@ -401,13 +429,13 @@ sequenceDiagram
     FuelRPC-->>FuelSDK: Return balance data
     FuelSDK-->>Client: Balance data
     Client-->>Frontend: Account balance
-    
+
     Frontend->>Client: Get locked collateral
     Client->>Indexer: Query locked collateral
     Indexer-->>Client: Collateral data
     Client-->>Frontend: Collateral information
     Frontend-->>User: Display balance & collateral
-    
+
     loop Every 5 seconds
         Frontend->>Client: Poll for updates
         Frontend-->>User: Update display
@@ -415,6 +443,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to account/portfolio section
 2. View total USDC balance from Fuel RPC via fuel-sdk
 3. See available collateral for new positions
@@ -424,12 +453,14 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-119
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Frontend scaffolding and wallet integration
 - Client SDK setup with data transformation
 - Indexer configuration for balance tracking
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Dashboard displays total USDC balance with 6 decimal precision
   - Available collateral calculation: total_balance - used_collateral - pending_orders
@@ -437,7 +468,6 @@ sequenceDiagram
   - Margin utilization = `(used_collateral / total_balance) * 100`
   - Balance updates within 5 seconds of on-chain changes via polling
   - Color-coded margin health: green (0-50%), yellow (50-80%), red (80-100%)
-  
 - **Non-Functional Requirements**:
   - Page load time < 2 seconds
   - Balance query response time < 500ms
@@ -448,10 +478,11 @@ sequenceDiagram
   - Documented balance calculation formulas
 
 **Unhappy Paths**:
-  - Network disconnection shows last known balance with "offline" indicator
-  - Contract query failure displays fallback data with timestamp
-  - Invalid balance data triggers error boundary with recovery option
-  - Negative balance prevention with validation checks
+
+- Network disconnection shows last known balance with "offline" indicator
+- Contract query failure displays fallback data with timestamp
+- Invalid balance data triggers error boundary with recovery option
+- Negative balance prevention with validation checks
 
 **Subtasks**:
 
@@ -459,17 +490,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, GraphQL Client
   - Area of project modified: Frontend Dashboard Component
   - Details: Implement balance display component with polling, integrate with wallet connector, create margin utilization visualizations
-  
 - **Client SDK Integration**
   - Required competencies: Client SDK, Backend Development
   - Area of project modified: Client SDK Layer
   - Details: Balance queries through fuel-sdk, collateral data from indexer, polling optimization
-  
 - **Smart Contract Integration**
   - Required competencies: Sway/Fuel, Contract Integration
   - Area of project modified: Contract Interfaces
   - Details: Integrate balance query functions via fuel-sdk, handle multiple collateral types
-  
 - **Testing & QA**
   - Required competencies: Test Automation, E2E Testing
   - Area of project modified: Test Suite
@@ -482,6 +510,7 @@ sequenceDiagram
 **Story**: As a trader, I want to open long positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can amplify my gains on price increases.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -491,11 +520,11 @@ sequenceDiagram
     participant Contracts
     participant Oracle
     participant Indexer
-    
+
     User->>Frontend: Select asset and enter position details
     Frontend->>Client: Validate position parameters
     Client-->>Frontend: Return validation result
-    
+
     alt Validation Failed
         Frontend-->>User: Show error message
     else Validation Passed
@@ -517,6 +546,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to trading interface for desired asset
 2. Select "Long" position side
 3. Enter position size in USD
@@ -528,13 +558,15 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-113, STAR-119
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Contract position management implementation
 - Oracle integration for price feeds
 - Trading interface development
 - Client SDK transaction management
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Support for ETH, BTC, FUEL, stFUEL with correct decimal precision
   - Position size validation: min $10, max $1,000,000
@@ -542,7 +574,6 @@ sequenceDiagram
   - Real-time liquidation price calculation: `entry_price * (1 - 1/leverage + fees)`
   - Transaction completes within 60 seconds or times out with rollback
   - Position appears in portfolio immediately after confirmation
-  
 - **Non-Functional Requirements**:
   - Price updates every 1 second during position entry
   - Gas estimation accurate within 10%
@@ -552,10 +583,11 @@ sequenceDiagram
   - Load testing for 100 concurrent position openings
 
 **Unhappy Paths**:
-  - Insufficient collateral shows required amount and deposit option
-  - Oracle failure prevents position with safety message
-  - Network congestion warning with gas price options
-  - Contract paused state shows maintenance message
+
+- Insufficient collateral shows required amount and deposit option
+- Oracle failure prevents position with safety message
+- Network congestion warning with gas price options
+- Contract paused state shows maintenance message
 
 **Subtasks**:
 
@@ -563,22 +595,18 @@ sequenceDiagram
   - Required competencies: React, TypeScript, Web3 Integration
   - Area of project modified: Trading Interface Components
   - Details: Position entry form, leverage slider, preview modal, real-time price updates
-  
 - **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols, Financial Mathematics
   - Area of project modified: Position Manager Contract
   - Details: Implement increase_position function, margin calculations, leverage validation
-  
 - **Oracle Integration**
   - Required competencies: Blockchain Oracles, Price Feeds
   - Area of project modified: Oracle Interface
   - Details: Integrate Stork oracle feeds, price validation, staleness checks
-  
 - **Client SDK Processing**
   - Required competencies: Client SDK, Event Processing
   - Area of project modified: Client SDK Services
   - Details: Position event processing, state management, analytics tracking
-  
 - **QA & Testing**
   - Required competencies: DeFi Testing, Smart Contract Auditing
   - Area of project modified: Test Suite
@@ -591,6 +619,7 @@ sequenceDiagram
 **Story**: As a trader, I want to open short positions on crypto assets (ETH, BTC, FUEL, stFUEL) with leverage so that I can profit from price decreases.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -600,7 +629,7 @@ sequenceDiagram
     participant Contracts
     participant Oracle
     participant Indexer
-    
+
     User->>Frontend: Select asset for shorting
     Frontend->>Client: Calculate borrowing costs
     Client->>Indexer: Fetch current funding rate
@@ -621,6 +650,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to trading interface for desired asset
 2. Select "Short" position side
 3. Enter position size in USD
@@ -632,12 +662,14 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-113, STAR-119
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Contract position management
 - Funding rate mechanism
 - Oracle integration
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Short position interface with same assets as long positions
   - Borrowing cost display: `funding_rate * position_size * duration`
@@ -645,7 +677,6 @@ sequenceDiagram
   - Funding rate display with 8-hour payment cycles
   - Maximum short interest limits per asset
   - Short positions marked distinctly in portfolio (red indicators)
-  
 - **Non-Functional Requirements**:
   - Funding rate updates every minute
   - Short interest calculations optimized for performance
@@ -655,10 +686,11 @@ sequenceDiagram
   - Integration tests for funding payments
 
 **Unhappy Paths**:
-  - Maximum short interest reached shows current limit
-  - Negative funding rate clearly explained to user
-  - Insufficient liquidity for short prevents position
-  - Funding payment failure triggers liquidation warning
+
+- Maximum short interest reached shows current limit
+- Negative funding rate clearly explained to user
+- Insufficient liquidity for short prevents position
+- Funding payment failure triggers liquidation warning
 
 **Subtasks**:
 
@@ -666,17 +698,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, DeFi Interfaces
   - Area of project modified: Trading Components
   - Details: Short position form, funding rate display, cost calculator
-  
 - **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Mathematics
   - Area of project modified: Position Manager Contract
   - Details: Short position logic, funding rate integration, borrowing mechanics
-  
 - **Funding Rate Integration**
   - Required competencies: DeFi Protocols, Financial Engineering
   - Area of project modified: Funding System
   - Details: Funding rate calculations, payment collection
-  
 - **QA & Testing**
   - Required competencies: DeFi Testing, Risk Analysis
   - Area of project modified: Test Suite
@@ -689,6 +718,7 @@ sequenceDiagram
 **Story**: As a trader, I want to view my current positions, including size, leverage, PnL, and margin requirements so that I can monitor my portfolio performance and risk.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -696,14 +726,14 @@ sequenceDiagram
     participant Client
     participant Indexer
     participant PriceOracle
-    
+
     User->>Frontend: Navigate to positions
     Frontend->>Client: Query open positions
     Client->>Indexer: Get position data
     Indexer-->>Client: Return position data
     Client-->>Frontend: Position information
     Frontend-->>User: Display positions
-    
+
     loop Every 10 seconds
         Frontend->>Client: Fetch current prices
         Client->>PriceOracle: Get latest prices
@@ -714,12 +744,13 @@ sequenceDiagram
         Client-->>Frontend: Updated position data
         Frontend-->>User: Update position display
     end
-    
+
     User->>Frontend: Click position details
     Frontend-->>User: Expand position info
 ```
 
 **Task Flow**:
+
 1. Navigate to portfolio/positions section
 2. View list of all open positions via Client SDK
 3. See position details: asset, side, size, leverage
@@ -729,11 +760,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-107, STAR-108
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Client SDK position data processing
 - Real-time P&L calculation system with polling
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Position table with sortable columns: Asset, Side, Size, Leverage, Entry Price, Mark Price, P&L, ROE
   - Unrealized P&L: `(mark_price - entry_price) * size * side_multiplier`
@@ -741,7 +774,6 @@ sequenceDiagram
   - Margin ratio with visual indicators: safe (>50%), warning (20-50%), danger (<20%)
   - Expandable rows showing: entry time, funding paid/received, fees paid, liquidation price
   - Position grouping by asset with aggregate statistics
-  
 - **Non-Functional Requirements**:
   - Position updates every 10 seconds via polling
   - P&L calculations accurate to 6 decimal places
@@ -750,10 +782,11 @@ sequenceDiagram
   - Real-time price feeds integrated
 
 **Unhappy Paths**:
-  - Price feed failure shows last known prices with timestamp
-  - Large position count triggers pagination
-  - Calculation errors show fallback to contract data
-  - Network issues maintain local state with sync indicator
+
+- Price feed failure shows last known prices with timestamp
+- Large position count triggers pagination
+- Calculation errors show fallback to contract data
+- Network issues maintain local state with sync indicator
 
 **Subtasks**:
 
@@ -761,17 +794,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, Table Components
   - Area of project modified: Portfolio Components
   - Details: Position table, P&L calculations, real-time updates via polling
-  
 - **Client SDK Integration**
   - Required competencies: Client SDK, Real-time Data
   - Area of project modified: Client SDK Layer
   - Details: Position aggregation, P&L calculations, performance metrics
-  
 - **Data Processing**
   - Required competencies: Data Engineering, Event Processing
   - Area of project modified: Indexer
   - Details: Position event processing, state reconstruction
-  
 - **QA & Testing**
   - Required competencies: Frontend Testing, Data Validation
   - Area of project modified: Test Suite
@@ -783,6 +813,7 @@ sequenceDiagram
 **Story**: As a trader, I want to close my positions partially or fully to realize profits or cut losses and manage my portfolio risk.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -792,7 +823,7 @@ sequenceDiagram
     participant Contracts
     participant Oracle
     participant Indexer
-    
+
     User->>Frontend: Select position to close
     Frontend-->>User: Show close modal
     User->>Frontend: Choose close amount
@@ -810,6 +841,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to open position
 2. Select "Close Position" action
 3. Choose close amount (partial or full)
@@ -820,11 +852,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-116
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Position closure functionality in contracts
 - Client SDK transaction management
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Close modal with slider for partial close (25%, 50%, 75%, 100%, custom)
   - Exit price estimation
@@ -833,7 +867,6 @@ sequenceDiagram
   - Position closure confirmation within 60 seconds
   - Portfolio automatically updates after closure
   - Transaction history entry created with all details
-  
 - **Non-Functional Requirements**:
   - Closure transaction gas optimization
   - Partial close minimum: $10 or 10% (whichever is greater)
@@ -842,9 +875,10 @@ sequenceDiagram
   - Documentation of closure mechanics
 
 **Unhappy Paths**:
-  - Insufficient gas shows required amount
-  - Contract pause prevents closure with explanation
-  - Partial close leaving dust amount prevented
+
+- Insufficient gas shows required amount
+- Contract pause prevents closure with explanation
+- Partial close leaving dust amount prevented
 
 **Subtasks**:
 
@@ -852,17 +886,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, Transaction UI
   - Area of project modified: Position Management Components
   - Details: Close modal, partial close slider, P&L preview
-  
 - **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Position Manager Contract
   - Details: Implement decrease_position function, partial close logic
-  
 - **Client SDK Processing**
   - Required competencies: Client SDK, Transaction Management
   - Area of project modified: Client SDK System
   - Details: Transaction management integration, event handling
-  
 - **QA & Testing**
   - Required competencies: DeFi Testing, Transaction Testing
   - Area of project modified: Test Suite
@@ -874,6 +905,7 @@ sequenceDiagram
 **Story**: As a trader, I want to view price charts and market data (updated via polling) for the assets I'm trading so that I can make informed trading decisions.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -882,7 +914,7 @@ sequenceDiagram
     participant Client
     participant Indexer
     participant Oracle
-    
+
     User->>Frontend: Select asset and timeframe
     Frontend->>Client: Query historical data
     Client->>Indexer: Get price history
@@ -890,7 +922,7 @@ sequenceDiagram
     Client-->>Frontend: Historical data
     Frontend->>TradingView: Initialize chart
     TradingView-->>User: Display chart
-    
+
     loop Every 5 seconds
         Frontend->>Client: Poll latest price
         Client->>Oracle: Get current price
@@ -904,6 +936,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to trading interface for specific asset
 2. View price chart with different timeframes (updated via polling)
 3. See current bid/ask prices and spread
@@ -912,11 +945,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: None
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Oracle integration
 - Charts infrastructure setup
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - TradingView Advanced Charts integration
   - Timeframes: 1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w
@@ -925,7 +960,6 @@ sequenceDiagram
   - Drawing tools: trendlines, horizontal lines, fibonacci
   - Price updates every 5 seconds via polling through Client SDK
   - Chart data persistence in localStorage
-  
 - **Non-Functional Requirements**:
   - Chart load time < 2 seconds
   - Smooth chart performance with 10,000+ candles
@@ -934,10 +968,11 @@ sequenceDiagram
   - Chart library bundle size < 500KB
 
 **Unhappy Paths**:
-  - Missing historical data shows available range
-  - Price feed interruption maintains last known state
-  - Chart library load failure shows basic price display
-  - Invalid timeframe selection defaults to 1h
+
+- Missing historical data shows available range
+- Price feed interruption maintains last known state
+- Chart library load failure shows basic price display
+- Invalid timeframe selection defaults to 1h
 
 **Subtasks**:
 
@@ -945,17 +980,14 @@ sequenceDiagram
   - Required competencies: React, TradingView, TypeScript
   - Area of project modified: Chart Components
   - Details: TradingView integration, custom indicators, toolbar
-  
 - **Data Pipeline**
   - Required competencies: Data Engineering, Time-series Data
   - Area of project modified: Client SDK Services
   - Details: OHLCV data aggregation, historical data storage, polling infrastructure
-  
 - **Price Feed Integration**
   - Required competencies: Real-time Data, Client SDK
   - Area of project modified: Client SDK Layer
   - Details: Real-time price subscription, data transformation through Client
-  
 - **QA & Testing**
   - Required competencies: Frontend Testing, Performance Testing
   - Area of project modified: Test Suite
@@ -967,6 +999,7 @@ sequenceDiagram
 **Story**: As a trader, I want to connect my Fuel wallet to the platform to manage my trades and interact with the Fuel network securely.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -974,7 +1007,7 @@ sequenceDiagram
     participant WalletConnector
     participant FuelWallet
     participant Contracts
-    
+
     User->>Frontend: Click Connect Wallet
     Frontend->>WalletConnector: Initialize connectors
     WalletConnector-->>Frontend: Show wallet options
@@ -988,6 +1021,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Visit Starboard Finance platform
 2. Click "Connect Wallet" button
 3. Select Fuel wallet from connector options
@@ -996,10 +1030,12 @@ sequenceDiagram
 
 **Prerequisite Stories**: None
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Frontend project setup
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Support for Fuel Wallet, WalletConnect compatible wallets
   - Account address displayed in truncated format (0x1234...5678)
@@ -1008,7 +1044,6 @@ sequenceDiagram
   - Disconnect functionality clearing all session data
   - Auto-reconnect on page refresh if previously connected
   - Connection state persisted in localStorage
-  
 - **Non-Functional Requirements**:
   - Connection process < 5 seconds
   - Secure storage of connection metadata
@@ -1018,11 +1053,12 @@ sequenceDiagram
   - Browser extension detection
 
 **Unhappy Paths**:
-  - No wallet installed shows installation guide
-  - Wrong network prompts network switch
-  - Connection timeout after 30 seconds
-  - Wallet locked requires unlock prompt
-  - Multiple wallets shows selection modal
+
+- No wallet installed shows installation guide
+- Wrong network prompts network switch
+- Connection timeout after 30 seconds
+- Wallet locked requires unlock prompt
+- Multiple wallets shows selection modal
 
 **Subtasks**:
 
@@ -1038,26 +1074,27 @@ sequenceDiagram
 **Story**: As a trader, I want to see my trading history and performance metrics so that I can analyze my trading patterns and improve my strategy.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
     participant Frontend
     participant Client
     participant Indexer
-    
+
     User->>Frontend: Navigate to history
     Frontend->>Client: Query trade history
     Client->>Indexer: Get paginated trades
     Indexer-->>Client: Return trade data
     Client-->>Frontend: Formatted trade history
     Frontend-->>User: Display trade table
-    
+
     User->>Frontend: Apply filters
     Frontend->>Client: Query filtered data
     Client->>Indexer: Get filtered trades
     Indexer-->>Client: Filtered results
     Client-->>Frontend: Filtered trade data
-    
+
     User->>Frontend: View analytics
     Frontend->>Client: Calculate metrics
     Client-->>Frontend: Performance data
@@ -1065,6 +1102,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to account/history section
 2. View chronological list of all trades through Client SDK
 3. Filter by date range, asset, or trade type
@@ -1073,11 +1111,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-107, STAR-108, STAR-110
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Trade history processing in indexer
 - Client SDK analytics system
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Trade history table: Date, Asset, Side, Size, Open Price, Close Price, Fees, P&L, ROE
   - Filters: date range picker, asset selector, long/short filter, profit/loss filter
@@ -1085,7 +1125,6 @@ sequenceDiagram
   - Trade details modal with complete transaction information
   - Performance metrics: Total P&L, Win Rate, Average Win/Loss, Sharpe Ratio, Max Drawdown
   - Cumulative P&L chart over time
-  
 - **Non-Functional Requirements**:
   - Query response time < 1 second for 1000 trades
   - Real-time updates for new trades
@@ -1094,9 +1133,10 @@ sequenceDiagram
   - Audit trail for all modifications
 
 **Unhappy Paths**:
-  - No trades shows onboarding message
-  - Large date ranges trigger pagination warning
-  - Missing price data shows estimation notice
+
+- No trades shows onboarding message
+- Large date ranges trigger pagination warning
+- Missing price data shows estimation notice
 
 **Subtasks**:
 
@@ -1104,17 +1144,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, Data Visualization
   - Area of project modified: History Components
   - Details: Trade table, filters, performance charts
-  
 - **Client SDK Analytics Engine**
   - Required competencies: Financial Analytics, Statistics, Client SDK
   - Area of project modified: Client SDK Analytics Service
   - Details: Performance metrics calculation in bonsai layer, risk metrics
-  
 - **Data Processing**
   - Required competencies: Client SDK, Database Optimization
   - Area of project modified: Client SDK Layer
   - Details: Trade aggregation queries, pagination optimization
-  
 - **QA & Testing**
   - Required competencies: Data Testing, Performance Testing
   - Area of project modified: Test Suite
@@ -1126,6 +1163,7 @@ sequenceDiagram
 **Story**: As a funding rate arbitrager, I want to monitor funding rates across different time periods to identify arbitrage opportunities and optimize my positions.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1133,7 +1171,7 @@ sequenceDiagram
     participant Client
     participant Indexer
     participant Contracts
-    
+
     User->>Frontend: Navigate to funding rates
     Frontend->>Client: Query current rates
     Client->>Indexer: Get funding data
@@ -1142,7 +1180,7 @@ sequenceDiagram
     Indexer-->>Client: Funding data
     Client-->>Frontend: Formatted funding data
     Frontend-->>User: Display funding dashboard
-    
+
     loop Every minute
         Frontend->>Client: Poll funding updates
         Client->>Indexer: Get latest rates
@@ -1153,6 +1191,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to funding rates section
 2. View current funding rates for all markets from Indexer
 3. See funding rate history and trends
@@ -1161,11 +1200,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-116
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Funding rate mechanism in contracts
 - Funding data processing in indexer
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Funding rate dashboard showing all markets with current rates (% per 8 hours)
   - Historical funding chart with 1h, 24h, 7d, 30d views
@@ -1174,7 +1215,6 @@ sequenceDiagram
   - Cumulative funding received/paid per position
   - Arbitrage opportunity indicator when rates diverge significantly
   - Funding rate heatmap for quick visual analysis
-  
 - **Non-Functional Requirements**:
   - Funding rate updates every minute
   - Historical data retention for 90 days
@@ -1184,10 +1224,11 @@ sequenceDiagram
   - Real-time alerts for rate changes > 0.05%
 
 **Unhappy Paths**:
-  - Contract read failure uses cached rates
-  - Missing historical data shows available range
-  - Prediction model failure shows "unavailable"
-  - Rate calculation errors trigger fallback formula
+
+- Contract read failure uses cached rates
+- Missing historical data shows available range
+- Prediction model failure shows "unavailable"
+- Rate calculation errors trigger fallback formula
 
 **Subtasks**:
 
@@ -1195,17 +1236,14 @@ sequenceDiagram
   - Required competencies: React, TypeScript, Charting
   - Area of project modified: Funding Components
   - Details: Rate dashboard, historical charts, prediction display
-  
 - **Funding Calculations**
   - Required competencies: DeFi Mathematics, Financial Engineering
   - Area of project modified: Funding Service
   - Details: Rate calculation engine, prediction model
-  
 - **Data Pipeline**
   - Required competencies: Data Engineering, Time-series Analysis
   - Area of project modified: Indexer and Client SDK
   - Details: Funding event processing, aggregation queries
-  
 - **QA & Testing**
   - Required competencies: Financial Testing, Data Validation
   - Area of project modified: Test Suite
@@ -1217,6 +1255,7 @@ sequenceDiagram
 **Story**: As a liquidity provider, I want to deposit USDC into the liquidity pool to earn fees from traders while taking proportional house risk through RLP tokens.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1226,7 +1265,7 @@ sequenceDiagram
     participant Contracts
     participant RLPToken
     participant Indexer
-    
+
     User->>Frontend: Navigate to LP section
     Frontend->>Client: Query pool statistics
     Client->>Indexer: Get pool data
@@ -1248,6 +1287,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to liquidity provision section
 2. View current pool statistics (TVL, APY, utilization) from Indexer
 3. Enter USDC amount to deposit
@@ -1259,20 +1299,21 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-119
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - RLP token system implementation
 - Liquidity pool management in contracts
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Pool statistics display: TVL, 7-day APY, current utilization, total RLP supply
-  - RLP token calculation: deposit_amount / pool_value * total_rlp_supply
+  - RLP token calculation: deposit_amount / pool_value \* total_rlp_supply
   - Minimum deposit: 100 USDC
   - Maximum deposit: 10% of current TVL or $1M (whichever is lower)
   - Deposit fee: 0.1% (configurable)
   - RLP tokens received immediately upon confirmation
   - LP position appears in portfolio with real-time value
-  
 - **Non-Functional Requirements**:
   - APY calculation updated hourly
   - Pool statistics from Indexer updated every minute
@@ -1282,33 +1323,30 @@ sequenceDiagram
   - Integration tests for edge cases
 
 **Unhappy Paths**:
-  - Insufficient USDC balance shows required amount
-  - Pool capacity reached prevents deposit
-  - Approval failure handled gracefully
-  - RLP minting failure triggers revert
-  - High utilization warning before deposit
+
+- Insufficient USDC balance shows required amount
+- Pool capacity reached prevents deposit
+- Approval failure handled gracefully
+- RLP minting failure triggers revert
+- High utilization warning before deposit
 
 **Subtasks**:
 
 - **UI/UX Design**
   - Required competencies: UI/UX Design, DeFi Interfaces
   - Area of project modified: LP Interface
-  
 - **Frontend Development**
   - Required competencies: React, TypeScript, Web3
   - Area of project modified: LP Components
   - Details: Deposit form, pool statistics, RLP calculator
-  
 - **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Liquidity Pool Contract
   - Details: Deposit function, RLP minting logic
-  
 - **RLP Token Integration**
   - Required competencies: Token Standards, DeFi
   - Area of project modified: RLP Token Contract
   - Details: Token minting, balance tracking
-  
 - **QA & Testing**
   - Required competencies: DeFi Testing, Security Testing
   - Area of project modified: Test Suite
@@ -1320,6 +1358,7 @@ sequenceDiagram
 **Story**: As a liquidity provider, I want to withdraw my USDC from the liquidity pool when needed by specifying USD amount to withdraw and receiving my proportional share.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1329,7 +1368,7 @@ sequenceDiagram
     participant Contracts
     participant RLPToken
     participant Indexer
-    
+
     User->>Frontend: Navigate to withdraw
     Frontend->>Client: Query RLP balance
     Client->>RLPToken: Get RLP balance
@@ -1349,7 +1388,7 @@ sequenceDiagram
     Contracts-->>User: Transfer USDC
     Contracts-->>Indexer: Emit RemoveLiquidity event
     Frontend-->>User: Show success
-    
+
     alt Complete Withdrawal Option
         User->>Frontend: Click complete withdrawal
         Frontend->>Client: Calculate full withdrawal
@@ -1358,6 +1397,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to liquidity withdrawal section
 2. View current RLP token balance and USDC value
 3. Enter USD amount to withdraw (not RLP tokens)
@@ -1370,15 +1410,17 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-122
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - RLP token burning mechanism
 - Withdrawal logic in contracts
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - RLP balance display with current USDC value
   - USD amount input for withdrawal (not RLP tokens)
-  - RLP calculation: usd_amount / pool_value * total_rlp_supply
+  - RLP calculation: usd_amount / pool_value \* total_rlp_supply
   - Complete withdrawal option
   - Partial withdrawal support (minimum $100 or 10%)
   - Withdrawal fee: 0.1% (configurable)
@@ -1386,7 +1428,6 @@ sequenceDiagram
   - Immediate USDC transfer upon confirmation
   - **Note**: Detailed withdrawal limits, utilization caps, and cooldown mechanisms will be specified in a follow-up ADR (Architecture Decision Record)
   - Updated pool statistics after withdrawal
-  
 - **Non-Functional Requirements**:
   - Real-time RLP value updates
   - Withdrawal preview accuracy > 99.9%
@@ -1395,33 +1436,30 @@ sequenceDiagram
   - Audit trail of all withdrawals
 
 **Unhappy Paths**:
-  - Cooldown period active shows time remaining
-  - Insufficient pool liquidity delays withdrawal
-  - RLP approval failure handled gracefully
-  - Pool imbalance triggers withdrawal limit
-  - Emergency withdrawal mode if pool is paused
+
+- Cooldown period active shows time remaining
+- Insufficient pool liquidity delays withdrawal
+- RLP approval failure handled gracefully
+- Pool imbalance triggers withdrawal limit
+- Emergency withdrawal mode if pool is paused
 
 **Subtasks**:
 
 - **UI/UX Design**
   - Required competencies: UI/UX Design, DeFi Interfaces
   - Area of project modified: LP Interface
-  
 - **Frontend Development**
   - Required competencies: React, TypeScript, Web3
   - Area of project modified: LP Components
   - Details: USD withdrawal form, complete withdrawal option, cooldown timer, value calculator
-  
 - **Smart Contract Development**
   - Required competencies: Sway/Fuel, DeFi Protocols
   - Area of project modified: Liquidity Pool Contract
   - Details: USD-based withdrawal function, RLP burning logic, complete withdrawal
-  
 - **Cooldown Mechanism**
   - Required competencies: Smart Contracts, Time-locks
   - Area of project modified: Pool Contract
   - Details: Cooldown tracking, emergency withdrawal
-  
 - **QA & Testing**
   - Required competencies: DeFi Testing, Edge Cases
   - Area of project modified: Test Suite
@@ -1433,6 +1471,7 @@ sequenceDiagram
 **Story**: As a liquidity provider, I want to view my earnings from trading fees and my exposure to trader profits/losses so that I can track my liquidity provision performance.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1440,7 +1479,7 @@ sequenceDiagram
     participant Client
     participant Indexer
     participant Contracts
-    
+
     User->>Frontend: Navigate to LP dashboard
     Frontend->>Client: Query LP position
     Client->>Indexer: Get LP data
@@ -1449,7 +1488,7 @@ sequenceDiagram
     Client->>Client: Calculate performance (bonsai layer)
     Client-->>Frontend: Performance metrics
     Frontend-->>User: Display LP dashboard
-    
+
     User->>Frontend: View historical chart
     Frontend->>Client: Query historical data
     Client->>Indexer: Get time series data
@@ -1459,6 +1498,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Navigate to LP dashboard/analytics
 2. View current RLP token value and share of pool
 3. See earnings from trading fees over time
@@ -1468,11 +1508,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-122
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - LP analytics system in Client SDK
 - Fee distribution tracking in indexer
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Current position: RLP balance, USDC value, pool share %, unrealized P&L
   - Fee earnings breakdown: daily, weekly, monthly, all-time
@@ -1481,7 +1523,6 @@ sequenceDiagram
   - Pool metrics: utilization rate, total fees collected, trader P&L
   - Performance chart with customizable time ranges
   - Risk metrics: max drawdown, volatility, Sharpe ratio
-  
 - **Non-Functional Requirements**:
   - Dashboard updates every minute
   - Historical data for 1 year
@@ -1490,32 +1531,29 @@ sequenceDiagram
   - Real-time fee accrual display
 
 **Unhappy Paths**:
-  - No LP position shows demo dashboard
-  - Incomplete data shows available range
-  - Calculation errors fall back to contract data
-  - High trader profits show risk warning
+
+- No LP position shows demo dashboard
+- Incomplete data shows available range
+- Calculation errors fall back to contract data
+- High trader profits show risk warning
 
 **Subtasks**:
 
 - **UI/UX Design**
   - Required competencies: UI/UX Design, Dashboard Design
   - Area of project modified: LP Dashboard
-  
 - **Frontend Development**
   - Required competencies: React, TypeScript, Data Visualization
   - Area of project modified: LP Analytics Components
   - Details: Dashboard layout, performance charts, metrics display
-  
 - **Client SDK Analytics Engine**
   - Required competencies: Financial Analytics, DeFi Metrics, Client SDK
   - Area of project modified: Client SDK Analytics Service
   - Details: APY calculations, risk metrics in bonsai layer, P&L attribution
-  
 - **Data Pipeline**
   - Required competencies: Data Engineering, Client SDK
   - Area of project modified: Indexer and Client SDK
   - Details: Fee event processing, historical aggregation
-  
 - **QA & Testing**
   - Required competencies: Analytics Testing, Data Validation
   - Area of project modified: Test Suite
@@ -1527,6 +1565,7 @@ sequenceDiagram
 **Story**: As a trader, I want to receive clear error messages when transactions fail or when I have insufficient collateral so that I can understand and resolve issues quickly.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1534,17 +1573,17 @@ sequenceDiagram
     participant Client
     participant Wallet
     participant Contracts
-    
+
     User->>Frontend: Initiate transaction
     Frontend->>Client: Pre-flight checks
-    
+
     alt Validation Failed
         Client-->>Frontend: Error details
         Frontend-->>User: Show error with solution
     else Validation Passed
         Frontend->>Wallet: Submit transaction
         Wallet->>Client: Request signature
-        
+
         alt User Rejected
             Wallet-->>Client: Rejection
             Client-->>Frontend: User cancelled
@@ -1567,6 +1606,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Attempt a transaction (deposit, trade, withdrawal)
 2. Encounter transaction failure or validation error
 3. Receive clear, actionable error message through Client SDK
@@ -1575,10 +1615,12 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-107, STAR-108
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Client SDK transaction management system
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Pre-flight validation for: insufficient balance, invalid parameters, network issues
   - Error categorization: user errors, network errors, contract errors, wallet errors
@@ -1587,7 +1629,6 @@ sequenceDiagram
   - Error tracking and analytics for monitoring common issues
   - Toast notifications for non-blocking errors
   - Modal dialogs for blocking errors requiring user action
-  
 - **Non-Functional Requirements**:
   - Error detection within 100ms for validation errors
   - Error message display within 500ms of failure
@@ -1596,31 +1637,28 @@ sequenceDiagram
   - Accessibility compliance for error displays
 
 **Unhappy Paths**:
-  - Unknown errors show generic message with support link
-  - Critical errors trigger emergency mode
-  - Network timeout shows offline indicator
+
+- Unknown errors show generic message with support link
+- Critical errors trigger emergency mode
+- Network timeout shows offline indicator
 
 **Subtasks**:
 
 - **UX Writing**
   - Required competencies: UX Writing, Technical Communication
   - Area of project modified: Error Messages
-  
 - **Error Handling System**
   - Required competencies: TypeScript, Error Management, Client SDK
   - Area of project modified: Client SDK Transaction Manager
   - Details: Error parser within Client SDK, recovery flows
-  
 - **Frontend Components**
   - Required competencies: React, TypeScript, UI Components
   - Area of project modified: Error Components
   - Details: Error modals, toast notifications, inline validation
-  
 - **Validation Layer**
   - Required competencies: Web3, Validation Logic, Client SDK
   - Area of project modified: Client SDK Validation Service
   - Details: Pre-flight checks, parameter validation
-  
 - **QA & Testing**
   - Required competencies: Error Testing, E2E Testing
   - Area of project modified: Test Suite
@@ -1633,6 +1671,7 @@ sequenceDiagram
 **Story**: As a trader, I want to understand the funding fees I'll pay based on my position length and open interest imbalances so that I can factor these costs into my trading decisions.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1640,7 +1679,7 @@ sequenceDiagram
     participant Client
     participant Indexer
     participant Contracts
-    
+
     User->>Frontend: Open position form
     Frontend->>Client: Get current rate
     Client->>Indexer: Query funding rate
@@ -1652,7 +1691,7 @@ sequenceDiagram
     Frontend->>Client: Calculate funding cost (bonsai layer)
     Client-->>Frontend: Projected costs
     Frontend-->>User: Display funding preview
-    
+
     User->>Frontend: View existing position
     Frontend->>Client: Get accumulated funding
     Client->>Indexer: Get funding history
@@ -1662,6 +1701,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. View funding rate information before opening position
 2. Monitor ongoing funding costs for open positions
 3. Understand how funding rates are calculated
@@ -1670,10 +1710,12 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-107, STAR-108, STAR-109
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Funding rate mechanism
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Funding rate display on position entry form (rate per 8 hours)
   - Cost calculator in Client (bonsai layer): `position_size * funding_rate * (hours_held / 8)`
@@ -1682,7 +1724,6 @@ sequenceDiagram
   - Accumulated funding display per position
   - Funding payment history with timestamps and amounts
   - Projected funding costs for 1 day, 7 days, 30 days
-  
 - **Non-Functional Requirements**:
   - Funding calculations update in real-time
   - Historical funding data for 90 days
@@ -1691,10 +1732,11 @@ sequenceDiagram
   - Documentation of funding mechanism
 
 **Unhappy Paths**:
-  - Extreme funding rates trigger warning
-  - Calculator overflow handled gracefully
-  - Missing historical data shows available range
-  - Negative rates clearly explained
+
+- Extreme funding rates trigger warning
+- Calculator overflow handled gracefully
+- Missing historical data shows available range
+- Negative rates clearly explained
 
 **Subtasks**:
 
@@ -1702,17 +1744,14 @@ sequenceDiagram
   - Required competencies: React, Financial Mathematics, Client SDK
   - Area of project modified: Client SDK Calculator Components
   - Details: Cost calculator in bonsai layer, break-even analysis, projections
-  
 - **Frontend Integration**
   - Required competencies: React, TypeScript
   - Area of project modified: Position Components
   - Details: Funding display integration, payment history
-  
 - **Data Processing**
   - Required competencies: Client SDK, Data Aggregation
   - Area of project modified: Client SDK Layer
   - Details: Funding aggregation queries, history processing
-  
 - **QA & Testing**
   - Required competencies: Calculator Testing, Math Validation
   - Area of project modified: Test Suite
@@ -1724,6 +1763,7 @@ sequenceDiagram
 **Story**: As a trader, I want to select between testnet and mainnet so that I can test the platform before using it with real funds or switch to the production environment.
 
 **User Flow Diagram**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -1731,7 +1771,7 @@ sequenceDiagram
     participant NetworkManager
     participant Wallet
     participant Contracts
-    
+
     User->>Frontend: Click network selector in header
     Frontend-->>User: Show network options
     User->>Frontend: Select network
@@ -1746,6 +1786,7 @@ sequenceDiagram
 ```
 
 **Task Flow**:
+
 1. Visit Starboard Finance platform
 2. See network selector in header
 3. Choose between Testnet and Mainnet
@@ -1755,11 +1796,13 @@ sequenceDiagram
 
 **Prerequisite Stories**: STAR-119
 
-**Prerequisite Technical Stories**: 
+**Prerequisite Technical Stories**:
+
 - Multi-network contract deployment
 - Network configuration in frontend
 
 **Acceptance Criteria**:
+
 - **Functional Requirements**:
   - Network selector in header showing current network
   - Clear visual distinction: Testnet (orange), Mainnet (green)
@@ -1772,7 +1815,6 @@ sequenceDiagram
     - No cross-network data contamination in state management
   - Network preference saved in localStorage
   - URL parameter support for network selection (?network=testnet)
-  
 - **Non-Functional Requirements**:
   - Network switch completed within 3 seconds
   - No data loss during network switch
@@ -1782,10 +1824,11 @@ sequenceDiagram
   - Fallback RPC endpoints for reliability
 
 **Unhappy Paths**:
-  - Wallet on wrong network prompts switch
-  - Network switch failure maintains current network
-  - RPC unavailable shows maintenance message
-  - Unsupported network shows error
+
+- Wallet on wrong network prompts switch
+- Network switch failure maintains current network
+- RPC unavailable shows maintenance message
+- Unsupported network shows error
 
 **Subtasks**:
 
@@ -1793,19 +1836,15 @@ sequenceDiagram
   - Required competencies: Web3, Network Configuration
   - Area of project modified: Network Service
   - Details: Network switching logic, configuration management
-  
 - **Frontend Integration**
   - Required competencies: React, TypeScript
   - Area of project modified: Header and App Components
   - Details: Network selector in header, visual indicators, state management
-  
 - **Contract Configuration**
   - Required competencies: Smart Contracts, Multi-chain
   - Area of project modified: Contract Configs
   - Details: Network-specific addresses, ABI management
-  
 - **QA & Testing**
   - Required competencies: Network Testing, E2E Testing
   - Area of project modified: Test Suite
   - Details: Network switch scenarios, data isolation testing
-

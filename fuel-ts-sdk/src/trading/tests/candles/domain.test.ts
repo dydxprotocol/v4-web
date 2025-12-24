@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { Candle, CandleSchema } from '../../src/candles';
+import { describe, expect, it } from 'vitest';
 import { assetId } from '@/shared/types';
+import { CandleSchema } from '../../src/candles';
 
 describe('Candle Domain', () => {
   describe('CandleSchema', () => {

@@ -2,17 +2,17 @@ name: 🧜‍♀️ Validate Mermaid Diagrams
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
     paths:
-      - "**/*.md"
-      - ".github/workflows/mermaid-validation.yaml"
-      - "scripts/validate-mermaid-remark.js"
+      - '**/*.md'
+      - '.github/workflows/mermaid-validation.yaml'
+      - 'scripts/validate-mermaid-remark.js'
   pull_request:
-    branches: ["*"]
+    branches: ['*']
     paths:
-      - "**/*.md"
-      - ".github/workflows/mermaid-validation.yaml"
-      - "scripts/validate-mermaid-remark.js"
+      - '**/*.md'
+      - '.github/workflows/mermaid-validation.yaml'
+      - 'scripts/validate-mermaid-remark.js'
 
 jobs:
   validate-mermaid:
@@ -25,7 +25,7 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
 
       - name: 📦 Install pnpm
         uses: pnpm/action-setup@v4

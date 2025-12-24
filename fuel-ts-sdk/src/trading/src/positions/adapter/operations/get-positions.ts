@@ -1,8 +1,7 @@
-import type { Position as GraphQLPosition } from '@/generated/graphql';
-import { Address, address, AssetId, assetId, positionId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
-
-import { PositionKeySchema, PositionSchema, type Position } from '../../domain';
+import type { Position as GraphQLPosition } from '@/generated/graphql';
+import { Address, AssetId, address, assetId, positionId } from '@/shared/types';
+import { type Position, PositionKeySchema, PositionSchema } from '../../domain';
 import type { GetPositionsOptions } from '../../port';
 import { GET_POSITIONS_QUERY } from './get-positions.query';
 

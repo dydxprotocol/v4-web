@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type {
   CandleD1,
   CandleH1,
   CandleH4,
   CandleM1,
+  CandleM5,
   CandleM15,
   CandleM30,
-  CandleM5,
 } from '@/generated/graphql';
 
 describe('Candle Adapter - Mapper', () => {

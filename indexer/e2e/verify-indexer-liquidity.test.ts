@@ -1,7 +1,6 @@
 import pg from 'pg';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-
-import { expandDecimals, USER_0_ADDRESS, USER_1_ADDRESS, USER_2_ADDRESS } from './utils';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { USER_0_ADDRESS, USER_1_ADDRESS, USER_2_ADDRESS, expandDecimals } from './utils';
 
 const { Client } = pg;
 

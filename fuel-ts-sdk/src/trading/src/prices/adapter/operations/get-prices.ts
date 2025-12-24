@@ -1,8 +1,7 @@
+import type { GraphQLClient } from 'graphql-request';
 import type { Price as GraphQLPrice } from '@/generated/graphql';
 import { AssetId, assetId, priceId } from '@/shared/types';
-import type { GraphQLClient } from 'graphql-request';
-
-import { PriceSchema, type Price } from '../../domain';
+import { type Price, PriceSchema } from '../../domain';
 import type { GetPricesOptions } from '../../port';
 import { GET_PRICES_QUERY } from './get-prices.query';
 

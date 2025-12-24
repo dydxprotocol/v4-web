@@ -13,6 +13,10 @@ export default [
       '**/generated/**',
       '*.min.js',
       'pnpm-lock.yaml',
+
+      'frontend/**',
+      'fuel-ts-sdk/**',
+      'indexer/**',
     ],
   },
 ];

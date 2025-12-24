@@ -1,15 +1,14 @@
 import { Provider, Wallet } from 'fuels';
-
 // eslint-disable-next-line import/no-relative-packages
 import { StorkMock } from '../../contracts/types';
 import {
+  BTC_ASSET,
+  DEPLOYER_PK,
+  ETH_ASSET,
+  USDC_ASSET,
   call,
   moveBlockchainTime,
   toPrice,
-  BTC_ASSET,
-  USDC_ASSET,
-  ETH_ASSET,
-  DEPLOYER_PK,
 } from './utils';
 
 // graphql url is hardcoded, taken form the fuel node starting script

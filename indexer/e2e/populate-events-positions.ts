@@ -1,25 +1,24 @@
 import { Provider, Wallet, createAssetId } from 'fuels';
-
 // eslint-disable-next-line import/no-relative-packages
-import { StorkMock, Vault, TestnetToken } from '../../contracts/types';
+import { StorkMock, TestnetToken, Vault } from '../../contracts/types';
 import {
-  call,
-  moveBlockchainTime,
-  toPrice,
-  walletToAddressIdentity,
-  expandDecimals,
-  DEFAULT_SUB_ID,
-  BTC_MAX_LEVERAGE,
-  BNB_MAX_LEVERAGE,
   BNB_ASSET,
-  ETH_MAX_LEVERAGE,
+  BNB_MAX_LEVERAGE,
   BTC_ASSET,
-  USDC_ASSET,
-  ETH_ASSET,
+  BTC_MAX_LEVERAGE,
+  DEFAULT_SUB_ID,
   DEPLOYER_PK,
+  ETH_ASSET,
+  ETH_MAX_LEVERAGE,
+  USDC_ASSET,
   USER_0_PK,
   USER_1_PK,
   USER_2_PK,
+  call,
+  expandDecimals,
+  moveBlockchainTime,
+  toPrice,
+  walletToAddressIdentity,
 } from './utils';
 
 // graphql url is hardcoded, taken form the fuel node starting script

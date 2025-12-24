@@ -10,7 +10,7 @@
     "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
     "test:e2e": "vitest --mode indexer-e2e run",
     "lint": "eslint .",
-    "fix-lint": "eslint --fix ."
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@graphile-contrib/pg-simplify-inflector": "^6.1.0",

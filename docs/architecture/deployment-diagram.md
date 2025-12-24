@@ -28,7 +28,7 @@ graph TB
             SC[Starboard Contracts]
             OR[Stork Oracles<br/>ETH, BTC, FUEL, stFUEL]
         end
-        
+
         subgraph "Assets"
             A1[USDC<br/>Vault Asset & Collateral]
             A2[RLP Tokens<br/>LP Position Asset]
@@ -45,32 +45,32 @@ graph TB
     U2 --> W1
     U3 --> W1
     U1 --> W2
-    
+
     %% Frontend to client connections
     W1 --> SC_CLIENT
     W2 --> SC_CLIENT
-    
+
     %% Client to connectors
     SC_CLIENT --> FC
-    
+
     %% Client to data layer
     SC_CLIENT --> IDX
-    
+
     %% Connector to network
     FC --> SC
     FC --> OR
     FC --> A1
     FC --> A2
-    
+
     %% Contracts to indexer (data flow)
     SC --> IDX
-    
+
     %% Contract interactions
     SC --> OR
     OR --> STORK
     SC --> A1
     SC --> A2
-    
+
     %% External services
     W1 --> BE
 
@@ -97,20 +97,24 @@ graph TB
 ## Component Details
 
 ### Frontend Layer
+
 - **Starboard Web App**: Modified dYdX frontend with new branding and Fuel network integration
 - **Worldchain Mini App**: Simplified trading interface for the Worldchain mini app store
 - **Starboard Client**: Central interface layer that handles all API calls to the data layer and smart contract interactions via fuel-ts-sdk
 - **Fuel Connectors**: Handles both Fuel wallets and EVM wallets, providing unified wallet interface
 
 ### Data & API Layer
+
 - **Subsquid Indexer**: Single service that processes Fuel network events and provides both GraphQL and REST APIs with dYdX compatibility
 
 ### Fuel Network Layer
+
 - **Starboard Contracts**: Updated contracts with USDC-only deposits, no RUSD, RLP positions, and configurable fees (deployed on both mainnet and testnet environments)
 - **Stork Oracles**: Price feed integration for supported assets (ETH, BTC, FUEL, stFUEL)
 - **Assets**: USDC as primary asset and RLP tokens for liquidity provider positions
 
 ### Key Architecture Changes from Original dYdX
+
 1. **Blockchain**: Migrated from Cosmos to Fuel Network
 2. **Asset Strategy**: USDC-only vault and collateral system
 3. **LP Tokens**: RLP tokens instead of RUSD for liquidity positions
@@ -119,6 +123,7 @@ graph TB
 6. **Wallet Integration**: Unified Fuel connectors handling both Fuel and EVM wallets
 
 ## Data Flow
+
 1. Users interact through web app or mini app
 2. Frontend applications route all requests through the Starboard Client
 3. Starboard Client handles API calls to the subsquid indexer for read operations

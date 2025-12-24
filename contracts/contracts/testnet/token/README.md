@@ -24,6 +24,7 @@ src/
 ### Initialization
 
 The contract must be initialized once with:
+
 - `name`: Token name (e.g., "My Token")
 - `symbol`: Token symbol (e.g., "MTK")
 - `decimals`: Number of decimal places (default: 18)
@@ -31,16 +32,19 @@ The contract must be initialized once with:
 ### Core Functions
 
 #### SRC20 Functions
+
 - `name()` → Returns token name
 - `symbol()` → Returns token symbol
 - `decimals()` → Returns number of decimals
 - `total_supply()` → Returns total token supply
 
 #### SRC3 Functions
+
 - `mint(recipient, amount)` → Mints new tokens to specified address
 - `burn(amount)` → Burns tokens from caller's balance
 
 #### Utility Functions
+
 - `get_asset_id()` → Returns the asset ID for this token
 
 ## Key Differences from ERC20

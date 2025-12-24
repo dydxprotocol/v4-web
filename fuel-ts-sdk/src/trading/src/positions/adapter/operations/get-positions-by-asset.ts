@@ -1,6 +1,5 @@
-import type { AssetId } from '@/shared/types';
 import type { GraphQLClient } from 'graphql-request';
-
+import type { AssetId } from '@/shared/types';
 import type { Position } from '../../domain';
 import { getPositions } from './get-positions';
 

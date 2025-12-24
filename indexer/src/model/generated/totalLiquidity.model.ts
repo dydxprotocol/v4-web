@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
+import { BigIntColumn as BigIntColumn_, Entity as Entity_, IntColumn as IntColumn_, PrimaryColumn as PrimaryColumn_ } from "@subsquid/typeorm-store"
 
 @Entity_()
 export class TotalLiquidity {

@@ -31,11 +31,13 @@ pnpm install
 ### 3. Start the development servers
 
 **Start the indexer:**
+
 ```bash
 pnpm run dev:indexer
 ```
 
 **Start the frontend:**
+
 ```bash
 pnpm run dev
 ```
@@ -56,11 +58,13 @@ starboard/
 ## Available Commands
 
 ### Development
+
 - `pnpm run dev` - Start frontend dev server
 - `pnpm run dev:indexer` - Start indexer
 - `pnpm run dev:all` - Start everything (requires Docker)
 
 ### Building
+
 - `pnpm run build` - Build all packages
 - `pnpm run build:frontend` - Build frontend only
 - `pnpm run build:indexer` - Build indexer only
@@ -68,17 +72,20 @@ starboard/
 - `pnpm run build:contracts` - Build Sway contracts
 
 ### Code Quality
+
 - `pnpm run lint` - Lint all packages
 - `pnpm run lint:fix` - Auto-fix linting issues
 - `pnpm run format` - Format code with Prettier
 - `pnpm run format:check` - Check code formatting
 
 ### Testing
+
 - `pnpm run test` - Run tests
 
 ## Tech Stack
 
 ### Frontend
+
 - React 19
 - React Router v7
 - Tailwind CSS v4
@@ -86,17 +93,20 @@ starboard/
 - Vite
 
 ### Indexer
+
 - Subsquid
 - PostgreSQL
 - PostGraphile
 
 ### Contracts
+
 - Sway
 - Fuel SDK
 
 ## Environment Variables
 
 ### Indexer (`indexer/.env`)
+
 ```bash
 # Database
 DB_NAME=postgres
@@ -121,6 +131,7 @@ FROM_BLOCK=42335475
 ## Contributing
 
 We use:
+
 - **Conventional Commits** for commit messages
 - **pnpm workspaces** for monorepo management
 - **ESLint + Prettier** for code quality

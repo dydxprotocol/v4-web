@@ -18,7 +18,7 @@ services:
     volumes:
       - fuel-core-db:/mnt/db
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost:4000/v1/health || exit 1"]
+      test: ['CMD-SHELL', 'curl --fail http://localhost:4000/v1/health || exit 1']
       interval: 10s
       start_period: 3s
       timeout: 10s
@@ -26,7 +26,7 @@ services:
 
   db:
     image: postgres:15
-    container_name: "starboard_indexer_db"
+    container_name: 'starboard_indexer_db'
     restart: unless-stopped
     env_file:
       - .env.docker
@@ -35,10 +35,10 @@ services:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASS:-postgres}
     ports:
-      - "${DB_PORT:-23751}:5432"
+      - '${DB_PORT:-23751}:5432'
       # command: ["postgres", "-c", "log_statement=all"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
       interval: 10s
       start_period: 3s
       timeout: 10s
@@ -67,14 +67,19 @@ services:
       VAULT_ADDRESS: ${VAULT_ADDRESS:-0x01bbCEFbC64350a092310d59E29cFF269DB01539866aBb263f6dB78C275a84F2}
       FROM_BLOCK: ${FROM_BLOCK:-0}
       NVM_DIR: /root/.nvm
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]
+    command:
+      [
+        'bash',
+        '-c',
+        'source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js',
+      ]
     depends_on:
       fuel-core:
         condition: service_healthy
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'node.*main.js' || exit 1"]
+      test: ['CMD-SHELL', "pgrep -f 'node.*main.js' || exit 1"]
       interval: 30s
       start_period: 60s
       timeout: 10s
@@ -98,15 +103,15 @@ services:
       NVM_DIR: /root/.nvm
       GRAPHQL_SERVER_PORT: 4350
     ports:
-      - "${GQL_PORT:-4350}:4350"
-    command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && node lib/api.js"]
+      - '${GQL_PORT:-4350}:4350'
+    command: ['bash', '-c', 'source /root/.nvm/nvm.sh && cd /starboard/indexer && node lib/api.js']
     depends_on:
       db:
         condition: service_healthy
       indexer:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'node.*api.js' || exit 1"]
+      test: ['CMD-SHELL', "pgrep -f 'node.*api.js' || exit 1"]
       interval: 30s
       start_period: 30s
       timeout: 10s

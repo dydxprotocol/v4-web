@@ -1,7 +1,6 @@
-import type { Price as GraphQLPrice } from '@/generated/graphql';
 import type { GraphQLClient } from 'graphql-request';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
+import type { Price as GraphQLPrice } from '@/generated/graphql';
 import { createGraphQLPriceRepository } from '../../src/prices';
 
 describe('Price Repository Adapter', () => {

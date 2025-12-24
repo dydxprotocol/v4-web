@@ -1,14 +1,13 @@
 # Starboard - Indexer
 
-
 ## Getting started
 
 Review `.env` file.
 
 ### Prerequisites
 
-* Node.js (version 20.x and above)
-* Docker
+- Node.js (version 20.x and above)
+- Docker
 
 ### Run indexer
 
@@ -30,7 +29,7 @@ node -r dotenv/config lib/main.js
 # or (this does not require the project to be build)
 pnpm start
 
-# Run API, update db connection params, 
+# Run API, update db connection params,
 # for the production consult postgres docs for safer configuration
 pnpm postgraphile -c "postgres://postgres:postgres@localhost:23751/postgres" --enhance-graphiql
 
@@ -59,6 +58,7 @@ starts up the indexer, waits for the indexer to process the events
 and shuts everything down. The database and the fuel node have to run separately.
 
 Build contracts
+
 ```shell
 pnpm --filter starboard/contracts build
 pnpm --filter starboard/contracts gen:types
@@ -73,6 +73,7 @@ pnpm sqd up:e2e
 ```
 
 Run an example test
+
 ```shell
 ./e2e/run.sh e2e/populate-events-price.ts e2e/verify-indexer-price.test.ts
 ```
@@ -83,8 +84,9 @@ Shut down the database and the fuel node.
 pnpm sqd down:e2e
 ```
 
-The interactive mode simply waits for Ctrl-C to initialize the shutdown 
+The interactive mode simply waits for Ctrl-C to initialize the shutdown
 to enable the infrastructure for other test purposes
+
 ```shell
 ./e2e/run.sh e2e/populate-events-price.ts e2e/verify-indexer-price.test.ts i
 ```
@@ -111,4 +113,3 @@ Views are not generated from the schema, they are provided with custom migration
 See `db/migrations/1762648930785-Data.js` for instance.
 Such scripts are marked with the comment `// NON GENERATED MIGRATION`.
 In case the schema is changed, views may need to be updated as well - it must be done manually.
-

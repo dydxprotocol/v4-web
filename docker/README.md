@@ -30,6 +30,7 @@ starboard/
 **Location:** `docker/starboard/Dockerfile`
 
 This uses **standard Docker practices**:
+
 - ✅ `COPY . .` from local filesystem
 - ✅ No git operations
 - ✅ Works same in dev and CI/CD
@@ -42,11 +43,12 @@ This uses **standard Docker practices**:
 services:
   indexer:
     build:
-      context: ..                      # Repo root (starboard/)
-      dockerfile: docker/starboard/Dockerfile  # This Dockerfile
+      context: .. # Repo root (starboard/)
+      dockerfile: docker/starboard/Dockerfile # This Dockerfile
 ```
 
 **How it works:**
+
 1. Build context = `starboard/` (repo root)
 2. Dockerfile = `docker/starboard/Dockerfile`
 3. `COPY . .` copies entire repo into image
@@ -54,12 +56,12 @@ services:
 
 ## Services
 
-| Service | Container | Port | Description |
-|---------|-----------|------|-------------|
-| fuel-core | starboard_fuel_core | 4000 | Local Fuel blockchain node |
-| db | starboard_indexer_db | 23751 | PostgreSQL database |
-| indexer | starboard_indexer_processor | - | Indexes blockchain events |
-| api | starboard_indexer_api | 4350 | GraphQL API |
+| Service   | Container                   | Port  | Description                |
+| --------- | --------------------------- | ----- | -------------------------- |
+| fuel-core | starboard_fuel_core         | 4000  | Local Fuel blockchain node |
+| db        | starboard_indexer_db        | 23751 | PostgreSQL database        |
+| indexer   | starboard_indexer_processor | -     | Indexes blockchain events  |
+| api       | starboard_indexer_api       | 4350  | GraphQL API                |
 
 ## Commands
 
@@ -201,12 +203,12 @@ PRICEFEED_WRAPPER=0x212EB3F8Ff08392B2aa030768A3814fc5A0a67F94412CfE07e37DD1cbC24
 
 The local fuel node includes these prefunded accounts for testing:
 
-| Role | Private Key | Address |
-|------|-------------|---------|
-| **Deployer** | `0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a` | `0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6` |
-| **User0** | `0x366079294383ed426ef94b9e86a8e448876a92c1ead9bbf75e6e205a6f4f570d` | `0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770` |
-| **User1** | `0xb978aa71a1487dc9c1f996493af73f0427cf78f560b606224e7f0089bae04c41` | `0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c` |
-| **Liquidator** | `0xa5675fc7eb0657940fc73f6ec6c5265c045065ddac62e12e1174da030f3868b3` | `0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088` |
+| Role            | Private Key                                                          | Address                                                              |
+| --------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Deployer**    | `0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a` | `0x0a0da2e1d4d201cc73cd500dfd64a732f1b94e5fb2d86657ab43ff620acaefd6` |
+| **User0**       | `0x366079294383ed426ef94b9e86a8e448876a92c1ead9bbf75e6e205a6f4f570d` | `0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770` |
+| **User1**       | `0xb978aa71a1487dc9c1f996493af73f0427cf78f560b606224e7f0089bae04c41` | `0x7ab1e9d9fd10909aead61cbfd4a5ec2d80bb304f34cfa2b5a9446398e284e92c` |
+| **Liquidator**  | `0xa5675fc7eb0657940fc73f6ec6c5265c045065ddac62e12e1174da030f3868b3` | `0xad000576cc6dc12183a0306d8809c24f897fbbccfd3f179c571db6659218c088` |
 | **PriceSigner** | `0xb19556cb693d7850d0e75d05a6e2e4c9ed5691d9e5bc54a7d43ee6eed3ad5fe3` | `0x6fe2a2b3a6f712b211c7317cf0fd12805d10f4f5473cfb461b1e2ba7acaf790b` |
 
 ⚠️ **WARNING:** These are test keys for local development only. Never use with real funds!
@@ -342,13 +344,14 @@ dockerfile: docker/starboard/Dockerfile  # But Dockerfile is organized in subdir
 ```
 
 This gives us:
+
 - ✅ Standard build context (repo root)
 - ✅ Organized Dockerfile location
 - ✅ Clean repository structure
 
 ```yaml
-context: ..              # Build from repo root ✅
-dockerfile: docker/starboard/Dockerfile  # But Dockerfile is organized in subdir
+context: .. # Build from repo root ✅
+dockerfile: docker/starboard/Dockerfile # But Dockerfile is organized in subdir
 ```
 
 ## Troubleshooting
@@ -374,6 +377,7 @@ docker-compose ps
 ### Port conflicts
 
 Edit `docker/.env.docker` to change ports:
+
 ```bash
 FUEL_CORE_PORT=4001
 GQL_PORT=4351
@@ -390,6 +394,7 @@ DB_PORT=23752
 ## Support
 
 For issues:
+
 1. Check logs: `docker-compose logs <service>`
 2. Verify .env exists: `ls .env`
 3. Test endpoints (see Testing section above)

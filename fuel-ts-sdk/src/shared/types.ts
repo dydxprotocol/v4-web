@@ -25,7 +25,10 @@ export const safeAssetId = (str: string): AssetId | undefined => {
 /**
  * PositionId - Unique position identifier
  */
-export const PositionIdSchema = z.string().min(1, 'Position ID cannot be empty').brand<'PositionId'>();
+export const PositionIdSchema = z
+  .string()
+  .min(1, 'Position ID cannot be empty')
+  .brand<'PositionId'>();
 export type PositionId = z.infer<typeof PositionIdSchema>;
 export const positionId = (str: string): PositionId => PositionIdSchema.parse(str);
 export const safePositionId = (str: string): PositionId | undefined => {

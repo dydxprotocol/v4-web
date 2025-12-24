@@ -1,7 +1,6 @@
 import pg from 'pg';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-
-import { toPrice, BTC_ASSET, USDC_ASSET, ETH_ASSET } from './utils';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { BTC_ASSET, ETH_ASSET, USDC_ASSET, toPrice } from './utils';
 
 const { Client } = pg;
 

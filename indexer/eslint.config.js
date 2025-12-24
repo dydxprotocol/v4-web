@@ -1,7 +1,7 @@
 import js from '@eslint/js';
+import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import prettier from 'eslint-config-prettier';
 import baseConfig from '../eslint.config.base.js';
 
 export default tseslint.config(
@@ -15,9 +15,14 @@ export default tseslint.config(
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: globals.node,
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       ...baseConfig.rules,
+      '@typescript-eslint/no-explicit-any': 'off',
+
       // Node.js specific
       'no-console': 'off', // Console logging is fine in backend services
     },

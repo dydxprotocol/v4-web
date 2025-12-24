@@ -1,18 +1,25 @@
+import type { GraphQLClient } from 'graphql-request';
 import type {
   CandleD1,
   CandleH1,
   CandleH4,
   CandleM1,
+  CandleM5,
   CandleM15,
   CandleM30,
-  CandleM5,
 } from '@/generated/graphql';
 import { AssetId, assetId } from '@/shared/types';
-import type { GraphQLClient } from 'graphql-request';
-
-import { CandleSchema, type Candle } from '../../domain';
+import { type Candle, CandleSchema } from '../../domain';
 import type { CandleInterval, GetCandlesOptions } from '../../port';
-import { GET_CANDLES_D1_QUERY, GET_CANDLES_H1_QUERY, GET_CANDLES_H4_QUERY, GET_CANDLES_M1_QUERY, GET_CANDLES_M15_QUERY, GET_CANDLES_M30_QUERY, GET_CANDLES_M5_QUERY } from './get-candles.query';
+import {
+  GET_CANDLES_D1_QUERY,
+  GET_CANDLES_H1_QUERY,
+  GET_CANDLES_H4_QUERY,
+  GET_CANDLES_M1_QUERY,
+  GET_CANDLES_M5_QUERY,
+  GET_CANDLES_M15_QUERY,
+  GET_CANDLES_M30_QUERY,
+} from './get-candles.query';
 
 type GraphQLCandle = CandleD1 | CandleH1 | CandleH4 | CandleM1 | CandleM5 | CandleM15 | CandleM30;
 

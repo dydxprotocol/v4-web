@@ -1,10 +1,10 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import react from '@vitejs/plugin-react';
 import path from 'path';
+import { type Plugin, defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react(), vanillaExtractPlugin()],
+  plugins: [react(), vanillaExtractPlugin()] as unknown as Plugin[],
   test: {
     globals: true,
     environment: 'jsdom',

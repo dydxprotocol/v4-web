@@ -1,12 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import {
-  Position,
-  PositionKey,
-  PositionChange,
-  PositionSchema,
-  PositionKeySchema,
-} from '../../src/positions';
+import { describe, expect, it } from 'vitest';
 import { address, assetId, positionId } from '@/shared/types';
+import { PositionChange, PositionKeySchema, PositionSchema } from '../../src/positions';
 
 describe('Position Domain', () => {
   describe('PositionKeySchema', () => {

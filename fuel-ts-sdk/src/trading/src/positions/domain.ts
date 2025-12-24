@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { AddressSchema, AssetIdSchema, PositionIdSchema } from '@/shared/types';
 import { PositionChange } from '@/generated/graphql';
+import { AddressSchema, AssetIdSchema, PositionIdSchema } from '@/shared/types';
 
 export type PositionKey = z.infer<typeof PositionKeySchema>;
 export type Position = z.infer<typeof PositionSchema>;

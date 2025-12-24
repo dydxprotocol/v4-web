@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Price as GraphQLPrice } from '@/generated/graphql';
 
 // We need to import the internal function for testing

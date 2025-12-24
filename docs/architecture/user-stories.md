@@ -45,6 +45,7 @@
 ## Project Overview
 
 Starboard Finance is a DeFi perpetuals trading platform that:
+
 - Deploys modified Ruscet contracts to Fuel mainnet
 - Uses a forked DYDX frontend with Starboard branding
 - Supports leveraged long/short positions on crypto assets (ETH, BTC, FUEL, stFUEL)
@@ -52,7 +53,6 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - Provides liquidity through RLP tokens instead of RUSD
 - Integrates Stork oracles for price feeds
 - Uses GraphQL API with data transformation to match SDK expected formats
-
 
 ## User Groups
 
@@ -69,6 +69,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 3
 
 **Task Flow**:
+
 1. Navigate to account/portfolio section
 2. View total USDC balance
 3. See available collateral for new positions
@@ -77,6 +78,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. Monitor balance updates via polling
 
 **Acceptance Criteria**:
+
 - [ ] Dashboard displays total USDC balance with real-time updates
 - [ ] Available collateral is calculated and displayed correctly
 - [ ] Used collateral shows breakdown by position
@@ -85,8 +87,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Clear visual indicators for margin health status
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-112
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - GraphQL API with data transformation (STAR-136)
   - Data polling integration (STAR-125)
 
@@ -97,6 +100,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Task Flow**:
+
 1. Navigate to trading interface for desired asset
 2. Select "Long" position side
 3. Enter position size in USD
@@ -107,6 +111,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 8. Wait for position to open
 
 **Acceptance Criteria**:
+
 - [ ] Trading interface supports all four assets (ETH, BTC, FUEL, stFUEL)
 - [ ] Position size validation prevents exceeding available collateral
 - [ ] Leverage selector respects maximum limits per asset
@@ -116,8 +121,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Real-time position updates reflect in portfolio
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-106, STAR-112
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Contract position management (STAR-129)
   - Oracle integration (STAR-133)
   - Trading interface (STAR-123)
@@ -129,6 +135,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Task Flow**:
+
 1. Navigate to trading interface for desired asset
 2. Select "Short" position side
 3. Enter position size in USD
@@ -139,6 +146,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 8. Wait for position to open
 
 **Acceptance Criteria**:
+
 - [ ] Short position interface mirrors long position functionality
 - [ ] Borrowing costs are calculated and displayed
 - [ ] Short-specific liquidation price calculations are accurate
@@ -147,8 +155,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Short positions reflect correctly in portfolio view
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-106, STAR-112
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Contract position management (STAR-129)
   - Oracle integration (STAR-133)
   - Trading interface (STAR-123)
@@ -160,6 +169,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 5
 
 **Task Flow**:
+
 1. Navigate to portfolio/positions section
 2. View list of all open positions
 3. See position details: asset, side, size, leverage
@@ -168,6 +178,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. View position history and performance metrics
 
 **Acceptance Criteria**:
+
 - [ ] Positions table shows all open positions with key metrics
 - [ ] PnL updates every 10 seconds with color coding (green/red)
 - [ ] Margin health indicators show proximity to liquidation
@@ -176,8 +187,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Warning alerts when positions approach liquidation threshold
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-107, STAR-108
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - GraphQL position data processing (STAR-135)
   - Polling-based PnL calculations (STAR-125)
 
@@ -188,6 +200,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Task Flow**:
+
 1. Navigate to open position
 2. Select "Close Position" action
 3. Choose close amount (partial or full)
@@ -197,6 +210,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 7. Wait for position closure
 
 **Acceptance Criteria**:
+
 - [ ] Close position modal shows current position details
 - [ ] Partial close allows percentage or dollar amount selection
 - [ ] Exit price estimation includes slippage calculations
@@ -205,8 +219,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Portfolio updates reflect changes immediately after confirmation
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-109
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Position closure contracts (STAR-129)
   - Transaction management (STAR-124)
 
@@ -217,6 +232,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Task Flow**:
+
 1. Navigate to trading interface for specific asset
 2. View price chart with different timeframes (updated via polling)
 3. See current bid/ask prices and spread
@@ -224,6 +240,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 5. Access technical indicators and drawing tools
 
 **Acceptance Criteria**:
+
 - [ ] TradingView charts integrated with multiple timeframes
 - [ ] Price data updates every 5 seconds via polling
 - [ ] Market statistics show 24h volume, price change, high/low
@@ -231,8 +248,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Real-time price feeds from Stork oracles
 
 **Dependencies**:
+
 - **Prerequisites**: None
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Oracle integration (STAR-133)
   - GraphQL market data processing (STAR-136)
   - Charts infrastructure (STAR-126)
@@ -244,6 +262,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 4
 
 **Task Flow**:
+
 1. Visit Starboard Finance platform
 2. Click "Connect Wallet" button
 3. Select Fuel wallet from connector options
@@ -251,6 +270,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 5. Confirm account selection
 
 **Acceptance Criteria**:
+
 - [ ] Wallet connection modal shows available Fuel wallets
 - [ ] Connection process is secure and follows Fuel standards
 - [ ] Connected wallet address is displayed in header
@@ -259,8 +279,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Network verification ensures connection to correct chain
 
 **Dependencies**:
+
 - **Prerequisites**: None
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Fuel connectors setup (STAR-122)
   - Authentication state (STAR-121)
 
@@ -271,6 +292,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Task Flow**:
+
 1. Navigate to account/history section
 2. View chronological list of all trades
 3. Filter by date range, asset, or trade type
@@ -279,6 +301,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. Export trading data (optional)
 
 **Acceptance Criteria**:
+
 - [ ] Trading history shows all completed trades with timestamps
 - [ ] Filtering by date range, asset, position type, and profit/loss
 - [ ] Trade details include entry/exit prices, fees, and net PnL
@@ -287,8 +310,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] CSV export functionality for external analysis
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-107, STAR-108, STAR-110
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - GraphQL trade history processing (STAR-135)
   - Performance analytics (STAR-127)
 
@@ -299,6 +323,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Task Flow**:
+
 1. Navigate to funding rates section
 2. View current funding rates for all markets
 3. See funding rate history and trends
@@ -306,14 +331,16 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 5. Track funding costs for open positions
 
 **Acceptance Criteria**:
+
 - [ ] Funding rates dashboard shows current rates for all assets
 - [ ] Historical funding rates with trend analysis and charts
 - [ ] Funding rate predictions based on open interest imbalances
 - [ ] Integration with position view to show funding costs
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-109
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Funding rate calculation (STAR-130)
   - GraphQL funding rate data processing (STAR-136)
 
@@ -324,6 +351,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Task Flow**:
+
 1. Navigate to liquidity provision section
 2. View current pool statistics (TVL, APY, utilization)
 3. Enter USDC amount to deposit
@@ -334,6 +362,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 8. Receive RLP tokens representing pool share
 
 **Acceptance Criteria**:
+
 - [ ] LP interface shows pool TVL, current APY, and utilization rate
 - [ ] RLP token calculation is accurate and transparent
 - [ ] Deposit confirmation shows expected returns and risks
@@ -342,8 +371,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Transaction history shows LP deposit events
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-112
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - RLP token contracts (STAR-131)
   - Liquidity pool management (STAR-129)
 
@@ -354,6 +384,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Task Flow**:
+
 1. Navigate to liquidity withdrawal section
 2. View current RLP token balance
 3. Enter amount of RLP tokens to burn
@@ -364,6 +395,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 8. Receive USDC and see updated RLP balance
 
 **Acceptance Criteria**:
+
 - [ ] Withdrawal interface shows current RLP balance and value
 - [ ] USDC calculation reflects current pool performance
 - [ ] Withdrawal fees and cooldown periods are clearly displayed
@@ -372,8 +404,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Pool statistics update after successful withdrawal
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-115
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - RLP token burning (STAR-131)
   - Liquidity withdrawal logic (STAR-129)
 
@@ -384,6 +417,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Task Flow**:
+
 1. Navigate to LP dashboard/analytics
 2. View current RLP token value and share of pool
 3. See earnings from trading fees over time
@@ -392,6 +426,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. View pool utilization and risk metrics
 
 **Acceptance Criteria**:
+
 - [ ] LP dashboard shows current RLP value and pool share percentage
 - [ ] Fee earnings tracked with daily, weekly, monthly breakdowns
 - [ ] Trader PnL exposure shown with risk indicators
@@ -400,8 +435,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Comparison with initial deposit amount and returns
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-115
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - LP analytics (STAR-127)
   - GraphQL fee distribution data processing (STAR-135)
 
@@ -412,6 +448,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 4
 
 **Task Flow**:
+
 1. Attempt a transaction (deposit, trade, withdrawal)
 2. Encounter transaction failure or validation error
 3. Receive clear, actionable error message
@@ -420,6 +457,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. Retry transaction after addressing the issue
 
 **Acceptance Criteria**:
+
 - [ ] Error messages are user-friendly and specific to the issue
 - [ ] Pre-flight validation prevents common transaction failures
 - [ ] Retry mechanisms for temporary network issues
@@ -428,8 +466,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Transaction failure tracking and analytics
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-107, STAR-108
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Error handling system (STAR-124)
   - Transaction validation (STAR-129)
 
@@ -440,6 +479,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 5
 
 **Task Flow**:
+
 1. View funding rate information before opening position
 2. Monitor ongoing funding costs for open positions
 3. Understand how funding rates are calculated
@@ -447,6 +487,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 5. Factor funding costs into position sizing
 
 **Acceptance Criteria**:
+
 - [ ] Funding rate information is displayed prominently in trading interface
 - [ ] Cost calculator estimates funding fees for different time periods
 - [ ] Real-time funding costs shown for open positions
@@ -454,8 +495,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Integration with position profitability calculations
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-107, STAR-108, STAR-109
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Funding rate mechanism (STAR-130)
   - Funding cost calculations (STAR-125)
 
@@ -466,6 +508,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 3
 
 **Task Flow**:
+
 1. Visit Starboard Finance platform
 2. See network selector in header or settings
 3. Choose between Testnet and Mainnet
@@ -474,6 +517,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 6. Wallet automatically switches to correct network
 
 **Acceptance Criteria**:
+
 - [ ] Network selector displays current network (Testnet/Mainnet)
 - [ ] Switching between networks updates all contract addresses
 - [ ] Wallet is prompted to switch to correct network if needed
@@ -482,8 +526,9 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 - [ ] Clear visual indicators show which network is active
 
 **Dependencies**:
+
 - **Prerequisites**: STAR-112
-- **Technical Requirements**: 
+- **Technical Requirements**:
   - Contract deployment on both networks (STAR-128)
   - Network configuration management (STAR-121)
 
@@ -496,6 +541,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 5
 
 **Acceptance Criteria**:
+
 - [ ] DYDX frontend successfully forked and configured for Fuel network
 - [ ] Starboard branding applied (colors, logos, typography, copy)
 - [ ] Build system configured for Fuel network deployment
@@ -509,6 +555,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] Fuel connectors installed and configured correctly
 - [ ] Wallet connection UI supports multiple wallet types
 - [ ] Wallet state management integrated with Redux/context
@@ -522,6 +569,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Acceptance Criteria**:
+
 - [ ] Position opening forms for long and short positions
 - [ ] Real-time validation for position size and leverage
 - [ ] Market selection and asset switching interface
@@ -535,6 +583,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Acceptance Criteria**:
+
 - [ ] Transaction Supervisor for operation wrapping and monitoring
 - [ ] Transaction status tracking with real-time updates
 - [ ] Comprehensive error handling with user-friendly messages
@@ -548,6 +597,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] Polling interval management with configurable rates
 - [ ] Price feed integration with automatic updates
 - [ ] Position and balance updates via scheduled polling
@@ -561,6 +611,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Acceptance Criteria**:
+
 - [ ] TradingView charting library integration
 - [ ] Market data displays (volume, price change, statistics)
 - [ ] Multiple timeframe support (1m, 5m, 15m, 1h, 4h, 1d)
@@ -574,6 +625,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Acceptance Criteria**:
+
 - [ ] Trading performance analytics with PnL tracking
 - [ ] LP performance dashboards with fee earnings
 - [ ] Portfolio tracking and risk metrics
@@ -587,6 +639,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] Ruscet contracts forked and updated to latest Forc toolchain
 - [ ] Configuration for USDC-only deposits and RLP tokens
 - [ ] Successful deployment to Fuel testnet with verified contracts
@@ -603,6 +656,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 10
 
 **Acceptance Criteria**:
+
 - [ ] increase_position function with validation and risk checks
 - [ ] decrease_position function with partial close support
 - [ ] Position liquidation mechanisms with fair pricing
@@ -616,6 +670,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Acceptance Criteria**:
+
 - [ ] Funding rate calculation algorithm based on open interest
 - [ ] Funding rate storage and periodic updates (8-hour cycles)
 - [ ] Funding payment collection and distribution system
@@ -629,6 +684,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Acceptance Criteria**:
+
 - [ ] RLP token contract with standard token functionality
 - [ ] Token minting for LP deposits with accurate valuation
 - [ ] Token burning for LP withdrawals with pool share calculation
@@ -642,6 +698,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 5
 
 **Acceptance Criteria**:
+
 - [ ] Fee calculation framework with configurable parameters
 - [ ] Position-length based fee calculations
 - [ ] Open interest imbalance fee adjustments
@@ -655,6 +712,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] Stork oracle interfaces integrated for all supported assets
 - [ ] Price feed validation and staleness checks
 - [ ] Fallback mechanisms for oracle failures
@@ -668,6 +726,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] Subsquid project initialized with Fuel network support
 - [ ] Database schema designed for SDK compatibility
 - [ ] Fuel network event processing configuration
@@ -681,6 +740,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Acceptance Criteria**:
+
 - [ ] Event mapping from Ruscet contracts to SDK-compatible structures
 - [ ] Position event processing with state management
 - [ ] Trade and funding event handling with calculations
@@ -694,6 +754,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 7
 
 **Acceptance Criteria**:
+
 - [ ] GraphQL schema designed for trading data with SDK compatibility
 - [ ] Query resolvers returning data in SDK-expected formats
 - [ ] Polling endpoints for live data with transformation support
@@ -707,6 +768,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 5
 
 **Acceptance Criteria**:
+
 - [ ] Polling mechanism combines RPC and indexer data sources
 - [ ] Efficient data retrieval without dedicated REST endpoints
 - [ ] Market and account data polling with optimized queries
@@ -720,6 +782,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 6
 
 **Acceptance Criteria**:
+
 - [ ] GitHub Actions configured for frontend with build and deploy
 - [ ] Contract testing and deployment pipelines with security checks
 - [ ] Indexer deployment automation with database migrations
@@ -733,6 +796,7 @@ Starboard Finance is a DeFi perpetuals trading platform that:
 **Story Points**: 8
 
 **Acceptance Criteria**:
+
 - [ ] Production hosting infrastructure (Vercel, cloud services)
 - [ ] Comprehensive monitoring and alerting systems
 - [ ] Database and caching infrastructure with backup systems
@@ -759,17 +823,17 @@ STAR-111, STAR-113, STAR-114, STAR-118, STAR-119, STAR-120 (parallel after core 
 
 ### Technical Dependencies Matrix
 
-| Feature | Smart Contract | Frontend | Indexer | Infrastructure |
-|---------|----------------|----------|---------|----------------|
-| Wallet Connection | - | STAR-121,02 | - | STAR-138 |
-| USDC Deposits | STAR-128,02 | STAR-121,02 | STAR-134 | STAR-138 |
-| Account Balance | STAR-128 | STAR-125 | STAR-136 | - |
-| Position Trading | STAR-129,06 | STAR-123,04 | STAR-135 | - |
-| Portfolio View | STAR-129 | STAR-125 | STAR-135,03 | - |
-| Market Data | STAR-133 | STAR-126 | STAR-136 | - |
-| Trading History | - | STAR-127 | STAR-135 | - |
-| Funding Rates | STAR-130 | STAR-127 | STAR-136 | - |
-| Liquidity Provision | STAR-131 | STAR-123 | STAR-135 | - |
-| LP Analytics | STAR-131 | STAR-127 | STAR-135 | - |
+| Feature             | Smart Contract | Frontend    | Indexer     | Infrastructure |
+| ------------------- | -------------- | ----------- | ----------- | -------------- |
+| Wallet Connection   | -              | STAR-121,02 | -           | STAR-138       |
+| USDC Deposits       | STAR-128,02    | STAR-121,02 | STAR-134    | STAR-138       |
+| Account Balance     | STAR-128       | STAR-125    | STAR-136    | -              |
+| Position Trading    | STAR-129,06    | STAR-123,04 | STAR-135    | -              |
+| Portfolio View      | STAR-129       | STAR-125    | STAR-135,03 | -              |
+| Market Data         | STAR-133       | STAR-126    | STAR-136    | -              |
+| Trading History     | -              | STAR-127    | STAR-135    | -              |
+| Funding Rates       | STAR-130       | STAR-127    | STAR-136    | -              |
+| Liquidity Provision | STAR-131       | STAR-123    | STAR-135    | -              |
+| LP Analytics        | STAR-131       | STAR-127    | STAR-135    | -              |
 
 This comprehensive user story breakdown provides a clear roadmap for implementing Starboard Finance with well-defined acceptance criteria and dependencies.

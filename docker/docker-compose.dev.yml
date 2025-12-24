@@ -1,6 +1,6 @@
 # Docker Compose override for local development
 # This file mounts local code instead of using the code cloned in the image
-# 
+#
 # Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 services:
@@ -10,15 +10,15 @@ services:
       - ../:/starboard-local:ro
     environment:
       # Override to use local mounted code
-      INDEXER_USE_LOCAL_CODE: "true"
+      INDEXER_USE_LOCAL_CODE: 'true'
     # Use a custom command that uses the local code
-    command: 
+    command:
       - bash
       - -c
       - |
         set -e
         echo "🏗️  Using local code from /starboard-local"
-        
+
         # Copy local built code to the expected location
         if [ -d "/starboard-local/indexer/lib" ]; then
           echo "📦 Copying built indexer code..."
@@ -29,7 +29,7 @@ services:
         source /root/.nvm/nvm.sh
         cd /starboard/indexer
         /starboard/node_modules/.bin/squid-typeorm-migration apply
-        
+
         # Start the indexer
         echo "🚀 Starting indexer processor..."
         node lib/main.js
@@ -37,4 +37,3 @@ services:
   api:
     volumes:
       - ../:/starboard-local:ro
-

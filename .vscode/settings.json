@@ -18,12 +18,7 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "tailwindCSS.classAttributes": ["tw"],
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)", // tw`...`

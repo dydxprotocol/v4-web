@@ -7,4 +7,5 @@ coverage/
 pnpm-lock.yaml
 *.min.js
 *.min.css
+**/generated
 frontend/src/vite-env.d.ts

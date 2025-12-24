@@ -1,15 +1,14 @@
+import type { GraphQLClient } from 'graphql-request';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   CandleD1,
   CandleH1,
   CandleH4,
   CandleM1,
+  CandleM5,
   CandleM15,
   CandleM30,
-  CandleM5,
 } from '@/generated/graphql';
-import type { GraphQLClient } from 'graphql-request';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { createGraphQLCandleRepository } from '../../src/candles';
 import type { CandleInterval } from '../../src/candles';
 

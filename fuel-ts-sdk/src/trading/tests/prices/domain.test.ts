@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { Price, PriceSchema } from '../../src/prices';
+import { describe, expect, it } from 'vitest';
 import { assetId, priceId } from '@/shared/types';
+import { PriceSchema } from '../../src/prices';
 
 describe('Price Domain', () => {
   describe('PriceSchema', () => {

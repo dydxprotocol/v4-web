@@ -1,19 +1,18 @@
 import { run } from '@subsquid/batch-processor';
-import { augmentBlock, Block, Receipt } from '@subsquid/fuel-objects';
+import { Block, Receipt, augmentBlock } from '@subsquid/fuel-objects';
 import { DataSourceBuilder } from '@subsquid/fuel-stream';
 import { TypeormDatabase } from '@subsquid/typeorm-store';
-import { Interface, BN, DateTime } from 'fuels';
-
+import { BN, DateTime, Interface } from 'fuels';
 import priceOracleAbi from './abis/stork-mock-abi.json';
 import vaultAbi from './abis/vault-abi.json';
 import {
-  Price,
-  PositionKey,
-  Position,
-  TotalPosition,
   Liquidity,
-  TotalLiquidity,
+  Position,
   PositionChange,
+  PositionKey,
+  Price,
+  TotalLiquidity,
+  TotalPosition,
 } from './model/generated';
 
 export const priceOracleInterface = new Interface(priceOracleAbi);
