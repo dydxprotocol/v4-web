@@ -43,7 +43,7 @@ jobs:
 
       - name: Postinstall script
         run: |
-          tar -xzC public -f tradingview/tradingview.tgz # manually inline postinstall script
+          tar -xzC public -f packages/tradingview.tgz # manually inline postinstall script
 
       - name: Run frontend tests
         run: pnpm exec vitest run
