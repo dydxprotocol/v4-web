@@ -20,18 +20,17 @@ export function pointsToEstimatedDollarRewards(
 
 export function feesToEstimatedDollarRewards(totalFees?: number): number {
   if (!totalFees) return 0;
-  return totalFees * 0.5;
+  return totalFees * CURRENT_SURGE_REWARDS_DETAILS.rebateFraction;
 }
 
-// Move to Chaos Labs query once its available
 export const CURRENT_SURGE_REWARDS_DETAILS = {
-  season: 9,
+  season: 10,
   rewardAmount: '',
   rewardAmountUsd: 0,
   rebatePercent: '50%',
   rebatePercentNumeric: '50',
   rebateFraction: 0.5,
-  endTime: '2025-12-31T23:59:59.000Z', // end of month
+  endTime: '2026-01-31T23:59:59.000Z', // end of jan 2026
 };
 
 export const DEC_2025_COMPETITION_DETAILS = {

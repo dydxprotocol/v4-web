@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, HTMLAttributes } from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -25,7 +25,10 @@ type StyleProps = {
   className?: string;
 };
 
-export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
+export const Link = forwardRef<
+  HTMLAnchorElement,
+  ElementProps & StyleProps & HTMLAttributes<HTMLAnchorElement>
+>(
   (
     {
       analyticsConfig,
