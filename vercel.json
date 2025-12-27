@@ -1,4 +1,9 @@
 {
+  "buildCommand": "pnpm run build:ts-sdk && pnpm --filter frontend run build",
+  "devCommand": "pnpm --filter frontend run dev",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "frontend/dist",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
