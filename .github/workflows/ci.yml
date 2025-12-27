@@ -29,17 +29,12 @@ jobs:
           fuelup toolchain install mainnet
           fuelup default mainnet
 
-      - name: Run contracts tests
+      - name: Install dependencies and build
         run: |
           pnpm install --ignore-scripts --frozen-lockfile
           pnpm run build:ts-sdk
           pnpm --filter starboard/contracts build
           pnpm --filter starboard/contracts gen:types
-          pnpm --filter starboard/contracts test
 
-      - name: Test fuel-ts-sdk
-        run: |
-          pnpm --filter fuel-ts-sdk test
-
-      - name: Run frontend tests
-        run: pnpm exec vitest run
+      - name: Run tests
+        run: pnpm test
