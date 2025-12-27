@@ -7,8 +7,8 @@
     "gen:model": "squid-typeorm-codegen",
     "gen:migration": "squid-typeorm-migration generate",
     "apply:migration": "squid-typeorm-migration apply",
-    "start": "ts-node -r dotenv/config src/main.ts",
-    "start:e2e": "ts-node -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
+    "start": "ts-node --esm -r dotenv/config src/main.ts",
+    "start:e2e": "ts-node --esm -r dotenv/config src/main.ts dotenv_config_path=.env.indexer-e2e",
     "test:e2e": "vitest --mode indexer-e2e run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

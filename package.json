@@ -10,7 +10,7 @@
   "packageManager": "pnpm@8.6.6",
   "scripts": {
     "dev": "pnpm --filter frontend run dev",
-    "dev:indexer": "pnpm --filter indexer run dev",
+    "dev:indexer": "pnpm --filter indexer run start",
     "dev:all": "make -C docker start && pnpm run dev",
     "build": "pnpm run build:ts-sdk && pnpm run build:frontend && pnpm run build:indexer",
     "build:ts-sdk": "pnpm --filter fuel-ts-sdk run build",
