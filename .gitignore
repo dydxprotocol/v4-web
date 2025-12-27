@@ -15,6 +15,9 @@ dist-ssr
 *.key
 .env
 
+# Auto-generated Vite types
+frontend/src/vite-env.d.ts
+
 entry_points/
 
 # Editor directories and files
