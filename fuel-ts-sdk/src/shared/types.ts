@@ -37,12 +37,43 @@ export const safePositionId = (str: string): PositionId | undefined => {
 };
 
 /**
- * PriceId - Unique price identifier
+ * AssetPriceId - Unique asset price identifier
  */
-export const PriceIdSchema = z.string().min(1, 'Price ID cannot be empty').brand<'PriceId'>();
-export type PriceId = z.infer<typeof PriceIdSchema>;
-export const priceId = (str: string): PriceId => PriceIdSchema.parse(str);
-export const safePriceId = (str: string): PriceId | undefined => {
-  const result = PriceIdSchema.safeParse(str);
+export const AssetPriceIdSchema = z
+  .string()
+  .min(1, 'Asset Price ID cannot be empty')
+  .brand<'AssetPriceId'>();
+export type AssetPriceId = z.infer<typeof AssetPriceIdSchema>;
+export const assetPriceId = (str: string): AssetPriceId => AssetPriceIdSchema.parse(str);
+export const safeAssetPriceId = (str: string): AssetPriceId | undefined => {
+  const result = AssetPriceIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
+ * CandleId - Unique candle identifier
+ */
+export const CandleIdSchema = z
+  .string()
+  .min(1, 'Candle ID cannot be empty')
+  .brand<'CandleId'>();
+export type CandleId = z.infer<typeof CandleIdSchema>;
+export const candleId = (str: string): CandleId => CandleIdSchema.parse(str);
+export const safeCandleId = (str: string): CandleId | undefined => {
+  const result = CandleIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
+ * MarketConfigId - Unique market configuration identifier
+ */
+export const MarketConfigIdSchema = z
+  .string()
+  .min(1, 'Market Config ID cannot be empty')
+  .brand<'MarketConfigId'>();
+export type MarketConfigId = z.infer<typeof MarketConfigIdSchema>;
+export const marketConfigId = (str: string): MarketConfigId => MarketConfigIdSchema.parse(str);
+export const safeMarketConfigId = (str: string): MarketConfigId | undefined => {
+  const result = MarketConfigIdSchema.safeParse(str);
   return result.success ? result.data : undefined;
 };
