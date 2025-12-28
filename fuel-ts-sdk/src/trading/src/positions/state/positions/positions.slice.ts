@@ -3,7 +3,7 @@ import 'immer';
 
 import * as positionsReducers from './positions.actions';
 import { fetchCurrentPositions, fetchPositionsByAccount } from './positions.thunks';
-import { positionsInitialState } from './positions.types';
+import { positionsAdapter, positionsInitialState } from './positions.types';
 
 export const positionsSlice = createSlice({
   name: 'positions',
@@ -16,7 +16,7 @@ export const positionsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchPositionsByAccount.fulfilled, (state, action) => {
-        state.data[action.payload.account] = action.payload.positions;
+        positionsAdapter.upsertMany(state, action.payload.positions);
         state.fetchStatus = 'fulfilled';
       })
       .addCase(fetchPositionsByAccount.rejected, (state, action) => {
@@ -28,7 +28,7 @@ export const positionsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCurrentPositions.fulfilled, (state, action) => {
-        state.data[action.payload.account] = action.payload.positions;
+        positionsAdapter.upsertMany(state, action.payload.positions);
         state.fetchStatus = 'fulfilled';
       })
       .addCase(fetchCurrentPositions.rejected, (state, action) => {

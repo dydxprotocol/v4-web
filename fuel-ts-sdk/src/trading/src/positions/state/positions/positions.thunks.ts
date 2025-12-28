@@ -1,8 +1,7 @@
 import type { Address } from '@/shared/types';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import type { Position } from '../../domain';
-import type { PositionRepository } from '../../port';
+import type { Position, PositionRepository } from '../../domain';
 
 export const fetchPositionsByAccount = createAsyncThunk<
   { account: Address; positions: Position[] },

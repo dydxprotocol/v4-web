@@ -1,8 +1,8 @@
 import { OraclePrice } from '@/shared/models/decimals';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 
-import type { Position } from './positions.models';
-import { PositionChange, PositionSide, PositionStatus } from './positions.models';
+import type { Position } from './positions.types';
+import { PositionChange, PositionSide, PositionStatus } from './positions.types';
 
 export function getPositionStatus(position: Position): PositionStatus {
   if (position.change === PositionChange.Close || position.change === PositionChange.Liquidate) {
