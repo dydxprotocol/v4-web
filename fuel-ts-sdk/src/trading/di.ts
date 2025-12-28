@@ -1,9 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import type { GraphQLClient } from 'graphql-request';
-
-import { portfolioMetrics } from '@/cross-domain/portfolio';
 import type { StoreService } from '@/shared/lib/store-service';
-
 import * as Markets from './src/markets';
 import * as Positions from './src/positions';
 
@@ -13,21 +10,23 @@ export const tradingReducer = combineReducers({
 });
 
 export const createTradingModule = (graphqlClient: GraphQLClient) => {
-  const repositories = {
-    markets: Markets.createRepositories(graphqlClient),
-    positions: Positions.createRepositories(graphqlClient),
-  };
-
   return {
     getThunkExtras: (): TradingThunkExtras => ({
-      marketRepository: repositories.markets.graphQLMarketRepository,
-      positionRepository: repositories.positions.graphQLPositionRepository,
+      assetPriceRepository: Markets.adapters.createGraphQLAssetPriceRepository(graphqlClient),
+      candleRepository: Markets.adapters.createGraphQLCandleRepository(graphqlClient),
+      marketConfigRepository: Markets.adapters.createGraphQLMarketConfigRepository(graphqlClient),
+
+      positionRepository: Positions.adapters.createGraphQLPositionRepository(graphqlClient),
     }),
-    createServices: (storeService: StoreService) => ({
-      markets: Markets.createServices(storeService),
-      positions: Positions.createServices(storeService),
-      portfolio: portfolioMetrics,
-    }),
+    createCommands: (storeService: StoreService) => {
+      const positionCommands = Positions.createPositionCommands(storeService);
+      const marketCommands = Markets.createMarketCommands(storeService);
+
+      return {
+        ...positionCommands,
+        ...marketCommands,
+      };
+    },
   };
 };
 
