@@ -21,6 +21,11 @@ export const createStarboardClient = (config: StarboardClientConfig) => {
   const starboardStore = createStore(tradingModule.getThunkExtras());
   const storeService = createStoreService(starboardStore);
 
+  const portfolioModule = createPortfolioModule({
+    getState: starboardStore.getState,
+    trading: tradingModule,
+  });
+
   return {
     positions: Positions.createGraphQLPositionRepository(graphqlClient),
     prices: Prices.createGraphQLPriceRepository(graphqlClient),
