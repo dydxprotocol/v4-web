@@ -2,12 +2,18 @@
   "name": "fuel-ts-sdk",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./trading": {
+      "types": "./dist/trading/index.d.ts",
+      "import": "./dist/trading/index.js"
+    },
+    "./cross-domain": {
+      "types": "./dist/cross-domain/index.d.ts",
+      "import": "./dist/cross-domain/index.js"
     }
   },
   "files": [
@@ -26,8 +32,10 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
+    "@types/lodash": "^4.17.21",
     "graphql": "^16.8.1",
     "graphql-request": "^7.3.5",
+    "lodash": "^4.17.21",
     "zod": "^3.24.1"
   },
   "devDependencies": {
