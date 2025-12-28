@@ -1,1 +1,0 @@
-export { createGraphQLPriceRepository } from './repository';

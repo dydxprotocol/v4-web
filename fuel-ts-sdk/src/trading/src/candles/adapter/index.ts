@@ -1,1 +1,0 @@
-export { createGraphQLCandleRepository } from './repository';
