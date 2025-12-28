@@ -1,21 +1,28 @@
+import { createSelector } from '@reduxjs/toolkit';
+import { memoize } from 'lodash';
 import type { RootState } from '@/shared/lib/redux';
 import type { AssetId } from '@/shared/types';
+import { marketConfigsAdapter } from './market-configs.types';
 
-import type { MarketConfig } from '../../domain';
+const selectMarketConfigsState = (state: RootState) => state.trading.markets.marketConfigs;
 
-export const selectMarketConfigsState = (state: RootState) =>
-  state.trading.markets.marketConfigs;
+const selectors = marketConfigsAdapter.getSelectors(selectMarketConfigsState);
 
-export const selectMarketConfig =
-  (assetId: AssetId) =>
-  (state: RootState): MarketConfig | undefined =>
-    selectMarketConfigsState(state).data[assetId];
+export const selectAllMarketConfigs = selectors.selectAll;
 
-export const selectAllMarketConfigs = (state: RootState): Record<AssetId, MarketConfig> =>
-  selectMarketConfigsState(state).data;
+export const selectMarketConfigsFetchStatus = createSelector(
+  [selectMarketConfigsState],
+  (state) => state.fetchStatus
+);
 
-export const selectMarketConfigsFetchStatus = (state: RootState) =>
-  selectMarketConfigsState(state).fetchStatus;
+export const selectMarketConfigsError = createSelector(
+  [selectMarketConfigsState],
+  (state) => state.error
+);
 
-export const selectMarketConfigsError = (state: RootState) =>
-  selectMarketConfigsState(state).error;
+export const selectMarketConfigByAsset = memoize((asset: AssetId) =>
+  createSelector(
+    [selectAllMarketConfigs],
+    (configs) => configs.find((c) => c.asset === asset)
+  )
+);

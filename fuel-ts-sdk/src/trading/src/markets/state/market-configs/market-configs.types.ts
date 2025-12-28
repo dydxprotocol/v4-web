@@ -1,12 +1,16 @@
-import type { LoadableState } from '@/shared/lib/redux';
-import type { AssetId } from '@/shared/types';
-
+import { createEntityAdapter } from '@reduxjs/toolkit';
+import { LoadableMixin } from '@/shared/lib/redux';
+import type { MarketConfigId } from '@/shared/types';
 import type { MarketConfig } from '../../domain';
 
-export type MarketConfigsState = LoadableState<Record<AssetId, MarketConfig>>;
+export const marketConfigsAdapter = createEntityAdapter<MarketConfig, MarketConfigId>({
+  selectId: (marketConfig) => marketConfig.id,
+  sortComparer: (a, b) => a.asset.localeCompare(b.asset),
+});
 
-export const marketConfigsInitialState: MarketConfigsState = {
-  data: {},
+export const marketConfigsInitialState = marketConfigsAdapter.getInitialState<LoadableMixin>({
   fetchStatus: 'idle',
   error: null,
-};
+});
+
+export type MarketConfigsState = typeof marketConfigsInitialState;

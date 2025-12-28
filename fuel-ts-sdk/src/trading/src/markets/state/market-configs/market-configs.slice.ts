@@ -1,14 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import 'immer';
 
-import * as marketConfigsReducers from './market-configs.actions';
 import { fetchMarketConfig } from './market-configs.thunks';
-import { marketConfigsInitialState } from './market-configs.types';
+import { marketConfigsAdapter, marketConfigsInitialState } from './market-configs.types';
 
 export const marketConfigsSlice = createSlice({
   name: 'marketConfigs',
   initialState: marketConfigsInitialState,
-  reducers: marketConfigsReducers,
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchMarketConfig.pending, (state) => {
@@ -16,7 +15,7 @@ export const marketConfigsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMarketConfig.fulfilled, (state, action) => {
-        state.data[action.payload.assetId] = action.payload.config;
+        marketConfigsAdapter.upsertOne(state, action.payload);
         state.fetchStatus = 'fulfilled';
       })
       .addCase(fetchMarketConfig.rejected, (state, action) => {
