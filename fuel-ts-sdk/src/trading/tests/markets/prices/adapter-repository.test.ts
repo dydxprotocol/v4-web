@@ -1,7 +1,7 @@
 import type { GraphQLClient } from 'graphql-request';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Price as GraphQLPrice } from '@/generated/graphql';
-import { createGraphQLPriceRepository } from '../../src/prices';
+import { createGraphQLPriceRepository } from '../../src/markets';
 
 describe('Price Repository Adapter', () => {
   let mockClient: GraphQLClient;

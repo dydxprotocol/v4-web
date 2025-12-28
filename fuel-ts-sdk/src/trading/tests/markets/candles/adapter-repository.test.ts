@@ -9,8 +9,8 @@ import type {
   CandleM15,
   CandleM30,
 } from '@/generated/graphql';
-import { createGraphQLCandleRepository } from '../../src/candles';
-import type { CandleInterval } from '../../src/candles';
+import { createGraphQLCandleRepository } from '../../src/markets';
+import type { CandleInterval } from '../../src/markets';
 
 describe('Candle Repository Adapter', () => {
   let mockClient: GraphQLClient;
