@@ -69,6 +69,25 @@ source = "registry+signed_int?0.26.1#QmWB8r7jN9bE1sVUJzQoTCbsTXyL6qB55mSfeicd6Et
 dependencies = ["std"]
 
 [[package]]
+name = "simple-proxy"
+source = "member"
+dependencies = [
+    "src14",
+    "src5",
+    "std",
+    "upgradability",
+]
+
+[[package]]
+name = "src14"
+version = "0.8.0"
+source = "registry+src14?0.8.0#QmQduNaJgjotgw2tz5KLv18PckFZP6zLH3Wzk7mqLfwgcu!"
+dependencies = [
+    "src5",
+    "std",
+]
+
+[[package]]
 name = "src20"
 version = "0.8.0"
 source = "registry+src20?0.8.0#QmSwYjybtdvSF3Ey9RncVUUaFaWsizSBNgAtY9JoyaAHvh!"
@@ -110,10 +129,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "test-target-contract"
+source = "member"
+dependencies = ["std"]
+
+[[package]]
 name = "testnet-token"
 source = "member"
 dependencies = [
     "src20",
+    "std",
+]
+
+[[package]]
+name = "upgradability"
+version = "0.26.0"
+source = "registry+upgradability?0.26.0#QmQBf8VPWtYKBM1t5udMovfbaq8j98mq35yLADqrZxsgjo!"
+dependencies = [
+    "src14",
+    "src5",
     "std",
 ]
 
