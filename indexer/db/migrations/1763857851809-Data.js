@@ -15,7 +15,7 @@ BEGIN
       WHERE current_price.timestamp < NEW.timestamp;
    GET DIAGNOSTICS v_cnt = ROW_COUNT;
    IF v_cnt > 0 THEN
-      PERFORM pg_notify('postgraphile:current_price_update', json_build_object('asset', NEW.asset, 'timestamp', NEW.timestamp, 'price', NEW.price)::text);
+      PERFORM pg_notify('starboard:price:'||SUBSTRING(NEW.asset, 1, 42), json_build_object('asset', NEW.asset, 'timestamp', NEW.timestamp, 'price', NEW.price)::text);
    END IF;
    RETURN NEW;
 END;

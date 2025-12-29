@@ -4,7 +4,14 @@ import PgPubsub from '@graphile/pg-pubsub';
 import express from 'express';
 import { NodePlugin } from 'graphile-build';
 import type * as pg from 'pg';
-import { gql, makeExtendSchemaPlugin, postgraphile, Plugin, makePluginHook } from 'postgraphile';
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  postgraphile,
+  Plugin,
+  makePluginHook,
+  embed,
+} from 'postgraphile';
 import FilterPlugin from 'postgraphile-plugin-connection-filter';
 
 const app = express();
@@ -42,6 +49,13 @@ export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((_build, opt
   };
 });
 
+// Use these topics to work around PostgreSQL's 63-byte channel name limit
+// The asset (66 chars) is cut to the high 42 chars for the topic name (includes the 0x prefix)
+// This allows efficient filtering: each subscriber only listens to their asset's topic
+function buildCurrentPriceTopic(args: { asset: string }) {
+  return `starboard:price:${args.asset.substring(0, 42)}`;
+}
+
 export const CurrentPricePlugin: Plugin = makeExtendSchemaPlugin((_build, _options) => {
   return {
     typeDefs: gql`
@@ -52,10 +66,27 @@ export const CurrentPricePlugin: Plugin = makeExtendSchemaPlugin((_build, _optio
       }
 
       extend type Subscription {
-        currentPriceUpdated: _CurrentPricePayload
-          @pgSubscription(topic: "postgraphile:current_price_update")
+        currentPriceUpdated(asset: String!): _CurrentPricePayload
+          @pgSubscription(topic: ${embed(buildCurrentPriceTopic)})
       }
     `,
+    resolvers: {
+      Subscription: {
+        currentPriceUpdated: {
+          resolve: (payload, { asset }, _context, _info) => {
+            // { asset }: same asset argument from the original subscription query
+
+            // Defense in depth: verify the asset matches (in case of hash collision, though for 20 bytes it is hard)
+            if (payload.asset !== asset) {
+              // TODO Unfortunately, a client will receive null, use subscribePlan to filter out properly
+              return null; // Filter out non-matching events
+            }
+
+            return payload;
+          },
+        },
+      },
+    },
   };
 });
 
