@@ -56,8 +56,8 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
 
     // eslint-disable-next-line no-console
     console.log("usdc setup, asset_id", USDCAssetId)
-    const [vaultAddress] = await deployStarboard({
-        // [vaultAddress, pricefeedWrapperAddress]
+    const [vaultAddress, vaultImplAddress] = await deployStarboard({
+        // [vaultAddress, vaultImplAddress, pricefeedWrapperAddress]
         url: taskArgs.url as string,
         privK: taskArgs.privK as string,
         usdcAssetId: USDCAssetId,
@@ -71,9 +71,9 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
     const deployer = Wallet.fromPrivateKey(taskArgs.privK as string, provider)
     const vault = new VaultContract(vaultAddress, deployer)
 
-    await call(vault.functions.set_asset_config(BTC_ASSET, 9))
-    await call(vault.functions.set_asset_config(BNB_ASSET, 9))
-    await call(vault.functions.set_asset_config(ETH_ASSET, 9))
+    await call(vault.functions.set_asset_config(BTC_ASSET, 9).addContracts([vaultImplAddress]))
+    await call(vault.functions.set_asset_config(BNB_ASSET, 9).addContracts([vaultImplAddress]))
+    await call(vault.functions.set_asset_config(ETH_ASSET, 9).addContracts([vaultImplAddress]))
 
     // eslint-disable-next-line no-console
     console.log("Setup complete")

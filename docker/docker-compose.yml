@@ -63,7 +63,7 @@ services:
       GATEWAY_URL: ${GATEWAY_URL:-}
       GRAPHQL_URL: http://starboard_fuel_core:4000/v1/graphql
       VAULT_PRICEFEED_ADDRESS: ${VAULT_PRICEFEED_ADDRESS:-0x422729Dc06fD5811ec48eDf38915a52aa6383B3a2e91a7f45F1eECaAba2aEf81}
-      VAULT_ADDRESS: ${VAULT_ADDRESS:-0x2067c1DF217DD8e8dDf0cb5E0f26bF8d9b4584b3512Aeee270a19e8A27576aE3}
+      VAULT_ADDRESS: ${VAULT_ADDRESS:-0x3FB57f05B65e44aA5da7679B583c0143bAC325B78380222E24d272744bbd6D36}
       FROM_BLOCK: ${FROM_BLOCK:-0}
       NVM_DIR: /root/.nvm
     command: ["bash", "-c", "source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js"]

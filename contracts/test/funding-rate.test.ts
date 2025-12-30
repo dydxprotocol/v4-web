@@ -21,6 +21,7 @@ import {
     PricefeedWrapperFactory,
     StorkMockFactory,
     VaultExposeFactory,
+    SimpleProxyFactory,
     Fungible,
     VaultExpose,
     StorkMock,
@@ -71,7 +72,7 @@ describe("Vault.funding_rate", () => {
         const { contract: pricefeedWrapperDeployed } = await waitForResultPricefeedWrapper()
         pricefeedWrapper = pricefeedWrapperDeployed
 
-        const { waitForResult: waitForResultVault } = await VaultExposeFactory.deploy(deployer, {
+        const { waitForResult: waitForResultVaultImpl } = await VaultExposeFactory.deploy(deployer, {
             configurableConstants: {
                 COLLATERAL_ASSET_ID: { bits: USDC_ASSET_ID },
                 COLLATERAL_ASSET,
@@ -79,8 +80,20 @@ describe("Vault.funding_rate", () => {
                 PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.b256Address },
             },
         })
-        const { contract: vaultExposeDeployed } = await waitForResultVault()
-        vaultExpose = vaultExposeDeployed
+        const { contract: vaultImpl } = await waitForResultVaultImpl()
+
+        const { waitForResult: waitForResultSimpleProxy } = await SimpleProxyFactory.deploy(deployer, {
+            configurableConstants: {
+                DEPLOYER: { bits: deployer.address.toHexString() },
+            },
+        })
+        const { contract: simpleProxy } = await waitForResultSimpleProxy()
+        await call(
+            simpleProxy.functions.initialize_proxy(deployerIdentity, {
+                bits: vaultImpl.id.toHexString(),
+            }),
+        )
+        vaultExpose = new VaultExpose(simpleProxy.id.toAddress(), deployer)
 
         await call(vaultExpose.functions.initialize(deployerIdentity))
         await call(vaultExpose.functions.set_liquidator(liquidatorIdentity, true))
