@@ -1,7 +1,9 @@
 node_modules/
 dist/
 build/
-lib/
+fuel-ts-sdk/lib/
+contracts/lib/
+indexer/lib/
 .next/
 coverage/
 pnpm-lock.yaml
