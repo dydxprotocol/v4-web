@@ -1,6 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import type { GraphQLClient } from 'graphql-request';
 import type { StoreService } from '@/shared/lib/store-service';
+import * as Domain from './src/domain-services';
 import * as Markets from './src/markets';
 import * as Positions from './src/positions';
 
@@ -18,13 +19,20 @@ export const createTradingModule = (graphqlClient: GraphQLClient) => {
 
       positionRepository: Positions.adapters.createGraphQLPositionRepository(graphqlClient),
     }),
-    createCommands: (storeService: StoreService) => {
+    createCommandsAndQueries: (storeService: StoreService) => {
       const positionCommands = Positions.createPositionCommands(storeService);
+      const positionsQueries = Positions.createPositionQueries(storeService);
       const marketCommands = Markets.createMarketCommands(storeService);
+      const marketQueries = Markets.createMarketQueries(storeService);
+      const domainCommands = Domain.createTradingDomainQueries({
+        marketQueries,
+        positionsQueries,
+      });
 
       return {
         ...positionCommands,
         ...marketCommands,
+        ...domainCommands,
       };
     },
   };
