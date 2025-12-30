@@ -1,7 +1,8 @@
-export * from './price.model';
-export * from './liquidity.model';
-export * from './totalLiquidity.model';
-export * from './positionKey.model';
-export * from './position.model';
-export * from './_positionChange';
-export * from './totalPosition.model';
+export * from './_positionChange.js';
+export * from './liquidity.model.js';
+export * from './position.model.js';
+export * from './positionKey.model.js';
+export * from './price.model.js';
+export * from './totalLiquidity.model.js';
+export * from './totalPosition.model.js';
+

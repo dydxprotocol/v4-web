@@ -1,6 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
-import {PositionKey} from "./positionKey.model"
-import {PositionChange} from "./_positionChange"
+import { BigIntColumn as BigIntColumn_, BooleanColumn as BooleanColumn_, Column as Column_, Entity as Entity_, Index as Index_, IntColumn as IntColumn_, ManyToOne as ManyToOne_, PrimaryColumn as PrimaryColumn_ } from "@subsquid/typeorm-store"
+import { PositionChange } from "./_positionChange.js"
+import { PositionKey } from "./positionKey.model.js"
 
 @Entity_()
 export class Position {
