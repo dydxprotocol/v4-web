@@ -44,6 +44,7 @@
     "@graphql-codegen/typescript": "^5.0.5",
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-operations": "^5.0.1",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "tsup": "^8.5.1",
     "vitest": "^3.0.9"
   }

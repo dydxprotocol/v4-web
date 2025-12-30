@@ -156,6 +156,7 @@
     "pnpm": "^8.6.6",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.5",
+    "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vitest": "^3.0.9"
   },
