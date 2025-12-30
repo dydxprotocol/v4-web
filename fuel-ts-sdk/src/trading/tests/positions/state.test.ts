@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
-
 import { address, assetId, positionId } from '@/shared/types';
 import {
+  PositionChange,
+  PositionSide,
+  PositionStatus,
   filterClosedPositions,
   filterOpenPositions,
   getPositionSide,
   getPositionStatus,
   isPositionClosed,
   isPositionOpen,
-  PositionChange,
-  PositionSide,
-  PositionStatus,
 } from '../../src/positions/domain';
 import { PositionSize } from '../../src/positions/domain/positions.decimals';
 import { createMockPosition } from './helpers';
@@ -141,10 +140,30 @@ describe('Position State Utilities', () => {
   describe('filterOpenPositions', () => {
     it('should filter only open positions', () => {
       const positions = [
-        createMockPosition({ id: positionId('1'), latest: true, size: PositionSize.fromBigInt(1000n), change: PositionChange.Increase }),
-        createMockPosition({ id: positionId('2'), latest: true, size: PositionSize.fromBigInt(0n), change: PositionChange.Close }),
-        createMockPosition({ id: positionId('3'), latest: true, size: PositionSize.fromBigInt(500n), change: PositionChange.Increase }),
-        createMockPosition({ id: positionId('4'), latest: false, size: PositionSize.fromBigInt(200n), change: PositionChange.Decrease }),
+        createMockPosition({
+          id: positionId('1'),
+          latest: true,
+          size: PositionSize.fromBigInt(1000n),
+          change: PositionChange.Increase,
+        }),
+        createMockPosition({
+          id: positionId('2'),
+          latest: true,
+          size: PositionSize.fromBigInt(0n),
+          change: PositionChange.Close,
+        }),
+        createMockPosition({
+          id: positionId('3'),
+          latest: true,
+          size: PositionSize.fromBigInt(500n),
+          change: PositionChange.Increase,
+        }),
+        createMockPosition({
+          id: positionId('4'),
+          latest: false,
+          size: PositionSize.fromBigInt(200n),
+          change: PositionChange.Decrease,
+        }),
       ];
 
       const openPositions = filterOpenPositions(positions);
@@ -156,8 +175,16 @@ describe('Position State Utilities', () => {
 
     it('should return empty array when no open positions', () => {
       const positions = [
-        createMockPosition({ latest: true, size: PositionSize.fromBigInt(0n), change: PositionChange.Close }),
-        createMockPosition({ latest: false, size: PositionSize.fromBigInt(1000n), change: PositionChange.Increase }),
+        createMockPosition({
+          latest: true,
+          size: PositionSize.fromBigInt(0n),
+          change: PositionChange.Close,
+        }),
+        createMockPosition({
+          latest: false,
+          size: PositionSize.fromBigInt(1000n),
+          change: PositionChange.Increase,
+        }),
       ];
 
       const openPositions = filterOpenPositions(positions);
@@ -169,10 +196,30 @@ describe('Position State Utilities', () => {
   describe('filterClosedPositions', () => {
     it('should filter only closed positions', () => {
       const positions = [
-        createMockPosition({ id: positionId('1'), latest: true, size: PositionSize.fromBigInt(1000n), change: PositionChange.Increase }),
-        createMockPosition({ id: positionId('2'), latest: true, size: PositionSize.fromBigInt(0n), change: PositionChange.Close }),
-        createMockPosition({ id: positionId('3'), latest: true, size: PositionSize.fromBigInt(500n), change: PositionChange.Increase }),
-        createMockPosition({ id: positionId('4'), latest: false, size: PositionSize.fromBigInt(200n), change: PositionChange.Decrease }),
+        createMockPosition({
+          id: positionId('1'),
+          latest: true,
+          size: PositionSize.fromBigInt(1000n),
+          change: PositionChange.Increase,
+        }),
+        createMockPosition({
+          id: positionId('2'),
+          latest: true,
+          size: PositionSize.fromBigInt(0n),
+          change: PositionChange.Close,
+        }),
+        createMockPosition({
+          id: positionId('3'),
+          latest: true,
+          size: PositionSize.fromBigInt(500n),
+          change: PositionChange.Increase,
+        }),
+        createMockPosition({
+          id: positionId('4'),
+          latest: false,
+          size: PositionSize.fromBigInt(200n),
+          change: PositionChange.Decrease,
+        }),
       ];
 
       const closedPositions = filterClosedPositions(positions);
@@ -184,8 +231,16 @@ describe('Position State Utilities', () => {
 
     it('should return empty array when no closed positions', () => {
       const positions = [
-        createMockPosition({ latest: true, size: PositionSize.fromBigInt(1000n), change: PositionChange.Increase }),
-        createMockPosition({ latest: true, size: PositionSize.fromBigInt(500n), change: PositionChange.Increase }),
+        createMockPosition({
+          latest: true,
+          size: PositionSize.fromBigInt(1000n),
+          change: PositionChange.Increase,
+        }),
+        createMockPosition({
+          latest: true,
+          size: PositionSize.fromBigInt(500n),
+          change: PositionChange.Increase,
+        }),
       ];
 
       const closedPositions = filterClosedPositions(positions);

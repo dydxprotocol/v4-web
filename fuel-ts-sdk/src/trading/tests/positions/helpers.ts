@@ -1,6 +1,5 @@
 import { CollateralAmount } from '@/shared/models/decimals';
 import { address, assetId, positionId } from '@/shared/types';
-
 import type { Position } from '../../src/positions/domain';
 import { PositionChange } from '../../src/positions/domain';
 import {

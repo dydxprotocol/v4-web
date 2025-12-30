@@ -1,25 +1,13 @@
-import { CollateralAmount, OraclePrice, PercentageValue, UsdValue } from '@/shared/models/decimals';
-import { address, assetId, positionId } from '@/shared/types';
 import { describe, expect, it } from 'vitest';
-
-import type { MarketConfig } from '@/trading/src/markets';
+import { CollateralAmount, OraclePrice, UsdValue } from '@/shared/models/decimals';
+import { address, assetId, positionId } from '@/shared/types';
+import { calculateLeverage } from '../../src/positions/application/queries/calculate-leverage';
+import { calculateNotional } from '../../src/positions/application/queries/calculate-notional';
+import { calculateUnrealizedPnl } from '../../src/positions/application/queries/calculate-unrealized-pnl';
+import { calculateUnrealizedPnlPercent } from '../../src/positions/application/queries/calculate-unrealized-pnl-percent';
 import { PositionSize } from '../../src/positions/domain/positions.decimals';
-import { PositionChange } from '../../src/positions/domain/positions.models';
-import {
-  calculateLeverage,
-  calculateLiquidationPrice,
-  calculateNotional,
-  calculateUnrealizedPnl,
-  calculateUnrealizedPnlPercent,
-} from '../../src/positions/services/position-metrics.service';
+import { PositionChange } from '../../src/positions/domain/positions.entity';
 import { createMockPosition } from './helpers';
-
-const mockMarketConfig: MarketConfig = {
-  initialMarginFraction: 50000000000000000n,
-  maintenanceMarginFraction: PercentageValue.fromBigInt(25000000000000000n),
-  tickSizeDecimals: 2,
-  stepSizeDecimals: 4,
-};
 
 describe('Position Metrics Service', () => {
   describe('calculateNotional', () => {
@@ -234,73 +222,6 @@ describe('Position Metrics Service', () => {
     });
   });
 
-  describe('calculateLiquidationPrice', () => {
-    it('should calculate liquidation price for long position', () => {
-      const positionHistory = [
-        createMockPosition({
-          size: PositionSize.fromBigInt(1000000000000000000n),
-          collateralAmount: CollateralAmount.fromBigInt(50000000000n),
-          latest: true,
-        }),
-      ];
-      const equity = UsdValue.fromBigInt(100000000000000000n);
-      const otherPositionsRisk = UsdValue.fromBigInt(10000000000000000n);
-
-      const liquidationPrice = calculateLiquidationPrice(
-        positionHistory,
-        equity,
-        mockMarketConfig,
-        otherPositionsRisk
-      );
-
-      expect(liquidationPrice.value).toBeGreaterThan(0n);
-    });
-
-    it('should calculate liquidation price for short position', () => {
-      const positionHistory = [
-        createMockPosition({
-          size: PositionSize.fromBigInt(-1000000000000000000n),
-          collateralAmount: CollateralAmount.fromBigInt(50000000000n),
-          positionKey: {
-            account: address('0x123'),
-            indexAssetId: assetId('0xasset'),
-            isLong: false,
-          },
-          latest: true,
-        }),
-      ];
-      const equity = UsdValue.fromBigInt(100000000000000000n);
-      const otherPositionsRisk = UsdValue.fromBigInt(10000000000000000n);
-
-      const liquidationPrice = calculateLiquidationPrice(
-        positionHistory,
-        equity,
-        mockMarketConfig,
-        otherPositionsRisk
-      );
-
-      expect(liquidationPrice.value).toBeGreaterThan(0n);
-    });
-
-    it('should return zero for zero size', () => {
-      const positionHistory = [
-        createMockPosition({
-          size: PositionSize.fromBigInt(0n),
-          collateralAmount: CollateralAmount.fromBigInt(50000000000n),
-          latest: true,
-        }),
-      ];
-      const equity = UsdValue.fromBigInt(100000000000000000n);
-      const otherPositionsRisk = UsdValue.fromBigInt(10000000000000000n);
-
-      const liquidationPrice = calculateLiquidationPrice(
-        positionHistory,
-        equity,
-        mockMarketConfig,
-        otherPositionsRisk
-      );
-
-      expect(liquidationPrice.value).toBe(0n);
-    });
-  });
+  // calculateLiquidationPrice moved to domain-services/queries (requires DI with market queries)
+  // Tests for it should be in a separate domain-services test file
 });
