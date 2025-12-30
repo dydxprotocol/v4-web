@@ -20,8 +20,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm codegen && tsup",
-    "dev": "tsup --watch",
+    "build": "pnpm codegen && rollup -c",
+    "dev": "rollup -c --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -45,7 +45,14 @@
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-operations": "^5.0.1",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "tsup": "^8.5.1",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/node": "^25.0.3",
+    "rollup": "^4.54.0",
+    "rollup-plugin-dts": "^6.3.0",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "typescript": "~5.9.3",
     "vitest": "^3.0.9"
   }
 }

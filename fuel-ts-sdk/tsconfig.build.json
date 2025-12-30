@@ -4,7 +4,7 @@
     "module": "ESNext",
     "composite": true,
     "moduleResolution": "Node",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
