@@ -4,8 +4,9 @@
 
 export DOTENV_CONFIG_PATH=.env.indexer-e2e
 
+export SALT=0x8000000000000000000000000000000000000000000000000000000000000000
 export MOCK_STORK_CONTRACT=0x422729Dc06fD5811ec48eDf38915a52aa6383B3a2e91a7f45F1eECaAba2aEf81
-export VAULT_CONTRACT=0x3FB57f05B65e44aA5da7679B583c0143bAC325B78380222E24d272744bbd6D36
+export VAULT_CONTRACT=0x01bbCEFbC64350a092310d59E29cFF269DB01539866aBb263f6dB78C275a84F2
 export PRICEFEED_WRAPPER_CONTRACT=0x212EB3F8Ff08392B2aa030768A3814fc5A0a67F94412CfE07e37DD1cbC24F9D6
 export USDC_CONTRACT=0x9534954321965C4B2dC45712AC3e7B575AFD43C38d2c9834bb5232f5F2BF2c6E
 export USDC_ASSET_ID=0xda81350458510a2b4adfb85032ad319a61f271e9ccabe702c96696efc72bc6de
@@ -52,9 +53,9 @@ do
 done
 
 echo "Deploying Mocked Stork contract" && \
-pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" && \
+pnpm --filter starboard/contracts deploy:stork-mock --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" --salt="${SALT}" && \
 echo "Deploying the Vault contract" && \
-pnpm --filter starboard/contracts setup:testnet --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" --storkContractAddress="${MOCK_STORK_CONTRACT}" && \
+pnpm --filter starboard/contracts setup:testnet --url="http://127.0.0.1:4000/v1/graphql" --privK="0x9e42fa83bda35cbc769c4b058c721adef68011d7945d0b30165397ec6d05a53a" --storkContractAddress="${MOCK_STORK_CONTRACT}" --salt="${SALT}" && \
 echo "Building the squid indexer and applying the database migrations" && \
 pnpm sqd build && \
 pnpm sqd migration:apply && \

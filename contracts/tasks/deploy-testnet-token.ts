@@ -1,9 +1,9 @@
 import { Provider, Wallet } from "fuels"
-import { getArgs, call } from "./utils"
+import { getArgs, call, getRandomSalt } from "./utils"
 import { TestnetTokenFactory } from "../types"
 
 if (require.main === module) {
-    deployTestnetToken(getArgs(["url", "privK", "name", "symbol", "decimals"]))
+    deployTestnetToken(getArgs(["url", "privK", "name", "symbol", "decimals"], ["salt"]))
         .then(() => {
             process.exit(0)
         })
@@ -15,6 +15,7 @@ if (require.main === module) {
 }
 
 export async function deployTestnetToken(taskArgs: any) {
+    const salt = taskArgs.salt || getRandomSalt()
     // eslint-disable-next-line no-console
     console.log("Deploy a token for the testnet")
 
@@ -30,7 +31,7 @@ export async function deployTestnetToken(taskArgs: any) {
             SYMBOL: taskArgs.symbol,
             DECIMALS: taskArgs.decimals,
         },
-        salt: "0x8000000000000000000000000000000000000000000000000000000000000000",
+        salt,
     })
     const { contract: tt } = await waitForResultTestnetToken()
 

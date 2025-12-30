@@ -1,11 +1,11 @@
 import { Provider, Wallet } from "fuels"
 import { Vault as VaultContract } from "../types/Vault"
-import { call, getArgs, USDC_ASSET, BTC_ASSET, BNB_ASSET, ETH_ASSET } from "./utils"
+import { call, getArgs, USDC_ASSET, BTC_ASSET, BNB_ASSET, ETH_ASSET, getRandomSalt } from "./utils"
 import { deployTestnetToken } from "./deploy-testnet-token"
 import { deployStarboard } from "./deploy-starboard"
 
 if (require.main === module) {
-    setupTestnet(getArgs(["url", "privK", "storkContractAddress"]))
+    setupTestnet(getArgs(["url", "privK", "storkContractAddress"], ["salt"]))
         .then(() => {
             process.exit(0)
         })
@@ -17,6 +17,7 @@ if (require.main === module) {
 }
 
 export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
+    const salt = taskArgs.salt || getRandomSalt()
     // eslint-disable-next-line no-console
     console.log("Setup asset configuration for the testnet")
 
@@ -27,6 +28,7 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
         name: "mckUSDC",
         symbol: "sUSDC",
         decimals: "6",
+        salt,
     })
 
     await deployTestnetToken({
@@ -36,6 +38,7 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
         name: "mockBTC",
         symbol: "sbBTC",
         decimals: "9",
+        salt,
     })
     await deployTestnetToken({
         // [BNBAddress, BNBAssetId]
@@ -44,6 +47,7 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
         name: "mockBNB",
         symbol: "sbBNB",
         decimals: "9",
+        salt,
     })
     await deployTestnetToken({
         // [ETHAddress, ETHAssetId]
@@ -52,6 +56,7 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
         name: "mockETH",
         symbol: "sbETH",
         decimals: "9",
+        salt,
     })
 
     // eslint-disable-next-line no-console
@@ -64,6 +69,7 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
         usdcPricefeedId: USDC_ASSET,
         usdcDecimals: "6",
         storkContract: taskArgs.storkContractAddress,
+        salt,
     })
 
     // it is important to instantiate the wallet after deployment

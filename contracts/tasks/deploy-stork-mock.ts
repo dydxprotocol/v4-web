@@ -1,9 +1,9 @@
 import { Provider, Wallet } from "fuels"
-import { getArgs } from "./utils"
+import { getArgs, getRandomSalt } from "./utils"
 import { StorkMockFactory } from "../types/StorkMockFactory"
 
 if (require.main === module) {
-    deployStorkMock(getArgs(["url", "privK"]))
+    deployStorkMock(getArgs(["url", "privK"], ["salt"]))
         .then(() => {
             process.exit(0)
         })
@@ -15,6 +15,7 @@ if (require.main === module) {
 }
 
 async function deployStorkMock(taskArgs: any) {
+    const salt = taskArgs.salt || getRandomSalt()
     // eslint-disable-next-line no-console
     console.log("Deploy a stork mock")
 
@@ -24,7 +25,7 @@ async function deployStorkMock(taskArgs: any) {
     // eslint-disable-next-line no-console
     console.log(`Deploying mocked stork contract`)
     const { waitForResult: waitForResultMockStorkContract } = await StorkMockFactory.deploy(deployer, {
-        salt: "0x8000000000000000000000000000000000000000000000000000000000000000",
+        salt,
     })
     const { contract: mockStorkContract } = await waitForResultMockStorkContract()
     // eslint-disable-next-line no-console

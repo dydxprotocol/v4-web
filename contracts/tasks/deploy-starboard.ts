@@ -1,9 +1,9 @@
 import { Provider, Wallet } from "fuels"
-import { call, getArgs } from "./utils"
+import { call, getArgs, getRandomSalt } from "./utils"
 import { PricefeedWrapperFactory, VaultFactory, SimpleProxyFactory, Vault } from "../types"
 
 if (require.main === module) {
-    deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"]))
+    deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"], ["salt"]))
         .then(() => {
             process.exit(0)
         })
@@ -15,6 +15,7 @@ if (require.main === module) {
 }
 
 export async function deployStarboard(taskArgs: any) {
+    const salt = taskArgs.salt || getRandomSalt()
     const provider = new Provider(taskArgs.url)
     const deployer = Wallet.fromPrivateKey(taskArgs.privK, provider)
 
@@ -25,7 +26,7 @@ export async function deployStarboard(taskArgs: any) {
         configurableConstants: {
             STORK_CONTRACT: storkContract,
         },
-        salt: "0x8000000000000000000000000000000000000000000000000000000000000000",
+        salt,
     })
     const { contract: pricefeedWrapper } = await waitForResultPricefeedWrapper()
     // eslint-disable-next-line no-console
@@ -38,7 +39,7 @@ export async function deployStarboard(taskArgs: any) {
             COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
             PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
         },
-        salt: "0x8000000000000000000000000000000000000000000000000000000000000001",
+        salt,
     })
     const { contract: vaultImpl } = await waitForResultVaultImpl()
     // eslint-disable-next-line no-console
@@ -48,7 +49,7 @@ export async function deployStarboard(taskArgs: any) {
         configurableConstants: {
             DEPLOYER: { bits: deployer.address.toHexString() },
         },
-        salt: "0x8000000000000000000000000000000000000000000000000000000000000002",
+        salt,
     })
     const { contract: simpleProxy } = await waitForResultSimpleProxy()
     // eslint-disable-next-line no-console
