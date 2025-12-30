@@ -148,7 +148,7 @@ describe("SimpleProxy", () => {
 
             // Verify owner is unchanged
             const receivedProxyOwner = (await simpleProxy.functions.proxy_owner().get()).value
-            expect(receivedProxyOwner.Initialized!.Address!.bits).toBe(user0.address.toHexString())
+            expect(receivedProxyOwner.Initialized?.Address?.bits).toBe(user0.address.toHexString())
         })
     })
 

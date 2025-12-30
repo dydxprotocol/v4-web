@@ -103,15 +103,17 @@ describe("Vault.funding_rate", () => {
 
         attachedContracts = [vault, vaultImpl, storkMock, pricefeedWrapper]
 
-        await call(vault.functions.initialize(deployerIdentity))
-        await call(vault.functions.set_liquidator(liquidatorIdentity, true))
+        await call(vault.functions.initialize(deployerIdentity).addContracts([vaultImpl]))
+        await call(vault.functions.set_liquidator(liquidatorIdentity, true).addContracts([vaultImpl]))
 
         await call(
-            vault.functions.set_fees(
-                30, // mint_burn_fee_basis_points
-                10, // margin_fee_basis_points
-                expandDecimals(5), // liquidation_fee_usd
-            ),
+            vault.functions
+                .set_fees(
+                    30, // mint_burn_fee_basis_points
+                    10, // margin_fee_basis_points
+                    expandDecimals(5), // liquidation_fee_usd
+                )
+                .addContracts([vaultImpl]),
         )
 
         vaultUser0 = new Vault(vault.id.toAddress(), user0)
@@ -120,9 +122,9 @@ describe("Vault.funding_rate", () => {
 
         await call(storkMock.functions.update_price(USDC_ASSET, expandDecimals(1, 18)))
 
-        await call(vault.functions.set_asset_config(...getUsdcConfig()))
-        await call(vault.functions.set_asset_config(...getBtcConfig()))
-        await call(vault.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE))
+        await call(vault.functions.set_asset_config(...getUsdcConfig()).addContracts([vaultImpl]))
+        await call(vault.functions.set_asset_config(...getBtcConfig()).addContracts([vaultImpl]))
+        await call(vault.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE).addContracts([vaultImpl]))
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(40000, 18)))
 

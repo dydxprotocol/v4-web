@@ -36,7 +36,7 @@ abi SimpleProxy : SRC14 + SRC14Extension {
     #[storage(write)]
     fn initialize_proxy(owner: Identity, target: ContractId);
 
-    #[storage(write)]
+    #[storage(read, write)]
     fn set_proxy_owner(new_owner: Identity);
 }
 
@@ -80,12 +80,15 @@ impl SimpleProxy for Contract {
             SimpleProxyError::InvalidOwner,
         );
 
+        // frankly, _set_proxy_owner() checks only_proxy_owner() already
+        // so we have to write data manually here
         storage::SRC14.target.write(Some(target));
         storage::SRC14.proxy_owner.write(State::Initialized(owner));
     }
 
-    #[storage(write)]
+    #[storage(read, write)]
     fn set_proxy_owner(new_owner: Identity) {
+        // frankly, _set_proxy_owner() checks only_proxy_owner() already
         _set_proxy_owner(State::Initialized(new_owner));
     }
 }
