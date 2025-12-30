@@ -1,25 +1,20 @@
+import { StoreService } from '@/shared/lib/store-service';
+import { createCalculateLiquidationPrice } from '../../../domain-services/queries/calculate-liquidation-price';
 import { calculateLeverage } from './calculate-leverage';
 import { calculateNotional } from './calculate-notional';
+import { calculatePositionHealth } from './calculate-position-health';
 import { calculateUnrealizedPnl } from './calculate-unrealized-pnl';
 import { calculateUnrealizedPnlPercent } from './calculate-unrealized-pnl-percent';
-import { calculateLiquidationPrice } from './calculate-liquidation-price';
-import { calculateInitialMargin } from './calculate-initial-margin';
-import { calculateMaintenanceMargin } from './calculate-maintenance-margin';
-import { calculateMaxLeverage } from './calculate-max-leverage';
-import { calculatePositionHealth } from './calculate-position-health';
-import { calculateRiskMetrics } from './calculate-risk-metrics';
+import { createGetPositionById } from './get-position-by-id';
 
-export const createPositionQueries = () => ({
+export const createPositionQueries = (storeService: StoreService) => ({
   calculateNotional,
   calculateUnrealizedPnl,
   calculateUnrealizedPnlPercent,
   calculateLeverage,
-  calculateLiquidationPrice,
-  calculateInitialMargin,
-  calculateMaintenanceMargin,
-  calculateMaxLeverage,
+  createCalculateLiquidationPrice,
   calculatePositionHealth,
-  calculateRiskMetrics,
+  getPositionById: createGetPositionById(storeService),
 });
 
-export type PositionQueries = ReturnType<typeof createPositionQueries>;
+export type PositionsQueries = ReturnType<typeof createPositionQueries>;
