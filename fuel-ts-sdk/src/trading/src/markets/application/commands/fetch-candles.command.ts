@@ -1,7 +1,7 @@
 import type { StoreService } from '@/shared/lib/store-service';
 import type { AssetId } from '@/shared/types';
 import type { CandleInterval } from '../../domain';
-import * as candles from '../../state/candles';
+import { candles } from '../../infrastructure';
 
 export const createFetchCandlesCommand =
   (store: StoreService) =>
