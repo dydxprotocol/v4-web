@@ -3,8 +3,8 @@ import { Block, Receipt, augmentBlock } from '@subsquid/fuel-objects';
 import { DataSourceBuilder } from '@subsquid/fuel-stream';
 import { TypeormDatabase } from '@subsquid/typeorm-store';
 import { BN, DateTime, Interface } from 'fuels';
-import priceOracleAbi from './abis/stork-mock-abi.json';
-import vaultAbi from './abis/vault-abi.json';
+import priceOracleAbi from './abis/stork-mock-abi.json' with { type: 'json' };
+import vaultAbi from './abis/vault-abi.json' with { type: 'json' };
 import {
   Liquidity,
   Position,
@@ -13,7 +13,7 @@ import {
   Price,
   TotalLiquidity,
   TotalPosition,
-} from './model/generated';
+} from './model/generated/index.js';
 
 export const priceOracleInterface = new Interface(priceOracleAbi);
 export const vaultInterface = new Interface(vaultAbi);

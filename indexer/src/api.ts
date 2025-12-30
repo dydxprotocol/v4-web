@@ -1,6 +1,7 @@
 import SimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
-import AggregatesPluggin from '@graphile/pg-aggregates';
-import PgPubsub from '@graphile/pg-pubsub';
+import * as PgAggregatesPlugin from '@graphile/pg-aggregates';
+import * as PgPubsubModule from '@graphile/pg-pubsub';
+const PgPubsub = (PgPubsubModule as any).default || PgPubsubModule;
 import express from 'express';
 import { NodePlugin } from 'graphile-build';
 import type * as pg from 'pg';
@@ -121,7 +122,7 @@ app.use(
       disableQueryLog: true, // set to false to see the processed queries
       skipPlugins: [NodePlugin],
       appendPlugins: [
-        AggregatesPluggin,
+        (PgAggregatesPlugin.default as any).default,
         FilterPlugin,
         SimplifyInflectorPlugin,
         ProcessorStatusPlugin,
