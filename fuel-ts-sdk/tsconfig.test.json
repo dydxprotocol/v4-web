@@ -1,6 +1,7 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
+    "composite": false,
     "declaration": false,
     "declarationMap": false,
     "noEmit": true
