@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
+import 'react';
 import type { ClassValue } from 'clsx';
 
 declare module 'react' {
-  interface HTMLAttributes<_T> {
+  interface HTMLAttributes<T> {
     /**
      * Component styles from vanilla-extract or CSS modules
      * Can be a single class or array of classes
@@ -15,7 +15,7 @@ declare module 'react' {
     tw?: string;
   }
 
-  interface SVGAttributes<_T> {
+  interface SVGAttributes<T> {
     /**
      * Component styles from vanilla-extract or CSS modules
      * Can be a single class or array of classes
@@ -29,7 +29,7 @@ declare module 'react' {
   }
 
   // Button needs explicit children in React 19
-  interface ButtonHTMLAttributes<_T> {
+  interface ButtonHTMLAttributes<T> {
     children?: ReactNode;
   }
 }

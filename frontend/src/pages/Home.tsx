@@ -1,31 +1,32 @@
-import { useContext, useEffect, useState } from 'react';
-import { StarboardClientContext } from '@/contexts/StarboardClient.context';
+import { useEffect } from 'react';
+import { NetworkSwitchContext } from '@/contexts/network-switch/network-switch.context';
+import { getEnv } from '@/lib/env';
+import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
+import { useRequiredContext } from '@/lib/use-required-context.hook';
 import * as styles from './Home.css';
 
+const testNetUrl = 'https://starboard.squids.live/starboard-testnet@test2/api/graphql';
+const localNodeUrl = getEnv('VITE_INDEXER_URL');
+
 export default function Home() {
-  const client = useContext(StarboardClientContext);
-  const [positionsCount, setPositionsCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const tradingSdk = useTradingSdk();
+  const fetchedPosition = useSdkQuery(() => tradingSdk.getPositionById('181-0-28' as any));
+
+  const networkSwitch = useRequiredContext(NetworkSwitchContext);
+  const currentNetwork = networkSwitch.getNetworkUrl();
+
+  function switchToTestNet() {
+    networkSwitch.changeNetworkUrl(testNetUrl);
+  }
+  function switchToLocalNode() {
+    networkSwitch.changeNetworkUrl(localNodeUrl);
+  }
 
   useEffect(() => {
-    if (!client) return;
-
-    const fetchPositions = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const positions = await client.positions.getPositions({ limit: 100 });
-        setPositionsCount(positions.length);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch positions');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPositions();
-  }, [client]);
+    tradingSdk.fetchCurrentPositions(
+      '0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770' as any
+    );
+  }, [tradingSdk]);
 
   return (
     <div css={styles.page}>
@@ -37,18 +38,28 @@ export default function Home() {
 
         <div css={styles.statusCard}>
           <h2 css={styles.statusTitle}>Indexer Status</h2>
-          {loading && <p css={styles.statusLoading}>⏳ Connecting to indexer...</p>}
-          {error && <p css={styles.statusError}>⚠️ {error}</p>}
-          {positionsCount !== null && (
+          <h2 css={styles.statusTitle}>Current network: {networkSwitch.getNetworkUrl()}</h2>
+
+          {fetchedPosition && (
             <p css={styles.statusSuccess}>
-              ✓ Connected. Found {positionsCount} position{positionsCount !== 1 ? 's' : ''}.
+              ✓ Connected. Found position with id {fetchedPosition?.id}
             </p>
           )}
         </div>
 
         <div css={styles.buttonContainer}>
-          <button css={styles.button}>Launch App</button>
-          <button css={styles.buttonSecondary}>Documentation</button>
+          <button
+            css={currentNetwork === testNetUrl ? styles.button : styles.buttonSecondary}
+            onClick={switchToTestNet}
+          >
+            Testnet
+          </button>
+          <button
+            css={currentNetwork === localNodeUrl ? styles.button : styles.buttonSecondary}
+            onClick={switchToLocalNode}
+          >
+            Local node
+          </button>
         </div>
       </div>
     </div>

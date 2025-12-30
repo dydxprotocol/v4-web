@@ -21,6 +21,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "customConditions": ["module"],
 
     /* Linting */
     "strict": true,
