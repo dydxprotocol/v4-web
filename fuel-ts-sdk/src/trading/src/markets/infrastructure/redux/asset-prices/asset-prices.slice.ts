@@ -13,7 +13,7 @@ export const assetPricesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCurrentAssetPrices.pending, (state) => {
+      .addCase(fetchAssetPricesByIds.pending, (state) => {
         state.fetchStatus = 'pending';
         state.error = null;
       })

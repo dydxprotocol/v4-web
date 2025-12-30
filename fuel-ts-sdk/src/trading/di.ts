@@ -33,6 +33,8 @@ export const createTradingModule = (graphqlClient: GraphQLClient) => {
         ...positionCommands,
         ...marketCommands,
         ...domainCommands,
+        ...positionsQueries,
+        ...marketQueries,
       };
     },
   };

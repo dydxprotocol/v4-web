@@ -1,5 +1,5 @@
 import type { GraphQLClient } from 'graphql-request';
-import type { PositionRepository } from '../../domain';
+import type { PositionRepository } from '../../../domain';
 import { getCurrentPositions } from './get-current-positions';
 import { getPositions } from './get-positions';
 import { getPositionsByAccount } from './get-positions-by-account';

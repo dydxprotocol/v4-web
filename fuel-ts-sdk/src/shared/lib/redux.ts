@@ -30,6 +30,17 @@ export interface LoadableState<T> {
 
 export type StoreThunkExtraArgument = TradingThunkExtras;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const serializeForDevTools = (state: any): any => {
+  if (typeof state === 'bigint') return state.toString() + 'n';
+  if (state && typeof state === 'object') {
+    return Array.isArray(state)
+      ? state.map(serializeForDevTools)
+      : Object.fromEntries(Object.entries(state).map(([k, v]) => [k, serializeForDevTools(v)]));
+  }
+  return state;
+};
+
 export const createStore = (extraArgument: StoreThunkExtraArgument) => {
   return configureStore({
     reducer: combineReducers({
@@ -40,7 +51,14 @@ export const createStore = (extraArgument: StoreThunkExtraArgument) => {
         thunk: {
           extraArgument,
         },
+        serializableCheck: false,
       }),
+    devTools: {
+      name: 'Starboard',
+      trace: true,
+      stateSanitizer: serializeForDevTools,
+      actionSanitizer: serializeForDevTools,
+    },
   });
 };
 
