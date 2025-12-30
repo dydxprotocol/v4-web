@@ -1,5 +1,5 @@
 import type { AssetId } from '@/shared/types';
-import type { Candle, CandleInterval } from './candles.types';
+import type { Candle, CandleInterval } from './candles.entity';
 
 /**
  * Query options for fetching candles

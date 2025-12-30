@@ -1,5 +1,5 @@
 import type { AssetId } from '@/shared/types';
-import type { AssetPrice } from './asset-prices.types';
+import type { AssetPrice } from './asset-prices.entity';
 
 /**
  * Query options for fetching asset prices

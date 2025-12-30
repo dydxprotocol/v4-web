@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PercentageValue } from '@/shared/models/decimals';
 import { AssetIdSchema, MarketConfigIdSchema } from '@/shared/types';
 import { decimalValueSchema } from '@/shared/utils/decimalCalculator/utils/zod';
-import type { MarketConfig } from './market-configs.types';
+import type { MarketConfig } from './market-configs.entity';
 
 export const MarketConfigSchema = z.object({
   id: MarketConfigIdSchema,

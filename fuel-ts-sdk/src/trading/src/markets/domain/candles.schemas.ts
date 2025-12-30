@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AssetIdSchema, CandleIdSchema } from '@/shared/types';
-import type { Candle } from './candles.types';
+import type { Candle } from './candles.entity';
 
 export const CandleSchema = z.object({
   id: CandleIdSchema,
