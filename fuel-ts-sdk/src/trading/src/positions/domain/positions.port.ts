@@ -1,5 +1,5 @@
 import type { Address, AssetId } from '@/shared/types';
-import type { Position } from './positions.types';
+import type { Position } from './positions.entity';
 
 /**
  * Query options for fetching positions
