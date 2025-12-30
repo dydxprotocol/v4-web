@@ -53,10 +53,7 @@ export const safeAssetPriceId = (str: string): AssetPriceId | undefined => {
 /**
  * CandleId - Unique candle identifier
  */
-export const CandleIdSchema = z
-  .string()
-  .min(1, 'Candle ID cannot be empty')
-  .brand<'CandleId'>();
+export const CandleIdSchema = z.string().min(1, 'Candle ID cannot be empty').brand<'CandleId'>();
 export type CandleId = z.infer<typeof CandleIdSchema>;
 export const candleId = (str: string): CandleId => CandleIdSchema.parse(str);
 export const safeCandleId = (str: string): CandleId | undefined => {

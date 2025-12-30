@@ -1,5 +1,4 @@
 import { z } from 'zod';
-
 import type { DecimalValue } from '../../../models/decimalValue';
 
 export function decimalValueSchema<T extends DecimalValue>(
