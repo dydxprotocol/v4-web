@@ -1,5 +1,5 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
-import { LoadableMixin } from '@/shared/lib/redux';
+import type { LoadableMixin } from '@/shared/lib/redux';
 import type { CandleId } from '@/shared/types';
 import type { Candle } from '../../../domain';
 

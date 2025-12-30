@@ -6,7 +6,7 @@ export {
   getPositionStatus,
   isPositionClosed,
   isPositionOpen,
-} from './positions.calculators';
+} from './positions.calculations';
 export { PositionChange, PositionSide, PositionStatus } from './positions.entity';
 export type { Position, PositionKey } from './positions.entity';
 export type { GetPositionsOptions, PositionRepository } from './positions.port';

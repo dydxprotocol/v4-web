@@ -1,6 +1,6 @@
-import { UsdValue } from '@/shared/models/decimals';
+import type { UsdValue } from '@/shared/models/decimals';
 import { type MarketConfigId } from '@/shared/types';
-import { MarketQueries } from '../../markets';
+import type { MarketQueries } from '../../markets';
 import type { PositionsQueries, RiskMetrics } from '../../positions';
 import { createCalculateInitialMargin } from './calculate-initial-margin';
 import { createCalculateMaintenanceMargin } from './calculate-maintenance-margin';

@@ -1,4 +1,4 @@
-import { StoreService } from '@/shared/lib/store-service';
+import type { StoreService } from '@/shared/lib/store-service';
 import { createCalculateLiquidationPrice } from '../../../domain-services/queries/calculate-liquidation-price';
 import { calculateLeverage } from './calculate-leverage';
 import { calculateNotional } from './calculate-notional';

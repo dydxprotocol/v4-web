@@ -8,7 +8,8 @@ import type {
   CandleM15,
   CandleM30,
 } from '@/generated/graphql';
-import { AssetId, assetId, candleId } from '@/shared/types';
+import type { AssetId } from '@/shared/types';
+import { assetId, candleId } from '@/shared/types';
 import type { CandleInterval, GetCandlesOptions } from '../../../domain';
 import { type Candle, CandleSchema } from '../../../domain';
 import {

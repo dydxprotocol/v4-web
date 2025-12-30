@@ -1,7 +1,7 @@
 import { RatioOutput } from '@/shared/models/decimals';
-import { MarketConfigId } from '@/shared/types';
+import type { MarketConfigId } from '@/shared/types';
 import { DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
-import { MarketQueries } from '../../markets';
+import type { MarketQueries } from '../../markets';
 
 export interface CalculateMaxLeverageDependencies {
   marketQueries: MarketQueries;

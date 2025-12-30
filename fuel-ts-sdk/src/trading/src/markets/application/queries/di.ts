@@ -1,4 +1,4 @@
-import { StoreService } from '@/shared/lib/store-service';
+import type { StoreService } from '@/shared/lib/store-service';
 import { createGetMarketConfigById } from './get-market-config-by-id';
 
 export const createMarketQueries = (storeService: StoreService) => ({

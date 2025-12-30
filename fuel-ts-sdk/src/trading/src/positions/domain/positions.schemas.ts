@@ -1,9 +1,8 @@
+import { z } from 'zod';
 import { PositionChange } from '@/generated/graphql';
 import { CollateralAmount } from '@/shared/models/decimals';
 import { AddressSchema, AssetIdSchema, PositionIdSchema } from '@/shared/types';
 import { decimalValueSchema } from '@/shared/utils/decimalCalculator/utils/zod';
-import { z } from 'zod';
-
 import {
   FundingRate,
   PnlDelta,

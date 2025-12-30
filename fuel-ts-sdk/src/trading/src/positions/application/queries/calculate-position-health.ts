@@ -1,4 +1,5 @@
-import { PercentageValue, RatioOutput, UsdValue } from '@/shared/models/decimals';
+import type { UsdValue } from '@/shared/models/decimals';
+import { PercentageValue, RatioOutput } from '@/shared/models/decimals';
 import { DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 
 export function calculatePositionHealth(

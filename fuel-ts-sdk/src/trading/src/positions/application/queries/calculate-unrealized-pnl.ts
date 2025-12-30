@@ -1,6 +1,7 @@
-import { OraclePrice, UsdValue } from '@/shared/models/decimals';
+import type { OraclePrice } from '@/shared/models/decimals';
+import { UsdValue } from '@/shared/models/decimals';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
-import { getPositionSide, type Position, PositionSide } from '../../domain';
+import { type Position, PositionSide, getPositionSide } from '../../domain';
 
 export function calculateUnrealizedPnl(
   positionHistory: Position[],

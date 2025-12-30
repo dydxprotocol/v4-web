@@ -6,10 +6,8 @@ import {
   type CalculateMaxLeverageDependencies,
   createCalculateMaxLeverage,
 } from './calculate-max-leverage';
-import {
-  CalculateRiskMetricsDependencies,
-  createCalculateRiskMetrics,
-} from './calculate-risk-metrics';
+import type { CalculateRiskMetricsDependencies } from './calculate-risk-metrics';
+import { createCalculateRiskMetrics } from './calculate-risk-metrics';
 
 export type TradingDomainQueriesDependencies = CalculateInitialMarginDependencies &
   CalculateMaxLeverageDependencies &

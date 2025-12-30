@@ -1,6 +1,7 @@
 import type { GraphQLClient } from 'graphql-request';
 import type { Address } from '@/shared/types';
-import { type Position, filterOpenPositions } from '../../domain';
+import type { Position } from '../../../domain';
+import { filterOpenPositions } from '../../../domain';
 import { getPositionsByAccount } from './get-positions-by-account';
 
 export const getCurrentPositions =

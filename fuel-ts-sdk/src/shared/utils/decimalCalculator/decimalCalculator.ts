@@ -1,4 +1,5 @@
-import { DecimalValue, DecimalValueCtor, HeadlessDecimalValue } from '../../models/decimalValue';
+import type { DecimalValue, DecimalValueCtor } from '../../models/decimalValue';
+import { HeadlessDecimalValue } from '../../models/decimalValue';
 import { Formula } from './formula';
 
 export class DecimalCalculator {
@@ -31,7 +32,7 @@ export class DecimalCalculator {
     builder: DecimalCalculator | ((builder: DecimalCalculator) => DecimalCalculator)
   ) {
     const builtFormula = typeof builder === 'function' ? builder(new DecimalCalculator()) : builder;
-    if (!!builtFormula.denominatorFormula)
+    if (builtFormula.denominatorFormula)
       throw new Error('Nominator formula cannot have nested denominator formulas');
 
     return new DecimalCalculator(builtFormula.numeratorFormula);
@@ -73,7 +74,7 @@ export class DecimalCalculator {
   divideBy(value: DecimalValue) {
     if (!this.numeratorFormula.hasElements())
       throw new Error('Denominator cannot be invoked before numerator');
-    if (!!this.denominatorFormula) throw new Error('Illegal consecutive denominator invocation');
+    if (this.denominatorFormula) throw new Error('Illegal consecutive denominator invocation');
 
     const calc = this.deepCopy();
     calc.denominatorFormula = new Formula([value]);
@@ -83,10 +84,10 @@ export class DecimalCalculator {
   inDenominator(builder: DecimalCalculator | ((builder: DecimalCalculator) => DecimalCalculator)) {
     if (!this.numeratorFormula.hasElements())
       throw new Error('Denominator cannot be invoked before numerator');
-    if (!!this.denominatorFormula) throw new Error('Illegal consecutive denominator invocation');
+    if (this.denominatorFormula) throw new Error('Illegal consecutive denominator invocation');
 
     const builtFormula = typeof builder === 'function' ? builder(new DecimalCalculator()) : builder;
-    if (!!builtFormula.denominatorFormula)
+    if (builtFormula.denominatorFormula)
       throw new Error('Denominator formula cannot have nested denominator formulas');
 
     const calc = this.deepCopy();

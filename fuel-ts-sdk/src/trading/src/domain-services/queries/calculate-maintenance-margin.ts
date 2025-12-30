@@ -1,7 +1,7 @@
 import { UsdValue } from '@/shared/models/decimals';
-import { MarketConfigId } from '@/shared/types';
+import type { MarketConfigId } from '@/shared/types';
 import { DecimalCalculator } from '@/shared/utils/decimalCalculator';
-import { MarketQueries } from '../../markets';
+import type { MarketQueries } from '../../markets';
 
 export interface CalculateMaintenanceMarginDependencies {
   marketQueries: MarketQueries;

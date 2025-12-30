@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import 'immer';
-
 import { fetchMarketConfig } from './market-configs.thunks';
 import { marketConfigsAdapter, marketConfigsInitialState } from './market-configs.types';
 

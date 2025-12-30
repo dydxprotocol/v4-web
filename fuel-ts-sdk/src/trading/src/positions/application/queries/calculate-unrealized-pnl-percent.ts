@@ -1,4 +1,5 @@
-import { OraclePrice, PercentageMultiplier, UsdValue } from '@/shared/models/decimals';
+import type { OraclePrice, UsdValue } from '@/shared/models/decimals';
+import { PercentageMultiplier } from '@/shared/models/decimals';
 import { DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 import type { Position } from '../../domain';
 import { calculateUnrealizedPnl } from './calculate-unrealized-pnl';

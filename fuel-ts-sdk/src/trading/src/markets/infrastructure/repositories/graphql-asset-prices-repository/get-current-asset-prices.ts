@@ -1,9 +1,10 @@
 import type { GraphQLClient } from 'graphql-request';
 import { OraclePrice } from '@/shared/models/decimals';
-import { AssetId, assetId, assetPriceId } from '@/shared/types';
+import type { AssetId } from '@/shared/types';
+import { assetId, assetPriceId } from '@/shared/types';
 import type { GetAssetPricesOptions } from '../../../domain';
 import { type AssetPrice, AssetPriceSchema } from '../../../domain';
-import { GET_CURRENT_ASSET_PRICES_QUERY } from './operations/get-current-asset-prices.query';
+import { GET_CURRENT_ASSET_PRICES_QUERY } from './get-current-asset-prices.gql';
 
 interface GraphQLCurrentPrice {
   asset: string;

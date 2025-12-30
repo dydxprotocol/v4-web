@@ -1,8 +1,10 @@
-import { OraclePrice, PercentageValue, UsdValue } from '@/shared/models/decimals';
-import { MarketConfigId, PositionId } from '@/shared/types';
+import type { UsdValue } from '@/shared/models/decimals';
+import { OraclePrice, PercentageValue } from '@/shared/models/decimals';
+import type { MarketConfigId, PositionId } from '@/shared/types';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
-import { MarketQueries } from '../../markets';
-import { PositionSide, PositionsQueries, getPositionSide } from '../../positions';
+import type { MarketQueries } from '../../markets';
+import type { PositionsQueries } from '../../positions';
+import { PositionSide, getPositionSide } from '../../positions';
 
 export interface CalculateLiquidationPriceDependencies {
   positionsQueries: PositionsQueries;

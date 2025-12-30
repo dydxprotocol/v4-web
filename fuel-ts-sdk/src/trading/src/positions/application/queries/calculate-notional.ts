@@ -1,4 +1,5 @@
-import { OraclePrice, UsdValue } from '@/shared/models/decimals';
+import type { OraclePrice } from '@/shared/models/decimals';
+import { UsdValue } from '@/shared/models/decimals';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 import type { Position } from '../../domain';
 

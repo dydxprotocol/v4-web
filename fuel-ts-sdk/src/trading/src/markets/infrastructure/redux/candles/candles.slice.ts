@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import 'immer';
-
 import { fetchCandles } from './candles.thunks';
 import { candlesAdapter, candlesInitialState } from './candles.types';
 

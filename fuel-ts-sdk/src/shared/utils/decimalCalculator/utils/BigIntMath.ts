@@ -1,4 +1,5 @@
-import { DecimalValue, DecimalValueCtor, HeadlessDecimalValue } from '../../../models/decimalValue';
+import type { DecimalValue } from '../../../models/decimalValue';
+import { HeadlessDecimalValue } from '../../../models/decimalValue';
 
 export const BigIntMath = {
   abs<T extends DecimalValue>(decimalValue: T): DecimalValue {
@@ -6,7 +7,3 @@ export const BigIntMath = {
     return new HeadlessDecimalValue(absValue, decimalValue.decimals);
   },
 };
-
-function getConstructor<T extends DecimalValue>(decimalValue: T): DecimalValueCtor<T> {
-  return decimalValue.constructor as DecimalValueCtor<T>;
-}

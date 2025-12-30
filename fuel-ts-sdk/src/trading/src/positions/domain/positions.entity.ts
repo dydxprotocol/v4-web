@@ -1,5 +1,4 @@
 import type { z } from 'zod';
-
 import type { PositionKeySchema, PositionSchema } from './positions.schemas';
 
 export { PositionChange } from '@/generated/graphql';
