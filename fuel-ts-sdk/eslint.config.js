@@ -21,6 +21,14 @@ export default tseslint.config(
     rules: {
       ...baseConfig.rules,
       'no-console': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          disallowTypeAnnotations: true,
+          fixStyle: 'separate-type-imports',
+        },
+      ],
     },
   }
 );

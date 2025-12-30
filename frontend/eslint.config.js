@@ -49,6 +49,14 @@ export default tseslint.config(
       'react/no-unescaped-entities': 'off',
       // TypeScript-specific
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          disallowTypeAnnotations: true,
+          fixStyle: 'separate-type-imports',
+        },
+      ],
     },
   }
 );
