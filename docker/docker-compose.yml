@@ -71,7 +71,7 @@ services:
       [
         'bash',
         '-c',
-        'source /root/.nvm/nvm.sh && cd /starboard/indexer && ../node_modules/.bin/squid-typeorm-migration apply && node lib/main.js',
+        'source /root/.nvm/nvm.sh && cd /starboard/indexer && pnpm exec squid-typeorm-migration apply && node lib/main.js',
       ]
     depends_on:
       fuel-core:

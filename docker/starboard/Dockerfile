@@ -42,11 +42,11 @@ WORKDIR /starboard
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY frontend/package.json ./frontend/
 COPY indexer/package.json ./indexer/
-COPY fuel-ts-sdk/package.json fuel-ts-sdk/codegen.yml fuel-ts-sdk/scalar-definitions.graphql ./fuel-ts-sdk/
+COPY fuel-ts-sdk/package.json fuel-ts-sdk/codegen.yml fuel-ts-sdk/scalar-definitions.graphql fuel-ts-sdk/rollup.config.mjs fuel-ts-sdk/tsconfig.build.json fuel-ts-sdk/tsconfig.json ./fuel-ts-sdk/
 COPY contracts/package.json ./contracts/
 
 # Copy files needed by preinstall and postinstall scripts
-COPY scripts ./scripts
+# COPY scripts ./scripts
 COPY packages/tradingview.tgz ./packages/
 COPY indexer/schema.graphql ./indexer/
 
