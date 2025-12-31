@@ -1,5 +1,5 @@
 import { Provider, Wallet, createAssetId } from 'fuels';
-import { StorkMock, TestnetToken, Vault } from '../../contracts/types';
+import { StorkMock, TestnetToken, Vault } from '../../contracts/types/index.js';
 import {
   BTC_ASSET,
   BTC_MAX_LEVERAGE,
@@ -24,7 +24,7 @@ import {
 // graphql url is hardcoded, taken form the fuel node starting script
 const graphQLUrl = 'http://127.0.0.1:4000/v1/graphql';
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   populateEvents()
     .then(() => {
       process.exit(0);

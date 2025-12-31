@@ -2,6 +2,7 @@ import SimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
 import * as PgAggregatesPlugin from '@graphile/pg-aggregates';
 import * as PgPubsubModule from '@graphile/pg-pubsub';
 const PgPubsub = (PgPubsubModule as any).default || PgPubsubModule;
+import cors from 'cors';
 import express from 'express';
 import { NodePlugin } from 'graphile-build';
 import type * as pg from 'pg';
@@ -16,6 +17,8 @@ import {
 import FilterPlugin from 'postgraphile-plugin-connection-filter';
 
 const app = express();
+
+app.use(cors());
 
 export const ProcessorStatusPlugin: Plugin = makeExtendSchemaPlugin((_build, options) => {
   const schemas: string[] = options.stateSchemas || ['squid_processor'];
