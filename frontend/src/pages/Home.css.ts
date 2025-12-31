@@ -124,3 +124,143 @@ export const buttonSecondary = style({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
 });
+
+export const formGroup = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+  marginBottom: '1.5rem',
+});
+
+export const label = style({
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  color: '#e2e8f0',
+  marginBottom: '0.5rem',
+});
+
+export const input = style({
+  padding: '0.75rem 1rem',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  color: 'white',
+  borderRadius: '0.5rem',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  fontSize: '1rem',
+  fontFamily: 'monospace',
+  transition: 'all 0.2s',
+  ':focus': {
+    outline: 'none',
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+  },
+  '::placeholder': {
+    color: '#64748b',
+  },
+});
+
+export const fetchButton = style({
+  padding: '0.75rem 1.5rem',
+  backgroundColor: '#8b5cf6',
+  color: 'white',
+  borderRadius: '0.5rem',
+  border: 'none',
+  fontSize: '1rem',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.39)',
+  ':hover': {
+    backgroundColor: '#7c3aed',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 20px rgba(139, 92, 246, 0.5)',
+  },
+  ':active': {
+    transform: 'translateY(0)',
+  },
+  ':disabled': {
+    backgroundColor: '#4b5563',
+    cursor: 'not-allowed',
+    boxShadow: 'none',
+    transform: 'none',
+  },
+});
+
+export const positionsContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  marginTop: '1.5rem',
+});
+
+export const positionCard = style({
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  borderRadius: '0.75rem',
+  padding: '1.25rem',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+});
+
+export const positionHeader = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '1rem',
+  paddingBottom: '0.75rem',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+});
+
+export const positionSide = style({
+  padding: '0.25rem 0.75rem',
+  borderRadius: '0.375rem',
+  fontSize: '0.875rem',
+  fontWeight: '600',
+});
+
+export const longPosition = style({
+  backgroundColor: 'rgba(34, 197, 94, 0.2)',
+  color: '#22c55e',
+});
+
+export const shortPosition = style({
+  backgroundColor: 'rgba(239, 68, 68, 0.2)',
+  color: '#ef4444',
+});
+
+export const positionGrid = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: '1rem',
+});
+
+export const positionField = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+});
+
+export const fieldLabel = style({
+  fontSize: '0.75rem',
+  color: '#94a3b8',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+});
+
+export const fieldValue = style({
+  fontSize: '1rem',
+  color: '#e2e8f0',
+  fontWeight: '500',
+  fontFamily: 'monospace',
+});
+
+export const profitPositive = style({
+  color: '#22c55e',
+});
+
+export const profitNegative = style({
+  color: '#ef4444',
+});
