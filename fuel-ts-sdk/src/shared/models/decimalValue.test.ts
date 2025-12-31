@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { DecimalValue, HeadlessDecimalValue } from './decimalValue';
-import { CollateralAmount, UsdValue } from './decimals';
+import { CollateralAmount, OraclePrice, UsdValue } from './decimals';
 
 describe('DecimalValue', () => {
   describe('construction', () => {
     it('should create from bigint', () => {
-      const value = UsdValue.fromBigInt(100000000000000000n); // 100.0 with 15 decimals
+      const value = UsdValue.fromBigInt(100000000000n); // 100.0 with 9 decimals
 
-      expect(value.value).toBe(100000000000000000n);
-      expect(value.decimals).toBe(15n);
+      expect(value.value).toBe(100000000000n);
+      expect(value.decimals).toBe(9n);
     });
 
     it('should create from float', () => {
@@ -30,7 +30,7 @@ describe('DecimalValue', () => {
 
   describe('conversion', () => {
     it('should convert to float', () => {
-      const value = UsdValue.fromBigInt(123456789000000000n); // 123.456789 with 15 decimals
+      const value = UsdValue.fromBigInt(123456789000n); // 123.456789 with 9 decimals
 
       expect(value.toFloat()).toBeCloseTo(123.456789, 6);
     });
@@ -38,7 +38,7 @@ describe('DecimalValue', () => {
     it('should convert to bigint', () => {
       const value = UsdValue.fromFloat(100.5);
 
-      expect(value.toBigInt()).toBe(100500000000000000n);
+      expect(value.toBigInt()).toBe(100500000000n);
     });
 
     it('should handle zero', () => {
@@ -65,16 +65,16 @@ describe('DecimalValue', () => {
     });
 
     it('should adjust to higher decimals', () => {
-      // UsdValue has 15 decimals, CollateralAmount has 9
-      const value = CollateralAmount.fromFloat(100);
-      const adjusted = value.adjustTo(UsdValue);
+      // UsdValue has 9 decimals, OraclePrice has 18
+      const value = UsdValue.fromFloat(100);
+      const adjusted = value.adjustTo(OraclePrice);
 
       expect(adjusted.toFloat()).toBeCloseTo(100, 6);
-      expect(adjusted.decimals).toBe(UsdValue.decimals);
+      expect(adjusted.decimals).toBe(OraclePrice.decimals);
     });
 
     it('should adjust to lower decimals', () => {
-      // UsdValue has 15 decimals, CollateralAmount has 9
+      // UsdValue has 9 decimals, same as CollateralAmount
       const value = UsdValue.fromFloat(100);
       const adjusted = value.adjustTo(CollateralAmount);
 
@@ -133,7 +133,7 @@ describe('DecimalValue', () => {
 
       // Due to floating point precision, we can't expect exact match
       // Just verify it's approximately correct
-      const expected = BigInt(Number.MAX_SAFE_INTEGER) * 1000000000000000n;
+      const expected = BigInt(Number.MAX_SAFE_INTEGER) * 1000000000n; // 9 decimals
       const diff = maxSafe.value > expected ? maxSafe.value - expected : expected - maxSafe.value;
 
       // Allow up to 0.1% difference due to floating point precision

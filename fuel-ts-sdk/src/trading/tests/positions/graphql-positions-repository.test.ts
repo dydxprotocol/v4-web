@@ -20,17 +20,19 @@ describe('GraphQLPositionsRepository', () => {
       ];
 
       mockClient.mockResponse('GetPositions', {
-        positions: mockPositions.map((p) => ({
-          ...p,
-          collateralAmount: p.collateralAmount.value.toString(),
-          size: p.size.value.toString(),
-          collateralTransferred: p.collateralTransferred.value.toString(),
-          positionFee: p.positionFee.value.toString(),
-          fundingRate: p.fundingRate.value.toString(),
-          pnlDelta: p.pnlDelta.value.toString(),
-          realizedFundingRate: p.realizedFundingRate.value.toString(),
-          realizedPnl: p.realizedPnl.value.toString(),
-        })),
+        positions: {
+          nodes: mockPositions.map((p) => ({
+            ...p,
+            collateralAmount: p.collateralAmount.value.toString(),
+            size: p.size.value.toString(),
+            collateralTransferred: p.collateralTransferred.value.toString(),
+            positionFee: p.positionFee.value.toString(),
+            fundingRate: p.fundingRate.value.toString(),
+            pnlDelta: p.pnlDelta.value.toString(),
+            realizedFundingRate: p.realizedFundingRate.value.toString(),
+            realizedPnl: p.realizedPnl.value.toString(),
+          })),
+        },
       });
 
       const positions = await getPositions(mockClient as any)();
@@ -42,7 +44,9 @@ describe('GraphQLPositionsRepository', () => {
 
     it('should handle empty results', async () => {
       mockClient.mockResponse('GetPositions', {
-        positions: [],
+        positions: {
+          nodes: [],
+        },
       });
 
       const positions = await getPositions(mockClient as any)();
@@ -54,19 +58,21 @@ describe('GraphQLPositionsRepository', () => {
       const mockPosition = createTestPosition({ id: positionId('pos-1') });
 
       mockClient.mockResponse('GetPositions', {
-        positions: [
-          {
-            ...mockPosition,
-            collateralAmount: mockPosition.collateralAmount.value.toString(),
-            size: mockPosition.size.value.toString(),
-            collateralTransferred: mockPosition.collateralTransferred.value.toString(),
-            positionFee: mockPosition.positionFee.value.toString(),
-            fundingRate: mockPosition.fundingRate.value.toString(),
-            pnlDelta: mockPosition.pnlDelta.value.toString(),
-            realizedFundingRate: mockPosition.realizedFundingRate.value.toString(),
-            realizedPnl: mockPosition.realizedPnl.value.toString(),
-          },
-        ],
+        positions: {
+          nodes: [
+            {
+              ...mockPosition,
+              collateralAmount: mockPosition.collateralAmount.value.toString(),
+              size: mockPosition.size.value.toString(),
+              collateralTransferred: mockPosition.collateralTransferred.value.toString(),
+              positionFee: mockPosition.positionFee.value.toString(),
+              fundingRate: mockPosition.fundingRate.value.toString(),
+              pnlDelta: mockPosition.pnlDelta.value.toString(),
+              realizedFundingRate: mockPosition.realizedFundingRate.value.toString(),
+              realizedPnl: mockPosition.realizedPnl.value.toString(),
+            },
+          ],
+        },
       });
 
       const positions = await getPositions(mockClient as any)();
