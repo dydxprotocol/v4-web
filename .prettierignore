@@ -11,3 +11,4 @@ pnpm-lock.yaml
 *.min.css
 **/generated
 frontend/src/vite-env.d.ts
+indexer/src/main.ts

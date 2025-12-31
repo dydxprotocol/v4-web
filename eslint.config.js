@@ -17,6 +17,7 @@ export default [
       'frontend/**',
       'fuel-ts-sdk/**',
       'indexer/**',
+      'contracts/types/**',
     ],
   },
 ];

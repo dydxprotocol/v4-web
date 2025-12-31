@@ -9,7 +9,7 @@ import baseConfig from '../eslint.config.base.js';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'public/tradingview/**'],
+    ignores: ['dist', 'public/tradingview/**', '**/*.d.ts'],
   },
   {
     files: ['**/*.{ts,tsx}'],
