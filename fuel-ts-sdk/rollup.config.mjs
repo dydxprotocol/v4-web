@@ -1,8 +1,8 @@
 import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
-import esbuild from 'rollup-plugin-esbuild';
-import dts from 'rollup-plugin-dts';
 import path from 'path';
+import dts from 'rollup-plugin-dts';
+import esbuild from 'rollup-plugin-esbuild';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -13,6 +13,7 @@ export default [
   // JS build
   {
     input: {
+      index: 'src/index.ts',
       client: 'src/client.ts',
       'trading/index': 'src/trading/index.ts',
     },
@@ -25,9 +26,7 @@ export default [
     external,
     plugins: [
       alias({
-        entries: [
-          { find: '@', replacement: path.resolve(__dirname, 'src') }
-        ]
+        entries: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
       }),
       resolve({ extensions: ['.ts', '.js'] }),
       esbuild({
@@ -39,6 +38,7 @@ export default [
   // DTS build
   {
     input: {
+      index: 'src/index.ts',
       client: 'src/client.ts',
       'trading/index': 'src/trading/index.ts',
     },
