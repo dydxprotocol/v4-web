@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '@/shared/lib/redux';
 import type { Address } from '@/shared/types';
 import type { Position } from '../../../domain';
@@ -12,10 +13,11 @@ export const selectPositionById = adapterSelectors.selectById;
 export const selectPositionIds = adapterSelectors.selectIds;
 export const selectPositionEntities = adapterSelectors.selectEntities;
 
-export const selectPositionsByAccount =
-  (account: Address) =>
-  (state: RootState): Position[] =>
-    selectAllPositions(state).filter((p) => p.positionKey.account === account);
+export const selectPositionsByAccount = createSelector(
+  [(_, address?: Address) => address, selectAllPositions],
+  (address, allPositions): Position[] =>
+    allPositions.filter((p) => p.positionKey.account === address)
+);
 
 export const selectPositionsFetchStatus = (state: RootState) =>
   selectPositionsState(state).fetchStatus;
