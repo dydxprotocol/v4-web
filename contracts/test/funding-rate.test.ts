@@ -1,18 +1,27 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
 import { WalletUnlocked } from "fuels"
-import { launchNode, getNodeWallets } from "./node"
+import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import {
-    call,
+    Fungible,
+    FungibleFactory,
+    PricefeedWrapper,
+    PricefeedWrapperFactory,
+    StorkMock,
+    StorkMockFactory,
+    VaultExpose,
+    VaultExposeFactory,
+} from "../types/index.js"
+import { getNodeWallets, launchNode } from "./node.js"
+import {
     AddressIdentity,
-    walletToAddressIdentity,
-    expandDecimals,
-    COLLATERAL_ASSET,
-    USDC_ASSET,
     BTC_ASSET,
     BTC_MAX_LEVERAGE,
+    call,
+    COLLATERAL_ASSET,
+    expandDecimals,
+    getAssetId,
     getBtcConfig,
     getUsdcConfig,
-    getAssetId,
     moveBlockchainTime,
 } from "./utils"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"

@@ -1,8 +1,8 @@
 import { Provider, Wallet } from "fuels"
-import { TestnetToken } from "../types/TestnetToken"
-import { call, getArgs } from "./utils"
+import { TestnetToken } from "../types/TestnetToken.js"
+import { call, getArgs } from "./utils.js"
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     faucet(getArgs(["url", "privK", "token"]))
         .then(() => {
             process.exit(0)

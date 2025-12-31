@@ -13,6 +13,8 @@ if (require.main === module) {
         })
 }
 
+export { deployStorkMock }
+
 async function deployStorkMock(taskArgs: any) {
     const salt = taskArgs.salt || getRandomSalt()
     // eslint-disable-next-line no-console

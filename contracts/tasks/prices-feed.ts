@@ -1,8 +1,8 @@
 import { Provider, Wallet } from "fuels"
-import { StorkMock } from "../types/StorkMock"
-import { call, getArgs } from "./utils"
+import { StorkMock } from "../types/StorkMock.js"
+import { call, getArgs } from "./utils.js"
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     pricesFeed(getArgs(["url", "priceSignerPrivK", "mockPricefeedAddress"]))
         .then(() => {
             process.exit(0)

@@ -1,32 +1,34 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
 import { AbstractContract, WalletUnlocked } from "fuels"
-import { launchNode, getNodeWallets } from "./node"
-import {
-    call,
-    AddressIdentity,
-    walletToAddressIdentity,
-    expandDecimals,
-    COLLATERAL_ASSET,
-    USDC_ASSET,
-    BTC_ASSET,
-    BTC_MAX_LEVERAGE,
-    getBtcConfig,
-    getUsdcConfig,
-    getAssetId,
-} from "./utils"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import {
+    Fungible,
     FungibleFactory,
+    PricefeedWrapper,
     PricefeedWrapperFactory,
+    StorkMock,
     StorkMockFactory,
     TestnetTokenFactory,
     VaultFactory,
     SimpleProxyFactory,
     Fungible,
     Vault,
-    StorkMock,
-    PricefeedWrapper,
-} from "../types"
+    VaultFactory,
+} from "../types/index.js"
+import { getNodeWallets, launchNode } from "./node.js"
+import {
+    AddressIdentity,
+    BTC_ASSET,
+    BTC_MAX_LEVERAGE,
+    call,
+    COLLATERAL_ASSET,
+    expandDecimals,
+    getAssetId,
+    getBtcConfig,
+    getUsdcConfig,
+    USDC_ASSET,
+    walletToAddressIdentity,
+} from "./utils.js"
 
 describe("Vault.touch", () => {
     let attachedContracts: AbstractContract[]

@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
-import { WalletUnlocked, DateTime, BN } from "fuels"
-import { launchNode, getNodeWallets } from "./node"
-import { call, BTC_ASSET, USDC_ASSET, ETH_ASSET } from "./utils"
+import { BN, DateTime, WalletUnlocked } from "fuels"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import { PricefeedWrapper, StorkMock, PricefeedWrapperFactory, StorkMockFactory } from "../types"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { PricefeedWrapper, PricefeedWrapperFactory, StorkMock, StorkMockFactory } from "../types/index.js"
+import { getNodeWallets, launchNode } from "./node.js"
+import { BTC_ASSET, call, ETH_ASSET, USDC_ASSET } from "./utils.js"
 
 function toPrice(value: number, decimals: number = 9): string {
     const v = BigInt(value) * BigInt(10) ** BigInt(decimals)
