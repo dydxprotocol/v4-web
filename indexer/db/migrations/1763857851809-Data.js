@@ -1,5 +1,5 @@
 // NON GENERATED MIGRATION
-module.exports = class Data1763857851809 {
+export class Data1763857851809 {
   name = 'Data1763857851809';
 
   async up(db) {
@@ -34,4 +34,4 @@ EXECUTE FUNCTION current_price_update()`);
     await db.query(`DROP FUNCTION current_price_update()`);
     await db.query(`DROP TABLE "current_price"`);
   }
-};
+}

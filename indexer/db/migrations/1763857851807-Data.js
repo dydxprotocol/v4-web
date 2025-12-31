@@ -1,4 +1,4 @@
-module.exports = class Data1763857851807 {
+export class Data1763857851807 {
   name = 'Data1763857851807';
 
   async up(db) {

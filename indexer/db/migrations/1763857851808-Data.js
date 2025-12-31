@@ -1,5 +1,5 @@
 // NON GENERATED MIGRATION
-module.exports = class Data1763857851808 {
+export class Data1763857851808 {
   name = 'Data1763857851808';
 
   async up(db) {
@@ -37,4 +37,4 @@ module.exports = class Data1763857851808 {
     await db.query(`DROP VIEW "candle_d1"`);
     await db.query(`DROP INDEX "public"."IDX_price_asset_timestamp"`);
   }
-};
+}
