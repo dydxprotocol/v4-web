@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-import { cpSync } from 'fs';
+import { cpSync } from "fs"
 
-cpSync('contracts/core/vault/src/', 'contracts/vault-expose/src/', { recursive: true });
+cpSync("contracts/core/vault/src/", "contracts/vault-expose/src/", { recursive: true })

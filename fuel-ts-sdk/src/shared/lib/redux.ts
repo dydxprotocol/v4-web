@@ -1,6 +1,5 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-
-import { tradingReducer, type TradingThunkExtras } from '@/trading/di';
+import { type TradingThunkExtras, tradingReducer } from '@/trading/di';
 
 export type RequestStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
 

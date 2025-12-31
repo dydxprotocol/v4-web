@@ -295,7 +295,7 @@ importers:
         version: 9.39.1
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^4.3.0
-        version: 4.3.0(prettier@3.7.4)
+        version: 4.3.0(prettier@3.4.2)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1
@@ -312,11 +312,11 @@ importers:
         specifier: ^8.6.6
         version: 8.6.6
       prettier:
-        specifier: ^3.2.5
-        version: 3.7.4
+        specifier: ^3.4.2
+        version: 3.4.2
       prettier-plugin-tailwindcss:
         specifier: ^0.6.5
-        version: 0.6.5(@trivago/prettier-plugin-sort-imports@4.3.0)(prettier@3.7.4)
+        version: 0.6.5(@trivago/prettier-plugin-sort-imports@4.3.0)(prettier@3.4.2)
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
@@ -8617,7 +8617,7 @@ packages:
       - supports-color
     dev: true
 
-  /@trivago/prettier-plugin-sort-imports@4.3.0(prettier@3.7.4):
+  /@trivago/prettier-plugin-sort-imports@4.3.0(prettier@3.4.2):
     resolution: {integrity: sha512-r3n0onD3BTOVUNPhR4lhVK4/pABGpbA7bW3eumZnYdKaHkf1qEC+Mag6DPbGNuuh0eG8AaYj+YqmVHSiGslaTQ==}
     peerDependencies:
       '@vue/compiler-sfc': 3.x
@@ -8632,7 +8632,7 @@ packages:
       '@babel/types': 7.17.0
       javascript-natural-sort: 0.7.1
       lodash: 4.17.21
-      prettier: 3.7.4
+      prettier: 3.4.2
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8835,7 +8835,6 @@ packages:
 
   /@types/node@20.3.1:
     resolution: {integrity: sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==}
-    dev: true
 
   /@types/node@22.7.5:
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
@@ -9365,7 +9364,7 @@ packages:
       '@vitest/spy': 3.0.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
-      vite: 5.4.21(@types/node@22.7.5)
+      vite: 5.4.21(@types/node@25.0.3)
 
   /@vitest/pretty-format@3.0.9:
     resolution: {integrity: sha512-OW9F8t2J3AwFEwENg3yMyKWweF7oRJlMyHOMIhO5F3n0+cgQAJZBjNgrF8dLwFTEXl5jUqBLXd9QyyKv8zEcmA==}
@@ -14886,7 +14885,7 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-tailwindcss@0.6.5(@trivago/prettier-plugin-sort-imports@4.3.0)(prettier@3.7.4):
+  /prettier-plugin-tailwindcss@0.6.5(@trivago/prettier-plugin-sort-imports@4.3.0)(prettier@3.4.2):
     resolution: {integrity: sha512-axfeOArc/RiGHjOIy9HytehlC0ZLeMaqY09mm8YCkMzznKiDkwFzOpBvtuhuv3xG5qB73+Mj7OCe2j/L1ryfuQ==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
@@ -14938,13 +14937,19 @@ packages:
       prettier-plugin-svelte:
         optional: true
     dependencies:
-      '@trivago/prettier-plugin-sort-imports': 4.3.0(prettier@3.7.4)
-      prettier: 3.7.4
+      '@trivago/prettier-plugin-sort-imports': 4.3.0(prettier@3.4.2)
+      prettier: 3.4.2
     dev: true
 
   /prettier@3.1.0:
     resolution: {integrity: sha512-TQLvXjq5IAibjh8EpBIkNKxO749UEWABoiIZehEPiY4GNpVdhaFKqSTu+QrlU6D2dPAfubRmtJTi4K4YkQ5eXw==}
     engines: {node: '>=14'}
+    dev: true
+
+  /prettier@3.4.2:
+    resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /prettier@3.7.4:
@@ -16889,7 +16894,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
 
   /vite-node@3.0.9(@types/node@22.7.5):
     resolution: {integrity: sha512-w3Gdx7jDcuT9cNn9jExXgOyKmf5UOTb6WMHz8LGAm54eS1Elf5OuBhCxl6zJxGhEeIkgsE1WbHuoL0mj/UXqXg==}
@@ -17072,7 +17076,6 @@ packages:
       rollup: 4.53.3
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /vite@5.4.21(@types/node@22.7.5):
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
@@ -17111,6 +17114,7 @@ packages:
       rollup: 4.53.3
     optionalDependencies:
       fsevents: 2.3.3
+    dev: false
 
   /vite@5.4.21(@types/node@24.10.1):
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
@@ -17260,7 +17264,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
 
   /vitest@1.4.0(@types/node@22.7.5)(jsdom@24.1.0):
     resolution: {integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw==}

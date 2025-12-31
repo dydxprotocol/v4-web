@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/refs */
-import { getEnv } from '@/lib/env';
+import { type PropsWithChildren, useRef } from 'react';
 import { createStarboardClient } from 'fuel-ts-sdk/client';
-import { useRef, type PropsWithChildren } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
+import { getEnv } from '@/lib/env';
 import type { FuelTsSdkContextType } from './fuel-ts-sdk.context';
 import { FuelTsSdkContext } from './fuel-ts-sdk.context';
 

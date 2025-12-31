@@ -54,4 +54,4 @@ export class Data1763857851807 {
     await db.query(`DROP INDEX "public"."IDX_563a960fee18d232545cb34566"`);
     await db.query(`ALTER TABLE "position" DROP CONSTRAINT "FK_3306a154148b37f510ef9e5daf4"`);
   }
-};
+}

@@ -1,7 +1,6 @@
 import SimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
 import * as PgAggregatesPlugin from '@graphile/pg-aggregates';
 import * as PgPubsubModule from '@graphile/pg-pubsub';
-const PgPubsub = (PgPubsubModule as any).default || PgPubsubModule;
 import cors from 'cors';
 import express from 'express';
 import { NodePlugin } from 'graphile-build';
@@ -15,6 +14,8 @@ import {
   embed,
 } from 'postgraphile';
 import FilterPlugin from 'postgraphile-plugin-connection-filter';
+
+const PgPubsub = (PgPubsubModule as any).default || PgPubsubModule;
 
 const app = express();
 
