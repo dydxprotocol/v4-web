@@ -4,47 +4,68 @@ import type { Address, AssetId } from '@/shared/types';
 import { address, assetId, positionId } from '@/shared/types';
 import type { GetPositionsOptions, Position } from '../../../domain';
 import { PositionKeySchema, PositionSchema } from '../../../domain';
-import { GET_POSITIONS_QUERY } from './get-positions.query';
+import { GET_POSITIONS_QUERY, GET_POSITION_KEYS_BY_ACCOUNT } from './get-positions.gql';
 
 export const getPositions =
   (client: GraphQLClient) =>
   async (options: GetPositionsOptions = {}): Promise<Position[]> => {
-    const { limit = 100, offset = 0, orderBy = 'timestamp_DESC' } = options;
+    const { limit = 100, offset = 0, orderBy = 'TIMESTAMP_DESC', account } = options;
 
-    const where = buildWhereClause(options);
+    // If filtering by account only, first get position key IDs for that account
+    let positionKeyIds: string[] | undefined;
+    if (account && !options.indexAssetId && options.isLong === undefined) {
+      const keysData = await client.request<{ positionKeys: { nodes: { id: string }[] } }>(
+        GET_POSITION_KEYS_BY_ACCOUNT,
+        { account }
+      );
+      positionKeyIds = keysData.positionKeys.nodes.map((k) => k.id);
 
-    const data = await client.request<{ positions: GraphQLPosition[] }>(GET_POSITIONS_QUERY, {
-      limit,
-      offset,
-      where,
-      orderBy: [orderBy],
-    });
+      // If no position keys found, return empty array
+      if (positionKeyIds.length === 0) {
+        return [];
+      }
+    }
 
-    return data.positions.map(toDomainPosition);
+    const where = buildWhereClause(options, positionKeyIds);
+
+    const data = await client.request<{ positions: { nodes: GraphQLPosition[] } }>(
+      GET_POSITIONS_QUERY,
+      {
+        limit,
+        offset,
+        where,
+        orderBy: [orderBy],
+      }
+    );
+
+    return data.positions.nodes.map(toDomainPosition);
   };
 
 interface PositionWhereClause {
-  positionKey?: {
-    account_eq?: Address;
-    indexAssetId_eq?: AssetId;
-    isLong_eq?: boolean;
-  };
-  latest_eq?: boolean;
+  positionKeyId?: { equalTo?: string; in?: string[] };
+  latest?: { equalTo?: boolean };
 }
 
-function buildWhereClause(options: GetPositionsOptions) {
+function buildPositionKeyId(account: Address, indexAssetId: AssetId, isLong: boolean): string {
+  // Position key format: account-indexAssetId-isLong
+  return `${account}-${indexAssetId}-${isLong}`;
+}
+
+function buildWhereClause(options: GetPositionsOptions, positionKeyIds?: string[]) {
   const { account, indexAssetId, isLong, latestOnly } = options;
 
   const where: PositionWhereClause = {};
 
-  if (account || indexAssetId || isLong !== undefined) {
-    where.positionKey = {};
-    if (account) where.positionKey.account_eq = account;
-    if (indexAssetId) where.positionKey.indexAssetId_eq = indexAssetId;
-    if (isLong !== undefined) where.positionKey.isLong_eq = isLong;
+  // If we have position key IDs from the account query, filter by those
+  if (positionKeyIds && positionKeyIds.length > 0) {
+    where.positionKeyId = { in: positionKeyIds };
+  }
+  // Otherwise filter by full positionKeyId if we have all three components
+  else if (account && indexAssetId && isLong !== undefined) {
+    where.positionKeyId = { equalTo: buildPositionKeyId(account, indexAssetId, isLong) };
   }
 
-  if (latestOnly) where.latest_eq = true;
+  if (latestOnly) where.latest = { equalTo: true };
 
   return Object.keys(where).length > 0 ? where : undefined;
 }
