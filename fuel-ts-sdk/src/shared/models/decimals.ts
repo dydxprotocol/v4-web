@@ -6,7 +6,7 @@ export class OraclePrice extends DecimalValue {
 }
 export class UsdValue extends DecimalValue {
   declare __brand: typeof UsdValue;
-  static decimals = 15n as const;
+  static decimals = 9n as const;
 }
 export class PercentageMultiplier extends DecimalValue {
   declare __brand: typeof PercentageMultiplier;
