@@ -6,12 +6,12 @@ import express from 'express';
 import { NodePlugin } from 'graphile-build';
 import type * as pg from 'pg';
 import {
+  Plugin,
+  embed,
   gql,
   makeExtendSchemaPlugin,
-  postgraphile,
-  Plugin,
   makePluginHook,
-  embed,
+  postgraphile,
 } from 'postgraphile';
 import FilterPlugin from 'postgraphile-plugin-connection-filter';
 
