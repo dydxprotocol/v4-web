@@ -6,18 +6,20 @@ import * as Markets from './src/markets';
 import * as Positions from './src/positions';
 
 export const tradingReducer = combineReducers({
-  markets: Markets.marketsReducer,
-  positions: Positions.positionsReducer,
+  ...Markets.marketsReducer,
+  ...Positions.positionsReducer,
 });
 
 export const createTradingModule = (graphqlClient: GraphQLClient) => {
   return {
     getThunkExtras: (): TradingThunkExtras => ({
-      assetPriceRepository: Markets.adapters.createGraphQLAssetPriceRepository(graphqlClient),
-      candleRepository: Markets.adapters.createGraphQLCandleRepository(graphqlClient),
-      marketConfigRepository: Markets.adapters.createGraphQLMarketConfigRepository(graphqlClient),
-
-      positionRepository: Positions.adapters.createGraphQLPositionRepository(graphqlClient),
+      assetPriceRepository:
+        Markets.marketsAdapters.createGraphQLAssetPriceRepository(graphqlClient),
+      marketConfigRepository:
+        Markets.marketsAdapters.createGraphQLMarketConfigRepository(graphqlClient),
+      candleRepository: Markets.marketsAdapters.createGraphQLCandleRepository(graphqlClient),
+      positionRepository:
+        Positions.positionsAdapters.createGraphQLPositionRepository(graphqlClient),
     }),
     createCommandsAndQueries: (storeService: StoreService) => {
       const positionCommands = Positions.createPositionCommands(storeService);
