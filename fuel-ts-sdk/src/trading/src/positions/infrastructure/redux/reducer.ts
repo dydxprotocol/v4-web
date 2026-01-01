@@ -1,6 +1,9 @@
-import * as positions from './positions';
+import { positionsApi } from './positions';
 
-export const { positionsReducer } = positions.slice;
-export type PositionsThunkExtra = positions.thunks.PositionsThunkExtra;
+export type { PositionsThunkExtra } from './positions';
 
-export { positions };
+export const positionsReducer = {
+  [positionsApi.reducerPath]: positionsApi.reducer,
+};
+
+export const positionsMiddleware = [positionsApi.middleware];

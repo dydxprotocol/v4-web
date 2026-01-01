@@ -4,7 +4,6 @@ import { calculateNotional } from './calculate-notional';
 import { calculatePositionHealth } from './calculate-position-health';
 import { calculateUnrealizedPnl } from './calculate-unrealized-pnl';
 import { calculateUnrealizedPnlPercent } from './calculate-unrealized-pnl-percent';
-import { createGetPositionById } from './get-position-by-id';
 import { createGetAccountPositions } from './get-positions-by-address';
 
 export const createPositionQueries = (storeService: StoreService) => ({
@@ -13,7 +12,6 @@ export const createPositionQueries = (storeService: StoreService) => ({
   calculateUnrealizedPnlPercent,
   calculateLeverage,
   calculatePositionHealth,
-  getPositionById: createGetPositionById(storeService),
   getAccountPositions: createGetAccountPositions(storeService),
 });
 

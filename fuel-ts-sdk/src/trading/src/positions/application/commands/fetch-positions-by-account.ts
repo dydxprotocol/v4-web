@@ -1,8 +1,7 @@
 import type { StoreService } from '@/shared/lib/store-service';
 import type { Address } from '@/shared/types';
-import { positions } from '../../infrastructure';
+import { positionsApi } from '../../infrastructure';
 
-export const createFetchPositionsByAccountCommand =
-  (store: StoreService) => async (account: Address) => {
-    await store.dispatch(positions.thunks.fetchPositionsByAccount(account)).unwrap();
-  };
+export const createFetchPositionsByAccount = (store: StoreService) => async (address: Address) => {
+  await store.dispatch(positionsApi.endpoints.getPositions.initiate({ address })).unwrap();
+};

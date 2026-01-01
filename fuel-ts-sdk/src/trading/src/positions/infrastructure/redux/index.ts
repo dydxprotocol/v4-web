@@ -1,2 +1,2 @@
-export * from './positions/positions.selectors';
+export * from './positions';
 export * from './reducer';
