@@ -30,11 +30,9 @@ export const FormLabel: FC<FormLabelProps> = ({ children, ...props }) => {
 
 type FormInputProps = InputHTMLAttributes<HTMLInputElement>;
 
-export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
-  ({ ...props }, ref) => {
-    return <input ref={ref} css={css.input} {...props} />;
-  }
-);
+export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(({ ...props }, ref) => {
+  return <input ref={ref} css={css.input} {...props} />;
+});
 
 FormInput.displayName = 'FormInput';
 
