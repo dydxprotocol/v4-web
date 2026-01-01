@@ -1,18 +1,18 @@
-import { render } from '@testing-library/react'
-import type { RenderOptions } from '@testing-library/react'
-import type { ReactElement, ReactNode } from 'react'
-import { BrowserRouter } from 'react-router'
+import type { ReactElement, ReactNode } from 'react';
+import { BrowserRouter } from 'react-router';
+import { render } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
 
 interface AllTheProvidersProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 function AllTheProviders({ children }: AllTheProvidersProps) {
-  return <BrowserRouter>{children}</BrowserRouter>
+  return <BrowserRouter>{children}</BrowserRouter>;
 }
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
-  render(ui, { wrapper: AllTheProviders, ...options })
+  render(ui, { wrapper: AllTheProviders, ...options });
 
-export * from '@testing-library/react'
-export { customRender as render }
+export * from '@testing-library/react';
+export { customRender as render };
