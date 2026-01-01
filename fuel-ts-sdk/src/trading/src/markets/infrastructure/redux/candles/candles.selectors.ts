@@ -1,26 +1,20 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { memoize } from 'lodash';
 import type { RootState } from '@/shared/lib/redux';
-import type { AssetId } from '@/shared/types';
+import { type AssetId } from '@/shared/types';
 import type { CandleInterval } from '../../../domain';
-import { candlesAdapter } from './candles.types';
+import { candlesApi } from './candles.api';
 
-const selectCandlesState = (state: RootState) => state.trading.markets.candles;
-
-const selectors = candlesAdapter.getSelectors(selectCandlesState);
-
-export const selectAllCandles = selectors.selectAll;
-
-export const selectCandlesFetchStatus = createSelector(
-  [selectCandlesState],
-  (state) => state.fetchStatus
+const selectGetCandlesEndpointState = memoize(
+  (state: RootState, asset: AssetId, interval: CandleInterval, limit = 100) =>
+    candlesApi.endpoints.getCandles.select({ asset, interval, limit })(state)
 );
 
-export const selectCandlesError = createSelector([selectCandlesState], (state) => state.error);
-
-export const selectCandlesByAssetAndInterval = memoize((asset: AssetId, interval: CandleInterval) =>
-  createSelector(
-    [selectAllCandles],
-    (candles) => candles.filter((c) => c.asset === asset && c.interval === interval) ?? []
-  )
+export const selectCandlesByAssetAndInterval = createSelector(
+  [selectGetCandlesEndpointState],
+  (state) => state.data ?? []
+);
+export const selectCandlesFetchStatus = createSelector(
+  [selectGetCandlesEndpointState],
+  (state) => state.status
 );
