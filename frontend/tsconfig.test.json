@@ -30,5 +30,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*", "plugins/**/*"]
+  "include": ["src/**/*", "plugins/**/*", "vitest-env.d.ts"]
 }
