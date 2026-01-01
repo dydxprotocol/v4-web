@@ -6,5 +6,5 @@ import { candles } from '../../infrastructure';
 export const createFetchCandlesCommand =
   (store: StoreService) =>
   async (asset: AssetId, interval: CandleInterval, limit = 100) => {
-    await store.dispatch(candles.thunks.fetchCandles({ asset, interval, limit })).unwrap();
+    await store.dispatch(candles.api.endpoints.getCandles.initiate({ asset, interval, limit }));
   };

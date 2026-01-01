@@ -5,13 +5,16 @@ import type { Candle, CandleInterval } from './candles.entity';
  * Query options for fetching candles
  */
 export interface GetCandlesOptions {
-  interval: CandleInterval;
   limit?: number;
   offset?: number;
   /**
    * Filter by asset identifier.
    */
   asset?: AssetId;
+  /**
+   * Candle interval to fetch (required).
+   */
+  interval: CandleInterval;
   /**
    * Default ordering is by startedAt descending.
    */

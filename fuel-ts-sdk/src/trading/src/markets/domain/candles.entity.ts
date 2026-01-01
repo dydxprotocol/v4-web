@@ -12,6 +12,7 @@ export interface Candle {
   id: CandleId;
   asset: AssetId;
   interval: CandleInterval;
+  openPrice: bigint;
   closePrice: bigint;
   highPrice: bigint;
   lowPrice: bigint;

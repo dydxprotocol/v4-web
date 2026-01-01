@@ -8,7 +8,6 @@ import type {
   CandleM15,
   CandleM30,
 } from '@/generated/graphql';
-import type { AssetId } from '@/shared/types';
 import { assetId, candleId } from '@/shared/types';
 import type { CandleInterval, GetCandlesOptions } from '../../../domain';
 import { type Candle, CandleSchema } from '../../../domain';
@@ -24,14 +23,37 @@ import {
 
 type GraphQLCandle = CandleD1 | CandleH1 | CandleH4 | CandleM1 | CandleM5 | CandleM15 | CandleM30;
 
+// Map intervals to their corresponding queries
+const intervalQueryMap: Record<CandleInterval, string> = {
+  M1: GET_CANDLES_M1_QUERY,
+  M5: GET_CANDLES_M5_QUERY,
+  M15: GET_CANDLES_M15_QUERY,
+  M30: GET_CANDLES_M30_QUERY,
+  H1: GET_CANDLES_H1_QUERY,
+  H4: GET_CANDLES_H4_QUERY,
+  D1: GET_CANDLES_D1_QUERY,
+};
+
+// Map intervals to their corresponding GraphQL response field names
+const intervalFieldMap: Record<CandleInterval, string> = {
+  M1: 'candleM1s',
+  M5: 'candleM5s',
+  M15: 'candleM15s',
+  M30: 'candleM30s',
+  H1: 'candleH1s',
+  H4: 'candleH4s',
+  D1: 'candleD1s',
+};
+
 export const getCandles =
   (client: GraphQLClient) =>
   async (options: GetCandlesOptions): Promise<Candle[]> => {
-    const { interval, limit = 100, offset = 0, orderBy = 'STARTED_AT_DESC' } = options;
+    const { limit, offset = 0, orderBy = 'STARTED_AT_DESC', asset, interval } = options;
 
-    const where = buildWhereClause(options);
-    const query = getQueryForInterval(interval);
-    const queryField = getQueryFieldForInterval(interval);
+    const query = intervalQueryMap[interval];
+    const fieldName = intervalFieldMap[interval];
+
+    const where = asset ? { asset: { equalTo: asset } } : undefined;
 
     const data = await client.request<Record<string, { nodes: GraphQLCandle[] }>>(query, {
       limit,
@@ -40,75 +62,31 @@ export const getCandles =
       orderBy: [orderBy],
     });
 
-    const candles = data[queryField]?.nodes || [];
-    return candles.map((gql) => toDomainCandle(gql, interval));
+    const nodes = data[fieldName]?.nodes || [];
+    return mapCandlesWithOpen(nodes, interval);
   };
 
-function getQueryForInterval(interval: CandleInterval) {
-  switch (interval) {
-    case 'D1':
-      return GET_CANDLES_D1_QUERY;
-    case 'H1':
-      return GET_CANDLES_H1_QUERY;
-    case 'H4':
-      return GET_CANDLES_H4_QUERY;
-    case 'M1':
-      return GET_CANDLES_M1_QUERY;
-    case 'M5':
-      return GET_CANDLES_M5_QUERY;
-    case 'M15':
-      return GET_CANDLES_M15_QUERY;
-    case 'M30':
-      return GET_CANDLES_M30_QUERY;
-  }
-}
+function mapCandlesWithOpen(gqlCandles: GraphQLCandle[], interval: CandleInterval): Candle[] {
+  // Since candles are ordered DESC by startedAt, we need to reverse to calculate opens
+  const sorted = [...gqlCandles].reverse();
 
-function getQueryFieldForInterval(interval: CandleInterval): string {
-  switch (interval) {
-    case 'D1':
-      return 'candleD1s';
-    case 'H1':
-      return 'candleH1s';
-    case 'H4':
-      return 'candleH4s';
-    case 'M1':
-      return 'candleM1s';
-    case 'M5':
-      return 'candleM5s';
-    case 'M15':
-      return 'candleM15s';
-    case 'M30':
-      return 'candleM30s';
-  }
-}
+  return sorted.map((gql, index) => {
+    const asset = assetId(gql.asset);
+    const id = candleId(`${asset}-${interval}-${gql.startedAt}`);
 
-interface CandleWhereClause {
-  asset_eq?: AssetId;
-}
+    // Use previous candle's close as this candle's open
+    // For the first candle, use its own close as open (will appear flat)
+    const openPrice = index > 0 ? BigInt(sorted[index - 1].closePrice) : BigInt(gql.closePrice);
 
-function buildWhereClause(options: GetCandlesOptions) {
-  const { asset } = options;
-
-  const where: CandleWhereClause = {};
-
-  if (asset) {
-    where.asset_eq = asset;
-  }
-
-  return Object.keys(where).length > 0 ? where : undefined;
-}
-
-function toDomainCandle(gql: GraphQLCandle, interval: CandleInterval): Candle {
-  const asset = assetId(gql.asset);
-  const id = candleId(`${asset}-${interval}-${gql.startedAt}`);
-
-  return CandleSchema.parse({
-    id,
-    asset,
-    interval,
-    closePrice: BigInt(gql.closePrice),
-    highPrice: BigInt(gql.highPrice),
-    lowPrice: BigInt(gql.lowPrice),
-    startedAt: gql.startedAt,
+    return CandleSchema.parse({
+      id,
+      asset,
+      interval,
+      openPrice,
+      closePrice: BigInt(gql.closePrice),
+      highPrice: BigInt(gql.highPrice),
+      lowPrice: BigInt(gql.lowPrice),
+      startedAt: gql.startedAt,
+    });
   });
 }

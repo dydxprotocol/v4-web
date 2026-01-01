@@ -6,6 +6,7 @@ export const CandleSchema = z.object({
   id: CandleIdSchema,
   asset: AssetIdSchema,
   interval: z.enum(['D1', 'H1', 'H4', 'M1', 'M5', 'M15', 'M30']),
+  openPrice: z.bigint(),
   closePrice: z.bigint(),
   highPrice: z.bigint(),
   lowPrice: z.bigint(),
