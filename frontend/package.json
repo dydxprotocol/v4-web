@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "postinstall": "[ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true"
+    "postinstall": "npm run generate-env && ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true)",
+    "generate-env": "node scripts/generate-env.js"
   },
   "dependencies": {
     "@react-router/node": "^7.11.0",
