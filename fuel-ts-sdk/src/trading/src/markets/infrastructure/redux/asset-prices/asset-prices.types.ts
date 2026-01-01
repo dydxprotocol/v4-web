@@ -9,7 +9,7 @@ export const assetPricesAdapter = createEntityAdapter<AssetPrice, AssetPriceId>(
 });
 
 export const assetPricesInitialState = assetPricesAdapter.getInitialState<LoadableMixin>({
-  fetchStatus: 'idle',
+  fetchStatus: 'uninitialized',
   error: null,
 });
 

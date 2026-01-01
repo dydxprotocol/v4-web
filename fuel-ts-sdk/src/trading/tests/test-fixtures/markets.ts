@@ -40,6 +40,7 @@ export function createTestCandle(overrides: Partial<Candle> = {}): Candle {
     asset: assetId('0xbtc'),
     interval: 'M15' as const,
     startedAt: baseTime,
+    openPrice: 50000n,
     closePrice: 50500n,
     highPrice: 51000n,
     lowPrice: 49000n,

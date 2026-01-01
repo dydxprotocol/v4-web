@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { PositionChange } from '@/generated/graphql';
 import { CollateralAmount } from '@/shared/models/decimals';
-import { AddressSchema, AssetIdSchema, PositionIdSchema } from '@/shared/types';
+import {
+  AddressSchema,
+  AssetIdSchema,
+  PositionRevisionIdSchema,
+  PositionStableIdSchema,
+} from '@/shared/types';
 import { decimalValueSchema } from '@/shared/utils/decimalCalculator/utils/zod';
 import {
   FundingRate,
@@ -19,13 +24,14 @@ const PnlDeltaSchema = decimalValueSchema(PnlDelta);
 const RealizedPnlSchema = decimalValueSchema(RealizedPnl);
 
 export const PositionKeySchema = z.object({
+  id: PositionStableIdSchema,
   account: AddressSchema,
   indexAssetId: AssetIdSchema,
   isLong: z.boolean(),
 });
 
 export const PositionSchema = z.object({
-  id: PositionIdSchema,
+  revisionId: PositionRevisionIdSchema,
   positionKey: PositionKeySchema,
   collateralAmount: CollateralAmountSchema,
   size: PositionSizeSchema,

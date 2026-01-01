@@ -1,4 +1,4 @@
-import type { Address, AssetId } from '@/shared/types';
+import type { Address, AssetId, PositionStableId } from '@/shared/types';
 import type { Position } from './positions.entity';
 
 /**
@@ -18,12 +18,6 @@ export interface GetPositionsOptions {
  * PositionRepository - Port (interface) defining position data access contract
  */
 export interface PositionRepository {
-  getPositions(options?: GetPositionsOptions): Promise<Position[]>;
+  getPositionsByStableId(stableId: PositionStableId, latestOnly?: boolean): Promise<Position[]>;
   getPositionsByAccount(account: Address, latestOnly?: boolean): Promise<Position[]>;
-  getPositionsByAsset(
-    indexAssetId: AssetId,
-    isLong?: boolean,
-    latestOnly?: boolean
-  ): Promise<Position[]>;
-  getCurrentPositions(account: Address): Promise<Position[]>;
 }

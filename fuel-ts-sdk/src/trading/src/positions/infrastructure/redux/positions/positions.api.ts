@@ -1,22 +1,18 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query';
-import type { Address } from '@/shared/types';
-import type { Position, PositionRepository } from '../../../domain';
-
-export interface GetPositionsArgs {
-  address: Address;
-}
+import type { Address, PositionStableId } from '@/shared/types';
+import type { PositionRepository } from '../../../domain';
 
 export const positionsApi = createApi({
   reducerPath: 'positionsApi',
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['Positions'],
+  tagTypes: ['positions-by-address', 'positions-by-stable-id'],
   endpoints: (builder) => ({
-    getPositions: builder.query<Position[], GetPositionsArgs>({
-      async queryFn(args, api) {
+    getPositionsByAddress: builder.query({
+      async queryFn(address: Address, api) {
         try {
           const { positionRepository } = api.extra as PositionsThunkExtra;
-          const data = await positionRepository.getPositionsByAccount(args.address);
-          return { data };
+          const result = await positionRepository.getPositionsByAccount(address);
+          return { data: result ?? [] };
         } catch (error) {
           return {
             error: {
@@ -26,7 +22,24 @@ export const positionsApi = createApi({
           };
         }
       },
-      providesTags: (_result, _error, args) => [{ type: 'Positions', id: args.address }],
+      providesTags: (_result, _error, arg) => [{ type: 'positions-by-address', id: arg }],
+    }),
+    getPositionsByStableId: builder.query({
+      async queryFn(stableId: PositionStableId, api) {
+        try {
+          const { positionRepository } = api.extra as PositionsThunkExtra;
+          const result = await positionRepository.getPositionsByStableId(stableId);
+          return { data: result ?? [] };
+        } catch (error) {
+          return {
+            error: {
+              status: 'CUSTOM_ERROR',
+              error: error instanceof Error ? error.message : 'Unknown error',
+            },
+          };
+        }
+      },
+      providesTags: (_result, _error, arg) => [{ type: 'positions-by-stable-id', id: arg }],
     }),
   }),
 });

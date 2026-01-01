@@ -9,7 +9,7 @@ export const marketConfigsAdapter = createEntityAdapter<MarketConfig, MarketConf
 });
 
 export const marketConfigsInitialState = marketConfigsAdapter.getInitialState<LoadableMixin>({
-  fetchStatus: 'idle',
+  fetchStatus: 'uninitialized',
   error: null,
 });
 

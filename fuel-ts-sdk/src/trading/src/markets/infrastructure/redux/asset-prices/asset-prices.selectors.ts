@@ -4,7 +4,7 @@ import type { RootState } from '@/shared/lib/redux';
 import type { AssetId } from '@/shared/types';
 import { assetPricesAdapter } from './asset-prices.types';
 
-const selectAssetPricesState = (state: RootState) => state.trading.markets.assetPrices;
+const selectAssetPricesState = (state: RootState) => state.markets.assetPrices;
 
 const selectors = assetPricesAdapter.getSelectors(selectAssetPricesState);
 

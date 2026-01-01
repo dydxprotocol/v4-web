@@ -23,16 +23,32 @@ export const safeAssetId = (str?: string): AssetId | undefined => {
 };
 
 /**
- * PositionId - Unique position identifier
+ * PositionStableId - Unique position identifier (permanent ID across all revisions)
  */
-export const PositionIdSchema = z
+export const PositionStableIdSchema = z
   .string()
-  .min(1, 'Position ID cannot be empty')
-  .brand<'PositionId'>();
-export type PositionId = z.infer<typeof PositionIdSchema>;
-export const positionId = (str?: string): PositionId => PositionIdSchema.parse(str);
-export const safePositionId = (str?: string): PositionId | undefined => {
-  const result = PositionIdSchema.safeParse(str);
+  .min(1, 'Position Stable ID cannot be empty')
+  .brand<'PositionStableId'>();
+export type PositionStableId = z.infer<typeof PositionStableIdSchema>;
+export const positionStableId = (str?: string): PositionStableId =>
+  PositionStableIdSchema.parse(str);
+export const safePositionStableId = (str?: string): PositionStableId | undefined => {
+  const result = PositionStableIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
+ * PositionRevisionId - Unique position revision identifier (snapshot/version ID)
+ */
+export const PositionRevisionIdSchema = z
+  .string()
+  .min(1, 'Position Revision ID cannot be empty')
+  .brand<'PositionRevisionId'>();
+export type PositionRevisionId = z.infer<typeof PositionRevisionIdSchema>;
+export const positionRevisionId = (str?: string): PositionRevisionId =>
+  PositionRevisionIdSchema.parse(str);
+export const safePositionRevisionId = (str?: string): PositionRevisionId | undefined => {
+  const result = PositionRevisionIdSchema.safeParse(str);
   return result.success ? result.data : undefined;
 };
 
