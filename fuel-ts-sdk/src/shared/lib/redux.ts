@@ -1,7 +1,8 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import { marketsMiddleware, positionsMiddleware } from '@/trading';
 import { type TradingThunkExtras, tradingReducer } from '@/trading/di';
 
-export type RequestStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
+export type RequestStatus = 'uninitialized' | 'pending' | 'fulfilled' | 'rejected';
 
 /**
  * Loadable - Wraps data with loading state
@@ -42,16 +43,16 @@ const serializeForDevTools = (state: any): any => {
 
 export const createStore = (extraArgument: StoreThunkExtraArgument) => {
   return configureStore({
-    reducer: combineReducers({
-      trading: tradingReducer,
-    }),
+    reducer: tradingReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         thunk: {
           extraArgument,
         },
         serializableCheck: false,
-      }),
+      })
+        .concat(marketsMiddleware)
+        .concat(positionsMiddleware),
     devTools: {
       name: 'Starboard',
       trace: true,

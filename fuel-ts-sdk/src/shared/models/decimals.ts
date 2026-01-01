@@ -24,3 +24,19 @@ export class CollateralAmount extends DecimalValue {
   declare __brand: typeof CollateralAmount;
   static decimals = 9n as const;
 }
+export class Usdc extends DecimalValue {
+  declare __brand: typeof Usdc;
+  static decimals = 6n as const;
+}
+export class Btc extends DecimalValue {
+  declare __brand: typeof Btc;
+  static decimals = 9n as const;
+}
+export class Bnb extends DecimalValue {
+  declare __brand: typeof Bnb;
+  static decimals = 9n as const;
+}
+export class Eth extends DecimalValue {
+  declare __brand: typeof Eth;
+  static decimals = 9n as const;
+}
