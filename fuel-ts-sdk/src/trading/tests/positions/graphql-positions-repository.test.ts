@@ -26,10 +26,7 @@ describe('GraphQLPositionsRepository', () => {
       // Mock the first query: GetPositionKeysByAccount
       mockClient.mockResponse('GetPositionKeysByAccount', {
         positionKeys: {
-          nodes: [
-            { id: 'key-1' },
-            { id: 'key-2' },
-          ],
+          nodes: [{ id: 'key-1' }, { id: 'key-2' }],
         },
       });
 

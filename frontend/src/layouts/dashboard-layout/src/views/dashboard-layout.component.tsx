@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import { NetworkSwitchContext } from '@/contexts/network-switch/network-switch.context';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
 import { NETWORKS, type Network } from '@/models/network';
@@ -14,23 +14,38 @@ export function DashboardLayout() {
 
   return (
     <div css={styles.page}>
-      <div css={styles.container}>
-        <div css={styles.buttonContainer}>
-          {NETWORKS.map((network) => (
-            <button
-              onClick={() => switchTo(network)}
-              key={network}
-              css={currentNetwork === network ? styles.button : styles.buttonSecondary}
-            >
-              {NETWORK_DISPLAY_VALUES[network]}
-            </button>
-          ))}
+      <header css={styles.header}>
+        <div css={styles.headerLeft}>
+          <div css={styles.logo}>Starboard</div>
+          <nav css={styles.nav}>
+            <Link to="/" css={styles.navLink}>
+              Dashboard
+            </Link>
+            <Link to="/trade" css={styles.navLink}>
+              Trade
+            </Link>
+          </nav>
         </div>
 
-        <h4 css={styles.statusTitle}>Indexer URL: {networkSwitch.getCurrentNetwork()}</h4>
+        <div css={styles.networkSection}>
+          <span css={styles.networkLabel}>Network</span>
+          <div css={styles.networkSelector}>
+            {NETWORKS.map((network) => (
+              <button
+                onClick={() => switchTo(network)}
+                key={network}
+                css={currentNetwork === network ? styles.buttonActive : styles.button}
+              >
+                {NETWORK_DISPLAY_VALUES[network]}
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
 
+      <main css={styles.container}>
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }

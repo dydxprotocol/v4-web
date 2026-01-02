@@ -24,6 +24,7 @@ describe('WalletAddressForm', () => {
     const input = screen.getByPlaceholderText('0x...');
     const button = screen.getByText('Get Positions');
 
+    await user.clear(input);
     await user.type(input, '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef');
     await user.click(button);
 
@@ -41,6 +42,7 @@ describe('WalletAddressForm', () => {
     const button = screen.getByText('Get Positions');
 
     const validAddress = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+    await user.clear(input);
     await user.type(input, validAddress);
     await user.click(button);
 
@@ -58,6 +60,7 @@ describe('WalletAddressForm', () => {
     const input = screen.getByPlaceholderText('0x...');
     const button = screen.getByText('Get Positions');
 
+    await user.clear(input);
     await user.type(input, '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef');
     await user.click(button);
 

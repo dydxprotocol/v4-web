@@ -22,7 +22,11 @@ export const WalletAddressForm: FC<WalletAddressFormProps> = ({ onSubmit }) => {
   return (
     <FormGroup>
       <FormLabel>Wallet Address</FormLabel>
-      <FormInput ref={inputRef} placeholder="0x..." />
+      <FormInput
+        ref={inputRef}
+        placeholder="0x..."
+        defaultValue="0xc2833c4eae8a3b056a6f21a04d1a176780d5dc9df621270c41bec86a90c3d770"
+      />
       <FormButton onClick={handleSubmit} disabled={isLoading}>
         {isLoading ? 'Loading...' : 'Get Positions'}
       </FormButton>
