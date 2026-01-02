@@ -15,7 +15,7 @@ export const PositionsList: FC<PositionsListProps> = ({ positions }) => {
   return (
     <div css={styles.positionsContainer}>
       {positions.map((position) => (
-        <PositionCard key={position.id} position={position} />
+        <PositionCard key={position.revisionId} position={position} />
       ))}
     </div>
   );

@@ -8,7 +8,7 @@ export function Home() {
   const [queriedAddress, setQueriedAddress] = useState<Address>();
   const tradingSdk = useTradingSdk();
   const heldPositions = useSdkQuery(() =>
-    queriedAddress ? tradingSdk.getAccountPositions(queriedAddress) : []
+    queriedAddress ? tradingSdk.getAccountPositions(queriedAddress) : null
   );
 
   async function fetchPositionsByAddress(address: Address) {
@@ -22,7 +22,7 @@ export function Home() {
 
       <Card>
         <WalletAddressForm onSubmit={fetchPositionsByAddress} />
-        <PositionsList positions={heldPositions} />
+        {heldPositions && <PositionsList positions={heldPositions} />}
       </Card>
     </>
   );
