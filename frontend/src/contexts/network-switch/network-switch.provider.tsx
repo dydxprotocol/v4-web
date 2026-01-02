@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { getEnv } from '@/lib/env';
+import { getDefaultNetwork } from '@/lib/env';
+import type { Network } from '@/models/network';
 import type { NetworkSwitchContextType } from './network-switch.context';
 import { NetworkSwitchContext } from './network-switch.context';
 
@@ -11,14 +12,14 @@ type NetworkSwitchContextProviderProps = {
 export const NetworkSwitchContextProvider: FC<NetworkSwitchContextProviderProps> = ({
   children,
 }) => {
-  const [indexerUrl, setIndexerUrl] = useState(getEnv('VITE_INDEXER_URL'));
+  const [currentNetwork, setCurrentNetwork] = useState<Network>(getDefaultNetwork());
 
   const contextValue = useMemo<NetworkSwitchContextType>(
     () => ({
-      changeNetworkUrl: setIndexerUrl,
-      getNetworkUrl: () => indexerUrl,
+      changeNetwork: setCurrentNetwork,
+      getCurrentNetwork: () => currentNetwork,
     }),
-    [indexerUrl]
+    [currentNetwork]
   );
 
   const childrenMemoized = useMemo(() => children(contextValue), [children, contextValue]);
