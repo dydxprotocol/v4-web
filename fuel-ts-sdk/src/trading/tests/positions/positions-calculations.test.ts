@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { positionId } from '@/shared/types';
+import { positionRevisionId } from '@/shared/types';
 import { PositionChange, PositionSide, PositionStatus } from '@/trading/src/positions/domain';
 import {
   calculateEntryPrice,
@@ -109,16 +109,16 @@ describe('Position Calculations', () => {
   describe('filterOpenPositions', () => {
     it('should filter only open positions', () => {
       const positions = [
-        createOpenLongPosition({ id: positionId('pos-1') }),
-        createClosedPosition({ id: positionId('pos-2') }),
-        createOpenShortPosition({ id: positionId('pos-3') }),
-        createClosedPosition({ id: positionId('pos-4') }),
+        createOpenLongPosition({ revisionId: positionRevisionId('pos-1') }),
+        createClosedPosition({ revisionId: positionRevisionId('pos-2') }),
+        createOpenShortPosition({ revisionId: positionRevisionId('pos-3') }),
+        createClosedPosition({ revisionId: positionRevisionId('pos-4') }),
       ];
 
       const openPositions = filterOpenPositions(positions);
 
       expect(openPositions).toHaveLength(2);
-      expect(openPositions.map((p) => p.id)).toEqual(['pos-1', 'pos-3']);
+      expect(openPositions.map((p) => p.revisionId)).toEqual(['pos-1', 'pos-3']);
     });
 
     it('should return empty array when no open positions', () => {
@@ -133,16 +133,16 @@ describe('Position Calculations', () => {
   describe('filterClosedPositions', () => {
     it('should filter only closed positions', () => {
       const positions = [
-        createOpenLongPosition({ id: positionId('pos-1') }),
-        createClosedPosition({ id: positionId('pos-2') }),
-        createOpenShortPosition({ id: positionId('pos-3') }),
-        createClosedPosition({ id: positionId('pos-4') }),
+        createOpenLongPosition({ revisionId: positionRevisionId('pos-1') }),
+        createClosedPosition({ revisionId: positionRevisionId('pos-2') }),
+        createOpenShortPosition({ revisionId: positionRevisionId('pos-3') }),
+        createClosedPosition({ revisionId: positionRevisionId('pos-4') }),
       ];
 
       const closedPositions = filterClosedPositions(positions);
 
       expect(closedPositions).toHaveLength(2);
-      expect(closedPositions.map((p) => p.id)).toEqual(['pos-2', 'pos-4']);
+      expect(closedPositions.map((p) => p.revisionId)).toEqual(['pos-2', 'pos-4']);
     });
 
     it('should return empty array when no closed positions', () => {

@@ -1,5 +1,5 @@
 import { CollateralAmount } from '@/shared/models/decimals';
-import { address, assetId, positionId } from '@/shared/types';
+import { address, assetId, positionRevisionId, positionStableId } from '@/shared/types';
 import type { Position } from '@/trading/src/positions/domain';
 import { PositionChange } from '@/trading/src/positions/domain';
 import {
@@ -15,8 +15,9 @@ import {
  */
 export function createTestPosition(overrides: Partial<Position> = {}): Position {
   return {
-    id: positionId('test-position-1'),
+    revisionId: positionRevisionId('test-position-revision-1'),
     positionKey: {
+      id: positionStableId('0xtest-position-stable-id'),
       account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
       indexAssetId: assetId('0xbtc'),
       isLong: true,
@@ -42,6 +43,7 @@ export function createTestPosition(overrides: Partial<Position> = {}): Position 
 export function createOpenLongPosition(overrides: Partial<Position> = {}): Position {
   return createTestPosition({
     positionKey: {
+      id: positionStableId('0xtest-position-stable-id'),
       account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
       indexAssetId: assetId('0xbtc'),
       isLong: true,
@@ -58,6 +60,7 @@ export function createOpenLongPosition(overrides: Partial<Position> = {}): Posit
 export function createOpenShortPosition(overrides: Partial<Position> = {}): Position {
   return createTestPosition({
     positionKey: {
+      id: positionStableId('0xtest-position-stable-id'),
       account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
       indexAssetId: assetId('0xbtc'),
       isLong: false,
@@ -85,10 +88,17 @@ export function createClosedPosition(overrides: Partial<Position> = {}): Positio
  */
 export function createPositionHistory(): Position[] {
   const baseTimestamp = Date.now() - 1000000;
+  const stableId = positionStableId('0xposition-1-stable-id');
 
   return [
     createTestPosition({
-      id: positionId('position-1-event-1'),
+      revisionId: positionRevisionId('position-1-event-1'),
+      positionKey: {
+        id: stableId,
+        account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
+        indexAssetId: assetId('0xbtc'),
+        isLong: true,
+      },
       timestamp: baseTimestamp,
       change: PositionChange.Increase,
       size: PositionSize.fromFloat(5000),
@@ -96,7 +106,13 @@ export function createPositionHistory(): Position[] {
       latest: false,
     }),
     createTestPosition({
-      id: positionId('position-1-event-2'),
+      revisionId: positionRevisionId('position-1-event-2'),
+      positionKey: {
+        id: stableId,
+        account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
+        indexAssetId: assetId('0xbtc'),
+        isLong: true,
+      },
       timestamp: baseTimestamp + 10000,
       change: PositionChange.Increase,
       size: PositionSize.fromFloat(10000),
@@ -104,7 +120,13 @@ export function createPositionHistory(): Position[] {
       latest: false,
     }),
     createTestPosition({
-      id: positionId('position-1-event-3'),
+      revisionId: positionRevisionId('position-1-event-3'),
+      positionKey: {
+        id: stableId,
+        account: address('0x1234567890123456789012345678901234567890123456789012345678901234'),
+        indexAssetId: assetId('0xbtc'),
+        isLong: true,
+      },
       timestamp: baseTimestamp + 20000,
       change: PositionChange.Decrease,
       size: PositionSize.fromFloat(7000),
