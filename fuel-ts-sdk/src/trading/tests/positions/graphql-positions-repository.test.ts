@@ -23,7 +23,18 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      mockClient.mockResponse('GetPositionsByAccount', {
+      // Mock the first query: GetPositionKeysByAccount
+      mockClient.mockResponse('GetPositionKeysByAccount', {
+        positionKeys: {
+          nodes: [
+            { id: 'key-1' },
+            { id: 'key-2' },
+          ],
+        },
+      });
+
+      // Mock the second query: GetPositionsByKeyIds
+      mockClient.mockResponse('GetPositionsByKeyIds', {
         positions: {
           nodes: mockPositions.map((p) => ({
             id: p.revisionId,
@@ -60,8 +71,9 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      mockClient.mockResponse('GetPositionsByAccount', {
-        positions: {
+      // Mock empty position keys
+      mockClient.mockResponse('GetPositionKeysByAccount', {
+        positionKeys: {
           nodes: [],
         },
       });
@@ -77,7 +89,15 @@ describe('GraphQLPositionsRepository', () => {
         '0x1234567890123456789012345678901234567890123456789012345678901234'
       );
 
-      mockClient.mockResponse('GetPositionsByAccount', {
+      // Mock the first query: GetPositionKeysByAccount
+      mockClient.mockResponse('GetPositionKeysByAccount', {
+        positionKeys: {
+          nodes: [{ id: 'key-1' }],
+        },
+      });
+
+      // Mock the second query: GetPositionsByKeyIds
+      mockClient.mockResponse('GetPositionsByKeyIds', {
         positions: {
           nodes: [
             {
