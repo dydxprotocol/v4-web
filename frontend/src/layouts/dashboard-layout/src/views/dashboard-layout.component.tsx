@@ -1,46 +1,41 @@
 import { Outlet } from 'react-router';
 import { NetworkSwitchContext } from '@/contexts/network-switch/network-switch.context';
-import { getEnv } from '@/lib/env';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
+import { NETWORKS, type Network } from '@/models/network';
 import * as styles from './dashboard-layout.css';
-
-const testNetUrl = 'https://starboard.squids.live/starboard-testnet@test2/api/graphql';
-const localNodeUrl = getEnv('VITE_INDEXER_URL');
 
 export function DashboardLayout() {
   const networkSwitch = useRequiredContext(NetworkSwitchContext);
-  const currentNetwork = networkSwitch.getNetworkUrl();
+  const currentNetwork = networkSwitch.getCurrentNetwork();
 
-  function switchToTestNet() {
-    networkSwitch.changeNetworkUrl(testNetUrl);
-  }
-
-  function switchToLocalNode() {
-    networkSwitch.changeNetworkUrl(localNodeUrl);
+  function switchTo(network: Network) {
+    networkSwitch.changeNetwork(network);
   }
 
   return (
     <div css={styles.page}>
       <div css={styles.container}>
         <div css={styles.buttonContainer}>
-          <button
-            css={currentNetwork === testNetUrl ? styles.button : styles.buttonSecondary}
-            onClick={switchToTestNet}
-          >
-            Testnet
-          </button>
-          <button
-            css={currentNetwork === localNodeUrl ? styles.button : styles.buttonSecondary}
-            onClick={switchToLocalNode}
-          >
-            Local node
-          </button>
+          {NETWORKS.map((network) => (
+            <button
+              onClick={() => switchTo(network)}
+              key={network}
+              css={currentNetwork === network ? styles.button : styles.buttonSecondary}
+            >
+              {NETWORK_DISPLAY_VALUES[network]}
+            </button>
+          ))}
         </div>
 
-        <h4 css={styles.statusTitle}>Indexer URL: {networkSwitch.getNetworkUrl()}</h4>
+        <h4 css={styles.statusTitle}>Indexer URL: {networkSwitch.getCurrentNetwork()}</h4>
 
         <Outlet />
       </div>
     </div>
   );
 }
+
+const NETWORK_DISPLAY_VALUES: Record<Network, string> = {
+  local: 'Local Node',
+  testnet: 'Testnet',
+};
