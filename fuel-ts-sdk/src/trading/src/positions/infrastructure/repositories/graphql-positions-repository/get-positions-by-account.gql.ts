@@ -1,9 +1,19 @@
 import { gql } from 'graphql-request';
 
-export const GET_POSITIONS_BY_ACCOUNT_QUERY = gql`
-  query GetPositionsByAccount($account: String!, $latestOnly: Boolean) {
+export const GET_POSITION_KEYS_BY_ACCOUNT_QUERY = gql`
+  query GetPositionKeysByAccount($account: String!) {
+    positionKeys(filter: { account: { equalTo: $account } }) {
+      nodes {
+        id
+      }
+    }
+  }
+`;
+
+export const GET_POSITIONS_BY_KEY_IDS_QUERY = gql`
+  query GetPositionsByKeyIds($positionKeyIds: [String!]!, $latestOnly: Boolean) {
     positions(
-      filter: { positionKey: { account: { equalTo: $account } }, latest: { equalTo: $latestOnly } }
+      filter: { positionKeyId: { in: $positionKeyIds }, latest: { equalTo: $latestOnly } }
       orderBy: TIMESTAMP_DESC
     ) {
       nodes {
