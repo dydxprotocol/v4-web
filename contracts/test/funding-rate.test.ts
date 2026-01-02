@@ -10,6 +10,7 @@ import {
     StorkMockFactory,
     VaultExpose,
     VaultExposeFactory,
+    SimpleProxyFactory,
 } from "../types/index.js"
 import { getNodeWallets, launchNode } from "./node.js"
 import {
@@ -23,19 +24,9 @@ import {
     getBtcConfig,
     getUsdcConfig,
     moveBlockchainTime,
-} from "./utils"
-import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import {
-    FungibleFactory,
-    PricefeedWrapperFactory,
-    StorkMockFactory,
-    VaultExposeFactory,
-    SimpleProxyFactory,
-    Fungible,
-    VaultExpose,
-    StorkMock,
-    PricefeedWrapper,
-} from "../types"
+    USDC_ASSET,
+    walletToAddressIdentity,
+} from "./utils.js"
 
 const NEUTRAL_CUMULATIVE_FUNDING_RATE = "57896044618658097711785492504343953926634992332820282019728792003956564819968" // 2 ** 255
 const FUNDING_RATE_PRECISION = BigInt("1000000000000000000")

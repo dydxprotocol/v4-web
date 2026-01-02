@@ -1,8 +1,8 @@
 import { Provider, Wallet } from "fuels"
-import { getArgs, call, getRandomSalt } from "./utils"
-import { TestnetTokenFactory } from "../types"
+import { TestnetTokenFactory } from "../types/index.js"
+import { call, getArgs, getRandomSalt } from "./utils.js"
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     deployTestnetToken(getArgs(["url", "privK", "name", "symbol", "decimals"], ["salt"]))
         .then(() => {
             process.exit(0)

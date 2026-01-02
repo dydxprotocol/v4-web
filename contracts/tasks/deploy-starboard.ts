@@ -1,8 +1,8 @@
 import { Provider, Wallet } from "fuels"
-import { call, getArgs, getRandomSalt } from "./utils"
-import { PricefeedWrapperFactory, VaultFactory, SimpleProxyFactory, Vault } from "../types"
+import { PricefeedWrapperFactory, SimpleProxyFactory, Vault, VaultFactory } from "../types/index.js"
+import { call, getArgs, getRandomSalt } from "./utils.js"
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     deployStarboard(getArgs(["url", "privK", "usdcAssetId", "usdcPricefeedId", "usdcDecimals", "storkContract"], ["salt"]))
         .then(() => {
             process.exit(0)
@@ -41,7 +41,7 @@ export async function deployStarboard(taskArgs: any) {
         salt,
     })
     const { contract: vaultImpl } = await waitForResultVaultImpl()
-    // eslint-disable-next-line no-console
+
     console.log(`Vault implementation deployed to: ${vaultImpl.id.toString()} ${vaultImpl.id.toB256().toString()}`)
 
     const { waitForResult: waitForResultSimpleProxy } = await SimpleProxyFactory.deploy(deployer, {
@@ -51,25 +51,25 @@ export async function deployStarboard(taskArgs: any) {
         salt,
     })
     const { contract: simpleProxy } = await waitForResultSimpleProxy()
-    // eslint-disable-next-line no-console
+
     console.log(`SimpleProxy deployed to: ${simpleProxy.id.toString()} ${simpleProxy.id.toB256().toString()}`)
     await call(
         simpleProxy.functions.initialize_proxy(deployerIdentity, {
             bits: vaultImpl.id.toHexString(),
         }),
     )
-    // eslint-disable-next-line no-console
+
     console.log("SimpleProxy initialized")
     const vault = new Vault(simpleProxy.id.toAddress(), deployer)
-    // eslint-disable-next-line no-console
+
     console.log(`Vault deployed to: ${vault.id.toString()} ${vault.id.toB256().toString()}`)
     await call(vault.functions.initialize(deployerIdentity).addContracts([vaultImpl]))
-    // eslint-disable-next-line no-console
+
     console.log("Vault initialized")
 
     await call(vault.functions.set_liquidator(deployerIdentity, true).addContracts([vaultImpl]))
     await call(vault.functions.set_asset_config(taskArgs.usdcPricefeedId, taskArgs.usdcDecimals).addContracts([vaultImpl]))
-    // eslint-disable-next-line no-console
+
     console.log("Deployment done")
 
     return [vault.id.toString(), vaultImpl.id.toString(), pricefeedWrapper.id.toString()]

@@ -10,6 +10,7 @@ import {
     StorkMockFactory,
     Vault,
     VaultFactory,
+    SimpleProxyFactory,
 } from "../types/index.js"
 import { getNodeWallets, launchNode } from "./node.js"
 import {
@@ -21,20 +22,8 @@ import {
     getAssetId,
     getBtcConfig,
     getUsdcConfig,
-    getAssetId,
-} from "./utils"
-import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import {
-    FungibleFactory,
-    PricefeedWrapperFactory,
-    StorkMockFactory,
-    VaultFactory,
-    SimpleProxyFactory,
-    Vault,
-    StorkMock,
-    PricefeedWrapper,
-    Fungible,
-} from "../types"
+    walletToAddressIdentity,
+} from "./utils.js"
 
 describe("Vault SRC20", () => {
     let attachedContracts: AbstractContract[]

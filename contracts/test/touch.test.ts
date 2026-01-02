@@ -11,9 +11,7 @@ import {
     TestnetTokenFactory,
     VaultFactory,
     SimpleProxyFactory,
-    Fungible,
     Vault,
-    VaultFactory,
 } from "../types/index.js"
 import { getNodeWallets, launchNode } from "./node.js"
 import {

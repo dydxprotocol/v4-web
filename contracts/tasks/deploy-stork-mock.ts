@@ -1,8 +1,8 @@
 import { Provider, Wallet } from "fuels"
-import { getArgs, getRandomSalt } from "./utils"
-import { StorkMockFactory } from "../types/StorkMockFactory"
+import { getArgs, getRandomSalt } from "./utils.js"
+import { StorkMockFactory } from "../types/StorkMockFactory.js"
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     deployStorkMock(getArgs(["url", "privK"], ["salt"]))
         .then(() => {
             process.exit(0)

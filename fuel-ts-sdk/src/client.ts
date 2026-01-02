@@ -1,13 +1,11 @@
-import { Candles, CurrentPrices, Positions, Prices } from '@/trading';
 import { GraphQLClient } from 'graphql-request';
-import { Candles, Positions, Prices } from '@/trading';
+import { createTradingModule } from '@/trading/di';
+import type { RootState } from './shared/lib/redux';
+import { createStore } from './shared/lib/redux';
+import { createStoreService } from './shared/lib/store-service';
 
-export interface StarboardClient {
-  positions: Positions.PositionRepository;
-  prices: Prices.PriceRepository;
-  candles: Candles.CandleRepository;
-  currentPrices: CurrentPrices.CurrentPriceRepository;
-}
+export type { RootState };
+export type StarboardClient = ReturnType<typeof createStarboardClient>;
 
 export interface StarboardClientConfig {
   indexerUrl: string;
@@ -22,9 +20,7 @@ export const createStarboardClient = (config: StarboardClientConfig) => {
   const storeService = createStoreService(starboardStore);
 
   return {
-    positions: Positions.createGraphQLPositionRepository(graphqlClient),
-    prices: Prices.createGraphQLPriceRepository(graphqlClient),
-    candles: Candles.createGraphQLCandleRepository(graphqlClient),
-    currentPrices: CurrentPrices.createGraphQLCurrentPriceRepository(graphqlClient),
+    trading: tradingModule.createCommandsAndQueries(storeService),
+    store: starboardStore,
   };
 };

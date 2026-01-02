@@ -10,6 +10,7 @@ import {
     StorkMockFactory,
     Vault,
     VaultExposeFactory,
+    SimpleProxyFactory,
 } from "../types/index.js"
 import { getNodeWallets, launchNode } from "./node.js"
 import {
@@ -24,19 +25,9 @@ import {
     getBtcConfig,
     getUsdcConfig,
     moveBlockchainTime,
-} from "./utils"
-import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
-import {
-    FungibleFactory,
-    PricefeedWrapperFactory,
-    StorkMockFactory,
-    VaultExposeFactory,
-    SimpleProxyFactory,
-    Fungible,
-    StorkMock,
-    PricefeedWrapper,
-    Vault,
-} from "../types"
+    USDC_ASSET,
+    walletToAddressIdentity,
+} from "./utils.js"
 
 describe("Vault.funding_rate", () => {
     let attachedContracts: AbstractContract[]
