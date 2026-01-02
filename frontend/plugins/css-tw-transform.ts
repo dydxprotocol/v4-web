@@ -75,18 +75,96 @@ export function cssTwTransformPlugin(): Plugin {
         return null;
       }
 
-      // Process each JSX tag (including self-closing)
-      // Match opening tags like <div ... > or <Component ... /> or multiline
-      const tagPattern = /<(\w+)((?:\s+[^>]*?)?)(\/?)\s*>/gs;
+      // Helper to find the end of a JSX opening tag, handling nested braces
+      function findTagEnd(str: string, startIdx: number): number {
+        let depth = 0;
+        let inString: string | null = null;
+        let escaped = false;
 
-      transformed = code.replace(tagPattern, (fullMatch, tagName, propsString, selfClosing) => {
+        for (let i = startIdx; i < str.length; i++) {
+          const char = str[i];
+
+          // Handle string literals
+          if (!escaped && (char === '"' || char === "'" || char === '`')) {
+            if (inString === char) {
+              inString = null;
+            } else if (inString === null) {
+              inString = char;
+            }
+          }
+
+          // Track escape sequences
+          if (char === '\\' && !escaped) {
+            escaped = true;
+            continue;
+          }
+          escaped = false;
+
+          // Skip everything inside strings
+          if (inString) continue;
+
+          // Track JSX expression depth
+          if (char === '{') {
+            depth++;
+          } else if (char === '}') {
+            depth--;
+          } else if (char === '>' && depth === 0) {
+            return i;
+          }
+        }
+
+        return -1;
+      }
+
+      // Process JSX tags by finding them properly
+      let cursor = 0;
+      const replacements: Array<{ start: number; end: number; replacement: string }> = [];
+
+      while (cursor < transformed.length) {
+        // Find next opening tag
+        const tagStart = transformed.indexOf('<', cursor);
+        if (tagStart === -1) break;
+
+        // Check if it's a closing tag or comment
+        if (transformed[tagStart + 1] === '/' || transformed[tagStart + 1] === '!') {
+          cursor = tagStart + 1;
+          continue;
+        }
+
+        // Extract tag name
+        const tagNameMatch = transformed.slice(tagStart + 1).match(/^(\w+)/);
+        if (!tagNameMatch) {
+          cursor = tagStart + 1;
+          continue;
+        }
+
+        const tagName = tagNameMatch[1];
+        const propsStart = tagStart + 1 + tagName.length;
+
+        // Find the end of this tag
+        const tagEnd = findTagEnd(transformed, propsStart);
+        if (tagEnd === -1) {
+          cursor = tagStart + 1;
+          continue;
+        }
+
+        let propsString = transformed.slice(propsStart, tagEnd);
+
+        // Check if this is a self-closing tag and strip the / from propsString
+        let selfClosing = '';
+        if (propsString.trimEnd().endsWith('/')) {
+          selfClosing = '/';
+          propsString = propsString.trimEnd().slice(0, -1);
+        }
+
         // Check if this tag has css, tw, or className props
         const hasCssProp = /\s+css=/.test(propsString);
         const hasTwProp = /\s+tw=/.test(propsString);
         const hasClassNameProp = /\s+className=/.test(propsString);
 
         if (!hasCssProp && !hasTwProp) {
-          return fullMatch;
+          cursor = tagEnd + 1;
+          continue;
         }
 
         let cssValue: string | null = null;
@@ -180,7 +258,8 @@ export function cssTwTransformPlugin(): Plugin {
         }
 
         if (parts.length === 0) {
-          return fullMatch;
+          cursor = tagEnd + 1;
+          continue;
         }
 
         if (parts.length === 1 && twValue !== null && !existingClassName && !cssValue) {
@@ -193,8 +272,22 @@ export function cssTwTransformPlugin(): Plugin {
         }
 
         // Reconstruct tag
-        return `<${tagName}${cleanedProps} className=${classNameExpr}${selfClosing}>`;
-      });
+        const replacement = `<${tagName}${cleanedProps} className=${classNameExpr}${selfClosing}>`;
+
+        replacements.push({
+          start: tagStart,
+          end: tagEnd + 1,
+          replacement,
+        });
+
+        cursor = tagEnd + 1;
+      }
+
+      // Apply replacements in reverse order to maintain correct indices
+      for (let i = replacements.length - 1; i >= 0; i--) {
+        const { start, end, replacement } = replacements[i];
+        transformed = transformed.slice(0, start) + replacement + transformed.slice(end);
+      }
 
       // If we used clsx, ensure it's imported
       if (needsClsx && transformed !== code) {

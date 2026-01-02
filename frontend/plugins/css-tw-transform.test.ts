@@ -213,4 +213,132 @@ export function Component() {
       expect(result?.code).toContain('className={clsx(styles.button, "mt-2")}');
     });
   });
+
+  describe('prop ordering with event handlers and comparisons', () => {
+    it('should handle onClick before css with arrow function', () => {
+      const input = `<button
+  onClick={() => switchTo(network)}
+  key={network}
+  css={styles.button}
+>
+  Click
+</button>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('onClick={() => switchTo(network)}');
+      expect(result?.code).toContain('key={network}');
+      expect(result?.code).toContain('className={clsx(styles.button)}');
+    });
+
+    it('should handle css before onClick with arrow function', () => {
+      const input = `<button
+  css={styles.button}
+  onClick={() => switchTo(network)}
+  key={network}
+>
+  Click
+</button>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('onClick={() => switchTo(network)}');
+      expect(result?.code).toContain('key={network}');
+      expect(result?.code).toContain('className={clsx(styles.button)}');
+    });
+
+    it('should handle css with ternary containing comparison operators', () => {
+      const input = `<button
+  onClick={() => doSomething()}
+  css={currentNetwork === network ? styles.button : styles.buttonSecondary}
+  key={item}
+>
+  Click
+</button>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('onClick={() => doSomething()}');
+      expect(result?.code).toContain(
+        'className={clsx(currentNetwork === network ? styles.button : styles.buttonSecondary)}'
+      );
+      expect(result?.code).toContain('key={item}');
+    });
+
+    it('should handle multiple arrow functions with > operators', () => {
+      const input = `<div
+  onMouseEnter={() => setHover(true)}
+  onMouseLeave={() => setHover(false)}
+  css={isActive ? styles.active : styles.inactive}
+  onClick={() => count > 5 ? reset() : increment()}
+>
+  Content
+</div>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('onMouseEnter={() => setHover(true)}');
+      expect(result?.code).toContain('onMouseLeave={() => setHover(false)}');
+      expect(result?.code).toContain('onClick={() => count > 5 ? reset() : increment()}');
+      expect(result?.code).toContain(
+        'className={clsx(isActive ? styles.active : styles.inactive)}'
+      );
+    });
+
+    it('should handle css between other props with complex expressions', () => {
+      const input = `<button
+  type="button"
+  disabled={count >= maxCount}
+  css={styles.button}
+  onClick={() => value < threshold ? handleLow() : handleHigh()}
+  aria-pressed={isPressed}
+>
+  Submit
+</button>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('type="button"');
+      expect(result?.code).toContain('disabled={count >= maxCount}');
+      expect(result?.code).toContain(
+        'onClick={() => value < threshold ? handleLow() : handleHigh()}'
+      );
+      expect(result?.code).toContain('aria-pressed={isPressed}');
+      expect(result?.code).toContain('className={clsx(styles.button)}');
+    });
+
+    it('should handle nested ternaries with comparison operators', () => {
+      const input = `<div css={x > 10 ? styles.large : y < 5 ? styles.small : styles.medium}>Content</div>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain(
+        'className={clsx(x > 10 ? styles.large : y < 5 ? styles.small : styles.medium)}'
+      );
+    });
+
+    it('should handle template literals in other props', () => {
+      const input = `<div
+  data-test={\`item-\${id}\`}
+  css={styles.container}
+  onClick={() => handler(\`value-\${index}\`)}
+>
+  Content
+</div>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('data-test={`item-${id}`}');
+      expect(result?.code).toContain('onClick={() => handler(`value-${index}`)}');
+      expect(result?.code).toContain('className={clsx(styles.container)}');
+    });
+
+    it('should handle JSX spread operators with css prop', () => {
+      const input = `<button {...props} css={styles.button} onClick={() => action()}>Click</button>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('{...props}');
+      expect(result?.code).toContain('onClick={() => action()}');
+      expect(result?.code).toContain('className={clsx(styles.button)}');
+    });
+
+    it('should handle object literals in props with css', () => {
+      const input = `<Component
+  css={styles.wrapper}
+  config={{ enabled: true, threshold: value > 10 }}
+  onClick={() => process()}
+>
+  Content
+</Component>`;
+      const result = transform(input, 'test.tsx');
+      expect(result?.code).toContain('config={{ enabled: true, threshold: value > 10 }}');
+      expect(result?.code).toContain('onClick={() => process()}');
+      expect(result?.code).toContain('className={clsx(styles.wrapper)}');
+    });
+  });
 });
