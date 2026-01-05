@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
+import { Theme } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css';
 import App from './App.tsx';
 import { NetworkSwitchContextProvider } from './contexts/network-switch';
 import { getIndexerUrl } from './lib/env';
@@ -14,9 +16,11 @@ createRoot(document.getElementById('root')!).render(
           indexerUrl={getIndexerUrl(networkSwitch.getCurrentNetwork())}
           key={networkSwitch.getCurrentNetwork()}
         >
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <Theme appearance="dark">
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </Theme>
         </FuelTsSdkProvider>
       )}
     </NetworkSwitchContextProvider>
