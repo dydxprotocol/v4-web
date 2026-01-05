@@ -12,7 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonk';
+import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonkPnlLeaderboard';
 import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';

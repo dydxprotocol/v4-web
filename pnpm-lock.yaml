@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.3.0
-    version: 3.3.0
+    specifier: 3.4.0
+    version: 3.4.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.367
-    version: 1.1.367
+    specifier: 1.1.371
+    version: 1.1.371
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -1701,8 +1701,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.3.0:
-    resolution: {integrity: sha512-5chJrVsRJBL4Ba+/1r5R9IEd+ytNsTvq/YWKcnI9Je2WdUB/qBnMs89ifPauB7wAI++myqUZ1OeBVqQUW3pStQ==}
+  /@dydxprotocol/v4-client-js@3.4.0:
+    resolution: {integrity: sha512-dMEcqfJAreiDQjrgJyUNGqxUH3sh5J5LG5fKItCRIM7MsygAvf5/kpedQByh6nO6ov+tUw4zgT4OFc9vKN+cMQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1711,7 +1711,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.4.0-rc.0
+      '@dydxprotocol/v4-proto': 9.5.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -1732,8 +1732,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.367:
-    resolution: {integrity: sha512-lUGI2cSZy6BHm/jCIw0MN85WCGepy0CpAjXHrBAnR9QXmZGcTFN8LLfTC7XfbKWy/0tFNMcRc3HF26qNPIu2bg==}
+  /@dydxprotocol/v4-localization@1.1.371:
+    resolution: {integrity: sha512-MoZWv3DSH9dQgy5jnUtdk4wUPBbe3p6kOWQz2/9gLc0y+sIwLr5LNqpSS6+dn43/Ni/mr8jcj0QwM9nrAvGhWQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
@@ -1742,8 +1742,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@9.4.0-rc.0:
-    resolution: {integrity: sha512-1vtvGAdX2U6PWiDEYbNA253fB4m53eAQsmC/4hquy7rRGTam/33YdrKKDPtGCIByFbXSt/P9pegg+F4HZ7MrBQ==}
+  /@dydxprotocol/v4-proto@9.5.0:
+    resolution: {integrity: sha512-J8Hqw3PyVmx4FViwo2w1KHvTt70r/OG6gpaogbeDifY6lB6UU/j/PUjdAZVkjLREkzJY4XzhJkrsnqpBtF/1mg==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -4163,7 +4163,7 @@ packages:
     resolution: {integrity: sha512-YYYHsVYd46XwY2QZzpGeU4PSdRhHdxnzkB8piWGvJW2xbikZ3R+epAYEL4q/K8bh9JPTucsUdwRFnACor1aOYw==}
     engines: {node: ^18.20 || ^20.17 || >=22}
     dependencies:
-      '@metamask/utils': 11.8.1
+      '@metamask/utils': 11.9.0
       fast-safe-stringify: 2.1.1
     transitivePeerDependencies:
       - supports-color
@@ -4249,8 +4249,8 @@ packages:
     engines: {node: '>=16.0.0'}
     dev: false
 
-  /@metamask/utils@11.8.1:
-    resolution: {integrity: sha512-DIbsNUyqWLFgqJlZxi1OOCMYvI23GqFCvNJAtzv8/WXWzJfnJnvp1M24j7VvUe3URBi3S86UgQ7+7aWU9p/cnQ==}
+  /@metamask/utils@11.9.0:
+    resolution: {integrity: sha512-wRnoSDD9jTWOge/+reFviJQANhS+uy8Y+OEwRanp5mQeGTjBFmK1r2cTOnei2UCZRV1crXHzeJVSFEoDDcgRbA==}
     engines: {node: ^18.18 || ^20.14 || >=22}
     dependencies:
       '@ethereumjs/tx': 4.2.0
@@ -12658,6 +12658,7 @@ packages:
 
   /@walletconnect/sign-client@2.17.2:
     resolution: {integrity: sha512-/wigdCIQjlBXSWY43Id0IPvZ5biq4HiiQZti8Ljvx408UYjmqcxcBitbj2UJXMYkid7704JWAB2mw32I1HgshQ==}
+    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
     dependencies:
       '@walletconnect/core': 2.17.2
       '@walletconnect/events': 1.0.1
@@ -14575,8 +14576,8 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
-  /baseline-browser-mapping@2.9.8:
-    resolution: {integrity: sha512-Y1fOuNDowLfgKOypdc9SPABfoWXuZHBOyCS4cD52IeZBhr4Md6CLLs6atcxVrzRmQ06E7hSlm5bHHApPKR/byA==}
+  /baseline-browser-mapping@2.9.9:
+    resolution: {integrity: sha512-V8fbOCSeOFvlDj7LLChUcqbZrdKD9RU/VR260piF1790vT0mfLSwGc/Qzxv3IqiTukOpNtItePa0HBpMAj7MDg==}
     hasBin: true
 
   /basic-ftp@5.0.5:
@@ -14828,7 +14829,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      baseline-browser-mapping: 2.9.8
+      baseline-browser-mapping: 2.9.9
       caniuse-lite: 1.0.30001760
       electron-to-chromium: 1.5.267
       node-releases: 2.0.27
