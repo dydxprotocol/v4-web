@@ -33,9 +33,9 @@ export async function deployStarboard(taskArgs: any) {
 
     const { waitForResult: waitForResultVaultImpl } = await VaultFactory.deploy(deployer, {
         configurableConstants: {
-            COLLATERAL_ASSET_ID: { bits: taskArgs.usdcAssetId },
-            COLLATERAL_ASSET: taskArgs.usdcPricefeedId,
-            COLLATERAL_ASSET_DECIMALS: taskArgs.usdcDecimals,
+            BASE_ASSET_ID: { bits: taskArgs.usdcAssetId },
+            BASE_ASSET: taskArgs.usdcPricefeedId,
+            BASE_ASSET_DECIMALS: taskArgs.usdcDecimals,
             PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.toString() },
         },
         salt,
@@ -68,7 +68,6 @@ export async function deployStarboard(taskArgs: any) {
     console.log("Vault initialized")
 
     await call(vault.functions.set_liquidator(deployerIdentity, true).addContracts([vaultImpl]))
-    await call(vault.functions.set_asset_config(taskArgs.usdcPricefeedId, taskArgs.usdcDecimals).addContracts([vaultImpl]))
 
     // eslint-disable-next-line no-console
     console.log("Deployment done")
