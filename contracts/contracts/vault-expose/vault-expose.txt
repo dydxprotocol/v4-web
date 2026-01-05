@@ -17,6 +17,18 @@ abi VaultExpose {
     fn update_funding_info(asset: b256);
 
     fn calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256);
+
+    fn calculate_settlement(
+        protocol_fee: u256,
+        liquidity_fee: u256,
+        liquidation_fee: u256,
+        funding_rate: u256,
+        funding_rate_has_profit: bool,
+        pnl_delta: u256,
+        pnl_delta_has_profit: bool,
+        collateral: u256,
+        total_reserves: u256,
+    ) -> (u256, u256, u256, u256, u256, u256, u256, PositionSettlementStatus);
 }
 
 impl VaultExpose for Contract {
@@ -52,5 +64,29 @@ impl VaultExpose for Contract {
 
     fn calculate_cumulative_funding_rate(funding_info: FundingInfo, now: u64) -> (u256, u256) {
         _calculate_cumulative_funding_rate(funding_info, now)
+    }
+
+    fn calculate_settlement(
+        protocol_fee: u256,
+        liquidity_fee: u256,
+        liquidation_fee: u256,
+        funding_rate: u256,
+        funding_rate_has_profit: bool,
+        pnl_delta: u256,
+        pnl_delta_has_profit: bool,
+        collateral: u256,
+        total_reserves: u256,
+    ) -> (u256, u256, u256, u256, u256, u256, u256, PositionSettlementStatus) {
+        _calculate_settlement(
+            protocol_fee,
+            liquidity_fee,
+            liquidation_fee,
+            funding_rate,
+            funding_rate_has_profit,
+            pnl_delta,
+            pnl_delta_has_profit,
+            collateral,
+            total_reserves,
+        )
     }
 }

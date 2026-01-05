@@ -40,6 +40,7 @@ use core_interfaces::{
         FundingInfo,
         Position,
         PositionKey,
+        PositionSettlementStatus,
         Vault,
     },
 };
@@ -73,12 +74,14 @@ const LP_ASSET_NAME: str[11] = __to_str_array("StarBoardLP");
 const LP_ASSET_SYMBOL: str[3] = __to_str_array("SLP");
 
 configurable {
-    /// The stable asset used for collateral in short positions
-    COLLATERAL_ASSET_ID: AssetId = AssetId::zero(),
-    /// The stable asset used for collateral in short positions
-    COLLATERAL_ASSET: b256 = b256::zero(),
-    COLLATERAL_ASSET_DECIMALS: u32 = 0,
-    /// The pricefeed provider contract used to get the price of the collateral asset
+    /// The stable asset used for collaterals, the FUEL asset id for transfers
+    BASE_ASSET_ID: AssetId = AssetId::zero(),
+    /// The stable asset used for collaterals, the oracle asset for prices
+    BASE_ASSET: b256 = b256::zero(),
+    /// used to convert the oracle prices to the collateral asset prices
+    /// this is also the decimals of LP Token
+    BASE_ASSET_DECIMALS: u32 = 0,
+    /// The pricefeed provider contract used to get the prices of the assets
     PRICEFEED_WRAPPER: ContractId = ZERO_CONTRACT,
 }
 
@@ -89,26 +92,28 @@ storage {
         /// charged when liquidating a position
         /// denominated in collateral asset
         liquidation_fee: u256 = 0u256,
-        /// charged when minting/burning LP assets
+        /// charged when adding/removing liquidity
         /// 0.3% by default
-        mint_burn_fee_basis_points: u64 = 30,
+        liquidity_fee_basis_points: u64 = 30,
         /// applied to size of leveraged positions
         /// 0.1% by default
-        margin_fee_basis_points: u64 = 10,
+        position_fee_basis_points: u64 = 10,
         // Misc
         approved_routers: StorageMap<Identity, StorageMap<Identity, bool>> = StorageMap {},
         is_liquidator: StorageMap<Identity, bool> = StorageMap {},
         max_leverage: StorageMap<b256, u256> = StorageMap {},
         whitelisted_assets: StorageMap<b256, bool> = StorageMap {},
-        asset_decimals: StorageMap<b256, u32> = StorageMap {},
         // tracks all open Positions
         positions: StorageMap<b256, Position> = StorageMap {},
         // tracks amount of fees (in collateral asset)
         fee_reserve: u256 = 0,
-        // tracks the number of received tokens that can be used for leverage
-        // tracked separately to exclude funds that are deposited 
-        // as margin collateral
-        pool_amounts: StorageMap<b256, u256> = StorageMap {},
+        // track amount of collateral in the pool
+        total_collateral: u256 = 0,
+        // tracks the total amount of reserves for profits and funding rates
+        total_reserves: u256 = 0,
+        // tracks the total amount of liquidity in the reserves
+        // may be greater than total_reserves
+        total_liquidity: u256 = 0,
     },
     fund {
         funding_info: StorageMap<b256, FundingInfo> = StorageMap {},
@@ -156,7 +161,7 @@ impl SRC20 for Contract {
     #[storage(read)]
     fn decimals(asset: AssetId) -> Option<u8> {
         if asset == AssetId::default() {
-            Some(COLLATERAL_ASSET_DECIMALS.try_as_u8().unwrap_or(255))
+            Some(BASE_ASSET_DECIMALS.try_as_u8().unwrap_or(255))
         } else {
             None
         }
@@ -216,15 +221,19 @@ impl Vault for Contract {
         storage::vault.is_initialized.write(true);
         initialize_ownership(gov);
 
+        // TODO do not overwrite the fees if they are already set by set_fees()
         // set the default fees
-        // the liquidation fee cannot initialize in the storage section because of the configurable
+        // the liquidation fee cannot be initialized in the storage section because of the configurable
         storage::vault
             .liquidation_fee
-            .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(COLLATERAL_ASSET_DECIMALS)));
-        storage::vault.mint_burn_fee_basis_points.write(30);
-        storage::vault.margin_fee_basis_points.write(10);
+            .write(DEFAULT_LIQUIDATION_FEE * (10u256.pow(BASE_ASSET_DECIMALS)));
+        storage::vault.liquidity_fee_basis_points.write(30);
+        storage::vault.position_fee_basis_points.write(10);
 
         storage::vault.fee_reserve.write(0);
+        storage::vault.total_collateral.write(0);
+        storage::vault.total_reserves.write(0);
+        storage::vault.total_liquidity.write(0);
 
         storage::lp_asset.total_supply.write(0);
         let lp_asset = AssetId::default();
@@ -242,7 +251,7 @@ impl Vault for Contract {
         });
         log(SetDecimalsEvent {
             asset: lp_asset,
-            decimals: COLLATERAL_ASSET_DECIMALS.try_as_u8().unwrap_or(255),
+            decimals: BASE_ASSET_DECIMALS.try_as_u8().unwrap_or(255),
             sender: sender,
         });
         log(TotalSupplyEvent {
@@ -267,61 +276,53 @@ impl Vault for Contract {
 
     #[storage(read, write)]
     fn set_fees(
-        mint_burn_fee_basis_points: u64,
-        margin_fee_basis_points: u64,
+        liquidity_fee_basis_points: u64,
+        position_fee_basis_points: u64,
         liquidation_fee: u256,
     ) {
         only_owner();
 
         require(
-            mint_burn_fee_basis_points <= MAX_FEE_BASIS_POINTS && margin_fee_basis_points <= MAX_FEE_BASIS_POINTS,
+            liquidity_fee_basis_points <= MAX_FEE_BASIS_POINTS && position_fee_basis_points <= MAX_FEE_BASIS_POINTS,
             Error::VaultInvalidFeeBasisPoints,
         );
         require(
             liquidation_fee <= MAX_LIQUIDATION_FEE * (10u256
-                    .pow(COLLATERAL_ASSET_DECIMALS)),
+                    .pow(BASE_ASSET_DECIMALS)),
             Error::VaultInvalidLiquidationFee,
         );
 
         storage::vault
-            .mint_burn_fee_basis_points
-            .write(mint_burn_fee_basis_points);
+            .liquidity_fee_basis_points
+            .write(liquidity_fee_basis_points);
         storage::vault
-            .margin_fee_basis_points
-            .write(margin_fee_basis_points);
+            .position_fee_basis_points
+            .write(position_fee_basis_points);
         storage::vault.liquidation_fee.write(liquidation_fee);
 
         log(SetFees {
-            mint_burn_fee_basis_points,
-            margin_fee_basis_points,
+            liquidity_fee_basis_points,
+            position_fee_basis_points,
             liquidation_fee,
         });
     }
 
+    /// the asset is whitelisted and max leverage is set
     /// max leverage must be multiplied by 10_000 to get actual leverage
     /// e.g: 50 * 10_000 = 50%
-    #[storage(write)]
-    fn set_max_leverage(asset: b256, max_leverage: u256) {
-        only_owner();
-        require(max_leverage <= MAX_LEVERAGE, Error::VaultInvalidMaxLeverage);
-        storage::vault.max_leverage.insert(asset, max_leverage);
-        log(SetMaxLeverage {
-            asset,
-            max_leverage,
-        });
-    }
-
-    // TODO exclude the collateral asset
     #[storage(read, write)]
-    fn set_asset_config(asset: b256, asset_decimals: u32) {
+    fn set_asset_config(asset: b256, max_leverage: u256) {
         only_owner();
 
+        require(asset != BASE_ASSET, Error::VaultInvalidAsset);
+        require(max_leverage <= MAX_LEVERAGE, Error::VaultInvalidMaxLeverage);
+
+        storage::vault.max_leverage.insert(asset, max_leverage);
         storage::vault.whitelisted_assets.insert(asset, true);
-        storage::vault.asset_decimals.insert(asset, asset_decimals);
 
         log(SetAssetConfig {
             asset,
-            asset_decimals,
+            max_leverage,
         });
     }
 
@@ -339,7 +340,7 @@ impl Vault for Contract {
         );
 
         storage::vault.whitelisted_assets.remove(asset);
-        storage::vault.asset_decimals.remove(asset);
+        storage::vault.max_leverage.remove(asset);
 
         log(ClearAssetConfig { asset });
     }
@@ -411,8 +412,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_pool_amounts(asset: b256) -> u256 {
-        storage::vault.pool_amounts.get(asset).try_read().unwrap_or(0)
+    fn get_total_reserves() -> u256 {
+        storage::vault.total_reserves.read()
     }
 
     #[storage(read)]
@@ -426,13 +427,8 @@ impl Vault for Contract {
     }
 
     #[storage(read)]
-    fn get_asset_decimals(asset: b256) -> u32 {
-        storage::vault.asset_decimals.get(asset).try_read().unwrap_or(0)
-    }
-
-    #[storage(read)]
-    fn get_collateral_asset() -> AssetId {
-        COLLATERAL_ASSET_ID
+    fn get_base_asset() -> AssetId {
+        BASE_ASSET_ID
     }
 
     fn get_lp_asset() -> AssetId {
@@ -476,17 +472,17 @@ impl Vault for Contract {
 
     #[storage(read)]
     fn get_liquidation_fee() -> u256 {
-        storage::vault.liquidation_fee.read()
+        storage::vault.liquidation_fee.try_read().unwrap_or(0)
     }
 
     #[storage(read)]
-    fn get_mint_burn_fee_basis_points() -> u64 {
-        storage::vault.mint_burn_fee_basis_points.read()
+    fn get_liquidity_fee_basis_points() -> u64 {
+        storage::vault.liquidity_fee_basis_points.try_read().unwrap_or(0)
     }
 
     #[storage(read)]
-    fn get_margin_fee_basis_points() -> u64 {
-        storage::vault.margin_fee_basis_points.read()
+    fn get_position_fee_basis_points() -> u64 {
+        storage::vault.position_fee_basis_points.try_read().unwrap_or(0)
     }
 
     #[storage(read)]
@@ -506,11 +502,13 @@ impl Vault for Contract {
 
     #[storage(read)]
     fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
+        _only_initialized();
         _get_add_liquidity_amount(asset_amount)
     }
 
     #[storage(read)]
-    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64) {
+    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64, u64) {
+        _only_initialized();
         _get_remove_liquidity_amount(lp_asset_amount)
     }
 
@@ -641,6 +639,7 @@ fn _write_position(position_key: b256, position: Position) {
 #[storage(write)]
 fn _write_fee_reserve(fee_reserve: u256) {
     storage::vault.fee_reserve.write(fee_reserve);
+    // TODO remove this event?
     log(WriteFeeReserve { fee_reserve });
 }
 
@@ -649,22 +648,12 @@ fn _get_after_fee_amount(amount: u64, fee_basis_points: u64) -> u64 {
     amount * (BASIS_POINTS_DIVISOR - fee_basis_points) / BASIS_POINTS_DIVISOR
 }
 
-#[storage(read, write)]
-fn _collect_swap_fees(amount: u64, after_fee_amount: u64) {
-    let fee_amount = amount - after_fee_amount;
-
-    let fee_reserve = _get_fee_reserve();
-    _write_fee_reserve(fee_reserve + fee_amount.as_u256());
-
-    log(CollectSwapFees { fee_amount });
-}
-
 /// price in the usd
 /// max/min prices express the spread, to be provided in the future
 #[storage(read)]
 fn _get_max_price(asset: b256) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
-    let collateral_asset_price = pricefeed_wrapper.price(COLLATERAL_ASSET);
+    let collateral_asset_price = pricefeed_wrapper.price(BASE_ASSET);
     let asset_price = pricefeed_wrapper.price(asset);
     // TODO overflow check
     asset_price * PRICE_PRECISION / collateral_asset_price
@@ -675,7 +664,7 @@ fn _get_max_price(asset: b256) -> u256 {
 #[storage(read)]
 fn _get_min_price(asset: b256) -> u256 {
     let pricefeed_wrapper = abi(PricefeedWrapper, PRICEFEED_WRAPPER.bits());
-    let collateral_asset_price = pricefeed_wrapper.price(COLLATERAL_ASSET);
+    let collateral_asset_price = pricefeed_wrapper.price(BASE_ASSET);
     let asset_price = pricefeed_wrapper.price(asset);
     // TODO overflow check
     asset_price * PRICE_PRECISION / collateral_asset_price
@@ -689,11 +678,6 @@ fn _is_asset_whitelisted(asset: b256) -> bool {
 #[storage(read)]
 fn _get_position_by_key(position_key: b256) -> Position {
     storage::vault.positions.get(position_key).try_read().unwrap_or(Position::default())
-}
-
-#[storage(read)]
-fn _get_pool_amounts(asset: b256) -> u256 {
-    storage::vault.pool_amounts.get(asset).try_read().unwrap_or(0)
 }
 
 #[storage(read)]
@@ -713,6 +697,7 @@ fn _get_position_key(account: Identity, index_asset: b256, is_long: bool) -> b25
 /// 0: no liquidation needed
 /// 1: losses exceed collateral
 /// 2: max leverage exceeded
+/// The liquidation status does not depend on the total reserves.
 #[storage(read)]
 fn _validate_liquidation(
     account: Identity,
@@ -814,9 +799,10 @@ fn _get_position_fee(
         return 0;
     }
 
-    let margin_fee_basis_points = storage::vault.margin_fee_basis_points.try_read().unwrap_or(0).as_u256();
+    // TODO remove try_read?
+    let position_fee_basis_points = storage::vault.position_fee_basis_points.try_read().unwrap_or(0).as_u256();
 
-    size_delta * margin_fee_basis_points / BASIS_POINTS_DIVISOR.as_u256()
+    size_delta * position_fee_basis_points / BASIS_POINTS_DIVISOR.as_u256()
 }
 
 #[storage(read)]
@@ -826,39 +812,6 @@ fn _get_position_pnl(account: Identity, index_asset: b256, is_long: bool) -> (bo
     let position = _get_position_by_key(position_key);
 
     _get_pnl(index_asset, position.size, position.average_price, is_long)
-}
-
-#[storage(read, write)]
-fn _increase_pool_amount(amount: u256) {
-    let asset = COLLATERAL_ASSET;
-    let new_pool_amount = _get_pool_amounts(asset) + amount;
-    storage::vault.pool_amounts.insert(asset, new_pool_amount);
-    log(WritePoolAmount {
-        asset,
-        pool_amount: new_pool_amount,
-    });
-
-    let balance = balance_of(ContractId::this(), COLLATERAL_ASSET_ID);
-
-    require(
-        new_pool_amount <= balance
-            .as_u256(),
-        Error::VaultInvalidIncrease,
-    );
-}
-
-#[storage(read, write)]
-fn _decrease_pool_amount(amount: u256) {
-    let asset = COLLATERAL_ASSET;
-    let pool_amount = _get_pool_amounts(asset);
-    require(pool_amount >= amount, Error::VaultPoolAmountExceeded);
-
-    let new_pool_amount = pool_amount - amount;
-    storage::vault.pool_amounts.insert(asset, new_pool_amount);
-    log(WritePoolAmount {
-        asset,
-        pool_amount: new_pool_amount,
-    });
 }
 
 #[storage(read)]
@@ -878,15 +831,6 @@ fn _validate_router(account: Identity) {
             .unwrap_or(false),
         Error::VaultInvalidMsgCaller,
     );
-}
-
-fn _validate_position(size: u256, collateral: u256) {
-    if size == 0 {
-        require(collateral == 0, Error::VaultCollateralShouldBeWithdrawn);
-        return;
-    }
-
-    require(size >= collateral, Error::VaultSizeMustBeMoreThanCollateral);
 }
 
 // calculates the next average price for a position
@@ -924,21 +868,6 @@ fn _get_next_average_price(
 }
 
 #[storage(read, write)]
-fn _collect_position_fee(
-    account: Identity,
-    index_asset: b256,
-    is_long: bool,
-    size_delta: u256,
-) -> u256 {
-    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
-
-    let new_fee_reserve = _get_fee_reserve() + position_fee;
-    _write_fee_reserve(new_fee_reserve);
-
-    position_fee
-}
-
-#[storage(read, write)]
 fn _withdraw_fees(receiver: Identity) -> u64 {
     let amount = u64::try_from(_get_fee_reserve()).unwrap();
     if amount == 0 {
@@ -947,12 +876,7 @@ fn _withdraw_fees(receiver: Identity) -> u64 {
 
     storage::vault.fee_reserve.write(0);
 
-    _transfer_out(
-        COLLATERAL_ASSET_ID,
-        u64::try_from(amount)
-            .unwrap(),
-        receiver,
-    );
+    _transfer_out(BASE_ASSET_ID, u64::try_from(amount).unwrap(), receiver);
 
     log(WithdrawFees {
         receiver,
@@ -963,13 +887,21 @@ fn _withdraw_fees(receiver: Identity) -> u64 {
 }
 
 #[storage(read)]
-fn _get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
-    let fee_basis_points = storage::vault.mint_burn_fee_basis_points.try_read().unwrap_or(0);
+fn _get_add_liquidity_amount(base_asset_amount: u64) -> (u64, u64, u64) {
+    let fee_basis_points = storage::vault.liquidity_fee_basis_points.read();
 
-    let amount_after_fees = _get_after_fee_amount(asset_amount, fee_basis_points);
+    let amount_after_fees = _get_after_fee_amount(base_asset_amount, fee_basis_points);
 
-    //TODO: it is 1:1 lp assets to collateral assets now
-    let mint_amount = amount_after_fees;
+    let total_lp_assets = storage::lp_asset.total_supply.read();
+    let total_liquidity = storage::vault.total_liquidity.read();
+    // no threat to overflow since all values fit u64
+    let mint_amount_u256 = if total_liquidity == 0 {
+        amount_after_fees.as_u256()
+    } else {
+        total_lp_assets.as_u256() * amount_after_fees.as_u256() / total_liquidity
+    };
+    // not threat to overflow since total_lp_assets <= total_liquidity
+    let mint_amount = u64::try_from(mint_amount_u256).unwrap();
     (mint_amount, amount_after_fees, fee_basis_points)
 }
 
@@ -977,22 +909,21 @@ fn _get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64) {
 fn _add_liquidity(receiver: Identity) -> u64 {
     require(!receiver.is_zero(), Error::VaultReceiverCannotBeZero);
 
-    let asset_amount = _transfer_in(COLLATERAL_ASSET_ID);
-    require(asset_amount > 0, Error::VaultInvalidAssetAmount);
+    let base_asset_amount = _transfer_in(BASE_ASSET_ID);
+    require(base_asset_amount > 0, Error::VaultInvalidBaseAssetAmount);
 
-    let (mint_amount, amount_after_fees, fee_basis_points) = _get_add_liquidity_amount(asset_amount);
-    // this needs to be called here because _get_add_liquidity_amount is read-only and cannot update state
-    _collect_swap_fees(asset_amount, amount_after_fees);
+    let (mint_amount, amount_after_fees, fee_basis_points) = _get_add_liquidity_amount(base_asset_amount);
+    require(mint_amount > 0, Error::VaultDustyBaseAssetAmount);
 
-    _increase_pool_amount(amount_after_fees.as_u256());
+    let fee_amount = base_asset_amount - amount_after_fees;
 
-    // TODO does it make sense?
-    // require amount to be less than u64::max
-    require(
-        mint_amount < u64::max(),
-        Error::VaultInvalidMintAmountGtU64Max,
-    );
-    require(mint_amount > 0, "mint_amount is 0");
+    _write_fee_reserve(_get_fee_reserve() + fee_amount.as_u256());
+
+    let new_total_reserves = storage::vault.total_reserves.read() + amount_after_fees.as_u256();
+    storage::vault.total_reserves.write(new_total_reserves);
+
+    let new_total_liquidity = storage::vault.total_liquidity.read() + amount_after_fees.as_u256();
+    storage::vault.total_liquidity.write(new_total_liquidity);
 
     let new_supply = mint_amount + storage::lp_asset.total_supply.read();
     storage::lp_asset.total_supply.write(new_supply);
@@ -1007,26 +938,38 @@ fn _add_liquidity(receiver: Identity) -> u64 {
 
     log(AddLiquidity {
         account: receiver,
-        stable_asset_amount: asset_amount,
+        base_asset_amount: base_asset_amount,
         lp_asset_amount: mint_amount,
-        fee: asset_amount - amount_after_fees,
+        fee: fee_amount,
     });
 
     mint_amount
 }
 
 #[storage(read)]
-fn _get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64) {
-    //TODO: it is 1:1 lp assets to collateral assets now
-    let redemption_amount = lp_asset_amount;
+fn _get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64, u64) {
+    let fee_basis_points = storage::vault.liquidity_fee_basis_points.read();
 
-    require(redemption_amount > 0, Error::VaultInvalidRedemptionAmount);
+    let total_lp_assets = storage::lp_asset.total_supply.read();
+    let total_reserves = storage::vault.total_reserves.read();
+    let total_liquidity = storage::vault.total_liquidity.read();
 
-    let fee_basis_points = storage::vault.mint_burn_fee_basis_points.try_read().unwrap_or(0);
+    // no threat to overflow since all values fit u64
+    let liquidity_amount_u256 = total_liquidity * lp_asset_amount.as_u256() / total_lp_assets.as_u256();
+    // not threat to overflow since all values fit u64
+    let liquidity_amount = u64::try_from(liquidity_amount_u256).unwrap();
+
+    let redemption_amount_u256 = if total_liquidity > total_reserves {
+        // not threat to overflow since total_reserves <= total_liquidity and all values fit u64
+        liquidity_amount_u256 * total_reserves / total_liquidity
+    } else {
+        liquidity_amount_u256
+    };
+    // not threat to overflow since all values fit u64
+    let redemption_amount = u64::try_from(redemption_amount_u256).unwrap();
 
     let amount_out = _get_after_fee_amount(redemption_amount, fee_basis_points);
-    require(amount_out > 0, Error::VaultInvalidAmountOut);
-    (redemption_amount, amount_out, fee_basis_points)
+    (liquidity_amount, redemption_amount, amount_out, fee_basis_points)
 }
 
 #[storage(read, write)]
@@ -1034,22 +977,23 @@ fn _remove_liquidity(receiver: Identity) -> u64 {
     require(!receiver.is_zero(), Error::VaultReceiverCannotBeZero);
 
     let lp_asset_amount = _transfer_in(AssetId::default());
-    require(lp_asset_amount > 0, Error::VaultInvalidRusdAmount);
+    require(lp_asset_amount > 0, Error::VaultInvalidLpAssetAmount);
 
-    // TODO does it make sense?
-    // require amount to be less than u64::max
-    require(
-        lp_asset_amount < u64::max(),
-        Error::VaultInvalidRUSDBurnAmountGtU64Max,
-    );
+    let (liquidity_amount, redemption_amount, amount_out, fee_basis_points) = _get_remove_liquidity_amount(lp_asset_amount);
 
-    let (redemption_amount, amount_out, fee_basis_points) = _get_remove_liquidity_amount(lp_asset_amount);
-    // this needs to be called here because _get_remove_liquidity_amount is read-only and cannot update state
-    _collect_swap_fees(redemption_amount, amount_out);
     require(amount_out > 0, Error::VaultInvalidAmountOut);
 
-    _decrease_pool_amount(redemption_amount.as_u256());
+    let fee_amount = redemption_amount - amount_out;
 
+    _write_fee_reserve(_get_fee_reserve() + fee_amount.as_u256());
+
+    let new_total_reserves = storage::vault.total_reserves.read() - redemption_amount.as_u256();
+    storage::vault.total_reserves.write(new_total_reserves);
+
+    let new_total_liquidity = storage::vault.total_liquidity.read() - liquidity_amount.as_u256();
+    storage::vault.total_liquidity.write(new_total_liquidity);
+
+    // not threat to overflow since all values fit u64
     let burn_amount_u64 = u64::try_from(lp_asset_amount).unwrap();
     let new_supply = storage::lp_asset.total_supply.read() - burn_amount_u64;
     storage::lp_asset.total_supply.write(new_supply);
@@ -1062,12 +1006,12 @@ fn _remove_liquidity(receiver: Identity) -> u64 {
 
     log(RemoveLiquidity {
         account: receiver,
-        stable_asset_amount: amount_out,
+        base_asset_amount: amount_out,
         lp_asset_amount: burn_amount_u64,
-        fee: redemption_amount - amount_out,
+        fee: fee_amount,
     });
 
-    _transfer_out(COLLATERAL_ASSET_ID, amount_out, receiver);
+    _transfer_out(BASE_ASSET_ID, amount_out, receiver);
 
     amount_out
 }
@@ -1083,10 +1027,6 @@ fn _increase_position(
 
     _validate_router(account);
 
-    require(
-        index_asset != COLLATERAL_ASSET,
-        Error::VaultShortIndexAssetMustNotBeStableAsset,
-    );
     require(
         _is_asset_whitelisted(index_asset),
         Error::VaultAssetNotWhitelisted,
@@ -1112,12 +1052,58 @@ fn _increase_position(
         });
     }
 
+    let collateral_delta = _transfer_in(BASE_ASSET_ID).as_u256();
+
+    let total_reserves = storage::vault.total_reserves.read();
+
+    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
+
+    let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
+        index_asset,
+        position
+            .size,
+        is_long,
+        position
+            .cumulative_funding_rate,
+    );
+
+    let (
+        out_protocol_fee,
+        _,
+        _,
+        out_funding_rate,
+        _,
+        out_collateral,
+        out_total_reserves,
+        status,
+    ) = _calculate_settlement(
+        position_fee,
+        0,
+        0,
+        funding_rate,
+        funding_rate_has_profit,
+        0,
+        true,
+        position
+            .collateral + collateral_delta,
+        total_reserves,
+    );
+
+    match status {
+        PositionSettlementStatus::InsufficientCollateral => {
+            require(false, Error::VaultInsufficientCollateral);
+        }
+        _ => {}
+    }
+
+    // TODO one price
     let price = if is_long {
         _get_max_price(index_asset)
     } else {
         _get_min_price(index_asset)
     };
 
+    // update the average price before the size and collateral are updated
     position.average_price = if position.size == 0 {
         price
     } else if size_delta == 0 {
@@ -1135,44 +1121,17 @@ fn _increase_position(
         )
     };
 
-    let position_fee = _collect_position_fee(account, index_asset, is_long, size_delta);
-
-    let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
-        index_asset,
-        position
-            .size,
-        is_long,
-        position
-            .cumulative_funding_rate,
-    );
-
-    // TODO make collateral u64?
-    let collateral_delta = _transfer_in(COLLATERAL_ASSET_ID).as_u256();
-
-    position.collateral = position.collateral + collateral_delta;
-
-    if funding_rate_has_profit {
-        // TODO in some crazy situations funding rate can be greater than the total supply of collateral asset
-        position.collateral = position.collateral + funding_rate;
-    } else {
-        require(
-            position
-                .collateral >= funding_rate,
-            Error::VaultInsufficientCollateralForFees,
-        );
-        position.collateral = position.collateral - funding_rate;
-    }
-
-    require(
-        position
-            .collateral >= position_fee,
-        Error::VaultInsufficientCollateralForFees,
-    );
-    position.collateral = position.collateral - position_fee;
+    // update the total collateral before the size and collateral are updated
+    // no threat to underflow
+    storage::vault
+        .total_collateral
+        .write(storage::vault.total_collateral.read() + out_collateral - position.collateral);
+    // total_reserves must be written before _validate_liquidation is called
+    storage::vault.total_reserves.write(out_total_reserves);
+    _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
 
     position.size = position.size + size_delta;
-
-    position.last_increased_time = timestamp();
+    position.collateral = out_collateral;
 
     // TODO collateral may be high because of funding rate, maybe excess should be returned to the user?
     require(
@@ -1182,12 +1141,13 @@ fn _increase_position(
         Error::VaultSizeMustBeMoreThanCollateral,
     );
 
-    // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
-    // validates the average_price. If not for this position write, it would receive a stale avg price (could be 0)
-    let new_cumulative_funding_rate = _increase_and_update_funding_info(index_asset, size_delta, is_long);
+    position.last_increased_time = timestamp();
 
+    let new_cumulative_funding_rate = _increase_and_update_funding_info(index_asset, size_delta, is_long);
     position.cumulative_funding_rate = new_cumulative_funding_rate;
 
+    // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
+    // validates the average_price. If not for this position write, it would receive a stale avg price (could be 0)
     _write_position(position_key, position);
 
     let (_liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, true);
@@ -1232,7 +1192,9 @@ fn _decrease_position(
         Error::VaultCollateralExceeded,
     );
 
-    let position_fee = _collect_position_fee(account, index_asset, is_long, size_delta);
+    let total_reserves = storage::vault.total_reserves.read();
+
+    let position_fee = _get_position_fee(account, index_asset, is_long, size_delta);
 
     let (has_profit, pnl_delta) = _get_pnl(index_asset, size_delta, position.average_price, is_long);
 
@@ -1244,64 +1206,69 @@ fn _decrease_position(
         position
             .cumulative_funding_rate,
     );
+    let (
+        out_protocol_fee,
+        _,
+        _,
+        out_funding_rate,
+        out_pnl_delta,
+        mut out_collateral,
+        out_total_reserves,
+        status,
+    ) = _calculate_settlement(
+        position_fee,
+        0,
+        0,
+        funding_rate,
+        funding_rate_has_profit,
+        pnl_delta,
+        has_profit,
+        position
+            .collateral,
+        total_reserves,
+    );
+
+    match status {
+        PositionSettlementStatus::InsufficientCollateral => {
+            require(false, Error::VaultInsufficientCollateral);
+        }
+        _ => {}
+    }
 
     if pnl_delta > 0 {
         if has_profit {
-            position.realized_pnl = position.realized_pnl + I256::from_uint(pnl_delta);
+            position.realized_pnl = position.realized_pnl + I256::from_uint(out_pnl_delta);
         } else {
-            position.realized_pnl = position.realized_pnl - I256::from_uint(pnl_delta);
+            position.realized_pnl = position.realized_pnl - I256::from_uint(out_pnl_delta);
         }
     }
 
-    let mut adjusted_collateral = position.collateral;
-
-    // first add, then subtract
-    if has_profit {
-        // TODO it an extreme case it may overflow
-        adjusted_collateral = adjusted_collateral + pnl_delta;
-    }
-
-    if funding_rate_has_profit {
-        adjusted_collateral = adjusted_collateral + funding_rate;
-    }
-
-    require(
-        adjusted_collateral >= position_fee,
-        Error::VaultInsufficientCollateralForFees,
-    );
-    adjusted_collateral = adjusted_collateral - position_fee;
-
-    if !has_profit {
-        require(
-            adjusted_collateral >= pnl_delta,
-            Error::VaultInsufficientCollateralForFees, // TODO good error message?
-        );
-        adjusted_collateral = adjusted_collateral - pnl_delta;
-    }
-
-    if !funding_rate_has_profit {
-        require(
-            adjusted_collateral >= funding_rate,
-            Error::VaultInsufficientCollateralForFees, // TODO good error message?
-        );
-        adjusted_collateral = adjusted_collateral - funding_rate;
-    }
-
-    let mut collateral_out_after_fee = 0;
+    // if the position is not closed, amount above the collateral target is returned to the user
+    let collateral_target = position.collateral - collateral_delta;
+    let mut amount_out = 0;
     if position.size == size_delta {
-        collateral_out_after_fee = adjusted_collateral;
-        position.collateral = 0;
-    } else if adjusted_collateral > position.collateral - collateral_delta
-    {
-        collateral_out_after_fee = adjusted_collateral - (position.collateral - collateral_delta);
-        position.collateral = position.collateral - collateral_delta;
+        amount_out = out_collateral;
+        out_collateral = 0;
+    } else if out_collateral > collateral_target {
+        amount_out = out_collateral - collateral_target;
+        out_collateral = collateral_target;
     } else {
-        collateral_out_after_fee = 0;
-        position.collateral = adjusted_collateral;
+        amount_out = 0;
+        // out_collateral is unchanged
     }
+
+    // update the total collateral before the size and collateral are updated
+    // no threat to underflow
+    storage::vault
+        .total_collateral
+        .write(storage::vault.total_collateral.read() + out_collateral - position.collateral);
+    // total_reserves must be written before _validate_liquidation is called
+    storage::vault.total_reserves.write(out_total_reserves);
+    _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
 
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, size_delta, is_long);
 
+    // TODO one price
     let price = if is_long {
         _get_min_price(index_asset)
     } else {
@@ -1309,13 +1276,21 @@ fn _decrease_position(
     };
 
     if position.size != size_delta {
+        position.collateral = out_collateral;
+        // no threat to underflow
         position.size = position.size - size_delta;
 
         position.last_increased_time = timestamp();
 
         position.cumulative_funding_rate = new_cumulative_funding_rate;
 
-        _validate_position(position.size, position.collateral);
+        // TODO collateral may be high because of funding rate, maybe excess should be returned to the user?
+        require(
+            position
+                .size >= position
+                .collateral,
+            Error::VaultSizeMustBeMoreThanCollateral,
+        );
 
         // update storage because the above changes are ignored by call to other fn `validate_liquidation`
         // we need to have a storage write here because _validate_liquidation re-constructs the position key and 
@@ -1334,13 +1309,20 @@ fn _decrease_position(
             price,
             average_price: position.average_price,
             position_fee,
-            funding_rate,
+            funding_rate: out_funding_rate,
             funding_rate_has_profit,
             pnl_delta_has_profit: has_profit,
-            pnl_delta,
+            pnl_delta: out_pnl_delta,
             cumulative_funding_rate: new_cumulative_funding_rate,
         });
     } else {
+        // remove the position from storage
+        storage::vault.positions.remove(position_key);
+        log(WritePosition { // TODO do we need this event?
+            position_key,
+            position: Position::default(),
+        });
+
         log(DecreasePosition {
             key: position_key,
             account,
@@ -1351,35 +1333,23 @@ fn _decrease_position(
             price,
             average_price: position.average_price,
             position_fee,
-            funding_rate,
+            funding_rate: out_funding_rate,
             funding_rate_has_profit,
             pnl_delta_has_profit: has_profit,
-            pnl_delta,
+            pnl_delta: out_pnl_delta,
             cumulative_funding_rate: new_cumulative_funding_rate,
         });
         log(ClosePosition {
             key: position_key,
             realized_pnl: position.realized_pnl,
         });
-
-        // remove the position from storage
-        storage::vault.positions.remove(position_key);
-        log(WritePosition {
-            position_key,
-            position: Position::default(),
-        });
     }
 
-    if collateral_out_after_fee > 0 {
+    if amount_out > 0 {
         // @TODO: potential revert here
-        _transfer_out(
-            COLLATERAL_ASSET_ID,
-            u64::try_from(collateral_out_after_fee)
-                .unwrap(),
-            receiver,
-        );
+        _transfer_out(BASE_ASSET_ID, u64::try_from(amount_out).unwrap(), receiver);
     }
-    (position.collateral, price, collateral_out_after_fee)
+    (position.collateral, price, amount_out)
 }
 
 #[storage(read, write)]
@@ -1409,11 +1379,13 @@ fn _liquidate_position(
     let (liquidation_state, _left_collateral) = _validate_liquidation(account, index_asset, is_long, false);
     require(liquidation_state != 0, Error::VaultCannotBeLiquidated);
 
-    let mut position_fee = _get_position_fee(account, index_asset, is_long, position.size);
+    let total_reserves = storage::vault.total_reserves.read();
 
-    let (mut has_profit, mut pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
+    let position_fee = _get_position_fee(account, index_asset, is_long, position.size);
 
-    let (mut funding_rate, mut funding_rate_has_profit) = _calculate_funding_rate(
+    let (has_profit, pnl_delta) = _get_pnl(index_asset, position.size, position.average_price, is_long);
+
+    let (funding_rate, funding_rate_has_profit) = _calculate_funding_rate(
         index_asset,
         position
             .size,
@@ -1422,56 +1394,38 @@ fn _liquidate_position(
             .cumulative_funding_rate,
     );
 
-    let mut liquidation_fee = storage::vault.liquidation_fee.try_read().unwrap_or(0);
+    let liquidation_fee = storage::vault.liquidation_fee.try_read().unwrap_or(0);
 
-    // recalculate losses and fees
-    // in the order of priority
-    let mut available_collateral = position.collateral;
+    let (
+        out_protocol_fee,
+        _,
+        out_liquidation_fee,
+        out_funding_rate,
+        out_pnl_delta,
+        out_collateral,
+        out_total_reserves,
+        _,
+    ) = _calculate_settlement(
+        position_fee,
+        0,
+        liquidation_fee,
+        funding_rate,
+        funding_rate_has_profit,
+        pnl_delta,
+        has_profit,
+        position
+            .collateral,
+        total_reserves,
+    );
 
-    if funding_rate_has_profit {
-        available_collateral = available_collateral + funding_rate;
-    }
-
-    if has_profit {
-        available_collateral = available_collateral + pnl_delta;
-    }
-
-    if !funding_rate_has_profit {
-        if available_collateral < funding_rate {
-            funding_rate = available_collateral;
-            available_collateral = 0;
-        } else {
-            available_collateral = available_collateral - funding_rate;
-        }
-    }
-
-    if available_collateral < liquidation_fee {
-        liquidation_fee = available_collateral;
-        available_collateral = 0;
-    } else {
-        available_collateral = available_collateral - liquidation_fee;
-    }
-
-    if !has_profit {
-        if available_collateral < pnl_delta {
-            pnl_delta = available_collateral;
-            available_collateral = 0;
-        } else {
-            available_collateral = available_collateral - pnl_delta;
-        }
-    }
-
-    if available_collateral < position_fee {
-        position_fee = available_collateral;
-        available_collateral = 0;
-    } else {
-        available_collateral = available_collateral - position_fee;
-    }
-
-    if position_fee > 0 {
-        let new_fee_reserve = _get_fee_reserve() + position_fee;
-        _write_fee_reserve(new_fee_reserve);
-    }
+    storage::vault
+        .total_collateral
+        .write(storage::vault.total_collateral.read() - position.collateral);
+    // remaining collateral is moved to the reserves
+    storage::vault
+        .total_reserves
+        .write(out_total_reserves + out_collateral);
+    _write_fee_reserve(_get_fee_reserve() + out_protocol_fee);
 
     let new_cumulative_funding_rate = _decrease_and_update_funding_info(index_asset, position.size, is_long);
 
@@ -1480,6 +1434,13 @@ fn _liquidate_position(
     } else {
         _get_max_price(index_asset)
     };
+
+    storage::vault.positions.remove(position_key);
+    log(WritePosition {
+        position_key,
+        position: Position::default(),
+    });
+
     log(LiquidatePosition {
         key: position_key,
         account,
@@ -1488,27 +1449,185 @@ fn _liquidate_position(
         collateral: position.collateral,
         size: position.size,
         mark_price,
-        position_fee,
-        funding_rate,
+        position_fee: out_protocol_fee,
+        funding_rate: out_funding_rate,
         funding_rate_has_profit,
-        liquidation_fee,
+        liquidation_fee: out_liquidation_fee,
         pnl_delta_has_profit: has_profit,
-        pnl_delta,
+        pnl_delta: out_pnl_delta,
         cumulative_funding_rate: new_cumulative_funding_rate,
     });
 
-    storage::vault.positions.remove(position_key);
-
     // pay the fee receiver using the pool
-    if liquidation_fee > 0 {
+    if out_liquidation_fee > 0 {
         _transfer_out(
-            COLLATERAL_ASSET_ID,
+            BASE_ASSET_ID,
             // @TODO: potential revert here
-            u64::try_from(liquidation_fee)
+            u64::try_from(out_liquidation_fee)
                 .unwrap(),
             fee_receiver,
         );
     }
+}
+
+/// The pure function to calculate the settlement of the position.
+/// It checks if there is enough collateral or total reserves to cover the settlement.
+/// If not, it cuts the values according to priorities.
+/// Priorities are: fees, the funding rate, and the pnl delta.
+/// The complexity comes from the fact that the function aggregates the flows to cover all cases.
+/// Returns updated values of the protocol fee, liquidity fee, liquidation fee, funding rate, pnl delta, collateral, total reserves, and the status.
+/// The status is: success, insufficient collateral, or insufficient reserves.
+/// The insufficient collateral status overrides the insufficient reserves status if both are set.
+///
+/// Rules.
+/// If funding_rate_has_profit is true, the funding_rate amount is moved from the reserves to the collateral.
+/// If it is false, then the funding_rate amount is moved from the collateral to the reserves.
+/// If pnl_delta_has_profit is true, the pnl_delta amount is moved from the reserves to the collateral.
+/// If it is false, then the pnl_delta amount is moved from the collateral to the reserves.
+/// The liquidity fee is moved from the collateral to the reserves always.
+/// The protocol fee is subtracted from the collateral (collected in a separate record).
+/// The liquidation fee is subtracted from the collateral (collected in a separate record).
+/// The final collateral cannot be negative.
+/// If it is negative, the status is set to insufficient collateral and outgoing payments are cut so the final collateral is 0.
+/// The final total reserves cannot be negative.
+/// If it is negative, the status is set to insufficient reserves and outgoing payments are cut so the final reserves is 0.
+/// The payments have priorities (descending order): protocol fee, liquidation fee, liquidity fee, funding rate, pnl delta.
+/// If the collateral or reserves are insufficient, the payments are cut according to the priorities.
+/// The funds flow is optimized so incomes are first accounted for and then expenses -
+/// it is relevant when payments are cut.
+fn _calculate_settlement(
+    protocol_fee: u256,
+    liquidity_fee: u256,
+    liquidation_fee: u256,
+    funding_rate: u256,
+    funding_rate_has_profit: bool,
+    pnl_delta: u256,
+    pnl_delta_has_profit: bool,
+    collateral: u256,
+    total_reserves: u256,
+) -> (u256, u256, u256, u256, u256, u256, u256, PositionSettlementStatus) {
+    // amount that goes from the collateral to the reserves
+    let amount_to_reserves = liquidity_fee + (if !funding_rate_has_profit {
+        funding_rate
+    } else {
+        0
+    }) + (if !pnl_delta_has_profit { pnl_delta } else { 0 });
+
+    // amount that goes from the reserves to the collateral
+    let amount_to_collateral = (if funding_rate_has_profit {
+        funding_rate
+    } else {
+        0
+    }) + (if pnl_delta_has_profit { pnl_delta } else { 0 });
+
+    let mut out_collateral = collateral;
+    let mut out_reserves = total_reserves;
+    let mut out_liquidity_fee = liquidity_fee; // default value when amount_to_collateral == amount_to_reserves
+    let mut out_funding_rate = funding_rate; // default value when amount_to_collateral == amount_to_reserves
+    let mut out_pnl_delta = pnl_delta; // default value when amount_to_collateral == amount_to_reserves
+    // we do not use a simple comparison out_reserves ==0 or out_collateral ==0 at the end
+    // in order to to cover boundary cases
+    let mut status = PositionSettlementStatus::Success;
+
+    // this is ok to cover the case when reserves -> collateral before other fees
+    // the aggregated flow moves funds from the reserves to the collateral
+    if amount_to_collateral > amount_to_reserves {
+        out_reserves = out_reserves + amount_to_reserves;
+        out_liquidity_fee = liquidity_fee;
+        if funding_rate_has_profit {
+            out_funding_rate = if out_reserves < funding_rate {
+                out_reserves
+            } else {
+                funding_rate
+            };
+            out_reserves = out_reserves - out_funding_rate;
+            out_collateral = out_collateral + out_funding_rate;
+        }
+        if pnl_delta_has_profit {
+            out_pnl_delta = if out_reserves < pnl_delta {
+                out_reserves
+            } else {
+                pnl_delta
+            };
+            out_reserves = out_reserves - out_pnl_delta;
+            out_collateral = out_collateral + out_pnl_delta;
+        }
+        // save to substract, finally in this if-block out_collateral does not decrease
+        out_collateral = out_collateral - amount_to_reserves;
+        if amount_to_collateral > total_reserves + amount_to_reserves
+        {
+            status = PositionSettlementStatus::InsufficientReserves;
+        }
+    }
+
+    let out_protocol_fee = if out_collateral < protocol_fee {
+        out_collateral
+    } else {
+        protocol_fee
+    };
+    out_collateral = out_collateral - out_protocol_fee;
+    if out_protocol_fee < protocol_fee {
+        // this may override InsufficientReserves, but that's ok
+        status = PositionSettlementStatus::InsufficientCollateral;
+    }
+
+    let out_liquidation_fee = if out_collateral < liquidation_fee {
+        out_collateral
+    } else {
+        liquidation_fee
+    };
+    out_collateral = out_collateral - out_liquidation_fee;
+    if out_liquidation_fee < liquidation_fee {
+        // this may override InsufficientReserves, but that's ok
+        status = PositionSettlementStatus::InsufficientCollateral;
+    }
+
+    // the aggregated flow moves funds from the collateral to the reserves
+    if amount_to_collateral < amount_to_reserves {
+        // we have to update the status before the out_collateral is updated
+        if amount_to_reserves > out_collateral + amount_to_collateral
+        {
+            status = PositionSettlementStatus::InsufficientCollateral;
+        }
+        out_collateral = out_collateral + amount_to_collateral;
+        out_liquidity_fee = if out_collateral < liquidity_fee {
+            out_collateral
+        } else {
+            liquidity_fee
+        };
+        out_collateral = out_collateral - out_liquidity_fee;
+        out_reserves = out_reserves + out_liquidity_fee;
+        if !funding_rate_has_profit {
+            out_funding_rate = if out_collateral < funding_rate {
+                out_collateral
+            } else {
+                funding_rate
+            };
+            out_collateral = out_collateral - out_funding_rate;
+            out_reserves = out_reserves + out_funding_rate;
+        }
+        if !pnl_delta_has_profit {
+            out_pnl_delta = if out_collateral < pnl_delta {
+                out_collateral
+            } else {
+                pnl_delta
+            };
+            out_collateral = out_collateral - out_pnl_delta;
+            out_reserves = out_reserves + out_pnl_delta;
+        }
+        // save to substract, finally in this if-block out_reserves does not decrease
+        out_reserves = out_reserves - amount_to_collateral;
+    }
+    (
+        out_protocol_fee,
+        out_liquidity_fee,
+        out_liquidation_fee,
+        out_funding_rate,
+        out_pnl_delta,
+        out_collateral,
+        out_reserves,
+        status,
+    )
 }
 
 /// `long_cumulative_funding_rate` and `short_cumulative_funding_rate`

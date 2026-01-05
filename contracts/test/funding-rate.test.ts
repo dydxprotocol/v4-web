@@ -1,4 +1,17 @@
 import { WalletUnlocked } from "fuels"
+import { launchNode, getNodeWallets } from "./node.js"
+import {
+    call,
+    AddressIdentity,
+    walletToAddressIdentity,
+    expandDecimals,
+    BASE_ASSET,
+    USDC_ASSET,
+    BTC_ASSET,
+    getBtcConfig,
+    getAssetId,
+    moveBlockchainTime,
+} from "./utils.js"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import {
@@ -12,21 +25,6 @@ import {
     VaultExposeFactory,
     SimpleProxyFactory,
 } from "../types/index.js"
-import { getNodeWallets, launchNode } from "./node.js"
-import {
-    AddressIdentity,
-    BTC_ASSET,
-    BTC_MAX_LEVERAGE,
-    call,
-    COLLATERAL_ASSET,
-    expandDecimals,
-    getAssetId,
-    getBtcConfig,
-    getUsdcConfig,
-    moveBlockchainTime,
-    USDC_ASSET,
-    walletToAddressIdentity,
-} from "./utils.js"
 
 const NEUTRAL_CUMULATIVE_FUNDING_RATE = "57896044618658097711785492504343953926634992332820282019728792003956564819968" // 2 ** 255
 const FUNDING_RATE_PRECISION = BigInt("1000000000000000000")
@@ -74,9 +72,9 @@ describe("Vault.funding_rate", () => {
 
         const { waitForResult: waitForResultVaultImpl } = await VaultExposeFactory.deploy(deployer, {
             configurableConstants: {
-                COLLATERAL_ASSET_ID: { bits: USDC_ASSET_ID },
-                COLLATERAL_ASSET,
-                COLLATERAL_ASSET_DECIMALS: 9,
+                BASE_ASSET_ID: { bits: USDC_ASSET_ID },
+                BASE_ASSET,
+                BASE_ASSET_DECIMALS: 9,
                 PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.b256Address },
             },
         })
@@ -108,9 +106,7 @@ describe("Vault.funding_rate", () => {
 
         await call(storkMock.functions.update_price(USDC_ASSET, expandDecimals(1, 18)))
 
-        await call(vaultExpose.functions.set_asset_config(...getUsdcConfig()))
         await call(vaultExpose.functions.set_asset_config(...getBtcConfig()))
-        await call(vaultExpose.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE))
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(40000, 18)))
     })
