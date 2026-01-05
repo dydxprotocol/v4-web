@@ -25,6 +25,11 @@ pub struct FundingInfo {
     pub short_cumulative_funding_rate: u256,
     pub last_funding_time: u64,
 }
+pub enum PositionSettlementStatus {
+    Success: (),
+    InsufficientCollateral: (),
+    InsufficientReserves: (),
+}
 abi Vault {
     /// Get the revision of the contract
     fn get_revision() -> u8;
@@ -39,18 +44,16 @@ abi Vault {
     */
     #[storage(write)]
     fn set_liquidator(liquidator: Identity, is_active: bool);
-    #[storage(write)]
-    fn set_max_leverage(asset: b256, max_leverage: u256);
     #[storage(read, write)]
     fn set_fees(
-        mint_burn_fee_basis_points: u64,
-        margin_fee_basis_points: u64,
-        liquidation_fee_usd: u256,
+        liquidity_fee_basis_points: u64,
+        position_fee_basis_points: u64,
+        liquidation_fee: u256,
     );
     #[storage(read, write)]
     fn withdraw_fees(receiver: Identity) -> u64;
     #[storage(read, write)]
-    fn set_asset_config(asset: b256, asset_decimals: u32);
+    fn set_asset_config(asset: b256, max_leverage: u256);
     #[storage(read, write)]
     fn clear_asset_config(asset: b256);
     #[storage(write)]
@@ -86,15 +89,13 @@ abi Vault {
     #[storage(read)]
     fn get_min_price(asset: b256) -> u256;
     #[storage(read)]
-    fn get_pool_amounts(asset: b256) -> u256;
+    fn get_total_reserves() -> u256;
     #[storage(read)]
     fn get_fee_reserve() -> u256;
     #[storage(read)]
     fn is_asset_whitelisted(asset: b256) -> bool;
     #[storage(read)]
-    fn get_asset_decimals(asset: b256) -> u32;
-    #[storage(read)]
-    fn get_collateral_asset() -> AssetId;
+    fn get_base_asset() -> AssetId;
     fn get_lp_asset() -> AssetId;
     #[storage(read)]
     fn get_position_leverage(account: Identity, index_asset: b256, is_long: bool) -> u256;
@@ -111,9 +112,9 @@ abi Vault {
     #[storage(read)]
     fn get_liquidation_fee() -> u256;
     #[storage(read)]
-    fn get_mint_burn_fee_basis_points() -> u64;
+    fn get_liquidity_fee_basis_points() -> u64;
     #[storage(read)]
-    fn get_margin_fee_basis_points() -> u64;
+    fn get_position_fee_basis_points() -> u64;
     #[storage(read)]
     fn is_liquidator(account: Identity) -> bool;
     #[storage(read)]
@@ -126,7 +127,7 @@ abi Vault {
     #[storage(read)]
     fn get_add_liquidity_amount(asset_amount: u64) -> (u64, u64, u64);
     #[storage(read)]
-    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64);
+    fn get_remove_liquidity_amount(lp_asset_amount: u64) -> (u64, u64, u64, u64);
     #[storage(read)]
     fn get_funding_info(asset: b256) -> FundingInfo;
     /*

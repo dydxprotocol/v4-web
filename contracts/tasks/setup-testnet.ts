@@ -1,6 +1,17 @@
 import { Provider, Wallet } from "fuels"
 import { Vault as VaultContract } from "../types/Vault.js"
-import { call, getArgs, USDC_ASSET, BTC_ASSET, BNB_ASSET, ETH_ASSET, getRandomSalt } from "./utils.js"
+import {
+    call,
+    getArgs,
+    USDC_ASSET,
+    BTC_ASSET,
+    BNB_ASSET,
+    ETH_ASSET,
+    BTC_MAX_LEVERAGE,
+    ETH_MAX_LEVERAGE,
+    BNB_MAX_LEVERAGE,
+    getRandomSalt,
+} from "./utils.js"
 import { deployTestnetToken } from "./deploy-testnet-token.js"
 import { deployStarboard } from "./deploy-starboard.js"
 
@@ -75,9 +86,9 @@ export async function setupTestnet(taskArgs: Record<string, string | boolean>) {
     const deployer = Wallet.fromPrivateKey(taskArgs.privK as string, provider)
     const vault = new VaultContract(vaultAddress, deployer)
 
-    await call(vault.functions.set_asset_config(BTC_ASSET, 9).addContracts([vaultImplAddress]))
-    await call(vault.functions.set_asset_config(BNB_ASSET, 9).addContracts([vaultImplAddress]))
-    await call(vault.functions.set_asset_config(ETH_ASSET, 9).addContracts([vaultImplAddress]))
+    await call(vault.functions.set_asset_config(BTC_ASSET, BTC_MAX_LEVERAGE).addContracts([vaultImplAddress]))
+    await call(vault.functions.set_asset_config(BNB_ASSET, BNB_MAX_LEVERAGE).addContracts([vaultImplAddress]))
+    await call(vault.functions.set_asset_config(ETH_ASSET, ETH_MAX_LEVERAGE).addContracts([vaultImplAddress]))
 
     console.log("Setup complete")
 }

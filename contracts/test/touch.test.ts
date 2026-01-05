@@ -1,4 +1,16 @@
 import { AbstractContract, WalletUnlocked } from "fuels"
+import { launchNode, getNodeWallets } from "./node.js"
+import {
+    call,
+    AddressIdentity,
+    walletToAddressIdentity,
+    expandDecimals,
+    BASE_ASSET,
+    USDC_ASSET,
+    BTC_ASSET,
+    getBtcConfig,
+    getAssetId,
+} from "./utils.js"
 import { DeployContractConfig, LaunchTestNodeReturn } from "fuels/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import {
@@ -13,20 +25,6 @@ import {
     SimpleProxyFactory,
     Vault,
 } from "../types/index.js"
-import { getNodeWallets, launchNode } from "./node.js"
-import {
-    AddressIdentity,
-    BTC_ASSET,
-    BTC_MAX_LEVERAGE,
-    call,
-    COLLATERAL_ASSET,
-    expandDecimals,
-    getAssetId,
-    getBtcConfig,
-    getUsdcConfig,
-    USDC_ASSET,
-    walletToAddressIdentity,
-} from "./utils.js"
 
 describe("Vault.touch", () => {
     let attachedContracts: AbstractContract[]
@@ -80,9 +78,9 @@ describe("Vault.touch", () => {
 
         const { waitForResult: waitForResultVaultImpl } = await VaultFactory.deploy(deployer, {
             configurableConstants: {
-                COLLATERAL_ASSET_ID: { bits: USDC_ASSET_ID },
-                COLLATERAL_ASSET,
-                COLLATERAL_ASSET_DECIMALS: 9,
+                BASE_ASSET_ID: { bits: USDC_ASSET_ID },
+                BASE_ASSET,
+                BASE_ASSET_DECIMALS: 9,
                 PRICEFEED_WRAPPER: { bits: pricefeedWrapper.id.b256Address },
             },
         })
@@ -121,9 +119,7 @@ describe("Vault.touch", () => {
 
         await call(storkMock.functions.update_price(USDC_ASSET, expandDecimals(1, 18)))
 
-        await call(vault.functions.set_asset_config(...getUsdcConfig()))
         await call(vault.functions.set_asset_config(...getBtcConfig()))
-        await call(vault.functions.set_max_leverage(BTC_ASSET, BTC_MAX_LEVERAGE))
 
         await call(storkMock.functions.update_price(BTC_ASSET, expandDecimals(40000, 18)))
     })

@@ -5,6 +5,10 @@ export const BNB_ASSET = "0x1bc6d6279e196b1fa7b94a792d57a47433858940c1b3500f2a5e
 export const BTC_ASSET = "0x7404e3d104ea7841c3d9e6fd20adfe99b4ad586bc08d8f3bd3afef894cf184de"
 export const ETH_ASSET = "0x59102b37de83bdda9f38ac8254e596f0d9ac61d2035c07936675e87342817160"
 
+export const BTC_MAX_LEVERAGE = 50 * 10_000
+export const ETH_MAX_LEVERAGE = 50 * 10_000
+export const BNB_MAX_LEVERAGE = 50 * 10_000
+
 export function getArgs(requiredArgs: string[], optionalArgs: string[] = []): Record<string, string | boolean> {
     const argsObject: Record<string, string | boolean> = process.argv.reduce(
         (args, arg) => {

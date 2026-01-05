@@ -16,14 +16,14 @@ pub struct SetApprovedRouter {
 }
 pub struct SetAssetConfig {
     pub asset: b256,
-    pub asset_decimals: u32,
+    pub max_leverage: u256,
 }
 pub struct ClearAssetConfig {
     pub asset: b256,
 }
 pub struct SetFees {
-    pub mint_burn_fee_basis_points: u64,
-    pub margin_fee_basis_points: u64,
+    pub liquidity_fee_basis_points: u64,
+    pub position_fee_basis_points: u64,
     pub liquidation_fee: u256,
 }
 pub struct WritePosition {
@@ -39,18 +39,15 @@ pub struct SetLiquidator {
 }
 pub struct AddLiquidity {
     pub account: Identity,
-    pub stable_asset_amount: u64,
+    pub base_asset_amount: u64,
     pub lp_asset_amount: u64,
     pub fee: u64,
 }
 pub struct RemoveLiquidity {
     pub account: Identity,
-    pub stable_asset_amount: u64,
+    pub base_asset_amount: u64,
     pub lp_asset_amount: u64,
     pub fee: u64,
-}
-pub struct CollectSwapFees {
-    pub fee_amount: u64,
 }
 pub struct WithdrawFees {
     pub receiver: Identity,
@@ -111,14 +108,6 @@ pub struct LiquidatePosition {
     pub pnl_delta: u256,
     pub pnl_delta_has_profit: bool,
     pub cumulative_funding_rate: u256,
-}
-pub struct SetMaxLeverage {
-    pub asset: b256,
-    pub max_leverage: u256,
-}
-pub struct WritePoolAmount {
-    pub asset: b256,
-    pub pool_amount: u256,
 }
 pub struct UpdateFundingInfo {
     pub asset: b256,
