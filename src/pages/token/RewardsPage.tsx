@@ -12,6 +12,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnableBonkPnlLeaderboard } from '@/hooks/useEnableBonkPnlLeaderboard';
 import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -26,6 +27,7 @@ import { TermsOfUseLink } from '@/components/TermsOfUseLink';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
+import { BonkPnlPanel } from './BonkPnlPanel';
 import { CompetitionIncentivesPanel } from './CompetitionIncentivesPanel';
 import { CompetitionLeaderboardPanel } from './CompetitionLeaderboardPanel';
 import { GeoblockedPanel } from './GeoblockedPanel';
@@ -37,6 +39,7 @@ import { SwapAndStakingPanel } from './SwapAndStakingPanel';
 import { UnbondingPanels } from './UnbondingPanels';
 
 enum Tab {
+  BonkPnl = 'BonkPnl',
   Rewards = 'Rewards',
   Competition = 'Competition',
 }
@@ -44,13 +47,14 @@ enum Tab {
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const enableBonkPnlLeaderboard = useEnableBonkPnlLeaderboard();
 
   const { complianceState } = usePerpetualsComplianceState();
   const { isTablet } = useBreakpoints();
 
   const { usdcDenom } = useTokenConfigs();
 
-  const [value, setValue] = useState(Tab.Rewards);
+  const [value, setValue] = useState(enableBonkPnlLeaderboard ? Tab.BonkPnl : Tab.Rewards);
 
   const { totalRewards } = orEmptyObj(BonsaiHooks.useStakingRewards().data);
 
@@ -73,6 +77,42 @@ const RewardsPage = () => {
       })}
     </div>
   );
+
+  const tabs = [
+    ...(enableBonkPnlLeaderboard
+      ? [
+          {
+            content: (
+              <div tw="flexColumn gap-1.5">
+                <BonkPnlPanel />
+              </div>
+            ),
+            label: 'Bonk PNL',
+            value: Tab.BonkPnl,
+          },
+        ]
+      : []),
+    {
+      content: (
+        <div tw="flexColumn gap-1.5">
+          <LaunchIncentivesPanel />
+          <RewardsLeaderboardPanel />
+        </div>
+      ),
+      label: stringGetter({ key: STRING_KEYS.REWARDS }),
+      value: Tab.Rewards,
+    },
+    {
+      content: (
+        <div tw="flexColumn gap-1.5">
+          <CompetitionIncentivesPanel />
+          <CompetitionLeaderboardPanel />
+        </div>
+      ),
+      label: stringGetter({ key: STRING_KEYS.REBATES }),
+      value: Tab.Competition,
+    },
+  ];
 
   return (
     <$Page>
@@ -103,28 +143,7 @@ const RewardsPage = () => {
                 setValue(v);
               }}
               tw="flex-[2]"
-              items={[
-                {
-                  content: (
-                    <div tw="flexColumn gap-1.5">
-                      <LaunchIncentivesPanel />
-                      <RewardsLeaderboardPanel />
-                    </div>
-                  ),
-                  label: stringGetter({ key: STRING_KEYS.REWARDS }),
-                  value: Tab.Rewards,
-                },
-                {
-                  content: (
-                    <div tw="flexColumn gap-1.5">
-                      <CompetitionIncentivesPanel />
-                      <CompetitionLeaderboardPanel />
-                    </div>
-                  ),
-                  label: stringGetter({ key: STRING_KEYS.REBATES }),
-                  value: Tab.Competition,
-                },
-              ]}
+              items={tabs}
               withTransitions={false}
             />
             <div tw="flexColumn flex-1 gap-1.5">
