@@ -5,7 +5,11 @@ import type {
   HistoryCallback,
   IBasicDataFeed,
   LibrarySymbolInfo,
+  OnReadyCallback,
   ResolutionString,
+  ResolveCallback,
+  SubscribeBarsCallback,
+  PeriodParams,
 } from 'public/tradingview/charting_library';
 
 // Map TradingView resolutions to our candle intervals
@@ -14,7 +18,7 @@ export function createDatafeed(
   getCandles: (interval: CandleInterval) => Promise<Candle[]>
 ): IBasicDataFeed {
   return {
-    onReady: (callback) => {
+    onReady: (callback: OnReadyCallback) => {
       setTimeout(() => {
         callback({
           supported_resolutions: ['1', '5', '15', '30', '60', '240', '1D'] as ResolutionString[],
@@ -29,7 +33,7 @@ export function createDatafeed(
       // Not implemented - we don't have symbol search
     },
 
-    resolveSymbol: (symbolName, onResolve) => {
+    resolveSymbol: (symbolName: string, onResolve: ResolveCallback) => {
       setTimeout(() => {
         const symbolInfo: LibrarySymbolInfo = {
           name: symbolName,
@@ -55,9 +59,9 @@ export function createDatafeed(
     },
 
     getBars: async (
-      _symbolInfo,
-      resolution,
-      periodParams,
+      _symbolInfo: LibrarySymbolInfo,
+      resolution: ResolutionString,
+      periodParams: PeriodParams,
       onResult: HistoryCallback,
       onError: ErrorCallback
     ) => {
@@ -90,17 +94,17 @@ export function createDatafeed(
     },
 
     subscribeBars: (
-      _symbolInfo,
-      _resolution,
-      _onTick,
-      _listenerGuid,
-      _onResetCacheNeededCallback
+      _symbolInfo: LibrarySymbolInfo,
+      _resolution: ResolutionString,
+      _onTick: SubscribeBarsCallback,
+      _listenerGuid: string,
+      _onResetCacheNeededCallback: () => void
     ) => {
       // Real-time updates would go here
       // You can subscribe to Redux store changes and call onTick with new bars
     },
 
-    unsubscribeBars: (_listenerGuid) => {},
+    unsubscribeBars: (_listenerGuid: string) => {},
   };
 }
 
