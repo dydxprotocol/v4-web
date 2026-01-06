@@ -11,6 +11,9 @@ import {
   MarketFilters,
   type MarketData,
 } from '@/constants/markets';
+import { StatsigFlags } from '@/constants/statsig';
+
+import { useStatsigGateValue } from '@/hooks/useStatsig';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getFavoritedMarkets, getShouldHideLaunchableMarkets } from '@/state/appUiConfigsSelectors';
@@ -101,6 +104,9 @@ export const useMarketsData = ({
   const favoritedMarkets = useAppSelector(getFavoritedMarkets, shallowEqual);
   const hasMarketIds = Object.keys(perpetualMarkets).length > 0;
 
+  const shouldFilterHiddenMarkets = useStatsigGateValue(StatsigFlags.ffHideMarketsFilter);
+  const shouldFilterOpenInterest = useStatsigGateValue(StatsigFlags.ffOpenInterestFilter);
+
   // AssetIds from existing PerpetualMarkets
   const marketsAssetIdSet = useMemo(
     () =>
@@ -119,8 +125,10 @@ export const useMarketsData = ({
       .filter((m) => m.status !== 'FINAL_SETTLEMENT')
       // temporarily filter out markets with empty/0 oracle price and $0 open interest
       .filter((m) => MustBigNumber(m.oraclePrice).gt(0))
-      .filter((m) => MustBigNumber(m.openInterestUSDC).gt(0))
-      .filter((m) => !HIDDEN_MARKETS.has(m.assetId))
+      // filter out markets with $0 open interest (when gate is enabled)
+      .filter((m) => !shouldFilterOpenInterest || MustBigNumber(m.openInterestUSDC).gt(0))
+      // filter out hidden markets (when gate is enabled)
+      .filter((m) => !shouldFilterHiddenMarkets || !HIDDEN_MARKETS.has(m.assetId))
       .map(getMarketDataFromPerpetualMarketSummary);
 
     const unlaunchedMarketsData =
@@ -128,6 +136,8 @@ export const useMarketsData = ({
         ? Object.values(assets)
             .filter(isTruthy)
             .filter((a) => !ASSETS_TO_REMOVE.has(a.assetId))
+            // filter out hidden markets (when gate is enabled)
+            .filter((a) => !shouldFilterHiddenMarkets || !HIDDEN_MARKETS.has(a.assetId))
             .sort(sortByMarketCap)
             .map((asset) => {
               // Remove assets that are already in the list of markets from Indexer a long with assets that have no price or a negative price
@@ -143,11 +153,13 @@ export const useMarketsData = ({
     return [...listOfMarkets, ...unlaunchedMarketsData];
   }, [
     perpetualMarkets,
-    marketsAssetIdSet,
-    assets,
-    favoritedMarkets,
-    shouldHideLaunchableMarkets,
     forceShowUnlaunchedMarkets,
+    shouldHideLaunchableMarkets,
+    assets,
+    shouldFilterOpenInterest,
+    shouldFilterHiddenMarkets,
+    marketsAssetIdSet,
+    favoritedMarkets,
   ]);
 
   const filteredMarkets = useMemo(() => {
