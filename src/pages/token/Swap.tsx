@@ -82,6 +82,7 @@ export const Swap = () => {
     const dydx = {
       rawBalanceBigInt: parseUnits(`${usableDydxBalance}`, DYDX_DECIMALS),
       formatted: MustBigNumber(usableDydxBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalance: usableDydxBalance,
     };
     const usableUsdcBalance = Math.max(
       (parentSubaccountUsdcBalance ?? 0) - AMOUNT_RESERVED_FOR_GAS_USDC,
@@ -90,6 +91,7 @@ export const Swap = () => {
     const usdc = {
       rawBalanceBigInt: parseUnits(`${usableUsdcBalance}`, USDC_DECIMALS),
       formatted: MustBigNumber(usableUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
+      rawBalance: usableUsdcBalance,
     };
 
     return {
@@ -114,9 +116,9 @@ export const Swap = () => {
 
   const setMaxAmount = (m: SwapMode) => {
     if (m === 'exact-in') {
-      setAmount(tokenBalances.inputBalance.formatted);
+      setAmount(`${tokenBalances.inputBalance.rawBalance}`);
     } else {
-      setAmount(tokenBalances.outputBalance.formatted);
+      setAmount(`${tokenBalances.outputBalance.rawBalance}`);
     }
     setMode(m);
   };
@@ -217,7 +219,7 @@ export const Swap = () => {
               {tokenBalances.inputBalance.formatted ? (
                 <Output
                   value={tokenBalances.inputBalance.formatted}
-                  type={OutputType.CompactNumber}
+                  type={OutputType.Text}
                   slotRight={` ${getTokenLabel(inputToken)}`}
                 />
               ) : (
@@ -269,7 +271,7 @@ export const Swap = () => {
               {tokenBalances.outputBalance.formatted ? (
                 <Output
                   value={tokenBalances.outputBalance.formatted}
-                  type={OutputType.CompactNumber}
+                  type={OutputType.Text}
                   slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
                 />
               ) : (
