@@ -6,10 +6,10 @@ import type {
   IBasicDataFeed,
   LibrarySymbolInfo,
   OnReadyCallback,
+  PeriodParams,
   ResolutionString,
   ResolveCallback,
   SubscribeBarsCallback,
-  PeriodParams,
 } from 'public/tradingview/charting_library';
 
 // Map TradingView resolutions to our candle intervals
