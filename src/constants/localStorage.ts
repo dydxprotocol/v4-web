@@ -23,6 +23,7 @@ export enum LocalStorageKey {
 
   // UI State
   LastViewedMarket = 'dydx.LastViewedMarket',
+  LastViewedSpotToken = 'dydx.LastViewedSpotToken',
   SelectedLocale = 'dydx.SelectedLocale',
   SelectedNetwork = 'dydx.SelectedNetwork',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',

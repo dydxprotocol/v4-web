@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { ButtonAction } from '@/constants/buttons';
+import { NEAR_INSTANT_DEPOSIT_CHAINS } from '@/constants/chains';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAppSelectorWithArgs } from '@/hooks/useParameterizedSelector';
@@ -32,10 +33,15 @@ export const DepositStatus = ({ txHash, chainId, onClose }: DepositStatusProps) 
   const depositSuccess = deposit?.status === 'success';
 
   const statusDescription = useMemo(() => {
-    if (depositSuccess) return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_FOR_TRADING });
-
-    if (deposit?.isInstantDeposit)
+    if (depositSuccess) {
+      return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_FOR_TRADING });
+    }
+    if (
+      Boolean(deposit?.isInstantDeposit) ||
+      NEAR_INSTANT_DEPOSIT_CHAINS.includes(deposit?.chainId ?? '')
+    ) {
       return stringGetter({ key: STRING_KEYS.YOUR_FUNDS_AVAILABLE_SOON });
+    }
 
     return stringGetter({ key: STRING_KEYS.YOU_MAY_CLOSE_WINDOW });
   }, [deposit, depositSuccess, stringGetter]);

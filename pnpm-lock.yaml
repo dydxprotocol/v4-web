@@ -30,11 +30,11 @@ dependencies:
     specifier: ^5.23.3
     version: 5.35.1
   '@dydxprotocol/v4-client-js':
-    specifier: 3.1.1
-    version: 3.1.1
+    specifier: 3.4.0
+    version: 3.4.0
   '@dydxprotocol/v4-localization':
-    specifier: 1.1.359
-    version: 1.1.359
+    specifier: 1.1.373
+    version: 1.1.373
   '@dydxprotocol/v4-proto':
     specifier: ^7.0.0-dev.0
     version: 7.0.5
@@ -137,6 +137,9 @@ dependencies:
   '@reduxjs/toolkit':
     specifier: ^2.2.5
     version: 2.9.0(react-redux@9.2.0)(react@18.3.1)
+  '@scure/bip39':
+    specifier: ^2.0.1
+    version: 2.0.1
   '@skip-go/client':
     specifier: 1.5.8
     version: 1.5.8(@solana/web3.js@1.98.4)(viem@2.38.0)
@@ -215,6 +218,9 @@ dependencies:
   bignumber.js:
     specifier: ^9.1.1
     version: 9.3.1
+  bs58:
+    specifier: ^6.0.0
+    version: 6.0.0
   cmdk:
     specifier: ^0.2.0
     version: 0.2.1(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
@@ -224,6 +230,9 @@ dependencies:
   cuer:
     specifier: ^0.0.2
     version: 0.0.2(react-dom@18.3.1)(react@18.3.1)(typescript@5.9.3)
+  ed25519-hd-key:
+    specifier: ^1.3.0
+    version: 1.3.0
   export-to-csv:
     specifier: ^1.2.3
     version: 1.4.0
@@ -331,6 +340,9 @@ devDependencies:
   '@trivago/prettier-plugin-sort-imports':
     specifier: ^4.3.0
     version: 4.3.0(prettier@3.6.2)
+  '@types/bs58':
+    specifier: ^5.0.0
+    version: 5.0.0
   '@types/color':
     specifier: ^3.0.3
     version: 3.0.6
@@ -1659,8 +1671,8 @@ packages:
       '@datadog/browser-core': 5.35.1
     dev: false
 
-  /@dydxprotocol/v4-client-js@3.1.1:
-    resolution: {integrity: sha512-ZSAN030x+LBei1lbdJ4TLSFLXNlqI99+LIq1TO2soeircH3TZr/UzJR2TArrj0fmQQBTPto7qqVdQRQacvPCng==}
+  /@dydxprotocol/v4-client-js@3.4.0:
+    resolution: {integrity: sha512-dMEcqfJAreiDQjrgJyUNGqxUH3sh5J5LG5fKItCRIM7MsygAvf5/kpedQByh6nO6ov+tUw4zgT4OFc9vKN+cMQ==}
     dependencies:
       '@cosmjs/amino': 0.32.4
       '@cosmjs/encoding': 0.32.4
@@ -1669,7 +1681,7 @@ packages:
       '@cosmjs/stargate': 0.32.4
       '@cosmjs/tendermint-rpc': 0.32.4
       '@cosmjs/utils': 0.32.4
-      '@dydxprotocol/v4-proto': 9.4.0-rc.0
+      '@dydxprotocol/v4-proto': 9.5.0
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
@@ -1690,8 +1702,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.359:
-    resolution: {integrity: sha512-nGDKaWMavhminoFcLLuP9JGbbmnFaTuAkeYoe9Hhw+5v7cRYF/CwTcaBM+bmd1vfdZPA0J7vGE9ZKt08Agb2NQ==}
+  /@dydxprotocol/v4-localization@1.1.373:
+    resolution: {integrity: sha512-RIJGSm4DiqJS7oMyOUS5VeqVnu22fUzOZ0w5KIDEv6yIzLK2GXowfAxZjH3RBoy73mW9ox3Bjsz6stCRttExkA==}
     dev: false
 
   /@dydxprotocol/v4-proto@7.0.5:
@@ -1700,8 +1712,8 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
-  /@dydxprotocol/v4-proto@9.4.0-rc.0:
-    resolution: {integrity: sha512-1vtvGAdX2U6PWiDEYbNA253fB4m53eAQsmC/4hquy7rRGTam/33YdrKKDPtGCIByFbXSt/P9pegg+F4HZ7MrBQ==}
+  /@dydxprotocol/v4-proto@9.5.0:
+    resolution: {integrity: sha512-J8Hqw3PyVmx4FViwo2w1KHvTt70r/OG6gpaogbeDifY6lB6UU/j/PUjdAZVkjLREkzJY4XzhJkrsnqpBtF/1mg==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -4506,7 +4518,6 @@ packages:
   /@noble/hashes@2.0.1:
     resolution: {integrity: sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==}
     engines: {node: '>= 20.19.0'}
-    dev: true
 
   /@noble/secp256k1@1.7.1:
     resolution: {integrity: sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw==}
@@ -8894,6 +8905,10 @@ packages:
     resolution: {integrity: sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==}
     dev: false
 
+  /@scure/base@2.0.0:
+    resolution: {integrity: sha512-3E1kpuZginKkek01ovG8krQ0Z44E3DHPjc5S2rjJw9lZn3KSQOs8S7wqikF/AH7iRanHypj85uGyxk0XAyC37w==}
+    dev: false
+
   /@scure/bip32@1.1.5:
     resolution: {integrity: sha512-XyNh1rB0SkEqd3tXcXMi+Xe1fvg+kUIcoRIEujP1Jgv7DqW2r9lg3Ah0NkFaCs9sTkQAQA8kw7xiRXzENi9Rtw==}
     dependencies:
@@ -8952,6 +8967,13 @@ packages:
     dependencies:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
+    dev: false
+
+  /@scure/bip39@2.0.1:
+    resolution: {integrity: sha512-PsxdFj/d2AcJcZDX1FXN3dDgitDDTmwf78rKZq1a6c1P1Nan1X/Sxc7667zU3U+AN60g7SxxP0YCVw2H/hBycg==}
+    dependencies:
+      '@noble/hashes': 2.0.1
+      '@scure/base': 2.0.0
     dev: false
 
   /@simplewebauthn/browser@9.0.1:
@@ -9960,6 +9982,13 @@ packages:
     dependencies:
       '@types/node': 22.18.8
     dev: false
+
+  /@types/bs58@5.0.0:
+    resolution: {integrity: sha512-cAw/jKBzo98m6Xz1X5ETqymWfIMbXbu6nK15W4LQYjeHJkVqSmM5PO8Bd9KVHQJ/F4rHcSso9LcjtgCW6TGu2w==}
+    deprecated: This is a stub types definition. bs58 provides its own type definitions, so you do not need this installed.
+    dependencies:
+      bs58: 6.0.0
+    dev: true
 
   /@types/color-convert@2.0.4:
     resolution: {integrity: sha512-Ub1MmDdyZ7mX//g25uBAoH/mWGd9swVbt8BseymnaE18SU4po/PjmCrHxqIIRjBo3hV/vh1KGr0eMxUhp+t+dQ==}
@@ -13180,7 +13209,6 @@ packages:
   /ansi-regex@6.2.2:
     resolution: {integrity: sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==}
     engines: {node: '>=12'}
-    requiresBuild: true
 
   /ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
@@ -13658,7 +13686,6 @@ packages:
 
   /base-x@5.0.1:
     resolution: {integrity: sha512-M7uio8Zt++eg3jPj+rHMfCC+IuygQHHCOU+IYsVtik6FWjuYpVt/+MRKcgsAMHh8mMFAwnB+Bs+mTrFiXjMzKg==}
-    dev: false
 
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -13954,7 +13981,6 @@ packages:
     resolution: {integrity: sha512-PD0wEnEYg6ijszw/u8s+iI3H17cTymlrwkKhDhPZq+Sokl3AU4htyBFTjAeNAlCCmg0f53g6ih3jATyCKftTfw==}
     dependencies:
       base-x: 5.0.1
-    dev: false
 
   /bs58check@2.1.2:
     resolution: {integrity: sha512-0TS1jicxdU09dwJMNZtVAfzPi6Q6QeN0pM1Fkzrjn+XYHvzMKPU3pHVpva+769iNVSfIYWf7LJ6WR+BuuMf8cA==}
@@ -15522,6 +15548,13 @@ packages:
       '@noble/ciphers': 1.3.0
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
+    dev: false
+
+  /ed25519-hd-key@1.3.0:
+    resolution: {integrity: sha512-IWwAyiiuJQhgu3L8NaHb68eJxTu2pgCwxIBdgpLJdKpYZM46+AXePSVTr7fkNKaUOfOL4IrjEUaQvyVRIDP7fg==}
+    dependencies:
+      create-hmac: 1.1.7
+      tweetnacl: 1.0.3
     dev: false
 
   /edge-paths@3.0.5:

@@ -2,10 +2,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { type LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
+import { Keypair } from '@solana/web3.js';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { ConnectorType, DydxAddress, PrivateInformation } from '@/constants/wallets';
+import {
+  ConnectorType,
+  DydxAddress,
+  PrivateInformation,
+  WalletNetworkType,
+} from '@/constants/wallets';
 
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
@@ -39,10 +45,10 @@ export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();
-  const geo = useAppSelector(getGeo);
-  const { checkForGeo } = useEnvFeatures();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { endTurnkeySession } = useTurnkeyWallet();
+  const { checkForGeo } = useEnvFeatures();
+  const geo = useAppSelector(getGeo);
 
   // Wallet connection
   const {
@@ -88,6 +94,7 @@ const useAccountsContext = () => {
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
+  const [localSolanaKeypair, setLocalSolanaKeypair] = useState<Keypair>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
@@ -97,9 +104,18 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
+  const canDeriveSolanaWallet = useMemo(() => {
+    return sourceAccount.chain !== WalletNetworkType.Cosmos;
+  }, [sourceAccount.chain]);
+
+  const solanaAddress = useMemo(
+    () => localSolanaKeypair?.publicKey.toBase58(),
+    [localSolanaKeypair]
+  );
+
   useEffect(() => {
-    dispatch(setLocalWallet({ address: dydxAddress, subaccountNumber: 0 }));
-  }, [dispatch, dydxAddress]);
+    dispatch(setLocalWallet({ address: dydxAddress, solanaAddress, subaccountNumber: 0 }));
+  }, [dispatch, dydxAddress, solanaAddress]);
 
   const setWalletFromTurnkeySignature = useCallback(
     async (signature: string) => {
@@ -128,13 +144,16 @@ const useAccountsContext = () => {
   const cosmosWallets = useCosmosWallets(hdKey, getCosmosOfflineSigner);
 
   useEffect(() => {
-    if (localDydxWallet && localNobleWallet) {
-      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet);
+    if (localDydxWallet && localNobleWallet && localSolanaKeypair) {
+      localWalletManager.setLocalWallet(localDydxWallet, localNobleWallet, localSolanaKeypair);
     } else {
       localWalletManager.clearLocalWallet();
     }
-  }, [localDydxWallet, localNobleWallet]);
+  }, [localDydxWallet, localNobleWallet, localSolanaKeypair]);
 
+  /**
+   * Reconnect Side Effect - This is used to handle the reconnection flow when the user returns to the app.
+   */
   useEffect(() => {
     (async () => {
       const result = await onboardingManager.handleWalletConnection({
@@ -161,6 +180,10 @@ const useAccountsContext = () => {
         setLocalNobleWallet(result.nobleWallet);
       }
 
+      if (result.solanaKeypair) {
+        setLocalSolanaKeypair(result.solanaKeypair);
+      }
+
       if (result.hdKey) {
         setHdKey(result.hdKey);
       }
@@ -173,7 +196,20 @@ const useAccountsContext = () => {
         disconnectLocalDydxWallet();
       }
     })();
-  }, [signerWagmi, isConnectedGraz, sourceAccount, hasLocalDydxWallet, blockedGeo]);
+    // we don't want to re-run on `authenticated` or `ready` because this is for the Reconnection Flow
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dispatch,
+    signMessageAsync,
+    getCosmosOfflineSigner,
+    getWalletFromSignature,
+    selectedDydxChainId,
+    signerWagmi,
+    isConnectedGraz,
+    sourceAccount,
+    hasLocalDydxWallet,
+    blockedGeo,
+  ]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {
@@ -209,12 +245,6 @@ const useAccountsContext = () => {
       })
     );
   }, [dispatch, dydxSubaccounts]);
-
-  useEffect(() => {
-    if (blockedGeo) {
-      disconnect();
-    }
-  }, [blockedGeo]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {
@@ -264,6 +294,11 @@ const useAccountsContext = () => {
 
     // Cosmos wallets (on-demand)
     ...cosmosWallets,
+
+    // Solana spot accounts
+    solanaAddress,
+    localSolanaKeypair,
+    canDeriveSolanaWallet,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

@@ -14,8 +14,9 @@ export const AffiliateProgressCard = ({
 }) => {
   const stringGetter = useStringGetter();
 
-  const progressRatio = volume / AFFILIATES_REQUIRED_VOLUME_USD;
-  const remaining = AFFILIATES_REQUIRED_VOLUME_USD - volume;
+  const progressRatio = Math.min(1, volume / AFFILIATES_REQUIRED_VOLUME_USD);
+  const remaining = Math.max(0, AFFILIATES_REQUIRED_VOLUME_USD - volume);
+
   return (
     <div className={className} tw="flex flex-col gap-1.5 rounded-1 p-1">
       <div tw="flex items-center justify-between gap-0.5">

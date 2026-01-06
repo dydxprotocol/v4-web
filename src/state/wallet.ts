@@ -15,6 +15,7 @@ export interface WalletState {
   sourceAccount: SourceAccount;
   localWallet?: {
     address?: string;
+    solanaAddress?: string;
     subaccountNumber?: number;
     // Indicates if wallet was directly imported (mnemonic) vs derived from source wallet
     // When 'imported', sourceAccount is not required for AccountConnected state
@@ -60,6 +61,7 @@ export const walletSlice = createSlice({
         payload,
       }: PayloadAction<{
         address?: string;
+        solanaAddress?: string;
         subaccountNumber?: number;
         walletSource?: 'imported' | 'derived';
       }>

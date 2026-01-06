@@ -5,6 +5,7 @@ import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
+import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -50,32 +51,24 @@ export const MarketsStats = (props: MarketsStatsProps) => {
           <MarketsCompactTable sorting={MarketSorting.RECENTLY_LISTED} />
         </$Section>
       )}
-      <$TradingLeaguesBanner>
-        <img
-          src="/trading-league.svg"
-          alt="Trading League trophy"
-          tw="pointer-events-none absolute right-[5%] top-[5%] h-[90%] opacity-60"
-        />
-        <div tw="z-[1] flex max-w-[80%] flex-col justify-between">
-          <div tw="flex flex-col gap-[0.75rem]">
-            <span tw="text-large text-white font-large-bold">
-              {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_TITLE })}{' '}
-              <$ActiveTag>{stringGetter({ key: STRING_KEYS.ACTIVE })}</$ActiveTag>
-            </span>
-            <span tw="text-color-accent font-small-medium">
-              {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_SUBTITLE })}
-            </span>
-          </div>
+      <$LiquidationRebatesBanner>
+        <div tw="z-[1] flex max-w-[65%] flex-col gap-2">
+          <span tw="text-white font-extra-bold">
+            {stringGetter({
+              key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025_UPDATE_1,
+              params: { REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount },
+            })}
+          </span>
           <Button
             action={ButtonAction.Primary}
             type={ButtonType.Link}
-            href="https://dydx.trade/dydx?utm_source=markets&utm_medium=ui&utm_campaign=01112025-markets-leagues-dydx&utm_term=&utm_content=markets-banner"
+            href="https://www.dydx.xyz/liquidation-rebates"
             tw="self-start"
           >
-            {stringGetter({ key: STRING_KEYS.TRADING_LEAGUES_BANNER_CTA })}
+            {stringGetter({ key: STRING_KEYS.CHECK_ELIGIBILITY })}
           </Button>
         </div>
-      </$TradingLeaguesBanner>
+      </$LiquidationRebatesBanner>
     </section>
   );
 };
@@ -99,9 +92,8 @@ const $SectionHeader = styled.div`
   }
 `;
 
-const $TradingLeaguesBanner = styled.div`
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/trading-league-banner-bg.png');
+const $LiquidationRebatesBanner = styled.div`
+  background-image: url('/liquidation.png');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -110,17 +102,4 @@ const $TradingLeaguesBanner = styled.div`
   padding: 1.5rem;
   display: grid;
   border-radius: 0.625rem;
-`;
-
-const $ActiveTag = styled.span`
-  border-radius: 0.5rem;
-  border: 1px solid;
-  border-color: var(--color-positive);
-  background-color: color-mix(in srgb, var(--color-positive) 12%, transparent);
-  padding: 0.1875rem 0.375rem;
-  color: var(--color-positive);
-  font: var(--font-mini-bold);
-  vertical-align: middle;
-  display: inline-block;
-  transform: translateY(-2px);
 `;

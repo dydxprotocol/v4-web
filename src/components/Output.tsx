@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import { SupportedLocales } from '@/constants/localization';
 import {
   LEVERAGE_DECIMALS,
+  NumberSign,
   PERCENT_DECIMALS,
   SMALL_PERCENT_DECIMALS,
   SMALL_USD_DECIMALS,
@@ -326,6 +327,7 @@ type StyleProps = {
   className?: string;
   withBaseFont?: boolean;
   withSignColor?: boolean;
+  withSignedValueColor?: boolean;
 };
 
 export type OutputProps = ElementProps & StyleProps;
@@ -349,6 +351,7 @@ export const Output = ({
   withParentheses,
   showSign = ShowSign.Negative,
   withSignColor = false,
+  withSignedValueColor,
 
   dateOptions,
   relativeTimeOptions = {
@@ -499,6 +502,15 @@ export const Output = ({
           className={className}
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
+          valueColor={
+            withSignedValueColor
+              ? isNegative
+                ? NumberSign.Negative
+                : isPositive
+                  ? NumberSign.Positive
+                  : undefined
+              : undefined
+          }
         >
           {slotLeft}
           {sign && (
@@ -553,10 +565,21 @@ const $Text = styled.output<{ withParentheses?: boolean }>`
       --output-afterString: ')';
     `}
 `;
-const $Number = styled($Text)<{ withBaseFont?: boolean }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean; valueColor?: NumberSign }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`
       font-feature-settings: var(--fontFeature-monoNumbers);
     `}
+
+  ${({ valueColor }) =>
+    valueColor === NumberSign.Positive
+      ? css`
+          color: var(--color-positive) !important;
+        `
+      : valueColor === NumberSign.Negative
+        ? css`
+            color: var(--color-negative) !important;
+          `
+        : ''}
 `;

@@ -112,6 +112,10 @@ export type SubaccountPositionDerivedCore = {
   initialRisk: BigNumber;
   maintenanceRisk: BigNumber;
   maxLeverage: BigNumber | null;
+  effectiveSelectedLeverage: BigNumber;
+
+  adjustedImfFromSelectedLeverage: BigNumber;
+  initialRiskFromSelectedLeverage: BigNumber;
 
   // these are just copied from the perpetual position for aesthetic reasons honestly
   baseEntryPrice: BigNumber;
@@ -123,6 +127,7 @@ export type SubaccountPositionDerivedExtra = {
   leverage: BigNumber | null;
   marginValueMaintenance: BigNumber;
   marginValueInitial: BigNumber;
+  marginValueInitialFromSelectedLeverage: BigNumber;
   liquidationPrice: BigNumber | null;
 
   updatedUnrealizedPnl: BigNumber;
@@ -192,6 +197,7 @@ export enum SubaccountFillType {
 export type SubaccountFill = Omit<IndexerCompositeFillObject, 'type'> & {
   marginMode: MarginMode;
   type: SubaccountFillType | undefined;
+  closedPnl?: number;
 };
 
 export type LiveTrade = IndexerWsTradeResponseObject;

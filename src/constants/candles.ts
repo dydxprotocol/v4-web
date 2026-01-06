@@ -1,6 +1,6 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
 
-import { SpotCandleServiceInterval } from '@/lib/tradingView/spotDatafeed/types';
+import { SpotApiBarsResolution } from '@/clients/spotApi';
 
 import { MetadataServiceCandlesTimeframes } from './assetMetadata';
 import { STRING_KEYS } from './localization';
@@ -133,7 +133,7 @@ export const RESOLUTION_STRING_TO_LABEL = {
 } as Record<ResolutionString, { value: string; unitStringKey?: string }>;
 
 /**
- * @description ResolutionStrings used with TradingView's charting library mapped to SpotCandleServiceInterval
+ * @description ResolutionStrings used with TradingView's charting library mapped to SpotApiBarsResolution
  */
 export const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
   '1S': '1S',
@@ -149,4 +149,4 @@ export const RESOLUTION_TO_SPOT_INTERVAL_MAP = {
   '720': '720',
   '1D': '1D',
   '1W': '7D',
-} as Record<ResolutionString, SpotCandleServiceInterval>;
+} as Record<ResolutionString, SpotApiBarsResolution>;

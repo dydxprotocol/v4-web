@@ -10,6 +10,8 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Input, InputType, type InputProps } from '@/components/Input';
 
+import { isPresent } from '@/lib/typeUtils';
+
 type ElementProps = {
   onTextChange?: (value: string) => void;
   className?: string;
@@ -17,9 +19,12 @@ type ElementProps = {
 
 export type SearchInputProps = ElementProps & InputProps;
 
-export const SearchInput = ({ placeholder, onTextChange, className }: SearchInputProps) => {
-  const [value, setValue] = useState('');
+export const SearchInput = ({ value, placeholder, onTextChange, className }: SearchInputProps) => {
+  const [internalValue, setInternalValue] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const isControlled = isPresent(value);
+  const displayValue = isControlled ? String(value) : internalValue;
 
   return (
     <$Search className={className}>
@@ -27,20 +32,21 @@ export const SearchInput = ({ placeholder, onTextChange, className }: SearchInpu
       <Input
         autoFocus
         ref={inputRef}
-        value={value}
+        value={displayValue}
         type={InputType.Search}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setValue(e.target.value);
-          onTextChange?.(e.target.value);
+          const newValue = e.target.value;
+          setInternalValue(newValue);
+          onTextChange?.(newValue);
         }}
         placeholder={placeholder}
         tw="max-w-full rounded-0"
       />
-      {value.length > 0 && (
+      {displayValue.length > 0 && (
         <$IconButton
           iconName={IconName.Close}
           onClick={() => {
-            setValue('');
+            setInternalValue('');
             onTextChange?.('');
           }}
           buttonStyle={ButtonStyle.WithoutBackground}

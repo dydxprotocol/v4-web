@@ -1,0 +1,204 @@
+import { ReactNode, useEffect, useState } from 'react';
+
+import { NumericFormat } from 'react-number-format';
+import styled, { css } from 'styled-components';
+
+import { Icon, IconName } from '@/components/Icon';
+
+type ValidationConfig = {
+  min?: number;
+  max?: number;
+  decimalScale?: number;
+};
+
+export type QuickButtonProps = {
+  options: string[];
+  onSelect?: (value: string) => void;
+  onOptionsEdit?: (options: string[]) => void;
+  currentValue?: string;
+  disabled?: boolean;
+  validation?: ValidationConfig;
+  prefix?: string;
+  suffix?: string;
+  slotRight?: ReactNode;
+};
+
+export const QuickButtons = ({
+  options,
+  onSelect,
+  onOptionsEdit,
+  currentValue,
+  disabled,
+  validation,
+  prefix,
+  suffix,
+  slotRight,
+}: QuickButtonProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValues, setEditValues] = useState<string[]>(options);
+
+  const handleEdit = () => {
+    setEditValues(options.map((o) => o.toString()));
+    setIsEditing(true);
+  };
+
+  const handleConfirmEdit = () => {
+    const validatedValues = editValues.map((value, i) => {
+      const numValue = parseFloat(value);
+
+      if (Number.isNaN(numValue)) {
+        return options[i]!;
+      }
+
+      let clamped = numValue;
+      if (validation?.min !== undefined) clamped = Math.max(clamped, validation.min);
+      if (validation?.max !== undefined) clamped = Math.min(clamped, validation.max);
+      const clampedString = clamped.toString();
+
+      const isDuplicate = options.includes(clampedString) && options.indexOf(clampedString) !== i;
+      if (isDuplicate) {
+        return options[i]!;
+      }
+
+      return clampedString;
+    });
+
+    onOptionsEdit?.(validatedValues);
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    setEditValues(options);
+  }, [options]);
+
+  const handleInputChange = (index: number, value: string) => {
+    const newEditValues = [...editValues];
+    newEditValues[index] = value;
+    setEditValues(newEditValues);
+  };
+
+  return (
+    <$QuickButtonsContainer>
+      {options.map((option, i) =>
+        isEditing ? (
+          <$InputQuickButtonContainer key={option}>
+            <$QuickButtonInput
+              allowNegative={false}
+              decimalScale={validation?.decimalScale ?? 2}
+              disabled={disabled}
+              value={editValues[i]}
+              onValueChange={(values: { value: string }) => handleInputChange(i, values.value)}
+              prefix={prefix}
+              suffix={suffix}
+            />
+          </$InputQuickButtonContainer>
+        ) : (
+          <$QuickButtonContainer
+            key={option}
+            onClick={() => onSelect?.(option)}
+            type="button"
+            isSelected={currentValue === option}
+            disabled={disabled}
+          >
+            <span tw="truncate">
+              {prefix}
+              {option}
+              {suffix}
+            </span>
+            {slotRight}
+          </$QuickButtonContainer>
+        )
+      )}
+      <$QuickButtonContainer
+        aria-label={isEditing ? 'Confirm' : 'Edit'}
+        type="button"
+        onClick={isEditing ? handleConfirmEdit : handleEdit}
+        disabled={disabled}
+        isEditing={isEditing}
+      >
+        <Icon iconName={isEditing ? IconName.Check : IconName.Pencil2} size="1rem" />
+      </$QuickButtonContainer>
+    </$QuickButtonsContainer>
+  );
+};
+
+const $QuickButtonInput = styled(NumericFormat)`
+  outline: 0;
+  border: 0;
+  min-width: 0;
+  background-color: transparent;
+  text-align: center;
+`;
+
+const $QuickButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 2.3125rem;
+  gap: 0.75rem;
+
+  & > *:not(:last-child) {
+    flex: 1;
+  }
+
+  & > *:last-child {
+    aspect-ratio: 1;
+    flex-shrink: 0;
+  }
+`;
+
+const QuickButtonContainerStyles = css`
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  height: 100%;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-layer-4);
+  padding: 0 0.5rem;
+  font: var(--font-base-medium);
+  color: var(--color-text-1);
+  min-width: 0;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: 0.3s var(--ease-out-expo);
+  }
+`;
+
+const $InputQuickButtonContainer = styled.div`
+  ${QuickButtonContainerStyles}
+
+  background-color: var(--color-layer-3);
+
+  &:focus-within {
+    background-color: var(--color-layer-4);
+    border-color: var(--color-layer-5);
+    color: var(--color-text-2);
+  }
+`;
+
+const $QuickButtonContainer = styled.button<{ isSelected?: boolean; isEditing?: boolean }>`
+  ${QuickButtonContainerStyles}
+
+  ${({ isSelected }) =>
+    isSelected &&
+    css`
+      background-color: var(--color-layer-4);
+    `}
+
+  ${({ isEditing }) =>
+    isEditing &&
+    css`
+      background-color: var(--color-accent-faded);
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    `}
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-layer-3);
+    }
+  }
+`;

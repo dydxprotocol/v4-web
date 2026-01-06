@@ -7,6 +7,8 @@ export const GlobalStyle = createGlobalStyle`
     --color-green: ${({ theme }) => theme.green};
     --color-red: ${({ theme }) => theme.red};
 
+    --color-red-faded: ${({ theme }) => theme.redFaded};
+    --color-green-faded: ${({ theme }) => theme.greenFaded};
     --color-white-faded: ${({ theme }) => theme.whiteFaded};
 
     --color-layer-0: ${({ theme }) => theme.layer0};
@@ -58,6 +60,8 @@ export const GlobalStyle = createGlobalStyle`
     --color-risk-low: ${({ theme }) => theme.riskLow};
     --color-risk-medium: ${({ theme }) => theme.riskMedium};
     --color-risk-high: ${({ theme }) => theme.riskHigh};
+
+    --color-input-background: ${({ theme }) => theme.inputBackground};
 
     --hover-filter-base: ${({ theme }) => theme.hoverFilterBase};
     --hover-filter-variant: ${({ theme }) => theme.hoverFilterVariant};

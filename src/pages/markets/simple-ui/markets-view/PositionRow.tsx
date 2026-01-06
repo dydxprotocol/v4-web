@@ -60,7 +60,7 @@ export const PositionRow = ({
       case PositionSortType.Leverage: {
         const marginUsage =
           subaccountEquity != null && subaccountEquity !== 0
-            ? position.marginValueInitial.div(subaccountEquity).toNumber()
+            ? position.marginValueInitialFromSelectedLeverage.div(subaccountEquity).toNumber()
             : undefined;
 
         return (
@@ -69,7 +69,7 @@ export const PositionRow = ({
               tw="text-color-text-2"
               withSubscript
               type={OutputType.Fiat}
-              value={position.marginValueInitial}
+              value={position.marginValueInitialFromSelectedLeverage}
             />
             <span tw="row gap-0.25 text-color-text-1 font-small-book">
               {marginUsage && (
@@ -180,7 +180,11 @@ export const PositionRow = ({
           <span tw="row gap-0.25 whitespace-nowrap leading-[1rem]">
             {market.displayableAsset}
             <Tag tw="bg-color-layer-4">
-              <Output type={OutputType.Multiple} value={position.leverage} tw="text-color-text-1" />
+              <Output
+                type={OutputType.Multiple}
+                value={position.effectiveSelectedLeverage}
+                tw="text-color-text-1"
+              />
             </Tag>
           </span>
           <span tw="row gap-0.25 font-small-book">

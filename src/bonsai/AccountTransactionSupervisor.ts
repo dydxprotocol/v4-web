@@ -43,7 +43,7 @@ import {
 import type { RootStore } from '@/state/_store';
 import { store as reduxStore } from '@/state/_store';
 import { getSubaccountId, getUserWalletAddress } from '@/state/accountInfoSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { createAppSelector } from '@/state/appTypes';
 import {
   cancelAllSubmitted,
@@ -54,7 +54,7 @@ import {
   placeOrderSubmitted,
   placeOrderTimeout,
 } from '@/state/localOrders';
-import { getLocalWalletNonce } from '@/state/walletSelectors';
+import { getLocalWalletNonce, selectIsKeplrConnected } from '@/state/walletSelectors';
 
 import { track } from '@/lib/analytics/analytics';
 import { calc } from '@/lib/do';
@@ -79,6 +79,7 @@ import { StateConditionNotifier, Tracker } from './StateConditionNotifier';
 import { getSimpleOrderStatus } from './calculators/orders';
 import { TradeFormPayload } from './forms/trade/types';
 import { PlaceOrderMarketInfo, PlaceOrderPayload } from './forms/triggers/types';
+import { getLazyLocalWallet } from './lib/lazyDynamicLibs';
 import { CompositeClientManager } from './rest/lib/compositeClientManager';
 import { estimateLiveValidatorHeight } from './selectors/apiStatus';
 
@@ -86,6 +87,7 @@ interface TransactionSupervisorShared {
   store: RootStore;
   compositeClientManager: typeof CompositeClientManager;
   stateNotifier: StateConditionNotifier;
+  maybeDydxLocalWallet?: LocalWallet | null;
 }
 
 const selectOrdersAndFills = createAppSelector(
@@ -111,10 +113,13 @@ export const SHORT_TERM_ORDER_DURATION_SAFETY_MARGIN = 5;
 export class AccountTransactionSupervisor {
   private store: RootStore;
 
+  private cachedDydxLocalWallet: LocalWallet | null;
+
   private shared: TransactionSupervisorShared;
 
   constructor(store: RootStore, compositeClientManager: typeof CompositeClientManager) {
     this.store = store;
+    this.cachedDydxLocalWallet = null;
 
     this.shared = {
       compositeClientManager,
@@ -130,9 +135,11 @@ export class AccountTransactionSupervisor {
     tracking?: Tracker<P, Q>
   ) {
     return async () => {
+      const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
+
       const result = await taskBuilder({ payload: basePayload })
         .with<AddSharedContextMiddlewareProps>(
-          addSharedContextMiddleware(nameForLogging, this.shared)
+          addSharedContextMiddleware(nameForLogging, { ...this.shared, maybeDydxLocalWallet })
         )
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         .with<StateTrackingProps<Q>>(stateTrackingMiddleware(tracking))
@@ -151,6 +158,28 @@ export class AccountTransactionSupervisor {
 
       return result;
     };
+  }
+
+  private async getCosmosLocalWallet() {
+    const state = this.store.getState();
+    const isKeplrConnected = selectIsKeplrConnected(state);
+
+    if (isKeplrConnected && window.keplr) {
+      if (this.cachedDydxLocalWallet) {
+        return this.cachedDydxLocalWallet;
+      }
+
+      const chainId = getSelectedDydxChainId(state);
+      const dydxOfflineSigner = await window.keplr.getOfflineSigner(chainId);
+      const dydxLocalWallet = await (
+        await getLazyLocalWallet()
+      ).fromOfflineSigner(dydxOfflineSigner);
+
+      this.cachedDydxLocalWallet = dydxLocalWallet;
+      return dydxLocalWallet;
+    }
+
+    return undefined;
   }
 
   private createCancelOrderPayload(orderId: string): CancelOrderPayload | undefined {
@@ -570,10 +599,15 @@ export class AccountTransactionSupervisor {
     payloadArg: PlaceOrderPayload,
     source: TradeMetadataSource
   ): Promise<OperationResult<any>> {
+    const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
+
     return (
       taskBuilder({ payload: payloadArg })
         .with<AddSharedContextMiddlewareProps>(
-          addSharedContextMiddleware('AccountTransactionSupervisor/placeOrderWrapper', this.shared)
+          addSharedContextMiddleware('AccountTransactionSupervisor/placeOrderWrapper', {
+            ...this.shared,
+            maybeDydxLocalWallet,
+          })
         )
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         // fully prepare/augment the trade payload
@@ -780,10 +814,14 @@ export class AccountTransactionSupervisor {
 
   public async closeAllPositions() {
     track(AnalyticsEvents.TradeCloseAllPositionsClick({}));
+    const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
 
     return taskBuilder({ payload: {} })
       .with<AddSharedContextMiddlewareProps>(
-        addSharedContextMiddleware('AccountTransactionSupervisor/closeAllPositions', this.shared)
+        addSharedContextMiddleware('AccountTransactionSupervisor/closeAllPositions', {
+          ...this.shared,
+          maybeDydxLocalWallet,
+        })
       )
       .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
       .with<{ closePayloads: PlaceOrderPayload[] }>(async (context, next) => {
@@ -846,10 +884,15 @@ export class AccountTransactionSupervisor {
     orderId: string;
     withNotification?: boolean;
   }) {
+    const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
+
     return (
       taskBuilder({ payload: { orderId, withNotification } })
         .with<AddSharedContextMiddlewareProps>(
-          addSharedContextMiddleware('AccountTransactionSupervisor/cancelOrder', this.shared)
+          addSharedContextMiddleware('AccountTransactionSupervisor/cancelOrder', {
+            ...this.shared,
+            maybeDydxLocalWallet,
+          })
         )
         .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
         // populate order details
@@ -944,10 +987,14 @@ export class AccountTransactionSupervisor {
 
   public async cancelAllOrders({ marketId }: { marketId?: string }) {
     track(AnalyticsEvents.TradeCancelAllOrdersClick({ marketId }));
+    const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
 
     return taskBuilder({ payload: { marketId } })
       .with<AddSharedContextMiddlewareProps>(
-        addSharedContextMiddleware('AccountTransactionSupervisor/cancelAllOrders', this.shared)
+        addSharedContextMiddleware('AccountTransactionSupervisor/cancelAllOrders', {
+          ...this.shared,
+          maybeDydxLocalWallet,
+        })
       )
       .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
       .with<{ ordersWithUuids: Array<{ order: SubaccountOrder; uuid: string }> }>(
@@ -1038,6 +1085,8 @@ export class AccountTransactionSupervisor {
     const hasStatefulOperations = isMainOrderStateful || (order.triggersPayloads?.length ?? 0) > 0;
 
     if (hasStatefulOperations) {
+      const maybeDydxLocalWallet = await this.getCosmosLocalWallet();
+
       return (
         taskBuilder({
           payload: {
@@ -1047,10 +1096,10 @@ export class AccountTransactionSupervisor {
           },
         })
           .with<AddSharedContextMiddlewareProps>(
-            addSharedContextMiddleware(
-              'AccountTransactionSupervisor/executeBulkStatefulOrders',
-              this.shared
-            )
+            addSharedContextMiddleware('AccountTransactionSupervisor/executeBulkStatefulOrders', {
+              ...this.shared,
+              maybeDydxLocalWallet,
+            })
           )
           .with<ValidateLocalWalletMiddlewareProps>(validateLocalWalletMiddleware())
           // Prepare payloads with current height and collect cancel/place operations
@@ -1396,6 +1445,10 @@ function validateLocalWalletMiddleware() {
     const state = context.shared.store.getState();
     const localWalletNonce = getLocalWalletNonce(state);
 
+    if (context.shared.maybeDydxLocalWallet) {
+      return next(context);
+    }
+
     if (localWalletNonce == null) {
       const errorMsg = 'No valid local wallet available';
       const errSource = context.fnName;
@@ -1420,14 +1473,16 @@ function addClientAndWalletMiddleware(store: RootStore) {
 
   return createMiddleware<AddClientAndWalletMiddlewareProps, AddSharedContextMiddlewareProps>(
     async (context, next) => {
-      const network = getSelectedNetwork(context.shared.store.getState());
-      const localWalletNonce = getLocalWalletNonce(context.shared.store.getState());
+      const state = context.shared.store.getState();
+      const network = getSelectedNetwork(state);
+      const localWalletNonce = getLocalWalletNonce(state);
 
       const clientConfig = {
         network,
         dispatch: context.shared.store.dispatch,
       };
       const clientWrapper = context.shared.compositeClientManager.use(clientConfig);
+      const maybeDydxLocalWallet = context.shared.maybeDydxLocalWallet;
 
       try {
         if (network !== networkBefore) {
@@ -1436,11 +1491,18 @@ function addClientAndWalletMiddleware(store: RootStore) {
         if (localWalletNonce !== nonceBefore) {
           throw new Error('Local wallet changed before operation execution');
         }
-        if (localWalletNonce == null) {
-          throw new Error('No valid local wallet nonce found');
-        }
 
-        const localWallet = localWalletManager.getLocalWallet(localWalletNonce);
+        const localWallet = calc(() => {
+          if (maybeDydxLocalWallet) {
+            return maybeDydxLocalWallet;
+          }
+
+          if (localWalletNonce == null) {
+            throw new Error('No valid local wallet nonce found');
+          }
+
+          return localWalletManager.getLocalWallet(localWalletNonce);
+        });
 
         if (localWallet == null) {
           throw new Error('Local wallet not initialized or nonce was incorrect.');

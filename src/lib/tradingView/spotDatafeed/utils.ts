@@ -1,59 +1,73 @@
 import { DateTime } from 'luxon';
 import type {
-  Bar,
   LibrarySymbolInfo,
   ResolutionString,
   Timezone,
 } from 'public/tradingview/charting_library';
 
-import { RESOLUTION_TO_SPOT_INTERVAL_MAP } from '@/constants/candles';
+import { RESOLUTION_TO_SPOT_INTERVAL_MAP, TradingViewBar } from '@/constants/candles';
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
+import { SpotApiBarObject, SpotApiBarsResolution } from '@/clients/spotApi';
 import { objectKeys } from '@/lib/objectHelpers';
-
-import { SpotCandleData, SpotCandleServiceInterval } from './types';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
-// Convert TradingView resolution to spot candle service interval
-export const resolutionToSpotInterval = (
-  resolution: ResolutionString
-): SpotCandleServiceInterval => {
+// Convert TradingView resolution to spot bars resolution
+export const resolutionToSpotInterval = (resolution: ResolutionString): SpotApiBarsResolution => {
   return RESOLUTION_TO_SPOT_INTERVAL_MAP[resolution] ?? '1D';
 };
 
 // Supported resolutions for spot charts
 export const SPOT_SUPPORTED_RESOLUTIONS = objectKeys(RESOLUTION_TO_SPOT_INTERVAL_MAP);
 
-// Transform single candle item for chart consumption
-export const transformSpotCandleForChart = (candle: SpotCandleData): Bar => {
+// Transform single bar item for chart consumption
+export const transformSpotCandleForChart = (bar: SpotApiBarObject): TradingViewBar => {
   return {
-    time: candle.t * 1000, // Convert to milliseconds
-    open: candle.o,
-    high: candle.h,
-    low: candle.l,
-    close: candle.c,
-    volume: candle.v_usd,
+    time: bar.t * 1000, // Convert to milliseconds
+    open: bar.o,
+    high: bar.h,
+    low: bar.l,
+    close: bar.c,
+    volume: parseFloat(bar.volume),
   };
 };
 
-// Transform array of candle data for chart consumption
-export const transformSpotCandlesForChart = (candles: SpotCandleData[]): Bar[] => {
-  return candles.map(transformSpotCandleForChart);
+// Transform array of bar data for chart consumption
+export const transformSpotCandlesForChart = (bars: SpotApiBarObject[]): TradingViewBar[] => {
+  return bars.map(transformSpotCandleForChart);
+};
+
+const getSpotPriceDecimals = (price?: number | null): number => {
+  if (!price || price <= 0) return 6;
+
+  const magnitude = Math.floor(Math.log10(Math.abs(price)));
+  const decimals = Math.max(0, SMALL_USD_DECIMALS - magnitude - 1);
+
+  return Math.min(decimals, 10);
 };
 
 // Create symbol info for spot tokens
-export const createSpotSymbolInfo = (tokenSymbol: string): LibrarySymbolInfo => {
+export const createSpotSymbolInfo = (
+  tokenMint: string,
+  tokenPrice?: number | null,
+  tokenName?: string,
+  tokenSymbol?: string
+): LibrarySymbolInfo => {
+  const decimals = getSpotPriceDecimals(tokenPrice);
+  const pricescale = 10 ** decimals;
+
   return {
-    ticker: tokenSymbol,
-    name: tokenSymbol,
-    description: tokenSymbol,
+    ticker: tokenMint,
+    name: `${tokenSymbol ?? tokenMint}/USD`,
+    description: tokenName ?? tokenSymbol ?? tokenMint,
     type: 'crypto',
     session: '24x7',
     timezone,
     exchange: 'Spot',
     listed_exchange: 'Spot',
     minmov: 1,
-    pricescale: 1000000,
+    pricescale,
     has_intraday: true,
     has_daily: true,
     has_weekly_and_monthly: true,

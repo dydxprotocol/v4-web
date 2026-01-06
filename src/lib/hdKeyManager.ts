@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { LocalWallet } from '@dydxprotocol/v4-client-js';
+import { Keypair } from '@solana/web3.js';
 
 import { Hdkey } from '@/constants/account';
 
@@ -59,14 +60,21 @@ class LocalWalletManager {
 
   private localNobleWallet: LocalWallet | undefined;
 
+  private localSolanaKeypair: Keypair | undefined;
+
   setStore(store: RootStore) {
     this.store = store;
   }
 
-  setLocalWallet(localWallet: LocalWallet, localNobleWallet: LocalWallet) {
+  setLocalWallet(
+    localWallet: LocalWallet,
+    localNobleWallet: LocalWallet,
+    localSolanaKeypair: Keypair
+  ) {
     this.localWalletNonce = this.localWalletNonce != null ? this.localWalletNonce + 1 : 0;
     this.localWallet = localWallet;
     this.localNobleWallet = localNobleWallet;
+    this.localSolanaKeypair = localSolanaKeypair;
 
     if (!this.store) {
       log('LocalWalletManager: store has not been set');
@@ -92,10 +100,19 @@ class LocalWalletManager {
     return this.localNobleWallet;
   }
 
+  getLocalSolanaKeypair(localWalletNonce: number): Keypair | undefined {
+    if (localWalletNonce !== this.localWalletNonce) {
+      return undefined;
+    }
+
+    return this.localSolanaKeypair;
+  }
+
   clearLocalWallet() {
     this.localWalletNonce = undefined;
     this.localWallet = undefined;
     this.localNobleWallet = undefined;
+    this.localSolanaKeypair = undefined;
     this.store?.dispatch(setLocalWalletNonce(undefined));
   }
 }

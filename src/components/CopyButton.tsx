@@ -16,6 +16,7 @@ export type CopyButtonProps = {
   buttonType?: 'text' | 'icon' | 'default';
   children?: React.ReactNode;
   onCopy?: () => void;
+  copyIconPosition?: 'start' | 'end';
 } & ButtonProps;
 
 export const CopyButton = ({
@@ -23,14 +24,20 @@ export const CopyButton = ({
   buttonType = 'default',
   children,
   onCopy,
+  copyIconPosition = buttonType === 'default' ? 'start' : 'end',
   ...buttonProps
 }: CopyButtonProps) => {
   const { copied, copy, tooltipString } = useCopyValue({ value, onCopy });
 
   return buttonType === 'text' ? (
     <$InlineRow onClick={copy} copied={copied}>
+      {copyIconPosition === 'start' && (
+        <$Icon $copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
+      )}
       {children}
-      <$Icon $copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
+      {copyIconPosition === 'end' && (
+        <$Icon $copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
+      )}
     </$InlineRow>
   ) : buttonType === 'icon' ? (
     <WithTooltip tooltipString={tooltipString}>
@@ -45,14 +52,16 @@ export const CopyButton = ({
   ) : (
     <Button
       {...buttonProps}
-      action={copied ? ButtonAction.Create : ButtonAction.Primary}
+      action={copied ? ButtonAction.Create : (buttonProps.action ?? ButtonAction.Primary)}
       onClick={copy}
     >
-      <Icon iconName={IconName.Copy} />
+      {copyIconPosition === 'start' && <Icon iconName={copied ? IconName.Check : IconName.Copy} />}
       {children ?? tooltipString}
+      {copyIconPosition === 'end' && <Icon iconName={copied ? IconName.Check : IconName.Copy} />}
     </Button>
   );
 };
+
 const $InlineRow = styled.div<{ copied: boolean }>`
   ${layoutMixins.inlineRow}
   cursor: pointer;

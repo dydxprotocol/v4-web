@@ -80,6 +80,7 @@ const reducer = createVanillaReducer({
 interface InputData {
   rawParentSubaccountData: ParentSubaccountDataBase | undefined;
   rawRelevantMarkets: MarketsData | undefined;
+  selectedMarketLeverages: { [marketId: string]: number };
   canViewAccount?: boolean;
 }
 
@@ -109,6 +110,13 @@ export interface SubaccountTransferPayload {
   destinationSubaccountNumber: number;
 }
 
+export interface SubaccountUpdateLeveragePayload {
+  senderAddress: string;
+  subaccountNumber: number;
+  clobPairId: number;
+  leverage: number;
+}
+
 interface SummaryData {
   accountBefore: AccountDetails;
   accountAfter: AccountDetails;
@@ -129,7 +137,12 @@ function calculateSummary(
     accountData.rawRelevantMarkets,
     state.childSubaccountNumber,
     (rawParentSubaccountData, rawRelevantMarkets, childSubaccountNumber) =>
-      getRelevantAccountDetails(rawParentSubaccountData, rawRelevantMarkets, childSubaccountNumber)
+      getRelevantAccountDetails(
+        rawParentSubaccountData,
+        rawRelevantMarkets,
+        accountData.selectedMarketLeverages,
+        childSubaccountNumber
+      )
   );
 
   const inputs = calc((): Partial<InputSummary> | undefined => {
@@ -266,6 +279,7 @@ function calculateSummary(
         getRelevantAccountDetails(
           applyOperationsToSubaccount(rawParentSubaccountData, operations),
           rawRelevantMarkets,
+          accountData.selectedMarketLeverages,
           childSubaccountNumber
         )
     );
@@ -433,15 +447,18 @@ function stringToNumberStringOrUndefined(num: string): string | undefined {
 function getRelevantAccountDetails(
   rawParentSubaccountData: ParentSubaccountDataBase,
   rawRelevantMarkets: MarketsData,
+  selectedMarketLeverages: { [marketId: string]: number },
   childSubaccountNumber: number
 ): AccountDetails {
   const calculatedAccount = calculateParentSubaccountSummary(
     rawParentSubaccountData,
-    rawRelevantMarkets
+    rawRelevantMarkets,
+    selectedMarketLeverages
   );
   const calculatedPositions = calculateParentSubaccountPositions(
     rawParentSubaccountData,
-    rawRelevantMarkets
+    rawRelevantMarkets,
+    selectedMarketLeverages
   );
   const relevantPositions = calculatedPositions.filter(
     (p) => p.subaccountNumber === childSubaccountNumber

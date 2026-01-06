@@ -11,8 +11,8 @@ import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { ConnectorType, EvmAddress, WalletNetworkType, wallets } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -59,7 +59,7 @@ const Profile = () => {
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
   const { sourceAccount, dydxAddress } = useAccounts();
-  const { disableConnectButton } = useComplianceState();
+  const { disableConnectButton } = usePerpetualsComplianceState();
 
   const { data: ensName } = useEnsName({
     address:

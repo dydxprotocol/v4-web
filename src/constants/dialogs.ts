@@ -46,7 +46,6 @@ export type ExternalLinkDialogProps = {
 };
 export type ExternalNavStrideDialogProps = {};
 export type FillDetailsDialogProps = { fillId: string };
-export type GeoComplianceDialogProps = {};
 export type GlobalCommandDialogProps = {};
 export type HelpDialogProps = {};
 export type ExternalNavKeplrDialogProps = {};
@@ -64,6 +63,7 @@ export type ReferralDialogProps = { refCode: string };
 export type RestrictedGeoDialogProps = { preventClose?: boolean };
 export type RestrictedWalletDialogProps = { preventClose?: boolean };
 export type SelectMarginModeDialogProps = {};
+export type SetMarketLeverageDialogProps = { marketId: string };
 export type SetupPasskeyDialogProps = { onClose: () => void };
 export type ShareAffiliateDialogProps = {};
 export type SharePNLAnalyticsDialogProps = {
@@ -143,7 +143,6 @@ export const DialogTypes = unionize(
     ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
     ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
     FillDetails: ofType<FillDetailsDialogProps>(),
-    GeoCompliance: ofType<GeoComplianceDialogProps>(),
     GlobalCommand: ofType<GlobalCommandDialogProps>(),
     Help: ofType<HelpDialogProps>(),
     ManageAccount: ofType<ManageAccountDialogProps>(),
@@ -159,6 +158,7 @@ export const DialogTypes = unionize(
     Referral: ofType<ReferralDialogProps>(),
     RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
     RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
+    SetMarketLeverage: ofType<SetMarketLeverageDialogProps>(),
     SetupPasskey: ofType<SetupPasskeyDialogProps>(),
     ShareAffiliate: ofType<ShareAffiliateDialogProps>(),
     SharePNLAnalytics: ofType<SharePNLAnalyticsDialogProps>(),

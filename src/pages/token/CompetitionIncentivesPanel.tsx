@@ -8,14 +8,13 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 import { StatsigFlags } from '@/constants/statsig';
 
-import { useChaosLabsPnlDistribution } from '@/hooks/rewards/hooks';
-import { NOV_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
+import { useClcPnlDistribution } from '@/hooks/rewards/hooks';
+import { DEC_2025_COMPETITION_DETAILS } from '@/hooks/rewards/util';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useNow } from '@/hooks/useNow';
 import { useStatsigGateValue } from '@/hooks/useStatsig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { ChaosLabsIcon } from '@/icons/chaos-labs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -37,14 +36,14 @@ export const CompetitionIncentivesPanel = () => {
 
 const September2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
-
-  const week = Math.floor((new Date().getUTCDate() - 1) / 7) + 1;
-
+  const now = new Date();
+  // December 2025 is the first month (Month 1)
+  // Calculate months difference from Dec 2025, and add 1 to make it "Month 1"
+  const monthNumber = (now.getUTCFullYear() - 2025) * 12 + (now.getUTCMonth() - 11) + 1;
+  // For endTime, set to last ms of current UTC month
   const endTime = (() => {
-    const date = new Date();
-    date.setUTCDate((week - 1) * 7);
-    date.setUTCHours(23, 59, 59, 999);
-    date.setUTCDate(date.getUTCDate() + 7);
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0)); // first of next month UTC
+    date.setTime(date.getTime() - 1);
     return date.toISOString();
   })();
 
@@ -57,9 +56,9 @@ const September2025RewardsPanel = () => {
               <div tw="font-medium-bold">
                 <span tw="font-bold">
                   {stringGetter({
-                    key: STRING_KEYS.COMPETITION_HEADLINE_NOV_2025,
+                    key: STRING_KEYS.COMPETITION_HEADLINE_DEC_2025_UPDATE_1,
                     params: {
-                      REWARD_AMOUNT: NOV_2025_COMPETITION_DETAILS.rewardAmount,
+                      REWARD_AMOUNT: DEC_2025_COMPETITION_DETAILS.rewardAmount,
                     },
                   })}
                 </span>
@@ -68,27 +67,40 @@ const September2025RewardsPanel = () => {
                 {stringGetter({ key: STRING_KEYS.ACTIVE })}
               </SuccessTag>
             </div>
-            <span>
-              <span tw="text-color-text-0">
+            <div>
+              <p tw="mb-0.5 text-color-text-0">
                 {stringGetter({
-                  key: STRING_KEYS.COMPETITION_BODY_NOV_2025,
+                  key: STRING_KEYS.COMPETITION_BODY_1_DEC_2025,
                   params: {
-                    REWARD_AMOUNT: NOV_2025_COMPETITION_DETAILS.rewardAmount,
+                    PROGRAM_LINK: (
+                      <Link href="https://www.mintscan.io/dydx/proposals/321" isInline>
+                        {stringGetter({ key: STRING_KEYS.COMPETITION_BODY_1_DEC_2025_LINK_TEXT })}
+                      </Link>
+                    ),
                   },
-                })}{' '}
-                <Link href="https://www.dydx.xyz/surge" isInline>
-                  {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
-                </Link>
-              </span>
-            </span>
+                })}
+              </p>
+              <p tw="text-color-text-0">
+                {stringGetter({
+                  key: STRING_KEYS.COMPETITION_BODY_2_DEC_2025,
+                  params: {
+                    HERE_LINK: (
+                      <Link href="https://www.dydx.xyz/liquidation-rebates" isInline>
+                        {stringGetter({ key: STRING_KEYS.HERE })}
+                      </Link>
+                    ),
+                  },
+                })}
+              </p>
+            </div>
           </div>
           <div tw="flex items-center gap-0.25 self-start rounded-3 bg-color-layer-1 px-0.875 py-0.5">
             <Icon iconName={IconName.Clock} size="1.25rem" tw="text-color-accent" />
             <div tw="flex gap-0.375">
               <div tw="text-color-accent">
                 {stringGetter({
-                  key: STRING_KEYS.WEEK_COUNTDOWN,
-                  params: { WEEK: week },
+                  key: STRING_KEYS.MONTH_COUNTDOWN,
+                  params: { MONTH: monthNumber },
                 })}
                 :
               </div>
@@ -105,7 +117,7 @@ const September2025RewardsPanel = () => {
 const Sept2025RewardsPanel = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { data: topPnls, isLoading } = useChaosLabsPnlDistribution();
+  const { data: topPnls, isLoading } = useClcPnlDistribution();
 
   const userReward = topPnls?.find((entry) => entry.address === dydxAddress)?.dollarReward ?? 0;
 
@@ -125,7 +137,7 @@ const Sept2025RewardsPanel = () => {
             })}
             slotTrigger={
               <div tw="row cursor-help gap-0.5 text-nowrap font-medium text-color-accent no-underline">
-                {stringGetter({ key: STRING_KEYS.WEEKLY_PRIZE })}
+                {stringGetter({ key: STRING_KEYS.ESTIMATED_PRIZE })}
                 <Icon iconName={IconName.InfoStroke} />
               </div>
             }
@@ -140,10 +152,6 @@ const Sept2025RewardsPanel = () => {
           </$Points>
         </div>
         <img src="/rewards-stars.svg" alt="reward-stars" tw="h-auto w-2 self-start" />
-      </div>
-
-      <div tw="flex items-center gap-[0.5em] self-end font-tiny-medium">
-        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
       </div>
     </div>
   );

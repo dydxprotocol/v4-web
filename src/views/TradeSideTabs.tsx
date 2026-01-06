@@ -59,6 +59,7 @@ export const TradeSideTabs = ({ sharedContent, className }: ElementProps & Style
 const tradeSideTabsType = getSimpleStyledOutputType(Tabs, {} as { activeTab: OrderSide });
 
 const $TradeSideTabs = styled(Tabs)<{ activeTab: OrderSide }>`
+  --tabs-height: 2.625rem;
   ${({ activeTab }) =>
     activeTab === OrderSide.BUY
       ? css`

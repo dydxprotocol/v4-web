@@ -179,7 +179,7 @@ export const MarketsBanners = ({
           <span tw="mr-0.25 rounded-[0.25rem] bg-color-accent px-0.25">
             {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE_ACCENT })}
           </span>{' '}
-          {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_TITLE })}
+          {stringGetter({ key: STRING_KEYS.NO_FEE_DECEMBER_BANNER_TITLE })}
         </span>
         <Link isAccent onClick={onClickNoFeeBanner} tw="font-base-medium">
           {stringGetter({ key: STRING_KEYS.NO_FEE_NOVEMBER_BANNER_CTA })} →

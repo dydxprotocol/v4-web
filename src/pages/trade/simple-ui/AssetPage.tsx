@@ -6,8 +6,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_VAULT_DEPOSIT_FOR_LAUNCH } from '@/constants/numbers';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
+import { usePerpetualsComplianceState } from '@/hooks/usePerpetualsComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -35,7 +35,7 @@ const AssetPage = () => {
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const { isViewingUnlaunchedMarket } = useCurrentMarketId();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
-  const { complianceState } = useComplianceState();
+  const { complianceState } = usePerpetualsComplianceState();
 
   if (currentMarketId == null) {
     return <LoadingSpace id="asset-page-loading" />;
@@ -81,7 +81,7 @@ const AssetPage = () => {
                 <WithTooltip tooltip="vault-apr-90d">
                   <MegaVaultYieldOutput
                     withLoading
-                    yieldType="ninetyDay"
+                    yieldType="thirtyDay"
                     tw="inline-block"
                     slotRight={<span>{stringGetter({ key: STRING_KEYS.APR })}</span>}
                   />
