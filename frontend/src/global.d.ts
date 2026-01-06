@@ -1,6 +1,9 @@
 import 'react';
 import type { ClassValue } from 'clsx';
-import type { IChartingLibraryWidget, ChartingLibraryWidgetOptions } from 'public/tradingview/charting_library';
+import type {
+  ChartingLibraryWidgetOptions,
+  IChartingLibraryWidget,
+} from 'public/tradingview/charting_library';
 
 declare global {
   interface Window {
