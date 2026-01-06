@@ -17,12 +17,22 @@ export const SizeSlider: FC = () => {
   const currentOrderSide = useWatch({ control, name: 'orderSide' });
 
   const effectiveMaxSize = (() => {
-    if (currentOrderSide === 'sell') return userBalanceInBaseAsset;
+    if (currentOrderSide === 'sell') {
+      return Number.isFinite(userBalanceInBaseAsset) && userBalanceInBaseAsset >= 0
+        ? userBalanceInBaseAsset
+        : 0;
+    }
 
-    const effectivePrice =
+    const parsedPrice =
       currentOrderExecutionType === 'limit' && currentPrice
         ? parseFloat(currentPrice)
         : currentQuoteAssetPrice;
+
+    const effectivePrice =
+      Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : currentQuoteAssetPrice;
+
+    if (!Number.isFinite(effectivePrice) || effectivePrice <= 0) return 0;
+    if (!Number.isFinite(userBalanceInQuoteAsset) || userBalanceInQuoteAsset < 0) return 0;
 
     return userBalanceInQuoteAsset / effectivePrice;
   })();
