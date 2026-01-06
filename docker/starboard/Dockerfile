@@ -46,7 +46,7 @@ COPY fuel-ts-sdk/package.json fuel-ts-sdk/codegen.yml fuel-ts-sdk/scalar-definit
 COPY contracts/package.json ./contracts/
 
 # Copy files needed by preinstall and postinstall scripts
-# COPY scripts ./scripts
+COPY frontend/scripts ./frontend/scripts
 COPY packages/tradingview.tgz ./packages/
 COPY indexer/schema.graphql ./indexer/
 
@@ -61,16 +61,22 @@ RUN export PNPM_HOME="/root/.local/share/pnpm" && \
 # Copy application code
 COPY . .
 
+# Ensure TradingView is extracted (in case COPY didn't preserve it from postinstall)
+RUN export NVM_DIR="$HOME/.nvm" && \
+    . ${HOME}/.nvm/nvm.sh && \
+    cd /starboard/frontend && \
+    ([ -f ../packages/tradingview.tgz ] && tar -xzC public -f ../packages/tradingview.tgz || true)
+
 # Build the application
 RUN export PNPM_HOME="/root/.local/share/pnpm" && \
     export PATH="$PNPM_HOME:${PATH}" && \
     export PATH="${HOME}/.fuelup/bin:${PATH}" && \
     export NVM_DIR="$HOME/.nvm" && \
     . ${HOME}/.nvm/nvm.sh && \
-    pnpm run build:ts-sdk && \
     pnpm --filter starboard/contracts build && \
     pnpm --filter starboard/contracts gen:types && \
     pnpm --filter @starboard/indexer build && \
+    pnpm --filter fuel-ts-sdk build && \
     pnpm --filter frontend build
 
 # Copy contract setup script
