@@ -44,5 +44,6 @@
       "self_closing_tag": true
     }
   },
-  "cSpell.words": ["Promiseable"]
+  "cSpell.words": ["Promiseable"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
