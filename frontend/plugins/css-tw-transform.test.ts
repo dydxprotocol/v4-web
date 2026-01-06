@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cssTwTransformPlugin } from './css-tw-transform';
+import { cssTwTransformPlugin } from './css-tw-transform.js';
 
 describe('cssTwTransformPlugin', () => {
   const plugin = cssTwTransformPlugin();
