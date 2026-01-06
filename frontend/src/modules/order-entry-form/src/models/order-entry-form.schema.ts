@@ -19,12 +19,35 @@ export const createOrderEntryFormSchema = (context: OrderEntryFormMetaContextTyp
       price: numericString,
       positionSize: numericString.min(1, 'Size is required'),
     })
+    .superRefine(function validateSize(data, ctx) {
+      if (!data.positionSize)
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['positionSize'],
+          message: 'Size is required',
+        });
+      if (toNumber(data.positionSize) === 0)
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['positionSize'],
+          message: 'Size must be greater than 0',
+        });
+    })
     .superRefine(function validatePrice(data, ctx) {
-      if (data.orderExecutionType === 'limit' && !data.price)
+      if (data.orderExecutionType !== 'limit') return;
+
+      if (!data.price)
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['price'],
           message: 'Price is required for limit orders',
+        });
+
+      if (toNumber(data.price) === 0)
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['price'],
+          message: 'Price must be greater than 0',
         });
     })
     .superRefine(function validateTriggerPrice(data, ctx) {
@@ -90,5 +113,5 @@ export const createOrderEntryFormSchema = (context: OrderEntryFormMetaContextTyp
 
 function toNumber(input: string): number {
   const num = parseFloat(input);
-  return isNaN(num) ? 0 : num;
+  return isNaN(num) ? -1 : num;
 }
