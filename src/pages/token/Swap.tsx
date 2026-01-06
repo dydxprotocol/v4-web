@@ -81,7 +81,6 @@ export const Swap = () => {
     );
     const dydx = {
       rawBalanceBigInt: parseUnits(`${usableDydxBalance}`, DYDX_DECIMALS),
-      formatted: MustBigNumber(usableDydxBalance).toFormat(2, BigNumber.ROUND_DOWN),
       rawBalance: usableDydxBalance,
     };
     const usableUsdcBalance = Math.max(
@@ -90,7 +89,6 @@ export const Swap = () => {
     );
     const usdc = {
       rawBalanceBigInt: parseUnits(`${usableUsdcBalance}`, USDC_DECIMALS),
-      formatted: MustBigNumber(usableUsdcBalance).toFormat(2, BigNumber.ROUND_DOWN),
       rawBalance: usableUsdcBalance,
     };
 
@@ -216,15 +214,11 @@ export const Swap = () => {
               onClick={() => setMaxAmount('exact-in')}
             >
               <CardHolderIcon />
-              {tokenBalances.inputBalance.formatted ? (
-                <Output
-                  value={tokenBalances.inputBalance.formatted}
-                  type={OutputType.Text}
-                  slotRight={` ${getTokenLabel(inputToken)}`}
-                />
-              ) : (
-                `- ${getTokenLabel(inputToken)}`
-              )}
+              <Output
+                value={tokenBalances.inputBalance.rawBalance}
+                type={OutputType.CompactNumber}
+                slotRight={` ${getTokenLabel(inputToken)}`}
+              />
             </Button>
           </div>
 
@@ -268,15 +262,11 @@ export const Swap = () => {
               tw="flex h-fit items-center gap-0.375 p-0 font-small-medium hover:[--button-textColor:var(--color-text-1)]"
             >
               <CardHolderIcon />
-              {tokenBalances.outputBalance.formatted ? (
-                <Output
-                  value={tokenBalances.outputBalance.formatted}
-                  type={OutputType.Text}
-                  slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
-                />
-              ) : (
-                `- ${getTokenLabel(otherToken(inputToken))}`
-              )}
+              <Output
+                value={tokenBalances.outputBalance.rawBalance}
+                type={OutputType.CompactNumber}
+                slotRight={` ${getTokenLabel(otherToken(inputToken))}`}
+              />
             </Button>
           </div>
           <div tw="flex items-center justify-between gap-0.5">
