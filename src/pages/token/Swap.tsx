@@ -46,7 +46,7 @@ import { addSwap } from '@/state/swaps';
 
 import { track } from '@/lib/analytics/analytics';
 import { escapeRegExp, numericValueRegex } from '@/lib/inputUtils';
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 
 type SwapMode = 'exact-in' | 'exact-out';
 function otherToken(currToken: 'usdc' | 'dydx') {
