@@ -1,5 +1,14 @@
 import 'react';
 import type { ClassValue } from 'clsx';
+import type { IChartingLibraryWidget, ChartingLibraryWidgetOptions } from 'public/tradingview/charting_library';
+
+declare global {
+  interface Window {
+    TradingView: {
+      widget: new (options: ChartingLibraryWidgetOptions) => IChartingLibraryWidget;
+    };
+  }
+}
 
 declare module 'react' {
   interface HTMLAttributes<T> {
