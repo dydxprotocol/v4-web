@@ -1,34 +1,17 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
-    "target": "ES2022",
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
-    "skipLibCheck": true,
-
-    /* Bundler mode */
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
     "jsx": "react-jsx",
-
-    /* Path mapping */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-
-    /* Linting */
-    "strict": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUnusedParameters": false
   },
   "include": ["src/**/*", "plugins/**/*", "vitest-env.d.ts"]
 }
