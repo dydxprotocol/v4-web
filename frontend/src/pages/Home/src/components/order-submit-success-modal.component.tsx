@@ -22,13 +22,25 @@ export const OrderSubmitSuccessModal: FC<OrderSubmitSuccessModalProps> = ({
       {formData && (
         <Flex direction="column" gap="2" mt="3">
           <div style={{ fontSize: '14px', fontFamily: 'monospace' }}>
-            <div><strong>Order Mode:</strong> {formData.orderMode}</div>
-            <div><strong>Execution Type:</strong> {formData.orderExecutionType}</div>
-            <div><strong>Side:</strong> {formData.orderSide}</div>
-            <div><strong>Position Size:</strong> {formData.positionSize}</div>
-            <div><strong>Price:</strong> {formData.price}</div>
+            <div>
+              <strong>Order Mode:</strong> {formData.orderMode}
+            </div>
+            <div>
+              <strong>Execution Type:</strong> {formData.orderExecutionType}
+            </div>
+            <div>
+              <strong>Side:</strong> {formData.orderSide}
+            </div>
+            <div>
+              <strong>Position Size:</strong> {formData.positionSize}
+            </div>
+            <div>
+              <strong>Price:</strong> {formData.price}
+            </div>
             {formData.triggerPrice && (
-              <div><strong>Trigger Price:</strong> {formData.triggerPrice}</div>
+              <div>
+                <strong>Trigger Price:</strong> {formData.triggerPrice}
+              </div>
             )}
           </div>
         </Flex>
