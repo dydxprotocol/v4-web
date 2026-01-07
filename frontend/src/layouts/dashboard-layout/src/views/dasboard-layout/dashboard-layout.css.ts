@@ -141,10 +141,10 @@ export const walletConnected = style({
 
 export const container = style({
   flex: 1,
-  maxWidth: '90rem',
   width: '100%',
-  margin: '0 auto',
-  padding: '1.5rem',
+  maxWidth: '100%',
+  margin: 0,
+  padding: 0,
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
