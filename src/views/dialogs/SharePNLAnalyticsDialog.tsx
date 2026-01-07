@@ -210,23 +210,25 @@ export const SharePNLAnalyticsDialog = ({
             />
           </div>
 
-          {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
-            <$QrCode
-              tw="rounded-0.25 bg-color-layer-3"
-              size={68}
-              value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
-              options={{
-                cells: {
-                  fill: 'var(--color-text-2)',
-                },
-                finder: {
-                  fill: 'var(--color-text-2)',
-                },
-              }}
-            />
-          ) : (
-            <div tw="mt-1 size-[68px]" />
-          )}
+          <div tw="w-full text-right">
+            {import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL ? (
+              <$QrCode
+                tw="rounded-0.25 bg-color-layer-3"
+                size={68}
+                value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
+                options={{
+                  cells: {
+                    fill: 'var(--color-text-2)',
+                  },
+                  finder: {
+                    fill: 'var(--color-text-2)',
+                  },
+                }}
+              />
+            ) : (
+              <div tw="mt-1 size-[68px]" />
+            )}
+          </div>
         </div>
       </$ShareableCard>
 
