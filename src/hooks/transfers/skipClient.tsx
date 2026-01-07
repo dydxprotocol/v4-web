@@ -134,12 +134,23 @@ const useSkipClientContext = () => {
   useEffect(() => {
     const signers: SignerGetters = {
       getSvmSigner: async () => {
-        if (sourceAccount.chain !== WalletNetworkType.Solana || !window.phantom?.solana) {
+        if (sourceAccount.chain !== WalletNetworkType.Solana) {
+          // || !window.phantom?.solana || !window.backpack?.connect) {
           throw new Error('no solana wallet connected');
         }
 
-        await window.phantom.solana.connect();
-        return (window as any).phantom.solana;
+        // Try Phantom first, then Backpack
+        if (window.phantom?.solana) {
+          await window.phantom.solana.connect();
+          return (window as any).phantom.solana;
+        }
+
+        if ((window as any).backpack) {
+          await (window as any).backpack.connect();
+          return (window as any).backpack;
+        }
+
+        throw new Error('no solana wallet connected');
       },
       getCosmosSigner: async (chainId: string) => {
         if (sourceAccount.chain !== WalletNetworkType.Cosmos) {

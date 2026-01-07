@@ -65,6 +65,7 @@ export enum WalletType {
   Phantom = 'PHANTOM',
   MetaMask = 'METAMASK',
   Turnkey = 'TURNKEY',
+  Backpack = 'BACKPACK',
 }
 
 export enum ConnectorType {
@@ -78,6 +79,7 @@ export enum ConnectorType {
   Privy = 'privy',
   PhantomSolana = 'phantomSolana',
   Turnkey = 'turnkey',
+  BackpackSolana = 'backpackSolana',
 }
 
 export enum WalletNetworkType {
@@ -96,6 +98,7 @@ export type WalletInfo =
         | ConnectorType.Coinbase
         | ConnectorType.WalletConnect
         | ConnectorType.PhantomSolana
+        | ConnectorType.BackpackSolana
         | ConnectorType.Privy;
       name: WalletType;
     }
@@ -227,9 +230,11 @@ export const OKX_MIPD_RDNS = 'com.okex.wallet';
 export const KEPLR_MIPD_RDNS = 'app.keplr';
 export const COINBASE_MIPD_RDNS = 'com.coinbase.wallet';
 export const METAMASK_MIPD_RDNS = 'io.metamask';
+export const BACKPACK_MIPD_RDNS = 'app.backpack';
 
 export const PHANTOM_DOWNLOAD_LINK = 'https://phantom.app/download';
 export const KEPLR_DOWNLOAD_LINK = 'https://www.keplr.app/get';
+export const BACKPACK_DOWNLOAD_LINK = 'https://www.backpack.app/download';
 
 export enum DydxChainAsset {
   USDC = 'usdc',

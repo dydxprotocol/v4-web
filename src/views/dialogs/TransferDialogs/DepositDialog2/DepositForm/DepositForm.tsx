@@ -119,7 +119,7 @@ export const DepositForm = ({
     }
 
     if (sourceAccount.chain === WalletNetworkType.Solana) {
-      return window.phantom?.solana;
+      return window.phantom?.solana ?? (window as any).backpack;
     }
 
     if (sourceAccount.chain === WalletNetworkType.Cosmos) {

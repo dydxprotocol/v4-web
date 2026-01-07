@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { type WalletType as CosmosWalletType } from 'graz';
 
 import {
+  BACKPACK_DOWNLOAD_LINK,
+  BACKPACK_MIPD_RDNS,
   COINBASE_MIPD_RDNS,
   ConnectorType,
   KEPLR_DOWNLOAD_LINK,
@@ -47,6 +49,10 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       (wallet) => wallet.detail.info.rdns === METAMASK_MIPD_RDNS
     );
 
+    const isBackpackDetected =
+      Boolean(window.ethereum?.isBackpack) ||
+      injectedWallets.findIndex((wallet) => wallet.detail.info.rdns === BACKPACK_MIPD_RDNS) !== -1;
+
     const otherInjectedWallets = injectedWallets
       .filter(
         (wallet) =>
@@ -58,7 +64,9 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           wallet.detail.info.rdns !== KEPLR_MIPD_RDNS &&
           // Remove Coinbase injected support because the regular Coinbase connector already supports
           // handling switching between injected/mobile/smart account
-          wallet.detail.info.rdns !== COINBASE_MIPD_RDNS
+          wallet.detail.info.rdns !== COINBASE_MIPD_RDNS &&
+          // Remove Backpack EVM
+          wallet.detail.info.rdns !== BACKPACK_MIPD_RDNS
       )
       .map(getWalletInfoFromInjectedWallet);
 
@@ -71,6 +79,17 @@ export const useDisplayedWallets = (): WalletInfo[] => {
           connectorType: ConnectorType.DownloadWallet,
           name: WalletType.Phantom,
           downloadLink: PHANTOM_DOWNLOAD_LINK,
+        };
+
+    const backpackWallet = isBackpackDetected
+      ? {
+          connectorType: ConnectorType.BackpackSolana,
+          name: WalletType.Backpack,
+        }
+      : {
+          connectorType: ConnectorType.DownloadWallet,
+          name: WalletType.Backpack,
+          downloadLink: BACKPACK_DOWNLOAD_LINK,
         };
 
     const keplrWallet = isKeplrDetected
@@ -108,6 +127,7 @@ export const useDisplayedWallets = (): WalletInfo[] => {
       injectedMetaMask && getWalletInfoFromInjectedWallet(injectedMetaMask),
       ...otherInjectedWallets,
       phantomWallet,
+      backpackWallet,
       keplrWallet,
       { connectorType: ConnectorType.WalletConnect, name: WalletType.WalletConnect2 },
       { connectorType: ConnectorType.Coinbase, name: WalletType.CoinbaseWallet },

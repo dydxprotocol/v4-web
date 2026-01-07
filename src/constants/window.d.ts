@@ -5,5 +5,6 @@ declare global {
     keplr?: Keplr;
     // need to add web3-react-phantom to get Phantom wallet import
     phantom?: any;
+    backpack?: any;
   }
 }

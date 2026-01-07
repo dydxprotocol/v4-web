@@ -36,6 +36,7 @@ import { testFlags } from '@/lib/testFlags';
 import { isWagmiConnectorType, isWagmiResolvedWallet, resolveWagmiConnector } from '@/lib/wagmi';
 import { parseWalletError } from '@/lib/wallet';
 
+import { useBackpackWallet } from './useBackpackWallet';
 import { useStringGetter } from './useStringGetter';
 
 const WalletConnectionContext = createContext<
@@ -72,6 +73,12 @@ export const useWalletConnectionContext = () => {
     connect: connectPhantom,
     disconnect: disconnectPhantom,
   } = usePhantomWallet();
+
+  const {
+    solAddress: solAddressBackpack,
+    connect: connectBackpack,
+    disconnect: disconnectBackpack,
+  } = useBackpackWallet();
 
   const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
     chainId: SUPPORTED_COSMOS_CHAINS,
@@ -113,12 +120,15 @@ export const useWalletConnectionContext = () => {
       dispatch(setSourceAddress({ address: solAddressPhantom, chain: WalletNetworkType.Solana }));
     } else if (walletInfo.connectorType === ConnectorType.Cosmos && dydxAddressGraz) {
       dispatch(setSourceAddress({ address: dydxAddressGraz, chain: WalletNetworkType.Cosmos }));
+    } else if (walletInfo.connectorType === ConnectorType.BackpackSolana && solAddressBackpack) {
+      dispatch(setSourceAddress({ address: solAddressBackpack, chain: WalletNetworkType.Solana }));
     }
   }, [
     sourceAccount.walletInfo,
     evmAddressWagmi,
     solAddressPhantom,
     dydxAddressGraz,
+    solAddressBackpack,
     dispatch,
     primaryTurnkeyWallet,
   ]);
@@ -204,6 +214,8 @@ export const useWalletConnectionContext = () => {
           }
         } else if (wallet.connectorType === ConnectorType.PhantomSolana) {
           await connectPhantom();
+        } else if (wallet.connectorType === ConnectorType.BackpackSolana) {
+          await connectBackpack();
         } else if (isWagmiConnectorType(wallet)) {
           if (!isConnectedWagmi && (!!forceConnect || !isEvmAccountConnected)) {
             const connector = resolveWagmiConnector({ wallet, walletConnectConfig });
@@ -229,7 +241,17 @@ export const useWalletConnectionContext = () => {
         }
       }
     },
-    [isConnectedGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login, connectPhantom]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      isConnectedGraz,
+      isConnectedWagmi,
+      signerWagmi,
+      ready,
+      authenticated,
+      login,
+      connectPhantom,
+      connectBackpack,
+    ]
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -240,6 +262,7 @@ export const useWalletConnectionContext = () => {
     if (isConnectedGraz) await disconnectGraz();
     if (authenticated) await logout();
     if (solAddressPhantom) await disconnectPhantom();
+    if (solAddressBackpack) await disconnectBackpack();
   }, [
     dispatch,
     isConnectedWagmi,
@@ -250,6 +273,8 @@ export const useWalletConnectionContext = () => {
     logout,
     solAddressPhantom,
     disconnectPhantom,
+    solAddressBackpack,
+    disconnectBackpack,
   ]);
 
   // Wallet selection

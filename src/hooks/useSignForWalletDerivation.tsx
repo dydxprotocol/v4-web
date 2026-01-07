@@ -10,6 +10,7 @@ import { usePhantomWallet } from '@/hooks/usePhantomWallet';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { useBackpackWallet } from './useBackpackWallet';
 import { useEnvConfig } from './useEnvConfig';
 
 export default function useSignForWalletDerivation(wallet: WalletInfo | undefined) {
@@ -35,6 +36,7 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
   );
 
   const { signMessage: phantomSignMessage } = usePhantomWallet();
+  const { signMessage: backpackSignMessage } = useBackpackWallet();
 
   const signSolanaMessage = useCallback(async (): Promise<string> => {
     const signature = await phantomSignMessage(stableStringify(signTypedData));
@@ -42,16 +44,25 @@ export default function useSignForWalletDerivation(wallet: WalletInfo | undefine
     return Buffer.from([0, ...signature]).toString('hex');
   }, [phantomSignMessage, signTypedData]);
 
+  const signBackpackMessage = useCallback(async (): Promise<string> => {
+    const signature = await backpackSignMessage(stableStringify(signTypedData));
+    return Buffer.from([0, ...signature]).toString('hex');
+  }, [backpackSignMessage, signTypedData]);
+
   const signMessage = useCallback(async (): Promise<string> => {
     if (wallet?.connectorType === ConnectorType.PhantomSolana) {
       return signSolanaMessage();
+    }
+
+    if (wallet?.connectorType === ConnectorType.BackpackSolana) {
+      return signBackpackMessage();
     }
 
     const isMetaMask =
       wallet?.connectorType === ConnectorType.Injected && wallet.name === 'MetaMask';
 
     return signEvmMessage(isMetaMask);
-  }, [signEvmMessage, signSolanaMessage, wallet?.connectorType, wallet?.name]);
+  }, [signEvmMessage, signSolanaMessage, signBackpackMessage, wallet?.connectorType, wallet?.name]);
 
   return signMessage;
 }
