@@ -12,3 +12,5 @@ export { CandleSchema } from './candles.schemas';
 export type { AssetPrice } from './asset-prices.entity';
 export type { AssetPriceRepository, GetAssetPricesOptions } from './asset-prices.port';
 export { AssetPriceSchema } from './asset-prices.schemas';
+
+export * from './asset.entity';

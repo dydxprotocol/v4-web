@@ -23,6 +23,20 @@ export const safeAssetId = (str?: string): AssetId | undefined => {
 };
 
 /**
+ * ContractId - Fuel contract identifier
+ */
+export const ContractIdSchema = z
+  .string()
+  .min(1, 'Contract ID cannot be empty')
+  .brand<'ContractId'>();
+export type ContractId = z.infer<typeof AssetIdSchema>;
+export const contractId = (str?: string): AssetId => AssetIdSchema.parse(str);
+export const safeContractId = (str?: string): AssetId | undefined => {
+  const result = AssetIdSchema.safeParse(str);
+  return result.success ? result.data : undefined;
+};
+
+/**
  * PositionStableId - Unique position identifier (permanent ID across all revisions)
  */
 export const PositionStableIdSchema = z

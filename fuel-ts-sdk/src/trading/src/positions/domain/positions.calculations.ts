@@ -1,4 +1,4 @@
-import { OraclePrice } from '@/shared/models/decimals';
+import { CollateralAmount, OraclePrice, RatioOutput } from '@/shared/models/decimals';
 import { BigIntMath, DecimalCalculator, zero } from '@/shared/utils/decimalCalculator';
 import type { Position } from './positions.entity';
 import { PositionChange, PositionSide, PositionStatus } from './positions.entity';
@@ -63,4 +63,28 @@ export function calculateEntryPrice(positionHistory: Position[]): OraclePrice {
   return DecimalCalculator.inNumerator(totalCollateralFormula)
     .inDenominator(totalSizeAddedFormula)
     .calculate(OraclePrice);
+}
+
+export function calculatePositionLeverage(position: Position): RatioOutput {
+  if (position.collateralAmount.value <= 0n) {
+    return zero(RatioOutput);
+  }
+
+  return DecimalCalculator.value(position.size)
+    .divideBy(position.collateralAmount)
+    .calculate(RatioOutput);
+}
+
+export function calculateTotalCollateral(positions: Position[]): CollateralAmount {
+  if (positions.length === 0) {
+    return zero(CollateralAmount);
+  }
+
+  let totalFormula = DecimalCalculator.value(positions[0].collateralAmount);
+
+  for (let i = 1; i < positions.length; i++) {
+    totalFormula = totalFormula.add(positions[i].collateralAmount);
+  }
+
+  return totalFormula.calculate(CollateralAmount);
 }
