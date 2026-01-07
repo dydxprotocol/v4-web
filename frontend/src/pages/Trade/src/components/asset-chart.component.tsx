@@ -4,9 +4,9 @@ import type { Candle, CandleInterval } from 'fuel-ts-sdk/trading';
 import { TradingChart } from '@/components/TradingChart';
 import { useTradingSdk } from '@/lib/fuel-ts-sdk';
 
-type AssetChartProps = { assetId: AssetId };
+type AssetChartProps = { assetId: AssetId; assetSymbol: string };
 
-export const AssetChart: FC<AssetChartProps> = ({ assetId }) => {
+export const AssetChart: FC<AssetChartProps> = ({ assetId, assetSymbol }) => {
   const tradingSdk = useTradingSdk();
 
   const getOrFetchCandles = useCallback(
@@ -24,5 +24,5 @@ export const AssetChart: FC<AssetChartProps> = ({ assetId }) => {
     [tradingSdk, assetId]
   );
 
-  return <TradingChart symbol="BTC-USD" candlesGetter={getOrFetchCandles} />;
+  return <TradingChart symbol={assetSymbol} candlesGetter={getOrFetchCandles} />;
 };
