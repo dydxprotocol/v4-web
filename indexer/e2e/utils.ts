@@ -98,30 +98,23 @@ export function expandDecimals(value: number, decimals: number = 6): string {
   return v.toString();
 }
 
-export function getUsdcConfig(): [string, number] {
-  return [
-    USDC_ASSET,
-    9, // asset_decimals
-  ];
-}
-
 export function getBtcConfig(): [string, number] {
   return [
     BTC_ASSET,
-    9, // asset_decimals
+    BTC_MAX_LEVERAGE, // max_leverage
   ];
 }
 
 export function getEthConfig(): [string, number] {
   return [
     ETH_ASSET,
-    9, // asset_decimals
+    ETH_MAX_LEVERAGE, // max_leverage
   ];
 }
 
 export function getBnbConfig(): [string, number] {
   return [
     BNB_ASSET,
-    9, // asset_decimals
+    BNB_MAX_LEVERAGE, // max_leverage
   ];
 }

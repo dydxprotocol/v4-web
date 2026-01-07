@@ -17,12 +17,14 @@ pnpm install
 
 # Compile the project
 pnpm build
+# or
+pnpm sqd build
 
 # Launch Postgres database to store the data
 docker compose up -d
 
 # Apply database migrations to create the target schema
-pnpm apply:migration
+pnpm sqd migration:apply
 
 # Run indexer
 node -r dotenv/config lib/main.js
@@ -113,3 +115,15 @@ Views are not generated from the schema, they are provided with custom migration
 See `db/migrations/1762648930785-Data.js` for instance.
 Such scripts are marked with the comment `// NON GENERATED MIGRATION`.
 In case the schema is changed, views may need to be updated as well - it must be done manually.
+
+## Model Generation - Codegen
+
+**NTICE.** Important when schemas are changed.
+
+There are two schema files: `schema.graphql` and `schema.derivatives.graphql`.
+Codegen tool generates ts source files from the schemas.
+Codegen is not in the chain of build process
+because it generates code incompatible with ECMAScript.
+Rather generated files are added to the repo.
+If any schema is changed, the model have to be regenerated manually and corrected:
+the extension `.js` needs to be added in import statements.

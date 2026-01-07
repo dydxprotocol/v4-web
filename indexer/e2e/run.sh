@@ -24,7 +24,7 @@ populate_events() {
       echo "Skipping population of events"
   else
       echo "Populating events"
-      ts-node $1
+      pnpm exec tsx $1
       if [ $? -ne 0 ]; then
           echo "Failed to execute the script"
           exit 1
