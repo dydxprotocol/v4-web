@@ -43,6 +43,7 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 
 import { getUserWalletAddress } from '@/state/accountInfoSelectors';
 import {
+  getIsAccountConnected,
   getSubaccountFreeCollateral,
   selectOrphanedTriggerOrders,
   selectReclaimableChildSubaccountFunds,
@@ -1076,12 +1077,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const dispatch = useAppDispatch();
       const stringGetter = useStringGetter();
       const isKeplr = useAppSelector(selectIsKeplrConnected);
+      const isAccountConnected = useAppSelector(getIsAccountConnected);
       const reclaimableChildSubaccountFunds = useAppSelector(selectReclaimableChildSubaccountFunds);
       const ordersToCancel = useAppSelector(selectOrphanedTriggerOrders);
       const maybeRebalanceAction = useAppSelector(selectShouldAccountRebalanceUsdc);
 
       useEffect(() => {
-        if (!isKeplr) return;
+        if (!isKeplr || !isAccountConnected) return;
 
         if (reclaimableChildSubaccountFunds && reclaimableChildSubaccountFunds.length > 0) {
           const amountBN = reclaimableChildSubaccountFunds.reduce(
@@ -1121,6 +1123,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         hideNotification,
         stringGetter,
         reclaimableChildSubaccountFunds,
+        isAccountConnected,
       ]);
 
       useEffect(() => {

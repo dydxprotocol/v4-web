@@ -16,19 +16,18 @@ import {
 import { useTurnkeyWallet } from '@/providers/TurnkeyWalletProvider';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { getGeo } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setLocalWallet } from '@/state/wallet';
 import { getSourceAccount } from '@/state/walletSelectors';
 
 import { hdKeyManager, localWalletManager } from '@/lib/hdKeyManager';
-import { onboardingManager } from '@/lib/onboarding/OnboardingSupervisor';
+import { onboardingManager, WalletDerivationResult } from '@/lib/onboarding/OnboardingSupervisor';
+import { deriveSolanaKeypairFromPrivateKey } from '@/lib/solanaWallet';
 import { dydxPersistedWalletService } from '@/lib/wallet/dydxPersistedWalletService';
 
 import { useCosmosWallets } from './useCosmosWallets';
 import { useDydxClient } from './useDydxClient';
-import { useEnvFeatures } from './useEnvFeatures';
 import { useLocalStorage } from './useLocalStorage';
 import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
@@ -47,8 +46,6 @@ const useAccountsContext = () => {
   const dispatch = useAppDispatch();
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { endTurnkeySession } = useTurnkeyWallet();
-  const { checkForGeo } = useEnvFeatures();
-  const geo = useAppSelector(getGeo);
 
   // Wallet connection
   const {
@@ -65,10 +62,6 @@ const useAccountsContext = () => {
   const sourceAccount = useAppSelector(getSourceAccount);
 
   const { ready, authenticated } = usePrivy();
-
-  const blockedGeo = useMemo(() => {
-    return geo.currentlyGeoBlocked && checkForGeo;
-  }, [geo, checkForGeo]);
 
   // dYdXClient Onboarding & Account Helpers
   const { indexerClient, getWalletFromSignature } = useDydxClient();
@@ -131,8 +124,15 @@ const useAccountsContext = () => {
       // Persist to SecureStorage for session restoration
       await dydxPersistedWalletService.secureStorePrivateKey(privateKey);
 
+      if (!privateKey) {
+        throw new Error('Could not derive keys from Turnkey signature');
+      }
+
+      const solanaKeypair = deriveSolanaKeypairFromPrivateKey(privateKey);
+
       setLocalDydxWallet(wallet);
       setLocalNobleWallet(nobleWallet);
+      setLocalSolanaKeypair(solanaKeypair);
       setHdKey(key);
       return wallet.address;
     },
@@ -151,6 +151,32 @@ const useAccountsContext = () => {
     }
   }, [localDydxWallet, localNobleWallet, localSolanaKeypair]);
 
+  const handleWalletConnectionResult = (result: WalletDerivationResult) => {
+    if (result.wallet) {
+      setLocalDydxWallet(result.wallet);
+    }
+
+    if (result.nobleWallet) {
+      setLocalNobleWallet(result.nobleWallet);
+    }
+
+    if (result.solanaKeypair) {
+      setLocalSolanaKeypair(result.solanaKeypair);
+    }
+
+    if (result.hdKey) {
+      setHdKey(result.hdKey);
+    }
+
+    // Dispatch onboarding state
+    dispatch(setOnboardingState(result.onboardingState));
+
+    // Handle disconnected state
+    if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
+      disconnectLocalDydxWallet();
+    }
+  };
+
   /**
    * Reconnect Side Effect - This is used to handle the reconnection flow when the user returns to the app.
    */
@@ -160,7 +186,6 @@ const useAccountsContext = () => {
         context: {
           sourceAccount,
           hasLocalDydxWallet,
-          blockedGeo,
           isConnectedGraz,
           authenticated,
           ready,
@@ -172,43 +197,17 @@ const useAccountsContext = () => {
       });
 
       // Handle the result
-      if (result.wallet) {
-        setLocalDydxWallet(result.wallet);
-      }
-
-      if (result.nobleWallet) {
-        setLocalNobleWallet(result.nobleWallet);
-      }
-
-      if (result.solanaKeypair) {
-        setLocalSolanaKeypair(result.solanaKeypair);
-      }
-
-      if (result.hdKey) {
-        setHdKey(result.hdKey);
-      }
-
-      // Dispatch onboarding state
-      dispatch(setOnboardingState(result.onboardingState));
-
-      // Handle disconnected state
-      if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
-        disconnectLocalDydxWallet();
-      }
+      handleWalletConnectionResult(result);
     })();
     // we don't want to re-run on `authenticated` or `ready` because this is for the Reconnection Flow
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispatch,
     signMessageAsync,
-    getCosmosOfflineSigner,
-    getWalletFromSignature,
     selectedDydxChainId,
     signerWagmi,
     isConnectedGraz,
     sourceAccount,
-    hasLocalDydxWallet,
-    blockedGeo,
   ]);
 
   // clear subaccounts when no dydxAddress is set
@@ -288,8 +287,6 @@ const useAccountsContext = () => {
     localNobleWallet,
     dydxAccounts,
     dydxAddress,
-    setLocalDydxWallet,
-    setLocalNobleWallet,
     setHdKey,
 
     // Cosmos wallets (on-demand)
@@ -302,6 +299,7 @@ const useAccountsContext = () => {
 
     // Onboarding state
     saveHasAcknowledgedTerms,
+    handleWalletConnectionResult,
 
     // Disconnect wallet / accounts
     disconnect,

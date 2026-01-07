@@ -64,7 +64,11 @@ export function setUpUsdcRebalanceLifecycle(store: RootStore) {
         const { localDydxWallet, parentSubaccountInfo, sourceAccount, rebalanceAction } = data!;
 
         // context: Cosmos wallets do not support our lifecycle methods and are instead handled within useNotificationTypes
-        if (rebalanceAction == null || sourceAccount.chain === WalletNetworkType.Cosmos) {
+        if (
+          rebalanceAction == null ||
+          sourceAccount.chain === WalletNetworkType.Cosmos ||
+          sourceAccount.chain == null
+        ) {
           return;
         }
 
