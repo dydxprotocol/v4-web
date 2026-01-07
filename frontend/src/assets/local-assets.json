@@ -1,0 +1,30 @@
+[
+  {
+    "contractId": "0x9534954321965C4B2dC45712AC3e7B575AFD43C38d2c9834bb5232f5F2BF2c6E",
+    "assetId": "0xda81350458510a2b4adfb85032ad319a61f271e9ccabe702c96696efc72bc6de",
+    "symbol": "sUSDC",
+    "name": "mckUSDC",
+    "decimals": 6
+  },
+  {
+    "contractId": "0x3D379cf47c26002BB165ed14014447565D2Eeb8E77e0a6cd5dda9db8E4Ac22Db",
+    "assetId": "0x3d784e98d0b5d1957ade15765c6d89e8335c42b71ada2745d2469fc238f828c2",
+    "symbol": "sbBTC",
+    "name": "mockBTC",
+    "decimals": 9
+  },
+  {
+    "contractId": "0x5e09347b1Eed0ed2c9c1617540Ddd69F43329622c89a351EdAd97431ebBE1D37",
+    "assetId": "0xf75352d02a6f453d4cb4e630b76aa828d35b4f9bbccc9bc3428cdb0232ecb4bd",
+    "symbol": "sbBNB",
+    "name": "mockBNB",
+    "decimals": 9
+  },
+  {
+    "contractId": "0xc2dc1D9158BB69c47801160cb9eC7Ebed285fB8cfC000DFDDeaA05E0BcCBb595",
+    "assetId": "0x7fecd8bae83a47fa10bc9e87d1fa4e8cb7dd427c69dd7e64b45e350082d6d094",
+    "symbol": "sbETH",
+    "name": "mockETH",
+    "decimals": 9
+  }
+]
