@@ -21,5 +21,5 @@ export const DashboardTradingChart: FC = () => {
     [asset, tradingSdk]
   );
 
-  return <TradingChart symbol="XHT/USDT" candlesGetter={getOrFetchCandles} />;
+  return <TradingChart symbol={asset?.symbol ?? '?'} candlesGetter={getOrFetchCandles} />;
 };

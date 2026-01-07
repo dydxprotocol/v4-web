@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
-import * as Select from '@radix-ui/react-select';
 import type { AssetId } from 'fuel-ts-sdk';
+import { Select } from 'radix-ui';
 import { useSdkQuery, useTradingSdk } from '@/lib/fuel-ts-sdk';
 import * as styles from './asset-select.css';
 

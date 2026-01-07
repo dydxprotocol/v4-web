@@ -1,4 +1,4 @@
-import * as Tabs from '@radix-ui/react-tabs';
+import { Tabs } from 'radix-ui';
 import { useController } from 'react-hook-form';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
 import { OrderEntryFormApiContext } from '../contexts';
