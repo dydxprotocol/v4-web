@@ -1,9 +1,7 @@
 import { Route, Routes } from 'react-router';
 import { DashboardLayout } from './layouts/dashboard-layout';
-import Home from './pages/Home';
-import NotFound from './pages/NotFound';
-import Trade from './pages/Trade';
 import { Dashboard } from './pages/Dashboard';
+import NotFound from './pages/NotFound';
 
 export default function App() {
   return (
@@ -11,10 +9,8 @@ export default function App() {
       <Routes>
         <Route element={<DashboardLayout />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/trade" element={<Trade />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

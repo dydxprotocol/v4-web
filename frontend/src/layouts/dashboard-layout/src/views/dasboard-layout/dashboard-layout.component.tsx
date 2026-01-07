@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router';
+import { Outlet } from 'react-router';
 import { NetworkSwitchContext } from '@/contexts/network-switch/network-switch.context';
 import { WalletContext } from '@/contexts/wallet/wallet.context';
 import { useRequiredContext } from '@/lib/use-required-context.hook';
@@ -28,14 +28,6 @@ export function DashboardLayout() {
       <header css={styles.header}>
         <div>
           <div css={styles.logo}>Starboard</div>
-          <nav css={styles.nav}>
-            <Link to="/" css={styles.navLink}>
-              Dashboard
-            </Link>
-            <Link to="/trade" css={styles.navLink}>
-              Trade
-            </Link>
-          </nav>
         </div>
 
         <AssetSelect />
