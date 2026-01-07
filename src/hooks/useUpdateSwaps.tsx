@@ -28,7 +28,7 @@ const SWAP_SLIPPAGE_PERCENT = '0.50'; // 0.50% (50 bps)
 export const useUpdateSwaps = () => {
   const { withdraw } = useSubaccount();
   const dispatch = useAppDispatch();
-  const { dydxAddress, getNobleAddress, getOsmosisAddress, getNeutronAddress } = useAccounts();
+  const { dydxAddress, getOsmosisAddress, getNeutronAddress, nobleAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
   const pendingSwaps = useAppSelector(getPendingSwaps);
@@ -73,8 +73,7 @@ export const useUpdateSwaps = () => {
       const { route } = swap;
 
       // Derive Cosmos addresses on-demand
-      const [nobleAddress, osmosisAddress, neutronAddress] = await Promise.all([
-        getNobleAddress(),
+      const [osmosisAddress, neutronAddress] = await Promise.all([
         getOsmosisAddress(),
         getNeutronAddress(),
       ]);
@@ -122,7 +121,7 @@ export const useUpdateSwaps = () => {
         },
       });
     },
-    [dispatch, dydxAddress, getNeutronAddress, getNobleAddress, getOsmosisAddress, skipClient]
+    [dispatch, dydxAddress, nobleAddress, getNeutronAddress, getOsmosisAddress, skipClient]
   );
 
   useEffect(() => {

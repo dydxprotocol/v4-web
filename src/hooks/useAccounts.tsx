@@ -106,6 +106,11 @@ const useAccountsContext = () => {
     [localSolanaKeypair]
   );
 
+  const nobleAddress = useMemo(
+    () => localNobleWallet?.address as string | undefined,
+    [localNobleWallet]
+  );
+
   useEffect(() => {
     dispatch(setLocalWallet({ address: dydxAddress, solanaAddress, subaccountNumber: 0 }));
   }, [dispatch, dydxAddress, solanaAddress]);
@@ -173,7 +178,7 @@ const useAccountsContext = () => {
 
     // Handle disconnected state
     if (result.onboardingState === OnboardingState.Disconnected && !result.wallet) {
-      disconnectLocalDydxWallet();
+      disconnectLocalWallets();
     }
   };
 
@@ -246,11 +251,13 @@ const useAccountsContext = () => {
   }, [dispatch, dydxSubaccounts]);
 
   // Disconnect wallet / accounts
-  const disconnectLocalDydxWallet = () => {
+  const disconnectLocalWallets = () => {
     // Clear persisted mnemonic from SecureStorage
     dydxPersistedWalletService.clearStoredWallet();
 
     setLocalDydxWallet(undefined);
+    setLocalNobleWallet(undefined);
+    setLocalSolanaKeypair(undefined);
     setHdKey(undefined);
     hdKeyManager.clearHdkey();
   };
@@ -261,8 +268,8 @@ const useAccountsContext = () => {
       await endTurnkeySession();
     }
 
-    // Disconnect local wallet
-    disconnectLocalDydxWallet();
+    // Disconnect local wallets
+    disconnectLocalWallets();
     selectWallet(undefined);
   };
 
@@ -284,10 +291,13 @@ const useAccountsContext = () => {
     // dYdX accounts
     hdKey,
     localDydxWallet,
-    localNobleWallet,
     dydxAccounts,
     dydxAddress,
     setHdKey,
+
+    // Noble accounts
+    localNobleWallet,
+    nobleAddress,
 
     // Cosmos wallets (on-demand)
     ...cosmosWallets,

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { logBonsaiInfo } from '@/bonsai/logs';
 import { BonsaiHelpers } from '@/bonsai/ontology';
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import { BalanceRequest, RouteRequest, RouteResponse } from '@skip-go/client';
 import { useQuery } from '@tanstack/react-query';
 import { orderBy, partition } from 'lodash';
@@ -33,18 +32,13 @@ import { AttemptBigNumber, MustBigNumber } from '@/lib/numbers';
 import { ALLOW_UNSAFE_BELOW_USD_LIMIT, MAX_ALLOWED_SLIPPAGE_PERCENT } from '../consts';
 
 export function useBalances() {
-  const { sourceAccount, dydxAddress } = useAccounts();
+  const { sourceAccount, dydxAddress, nobleAddress } = useAccounts();
   const { skipClient } = useSkipClient();
 
-  const { nobleAddress, osmosisAddress, neutronAddress } = useMemo(() => {
-    if (!dydxAddress)
-      return { nobleAddress: undefined, osmosisAddress: undefined, neutronAddress: undefined };
+  const { osmosisAddress, neutronAddress } = useMemo(() => {
+    if (!dydxAddress) return { osmosisAddress: undefined, neutronAddress: undefined };
 
     return {
-      nobleAddress: convertBech32Address({
-        address: dydxAddress as string,
-        bech32Prefix: NOBLE_BECH32_PREFIX,
-      }),
       osmosisAddress: convertBech32Address({
         address: dydxAddress as string,
         bech32Prefix: OSMO_BECH32_PREFIX,

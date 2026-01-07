@@ -5,9 +5,10 @@ export enum LocalStorageKey {
   DydxAddress = 'dydx.DydxAddress',
   OnboardingSelectedWallet = 'dydx.OnboardingSelectedWallet',
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
-  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
   KeplrCompliance = 'dydx.KeplrCompliance',
-  SolDerivedAddresses = 'dydx.SolDerivedAddresses',
+
+  EvmDerivedAddresses = 'dydx.EvmDerivedAddresses', // Deprecated
+  SolDerivedAddresses = 'dydx.SolDerivedAddresses', // Deprecated
 
   // Gas
   SelectedGasDenom = 'dydx.SelectedGasDenom',

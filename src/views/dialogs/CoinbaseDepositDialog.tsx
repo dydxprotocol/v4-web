@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { NOBLE_BECH32_PREFIX } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import { AnalyticsEvents } from '@/constants/analytics';
@@ -20,7 +19,6 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { QrCode } from '@/components/QrCode';
 import { SpotTabItem, SpotTabs } from '@/pages/spot/SpotTabs';
 
-import { convertBech32Address } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics/analytics';
 
 import { SpotDepositForm } from './TransferDialogs/DepositDialog2/SpotDepositForm';
@@ -33,15 +31,8 @@ export const CoinbaseDepositDialog = ({
   const stringGetter = useStringGetter();
   const [showCopyLogo, setShowCopyLogo] = useState(true);
   const [selectedTab, setSelectedTab] = useState<'perps' | 'spot'>('perps');
-  const { dydxAddress, solanaAddress } = useAccounts();
+  const { nobleAddress, solanaAddress } = useAccounts();
   const isSpotEnabled = useEnableSpot();
-
-  const nobleAddress =
-    dydxAddress &&
-    convertBech32Address({
-      address: dydxAddress as string,
-      bech32Prefix: NOBLE_BECH32_PREFIX,
-    });
 
   useEffect(() => {
     if (selectedTab === 'spot') {
