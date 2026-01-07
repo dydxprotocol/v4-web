@@ -12,8 +12,8 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    expect(screen.getByText('BUY')).toBeInTheDocument();
-    expect(screen.getByText('SELL')).toBeInTheDocument();
+    expect(screen.getByText('Buy')).toBeInTheDocument();
+    expect(screen.getByText('Sell')).toBeInTheDocument();
   });
 
   it('buy is selected by default', () => {
@@ -23,7 +23,7 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const buyButton = screen.getByText('BUY');
+    const buyButton = screen.getByText('Buy');
     expect(buyButton).toHaveAttribute('data-state', 'active');
   });
 
@@ -35,7 +35,7 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const sellButton = screen.getByText('SELL');
+    const sellButton = screen.getByText('Sell');
     await user.click(sellButton);
 
     expect(sellButton).toHaveAttribute('data-state', 'active');
@@ -49,10 +49,10 @@ describe('OrderSideSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const sellButton = screen.getByText('SELL');
+    const sellButton = screen.getByText('Sell');
     await user.click(sellButton);
 
-    const buyButton = screen.getByText('BUY');
+    const buyButton = screen.getByText('Buy');
     await user.click(buyButton);
 
     expect(buyButton).toHaveAttribute('data-state', 'active');

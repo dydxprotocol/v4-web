@@ -12,8 +12,8 @@ describe('OrderExecutionSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    expect(screen.getByText('MARKET')).toBeInTheDocument();
-    expect(screen.getByText('LIMIT')).toBeInTheDocument();
+    expect(screen.getByText('Market')).toBeInTheDocument();
+    expect(screen.getByText('Limit')).toBeInTheDocument();
   });
 
   it('market is selected by default', () => {
@@ -23,7 +23,7 @@ describe('OrderExecutionSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const marketButton = screen.getByText('MARKET');
+    const marketButton = screen.getByText('Market');
     expect(marketButton).toHaveAttribute('data-state', 'active');
   });
 
@@ -35,7 +35,7 @@ describe('OrderExecutionSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const limitButton = screen.getByText('LIMIT');
+    const limitButton = screen.getByText('Limit');
     await user.click(limitButton);
 
     expect(limitButton).toHaveAttribute('data-state', 'active');
@@ -49,10 +49,10 @@ describe('OrderExecutionSwitch', () => {
       </OrderEntryFormTestWrapper>
     );
 
-    const limitButton = screen.getByText('LIMIT');
+    const limitButton = screen.getByText('Limit');
     await user.click(limitButton);
 
-    const marketButton = screen.getByText('MARKET');
+    const marketButton = screen.getByText('Market');
     await user.click(marketButton);
 
     expect(marketButton).toHaveAttribute('data-state', 'active');
