@@ -10,7 +10,8 @@ export const button = style({
   cursor: 'pointer',
   transition: 'all 0.2s',
   marginTop: '0.5rem',
-  textTransform: 'uppercase',
+  textTransform: 'none',
+  letterSpacing: '0.01em',
 });
 
 export const disabledButton = style({

@@ -30,7 +30,7 @@ export const sellLabel = style({
 });
 
 export const value = style({
-  fontSize: '1.25rem',
+  fontSize: '1rem',
   color: '#fff',
   fontWeight: '600',
 });
@@ -44,7 +44,7 @@ export const fees = style({
 });
 
 export const feesLabel = style({
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
   color: '#999',
 });
 
@@ -52,6 +52,7 @@ export const feesLink = style({
   fontSize: '0.75rem',
   color: '#8b5cf6',
   cursor: 'pointer',
+  textTransform: 'none',
   ':hover': {
     textDecoration: 'underline',
   },
@@ -68,6 +69,7 @@ export const link = style({
   fontSize: '0.75rem',
   color: '#8b5cf6',
   cursor: 'pointer',
+  textTransform: 'none',
   ':hover': {
     textDecoration: 'underline',
   },

@@ -8,7 +8,7 @@ export function SubmitButton() {
   const orderSide = useWatch({ control, name: 'orderSide' });
 
   const formState = useFormState({ control });
-  const buttonText = `${orderSide.toUpperCase()} STARBOARD TOKEN`;
+  const buttonText = `${orderSide === 'buy' ? 'Buy' : 'Sell'} Starboard Token`;
 
   return (
     <button

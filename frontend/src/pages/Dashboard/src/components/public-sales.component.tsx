@@ -22,7 +22,7 @@ const MOCK_TRADES: Trade[] = [
 export function PublicSales() {
   return (
     <div css={styles.container}>
-      <h2 css={styles.title}>PUBLIC SALES</h2>
+      <h2 css={styles.title}>Public Sales</h2>
       <div css={styles.tableContainer}>
         <table css={styles.table}>
           <thead>

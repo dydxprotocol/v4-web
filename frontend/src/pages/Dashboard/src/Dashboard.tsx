@@ -52,7 +52,7 @@ export function Dashboard() {
             <PublicSales />
           </div>
           <div css={styles.orderEntryContainer}>
-            <h2 css={styles.orderEntryTitle}>ORDER ENTRY</h2>
+            <h2 css={styles.orderEntryTitle}>Order Entry</h2>
             <div css={styles.orderEntryFormWrapper}>
               <OrderEntryForm
                 baseAssetName="XHT"

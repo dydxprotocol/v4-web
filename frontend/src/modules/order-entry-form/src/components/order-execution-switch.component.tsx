@@ -14,7 +14,7 @@ export function OrderExecutionSwitch() {
       <Tabs.List css={styles.tabsList}>
         {ORDER_EXECUTION_TYPES.map((type) => (
           <Tabs.Trigger key={type} value={type} css={styles.tabsTrigger}>
-            {type.toUpperCase()}
+            {type.charAt(0).toUpperCase() + type.slice(1)}
           </Tabs.Trigger>
         ))}
       </Tabs.List>

@@ -11,7 +11,7 @@ export function OrderModeSelect() {
 
   return (
     <div css={styles.container}>
-      <label css={styles.label}>Order mode:</label>
+      <label css={styles.label}>Order mode</label>
       <Select.Root value={field.value} onValueChange={field.onChange}>
         <Select.Trigger css={styles.selectTrigger}>
           <Select.Value />

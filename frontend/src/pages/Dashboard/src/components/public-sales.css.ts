@@ -11,8 +11,8 @@ export const title = style({
   fontWeight: 600,
   color: '#e2e8f0',
   marginBottom: '1rem',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
+  textTransform: 'none',
+  letterSpacing: '0.01em',
 });
 
 export const tableContainer = style({

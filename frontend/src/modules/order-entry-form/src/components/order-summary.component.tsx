@@ -20,9 +20,9 @@ export function OrderSummary() {
     <div css={styles.container}>
       <div css={styles.row}>
         <span css={[styles.label, orderSide === 'buy' ? styles.buyLabel : styles.sellLabel]}>
-          {orderSide.toUpperCase()}
+          {orderSide === 'buy' ? 'Buy' : 'Sell'}
         </span>
-        <span css={styles.label}>Order Price:</span>
+        <span css={styles.label}>Order price:</span>
       </div>
       <div css={styles.row}>
         <span css={styles.value}>
@@ -31,12 +31,12 @@ export function OrderSummary() {
       </div>
       <div css={styles.fees}>
         <span css={styles.feesLabel}>Fees:</span>
-        <span css={styles.feesLink}>VIEW MY FEES</span>
+        <span css={styles.feesLink}>View my fees</span>
       </div>
       <div css={styles.links}>
-        <span css={styles.link}>{orderSide === 'buy' ? baseAssetName : quoteAssetName} INFO</span>
+        <span css={styles.link}>{orderSide === 'buy' ? baseAssetName : quoteAssetName} info</span>
         <span css={styles.separator}>|</span>
-        <span css={styles.link}>VIEW ALL PRICES</span>
+        <span css={styles.link}>View all prices</span>
       </div>
     </div>
   );

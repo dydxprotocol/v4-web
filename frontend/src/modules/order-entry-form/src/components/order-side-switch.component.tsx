@@ -14,7 +14,7 @@ export function OrderSideSwitch() {
       <Tabs.List css={styles.tabsList}>
         {ORDER_SIDES.map((side) => (
           <Tabs.Trigger key={side} value={side} css={styles.tabsTrigger} data-side={side}>
-            {side.toUpperCase()}
+            {side.charAt(0).toUpperCase() + side.slice(1)}
           </Tabs.Trigger>
         ))}
       </Tabs.List>
